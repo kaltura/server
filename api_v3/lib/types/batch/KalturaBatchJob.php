@@ -407,9 +407,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kRecalculateResponseProfileCacheJobData':
 				$this->data = new KalturaRecalculateResponseProfileCacheJobData();
 				break;
-			case 'kLiveToVodJobData':
-				$this->data = new KalturaLiveToVodJobData();
-				break;
 				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
@@ -633,11 +630,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 							$this->data = new KalturaRecalculateResponseProfileCacheJobData();
 						break;
 				}
-				break;
-			case KalturaBatchJobType::LIVE_TO_VOD:
-				$dbData = new kLiveToVodJobData();
-				if(is_null($this->data))
-					$this->data = new KalturaLiveToVodJobData();
 				break;
 				
 			default:

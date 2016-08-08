@@ -43,5 +43,4 @@ interface BatchJobType extends BaseEnum
 	const SYNC_CATEGORY_PRIVACY_CONTEXT = 39;
 	const LIVE_REPORT_EXPORT = 40;
 	const RECALCULATE_CACHE = 41;
-	const LIVE_TO_VOD = 42;
 }
