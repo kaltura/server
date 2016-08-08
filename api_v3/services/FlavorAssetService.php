@@ -23,7 +23,7 @@ class FlavorAssetService extends KalturaAssetService
 			$actionName == 'convert' ||
 			$actionName == 'reconvert' ||
 			$actionName == 'setContent' || 
-			$actionname == 'serveAdStitchCmd'
+			$actionName == 'serveAdStitchCmd'
 			)
 		{
 			$this->partnerGroup .= ',0';
