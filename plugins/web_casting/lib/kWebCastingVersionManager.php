@@ -3,7 +3,7 @@
  * @package plugins.webCasting
  * @subpackage lib
  */
-class kCaptureSpaceVersionManager{
+class kWebCastingVersionManager{
     const INI_FILE_NAME = 'webCastingInfo.ini';
 
 //    private static $supportedOS = array(
