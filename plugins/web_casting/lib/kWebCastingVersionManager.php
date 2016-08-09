@@ -29,7 +29,6 @@ class kWebCastingVersionManager{
     }
 
     // Implement actual logic
-    //
     private static function internalGetVersionInfo($serverDefinedMinimalVersion,
                                                    $serverDefinedRecommendedVersion,
                                                    $serverDefinedURL,
@@ -38,17 +37,40 @@ class kWebCastingVersionManager{
                                                    $UIConfDefinedURL)
     {
         KalturaLog::debug('$serverDefinedMinimalVersion = ' . $serverDefinedMinimalVersion .
-            '$serverDefinedRecommendedVersion = ' . $serverDefinedRecommendedVersion .
-            '$serverDefinedURL = ' . $serverDefinedURL .
-            '$UIConfDefinedMinimalVersion = ' . $UIConfDefinedMinimalVersion .
-            '$UIConfDefinedIgnoreOptionalUpdates = ' . $UIConfDefinedIgnoreOptionalUpdates .
-            '$UIConfDefinedURL = ' . $UIConfDefinedURL);
-
+            ' $serverDefinedRecommendedVersion = ' . $serverDefinedRecommendedVersion .
+            ' $serverDefinedURL = ' . $serverDefinedURL .
+            ' $UIConfDefinedMinimalVersion = ' . $UIConfDefinedMinimalVersion .
+            ' $UIConfDefinedIgnoreOptionalUpdates = ' . $UIConfDefinedIgnoreOptionalUpdates .
+            ' $UIConfDefinedURL = ' . $UIConfDefinedURL);
 
         $response = new KalturaWebCastingVersionInfo();
-        $response->url = "http://www.kaltura.com/";
-        $response->minimalVersion = "1.2.3.4";
-        $response->recommendedVersion = "2.3.4.5";
+
+        // we have a $UIConfDefinedMinimalVersion and its higher
+        if ($UIConfDefinedMinimalVersion && version_compare($UIConfDefinedMinimalVersion, $serverDefinedMinimalVersion) > 0)
+        {
+            $response->minimalVersion = $UIConfDefinedMinimalVersion;
+            $response->url = $UIConfDefinedURL;
+        }
+        else
+        {
+            $response->minimalVersion = $serverDefinedMinimalVersion;
+            $response->url = $serverDefinedURL;
+        }
+
+        if ($UIConfDefinedIgnoreOptionalUpdates)
+        {
+            $response->recommendedVersion = $response->minimalVersion;
+        }
+        else
+        {
+            $response->recommendedVersion = $serverDefinedRecommendedVersion;
+
+            // if $serverDefinedRecommendedVersion >= $response->minimalVersion
+            if (version_compare($response->minimalVersion, $serverDefinedRecommendedVersion) >= 0)
+            {
+                $response->url = $serverDefinedURL;
+            }
+        }
 
         return $response;
     }
@@ -70,7 +92,7 @@ class kWebCastingVersionManager{
 
         $config = json_decode($ui_conf->getConfig(), true);
         $UIConfDefinedMinimalVersion = array_key_exists("minimalVersion", $config) ? $config["minimalVersion"] : null;
-        $UIConfDefinedIgnoreOptionalUpdates = array_key_exists("ignoreOptionalUpdates", $config) ? $config["ignoreOptionalUpdates"] : null;
+        $UIConfDefinedIgnoreOptionalUpdates = array_key_exists("ignoreOptionalUpdates", $config) ? $config["ignoreOptionalUpdates"] : false;
         $UIConfDefinedURL = $ui_conf->getSwfUrl();
 
         return self::internalGetVersionInfo($serverDefinedMinimalVersion,
