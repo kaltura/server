@@ -18,14 +18,7 @@ class WebCastingService extends KalturaBaseService
     function getVersionInfoAction($os, $UIConfId = null)
     {
         $versionManager = new kWebCastingVersionManager();
-        $versionManager->getVersionInfo($os, $UIConfId);
-
-        $response = new KalturaWebCastingVersionInfo();
-        $response->url = "http://www.kaltura.com/" . $UIConfId;
-        $response->minimalVersion = "1.2.3.4";
-        $response->recommendedVersion = "2.3.4.5";
-
-        return $response;
+        return $versionManager->getVersionInfo($os, $UIConfId);
     }
 }
 
