@@ -51,8 +51,8 @@ class kWebCastingVersionManager{
         if (!$ui_conf)
             throw new KalturaAPIException(WebCastingErrors::UI_CONF_NOT_FOUND, $UIConfId);
 
-        $config = json_decode($ui_conf->getConfig());
-        KalturaLog::debug('gonfig after json_decode ' . print_r($config, true));
+        $config = json_decode($ui_conf->getConfig(), true);
+        KalturaLog::debug('config after json_decode ' . print_r($config, true));
 
         $UIConfDefinedMinimalVersion = $config["minimalVersion"];
         $ignoreOptionalUpdates = $config["ignoreOptionalUpdates"];
