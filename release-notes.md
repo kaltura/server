@@ -1,5 +1,16 @@
 # Kajam 11.21.0 #
 
+## Modify scheduling consumer to update sphinx on events ##
+ - Issue Type: Task
+ - Issue ID: PLAT-5673
+
+### Configuration ###
+- None
+
+### Deployment scripts ###
+re-populate sphinx Schedule Events.
+Run the schedule population sphinx script: php /opt/kaltura/app/deployment/base/scripts/populateSphinxScheduleEvents.php
+
 ## Modify kaltura_cue_point sphinx index columns from int to text field (for better sphinx querying) ##
 
  - Issue Type: Bug
