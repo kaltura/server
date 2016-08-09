@@ -36,14 +36,29 @@ class kWebCastingVersionManager{
         if (!$osSpecificConfig)
             throw new KalturaAPIException(WebCastingErrors::UNKNOWN_OS, $os);
 
-        KalturaLog::debug('got ' . $osSpecificConfig . ' from getConfig for os ' . $os);
+        KalturaLog::debug('got ' . print_r($osSpecificConfig, true) . ' from getConfig for os ' . $os);
+
+        $serverDefinedMinimalVersion = $osSpecificConfig->minimalVersion;
+        $serverDefinedRecommended = $osSpecificConfig->recommendedVersion;
+        $serverDefinedURL = $osSpecificConfig->installationURL;
+
+        KalturaLog::debug('$serverDefinedMinimalVersion = ' . $serverDefinedMinimalVersion);
+        KalturaLog::debug('$serverDefinedRecommended = ' . $serverDefinedRecommended);
+        KalturaLog::debug('$serverDefinedURL = ' . $serverDefinedURL);
+
 
         $ui_conf = uiConfPeer::retrieveByPK($UIConfId);
         if (!$ui_conf)
             throw new KalturaAPIException(WebCastingErrors::UI_CONF_NOT_FOUND, $UIConfId);
 
-        KalturaLog::debug('got uiconf: ' . print_r($ui_conf, true));
-        KalturaLog::debug('UIConf->getConfig() ' . print_r($ui_conf->getConfig(), true));
-        KalturaLog::debug('UIConf->getSwfUrl() ' . print_r($ui_conf->getSwfUrl(), true));
+        $UIConfDefinedMinimalVersion = $ui_conf->getConfig()->minimalVersion;
+        $ignoreOptionalUpdates = $ui_conf->getConfig()->ignoreOptionalUpdates;
+        $UIConfDefinedURL = $ui_conf->getSwfUrl();
+        KalturaLog::debug('$UIConfDefinedMinimalVersion = ' . $UIConfDefinedMinimalVersion);
+        KalturaLog::debug('$ignoreOptionalUpdates = ' . $ignoreOptionalUpdates);
+        KalturaLog::debug('$UIConfDefinedURL = ' . $UIConfDefinedURL);
+
+
+
     }
 }
