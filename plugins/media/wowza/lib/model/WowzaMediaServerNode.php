@@ -43,7 +43,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$url = "$protocol://$playbackHost";
 		$url = str_replace("{hostName}", $hostname, $url);
 		return $url;
-		
 	}
 	
 	public function getLiveWebServiceName()
@@ -128,15 +127,18 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $port;
 	}
 	
-	public function getApplicationPrefix($mediaServerConfig)
+	public function getApplicationPrefix()
 	{
-		$appPrefix = "";
+		$appPrefix = $this->getAppPrefix();
+		if(!$appPrefix)
+			return "";
 
-		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
-		
-		if(!is_null($this->getAppPrefix()))
-			$appPrefix = $this->getAppPrefix();
-		
+		$hostname = $this->getHostname();
+		if(!$this->getIsExternalMediaServer())
+			$hostname = preg_replace('/\..*$/', '', $hostname);
+
+		$appPrefix = str_replace("{hostName}", $hostname, $appPrefix);
+
 		return $appPrefix;
 	}
 	

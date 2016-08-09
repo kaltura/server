@@ -85,10 +85,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	public function buildServeFlavors() 
 	{
-		$flavors = array();
-		$baseUrl = $this->liveStreamConfig->getUrl();
-		$flavors[] = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
-		
+		$flavors = $this->buildHttpFlavorsArray();
 		return $flavors;
 	}
 	
@@ -110,6 +107,120 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function checkIsLive($url) {
 		throw new Exception('Status cannot be determined for live stream protocol. Delivery Profile ID: '.$this->getId());
+	}
+
+	protected function buildHttpFlavorsArray()
+	{
+		$flavors = array();
+
+		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
+
+		if(!count($liveEntryServerNodes))
+			return $flavors;
+
+		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
+		{
+			/* @var $liveEntryServerNode LiveEntryServerNode */
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if($serverNode)
+			{
+				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				{
+					$httpUrl = $this->getFlavorHttpUrl($serverNode);
+					$flavors = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
+				}
+			}
+		}
+
+		$liveEntryServerNode = array_shift($liveEntryServerNodes);
+		$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+		if ($serverNode)
+		{
+			$httpUrl = $this->getFlavorHttpUrl($serverNode);
+			$flavors = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
+		}
+
+		return $flavors;
+	}
+
+	protected function getStreamName()
+	{
+		$flavorParamsIds = $this->getDynamicAttributes()->getFlavorParamIds();
+		$streamName = $this->getDynamicAttributes()->getEntryId();
+		$entry = entryPeer::retrieveByPK($streamName);
+
+		$tag = $this->getDynamicAttributes()->getTags();
+		if(is_null($tag) && ($entry->getConversionProfileId() || $entry->getType() == entryType::LIVE_CHANNEL))
+			$tag = 'all';
+
+		if(count($flavorParamsIds) === 1)
+		{
+			$streamName .= '_' . reset($flavorParamsIds);
+		}
+		elseif(count($flavorParamsIds) > 1)
+		{
+			sort($flavorParamsIds);
+			$tag = implode('_', $flavorParamsIds);
+			$streamName = "smil:{$streamName}_{$tag}.smil";
+		}
+		elseif($tag)
+		{
+			$streamName = "smil:{$streamName}_{$tag}.smil";
+		}
+
+		return $streamName;
+	}
+
+	protected function getQueryAttributes()
+	{
+		$flavorParamsIds = $this->getDynamicAttributes()->getFlavorParamIds();
+		$streamName = $this->getDynamicAttributes()->getEntryId();
+		$entry = entryPeer::retrieveByPK($streamName);
+
+		$queryString = array();
+		if($entry->getDvrStatus() == DVRStatus::ENABLED)
+		{
+			$queryString[] = 'DVR';
+		}
+
+		if(count($flavorParamsIds) > 1)
+		{
+			sort($flavorParamsIds);
+			$queryString[] = 'flavorIds=' . implode(',', $flavorParamsIds);
+		}
+
+		if(count($queryString))
+		{
+			$queryString = '?' . implode('&', $queryString);
+		}
+		else
+		{
+			$queryString = '';
+		}
+
+		return $queryString;
+	}
+
+	protected function getBaseUrl($serverNode, $streamFormat = null)
+	{
+		/* @var $serverNode WowzaMediaServerNode */
+		$baseUrl = $this->getDynamicAttributes()->getMediaProtocol() . "://";
+
+		if($this->getHostName())
+		{
+			$baseUrl .= rtrim($this->getHostName(), "/") . ":" . $serverNode->getPortByProtocolAndFormatYossi($this->getDynamicAttributes()->getMediaProtocol(), $streamFormat);
+		}
+		else
+		{
+			$baseUrl .= rtrim($serverNode->getHostName(), "/") . ":" . $serverNode->getPortByProtocolAndFormatYossi($this->getDynamicAttributes()->getMediaProtocol(), $streamFormat);
+		}
+
+		$baseUrl .= "/" . $serverNode->getApplicationPrefix() . "/" . $serverNode->getApplicationName();
+
+		KalturaLog::debug("Testing::yossi Url = [$baseUrl]");
+
+		return $baseUrl;
 	}
 }
 

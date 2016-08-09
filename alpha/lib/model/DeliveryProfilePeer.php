@@ -160,83 +160,160 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param boolean $checkSecured whether we should prefer secured delivery profiles.
 	 * @return DeliveryProfile
 	 */
-	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $checkSecured = true) {
-	
-		$deliveries = array();
+	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $checkSecured = true)
+	{
 		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			KalturaLog::err('Failed to retrieve entryID: '. $entryId);
+			return null;
+		}
+
 		$partnerId = $entry->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner) {
+		if(!$partner)
+		{
 			KalturaLog::err('Failed to retrieve partnerId: '. $partnerId);
 			return null;
 		}
-		
-		$isSecured = false;
-		if($checkSecured)
-			$isSecured = self::isSecured($partner, $entry);
-		$delivery = self::getDeliveryByPartner($partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured);
+
+		$isSecured = $checkSecured ? self::isSecured($partner, $entry) : false;
+		$isLive = in_array($entry->getSource(), LiveEntry::$kalturaLiveSourceTypes) ? true : false;
+
+		$delivery = self::getDeliveryByPartner($entry, $partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured, $isLive);
 		if($delivery)
 			$delivery->setEntryId($entryId);
+		
 		return $delivery;
 	}
 		
 	/**
 	 * This function returns the matching delivery object for a given partner and delivery protocol
+	 * @param entry $entry server entryId
 	 * @param Partner $partner The partner
 	 * @param PlaybackProtocol $streamerType - The protocol
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
 	 * @param boolean $isSecured whether we're interested in secured delivery profile
+	 *
+	 * @return DeliveryProfile $delivery
 	 */
-	public static function getDeliveryByPartner(Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false) {
-	
-		$partnerId = $partner->getId();
-		$deliveryIds = $partner->getDeliveryProfileIds();
-		
-		// if the partner has an override for the required format on the partner object - use that
-		if(array_key_exists($streamerType, $deliveryIds)) {
-			$deliveryIds = $deliveryIds[$streamerType];
-			
-			self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-			
-			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
-			
-			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
-			uasort($deliveries, array($cmp, "compare"));
-		} 
-		// Else catch the default by the protocol
-		else {
-			$c = new Criteria();
-			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
-			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
-			$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
-			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
-			
-			if($isSecured)
-				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null)');
-			else
-				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
+	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
+	{
+		$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive);
 
-			self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
-					
-			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
-			$c->addAscendingOrderByColumn($orderBy);
-			$c->addAscendingOrderByColumn(DeliveryProfilePeer::PRIORITY);
-			
-			$deliveries = self::doSelect($c);
+		// if the partner has an override for the required format on the partner object - use that
+		if(count($deliveryIds))
+		{
+			$deliveries = self::getDeliveryByIds($deliveryIds, $partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured, $isLive);
 		}
-		
+		// Else catch the default by the protocol
+		else
+		{
+			$deliveries = self::getDefaultDelivery($partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured, $isLive);
+		}
+
+		return self::selectDeliveryByDeliveryAttributes($partner->getId(), $streamerType, $deliveries, $deliveryAttributes);
+	}
+
+	protected static function getCustomDeliveryIds($entry, $partner, $streamerType, $isLive)
+	{
+		$deliveryIds = array();
+
+		if($isLive)
+		{
+			/* @var $entry LiveEntry */
+			$playableServerNode = $entry->getMediaServer();
+			if($playableServerNode)
+			{
+				/* @var WowzaMediaServerNode $playableServerNode */
+				$machineDeliveryIds = $playableServerNode->getDeliveryProfileIds();
+				if(array_key_exists($streamerType, $machineDeliveryIds))
+				{
+					$deliveryIds = explode(",", $machineDeliveryIds[$streamerType]);
+				}
+			}
+		}
+		else
+		{
+			$partnerDeliveryIds = $partner->getDeliveryProfileIds();
+			if(array_key_exists($streamerType, $partnerDeliveryIds))
+			{
+				$deliveryIds = $partnerDeliveryIds[$streamerType];
+			}
+		}
+
+		return $deliveryIds;
+	}
+
+	protected static function selectDeliveryByDeliveryAttributes($partnerId, $streamerType, $deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
-		if($delivery) {
+
+		if($delivery)
+		{
 			KalturaLog::info("Delivery ID for partnerId [$partnerId] and streamer type [$streamerType] is " . $delivery->getId());
-		} else {
+		} else
+		{
 			$mediaProtocol = $deliveryAttributes ? $deliveryAttributes->getMediaProtocol() : null;
 			KalturaLog::err("Delivery ID can't be determined for partnerId [$partnerId] streamer type [$streamerType] and media protocol [$mediaProtocol]");
 		}
+
 		return $delivery;
 	}
-	
+
+	// if the partner has an override for the required format on the partner object - use that
+	protected static function getDeliveryByIds($deliveryIds, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
+	{
+		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
+
+		$c = new Criteria();
+		$c->add(DeliveryProfilePeer::PARTNER_ID, $partner->getId());
+		$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
+
+		if($isLive)
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
+		else
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
+
+		$deliveries = DeliveryProfilePeer::doSelect($c);
+
+		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
+		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
+		uasort($deliveries, array($cmp, "compare"));
+
+		return $deliveries;
+	}
+
+	protected static function getDefaultDelivery(Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
+	{
+		$c = new Criteria();
+		$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+		$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
+		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
+
+		if($isLive)
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
+		else
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
+
+		if($isSecured)
+			$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null)');
+		else
+			$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
+
+		self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
+
+		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partner->getId()})";
+		$c->addAscendingOrderByColumn($orderBy);
+		$c->addAscendingOrderByColumn(DeliveryProfilePeer::PRIORITY);
+
+		$deliveries = self::doSelect($c);
+
+		return $deliveries;
+	}
+
 	protected static function isSecured($partner, $entry) {
 		$ks = kCurrentContext::$ks_object;
 		$isSecured = false;

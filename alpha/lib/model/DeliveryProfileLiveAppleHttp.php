@@ -165,7 +165,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($uiConfId)
 			$url .= '/uiConfId/' . $uiConfId;
 
-		if(count($this->params->getPlayerConfig()))
+		if(count($this->getDynamicAttributes()->getPlayerConfig()))
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 			
 		// TODO encrypt the manifest URL
@@ -180,63 +180,106 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
 	}
 
-	public function buildServeFlavors() 
-	{	
-		$baseUrl = $this->liveStreamConfig->getUrl();
-		$backupUrl = $this->liveStreamConfig->getBackupUrl();
-		
-		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
-		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
-		
-		//We do not yet support Audio only stream manifest mreging
-		$isAudioStream = $this->isAudioStream($primaryServerStreams, $backupServerStreams);
-		
-		if($this->params->getUsePlayServer() || $isAudioStream || (!count($primaryServerStreams) && !count($backupServerStreams)))
+	protected function getFlavorHttpUrl($serverNode)
+	{
+		$httpUrl = $this->getBaseUrl($serverNode, PlaybackProtocol::HLS);
+
+		if($this->getDynamicAttributes()->getUsePlayServer())
 		{
-			$this->shouldRedirect = true;
+			$httpUrl = $this->getPlayServerUrl($httpUrl);
 		}
-		
-		if($isAudioStream)
-		{
-			$baseUrl = str_replace('_all.smil', '_pass.smil', $baseUrl);
-			$this->liveStreamConfig->setUrl($baseUrl);
-			$this->liveStreamConfig->setBackupUrl(null);
-		}
-		
-		if($this->params->getUsePlayServer()) {
-			
-			$this->liveStreamConfig->setUrl($this->getPlayServerUrl($baseUrl));
-			$this->liveStreamConfig->setBackupUrl(null);
-		}
-				
-		if($this->shouldRedirect) {
-			return parent::buildServeFlavors();
-		}
-				
+
+		return rtrim($httpUrl, "/") . "/" . $this->getStreamName() . "/playlist.m3u8" . $this->getQueryAttributes();
+	}
+
+	protected function buildHttpFlavorsArray()
+	{
 		$flavors = array();
-		$this->buildM3u8Flavors($baseUrl, $flavors, $primaryServerStreams);
-		if($backupUrl && ($this->getForceProxy() || count($flavors) == 0))
+		$primaryServerNode = null;
+		$backupServerNode = null;
+		$primaryStreamInfo = null;
+		$backupStreamInfo = null;
+
+		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
+
+		if(!count($liveEntryServerNodes))
+			return $flavors;
+
+		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
+		{
+			/* @var $liveEntryServerNode LiveEntryServerNode */
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if($serverNode)
+			{
+				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				{
+					$primaryServerNode = $serverNode;
+					$primaryStreamInfo = $liveEntryServerNode->getStreams();
+					unset($liveEntryServerNodes[$key]);
+				}
+			}
+		}
+
+		if(!$primaryServerNode)
+		{
+			$liveEntryServerNode = array_shift($liveEntryServerNodes);
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if($serverNode)
+			{
+				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				{
+					$primaryServerNode = $serverNode;
+					$primaryStreamInfo = $liveEntryServerNode->getStreams();
+				}
+			}
+		}
+
+		if(count($liveEntryServerNodes))
+		{
+			$liveEntryServerNode = array_shift($liveEntryServerNodes);
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if ($serverNode)
+			{
+				$backupServerNode = $serverNode;
+				$backupStreamInfo = $liveEntryServerNode->getStreams();
+			}
+		}
+
+		if(!$primaryServerNode && $backupServerNode)
+			return $flavors;
+
+		if($this->getDynamicAttributes()->getUsePlayServer() || (!count($primaryStreamInfo) && !count($backupStreamInfo)))
+			return parent::buildHttpFlavorsArray();
+
+		$primaryStreamUrl = $this->getFlavorHttpUrl($primaryServerNode);
+		$this->buildM3u8Flavors($primaryStreamUrl, $flavors, $primaryStreamInfo);
+
+		if($backupServerNode && ($this->getForceProxy() || count($flavors) == 0))
 		{
 			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primay and backup streams
-			$priamryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryServerStreams);
-			$this->buildM3u8Flavors($backupUrl, $flavors, $backupServerStreams, $priamryFlavorBitrateInfo);
+			$backupStreamUrl = $this->getFlavorHttpUrl($backupServerNode);
+			$primaryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryStreamInfo);
+			$this->buildM3u8Flavors($backupStreamUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
 		}
-		
+
 		foreach ($flavors as $index => $flavor)
 		{
 			$flavors[$index]['index'] = $index;
 		}
-			
+
 		usort($flavors, array($this, 'compareFlavors'));
-		
+
 		foreach ($flavors as $index => $flavor)
 		{
 			unset($flavors[$index]['index']);
 		}
-		
+
 		return $flavors;
+
 	}
-	
+
 	public function getRenderer($flavors)
 	{
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
@@ -255,27 +298,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavorBitrateInfo[$stream->getFlavorId()] = $stream->getBitrate();
 		}
 		return $flavorBitrateInfo;
-	}
-	
-	private function isAudioStream($primaryServerStreams, $backupServerStreams)
-	{
-		if(count($primaryServerStreams))
-		{
-			/* @var $kLiveStreamParams kLiveStreamParams */
-			$kLiveStreamParams = reset($primaryServerStreams);
-			if(!$kLiveStreamParams->getHeight() && !$kLiveStreamParams->getWidth())
-				return true;
-		}
-		
-		if(count($backupServerStreams))
-		{
-			/* @var $kLiveStreamParams kLiveStreamParams */
-			$kLiveStreamParams = reset($backupServerStreams);
-			if(!$kLiveStreamParams->getHeight() && !$kLiveStreamParams->getWidth())
-				return true;
-		}
-		
-		return false;
 	}
 }
 

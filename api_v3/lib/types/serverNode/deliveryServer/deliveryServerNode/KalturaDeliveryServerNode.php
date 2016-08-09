@@ -12,10 +12,17 @@ abstract class KalturaDeliveryServerNode extends KalturaServerNode
 	 * @filter like,mlikeor,mlikeand
 	 */
 	public $playbackDomain;
-		
+
+	/**
+	 * Delivery profile ids
+	 * @var KalturaKeyValueArray
+	 */
+	public $deliveryProfileIds;
+
 	private static $map_between_objects = array 
 	(
 		"playbackDomain" => "playbackHostName",
+		"deliveryProfileIds",
 	);
 	
 	/* (non-PHPdoc)
