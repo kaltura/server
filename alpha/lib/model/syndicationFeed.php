@@ -209,7 +209,7 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	/**
 	 * @param boolean $v
 	 */
-	public function setFeedContentHeader($v)
+	public function setFeedContentTypeHeader($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FEED_CONTENT_TYPE_HEADER, $v);
 	}
@@ -217,7 +217,7 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	/**
 	 * @return boolean
 	 */
-	public function getFeedContentHeader()
+	public function getFeedContentTypeHeader()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FEED_CONTENT_TYPE_HEADER, null, 'text/xml; charset=utf-8');
 	}
