@@ -77,7 +77,6 @@ class kWebCastingVersionManager{
 
     public function getVersionInfo($os, $UIConfId)
     {
-        KalturaLog::info("in getVersionInfo");
         $osSpecificConfig = self::getServerConfig($os);
         if (!$osSpecificConfig)
             throw new KalturaAPIException(WebCastingErrors::UNKNOWN_OS, $os);
@@ -86,9 +85,12 @@ class kWebCastingVersionManager{
         $serverDefinedRecommendedVersion = $osSpecificConfig["recommendedVersion"];
         $serverDefinedURL = $osSpecificConfig["installationURL"];
 
-        $ui_conf = uiConfPeer::retrieveByPK($UIConfId);
-        if (!$ui_conf)
-            throw new KalturaAPIException(WebCastingErrors::UI_CONF_NOT_FOUND, $UIConfId);
+        if ($UIConfId)
+        {
+            $ui_conf = uiConfPeer::retrieveByPK($UIConfId);
+            if (!$ui_conf)
+                throw new KalturaAPIException(WebCastingErrors::UI_CONF_NOT_FOUND, $UIConfId);
+        }
 
         $config = json_decode($ui_conf->getConfig(), true);
         $UIConfDefinedMinimalVersion = array_key_exists("minimalVersion", $config) ? $config["minimalVersion"] : null;
