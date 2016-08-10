@@ -26,7 +26,7 @@ abstract class SyndicationFeedRenderer {
 	 * @return the HTTP header
 	 */
 	public function handleHttpHeader() {
-		return "content-type: text/xml; charset=utf-8";
+		return "content-type: " . $this->syndicationFeedDB->getFeedContentHeader();
 	}
 	
 	/**
