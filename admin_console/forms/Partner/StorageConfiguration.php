@@ -65,7 +65,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		$this->addElement('select', 'signatureType', array(
 				'label'			=> 'Signature Type:',
 				'filters'		=> array('StringTrim'),
-				'multiOptions'	=> array('None' => '',
+				'multiOptions'	=> array('' => 'Default (v4)',
 						's3' => 's3',
 				),
 		));
