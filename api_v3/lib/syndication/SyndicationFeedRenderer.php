@@ -26,7 +26,7 @@ abstract class SyndicationFeedRenderer {
 	 * @return the HTTP header
 	 */
 	public function handleHttpHeader() {
-		return "content-type: " . $this->syndicationFeedDB->getFeedContentHeader();
+		return "content-type: " . $this->syndicationFeedDB->getFeedContentTypeHeader();
 	}
 	
 	/**
