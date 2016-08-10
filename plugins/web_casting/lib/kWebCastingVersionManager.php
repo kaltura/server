@@ -98,8 +98,10 @@ class kWebCastingVersionManager{
             $config = json_decode($ui_conf->getConfig(), true);
             if (array_key_exists("minimalVersion", $config))
                 $UIConfDefinedMinimalVersion = $config["minimalVersion"];
-            if (array_key_exists("ignoreOptionalUpdates", $config))
-                $UIConfDefinedIgnoreOptionalUpdates = $config["ignoreOptionalUpdates"];
+            if (array_key_exists("ignoreOptionalUpdates", $config)) {
+                $UIConfDefinedIgnoreOptionalUpdatesString = $config["ignoreOptionalUpdates"];
+                $UIConfDefinedIgnoreOptionalUpdates = ($UIConfDefinedIgnoreOptionalUpdatesString === 'true');
+            }
 
             $UIConfDefinedURL = $ui_conf->getSwfUrl();
         }
