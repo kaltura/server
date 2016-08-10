@@ -85,8 +85,61 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	public function buildServeFlavors() 
 	{
+		$this->initLiveStreamConfig();
 		$flavors = $this->buildHttpFlavorsArray();
 		return $flavors;
+	}
+	
+	protected function initLiveStreamConfig()
+	{
+		$this->liveStreamConfig = new kLiveStreamConfiguration();
+		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
+		
+		if(!count($liveEntryServerNodes))
+			return;
+		
+		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
+		{
+			/* @var $liveEntryServerNode LiveEntryServerNode */
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if($serverNode)
+			{
+				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				{
+					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
+					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
+					unset($liveEntryServerNodes[$key]);
+					break;
+				}
+			}
+		}
+		
+		if(!$this->liveStreamConfig->getUrl())
+		{
+			$liveEntryServerNode = array_shift($liveEntryServerNodes);
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if($serverNode)
+			{
+				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				{
+					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
+					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
+				}
+			}
+		}
+		
+		if(count($liveEntryServerNodes))
+		{
+			$liveEntryServerNode = array_shift($liveEntryServerNodes);
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if ($serverNode)
+			{
+				$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($serverNode));
+				$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
+			}
+		}
 	}
 	
 	public function isLive ($url) {
@@ -112,35 +165,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	protected function buildHttpFlavorsArray()
 	{
 		$flavors = array();
-
-		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
-
-		if(!count($liveEntryServerNodes))
-			return $flavors;
-
-		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
-		{
-			/* @var $liveEntryServerNode LiveEntryServerNode */
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode)
-			{
-				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
-				{
-					$httpUrl = $this->getFlavorHttpUrl($serverNode);
-					$flavors = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
-				}
-			}
-		}
-
-		$liveEntryServerNode = array_shift($liveEntryServerNodes);
-		$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-		if ($serverNode)
-		{
-			$httpUrl = $this->getFlavorHttpUrl($serverNode);
-			$flavors = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
-		}
-
+		
+		$httpUrl = $this->liveStreamConfig->getUrl();
+		$flavors[] = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
 		return $flavors;
 	}
 
@@ -201,6 +228,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		return $queryString;
 	}
+	
+	protected function getHttpUrl($serverNode)
+	{
+		return "";
+	}
 
 	protected function getBaseUrl($serverNode, $streamFormat = null)
 	{
@@ -218,7 +250,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		$baseUrl .= "/" . $serverNode->getApplicationPrefix() . "/" . $serverNode->getApplicationName();
 
-		KalturaLog::debug("Testing::yossi Url = [$baseUrl]");
+		KalturaLog::debug("Testing::yossi stepUrl = [$baseUrl]");
 
 		return $baseUrl;
 	}

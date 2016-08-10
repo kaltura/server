@@ -180,7 +180,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
 	}
 
-	protected function getFlavorHttpUrl($serverNode)
+	protected function getHttpUrl($serverNode)
 	{
 		$httpUrl = $this->getBaseUrl($serverNode, PlaybackProtocol::HLS);
 
@@ -195,73 +195,24 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	protected function buildHttpFlavorsArray()
 	{
 		$flavors = array();
-		$primaryServerNode = null;
-		$backupServerNode = null;
-		$primaryStreamInfo = null;
-		$backupStreamInfo = null;
-
-		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
-
-		if(!count($liveEntryServerNodes))
-			return $flavors;
-
-		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
-		{
-			/* @var $liveEntryServerNode LiveEntryServerNode */
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode)
-			{
-				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
-				{
-					$primaryServerNode = $serverNode;
-					$primaryStreamInfo = $liveEntryServerNode->getStreams();
-					unset($liveEntryServerNodes[$key]);
-				}
-			}
-		}
-
-		if(!$primaryServerNode)
-		{
-			$liveEntryServerNode = array_shift($liveEntryServerNodes);
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode)
-			{
-				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
-				{
-					$primaryServerNode = $serverNode;
-					$primaryStreamInfo = $liveEntryServerNode->getStreams();
-				}
-			}
-		}
-
-		if(count($liveEntryServerNodes))
-		{
-			$liveEntryServerNode = array_shift($liveEntryServerNodes);
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if ($serverNode)
-			{
-				$backupServerNode = $serverNode;
-				$backupStreamInfo = $liveEntryServerNode->getStreams();
-			}
-		}
-
-		if(!$primaryServerNode && $backupServerNode)
-			return $flavors;
-
+		
+		$primaryManifestUrl = $this->liveStreamConfig->getUrl();
+		$backupManifestUrl = $this->liveStreamConfig->getBackupUrl();
+		$primaryStreamInfo = $this->liveStreamConfig->getPrimaryStreamInfo();
+		$backupStreamInfo = $this->liveStreamConfig->getBackupStreamInfo();
+		
 		if($this->getDynamicAttributes()->getUsePlayServer() || (!count($primaryStreamInfo) && !count($backupStreamInfo)))
-			return parent::buildHttpFlavorsArray();
-
-		$primaryStreamUrl = $this->getFlavorHttpUrl($primaryServerNode);
-		$this->buildM3u8Flavors($primaryStreamUrl, $flavors, $primaryStreamInfo);
-
-		if($backupServerNode && ($this->getForceProxy() || count($flavors) == 0))
 		{
-			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primay and backup streams
-			$backupStreamUrl = $this->getFlavorHttpUrl($backupServerNode);
+			$this->shouldRedirect = true;
+			return parent::buildHttpFlavorsArray();
+		}
+		
+		$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
+		if($backupManifestUrl && ($this->getForceProxy() || count($flavors) == 0))
+		{
+			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primary and backup streams
 			$primaryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryStreamInfo);
-			$this->buildM3u8Flavors($backupStreamUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
+			$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
 		}
 
 		foreach ($flavors as $index => $flavor)
