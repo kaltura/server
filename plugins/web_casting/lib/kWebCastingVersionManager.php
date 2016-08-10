@@ -63,13 +63,14 @@ class kWebCastingVersionManager{
         }
         else
         {
-            $response->recommendedVersion = $serverDefinedRecommendedVersion;
-
             // if $serverDefinedRecommendedVersion >= $response->minimalVersion
             if (version_compare($response->minimalVersion, $serverDefinedRecommendedVersion) >= 0)
             {
+                $response->recommendedVersion = $response->minimalVersion;
                 $response->url = $serverDefinedURL;
             }
+            else
+                $response->recommendedVersion = $serverDefinedRecommendedVersion;
         }
 
         return $response;
