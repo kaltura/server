@@ -87,6 +87,7 @@ class kWebCastingVersionManager{
 
         $UIConfDefinedMinimalVersion = null;
         $UIConfDefinedIgnoreOptionalUpdates = false;
+        $UIConfDefinedURL = "";
 
         if ($UIConfId)
         {
@@ -99,9 +100,9 @@ class kWebCastingVersionManager{
                 $UIConfDefinedMinimalVersion = $config["minimalVersion"];
             if (array_key_exists("ignoreOptionalUpdates", $config))
                 $UIConfDefinedIgnoreOptionalUpdates = $config["ignoreOptionalUpdates"];
-        }
 
-        $UIConfDefinedURL = $ui_conf->getSwfUrl();
+            $UIConfDefinedURL = $ui_conf->getSwfUrl();
+        }
 
         return self::internalGetVersionInfo($serverDefinedMinimalVersion,
             $serverDefinedRecommendedVersion,
