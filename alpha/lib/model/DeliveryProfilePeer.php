@@ -195,6 +195,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
 	 * @param boolean $isSecured whether we're interested in secured delivery profile
+	 * @param boolean $isLive should fetch live or vod delivery profiles
 	 *
 	 * @return DeliveryProfile $delivery
 	 */
