@@ -431,7 +431,7 @@ jQuery(function() {
 	});
 });
 
-function assignDeliveryProfile(format, currentDps)
+function assignDeliveryProfile(format, currentDps, type = null)
 {
 	var partnerId = $("#id")[0].value;
 
@@ -445,11 +445,12 @@ function assignDeliveryProfile(format, currentDps)
 		resizable: false,
 		width: 750,
 		title: '<?php echo $this->translate('Edit delivery profiles : Partner id '); ?>' + partnerId +
-			'<?php echo $this->translate(' , Format '); ?>' + format,
+			'<?php echo $this->translate(' , Format '); ?>' + format +
+			'<?php echo $this->translate(' , type '); ?>' + type,
 		height: 400,
 		buttons: {			
 			'<?php echo $this->translate('OK'); ?>': function() {
-				okPressed(format);
+				okPressed(format, type);
 				jQuery(this).dialog('close').remove();
 			},
 		},

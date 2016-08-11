@@ -158,9 +158,20 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElement('select', 'deliveryFormat', array(
 				'label'			=> 'Add format',
+				'filters'		=> array('StringTrim'),
 				'registerInArrayValidator' => false,
 		));
-		
+
+		$this->addElement('select', 'Delivery_profile_type_drop', array(
+				'label'			=> 'type of profile:',
+				'registerInArrayValidator' => false,
+		));
+		$entryDeliveryType = array(
+			'VOD' => 'VOD',
+			'Live' => 'Live',
+		);
+		$this->getElement('Delivery_profile_type_drop')->setMultiOptions($entryDeliveryType);
+
 		$this->addElement('button', 'editDeliveryProfiles', array(
 				'label'		=> 'Add',
 				'decorators'	=> array('ViewHelper'),
@@ -837,7 +848,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','reference_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		
-		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
+		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'deliveryFormat','Delivery_profile_type_drop', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
 
 		$this->addDisplayGroup(array_merge(array('notifications_config', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
