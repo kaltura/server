@@ -232,19 +232,16 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 			return true;
 		}
 		
-		if($object instanceof entry && isset($modifiedColumns["CUSTOM_DATA"]) && in_array("replacedEntryId", array_keys($modifiedColumns["CUSTOM_DATA"][null])))
+		if($object instanceof entry && $object->getReplacedEntryId())
 		{
-			if($object->getReplacedEntryId())
+			$replacedEntry = entryPeer::retrieveByPK($object->getReplacedEntryId());
+			$replacementOptions = $replacedEntry->getReplacementOptions();
+			foreach($replacementOptions->getPluginOptionItems() as $replacementItem)
 			{
-				$replacedEntry = entryPeer::retrieveByPK($object->getReplacedEntryId());
-				$replacementOptions = $replacedEntry->getReplacementOptions();
-				foreach($replacementOptions->getPluginOptionItems() as $replacementItem)
-				{
-					if($replacementItem instanceof kMetadataReplacementOptionsItem && $replacementItem->getShouldCopyMetadata())
-						return true;
-				}
+				if($replacementItem instanceof kMetadataReplacementOptionsItem && $replacementItem->getShouldCopyMetadata())
+					return true;
 			}
-		}
+		}	
 		
 		return false;
 	}
