@@ -520,12 +520,13 @@ class KCurlWrapper
 			{
 				if ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
 					$this->protocol = self::HTTP_PROTOCOL_FTP;
+					
+				if ( in_array ($url_parts["scheme"], array ('http', 'https')) && isset ($url_parts['user']) )
+				{
+					curl_setopt ($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+				}
 			}
 			
-			if (isset ($url_parts['user']) && isset ($url_parts["scheme"]) && in_array ($url_parts["scheme"], array ('http', 'https')) )
-			{
-				curl_setopt ($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-			}
 		}
 		catch ( Exception $exception )
 		{
