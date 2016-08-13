@@ -26,6 +26,7 @@ class kCacheManager
 	const CACHE_TYPE_SPHINX_EXECUTED_SERVER = 'sphinxExecutedServer';
 	const CACHE_TYPE_RESPONSE_PROFILE = 'responseProfile';
 	const CACHE_TYPE_RESPONSE_PROFILE_INVALIDATION = 'responseProfileInvalidation';
+	const CACHE_TYPE_ENTRY_KUSER_ENTITLEMENT = "entryKuserEntitlement";
 	
 	protected static $caches = array();
 	

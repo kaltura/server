@@ -12,6 +12,8 @@ class kEntitlementUtils
 	
 	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC';
 	
+	const ENTRY_KUSER_ENTITLEMENT_EXPIRY = 600; // expiry for entitlement cache
+	
 	protected static $initialized = false;
 	protected static $entitlementEnforcement = false;
 	protected static $entitlementForced = null;
@@ -51,6 +53,27 @@ class kEntitlementUtils
 	 */
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ENTRY_KUSER_ENTITLEMENT);
+
+		$cacheKey = $kuserId."_".$entry->getId()."_".$ks::buildPrivileges($ks->privileges);
+		
+		if ($cache && $cache->get($cacheKey))
+				return true;
+			
+		$result = self::isEntryEntitledImpl($entry, $kuserId, $ks);
+		
+		if ($result && $cache)
+		{
+			$cache->set($cacheKey, $result, self::ENTRY_KUSER_ENTITLEMENT_EXPIRY);
+		}
+		
+		return $result;
+	}
+	
+	public static function isEntryEntitledImpl(entry $entry, $kuserId, $ks)
+	{
 		if($entry->getSecurityParentId())
 		{
 			$entry = $entry->getParentEntry();
@@ -60,8 +83,6 @@ class kEntitlementUtils
 				return false;
 			}
 		}
-		
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		
 		if(self::$entitlementForced === false)
 		{
