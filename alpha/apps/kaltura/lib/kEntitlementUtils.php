@@ -61,22 +61,22 @@ class kEntitlementUtils
 		{
 			$cacheKey .= $ks::buildPrivileges($ks->privileges)."_";
 			if (!$kuserId)
-				$cacheUser = kCurrentContext::$ks_uid;
+			{
+				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+				$cacheUser = "$partnerId:". strtolower(str_replace(' ', '_', kCurrentContext::$ks_uid));
+			}
 		}
 		
 		$cacheKey .= $cacheUser;
 		
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ENTRY_KUSER_ENTITLEMENT);
-
-		if ($cache && $cache->get($cacheKey))
-				return true;
+		$result = kCacheManager::multilayerCacheGetAndUpdate(kCacheManager::CACHE_TYPE_ENTRY_KUSER_ENTITLEMENT, $cacheKey, self::ENTRY_KUSER_ENTITLEMENT_EXPIRY);
+		if ($result)
+			return true;
 			
 		$result = self::isEntryEntitledImpl($entry, $kuserId, $ks);
 		
-		if ($result && $cache)
-		{
-			$cache->set($cacheKey, $result, self::ENTRY_KUSER_ENTITLEMENT_EXPIRY);
-		}
+		if ($result)
+			kCacheManager::multilayerCacheSet(kCacheManager::CACHE_TYPE_ENTRY_KUSER_ENTITLEMENT, $cacheKey, $result, self::ENTRY_KUSER_ENTITLEMENT_EXPIRY);
 		
 		return $result;
 	}

@@ -98,4 +98,59 @@ class kCacheManager
 		
 		return self::getCache($cacheSection);
 	}
+	
+	/**
+	 * Fetch a non zero/null/false value from a multi layer cache. If the value was found set it back in the previous cache layers
+	 * @param string $cacheType
+	 * @param string $key
+	 * @param int $expiry
+	 * @return cache key value
+	 */
+	public static function multilayerCacheGetAndUpdate($cacheType, $key, $expiry)
+	{
+		$result = null;
+		$cacheSections = kCacheManager::getCacheSectionNames($cacheType);
+		if (!$cacheSections)
+			return $result;
+		
+		$cacheStores = array();
+		foreach ($cacheSections as $cacheSection)
+		{
+			$cacheStore = kCacheManager::getCache($cacheSection);
+			if (!$cacheStore)
+				continue;
+			
+			$result = $cacheStore->get($key);
+			if ($result)
+				break;
+		}
+		
+		if (!$result)
+			return;
+		
+		foreach($cacheStores as $cacheStore)
+			$cacheStore->set($key, $result, $expiry);
+		
+		return $result;
+	}
+	
+	/**
+	 * Fetch a non zero value from a multi layer cache. If the value was found set it back in the previous cache layers
+	 * @param string $cacheType
+	 * @param string $key
+	 * @param int $expiry
+	 */
+	public static function multilayerCacheSet($cacheType, $key, $value, $expiry)
+	{
+		$cacheSections = kCacheManager::getCacheSectionNames($cacheType);
+		if ($cacheSections)
+		{
+			foreach ($cacheSections as $cacheSection)
+			{
+				$cacheStore = kCacheManager::getCache($cacheSection);
+				if ($cacheStore)
+					$cacheStore->set($key, $value, $expiry);
+			}
+		}
+	}
 }
