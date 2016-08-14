@@ -53,12 +53,21 @@ class kEntitlementUtils
 	 */
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
+		// check cache using {entryId}_{ks privileges}_{kuserId/puserId}
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
-
+		$cacheKey = $entry->getId()."_";
+		$cacheUser = $kuserId;
+		if($ks)
+		{
+			$cacheKey .= $ks::buildPrivileges($ks->privileges)."_";
+			if (!$kuserId)
+				$cacheUser = kCurrentContext::$ks_uid;
+		}
+		
+		$cacheKey .= $cacheUser;
+		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ENTRY_KUSER_ENTITLEMENT);
 
-		$cacheKey = $kuserId."_".$entry->getId()."_".$ks::buildPrivileges($ks->privileges);
-		
 		if ($cache && $cache->get($cacheKey))
 				return true;
 			
