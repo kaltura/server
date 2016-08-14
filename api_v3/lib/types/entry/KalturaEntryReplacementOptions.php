@@ -11,10 +11,17 @@ class KalturaEntryReplacementOptions extends KalturaObject
 	 * @var int
 	 */
 	public $keepManualThumbnails;
-	
+
+	/**
+	 * Array of plugin replacement options
+	 * @var KalturaPluginReplacementOptionsArray
+	 */
+	public $pluginOptionItems;
+
 	private static $mapBetweenObjects = array
 	(
 		'keepManualThumbnails',
+		'pluginOptionItems',
 	);
 	
 	/* (non-PHPdoc)

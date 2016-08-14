@@ -3085,6 +3085,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$copyObj->setPuserId($this->puser_id);
 		$copyObj->setAccessControlId($this->access_control_id);
 		$copyObj->setConversionProfileId($this->conversion_profile_id);
+		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
 
 		if($coptPartnerId)
 			$copyObj->setPartnerId($this->getPartnerId());

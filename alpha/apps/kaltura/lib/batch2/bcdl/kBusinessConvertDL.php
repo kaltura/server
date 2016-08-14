@@ -584,4 +584,117 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		$entry->setStreamBitrates($streamBitrates);
 		$entry->save();
 	}
+	
+	public static function generateAdStitchingCmdline($flavorParams, $flavorParamsOutput, $ffprobeJson = null, $duration = null)
+	{
+		if($ffprobeJson){
+			$parser = new KFFMpegMediaParserAdStitchHelper($ffprobeJson);
+			$srcMedInf = $parser->getMediaInfo();
+			$srcMedSet = KFFMpegMediaParserAdStitchHelper::mediaInfoToKDL($srcMedInf);
+			$isAdImage = false;
+			$srcContainer = $srcMedSet->_container->_format;
+			if(strstr($srcContainer,"image")!==false || strstr($srcContainer,"jpeg")!==false || strstr($srcContainer,"jpg")!==false || strstr($srcContainer,"png")!==false){
+				$isAdImage = true;
+			}
+		}
+			/*
+			 * Nulled 'ffprobeJson' ==> 'filler-case', create black and silent video
+			 */
+		else {
+			$srcMedSet = new KDLMediaDataSet();
+			$isAdImage = false;
+		}
+		$isAdAudio = isset($srcMedSet->_audio);
+		$isAdVideo = isset($srcMedSet->_video);
+			/*
+			 * For image AD or in 'filler-case', 
+			 * make sure that the 'duration' is set,
+			 * otherwise - set to default 10 sec
+			 */
+		if(!($duration) && ($isAdImage || !($isAdAudio && $isAdVideo)) ) {
+			$duration = 10;
+		}
+
+		/**
+		 * To match from flavor params output-
+		 * - frame size
+		 * - fps
+		 * - gop
+		 * - audio params
+		 * Other matching
+		 * - AvoidVideoShrinkFramesizeToSource = on
+		 * - two pass - off
+		 * - encypted - off
+		 * - letter boxing
+		 * - other extra params (from live sticthing)
+		 */
+		$kdlFlavor = KDLWrap::ConvertFlavorCdl2Kdl($flavorParams);
+		$kdlFlavor->_isTwoPass = false;
+		$kdlFlavor->_isEncrypted = false;
+		$kdlFlavor->_video->_arProcessingMode = 2; // letter boxing
+		$kdlFlavor->_video->_isShrinkFramesizeToSource = false;
+		$kdlFlavor->_transcoders[0]->_extra.= " -x264opts sps-id=27:colorprim=undef:transfer=undef:colormatrix=undef";
+		if($flavorParamsOutput->getWidth()){
+			$kdlFlavor->_video->_width = $flavorParamsOutput->getWidth();
+		}
+		if($flavorParamsOutput->getHeight()){
+			$kdlFlavor->_video->_height = $flavorParamsOutput->getHeight();
+		}
+		if($flavorParamsOutput->getGopSize()){
+			$kdlFlavor->_video->_gop = $flavorParamsOutput->getGopSize();
+		}
+		if($flavorParamsOutput->getFrameRate()){
+			$kdlFlavor->_video->_frameRate = $flavorParamsOutput->getFrameRate();
+		}
+		if($flavorParamsOutput->getAudioBitrate()){
+			$kdlFlavor->_audio->_bitRate = $flavorParamsOutput->getAudioBitrate();
+		}
+		if($flavorParamsOutput->getAudioSampleRate()){
+			$kdlFlavor->_audio->_sampleRate = $flavorParamsOutput->getAudioSampleRate();
+		}
+		if($duration){
+			if($isAdImage) {
+				$kdlFlavor->_transcoders[0]->_extra.= " -t $duration";
+			}
+			else {
+				$kdlFlavor->_clipDur = $duration*1000;
+			}
+		}
+		
+		{
+			/*
+			 * KDL does not support (yet ...) image-2-video generation,
+			 * meanwhile following dummy '_audio' & '_video' initializations 
+			 * imitate 'normal' aud/vid behaviour
+			 */
+			if($isAdAudio==false){
+				$srcMedSet->_audio = clone($kdlFlavor->_audio);
+			}
+			if($isAdVideo==false){
+				$srcMedSet->_video = clone($kdlFlavor->_video);
+			}
+		}
+		
+		$target = $kdlFlavor->GenerateTarget($srcMedSet);
+		$cmdLine = $target->_transcoders[0]->_cmd;
+			// 'image' source needs 'looping' 
+		if($isAdImage){
+			$cmdLine = str_replace(" -i "," -loop 1 -i ", $cmdLine);
+		}
+		
+			// Add 'silent' source, if no AD audio source
+		if($isAdAudio==false){
+			$cmdLine = str_replace(array(KDLCmdlinePlaceholders::InFileName), 
+							array(KDLCmdlinePlaceholders::InFileName." -f s16le -acodec pcm_s16le -i /dev/zero"), 
+							$cmdLine);	
+		}
+		
+			// Add 'black' source, if no AD video source
+		if($isAdVideo==false){
+			$cmdLine = " -f rawvideo -pix_fmt rgb24 -s 480x270".str_replace(array(KDLCmdlinePlaceholders::InFileName), 
+							array("/dev/zero"), 
+							$cmdLine);	
+		}
+		return $cmdLine;
+	}
 }

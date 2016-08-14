@@ -393,9 +393,9 @@ index kaltura_cue_point:kaltura_base
 	rt_attr_uint = end_time
 	rt_attr_uint = duration
 	rt_attr_uint = cue_point_status
-	rt_attr_uint = cue_point_type
+	rt_field = cue_point_type
 	rt_attr_uint = sub_type
-	rt_attr_uint = kuser_id
+	rt_field = kuser_id
 	rt_attr_bigint = partner_sort_value
 	rt_attr_uint = depth
 	rt_attr_uint = children_count
@@ -405,7 +405,7 @@ index kaltura_cue_point:kaltura_base
 	rt_attr_timestamp = updated_at
 	rt_attr_string = str_entry_id
 	rt_attr_string = str_cue_point_id
-	rt_attr_uint = is_public
+	rt_field = is_public
 	rt_field = plugins_data
 }
 

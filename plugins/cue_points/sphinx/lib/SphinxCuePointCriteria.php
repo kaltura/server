@@ -50,10 +50,36 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		{
 		    $this->sphinxSkipped = false;
 		    $isPublic = $filter->get('_eq_is_public');
-		    $this->addCondition('is_public' . " = " . $isPublic);
+		    $this->addAnd(CuePointPeer::IS_PUBLIC, CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId()).$isPublic, Criteria::EQUAL);	
 		}
 		$filter->unsetByName('_eq_is_public');
 
 		return parent::applyFilterFields($filter);
+	}
+
+	public function translateSphinxCriterion(SphinxCriterion $crit)
+	{
+		$field = $crit->getTable() . '.' . $crit->getColumn();
+		if ($field == CuePointPeer::TYPE && $crit->getComparison() == Criteria::EQUAL)
+		{
+			return array(
+				CuePointPeer::TYPE,
+				Criteria::LIKE,
+				CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId()) . $crit->getValue());
+		} else if ($field == CuePointPeer::TYPE && $crit->getComparison() == Criteria::IN)
+		{
+			return array(
+				CuePointPeer::TYPE,
+				Criteria::IN,
+				$this::addPrefixToArray($crit->getValue(), CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId())));
+		}
+		return parent::translateSphinxCriterion($crit);
+	}
+
+	private function addPrefixToArray(array $strings, $prefix)
+	{
+		foreach ($strings as &$value)
+			$value = $prefix.$value;
+		return $strings;
 	}
 }

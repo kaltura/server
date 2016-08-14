@@ -65,7 +65,6 @@ enabledWorkers.KAsyncIntegrateCloser				= 1
 enabledWorkers.KAsyncClearCuePoints					= 1
 enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 
-
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
 enabledWorkers.KAsyncDbCleanup						= 1
@@ -769,4 +768,3 @@ maximumExecutionTime                    = 36000
 maxJobsEachRun                          = 1
 filter.jobSubTypeIn                     = document.thumbAssets
 params.skipSourceValidation             = 1
-

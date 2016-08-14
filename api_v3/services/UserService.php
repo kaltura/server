@@ -50,7 +50,8 @@ class UserService extends KalturaBaseUserService
 		$dbUser = null;
 		$dbUser = $user->toObject($dbUser);
 		try {
-			$dbUser = kuserPeer::addUser($dbUser, $user->password);
+			$checkPasswordStructure = isset($user->password) ? true : false;
+			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure);
 		}
 		
 		catch (kUserException $e) {
