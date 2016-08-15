@@ -15,16 +15,10 @@ class KalturaUrlTokenizerCloudFront extends KalturaUrlTokenizer {
 	 */
 	public $rootDir;
 	
-	/**
-	 * @var bool
-	 */
-	public $limitIpAddress;
-	
 	private static $map_between_objects = array
 	(
 			"keyPairId",
 			"rootDir",
-			"limitIpAddress",
 	);
 	
 	public function getMapBetweenObjects ( )

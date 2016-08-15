@@ -24,6 +24,11 @@ abstract class kUrlTokenizer
 	protected $ksObject;
 	
 	/**
+	 * @var bool
+	 */
+	protected $limitIpAddress;
+	
+	/**
 	 * @param string $playbackContext
 	 */
 	public function setPlaybackContext($playbackContext)
@@ -94,5 +99,19 @@ abstract class kUrlTokenizer
 	 */
 	public function setKsObject($ksObject) {
 		$this->ksObject = $ksObject;
+	}
+
+	/**
+	 * @return the $limitIpAddress
+	 */
+	public function getLimitIpAddress() {
+		return $this->limitIpAddress;
+	}
+	
+	/**
+	 * @param string $limitIpAddress
+	 */
+	public function setLimitIpAddress($limitIpAddress) {
+		$this->limitIpAddress = $limitIpAddress;
 	}
 }
