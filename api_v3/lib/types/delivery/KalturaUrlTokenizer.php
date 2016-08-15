@@ -20,10 +20,16 @@ class KalturaUrlTokenizer extends KalturaObject
 	 */
 	public $key;
 	
+	/**
+	 * @var bool
+	 */
+	public $limitIpAddress;
+	
 	private static $map_between_objects = array
 	(
 			"key",
 			"window",
+			"limitIpAddress",
 	);
 	
 	public function getMapBetweenObjects ( )
