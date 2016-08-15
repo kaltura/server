@@ -206,7 +206,7 @@ class ScheduleEventService extends KalturaBaseService
 		$maxDuration = SchedulePlugin::getScheduleEventmaxDuration();
 		$maxRecurrences = SchedulePlugin::getScheduleEventmaxRecurrences();
 		$startTime = max($now, $dbScheduleEvent->getStartDate(null));
-		$endTime = min($now + $maxDuration, $dbScheduleEvent->getEndDate(null));
+		$endTime = $now + $maxDuration;
 		$dates = $dbScheduleEvent->getDates($startTime, $endTime, $maxRecurrences);
 		KalturaLog::debug("Found [" . count($dates) . "] dates");
 		
