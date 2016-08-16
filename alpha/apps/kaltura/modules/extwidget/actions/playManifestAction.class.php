@@ -283,7 +283,7 @@ class playManifestAction extends kalturaAction
 						
 		if (!is_null($this->flavorIds))
 		{
-			if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
+			if (self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
 			{
 				$this->addAltAudioFlavors();
 			}
@@ -307,13 +307,22 @@ class playManifestAction extends kalturaAction
 			return;
 
 		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
-		if (!is_null($this->flavorIds) && $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
+		if (!is_null($this->flavorIds) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
 		{
 			$this->addAltAudioFlavors();
 		}
 
 	}
-	
+
+	private static function shouldAddAltAudioFlavors($format)
+	{
+		$supportedProtocols = Array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::SILVER_LIGHT);
+		if (in_array($format, $supportedProtocols))
+			return true;
+
+		return false;
+	}
+
 	protected function initFlavorParamsIds()
 	{
 		$this->initFlavorIds();
