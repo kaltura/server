@@ -120,7 +120,6 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	/**
 	 * @var KalturaScheduleEventRecurrenceType
 	 * @filter eq,in
-	 * @insertonly
 	 */
 	public $recurrenceType;
 
@@ -249,6 +248,26 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxDuration);
 		}
 	}
+
+	/***
+	 * @param $targetRecurrenceType
+	 * @param $sourceRecurrenceType
+	 * @throws KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE
+	 */
+	public function validateScheduleEventType($targetRecurrenceType, $sourceRecurrenceType)
+	{
+		if (!is_null($targetRecurrenceType))
+		{
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRENCE)
+				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRING && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRING)
+				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
+				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+		}
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert($propertiesToSkip)
@@ -288,11 +307,13 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			
 		$this->validate($startDate, $endDate);
 
+		$this->validateScheduleEventType($this->recurrenceType, $sourceObject->getRecurrenceType());
+
 		if($this->isNull('sequence') || $this->sequence <= $sourceObject->getSequence())
 		{
 			$sourceObject->incrementSequence();
 		}
-		
+
 		if(!$this->isNull('duration'))
 		{
 			if(!$this->isNull('endDate'))
@@ -304,11 +325,13 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			}
 			else
 			{
-				$this->endDate = $startDate + $this->duration;
-				$this->duration = null;
+				if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING )
+				{
+					$this->endDate = $startDate + $this->duration;
+					$this->duration = null;
+				}
 			}
 		}
-		
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
