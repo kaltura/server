@@ -316,7 +316,7 @@ class playManifestAction extends kalturaAction
 
 	private static function shouldAddAltAudioFlavors($format)
 	{
-		$supportedProtocols = Array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH);
+		$supportedProtocols = Array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::SILVER_LIGHT);
 		if (in_array($format, $supportedProtocols))
 			return true;
 
