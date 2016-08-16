@@ -325,7 +325,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			}
 			else
 			{
-				if (!is_null($targetRecurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING )
+				if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING )
 				{
 					$this->endDate = $startDate + $this->duration;
 					$this->duration = null;
