@@ -477,9 +477,24 @@ class DeliveryProfileDynamicAttributes {
 			}
 				
 			if ($curFlavors)
+			{
+				$this->addAltAudioFlavors($flavors, $curFlavors);
 				return $curFlavors;
+			}
 		}
 		return array();
+	}
+
+	private function addAltAudioFlavors($flavors, &$curFlavors)
+	{
+		if(!playManifestAction::shouldAddAltAudioFlavors($this->getFormat()))
+			return;
+
+		foreach($flavors as $flavor)
+		{
+			if(!in_array($flavor, $curFlavors) && $flavor->hasTag(assetParams::TAG_ALT_AUDIO))
+				$curFlavors[] = $flavor;
+		}
 	}
 
 	/**
