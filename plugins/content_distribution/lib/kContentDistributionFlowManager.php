@@ -1741,9 +1741,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 			
 		$entry = $asset->getentry();
-		if(!$entry)
+		if(!$entry || $entry->getStatus() == entryStatus::DELETED)
 		{
-			KalturaLog::log("Entry [" . $asset->getEntryId() . "] not found");
+			KalturaLog::log("Entry [" . $asset->getEntryId() . "] not found or deleted");
 			return true;
 		}
 			
