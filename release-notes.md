@@ -2,6 +2,7 @@
 
 ### Deployment scripts ###
 Run 'php deployment/updates/scripts/add_permissions/2016_08_07_update_play_server_get_flavor_asset_service_permission.php'
+Run 'php deployment/updates/scripts/add_permissions/2016_08_17_update_play_server_list_cue_points_group_permission.php'
 
 # Kajam 11.21.0 #
 
