@@ -152,7 +152,8 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 				}
 		
 				$xml = $this->handleEntry($context, $feed, $entry, $entryDistribution);
-				if(!is_null($xml) && $enableCache) {
+				if(!is_null($xml) && $enableCache) 
+				{
 					$cacheStore->set($cacheKey . self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
 					$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
 				}
