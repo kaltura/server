@@ -256,17 +256,26 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	 */
 	public function validateScheduleEventType($targetRecurrenceType, $sourceRecurrenceType)
 	{
-		if (!is_null($targetRecurrenceType))
+		 if (!is_null($targetRecurrenceType))
+                {
+                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRENCE)
+                                throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+
+                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRING && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRING)
+                                throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+
+                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
+                                throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+
+                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::NONE && !is_null($this->recurrence))
+				throw new KalturaAPIException("Can't update single schedule event with recurring data when recurrenceType is not \"RECURRING\".");
+                }
+                else
 		{
-			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRENCE)
-				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+	                if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && !is_null($this->recurrence))
+        	                throw new KalturaAPIException("Can't update single schedule event with recurring data when recurrenceType is not \"RECURRING\".");
+                }
 
-			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRING && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRING)
-				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
-
-			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
-				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
-		}
 	}
 	
 	/* (non-PHPdoc)
