@@ -314,7 +314,7 @@ class playManifestAction extends kalturaAction
 
 	}
 
-	public static function shouldAddAltAudioFlavors($format)
+	private static function shouldAddAltAudioFlavors($format)
 	{
 		$supportedProtocols = Array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::SILVER_LIGHT);
 		if (in_array($format, $supportedProtocols))
@@ -538,6 +538,16 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
+	private function addAltAudioTag()
+	{
+		$tags = $this->deliveryAttributes->getTags();
+		foreach ($tags as &$tagsFallback)
+		{
+			$tagsFallback[] = assetParams::TAG_ALT_AUDIO;
+		}
+		$this->deliveryAttributes->setTags($tags);
+	}
+
 	protected function initPlaylistFlavorAssetArray()
 	{
 		list($entryIds, $durations, $mediaEntry) =
@@ -563,6 +573,9 @@ class playManifestAction extends kalturaAction
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
 			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+
+			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
+				$this->addAltAudioTag();
 			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 		}
 			
@@ -611,6 +624,8 @@ class playManifestAction extends kalturaAction
 
 		if ($flavorByTags)
 		{
+			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
+				$this->addAltAudioTag();
 			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 		}
 		
