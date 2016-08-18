@@ -606,6 +606,8 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		}
 		$isAdAudio = isset($srcMedSet->_audio);
 		$isAdVideo = isset($srcMedSet->_video);
+		// ToDo re-insert logic
+		$isAdVideo = true;
 			/*
 			 * For image AD or in 'filler-case', 
 			 * make sure that the 'duration' is set,
