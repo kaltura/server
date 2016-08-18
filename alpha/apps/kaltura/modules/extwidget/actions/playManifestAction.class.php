@@ -541,11 +541,13 @@ class playManifestAction extends kalturaAction
 	private function addAltAudioTag()
 	{
 		$tags = $this->deliveryAttributes->getTags();
-		foreach ($tags as &$tagsFallback)
+		$newTags = Array();
+		foreach ($tags as $tagsFallback)
 		{
 			$tagsFallback[] = assetParams::TAG_ALT_AUDIO;
+			$newTags[] = $tagsFallback;
 		}
-		$this->deliveryAttributes->setTags($tags);
+		$this->deliveryAttributes->setTags($newTags);
 	}
 
 	protected function initPlaylistFlavorAssetArray()
