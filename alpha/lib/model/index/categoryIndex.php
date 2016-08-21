@@ -350,5 +350,9 @@ class categoryIndex extends BaseIndexObject
 		return categoryPeer::doCount($c);
 	}
 
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("category:id=%s", categoryPeer::ID), array("category:partnerId=%s", categoryPeer::PARTNER_ID));		
+	}
 }
 
