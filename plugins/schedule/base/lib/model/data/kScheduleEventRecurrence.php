@@ -350,9 +350,8 @@ class kScheduleEventRecurrence
 	 */
 	public function getDates($periodStart, $seed = null, $limit = null)
 	{
-
 		$periodEnd = strtotime('+1 year', $periodStart);
-		if(!$this->until && $this->until < $periodEnd)
+		if(!is_null($this->until) && $this->until < $periodEnd)
 			$periodEnd = $this->until;
 
 		KalturaLog::debug("Fetching dates name [$this->name] start-time[" . date('d/n/y G:i:s', $periodStart) . "] end-time[" . date('d/n/y G:i:s', $periodEnd) . "] seed[" . date('d/n/y G:i:s', $seed) . "] max-recurrences [$limit]");
