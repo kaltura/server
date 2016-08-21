@@ -130,21 +130,6 @@ class playManifestAction extends kalturaAction
 		return $calcToken == $urlToken;
 	}
 
-	protected function addAltAudioFlavors()
-	{
-		$extraFlavors = assetPeer::retrieveReadyByEntryIdAndTag($this->entryId, assetParams::TAG_ALT_AUDIO);
-		foreach ($extraFlavors as $extraFlavor)
-		{
-			/**
-			 * @var asset $extraFlavor
-			 */
-			if (!in_array($extraFlavor->getId(), $this->flavorIds))
-			{
-				$this->flavorIds[] = $extraFlavor->getId();
-			}
-		}
-	}
-
 	/**
 	 * @param array $params
 	 * @return array
@@ -282,13 +267,8 @@ class playManifestAction extends kalturaAction
 			$this->flavorIds = array($flavorId);
 						
 		if (!is_null($this->flavorIds))
-		{
-			if (self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-			{
-				$this->addAltAudioFlavors();
-			}
 			return;
-		}
+
 		$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
 		if (!is_null($flavorParamIds))
 			$this->flavorParamsIds = explode(',', $flavorParamIds);
@@ -302,15 +282,6 @@ class playManifestAction extends kalturaAction
 			
 		if($this->secureEntryHelper)
 			$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
-		
-		if(is_null($this->flavorParamsIds))
-			return;
-
-		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
-		if (!is_null($this->flavorIds) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-		{
-			$this->addAltAudioFlavors();
-		}
 
 	}
 
@@ -541,13 +512,11 @@ class playManifestAction extends kalturaAction
 	private function addAltAudioTag()
 	{
 		$tags = $this->deliveryAttributes->getTags();
-		$newTags = Array();
-		foreach ($tags as $tagsFallback)
+		foreach ($tags as &$tagsFallback)
 		{
 			$tagsFallback[] = assetParams::TAG_ALT_AUDIO;
-			$newTags[] = $tagsFallback;
 		}
-		$this->deliveryAttributes->setTags($newTags);
+		$this->deliveryAttributes->setTags($tags);
 	}
 
 	protected function initPlaylistFlavorAssetArray()
@@ -561,30 +530,68 @@ class playManifestAction extends kalturaAction
 		
 		$this->duration = array_sum($durations) / 1000;
 
-		$flavorAssets = array();
-		
-		if ($this->flavorIds)
-		{
-			$flavorAssets = assetPeer::retrieveReadyByEntryId($mediaEntry->getId(), $this->flavorIds);
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-		}
-		
-		if (!$flavorAssets)
-		{
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
+		$filteredFlavorAssets = $this->filterFlavorsByIdOrParamsIds($flavorAssets);
 
-			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
-				$this->addAltAudioTag();
-			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
+		{
+			$filteredFlavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+			$filteredFlavorAssets = $this->removeMaxBitrateFlavors($filteredFlavorAssets);
+			$filteredFlavorAssets = $this->filterByTagsAndAltAudio($filteredFlavorAssets);
 		}
-			
+
 		$this->deliveryAttributes->setStorageId(null);
-		$this->deliveryAttributes->setFlavorAssets($flavorAssets);
+		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
 	}
-	
+
+	private function filterByTagsAndAltAudio($flavorAssets)
+	{
+		if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
+			$this->addAltAudioTag();
+		$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+		return $filteredFlavorAssets;
+	}
+
+	private function filterFlavorsByIdOrParamsIds($flavorAssets)
+	{
+		$filteredFlavorAssets = Array();
+
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			/**
+			 * @var asset $flavorAsset
+			 */
+			if ($this->shouldIncludeFlavor($flavorAsset))
+				$filteredFlavorAssets[] = $flavorAsset;
+		}
+		$filteredFlavorAssets = $this->removeNotAllowedFlavors($filteredFlavorAssets);
+		$filteredFlavorAssets = $this->removeMaxBitrateFlavors($filteredFlavorAssets);
+
+		if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+			$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
+		return $filteredFlavorAssets;
+	}
+
+	private function addAltAudioFlavors(&$filteredFlavorAssets, $originalFlavorAssets)
+	{
+		foreach ($originalFlavorAssets as $flavorAsset)
+		{
+			/**
+			 * @var asset $flavorAsset
+			 */
+			if ($flavorAsset->hasTag(assetParams::TAG_ALT_AUDIO) && !in_array($flavorAsset, $filteredFlavorAssets))
+				$filteredFlavorAssets[] = $flavorAsset;
+		}
+	}
+
+	private function shouldIncludeFlavor($flavorAsset)
+	{
+		if(($this->flavorIds && in_array($flavorAsset->getId(), $this->flavorIds)) || ($this->flavorParamsIds && in_array($flavorAsset->getFlavorParamsId(), $this->flavorParamsIds)))
+			return true;
+
+		return false;
+	}
+
 	protected function initFlavorAssetArray()
 	{
 		if(!$this->shouldInitFlavorAssetsArray())
@@ -593,26 +600,21 @@ class playManifestAction extends kalturaAction
 		$oneOnly = false;
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP || $this->deliveryAttributes->getFormat() == "url" || $this->deliveryAttributes->getFormat() == "rtsp")
 			$oneOnly = true;
-								
-		// get initial flavor list by input
-		$flavorAssets = array();
+
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
 		$flavorByTags = false;
-		if ($this->flavorIds)
+
+		$filteredFlavorAssets = $this->filterFlavorsByIdOrParamsIds($flavorAssets);
+
+		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 		{
-			$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId, $this->flavorIds);
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);		
-		}
-		if (!$flavorAssets || !count($flavorAssets))
-		{
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId); 
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+			$filteredFlavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+			$filteredFlavorAssets = $this->removeMaxBitrateFlavors($filteredFlavorAssets);
 			$flavorByTags = true;
 		}		
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::SILVER_LIGHT)
 		{
-			if ($this->initSilverLightManifest($flavorAssets))
+			if ($this->initSilverLightManifest($filteredFlavorAssets))
 			{
 				return;
 			}
@@ -625,12 +627,10 @@ class playManifestAction extends kalturaAction
 		}
 
 		if ($flavorByTags)
-		{
-			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
-				$this->addAltAudioTag();
-			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
-		}
-		
+			$filteredFlavorAssets = $this->filterByTagsAndAltAudio($filteredFlavorAssets);
+
+		$flavorAssets = $filteredFlavorAssets;
+
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HDS || $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
 		{
 			// try to look for a smil manifest, if it was found, we will use it for hds and hls
