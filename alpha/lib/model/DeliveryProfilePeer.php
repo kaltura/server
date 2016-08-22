@@ -224,6 +224,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		if($isLive)
 		{
 			/* @var $entry LiveEntry */
+			/* @var $partner Partner */
 			$playableServerNode = $entry->getMediaServer();
 			if($playableServerNode)
 			{
@@ -232,6 +233,15 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				if(array_key_exists($streamerType, $machineDeliveryIds))
 				{
 					$deliveryIds = explode(",", $machineDeliveryIds[$streamerType]);
+				}
+			}
+			
+			if(!count($deliveryIds))
+			{
+				$partnerLiveDeliveryIds = $partner->getLiveDeliveryProfileIds();
+				if(array_key_exists($streamerType, $partnerLiveDeliveryIds))
+				{
+					$deliveryIds = $partnerLiveDeliveryIds[$streamerType];
 				}
 			}
 		}

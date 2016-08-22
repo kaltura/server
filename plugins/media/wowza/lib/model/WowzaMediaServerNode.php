@@ -108,12 +108,12 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $domain;
 	}
 	
-	public function getPortByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
+	public function getPortByProtocolAndFormat($protocol = 'http', $format = null)
 	{
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
-		
 		$portField = 'port' . ($protocol != 'http' ? "-$protocol" : "") . ($format ? "-$format" : "");
 		
+		$mediaServerConfig = kConf::getMap('media_servers');
 		$port = $this->getValueByField($mediaServerConfig, $portField, $port);
 		
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
@@ -129,16 +129,20 @@ class WowzaMediaServerNode extends MediaServerNode {
 	
 	public function getApplicationPrefix()
 	{
-		$appPrefix = $this->getAppPrefix();
-		if(!$appPrefix)
-			return "";
-
+		$appPrefix = "";
+		$mediaServerConfig = kConf::getMap('media_servers');
+		
+		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
+		
+		if(!is_null($this->getAppPrefix()))
+			$appPrefix = $this->getAppPrefix();
+		
 		$hostname = $this->getHostname();
 		if(!$this->getIsExternalMediaServer())
 			$hostname = preg_replace('/\..*$/', '', $hostname);
-
+		
 		$appPrefix = str_replace("{hostName}", $hostname, $appPrefix);
-
+		
 		return $appPrefix;
 	}
 	

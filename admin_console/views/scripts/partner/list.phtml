@@ -431,11 +431,11 @@ jQuery(function() {
 	});
 });
 
-function assignDeliveryProfile(format, currentDps)
+function assignLiveDeliveryProfile(format, currentDps)
 {
 	var partnerId = $("#id")[0].value;
-
-	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-delivery-profile')); ?>';
+	
+	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-live-delivery-profile')); ?>';
 	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/streamerType/" + format;
 	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
 	
@@ -444,12 +444,44 @@ function assignDeliveryProfile(format, currentDps)
 		modal: true,
 		resizable: false,
 		width: 750,
+		title: '<?php echo $this->translate('Edit Live delivery profiles : Partner id '); ?>' + partnerId +
+		'<?php echo $this->translate(' , Format '); ?>' + format,
+		height: 400,
+		buttons: {
+			'<?php echo $this->translate('OK'); ?>': function() {
+				okPressedLive(format);
+				jQuery(this).dialog('close').remove();
+			},
+		},
+		close: function() {
+			$(this).dialog('close').remove();
+		}
+	});
+	dialogDiv.load(
+		url
+	);
+}
+
+function assignDeliveryProfile(format, currentDps, type = null)
+{
+	var partnerId = $("#id")[0].value;
+
+	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-delivery-profile')); ?>';
+	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/streamerType/" + format + "/deliveryType/" + type;
+	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 750,
 		title: '<?php echo $this->translate('Edit delivery profiles : Partner id '); ?>' + partnerId +
-			'<?php echo $this->translate(' , Format '); ?>' + format,
+			'<?php echo $this->translate(' , Format '); ?>' + format +
+			'<?php echo $this->translate(' , type '); ?>' + type,
 		height: 400,
 		buttons: {			
 			'<?php echo $this->translate('OK'); ?>': function() {
-				okPressed(format);
+				okPressed(format, type);
 				jQuery(this).dialog('close').remove();
 			},
 		},
