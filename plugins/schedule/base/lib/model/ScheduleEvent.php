@@ -184,7 +184,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		}
 		
 		$recurrence = $this->getRecurrence();
-		$dates = $recurrence->getDates($periodStart, $periodEnd, $this->getStartDate(null), $limit);
+		$dates = $recurrence->getDates($periodStart, $this->getStartDate(null), $limit);
 		
 		sort($dates);
 		if(count($dates) > $limit)

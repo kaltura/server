@@ -12,11 +12,6 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 	 */
 	protected $rootDir;
 
-	/**
-	 * @var bool
-	 */
-	protected $limitIpAddress;
-	
 	static function urlSafeBase64Encode($value)
 	{
 		$encoded = base64_encode($value);
@@ -90,7 +85,7 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 		$DateLessThan = time() + $this->window;
 		$conditions = array('"DateLessThan":{"AWS:EpochTime":'.$DateLessThan.'}');
 		$ipStr = "";
-		if ($this->limitIpAddress)
+		if ($this->getLimitIpAddress())
 		{
 			// When multiple equivalent requests hit cloudfront at once, cloudfront may respond with the same response although
 			// caching headers instruct not to cache the response. When content is secured by IP, one clinet may receive content
@@ -181,21 +176,5 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 	public function setRootDir($rootDir) 
 	{
 		$this->rootDir = $rootDir;
-	}
-
-	/**
-	 * @return the $limitIpAddress
-	 */
-	public function getLimitIpAddress() 
-	{
-		return $this->limitIpAddress;
-	}
-	
-	/**
-	 * @param string $limitIpAddress
-	 */
-	public function setLimitIpAddress($limitIpAddress) 
-	{
-		$this->limitIpAddress = $limitIpAddress;
 	}
 }

@@ -344,26 +344,22 @@ class kScheduleEventRecurrence
 	/**
 	 * Returns a list of timestamps in the specified period.
 	 * @param int $periodStart the starting timestamp of the period
-	 * @param int $periodEnd the ending timestamp of the period
 	 * @param int $seed the timestamp of this Recurrence's first instance
 	 * @param int $limit maximum number of dates 
 	 * @return array
 	 */
-	public function getDates($periodStart, $periodEnd = null, $seed = null, $limit = null)
+	public function getDates($periodStart, $seed = null, $limit = null)
 	{
+		$periodEnd = strtotime('+1 year', $periodStart);
+		if(!is_null($this->until) && $this->until < $periodEnd)
+			$periodEnd = $this->until;
+
 		KalturaLog::debug("Fetching dates name [$this->name] start-time[" . date('d/n/y G:i:s', $periodStart) . "] end-time[" . date('d/n/y G:i:s', $periodEnd) . "] seed[" . date('d/n/y G:i:s', $seed) . "] max-recurrences [$limit]");
-		if(!$periodEnd)
-		{
-			$periodEnd = strtotime('+1 year', $periodStart);
-		}
 		if(!$seed)
 		{
 			$seed = $periodStart;
 		}
-		if($this->until && $this->until < $periodEnd)
-		{
-			$periodEnd = $this->until;
-		}
+
 		$dates = array();
 		$cal = $seed;
 		$calParts = getdate($cal);

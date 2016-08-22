@@ -17,6 +17,7 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	const CUSTOM_DATA_SERVE_PLAY_MANIFEST = 'serve_play_manifest';
 	const CUSTOM_DATA_USE_CATEGORY_ENTRIES = 'use_category_entries';
 	const CUSTOM_DATA_PLAYER_TYPE = 'player_type';
+	const CUSTOM_DATA_FEED_CONTENT_TYPE_HEADER = 'feed_content_type_header';
 
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
@@ -203,5 +204,21 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	public function getUseCategoryEntries()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_USE_CATEGORY_ENTRIES, null, false);
+	}
+	
+	/**
+	 * @param boolean $v
+	 */
+	public function setFeedContentTypeHeader($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FEED_CONTENT_TYPE_HEADER, $v);
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function getFeedContentTypeHeader()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FEED_CONTENT_TYPE_HEADER, null, 'text/xml; charset=utf-8');
 	}
 }
