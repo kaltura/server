@@ -416,7 +416,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	
 	private static function convertDuration2msec($str)
 	{
-		preg_match_all("/(([0-9]*)h ?)?(([0-9]*)mn ?)?(([0-9]*)s ?)?(([0-9]*)ms ?)?/",
+		preg_match_all("/(([0-9]*)\s?h?\s?)?(([0-9]*)\s?mn?\s?)?(([0-9]*)\s?s?\s?)?(([0-9]*)\s?ms?\s?)?/",
 			$str, $res);
 			
 		$hour = @$res[2][0];
