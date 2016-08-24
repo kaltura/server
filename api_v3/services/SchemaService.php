@@ -39,12 +39,12 @@ class SchemaService extends KalturaBaseService
 		header("Content-Type: text/plain; charset=UTF-8");
 		
 		$cacheXsdFile = self::getSchemaPath($type);
-		return $this->dumpFile($cacheXsdFile);
+		return $this->dumpFile($cacheXsdFile, 'application/xml');
 	}
 	
 	/**
-	 * @param KalturaSchemaType $type  
-	 * @return string filePath 
+	 * @param KalturaSchemaType $type
+	 * @return string filePath
 	 */
 	public static function getSchemaPath($type)
 	{
@@ -52,7 +52,14 @@ class SchemaService extends KalturaBaseService
 		if(file_exists($cacheXsdFile))
 			return realpath($cacheXsdFile);
 		
-		$xsdFile = fopen($cacheXsdFile, 'w');
+		$resultXsd = self::buildSchemaByType($type);
+		
+		kFile::safeFilePutContents($cacheXsdFile, $resultXsd);
+		return realpath($cacheXsdFile);
+	}
+	
+	private static function buildSchemaByType($type)
+	{
 		$elementsXSD = '';
 		
 		$baseXsdElement = new SimpleXMLElement('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
@@ -71,21 +78,21 @@ class SchemaService extends KalturaBaseService
 		
 		if(!($baseXsdElement instanceof SimpleXMLElement))
 			$baseXsdElement = new SimpleXMLElement('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
-	
+		
 		$version = '1.0';
 		if($baseXsdElement['version'])
 			$version = $baseXsdElement['version'];
 		
-		fwrite($xsdFile, "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" version=\"$version\">");
-			
+		$resultXsd = "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" version=\"$version\">";
+		
 		foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
 		{
 			/* @var $element SimpleXMLElement */
 			$xsd = $element->asXML();
 			$elementsXSD .= $xsd;
 			
-			fwrite($xsdFile, '
-	' . $xsd);
+			$resultXsd .= '
+	' . $xsd;
 		}
 		
 		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
@@ -96,13 +103,13 @@ class SchemaService extends KalturaBaseService
 			if($elements)
 			{
 				$elementsXSD .= $elements;
-				fwrite($xsdFile, $elements);
+				$resultXsd .= $elements;
 			}
 		}
 		
-		fwrite($xsdFile, '
+		$resultXsd .= '
 	<!-- Kaltura enum types -->
-	');
+	';
 		
 		$enumClasses = array();
 		$matches = null;
@@ -121,7 +128,7 @@ class SchemaService extends KalturaBaseService
 		{
 			if(!is_subclass_of($class, 'KalturaEnum') && !is_subclass_of($class, 'KalturaStringEnum')) // class must be enum
 				continue;
-				
+			
 			$xsdType = 'int';
 			if($classTypeReflector->isStringEnum())
 				$xsdType = 'string';
@@ -130,7 +137,7 @@ class SchemaService extends KalturaBaseService
 	<xs:simpleType name="' . $class . '">
 		<xs:annotation><xs:documentation>http://' . kConf::get('www_host') . '/api_v3/testmeDoc/index.php?object=' . $class . '</xs:documentation></xs:annotation>
 		<xs:restriction base="xs:' . $xsdType . '">';
-		
+			
 			$contants = $classTypeReflector->getConstants();
 			foreach($contants as $contant)
 			{
@@ -138,21 +145,19 @@ class SchemaService extends KalturaBaseService
 			<xs:enumeration value="' . $contant->getDefaultValue() . '"><xs:annotation><xs:documentation>' . $contant->getName() . '</xs:documentation></xs:annotation></xs:enumeration>';
 			}
 			
-						
+			
 			$xsd .= '
 		</xs:restriction>
 	</xs:simpleType>
 			';
 			
-			fwrite($xsdFile, $xsd);
+			$resultXsd .= $xsd;
 		}
 		
-		fwrite($xsdFile, '
-</xs:schema>');
+		$resultXsd .= '
+</xs:schema>';
 		
-		fclose($xsdFile);
-		
-		return realpath($cacheXsdFile);
+		return $resultXsd;
 	}
 	
 	private static function loadClassRecursively(KalturaTypeReflector $classTypeReflector, &$enumClasses)
