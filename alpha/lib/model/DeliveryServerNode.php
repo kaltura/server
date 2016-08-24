@@ -3,9 +3,6 @@
 abstract class DeliveryServerNode extends ServerNode {
 
 	const CUSTOM_DATA_DELIVERY_IDS = "delivery_profile_ids";
-
-	abstract public function getManifestUrl($protocol = 'http', $format = null);
-	abstract public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null);
 	
 	public function getPlaybackDomain()
 	{

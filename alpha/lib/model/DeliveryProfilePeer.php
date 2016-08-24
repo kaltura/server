@@ -279,7 +279,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 
 		$c = new Criteria();
-		$c->add(DeliveryProfilePeer::PARTNER_ID, $partner->getId());
+		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
 		$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
 
 		if($isLive)

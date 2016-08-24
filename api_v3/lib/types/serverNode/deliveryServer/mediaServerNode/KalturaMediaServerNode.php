@@ -23,6 +23,8 @@ abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
 	 * Media server playback Domain configuration by protocol and format
 	 *
 	 * @var KalturaKeyValueArray
+	 * @deprecated Use Delivery Profile Ids instead
+	 * 
 	 */
 	public $mediaServerPlaybackDomainConfig;
 	

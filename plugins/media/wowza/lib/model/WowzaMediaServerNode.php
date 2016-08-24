@@ -32,6 +32,31 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$this->setType(WowzaPlugin::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER));
 	}
 	
+	/**
+	 * @param string $serviceName
+	 * @return KalturaMediaServerClient
+	 */
+	public function getWebService($serviceName)
+	{
+		if(!isset(self::$webServices[$serviceName]))
+			return null;
+		
+		$serviceClass = self::$webServices[$serviceName];
+		
+		$domain = $this->getLiveServiceInternalDomain() ? $this->getLiveServiceInternalDomain() : $this->getHostname();
+		$port = $this->getLiveServicePort();
+		$protocol = $this->getLiveServiceProtocol();
+		
+		$url = "$protocol://$domain:$port/$serviceName?wsdl";
+		KalturaLog::debug("Service URL: $url");
+		return new $serviceClass($url);
+	}
+	
+	public function getLiveWebServiceName()
+	{
+		return WowzaMediaServerNode::WEB_SERVICE_LIVE;
+	}
+	
 	public function getManifestUrl($protocol = 'http', $format = null)
 	{		
 		$playbackHost = $this->getPlaybackHost($protocol, $format);
@@ -45,67 +70,20 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $url;
 	}
 	
-	public function getLiveWebServiceName()
+	public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null)
 	{
-		return WowzaMediaServerNode::WEB_SERVICE_LIVE;
-	}
-	
-	public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null)
-	{
-		$mediaServerGlobalConfig = array();
+		$hostname = $this->getHostname();
+		if(!$this->getIsExternalMediaServer())
+			$hostname = preg_replace('/\..*$/', '', $hostname);
 		
-		if(kConf::hasMap('media_servers'))
-			$mediaServerGlobalConfig = array_merge($mediaServerGlobalConfig, kConf::getMap('media_servers'));
+		$domain = ($baseUrl && $baseUrl !== '') ? $baseUrl : $hostname;
+		$port = $this->getPortByProtocolAndFormat($protocol, $format);
+		$appPrefix = $this->getApplicationPrefix();
+		$applicationName = $this->getApplicationName();
 		
-		if($this->partner_media_server_config)
-			$mediaServerGlobalConfig = array_merge($mediaServerGlobalConfig, $this->partner_media_server_config);
-			
-		$domain = $this->getDomainByProtocolAndFormat($mediaServerGlobalConfig, $protocol, $format);
-		
-		$port = $this->getPortByProtocolAndFormat($mediaServerGlobalConfig, $protocol, $format);
-		
-		$appPrefix = $this->getApplicationPrefix($mediaServerGlobalConfig);
-		
-		return "$domain:$port/$appPrefix";
-	}
-	
-	/**
-	 * @param string $serviceName
-	 * @return KalturaMediaServerClient
-	 */
-	public function getWebService($serviceName)
-	{	
-		if(!isset(self::$webServices[$serviceName]))
-			return null;
-			
-		$serviceClass = self::$webServices[$serviceName];
-		
-		$domain = $this->getLiveServiceInternalDomain() ? $this->getLiveServiceInternalDomain() : $this->getHostname();
-		$port = $this->getLiveServicePort();
-		$protocol = $this->getLiveServiceProtocol();
-		
-		$url = "$protocol://$domain:$port/$serviceName?wsdl";
-		KalturaLog::debug("Service URL: $url");
-		return new $serviceClass($url);
-	}
-	
-	public function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
-	{	
-		$domain = $this->getPlaybackDomain();
-		
-		$domainField = "domain" . ($format ? "-$format" : "");
-		
-		$domain = $this->getValueByField($mediaServerConfig, $domainField, $domain);
-		
-		$mediaServerPlaybackDomainConfig = $this->getMediaServerPlaybackDomainConfig();
-		if($mediaServerPlaybackDomainConfig)
-		{
-			$domainField = $protocol . ($format ? "-$format" : "");
-			if(isset($mediaServerPlaybackDomainConfig[$domainField]))
-				$domain = $mediaServerPlaybackDomainConfig[$domainField];
-		}
-		
-		return $domain;
+		$playbackHost = "$protocol://$domain:$port/$appPrefix/$applicationName";
+		$playbackHost = str_replace("{hostName}", $hostname, $playbackHost);
+		return $playbackHost;
 	}
 	
 	public function getPortByProtocolAndFormat($protocol = 'http', $format = null)

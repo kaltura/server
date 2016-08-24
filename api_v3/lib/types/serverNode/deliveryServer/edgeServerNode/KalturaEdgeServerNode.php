@@ -6,6 +6,14 @@
 class KalturaEdgeServerNode extends KalturaDeliveryServerNode
 {
 	/**
+	 * Delivery server playback Domain
+	 *
+	 * @var string
+	 * @filter like,mlikeor,mlikeand
+	 */
+	public $playbackDomain;
+	
+	/**
 	 * Overdie edge server default configuration - json format
 	 * @var string
 	 */
@@ -13,6 +21,7 @@ class KalturaEdgeServerNode extends KalturaDeliveryServerNode
 	
 	private static $map_between_objects = array
 	(
+		"playbackDomain" => "playbackHostName",
 		"config",
 	);
 	

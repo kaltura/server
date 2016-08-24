@@ -4,15 +4,7 @@
  * @subpackage objects
  */
 abstract class KalturaDeliveryServerNode extends KalturaServerNode
-{	
-	/**
-	 * Delivery server playback Domain
-	 *
-	 * @var string
-	 * @filter like,mlikeor,mlikeand
-	 */
-	public $playbackDomain;
-
+{
 	/**
 	 * Delivery profile ids
 	 * @var KalturaKeyValueArray
@@ -21,7 +13,6 @@ abstract class KalturaDeliveryServerNode extends KalturaServerNode
 
 	private static $map_between_objects = array 
 	(
-		"playbackDomain" => "playbackHostName",
 		"deliveryProfileIds",
 	);
 	

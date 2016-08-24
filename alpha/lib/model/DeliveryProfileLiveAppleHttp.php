@@ -183,13 +183,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	protected function getHttpUrl($serverNode)
 	{
 		$httpUrl = $this->getBaseUrl($serverNode, PlaybackProtocol::HLS);
+		$httpUrl = rtrim($httpUrl, "/") . "/" . $this->getStreamName() . "/playlist.m3u8" . $this->getQueryAttributes();
 
 		if($this->getDynamicAttributes()->getUsePlayServer())
 		{
 			$httpUrl = $this->getPlayServerUrl($httpUrl);
 		}
 
-		return rtrim($httpUrl, "/") . "/" . $this->getStreamName() . "/playlist.m3u8" . $this->getQueryAttributes();
+		return $httpUrl;
 	}
 
 	protected function buildHttpFlavorsArray()

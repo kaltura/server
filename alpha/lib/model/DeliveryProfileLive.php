@@ -237,21 +237,15 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	protected function getBaseUrl($serverNode, $streamFormat = null)
 	{
 		/* @var $serverNode WowzaMediaServerNode */
-		$baseUrl = $this->getDynamicAttributes()->getMediaProtocol() . "://";
-
-		if($this->getHostName())
-		{
-			$baseUrl .= rtrim($this->getHostName(), "/") . ":" . $serverNode->getPortByProtocolAndFormatYossi($this->getDynamicAttributes()->getMediaProtocol(), $streamFormat);
-		}
-		else
-		{
-			$baseUrl .= rtrim($serverNode->getHostName(), "/") . ":" . $serverNode->getPortByProtocolAndFormatYossi($this->getDynamicAttributes()->getMediaProtocol(), $streamFormat);
-		}
-
-		$baseUrl .= "/" . $serverNode->getApplicationPrefix() . "/" . $serverNode->getApplicationName();
-
-		KalturaLog::debug("Testing::yossi stepUrl = [$baseUrl]");
-
+		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
+		$domain = ($this->getHostName() && $this->getHostName() !== '') ? $this->getHostName() : $serverNode->getHostName();
+		$port = $serverNode->getPortByProtocolAndFormat($protocol, $streamFormat);
+		$appPrefix = $serverNode->getApplicationPrefix();
+		$appName = $serverNode->getApplicationName();
+		
+		$baseUrl = "$protocol://$domain:$port/$appPrefix/$appName";
+		KalturaLog::debug("Live Stream base url [$baseUrl]");
+		
 		return $baseUrl;
 	}
 }
