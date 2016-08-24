@@ -14,9 +14,10 @@
 		- rt_field = is_public
 
 ### Deployment scripts ###
-
-Reindex sphinx and re-populate cuepoints.
-
+- Restart Kaltura-batch service
+- Run:
+	
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_08_22_add_action_plugin_cuepoint.php
 
 # Kajam 11.21.0 #
 
