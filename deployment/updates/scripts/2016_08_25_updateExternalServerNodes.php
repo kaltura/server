@@ -91,7 +91,7 @@ if(!count($externalWowzaServerNodes))
 foreach ($externalWowzaServerNodes as $externalWowzaServerNode) 
 {
 	/* @var $externalWowzaServerNode WowzaMediaServerNode */
-	KalturaLog::debug("updating wowza server node with id [{$$externalWowzaServerNode->getId()}] with default delivery profile ids");
+	KalturaLog::debug("updating wowza server node with id [{$externalWowzaServerNode->getId()}] with default delivery profile ids");
 	$externalWowzaServerNode->setDeliveryProfileIds($defaultDeliveryProfileArray);
 	
 	if($executionMode === "debug")
