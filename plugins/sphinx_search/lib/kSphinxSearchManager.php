@@ -414,12 +414,14 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$sphinxLog = new SphinxLog();
 		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId());
 		$sphinxLog->setObjectId($object->getId());
-		$sphinxLog->setObjectType(get_class($object));
+		$sphinxLog->setObjectType($object->getIndexObjectName());
 		$sphinxLog->setEntryId($object->getEntryId());
 		$sphinxLog->setPartnerId($object->getPartnerId());
 		$sphinxLog->setSql($sql);
 		$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
+                kSphinxQueryCache::invalidateQueryCache($object);
+                
 		if(!kConf::get('exec_sphinx', 'local', 0))
 			return true;
 					

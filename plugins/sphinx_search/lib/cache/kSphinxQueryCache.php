@@ -7,6 +7,7 @@
 class kSphinxQueryCache extends kQueryCache
 {
 	const CACHE_PREFIX_QUERY_SPHINX = 'QCQSPH-';				// = Query Cache - Sphinx Query
+        const CACHE_PREFIX_INVALIDATION_KEY = 'QCISPH-';	// = Query Cache - Invalidation key
 
 	public static function getCachedSphinxQueryResults(Criteria $criteria, $objectClass, &$cacheKey)
 	{
@@ -107,4 +108,38 @@ class kSphinxQueryCache extends kQueryCache
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
 		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);
 	}
+        
+	public static function invalidateQueryCache($object)
+	{
+		if (!kConf::get("query_cache_invalidate_on_change"))
+		{
+			return;
+		}
+		
+                $objectClass = $object->getIndexObjectName();
+		$invalidationKeys = $objectClass::getCacheInvalidationKeys($object);
+		if (!$invalidationKeys)
+		{
+			return;
+		}
+		
+		self::initGlobalMemcache();
+		if (self::$s_memcacheKeys === null)			// The keys memcache suffices here
+		{
+			return null;
+		}
+				
+		$currentTime = time();
+		foreach ($invalidationKeys as $invalidationKey)
+		{
+			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY . str_replace(' ', '_', $invalidationKey);
+			KalturaLog::debug("kQueryCache: updating invalidation key, invkey=$invalidationKey");
+			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime, 
+				self::CACHED_QUERIES_EXPIRY_SEC + self::INVALIDATION_KEYS_EXPIRY_MARGIN))
+			{
+				KalturaLog::err("kQueryCache: failed to update invalidation key");
+			}
+		}
+	}
+        
 }

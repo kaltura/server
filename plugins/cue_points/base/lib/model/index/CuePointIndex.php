@@ -298,9 +298,12 @@ class CuePointIndex extends BaseIndexObject
 		return CuePointPeer::doCount($c);
 	}
 
-	public static function getCacheInvalidationKeys()
+	public static function getCacheInvalidationKeys($object = null)
 	{
-		return array(array("cuePoint:id=%s", CuePointPeer::ID), array("cuePoint:entryId=%s", CuePointPeer::ENTRY_ID));
+            if (is_null($object))
+		return array(array("cue_point:id=%s", CuePointPeer::ID), array("cue_point:entryId=%s", CuePointPeer::ENTRY_ID));
+            else
+		return array("cue_point:id=".strtolower($this->getId()), "cue_point:entryId=".strtolower($this->getEntryId()));
 	}
 }
 
