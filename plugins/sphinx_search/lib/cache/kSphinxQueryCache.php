@@ -61,6 +61,11 @@ class kSphinxQueryCache extends kQueryCache
 			$maxInvalidationKey = array_search($maxInvalidationTime, $cacheResult);
 		}
 
+		$currentTime = time();		
+		if (!is_null($maxInvalidationTime) && 
+                        $currentTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
+			return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
+                
 		// get the cache key and update the api cache
 		$cacheKey = self::CACHE_PREFIX_QUERY_SPHINX . md5(serialize($criteria) . self::CACHE_VERSION);
 		if ($cacheKey)
