@@ -7,7 +7,7 @@
 class kSphinxQueryCache extends kQueryCache
 {
 	const CACHE_PREFIX_QUERY_SPHINX = 'QCQSPH-';				// = Query Cache - Sphinx Query
-        const CACHE_PREFIX_INVALIDATION_KEY = 'QCISPH-';	// = Query Cache - Invalidation key
+	const CACHE_PREFIX_INVALIDATION_KEY = 'QCISPH-';	// = Query Cache - Invalidation key
 
 	public static function getCachedSphinxQueryResults(Criteria $criteria, $objectClass, &$cacheKey)
 	{
@@ -63,9 +63,9 @@ class kSphinxQueryCache extends kQueryCache
 
 		$currentTime = time();		
 		if (!is_null($maxInvalidationTime) && 
-                        $currentTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
+			$currentTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
 			return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
-                
+
 		// get the cache key and update the api cache
 		$cacheKey = self::CACHE_PREFIX_QUERY_SPHINX . md5(serialize($criteria) . self::CACHE_VERSION);
 		if ($cacheKey)
@@ -113,7 +113,7 @@ class kSphinxQueryCache extends kQueryCache
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
 		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);
 	}
-        
+
 	public static function invalidateQueryCache($object)
 	{
 		if (!kConf::get("query_cache_invalidate_on_change"))
@@ -146,5 +146,5 @@ class kSphinxQueryCache extends kQueryCache
 			}
 		}
 	}
-        
+
 }
