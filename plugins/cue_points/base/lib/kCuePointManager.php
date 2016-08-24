@@ -744,6 +744,17 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return;
  		}
 
+		$jobData = new kLiveToVodJobData();
+		$jobData->setVodEntryId($vodEntryId);
+		$jobData->setLiveEntryId($liveEntryId);
+		$jobData->setTotalVodDuration($totalVODDuration);
+		$jobData->setLastSegmentDuration($lastSegmentDuration);
+		$jobData->setAmfArray(json_encode($amfArray));
+		$batchJob = new BatchJob();
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
+		return;
+		
+
  		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $lastSegmentDuration);
  		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
 

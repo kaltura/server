@@ -1,7 +1,22 @@
 # Lynx 12.0.0 #
 
+## Add new batch job for handling copy cue-point from live to VOD ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-5733
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Make sure that to kaltura_cue_point index is modified from rt_attr_uint to rt_field :
+		- rt_field = cue_point_type
+		- rt_field = kuser_id
+		- rt_field = is_public
+
 ### Deployment scripts ###
-Run 'php deployment/updates/scripts/add_permissions/2016_08_07_update_play_server_get_flavor_asset_service_permission.php'
+
+Reindex sphinx and re-populate cuepoints.
+
 
 # Kajam 11.21.0 #
 
