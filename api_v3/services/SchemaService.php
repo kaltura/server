@@ -54,7 +54,7 @@ class SchemaService extends KalturaBaseService
 		
 		$resultXsd = self::buildSchemaByType($type);
 		
-		kFile::safeFilePutContents($cacheXsdFile, $resultXsd);
+		kFile::safeFilePutContents($cacheXsdFile, $resultXsd, 0644);
 		return realpath($cacheXsdFile);
 	}
 	
