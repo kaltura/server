@@ -74,7 +74,7 @@ class kJobsManager
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 			
-		$dbBatchJob->setDeletedAt(time());
+		$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_DELETED);
 		$dbBatchJob->save();
 		
 		return $dbBatchJob;
