@@ -485,7 +485,7 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_CATEGORY_FIELD_IS_DEPRECATED = "ENTRY_CATEGORY_FIELD_IS_DEPRECATED;;entry->categories and entry->categoriesIds fields are deprecated - user categoryEntry service";
 
-	const ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED = "ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED;NEW_VALUE;Cannot set the value of DISPLAY_IN_SEARCH to [\"@NEW_VALUE@]\"";
+	const ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED = "ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED;DISPLAY_IN_SEARCH_NEW_VALUE;Cannot set the value of DISPLAY_IN_SEARCH to [\"@DISPLAY_IN_SEARCH_NEW_VALUE@\"]";
 
 	/**
 	 * categoryEntry
