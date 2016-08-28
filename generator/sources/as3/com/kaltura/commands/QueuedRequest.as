@@ -30,6 +30,7 @@ package com.kaltura.commands {
 	import com.kaltura.errors.KalturaError;
 	import com.kaltura.events.KalturaEvent;
 	import com.kaltura.net.KalturaCall;
+	import flash.utils.*;
 
 	public class QueuedRequest extends KalturaCall {
 
@@ -144,7 +145,7 @@ package com.kaltura.commands {
 			var argsArr:Array = (call.args.toString()).split('&');
 			for (var k:int = 0; k < argsArr.length; k++) {
 				var inMap:Boolean = false;
-				var key:String = decodeURIComponent(argsArr[k].split('=')[0]);
+				var key:String = unescapeMultiByte(argsArr[k].split('=')[0]);
 				
 				//search the key in param map
 				for (var m:int = 0; m < _mapParamArr.length; m++) {
@@ -158,7 +159,7 @@ package com.kaltura.commands {
 				//if not in the multi request map 
 				if (!inMap && argsArr[k]) {
 					keyArray.push((ind + 1) + ":" + key);
-					valueArr.push(decodeURIComponent(argsArr[k].split('=')[1]));
+					valueArr.push(unescapeMultiByte(argsArr[k].split('=')[1]));
 				}
 			}
 		}
