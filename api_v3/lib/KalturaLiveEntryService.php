@@ -339,7 +339,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
-			
+
+			KalturaLog::debug("createRecordedEntry__ . $dbEntry->getRecordingOptions()->getShouldMakeHidden()");
+			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
+			{
+				KalturaLog::debug("createRecordedEntry__setDisplayInSearch true");
+				$recordedEntry->setDisplayInSearch(true);
+			}
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldCopyScheduling())
 			{
 				$recordedEntry->setStartDate($dbEntry->getStartDate());

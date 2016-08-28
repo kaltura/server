@@ -22,12 +22,18 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
 	 * @var KalturaNullableBoolean
 	 */
 	public $shouldCopyThumbnail;
-	
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $shouldMakeHidden;
+
 	private static $mapBetweenObjects = array
 	(
 		"shouldCopyEntitlement",
 		"shouldCopyScheduling",
 		"shouldCopyThumbnail",
+		"shouldMakeHidden"
 	);
 	
 	/* (non-PHPdoc)

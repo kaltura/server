@@ -23,7 +23,12 @@ class kLiveEntryRecordingOptions
 	 * @var boolean
 	 */
 	protected $shouldCopyThumbnail;
-	
+
+	/**
+	 * @var boolean
+	 */
+	protected $shouldMakeHidden = false;
+
 	/**
 	 * @return the $shouldCopyThumbnail
 	 */
@@ -68,5 +73,21 @@ class kLiveEntryRecordingOptions
 	public function getShouldCopyEntitlement()
 	{
 		return $this->shouldCopyEntitlement;
+	}
+
+	/**
+	 * @param boolean $shouldMakeHidden
+	 */
+	public function setShouldMakeHidden($shouldMakeHidden)
+	{
+		$this->shouldMakeHidden = $shouldMakeHidden;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getShouldMakeHidden()
+	{
+		return $this->shouldMakeHidden;
 	}
 }
