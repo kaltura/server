@@ -188,19 +188,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
 		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
 		
-		//We do not yet support Audio only stream manifest mreging
-		$isAudioStream = $this->isAudioStream($primaryServerStreams, $backupServerStreams);
-		
-		if($this->params->getUsePlayServer() || $isAudioStream || (!count($primaryServerStreams) && !count($backupServerStreams)))
+		if($this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
 		{
 			$this->shouldRedirect = true;
-		}
-		
-		if($isAudioStream)
-		{
-			$baseUrl = str_replace('_all.smil', '_pass.smil', $baseUrl);
-			$this->liveStreamConfig->setUrl($baseUrl);
-			$this->liveStreamConfig->setBackupUrl(null);
 		}
 		
 		if($this->params->getUsePlayServer()) {
@@ -255,27 +245,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavorBitrateInfo[$stream->getFlavorId()] = $stream->getBitrate();
 		}
 		return $flavorBitrateInfo;
-	}
-	
-	private function isAudioStream($primaryServerStreams, $backupServerStreams)
-	{
-		if(count($primaryServerStreams))
-		{
-			/* @var $kLiveStreamParams kLiveStreamParams */
-			$kLiveStreamParams = reset($primaryServerStreams);
-			if(!$kLiveStreamParams->getHeight() && !$kLiveStreamParams->getWidth())
-				return true;
-		}
-		
-		if(count($backupServerStreams))
-		{
-			/* @var $kLiveStreamParams kLiveStreamParams */
-			$kLiveStreamParams = reset($backupServerStreams);
-			if(!$kLiveStreamParams->getHeight() && !$kLiveStreamParams->getWidth())
-				return true;
-		}
-		
-		return false;
 	}
 }
 

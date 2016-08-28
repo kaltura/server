@@ -158,7 +158,14 @@ abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilt
 	 */
 	public $useCategoryEntries;
 	
-	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories", "storageId", "entriesOrderBy", "enforceEntitlement", "privacyContext", "updatedAt", "useCategoryEntries",);
+	/**
+	 * Feed content-type header value
+	 * @var string
+	 */
+	public $feedContentTypeHeader;
+	
+	
+	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories", "storageId", "entriesOrderBy", "enforceEntitlement", "privacyContext", "updatedAt", "useCategoryEntries", "feedContentTypeHeader",);
 	
 	public function getMapBetweenObjects()
 	{

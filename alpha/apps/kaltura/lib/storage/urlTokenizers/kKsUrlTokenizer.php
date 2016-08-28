@@ -48,6 +48,10 @@ class kKsUrlTokenizer extends kUrlTokenizer
 		$privileges = kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $this->entryId;
 		$privileges .= ',' . kSessionBase::PRIVILEGE_VIEW . ':' . $this->entryId;
 		$privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . $uriRestrict . '*';
+		if ($this->limitIpAddress)
+		{
+			$privileges .= ',' . kSessionBase::PRIVILEGE_IP_RESTRICTION . ':' . infraRequestUtils::getRemoteAddress();
+		}
 
 		$ks = kSessionBase::generateKsV2(
 			$this->key, 
