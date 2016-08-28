@@ -19,6 +19,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	const CUSTOM_DATA_FIELD_TRIGGERED_AT = 'triggeredAt';
 	const CUSTOM_DATA_FIELD_IS_PUBLIC = 'isPublic';
+	const CUSTOM_DATA_FIELD_PUSER_ID = 'puserId';
 
 	const INDEXED_FIELD_PREFIX = 'pid';
 
@@ -39,17 +40,26 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	
 	public function getPuserId()
 	{
-		$kuser =  kuserPeer::retrieveByPKNoFilter($this->getKuserId());
-	    if(!$kuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		$puserId = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PUSER_ID);
+		
+		if(!$puserId)
+		{
+			$kuser =  kuserPeer::retrieveByPKNoFilter($this->getKuserId());
+			if(!$kuser)
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 			
-		return $kuser->getPuserId();
+			$puserId = $kuser->getPuserId();
+			$this->putInCustomData(self::CUSTOM_DATA_FIELD_PUSER_ID, $puserId);
+			$this->save();
+		}
+		
+		return $puserId;
 	} 
 	
 	/**
-	 * @param string $v puser id
-	 * @param bool $isAdmin
+	 * @param string $puserId puser id
 	 * @return CuePoint
+	 * @throws Exception When partner id is not defined on the current object
 	 */
 	public function setPuserId($puserId)
 	{
@@ -61,6 +71,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $puserId);
 			
 		$this->setKuserId($kuser->getId());
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_PUSER_ID, $puserId);
 	} 
 	
 	/**

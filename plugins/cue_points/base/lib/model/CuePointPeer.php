@@ -139,10 +139,11 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 			}
 
 			$removedRecordsCount = 0;
+			$ksKuserId = kCurrentContext::getCurrentKsKuser()->getId();
 			foreach ($selectResults as $key => $cuePoint)
 			{
 				/* @var $cuePoint CuePoint */
-				if (kCurrentContext::$ks_uid && $cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic() && $cuePoint->getEntryId() != $privilagedEntryId)
+				if ($ksKuserId && $cuePoint->getKuserId() !== $ksKuserId && !$cuePoint->getIsPublic() && $cuePoint->getEntryId() != $privilagedEntryId)
 				{
 					KalturaLog::warning("Filtering cuePoint select result with the following: [ks_uid -" . kCurrentContext::$ks_uid . "] [puserId - " . $cuePoint->getPuserId() . "] [isPublic - " . $cuePoint->getIsPublicStr() . "] [cuepointEntryId -  " . $cuePoint->getEntryId() . "] [privilagedEntryId - " . $privilagedEntryId . "] ");
 					unset($selectResults[$key]);
