@@ -493,12 +493,12 @@ class KalturaSyndicationFeedRenderer
 				} else {
 					$xml = $renderer->handleBody($entry, $e, $flavorAssetUrl);
 				}
-			} 
-
-			if ($cacheStore)
-			{
-				$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
-				$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
+				
+				if ($cacheStore)
+				{
+					$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
+					$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
+				}
 			}
 			
 			echo $renderer->finalize($xml, $nextEntry !== false);
