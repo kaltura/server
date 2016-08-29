@@ -6,8 +6,12 @@
 
 class kSphinxQueryCache extends kQueryCache
 {
-	const CACHE_PREFIX_QUERY_SPHINX = 'QCQSPH-';				// = Query Cache - Sphinx Query
+	const CACHE_PREFIX_QUERY = 'QCQSPH-';				// = Query Cache - Sphinx Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCISPH-';	// = Query Cache - Invalidation key
+	const DONT_CACHE_KEY = 'QCCSPH-DontCache';			// when set new queries won't be cached in the memcache
+	const SPHINX_LAG_KEY = 'QCCSPH-SphinxLag';	// the lags of the diffrent sphinx servers in the current DC
+
+	protected static $sphinxLag = null;
 
 	public static function getCachedSphinxQueryResults(Criteria $criteria, $objectClass, &$cacheKey)
 	{
@@ -39,8 +43,8 @@ class kSphinxQueryCache extends kQueryCache
 		}
 
 		$keysToGet = $invalidationKeys;
-		//$keysToGet[] = self::DONT_CACHE_KEY;
-		//$keysToGet[] = self::MAX_SLAVE_LAG_KEY;
+		$keysToGet[] = self::DONT_CACHE_KEY;
+		$keysToGet[] = self::SPHINX_LAG_KEY;
 
 		$queryStart = microtime(true);
 		$cacheResult = self::$s_memcacheKeys->multiGet($keysToGet);
@@ -52,6 +56,23 @@ class kSphinxQueryCache extends kQueryCache
 			return null;
 		}
 
+		// don't cache the result if the 'dont cache' flag is enabled
+		$cacheQuery = true;
+		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult) && 
+			$cacheResult[self::DONT_CACHE_KEY])
+		{
+			KalturaLog::log("kQueryCache: dontCache key is set -> not caching the result");
+			$cacheQuery = false;
+		}
+		unset($cacheResult[self::DONT_CACHE_KEY]);
+
+		if (array_key_exists(self::SPHINX_LAG_KEY, $cacheResult) && 
+			strlen($cacheResult[self::SPHINX_LAG_KEY]))
+		{
+			self::$sphinxLag = json_decode($cacheResult[self::SPHINX_LAG_KEY], true);
+		}
+		unset($cacheResult[self::SPHINX_LAG_KEY]);
+		
 		// get max invalidation time
 		$maxInvalidationTime = null;
 		$maxInvalidationKey = null;
@@ -67,7 +88,7 @@ class kSphinxQueryCache extends kQueryCache
 			return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
 
 		// get the cache key and update the api cache
-		$cacheKey = self::CACHE_PREFIX_QUERY_SPHINX . md5(serialize($criteria) . self::CACHE_VERSION);
+		$cacheKey = self::CACHE_PREFIX_QUERY . md5(serialize($criteria) . self::CACHE_VERSION);
 		if ($cacheKey)
 		{
 			kApiCache::addInvalidationKeys($invalidationKeys, $maxInvalidationTime);
