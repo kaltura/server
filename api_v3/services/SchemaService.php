@@ -36,14 +36,30 @@ class SchemaService extends KalturaBaseService
 	 */
 	function serveAction($type)
 	{
-		$cachedXsdFilePath = kConf::get("cache_root_path") . "/$type.xsd";
+		$cachedXsdFilePath = self::getCachedXsdFilePath($type);
 		if(file_exists($cachedXsdFilePath))
 			return $this->dumpFile(realpath($cachedXsdFilePath), 'application/xml');
 		
 		$resultXsd = self::buildSchemaByType($type);
 		kFile::safeFilePutContents($cachedXsdFilePath, $resultXsd, 0644);
-		
 		return new kRendererString($resultXsd, 'application/xml');
+	}
+	
+	public static function getSchemaPath($type)
+	{
+		$cachedXsdFilePath = self::getCachedXsdFilePath($type);
+		if(file_exists($cachedXsdFilePath))
+			return realpath($cachedXsdFilePath);
+		
+		$resultXsd = self::buildSchemaByType($type);
+		kFile::safeFilePutContents($cachedXsdFilePath, $resultXsd, 0644);
+		return realpath($cachedXsdFilePath);
+	}
+	
+	private static function getCachedXsdFilePath($type)
+	{
+		$cachedXsdFilePath = kConf::get("cache_root_path") . "/$type.xsd";
+		return $cachedXsdFilePath;
 	}
 	
 	private static function buildSchemaByType($type)
