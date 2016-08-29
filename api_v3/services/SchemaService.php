@@ -10,7 +10,6 @@ class SchemaService extends KalturaBaseService
 {
 	const CORE_SCHEMA_NAME = 'core';
 	const ENUM_SCHEMA_NAME = 'enum';
-	const SCHEMA_BUILD_ERROR_CACHE_EXPIRY = 30;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerRequired()
@@ -39,31 +38,25 @@ class SchemaService extends KalturaBaseService
 	{
 		header("Content-Type: text/plain; charset=UTF-8");
 		
-		$cacheXsdFile = self::getSchemaPath($type);
-		return $this->dumpFile($cacheXsdFile, 'application/xml');
+		return $this->serveSchemaByType($type);
 	}
 	
-	/**
-	 * @param KalturaSchemaType $type
-	 * @return string filePath
-	 */
-	public static function getSchemaPath($type)
+	private function serveSchemaByType($type)
 	{
-		$cacheXsdFile = kConf::get("cache_root_path") . "/$type.xsd";
-		if(file_exists($cacheXsdFile))
-			return realpath($cacheXsdFile);
+		$cachedXsdFilePath = kConf::get("cache_root_path") . "/$type.xsd";
+		if(file_exists($cachedXsdFilePath))
+			return $this->dumpFile(realpath($cachedXsdFilePath), 'application/xml');
 		
 		$resultXsd = self::buildSchemaByType($type);
-		
-		if(kFile::safeFilePutContents($cacheXsdFile, $resultXsd, 0644))
+		if(kFile::safeFilePutContents($cachedXsdFilePath, $resultXsd, 0644))
 		{
-			return realpath($cacheXsdFile);
+			return $this->dumpFile(realpath($cachedXsdFilePath), 'application/xml');
 		}
 		else
 		{
-			KalturaResponseCacher::setExpiry(self::SCHEMA_BUILD_ERROR_CACHE_EXPIRY);
-			throw new KalturaAPIException(KalturaErrors::SCHEMA_BUILD_FAILED, $type);
+			return new kRendererString($resultXsd, 'application/xml');
 		}
+		
 	}
 	
 	private static function buildSchemaByType($type)
