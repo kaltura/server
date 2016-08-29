@@ -233,7 +233,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbLiveEntry->setRedirectEntryId(null);
 		$dbLiveEntry->save();
 		
-		if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && $liveEntryStatus == EntryServerNodeStatus::PLAYABLE && $dbLiveEntry->getRecordStatus())
+		if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && 
+				in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) && 
+				$dbLiveEntry->getRecordStatus())
 		{
 			KalturaLog::info("Checking if recorded entry needs to be created for entry $entryId");
 			$createRecordedEntry = false;
