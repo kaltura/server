@@ -651,6 +651,9 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	{
 		KalturaLog::debug("in validateDisplayInSearch. getDisplayInSearch= " . $this->displayInSearch);
 
+		if (!$this->displayInSearch)
+			return;
+
 		if ($this->displayInSearch === EntryDisplayInSearchType::PARTNER_ONLY ||
 			$this->displayInSearch === EntryDisplayInSearchType::SYSTEM)
 			return;
