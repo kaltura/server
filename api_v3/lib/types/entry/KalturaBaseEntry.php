@@ -649,21 +649,21 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 */
 	public function validateDisplayInSearch(entry $sourceObject = null)
 	{
-		KalturaLog::debug("in validateDisplayInSearch. getDisplayInSearch= " . $sourceObject->getDisplayInSearch());
+		KalturaLog::debug("in validateDisplayInSearch. getDisplayInSearch= " . $this->displayInSearch);
 
-		if ($this->getDisplayInSearch() === EntryDisplayInSearchType::PARTNER_ONLY ||
-			$this->getDisplayInSearch() === EntryDisplayInSearchType::SYSTEM)
+		if ($this->displayInSearch === EntryDisplayInSearchType::PARTNER_ONLY ||
+			$this->displayInSearch === EntryDisplayInSearchType::SYSTEM)
 			return;
 
 		// only for update scenario check against old object
 		if ($sourceObject) {
 
 			KalturaLog::debug("in validateDisplayInSearch. entry->getDisplayInSearch()= " . $sourceObject->getDisplayInSearch());
-			if ($this->getDisplayInSearch() === $sourceObject->getDisplayInSearch())
+			if ($this->displayInSearch === $sourceObject->getDisplayInSearch())
 				return;
 		}
 
-		throw new KalturaAPIException(KalturaErrors::ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED, $this->getDisplayInSearch());
+		throw new KalturaAPIException(KalturaErrors::ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED, $this->displayInSearch);
 	}
 
 	/* (non-PHPdoc)
