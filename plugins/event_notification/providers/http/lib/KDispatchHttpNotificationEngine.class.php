@@ -67,11 +67,8 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			$headers[] = "X-KALTURA-SIGNATURE: $dataSig";
 		}
 
-		KalturaLog::log("@@NA class name [".get_class($this->data)."]");
-
 		if ($httpNotificationTemplate->data instanceof KalturaHttpNotificationObjectData)
 		{
-			KalturaLog::log("@@NA class name [".$httpNotificationTemplate->data->format."]");
 			if ($httpNotificationTemplate->data->format == KalturaResponseType::RESPONSE_TYPE_XML)
 			{
 				$headers[] = 'content-type: application/xml';
