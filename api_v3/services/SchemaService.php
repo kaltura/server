@@ -60,29 +60,6 @@ class SchemaService extends KalturaBaseService
 		
 	}
 	
-	/**
-	 * @param KalturaSchemaType $type
-	 * @return string filePath
-	 */
-	public static function getSchemaPath($type)
-	{
-		$cacheXsdFile = kConf::get("cache_root_path") . "/$type.xsd";
-		if(file_exists($cacheXsdFile))
-			return realpath($cacheXsdFile);
-		
-		$resultXsd = self::buildSchemaByType($type);
-		
-		if(kFile::safeFilePutContents($cacheXsdFile, $resultXsd, 0644))
-		{
-			return realpath($cacheXsdFile);
-		}
-		else
-		{
-			KalturaResponseCacher::setExpiry(self::SCHEMA_BUILD_ERROR_CACHE_EXPIRY);
-			throw new KalturaAPIException(KalturaErrors::SCHEMA_BUILD_FAILED, $type);
-		}
-	}
-	
 	private static function buildSchemaByType($type)
 	{
 		$elementsXSD = '';
