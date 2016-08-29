@@ -129,6 +129,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $addThumbnailExtension;
 
 	/**
+	 * @var string
+	 */
+	protected $sessionId = null;
+
+	/**
 	 * @return the $addThumbnailExtension
 	 */
 	public function getAddThumbnailExtension() {
@@ -455,6 +460,22 @@ class DeliveryProfileDynamicAttributes {
 		$this->edgeServerIds = $edgeServerIds;
 	}
 	
+	/*
+	 * @return the sessionId
+	 */
+	public function getSessionId()
+	{
+		return $this->sessionId;
+	}
+
+	/*
+	 * @param string $sessionId
+	 */
+	public function setSessionId($sessionId)
+	{
+		$this->sessionId = $sessionId;
+	}
+
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
@@ -524,6 +545,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->playerConfig = $newObj->getPlayerConfig();
 		$this->uiConfId = $newObj->getUiConfId();
 		$this->edgeServerIds = $newObj->getEdgeServerIds();
+		$this->sessionId = $newObj->getSessionId();
 	}
 }
 
