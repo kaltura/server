@@ -541,7 +541,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 //				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
 //		}
 
-		$this->validateDisplayInSearch($sourceObject);
+		$this->validateDisplayInSearch();
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -649,27 +649,21 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 */
 	public function validateDisplayInSearch(entry $sourceObject = null)
 	{
-		KalturaLog::debug("in validateDisplayInSearch");
-
-		if (!$sourceObject)
-			return;
-
 		KalturaLog::debug("in validateDisplayInSearch. getDisplayInSearch= " . $sourceObject->getDisplayInSearch());
 
-		if ($sourceObject->getDisplayInSearch() === EntryDisplayInSearchType::PARTNER_ONLY ||
-			$sourceObject->getDisplayInSearch() === EntryDisplayInSearchType::SYSTEM)
+		if ($this->getDisplayInSearch() === EntryDisplayInSearchType::PARTNER_ONLY ||
+			$this->getDisplayInSearch() === EntryDisplayInSearchType::SYSTEM)
 			return;
 
-		// only for update scenario check the DB
-		if ($this->id) {
-			$entry = EntryPeer::retrieveByPK($this->id);
+		// only for update scenario check against old object
+		if ($sourceObject) {
 
-			KalturaLog::debug("in validateDisplayInSearch. entry->getDisplayInSearch()= " . $entry->getDisplayInSearch());
-			if ($entry && $entry->getDisplayInSearch() === $sourceObject->getDisplayInSearch())
+			KalturaLog::debug("in validateDisplayInSearch. entry->getDisplayInSearch()= " . $sourceObject->getDisplayInSearch());
+			if ($this->getDisplayInSearch() === $sourceObject->getDisplayInSearch())
 				return;
 		}
 
-		throw new KalturaAPIException(KalturaErrors::ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED, $sourceObject->getDisplayInSearch());
+		throw new KalturaAPIException(KalturaErrors::ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED, $this->getDisplayInSearch());
 	}
 
 	/* (non-PHPdoc)
