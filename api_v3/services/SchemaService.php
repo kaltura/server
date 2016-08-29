@@ -10,7 +10,6 @@ class SchemaService extends KalturaBaseService
 {
 	const CORE_SCHEMA_NAME = 'core';
 	const ENUM_SCHEMA_NAME = 'enum';
-	const SCHEMA_BUILD_ERROR_CACHE_EXPIRY = 30;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerRequired()
@@ -39,10 +38,10 @@ class SchemaService extends KalturaBaseService
 	{
 		header("Content-Type: text/plain; charset=UTF-8");
 		
-		return $this->serveSchemaBytType($type);
+		return $this->serveSchemaByType($type);
 	}
 	
-	private function serveSchemaBytType($type)
+	private function serveSchemaByType($type)
 	{
 		$cachedXsdFilePath = kConf::get("cache_root_path") . "/$type.xsd";
 		if(file_exists($cachedXsdFilePath))
