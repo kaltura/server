@@ -39,8 +39,25 @@ class SchemaService extends KalturaBaseService
 	{
 		header("Content-Type: text/plain; charset=UTF-8");
 		
-		$cacheXsdFile = self::getSchemaPath($type);
-		return $this->dumpFile($cacheXsdFile, 'application/xml');
+		return $this->serveSchemaBytType($type);
+	}
+	
+	private function serveSchemaBytType($type)
+	{
+		$cachedXsdFilePath = kConf::get("cache_root_path") . "/$type.xsd";
+		if(file_exists($cachedXsdFilePath))
+			return $this->dumpFile(realpath($cachedXsdFilePath), 'application/xml');
+		
+		$resultXsd = self::buildSchemaByType($type);
+		if(kFile::safeFilePutContents($cachedXsdFilePath, $resultXsd, 0644))
+		{
+			return $this->dumpFile(realpath($cachedXsdFilePath), 'application/xml');
+		}
+		else
+		{
+			return new kRendererString($resultXsd, 'application/xml');
+		}
+		
 	}
 	
 	/**
