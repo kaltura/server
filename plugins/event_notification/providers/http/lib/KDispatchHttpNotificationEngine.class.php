@@ -45,6 +45,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		 * job id
 		 * scheduler id, worker id, session
 		 */
+
 		
 		$contentParameters = array();
 		$postParameters = array();
@@ -65,7 +66,18 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			$dataSig = sha1($secret . $curlData);
 			$headers[] = "X-KALTURA-SIGNATURE: $dataSig";
 		}
-		
+
+		KalturaLog::log("@@NA class name [".get_class($this->data)."]");
+
+		if ($httpNotificationTemplate->data instanceof KalturaHttpNotificationObjectData)
+		{
+			KalturaLog::log("@@NA class name [".$httpNotificationTemplate->data->format."]");
+			if ($httpNotificationTemplate->data->format == KalturaResponseType::RESPONSE_TYPE_XML)
+			{
+				$headers[] = 'content-type: application/xml';
+			}
+		}
+
 		if(is_array($data->customHeaders) && count($data->customHeaders))
 		{
 			foreach($data->customHeaders as $customHeader)
