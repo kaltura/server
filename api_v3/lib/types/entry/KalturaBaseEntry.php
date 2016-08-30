@@ -649,7 +649,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 */
 	public function validateDisplayInSearch(entry $sourceObject = null)
 	{
-		if (!$this->displayInSearch)
+		if ($this->displayInSearch === null)
 			return;
 
 		if ($this->displayInSearch === EntryDisplayInSearchType::PARTNER_ONLY ||
