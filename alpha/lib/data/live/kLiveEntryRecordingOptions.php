@@ -27,7 +27,7 @@ class kLiveEntryRecordingOptions
 	/**
 	 * @var boolean
 	 */
-	protected $shouldMakeHidden = false;
+	protected $shouldMakeHidden;
 
 	/**
 	 * @return the $shouldCopyThumbnail
