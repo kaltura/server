@@ -71,7 +71,7 @@ foreach ($partnerToWorkOn as $partner)
 		KalturaLog::debug("Found hls domain config for partner [{$partner->getId()}] value [$hlsDomain]");
 		$hlsDeliveryProfile = getDeliveryProfileByHostName($hdsDomain);
 		if($hlsDeliveryProfile)
-			$hlsDeliveryProfileId = $hdsDeliveryProfile->getId();
+			$hlsDeliveryProfileId = $hlsDeliveryProfile->getId();
 	}
 	
 	if(!$hdsDeliveryProfileId && !$hlsDeliveryProfileId)
