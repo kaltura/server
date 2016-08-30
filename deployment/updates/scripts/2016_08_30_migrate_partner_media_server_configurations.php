@@ -39,11 +39,6 @@ function getValueByField($config, $filedValue)
 	return $value;
 }
 
-//$defaultDeliveryProfileArray = array(
-//	"applehttp" => $defaultHlsDeliveryProfile,
-//	"hds" => $defaultHdsDeliveryProfile
-//);
-
 KalturaLog::debug("Starting partner media server config migration");
 
 $partnerToWorkOn = getPartnersToWorkOn();
