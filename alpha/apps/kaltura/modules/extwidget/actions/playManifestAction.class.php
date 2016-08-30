@@ -1107,6 +1107,10 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
 			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
+			if(!$this->deliveryAttributes->getUiConfId())
+				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
+
+			$this->deliveryAttributes->setSessionId(infraRequestUtils::getRemoteAddress(). '_' .((float) mt_rand() / (float) mt_getrandmax()));
 		}
 
 		if($this->secureEntryHelper)
