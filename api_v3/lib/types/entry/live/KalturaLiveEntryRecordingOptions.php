@@ -33,7 +33,7 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
 		"shouldCopyEntitlement",
 		"shouldCopyScheduling",
 		"shouldCopyThumbnail",
-		"shouldMakeHidden"
+		"shouldMakeHidden",
 	);
 	
 	/* (non-PHPdoc)
