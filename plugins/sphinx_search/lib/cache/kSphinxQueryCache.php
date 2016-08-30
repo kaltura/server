@@ -119,13 +119,15 @@ class kSphinxQueryCache extends kQueryCache
 		return $queryResult;
 	}
 
-	public static function cacheSphinxQueryResults($cacheKey, $queryResult)
+	public static function cacheSphinxQueryResults($pdo, $cacheKey, $queryResult)
 	{
 		if (self::$s_memcacheQueries === null || $cacheKey === null)
 		{
 			return;
 		}
 
+		$hostName = $pdo->getHostName();
+		
 		$uniqueId = new UniqueId();
 		$debugInfo = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : '');
 		$debugInfo .= "[$uniqueId]";

@@ -182,6 +182,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$this->sphinxRecordCount =  (int)$metaItem['Value'];
 			}
 		}
+		
+		return $pdo;
 	}
 
 	protected function applySphinxResult($setLimit)
@@ -577,10 +579,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$limit = $this->getOffset() . ", $limit";
 		}
 		
-		$this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
+		$pdo = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
 
 		$queryResult = array($this->getFetchedIds(), $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit);
-		kSphinxQueryCache::cacheSphinxQueryResults($cacheKey, $queryResult);
+		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $cacheKey, $queryResult);
 
 		$this->applySphinxResult($setLimit);
 	}
