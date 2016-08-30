@@ -18,15 +18,20 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 	{
 		return $this->getFromCustomData("enforceRtmpe");
 	}
-	
-	public function buildServeFlavors()
+
+	protected function buildHttpFlavorsArray()
 	{
 		$flavors = $this->buildRtmpLiveStreamFlavorsArray();
 
-		$baseUrl = $this->liveStreamConfig->getUrl();
+		$entry = entryPeer::retrieveByPK($this->getDynamicAttributes()->getEntryId());
+		$baseUrl = $entry->getStreamUrl();
+		$baseUrl = rtrim($baseUrl, '/');
+		if (strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") === 0)
+			$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+
 		$this->finalizeUrls($baseUrl, $flavors);
 		$this->baseUrl = $baseUrl;
-		
+
 		return $flavors;
 	}
 	
@@ -50,7 +55,6 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 	}
 	
 	/**
-	 * @param string $baseUrl
 	 * @return array
 	 */
 	protected function buildRtmpLiveStreamFlavorsArray()

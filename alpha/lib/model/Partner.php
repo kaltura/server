@@ -749,6 +749,16 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('delivery_profile_ids', null, array());
 	}
 	
+	public function setLiveDeliveryProfileIds($params)
+	{
+		$this->putInCustomData('live_delivery_profile_ids', $params);
+	}
+	
+	public function getLiveDeliveryProfileIds()
+	{
+		return $this->getFromCustomData('live_delivery_profile_ids', null, array());
+	}
+	
 	public function getEmbedCodeTypes()
 	{
 		$map = kConf::getMap('players');
