@@ -40,9 +40,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$subpId = $entry->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 
-		$url = '';
-		if($this->getDynamicAttributes()->getUsePlayServer())
-			$url = $this->getPlayServerUrlPrefix();
+		$url = $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrlPrefix() : '';
 
 		$url .= "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		if ($entry->getType() == entryType::PLAYLIST)
