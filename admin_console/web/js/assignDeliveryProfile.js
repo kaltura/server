@@ -2,12 +2,15 @@ function addDeliveryProfileFormats() {
 
 	currentFormats = getPlaybackProtocols();
 	jQuery('#deliveryFormat').empty();
-	
-	var dpIdsStr = jQuery('#delivery_profile_ids').val();
-	var dpIdsJson = jQuery.parseJSON(dpIdsStr);
 
-	for(format in dpIdsJson) {
-		if(currentFormats[format])
+	var dpIdsStr = jQuery(getTag('VOD')).val();
+	var dpIdsJsonVOD = jQuery.parseJSON(dpIdsStr);
+	dpIdsStr = jQuery(getTag('Live')).val();
+	var dpIdsJsonLive = jQuery.parseJSON(dpIdsStr);
+
+
+	for(format in dpIdsJsonVOD) {
+		if(currentFormats[format] && dpIdsJsonLive && dpIdsJsonLive.hasOwnProperty(format))
 			delete currentFormats[format];
 	}
 
@@ -31,79 +34,92 @@ function getPlaybackProtocols() {
 	return playbackDict;
 }
 
-function createDeliveryProfilesTable() 
+function createDeliveryProfilesTable()
 {
 	if(jQuery('#deliveryProfilesTable'))
 		jQuery('#deliveryProfilesTable').remove();
-	
-	var dpIdsStr = jQuery('#delivery_profile_ids').val();
-	var dpIdsJson = jQuery.parseJSON(dpIdsStr);
+
 	var tbl = document.createElement('table');
-
 	createTitles(tbl);
-	for(format in dpIdsJson)
-		addFormatRow(tbl, format, dpIdsJson[format]);
 
-	jQuery('#delivery_profile_ids').after(tbl);
+	addRowWithType(tbl, 'VOD');
+	addRowWithType(tbl,'Live');
+
+	jQuery(getTag('Live')).after(tbl);
 	$(tbl).attr('id', 'deliveryProfilesTable');
 }
 
+function addRowWithType(tbl, type) {
+	var dpIdsStr = jQuery(getTag(type)).val();
+	var dpIdsJson = jQuery.parseJSON(dpIdsStr);
+	for(format in dpIdsJson) {
+		addFormatRow(tbl, format, dpIdsJson[format], type);
+	}
+}
+
+
 function createTitles(tbl) {
-	var row = document.createElement('tr');	
+	var row = document.createElement('tr');
 	var tdFormat = document.createElement('td');
 	tdFormat.innerHTML = "<b>Format</b>";
+	var tdType = document.createElement('td');
+	tdType.innerHTML = "<b>Type</b>";
 	var tdIds = document.createElement('td');
 	tdIds.innerHTML = "<b>Delivery profiles</b>";
 	var tdEdit = document.createElement('td');
 	var tdRemove = document.createElement('td');
-	$(row).append(tdFormat).append(tdIds).append(tdEdit).append(tdRemove);
+	$(row).append(tdFormat).append(tdType).append(tdIds).append(tdEdit).append(tdRemove);
 	$(tbl).append(row);
 }
 
-function addFormatRow(tbl, format, deliveryProfileIds) 
+function addFormatRow(tbl, format, deliveryProfileIds, type)
 {
-	var row = document.createElement('tr');	
+	var row = document.createElement('tr');
 	var tdFormat = document.createElement('td');
 	tdFormat.innerHTML = format;
+	var tdType = document.createElement('td');
+	tdType.innerHTML = type;
 	var tdDPIds = document.createElement('td');
 	tdDPIds.innerHTML = deliveryProfileIds;
 	var tdEdit = document.createElement('td');
-	tdEdit.innerHTML = '<button onclick="assignDeliveryProfile(\'' +format+'\',[' + deliveryProfileIds+ ']);">Edit</button>';
+	tdEdit.innerHTML = '<button onclick="assignDeliveryProfile(\'' +format+'\',[' + deliveryProfileIds+ '], \'' +type+'\');">Edit</button>';
 	var tdRemove = document.createElement('td');
-	tdRemove.innerHTML = '<button onclick="removeFormat(\'' +format+'\');">Remove</button>';
+	tdRemove.innerHTML = '<button onclick="removeFormat(\'' +format+'\', \'' +type+'\');">Remove</button>';
 
-	$(row).append(tdFormat).append(tdDPIds).append(tdEdit).append(tdRemove);
+	$(row).append(tdFormat).append(tdType).append(tdDPIds).append(tdEdit).append(tdRemove);
 	$(tbl).append(row);
 }
 
 function addDeliveryProfile() {
 	var deliveryFormat = jQuery('#deliveryFormat').val();
-	assignDeliveryProfile(deliveryFormat, null);
+	var deliveryType = jQuery('#delivery_profile_type').val();
+	assignDeliveryProfile(deliveryFormat, null, deliveryType);
 }
 
-function removeFormat(format) {
-	var dpIdsStr = $("#delivery_profile_ids")[0].value;
+function removeFormat(format, type) {
+	var dpIdsStr = $(getTag(type))[0].value;
 	var dpIdsObj = jQuery.parseJSON(dpIdsStr);
-
 	delete dpIdsObj[format];
-
-	$("#delivery_profile_ids")[0].value = JSON.stringify(dpIdsObj);
+	$(getTag(type))[0].value = JSON.stringify(dpIdsObj);
 	updatedUI();
 }
 
-function okPressed(format) {
+function okPressed(format, type) {
 
 	var selectedValues = [];
 	$("#selectedValues option").each(function() {selectedValues.push(parseInt(this.value));});
+	if(!selectedValues.length)
+		return;
 	
-	var dpIdsStr = $("#delivery_profile_ids")[0].value;
+	var dpIdsStr = $(getTag(type))[0].value;
 	var dpIdsObj = jQuery.parseJSON(dpIdsStr);
+
 	if(dpIdsObj == null)
 		dpIdsObj = jQuery.parseJSON("{}");
 
 	dpIdsObj[format] = selectedValues;
-	$("#delivery_profile_ids")[0].value = JSON.stringify(dpIdsObj);
 
+	$(getTag(type))[0].value = JSON.stringify(dpIdsObj);
 	updatedUI();
 }
 
@@ -112,3 +128,9 @@ function updatedUI() {
 	addDeliveryProfileFormats();
 }
 
+function getTag(type) {
+	if (type == 'VOD')
+		return "#delivery_profile_ids";
+	else if (type == 'Live')
+		return "#live_delivery_profile_ids";
+}

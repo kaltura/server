@@ -33,7 +33,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		if(!$flavors)
 			return null;
 		
-		if($this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
+		if($this->params->getEdgeServerIds() && count($this->getDynamicAttributes()->getEdgeServerIds()))
 			$this->applyFlavorsDomainPrefix($flavors);
 		
 		$renderer = $this->getRenderer($flavors);
@@ -44,6 +44,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	/**
 	 * This function clones a delivery profile and create a new one out of it.
 	 * @param DeliveryProfile $newObject The delivery profile we'd like to fill.
+	 * @return DeliveryProfile $newObject
 	 */
 	public function cloneToNew ( $newObject )
 	{

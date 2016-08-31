@@ -70,6 +70,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var array
 	 */
 	protected $flavorAssets = array();
+
+	/**
+	 * @var array
+	 */
+	protected $flavorParamIds = array();
 	
 	/**
 	 * @var array
@@ -225,6 +230,13 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return array $flavorParamIds
+	 */
+	public function getFlavorParamIds() {
+		return $this->flavorParamIds;
+	}
+
+	/**
 	 * @return the $remoteFileSyncs
 	 */
 	public function getRemoteFileSyncs() {
@@ -318,6 +330,13 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @param multitype: $flavorAssets
+	 */
+	public function setFlavorParamIds($flavorParamIds) {
+		$this->flavorParamIds = $flavorParamIds;
+	}
+
+	/**
 	 * @param multitype: $remoteFileSyncs
 	 */
 	public function setRemoteFileSyncs($remoteFileSyncs) {
@@ -353,7 +372,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	/**
-	 * @return the $tags
+	 * @return array $tags
 	 */
 	public function getTags() {
 		return $this->tags;
@@ -389,7 +408,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @return the $playerConfig
+	 * @return array $playerConfig
 	 */
 	public function getPlayerConfig()
 	{
@@ -445,7 +464,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	/**
-	 * @return the edge server ids
+	 * @return array edge server ids
 	 */
 	public function getEdgeServerIds()
 	{
@@ -536,6 +555,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();
 		$this->flavorAssets = $newObj->getFlavorAssets();
+		$this->flavorParamIds = $newObj->getFlavorParamIds();
 		$this->remoteFileSyncs = $newObj->getRemoteFileSyncs();
 		$this->manifestFileSync = $newObj->getManifestFileSync();
 		$this->preferredBitrate = $newObj->getPreferredBitrate();

@@ -7,19 +7,7 @@ class EdgeServerNode extends DeliveryServerNode {
 	const EDGE_SERVER_DEFAULT_VOD_CACHE_APPLICATION_NAME = "kVOD";
 	const EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME = "kMulticast";
 	const EDGE_SERVER_DEFAULT_KAPI_APPLICATION_NAME = "kAPI";
-	const CUSTOM_DATA_DELIVERY_IDS = "delivery_profile_ids";
 	const CUSTOM_DATA_KES_CONFIG = "config";
-	
-	/* Delivery Settings */
-	public function setDeliveryProfileIds($params)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_DELIVERY_IDS, $params);
-	}
-	
-	public function getDeliveryProfileIds()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
-	}
 	
 	/* Config Settings */
 	public function setConfig($config)

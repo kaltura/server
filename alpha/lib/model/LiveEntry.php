@@ -326,215 +326,46 @@ abstract class LiveEntry extends entry
 			}
 			return $configurations;
 		}
-		
-		$primaryMediaServer = null;
-		$backupMediaServer = null;
-		$primaryApplicationName = null;
-		$backupApplicationName = null;
-		$primaryStreamInfo = null;
-		$backupStreamInfo = null;
-		
-		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
-		if(count($liveEntryServerNodes))
-		{
-			foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
-			{
-				/* @var $liveEntryServerNode LiveEntryServerNode */
-				$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-				if($serverNode)
-				{
-					KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-					if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
-					{
-						$primaryMediaServer = $serverNode;
-						$primaryApplicationName = $serverNode->getApplicationName();
-						$primaryStreamInfo = $liveEntryServerNode->getStreams();
-						unset($liveEntryServerNodes[$key]);
-						break;
-					}
-				}
-			}
-			
-			if(!$primaryMediaServer)
-			{
-				if($currentDcOnly)
-					return array();
 
-				$liveEntryServerNode = array_shift($liveEntryServerNodes);
-				$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-				if ($serverNode)
-				{
-					$primaryMediaServer = $serverNode;
-					$primaryApplicationName = $serverNode->getApplicationName();
-					$primaryStreamInfo = $liveEntryServerNode->getStreams();
-				} else
-				{
-					KalturaLog::debug("Cannot retrieve extra information for un-registered media server node id  [" . $liveEntryServerNode->getServerNodeId() . "]");
-				}
-			}
-			
-			if(!$currentDcOnly && count($liveEntryServerNodes))
-			{
-				$liveEntryServerNode = reset($liveEntryServerNodes);
-				$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-				if ($serverNode)
-				{
-					$backupMediaServer = $serverNode;
-					$backupApplicationName = $serverNode->getApplicationName();
-					$backupStreamInfo = $liveEntryServerNode->getStreams();
-				}
-			}
-		}
-		
-		$manifestUrl = null;
-		$backupManifestUrl = null;
-		$hlsManifestUrl = null;
-		$hlsBackupManifestUrl = null;
-		
-		if (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
-		{
-			$partnerConfigurations = $this->getPartner()->getLiveStreamPlaybackUrlConfigurations();
-			
-			if (isset($partnerConfigurations[$protocol]))
-				$manifestUrl = $partnerConfigurations[$protocol];
-		}
-		elseif($primaryMediaServer)
-		{
-			$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
-			$primaryMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
-			
-			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol);
-			$hlsManifestUrl = $primaryMediaServer->getManifestUrl($protocol, PlaybackProtocol::HLS);
-			if($backupMediaServer)
-			{
-				$backupMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
-				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol);
-				$hlsBackupManifestUrl = $backupMediaServer->getManifestUrl($protocol, PlaybackProtocol::HLS);
-			}
-		}
-		
-		$rtmpStreamUrl = null;
-		$hlsStreamUrl = null;
-		$hdsStreamUrl = null;
-		$slStreamUrl = null;
-		$mpdStreamUrl = null;
-		$hlsBackupStreamUrl = null;
-		$hdsBackupStreamUrl = null;
-		
-		if ($manifestUrl)
-		{
-			$manifestUrl .= "$primaryApplicationName/";
-			$streamName = $this->getId();
-			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
-				$tag = 'all';
-		
-			$queryString = array();
-			if($this->getDvrStatus() == DVRStatus::ENABLED)
-			{
-				$queryString[] = 'DVR';
-			}
-			
-			if(count($flavorParamsIds) === 1)
-			{
-				$streamName .= '_' . reset($flavorParamsIds);
-			}
-			elseif(count($flavorParamsIds) > 1)
-			{
-				sort($flavorParamsIds);
-				$tag = implode('_', $flavorParamsIds);
-				$queryString[] = 'flavorIds=' . implode(',', $flavorParamsIds);
-				
-				$streamName = "smil:{$streamName}_{$tag}.smil";
-			}
-			elseif($tag)
-			{
-				$streamName = "smil:{$streamName}_{$tag}.smil";
-			}
-			
-			if(count($queryString))
-			{
-				$queryString = '?' . implode('&', $queryString);
-			}
-			else
-			{
-				$queryString = '';
-			}
-			
-			$rtmpStreamUrl = $manifestUrl;
-			
-			$manifestUrl .= $streamName;
-			$hlsStreamUrl .= $hlsManifestUrl . "$primaryApplicationName/" . $streamName . "/playlist.m3u8" . $queryString;
-			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
-			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
-			
-			if($backupManifestUrl)
-			{
-				$backupManifestUrl .= "$backupApplicationName/";
-				$backupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl .= $hlsBackupManifestUrl . "$backupApplicationName/" . $streamName . "/playlist.m3u8" .  $queryString;				
-				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
-			}
-		}
-			
-//		TODO - enable it and test it in non-SaaS environment
-//		$configuration = new kLiveStreamConfiguration();
-//		$configuration->setProtocol(PlaybackProtocol::RTMP);
-//		$configuration->setUrl($rtmpStreamUrl);
-//		$configurations[] = $configuration;
-		
+		$cdnApiHost = kConf::get("cdn_api_host");
+		$baseManifestUrl = "$protocol://$cdnApiHost/p/{$this->partner_id}/sp/{$this->partner_id}00/playManifest/entryId/{$this->id}/protocol/$protocol";
+
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::HDS);
-		$configuration->setUrl($hdsStreamUrl);
-		$configuration->setBackupUrl($hdsBackupStreamUrl);
-		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
-		$configuration->setBackupStreamInfo($backupStreamInfo);
+		$configuration->setUrl($baseManifestUrl . "/format/hds/a.f4m");
 		$configurations[] = $configuration;
-		
+
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::HLS);
-		$configuration->setUrl($hlsStreamUrl);
-		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
-		$configuration->setBackupStreamInfo($backupStreamInfo);
+		$configuration->setUrl($baseManifestUrl . "/format/applehttp/a.m3u8");
 		$configurations[] = $configuration;
-		
+
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
-		$configuration->setUrl($hlsStreamUrl);
-		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
-		$configuration->setBackupStreamInfo($backupStreamInfo);
+		$configuration->setUrl($baseManifestUrl . "/format/applehttp/a.m3u8");
 		$configurations[] = $configuration;
-		
+
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP_TO_MC);
-		$configuration->setUrl($hlsStreamUrl);
-		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
-		$configuration->setBackupStreamInfo($backupStreamInfo);
+		$configuration->setUrl($baseManifestUrl . "/format/applehttp_to_mc/a.m3u8");
 		$configurations[] = $configuration;
-		
+
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
-		$configuration->setUrl($slStreamUrl);
-		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
-		$configuration->setBackupStreamInfo($backupStreamInfo);
+		$configuration->setUrl($baseManifestUrl . "/format/sl/Manifest");
 		$configurations[] = $configuration;
-		
+
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
-		$configuration->setUrl($mpdStreamUrl);
-		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
-		$configuration->setBackupStreamInfo($backupStreamInfo);
+		$configuration->setUrl($baseManifestUrl . "/format/mpegdash/manifest.mpd");
 		$configurations[] = $configuration;
-		
+
 		if ($this->getPushPublishEnabled())
 		{
 			$pushPublishConfigurations = $this->getPushPublishPlaybackConfigurations();
 			$configurations = array_merge($configurations, $pushPublishConfigurations);
 		}
-		
+
 		return $configurations;
 	}
 
@@ -813,15 +644,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function getPlayableEntryServerNodes()
 	{
-		$entryServerNodes =  EntryServerNodePeer::retrieveByEntryId($this->getId());
-		$playableEntryServerNodes = array();
-		foreach ( $entryServerNodes as $entryServerNode)
-		{
-			/* @var EntryServerNode $entryServerNode */
-			if ($entryServerNode->getStatus() == EntryServerNodeStatus::PLAYABLE)
-				$playableEntryServerNodes[] = $entryServerNode;
-		}
-		return $playableEntryServerNodes;
+		return EntryServerNodePeer::retrievePlayableByEntryId($this->getId());
 	}
 	
 	/* (non-PHPdoc)
