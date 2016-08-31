@@ -79,7 +79,7 @@ $defaultDeliveryProfileArray = array(
 	"hds" => $defaultHdsDeliveryProfile
 );
 
-KalturaLog::debug("Starting external Wowza delivery profiles update with defaultHlsDeliveryProfile [$defaultHlsDeliveryProfile] and [defaultHdsDeliveryProfile] $defaultHdsDeliveryProfile");
+KalturaLog::debug("Starting external Wowza delivery profiles update with defaultHlsDeliveryProfile [$defaultHlsDeliveryProfile] and defaultHdsDeliveryProfile [$defaultHdsDeliveryProfile]");
 
 $externalWowzaServerNodes = getActiveExternalWowzaServerNode();
 if(!count($externalWowzaServerNodes))

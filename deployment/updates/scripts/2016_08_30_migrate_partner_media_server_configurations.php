@@ -19,11 +19,13 @@ function getPartnersToWorkOn()
 	return PartnerPeer::doSelect($c);
 }
 
-function getDeliveryProfileByHostNameAndStreamType($hostname, $streamType)
+function getDeliveryProfileByHostNameAndStreamType($partnerId, $hostname, $streamType)
 {
 	$c = new Criteria();
 	$c->add(DeliveryProfilePeer::HOST_NAME, $hostname);
 	$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamType);
+	$c->add(DeliveryProfilePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+	$c->addDescendingOrderByColumn(DeliveryProfilePeer::PARTNER_ID);
 	
 	return DeliveryProfilePeer::doSelectOne($c);
 }
@@ -61,7 +63,7 @@ foreach ($partnerToWorkOn as $partner)
 	if($hdsDomain)
 	{
 		KalturaLog::debug("Found hds domain config for partner [{$partner->getId()}] value [$hdsDomain]");
-		$hdsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($hdsDomain, 'hds');
+		$hdsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($partner->getId(), $hdsDomain, 'hds');
 		if($hdsDeliveryProfile)
 			$hdsDeliveryProfileId = $hdsDeliveryProfile->getId();
 	}
@@ -70,7 +72,7 @@ foreach ($partnerToWorkOn as $partner)
 	if($hlsDomain)
 	{
 		KalturaLog::debug("Found hls domain config for partner [{$partner->getId()}] value [$hlsDomain]");
-		$hlsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($hdsDomain, 'applehttp');
+		$hlsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($partner->getId(), $hdsDomain, 'applehttp');
 		if($hlsDeliveryProfile)
 			$hlsDeliveryProfileId = $hlsDeliveryProfile->getId();
 	}

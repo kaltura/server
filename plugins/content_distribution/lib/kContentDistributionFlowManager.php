@@ -10,7 +10,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof entry && $object->wasObjectSaved())
+		if($object instanceof entry && $object->wasObjectSaved() && $object->getType() !== entryType::LIVE_STREAM)
 			return true;
 		
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) || in_array(assetPeer::VERSION, $modifiedColumns))
@@ -27,7 +27,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
+		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED && $object->getType() !== entryType::LIVE_STREAM)
 		{
 			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 				return self::onEntryReady($object);
