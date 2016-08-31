@@ -1,3 +1,29 @@
+# Lynx 12.1.0 #
+## Live Delivery profile - enable overiding live delivery profiles per partner similar to how we work with VOD ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6024
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+Import partner mediaServerConfiguration and set the new liveDeliveryProfile ovveride option:
+
+	php /opt/kaltura/app/deployment/updates/scripts/2016_08_30_migrate_partner_media_server_configurations.php execute
+
+For current eCDN partners set the default empty deliveryProfile on the serverNode config to avoid configuring new deliveryProfle per machine:
+
+	php /opt/kaltura/app/deployment/updates/scripts/2016_08_25_updateExternalServerNodes.php execute
+	
+###### Note: the execute required param will be removed before the actual deployemnt.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Lynx 12.0.0 #
 
 # Kajam 11.21.0 #
