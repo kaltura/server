@@ -19,10 +19,11 @@ function getPartnersToWorkOn()
 	return PartnerPeer::doSelect($c);
 }
 
-function getDeliveryProfileByHostName($hostname)
+function getDeliveryProfileByHostNameAndStreamType($hostname, $streamType)
 {
 	$c = new Criteria();
 	$c->add(DeliveryProfilePeer::HOST_NAME, $hostname);
+	$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamType);
 	
 	return DeliveryProfilePeer::doSelectOne($c);
 }
@@ -60,7 +61,7 @@ foreach ($partnerToWorkOn as $partner)
 	if($hdsDomain)
 	{
 		KalturaLog::debug("Found hds domain config for partner [{$partner->getId()}] value [$hdsDomain]");
-		$hdsDeliveryProfile = getDeliveryProfileByHostName($hdsDomain);
+		$hdsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($hdsDomain, 'hds');
 		if($hdsDeliveryProfile)
 			$hdsDeliveryProfileId = $hdsDeliveryProfile->getId();
 	}
@@ -69,7 +70,7 @@ foreach ($partnerToWorkOn as $partner)
 	if($hlsDomain)
 	{
 		KalturaLog::debug("Found hls domain config for partner [{$partner->getId()}] value [$hlsDomain]");
-		$hlsDeliveryProfile = getDeliveryProfileByHostName($hdsDomain);
+		$hlsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($hdsDomain, 'applehttp');
 		if($hlsDeliveryProfile)
 			$hlsDeliveryProfileId = $hlsDeliveryProfile->getId();
 	}
@@ -81,10 +82,10 @@ foreach ($partnerToWorkOn as $partner)
 	}
 	
 	if($hdsDeliveryProfileId)
-		$liveDeliveryProfileConfig["hds"] =  $hdsDeliveryProfileId;
+		$liveDeliveryProfileConfig["hds"] =  array($hdsDeliveryProfileId);
 	
 	if($hlsDeliveryProfileId)
-		$liveDeliveryProfileConfig["applehttp"] =  $hlsDeliveryProfileId;
+		$liveDeliveryProfileConfig["applehttp"] =  array($hlsDeliveryProfileId);
 	
 	KalturaLog::debug("Setting live delivery profile config: " . print_r($liveDeliveryProfileConfig, true) . " for partnerId [{$partner->getId()}]");
 	
@@ -94,6 +95,7 @@ foreach ($partnerToWorkOn as $partner)
 		continue;
 	}
 	
+	$partner->removeFromCustomData("mediaServersConfiguration");
 	$partner->setLiveDeliveryProfileIds($liveDeliveryProfileConfig);
 	$partner->save();
 }
