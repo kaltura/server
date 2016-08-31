@@ -6,14 +6,14 @@
 
 class kSphinxQueryCache extends kQueryCache
 {
-	const MAX_ALLOWED_SPHINX_LAG_SEC = 60;	// The maximum allowed lag for caching a query result
-	
 	const CACHE_PREFIX_QUERY = 'QCQSPH-';				// = Query Cache - Sphinx Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCISPH-';	// = Query Cache - Invalidation key
 	const DONT_CACHE_KEY = 'QCCSPH-DontCache';			// when set new queries won't be cached in the memcache
 	const SPHINX_LAG_KEY = 'QCCSPH-SphinxLag';	// the lags of the diffrent sphinx servers in the current DC
 	
 	protected static $sphinxLag = null;
+	protected static $maxInvalidationTime = null;
+	protected static $maxInvalidationKey = null;
 
 	public static function getCachedSphinxQueryResults(Criteria $criteria, $objectClass, &$cacheKey)
 	{
@@ -89,6 +89,9 @@ class kSphinxQueryCache extends kQueryCache
 			$currentTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
 			return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
 
+		self::$maxInvalidationTime = $maxInvalidationTime;
+		self::$maxInvalidationKey = $maxInvalidationKey;
+		
 		// get the cache key and update the api cache
 		$cacheKey = self::CACHE_PREFIX_QUERY . md5(serialize($criteria) . self::CACHE_VERSION);
 		if ($cacheKey)
@@ -121,7 +124,7 @@ class kSphinxQueryCache extends kQueryCache
 		return $queryResult;
 	}
 
-	public static function cacheSphinxQueryResults($pdo, $cacheKey, $queryResult)
+	public static function cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult)
 	{
 		if (self::$s_memcacheQueries === null || $cacheKey === null)
 		{
@@ -132,10 +135,11 @@ class kSphinxQueryCache extends kQueryCache
 		if (!is_array(self::$sphinxLag) || !array_key_exists($hostName, self::$sphinxLag))
 			return; // don't cache if sphinx lag isn't known
 
-		$serverLag = self::$sphinxLag[$hostName];
-		if ($serverLag > self::MAX_ALLOWED_SPHINX_LAG_SEC)
+		$sphinxServerLag = self::$sphinxLag[$hostName];
+
+		if (self::$maxInvalidationTime > $sphinxServerLag )
 		{
-			KalturaLog::debug("kQueryCache: using an out of date slave -> not caching the result, peer=$peerClassName, invkey=$maxInvalidationKey querytime=$currentTime invtime=$maxInvalidationTime slavelag=$maxSlaveLag");
+			KalturaLog::debug("kQueryCache: using an out of date sphinx  -> not caching the result, peer=$objectClass, invkey=".self::$maxInvalidationKey." querytime=$currentTime invtime=".self::$maxInvalidationTime." sphinxLag=$sphinxServerLag");
 			return;
 		}
 		
@@ -143,7 +147,7 @@ class kSphinxQueryCache extends kQueryCache
 		$debugInfo = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : '');
 		$debugInfo .= "[$uniqueId]";
 
-		$queryTime = time();
+		$queryTime = time() - $serverLag;
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
 		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);
 	}
