@@ -1082,8 +1082,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] deleted");
 		
 		$entry = entryPeer::retrieveByPK($metadata->getObjectId());
-		if (!$entry){
-			KalturaLog::info("Entry [".$metadata->getObjectId()."] not found");
+		if (!$entry || $entry->getStatus() == entryStatus::DELETED){
+			KalturaLog::info("Entry [".$metadata->getObjectId()."] not found or deleted");
 			return true; 
 		}
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
