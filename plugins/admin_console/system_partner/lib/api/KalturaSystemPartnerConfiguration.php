@@ -240,6 +240,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $deliveryProfileIds;
 	
 	/**
+	 * @var string
+	 */
+	public $liveDeliveryProfileIds;
+	
+	/**
 	 * @var bool 
 	 */
 	public $enforceDelivery;
@@ -405,6 +410,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"audioThumbEntryId",
 		"liveThumbEntryId",		
 		"deliveryProfileIds",
+		"liveDeliveryProfileIds",
 	    "timeAlignedRenditions",
 		"htmlPurifierBehaviour",
 	);
@@ -436,6 +442,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 		if($this->deliveryProfileIds) {
 			$this->deliveryProfileIds = json_encode($this->deliveryProfileIds);
+		}
+		
+		if($this->liveDeliveryProfileIds) {
+			$this->liveDeliveryProfileIds = json_encode($this->liveDeliveryProfileIds);
 		}
 	}
 	
@@ -479,7 +489,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$object_to_fill->setDeliveryProfileIds(array());
 		} else {
 			$object_to_fill->setDeliveryProfileIds(json_decode($this->deliveryProfileIds, true));
-		} 
+		}
+		
+		if(empty($this->liveDeliveryProfileIds)) {
+			$object_to_fill->setLiveDeliveryProfileIds(array());
+		} else {
+			$object_to_fill->setLiveDeliveryProfileIds(json_decode($this->liveDeliveryProfileIds, true));
+		}
 		
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{

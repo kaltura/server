@@ -18,4 +18,9 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url . '/index.m3u8';
 	}
+
+	protected function getPlayServerUrlPrefix()
+	{
+		return $this->generatePlayServerUrlPrefix();
+	}
 }

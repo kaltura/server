@@ -26,6 +26,7 @@ class DeliveryProfileFilter extends baseObjectFilter
 			"_eq_status",
 			"_in_status",
 			"_eq_streamer_type",
+			"_is_live",
 			) , NULL );
 
 		$this->allowed_order_fields = array ("created_at", "updated_at");
@@ -59,5 +60,22 @@ class DeliveryProfileFilter extends baseObjectFilter
 	public function getIdFromPeer (  )
 	{
 		return DeliveryProfilePeer::ID;
+	}
+	
+	public function attachToFinalCriteria(Criteria $c)
+	{
+		$filterIsLive = $this->get('_is_live');
+		
+		if(!is_null($filterIsLive) && $filterIsLive == true)
+		{
+			$c->add(DeliveryProfilePeer::TYPE, DeliveryProfilePeer::getAllLiveDeliveryProfileTypes(), Criteria::IN);
+		}
+		else if(!is_null($filterIsLive) && $filterIsLive == false)
+		{
+			$c->add(DeliveryProfilePeer::TYPE, DeliveryProfilePeer::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
+		}
+		
+		$this->unsetByName('_is_live');
+		return parent::attachToFinalCriteria($c);
 	}
 }

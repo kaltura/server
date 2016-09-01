@@ -70,6 +70,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var array
 	 */
 	protected $flavorAssets = array();
+
+	/**
+	 * @var array
+	 */
+	protected $flavorParamIds = array();
 	
 	/**
 	 * @var array
@@ -127,6 +132,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var bool
 	 */
 	protected $addThumbnailExtension;
+
+	/**
+	 * @var string
+	 */
+	protected $sessionId = null;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -217,6 +227,13 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function getFlavorAssets() {
 		return $this->flavorAssets;
+	}
+
+	/**
+	 * @return array $flavorParamIds
+	 */
+	public function getFlavorParamIds() {
+		return $this->flavorParamIds;
 	}
 
 	/**
@@ -313,6 +330,13 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @param multitype: $flavorAssets
+	 */
+	public function setFlavorParamIds($flavorParamIds) {
+		$this->flavorParamIds = $flavorParamIds;
+	}
+
+	/**
 	 * @param multitype: $remoteFileSyncs
 	 */
 	public function setRemoteFileSyncs($remoteFileSyncs) {
@@ -348,7 +372,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	/**
-	 * @return the $tags
+	 * @return array $tags
 	 */
 	public function getTags() {
 		return $this->tags;
@@ -384,7 +408,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @return the $playerConfig
+	 * @return array $playerConfig
 	 */
 	public function getPlayerConfig()
 	{
@@ -440,7 +464,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	/**
-	 * @return the edge server ids
+	 * @return array edge server ids
 	 */
 	public function getEdgeServerIds()
 	{
@@ -455,6 +479,22 @@ class DeliveryProfileDynamicAttributes {
 		$this->edgeServerIds = $edgeServerIds;
 	}
 	
+	/*
+	 * @return the sessionId
+	 */
+	public function getSessionId()
+	{
+		return $this->sessionId;
+	}
+
+	/*
+	 * @param string $sessionId
+	 */
+	public function setSessionId($sessionId)
+	{
+		$this->sessionId = $sessionId;
+	}
+
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
@@ -515,6 +555,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();
 		$this->flavorAssets = $newObj->getFlavorAssets();
+		$this->flavorParamIds = $newObj->getFlavorParamIds();
 		$this->remoteFileSyncs = $newObj->getRemoteFileSyncs();
 		$this->manifestFileSync = $newObj->getManifestFileSync();
 		$this->preferredBitrate = $newObj->getPreferredBitrate();
@@ -524,6 +565,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->playerConfig = $newObj->getPlayerConfig();
 		$this->uiConfId = $newObj->getUiConfId();
 		$this->edgeServerIds = $newObj->getEdgeServerIds();
+		$this->sessionId = $newObj->getSessionId();
 	}
 }
 

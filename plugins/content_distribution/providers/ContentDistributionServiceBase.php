@@ -4,6 +4,7 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	
 	const CACHE_CREATION_TIME_SUFFIX = ".time";
 	const CACHE_CREATION_MARGIN = 30;
+	const CACHE_EXPIRY = 2592000;		// 30 days
 	const CACHE_SIZE = 100;
 	
 	/** Holds the distribution profile instance */
@@ -151,9 +152,10 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 				}
 		
 				$xml = $this->handleEntry($context, $feed, $entry, $entryDistribution);
-				if(!is_null($xml) && $enableCache) {
-					$cacheStore->set($cacheKey . self::CACHE_CREATION_TIME_SUFFIX, time());
-					$cacheStore->set($cacheKey, $xml);
+				if(!is_null($xml) && $enableCache) 
+				{
+					$cacheStore->set($cacheKey . self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
+					$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
 				}
 			}
 				

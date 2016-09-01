@@ -38,4 +38,9 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 		
 		return array($flavor);
 	}
+
+	protected function getPlayServerUrlPrefix()
+	{
+		return $this->generatePlayServerUrlPrefix();
+	}
 }

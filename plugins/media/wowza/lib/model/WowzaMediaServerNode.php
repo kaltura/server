@@ -32,53 +32,15 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$this->setType(WowzaPlugin::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER));
 	}
 	
-	public function getManifestUrl($protocol = 'http', $format = null)
-	{		
-		$playbackHost = $this->getPlaybackHost($protocol, $format);
-		
-		$hostname = $this->getHostname();
-		if(!$this->getIsExternalMediaServer())
-			$hostname = preg_replace('/\..*$/', '', $hostname);
-		
-		$url = "$protocol://$playbackHost";
-		$url = str_replace("{hostName}", $hostname, $url);
-		return $url;
-		
-	}
-	
-	public function getLiveWebServiceName()
-	{
-		return WowzaMediaServerNode::WEB_SERVICE_LIVE;
-	}
-	
-	public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null)
-	{
-		$mediaServerGlobalConfig = array();
-		
-		if(kConf::hasMap('media_servers'))
-			$mediaServerGlobalConfig = array_merge($mediaServerGlobalConfig, kConf::getMap('media_servers'));
-		
-		if($this->partner_media_server_config)
-			$mediaServerGlobalConfig = array_merge($mediaServerGlobalConfig, $this->partner_media_server_config);
-			
-		$domain = $this->getDomainByProtocolAndFormat($mediaServerGlobalConfig, $protocol, $format);
-		
-		$port = $this->getPortByProtocolAndFormat($mediaServerGlobalConfig, $protocol, $format);
-		
-		$appPrefix = $this->getApplicationPrefix($mediaServerGlobalConfig);
-		
-		return "$domain:$port/$appPrefix";
-	}
-	
 	/**
 	 * @param string $serviceName
 	 * @return KalturaMediaServerClient
 	 */
 	public function getWebService($serviceName)
-	{	
+	{
 		if(!isset(self::$webServices[$serviceName]))
 			return null;
-			
+		
 		$serviceClass = self::$webServices[$serviceName];
 		
 		$domain = $this->getLiveServiceInternalDomain() ? $this->getLiveServiceInternalDomain() : $this->getHostname();
@@ -90,31 +52,46 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return new $serviceClass($url);
 	}
 	
-	public function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
-	{	
-		$domain = $this->getPlaybackDomain();
-		
-		$domainField = "domain" . ($format ? "-$format" : "");
-		
-		$domain = $this->getValueByField($mediaServerConfig, $domainField, $domain);
-		
-		$mediaServerPlaybackDomainConfig = $this->getMediaServerPlaybackDomainConfig();
-		if($mediaServerPlaybackDomainConfig)
-		{
-			$domainField = $protocol . ($format ? "-$format" : "");
-			if(isset($mediaServerPlaybackDomainConfig[$domainField]))
-				$domain = $mediaServerPlaybackDomainConfig[$domainField];
-		}
-		
-		return $domain;
+	public function getLiveWebServiceName()
+	{
+		return WowzaMediaServerNode::WEB_SERVICE_LIVE;
 	}
 	
-	public function getPortByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
+	public function getManifestUrl($protocol = 'http', $format = null)
+	{		
+		$playbackHost = $this->getPlaybackHost($protocol, $format);
+		
+		$hostname = $this->getHostname();
+		if(!$this->getIsExternalMediaServer())
+			$hostname = preg_replace('/\..*$/', '', $hostname);
+		
+		$url = "$protocol://$playbackHost";
+		$url = str_replace("{hostName}", $hostname, $url);
+		return $url;
+	}
+	
+	public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null)
+	{
+		$hostname = $this->getHostname();
+		if(!$this->getIsExternalMediaServer())
+			$hostname = preg_replace('/\..*$/', '', $hostname);
+		
+		$domain = ($baseUrl && $baseUrl !== '') ? $baseUrl : $hostname;
+		$port = $this->getPortByProtocolAndFormat($protocol, $format);
+		$appPrefix = $this->getApplicationPrefix();
+		$applicationName = $this->getApplicationName();
+		
+		$playbackHost = "$protocol://$domain:$port/$appPrefix/$applicationName";
+		$playbackHost = str_replace("{hostName}", $hostname, $playbackHost);
+		return $playbackHost;
+	}
+	
+	public function getPortByProtocolAndFormat($protocol = 'http', $format = null)
 	{
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
-		
 		$portField = 'port' . ($protocol != 'http' ? "-$protocol" : "") . ($format ? "-$format" : "");
 		
+		$mediaServerConfig = kConf::getMap('media_servers');
 		$port = $this->getValueByField($mediaServerConfig, $portField, $port);
 		
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
@@ -128,14 +105,21 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $port;
 	}
 	
-	public function getApplicationPrefix($mediaServerConfig)
+	public function getApplicationPrefix()
 	{
 		$appPrefix = "";
-
+		$mediaServerConfig = kConf::getMap('media_servers');
+		
 		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
 		
 		if(!is_null($this->getAppPrefix()))
 			$appPrefix = $this->getAppPrefix();
+		
+		$hostname = $this->getHostname();
+		if(!$this->getIsExternalMediaServer())
+			$hostname = preg_replace('/\..*$/', '', $hostname);
+		
+		$appPrefix = str_replace("{hostName}", $hostname, $appPrefix);
 		
 		return $appPrefix;
 	}
