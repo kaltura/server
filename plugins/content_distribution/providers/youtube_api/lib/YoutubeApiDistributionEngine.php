@@ -284,15 +284,6 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 							throw new kTemporaryException($e->getMessage(), $e->getCode());
 						}
 					}
-					catch (Google_Service_Exception $e)
-					{
-						KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
-						$numOfTries++;
-						if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
-						{
-							throw new kTemporaryException($e->getMessage(), $e->getCode());
-						}
-					}
 				}
 			}
 			/* @var $ingestedVideo Google_Service_YouTube_Video */
