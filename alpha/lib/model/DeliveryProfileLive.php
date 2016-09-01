@@ -238,8 +238,12 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		/* @var $serverNode WowzaMediaServerNode */
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
-		$domain = ($this->getHostName() && $this->getHostName() !== '') ? $this->getHostName() : $serverNode->getHostName();
-		$port = $serverNode->getPortByProtocolAndFormat($protocol, $streamFormat);
+		$domain = ($this->getUrl() && $this->getUrl() !== '') ? $this->getUrl() : $serverNode->getHostName();
+		
+		$parsedDomain = parse_url($domain);
+		$port = $parsedDomain['port'] ? $parsedDomain['port'] : $serverNode->getPortByProtocolAndFormat($protocol, $streamFormat);
+		$domain = $parsedDomain['host'] ? $parsedDomain['host'] : $parsedDomain['path']; // Prior to 5.4.7 when no schema is provided domain would return as path  
+		
 		$appPrefix = $serverNode->getApplicationPrefix();
 		$appName = $serverNode->getApplicationName();
 		
