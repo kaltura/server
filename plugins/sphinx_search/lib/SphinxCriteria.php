@@ -159,7 +159,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 		//debug query
 
-		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, 0);
+		$sqlConditions = array();
+		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
@@ -175,15 +176,15 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if($this->doCount && $setLimit &&
 			(!$this->getLimit() || !$idsCount || $idsCount >= $this->getLimit()))
 		{
-			$metaItems = $pdo->queryAndFetchAll("show meta like '%total_found%'", PDO::FETCH_ASSOC);
+			$metaItems = $pdo->queryAndFetchAll("show meta like '%total_found%'", PDO::FETCH_ASSOC, $sqlConditions);
 			if ($metaItems)
 			{
 				$metaItem = reset($metaItems);
 				$this->sphinxRecordCount =  (int)$metaItem['Value'];
 			}
 		}
-		
-		return $pdo;
+
+		return array($pdo, $sqlConditions);
 	}
 
 	protected function applySphinxResult($setLimit)
@@ -579,10 +580,16 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$limit = $this->getOffset() . ", $limit";
 		}
 		
-		$pdo = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
+		list($pdo, $sqlConditions) = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
 
 		$queryResult = array($this->getFetchedIds(), $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit);
-		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult);
+		if (!kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult))
+		{
+			foreach($sqlConditions as $sqlCondition)
+				call_user_func_array("kApiCache::addSqlQueryCondition", $sqlCondition);
+		}
+
+
 
 		$this->applySphinxResult($setLimit);
 	}

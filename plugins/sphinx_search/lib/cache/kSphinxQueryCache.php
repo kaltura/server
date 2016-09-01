@@ -128,19 +128,19 @@ class kSphinxQueryCache extends kQueryCache
 	{
 		if (self::$s_memcacheQueries === null || $cacheKey === null)
 		{
-			return;
+			return false;
 		}
 
 		$hostName = $pdo->getHostName();
 		if (!is_array(self::$sphinxLag) || !array_key_exists($hostName, self::$sphinxLag))
-			return; // don't cache if sphinx lag isn't known
+			return false; // don't cache if sphinx lag isn't known
 
 		$queryTime = self::$sphinxLag[$hostName];
 
 		if (self::$maxInvalidationTime > $queryTime )
 		{
 			KalturaLog::debug("kQueryCache: using an out of date sphinx  -> not caching the result, peer=$objectClass, invkey=".self::$maxInvalidationKey." querytime=$currentTime invtime=".self::$maxInvalidationTime." sphinxLag=$queryTime");
-			return;
+			return false;
 		}
 		
 		$uniqueId = new UniqueId();
@@ -149,6 +149,8 @@ class kSphinxQueryCache extends kQueryCache
 
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
 		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);
+		
+		return true;
 	}
 
 	public static function invalidateQueryCache($object)

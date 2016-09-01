@@ -139,7 +139,7 @@ class KalturaPDO extends PropelPDO
 		return $result;
 	}
 
-	public function queryAndFetchAll($sql, $fetchStyle, $columnIndex = 0, $filter = null)
+	public function queryAndFetchAll($sql, $fetchStyle, &$sqlConditions, $columnIndex = 0, $filter = null)
 	{
 		$finalSql = str_replace(kApiCache::KALTURA_COMMENT_MARKER, $this->getComment(), $sql);
 		
@@ -167,8 +167,8 @@ class KalturaPDO extends PropelPDO
 			$result = array();
 			
 		$filteredResult = kApiCache::filterQueryResult($result, $filter);
-		
-		kApiCache::addSqlQueryCondition($this->configKey, $sql, $fetchStyle, $columnIndex, $filter, $filteredResult);
+	
+		$sqlConditions[] = array($this->configKey, $sql, $fetchStyle, $columnIndex, $filter, $filteredResult);		
 		
 		return $filteredResult;
 	}
