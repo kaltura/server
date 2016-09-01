@@ -410,11 +410,21 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		}
 		
 		KalturaLog::debug($sql);
-				
+		if (is_callable(array($object, "getUpdatedAt")))
+		{
+			$now = time();
+			$objectUpdatedAt = $object->getUpdatedAt(null);
+			if ($objectUpdatedAt < $now)
+			{
+				KalturaLog::log('sphinx update for non-updated object '.($now - $objectUpdatedAt).' '.get_class($object).' '.$object->getId().' '.kCurrentContext::$ks_partner_id.' '.kCurrentContext::$service.' '.kCurrentContext::$action);
+			}
+		}
+		
 		$sphinxLog = new SphinxLog();
 		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId());
 		$sphinxLog->setObjectId($object->getId());
-		$sphinxLog->setObjectType($object->getIndexObjectName());
+		$objectIndexClass = $object->getIndexObjectName();
+		$sphinxLog->setObjectType($objectIndexClass::getObjectName());
 		$sphinxLog->setEntryId($object->getEntryId());
 		$sphinxLog->setPartnerId($object->getPartnerId());
 		$sphinxLog->setSql($sql);

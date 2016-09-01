@@ -301,9 +301,9 @@ class CuePointIndex extends BaseIndexObject
 	public static function getCacheInvalidationKeys($object = null)
 	{
 		if (is_null($object))
-			return array(array("cue_point:id=%s", CuePointPeer::ID), array("cue_point:entryId=%s", CuePointPeer::ENTRY_ID));
+			return array(array("cue_point:id=%s", CuePointPeer::ID), array("cue_point:entryId=%s", CuePointPeer::ENTRY_ID), array("cue_point:partnerId=%s", CuePointPeer::PARTNER_ID));
 		else
-			return array("cue_point:id=" . strtolower($this->getId()), "cue_point:entryId=" . strtolower($this->getEntryId()));
+			return array("cue_point:id=" . strtolower($this->getId()), "cue_point:entryId=" . strtolower($this->getEntryId()), "cue_point:partnerId=" . strtolower($this->getPartnerId()));
 	}
 
 }
