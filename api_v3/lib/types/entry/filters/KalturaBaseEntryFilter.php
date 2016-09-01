@@ -170,11 +170,11 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 	
 		if( $this->idEqual == null && $this->redirectFromEntryId == null )
-        {
-        	$this->setDefaultStatus();
-            $this->setDefaultModerationStatus($this);
-            if(($this->parentEntryIdEqual == null) && ($this->idIn == null))
-            	$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		{
+			$this->setDefaultStatus();
+			$this->setDefaultModerationStatus($this);
+			if(($this->parentEntryIdEqual == null) && ($this->idIn == null))
+				$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		}
 		
 		$this->fixFilterUserId($this);
