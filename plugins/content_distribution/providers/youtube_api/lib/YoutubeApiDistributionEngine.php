@@ -274,8 +274,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 					{
 						$ingestedVideo = $media->nextChunk($chunk);
 						break;
-					}
-					catch (Google_IO_Exception $e)
+					} catch (Google_IO_Exception $e)
 					{
 						KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
 						$numOfTries++;
