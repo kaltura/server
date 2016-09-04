@@ -57,6 +57,11 @@ abstract class kManifestRenderer
 	 * @var array
 	 */
 	public $contributors;
+
+	/**
+	 * @var bool
+	 */
+	public $usePlayServer;
 	
 	protected function prepareFlavors()
 	{
@@ -108,6 +113,8 @@ abstract class kManifestRenderer
 	
 	abstract protected function applyDomainPrefix();
 
+	abstract protected function replacePlayServerSessionId();
+
 	/**
 	 * @param kSessionBase $ksObject
 	 */
@@ -145,6 +152,9 @@ abstract class kManifestRenderer
 		
 		if ($this->deliveryCode)
 			$this->replaceDeliveryCode();
+
+		if($this->usePlayServer)
+			$this->replacePlayServerSessionId();
 		
 		$this->tokenizeUrls();
 		$this->applyDomainPrefix();
@@ -294,6 +304,12 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 		
 		unset($this->flavor['domainPrefix']);
 	}
+
+	protected function replacePlayServerSessionId()
+	{
+		$sessionId = infraRequestUtils::getRemoteAddress(). '_' .((float) mt_rand() / (float) mt_getrandmax());
+		$this->flavor['url'] = str_replace("{sessionId}", $sessionId, $this->flavor['url']);
+	}
 }
 
 class kMultiFlavorManifestRenderer extends kManifestRenderer
@@ -398,6 +414,16 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 			}
 			
 			unset($flavor['domainPrefix']);
+		}
+	}
+
+	protected function replacePlayServerSessionId()
+	{
+		$sessionId = infraRequestUtils::getRemoteAddress(). '_' .((float) mt_rand() / (float) mt_getrandmax());
+
+		foreach ($this->flavors as &$flavor)
+		{
+			$flavor['url'] = str_replace("{sessionId}", $sessionId, $flavor['url']);
 		}
 	}
 }
