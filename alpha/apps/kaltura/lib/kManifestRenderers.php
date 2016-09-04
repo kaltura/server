@@ -253,7 +253,7 @@ abstract class kManifestRenderer
 		$flavor['url'] = self::urlJoin($urlPrefixPath, $flavor['url']);
 	}
 
-	protected function generateSessionId()
+	protected static function generateSessionId()
 	{
 		return infraRequestUtils::getRemoteAddress(). '_' .((float) mt_rand() / (float) mt_getrandmax());
 	}
@@ -312,7 +312,7 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 
 	protected function replacePlayServerSessionId()
 	{
-		$this->flavor['url'] = str_replace("{sessionId}",$this->generateSessionId(), $this->flavor['url']);
+		$this->flavor['url'] = str_replace("{sessionId}",self::generateSessionId(), $this->flavor['url']);
 	}
 }
 
@@ -423,7 +423,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 
 	protected function replacePlayServerSessionId()
 	{
-		$sessionId = $this->generateSessionId();
+		$sessionId = self::generateSessionId();
 
 		foreach ($this->flavors as &$flavor)
 		{
