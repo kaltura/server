@@ -434,9 +434,9 @@
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>should_entry_reconvert</key>
-						<description>An flag for indicating if current entry should be reconvert</description>
-						<value objectType="KalturaStringValue">
-							<value>1</value>
+						<description>A flag for indicating if current entry should be reconvert</description>
+						<value objectType="KalturaBooleanValue">
+							<value>true</value>
 						</value>
 					</item>
 				</userParameters>
