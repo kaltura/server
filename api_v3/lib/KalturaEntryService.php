@@ -1391,9 +1391,6 @@ class KalturaEntryService extends KalturaBaseService
 			
 		if  ($entry->endDate !== null)
 			$this->validateAdminSession("endDate");
-			
-		if ($entry->accessControlId !== null) 
-			$this->validateAdminSession("accessControlId");
 	}
 	
 	/**
@@ -1421,9 +1418,6 @@ class KalturaEntryService extends KalturaBaseService
 			
 		if  ($entry->endDate !== null)
 			$this->validateAdminSession("endDate");
-			
-		if ($entry->accessControlId !== null) 
-			$this->validateAdminSession("accessControlId");
 	}
 	
 	/**
