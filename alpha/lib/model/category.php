@@ -23,7 +23,8 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	protected $is_index = false;
 	
 	protected $move_entries_to_parent_category = null;
-	
+
+	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
 	
@@ -1698,19 +1699,35 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			return '';
 		
 		$privacyContext = explode(',', $this->getPrivacyContext());
-		$privacyContext[] = kEntitlementUtils::NOT_DEFAULT_CONTEXT;
-			
-		return implode(' ', $privacyContext);
+		$privacyContextArray = array();
+		$prefix = self::CATEGORIES_INDEXED_FIELD_PREFIX.$this->getPartnerId();
+
+		foreach ($privacyContext as $privacyContextItem)
+		{
+			$privacyContextArray[]  = $prefix.$privacyContextItem;
+		}
+
+		$privacyContextArray[] = $prefix.kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+
+		return implode(' ',$privacyContextArray);
 	}
 	
 	public function getSearchIndexPrivacyContexts()
 	{
+		$prefix = self::CATEGORIES_INDEXED_FIELD_PREFIX.$this->getPartnerId();
+
 		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
-			return kEntitlementUtils::DEFAULT_CONTEXT . $this->getPartnerId();
+			return $prefix.kEntitlementUtils::DEFAULT_CONTEXT;
 			
 		$privacyContexts = explode(',', $this->getPrivacyContexts());
-			
-		return implode(' ', $privacyContexts);
+		$privacyContextsArray = array();
+
+		foreach ($privacyContexts as $privacyContext)
+		{
+				$privacyContextsArray[]  = $prefix.$privacyContext;
+		}
+
+		return implode(' ',$privacyContextsArray);
 	}
 	
 	public function getSearchIndexfullName()

@@ -3121,7 +3121,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function getPrivacyByContexts()
 	{
-		return implode(' ',kEntitlementUtils::getPrivacyContextForEntry($this));
+		$privacyContextArray = array();
+		$privacyContextForEntry = kEntitlementUtils::getPrivacyContextForEntry($this);
+		$prefix = self::CATEGORIES_INDEXED_FIELD_PREFIX.$this->getPartnerId();
+		foreach ( $privacyContextForEntry as $privacyContext)
+		{
+			$privacyContextArray[] = $prefix.$privacyContext;
+		}
+		return implode(' ',$privacyContextArray);
 	}
 	
 	
