@@ -57,7 +57,7 @@ abstract class kManifestRenderer
 	 * @var array
 	 */
 	public $contributors;
-
+	
 	protected function prepareFlavors()
 	{
 	}

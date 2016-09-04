@@ -1194,7 +1194,7 @@ class playManifestAction extends kalturaAction
 		$renderer->setKsObject(kCurrentContext::$ks_object);
 		$renderer->setPlaybackContext($playbackContext);
 		$renderer->setDeliveryCode($deliveryCode);
-
+		
 		$renderer->output();
 	}
 }
