@@ -121,12 +121,8 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode)
 			{
-				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
-				{
-					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
-					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
-				}
+				$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
+				$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
 			}
 		}
 		
@@ -238,18 +234,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		/* @var $serverNode WowzaMediaServerNode */
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
-		$domain = ($this->getUrl() && $this->getUrl() !== '') ? $this->getUrl() : $serverNode->getHostName();
 		
-		$parsedDomain = parse_url($domain);
-		$port = $parsedDomain['port'] ? $parsedDomain['port'] : $serverNode->getPortByProtocolAndFormat($protocol, $streamFormat);
-		$domain = $parsedDomain['host'] ? $parsedDomain['host'] : $parsedDomain['path']; // Prior to 5.4.7 when no schema is provided domain would return as path  
+		$baseUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		
-		$appPrefix = $serverNode->getApplicationPrefix();
-		$appName = $serverNode->getApplicationName();
-		
-		$baseUrl = "$protocol://$domain:$port/$appPrefix/$appName";
 		KalturaLog::debug("Live Stream base url [$baseUrl]");
-		
 		return $baseUrl;
 	}
 }
