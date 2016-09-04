@@ -58,11 +58,6 @@ abstract class kManifestRenderer
 	 */
 	public $contributors;
 
-	/**
-	 * @var bool
-	 */
-	public $usePlayServer;
-	
 	protected function prepareFlavors()
 	{
 	}
@@ -153,8 +148,7 @@ abstract class kManifestRenderer
 		if ($this->deliveryCode)
 			$this->replaceDeliveryCode();
 
-		if($this->usePlayServer)
-			$this->replacePlayServerSessionId();
+		$this->replacePlayServerSessionId();
 		
 		$this->tokenizeUrls();
 		$this->applyDomainPrefix();
