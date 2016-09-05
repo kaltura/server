@@ -18,6 +18,15 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
+	static $liveSourceTypes = array(
+		EntrySourceType::LIVE_STREAM, 
+		EntrySourceType::LIVE_CHANNEL, 
+		EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS, 
+		EntrySourceType::MANUAL_LIVE_STREAM, 
+		EntrySourceType::AKAMAI_LIVE, 
+		EntrySourceType::AKAMAI_UNIVERSAL_LIVE
+	);
+	
 	protected $decidingLiveProfile = false;
 	
 	/* (non-PHPdoc)
@@ -298,6 +307,11 @@ abstract class LiveEntry extends entry
 	{
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes) )
 			$this->putInCustomData('live_stream_configurations', $v);
+	}
+	
+	public function getCustomLiveStreamConfigurations()
+	{
+		return $this->getFromCustomData('live_stream_configurations', null, array());
 	}
 	
 	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())

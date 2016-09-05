@@ -92,9 +92,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function initLiveStreamConfig()
 	{
-		$this->liveStreamConfig = new kLiveStreamConfiguration();
-		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
+		if(!$this->liveStreamConfig)
+			$this->liveStreamConfig = new kLiveStreamConfiguration();
 		
+		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
 		if(!count($liveEntryServerNodes))
 			return;
 		
