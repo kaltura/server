@@ -216,6 +216,14 @@ class DeliveryProfileDynamicAttributes {
 	public function getEntryId() {
 		return $this->entryId;
 	}
+	
+	/**
+	 * @return the $entry
+	 */
+	public function getEntry()
+	{
+		return entryPeer::retrieveByPK($this->getEntryId());
+	}
 
 	/**
 	 * @return the $flavorAssets
