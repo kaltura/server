@@ -583,13 +583,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		list($pdo, $sqlConditions) = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
 
 		$queryResult = array($this->getFetchedIds(), $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit);
-		if (!kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult))
-		{
-			foreach($sqlConditions as $sqlCondition)
-				call_user_func_array("kApiCache::addSqlQueryCondition", $sqlCondition);
-		}
-
-
+		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult, $sqlConditions);
 
 		$this->applySphinxResult($setLimit);
 	}

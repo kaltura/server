@@ -6,6 +6,9 @@
 
 class kSphinxQueryCache extends kQueryCache
 {
+	const MIN_CONDITIONAL_EXPIRY_INVALIDATION_WAIT = 30;	// min expiry time of conditional sphinx queries due to expected
+															// sphinx server update which will provide real sphinx conditional cache
+	
 	const CACHE_PREFIX_QUERY = 'QCQSPH-';				// = Query Cache - Sphinx Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCISPH-';	// = Query Cache - Invalidation key
 	const DONT_CACHE_KEY = 'QCCSPH-DontCache';			// when set new queries won't be cached in the memcache
@@ -14,9 +17,12 @@ class kSphinxQueryCache extends kQueryCache
 	protected static $sphinxLag = null;
 	protected static $maxInvalidationTime = null;
 	protected static $maxInvalidationKey = null;
-
+	protected static $reduceConditionalExpiry = 0;
+	
 	public static function getCachedSphinxQueryResults(Criteria $criteria, $objectClass, &$cacheKey)
 	{
+		self::$reduceConditionalExpiry = 0;
+		
 		if (!kConf::get("query_cache_enabled"))
 		{
 			return null;
@@ -87,8 +93,11 @@ class kSphinxQueryCache extends kQueryCache
 		$currentTime = time();		
 		if (!is_null($maxInvalidationTime) && 
 			$currentTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
+		{
+			self::$reduceConditionalExpiry = self::CLOCK_SYNC_TIME_MARGIN_SEC;
 			return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
-
+		}
+			
 		self::$maxInvalidationTime = $maxInvalidationTime;
 		self::$maxInvalidationKey = $maxInvalidationKey;
 		
@@ -124,7 +133,27 @@ class kSphinxQueryCache extends kQueryCache
 		return $queryResult;
 	}
 
-	public static function cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult)
+	public static function cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult, $sqlConditions)
+	{
+		$cached = self::internalCacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult);
+		
+		if (!$cached && count($sqlConditions))
+		{
+			foreach($sqlConditions as $sqlCondition)
+				call_user_func_array("kApiCache::addSqlQueryCondition", $sqlCondition);
+
+			// if invalidation keys exists but the query couldn't be cached yet, shortne the expiry
+			// in hope to have full api caching in one of the next calls
+			if (self::$reduceConditionalExpiry)
+			{
+				$finalExpiry = max(self::$reduceConditionalExpiry, self::MIN_CONDITIONAL_EXPIRY_INVALIDATION_WAIT);
+				KalturaLog::debug("kQueryCache: setConditionalCacheExpiry targetExpiry=".self::$reduceConditionalExpiry." finalExpiry=$finalExpiry");
+				kApiCache::setConditionalCacheExpiry($finalExpiry);
+			}
+		}
+	}
+		
+	protected static function internalCacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult)
 	{
 		if (self::$s_memcacheQueries === null || $cacheKey === null)
 		{
@@ -139,6 +168,8 @@ class kSphinxQueryCache extends kQueryCache
 
 		if (self::$maxInvalidationTime > $queryTime )
 		{
+			// in case of sphinx conditional queries, shorten the cache expiry till the sphinx server will reach the required invalidation update time
+			self::$reduceConditionalExpiry = self::$maxInvalidationTime - $queryTime;
 			KalturaLog::debug("kQueryCache: using an out of date sphinx  -> not caching the result, peer=$objectClass, invkey=".self::$maxInvalidationKey." querytime=$currentTime invtime=".self::$maxInvalidationTime." sphinxLag=$queryTime");
 			return false;
 		}
