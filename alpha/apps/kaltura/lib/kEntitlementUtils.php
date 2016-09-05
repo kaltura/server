@@ -19,6 +19,11 @@ class kEntitlementUtils
 	protected static $privacyContextSearch = null;
 	protected static $categoryModeration = false;
 
+	public static function getDefaultContextString( $partnerId )
+	{
+		return self::PARTNER_ID_PREFIX . $partnerId . self::DEFAULT_CONTEXT;
+	}
+
 	public static function getEntitlementEnforcement()
 	{
 		return self::$entitlementEnforcement;
@@ -191,7 +196,7 @@ class kEntitlementUtils
 		if($ks)
 		{
 			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
-				$ksPrivacyContexts = self::PARTNER_ID_PREFIX . $partner->getId() . self::DEFAULT_CONTEXT ;
+				$ksPrivacyContexts = self::getDefaultContextString( $partner->getId());
 			else
 			{
 				$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
@@ -215,7 +220,7 @@ class kEntitlementUtils
 		else
 		{
 			//no ks = set privacy context to default.
-			$c->add(categoryPeer::PRIVACY_CONTEXTS, array( self::PARTNER_ID_PREFIX . $partner->getId()) . self::DEFAULT_CONTEXT , KalturaCriteria::IN_LIKE);
+			$c->add(categoryPeer::PRIVACY_CONTEXTS, array( self::getDefaultContextString( $partner->getId() )) , KalturaCriteria::IN_LIKE);
 		}
 
 		$c->addAnd($crit);
@@ -324,12 +329,12 @@ class kEntitlementUtils
 
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
-			return array(self::DEFAULT_CONTEXT . $partnerId . self::TYPE_SEPERATOR . PrivacyType::ALL);
+			return array( self::getDefaultContextString( $partnerId ) . self::TYPE_SEPERATOR . PrivacyType::ALL);
 
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 
 		if(is_null($ksPrivacyContexts))
-			$ksPrivacyContexts = self::PARTNER_ID_PREFIX . $partnerId. self::DEFAULT_CONTEXT ;
+			$ksPrivacyContexts = self::getDefaultContextString( $partnerId );
 
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 
@@ -390,7 +395,6 @@ class kEntitlementUtils
 
 	private static function getPrivacyContextsByAllCategoryIds(entry $entry)
 	{
-		$defaultPrivacyContext = self::DEFAULT_CONTEXT;
 		$privacyContexts = array();
 
 		$allCategoriesIds = $entry->getAllCategoriesIds(true);
@@ -408,7 +412,7 @@ class kEntitlementUtils
 					foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
 					{
 						if(trim($categoryPrivacyContext) == '')
-						 	$categoryPrivacyContext = $defaultPrivacyContext;
+						 	$categoryPrivacyContext = self::DEFAULT_CONTEXT;
 
 						if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
 							$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
@@ -416,7 +420,7 @@ class kEntitlementUtils
 				}
 				else
 				{
-					$privacyContexts[$defaultPrivacyContext] = PrivacyType::ALL;
+					$privacyContexts[self::DEFAULT_CONTEXT] = PrivacyType::ALL;
 				}
 			}
 		}
@@ -426,8 +430,6 @@ class kEntitlementUtils
 
 	private static function getPrivacyContextsByCategoryEntries(entry $entry)
 	{
-		$defaultPrivacyContext = self::DEFAULT_CONTEXT;
-
 		$privacyContexts = array();
 		$categoriesIds = array();
 
@@ -449,7 +451,7 @@ class kEntitlementUtils
 
 		$noPrivacyContextCategory = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId());
 		if($noPrivacyContextCategory)
-			$privacyContexts[$defaultPrivacyContext] = PrivacyType::ALL;
+			$privacyContexts[ self::DEFAULT_CONTEXT ] = PrivacyType::ALL;
 
 		return $privacyContexts;
 	}
@@ -490,11 +492,11 @@ class kEntitlementUtils
 
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
-			return array(self::PARTNER_ID_PREFIX . $partnerId . self::DEFAULT_CONTEXT );
+			return array(self::getDefaultContextString( $partnerId ) );
 
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
-			return array(self::PARTNER_ID_PREFIX . $partnerId. self::DEFAULT_CONTEXT);
+			return array(self::getDefaultContextString( $partnerId ));
 		else
 		{
 			$ksPrivacyContexts = explode(',', $ksPrivacyContexts);

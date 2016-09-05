@@ -5,8 +5,6 @@
  */
 class SphinxCategoryCriteria extends SphinxCriteria
 {
-	const PARTNER_INDEXED_PREFIX = 'pid';
-
 	public function getIndexObjectName() {
 		return "categoryIndex";
 	}
@@ -211,7 +209,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 					kString::addSuffixToArray($crit->getValue(), category::FULL_NAME_EQUAL_MATCH_STRING));
 		} else if ($field == categoryPeer::DISPLAY_IN_SEARCH  && $crit->getComparison() == Criteria::EQUAL)
 		{
-
 			return array(
 					categoryPeer::DISPLAY_IN_SEARCH,
 					Criteria::EQUAL,
@@ -221,27 +218,26 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			return array(
 				categoryPeer::PRIVACY_CONTEXT,
 				Criteria::EQUAL,
-				self::PARTNER_INDEXED_PREFIX . $partnerId.$crit->getValue());
+				kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId.$crit->getValue());
 		}else if ($field == categoryPeer::PRIVACY_CONTEXT  && $crit->getComparison() == Criteria::IN )
 		{
 			return array(
 				categoryPeer::PRIVACY_CONTEXT,
 				Criteria::IN_LIKE,
-				kString::addPrefixToArray($crit->getValue(), self::PARTNER_INDEXED_PREFIX . $partnerId));
+				kString::addPrefixToArray($crit->getValue(), kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId));
 		}else if ($field == categoryPeer::PRIVACY_CONTEXTS  && $crit->getComparison() == Criteria::EQUAL)
 		{
 			return array(
 				categoryPeer::PRIVACY_CONTEXTS,
 				Criteria::EQUAL,
-				self::PARTNER_INDEXED_PREFIX . $partnerId.$crit->getValue());
+				kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId.$crit->getValue());
 		}else if ($field == categoryPeer::PRIVACY_CONTEXTS  && $crit->getComparison() == Criteria::IN )
 		{
 			return array(
 				categoryPeer::PRIVACY_CONTEXTS,
 				Criteria::IN_LIKE,
-				kString::addPrefixToArray($crit->getValue(), self::PARTNER_INDEXED_PREFIX . $partnerId));
+				kString::addPrefixToArray($crit->getValue(), kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId));
 		}
-
 
 		return parent::translateSphinxCriterion($crit);
 	}
