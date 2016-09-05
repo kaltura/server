@@ -1699,7 +1699,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $this->getPartnerId();
 
 		$privacyContexts = explode(',', $this->getPrivacyContext());
-		$privacyContexts = kstring::addPrefixToArray($privacyContexts ,$prefix);
+		$privacyContexts = kString::addPrefixToArray($privacyContexts ,$prefix);
 		$privacyContexts[] = $prefix . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
 
 		return implode(' ',$privacyContexts);
@@ -1713,7 +1713,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			return $prefix.kEntitlementUtils::DEFAULT_CONTEXT;
 			
 		$privacyContexts = explode(',', $this->getPrivacyContexts());
-		$privacyContexts = kstring::addPrefixToArray($privacyContexts ,$prefix);
+		$privacyContexts = kString::addPrefixToArray($privacyContexts ,$prefix);
 
 		return implode(' ',$privacyContexts);
 	}

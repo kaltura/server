@@ -3123,7 +3123,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$privacyContextForEntry = kEntitlementUtils::getPrivacyContextForEntry($this);
 		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $this->getPartnerId();
-		$privacyContextForEntry = kstring::addPrefixToArray($privacyContextForEntry ,$prefix);
+		$privacyContextForEntry = kString::addPrefixToArray($privacyContextForEntry ,$prefix);
 
 		return implode(' ',$privacyContextForEntry);
 	}
