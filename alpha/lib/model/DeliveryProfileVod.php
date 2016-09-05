@@ -14,18 +14,18 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * Functionality 
 	 * --------------------*/
 
-	protected function getPlayServerUrlPrefix()
+	protected function getPlayServerUrl()
 	{
 		return '';
 	}
 
-	protected  function generatePlayServerUrlPrefix()
+	protected  function generatePlayServerUrl()
 	{
 		$prefix = '/usePlayServer/1';
 		if($this->getDynamicAttributes()->getUiConfId())
 			$prefix .= '/uiConfId/'.$this->getDynamicAttributes()->getUiConfId();
-		if($this->getDynamicAttributes()->getSessionID())
-			$prefix .= '/sessionId/'.$this->getDynamicAttributes()->getSessionID();
+
+		$prefix .= '/sessionId/{sessionId}';
 
 		return $prefix;
 	}
@@ -40,9 +40,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$subpId = $entry->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 
-		$url = $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrlPrefix() : '';
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrl() : '';
 
-		$url .= "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		if ($entry->getType() == entryType::PLAYLIST)
 		{
 			$partner = $entry->getPartner();

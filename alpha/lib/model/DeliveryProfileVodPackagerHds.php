@@ -51,8 +51,8 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 		return $result;
 	}
 
-	protected function getPlayServerUrlPrefix()
+	protected function getPlayServerUrl()
 	{
-		return $this->generatePlayServerUrlPrefix();
+		return $this->generatePlayServerUrl();
 	}
 }

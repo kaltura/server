@@ -1054,8 +1054,6 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 			if(!$this->deliveryAttributes->getUiConfId())
 				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
-
-			$this->deliveryAttributes->setSessionId(infraRequestUtils::getRemoteAddress(). '_' .((float) mt_rand() / (float) mt_getrandmax()));
 		}
 
 		if($this->secureEntryHelper)
@@ -1105,7 +1103,7 @@ class playManifestAction extends kalturaAction
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		$renderer->lastModified = time();
-		
+
 		// Handle caching
 		$canCacheAccessControl = false;
 		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))
