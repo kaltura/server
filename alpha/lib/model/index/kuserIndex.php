@@ -298,5 +298,12 @@ class kuserIndex extends BaseIndexObject
 		return kuserPeer::doCount($c);
 	}
 
+	public static function getCacheInvalidationKeys($object = null)
+	{
+		if (is_null($object))
+			return array(array("kuser:id=%s", kuserPeer::ID), array("kuser:partnerId=%s", kuserPeer::PARTNER_ID));
+		else
+			return array("kuser:id=" . strtolower($object->getId()), "kuser:partnerId=" . strtolower($object->getPartnerId()));
+	}
 }
 

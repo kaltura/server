@@ -212,4 +212,20 @@ abstract class BaseIndexObject
 		}
 		return implode(" ", $optimizations);
 	}
+	
+	/**
+	 * Override in order to use the query cache.
+	 * Cache invalidation keys are used to determine when cached queries are valid.
+	 * Before returning a query result from the cache, the time of the cached query
+	 * is compared to the time saved in the invalidation key.
+	 * A cached query will only be used if it's newer than the matching invalidation key.
+	 *
+	 * @return     array The invalidation keys that should be checked before returning a cached result for this criteria.
+	 *		 if an empty array is returned, the query cache won't be used - the query will be performed on the Sphinx.
+	 *		 When object is null the function returns the invalidation key pattern otherwise it returns the actual value
+	 */
+	public static function getCacheInvalidationKeys($object = null)
+	{
+		return array();
+	}
 }

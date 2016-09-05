@@ -58,6 +58,18 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected $applySortRequired;
 	
 	/**
+	 * List of non sphinx order columna and direction (ASC, DESC)
+	 * @var array
+	 */
+	protected $nonSphinxOrderColumns = null;
+	
+	/**
+	 * total record count retrieved using Sphinx show meta
+	 * @var int
+	 */
+	protected $sphinxRecordCount = false;
+	
+	/**
 	 * Counts how many criterions couldn't be handled
 	 * @var int
 	 */
@@ -130,7 +142,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->selectColumn = $objectClass::getSphinxIdField();
 		
 		$sql = "SELECT {$this->selectColumn} $conditions FROM $index $wheres " . ($this->groupByColumn ? "GROUP BY {$this->groupByColumn} " : "" ) . "$orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
-		
+
 		if (kConf::hasParam('sphinx_extra_options'))
 			$sql .= ', ' . kConf::get('sphinx_extra_options');
 
@@ -146,7 +158,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 
 		//debug query
-		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, 0);
+
+		$sqlConditions = array();
+		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
@@ -156,6 +170,37 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$idsCount = count($ids);
 		$this->setFetchedIds($ids);
 		KalturaLog::info("Found $idsCount ids");
+
+		$this->sphinxRecordCount = false;
+
+		if($this->doCount && $setLimit &&
+			(!$this->getLimit() || !$idsCount || $idsCount >= $this->getLimit()))
+		{
+			$metaItems = $pdo->queryAndFetchAll("show meta like '%total_found%'", PDO::FETCH_ASSOC, $sqlConditions);
+			if ($metaItems)
+			{
+				$metaItem = reset($metaItems);
+				$this->sphinxRecordCount =  (int)$metaItem['Value'];
+			}
+		}
+
+		return array($pdo, $sqlConditions);
+	}
+
+	protected function applySphinxResult($setLimit)
+	{
+		if ($this->nonSphinxOrderColumns)
+		{
+			$this->clearOrderByColumns();
+			foreach($this->nonSphinxOrderColumns as $orderColoumn)
+			{
+				list($column, $direction) = $orderColumn;
+				if($direction == Criteria::DESC)
+					$this->addDescendingOrderByColumn($column);
+				else
+					$this->addAscendingOrderByColumn($column);
+			}
+		}
 		
 		foreach($this->keyToRemove as $key)
 		{
@@ -163,31 +208,24 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->remove($key);
 		}
 		
+		$objectClass = $this->getIndexObjectName();
 		$propelIdField = $objectClass::getPropelIdField();
-		$this->addAnd($propelIdField, $ids, Criteria::IN);
+		$this->addAnd($propelIdField, $this->getFetchedIds(), Criteria::IN);
 		
 		$this->recordsCount = 0;
 		
-		if(!$this->doCount)
-			return;
-			
 		if($setLimit)
 		{
-			if ($this->getLimit() && $idsCount && $idsCount < $this->getLimit())
+			if ($this->sphinxRecordCount !== false)
 			{
-				$this->recordsCount = $idsCount;
-				if($this->getOffset())
-					$this->recordsCount += $this->getOffset();				
+				$this->recordsCount = $this->sphinxRecordCount;
+				KalturaLog::info('Sphinx query total_found: ' . $this->recordsCount);
 			}
 			else
 			{
-				$metaItems = $pdo->queryAndFetchAll("show meta like '%total_found%'", PDO::FETCH_ASSOC);
-				if ($metaItems)
-				{
-					$metaItem = reset($metaItems);
-					$this->recordsCount = (int)$metaItem['Value'];
-					KalturaLog::info('Sphinx query total_found: ' . $this->recordsCount);
-				}
+				$this->recordsCount = count($this->getFetchedIds());
+				if($this->getOffset())
+					$this->recordsCount += $this->getOffset();				
 			}
 			
 			$this->setOffset(0);
@@ -378,7 +416,17 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->sphinxSkipped = true;
 			return;
 		}
-		
+
+		$cacheKey = null;
+		$cachedResult = kSphinxQueryCache::getCachedSphinxQueryResults($this, $objectClass, $cacheKey);
+		if ($cachedResult)
+		{
+			list($ids, $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit) = $cachedResult;
+			$this->setFetchedIds($ids);
+			$this->applySphinxResult($setLimit);
+			return;
+		}
+
 		$fieldsToKeep = $objectClass::getSphinxConditionsToKeep();
 		$criterionsMap = $this->getMap();
 		uksort($criterionsMap, array('SphinxCriteria','sortFieldsByPriority'));
@@ -451,7 +499,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$replace = $objectClass::getIndexOrderList();
 			$search = array_keys($replace);
 			
-			$this->clearOrderByColumns();
+			$this->nonSphinxOrderColumns = array();
 			foreach($orderByColumns as $orderByColumn)
 			{
 				$arr = explode(' ', $orderByColumn);
@@ -480,10 +528,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					{
 						list($match, $column, $direction) = $matches;
 						
-						if(strtoupper($direction) == Criteria::DESC)
-							$this->addDescendingOrderByColumn($column);
-						else
-							$this->addAscendingOrderByColumn($column);
+						$this->nonSphinxOrderColumns[] = array($column, strtoupper($direction));
 					}
 				}
 			}
@@ -535,7 +580,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$limit = $this->getOffset() . ", $limit";
 		}
 		
-		$this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
+		list($pdo, $sqlConditions) = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
+
+		$queryResult = array($this->getFetchedIds(), $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit);
+		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult, $sqlConditions);
+
+		$this->applySphinxResult($setLimit);
 	}
 	
 	/**
@@ -1085,3 +1135,4 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 	}
 }
+
