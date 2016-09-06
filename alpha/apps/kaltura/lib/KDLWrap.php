@@ -299,7 +299,7 @@ class KDLWrap
 			 * To avoid this - turn such flavors into 'forced'.
 			 */
 			if(isset($target->_audio) && !isset($target->_video)
-			&& isset($target->_multiStream->audio) && isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)>0){
+			&& isset($target->_multiStream->audio->streams) && count($target->_multiStream->audio->streams)>0){
 				$flavor->_force = true;
 			}
 		}
