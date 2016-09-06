@@ -23,7 +23,7 @@ class kSphinxQueryCache extends kQueryCache
 	{
 		self::$reduceConditionalExpiry = 0;
 		
-		if (!kConf::get("query_cache_enabled"))
+		if (!kConf::get("sphinx_query_cache_enabled"))
 		{
 			return null;
 		}
@@ -186,7 +186,7 @@ class kSphinxQueryCache extends kQueryCache
 
 	public static function invalidateQueryCache($object)
 	{
-		if (!kConf::get("query_cache_invalidate_on_change"))
+		if (!kConf::get("sphinx_query_cache_invalidate_on_change"))
 		{
 			return;
 		}

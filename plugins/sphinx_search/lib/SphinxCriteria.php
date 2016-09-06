@@ -189,9 +189,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 	protected function applySphinxResult($setLimit)
 	{
+		$this->clearOrderByColumns();
 		if ($this->nonSphinxOrderColumns)
 		{
-			$this->clearOrderByColumns();
 			foreach($this->nonSphinxOrderColumns as $orderColoumn)
 			{
 				list($column, $direction) = $orderColumn;
@@ -498,7 +498,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{
 			$replace = $objectClass::getIndexOrderList();
 			$search = array_keys($replace);
-			
+
+			$this->clearOrderByColumns();			
 			$this->nonSphinxOrderColumns = array();
 			foreach($orderByColumns as $orderByColumn)
 			{
