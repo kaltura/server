@@ -5,6 +5,24 @@
  */
 class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBaseFilter
 {
+	/**
+	 * Find event-resource objects that associated with the event, if none found, find by its parent event
+	 * @var int
+	 */
+	public $eventIdOrItsParentEqual;
+
+	static private $map_between_objects = array
+	(
+			"eventIdOrItsParentEqual" => "_eq_event_id_or_parent",
+	);
+	
+	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
+	
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()
 	 */

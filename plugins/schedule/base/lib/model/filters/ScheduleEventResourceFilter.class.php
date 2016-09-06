@@ -18,6 +18,7 @@ class ScheduleEventResourceFilter extends baseObjectFilter
 				"_lte_created_at",
 				"_gte_updated_at",
 				"_lte_updated_at",
+				"_eq_event_id_or_parent",
 			) , NULL );
 
 		$this->allowed_order_fields = array (
@@ -46,6 +47,37 @@ class ScheduleEventResourceFilter extends baseObjectFilter
 	public function getIdFromPeer()
 	{
 		return ScheduleEventResourcePeer::ID;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see baseObjectFilter::attachToFinalCriteria()
+	 */
+	public function attachToFinalCriteria(Criteria $criteria)
+	{
+		if($this->is_set('_eq_event_id_or_parent'))
+		{
+			$scheduleEventResources = ScheduleEventResourcePeer::retrieveByEventId($this->get('_eq_event_id_or_parent'));
+			if(count($scheduleEventResources))
+			{
+				$scheduleEventResourceIds = array();
+				foreach($scheduleEventResources as $scheduleEventResource)
+				{
+					/* @var $scheduleEventResource ScheduleEventResource */
+					$scheduleEventResourceIds[] = $scheduleEventResource->getId();
+				}
+				$this->set('_in_resource_id', implode(',', $scheduleEventResourceIds));
+			}
+			else 
+			{
+				$scheduleEvent = ScheduleEventPeer::retrieveByPK($this->get('_eq_event_id_or_parent'));
+				if($scheduleEvent->getParentId())
+				{
+					$this->set('_eq_event_id', $scheduleEvent->getParentId());
+				}
+			}
+			$this->unsetByName('_eq_event_id_or_parent');
+		}
 	}
 }
 
