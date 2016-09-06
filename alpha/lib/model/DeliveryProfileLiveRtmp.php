@@ -23,11 +23,11 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 	{
 		$flavors = $this->buildRtmpLiveStreamFlavorsArray();
 
-		$entry = entryPeer::retrieveByPK($this->getDynamicAttributes()->getEntryId());
+		$entry = $this->getDynamicAttributes()->getEntry();
 		$baseUrl = $entry->getStreamUrl();
 		$baseUrl = rtrim($baseUrl, '/');
-		if (strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") === 0)
-			$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+		if (strpos($this->getDynamicAttributes()->getMediaProtocol(), "rtmp") === 0)
+			$baseUrl = $this->getDynamicAttributes()->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 
 		$this->finalizeUrls($baseUrl, $flavors);
 		$this->baseUrl = $baseUrl;
