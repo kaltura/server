@@ -95,6 +95,13 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if(!$this->liveStreamConfig)
 			$this->liveStreamConfig = new kLiveStreamConfiguration();
 		
+		$entry = $this->getDynamicAttributes()->getEntry();
+		if(in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
+		{
+			$this->initManualLiveStreamConfiguration($entry);
+			return;
+		}
+		
 		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
 		if(!count($liveEntryServerNodes))
 			return;
@@ -137,6 +144,32 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 			}
 		}
+	}
+	
+	protected function initManualLiveStreamConfiguration(LiveStreamEntry $entry)
+	{
+		$customLiveStreamConfigurations = array();
+		
+		if($entry->getHlsStreamUrl())
+		{
+			$hlsLiveStreamConfig = new kLiveStreamConfiguration();
+			$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl());
+			$hlsLiveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
+			$customLiveStreamConfigurations[] = $hlsLiveStreamConfig;
+		}
+		
+		$customLiveStreamConfigurations = array_merge($entry->getCustomLiveStreamConfigurations(), $customLiveStreamConfigurations);
+		foreach($customLiveStreamConfigurations as $customLiveStreamConfiguration)
+		{
+			/* @var $customLiveStreamConfiguration kLiveStreamConfiguration */
+			if($this->getDynamicAttributes()->getFormat() == $customLiveStreamConfiguration->getProtocol())
+			{
+				$this->liveStreamConfig = $customLiveStreamConfiguration;
+				return;
+			}
+		}
+		
+		KalturaLog::debug("Could not locate custom live stream configuration from manual liveStream entry [{$entry->getId()}]");
 	}
 	
 	public function isLive ($url) {

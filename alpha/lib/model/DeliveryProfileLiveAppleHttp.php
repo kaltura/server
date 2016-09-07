@@ -11,21 +11,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * @var bool
 	 */
 	private $shouldRedirect = false;
-	
-	protected function initLiveStreamConfig()
-	{
-		$this->liveStreamConfig = new kLiveStreamConfiguration();
-		
-		$entry = $this->getDynamicAttributes()->getEntry();
-		if(in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
-		{
-			$this->liveStreamConfig->setUrl($entry->getHlsStreamUrl());
-			$this->liveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
-			return;
-		}
-		
-		return parent::initLiveStreamConfig();
-	}
 
 	public function setDisableExtraAttributes($v)
 	{
