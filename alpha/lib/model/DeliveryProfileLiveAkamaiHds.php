@@ -7,7 +7,7 @@ class DeliveryProfileLiveAkamaiHds extends DeliveryProfileLiveHds {
 		$this->liveStreamConfig = new kLiveStreamConfiguration();
 		
 		$entry = $this->getDynamicAttributes()->getEntry();
-		if($entry->getSource() === EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
+		if(in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
 		{
 			$customLiveStreamConfigurations = $entry->getCustomLiveStreamConfigurations();
 			foreach($customLiveStreamConfigurations as $customLiveStreamConfiguration)

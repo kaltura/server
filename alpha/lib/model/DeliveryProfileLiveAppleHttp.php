@@ -200,11 +200,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$httpUrl = $this->getBaseUrl($serverNode, PlaybackProtocol::HLS);
 		$httpUrl = rtrim($httpUrl, "/") . "/" . $this->getStreamName() . "/playlist.m3u8" . $this->getQueryAttributes();
 
-		if($this->getDynamicAttributes()->getUsePlayServer()) 
-		{
-			$httpUrl = $this->getPlayServerUrl($httpUrl);
-		}
-
 		return $httpUrl;
 	}
 
@@ -216,6 +211,12 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$backupManifestUrl = $this->liveStreamConfig->getBackupUrl();
 		$primaryStreamInfo = $this->liveStreamConfig->getPrimaryStreamInfo();
 		$backupStreamInfo = $this->liveStreamConfig->getBackupStreamInfo();
+		
+		if($this->getDynamicAttributes()->getUsePlayServer())
+		{
+			$playServerManifestUrl = $this->getPlayServerUrl($primaryManifestUrl);
+			$this->liveStreamConfig->setUrl($playServerManifestUrl);
+		}
 		
 		if($this->getDynamicAttributes()->getUsePlayServer() || (!count($primaryStreamInfo) && !count($backupStreamInfo)))
 		{
