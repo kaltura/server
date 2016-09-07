@@ -67,7 +67,7 @@ $defaultDeliveryProfileArray = array(
 	"hds" => $defaultHdsDeliveryProfile
 );
 
-KalturaLog::debug("Starting external Wowza delivery profiles update with default delivery profiles Array " . print_r($defaultDeliveryProfileArray));
+KalturaLog::debug("Starting external Wowza delivery profiles update with default delivery profiles Array " . print_r($defaultDeliveryProfileArray, true));
 
 $externalWowzaServerNodes = getActiveExternalWowzaServerNode();
 if(!count($externalWowzaServerNodes))
@@ -90,4 +90,4 @@ foreach ($externalWowzaServerNodes as $externalWowzaServerNode)
 	$externalWowzaServerNode->save();
 }
 
-KalturaLog::debug("Done external Wowza delivery profiles update with with default delivery profiles Array " . print_r($defaultDeliveryProfileArray));
+KalturaLog::debug("Done external Wowza delivery profiles update with with default delivery profiles Array " . print_r($defaultDeliveryProfileArray, true));
