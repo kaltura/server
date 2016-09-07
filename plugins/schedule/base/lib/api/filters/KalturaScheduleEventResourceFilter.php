@@ -9,11 +9,11 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 	 * Find event-resource objects that associated with the event, if none found, find by its parent event
 	 * @var int
 	 */
-	public $eventIdOrItsParentEqual;
+	public $eventIdOrItsParentIdEqual;
 
 	static private $map_between_objects = array
 	(
-			"eventIdOrItsParentEqual" => "_eq_event_id_or_parent",
+			"eventIdOrItsParentIdEqual" => "_eq_event_id_or_parent",
 	);
 	
 	

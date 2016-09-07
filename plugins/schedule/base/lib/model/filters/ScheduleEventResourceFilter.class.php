@@ -66,18 +66,19 @@ class ScheduleEventResourceFilter extends baseObjectFilter
 					/* @var $scheduleEventResource ScheduleEventResource */
 					$scheduleEventResourceIds[] = $scheduleEventResource->getId();
 				}
-				$this->set('_in_resource_id', implode(',', $scheduleEventResourceIds));
+				$criteria->add(ScheduleEventResourcePeer::ID, $scheduleEventResourceIds, Criteria::IN);
 			}
 			else 
 			{
 				$scheduleEvent = ScheduleEventPeer::retrieveByPK($this->get('_eq_event_id_or_parent'));
 				if($scheduleEvent->getParentId())
 				{
-					$this->set('_eq_event_id', $scheduleEvent->getParentId());
+					$criteria->add(ScheduleEventResourcePeer::EVENT_ID, $scheduleEvent->getParentId(), Criteria::EQUAL);
 				}
 			}
 			$this->unsetByName('_eq_event_id_or_parent');
 		}
+		return parent::attachToFinalCriteria($criteria);
 	}
 }
 
