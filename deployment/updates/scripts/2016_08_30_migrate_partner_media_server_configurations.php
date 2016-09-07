@@ -72,7 +72,7 @@ foreach ($partnerToWorkOn as $partner)
 	if($hlsDomain)
 	{
 		KalturaLog::debug("Found hls domain config for partner [{$partner->getId()}] value [$hlsDomain]");
-		$hlsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($partner->getId(), $hdsDomain, 'applehttp');
+		$hlsDeliveryProfile = getDeliveryProfileByHostNameAndStreamType($partner->getId(), $hlsDomain, 'applehttp');
 		if($hlsDeliveryProfile)
 			$hlsDeliveryProfileId = $hlsDeliveryProfile->getId();
 	}
