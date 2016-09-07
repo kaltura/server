@@ -26,34 +26,19 @@ function getWowzaServerNodeEnumValue()
 	return $enum->getId();
 }
 
-function getAppleHttpDefaultDeliveryProfileId()
+function getDefaultDeliveryProfileIdByTypeAndStreamType($type, $streamType)
 {
 	$c = new Criteria();
-	$c->add(DeliveryProfilePeer::TYPE, DeliveryProfileType::LIVE_HLS);
+	$c->add(DeliveryProfilePeer::TYPE, $type);
+	$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamType);
 	$c->add(DeliveryProfilePeer::STATUS, DeliveryStatus::ACTIVE);
+	$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
 	$c->add(DeliveryProfilePeer::HOST_NAME, null);
 	
 	$deliveryProfile = DeliveryProfilePeer::doSelectOne($c);
 	if(!$deliveryProfile)
 	{
-		KalturaLog::warning("Could not locate default empty liveHLS delivery profile");
-		die();
-	}
-	
-	return $deliveryProfile->getId();
-}
-
-function getHdsDefaultDeliveryProfileId()
-{
-	$c = new Criteria();
-	$c->add(DeliveryProfilePeer::TYPE, DeliveryProfileType::LIVE_HDS);
-	$c->add(DeliveryProfilePeer::STATUS, DeliveryStatus::ACTIVE);
-	$c->add(DeliveryProfilePeer::HOST_NAME, null);
-	
-	$deliveryProfile = DeliveryProfilePeer::doSelectOne($c);
-	if(!$deliveryProfile)
-	{
-		KalturaLog::warning("Could not locate default empty liveHLS delivery profile");
+		KalturaLog::warning("Could not locate default empty [$type] delivery profile with stream type [$streamType]");
 		die();
 	}
 	
@@ -72,14 +57,17 @@ function getActiveExternalWowzaServerNode()
 	return ServerNodePeer::doSelect($c);
 }
 
-$defaultHlsDeliveryProfile = getAppleHttpDefaultDeliveryProfileId();
-$defaultHdsDeliveryProfile = getHdsDefaultDeliveryProfileId();
+$defaultHlsDeliveryProfile = getDefaultDeliveryProfileIdByTypeAndStreamType(DeliveryProfileType::LIVE_HLS, PlaybackProtocol::HLS);
+$defaultAppleHttpDeliveryProfile = getDefaultDeliveryProfileIdByTypeAndStreamType(DeliveryProfileType::LIVE_HLS, PlaybackProtocol::APPLE_HTTP);
+$defaultHdsDeliveryProfile = getDefaultDeliveryProfileIdByTypeAndStreamType(DeliveryProfileType::LIVE_HDS, PlaybackProtocol::HDS);
+
 $defaultDeliveryProfileArray = array(
-	"applehttp" => $defaultHlsDeliveryProfile,
+	"applehttp" => $defaultAppleHttpDeliveryProfile,
+	"hls" => $defaultHlsDeliveryProfile,
 	"hds" => $defaultHdsDeliveryProfile
 );
 
-KalturaLog::debug("Starting external Wowza delivery profiles update with defaultHlsDeliveryProfile [$defaultHlsDeliveryProfile] and defaultHdsDeliveryProfile [$defaultHdsDeliveryProfile]");
+KalturaLog::debug("Starting external Wowza delivery profiles update with default delivery profiles Array " . print_r($defaultDeliveryProfileArray));
 
 $externalWowzaServerNodes = getActiveExternalWowzaServerNode();
 if(!count($externalWowzaServerNodes))
@@ -102,4 +90,4 @@ foreach ($externalWowzaServerNodes as $externalWowzaServerNode)
 	$externalWowzaServerNode->save();
 }
 
-KalturaLog::debug("Done external Wowza delivery profiles update with defaultHlsDeliveryProfile [$defaultHlsDeliveryProfile] and [defaultHdsDeliveryProfile] $defaultHdsDeliveryProfile");
+KalturaLog::debug("Done external Wowza delivery profiles update with with default delivery profiles Array " . print_r($defaultDeliveryProfileArray));

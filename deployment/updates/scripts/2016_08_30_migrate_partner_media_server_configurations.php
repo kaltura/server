@@ -97,7 +97,6 @@ foreach ($partnerToWorkOn as $partner)
 		continue;
 	}
 	
-	$partner->removeFromCustomData("mediaServersConfiguration");
 	$partner->setLiveDeliveryProfileIds($liveDeliveryProfileConfig);
 	$partner->save();
 }
