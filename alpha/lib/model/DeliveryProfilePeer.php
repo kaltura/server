@@ -201,7 +201,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive);
+		$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))
@@ -217,7 +217,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return self::selectDeliveryByDeliveryAttributes($partner->getId(), $streamerType, $deliveries, $deliveryAttributes);
 	}
 
-	protected static function getCustomDeliveryIds($entry, $partner, $streamerType, $isLive)
+	protected static function getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
 		$deliveryIds = array();
 
@@ -242,6 +242,30 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				if(array_key_exists($streamerType, $partnerLiveDeliveryIds))
 				{
 					$deliveryIds = $partnerLiveDeliveryIds[$streamerType];
+				}
+			}
+			
+			if(!count($deliveryIds) && in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
+			{
+				$customLiveStreamConfigurations = array();
+				if($entry->getHlsStreamUrl())
+				{
+					$hlsLiveStreamConfig = new kLiveStreamConfiguration();
+					$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl());
+					$hlsLiveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
+					$customLiveStreamConfigurations[] = $hlsLiveStreamConfig;
+				}
+				
+				$customLiveStreamConfigurations = array_merge($entry->getCustomLiveStreamConfigurations(), $customLiveStreamConfigurations);
+				foreach($customLiveStreamConfigurations as $customLiveStreamConfiguration)
+				{
+					/* @var $customLiveStreamConfiguration kLiveStreamConfiguration */
+					if($streamerType == $customLiveStreamConfiguration->getProtocol())
+					{
+						$cdnHost = parse_url($customLiveStreamConfiguration->getUrl(), PHP_URL_HOST);
+						$customLiveDelivery = self::getLiveDeliveryProfileByHostName($cdnHost, $deliveryAttributes);
+						$deliveryIds = array($customLiveDelivery->getId());
+					}
 				}
 			}
 		}

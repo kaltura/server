@@ -11,21 +11,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * @var bool
 	 */
 	private $shouldRedirect = false;
-	
-	protected function initLiveStreamConfig()
-	{
-		$this->liveStreamConfig = new kLiveStreamConfiguration();
-		
-		$entry = $this->getDynamicAttributes()->getEntry();
-		if(in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
-		{
-			$this->liveStreamConfig->setUrl($entry->getHlsStreamUrl());
-			$this->liveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
-			return;
-		}
-		
-		return parent::initLiveStreamConfig();
-	}
 
 	public function setDisableExtraAttributes($v)
 	{
@@ -200,11 +185,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$httpUrl = $this->getBaseUrl($serverNode, PlaybackProtocol::HLS);
 		$httpUrl = rtrim($httpUrl, "/") . "/" . $this->getStreamName() . "/playlist.m3u8" . $this->getQueryAttributes();
 
-		if($this->getDynamicAttributes()->getUsePlayServer()) 
-		{
-			$httpUrl = $this->getPlayServerUrl($httpUrl);
-		}
-
 		return $httpUrl;
 	}
 
@@ -216,6 +196,12 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$backupManifestUrl = $this->liveStreamConfig->getBackupUrl();
 		$primaryStreamInfo = $this->liveStreamConfig->getPrimaryStreamInfo();
 		$backupStreamInfo = $this->liveStreamConfig->getBackupStreamInfo();
+		
+		if($this->getDynamicAttributes()->getUsePlayServer())
+		{
+			$playServerManifestUrl = $this->getPlayServerUrl($primaryManifestUrl);
+			$this->liveStreamConfig->setUrl($playServerManifestUrl);
+		}
 		
 		if($this->getDynamicAttributes()->getUsePlayServer() || (!count($primaryStreamInfo) && !count($backupStreamInfo)))
 		{
