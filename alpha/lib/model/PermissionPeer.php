@@ -220,13 +220,14 @@ class PermissionPeer extends BasePermissionPeer
 	public static function getByNamesAndPartner(array $permissionNamesArray, array $partnerIdsArray)
 	{
 		$c = new Criteria();
-
 		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 		$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
 		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 		$c->addGroupByColumn(PermissionPeer::NAME);
 
 		PermissionPeer::setUseCriteriaFilter(false);
+		KalturaLog::debug("MOSHE");
+		KalturaLog::debug(print_r($c,true));
 		$permissions = PermissionPeer::doSelect($c);
 		PermissionPeer::setUseCriteriaFilter(true);
 
@@ -235,8 +236,7 @@ class PermissionPeer extends BasePermissionPeer
 
 	public static function preFetchPermissions($permissionsNamesArray)
 	{
-		$preFetchPermissions = PermissionPeer::getByNamesAndPartner($permissionsNamesArray , array(kCurrentContext::$ks_partner_id, PartnerPeer::GLOBAL_PARTNER));
-
+		$preFetchPermissions = PermissionPeer::getByNamesAndPartner($permissionsNamesArray , array(kCurrentContext::$ks_partner_id, strval(PartnerPeer::GLOBAL_PARTNER)));
 		foreach ($preFetchPermissions as $permission)
 		{
 			PermissionPeer::validatePermission($permission->getName(), kCurrentContext::$ks_partner_id, true ,$permission);
