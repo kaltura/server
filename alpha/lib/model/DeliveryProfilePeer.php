@@ -83,8 +83,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIVE_RTMP => 'DeliveryProfileLiveRtmp',
 			DeliveryProfileType::LIVE_HLS_TO_MULTICAST => "DeliveryProfileLiveAppleHttpToMulticast",
 			DeliveryProfileType::LIVE_PACKAGER_HLS => 'DeliveryProfileLivePackagerHls',
-			DeliveryProfileType::LIVE_PACKAGER_HLS => 'DeliveryProfileLivePackagerHds',
-			DeliveryProfileType::LIVE_PACKAGER_HLS => 'DeliveryProfileLivePackagerDash',
+			DeliveryProfileType::LIVE_PACKAGER_HDS => 'DeliveryProfileLivePackagerHds',
+			DeliveryProfileType::LIVE_PACKAGER_DASH => 'DeliveryProfileLivePackagerDash',
 					
 			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryProfileLiveAkamaiHds',
 	);
