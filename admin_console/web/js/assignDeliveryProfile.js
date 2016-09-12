@@ -45,7 +45,7 @@ function createDeliveryProfilesTable()
 	addRowWithType(tbl, 'VOD');
 	addRowWithType(tbl,'Live');
 
-	jQuery(getTag('Live')).after(tbl);
+	jQuery('#delivery_profile_ids').after(tbl);
 	$(tbl).attr('id', 'deliveryProfilesTable');
 }
 
