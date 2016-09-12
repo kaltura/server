@@ -54,6 +54,7 @@ interface DeliveryProfileType extends BaseEnum
 	const LIVE_PACKAGER_HLS = 1007;
 	const LIVE_PACKAGER_HDS = 1008;
 	const LIVE_PACKAGER_DASH = 1009;
+	const LIVE_PACKAGER_MSS = 1010;
 	
 	const LIVE_AKAMAI_HDS = 1013;
 }

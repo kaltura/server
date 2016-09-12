@@ -1271,6 +1271,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_PACKAGER_HDS" => "LIVE_PACKAGER_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_DASH" => "LIVE_DASH",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_PACKAGER_DASH" => "LIVE_PACKAGER_DASH",
+	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_PACKAGER_MSS" => "LIVE_PACKAGER_MSS",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_RTMP" => "LIVE_RTMP",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_HLS_TO_MULTICAST" => "LIVE_HLS_TO_MULTICAST",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_AKAMAI_HDS" => "LIVE_AKAMAI_HDS",

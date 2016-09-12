@@ -27,6 +27,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				DeliveryProfileType::LIVE_PACKAGER_HLS,
 				DeliveryProfileType::LIVE_PACKAGER_HDS,
 				DeliveryProfileType::LIVE_PACKAGER_DASH,
+				DeliveryProfileType::LIVE_PACKAGER_MSS,
 		);
 	
 	/**
@@ -85,6 +86,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIVE_PACKAGER_HLS => 'DeliveryProfileLivePackagerHls',
 			DeliveryProfileType::LIVE_PACKAGER_HDS => 'DeliveryProfileLivePackagerHds',
 			DeliveryProfileType::LIVE_PACKAGER_DASH => 'DeliveryProfileLivePackagerDash',
+			DeliveryProfileType::LIVE_PACKAGER_MSS => 'DeliveryProfileLivePackagerMss',
 					
 			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryProfileLiveAkamaiHds',
 	);
