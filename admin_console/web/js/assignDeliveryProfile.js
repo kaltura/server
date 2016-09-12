@@ -112,7 +112,7 @@ function okPressed(format, type) {
 		return;
 	
 	if(type == null)
-		type = "VOD"
+		type = "VOD";
 	
 	var dpIdsStr = $(getTag(type))[0].value;
 	var dpIdsObj = jQuery.parseJSON(dpIdsStr);
