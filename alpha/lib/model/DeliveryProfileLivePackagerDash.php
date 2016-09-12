@@ -1,6 +1,6 @@
 <?php
 
-class DeliveryProfileLivePackagerDash extends DeliveryProfileLivePackagerHds
+class DeliveryProfileLivePackagerDash extends DeliveryProfileLiveDash
 {
 	protected function getHttpUrl($serverNode)
 	{
