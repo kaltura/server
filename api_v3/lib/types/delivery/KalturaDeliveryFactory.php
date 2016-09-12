@@ -31,6 +31,7 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileAkamaiAppleHttpManifest();
 			case KalturaDeliveryProfileType::AKAMAI_HDS:
 				return new KalturaDeliveryProfileAkamaiHds();
+			case KalturaDeliveryProfileType::LIVE_PACKAGER_HLS:
 			case KalturaDeliveryProfileType::LIVE_HLS:
 				return new KalturaDeliveryProfileLiveAppleHttp();
 			case KalturaDeliveryProfileType::GENERIC_SS:
