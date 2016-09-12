@@ -1,17 +1,18 @@
 # Lynx 12.2.0 #
 
-## bpm - burn subtitles metadata trigger fix ##
+## Sphinx improvement - add partnerId to privacy_by_contextsx ##
 
- - Issue Type: Story
- - Issue ID: PLAT-6022
+ - Issue Type: Task
+ - Issue ID: PLAT-5983
 
 ### Configuration ###
 None.
  
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
-PLAT-5983
+	Run population scripts for entry and category tables in sphinx.
+
+
 # Lynx 12.1.0 #
 
 ## bpm - burn subtitles metadata trigger fix ##
