@@ -89,6 +89,8 @@ class KalturaDispatcher
 			KalturaLog::debug("Response profile: " . print_r($responseProfile, true));
 		}
 		
+		PermissionPeer::preFetchPermissions(array(PermissionName::FEATURE_END_USER_REPORTS, PermissionName::FEATURE_ENTITLEMENT));
+
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
 		
@@ -141,6 +143,7 @@ class KalturaDispatcher
 		return $res;
 	}
 	
+
 	/**
 	 * @param string $objectClass
 	 * @param string $objectId

@@ -8,7 +8,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 {
 	if ($oldAsset instanceof flavorAsset) {
 		// In case of live recording entry Don't drop the old asset
-		if ($entry->getSourceType() != EntrySourceType::RECORDED_LIVE)
+		if (!$entry->getIsRecordedEntry())
 			return true;
 	}
 	elseif ($oldAsset instanceof thumbAsset)
@@ -120,7 +120,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 						$defaultThumbAssetOld = $oldAsset;
 					}
 				}
-				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset,$entry))
+				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset,$tempEntry))
 				{
 					KalturaLog::info("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
 					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);

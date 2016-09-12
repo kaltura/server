@@ -35,12 +35,12 @@ class kLiveStreamConfiguration
 	protected $streamName;
 	
 	/**
-	 * @var kLiveStreamParams
+	 * @var array
 	 */
 	protected $primaryStreamInfo = null;
 	
 	/**
-	 * @var kLiveStreamParams
+	 * @var array
 	 */
 	protected $backupStreamInfo = null;
 	

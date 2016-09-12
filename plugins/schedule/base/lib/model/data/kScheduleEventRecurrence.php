@@ -350,7 +350,7 @@ class kScheduleEventRecurrence
 	 */
 	public function getDates($periodStart, $seed = null, $limit = null)
 	{
-		$periodEnd = strtotime('+1 year', $periodStart);
+		$periodEnd = strtotime('+2 year', $periodStart);
 		if(!is_null($this->until) && $this->until < $periodEnd)
 			$periodEnd = $this->until;
 

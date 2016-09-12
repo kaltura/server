@@ -165,7 +165,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($uiConfId)
 			$url .= '/uiConfId/' . $uiConfId;
 
-		if(count($this->params->getPlayerConfig()))
+		if(count($this->getDynamicAttributes()->getPlayerConfig()))
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 			
 		// TODO encrypt the manifest URL
@@ -180,53 +180,59 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
 	}
 
-	public function buildServeFlavors() 
-	{	
-		$baseUrl = $this->liveStreamConfig->getUrl();
-		$backupUrl = $this->liveStreamConfig->getBackupUrl();
+	protected function getHttpUrl($serverNode)
+	{
+		$httpUrl = $this->getBaseUrl($serverNode, PlaybackProtocol::HLS);
+		$httpUrl = rtrim($httpUrl, "/") . "/" . $this->getStreamName() . "/playlist.m3u8" . $this->getQueryAttributes();
+
+		return $httpUrl;
+	}
+
+	protected function buildHttpFlavorsArray()
+	{
+		$flavors = array();
 		
-		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
-		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
+		$primaryManifestUrl = $this->liveStreamConfig->getUrl();
+		$backupManifestUrl = $this->liveStreamConfig->getBackupUrl();
+		$primaryStreamInfo = $this->liveStreamConfig->getPrimaryStreamInfo();
+		$backupStreamInfo = $this->liveStreamConfig->getBackupStreamInfo();
 		
-		if($this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
+		if($this->getDynamicAttributes()->getUsePlayServer())
+		{
+			$playServerManifestUrl = $this->getPlayServerUrl($primaryManifestUrl);
+			$this->liveStreamConfig->setUrl($playServerManifestUrl);
+		}
+		
+		if($this->getDynamicAttributes()->getUsePlayServer() || (!count($primaryStreamInfo) && !count($backupStreamInfo)))
 		{
 			$this->shouldRedirect = true;
+			return parent::buildHttpFlavorsArray();
 		}
 		
-		if($this->params->getUsePlayServer()) {
-			
-			$this->liveStreamConfig->setUrl($this->getPlayServerUrl($baseUrl));
-			$this->liveStreamConfig->setBackupUrl(null);
-		}
-				
-		if($this->shouldRedirect) {
-			return parent::buildServeFlavors();
-		}
-				
-		$flavors = array();
-		$this->buildM3u8Flavors($baseUrl, $flavors, $primaryServerStreams);
-		if($backupUrl && ($this->getForceProxy() || count($flavors) == 0))
+		$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
+		if($backupManifestUrl && ($this->getForceProxy() || count($flavors) == 0))
 		{
-			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primay and backup streams
-			$priamryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryServerStreams);
-			$this->buildM3u8Flavors($backupUrl, $flavors, $backupServerStreams, $priamryFlavorBitrateInfo);
+			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primary and backup streams
+			$primaryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryStreamInfo);
+			$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
 		}
-		
+
 		foreach ($flavors as $index => $flavor)
 		{
 			$flavors[$index]['index'] = $index;
 		}
-			
+
 		usort($flavors, array($this, 'compareFlavors'));
-		
+
 		foreach ($flavors as $index => $flavor)
 		{
 			unset($flavors[$index]['index']);
 		}
-		
+
 		return $flavors;
+
 	}
-	
+
 	public function getRenderer($flavors)
 	{
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';

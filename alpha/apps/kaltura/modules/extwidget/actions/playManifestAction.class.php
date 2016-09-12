@@ -129,26 +129,6 @@ class playManifestAction extends kalturaAction
 		$calcToken = sha1(kConf::get('url_token_secret') . $url);
 		return $calcToken == $urlToken;
 	}
-
-	/**
-	 * @param array $params
-	 * @return array
-	 */
-	private function convertToShortNames(array $params)
-	{
-		$result = array();
-		foreach ($params as $key => $value)
-		{
-			if (isset(self::$shortNames[$key]))
-				$shortName = self::$shortNames[$key];
-			else
-				$shortName = $key;
-			
-			$result[$shortName] = $value;
-		}
-		
-		return $result;
-	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Initialization functions
@@ -310,6 +290,8 @@ class playManifestAction extends kalturaAction
 		
 		if(is_null($this->flavorParamsIds))
 			$this->flavorParamsIds = array();
+
+		$this->deliveryAttributes->setFlavorParamIds($this->flavorParamsIds);
 	}
 	
 	protected function enforceEncryption()
@@ -775,7 +757,7 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	
-	protected function initDeliveryProfile($cdnHost = null)
+	protected function initDeliveryProfile()
 	{
 		if ($this->deliveryAttributes->getStorageId())
 		{
@@ -887,14 +869,9 @@ class playManifestAction extends kalturaAction
 		$renderer->mediaUrl = $mediaUrl;
 		return $renderer;
 	}
-	
-	/**
-	 * @return array primary URL and backup URL
-	 */
-	private function getLiveEntryStreamConfig()
+
+	private function updateDeliveryAttributes()
 	{
-		$this->initFlavorParamsIds();
-		
 		$tag = null;
 		$tags = $this->deliveryAttributes->getTags();
 		if(count($tags) == 1) 
@@ -926,37 +903,15 @@ class playManifestAction extends kalturaAction
 				$tag = 'mbr';
 			}
 		}
-		
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $this->flavorParamsIds);
-		/* @var $liveStreamConfig kLiveStreamConfiguration */
-		if ($liveStreamConfig)
-			return $liveStreamConfig;
-		
-		switch($this->deliveryAttributes->getFormat())
-		{
-			case PlaybackProtocol::RTMP:
-				$baseUrl = $this->entry->getStreamUrl();
-				$baseUrl = rtrim($baseUrl, '/');
-				if (strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") === 0)
-					$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-				
-				$liveStreamConfig = new kLiveStreamConfiguration();
-				$liveStreamConfig->setUrl($baseUrl);
-				$liveStreamConfig->setProtocol(PlaybackProtocol::RTMP);
-				return $liveStreamConfig;				
-				
-			case PlaybackProtocol::APPLE_HTTP:
-				// TODO pass single tag
-				$liveStreamConfig = new kLiveStreamConfiguration();
-				$liveStreamConfig->setUrl($this->entry->getHlsStreamUrl());
-				$liveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
-				return $liveStreamConfig;
-		}
-		return null;
+
+		$this->deliveryAttributes->setTags($tag);
+		$this->deliveryAttributes->setMediaProtocol($protocol);
 	}
 	
 	private function serveLiveEntry()
-	{		
+	{
+		$this->initFlavorParamsIds();
+
 		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
  		{
  			if (!$this->entry->hasMediaServer())
@@ -964,26 +919,16 @@ class playManifestAction extends kalturaAction
  			
  			kApiCache::setExpiry(120);
  		}
- 		
- 		$liveStreamConfig = $this->getLiveEntryStreamConfig();
- 		if(!$liveStreamConfig)
- 			KExternalErrors::dieError(KExternalErrors::LIVE_STREAM_CONFIG_NOT_FOUND, "Live stream playbck configuration not found for entry [$this->entryId]");
-		$cdnHost = parse_url($liveStreamConfig->getUrl(), PHP_URL_HOST);	
-		
+
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL)
-		{
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HDS);
-		}
-		
-		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->deliveryAttributes);
-		
+
+		$this->deliveryProfile = $this->initDeliveryProfile();
 		if(!$this->deliveryProfile)
-		{
 			return null;
-		}
-		
+
+		$this->updateDeliveryAttributes();
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);
-		$this->deliveryProfile->setLiveStreamConfig($liveStreamConfig);	
 		return $this->deliveryProfile->serve();
 	}
 	
@@ -1079,7 +1024,7 @@ class playManifestAction extends kalturaAction
 		{
 			$tagsArray = explode(',', $tags);
 			$tags = array();
-			foreach ($tagsArray as $tag) 
+			foreach ($tagsArray as $tag)
 			{
 				$tags[] = array(trim($tag));
 			}
@@ -1107,6 +1052,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
 			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
+			if(!$this->deliveryAttributes->getUiConfId())
+				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
 		}
 
 		if($this->secureEntryHelper)
@@ -1156,7 +1103,7 @@ class playManifestAction extends kalturaAction
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		$renderer->lastModified = time();
-		
+
 		// Handle caching
 		$canCacheAccessControl = false;
 		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))

@@ -12,13 +12,14 @@ class DeliveryController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$partnerId = $this->_getParam('partnerId');
 		$storageId = $this->_getParam('storageId');
+		$deliveryType = $this->_getParam('deliveryType');
 		$streamerType = $this->_getParam('streamerType');
 		$currentDps = $this->_getParam('currentDeliveryProfiles');
 	
 		$client = Infra_ClientHelper::getClient();
-		$options = $this->getDeliveryProfiles($client, $partnerId, $streamerType);
-		$selected = $this->getDeliveryProfiles($client, $partnerId, $streamerType, $currentDps);
-	
+		$options = $this->getDeliveryProfiles($client, $partnerId, $streamerType, null, $deliveryType);
+		$selected = $this->getDeliveryProfiles($client, $partnerId, $streamerType, $currentDps, $deliveryType);
+
 		$this->view->possibleValues = array_diff_key($options, $selected);
 		$this->view->selectedValues = $selected;
 	
@@ -66,7 +67,7 @@ class DeliveryController extends Zend_Controller_Action
 	
 	}
 	
-	protected function getDeliveryProfiles($client, $partnerId, $streamerType, $dpIds = null) {
+	protected function getDeliveryProfiles($client, $partnerId, $streamerType, $dpIds = null, $deliveryType = 'VOD') {
 	
 		$options = array();
 		$deliveryProfileService = new Kaltura_Client_DeliveryProfileService($client);
@@ -80,6 +81,7 @@ class DeliveryController extends Zend_Controller_Action
 		}
 		
 		$filter->streamerTypeEqual = $streamerType;
+		$filter->isLive = $deliveryType === "Live" ? true : false;
 		$filter->statusIn = Kaltura_Client_Enum_DeliveryStatus::ACTIVE . "," . Kaltura_Client_Enum_DeliveryStatus::STAGING_OUT;
 		
 		$pager = new Kaltura_Client_Type_FilterPager();
@@ -104,7 +106,7 @@ class DeliveryController extends Zend_Controller_Action
 		
 		    $dpIdsArray = explode(",", $dpIds);
 		    foreach($dpIdsArray as $dpId)
-		        $sortedOptions[] = $options[$dpId];
+		        $sortedOptions[$dpId] = $options[$dpId];
 		    $options = $sortedOptions;
 		}
 				

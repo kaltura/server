@@ -38,4 +38,9 @@ class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
 		
 		return array($flavor);
 	}
+
+	protected function getPlayServerUrl()
+	{
+		return $this->generatePlayServerUrl();
+	}
 }

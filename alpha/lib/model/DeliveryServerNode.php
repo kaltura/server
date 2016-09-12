@@ -1,9 +1,8 @@
 <?php
 
 abstract class DeliveryServerNode extends ServerNode {
-	
-	abstract public function getManifestUrl($protocol = 'http', $format = null);
-	abstract public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null);
+
+	const CUSTOM_DATA_DELIVERY_IDS = "delivery_profile_ids";
 	
 	public function getPlaybackDomain()
 	{
@@ -13,6 +12,17 @@ abstract class DeliveryServerNode extends ServerNode {
 			$playbackHostName = $this->host_name;
 		
 		return $playbackHostName;
+	}
+
+	/* Delivery Settings */
+	public function setDeliveryProfileIds($params)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_DELIVERY_IDS, $params);
+	}
+
+	public function getDeliveryProfileIds()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
 	}
 
 } // DeliveryServerNode

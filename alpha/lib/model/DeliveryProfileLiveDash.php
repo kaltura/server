@@ -28,6 +28,12 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 		
 		return false;
 	}
+
+	protected function getHttpUrl($serverNode)
+	{
+		$baseUrl = $this->getBaseUrl($serverNode);
+		return rtrim($baseUrl, "/") . "/" . $this->getStreamName() . "/manifest.mpd" . $this->getQueryAttributes();
+	}
 	
 	/**
 	 * @param string $content
