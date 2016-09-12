@@ -27,32 +27,7 @@ class kPlayReadyPartnerSetup
 							DrmLicenseExpirationPolicy::FIXED_DURATION, 
 							1);
 		KalturaLog::info("Default policy id:".$defaultPolicy->getId());
-							
-		$rentalPolicy = 
-		self::createPolicy(	$partnerId, 
-							"rental_".$partnerId, 
-							PlayReadyPlugin::getCoreValue('DrmLicenseScenario', PlayReadyLicenseScenario::RENTAL), 
-							DrmLicenseExpirationPolicy::FIXED_DURATION, 
-							7);
-		KalturaLog::info("Rental policy id:".$rentalPolicy->getId());
-							
-		$purchasePolicy = 
-		self::createPolicy(	$partnerId, 
-							"purchase_".$partnerId, 
-							PlayReadyPlugin::getCoreValue('DrmLicenseScenario', PlayReadyLicenseScenario::PURCHASE), 
-							DrmLicenseExpirationPolicy::UNLIMITED);	
-		KalturaLog::info("Purchase policy id:".$purchasePolicy->getId());
-		
-		$subscriptionPolicy = 
-		self::createPolicy(	$partnerId, 
-							"subscription_".$partnerId, 
-							PlayReadyPlugin::getCoreValue('DrmLicenseScenario', PlayReadyLicenseScenario::SUBSCRIPTION), 
-							DrmLicenseExpirationPolicy::FIXED_DURATION,
-							7);	
-		KalturaLog::info("Subscription policy id:".$subscriptionPolicy->getId());
-		
-		
-		return array($defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy);
+		return array($defaultPolicy);
 	}
 	
 	private static function createDefaultAccessControl($partnerId, $defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy)
