@@ -121,6 +121,13 @@ class kSphinxQueryCache extends kQueryCache
 
 		list($queryResult, $queryTime, $debugInfo) = $queryResult;
 
+		if (!is_null($maxInvalidationTime) &&
+			$queryTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
+		{
+			KalturaLog::debug("kQueryCache: cached query invalid, peer=$objectClass, key=$cacheKey, invkey=$maxInvalidationKey querytime=$queryTime debugInfo=$debugInfo invtime=$maxInvalidationTime");
+			return null;
+		}
+		
 		// return from memcache
 		$existingInvKeys = array();
 		foreach ($cacheResult as $invalidationKey => $invalidationTime)
