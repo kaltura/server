@@ -16,6 +16,8 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	const ENTRY_CUE_POINT_INDEX_SUFFIX = 'cpe_';
 	const ENTRY_CUE_POINT_INDEX_SUB_TYPE = 'cpst';
 	
+	const CUE_POINT_FETCH_LIMIT = 1000;
+	
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -277,37 +279,44 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		if(!count($indexOnEntryTypes))
 			return;
 		
-		$dataByType = array();
 		CuePointPeer::setUseCriteriaFilter(false);
-		$cuePointObjects = CuePointPeer::retrieveByEntryId($entry->getId(), $indexOnEntryTypes);
+		$cuePointsCount = CuePointPeer::countByEntryIdAndTypes($entry->getId(), $indexOnEntryTypes);
 		CuePointPeer::setUseCriteriaFilter(true);
 		
-		foreach($cuePointObjects as $cuePoint)
+		$offset = 0;
+		$searchData = '';
+		while($offset < $cuePointsCount)
 		{
-			/* @var $cuePoint CuePoint */	
-			$contributedData = $cuePoint->contributeData();
+			CuePointPeer::setUseCriteriaFilter(false);
+			$cuePointObjects = CuePointPeer::retrieveByEntryIdTypeAndLimit($entry->getId(), self::CUE_POINT_FETCH_LIMIT, $offset, $indexOnEntryTypes);
+			CuePointPeer::setUseCriteriaFilter(true);
 			
-			if(!$contributedData)
-				continue;
-				
-			$cuePointType = $cuePoint->getType();
-			if(!isset($dataByType[$cuePointType]))
-				$dataByType[$cuePointType] = array();
+			foreach($cuePointObjects as $cuePoint)
+			{
+				/* @var $cuePoint CuePoint */
+				$contributedData = $cuePoint->contributeData();
+					
+				if(!$contributedData)
+					continue;
 			
-			$contributedData = self::buildDataToIndexOnEntry($contributedData, $cuePointType, $cuePoint->getPartnerId(), $cuePoint->getId(), $cuePoint->getSubType());
+				$cuePointType = $cuePoint->getType();
+					
+				$contributedData = self::buildDataToIndexOnEntry($contributedData, $cuePointType, $cuePoint->getPartnerId(), $cuePoint->getId(), $cuePoint->getSubType());
+					
+				$searchData .= $contributedData . ' ';
+			}
 			
-			$dataByType[$cuePointType][] = $contributedData;
-		}
-		
-		$data = array();
-		foreach ($dataByType as $type => $typeData)
-		{
-			$data = array_merge($data, $typeData);
+			$handledObjectsCount = count($cuePointObjects);
+			//In case cue point was deleted during index execution than offset will not reach count so breake when count is 0
+			if(!$handledObjectsCount)
+				break;
+			
+			$offset += $handledObjectsCount;
 		}
 		
 		$dataField  = CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);
 		$searchValues = array(
-			$dataField => CuePointPlugin::PLUGIN_NAME . "_" . $entry->getPartnerId() . ' ' . implode(' ', $data) . ' ' . CuePointPlugin::SEARCH_TEXT_SUFFIX
+			$dataField => CuePointPlugin::PLUGIN_NAME . "_" . $entry->getPartnerId() . ' ' . $searchData . ' ' . CuePointPlugin::SEARCH_TEXT_SUFFIX
 		);
 		
 		return $searchValues;
