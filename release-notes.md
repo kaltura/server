@@ -1,3 +1,17 @@
+# Lynx 12.2.0 #
+
+## bpm - burn subtitles metadata trigger fix ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-6022
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
+PLAT-5983
 # Lynx 12.1.0 #
 
 ## bpm - burn subtitles metadata trigger fix ##
