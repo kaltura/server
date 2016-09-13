@@ -20,7 +20,7 @@ var kObjects = {
 	        EntryDistribution:				{label:	'Entry Distribution', apiType: 'KalturaEntryDistribution'},
 	        Metadata:						{label:	'Metadata', apiType: 'KalturaMetadata'},
 	        asset:							{label:	'Asset', apiType: 'KalturaAsset'},
-			attachmentAsset:				{label: 'AttachmentAsset', apiType: 'KalturaAttachmentAsset'},
+	        attachmentAsset:				{label: 'AttachmentAsset', apiType: 'KalturaAttachmentAsset'},
 	        flavorAsset:					{label:	'Flavor Asset', apiType: 'KalturaFlavorAsset'},
 	        thumbAsset:						{label:	'Thumbnail Asset', apiType: 'KalturaThumbAsset'},
 	        accessControl:					{label:	'Access Control', apiType: 'KalturaAccessControlProfile'},
