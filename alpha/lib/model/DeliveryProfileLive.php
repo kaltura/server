@@ -263,6 +263,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		return "";
 	}
+	
+	protected function getServerNodeBaseUrl($serverNode, $streamFormat = null) 
+	{
+		
+	}
 
 	protected function getBaseUrl($serverNode, $streamFormat = null)
 	{
@@ -270,31 +275,23 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
 		$baseUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		
-		$appPrefix = $serverNode->getApplicationPrefix();
-		$applicationName = $serverNode->getApplicationName();
-		
-		//LiveDvr fails to parse double slash and does not find match so need to verify applicationPrefix exists before adding it 
-		if($appPrefix && $appPrefix !== '')
-			$baseUrl .= rtrim($appPrefix, "/") . "/";
-		$baseUrl .= "$applicationName";
-		
-		$baseUrl = str_replace("{hostName}", $serverNode->getHostName(), $baseUrl);
 		KalturaLog::debug("Live Stream base url [$baseUrl]");
 		return $baseUrl;
 	}
 	
-	protected function getLivePackagerUrl($serverNode, $streamFormat = null)
+	protected function getLivePackagerUrl($serverNode)
 	{
 		/* @var $serverNode WowzaMediaServerNode */
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
-		$baseLivePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
-		$baseLivePackagerUrl = str_replace("{DC}", $serverNode->getDc(), $baseLivePackagerUrl);
-		$baseLivePackagerUrl =  rtrim($baseLivePackagerUrl, "/");
+		$domain = preg_replace("(https?://)", "", $this->getUrl());
+
+		$livePackagerUrl = "$protocol://$domain";
+		$livePackagerUrl = str_replace("{DC}", $serverNode->getDc(), $livePackagerUrl);
 		
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
 		$entryId = $this->getDynamicAttributes()->getEntryId();
 		
-		$livePackagerUrl = "$baseLivePackagerUrl/p/$partnerID/entryId/$entryId/";
+		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/entryId/$entryId/";
 		
 		KalturaLog::debug("Live Packager base stream Url [$livePackagerUrl]");
 		return $livePackagerUrl;

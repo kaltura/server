@@ -91,6 +91,17 @@ class WowzaMediaServerNode extends MediaServerNode {
 		}
 		
 		$playbackHost = "$protocol://$domain/";
+		
+		$appPrefix = $this->getApplicationPrefix($mediaServerConfig);
+		$applicationName = $this->getApplicationName();
+		
+		//LiveDvr fails to parse double slash and does not find match so need to verify applicationPrefix exists before adding it 
+		if($appPrefix && $appPrefix !== '')
+			$playbackHost .= rtrim($appPrefix, "/") . "/";
+		$playbackHost .= "$applicationName";
+		
+		$playbackHost = str_replace("{hostName}", $hostname, $playbackHost);
+		
 		return $playbackHost;
 	}
 	
@@ -128,11 +139,8 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $port;
 	}
 	
-	public function getApplicationPrefix($mediaServerConfig = null)
+	public function getApplicationPrefix($mediaServerConfig)
 	{
-		if(!$mediaServerConfig)
-			$mediaServerConfig = kConf::getMap('media_servers');
-		
 		$appPrefix = "";
 		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
 		

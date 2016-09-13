@@ -10,7 +10,7 @@ class DeliveryProfileLivePackagerMss extends DeliveryProfileLive
 	
 	protected function getHttpUrl($serverNode)
 	{
-		$httpUrl = $this->getLivePackagerUrl($serverNode, PlaybackProtocol::HLS);
+		$httpUrl = $this->getLivePackagerUrl($serverNode);
 		$httpUrl .= "manifest";
 		
 		KalturaLog::debug("Live Stream url [$httpUrl]");
