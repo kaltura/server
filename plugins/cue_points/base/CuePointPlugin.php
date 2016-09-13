@@ -279,44 +279,44 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		if(!count($indexOnEntryTypes))
 			return;
 		
-		CuePointPeer::setUseCriteriaFilter(false);
-		$cuePointsCount = CuePointPeer::countByEntryIdAndTypes($entry->getId(), $indexOnEntryTypes);
-		CuePointPeer::setUseCriteriaFilter(true);
-		
 		$offset = 0;
-		$searchData = '';
-		while($offset < $cuePointsCount)
+		$searchDataBytType = array();
+		$entryId = $entry->getId();
+		$partnerId = $entry->getPartnerId();
+		
+		do 
 		{
 			CuePointPeer::setUseCriteriaFilter(false);
-			$cuePointObjects = CuePointPeer::retrieveByEntryIdTypeAndLimit($entry->getId(), self::CUE_POINT_FETCH_LIMIT, $offset, $indexOnEntryTypes);
+			$cuePointObjects = CuePointPeer::retrieveByEntryIdTypeAndLimit($partnerId, $entryId, self::CUE_POINT_FETCH_LIMIT, $offset, $indexOnEntryTypes);
 			CuePointPeer::setUseCriteriaFilter(true);
 			
 			foreach($cuePointObjects as $cuePoint)
 			{
 				/* @var $cuePoint CuePoint */
 				$contributedData = $cuePoint->contributeData();
-					
+				
 				if(!$contributedData)
 					continue;
-			
+				
 				$cuePointType = $cuePoint->getType();
-					
+				
 				$contributedData = self::buildDataToIndexOnEntry($contributedData, $cuePointType, $cuePoint->getPartnerId(), $cuePoint->getId(), $cuePoint->getSubType());
-					
-				$searchData .= $contributedData . ' ';
+				
+				if(!isset($searchDataBytType[$cuePointType]))
+					$searchDataBytType[$cuePointType] = '';
+				
+				$searchDataBytType[$cuePointType] .= $contributedData . ' ';
 			}
 			
 			$handledObjectsCount = count($cuePointObjects);
-			//In case cue point was deleted during index execution than offset will not reach count so breake when count is 0
-			if(!$handledObjectsCount)
-				break;
-			
 			$offset += $handledObjectsCount;
-		}
+		} 
+		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT); //In case cue point was deleted during index execution than offset will not reach count so break when count is 0
+		
 		
 		$dataField  = CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);
 		$searchValues = array(
-			$dataField => CuePointPlugin::PLUGIN_NAME . "_" . $entry->getPartnerId() . ' ' . $searchData . ' ' . CuePointPlugin::SEARCH_TEXT_SUFFIX
+			$dataField => CuePointPlugin::PLUGIN_NAME . "_" . $entry->getPartnerId() . ' ' . implode(' ', $searchDataBytType) . ' ' . CuePointPlugin::SEARCH_TEXT_SUFFIX
 		);
 		
 		return $searchValues;
