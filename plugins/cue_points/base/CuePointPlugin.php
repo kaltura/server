@@ -305,7 +305,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 				if(!isset($searchDataBytType[$cuePointType]))
 					$searchDataBytType[$cuePointType] = '';
 				
-				$searchDataBytType[$cuePointType] = $searchDataBytType[$cuePointType] . $contributedData . ' ';
+				$searchDataBytType[$cuePointType] .= $contributedData . ' ';
 			}
 			
 			$handledObjectsCount = count($cuePointObjects);
