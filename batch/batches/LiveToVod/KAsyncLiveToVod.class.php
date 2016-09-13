@@ -108,7 +108,8 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
 		$filter->statusIn = CuePointStatus::READY;
-		$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb';
+		//$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb';
+		$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb,annotation.Annotation';
 		$filter->createdAtLessThanOrEqual = $currentSegmentEndTime;
 		return $filter;
 	}
@@ -203,6 +204,8 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 				return new KalturaCodeCuePoint();
 			case "thumbCuePoint.Thumb":
 				return new KalturaThumbCuePoint();
+			case "annotation.Annotation":
+				return new KalturaAnnotation();
 			default:
 				return null;
 		}

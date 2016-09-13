@@ -1,4 +1,4 @@
-# Lynx 12.0.0 #
+# Lynx 12.2.0 #
 
 ## Add new batch job for handling copy cue-point from live to VOD ##
 
@@ -6,13 +6,12 @@
  - Issue ID: PLAT-5733
 
 ### Configuration ###
-- update sphinx kaltura.conf:
-	
-		Make sure that to kaltura_cue_point index is modified from rt_attr_uint to rt_field :
-		- rt_field = cue_point_type
-		- rt_field = kuser_id
-		- rt_field = is_public
-
+ - The batch.ini.Template has been change, make sure to add the follow to your batch.ini:
+	enabledWorkers.KAsyncLiveToVod				= 1
+	[KAsyncLiveToVod : KAsyncConvertWorker]
+	id							= 640
+	type							= KAsyncLiveToVod
+	scriptPath			 			= batches/LiveToVod/KAsyncLiveToVodExe.php
 ### Deployment scripts ###
 - Restart Kaltura-batch service
 - Run:
