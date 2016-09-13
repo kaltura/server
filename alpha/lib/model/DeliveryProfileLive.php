@@ -263,11 +263,6 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		return "";
 	}
-	
-	protected function getServerNodeBaseUrl($serverNode, $streamFormat = null) 
-	{
-		
-	}
 
 	protected function getBaseUrl($serverNode, $streamFormat = null)
 	{

@@ -90,18 +90,16 @@ class WowzaMediaServerNode extends MediaServerNode {
 			
 		}
 		
-		$playbackHost = "$protocol://$domain/";
-		
 		$appPrefix = $this->getApplicationPrefix($mediaServerConfig);
 		$applicationName = $this->getApplicationName();
 		
+		$playbackHost = "$protocol://$domain/";
 		//LiveDvr fails to parse double slash and does not find match so need to verify applicationPrefix exists before adding it 
 		if($appPrefix && $appPrefix !== '')
 			$playbackHost .= rtrim($appPrefix, "/") . "/";
 		$playbackHost .= "$applicationName";
 		
 		$playbackHost = str_replace("{hostName}", $hostname, $playbackHost);
-		
 		return $playbackHost;
 	}
 	
