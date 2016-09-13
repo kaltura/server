@@ -26,7 +26,6 @@ foreach ($partners as $partnerId)
         die('no such partner.'.PHP_EOL);
     }
 
-    // entryId => Entry
     $liveEntries = array();
 
     $c = new Criteria();
