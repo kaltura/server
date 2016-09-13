@@ -1,5 +1,29 @@
 # Lynx 12.2.0 #
 
+## Add new batch job for handling copy cue-point from live to VOD ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-5733
+
+### Configuration ###
+ - The batch.ini has been change, make sure to add the follow to your batch.ini:
+	
+	enabledWorkers.KAsyncLiveToVod		= 1
+	
+ - The workers.ini has been change, make sure to add the follow to your workers.ini:
+	
+	[KAsyncLiveToVod : KAsyncConvertWorker]
+	
+	id							= 640
+	
+	type							= KAsyncLiveToVod
+	
+	scriptPath			 			= batches/LiveToVod/KAsyncLiveToVodExe.php
+### Deployment scripts ###
+	run:
+	 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_08_22_add_action_plugin_cuepoint.php
+
 ## Sphinx improvement - add partnerId to privacy_by_contextsx ##
 
  - Issue Type: Task
