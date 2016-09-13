@@ -672,7 +672,10 @@ class kContentDistributionManager
 			return false;
 		} elseif (!count($validationErrors))
 			return self::addSubmitAddJob($entryDistribution, $distributionProfile);
-		
+
+		self::updateStatusToQueued($entryDistribution);
+
+
 		KalturaLog::log("Validation errors found");
 		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
 		if(!$entry)
@@ -1111,7 +1114,7 @@ class kContentDistributionManager
 
 	private static function updateStatusToQueued($entryDistribution)
 	{
-		if ($entryDistribution->getStatus() != EntryDistributionStatus::IMPORT_SUBMITTING)
+		if (!in_array($entryDistribution->getStatus(), array(EntryDistributionStatus::IMPORT_SUBMITTING, EntryDistributionStatus::IMPORT_UPDATING)) )
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 			$entryDistribution->save();

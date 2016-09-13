@@ -129,41 +129,6 @@ class playManifestAction extends kalturaAction
 		$calcToken = sha1(kConf::get('url_token_secret') . $url);
 		return $calcToken == $urlToken;
 	}
-
-	protected function addAltAudioFlavors()
-	{
-		$extraFlavors = assetPeer::retrieveReadyByEntryIdAndTag($this->entryId, assetParams::TAG_ALT_AUDIO);
-		foreach ($extraFlavors as $extraFlavor)
-		{
-			/**
-			 * @var asset $extraFlavor
-			 */
-			if (!in_array($extraFlavor->getId(), $this->flavorIds))
-			{
-				$this->flavorIds[] = $extraFlavor->getId();
-			}
-		}
-	}
-
-	/**
-	 * @param array $params
-	 * @return array
-	 */
-	private function convertToShortNames(array $params)
-	{
-		$result = array();
-		foreach ($params as $key => $value)
-		{
-			if (isset(self::$shortNames[$key]))
-				$shortName = self::$shortNames[$key];
-			else
-				$shortName = $key;
-			
-			$result[$shortName] = $value;
-		}
-		
-		return $result;
-	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Initialization functions
@@ -282,13 +247,8 @@ class playManifestAction extends kalturaAction
 			$this->flavorIds = array($flavorId);
 						
 		if (!is_null($this->flavorIds))
-		{
-			if (self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-			{
-				$this->addAltAudioFlavors();
-			}
 			return;
-		}
+
 		$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
 		if (!is_null($flavorParamIds))
 			$this->flavorParamsIds = explode(',', $flavorParamIds);
@@ -302,19 +262,9 @@ class playManifestAction extends kalturaAction
 			
 		if($this->secureEntryHelper)
 			$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
-		
-		if(is_null($this->flavorParamsIds))
-			return;
-
-		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
-		if (!is_null($this->flavorIds) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-		{
-			$this->addAltAudioFlavors();
-		}
-
 	}
 
-	public static function shouldAddAltAudioFlavors($format)
+	private static function shouldAddAltAudioFlavors($format)
 	{
 		$supportedProtocols = Array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::SILVER_LIGHT);
 		if (in_array($format, $supportedProtocols))
@@ -340,6 +290,8 @@ class playManifestAction extends kalturaAction
 		
 		if(is_null($this->flavorParamsIds))
 			$this->flavorParamsIds = array();
+
+		$this->deliveryAttributes->setFlavorParamIds($this->flavorParamsIds);
 	}
 	
 	protected function enforceEncryption()
@@ -538,6 +490,16 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
+	private function addAltAudioTag()
+	{
+		$tags = $this->deliveryAttributes->getTags();
+		foreach ($tags as &$tagsFallback)
+		{
+			$tagsFallback[] = assetParams::TAG_ALT_AUDIO;
+		}
+		$this->deliveryAttributes->setTags($tags);
+	}
+
 	protected function initPlaylistFlavorAssetArray()
 	{
 		list($entryIds, $durations, $mediaEntry) =
@@ -549,27 +511,60 @@ class playManifestAction extends kalturaAction
 		
 		$this->duration = array_sum($durations) / 1000;
 
-		$flavorAssets = array();
-		
-		if ($this->flavorIds)
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
+		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
+
+		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 		{
-			$flavorAssets = assetPeer::retrieveReadyByEntryId($mediaEntry->getId(), $this->flavorIds);
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
+				$this->addAltAudioTag();
+			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 		}
-		
-		if (!$flavorAssets)
-		{
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
-		}
-			
+
 		$this->deliveryAttributes->setStorageId(null);
-		$this->deliveryAttributes->setFlavorAssets($flavorAssets);
+		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
 	}
-	
+
+	private function filterFlavorsByAssetIdOrParamsIds($flavorAssets)
+	{
+		$filteredFlavorAssets = Array();
+
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			/**
+			 * @var asset $flavorAsset
+			 */
+			if ($this->shouldIncludeFlavor($flavorAsset))
+				$filteredFlavorAssets[] = $flavorAsset;
+		}
+
+		if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+			$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
+		return $filteredFlavorAssets;
+	}
+
+	private function addAltAudioFlavors(&$filteredFlavorAssets, $originalFlavorAssets)
+	{
+		foreach ($originalFlavorAssets as $flavorAsset)
+		{
+			/**
+			 * @var asset $flavorAsset
+			 */
+			if ($flavorAsset->hasTag(assetParams::TAG_ALT_AUDIO) && !in_array($flavorAsset, $filteredFlavorAssets))
+				$filteredFlavorAssets[] = $flavorAsset;
+		}
+	}
+
+	private function shouldIncludeFlavor($flavorAsset)
+	{
+		if(($this->flavorIds && in_array($flavorAsset->getId(), $this->flavorIds)) || ($this->flavorParamsIds && in_array($flavorAsset->getFlavorParamsId(), $this->flavorParamsIds)))
+			return true;
+
+		return false;
+	}
+
 	protected function initFlavorAssetArray()
 	{
 		if(!$this->shouldInitFlavorAssetsArray())
@@ -578,23 +573,17 @@ class playManifestAction extends kalturaAction
 		$oneOnly = false;
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP || $this->deliveryAttributes->getFormat() == "url" || $this->deliveryAttributes->getFormat() == "rtsp")
 			$oneOnly = true;
-								
-		// get initial flavor list by input
-		$flavorAssets = array();
+
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
 		$flavorByTags = false;
-		if ($this->flavorIds)
-		{
-			$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId, $this->flavorIds);
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);		
-		}
-		if (!$flavorAssets || !count($flavorAssets))
-		{
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId); 
-			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+
+		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
+
+		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 			$flavorByTags = true;
-		}		
+
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::SILVER_LIGHT)
 		{
 			if ($this->initSilverLightManifest($flavorAssets))
@@ -611,9 +600,13 @@ class playManifestAction extends kalturaAction
 
 		if ($flavorByTags)
 		{
-			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
+				$this->addAltAudioTag();
+			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 		}
-		
+
+		$flavorAssets = $filteredFlavorAssets;
+
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HDS || $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
 		{
 			// try to look for a smil manifest, if it was found, we will use it for hds and hls
@@ -764,7 +757,7 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	
-	protected function initDeliveryProfile($cdnHost = null)
+	protected function initDeliveryProfile()
 	{
 		if ($this->deliveryAttributes->getStorageId())
 		{
@@ -876,14 +869,9 @@ class playManifestAction extends kalturaAction
 		$renderer->mediaUrl = $mediaUrl;
 		return $renderer;
 	}
-	
-	/**
-	 * @return array primary URL and backup URL
-	 */
-	private function getLiveEntryStreamConfig()
+
+	private function updateDeliveryAttributes()
 	{
-		$this->initFlavorParamsIds();
-		
 		$tag = null;
 		$tags = $this->deliveryAttributes->getTags();
 		if(count($tags) == 1) 
@@ -915,37 +903,15 @@ class playManifestAction extends kalturaAction
 				$tag = 'mbr';
 			}
 		}
-		
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $this->flavorParamsIds);
-		/* @var $liveStreamConfig kLiveStreamConfiguration */
-		if ($liveStreamConfig)
-			return $liveStreamConfig;
-		
-		switch($this->deliveryAttributes->getFormat())
-		{
-			case PlaybackProtocol::RTMP:
-				$baseUrl = $this->entry->getStreamUrl();
-				$baseUrl = rtrim($baseUrl, '/');
-				if (strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") === 0)
-					$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-				
-				$liveStreamConfig = new kLiveStreamConfiguration();
-				$liveStreamConfig->setUrl($baseUrl);
-				$liveStreamConfig->setProtocol(PlaybackProtocol::RTMP);
-				return $liveStreamConfig;				
-				
-			case PlaybackProtocol::APPLE_HTTP:
-				// TODO pass single tag
-				$liveStreamConfig = new kLiveStreamConfiguration();
-				$liveStreamConfig->setUrl($this->entry->getHlsStreamUrl());
-				$liveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
-				return $liveStreamConfig;
-		}
-		return null;
+
+		$this->deliveryAttributes->setTags($tag);
+		$this->deliveryAttributes->setMediaProtocol($protocol);
 	}
 	
 	private function serveLiveEntry()
-	{		
+	{
+		$this->initFlavorParamsIds();
+
 		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
  		{
  			if (!$this->entry->hasMediaServer())
@@ -953,26 +919,16 @@ class playManifestAction extends kalturaAction
  			
  			kApiCache::setExpiry(120);
  		}
- 		
- 		$liveStreamConfig = $this->getLiveEntryStreamConfig();
- 		if(!$liveStreamConfig)
- 			KExternalErrors::dieError(KExternalErrors::LIVE_STREAM_CONFIG_NOT_FOUND, "Live stream playbck configuration not found for entry [$this->entryId]");
-		$cdnHost = parse_url($liveStreamConfig->getUrl(), PHP_URL_HOST);	
-		
+
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL)
-		{
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HDS);
-		}
-		
-		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->deliveryAttributes);
-		
+
+		$this->deliveryProfile = $this->initDeliveryProfile();
 		if(!$this->deliveryProfile)
-		{
 			return null;
-		}
-		
+
+		$this->updateDeliveryAttributes();
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);
-		$this->deliveryProfile->setLiveStreamConfig($liveStreamConfig);	
 		return $this->deliveryProfile->serve();
 	}
 	
@@ -1068,7 +1024,7 @@ class playManifestAction extends kalturaAction
 		{
 			$tagsArray = explode(',', $tags);
 			$tags = array();
-			foreach ($tagsArray as $tag) 
+			foreach ($tagsArray as $tag)
 			{
 				$tags[] = array(trim($tag));
 			}
@@ -1096,6 +1052,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
 			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
+			if(!$this->deliveryAttributes->getUiConfId())
+				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
 		}
 
 		if($this->secureEntryHelper)
@@ -1145,7 +1103,7 @@ class playManifestAction extends kalturaAction
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		$renderer->lastModified = time();
-		
+
 		// Handle caching
 		$canCacheAccessControl = false;
 		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))

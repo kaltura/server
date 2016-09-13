@@ -23,6 +23,11 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 		
 	}
 
+	protected function getHttpUrl($serverNode)
+	{
+		$baseUrl = $this->getBaseUrl($serverNode);
+		return rtrim($baseUrl, "/") . "/" . $this->getStreamName() . "/manifest.f4m" . $this->getQueryAttributes();
+	}
 	
 	/**
 	 * Fetch the manifest and build all flavors array

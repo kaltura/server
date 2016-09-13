@@ -85,11 +85,91 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	public function buildServeFlavors() 
 	{
-		$flavors = array();
-		$baseUrl = $this->liveStreamConfig->getUrl();
-		$flavors[] = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
-		
+		$this->initLiveStreamConfig();
+		$flavors = $this->buildHttpFlavorsArray();
 		return $flavors;
+	}
+	
+	protected function initLiveStreamConfig()
+	{
+		if(!$this->liveStreamConfig)
+			$this->liveStreamConfig = new kLiveStreamConfiguration();
+		
+		$entry = $this->getDynamicAttributes()->getEntry();
+		if(in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
+		{
+			$this->initManualLiveStreamConfiguration($entry);
+			return;
+		}
+		
+		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
+		if(!count($liveEntryServerNodes))
+			return;
+		
+		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
+		{
+			/* @var $liveEntryServerNode LiveEntryServerNode */
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if($serverNode)
+			{
+				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				{
+					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
+					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
+					unset($liveEntryServerNodes[$key]);
+					break;
+				}
+			}
+		}
+		
+		if(!$this->liveStreamConfig->getUrl())
+		{
+			$liveEntryServerNode = array_shift($liveEntryServerNodes);
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if($serverNode)
+			{
+				$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
+				$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
+			}
+		}
+		
+		if(count($liveEntryServerNodes))
+		{
+			$liveEntryServerNode = array_shift($liveEntryServerNodes);
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
+			if ($serverNode)
+			{
+				$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($serverNode));
+				$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
+			}
+		}
+	}
+	
+	protected function initManualLiveStreamConfiguration(LiveStreamEntry $entry)
+	{
+		$customLiveStreamConfigurations = array();
+		
+		if($entry->getHlsStreamUrl())
+		{
+			$hlsLiveStreamConfig = new kLiveStreamConfiguration();
+			$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl());
+			$hlsLiveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
+			$customLiveStreamConfigurations[] = $hlsLiveStreamConfig;
+		}
+		
+		$customLiveStreamConfigurations = array_merge($entry->getCustomLiveStreamConfigurations(), $customLiveStreamConfigurations);
+		foreach($customLiveStreamConfigurations as $customLiveStreamConfiguration)
+		{
+			/* @var $customLiveStreamConfiguration kLiveStreamConfiguration */
+			if($this->getDynamicAttributes()->getFormat() == $customLiveStreamConfiguration->getProtocol())
+			{
+				$this->liveStreamConfig = $customLiveStreamConfiguration;
+				return;
+			}
+		}
+		
+		KalturaLog::debug("Could not locate custom live stream configuration from manual liveStream entry [{$entry->getId()}]");
 	}
 	
 	public function isLive ($url) {
@@ -110,6 +190,89 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function checkIsLive($url) {
 		throw new Exception('Status cannot be determined for live stream protocol. Delivery Profile ID: '.$this->getId());
+	}
+
+	protected function buildHttpFlavorsArray()
+	{
+		$flavors = array();
+		
+		$httpUrl = $this->liveStreamConfig->getUrl();
+		$flavors[] = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
+		return $flavors;
+	}
+
+	protected function getStreamName()
+	{
+		$flavorParamsIds = $this->getDynamicAttributes()->getFlavorParamIds();
+		$streamName = $this->getDynamicAttributes()->getEntryId();
+		$entry = entryPeer::retrieveByPK($streamName);
+
+		$tag = $this->getDynamicAttributes()->getTags();
+		if(is_null($tag) && ($entry->getConversionProfileId() || $entry->getType() == entryType::LIVE_CHANNEL))
+			$tag = 'all';
+
+		if(count($flavorParamsIds) === 1)
+		{
+			$streamName .= '_' . reset($flavorParamsIds);
+		}
+		elseif(count($flavorParamsIds) > 1)
+		{
+			sort($flavorParamsIds);
+			$tag = implode('_', $flavorParamsIds);
+			$streamName = "smil:{$streamName}_{$tag}.smil";
+		}
+		elseif($tag)
+		{
+			$streamName = "smil:{$streamName}_{$tag}.smil";
+		}
+
+		return $streamName;
+	}
+
+	protected function getQueryAttributes()
+	{
+		$flavorParamsIds = $this->getDynamicAttributes()->getFlavorParamIds();
+		$streamName = $this->getDynamicAttributes()->getEntryId();
+		$entry = entryPeer::retrieveByPK($streamName);
+
+		$queryString = array();
+		if($entry->getDvrStatus() == DVRStatus::ENABLED)
+		{
+			$queryString[] = 'DVR';
+		}
+
+		if(count($flavorParamsIds) > 1)
+		{
+			sort($flavorParamsIds);
+			$queryString[] = 'flavorIds=' . implode(',', $flavorParamsIds);
+		}
+
+		if(count($queryString))
+		{
+			$queryString = '?' . implode('&', $queryString);
+		}
+		else
+		{
+			$queryString = '';
+		}
+
+		return $queryString;
+	}
+	
+	protected function getHttpUrl($serverNode)
+	{
+		return "";
+	}
+
+	protected function getBaseUrl($serverNode, $streamFormat = null)
+	{
+		/* @var $serverNode WowzaMediaServerNode */
+		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
+		
+		$baseUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
+		
+		KalturaLog::debug("Live Stream base url [$baseUrl]");
+		return $baseUrl;
 	}
 }
 

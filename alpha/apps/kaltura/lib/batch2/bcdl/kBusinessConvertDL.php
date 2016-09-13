@@ -8,7 +8,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 {
 	if ($oldAsset instanceof flavorAsset) {
 		// In case of live recording entry Don't drop the old asset
-		if ($entry->getSourceType() != EntrySourceType::RECORDED_LIVE)
+		if (!$entry->getIsRecordedEntry())
 			return true;
 	}
 	elseif ($oldAsset instanceof thumbAsset)
@@ -120,7 +120,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 						$defaultThumbAssetOld = $oldAsset;
 					}
 				}
-				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset,$entry))
+				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset,$tempEntry))
 				{
 					KalturaLog::info("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
 					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
@@ -606,8 +606,6 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		}
 		$isAdAudio = isset($srcMedSet->_audio);
 		$isAdVideo = isset($srcMedSet->_video);
-		// ToDo re-insert logic
-		$isAdVideo = true;
 			/*
 			 * For image AD or in 'filler-case', 
 			 * make sure that the 'duration' is set,
@@ -635,7 +633,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		$kdlFlavor->_isEncrypted = false;
 		$kdlFlavor->_video->_arProcessingMode = 2; // letter boxing
 		$kdlFlavor->_video->_isShrinkFramesizeToSource = false;
-		$kdlFlavor->_transcoders[0]->_extra.= " -x264opts sps-id=27:colorprim=undef:transfer=undef:colormatrix=undef";
+		$kdlFlavor->_transcoders[0]->_extra.= " -x264opts sps-id=27:colorprim=undef:transfer=undef:colormatrix=undef -movflags +faststart";
 		if($flavorParamsOutput->getWidth()){
 			$kdlFlavor->_video->_width = $flavorParamsOutput->getWidth();
 		}
@@ -662,7 +660,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 				$kdlFlavor->_clipDur = $duration*1000;
 			}
 		}
-		
+	
 		{
 			/*
 			 * KDL does not support (yet ...) image-2-video generation,
@@ -690,7 +688,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 							array(KDLCmdlinePlaceholders::InFileName." -f s16le -acodec pcm_s16le -i /dev/zero"), 
 							$cmdLine);	
 		}
-		
+	
 			// Add 'black' source, if no AD video source
 		if($isAdVideo==false){
 			$cmdLine = " -f rawvideo -pix_fmt rgb24 -s 480x270".str_replace(array(KDLCmdlinePlaceholders::InFileName), 

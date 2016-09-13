@@ -23,8 +23,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	protected $is_index = false;
 	
 	protected $move_entries_to_parent_category = null;
-	
-	
+
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
 	
 	const IS_AGGREGATION_CATEGORY = 'isAggregationCategory';
@@ -1696,21 +1695,27 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	{
 		if(is_null($this->getPrivacyContext()) || trim($this->getPrivacyContext()) == '')
 			return '';
-		
-		$privacyContext = explode(',', $this->getPrivacyContext());
-		$privacyContext[] = kEntitlementUtils::NOT_DEFAULT_CONTEXT;
-			
-		return implode(' ', $privacyContext);
+
+		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $this->getPartnerId();
+
+		$privacyContexts = explode(',', $this->getPrivacyContext());
+		$privacyContexts = kString::addPrefixToArray($privacyContexts ,$prefix);
+		$privacyContexts[] = $prefix . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+
+		return implode(' ',$privacyContexts);
 	}
 	
 	public function getSearchIndexPrivacyContexts()
 	{
+		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $this->getPartnerId();
+
 		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
-			return kEntitlementUtils::DEFAULT_CONTEXT . $this->getPartnerId();
+			return $prefix.kEntitlementUtils::DEFAULT_CONTEXT;
 			
 		$privacyContexts = explode(',', $this->getPrivacyContexts());
-			
-		return implode(' ', $privacyContexts);
+		$privacyContexts = kString::addPrefixToArray($privacyContexts ,$prefix);
+
+		return implode(' ',$privacyContexts);
 	}
 	
 	public function getSearchIndexfullName()

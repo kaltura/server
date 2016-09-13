@@ -156,6 +156,12 @@ class PermissionPeer extends BasePermissionPeer
 		}
 			
 		$permission = self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
+		return self::validatePermission($permissionName, $partnerId, $checkDependency, $permission);
+	}
+
+
+	private static function validatePermission($permissionName ,$partnerId, $checkDependency, $permission)
+	{
 		if (!$permission) {
 			self::$allowedPermissions[$partnerId][$permissionName] = false;
 			return false;
@@ -186,6 +192,7 @@ class PermissionPeer extends BasePermissionPeer
 			}
 		}
 		self::$allowedPermissions[$partnerId][$permissionName] = $permission;
+
 		return $permission;
 	}
 	
@@ -208,6 +215,32 @@ class PermissionPeer extends BasePermissionPeer
 		$permission = PermissionPeer::doSelectOne($c);
 		PermissionPeer::setUseCriteriaFilter(true);
 		return $permission;
+	}
+
+	public static function getByNamesAndPartner(array $permissionNamesArray, array $partnerIdsArray)
+	{
+		$partnerIdsArray = array_map('strval', $partnerIdsArray);
+
+		$c = new Criteria();
+		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
+		$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
+		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
+		$c->addGroupByColumn(PermissionPeer::NAME);
+
+		PermissionPeer::setUseCriteriaFilter(false);
+		$permissions = PermissionPeer::doSelect($c);
+		PermissionPeer::setUseCriteriaFilter(true);
+
+		return $permissions;
+	}
+
+	public static function preFetchPermissions($permissionsNamesArray)
+	{
+		$preFetchPermissions = PermissionPeer::getByNamesAndPartner($permissionsNamesArray , array(kCurrentContext::$ks_partner_id, PartnerPeer::GLOBAL_PARTNER));
+		foreach ($preFetchPermissions as $permission)
+		{
+			PermissionPeer::validatePermission($permission->getName(), kCurrentContext::$ks_partner_id, true ,$permission);
+		}
 	}
 	
 	public static function isAllowedPlugin($pluginName, $partnerId)

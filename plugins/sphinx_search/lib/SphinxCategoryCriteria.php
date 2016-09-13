@@ -54,12 +54,21 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_free_text');
 		
-		if($filter->get('_eq_privacy_context') && ($filter->get('_eq_privacy_context') == '*'))
+		if($filter->get('_eq_privacy_context'))
 		{
-			$filter->set('_matchor_privacy_context', kEntitlementUtils::NOT_DEFAULT_CONTEXT);
-			$filter->unsetByName('_eq_privacy_context');
+			if ($filter->get('_eq_privacy_context') == '*')
+			{
+				$this->addOr(CategoryPeer::PRIVACY_CONTEXT, kEntitlementUtils::NOT_DEFAULT_CONTEXT, Criteria::EQUAL);
+				$filter->set('_matchor_privacy_context', kEntitlementUtils::NOT_DEFAULT_CONTEXT);
+				$filter->unsetByName('_eq_privacy_context');
+			}
+			elseif ($filter->get('_eq_privacy_context') != '')
+			{
+				$this->addAnd(CategoryPeer::PRIVACY_CONTEXT, $filter->get('_eq_privacy_context'), Criteria::EQUAL);
+				$filter->unsetByName('_eq_privacy_context');
+			}
 		}
-		
+
 		if($filter->get('_eq_manager'))
 		{
 			$puserId = $filter->get('_eq_manager');
@@ -183,6 +192,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	public function translateSphinxCriterion(SphinxCriterion $crit)
 	{
 		$field = $crit->getTable() . '.' . $crit->getColumn();
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+
 		if ($field == categoryPeer::FULL_NAME && $crit->getComparison() == Criteria::EQUAL)
 		{
 			return array(
@@ -194,15 +205,38 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		{
 			return array(
 					categoryPeer::FULL_NAME, 
-					Criteria::IN_LIKE, 
+					Criteria::IN_LIKE,
 					kString::addSuffixToArray($crit->getValue(), category::FULL_NAME_EQUAL_MATCH_STRING));
 		} else if ($field == categoryPeer::DISPLAY_IN_SEARCH  && $crit->getComparison() == Criteria::EQUAL)
 		{
-			$partnerId = kCurrentContext::getCurrentPartnerId();
 			return array(
 					categoryPeer::DISPLAY_IN_SEARCH,
 					Criteria::EQUAL,
 					$crit->getValue() . "P" . $partnerId);
+		} else if ($field == categoryPeer::PRIVACY_CONTEXT  && $crit->getComparison() == Criteria::EQUAL)
+		{
+			return array(
+				categoryPeer::PRIVACY_CONTEXT,
+				Criteria::EQUAL,
+				kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId.$crit->getValue());
+		}else if ($field == categoryPeer::PRIVACY_CONTEXT  && $crit->getComparison() == Criteria::IN )
+		{
+			return array(
+				categoryPeer::PRIVACY_CONTEXT,
+				Criteria::IN_LIKE,
+				kString::addPrefixToArray($crit->getValue(), kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId));
+		}else if ($field == categoryPeer::PRIVACY_CONTEXTS  && $crit->getComparison() == Criteria::EQUAL)
+		{
+			return array(
+				categoryPeer::PRIVACY_CONTEXTS,
+				Criteria::EQUAL,
+				kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId.$crit->getValue());
+		}else if ($field == categoryPeer::PRIVACY_CONTEXTS  && $crit->getComparison() == Criteria::IN )
+		{
+			return array(
+				categoryPeer::PRIVACY_CONTEXTS,
+				Criteria::IN_LIKE,
+				kString::addPrefixToArray($crit->getValue(), kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId));
 		}
 
 		return parent::translateSphinxCriterion($crit);

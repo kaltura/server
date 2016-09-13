@@ -6,17 +6,77 @@
  - Issue ID: PLAT-5733
 
 ### Configuration ###
- - The batch.ini.Template has been change, make sure to add the follow to your batch.ini:
-	enabledWorkers.KAsyncLiveToVod				= 1
+ - The batch.ini has been change, make sure to add the follow to your batch.ini:
+	
+	enabledWorkers.KAsyncLiveToVod		= 1
+	
+ - The workers.ini has been change, make sure to add the follow to your workers.ini:
+	
 	[KAsyncLiveToVod : KAsyncConvertWorker]
+	
 	id							= 640
+	
 	type							= KAsyncLiveToVod
+	
 	scriptPath			 			= batches/LiveToVod/KAsyncLiveToVodExe.php
 ### Deployment scripts ###
-- Restart Kaltura-batch service
-- Run:
-	
+	run:
+	 
 		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_08_22_add_action_plugin_cuepoint.php
+
+## Sphinx improvement - add partnerId to privacy_by_contextsx ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-5983
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	Run population scripts for entry and category tables in sphinx.
+
+
+# Lynx 12.1.0 #
+
+## bpm - burn subtitles metadata trigger fix ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-6022
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
+
+## Live Delivery profile - enable overiding live delivery profiles per partner similar to how we work with VOD ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6024
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+Import partner mediaServerConfiguration and set the new liveDeliveryProfile ovveride option:
+
+	php /opt/kaltura/app/deployment/updates/scripts/2016_08_30_migrate_partner_media_server_configurations.php execute
+
+For current eCDN partners set the default empty deliveryProfile on the serverNode config to avoid configuring new deliveryProfle per machine:
+
+	php /opt/kaltura/app/deployment/updates/scripts/2016_08_25_updateExternalServerNodes.php execute
+	
+###### Note: the execute required param will be removed before the actual deployemnt.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Lynx 12.0.0 #
 
 # Kajam 11.21.0 #
 

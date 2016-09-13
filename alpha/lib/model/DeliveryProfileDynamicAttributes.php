@@ -70,6 +70,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var array
 	 */
 	protected $flavorAssets = array();
+
+	/**
+	 * @var array
+	 */
+	protected $flavorParamIds = array();
 	
 	/**
 	 * @var array
@@ -211,12 +216,27 @@ class DeliveryProfileDynamicAttributes {
 	public function getEntryId() {
 		return $this->entryId;
 	}
+	
+	/**
+	 * @return the $entry
+	 */
+	public function getEntry()
+	{
+		return entryPeer::retrieveByPK($this->getEntryId());
+	}
 
 	/**
 	 * @return the $flavorAssets
 	 */
 	public function getFlavorAssets() {
 		return $this->flavorAssets;
+	}
+
+	/**
+	 * @return array $flavorParamIds
+	 */
+	public function getFlavorParamIds() {
+		return $this->flavorParamIds;
 	}
 
 	/**
@@ -313,6 +333,13 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @param multitype: $flavorAssets
+	 */
+	public function setFlavorParamIds($flavorParamIds) {
+		$this->flavorParamIds = $flavorParamIds;
+	}
+
+	/**
 	 * @param multitype: $remoteFileSyncs
 	 */
 	public function setRemoteFileSyncs($remoteFileSyncs) {
@@ -348,7 +375,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	/**
-	 * @return the $tags
+	 * @return array $tags
 	 */
 	public function getTags() {
 		return $this->tags;
@@ -384,7 +411,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @return the $playerConfig
+	 * @return array $playerConfig
 	 */
 	public function getPlayerConfig()
 	{
@@ -440,7 +467,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	/**
-	 * @return the edge server ids
+	 * @return array edge server ids
 	 */
 	public function getEdgeServerIds()
 	{
@@ -477,25 +504,11 @@ class DeliveryProfileDynamicAttributes {
 			}
 				
 			if ($curFlavors)
-			{
-				$this->addAltAudioFlavors($flavors, $curFlavors);
 				return $curFlavors;
-			}
 		}
 		return array();
 	}
 
-	private function addAltAudioFlavors($flavors, &$curFlavors)
-	{
-		if(!playManifestAction::shouldAddAltAudioFlavors($this->getFormat()))
-			return;
-
-		foreach($flavors as $flavor)
-		{
-			if(!in_array($flavor, $curFlavors) && $flavor->hasTag(assetParams::TAG_ALT_AUDIO))
-				$curFlavors[] = $flavor;
-		}
-	}
 
 	/**
 	 * 
@@ -529,6 +542,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();
 		$this->flavorAssets = $newObj->getFlavorAssets();
+		$this->flavorParamIds = $newObj->getFlavorParamIds();
 		$this->remoteFileSyncs = $newObj->getRemoteFileSyncs();
 		$this->manifestFileSync = $newObj->getManifestFileSync();
 		$this->preferredBitrate = $newObj->getPreferredBitrate();

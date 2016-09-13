@@ -233,7 +233,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbLiveEntry->setRedirectEntryId(null);
 		$dbLiveEntry->save();
 		
-		if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && $liveEntryStatus == EntryServerNodeStatus::PLAYABLE && $dbLiveEntry->getRecordStatus())
+		if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && 
+				in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) && 
+				$dbLiveEntry->getRecordStatus())
 		{
 			KalturaLog::info("Checking if recorded entry needs to be created for entry $entryId");
 			$createRecordedEntry = false;
@@ -339,7 +341,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
-			
+
+			// make the recorded entry to be "hidden" in search so it won't return in entry list action
+			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
+			{
+				$recordedEntry->setDisplayInSearch(EntryDisplayInSearchType::SYSTEM);
+			}
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldCopyScheduling())
 			{
 				$recordedEntry->setStartDate($dbEntry->getStartDate());

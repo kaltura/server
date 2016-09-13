@@ -365,7 +365,14 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @insertonly
 	 */
 	public $templateEntryId;
-	
+
+	/**
+	 * should we display this entry in search
+	 *
+	 * @var KalturaEntryDisplayInSearchType
+	 */
+	public $displayInSearch;
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -412,6 +419,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 	"operationAttributes",
 		"capabilities",
 		"templateEntryId",
+		"displayInSearch",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -472,7 +480,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
-		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT . $partnerId)
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != 'pid'. $partnerId . kEntitlementUtils::DEFAULT_CONTEXT )
 		{
 			$this->categories = null;
 			$this->categoriesIds = null;
@@ -532,6 +540,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 //			if(count($c->getFetchedIds()))
 //				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
 //		}
+
+		$this->validateDisplayInSearch();
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -564,7 +574,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	{
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
-		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT . $partnerId && 
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != 'pid'. $partnerId . kEntitlementUtils::DEFAULT_CONTEXT &&
 			($this->categoriesIds != null || $this->categories != null))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_CATEGORY_FIELD_IS_DEPRECATED);
 			
@@ -630,7 +640,29 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		}
 		
 	}
-	
+
+	/* (non-PHPdoc)
+	 * Validate that the new value is EntryDisplayInSearchType::SYSTEM or EntryDisplayInSearchType::PARTNER_ONLY
+	 * or that the value given is the one that exists in the DB
+	 *
+	 * @throws KalturaErrors::ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED
+	 */
+	public function validateDisplayInSearch(entry $sourceObject = null)
+	{
+		if ($this->displayInSearch === null)
+			return;
+
+		if ($this->displayInSearch === EntryDisplayInSearchType::PARTNER_ONLY ||
+			$this->displayInSearch === EntryDisplayInSearchType::SYSTEM)
+			return;
+
+		// only for update scenario check against old object
+		if ($sourceObject && $this->displayInSearch === $sourceObject->getDisplayInSearch())
+			return;
+
+		throw new KalturaAPIException(KalturaErrors::ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED, $this->displayInSearch);
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate($source_object)
 	 */
@@ -652,6 +684,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 //		}
 				
 		$this->validateObjectsExist($sourceObject);
+
+		$this->validateDisplayInSearch($sourceObject);
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

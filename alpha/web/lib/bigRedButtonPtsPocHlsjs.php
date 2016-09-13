@@ -240,7 +240,7 @@ $html5Version = $_GET['playerVersion'];
 		</td>
 		<tr style="display: none; ">
 			<td>Ad Duration (milliseconds):</td>
-			<td><input type="text" id="txtAdDuration" value="30000" />
+			<td><input type="text" id="txtAdDuration" value="18000" />
 		</td>
 	</table>
 </div><!-- end #main -->
