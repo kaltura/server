@@ -251,10 +251,11 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	 * @param	PropelPDO 	$con	 		the connection to use
 	 * @return	CuePoints
 	 */
-	public static function retrieveByEntryIdTypeAndLimit($entryId, $limit, $offset, $types = array(), PropelPDO $con = null)
+	public static function retrieveByEntryIdTypeAndLimit($partnerId, $entryId, $limit, $offset, $types = array(), PropelPDO $con = null)
 	{
 		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
+		$criteria->add(CuePointPeer::PARTNER_ID, $partnerId);
 		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
 		$criteria->setLimit($limit);
 		$criteria->setOffset($offset);
