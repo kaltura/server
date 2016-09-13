@@ -1,5 +1,17 @@
 # Lynx 12.2.0 #
 
+## http attachment notifications ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6084
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/attachmentAssetHttpNotifications.xml
+
 ## Add new batch job for handling copy cue-point from live to VOD ##
 
  - Issue Type: Story
