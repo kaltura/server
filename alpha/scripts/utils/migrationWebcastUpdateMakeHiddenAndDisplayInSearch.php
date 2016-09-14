@@ -2,20 +2,27 @@
 
 require_once(__DIR__ . '/../bootstrap.php');
 
+const UPDATE_VOD_CHUNK_SIZE = 2;
+
 if (count($argv) < 2)
 {
-    die('pleas provide partner id as input' . PHP_EOL .
-        'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL .
-        'whereas X is the path to the partner ids file' . PHP_EOL);
+    die ("usage: php migrationWebcastUpdateMakeHiddenAndDisplayInSearch.php input_file debug|realrun");
 }
 
-$dryRun = !(count($argv) == 3 && @$argv[2] == "realrun");
+if (!in_array($argv[2], array("debug","realrun")))
+{
+    die ("usage: php migrationWebcastUpdateMakeHiddenAndDisplayInSearch.php input_file debug|realrun");
+}
+
+$dryRun = !(count($argv) == 3 && $argv[2] == "realrun");
 if ($dryRun)
 {
     KalturaLog::debug('this is a dry run. pass "realrun" as 2nd param to make it actually do stuff');
 }
 
-$partners = file(@$argv[1]);
+$partnersFilePath = $argv[1];
+$partners = file($argv[1]) or die('Could not read file [$partnersFilePath]!');
+
 foreach ($partners as $partnerId)
 {
     $partnerId = trim($partnerId);
@@ -23,17 +30,17 @@ foreach ($partners as $partnerId)
     $partner = PartnerPeer::retrieveByPK($partnerId);
     if(!$partner)
     {
-        die('no such partner.'.PHP_EOL);
+        KalturaLog::warning("partner [ " . $partnerId . "] does not exist. Skipping it");
     }
 
-    $liveEntries = array();
+    $vodEntriesToUpdate = array();
 
     $c = new Criteria();
-    $c->add(entryPeer::PARTNER_ID, $partnerId);
-    $c->add(entryPeer::SOURCE, EntrySourceType::LIVE_STREAM);
+    $c->addAnd(entryPeer::PARTNER_ID, $partnerId);
+    $c->addAnd(entryPeer::SOURCE, EntrySourceType::LIVE_STREAM);
+    $c->addAnd(entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 
-    $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-    $entries = entryPeer::doSelect($c, $con);
+    $entries = entryPeer::doSelect($c);
 
     KalturaLog::debug("got " . count($entries) . " live entries for partner " . $partnerId);
     foreach ($entries as $liveEntry)
@@ -42,11 +49,11 @@ foreach ($partners as $partnerId)
         $recordingOptions = $liveEntry->getRecordingOptions();
         if ($recordingOptions)
         {
+            $tmpRecordedEntryId =  $liveEntry->getRecordedEntryId();
+            $tmpRedirectEntryId =  $liveEntry->getRedirectEntryId();
+
             KalturaLog::debug("calling setShouldMakeHidden with true");
             if (!$dryRun){
-
-                $tmpRecordedEntryId =  $liveEntry->getRecordedEntryId();
-                $tmpRedirectEntryId =  $liveEntry->getRedirectEntryId();
 
                 $recordingOptions->setShouldMakeHidden(true);
                 $liveEntry->setRecordingOptions($recordingOptions);
@@ -58,7 +65,12 @@ foreach ($partners as $partnerId)
                 $liveEntry->setRedirectEntryId($tmpRedirectEntryId);
                 $liveEntry->save();
             }
-            $liveEntries[$liveEntry->getId()] = $liveEntry;
+
+            // if we have a vod store it for later. we will want to set it's display_in_search to EntryDisplayInSearchType::SYSTEM
+            if ($tmpRecordedEntryId)
+            {
+                $vodEntriesToUpdate[] = $tmpRecordedEntryId;
+            }
         }
         else
         {
@@ -66,44 +78,33 @@ foreach ($partners as $partnerId)
         }
     }
 
+    KalturaLog::debug("need to update " . count($vodEntriesToUpdate) . " VOD entries. Using chunk size of " . UPDATE_VOD_CHUNK_SIZE);
+    $vodEntriesChunks = array_chunk($vodEntriesToUpdate, UPDATE_VOD_CHUNK_SIZE);
+    foreach($vodEntriesChunks as $chunk)
+    {
+        updateVodEntriesDisplayInSearchToSYSTEM($partnerId, $chunk, $dryRun);
+    }
+}
+
+function updateVodEntriesDisplayInSearchToSYSTEM($partnerId, $entryIds, $dryRun)
+{
+    KalturaLog::debug("going to work on entries: " . implode($entryIds,","));
+
     $c1 = new Criteria();
-    $c1->add(entryPeer::PARTNER_ID, $partnerId);
-    $c1->add(entryPeer::SOURCE, EntrySourceType::RECORDED_LIVE);
+    $c1->addAnd(entryPeer::PARTNER_ID, $partnerId);
+    $c1->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
+    $c1->addAnd(entryPeer::SOURCE, EntrySourceType::RECORDED_LIVE);
+    $c1->addAnd(entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 
-    $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-    $vodEntries = entryPeer::doSelect($c1, $con);
+    $vodEntries = entryPeer::doSelect($c1);
 
-    KalturaLog::debug("got " . count($vodEntries) . " VOD entries for partner " . $partnerId);
     foreach ($vodEntries as $vodEntry)
     {
         KalturaLog::debug("Starting to work on VOD Entry [" . $vodEntry->getId() . "]");
-        $rootEntryId = $vodEntry->getRootEntryId();
-        KalturaLog::debug("rootEntryId is [" . $rootEntryId . "]");
-
-        if (!empty($rootEntryId))
+        if (!$dryRun)
         {
-            $rootEntry = array_key_exists($rootEntryId, $liveEntries) ? $liveEntries[$rootEntryId] : null;
-            if ($rootEntry)
-            {
-                $rootEntryRecordedEntryId = $rootEntry->getRecordedEntryId();
-                KalturaLog::debug("rootEntryRecordedEntryId is [" . $rootEntryRecordedEntryId . "]");
-
-                if ($rootEntryRecordedEntryId == $vodEntry->getId()) {
-                    KalturaLog::debug("calling setDisplayInSearch with EntryDisplayInSearchType::SYSTEM");
-                    if (!$dryRun) {
-                        $vodEntry->setDisplayInSearch(EntryDisplayInSearchType::SYSTEM);
-                        $vodEntry->save();
-                    }
-                }
-            }
-            else
-            {
-                KalturaLog::debug("rootEntryId [" . $rootEntryId . "] does not exist in liveEntries array");
-            }
-        }
-        else
-        {
-            KalturaLog::debug("No rootEntyId or it does not point to this entry");
+            $vodEntry->setDisplayInSearch(EntryDisplayInSearchType::SYSTEM);
+            $vodEntry->save();
         }
     }
 }
