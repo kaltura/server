@@ -72,10 +72,6 @@
 								<description>size</description>
 							</item>
 							<item objectType="KalturaStringValue">
-								<value>label</value>
-								<description>label</description>
-							</item>
-							<item objectType="KalturaStringValue">
 								<value>filename</value>
 								<description>filename</description>
 							</item>
