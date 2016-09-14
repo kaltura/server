@@ -427,6 +427,14 @@ class kString
 		return $strings;		
 	}
 
+	public static function addPrefixToArray(array $strings, $prefix)
+	{
+		foreach ($strings as &$value)
+			$value = $prefix.$value;
+
+		return $strings;
+	}
+
 	public static function fromCommaSeparatedToArray($str, $allowEmpty = false)
 	{
 		$values = array_map('trim', explode(',', $str));
