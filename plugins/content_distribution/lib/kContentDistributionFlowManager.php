@@ -1204,9 +1204,21 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
 		{
+			/**
+			 * @var entryDistribution $entryDistribution
+			 */
 			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
-				continue;
-		
+			{
+				if ($entryDistribution->getStatus() == EntryDistributionStatus::UPDATING)
+				{
+					$job = BatchJobPeer::retrieveByEntryIdAndType($entryDistribution->getEntryId(), ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE));
+					kJobsManager::abortDbBatchJob($job);
+					$entryDistribution->setStatus(EntryDistributionStatus::READY);
+					$entryDistribution->save();
+				} else
+					continue;
+			}
+
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
