@@ -23,7 +23,7 @@ class kSphinxQueryCache extends kQueryCache
 	{
 		self::$reduceConditionalExpiry = 0;
 		
-		if (!kConf::get("sphinx_query_cache_enabled"))
+		if (!kConf::get("sphinx_query_cache_enabled", "local", 0))
 		{
 			return null;
 		}
