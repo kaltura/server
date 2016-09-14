@@ -31,6 +31,7 @@ foreach ($partners as $partnerId)
     if(!$partner)
     {
         KalturaLog::warning("partner [ " . $partnerId . "] does not exist. Skipping it");
+        continue;
     }
 
     $vodEntriesToUpdate = array();
@@ -52,7 +53,7 @@ foreach ($partners as $partnerId)
             $tmpRecordedEntryId =  $liveEntry->getRecordedEntryId();
             $tmpRedirectEntryId =  $liveEntry->getRedirectEntryId();
 
-            KalturaLog::debug("calling setShouldMakeHidden with true");
+            KalturaLog::debug("calling setShouldMakeHidden with true on Entry [" . $liveEntry->getId() . "]");
             if (!$dryRun){
 
                 $recordingOptions->setShouldMakeHidden(true);
