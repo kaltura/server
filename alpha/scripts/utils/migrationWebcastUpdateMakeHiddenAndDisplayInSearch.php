@@ -2,7 +2,7 @@
 
 require_once(__DIR__ . '/../bootstrap.php');
 
-const UPDATE_VOD_CHUNK_SIZE = 2;
+const UPDATE_VOD_CHUNK_SIZE = 50;
 
 if (count($argv) < 2)
 {
