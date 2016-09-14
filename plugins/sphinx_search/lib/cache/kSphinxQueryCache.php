@@ -193,11 +193,11 @@ class kSphinxQueryCache extends kQueryCache
 
 	public static function invalidateQueryCache($object)
 	{
-		if (!kConf::get("sphinx_query_cache_invalidate_on_change"))
+		if (!kConf::get("sphinx_query_cache_invalidate_on_change", "local", 0))
 		{
 			return;
 		}
-		
+
 		$objectClass = $object->getIndexObjectName();
 		$invalidationKeys = $objectClass::getCacheInvalidationKeys($object);
 		if (!$invalidationKeys)
