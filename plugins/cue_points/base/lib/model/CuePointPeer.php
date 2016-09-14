@@ -67,9 +67,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 					$c->getNewCriterion(
 						CuePointPeer::TYPE,
 						array(
-							CuePoint::getIndexPrefix($partnerId).(ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB)),
-							CuePoint::getIndexPrefix($partnerId).(CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE)),
-							CuePoint::getIndexPrefix($partnerId).(AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD)),
+							ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB),
+							CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE),
+							AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD),
 							),
 						Criteria::IN
 					)
