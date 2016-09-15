@@ -295,13 +295,13 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			"city",
 		    "dateOfBirth",
 			"partnerData",
+			"group",
 		);
 	}
 	
 	
     protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
-	    KBatchBase::$kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
 		// checking the created entries
@@ -328,10 +328,91 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				continue;
 			}
 			
+			if ($bulkUploadResult->action != KalturaBulkUploadAction::DELETE)
+				$bulkUploadResult = $this->handleGroupUser($bulkUploadResult);
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
+	}
+
+	protected function handleGroupUser (KalturaBulkUploadResultUser $userResult)
+	{
+		KBatchBase::impersonate($this->currentPartnerId);
+		KalturaLog::info("Handling user/group association");
+			
+		$group = $userResult->group;
+		if (strpos($group, "-") === 0)
+		{
+			//if the user is being removed from the group
+			$group = substr($group, 1);
+			if ($userResult->action == KalturaBulkUploadAction::ADD)
+			{
+				KalturaLog::info("Cannot remove user from group - user could not have belonged to the group");
+				$userResult->errorCode = KalturaBatchJobErrorTypes::KALTURA_API;
+				$userResult->errorDescription = "Cannot remove user from group - user could not have belonged to the group";
+				KBatchBase::unimpersonate();
+				
+				return $userResult;
+			}
+			
+			try {
+				$removeResult = KBatchBase::$kClient->groupUser->delete ($userResult->userId, $group);
+			}
+			catch (Exception $e)
+			{
+				$userResult->errorCode = KalturaBatchJobErrorTypes::KALTURA_API;
+				$userResult->errorDescription = $e->getMessage();
+			}
+			
+		}
+		else {
+			try {
+				$groupUser = KBatchBase::$kClient->user->get ($group);
+				if ($groupUser->type != KalturaUserType::GROUP)
+				{
+					throw new Exception("The user exists but is not a group",1);
+					
+				}
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::info ("The user cannot be added to group - group $group needs to be created");
+				$groupUser = new KalturaUser();
+				$groupUser->id = $group;
+				$groupUser->type = KalturaUserType::GROUP;
+				
+				try {
+					$groupUser = KBatchBase::$kClient->user->add($groupUser);
+				}
+				
+				catch (Exception $e)
+				{
+					KalturaLog::info ("Unable to add non-existent group $group as a group user!");
+					KalturaLog::info ("Error occurred: " . $e->getMessage());
+					$userResult->errorCode = KalturaBatchJobErrorTypes::KALTURA_API;
+					$userResult->errorDescription = "Group $group could not be created!";
+					KBatchBase::unimpersonate();
+					
+					return $userResult;
+				}
+			}
+			
+			try{
+				$groupUser = new KalturaGroupUser();
+				$groupUser->userId = $userResult->userId;
+				$groupUser->groupId = $userResult->group;
+				
+				$groupUserAssoc = KBatchBase::$kClient->groupUser->add($groupUser);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::info ("Error occurred: " . $e->getMessage());
+				$userResult->errorCode = KalturaBatchJobErrorTypes::KALTURA_API;
+				$userResult->errorDescription = $e->getMessage();
+			}
+		}		
+		KBatchBase::unimpersonate();
 		
-		KBatchBase::$kClient->doMultiRequest();
+		return $userResult;
 	}
 	
 	protected function getUploadResultInstance ()
