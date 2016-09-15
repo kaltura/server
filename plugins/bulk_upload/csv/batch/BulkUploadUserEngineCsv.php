@@ -349,7 +349,11 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				KalturaLog::info("Cannot remove user from group - user could not have belonged to the group");
 				$userResult->errorCode = KalturaBatchJobErrorTypes::KALTURA_API;
 				$userResult->errorDescription = "Cannot remove user from group - user could not have belonged to the group";
+				KBatchBase::unimpersonate();
+				
+				return $userResult;
 			}
+			
 			try {
 				$removeResult = KBatchBase::$kClient->groupUser->delete ($userResult->userId, $group);
 			}
