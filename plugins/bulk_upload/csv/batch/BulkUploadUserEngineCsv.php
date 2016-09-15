@@ -391,7 +391,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 					KalturaLog::info ("Unable to add non-existent group $group as a group user!");
 					KalturaLog::info ("Error occurred: " . $e->getMessage());
 					$userResult->errorCode = KalturaBatchJobErrorTypes::KALTURA_API;
-					$userResult->errorDescription = $e->getMessage();
+					$userResult->errorDescription = "Group $group could not be created!";
 					KBatchBase::unimpersonate();
 					
 					return $userResult;
