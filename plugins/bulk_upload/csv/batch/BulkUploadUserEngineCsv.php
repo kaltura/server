@@ -342,7 +342,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		if ($userResult->action == KalturaBulkUploadAction::DELETE)
 		{
 			KalturaLog::info("User was deleted - group associations are irrelevant");
-			return;
+			return $userResult;
 		}
 		
 		$group = $userResult->group;
