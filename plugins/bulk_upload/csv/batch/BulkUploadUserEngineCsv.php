@@ -328,23 +328,17 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				continue;
 			}
 			
-			$bulkUploadResult = $this->handleGroupUser($bulkUploadResult);
+			if ($bulkUploadResult->action != KalturaBulkUploadAction::DELETE)
+				$bulkUploadResult = $this->handleGroupUser($bulkUploadResult);
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 	}
 
 	protected function handleGroupUser (KalturaBulkUploadResultUser $userResult)
 	{
-		
 		KBatchBase::impersonate($this->currentPartnerId);
-		KalturaLog::info("Handling addition of user to group");
-		
-		if ($userResult->action == KalturaBulkUploadAction::DELETE)
-		{
-			KalturaLog::info("User was deleted - group associations are irrelevant");
-			return $userResult;
-		}
-		
+		KalturaLog::info("Handling user/group association");
+			
 		$group = $userResult->group;
 		if (strpos($group, "-") === 0)
 		{
