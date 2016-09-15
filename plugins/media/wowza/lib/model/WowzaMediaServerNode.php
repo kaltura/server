@@ -87,20 +87,32 @@ class WowzaMediaServerNode extends MediaServerNode {
 			$domain = $this->getDomainByProtocolAndFormat($mediaServerConfig, $protocol, $format);
 			$port = $this->getPortByProtocolAndFormat($mediaServerConfig, $protocol, $format);
 			$domain = "$domain:$port";
-			
 		}
 		
+		$playbackHost = "$protocol://$domain/";
+		$playbackHost = str_replace("{hostName}", $hostname, $playbackHost);
+		return $playbackHost;
+	}
+	
+	public function getAppNameAndPrefix()
+	{
+		$appNameAndPrefix = '';
+		
+		$hostname = $this->getHostname();
+		if(!$this->getIsExternalMediaServer())
+			$hostname = preg_replace('/\..*$/', '', $hostname);
+		
+		$mediaServerConfig = kConf::getMap('media_servers');
 		$appPrefix = $this->getApplicationPrefix($mediaServerConfig);
 		$applicationName = $this->getApplicationName();
 		
-		$playbackHost = "$protocol://$domain/";
-		//LiveDvr fails to parse double slash and does not find match so need to verify applicationPrefix exists before adding it 
 		if($appPrefix && $appPrefix !== '')
-			$playbackHost .= rtrim($appPrefix, "/") . "/";
-		$playbackHost .= "$applicationName";
+			$appNameAndPrefix .= rtrim($appPrefix, "/") . "/";
+		$appNameAndPrefix .= "$applicationName";
 		
-		$playbackHost = str_replace("{hostName}", $hostname, $playbackHost);
-		return $playbackHost;
+		$playbackHost = str_replace("{hostName}", $hostname, $appNameAndPrefix);
+		
+		return $appNameAndPrefix;
 	}
 	
 	public function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
