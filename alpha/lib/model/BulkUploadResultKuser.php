@@ -20,6 +20,7 @@ class BulkUploadResultKuser extends BulkUploadResult
     const FIRST_NAME = "first_name";
     const LAST_NAME = "last_name";
     const TAGS = "tags";
+	const GROUP = "group";
     
     /* (non-PHPdoc)
      * @see BulkUploadResult::handleRelatedObjects()
@@ -81,4 +82,7 @@ class BulkUploadResultKuser extends BulkUploadResult
 	
     public function getTags()	{return $this->getFromCustomData(self::TAGS);}
 	public function setTags($v)	{$this->putInCustomData(self::TAGS, $v);}
+	
+	public function getGroup()	{return $this->getFromCustomData(self::GROUP);}
+	public function setGroup($v)	{$this->putInCustomData(self::GROUP, $v);}
 }
