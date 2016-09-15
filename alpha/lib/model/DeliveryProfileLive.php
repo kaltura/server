@@ -281,7 +281,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$domain = preg_replace("(https?://)", "", $this->getUrl());
 
 		$livePackagerUrl = "$protocol://$domain";
-		$livePackagerUrl = str_replace("{DC}", $serverNode->getDc(), $livePackagerUrl);
+		$livePackagerUrl = str_replace("{DC}", "DC-".$serverNode->getDc(), $livePackagerUrl);
 		
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
 		$entryId = $this->getDynamicAttributes()->getEntryId();
