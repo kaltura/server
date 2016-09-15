@@ -335,6 +335,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 	protected function handleGroupUser (KalturaBulkUploadResultUser $userResult)
 	{
+		
+		KBatchBase::impersonate($this->currentPartnerId);
 		KalturaLog::info("Handling addition of user to group");
 		
 		if ($userResult->action == KalturaBulkUploadAction::DELETE)
@@ -346,10 +348,12 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		$group = $userResult->group;
 		if (strpos($group, "-") === 0)
 		{
+			$group = substr($group, 1);
 			if ($userResult->action == KalturaBulkUploadAction::ADD)
 			{
 				KalturaLog::info("Cannot remove user from group - user could not have belonged to the group");
-				return;
+				$userResult->errorCode = KalturaBatchJobErrorTypes::KALTURA_API;
+				$userResult->errorDescription = "Cannot remove user from group - user could not have belonged to the group";
 			}
 			try {
 				$removeResult = KBatchBase::$kClient->groupUser->delete ($userResult->userId, $userResult->group);
@@ -389,6 +393,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				$userResult->errorDescription = $e->getMessage();
 			}
 		}		
+		KBatchBase::unimpersonate();
 		
 		return $userResult;
 	}
