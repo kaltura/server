@@ -116,8 +116,9 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		"filePath",
 		"fileName",
 		"bulkUploadObjectType",
-	    "objectData",
+	    	"objectData",
 		"numOfErrorObjects",
+        	"emailRecipients"
 	);
 
 	
