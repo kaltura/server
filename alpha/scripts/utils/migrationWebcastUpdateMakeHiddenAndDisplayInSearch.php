@@ -4,24 +4,18 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 const UPDATE_VOD_CHUNK_SIZE = 50;
 
-if (count($argv) < 2)
-{
+if (count($argv) < 3)
     die ("usage: php migrationWebcastUpdateMakeHiddenAndDisplayInSearch.php input_file debug|realrun");
-}
-
-if (!in_array($argv[2], array("debug","realrun")))
-{
-    die ("usage: php migrationWebcastUpdateMakeHiddenAndDisplayInSearch.php input_file debug|realrun");
-}
-
-$dryRun = !(count($argv) == 3 && $argv[2] == "realrun");
-if ($dryRun)
-{
-    KalturaLog::debug('this is a dry run. pass "realrun" as 2nd param to make it actually do stuff');
-}
 
 $partnersFilePath = $argv[1];
-$partners = file($argv[1]) or die('Could not read file [$partnersFilePath]!');
+$partners = file($partnersFilePath) or die('Could not read file [$partnersFilePath]!');
+
+if (!in_array($argv[2], array("debug","realrun")))
+    die ("usage: php migrationWebcastUpdateMakeHiddenAndDisplayInSearch.php input_file debug|realrun");
+
+$dryRun = ($argv[2] == "debug");
+if ($dryRun)
+    KalturaLog::debug('this is a dry run!');
 
 foreach ($partners as $partnerId)
 {
