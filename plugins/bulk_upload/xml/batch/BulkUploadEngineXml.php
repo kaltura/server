@@ -985,7 +985,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			
 			$thumbResource = $noParamsThumbResources[$index];
-			$thumb = KBatchBase::$kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
+			$thumb = KBatchBase::$kClient->thumbAsset->add($createdEntry->id, $thumbAsset, $thumbResource);
 			KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
 			if (strpos($thumbAsset->tags, self::DEFAULT_THUMB_TAG) !== false)
 				KBatchBase::$kClient->thumbAsset->setAsDefault($thumb->id);
