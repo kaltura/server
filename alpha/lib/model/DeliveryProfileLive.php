@@ -268,11 +268,44 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		/* @var $serverNode WowzaMediaServerNode */
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
+		$playbackHost = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
+		$appNameAndPrefix = $serverNode->getAppNameAndPrefix();
 		
-		$baseUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
+		$baseUrl = $playbackHost.$appNameAndPrefix;
 		
 		KalturaLog::debug("Live Stream base url [$baseUrl]");
 		return $baseUrl;
+	}
+	
+	protected function getLivePackagerUrl($serverNode, $streamFormat = null)
+	{
+		/* @var $serverNode WowzaMediaServerNode */
+		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
+		
+		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
+		$livePackagerUrl = str_replace("{DC}", "DC-".$serverNode->getDc(), $livePackagerUrl);
+		$livePackagerUrl = rtrim($livePackagerUrl, "/");
+		
+		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
+		$entryId = $this->getDynamicAttributes()->getEntryId();
+		
+		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
+		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
+		$livePackagerUrl .= "t/$secureToken/"; 
+		
+		KalturaLog::debug("Live Packager base stream Url [$livePackagerUrl]");
+		return $livePackagerUrl;
+	}
+	
+	private function generateLiveSecuredPackagerToken($url)
+	{
+		$livePackagerToken = kConf::get("live_packager_secure_token");
+		
+		$token = md5("$livePackagerToken $url", true);
+		$token = base64_encode($token);
+		$token = str_replace(array("=", "/"), array("", "_"), $token);
+		
+		return $token;
 	}
 }
 
