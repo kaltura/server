@@ -14,15 +14,15 @@ class ScheduleEventService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		
+
 		$this->applyPartnerFilterForClass('ScheduleEvent');
 		$this->applyPartnerFilterForClass('ScheduleResource');
 		$this->applyPartnerFilterForClass('ScheduleEventResource');
 	}
-	
+
 	/**
 	 * Allows you to add a new KalturaScheduleEvent object
-	 * 
+	 *
 	 * @action add
 	 * @param KalturaScheduleEvent $scheduleEvent
 	 * @return KalturaScheduleEvent
@@ -32,27 +32,38 @@ class ScheduleEventService extends KalturaBaseService
 		// save in database
 		$dbScheduleEvent = $scheduleEvent->toInsertableObject();
 		/* @var $dbScheduleEvent ScheduleEvent */
-		$dbScheduleEvent->save();
-		
+
+		$dates = null;
+
 		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
 		{
-			$this->createRecurrences($dbScheduleEvent);
+			$dates = $this->getRecurrencesDates($dbScheduleEvent);
+			if (!is_null($dates) && !empty($dates))
+			{
+				$dbScheduleEvent->setStartDate($dates[0]);
+				$dbScheduleEvent->setEndDate($dates[0] + $dbScheduleEvent->getDuration());
+			}
+
+			$dbScheduleEvent->save();
+			$this->createRecurrences($dbScheduleEvent, $dates);
 		}
-		
+		else
+			$dbScheduleEvent->save();
+
 		// return the saved object
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
 		return $scheduleEvent;
-	
+
 	}
-	
+
 	/**
 	 * Retrieve a KalturaScheduleEvent object by ID
-	 * 
+	 *
 	 * @action get
-	 * @param int $scheduleEventId 
+	 * @param int $scheduleEventId
 	 * @return KalturaScheduleEvent
-	 * 
+	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	public function getAction($scheduleEventId)
@@ -62,16 +73,16 @@ class ScheduleEventService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
 		}
-		
+
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
-		
+
 		return $scheduleEvent;
 	}
-	
+
 	/**
 	 * Update an existing KalturaScheduleEvent object
-	 * 
+	 *
 	 * @action update
 	 * @param int $scheduleEventId
 	 * @param KalturaScheduleEvent $scheduleEvent
@@ -86,27 +97,44 @@ class ScheduleEventService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
 		}
-		
+
+		$currentScheduleEventRecurrenceType = $dbScheduleEvent->getRecurrenceType();
+
 		$dbScheduleEvent = $scheduleEvent->toUpdatableObject($dbScheduleEvent);
 		/* @var $dbScheduleEvent ScheduleEvent */
-		$dbScheduleEvent->save();
-		
+
+		// In case we update a recurring event to be a single event we need to delete all recurrences and set the sequence to 1
+		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::NONE && $currentScheduleEventRecurrenceType === ScheduleEventRecurrenceType::RECURRING )
+		{
+			ScheduleEventPeer::deleteByParentId($dbScheduleEvent->getId());
+			$dbScheduleEvent->deleteRecurrence();
+			$dbScheduleEvent->setSequence(1);
+		}
+
 		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
 		{
-			$this->createRecurrences($dbScheduleEvent);
-		}
-		
+			$dates = $this->getRecurrencesDates($dbScheduleEvent);
+			if (!is_null($dates) && !empty($dates))
+			{
+				$dbScheduleEvent->setStartDate($dates[0]);
+				$dbScheduleEvent->setEndDate($dates[0] + $dbScheduleEvent->getDuration());
+			}
+			$dbScheduleEvent->save();
+			$this->createRecurrences($dbScheduleEvent, $dates);
+		}else
+			$dbScheduleEvent->save();
+
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
-		
+
 		return $scheduleEvent;
 	}
-	
+
 	/**
 	 * Mark the KalturaScheduleEvent object as deleted
-	 * 
+	 *
 	 * @action delete
-	 * @param int $scheduleEventId 
+	 * @param int $scheduleEventId
 	 * @return KalturaScheduleEvent
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
@@ -119,31 +147,31 @@ class ScheduleEventService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
 		}
-		
+
 		if($dbScheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRENCE)
 		{
 			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_CANT_BE_DELETE, $scheduleEventId, $dbScheduleEvent->getParentId());
 		}
-		
+
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::DELETED);
 		$dbScheduleEvent->save();
-		
+
 		if($dbScheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
 		{
 			ScheduleEventPeer::deleteByParentId($scheduleEventId);
 		}
-		
+
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
-		
+
 		return $scheduleEvent;
 	}
-	
+
 	/**
 	 * Mark the KalturaScheduleEvent object as cancelled
-	 * 
+	 *
 	 * @action cancel
-	 * @param int $scheduleEventId 
+	 * @param int $scheduleEventId
 	 * @return KalturaScheduleEvent
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
@@ -155,24 +183,24 @@ class ScheduleEventService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
 		}
-		
+
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::CANCELLED);
 		$dbScheduleEvent->save();
-		
+
 		if($dbScheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
 		{
 			ScheduleEventPeer::deleteByParentId($scheduleEventId);
 		}
-		
+
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
-		
+
 		return $scheduleEvent;
 	}
-	
+
 	/**
 	 * List KalturaScheduleEvent objects
-	 * 
+	 *
 	 * @action list
 	 * @param KalturaScheduleEventFilter $filter
 	 * @param KalturaFilterPager $pager
@@ -182,34 +210,52 @@ class ScheduleEventService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaScheduleEventFilter();
-			
+
 		if(!$pager)
 			$pager = new KalturaFilterPager();
-			
+
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
-	
+
+
 	/**
-	 * Create schedule recurrences for recurring event
-	 * 
+	 * Create schedule recurrences dates
+	 *
 	 * @param ScheduleEvent $dbScheduleEvent
 	 */
-	private function createRecurrences(ScheduleEvent $dbScheduleEvent)
+	private function getRecurrencesDates(ScheduleEvent $dbScheduleEvent)
 	{
 		$now = kApiCache::getTime();
 		if($dbScheduleEvent->getEndDate(null) < $now)
 		{
 			KalturaLog::debug("Event [" . $dbScheduleEvent->getId() . "] end time already passed");
-			return;
+			return null;
 		}
-		
+
 		$maxDuration = SchedulePlugin::getScheduleEventmaxDuration();
 		$maxRecurrences = SchedulePlugin::getScheduleEventmaxRecurrences();
 		$startTime = max($now, $dbScheduleEvent->getStartDate(null));
 		$endTime = $now + $maxDuration;
 		$dates = $dbScheduleEvent->getDates($startTime, $endTime, $maxRecurrences);
 		KalturaLog::debug("Found [" . count($dates) . "] dates");
-		
+
+		return $dates;
+	}
+
+	/**
+	 * Create schedule recurrences for recurring event
+	 *
+	 * @param ScheduleEvent $dbScheduleEvent
+	 * @param array $dates
+	 */
+	private function createRecurrences(ScheduleEvent $dbScheduleEvent, $dates)
+	{
+		if (is_null($dates))
+		{
+			KalturaLog::debug("No dates have been received");
+			return;
+		}
+
 		ScheduleEventPeer::deleteByParentId($dbScheduleEvent->getId(), $dates);
 		$existingScheduleEvents = ScheduleEventPeer::retrieveByParentIdAndDates($dbScheduleEvent->getId(), $dates);
 		$existingDates = array();
