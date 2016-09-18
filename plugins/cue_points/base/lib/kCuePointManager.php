@@ -363,16 +363,19 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	{
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $entryId);
+        $c->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
 
 		$this->deleteCuePoints($c);
 	}
 
 	protected function deleteCuePoints(Criteria $c)
 	{
+        $now = time();
 		CuePointPeer::setUseCriteriaFilter(false);
 		$cuePoints = CuePointPeer::doSelect($c);
 		$update = new Criteria();
 		$update->add(CuePointPeer::STATUS, CuePointStatus::DELETED);
+        $update->add(CuePointPeer::UPDATED_AT, $now);
 
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);
@@ -380,6 +383,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		foreach($cuePoints as $cuePoint)
 		{
 			$cuePoint->setStatus(CuePointStatus::DELETED);
+            $cuePoint->setUpdatedAt($now);
 			$cuePoint->indexToSearchIndex();
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
 		}

@@ -21,16 +21,20 @@ foreach ($entries as $deletedEntryId){
 		KalturaLog::debug ('ERROR: couldn\'t find entry id ['.$deletedEntryId.']'); 
 		continue;
 	}
-	
+
+    if ($deletedEntry->getStatus() != entryStatus::DELETED){
+        KalturaLog::debug ('ERROR: entry id ['.$deletedEntryId.'] is not deleted');
+        continue;
+    }
+
 	KalturaLog::debug('undeleting entry id ['. $deletedEntry->getID().']');
-	if ($deletedEntry->getStatus() == entryStatus::DELETED){		
-		$deletedEntry->setStatus(entryStatus::READY);
-	}
-	
-	$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
+
+    $entryDeleteTime = new DateTime ($deletedEntry->getUpdatedAt());
+    $deletedEntry->setStatus(entryStatus::READY);
+  	$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
 	$deletedEntry->setData($deletedEntry->getFromCustomData("deleted_original_data"),true); //data should be resotred even if it's NULL
-	$deletedEntry->save();
-	
+    $deletedEntry->save();
+
 	//undelete all entry's file syncs sub types 
 	$entryFileSyncKeys = array (); 
 	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA)){
@@ -62,14 +66,37 @@ foreach ($entries as $deletedEntryId){
 	}
 	foreach ($entryFileSyncKeys as $entryFileSyncKey)
 		restoreFileSyncByKey($entryFileSyncKey);
-	
+
+    //Restore cuePoints
+    $cuePointCrit = new Criteria();
+    $cuePointCrit->add(CuePointPeer::ENTRY_ID, $deletedEntry->getID(), Criteria::EQUAL);
+    $cuePointCrit->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::EQUAL);
+    CuePointPeer::setUseCriteriaFilter(false);
+    $deletedCuePoints = CuePointPeer::doSelect($cuePointCrit);
+    CuePointPeer::setUseCriteriaFilter(true);
+
+    foreach($deletedCuePoints as $deletedCuePoint)
+    {
+        /* @var $deletedCuePoint cuePoint */
+        $cuePointDeleteTime = new DateTime ($deletedCuePoint->getUpdatedAt());
+        $timeDiff = $entryDeleteTime->diff($cuePointDeleteTime);
+
+        //we allow a time difference of at most 59 seconds between the entry deletion time and the cue point deletion time
+        //because we want to restore only the cue points that were deleted due to the entry deletion
+        if ($timeDiff->format('%Y-%m-%d %H:%i') == '00-0-0 00:0') {
+            echo('changing status of cuePoint to ready [' . $deletedCuePoint->getId() . ']');
+            $deletedCuePoint->setStatus(CuePointStatus::READY);
+            $deletedCuePoint->save();
+        }
+    }
+
 	//Restore assets
 	$assetCrit = new Criteria();
 	$assetCrit->add(assetPeer::ENTRY_ID, $deletedEntry->getID(), Criteria::EQUAL);
 	assetPeer::setUseCriteriaFilter(false);
 	$deletedAssets = assetPeer::doSelect($assetCrit);
 	assetPeer::setUseCriteriaFilter(true);
-	
+
 	foreach($deletedAssets as $deletedAsset)
 	{
 		/* @var $deletedAsset asset */
