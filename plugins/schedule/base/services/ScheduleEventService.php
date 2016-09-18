@@ -38,13 +38,7 @@ class ScheduleEventService extends KalturaBaseService
 		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
 		{
 			$dates = $this->getRecurrencesDates($dbScheduleEvent);
-			if (!is_null($dates) && !empty($dates))
-			{
-				$dbScheduleEvent->setStartDate($dates[0]);
-				$dbScheduleEvent->setEndDate($dates[0] + $dbScheduleEvent->getDuration());
-			}
-
-			$dbScheduleEvent->save();
+			self::setRecurringDates($dates, $dbScheduleEvent);
 			$this->createRecurrences($dbScheduleEvent, $dates);
 		}
 		else
@@ -114,12 +108,7 @@ class ScheduleEventService extends KalturaBaseService
 		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
 		{
 			$dates = $this->getRecurrencesDates($dbScheduleEvent);
-			if (!is_null($dates) && !empty($dates))
-			{
-				$dbScheduleEvent->setStartDate($dates[0]);
-				$dbScheduleEvent->setEndDate($dates[0] + $dbScheduleEvent->getDuration());
-			}
-			$dbScheduleEvent->save();
+			self::setRecurringDates($dates, $dbScheduleEvent);
 			$this->createRecurrences($dbScheduleEvent, $dates);
 		}else
 			$dbScheduleEvent->save();
@@ -276,5 +265,19 @@ class ScheduleEventService extends KalturaBaseService
 			$scheduleEvent->setEndDate($date + $dbScheduleEvent->getDuration());
 			$scheduleEvent->save();
 		}
+	}
+
+	/**
+	 * @param $dates
+	 * @param $dbScheduleEvent
+	 */
+	private static function setRecurringDates($dates, $dbScheduleEvent)
+	{
+		if (!is_null($dates) && !empty($dates))
+		{
+			$dbScheduleEvent->setStartDate($dates[0]);
+			$dbScheduleEvent->setEndDate($dates[0] + $dbScheduleEvent->getDuration());
+		}
+		$dbScheduleEvent->save();
 	}
 }
