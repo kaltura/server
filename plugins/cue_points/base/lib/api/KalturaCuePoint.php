@@ -295,8 +295,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 			if (!$dbEntry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		}
-		
-		if($dbEntry->getType() != entryType::LIVE_STREAM
+		if($dbEntry->getType() != entryType::LIVE_STREAM && $dbEntry->getSourceType() != EntrySourceType::RECORDED_LIVE
 			&& $dbEntry->getLengthInMsecs() && $dbEntry->getLengthInMsecs() < $this->startTime)
 			throw new KalturaAPIException(KalturaCuePointErrors::START_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->startTime, $dbEntry->getLengthInMsecs());
 	}
