@@ -3,6 +3,19 @@
 ## Sphinx improvement - add partnerId to privacy_by_contextsx ##
 
  - Issue Type: Task
+ - Issue ID: PLAT-6085
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	cd /opt/kaltura/app/tests/standAloneClient
+	php exec.php categoryHttpNotifications.xml  
+
+## Sphinx improvement - add partnerId to privacy_by_contextsx ##
+
+ - Issue Type: Task
  - Issue ID: PLAT-5983
 
 ### Configuration ###
