@@ -130,8 +130,8 @@ class kJobsSuspender {
 	
 		// Suspend chosen ids
 		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_SUSPEND, BatchJob::BATCHJOB_STATUS_PENDING, true);
-		self::moveToSuspendedJobsTable($jobIds);
 		$rootJobIds = self::suspendRootJobs($jobIds);
+		self::moveToSuspendedJobsTable(array_merge($jobIds, $rootJobIds));
 		KalturaLog::info("$res jobs of partner ($partnerId) job type ($jobType / $jobSubType) on DC ($dc) were suspended");
 		KalturaLog::info("As a result, ". count($rootJobIds) . " root jobs were suspended.");
 	}
@@ -206,12 +206,13 @@ class kJobsSuspender {
 		
 		// Retrieve root jobs ids 
 		$c = new Criteria();
-		$c->addSelectColumn(BatchJobLockSuspendPeer::ROOT_JOB_ID);
-		$c->add(BatchJobLockSuspendPeer::ID, $jobIds, Criteria::IN);
-		$c->add(BatchJobLockSuspendPeer::STATUS, BatchJob::BATCHJOB_STATUS_SUSPEND);
+		$c->addSelectColumn(BatchJobLockPeer::ROOT_JOB_ID);
+		$c->add(BatchJobLockPeer::ID, $jobIds, Criteria::IN);
+		$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_SUSPEND);
 		$c->setDistinct();
-		$stmt = BatchJobLockSuspendPeer::doSelectStmt($c);
+		$stmt = BatchJobLockPeer::doSelectStmt($c);
 		$rootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		$rootIds = array_diff($rootIds, $jobIds);
 		
 		// Update root jobs status to be almost done 
 		$suspenderUpdateChunk = self::getSuspenderUpdateChunk();
@@ -233,7 +234,6 @@ class kJobsSuspender {
 			$start += $suspenderUpdateChunk;
 		}
 		
-		self::moveToSuspendedJobsTable($rootIds);
 		return $rootIds;
 	}
 	
