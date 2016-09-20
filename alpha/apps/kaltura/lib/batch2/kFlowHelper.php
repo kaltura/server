@@ -1758,20 +1758,32 @@ class kFlowHelper
 		return $logFileUrl;
 	}
 
-	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
-	{
-		kJobsManager::addMailJob(
-			null,
-			0,
-			$dbBatchJob->getPartnerId(),
-			$email_id,
-			kMailJobData::MAIL_PRIORITY_NORMAL,
-			kConf::get( "batch_alert_email" ),
-			kConf::get( "batch_alert_name" ),
-			$dbBatchJob->getPartner()->getBulkUploadNotificationsEmail(),
-			$params
-		);
-	}
+    	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
+    	{
+
+        	$emailRecipients = $dbBatchJob->getPartner()->getBulkUploadNotificationsEmail();
+        	$batchJobData = $dbBatchJob->getData();
+
+        	if($batchJobData instanceof kBulkUploadJobData){
+            		$jobRecipients = $batchJobData->getEmailRecipients();
+            		if(isset($jobRecipients)) {
+                		$emailRecipients = $jobRecipients;
+            		}
+        	}
+
+        	kJobsManager::addMailJob(
+            		null,
+            		0,
+            		$dbBatchJob->getPartnerId(),
+            		$email_id,
+            		kMailJobData::MAIL_PRIORITY_NORMAL,
+            		kConf::get( "batch_alert_email" ),
+            		kConf::get( "batch_alert_name" ),
+            		$emailRecipients,
+            		$params
+        	);
+
+    	}
 
 	/**
 	 * @param BatchJob $dbBatchJob
