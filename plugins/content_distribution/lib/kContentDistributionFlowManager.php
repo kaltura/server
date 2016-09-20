@@ -661,7 +661,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
-		
+
+		$origDirtyStatus = $entryDistribution->getDirtyStatus();
+
 		$entryDistribution->setErrorType(null);
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
@@ -695,7 +697,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 			
 		$entryDistribution->save();
-		
+
+		if ($origDirtyStatus == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
+		{
+			self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+		}
+
 		return $dbBatchJob;
 	}
 
@@ -712,14 +719,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
-		
+
+		$origDirtyStatus = $entryDistribution->getDirtyStatus();
+
 		$entryDistribution->setErrorType(null);
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
-		
+
 		$entryDistribution->setStatus(EntryDistributionStatus::READY);
 		$entryDistribution->setDirtyStatus(null);
-	
+
 		$distributionProfileId = $entryDistribution->getDistributionProfileId();
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$distributionProfile)
@@ -727,7 +736,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 			return $dbBatchJob;
 		}
-		
+
 		$distributionProvider = $distributionProfile->getProvider();
 		if(!$distributionProvider->isScheduleUpdateEnabled())
 		{
@@ -746,7 +755,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 			
 		$entryDistribution->save();
-		
+
+		if ($origDirtyStatus == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
+		{
+			self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+		}
+
 		return $dbBatchJob;
 	}
 
@@ -956,7 +970,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
-		
+
+		$origDirtyStatus = $entryDistribution->getDirtyStatus();
+
 		$entryDistribution->setErrorType($dbBatchJob->getErrType());
 		$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
 		$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
@@ -964,7 +980,19 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_SUBMITTING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
-		
+
+		if ($origDirtyStatus == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
+		{
+			$distributionProfileId = $entryDistribution->getDistributionProfileId();
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if(!$distributionProfile)
+			{
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+				return $dbBatchJob;
+			}
+			self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+		}
+
 		return $dbBatchJob;
 	}
 
@@ -981,7 +1009,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
-		
+		$origDirtyStatus = $entryDistribution->getDirtyStatus();
+
 		$entryDistribution->setErrorType($dbBatchJob->getErrType());
 		$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
 		$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
@@ -989,7 +1018,19 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
-		
+
+		if ($origDirtyStatus == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
+		{
+			$distributionProfileId = $entryDistribution->getDistributionProfileId();
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if(!$distributionProfile)
+			{
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+				return $dbBatchJob;
+			}
+			self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+		}
+
 		return $dbBatchJob;
 	}
 
@@ -1204,9 +1245,19 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
 		{
+			/**
+			 * @var entryDistribution $entryDistribution
+			 */
 			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
-				continue;
-		
+			{
+				if ($entryDistribution->getStatus() == EntryDistributionStatus::UPDATING || $entryDistribution->getStatus() == EntryDistributionStatus::SUBMITTING)
+				{
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
+					$entryDistribution->save();
+				} else
+					continue;
+			}
+
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)

@@ -24,6 +24,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				DeliveryProfileType::LIVE_DASH, 
 				DeliveryProfileType::LIVE_RTMP,
 				DeliveryProfileType::LIVE_HLS_TO_MULTICAST,
+				DeliveryProfileType::LIVE_PACKAGER_HLS,
+				DeliveryProfileType::LIVE_PACKAGER_HDS,
+				DeliveryProfileType::LIVE_PACKAGER_DASH,
+				DeliveryProfileType::LIVE_PACKAGER_MSS,
 		);
 	
 	/**
@@ -79,6 +83,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIVE_DASH => 'DeliveryProfileLiveDash',
 			DeliveryProfileType::LIVE_RTMP => 'DeliveryProfileLiveRtmp',
 			DeliveryProfileType::LIVE_HLS_TO_MULTICAST => "DeliveryProfileLiveAppleHttpToMulticast",
+			DeliveryProfileType::LIVE_PACKAGER_HLS => 'DeliveryProfileLivePackagerHls',
+			DeliveryProfileType::LIVE_PACKAGER_HDS => 'DeliveryProfileLivePackagerHds',
+			DeliveryProfileType::LIVE_PACKAGER_DASH => 'DeliveryProfileLivePackagerDash',
+			DeliveryProfileType::LIVE_PACKAGER_MSS => 'DeliveryProfileLivePackagerMss',
 					
 			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryProfileLiveAkamaiHds',
 	);

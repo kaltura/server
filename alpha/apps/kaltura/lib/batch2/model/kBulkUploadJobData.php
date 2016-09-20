@@ -82,7 +82,13 @@ class kBulkUploadJobData extends kJobData
 	 * @var int
 	 */
 	protected $numOfErrorObjects;
-	
+
+    	/**
+    	 * Recipients of the email for bulk upload success/failure
+     	* @var string
+     	*/
+   	 protected $emailRecipients;
+
 	/**
 	 * @return the $userId
 	 */
@@ -195,66 +201,81 @@ class kBulkUploadJobData extends kJobData
 		$this->resultsFileUrl = $resultsFileUrl;
 	}
 	/**
-     * @return the $numOfObjects
-     */
-    public function getNumOfObjects ()
-    {
-        return $this->numOfObjects;
-    }
+     	* @return the $numOfObjects
+     	*/
+    	public function getNumOfObjects ()
+   	{
+      	 	return $this->numOfObjects;
+   	}
 
 	/**
-     * @param int $numOfObjects
-     */
-    public function setNumOfObjects ($numOfObjects)
-    {
-        $this->numOfObjects = $numOfObjects;
-    }
+	* @param int $numOfObjects
+    	*/
+   	public function setNumOfObjects ($numOfObjects)
+    	{
+    	    	$this->numOfObjects = $numOfObjects;
+   	}
 	/**
-     * @return the $bulkUploadObjectType
-     */
-    public function getBulkUploadObjectType ()
-    {
-        return $this->bulkUploadObjectType;
-    }
+	* @return the $bulkUploadObjectType
+    	*/
+    	public function getBulkUploadObjectType ()
+   	{
+        	return $this->bulkUploadObjectType;
+    	}
 
 	/**
-     * @param int $bulkUploadObjectType
-     */
-    public function setBulkUploadObjectType ($bulkUploadObjectType)
-    {
-        $this->bulkUploadObjectType = $bulkUploadObjectType;
-    }
+     	* @param int $bulkUploadObjectType
+     	*/
+   	public function setBulkUploadObjectType ($bulkUploadObjectType)
+   	{
+       		$this->bulkUploadObjectType = $bulkUploadObjectType;
+   	}
 	/**
-     * @return kBulkUploadObjectData
-     */
-    public function getObjectData ()
-    {
-        return $this->objectData;
-    }
+     	* @return kBulkUploadObjectData
+     	*/
+    	public function getObjectData ()
+ 	{
+        	return $this->objectData;
+    	}
 
 	/**
-     * @param kBulkUploadObjectData $objectData
-     */
-    public function setObjectData ($objectData)
-    {
-        $this->objectData = $objectData;
-    }
+    	* @param kBulkUploadObjectData $objectData
+     	*/
+    	public function setObjectData ($objectData)
+    	{
+        	$this->objectData = $objectData;
+    	}
     
 	/**
-     * @return int
-     */
-    public function getNumOfErrorObjects ()
-    {
-        return $this->numOfErrorObjects;
-    }
+     	* @return int
+     	*/
+    	public function getNumOfErrorObjects ()
+    	{
+     	   	return $this->numOfErrorObjects;
+   	}
 
 	/**
-     * @param int $numOfErrorObjects
-     */
-    public function setNumOfErrorObjects ($numOfErrorObjects)
-    {
-        $this->numOfErrorObjects = $numOfErrorObjects;
-    }
+     	* @param int $numOfErrorObjects
+     	*/
+    	public function setNumOfErrorObjects ($numOfErrorObjects)
+    	{
+        	$this->numOfErrorObjects = $numOfErrorObjects;
+    	}
 
+    	/**
+     	* @param string $emailRecipients
+     	*/
+    	public function setEmailRecipients ($emailRecipients)
+    	{
+        	$this->emailRecipients = $emailRecipients;
+    	}
+
+    	/**
+     	* @return string
+     	*/
+    	public function getEmailRecipients ()
+    	{
+        	return $this->emailRecipients;
+    	}
 
 }

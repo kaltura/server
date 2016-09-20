@@ -350,4 +350,28 @@ class CuePointService extends KalturaBaseService
 		$dbCuePoint->setStatus($status);
 		$dbCuePoint->save();
 	}
+
+	/**
+	 * Clone cuePoint with id to given entry
+	 *
+	 * @action clone
+	 * @param string $id
+	 * @param string $entryId
+	 * @return KalturaCuePoint
+	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function cloneAction($id, $entryId)
+	{
+		$dbCuePoint = CuePointPeer::retrieveByPK($id);
+		if (!$dbCuePoint)
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		$newdbCuePoint = $dbCuePoint->copyToEntry($dbEntry);
+		$newdbCuePoint->save();
+		$cuePoint = KalturaCuePoint::getInstance($newdbCuePoint, $this->getResponseProfile());
+		return $cuePoint;
+	}
 }

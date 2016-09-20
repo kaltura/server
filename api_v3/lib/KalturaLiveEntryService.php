@@ -341,7 +341,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
-			
+
+			// make the recorded entry to be "hidden" in search so it won't return in entry list action
+			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
+			{
+				$recordedEntry->setDisplayInSearch(EntryDisplayInSearchType::SYSTEM);
+			}
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldCopyScheduling())
 			{
 				$recordedEntry->setStartDate($dbEntry->getStartDate());

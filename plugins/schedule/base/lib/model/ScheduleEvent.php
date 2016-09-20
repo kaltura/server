@@ -148,7 +148,12 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE, $v);
 	}
-	
+
+	public function deleteRecurrence()
+	{
+		$this->removeFromCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE);
+	}
+
 	/**
 	 * @return kScheduleEventRecurrence
 	 */
@@ -176,7 +181,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		}
 		if(!$periodEnd)
 		{
-			$periodEnd = strtotime('+1 year', $periodStart);
+			$periodEnd = strtotime('+2 year', $periodStart);
 		}
 		if(!$limit)
 		{

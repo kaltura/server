@@ -123,7 +123,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * Build all streaming flavors array
 	 * @param string $url
 	 */
-	private function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
+	protected function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
 	{
 		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
 		

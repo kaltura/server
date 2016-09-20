@@ -67,9 +67,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 					$c->getNewCriterion(
 						CuePointPeer::TYPE,
 						array(
-							CuePoint::getIndexPrefix($partnerId).(ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB)),
-							CuePoint::getIndexPrefix($partnerId).(CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE)),
-							CuePoint::getIndexPrefix($partnerId).(AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD)),
+							ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB),
+							CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE),
+							AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD),
 							),
 						Criteria::IN
 					)
@@ -222,8 +222,51 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		$criteria->addAscendingOrderByColumn(CuePointPeer::START_TIME);
 		return CuePointPeer::doSelect($criteria, $con);
 	}
-
-
+	
+	/**
+	 * @param 	string 		$entryId		the entry id.
+	 * @param 	array 		$types			the cue point types from CuePointType enum
+	 * @param	PropelPDO 	$con	 		the connection to use
+	 * @return 	array<CuePoint>
+	 */
+	public static function countByEntryIdAndTypes($entryId, array $types = null, PropelPDO $con = null)
+	{
+		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
+		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
+		
+		if(count($types))
+			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
+	
+		return CuePointPeer::doCount($criteria);
+	}
+	
+	/**
+	 * Retrieve multiple objects by entry id.
+	 *
+	 * @param	string 		$entryId 		the entry id.
+	 * @param	int 		$limit		 	select limit amount
+	 * @param	int			$offest			the offset to fetch from
+	 * @param	array 		$types 			the cue point types from CuePointType enum
+	 * @param	PropelPDO 	$con	 		the connection to use
+	 * @return	CuePoints
+	 */
+	public static function retrieveByEntryIdTypeAndLimit($partnerId, $entryId, $limit, $offset, $types = array(), PropelPDO $con = null)
+	{
+		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
+		$criteria->add(CuePointPeer::PARTNER_ID, $partnerId);
+		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
+		$criteria->setLimit($limit);
+		$criteria->setOffset($offset);
+		
+		if(count($types))
+			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
+		
+		$criteria->addAscendingOrderByColumn(CuePointPeer::START_TIME);
+		return CuePointPeer::doSelect($criteria, $con);
+	}
+	
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("cuePoint:id=%s", self::ID), array("cuePoint:entryId=%s", self::ENTRY_ID));

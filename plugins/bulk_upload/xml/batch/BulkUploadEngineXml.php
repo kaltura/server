@@ -614,10 +614,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		switch($contentAssetsAction)
 		{
 			case self::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-				$entry = $this->sendItemUpdateData($entryId, $entry, $flavorAssets, $flavorAssetsResources, $thumbAssets, $thumbAssetsResources);
+				list($entry, $nonCriticalErrors) = $this->sendItemUpdateData($entryId, $entry, $flavorAssets, $flavorAssetsResources, $thumbAssets, $thumbAssetsResources);
 				break;
 			case self::$actionsMap[KalturaBulkUploadAction::REPLACE]:
-				$entry = $this->sendItemReplaceData($entryId, $entry, $resource,
+				list($entry, $nonCriticalErrors) = $this->sendItemReplaceData($entryId, $entry, $resource,
 												  $noParamsFlavorAssets, $noParamsFlavorResources,
 												  $noParamsThumbAssets, $noParamsThumbResources, $pluginReplacementOptions);
 				$entryId = $entry->id;
@@ -650,6 +650,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new Exception(implode(', ', $pluginsErrorResults));
 	
 		//Updates the bulk upload result for the given entry (with the status and other data)
+		$updatedEntryBulkUploadResult->errorDescription = $nonCriticalErrors;
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
 	}
 
@@ -718,6 +719,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$flavor = KBatchBase::$kClient->flavorAsset->add($updatedEntryId, $flavorAsset);
 			KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorResource);		// TODO: use flavor instead of getMultiRequestResult
 		}
+
+		$requestResults = KBatchBase::$kClient->doMultiRequest();
+		if(is_array($requestResults))
+			foreach($requestResults as $requestResult)
+			{
+				if(is_array($requestResult) && isset($requestResult['code']))
+					throw new KalturaException($requestResult['message'], $requestResult['code']);
+
+				if($requestResult instanceof Exception)
+					throw $requestResult;
+			}
+
+
+		KBatchBase::$kClient->startMultiRequest();
 		
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
@@ -729,23 +744,23 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
-		
+
+		$nonCriticalErrors = '';
+		foreach($requestResults as $requestResult)
+		{
+			if (is_array($requestResult) && isset($requestResult['code']))
+				$nonCriticalErrors .= $requestResult['message']."\n";
+			if ($requestResult instanceof Exception)
+				$nonCriticalErrors .= $requestResult->getMessage()."\n";
+		}
+
+
 		//update is after add content since in case entry replacement we want the duration to be set on the new entry.
 		$updatedEntry = KBatchBase::$kClient->baseEntry->update($entryId, $updateEntry);
 		
 		KBatchBase::unimpersonate();
 		
-		if(is_array($requestResults))
-			foreach($requestResults as $requestResult)
-			{
-				if(is_array($requestResult) && isset($requestResult['code']))
-					throw new KalturaException($requestResult['message'], $requestResult['code']);
-				
-				if($requestResult instanceof Exception)
-					throw $requestResult;
-			}
-		
-		return $updatedEntry;
+		return array($updatedEntry, $nonCriticalErrors);
 	}
 
 	/**
@@ -879,10 +894,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 
-		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources, $flavorAssets);
+		list($createdEntry, $nonCriticalErrors) = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources, $flavorAssets);
 			
 		if (isset ($item->categories))
 	        $createdEntryBulkUploadResult = $this->createCategoryAssociations($createdEntry->id, $this->implodeChildElements($item->categories), $createdEntryBulkUploadResult);
+		$createdEntryBulkUploadResult->errorDescription = $nonCriticalErrors;
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateObjectsResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
@@ -935,8 +951,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			KBatchBase::$kClient->flavorAsset->add($newEntryId, $currFlavorAsset);
 		}
-		
-		
+
 		if($resource)
 			KBatchBase::$kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
 		
@@ -946,37 +961,49 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$flavor = KBatchBase::$kClient->flavorAsset->add($newEntryId, $flavorAsset);
 			KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorResource);			// TODO: use flavor instead of getMultiRequestResult
 		}
-		
-		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
-		{
-			
-			$thumbResource = $noParamsThumbResources[$index];
-			$thumb = KBatchBase::$kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
-			KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
-			if (strpos($thumbAsset->tags, self::DEFAULT_THUMB_TAG) !== false)
-				KBatchBase::$kClient->thumbAsset->setAsDefault($thumb->id);
-		}
-							
+		//Seperating to two multi-requests since if any of these fails we should fail all the process but if only thumbs fail it should continue fine
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
-		KBatchBase::unimpersonate();
-		
+
 		foreach($requestResults as $requestResult)
 		{
 			if(is_array($requestResult) && isset($requestResult['code']))
 				throw new KalturaException($requestResult['message'], $requestResult['code']);
-			
+
 			if($requestResult instanceof Exception)
 				throw $requestResult;
 		}
-		
+
 		$createdEntry = reset($requestResults);
 		if(is_null($createdEntry)) //checks that the entry was created
 			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		
+
 		if(!($createdEntry instanceof KalturaObjectBase)) // if the entry is not kaltura object (in case of errors)
 			throw new KalturaBulkUploadXmlException("Returned type is [" . get_class($createdEntry) . "], KalturaObjectBase was expected", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+
+		KBatchBase::$kClient->startMultiRequest();
+		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
+		{
+			
+			$thumbResource = $noParamsThumbResources[$index];
+			$thumb = KBatchBase::$kClient->thumbAsset->add($createdEntry->id, $thumbAsset, $thumbResource);
+			KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
+			if (strpos($thumbAsset->tags, self::DEFAULT_THUMB_TAG) !== false)
+				KBatchBase::$kClient->thumbAsset->setAsDefault($thumb->id);
+		}
+
+		$requestResults = KBatchBase::$kClient->doMultiRequest();
+		KBatchBase::unimpersonate();
+
+		$nonCriticalErrors = '';
+		foreach($requestResults as $requestResult)
+		{
+			if (is_array($requestResult) && isset($requestResult['code']))
+				$nonCriticalErrors .= $requestResult['message']."\n";
+			if ($requestResult instanceof Exception)
+				$nonCriticalErrors .= $requestResult->getMessage()."\n";
+		}
 		
-		return $createdEntry;
+		return array($createdEntry, $nonCriticalErrors);
 	}
 	
 		/**
@@ -1122,7 +1149,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				KBatchBase::$kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
 			}
 		}
-		
+
+		$requestResults = KBatchBase::$kClient->doMultiRequest();
+
+		foreach($requestResults as $requestResult)
+		{
+			if(is_array($requestResult) && isset($requestResult['code']))
+				throw new KalturaException($requestResult['message'], $requestResult['code']);
+
+			if($requestResult instanceof Exception)
+				throw $requestResult;
+		}
+
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($createdThumbAssets as $createdThumbAsset)
 		{
 			if(is_null($createdThumbAsset->thumbParamsId))
@@ -1148,8 +1187,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
 		KBatchBase::unimpersonate();
-		
-		return $updatedEntry;
+
+		$nonCriticalErrors = '';
+		foreach($requestResults as $requestResult)
+		{
+			if (is_array($requestResult) && isset($requestResult['code']))
+				$nonCriticalErrors .= $requestResult['message']."\n";
+			if ($requestResult instanceof Exception)
+				$nonCriticalErrors .= $requestResult->getMessage()."\n";
+		}
+
+
+		return array($updatedEntry,$nonCriticalErrors);
 	}
 	
 	/**
@@ -2247,7 +2296,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach($requestResults as $index => $requestResult)
 		{
 			$bulkUploadResult = $bulkUploadResults[$index];
-			
+			/**
+			 * @var KalturaBulkUploadResult $bulkUploadResult
+			 */
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
 			    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
