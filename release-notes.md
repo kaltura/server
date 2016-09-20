@@ -1,6 +1,6 @@
 # Lynx 12.2.0 #
 
-## Sphinx improvement - add partnerId to privacy_by_contextsx ##
+## Add new category HTTP notifications ##
 
  - Issue Type: Task
  - Issue ID: PLAT-6085
