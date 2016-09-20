@@ -36,7 +36,7 @@ None.
 	 
 		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_08_22_add_action_plugin_cuepoint.php
 
-## Sphinx improvement - add partnerId to privacy_by_contextsx ##
+## New category HTTP event notifications ##
 
  - Issue Type: Task
  - Issue ID: PLAT-6085
