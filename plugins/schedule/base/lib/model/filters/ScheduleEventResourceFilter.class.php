@@ -75,6 +75,10 @@ class ScheduleEventResourceFilter extends baseObjectFilter
 				{
 					$criteria->add(ScheduleEventResourcePeer::EVENT_ID, $scheduleEvent->getParentId(), Criteria::EQUAL);
 				}
+				else
+				{
+					$criteria->add(ScheduleEventResourcePeer::EVENT_ID, $scheduleEvent->getId(), Criteria::EQUAL);
+				}
 			}
 			$this->unsetByName('_eq_event_id_or_parent');
 		}
