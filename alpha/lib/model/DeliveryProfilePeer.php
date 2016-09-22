@@ -186,7 +186,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 
 		$isSecured = $checkSecured ? self::isSecured($partner, $entry) : false;
-		$isLive = in_array($entry->getSource(), LiveEntry::$liveSourceTypes) ? true : false;
+		
+		$isLive = $entry->getType() == entryType::LIVE_STREAM ? true : false;
 
 		$delivery = self::getDeliveryByPartner($entry, $partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured, $isLive);
 		if($delivery)
