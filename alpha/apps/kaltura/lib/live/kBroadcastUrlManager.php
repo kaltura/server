@@ -11,6 +11,7 @@ class kBroadcastUrlManager
 	const PROTOCOL_RTSP = 'rtsp';
 	
 	protected $partnerId;
+	protected $isEcdnPartner;
 	
 	protected function __construct($partnerId)
 	{
@@ -148,7 +149,7 @@ class kBroadcastUrlManager
 		$queryParams = array('t' => $entry->getStreamPassword());
 		
 		//Support eCDN partner using old mediaServers that must recieve additional info to operate
-		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
+		if($this->isEcdnPartner)
 		{
 			$queryParams = array_merge(array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex), $queryParams);
 			return http_build_query($queryParams);
@@ -166,11 +167,14 @@ class kBroadcastUrlManager
 			return '';
 		}
 		
+		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
+			$this->isEcdnPartner = true;
+		
 		$url = "$protocol://$hostname";
 		$url .= $concatStreamName ? "/" . $entry->getId() . '_%i' : '';
 		$paramsStr = $this->getQueryParams($entry, $mediaServerIndex);
 		
-		return "$url/?$paramsStr"; 
+		return "$url" . ($this->isEcdnPartner ? "/" : "") . "?$paramsStr";
 	}
 	
 }
