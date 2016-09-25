@@ -340,10 +340,11 @@ class kEntitlementUtils
 
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
 		{
-			$privacyContextSearch[] = self::PARTNER_ID_PREFIX . $partnerId .$ksPrivacyContext . self::TYPE_SEPERATOR . PrivacyType::ALL;
+			$pidPrefix = (0 === strpos($ksPrivacyContext, self::PARTNER_ID_PREFIX)) ? "" : (self::PARTNER_ID_PREFIX . $partnerId);
+			$privacyContextSearch[] = $pidPrefix . $ksPrivacyContext . self::TYPE_SEPERATOR . PrivacyType::ALL;
 
 			if (!$ks->isAnonymousSession())
-				$privacyContextSearch[] = self::PARTNER_ID_PREFIX . $partnerId .$ksPrivacyContext . self::TYPE_SEPERATOR  . PrivacyType::AUTHENTICATED_USERS;
+				$privacyContextSearch[] = $pidPrefix . $ksPrivacyContext . self::TYPE_SEPERATOR  . PrivacyType::AUTHENTICATED_USERS;
 		}
 
 		self::$privacyContextSearch = $privacyContextSearch;
