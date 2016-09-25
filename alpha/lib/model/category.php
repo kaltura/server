@@ -1696,11 +1696,9 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		if(is_null($this->getPrivacyContext()) || trim($this->getPrivacyContext()) == '')
 			return '';
 
-		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $this->getPartnerId();
-
 		$privacyContexts = explode(',', $this->getPrivacyContext());
-		$privacyContexts = kString::addPrefixToArray($privacyContexts ,$prefix);
-		$privacyContexts[] = $prefix . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+		$privacyContexts[] = kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+		$privacyContexts = kEntitlementUtils::handlePrivacyContexts( $privacyContexts, $this->getPartnerId() );
 
 		return implode(' ',$privacyContexts);
 	}
@@ -1710,10 +1708,10 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $this->getPartnerId();
 
 		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
-			return $prefix.kEntitlementUtils::DEFAULT_CONTEXT;
-			
+			return kEntitlementUtils::getDefaultContextString( $this->getPartnerId() );
+
 		$privacyContexts = explode(',', $this->getPrivacyContexts());
-		$privacyContexts = kString::addPrefixToArray($privacyContexts ,$prefix);
+		$privacyContexts = kEntitlementUtils::handlePrivacyContexts( $privacyContexts, $this->getPartnerId() );
 
 		return implode(' ',$privacyContexts);
 	}

@@ -24,6 +24,27 @@ class kEntitlementUtils
 		return self::PARTNER_ID_PREFIX . $partnerId . self::DEFAULT_CONTEXT;
 	}
 
+	public static function handlePrivacyContexts( $privacyContextsArray, $partnerId )
+	{
+		if ( is_null($privacyContextsArray) || is_null($partnerId))
+		{
+			KalturaLog::err("can't handle privacy context for privacyContextsArray: $privacyContextsArray and partnerId: $partnerId.");
+			return $privacyContextsArray;
+		}
+		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId;
+
+		foreach ($privacyContextsArray as &$value)
+		{
+			if (0 === strpos($value, $prefix))
+				KalturaLog::err("handling Privacy context: $value already has a prefix of $prefix");
+			else
+				$value = $prefix . $value;
+		}
+
+		return $privacyContextsArray;
+
+	}
+
 	public static function getEntitlementEnforcement()
 	{
 		return self::$entitlementEnforcement;
@@ -200,7 +221,7 @@ class kEntitlementUtils
 			else
 			{
 				$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
-				$ksPrivacyContexts = kString::addPrefixToArray( $ksPrivacyContexts, self::PARTNER_ID_PREFIX . $partner->getId());
+				$ksPrivacyContexts = self::handlePrivacyContexts( $ksPrivacyContexts, $partner->getId() );
 			}
 
 			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, KalturaCriteria::IN_LIKE);
@@ -315,7 +336,7 @@ class kEntitlementUtils
 			return array(category::formatPrivacy(PrivacyType::ALL, $partnerId));
 
 		return array(category::formatPrivacy(PrivacyType::ALL, $partnerId),
-				category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, $partnerId));
+			category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, $partnerId));
 	}
 
 	public static function getPrivacyContextSearch()
@@ -334,22 +355,21 @@ class kEntitlementUtils
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 
 		if(is_null($ksPrivacyContexts))
-			$ksPrivacyContexts = self::getDefaultContextString( $partnerId );
+			$ksPrivacyContexts = self::DEFAULT_CONTEXT;
 
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
 		{
-			$pidPrefix = (0 === strpos($ksPrivacyContext, self::PARTNER_ID_PREFIX)) ? "" : (self::PARTNER_ID_PREFIX . $partnerId);
-			$privacyContextSearch[] = $pidPrefix . $ksPrivacyContext . self::TYPE_SEPERATOR . PrivacyType::ALL;
+			$privacyContextSearch[] = $ksPrivacyContext . self::TYPE_SEPERATOR . PrivacyType::ALL;
 
 			if (!$ks->isAnonymousSession())
-				$privacyContextSearch[] = $pidPrefix . $ksPrivacyContext . self::TYPE_SEPERATOR  . PrivacyType::AUTHENTICATED_USERS;
+				$privacyContextSearch[] = $ksPrivacyContext . self::TYPE_SEPERATOR  . PrivacyType::AUTHENTICATED_USERS;
 		}
 
-		self::$privacyContextSearch = $privacyContextSearch;
+		self::$privacyContextSearch = self::handlePrivacyContexts( $privacyContextSearch, $partnerId );
 
-		return $privacyContextSearch;
+		return self::$privacyContextSearch;
 	}
 
 	public static function setPrivacyContextSearch($privacyContextSearch)
@@ -413,7 +433,7 @@ class kEntitlementUtils
 					foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
 					{
 						if(trim($categoryPrivacyContext) == '')
-						 	$categoryPrivacyContext = self::DEFAULT_CONTEXT;
+							$categoryPrivacyContext = self::DEFAULT_CONTEXT;
 
 						if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
 							$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
@@ -487,7 +507,7 @@ class kEntitlementUtils
 
 		return $privacyContextSearch;
 	}
-		public static function getKsPrivacyContext()
+	public static function getKsPrivacyContext()
 	{
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 
@@ -501,35 +521,35 @@ class kEntitlementUtils
 		else
 		{
 			$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
-			$ksPrivacyContexts = kString::addPrefixToArray( $ksPrivacyContexts, self::PARTNER_ID_PREFIX . $partnerId);
+			$ksPrivacyContexts = self::handlePrivacyContexts( $ksPrivacyContexts, $partnerId);
 		}
 
 		return $ksPrivacyContexts;
 	}
-	
+
 	/**
 	 * Function returns the privacy context(s) found on the KS, if none are found returns array containing DEFAULT_PC
 	 */
 	public static function getKsPrivacyContextArray()
 	{
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
-		
+
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
 			return array(self::DEFAULT_CONTEXT);
-			
+
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
 			return array(self::DEFAULT_CONTEXT);
-			
+
 		return explode(',', $ksPrivacyContexts);
 	}
-	
+
 	protected static function initCategoryModeration (ks $ks = null)
 	{
 		if (!$ks)
 			return;
-			
+
 		$enableCategoryModeration = $ks->getEnableCategoryModeration();
 		if ($enableCategoryModeration)
 			self::$categoryModeration = true;
