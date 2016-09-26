@@ -45,7 +45,7 @@ function createDeliveryProfilesTable()
 	addRowWithType(tbl, 'VOD');
 	addRowWithType(tbl,'Live');
 
-	jQuery(getTag('Live')).after(tbl);
+	jQuery('#delivery_profile_ids').after(tbl);
 	$(tbl).attr('id', 'deliveryProfilesTable');
 }
 
@@ -110,6 +110,9 @@ function okPressed(format, type) {
 	$("#selectedValues option").each(function() {selectedValues.push(parseInt(this.value));});
 	if(!selectedValues.length)
 		return;
+	
+	if(type == null)
+		type = "VOD";
 	
 	var dpIdsStr = $(getTag(type))[0].value;
 	var dpIdsObj = jQuery.parseJSON(dpIdsStr);

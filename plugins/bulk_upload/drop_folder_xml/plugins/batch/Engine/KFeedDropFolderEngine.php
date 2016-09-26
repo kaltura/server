@@ -217,7 +217,15 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		$feedFileName = uniqid ("dropFolderFile_{$this->dropFolder->id}_" . time() . '_');
 		
-		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $feedFileName;
+		$rootPath = KBatchBase::$taskConfig->params->mrss->xmlPath;
+		$res = KBatchBase::createDir($rootPath);
+		if ( !$res )
+		{
+			KalturaLog::err( "Cannot save XML item without shared directory");
+			die();
+		}
+		
+		$feedItemPath = $rootPath . DIRECTORY_SEPARATOR. $feedFileName;
 		$res = file_put_contents($feedItemPath, $feedItem->saveXML());
 		chmod($feedItemPath, KBatchBase::$taskConfig->chmod ? octdec(KBatchBase::$taskConfig->chmod) : 0660);
 		return $feedItemPath;

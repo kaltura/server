@@ -1,3 +1,67 @@
+# Lynx 12.2.0 #
+
+## http attachment notifications ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6084
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/attachmentAssetHttpNotifications.xml
+
+## Add new batch job for handling copy cue-point from live to VOD ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-5733
+
+### Configuration ###
+ - The batch.ini has been change, make sure to add the follow to your batch.ini:
+	
+	enabledWorkers.KAsyncLiveToVod		= 1
+	
+ - The workers.ini has been change, make sure to add the follow to your workers.ini:
+	
+	[KAsyncLiveToVod : KAsyncConvertWorker]
+	
+	id							= 640
+	
+	type							= KAsyncLiveToVod
+	
+	scriptPath			 			= batches/LiveToVod/KAsyncLiveToVodExe.php
+### Deployment scripts ###
+	run:
+	 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_08_22_add_action_plugin_cuepoint.php
+
+## New category HTTP event notifications ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6085
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	cd /opt/kaltura/app/tests/standAloneClient
+	php exec.php categoryHttpNotifications.xml  
+
+## Sphinx improvement - add partnerId to privacy_by_contextsx ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-5983
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	Run population scripts for entry and category tables in sphinx.
+
+
 # Lynx 12.1.0 #
 
 ## bpm - burn subtitles metadata trigger fix ##

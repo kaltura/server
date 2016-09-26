@@ -744,127 +744,17 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return;
  		}
 
- 		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $lastSegmentDuration);
- 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
-
- 		self::normalizeAMFTimes($amfArray, $totalVODDuration, $lastSegmentDuration);
-
- 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
-
- 		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
- 		$c = new KalturaCriteria();
- 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
- 		$c->add( CuePointPeer::CREATED_AT, $currentSegmentEndTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
- 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
- 		$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
- 		$c->setLimit( self::MAX_CUE_POINTS_TO_COPY_TO_VOD );
- 		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
-
- 		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
- 		KalturaLog::info("About to copy $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
- 		$processedCuePointIds = array();
- 		if ( $numLiveCuePointsToCopy > 0 )
-		{
-			foreach ( $liveCuePointsToCopy as $liveCuePoint )
-			{
-				$processedCuePointIds[] = $liveCuePoint->getId();
-				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
-
-				// if the cp was before the segment start time - move it to the beginning of the segment.
-				$cuePointCreationTime = max($cuePointCreationTime, $currentSegmentStartTime * 1000);
-				$offsetForTS = self::getOffsetForTimestamp($cuePointCreationTime, $amfArray);
-				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] cuePointCreationTime= $cuePointCreationTime offsetForTS= $offsetForTS";
-				KalturaLog::debug("Preparing to copy $copyMsg");
-				if ( ! is_null( $offsetForTS ) )
-					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $offsetForTS );
- 				else
-					KalturaLog::info("Not copying $copyMsg" );
- 			}
- 		}
- 		KalturaLog::info("Post processing cuePointIds for live entry [{$liveEntry->getId()}]: " . print_r($processedCuePointIds,true) );
- 		if ( count($processedCuePointIds) )
-			self::postProcessCuePoints( $liveEntry, $processedCuePointIds );
+		$jobData = new kLiveToVodJobData();
+		$jobData->setVodEntryId($vodEntryId);
+		$jobData->setLiveEntryId($liveEntryId);
+		$jobData->setTotalVodDuration($totalVODDuration);
+		$jobData->setLastSegmentDuration($lastSegmentDuration);
+		$jobData->setAmfArray(json_encode($amfArray));
+		$batchJob = new BatchJob();
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
+		return;
  	}
 
-	private static function getOffsetForTimestamp($timestamp, $amfArray){
-		KalturaLog::debug('getOffsetForTimestamp ' . $timestamp);
-		KalturaLog::debug('amfArray ' . print_r($amfArray, true));
-
-		$minDistanceAmf = self::getClosestAMF($timestamp, $amfArray);
-
-		$ret = 0;
-		if (is_null($minDistanceAmf))
-			KalturaLog::debug('minDistanceAmf is null - returning 0');
- 		elseif ($minDistanceAmf->ts > $timestamp)
-		{
-			KalturaLog::debug('timestamp is before ' . print_r($minDistanceAmf, true));
-			$ret = $minDistanceAmf->pts - ($minDistanceAmf->ts - $timestamp);
-		}
- 		else
-		{
-			KalturaLog::debug('timestamp is after ' . print_r($minDistanceAmf, true));
-			$ret = $minDistanceAmf->pts + ($timestamp - $minDistanceAmf->ts);
-		}
-
- 		// make sure we don't get a negative time
- 		$ret = max($ret,0);
-
- 		KalturaLog::debug('AMFs array is:' . print_r($amfArray, true) . 'getOffsetForTimestamp returning ' . $ret);
- 		return $ret;
-	}
-
-	private static function getClosestAMF($timestamp, $amfArray)
-	{
-		$len = count($amfArray);
-		$ret = null;
-		if ($len == 1)
-			$ret = $amfArray[0];
- 		else if ($timestamp >= $amfArray[$len-1]->ts)
-			$ret = $amfArray[$len-1];
- 		else if ($timestamp <= $amfArray[0]->ts)
-			$ret = $amfArray[0];
- 		else if ($len > 1) {
-			$lo = 0;
-			$hi = $len - 1;
-			while ($hi - $lo > 1) {
-				$mid = round(($lo + $hi) / 2);
-				if ($amfArray[$mid]->ts <= $timestamp)
-					$lo = $mid;
-				else
-					$hi = $mid;
- 			}
- 			if (abs($amfArray[$hi]->ts - $timestamp) > abs($amfArray[$lo]->ts - $timestamp))
-				$ret = $amfArray[$lo];
-			else
-				$ret = $amfArray[$hi];
- 		}
- 		KalturaLog::debug('getClosestAMF returning ' . print_r($ret, true));
- 		return $ret;
- 	}
-
-	// change the PTS of every amf to be relative to the beginning of the recording, and not to the beginning of the segment
-	private static function normalizeAMFTimes(&$amfArray, $totalVODDuration, $currentSegmentDuration)
-	{
-		foreach($amfArray as $key=>$amf){
-			$amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVODDuration - $currentSegmentDuration;
-		}
- 	}
-
-	private static function getSegmentEndTime($amfArray, $segmentDuration){
-		if (count($amfArray) == 0){
-			KalturaLog::warning("getSegmentEndTime got an empty AMFs array - returning 0 as segment end time");
-			return 0;
- 		}
- 		return ($amfArray[0]->ts - $amfArray[0]->pts + $segmentDuration) / 1000;
- 	}
-
-	private static function getSegmentStartTime($amfArray){
-		if (count($amfArray) == 0){
-			KalturaLog::warning("getSegmentStartTime got an empty AMFs array - returning 0 as segment end time");
-			return 0;
- 		}
- 		return ($amfArray[0]->ts - $amfArray[0]->pts) / 1000;
- 	}
 
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
 	{

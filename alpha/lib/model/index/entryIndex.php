@@ -460,5 +460,12 @@ class entryIndex extends BaseIndexObject
 		return entryPeer::doCount($c);
 	}
 
+	public static function getCacheInvalidationKeys($object = null)
+	{
+		if (is_null($object))
+			return array(array("entry:id=%s", entryPeer::ID), array("entry:partnerId=%s", entryPeer::PARTNER_ID));		
+		else
+			return array("entry:id=".strtolower($object->getId()), "entry:partnerId=".strtolower($object->getPartnerId()));
+	}
 }
 

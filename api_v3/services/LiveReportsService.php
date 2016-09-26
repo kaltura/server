@@ -235,8 +235,8 @@ class LiveReportsService extends KalturaBaseService
 		$filter->setTypeEquel(KalturaEntryType::LIVE_STREAM);
 		$filter->setIdIn($entryIds);
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$baseCriteria->addAscendingOrderByColumn(entryPeer::NAME);
 		$filter->attachToCriteria($baseCriteria);
-		$baseCriteria->addAscendingOrderByColumn("entry.name");
 		$pager->attachToCriteria($baseCriteria);
 		
 		$entries = entryPeer::doSelect($baseCriteria);

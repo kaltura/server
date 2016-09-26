@@ -132,6 +132,7 @@ class DeliveryController extends Zend_Controller_Action
 				return new Form_Delivery_DeliveryProfileAkamaiHds();
 			case Kaltura_Client_Enum_DeliveryProfileType::AKAMAI_HLS_MANIFEST:
 				return new Form_Delivery_DeliveryProfileAkamaiAppleHttpManifest();
+			case Kaltura_Client_Enum_DeliveryProfileType::LIVE_PACKAGER_HLS:
 			case Kaltura_Client_Enum_DeliveryProfileType::LIVE_HLS:
 				return new Form_Delivery_DeliveryProfileLiveAppleHttp();
 			case Kaltura_Client_Enum_DeliveryProfileType::GENERIC_SS:
@@ -162,6 +163,7 @@ class DeliveryController extends Zend_Controller_Action
 				return 'Kaltura_Client_Type_DeliveryProfileAkamaiHds';
 			case Kaltura_Client_Enum_DeliveryProfileType::AKAMAI_HLS_MANIFEST:
 				return 'Kaltura_Client_Type_DeliveryProfileAkamaiAppleHttpManifest';
+			case Kaltura_Client_Enum_DeliveryProfileType::LIVE_PACKAGER_HLS:
 			case Kaltura_Client_Enum_DeliveryProfileType::LIVE_HLS:
 				return 'Kaltura_Client_Type_DeliveryProfileLiveAppleHttp';
 			case Kaltura_Client_Enum_DeliveryProfileType::GENERIC_SS:

@@ -261,7 +261,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
                         if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRENCE)
                                 throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
 
-                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRING && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRING)
+                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRING && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
                                 throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
 
                         if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
@@ -291,7 +291,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
 			$this->validatePropertyNotNull('recurrence');
-		
+
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
@@ -341,6 +341,12 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 				}
 			}
 		}
+
+		if (!is_null($this->recurrenceType) && $this->recurrenceType == ScheduleEventRecurrenceType::NONE && $sourceObject->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
+		{
+			$this->duration = null;
+		}
+
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
