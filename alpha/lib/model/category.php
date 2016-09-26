@@ -1698,20 +1698,18 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 
 		$privacyContexts = explode(',', $this->getPrivacyContext());
 		$privacyContexts[] = kEntitlementUtils::NOT_DEFAULT_CONTEXT;
-		$privacyContexts = kEntitlementUtils::handlePrivacyContexts( $privacyContexts, $this->getPartnerId() );
+		$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, $this->getPartnerId() );
 
 		return implode(' ',$privacyContexts);
 	}
 	
 	public function getSearchIndexPrivacyContexts()
 	{
-		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $this->getPartnerId();
-
 		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
 			return kEntitlementUtils::getDefaultContextString( $this->getPartnerId() );
 
 		$privacyContexts = explode(',', $this->getPrivacyContexts());
-		$privacyContexts = kEntitlementUtils::handlePrivacyContexts( $privacyContexts, $this->getPartnerId() );
+		$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, $this->getPartnerId() );
 
 		return implode(' ',$privacyContexts);
 	}

@@ -480,7 +480,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
-		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::PARTNER_ID_PREFIX. $partnerId . kEntitlementUtils::DEFAULT_CONTEXT )
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::getDefaultContextString($partnerId) )
 		{
 			$this->categories = null;
 			$this->categoriesIds = null;
@@ -574,7 +574,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	{
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
-		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) !=  kEntitlementUtils::PARTNER_ID_PREFIX. $partnerId . kEntitlementUtils::DEFAULT_CONTEXT &&
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) !=  kEntitlementUtils::getDefaultContextString($partnerId) &&
 			($this->categoriesIds != null || $this->categories != null))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_CATEGORY_FIELD_IS_DEPRECATED);
 			

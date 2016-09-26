@@ -21,17 +21,22 @@ class kEntitlementUtils
 
 	public static function getDefaultContextString( $partnerId )
 	{
-		return self::PARTNER_ID_PREFIX . $partnerId . self::DEFAULT_CONTEXT;
+		return self::getPartnerPrefix($partnerId) . self::DEFAULT_CONTEXT;
 	}
 
-	public static function handlePrivacyContexts( $privacyContextsArray, $partnerId )
+	public static function getPartnerPrefix($partnerId)
+	{
+		return kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId;
+	}
+
+	public static function addPrivacyContextsPrefix($privacyContextsArray, $partnerId )
 	{
 		if ( is_null($privacyContextsArray) || is_null($partnerId))
 		{
 			KalturaLog::err("can't handle privacy context for privacyContextsArray: $privacyContextsArray and partnerId: $partnerId.");
 			return $privacyContextsArray;
 		}
-		$prefix = kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId;
+		$prefix = self::getPartnerPrefix($partnerId);
 
 		foreach ($privacyContextsArray as &$value)
 		{
@@ -221,7 +226,7 @@ class kEntitlementUtils
 			else
 			{
 				$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
-				$ksPrivacyContexts = self::handlePrivacyContexts( $ksPrivacyContexts, $partner->getId() );
+				$ksPrivacyContexts = self::addPrivacyContextsPrefix( $ksPrivacyContexts, $partner->getId() );
 			}
 
 			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, KalturaCriteria::IN_LIKE);
@@ -355,7 +360,10 @@ class kEntitlementUtils
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 
 		if(is_null($ksPrivacyContexts))
+		{   // setting $ksPrivacyContexts only with DEFAULT_CONTEXT string (to resolve conflicts)
+			// since prefix will be add in the addPrivacyContextsPrefix bellow
 			$ksPrivacyContexts = self::DEFAULT_CONTEXT;
+		}
 
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 
@@ -367,7 +375,7 @@ class kEntitlementUtils
 				$privacyContextSearch[] = $ksPrivacyContext . self::TYPE_SEPERATOR  . PrivacyType::AUTHENTICATED_USERS;
 		}
 
-		self::$privacyContextSearch = self::handlePrivacyContexts( $privacyContextSearch, $partnerId );
+		self::$privacyContextSearch = self::addPrivacyContextsPrefix( $privacyContextSearch, $partnerId );
 
 		return self::$privacyContextSearch;
 	}
@@ -521,7 +529,7 @@ class kEntitlementUtils
 		else
 		{
 			$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
-			$ksPrivacyContexts = self::handlePrivacyContexts( $ksPrivacyContexts, $partnerId);
+			$ksPrivacyContexts = self::addPrivacyContextsPrefix( $ksPrivacyContexts, $partnerId);
 		}
 
 		return $ksPrivacyContexts;
