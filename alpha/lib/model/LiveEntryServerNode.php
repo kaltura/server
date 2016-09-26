@@ -135,18 +135,49 @@ class LiveEntryServerNode extends EntryServerNode
 	
 	public function validateEntryServerNode()
 	{
-		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-		if(!$liveEntry)
-		{
-			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, will not validate entryServerNode registered");
-			return;
-		}
-		
 		/* @var $liveEntry LiveEntry */
 		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this))
 		{
 			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
-			$this->delete();
+			$this->deleteOrMarkForDeletion();
 		}
+	}
+	
+	public function deleteOrMarkForDeletion()
+	{
+		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+		if(!$liveEntry)
+		{
+			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
+			$this->delete();
+			return;
+		}
+		
+		$recordStatus = $liveEntry->getRecordStatus();
+		if($recordStatus && $recordStatus !== RecordStatus::DISABLED)
+		{
+			$recordedEntryId = $liveEntry->getRecordedEntryId();
+			$recordedEntry = $recordedEntryId ? entryPeer::retrieveByPK($recordedEntryId) : null;
+			
+			if(!$recordedEntry)
+			{
+				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
+				$this->delete();
+				return;
+			}
+			
+			if($recordedEntry && $recordedEntry->getStatus() === entryStatus::READY)
+			{
+				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] found and ready, clearing entry server node from db");
+				$this->delete();
+				return;
+			}
+			
+			$this->setStatus(EntryServerNodeStatus::MARKED_FOR_DELETION);
+			$this->save();
+		}
+		
+		KalturaLog::debug("Live entry with id [{$liveEntry->getId()}], is set with recording disabled, clearing entry server node id [{$this->getId()}] from db");
+		$this->delete();
 	}
 }

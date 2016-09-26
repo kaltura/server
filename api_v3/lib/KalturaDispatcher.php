@@ -213,8 +213,10 @@ class KalturaDispatcher
 			}
 			
 		}
-
-		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid))
+		
+		KalturaLog::debug("Testing:: dbObject getPuserId = [" . $dbObject->getPuserId() . "] kCurrentContext ks_uid = [" . kCurrentContext::$ks_uid . "]");
+		KalturaLog::debug("Testing:: ks_partner_id = [" . kCurrentContext::$ks_partner_id . "]");
+		if ((strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid)) && (kCurrentContext::$ks_partner_id != Partner::MEDIA_SERVER_PARTNER_ID))
 		{
 			$optionsArray = array();
 			if ( $options ) {

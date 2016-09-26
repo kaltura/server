@@ -9,4 +9,5 @@ interface EntryServerNodeStatus extends BaseEnum
 	const PLAYABLE = 1;
 	const BROADCASTING = 2;
 	const AUTHENTICATED = 3;
+	const MARKED_FOR_DELETION = 4;
 }

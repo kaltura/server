@@ -329,6 +329,17 @@ class myEntryUtils
 				return;
 			}
 		}
+		
+		if($entry->getType() === entryType::LIVE_STREAM && $entry->getRecordedEntryId())
+		{
+			$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
+			if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::PRECONVERT)))
+			{
+				KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");  
+				throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getRecordedEntryId());
+			}
+				
+		}
 
 		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
 		

@@ -234,6 +234,15 @@ class playManifestAction extends kalturaAction
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->entry->getPartnerId()) || 
 			$this->secureEntryHelper->hasRules())
 			$this->forceUrlTokenization = true;
+		
+		//check if recorded entry is ready if not than serve the live entry
+		if($this->entry->getSource() === EntrySourceType::RECORDED_LIVE && $this->entry->getStatus() !== entryStatus::READY)
+		{
+			$this->deliveryAttributes->setServeLiveAsVod(true);
+			$this->deliveryAttributes->setServeLiveAsVodEntryId($this->entryId);
+			$this->entryId = $this->entry->getRootEntryId();
+			$this->entry = entryPeer::retrieveByPK($this->entryId);
+		}
 	}
 	
 	protected function initFlavorIds()
@@ -912,10 +921,10 @@ class playManifestAction extends kalturaAction
 	{
 		$this->initFlavorParamsIds();
 
-		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes) && !$this->deliveryAttributes->getServeLiveAsVod())
  		{
  			if (!$this->entry->hasMediaServer())
- 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
  			
  			kApiCache::setExpiry(120);
  		}

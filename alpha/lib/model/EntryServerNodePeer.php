@@ -107,4 +107,17 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		}
 		return $playableEntryServerNodes;
 	}
+	
+	public static function retrieveByEntryIdAndStatus($entryId, $status)
+	{
+		$entryServerNodes =  self::retrieveByEntryId($entryId);
+		$serverNodesByStatus= array();
+		foreach ( $entryServerNodes as $entryServerNode)
+		{
+			/* @var EntryServerNode $entryServerNode */
+			if ($entryServerNode->getStatus() == $status)
+				$serverNodesByStatus[] = $entryServerNode;
+		}
+		return $serverNodesByStatus;
+	}
 } // EntryServerNodePeer
