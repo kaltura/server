@@ -110,7 +110,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 			$appNameAndPrefix .= rtrim($appPrefix, "/") . "/";
 		$appNameAndPrefix .= "$applicationName";
 		
-		$appNameAndPrefix = str_replace("{hostName}", $hostname, $appNameAndPrefix);
+		$playbackHost = str_replace("{hostName}", $hostname, $appNameAndPrefix);
 		
 		return $appNameAndPrefix;
 	}

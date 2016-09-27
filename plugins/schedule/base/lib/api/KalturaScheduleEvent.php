@@ -288,23 +288,9 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		$this->validatePropertyNotNull('startDate');
 		$this->validatePropertyNotNull('endDate');
 		$this->validate($this->startDate, $this->endDate);
-
-
-		$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
-
+		
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
-		{
 			$this->validatePropertyNotNull('recurrence');
-			$this->validatePropertyNotNull('duration');
-			if ($this->duration > $maxSingleEventDuration)
-				throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
-		}
-
-		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
-		{
-			if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
-				throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
-		}
 
 		parent::validateForInsert($propertiesToSkip);
 	}
@@ -314,54 +300,45 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if ($this->endDate instanceof KalturaNullField)
+		if($this->endDate instanceof KalturaNullField)
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('endDate'));
 		}
-
+		
 		/* @var $sourceObject ScheduleEvent */
 		$startDate = $sourceObject->getStartDate(null);
 		$endDate = $sourceObject->getEndDate(null);
-
-		if ($this->startDate)
+		
+		if($this->startDate)
 			$startDate = $this->startDate;
-		if ($this->endDate)
+		if($this->endDate)
 			$endDate = $this->endDate;
-
+			
 		$this->validate($startDate, $endDate);
 
 		$this->validateScheduleEventType($this->recurrenceType, $sourceObject->getRecurrenceType());
 
-		if ($this->isNull('sequence') || $this->sequence <= $sourceObject->getSequence())
+		if($this->isNull('sequence') || $this->sequence <= $sourceObject->getSequence())
 		{
 			$sourceObject->incrementSequence();
 		}
 
-		if (!$this->isNull('duration'))
+		if(!$this->isNull('duration'))
 		{
-			if (!$this->isNull('endDate'))
+			if(!$this->isNull('endDate'))
 			{
-				if (($startDate + $this->duration) != $this->endDate)
+				if(($startDate + $this->duration) != $this->endDate)
+				{
 					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_MUST_MATCH_END_TIME);
+				}
 			}
-
-			if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING)
+			else
 			{
-				$this->endDate = $startDate + $this->duration;
-				$this->duration = null;
-			}
-
-			$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
-
-			// validate single event duration in recurring event or in single event is 24 hours at most
-			if ($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
-			{
-				if ($this->duration > $maxSingleEventDuration)
-					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
-			} elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
-			{
-				if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
-					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+				if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING )
+				{
+					$this->endDate = $startDate + $this->duration;
+					$this->duration = null;
+				}
 			}
 		}
 

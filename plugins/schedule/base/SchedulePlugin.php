@@ -73,13 +73,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		
 		return null;
 	}
-
-	public static function getSingleScheduleEventMaxDuration()
-	{
-		$maxSingleScheduleEventDuration = 60 * 60 * 24; // 24 hours
-		return kConf::get('max_single_schedule_event_duration', 'local', $maxSingleScheduleEventDuration);
-	}
-
+	
 	public static function getScheduleEventmaxDuration()
 	{
 		$maxDuration = 60 * 60 * 24 * 365 * 2; // two years

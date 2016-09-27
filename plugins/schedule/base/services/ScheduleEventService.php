@@ -215,6 +215,11 @@ class ScheduleEventService extends KalturaBaseService
 	private function getRecurrencesDates(ScheduleEvent $dbScheduleEvent)
 	{
 		$now = kApiCache::getTime();
+		if($dbScheduleEvent->getEndDate(null) < $now)
+		{
+			KalturaLog::debug("Event [" . $dbScheduleEvent->getId() . "] end time already passed");
+			return null;
+		}
 
 		$maxDuration = SchedulePlugin::getScheduleEventmaxDuration();
 		$maxRecurrences = SchedulePlugin::getScheduleEventmaxRecurrences();
