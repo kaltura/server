@@ -302,8 +302,8 @@ class CuePointIndex extends BaseIndexObject
 	{
 		if (is_null($object))
 			return array(array("cue_point:id=%s", CuePointPeer::ID), array("cue_point:entryId=%s", CuePointPeer::ENTRY_ID), array("cue_point:partnerId=%s", CuePointPeer::PARTNER_ID));
-		
-		return array("cue_point:id=" . strtolower($object->getId()), "cue_point:entryId=" . strtolower($object->getEntryId()), "cue_point:partnerId=" . strtolower($object->getPartnerId()));
+		else
+			return array("cue_point:id=" . strtolower($object->getId()), "cue_point:entryId=" . strtolower($object->getEntryId()), "cue_point:partnerId=" . strtolower($object->getPartnerId()));
 	}
 
 }
