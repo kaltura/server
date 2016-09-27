@@ -88,6 +88,8 @@ class KalturaErrors extends APIErrors
 
 	const SYSTEM_NAME_ALREADY_EXISTS = "SYSTEM_NAME_ALREADY_EXISTS;SYS_NAME;System name [@SYS_NAME@] already exists";
 
+	const RESOURCE_PARENT_ID_NOT_FOUND = "RESOURCE_PARENT_ID_NOT_FOUND;PARENT_ID;Resource parent id [@PARENT_ID@] not found";
+
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 	
 	const MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED = "MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED;OBJECT_ID;Max update limit was reached. Object ID \"@OBJECT_ID@\" will not updated with latest chnages";
