@@ -1,3 +1,23 @@
+# Lynx 12.3.0 #
+## Fairplay offline ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6127
+
+#### Configuration ####
+
+- make sure Fairplay plugin is installed
+
+- Add new permission to admin.ini:
+
+    moduls.drmFairPlayOfflinePlay.enabled = true
+    moduls.drmFairPlayOfflinePlay.permissionType = 2
+    moduls.drmFairPlayOfflinePlay.label = DRM - Fairplay - allow offline play
+    moduls.drmFairPlayOfflinePlay.permissionName = FEATURE_FAIRPLAY_OFFLINE_PLAY
+    moduls.drmFairPlayOfflinePlay.basePermissionType = 3
+    moduls.drmFairPlayOfflinePlay.basePermissionName = DRM_PLUGIN_PERMISSION
+    moduls.drmFairPlayOfflinePlay.group = GROUP_ENABLE_DISABLE_FEATURES
+
 # Lynx 12.2.0 #
 
 ## http attachment notifications ##

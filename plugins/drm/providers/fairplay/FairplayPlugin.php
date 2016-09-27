@@ -6,6 +6,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 {
 	const PLUGIN_NAME = 'fairplay';
 	const SEARCH_DATA_SUFFIX = 's';
+	const DELIVERY_PREFIX = 'fpshls';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -154,12 +155,8 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getManifestEditors($config)
 	{
 		$contributors = array();
-		if ($config->format == PlaybackProtocol::APPLE_HTTP && $config->rendererClass == 'kM3U8ManifestRenderer')
+		if (self::shouldEditManifest($config))
 		{
-
-			if (!PermissionPeer::isValidForPartner(FairplayPermissionName::FEATURE_FAIRPLAY_OFFLINE_PLAY, $config->partnerId) || !self::isPlayBackFpshls($config->deliveryUrl))
-				return $contributors;
-
 			$contributor = new FairplayManifestEditor();
 			$contributor->entryId = $config->entryId;
 			$contributors[] = $contributor;
@@ -167,9 +164,18 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return $contributors;
 	}
 
+	private static function shouldEditManifest($config)
+	{
+		$allowOffline = PermissionPeer::isValidForPartner(FairplayPermissionName::FEATURE_FAIRPLAY_OFFLINE_PLAY, $config->partnerId) && self::isPlayBackFpshls($config->deliveryUrl);
+		if($config->format == PlaybackProtocol::APPLE_HTTP && $config->rendererClass == 'kM3U8ManifestRenderer' && $allowOffline)
+			return true;
+
+		return false;
+	}
+
 	private static function isPlayBackFpshls($deliveryUrl)
 	{
-		if(strpos($deliveryUrl, '/fpshls') !== false)
+		if(strpos($deliveryUrl, '/'.self::DELIVERY_PREFIX) !== false)
 			return true;
 
 		return false;
