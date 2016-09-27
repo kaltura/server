@@ -71,13 +71,12 @@ class ScheduleEventResourceFilter extends baseObjectFilter
 			else
 			{
 				$scheduleEvent = ScheduleEventPeer::retrieveByPK($this->get('_eq_event_id_or_parent'));
-				if(!is_null($scheduleEvent) && $scheduleEvent->getParentId())
+				if(!is_null($scheduleEvent))
 				{
-					$criteria->add(ScheduleEventResourcePeer::EVENT_ID, $scheduleEvent->getParentId(), Criteria::EQUAL);
-				}
-				elseif(!is_null($scheduleEvent))
-				{
-					$criteria->add(ScheduleEventResourcePeer::EVENT_ID, $scheduleEvent->getId(), Criteria::EQUAL);
+					if($scheduleEvent->getParentId())
+						$criteria->add(ScheduleEventResourcePeer::EVENT_ID, $scheduleEvent->getParentId(), Criteria::EQUAL);
+					else
+						$criteria->add(ScheduleEventResourcePeer::EVENT_ID, $scheduleEvent->getId(), Criteria::EQUAL);
 				}
 			}
 			$this->unsetByName('_eq_event_id_or_parent');
