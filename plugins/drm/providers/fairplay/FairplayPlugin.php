@@ -2,7 +2,7 @@
 /**
  * @package plugins.fairplay
  */
-class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending
+class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor
 {
 	const PLUGIN_NAME = 'fairplay';
 	const SEARCH_DATA_SUFFIX = 's';
@@ -150,6 +150,29 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
 		return array($drmDependency);
 	}
-	
+
+	public static function getManifestEditors($config)
+	{
+		$contributors = array();
+		if ($config->format == PlaybackProtocol::APPLE_HTTP && $config->rendererClass == 'kM3U8ManifestRenderer')
+		{
+
+			if (!PermissionPeer::isValidForPartner(FairplayPermissionName::FEATURE_FAIRPLAY_OFFLINE_PLAY, $config->partnerId) || !self::isPlayBackFpshls($config->deliveryUrl))
+				return $contributors;
+
+			$contributor = new FairplayManifestEditor();
+			$contributor->entryId = $config->entryId;
+			$contributors[] = $contributor;
+		}
+		return $contributors;
+	}
+
+	private static function isPlayBackFpshls($deliveryUrl)
+	{
+		if(strpos($deliveryUrl, '/fpshls') !== false)
+			return true;
+
+		return false;
+	}
 
 }
