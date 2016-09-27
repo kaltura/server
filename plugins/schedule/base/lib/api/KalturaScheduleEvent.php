@@ -290,7 +290,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		$this->validate($this->startDate, $this->endDate);
 
 
-		$maxSingleEventDuration = SchedulePlugin::getScheduleEventmaxDuration();
+		$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
 
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
 		{
@@ -351,7 +351,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 				$this->duration = null;
 			}
 
-			$maxSingleEventDuration = SchedulePlugin::getScheduleEventmaxDuration();
+			$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
 
 			// validate single event duration in recurring event or in single event is 24 hours at most
 			if ($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
