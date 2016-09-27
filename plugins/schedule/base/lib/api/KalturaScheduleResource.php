@@ -138,7 +138,7 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 
 		if (!$this->isNull('parentId') && $this->parentId != 0 )
 		{
-			$scheduleResource = ScheduleEventPeer::retrieveByPK($this->parentId);
+			$scheduleResource = ScheduleResourcePeer::retrieveByPK($this->parentId);
 			if (is_null($scheduleResource))
 				throw new KalturaAPIException(KalturaErrors::RESOURCE_PARENT_ID_NOT_FOUND, $this->parentId);
 		}
