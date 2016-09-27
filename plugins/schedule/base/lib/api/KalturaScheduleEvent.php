@@ -365,10 +365,16 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			}
 		}
 
+
+		// we can't update a recurrence object and set both until and count so if one of them is going to be updated we set remove the other one.
+		if(!is_null($this->recurrence->until) && !is_null($sourceObject->getRecurrence()) &&  !is_null($sourceObject->getRecurrence()->getCount()))
+			$this->recurrence->count = null;
+		if(!is_null($this->recurrence->count) && !is_null($sourceObject->getRecurrence()) &&  !is_null($sourceObject->getRecurrence()->getUntil()))
+			$this->recurrence->until = null;
+
+		//if we are updating an event from recurring to single event we need to remove the duration on the object since we calculate it from scratch according to start and end date
 		if (!is_null($this->recurrenceType) && $this->recurrenceType == ScheduleEventRecurrenceType::NONE && $sourceObject->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
-		{
 			$this->duration = null;
-		}
 
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
