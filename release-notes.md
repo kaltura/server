@@ -1,3 +1,16 @@
+# Lynx 12.3.0 #
+
+## push notifications ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6186
+
+### Configuration ###
+ - update OVP push servers to latest version
+ - add an exchange on each server named "kaltura_exchange"
+
+### Deployment scripts ###
+
 # Lynx 12.2.0 #
 
 ## http attachment notifications ##
