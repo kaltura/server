@@ -33,7 +33,7 @@ class RabbitMQProvider extends QueueProvider
 		$this->port = $rabbitConfig['port'];
 		$this->curlPort = $rabbitConfig['curl_port'];
 		$this->timeout = $rabbitConfig['timeout'];
-		$this->exchangeName = $rabbitConfig['exchange_name'];
+		$this->exchangeName = kConf::get("push_server_exchange");
 	}
 	
 	/*
