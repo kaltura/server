@@ -7,6 +7,14 @@
  */
 class DatesGenerator
 {
+	const SECONDLY = 'seconds';
+	const MINUTELY = 'minutes';
+	const HOURLY = 'hours';
+	const DAILY = 'days';
+	const WEEKLY = 'weeks';
+	const MONTHLY = 'months';
+	const YEARLY = 'years';
+
 	/**
 	 * @var int
 	 */
@@ -23,7 +31,7 @@ class DatesGenerator
 	private $name;
 
 	/**
-	 * @var ScheduleEventRecurrenceFrequency
+	 * @var string
 	 */
 	private $frequency;
 
@@ -105,7 +113,7 @@ class DatesGenerator
 	private $byOffset;
 
 	/**
-	 * @var ScheduleEventRecurrenceDay
+	 * @var string
 	 * Specifies the day on which the workweek starts.
 	 * This is significant when a WEEKLY frequency has an interval greater than 1, and a byDay rule part is specified.
 	 * This is also significant when in a YEARLY frequency when a byWeekNumber rule part is specified.
@@ -243,7 +251,7 @@ class DatesGenerator
 	}
 
 	/**
-	 * @param ScheduleEventRecurrenceFrequency $frequency
+	 * @param string $frequency
 	 */
 	public function setFrequency($frequency)
 	{
@@ -347,7 +355,7 @@ class DatesGenerator
 	}
 
 	/**
-	 * @param ScheduleEventRecurrenceFrequency $weekStartDay
+	 * @param string $weekStartDay
 	 */
 	public function setWeekStartDay($weekStartDay)
 	{
@@ -356,34 +364,15 @@ class DatesGenerator
 
 	/**
 	 * @param int $maxRecurrences
-	 * @param kScheduleEventRecurrence $recurrence
+	 * @param array $paramsArray
 	 */
-	public function __construct($maxRecurrences = 1000, $recurrence = null)
+	public function __construct($maxRecurrences = 1000, $paramsArray = array())
 	{
 		$this->maxRecurrences = $maxRecurrences;
-		if (!is_null($recurrence))
-			$this->initRecurrenceData($recurrence);
-	}
-
-	/**
-	 * @param kScheduleEventRecurrence $recurrence
-	 */
-	public function initRecurrenceData($recurrence){
-			$this->name = $recurrence->getName();
-			$this->frequency = $recurrence->getFrequency();
-			$this->until = $recurrence->getUntil();
-			$this->count = $recurrence->getCount();
-			$this->interval = $recurrence->getInterval();
-			$this->bySecond = $recurrence->getBySecond();
-			$this->byMinute = $recurrence->getByMinute();
-			$this->byHour = $recurrence->getByHour();
-			$this->byDay = $recurrence->getByDay();
-			$this->byMonthDay = $recurrence->getByMonthDay();
-			$this->byYearDay = $recurrence->getByYearDay();
-			$this->byWeekNumber = $recurrence->getByWeekNumber();
-			$this->byMonth = $recurrence->getByMonth();
-			$this->byOffset = $recurrence->getByOffset();
-			$this->weekStartDay = $recurrence->getWeekStartDay();
+		foreach($paramsArray as $param => $value)
+		{
+			$this->$param = $value;
+		}
 	}
 
 	/**
@@ -492,7 +481,7 @@ class DatesGenerator
 			$d = getdate($cal);
 			switch($this->frequency)
 			{
-				case ScheduleEventRecurrenceFrequency::MONTHLY:
+				case DatesGenerator::MONTHLY:
 					$cal = mktime(0, 0, 0, $d['mon'] + 1, 1, $d['year']);
 					break;
 
@@ -853,7 +842,7 @@ class DatesGenerator
 	 * with the frequency specified by this recurrence rule.
 	 *
 	 * @param int $date timestamp
-	 * @param ScheduleEventRecurrenceDay $weekDay
+	 * @param string $weekDay
 	 * @return array An array of timestamps
 	 */
 	private function getAbsWeekDays($date, $weekDay)
@@ -861,7 +850,7 @@ class DatesGenerator
 		$cal = $date;
 		$days = array();
 		$calDay = $this->getDayName($weekDay);
-		if($this->frequency == ScheduleEventRecurrenceFrequency::DAILY)
+		if($this->frequency == DatesGenerator::DAILY)
 		{
 			$current = getdate($cal);
 			if($current['weekday'] == $calDay)
@@ -869,7 +858,7 @@ class DatesGenerator
 				$days[] = $cal;
 			}
 		}
-		elseif($this->frequency == ScheduleEventRecurrenceFrequency::WEEKLY || $this->byWeekNumber)
+		elseif($this->frequency == DatesGenerator::WEEKLY || $this->byWeekNumber)
 		{
 			// Find the target day in the current week
 			$t = $cal;
@@ -888,7 +877,7 @@ class DatesGenerator
 			}
 			$days[] = $t;
 		}
-		elseif($this->frequency == ScheduleEventRecurrenceFrequency::MONTHLY || $this->byMonth)
+		elseif($this->frequency == DatesGenerator::MONTHLY || $this->byMonth)
 		{
 			// Add all of this weekDay's dates for the current month
 			$currentMonth = date('n', $cal);
@@ -908,7 +897,7 @@ class DatesGenerator
 				$cal = mktime($t['hours'], $t['minutes'], $t['seconds'], $target['mon'], $target['mday'], $target['year']);
 			}
 		}
-		elseif($this->frequency == ScheduleEventRecurrenceFrequency::YEARLY)
+		elseif($this->frequency == DatesGenerator::YEARLY)
 		{
 			// Add all of this weekDays dates for the current year
 			$current = getdate($cal);

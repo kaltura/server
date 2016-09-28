@@ -340,5 +340,15 @@ class kScheduleEventRecurrence
 	{
 		$this->weekStartDay = $weekStartDay;
 	}
+
+	/**
+	 * @return array of params as key and values
+	 */
+	public function asArray()
+	{
+		$paramsArray = get_object_vars($this);
+		return $paramsArray;
+
+	}
 	
 }
