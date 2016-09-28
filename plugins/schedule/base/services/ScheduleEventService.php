@@ -222,6 +222,7 @@ class ScheduleEventService extends KalturaBaseService
 		$dates = $datesGenerator->getDates($startTime);
 
 		KalturaLog::debug("Found [" . count($dates) . "] dates");
+		return $dates;
 	}
 
 	/**
