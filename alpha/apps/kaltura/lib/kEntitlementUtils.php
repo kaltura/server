@@ -40,10 +40,7 @@ class kEntitlementUtils
 
 		foreach ($privacyContextsArray as &$value)
 		{
-			if (0 === strpos($value, $prefix))
-				KalturaLog::err("handling Privacy context: $value already has a prefix of $prefix");
-			else
-				$value = $prefix . $value;
+			$value = $prefix . $value;
 		}
 
 		return $privacyContextsArray;
