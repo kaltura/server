@@ -744,6 +744,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return;
  		}
 
+		if (!self::hasCuePointOnEntry($liveEntryId))
+			return;
+
 		$jobData = new kLiveToVodJobData();
 		$jobData->setVodEntryId($vodEntryId);
 		$jobData->setLiveEntryId($liveEntryId);
@@ -754,6 +757,17 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
 		return;
  	}
+
+	private static function hasCuePointOnEntry($entryId)
+	{
+		$c = new KalturaCriteria();
+		$c->add( CuePointPeer::ENTRY_ID, $entryId );
+		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
+		$cuePoint = CuePointPeer::doSelectOne($c);
+		if ($cuePoint)
+			return true;
+		return false;
+	}
 
 
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
