@@ -898,7 +898,6 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>{php:return KalturaEventNotificationEventType::OBJECT_DATA_CHANGED;}</eventType>
 				<eventObjectType>{php:return KalturaEventNotificationEventObjectType::TRANSCRIPT_ASSET;}</eventObjectType>
-				<mainObjectCode>$object->getentry()</mainObjectCode>
 				<eventConditions objectType="array">
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Status equals</description>
