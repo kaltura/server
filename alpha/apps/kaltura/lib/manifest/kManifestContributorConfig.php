@@ -29,14 +29,7 @@ class kManifestContributorConfig
 	public $rendererClass;
 
 	/**
-	 * Partner id that the entry belongs to
-	 * @var int
+	 * @var DeliveryProfile
 	 */
-	public $partnerId;
-
-	/**
-	 * Delivery url of the delivery profile
-	 * @var string
-	 */
-	public $deliveryUrl;
+	public $deliveryProfile;
 }

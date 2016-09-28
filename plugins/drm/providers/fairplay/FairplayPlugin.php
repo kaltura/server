@@ -6,7 +6,6 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 {
 	const PLUGIN_NAME = 'fairplay';
 	const SEARCH_DATA_SUFFIX = 's';
-	const DELIVERY_PREFIX = 'fpshls';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -166,16 +165,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
 	private static function shouldEditManifest($config)
 	{
-		$allowOffline = PermissionPeer::isValidForPartner(FairplayPermissionName::FEATURE_FAIRPLAY_OFFLINE_PLAY, $config->partnerId) && self::isPlayBackFpshls($config->deliveryUrl);
-		if($config->format == PlaybackProtocol::APPLE_HTTP && $config->rendererClass == 'kM3U8ManifestRenderer' && $allowOffline)
-			return true;
-
-		return false;
-	}
-
-	private static function isPlayBackFpshls($deliveryUrl)
-	{
-		if(strpos($deliveryUrl, '/'.self::DELIVERY_PREFIX) !== false)
+		if($config->format == PlaybackProtocol::APPLE_HTTP && $config->rendererClass == 'kM3U8ManifestRenderer' && $config->deliveryProfile->getAllowFairplayOffline())
 			return true;
 
 		return false;
