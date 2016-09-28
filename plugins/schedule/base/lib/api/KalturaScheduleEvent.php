@@ -184,8 +184,8 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'endDate',
 		'referenceId',
 		'classificationType',
-		'geoLatitude',
-		'geoLongitude',
+		'geoLatitude' => 'GeoLat',
+		'geoLongitude' => 'GeoLong',
 		'location',
 		'organizer',
 		'ownerId',
@@ -401,23 +401,25 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			}
 			if(count($skipAttributes) < count($attributes))
 			{
+				$parentResponseProfile = new KalturaDetachedResponseProfile();
 				if(is_null($responseProfile))
 				{
-					$responseProfile = new KalturaDetachedResponseProfile();
-					$responseProfile->type = KalturaResponseProfileType::EXCLUDE_FIELDS;
-					$responseProfile->fields = implode(',', $skipAttributes);
+					$parentResponseProfile->type = KalturaResponseProfileType::EXCLUDE_FIELDS;
+					$parentResponseProfile->fields = implode(',', $skipAttributes);
 				}
 				elseif($responseProfile->type == KalturaResponseProfileType::EXCLUDE_FIELDS)
 				{
-					$responseProfile->fields = implode(',', array_intersect(explode(',', $responseProfile->fields), $skipAttributes));
+					$parentResponseProfile->type = KalturaResponseProfileType::EXCLUDE_FIELDS;
+					$parentResponseProfile->fields = implode(',', array_merge(explode(',', $responseProfile->fields), $skipAttributes));
 				}
 				elseif($responseProfile->type == KalturaResponseProfileType::INCLUDE_FIELDS)
 				{
-					$responseProfile->fields = implode(',', array_diff(explode(',', $responseProfile->fields), $skipAttributes));
+					$parentResponseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+					$parentResponseProfile->fields = implode(',', array_diff(explode(',', $responseProfile->fields), $skipAttributes));
 				}
 				
 				$parentObj = ScheduleEventPeer::retrieveByPK($srcObj->getParentId());
-				$this->fromObject($parentObj, $responseProfile);
+				$this->fromObject($parentObj, $parentResponseProfile);
 			}
 		}
 		
