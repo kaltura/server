@@ -455,7 +455,6 @@ class DatesGenerator
 				break;
 			}
 			$candidates = $this->getCandidates($cal);
-			KalturaLog::debug("Found [" . count($candidates) . "] candidates for calendar [" . date('d/n/y G:i:s', $cal) . "]");
 			foreach($candidates as $candidate)
 			{
 				// don't count candidates that occur before the seed date..
