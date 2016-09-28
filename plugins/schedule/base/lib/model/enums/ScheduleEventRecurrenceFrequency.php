@@ -5,11 +5,11 @@
  */
 interface ScheduleEventRecurrenceFrequency extends BaseEnum
 {
-	const SECONDLY = 'seconds';
-	const MINUTELY = 'minutes';
-	const HOURLY = 'hours';
-	const DAILY = 'days';
-	const WEEKLY = 'weeks';
-	const MONTHLY = 'months';
-	const YEARLY = 'years';
+	const SECONDLY = DatesGenerator::SECONDLY;
+	const MINUTELY = DatesGenerator::MINUTELY;
+	const DAILY = DatesGenerator::DAILY;
+	const HOURLY = DatesGenerator::HOURLY;
+	const WEEKLY = DatesGenerator::WEEKLY;
+	const MONTHLY = DatesGenerator::MONTHLY;
+	const YEARLY = DatesGenerator::YEARLY;
 }
