@@ -100,7 +100,7 @@ class kScheduleEventRecurrence
 	 * The default value is MONDAY.
 	 */
 	private $weekStartDay;
-	
+
 	/**
 	 * @return the $name
 	 */
@@ -108,7 +108,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->name;
 	}
-	
+
 	/**
 	 * @return the $frequency
 	 */
@@ -116,7 +116,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->frequency;
 	}
-	
+
 	/**
 	 * @return the $until
 	 */
@@ -124,7 +124,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->until;
 	}
-	
+
 	/**
 	 * @return the $count
 	 */
@@ -132,7 +132,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->count;
 	}
-	
+
 	/**
 	 * @return the $interval
 	 */
@@ -140,7 +140,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->interval;
 	}
-	
+
 	/**
 	 * @return the $bySecond
 	 */
@@ -148,7 +148,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->bySecond;
 	}
-	
+
 	/**
 	 * @return the $byMinute
 	 */
@@ -156,7 +156,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byMinute;
 	}
-	
+
 	/**
 	 * @return the $byHour
 	 */
@@ -164,7 +164,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byHour;
 	}
-	
+
 	/**
 	 * @return the $byDay
 	 */
@@ -172,7 +172,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byDay;
 	}
-	
+
 	/**
 	 * @return the $byMonthDay
 	 */
@@ -180,7 +180,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byMonthDay;
 	}
-	
+
 	/**
 	 * @return the $byYearDay
 	 */
@@ -188,7 +188,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byYearDay;
 	}
-	
+
 	/**
 	 * @return the $byWeekNumber
 	 */
@@ -196,7 +196,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byWeekNumber;
 	}
-	
+
 	/**
 	 * @return the $byMonth
 	 */
@@ -204,7 +204,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byMonth;
 	}
-	
+
 	/**
 	 * @return the $byOffset
 	 */
@@ -212,7 +212,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->byOffset;
 	}
-	
+
 	/**
 	 * @return the $weekStartDay
 	 */
@@ -220,7 +220,7 @@ class kScheduleEventRecurrence
 	{
 		return $this->weekStartDay;
 	}
-	
+
 	/**
 	 * @param string $name
 	 */
@@ -228,7 +228,7 @@ class kScheduleEventRecurrence
 	{
 		$this->name = $name;
 	}
-	
+
 	/**
 	 * @param ScheduleEventRecurrenceFrequency $frequency
 	 */
@@ -236,7 +236,7 @@ class kScheduleEventRecurrence
 	{
 		$this->frequency = $frequency;
 	}
-	
+
 	/**
 	 * @param int $until
 	 */
@@ -244,7 +244,7 @@ class kScheduleEventRecurrence
 	{
 		$this->until = $until;
 	}
-	
+
 	/**
 	 * @param int $count
 	 */
@@ -252,7 +252,7 @@ class kScheduleEventRecurrence
 	{
 		$this->count = $count;
 	}
-	
+
 	/**
 	 * @param int $interval
 	 */
@@ -260,7 +260,7 @@ class kScheduleEventRecurrence
 	{
 		$this->interval = $interval;
 	}
-	
+
 	/**
 	 * @param string $bySecond
 	 */
@@ -268,7 +268,7 @@ class kScheduleEventRecurrence
 	{
 		$this->bySecond = $bySecond;
 	}
-	
+
 	/**
 	 * @param string $byMinute
 	 */
@@ -276,7 +276,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byMinute = $byMinute;
 	}
-	
+
 	/**
 	 * @param string $byHour
 	 */
@@ -284,7 +284,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byHour = $byHour;
 	}
-	
+
 	/**
 	 * @param string $byDay
 	 */
@@ -292,7 +292,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byDay = $byDay;
 	}
-	
+
 	/**
 	 * @param string $byMonthDay
 	 */
@@ -300,7 +300,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byMonthDay = $byMonthDay;
 	}
-	
+
 	/**
 	 * @param string $byYearDay
 	 */
@@ -308,7 +308,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byYearDay = $byYearDay;
 	}
-	
+
 	/**
 	 * @param string $byWeekNumber
 	 */
@@ -316,7 +316,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byWeekNumber = $byWeekNumber;
 	}
-	
+
 	/**
 	 * @param string $byMonth
 	 */
@@ -324,7 +324,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byMonth = $byMonth;
 	}
-	
+
 	/**
 	 * @param string $byOffset
 	 */
@@ -332,7 +332,7 @@ class kScheduleEventRecurrence
 	{
 		$this->byOffset = $byOffset;
 	}
-	
+
 	/**
 	 * @param ScheduleEventRecurrenceFrequency $weekStartDay
 	 */
@@ -341,575 +341,4 @@ class kScheduleEventRecurrence
 		$this->weekStartDay = $weekStartDay;
 	}
 	
-	/**
-	 * Returns a list of timestamps in the specified period.
-	 * @param int $periodStart the starting timestamp of the period
-	 * @param int $seed the timestamp of this Recurrence's first instance
-	 * @param int $limit maximum number of dates 
-	 * @return array
-	 */
-	public function getDates($periodStart, $seed = null, $limit = null)
-	{
-		$periodEnd = strtotime('+2 year', $periodStart);
-		if(!is_null($this->until) && $this->until < $periodEnd)
-			$periodEnd = $this->until;
-
-		KalturaLog::debug("Fetching dates name [$this->name] start-time[" . date('d/n/y G:i:s', $periodStart) . "] end-time[" . date('d/n/y G:i:s', $periodEnd) . "] seed[" . date('d/n/y G:i:s', $seed) . "] max-recurrences [$limit]");
-		if(!$seed)
-		{
-			$seed = $periodStart;
-		}
-
-		$dates = array();
-		$cal = $seed;
-		$calParts = getdate($cal);
-		if(!is_null($this->bySecond))
-		{
-			$calParts['seconds'] = $this->bySecond;
-		}
-		if(!is_null($this->byMinute))
-		{
-			$calParts['minutes'] = $this->byMinute;
-		}
-		if(!is_null($this->byHour))
-		{
-			$calParts['hours'] = $this->byHour;
-		}
-		if(!is_null($this->byMonthDay))
-		{
-			$calParts['mday'] = $this->byHour;
-		}
-		if(!is_null($this->byMonth))
-		{
-			$calParts['mon'] = $this->byHour;
-		}
-		$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
-		KalturaLog::debug("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
-		
-		$invalidCandidateCount = 0;
-		if($limit && $this->count && $this->count < $limit)
-		{
-			$limit = $this->count;
-		}
-		
-		while(!$limit || $limit > count($dates))
-		{
-			if($this->until && $cal > $this->until)
-			{
-				KalturaLog::debug("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed until [" . date('d/n/y G:i:s', $this->until) . "]");
-				break;
-			}
-			if($cal > $periodEnd)
-			{
-				KalturaLog::debug("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed period-end [" . date('d/n/y G:i:s', $periodEnd) . "]");
-				break;
-			}
-			if($limit && (count($dates) + $invalidCandidateCount) >= $limit)
-			{
-				KalturaLog::debug("Count [" . count($dates) . "] passed limit [$limit]");
-				break;
-			}
-			$candidates = $this->getCandidates($cal);
-			KalturaLog::debug("Found [" . count($candidates) . "] candidates for calendar [" . date('d/n/y G:i:s', $cal) . "]");
-			foreach($candidates as $candidate)
-			{
-				// don't count candidates that occur before the seed date..
-				if($candidate >= $seed)
-				{
-					if($candidate < $periodStart || $candidate > $periodEnd)
-					{
-						$invalidCandidateCount++;
-					}
-					elseif($limit && (count($dates) + $invalidCandidateCount) >= $limit)
-					{
-						break;
-					}
-					elseif(!($this->until && $candidate > $this->until))
-					{
-						$dates[] = $candidate;
-					}
-				}
-			}
-			
-			// We went through all the candidates, and still need more
-			// Go to the start of the next time period
-			$d = getdate($cal);
-			switch($this->frequency)
-			{
-				case ScheduleEventRecurrenceFrequency::MONTHLY:
-					$cal = mktime(0, 0, 0, $d['mon'] + 1, 1, $d['year']);
-					break;
-					
-				default:
-					$cal = strtotime("+{$this->interval} {$this->frequency}", $cal);
-			}
-		}
-		sort($dates);
-		return $dates;
-	}
-	
-	/**
-	 * Returns a list of possible dates generated from the applicable BY* rules, using the specified date as a seed.
-	 *
-	 * @param int the seed date
-	 * @return array An array of timestamps
-	 */
-	public function getCandidates($date)
-	{
-		$dates = array($date);
-		
-		$dates = $this->getMonthVariants($dates);
-		$dates = $this->getWeekNoVariants($dates);
-		$dates = $this->getYearDayVariants($dates);
-		$dates = $this->getMonthDayVariants($dates);
-		$dates = $this->getDayVariants($dates);
-		$dates = $this->getHourVariants($dates);
-		$dates = $this->getMinuteVariants($dates);
-		$dates = $this->getSecondVariants($dates);
-		$dates = $this->getOffsetVariants($dates);
-		return $dates;
-	}
-	
-	/**
-	 * Applies BYSETPOS rules to candidate timestamps.
-	 *
-	 * Valid positions are from 1 to the size of the array.
-	 * Invalid positions are ignored.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getOffsetVariants(array $dates)
-	{
-		// return if no SETPOS rules specified
-		if(!$this->byOffset)
-		{
-			return $dates;
-		}
-		
-		// sort the array before processing
-		sort($dates);
-		$offsetDates = array();
-		$size = count($dates);
-		$offsets = explode(',', $this->byOffset);
-		foreach($offsets as $offset)
-		{
-			if($offset > 0 && $offset <= $size)
-			{
-				$offsetDates[] = $dates[$offset - 1];
-			}
-			elseif($offset < 0 && $offset >= -$size)
-			{
-				$offsetDates[] = $dates[$size + $offset];
-			}
-		}
-		return $offsetDates;
-	}
-	
-	/**
-	 * Applies BYMONTH rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYMONTH rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getMonthVariants(array $dates)
-	{
-		if(!$this->byMonth)
-		{
-			return $dates;
-		}
-		$months = explode(',', $this->byMonth);
-    	$monthlyDates = array();
-		foreach($dates as $date)
-		{
-			$currentMonth = date('n', $date);
-			foreach($months as $targetMonth)
-			{
-				if($targetMonth < $currentMonth)
-				{
-					$targetMonth += 12;
-				}
-				$distance = $targetMonth - $currentMonth;
-				$monthlyDates[] = strtotime("+$distance months", $date);
-			}
-		}
-		return $monthlyDates;
-	}
-	
-	/**
-	 * Applies BYSECOND rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYSECOND rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getSecondVariants(array $dates)
-	{
-		if(!$this->bySecond)
-		{
-			return $dates;
-		}
-    	$secondlyDates = array();
-		$seconds = explode(',', $this->bySecond);
-		foreach($dates as $date)
-		{
-			$cal = getdate($date);
-			foreach($seconds as $second)
-			{
-				$secondlyDates[] = mktime($cal['hours'], $cal['minutes'], $second, $cal['mon'], $cal['mday'], $cal['year']);
-			}
-		}
-		return $secondlyDates;
-	}
-	
-	/**
-	 * Applies BYWEEKNO rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYWEEKNO rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getWeekNoVariants(array $dates)
-	{
-		if(!$this->byWeekNumber)
-		{
-			return $dates;
-		}
-    	$weekNoDates = array();
-		$weekNumbers = explode(',', $this->byWeekNumber);
-		foreach($dates as $date)
-		{
-			$cal = getdate($date);
-			$year = $cal['year'];
-			$currentWeek = date('W', $date);
-			$currentWeekDay = date('N', $date) - 1;
-			foreach($weekNumbers as $targetWeek)
-			{
-				$y = ($targetWeek < $currentWeek) ? $year + 1 : $year;
-				$week = $this->getWeek($targetWeek, $y);
-				$target = getdate($week[$currentWeekDay]);
-				$weekNoDates[] = mktime($cal['hours'], $cal['minutes'], $cal['seconds'], $target['mon'], $target['mday'], $target['year']);
-			}
-		}
-		return $weekNoDates;
-	}
-	
-	/**
-	 * Returns an array of timestamps for the given week,year
-	 *
-	 * Returns timestamps in an array Mon-Sun, 0-6
-	 *
-	 * @param int $weekNumber
-	 * @param int $year
-	 */
-	private function getWeek($weekNumber, $year)
-	{
-		// Count from '0104' because January 4th is always in week 1
-		// (according to ISO 8601).
-		$time = strtotime($year . '0104 +' . ($weekNumber - 1) . ' weeks');
-		// Get the time of the first day of the week
-		$mondayTime = strtotime('-' . (date('w', $time) - 1) . ' days', $time);
-		// Get the times of days 0 -> 6
-		$dayTimes = array();
-		for($i = 0; $i < 7; ++$i)
-		{
-			$dayTimes[] = strtotime('+' . $i . ' days', $mondayTime);
-		}
-		// Return timestamps for mon-sun.
-		return $dayTimes;
-	}
-	
-	/**
-	 * Applies BYYEARDAY rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYYEARDAY rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getYearDayVariants(array $dates)
-	{
-		if(!count($this->byYearDay))
-		{
-			return $dates;
-		}
-        $yearDayDates = array();
-		$yearDays = explode(',', $this->byYearDay);
-		foreach($dates as $date)
-		{
-			// PHP's year days start counting at 0
-			// iCalendar starts counding at 1
-			$currentYearDay = date('z', $date) + 1;
-			$year = date('Y', $date);
-			foreach($yearDays as $targetYearDay)
-			{
-				if($targetYearDay < $currentYearDay)
-				{
-					$numDays = date('z', mktime(0, 0, 0, 12, 31, $year)) + 1;
-					$targetYearDay += $numDays;
-				}
-				$distance = $targetYearDay - $currentYearDay;
-				$yearDayDates[] = strtotime("+$distance days", $date);
-			}
-		}
-		return $yearDayDates;
-	}
-	
-	/**
-	 * Applies BYMONTHDAY rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYMONTHDAY rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getMonthDayVariants(array $dates)
-	{
-		if(!$this->byMonthDay)
-		{
-			return $dates;
-		}
-    	$monthDayDates = array();
-		$monthDays = explode(',', $this->byMonthDay);
-		foreach($dates as $date)
-		{
-			$cal = getdate($date);
-			foreach($monthDays as $monthDay)
-			{
-				$monthDayDates[] = mktime($cal['hours'], $cal['minutes'], $cal['seconds'], $cal['mon'], $monthDay, $cal['year']);
-			}
-		}
-		return $monthDayDates;
-	}
-	
-	/**
-	 * Applies BYDAY rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYDAY rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getDayVariants(array $dates)
-	{
-		if(!$this->byDay)
-		{
-			return $dates;
-		}
-    	$weekDayDates = array();
-		$days = explode(',', $this->byDay);
-		foreach($dates as $date)
-		{
-			foreach($days as $weekDay)
-			{
-				// if BYYEARDAY or BYMONTHDAY is specified filter existing list
-				if($this->byYearDay || $this->byMonthDay)
-				{
-					$currentDayOfWeek = date('l', $date);
-					if($this->getDayName($weekDay) == $currentDayOfWeek)
-					{
-						$weekDayDates[] = $date;
-					}
-				}
-				else
-				{
-					$absDays = $this->getAbsWeekDays($date, $weekDay);
-					$weekDayDates = array_merge($weekDayDates, $absDays);
-				}
-			}
-		}
-		return $weekDayDates;
-	}
-	
-	public static $dayNames = array(
-        'SU'=>'Sunday',
-        'MO'=>'Monday',
-        'TU'=>'Tuesday',
-        'WE'=>'Wednesday',
-        'TH'=>'Thursday',
-        'FR'=>'Friday',
-        'SA'=>'Saturday'
-    );
-	
-	private function getDayName($day){
-		if (strlen($day) > 2) {
-			$day = substr($day, -2);
-		}
-		
-		return self::$dayNames[$day];
-	}
-	
-	private function getDayOffset($day){
-		if (strlen($day) > 2) {
-			return (int) substr($day, 0, -2);
-		}
-		
-		return 0;
-	}
-	
-	/**
-	 * Returns a list of applicable dates corresponding to the specified week day in accordance
-	 * with the frequency specified by this recurrence rule.
-	 *
-	 * @param int $date timestamp
-	 * @param ScheduleEventRecurrenceDay $weekDay
-	 * @return array An array of timestamps
-	 */
-	private function getAbsWeekDays($date, $weekDay)
-	{
-		$cal = $date;
-    	$days = array();
-		$calDay = $this->getDayName($weekDay);
-		if($this->frequency == ScheduleEventRecurrenceFrequency::DAILY)
-		{
-			$current = getdate($cal);
-			if($current['weekday'] == $calDay)
-			{
-				$days[] = $cal;
-			}
-		}
-		elseif($this->frequency == ScheduleEventRecurrenceFrequency::WEEKLY || $this->byWeekNumber)
-		{
-			// Find the target day in the current week
-			$t = $cal;
-			// Back up to Sunday
-			$current = getdate($t);
-			if($current['weekday'] != 'Sunday')
-			{
-				$sunday = getdate(strtotime('-1 Sunday', $cal));
-				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $sunday['mon'], $sunday['mday'], $sunday['year']);
-			}
-			// Move head to the target day
-			if($calDay != 'Sunday')
-			{
-				$target = getdate(strtotime("+1 $calDay", $t));
-				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
-			}
-			$days[] = $t;
-		}
-		elseif($this->frequency == ScheduleEventRecurrenceFrequency::MONTHLY || $this->byMonth)
-		{
-			// Add all of this weekDay's dates for the current month
-			$currentMonth = date('n', $cal);
-			$t = getdate($cal);
-			$cal = mktime($t['hours'], $t['minutes'], $t['seconds'], $t['mon'], 1, $t['year']);
-			if(date('l', $cal) != $calDay)
-			{
-				// If the first day of the month is not valid,
-				// jump ahead to the first valid day
-				$target = getdate(strtotime("+1 $calDay", $cal));
-				$cal = mktime($t['hours'], $t['minutes'], $t['seconds'], $target['mon'], $target['mday'], $target['year']);
-			}
-			while(date('n', $cal) == $currentMonth)
-			{
-				$days[] = $cal;
-				$target = getdate(strtotime('+1 week', $cal));
-				$cal = mktime($t['hours'], $t['minutes'], $t['seconds'], $target['mon'], $target['mday'], $target['year']);
-			}
-		}
-		elseif($this->frequency == ScheduleEventRecurrenceFrequency::YEARLY)
-		{
-			// Add all of this weekDays dates for the current year
-			$current = getdate($cal);
-			// Go to the first day of the year
-			$cal = mktime($current['hours'], $current['minutes'], $current['seconds'], 1, 1, $current['year']);
-			if(!date('l', $cal) == $calDay)
-			{
-				$target = getdate(strtotime("+1 $calDay", $cal));
-				$cal = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
-			}
-			while(date('Y', $cal) == $current['year'])
-			{
-				$days[] = $cal;
-				$cal = strtotime('+1 week', $cal);
-			}
-		}
-		return $this->getOffsetDates($days, $this->getDayOffset($weekDay));
-	}
-	
-	/**
-	 * Returns a single-element sublist containing the element of $dates at $offset.
-	 *
-	 * Valid offsets are from 1 to the size of the list.
-	 * If an invalid offset is supplied, all elements from $dates are returned
-	 *
-	 * @param array $dates An array of timestamps
-	 * @param int $offset
-	 * @return array An array of timestamps
-	 */
-	private function getOffsetDates(array $dates, $offset)
-	{
-		if($offset == 0)
-		{
-			return $dates;
-		}
-    	$offsetDates = array();
-		$size = count($dates);
-		if($offset < 0 && $offset >= -$size)
-		{
-			$offsetDates[] = $dates[$size + $offset];
-		}
-		elseif($offset > 0 && $offset <= $size)
-		{
-			$offsetDates[] = $dates[$offset - 1];
-		}
-		return $offsetDates;
-	}
-	
-	/**
-	 * Applies BYHOUR rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYHOUR rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates An array of timestamps
-	 * @return array An array of timestamps
-	 */
-	private function getHourVariants(array $dates)
-	{
-		if(!$this->byHour)
-		{
-			return $dates;
-		}
-    	$hourlyDates = array();
-    	$hours = explode(',', $this->byHour);
-		foreach($dates as $date)
-		{
-			$cal = getdate($date);
-			foreach($hours as $hour)
-			{
-				$hourlyDates[] = mktime($hour, $cal['minutes'], $cal['seconds'], $cal['mon'], $cal['mday'], $cal['year']);
-			}
-		}
-		return $hourlyDates;
-	}
-	
-	/**
-	 * Applies BYMINUTE rules specified in this Recur instance to the specified date list.
-	 *
-	 * If no BYMINUTE rules are specified the date list is returned unmodified.
-	 *
-	 * @param array $dates an array of timestamps
-	 */
-	private function getMinuteVariants(array $dates)
-	{
-		if(!$this->byMinute)
-		{
-			return $dates;
-		}
-    	$minutelyDates = array();
-    	$minutes = explode(',', $this->byMinute);
-		foreach($dates as $date)
-		{
-			$cal = getdate($date);
-			foreach($minutes as $minute)
-			{
-				$minutelyDates[] = mktime($cal['hours'], $minute, $cal['seconds'], $cal['mon'], $cal['mday'], $cal['year']);
-			}
-		}
-		return $minutelyDates;
-	}
 }
