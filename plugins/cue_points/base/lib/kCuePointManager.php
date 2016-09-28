@@ -766,7 +766,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$cuePoint = CuePointPeer::doSelectOne($c);
 		if ($cuePoint)
 			return true;
-		else return false;
+		return false;
 	}
 
 
