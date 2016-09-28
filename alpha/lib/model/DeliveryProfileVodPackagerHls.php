@@ -23,4 +23,15 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 	{
 		return $this->generatePlayServerUrl();
 	}
+
+	public function setAllowFairplayOffline($v)
+	{
+		$this->putInCustomData("allowFairplayOffline", $v);
+	}
+
+	public function getAllowFairplayOffline()
+	{
+		return $this->getFromCustomData("allowFairplayOffline", null, false);
+	}
+
 }

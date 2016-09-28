@@ -38,6 +38,8 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileGenericSilverLight();
 			case KalturaDeliveryProfileType::GENERIC_RTMP:
 				return new KalturaDeliveryProfileGenericRtmp();
+			case KalturaDeliveryProfileType::VOD_PACKAGER_HLS:
+				return new KalturaDeliveryProfileVodPackagerHls();
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaDeliveryProfile', $type);
 				if(!$obj)
