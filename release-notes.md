@@ -10,6 +10,7 @@
  - add an exchange on each server named "kaltura_exchange"
 
 ### Deployment scripts ###
+None.
 
 # Lynx 12.2.0 #
 
