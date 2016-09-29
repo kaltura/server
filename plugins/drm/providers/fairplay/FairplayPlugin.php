@@ -165,8 +165,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
 	private static function shouldEditManifest($config)
 	{
-		if($config->format == PlaybackProtocol::APPLE_HTTP && $config->rendererClass == 'kM3U8ManifestRenderer' &&
-			method_exists($config->deliveryProfile, 'getAllowFairplayOffline') && $config->deliveryProfile->getAllowFairplayOffline())
+		if($config->deliveryProfile->getType() == DeliveryProfileType::VOD_PACKAGER_HLS && $config->deliveryProfile->getAllowFairplayOffline())
 			return true;
 
 		return false;
