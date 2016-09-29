@@ -790,7 +790,9 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			else {
 				$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
 				$codecs = "";
-				if ($bitrate && $bitrate <= 65536)
+				if (!isset($flavor['width']) || $flavor['width'] <= 0 &&
+					isset($flavor['height']) && $flavor['height'] > 0 &&
+					($bitrate && $bitrate <= 65536))
 					$codecs = ',CODECS="mp4a.40.2"';
 
 				// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
