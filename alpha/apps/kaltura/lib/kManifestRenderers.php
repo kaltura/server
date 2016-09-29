@@ -790,24 +790,21 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			else {
 				$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
 				$codecs = "";
-				if (!isset($flavor['width']) || $flavor['width'] <= 0 &&
-					isset($flavor['height']) && $flavor['height'] > 0 &&
-					($bitrate && $bitrate <= 65536))
-					$codecs = ',CODECS="mp4a.40.2"';
-
 				// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
 				if (strpos($flavor['url'], "index_0_av.m3u8"))
 					$bitrate += 40 * 1024;
 
 				$resolution = '';
-				if(isset($flavor['width']) && isset($flavor['height']))
+				if(isset($flavor['width']) && isset($flavor['height']) &&
+					($flavor['width'] > 0) || ($flavor['height'] > 0))
 				{
 					$width = $flavor['width'];
 					$height = $flavor['height'];
 					if ($width && $height)
 						$resolution = ",RESOLUTION={$width}x{$height}";
 				}
-					
+				else if ($bitrate && $bitrate <= 65536)
+					$codecs = ',CODECS="mp4a.40.2"';
 				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
 				$content .= $flavor['url'];
 				$flavorsArr[] = $content;
