@@ -142,6 +142,7 @@ class embedIframeAction extends sfAction
 		if($ui_conf_html5_url)
 		{
 			$url = str_replace('mwEmbedLoader.php', 'mwEmbedFrame.php', $ui_conf_html5_url);
+			$url = str_replace("{latest}", $html5_version, $url);
 			if (!kString::beginsWith($ui_conf_html5_url , "http")) // absolute URL
 				$url = $host . $url;
 		}
