@@ -207,11 +207,28 @@ class serveFlavorAction extends kalturaAction
 				{
 					// don't have a flavor for this entry in the desired flavor params, 
 					// choose the one with the closest bitrate
-					$flavor = null;
+					$flavor = reset($groupedFlavors[$entryId]);
 					foreach ($groupedFlavors[$entryId] as $curFlavor)
 					{
-						if (!$flavor ||
-							abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
+						// first priority - matching tags
+						if ($flavor->getTags() == $referenceFlavor->getTags())
+						{
+							if ($curFlavor->getTags() != $referenceFlavor->getTags())
+							{
+								continue;
+							}
+						}
+						else
+						{
+							if ($curFlavor->getTags() == $referenceFlavor->getTags())
+							{
+								$flavor = $curFlavor;
+								continue;
+							}
+						}
+
+						// second priority - bitrate
+						if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
 							abs($flavor->getBitrate() - $referenceFlavor->getBitrate()))
 						{
 							$flavor = $curFlavor;
