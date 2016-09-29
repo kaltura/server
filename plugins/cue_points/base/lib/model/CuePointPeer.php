@@ -240,7 +240,23 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	
 		return CuePointPeer::doCount($criteria);
 	}
-	
+
+	/**
+	 * @param 	string 		$entryId		the entry id.
+	 * @param	PropelPDO 	$con	 		the connection to use
+	 * @return 	boolean
+	 */
+	public static function hasReadyCuePointOnEntry($entryId, PropelPDO $con = null)
+	{
+		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$criteria->add( CuePointPeer::ENTRY_ID, $entryId );
+		$criteria->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
+		$cuePoint = CuePointPeer::doSelectOne($criteria, $con);
+		if ($cuePoint)
+			return true;
+		return false;
+	}
+
 	/**
 	 * Retrieve multiple objects by entry id.
 	 *
