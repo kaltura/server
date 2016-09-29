@@ -211,6 +211,8 @@ class serveFlavorAction extends kalturaAction
 					foreach ($groupedFlavors[$entryId] as $curFlavor)
 					{
 						if (!$flavor ||
+							($curFlavor->getTags() == $referenceFlavor->getTags() && 
+							$flavor->getTags() != $referenceFlavor->getTags()) ||
 							abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
 							abs($flavor->getBitrate() - $referenceFlavor->getBitrate()))
 						{
