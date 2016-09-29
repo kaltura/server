@@ -796,7 +796,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 
 				$resolution = '';
 				if(isset($flavor['width']) && isset($flavor['height']) &&
-					($flavor['width'] > 0) || ($flavor['height'] > 0))
+					(($flavor['width'] > 0) || ($flavor['height'] > 0)))
 				{
 					$width = $flavor['width'];
 					$height = $flavor['height'];
