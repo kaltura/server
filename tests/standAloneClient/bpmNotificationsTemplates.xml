@@ -31,6 +31,14 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Entry is not a temporary replacement entry</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>!$scope->getEvent()->getObject()->getIsTemporary()</code>
+						</field>
+					</item>
+				</eventConditions>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>endPoint</key>
@@ -121,6 +129,13 @@
 								<value>{trigger_flavor_params_id}</value>
 							</item>
 						</values>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Entry is not a temporary replacement entry</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getEvent()->getentry()->getObject()->getIsTemporary()</code>
+						</field>
+						<not>1</not>
 					</item>
 				</eventConditions>
 				<contentParameters objectType="array">
@@ -255,6 +270,13 @@
 								<value>{trigger_status}</value>
 							</item>
 						</values>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Entry is not a temporary replacement entry</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getEvent()->getObject()->getIsTemporary()</code>
+						</field>
+						<not>1</not>
 					</item>
 				</eventConditions>
 				<contentParameters objectType="array">
