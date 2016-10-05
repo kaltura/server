@@ -564,6 +564,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			// now $loginData has an id and hash key can be generated
 			$hashKey = $loginData->newPassHashKey();
 			$loginData->setPasswordHashKey($hashKey);
+			
+			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			{
+				//generate a new secret for user's admin console logins
+				$loginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+			}
+			
 			$loginData->save();
 			$alreadyExisted = false;
 			return $loginData;			
@@ -576,6 +583,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				// partner already has a user with the same login data
 				throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 			}
+			
+			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			{
+				//generate a new secret for user's admin console logins
+				$existingData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+			}
+			
 						
 			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;

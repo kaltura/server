@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class UserLoginData extends BaseUserLoginData {
+class UserLoginData extends BaseUserLoginData{
 	
 	public function getFullName()
 	{
@@ -208,6 +208,17 @@ class UserLoginData extends BaseUserLoginData {
 	{
 		$this->putInCustomData('previous_passwords', $prevPass);
 	}
+	
+	public function getSeedFor2FactorAuth ()
+	{
+		return $this->getFromCustomData ('seedFor2FactorAuth');
+	}
+	
+	public function setSeedFor2FactorAuth ($v)
+	{
+		$this->putInCustomData ('seedFor2FactorAuth');
+	}
+	
 	
 	public function passwordUsedBefore($pass)
 	{
