@@ -567,8 +567,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			
 			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			{
+				// add google authenticator library to include path
+				set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
+				require_once 'GoogleAuthenticator.php';
 				//generate a new secret for user's admin console logins
-				$loginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+				$seed = GoogleAuthenticator::createSecret();
+				KalturaLog::debug("seed value :" . $seed);
+				$loginData->setSeedFor2FactorAuth($seed);
 			}
 			
 			$loginData->save();

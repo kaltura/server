@@ -216,7 +216,7 @@ class UserLoginData extends BaseUserLoginData{
 	
 	public function setSeedFor2FactorAuth ($v)
 	{
-		$this->putInCustomData ('seedFor2FactorAuth');
+		$this->putInCustomData ('seedFor2FactorAuth', $v);
 	}
 	
 	

@@ -126,7 +126,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		{
 			if ($this->partnerId)
 			{
-			    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId, null, $this->privileges);
+			    $ks = $client->user->loginByLoginId($this->username, $this->password, null, $this->partnerId, null, $this->privileges);
 	    		$client->setKs($ks);
 	    		$user = $client->user->getByLoginId($this->username, $this->partnerId);
 	    		$identity = $this->getUserIdentity($user, $ks, $this->partnerId);
@@ -134,7 +134,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			}
 			
 		    if (!$this->ks)
-    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId, null, $this->privileges);
+    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, null, $partnerId, null, $this->privileges);
     		$client->setKs($this->ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
     		$identity = $this->getUserIdentity($user, $this->ks, $user->partnerId);
