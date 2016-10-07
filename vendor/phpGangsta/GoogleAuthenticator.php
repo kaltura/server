@@ -31,6 +31,7 @@ class GoogleAuthenticator
         for ($i = 0; $i < $secretLength; $i++) {
             $secret .= $validChars[array_rand($validChars)];
         }
+		
         return $secret;
     }
 
@@ -64,8 +65,8 @@ class GoogleAuthenticator
         // Only 32 bits
         $value = $value & 0x7FFFFFFF;
 
-        $modulo = pow(10, self::_codeLength);
-        return str_pad($value % $modulo, self::_codeLength, '0', STR_PAD_LEFT);
+        $modulo = pow(10, self::$_codeLength);
+        return str_pad($value % $modulo, self::$_codeLength, '0', STR_PAD_LEFT);
     }
 
     /**
