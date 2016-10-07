@@ -127,6 +127,9 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		
 		$client = Infra_ClientHelper::getClient();
 		$client->setKs(null);
+		$config = $client->getConfig();
+		$config->requestHeaders[] = $this->constructXRemoteAddrHeader($_SERVER['REMOTE_ADDR'], time(), 'admin_console', $settings->remoteAddrHeaderSalt);
+		$client->setConfig($config);
 		
 		try
 		{
@@ -158,6 +161,11 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			else
 				throw $ex;
 		}
+	}
+
+	protected function constructXRemoteAddrHeader ($remoteIp, $time, $uniqueId, $salt)
+	{
+		return "X_KALTURA_REMOTE_ADDR:$remoteIp,$time,$uniqueId," . md5("$remoteIp,$time,$uniqueId,$salt");	
 	}
 
 }
