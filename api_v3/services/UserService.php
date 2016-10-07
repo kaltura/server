@@ -369,7 +369,7 @@ class UserService extends KalturaBaseUserService
 	public function loginByLoginIdAction($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
 		// exceptions might be thrown
-		return parent::loginImpl(null, $loginId, $password, $otp, $partnerId, $expiry, $privileges);
+		return parent::loginImpl(null, $loginId, $password, $partnerId, $expiry, $privileges, $otp);
 	}
 	
 	
