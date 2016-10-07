@@ -585,7 +585,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
 			require_once 'GoogleAuthenticator.php';
 			
-			$qrCodeLink = urlencode (GoogleAuthenticator::getQRCodeGoogleUrl (kConf::get ('www_host') . 'admin console', $user->getLoginData()->getSeedFor2FactorAuth()));
+			$qrCodeLink = str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl (kConf::get ('www_host') . 'admin console', $user->getLoginData()->getSeedFor2FactorAuth()));
 			
 			if ($existingUser)
 			{
