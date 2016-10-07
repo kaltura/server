@@ -345,13 +345,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 	
 	// user login by login_email
-	public static function userLoginByEmail($email, $password, $partnerId = null)
+	public static function userLoginByEmail($email, $password, $partnerId = null, $otp = null)
 	{
 		$loginData = self::getByEmail($email);
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
-		return self::userLogin($loginData, $password, $partnerId, true);
+		return self::userLogin($loginData, $password, $partnerId, true, $otp);
 	}
 	
 	// user login by ks
@@ -385,7 +385,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 	
 	// user login by user_login_data object
-	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true)
+	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null)
 	{
 		$requestedPartner = $partnerId;
 		
@@ -415,6 +415,36 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		if (time() < $loginData->getLoginBlockedUntil(null)) {
 			throw new kUserException('', kUserException::LOGIN_BLOCKED);
+		}
+		
+		//Check if the user's ip address is in the right range to ignore the otp
+		
+		if ($partnerId && partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID
+			&& kConf::hasParam ('admin_console_partner_otp_internal_ips'))
+		{
+			$otpRequired = true;
+			$ipRanges = explode(',', kConf::get('admin_console_partner_otp_internal_ips'));
+			foreach ($ipRanges as $curRange)
+			{
+				if (kIpAddressUtils::isIpInRange($_SERVER['REMOTE_ADDR'], $curRange))
+				{
+					$otpRequired = false;
+					break;
+				}
+			}
+			
+			if ($otpRequired)
+			{
+				// add google authenticator library to include path
+				set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
+				require_once 'GoogleAuthenticator.php';
+				
+				$result = GoogleAuthenticator::verifyCode ($loginData->getSeedFor2FactorAuth(), $otp);
+				if (!$result)
+				{
+					throw new kUserException ('', kUserException::INVALID_OTP);
+				}
+			} 
 		}
 		
 		$loginData->setLoginAttempts(0);
@@ -572,7 +602,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				require_once 'GoogleAuthenticator.php';
 				//generate a new secret for user's admin console logins
 				$seed = GoogleAuthenticator::createSecret();
-				KalturaLog::debug("seed value :" . $seed);
 				$loginData->setSeedFor2FactorAuth($seed);
 			}
 			
@@ -591,6 +620,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			
 			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			{
+				// add google authenticator library to include path
+				set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
+				require_once 'GoogleAuthenticator.php';
 				//generate a new secret for user's admin console logins
 				$existingData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
 			}
