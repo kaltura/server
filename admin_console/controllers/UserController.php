@@ -330,7 +330,7 @@ class UserController extends Zend_Controller_Action
 					$request->getPost('new_password')
 				);
 				
-				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), null, Infra_ClientHelper::getPartnerId());
+				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Infra_ClientHelper::getPartnerId(), null, null, null);
 				$client->setKs($ks);
 				$user = $client->user->getByLoginId($request->getPost('email_address'), Infra_ClientHelper::getPartnerId());
 				if ($user->partnerId != Infra_ClientHelper::getPartnerId()) {
