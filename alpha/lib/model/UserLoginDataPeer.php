@@ -419,7 +419,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		//Check if the user's ip address is in the right range to ignore the otp
 		
-		if ($partnerId && partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID
+		if ($partnerId && $partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID
 			&& kConf::hasParam ('admin_console_partner_otp_internal_ips'))
 		{
 			$otpRequired = true;
