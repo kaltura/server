@@ -426,7 +426,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$ipRanges = explode(',', kConf::get('admin_console_partner_otp_internal_ips'));
 			foreach ($ipRanges as $curRange)
 			{
-				if (kIpAddressUtils::isIpInRange($_SERVER['REMOTE_ADDR'], $curRange))
+				if (kIpAddressUtils::isIpInRange(infraRequestUtils::getRemoteAddress(), $curRange))
 				{
 					$otpRequired = false;
 					break;
