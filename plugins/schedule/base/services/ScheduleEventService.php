@@ -214,12 +214,9 @@ class ScheduleEventService extends KalturaBaseService
 	 */
 	private function getRecurrencesDates(ScheduleEvent $dbScheduleEvent)
 	{
-		$now = kApiCache::getTime();
-
 		$maxRecurrences = SchedulePlugin::getScheduleEventmaxRecurrences();
-		$startTime = max($now, $dbScheduleEvent->getStartDate(null));
 		$datesGenerator = new DatesGenerator($maxRecurrences, $dbScheduleEvent->getRecurrence()->asArray());
-		$dates = $datesGenerator->getDates($startTime);
+		$dates = $datesGenerator->getDates($dbScheduleEvent->getStartDate(null));
 
 		KalturaLog::debug("Found [" . count($dates) . "] dates");
 		return $dates;
