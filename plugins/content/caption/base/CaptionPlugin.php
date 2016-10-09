@@ -434,10 +434,12 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$partnerId = $captionAsset->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$secret = $partner->getSecret();
-		$privilege = self::KS_PRIVILEGE_CAPTION.":".$captionAsset->getEntryId();
+		$privileges = self::KS_PRIVILEGE_CAPTION.":".$captionAsset->getEntryId();
+        $privileges .= "," . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ":" . $captionAsset->getEntryId();
+        $privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/' . '*';
 		$ksStr = '';
 		
-		kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
+		kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privileges);
 		
 		return $ksStr;
 	}
