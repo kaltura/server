@@ -212,6 +212,7 @@ class kJobsSuspender {
 		$c->setDistinct();
 		$stmt = BatchJobLockPeer::doSelectStmt($c);
 		$rootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		$rootIds = array_diff($rootIds, $jobIds);
 		
 		// Update root jobs status to be almost done 
 		$suspenderUpdateChunk = self::getSuspenderUpdateChunk();
@@ -232,6 +233,7 @@ class kJobsSuspender {
 			$affectedRows += BasePeer::doUpdate($updateCond, $update, $con);
 			$start += $suspenderUpdateChunk;
 		}
+		
 		return $rootIds;
 	}
 	
