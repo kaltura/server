@@ -245,6 +245,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.DURATION' => 'duration',
 				'schedule_event.CREATED_AT' => 'created_at',
 				'schedule_event.UPDATED_AT' => 'updated_at',
+				'schedule_event.SUMMARY' => 'summary',
 			);
 		}
 		return self::$orderFields;
