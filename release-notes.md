@@ -1,4 +1,17 @@
 # Lynx 12.4.0 #
+## Enable sort by summary for schedule events##
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6164
+
+### Configuration ###
+ - update sphinx kaltura.conf:
+	 Add index to kaltura_schedule_event:
+	- rt_attr_string = summary
+
+### Deployment scripts ###
+ - Reindex sphinx and re-populate schedule-event
+#### Known Issues & Limitations ####
+None.
 
 ## Support re-generating live stream token##
 
