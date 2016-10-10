@@ -425,10 +425,10 @@ class DatesGenerator
 			$calParts['hours'] = $this->byHour;
 
 		if(!is_null($this->byMonthDay))
-			$calParts['mday'] = $this->byHour;
+			$calParts['mday'] = $this->byMonthDay;
 
 		if(!is_null($this->byMonth))
-			$calParts['mon'] = $this->byHour;
+			$calParts['mon'] = $this->byMonth;
 
 		$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
 		KalturaLog::debug("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
@@ -481,7 +481,7 @@ class DatesGenerator
 			switch($this->frequency)
 			{
 				case DatesGenerator::MONTHLY:
-					$cal = mktime(0, 0, 0, $d['mon'] + 1, 1, $d['year']);
+					$cal = mktime($d['hours'], $d['minutes'], $d['seconds'], $d['mon'] + $this->interval, 1, $d['year']);
 					break;
 
 				default:
