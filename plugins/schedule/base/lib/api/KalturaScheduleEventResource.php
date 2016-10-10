@@ -85,9 +85,22 @@ class KalturaScheduleEventResource extends KalturaObject implements IRelatedFilt
 	{
 		$this->validatePropertyNotNull('eventId');
 		$this->validatePropertyNotNull('resourceId');
+
+		$c = new Criteria();
+		$c->add(ScheduleEventResourcePeer::RESOURCE_ID, $this->resourceId);
+		$c->add(ScheduleEventResourcePeer::EVENT_ID, $this->eventId);
+		if(ScheduleEventResourcePeer::doCount($c))
+			throw new KalturaAPIException(KalturaErrors::SCHEDULE_EVENT_RESOURCE_ALREADY_EXISTS, $this->eventId, $this->resourceId);
+
+		if (is_null(ScheduleEventPeer::retrieveByPK($this->eventId)))
+			throw new KalturaAPIException(KalturaErrors::SCHEDULE_EVENT_ID_NOT_FOUND, $this->eventId);
+
+		if (is_null(ScheduleResourcePeer::retrieveByPK($this->resourceId)) && $this->resourceId != 0)
+			throw new KalturaAPIException(KalturaErrors::SCHEDULE_RESOURCE_ID_NOT_FOUND, $this->resourceId);
+
 		return parent::validateForInsert($propertiesToSkip);
 	}
-		 
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */

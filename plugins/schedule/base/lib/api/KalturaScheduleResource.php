@@ -135,6 +135,13 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 			if(ScheduleResourcePeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 		}
+
+		if (!$this->isNull('parentId') && $this->parentId != 0 )
+		{
+			$scheduleResource = ScheduleResourcePeer::retrieveByPK($this->parentId);
+			if (is_null($scheduleResource))
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_PARENT_ID_NOT_FOUND, $this->parentId);
+		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -153,6 +160,13 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 			if(ScheduleResourcePeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 		}
+
+		if (!$this->isNull('parentId') && $this->parentId != 0 && $this->parentId != $sourceObject->getId() )
+		{
+			$scheduleResource = ScheduleResourcePeer::retrieveByPK($this->parentId);
+			if (is_null($scheduleResource))
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_PARENT_ID_NOT_FOUND, $this->parentId);
+		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -165,7 +179,7 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 		$object = null;
 	    switch($sourceObject->getType())
 	    {
-	    	case ScheduleResourceType::LOCATION:
+		    case ScheduleResourceType::LOCATION:
 	    		$object = new KalturaLocationScheduleResource();
 	    		break;
 	    		

@@ -27,4 +27,9 @@ class kManifestContributorConfig
 	 * @var string
 	 */
 	public $rendererClass;
+
+	/**
+	 * @var DeliveryProfile
+	 */
+	public $deliveryProfile;
 }

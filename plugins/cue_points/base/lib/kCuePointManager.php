@@ -744,6 +744,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return;
  		}
 
+		if (!CuePointPeer::hasReadyCuePointOnEntry($liveEntryId))
+			return;
+
 		$jobData = new kLiveToVodJobData();
 		$jobData->setVodEntryId($vodEntryId);
 		$jobData->setLiveEntryId($liveEntryId);
@@ -754,7 +757,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
 		return;
  	}
-
 
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
 	{
