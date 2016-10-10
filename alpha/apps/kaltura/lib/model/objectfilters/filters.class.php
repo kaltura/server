@@ -250,23 +250,7 @@ abstract class baseObjectFilter extends myBaseObject
 			return;
 			
 		list ( $field_name , $ascending ) = self::getFieldAndDirection ( $field_name );
-/*
-		if ( $field_name[0] == "-" )
-		{
-			$ascending = false;
-			$field_name = substr ( $field_name , 1 );
-		}
-		elseif ( $field_name[0] == "+" )
-		{
-			$ascending = true;
-			$field_name = substr ( $field_name , 1 );
-		}
-		else
-		{
-			$ascending = true;
-			// column is left as is
-		}
-*/
+
 		$column = $this->getRealFieldNameFromPeer ( $field_name  );
 
 		if ( $ascending )
@@ -774,7 +758,6 @@ abstract class baseObjectFilter extends myBaseObject
 	private function addOrder ( $criteria )
 	{
 		$order_string = $this->fields[self::ORDER];
-
 		if ( empty ( $order_string )) return;
 
 		$order_arr = explode ( "," , $order_string );

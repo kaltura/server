@@ -73,7 +73,8 @@ class ScheduleEventFilter extends baseObjectFilter
 			"updated_at", 
 			"start_date", 
 			"end_date", 
-			"priority", 
+			"priority",
+			"summary",
 		);
 			
 		$this->aliases = array ( 
