@@ -1,3 +1,22 @@
+# Lynx 12.4.0 #
+
+## Support re-generating live stream token##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6211
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	run:
+	 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_10_10_add_regenerate_secure_token_liveStream.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.3.0 #
 
 ## push notifications ##
