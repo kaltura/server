@@ -490,7 +490,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		return $apiEntry;
 	}
 	
-/**
+	/**
 	 *Remove push publish configuration from entry
 	 * 
 	 * @action removeLiveStreamPushPublishConfiguration
@@ -524,5 +524,36 @@ class LiveStreamService extends KalturaLiveEntryService
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
 		$apiEntry->fromObject($entry, $this->getResponseProfile());
 		return $apiEntry;
+	}
+	
+	/**
+	 * Regenerate new secure token for liveStream
+	 * 
+	 * @action regenrateSecureToken
+	 * @param string $entryId Live stream entry id to regenerate secure token for
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @validateUser entry entryId edit
+	 */
+	public function regenrateSecureTokenAction($entryId)
+	{
+		$this->dumpApiRequest($entryId);
+	
+		$liveEntry = entryPeer::retrieveByPK($entryId);
+		if (!$liveEntry || $liveEntry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+		
+		$password = sha1(md5(uniqid(rand(), true)));
+		$password = substr($password, rand(0, strlen($password) - 8), 8);
+		$liveEntry->setStreamPassword($password);
+		
+		$broadcastUrlManager = kBroadcastUrlManager::getInstance($liveEntry->getPartnerId());
+		$broadcastUrlManager->setEntryBroadcastingUrls($liveEntry);
+		
+		$liveEntry->save();
+	
+		$entry = KalturaEntryFactory::getInstanceByType($liveEntry->getType());
+		$entry->fromObject($liveEntry, $this->getResponseProfile());
+		return $entry;
 	}
 }
