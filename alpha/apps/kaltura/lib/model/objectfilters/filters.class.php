@@ -758,9 +758,7 @@ abstract class baseObjectFilter extends myBaseObject
 	private function addOrder ( $criteria )
 	{
 		$order_string = $this->fields[self::ORDER];
-		KalturaLog::info('asdfg - before check empy string');
 		if ( empty ( $order_string )) return;
-		KalturaLog::info('found str order: ' .$order_string);
 
 		$order_arr = explode ( "," , $order_string );
 		foreach ( $order_arr as $order )
@@ -771,8 +769,6 @@ abstract class baseObjectFilter extends myBaseObject
 			list ( $field_name , $ascending ) = self::getFieldAndDirection ( $order );
 			if ( in_array ( $field_name , $this->allowed_order_fields ) )
 			{
-				KalturaLog::info('qwer');
-				KalturaLog::info("getting $order in order");
 				$this->addOrderToCriteria( $criteria , $order );
 			}
 		}
