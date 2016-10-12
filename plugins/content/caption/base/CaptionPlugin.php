@@ -8,7 +8,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	const PLUGIN_NAME = 'caption';
 	const KS_PRIVILEGE_CAPTION = 'caption';
 
-	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager'; 
+	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
+
+       const URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -436,7 +438,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$secret = $partner->getSecret();
 		$privileges = self::KS_PRIVILEGE_CAPTION.":".$captionAsset->getEntryId();
        	$privileges .= "," . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ":" . $captionAsset->getEntryId();
-        	$privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/' . '*';
+        	$privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . self::URL_PREFIX . '*';
 		$ksStr = '';
 		
 		kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privileges);
@@ -494,7 +496,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							$ksStr = '/ks/' . self::generateKsForCaptionServe($captionAsset);
 						}
 
-						$captionAssetObj['url'] = $cdnHost . '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT' .
+						$captionAssetObj['url'] = $cdnHost . self::URL_PREFIX .
 							'/captionAssetId/' . $captionAsset->getId() . $ksStr . $versionStr . '/a.m3u8';
 					}
 					$label = $captionAsset->getLabel();
