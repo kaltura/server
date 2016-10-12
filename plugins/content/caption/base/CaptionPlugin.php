@@ -479,6 +479,11 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					{
 						if (!PermissionPeer::isValidForPartner(CaptionPermissionName::FEATURE_GENERATE_WEBVTT_CAPTIONS, $captionAsset->getPartnerId()))
 							continue;
+						
+						$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+						$fs = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
+						if (reset($fs) === null)
+							continue;
 
 						$cdnHost = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
 
