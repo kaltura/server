@@ -474,7 +474,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$captionAssetObj = array();
 
 					if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)
-						$captionAssetObj['url'] = $captionAsset->getExternalUrl($config->storageId);    // Currently only external caption assets are supported
+					{
+						// pass null as storageId in order to support any storage profile and not the one selected by the current video flavors
+						$captionAssetObj['url'] = $captionAsset->getExternalUrl(null);    // Currently only external caption assets are supported
+					}
 					else
 					{
 						if (!PermissionPeer::isValidForPartner(CaptionPermissionName::FEATURE_GENERATE_WEBVTT_CAPTIONS, $captionAsset->getPartnerId()))
