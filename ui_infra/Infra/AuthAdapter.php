@@ -12,6 +12,8 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     const USER_WRONG_PASSWORD = 'USER_WRONG_PASSWORD';
     
     const USER_NOT_FOUND = 'USER_NOT_FOUND';
+	
+	const X_KALTURA_REMOTE_ADDR = 'X-KALTURA-REMOTE-ADDR';
     
 	/**
 	 * @var string
@@ -165,7 +167,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 
 	protected function constructXRemoteAddrHeader ($remoteIp, $time, $uniqueId, $salt)
 	{
-		return "X_KALTURA_REMOTE_ADDR:$remoteIp,$time,$uniqueId," . md5("$remoteIp,$time,$uniqueId,$salt");	
+		return self::X_KALTURA_REMOTE_ADDR . ":$remoteIp,$time,$uniqueId," . md5("$remoteIp,$time,$uniqueId,$salt");	
 	}
 
 }

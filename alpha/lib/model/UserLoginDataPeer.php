@@ -419,11 +419,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		//Check if the user's ip address is in the right range to ignore the otp
 		
-		if ($partnerId && $partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID
-			&& kConf::hasParam ('admin_console_partner_otp_internal_ips'))
+		if(kConf::hasParam ('otp_required_partners') && 
+			in_array ($partnerId, kConf::hasParam ('otp_required_partners')) &&
+			kConf::hasParam ('partner_otp_internal_ips'))
 		{
 			$otpRequired = true;
-			$ipRanges = explode(',', kConf::get('admin_console_partner_otp_internal_ips'));
+			$ipRanges = explode(',', kConf::get('partner_otp_internal_ips'));
 			foreach ($ipRanges as $curRange)
 			{
 				if (kIpAddressUtils::isIpInRange(infraRequestUtils::getRemoteAddress(), $curRange))
@@ -436,8 +437,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			if ($otpRequired)
 			{
 				// add google authenticator library to include path
-				set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
-				require_once 'GoogleAuthenticator.php';
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 				
 				$result = GoogleAuthenticator::verifyCode ($loginData->getSeedFor2FactorAuth(), $otp);
 				if (!$result)
@@ -598,8 +598,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			{
 				// add google authenticator library to include path
-				set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
-				require_once 'GoogleAuthenticator.php';
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 				//generate a new secret for user's admin console logins
 				$seed = GoogleAuthenticator::createSecret();
 				$loginData->setSeedFor2FactorAuth($seed);
@@ -621,8 +620,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			{
 				// add google authenticator library to include path
-				set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
-				require_once 'GoogleAuthenticator.php';
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 				//generate a new secret for user's admin console logins
 				$existingData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
 			}
