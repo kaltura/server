@@ -220,25 +220,25 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	 */
 	public function validateEndTime(CuePoint $cuePoint = null)
 	{
-        //setting params or default if null
+		//setting params or default if null
 		if(is_null($this->startTime) && $cuePoint && $cuePoint->getStartTime())
 			$this->startTime = $cuePoint->getStartTime();
-			
+
 		if(is_null($this->triggeredAt) && $cuePoint && $cuePoint->getTriggeredAt())
 			$this->triggeredAt = $cuePoint->getTriggeredAt();
 
-        if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
-            $this->endTime = $this->startTime;
+		if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
+			$this->endTime = $this->startTime;
 
-        if ($this->isNull('duration') && (!$cuePoint || is_null($cuePoint->getDuration())))
-            $this->duration = 0;
+		if ($this->isNull('duration') && (!$cuePoint || is_null($cuePoint->getDuration())))
+			$this->duration = 0;
 
         //validate end time
-        if(!is_null($this->endTime) && $this->endTime < $this->startTime)
-            throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
+		if(!is_null($this->endTime) && $this->endTime < $this->startTime)
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
 
-        if($this->duration && $this->duration < 0)
-            throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
+		if($this->duration && $this->duration < 0)
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
 		
 		if($cuePoint)
 		{
@@ -268,11 +268,11 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	 */
 	public function validateStartTime($cuePointId = null)
 	{
-        if ($this->startTime === null) {
-            if(!$this->isNull('duration') || !$this->isNull('endTime'))
-                throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
-            $this->startTime = 0;
-        }
+		if ($this->startTime === null) {
+			if(!$this->isNull('duration') || !$this->isNull('endTime'))
+				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
+			$this->startTime = 0;
+		}
 		
 		if($this->startTime < 0)
 			throw new KalturaAPIException(KalturaCuePointErrors::START_TIME_CANNOT_BE_LESS_THAN_0);
