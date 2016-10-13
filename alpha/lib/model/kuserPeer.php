@@ -582,10 +582,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // If new user is admin console user
 		{
 			// add google authenticator library to include path
-			set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
-			require_once 'GoogleAuthenticator.php';
+			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 			
-			$qrCodeLink = str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl (kConf::get ('www_host') . 'admin console', $user->getLoginData()->getSeedFor2FactorAuth()));
+			//QR code link might contain the '|' character used as a separator by the mailer job dispatcher. 
+			$qrCodeLink = str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl (kConf::get ('www_host') . ' admin console', $user->getLoginData()->getSeedFor2FactorAuth()));
 			
 			if ($existingUser)
 			{
