@@ -197,6 +197,14 @@ class kContextDataHelper
 			$mediaEntryId = $mediaEntry->getId();
 			$this->msDuration = array_sum($durations);
 		}
+		elseif ($this->shouldServeVodFromLive())
+		{
+			$mediaEntryId = $this->entry->getRootEntryId();
+			if($mediaEntryId)
+				$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
+			
+			$this->msDuration = ($liveEntry && $liveEntry->getLengthInMsecs()) ? $liveEntry->getLengthInMsecs() : 300000;
+		}
 		else
 		{
 			$mediaEntryId = $this->entry->getId();
@@ -248,6 +256,13 @@ class kContextDataHelper
 				$flavorAssets[] = $this->asset;
 		}
 		$this->filterFlavorAssetsByTags($flavorAssets, $flavorTags);
+		
+		//If serving vod from live use live entry to select the correct playback protocols
+		if($this->shouldServeVodFromLive())
+		{
+			$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
+			$this->entry = $liveEntry;
+		}
 	}
 	
 	private function isFlavorAllowed($flavorParamsId, array $flavorParamsIds, $flavorParamsNotIn)
@@ -410,7 +425,6 @@ class kContextDataHelper
 			$this->streamerType = $pluginInstance->getContextDataStreamerType($scope, $flavorTags, $this->streamerType);
 			$this->mediaProtocol = $pluginInstance->getContextDataMediaProtocol($scope, $flavorTags, $this->streamerType, $this->mediaProtocol);
 		}
-		
 	}
 	
 	private function selectDeliveryTypeForAuto()
@@ -458,5 +472,14 @@ class kContextDataHelper
 			$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	
 		}
 		return $deliveryType;
+	}
+	
+	private function shouldServeVodFromLive()
+	{
+		$typeMatch = $this->entry->getType() == entryType::MEDIA_CLIP;
+		$sourceMatch = $this->entry->getSource() == EntrySourceType::RECORDED_LIVE;
+		$statusMatch = $this->entry->getStatus() === entryStatus::PENDING;
+		
+		return $typeMatch && $sourceMatch && $statusMatch;
 	}
 }

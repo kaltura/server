@@ -405,23 +405,41 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->validateMediaServers();
 	}
 	
-	function setRecordedContent($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
+	function setRecordedContent($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
 	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
+		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$dbAsset = assetPeer::retrieveById($assetId);
-		if (!$dbAsset || !($dbAsset instanceof liveAsset))
-			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
+		if($mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)
+		{
+			$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
+			return $entry->fromObject($dbLiveEntry, $this->getResponseProfile());
+		}
 		
-		if(!$dbEntry->getRecordedEntryId())
-			$this->createRecordedEntry($dbEntry, $mediaServerIndex);
+		if(!$dbLiveEntry->getRecordedEntryId())
+			$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
 		
-		$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+		$recordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
+		if(!$recordedEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbLiveEntry->getRecordedEntryId());
+		
+		$currentDuration = $dbLiveEntry->getLengthInMsecs();
+		$dbLiveEntry->setLengthInMsecs($currentDuration + $duration);
+		$dbLiveEntry->save();
 		
 		$service = new MediaService();
-		$service->initService('media', 'media', $this->actionName);
-		return $service->updateContentAction($recordedEntry->getId(), $resource);
+		if($recordedEntry->getStatus() == entryStatus::PENDING)
+		{
+			$service->initService('media', 'media', 'addContent');
+			$entry = $service->addContentAction($recordedEntry->getId(), $resource);	
+		}
+		else
+		{
+			$service->initService('media', 'media', 'updateContent');
+			$entry = $service->updateContentAction($recordedEntry->getId(), $resource);
+		}
+		
+		return $entry;
 	}
 }

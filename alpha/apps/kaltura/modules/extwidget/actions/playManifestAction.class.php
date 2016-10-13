@@ -238,7 +238,7 @@ class playManifestAction extends kalturaAction
 		//check if recorded entry is ready if not than serve the live entry
 		if($this->entry->getSource() === EntrySourceType::RECORDED_LIVE && $this->entry->getStatus() !== entryStatus::READY)
 		{
-			$this->deliveryAttributes->setServeLiveAsVod(true);
+			$this->deliveryAttributes->setServeVodFromLive(true);
 			$this->deliveryAttributes->setServeLiveAsVodEntryId($this->entryId);
 			$this->entryId = $this->entry->getRootEntryId();
 			$this->entry = entryPeer::retrieveByPK($this->entryId);
@@ -921,7 +921,7 @@ class playManifestAction extends kalturaAction
 	{
 		$this->initFlavorParamsIds();
 
-		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes) && !$this->deliveryAttributes->getServeLiveAsVod())
+		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes) && !$this->deliveryAttributes->getServeVodFromLive())
  		{
  			if (!$this->entry->hasMediaServer())
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
