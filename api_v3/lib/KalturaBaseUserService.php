@@ -147,6 +147,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param int $partnerId
 	 * @param int $expiry
 	 * @param string $privileges
+	 * @param string $otp
 	 * 
 	 * @return string KS
 	 *
@@ -158,7 +159,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 */		
-	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*')
+	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
 		KalturaResponseCacher::disableCache();
 		myPartnerUtils::resetPartnerFilter('kuser');
@@ -175,7 +176,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		
 		try {
 			if ($loginEmail) {
-				$user = UserLoginDataPeer::userLoginByEmail($loginEmail, $password, $partnerId);
+				$user = UserLoginDataPeer::userLoginByEmail($loginEmail, $password, $partnerId, $otp);
 			}
 			else {
 				$user = kuserPeer::userLogin($puserId, $password, $partnerId);
@@ -203,7 +204,11 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			else if ($code == kUserException::USER_IS_BLOCKED) {
 				throw new KalturaAPIException(KalturaErrors::USER_IS_BLOCKED);
-			}						
+			}
+			else if ($code == kUserException::INVALID_OTP) {
+				throw new KalturaAPIException(KalturaErrors::INVALID_OTP);
+			}
+									
 			throw new $e;
 		}
 		if (!$user) {

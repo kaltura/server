@@ -12,6 +12,8 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     const USER_WRONG_PASSWORD = 'USER_WRONG_PASSWORD';
     
     const USER_NOT_FOUND = 'USER_NOT_FOUND';
+	
+	const X_KALTURA_REMOTE_ADDR = 'X-KALTURA-REMOTE-ADDR';
     
 	/**
 	 * @var string
@@ -22,6 +24,11 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	 * @var string
 	 */
 	protected $password;
+	
+	/**
+	 * @var string 
+	 */
+	protected $otp;
 	
 	/**
 	 * @var int
@@ -46,10 +53,11 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	/**
 	 * Sets username and password for authentication
 	 */
-	public function setCredentials($username, $password = null)
+	public function setCredentials($username, $password = null, $otp = null)
 	{
 		$this->username = $username;
 		$this->password = $password;
+		$this->otp = $otp;
 	}
 	
 	/**
@@ -121,12 +129,15 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		
 		$client = Infra_ClientHelper::getClient();
 		$client->setKs(null);
+		$config = $client->getConfig();
+		$config->requestHeaders[] = $this->constructXRemoteAddrHeader($_SERVER['REMOTE_ADDR'], time(), 'admin_console', $settings->remoteAddrHeaderSalt);
+		$client->setConfig($config);
 		
 		try
 		{
 			if ($this->partnerId)
 			{
-			    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId, null, $this->privileges);
+			    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId, null, $this->privileges, $this->otp);
 	    		$client->setKs($ks);
 	    		$user = $client->user->getByLoginId($this->username, $this->partnerId);
 	    		$identity = $this->getUserIdentity($user, $ks, $this->partnerId);
@@ -134,7 +145,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			}
 			
 		    if (!$this->ks)
-    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId, null, $this->privileges);
+    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId, null, $this->privileges, $this->otp);
     		$client->setKs($this->ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
     		$identity = $this->getUserIdentity($user, $this->ks, $user->partnerId);
@@ -152,6 +163,11 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			else
 				throw $ex;
 		}
+	}
+
+	protected function constructXRemoteAddrHeader ($remoteIp, $time, $uniqueId, $salt)
+	{
+		return self::X_KALTURA_REMOTE_ADDR . ":$remoteIp,$time,$uniqueId," . md5("$remoteIp,$time,$uniqueId,$salt");	
 	}
 
 }
