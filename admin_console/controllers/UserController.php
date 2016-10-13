@@ -155,9 +155,7 @@ class UserController extends Zend_Controller_Action
 
 			$safeEmailFieldValue = strip_Tags($request->getPost('email')); // Strip HTML Tags to prevent a potential XSS attack
 			$passwordFieldValue = $request->getPost('password'); // DO NOT strip 'password' HTML Tags in order not to invalidate passwords (e.g. "<b>BoldPassword</b>")
-			$otpFieldValue = $request->getPost ('otp'); //one-time password - might not be provided.
-			
-			$adapter->setCredentials($safeEmailFieldValue, $passwordFieldValue, $otpFieldValue);
+			$adapter->setCredentials($safeEmailFieldValue, $passwordFieldValue);
 			$loginForm->getElement('email')->setValue( $safeEmailFieldValue ); // Update the "safe" value onto the form
 
 			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
@@ -330,7 +328,7 @@ class UserController extends Zend_Controller_Action
 					$request->getPost('new_password')
 				);
 				
-				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Infra_ClientHelper::getPartnerId(), null, null, null);
+				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Infra_ClientHelper::getPartnerId());
 				$client->setKs($ks);
 				$user = $client->user->getByLoginId($request->getPost('email_address'), Infra_ClientHelper::getPartnerId());
 				if ($user->partnerId != Infra_ClientHelper::getPartnerId()) {
