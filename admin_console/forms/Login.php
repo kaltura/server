@@ -34,19 +34,6 @@ class Form_Login extends Infra_Form
 			)
 		));
 		
-		$this->addElement('password', 'otp', array(
-			'label'	  => 'Authenticator Code:',
-			'required'   => true,
-			'autocomplete' => 'off',
-			'filters'	=> array('StringTrim'),
-			'validators' => array(),
-			'decorators' => array(
-				'ViewHelper',
-				'Label',
-				array('HtmlTag', array('tag' => 'div', 'class' => 'item')) 
-			)
-		));
-		
 		$this->addElement('checkbox', 'remember_me', array(
 			'label'	  => 'Remember Me?',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
