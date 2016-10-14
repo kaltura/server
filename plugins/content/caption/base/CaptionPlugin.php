@@ -474,7 +474,36 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$captionAssetObj = array();
 
 					if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)
-						$captionAssetObj['url'] = $captionAsset->getExternalUrl($config->storageId);    // Currently only external caption assets are supported
+					{
+						// pass null as storageId in order to support any storage profile and not the one selected by the current video flavors
+						$url = $captionAsset->getExternalUrl(null);
+						if (!$url)
+						{
+							$deliveryProfile = $config->deliveryProfile;
+							
+							$url = $deliveryProfile->getAssetUrl($captionAsset, false);
+							$url = preg_replace('/^https?:\/\//', '', $url);
+							$url = ltrim($url, "/");
+							
+							$urlPrefix = $deliveryProfile->getUrl();
+							$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
+							$urlPrefix = $deliveryProfile->getDynamicAttributes()->getMediaProtocol() . '://' . $urlPrefix;
+							$urlPrefix = rtrim($urlPrefix, "/") . "/";
+
+							$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
+							if ($urlPrefixPath && 
+								substr($urlPrefix, -strlen($urlPrefixPath)) == $urlPrefixPath)
+							{
+								$urlPrefix = substr($urlPrefix, 0, -strlen($urlPrefixPath));
+								$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
+							}
+							
+							$captionAssetObj['urlPrefix'] = $urlPrefix;
+							$captionAssetObj['tokenizer'] = $deliveryProfile->getTokenizer();
+						}
+						
+						$captionAssetObj['url'] = $url;
+					}
 					else
 					{
 						if (!PermissionPeer::isValidForPartner(CaptionPermissionName::FEATURE_GENERATE_WEBVTT_CAPTIONS, $captionAsset->getPartnerId()))

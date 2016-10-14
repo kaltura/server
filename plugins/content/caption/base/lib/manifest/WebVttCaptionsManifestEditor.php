@@ -22,13 +22,27 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 	{
 		foreach ($this->captions as $captionItem)
 		{
+			$url = $captionItem["url"];
+			$urlPrefix = isset($captionItem["urlPrefix"]) ? $captionItem["urlPrefix"] : null;
+			
+			$tokenizer = isset($captionItem["tokenizer"]) ? $captionItem["tokenizer"] : null;						
+			if ($tokenizer)
+			{
+				$url = $tokenizer->tokenizeSingleUrl($url, $urlPrefix);
+			}
+			
+			if ($urlPrefix)
+			{
+				$url = rtrim($urlPrefix, '/') . '/' . ltrim($url, '/');
+			}
+			
 			$manifestHeader .= "\n";
 			$language = '';
 			if (isset($captionItem["language"]))
 				$language = 'LANGUAGE="' . $captionItem["language"] . '",';
 			$manifestHeader .= '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="' . 
 				$captionItem["label"] . '",DEFAULT='.$captionItem["default"] . 
-				',AUTOSELECT=YES,FORCED=NO,' . $language. 'URI="' . $captionItem["url"] . '"';
+				',AUTOSELECT=YES,FORCED=NO,' . $language. 'URI="' . $url . '"';
 		}
 		
 		return $manifestHeader;
