@@ -442,6 +442,30 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		return $ksStr;
 	}
 
+	static protected function getLocalCaptionUrl($config, asset $captionAsset)
+	{
+		$deliveryProfile = $config->deliveryProfile;
+			
+		$url = $deliveryProfile->getAssetUrl($captionAsset, false);
+		$url = preg_replace('/^https?:\/\//', '', $url);
+		$url = ltrim($url, "/");
+			
+		$urlPrefix = $deliveryProfile->getUrl();
+		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
+		$urlPrefix = $deliveryProfile->getDynamicAttributes()->getMediaProtocol() . '://' . $urlPrefix;
+		$urlPrefix = rtrim($urlPrefix, "/") . "/";
+		
+		$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
+		if ($urlPrefixPath &&
+				substr($urlPrefix, -strlen($urlPrefixPath)) == $urlPrefixPath)
+		{
+			$urlPrefix = substr($urlPrefix, 0, -strlen($urlPrefixPath));
+			$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
+		}
+		
+		return array($urlPrefix, $url);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlayManifestContributor::getManifestEditors()
 	 */
@@ -479,27 +503,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						$url = $captionAsset->getExternalUrl(null);
 						if (!$url)
 						{
-							$deliveryProfile = $config->deliveryProfile;
-							
-							$url = $deliveryProfile->getAssetUrl($captionAsset, false);
-							$url = preg_replace('/^https?:\/\//', '', $url);
-							$url = ltrim($url, "/");
-							
-							$urlPrefix = $deliveryProfile->getUrl();
-							$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
-							$urlPrefix = $deliveryProfile->getDynamicAttributes()->getMediaProtocol() . '://' . $urlPrefix;
-							$urlPrefix = rtrim($urlPrefix, "/") . "/";
-
-							$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
-							if ($urlPrefixPath && 
-								substr($urlPrefix, -strlen($urlPrefixPath)) == $urlPrefixPath)
-							{
-								$urlPrefix = substr($urlPrefix, 0, -strlen($urlPrefixPath));
-								$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
-							}
+							list($urlPrefix, $url) = self::getLocalCaptionUrl($config, $captionAsset);
 							
 							$captionAssetObj['urlPrefix'] = $urlPrefix;
-							$captionAssetObj['tokenizer'] = $deliveryProfile->getTokenizer();
+							$captionAssetObj['tokenizer'] = $config->deliveryProfile->getTokenizer();
 						}
 						
 						$captionAssetObj['url'] = $url;
