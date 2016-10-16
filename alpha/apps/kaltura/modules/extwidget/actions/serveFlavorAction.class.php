@@ -43,9 +43,17 @@ class serveFlavorAction extends kalturaAction
 		if (method_exists($asset, 'getLanguage') && $asset->getLanguage())
 		{
 			$language = languageCodeManager::getObjectFromKalturaName($asset->getLanguage());
-			if ($language[1] && $language[1] != 'und')
+			$language = $language[1];
+			
+			// map enu / enb to eng, since these are not supported by the packager 
+			if ($language == 'enu' || $language == 'enb')
 			{
-				$sequence['language'] = $language[1];		// ISO639_T
+				$language = 'eng';
+			} 
+			
+			if ($language && $language != 'und')
+			{
+				$sequence['language'] = $language;		// ISO639_T
 			}
 		}
 
