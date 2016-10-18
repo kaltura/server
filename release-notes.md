@@ -1,6 +1,6 @@
-# Lynx 12.4.0#  
+# Lynx 12.4.0 # 
  
-## 2-Factor Admin Console Authentication ##
+## 2-Factor Admin Console Authentication ## 
 - Issue Type: New Feature 
 - Issue ID: PLAT-6125 
 
