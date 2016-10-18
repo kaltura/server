@@ -1,4 +1,16 @@
-# Lynx 12.4.0 #
+# Lynx 12.4.0 # 
+ 
+## 2-Factor Admin Console Authentication ## 
+- Issue Type: New Feature 
+- Issue ID: PLAT-6125 
+
+### Configuration ### 
+- Mandatory: in admin.ini, set settings.remoteAddrHeaderSalt to the same value as remote_addr_header_salt in local.ini
+- In local.ini add the following parameters: 
+    partner_otp_internal_ips = @IP_RANGE@ 
+	otp_required_partners[] = -2 
+
+
 ## Enable sort by summary for schedule events##
  - Issue Type: New Feature
  - Issue ID: PLAT-6164
