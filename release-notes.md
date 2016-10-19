@@ -1,5 +1,11 @@
 # Lynx 12.4.0 #
 
+## Allow Play Server to Run Flavor Asset List ##
+- Issue Type: Privileges
+
+### Deployment scripts ###
+- Run 'php deployment/updates/scripts/add_permissions/2016_10_18_update_play_server_list_flavor_asset_service_permission.php'
+
 ## 2-Factor Admin Console Authentication ##
 - Issue Type: New Feature 
 - Issue ID: PLAT-6125 
@@ -22,7 +28,7 @@
 
 ### Deployment scripts ###
  - Reindex sphinx and re-populate schedule-event
- - Run 'php deployment/updates/scripts/add_permissions/2016_10_18_update_play_server_list_flavor_asset_service_permission.php'
+ 
 #### Known Issues & Limitations ####
 None.
 
