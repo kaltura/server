@@ -623,6 +623,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 				//generate a new secret for user's admin console logins
 				$existingData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+				$existingData->save();
 			}
 			
 						
