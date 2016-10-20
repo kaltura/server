@@ -529,13 +529,13 @@ class LiveStreamService extends KalturaLiveEntryService
 	/**
 	 * Regenerate new secure token for liveStream
 	 * 
-	 * @action regenrateSecureToken
+	 * @action regenrateStreamToken
 	 * @param string $entryId Live stream entry id to regenerate secure token for
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @validateUser entry entryId edit
 	 */
-	public function regenrateSecureTokenAction($entryId)
+	public function regenrateStreamTokenAction($entryId)
 	{
 		$this->dumpApiRequest($entryId);
 	
