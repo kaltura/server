@@ -23,6 +23,9 @@ abstract class KalturaBusinessProcessServerBaseFilter extends KalturaFilter
 		"statusNotIn" => "_notin_status",
 		"typeEqual" => "_eq_type",
 		"typeIn" => "_in_type",
+		"dcEqual" => "_eq_dc",
+		"dcLessThenOrNull" => "_ltornull_dc",
+		"dcGreaterThenOrNull" => "_gtornull_dc",
 	);
 
 	static private $order_by_map = array
@@ -120,4 +123,19 @@ abstract class KalturaBusinessProcessServerBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $typeIn;
+
+	/**
+	 * @var int
+	 */
+	public $dcEqual;
+
+	/**
+	 * @var int
+	 */
+	public $dcLessThenOrNull;
+
+	/**
+	 * @var int
+	 */
+	public $dcGreaterThenOrNull;
 }

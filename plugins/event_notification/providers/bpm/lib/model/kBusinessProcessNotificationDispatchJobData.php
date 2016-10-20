@@ -86,7 +86,7 @@ class kBusinessProcessNotificationDispatchJobData extends kEventNotificationDisp
 	 */
 	public function getServer()
 	{
-		return BusinessProcessServerPeer::retrieveByPK($this->serverId);
+		return BusinessProcessServerPeer::retrieveByPkOrCurrentDc($this->serverId);
 	}
 
 	/**

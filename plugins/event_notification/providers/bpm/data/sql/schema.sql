@@ -22,6 +22,7 @@ CREATE TABLE business_process_server
 	status TINYINT,
 	type INTEGER,
 	custom_data TEXT,
+	dc INTEGER ,
 	PRIMARY KEY (id)
 )Type=InnoDB;
 

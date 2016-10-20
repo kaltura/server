@@ -104,6 +104,12 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	 * @var        array
 	 */
 	protected $oldColumnsValues = array();
+
+	/**
+	 * The dc of the server
+	 * @var int
+	 */
+	protected $dc;
 	
 	/**
 	 * @return array
@@ -282,6 +288,15 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [dc] column value.
+	 * @return int
+	 */
+	public function getDc()
+	{
+		return $this->dc;
 	}
 
 	/**
@@ -564,6 +579,28 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	} // setCustomData()
 
 	/**
+	 * Set the value of [dc] column.
+	 * @param $v
+	 * @return $this
+	 */
+	public function setDc($v)
+	{
+		if(!isset($this->oldColumnsValues[BusinessProcessServerPeer::DC]))
+			$this->oldColumnsValues[BusinessProcessServerPeer::DC] = $this->dc;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->dc !== $v) {
+			$this->dc = $v;
+			$this->modifiedColumns[] = BusinessProcessServerPeer::DC;
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -605,6 +642,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->dc = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -614,7 +652,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = BusinessProcessServerPeer::NUM_COLUMNS - BusinessProcessServerPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = BusinessProcessServerPeer::NUM_COLUMNS - BusinessProcessServerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BusinessProcessServer object", $e);
@@ -1136,6 +1174,8 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			case 9:
 				return $this->getCustomData();
 				break;
+			case 10:
+				return $this->getDc();
 			default:
 				return null;
 				break;
@@ -1167,6 +1207,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			$keys[7] => $this->getStatus(),
 			$keys[8] => $this->getType(),
 			$keys[9] => $this->getCustomData(),
+			$keys[10] => $this->getDc(),
 		);
 		return $result;
 	}
@@ -1228,6 +1269,9 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			case 9:
 				$this->setCustomData($value);
 				break;
+			case 10:
+				$this->setDc($value);
+				break;
 		} // switch()
 	}
 
@@ -1262,6 +1306,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setType($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setDc($arr[$keys[10]]);
 	}
 
 	/**
@@ -1283,6 +1328,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 		if ($this->isColumnModified(BusinessProcessServerPeer::STATUS)) $criteria->add(BusinessProcessServerPeer::STATUS, $this->status);
 		if ($this->isColumnModified(BusinessProcessServerPeer::TYPE)) $criteria->add(BusinessProcessServerPeer::TYPE, $this->type);
 		if ($this->isColumnModified(BusinessProcessServerPeer::CUSTOM_DATA)) $criteria->add(BusinessProcessServerPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(BusinessProcessServerPeer::DC)) $criteria->add(BusinessProcessServerPeer::DC, $this->dc);
 
 		return $criteria;
 	}
@@ -1379,6 +1425,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 
 		$copyObj->setCustomData($this->custom_data);
 
+		$copyObj->setDc($this->dc);
 
 		$copyObj->setNew(true);
 
