@@ -177,8 +177,8 @@ class myPartnerRegistration
 	 */
 	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $newPartner = null, $templatePartnerId = null )
 	{
-		$secret = sha1(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
-		$admin_secret = sha1(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
+		$secret = sha1(mcrypt_create_iv(24,MCRYPT_DEV_URANDOM));
+		$admin_secret = sha1(mcrypt_create_iv(24,MCRYPT_DEV_URANDOM));
 
 		if (!$newPartner)
 			$newPartner = new Partner();
