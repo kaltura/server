@@ -695,6 +695,10 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 							array("/dev/zero"), 
 							$cmdLine);	
 		}
+		if (empty($cmdLine))
+		{
+			throw new KalturaAPIException("Using the given parameters could not find valid transcoding command for flavor.");
+		}
 		return $cmdLine;
 	}
 }
