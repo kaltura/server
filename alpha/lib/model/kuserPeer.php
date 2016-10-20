@@ -585,7 +585,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 			
 			//QR code link might contain the '|' character used as a separator by the mailer job dispatcher. 
-			$qrCodeLink = str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl (kConf::get ('www_host') . ' admin console', $user->getLoginData()->getSeedFor2FactorAuth()));
+			$qrCodeLink = str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl ($user->getPuserId() . ' ' . kConf::get ('www_host') . ' KAC', $user->getLoginData()->getSeedFor2FactorAuth()));
 			
 			if ($existingUser)
 			{
