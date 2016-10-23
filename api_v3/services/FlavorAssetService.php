@@ -954,7 +954,10 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $assetId);
 
 		$cmdLine = kBusinessConvertDL::generateAdStitchingCmdline($flavorParamsDb, $flavorParamsOutputDb, $ffprobeJson, $duration);
-
+		if (empty($cmdLine))
+		{
+			throw new KalturaAPIException(KalturaErrors::GENERATE_TRANSCODING_COMMAND_FAIL, $assetId, $ffprobeJson);
+		}
 		return $cmdLine;
 	}
 }
