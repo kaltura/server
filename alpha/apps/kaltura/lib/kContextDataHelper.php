@@ -197,7 +197,7 @@ class kContextDataHelper
 			$mediaEntryId = $mediaEntry->getId();
 			$this->msDuration = array_sum($durations);
 		}
-		elseif ($this->shouldServeVodFromLive())
+		elseif (myEntryUtils::shouldServeVodFromLive($this->entry))
 		{
 			$mediaEntryId = $this->entry->getRootEntryId();
 			if($mediaEntryId)
@@ -258,7 +258,7 @@ class kContextDataHelper
 		$this->filterFlavorAssetsByTags($flavorAssets, $flavorTags);
 		
 		//If serving vod from live use live entry to select the correct playback protocols
-		if($this->shouldServeVodFromLive())
+		if(myEntryUtils::shouldServeVodFromLive($this->entry))
 		{
 			$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
 			$this->entry = $liveEntry;
@@ -472,14 +472,5 @@ class kContextDataHelper
 			$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	
 		}
 		return $deliveryType;
-	}
-	
-	private function shouldServeVodFromLive()
-	{
-		$typeMatch = $this->entry->getType() == entryType::MEDIA_CLIP;
-		$sourceMatch = $this->entry->getSource() == EntrySourceType::RECORDED_LIVE;
-		$statusMatch = $this->entry->getStatus() === entryStatus::PENDING;
-		
-		return $typeMatch && $sourceMatch && $statusMatch;
 	}
 }

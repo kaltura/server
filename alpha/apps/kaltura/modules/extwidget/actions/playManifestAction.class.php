@@ -236,12 +236,14 @@ class playManifestAction extends kalturaAction
 			$this->forceUrlTokenization = true;
 		
 		//check if recorded entry is ready if not than serve the live entry
-		if($this->entry->getSource() === EntrySourceType::RECORDED_LIVE && $this->entry->getStatus() !== entryStatus::READY)
+		if(myEntryUtils::shouldServeVodFromLive($this->entry))
 		{
 			$this->deliveryAttributes->setServeVodFromLive(true);
 			$this->deliveryAttributes->setServeLiveAsVodEntryId($this->entryId);
 			$this->entryId = $this->entry->getRootEntryId();
 			$this->entry = entryPeer::retrieveByPK($this->entryId);
+			if (!$this->entry || $this->entry->getStatus() == entryStatus::DELETED)
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 	}
 	

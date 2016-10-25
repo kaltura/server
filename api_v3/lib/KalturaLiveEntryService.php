@@ -93,7 +93,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($filename, kConf::get('content_group'));
 			chmod($filename, 0640);
 		}
-
+		
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
@@ -108,7 +108,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 
 		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
-
+		
 		if($mediaServerIndex ==EntryServerNodeType::LIVE_PRIMARY)
 		{
 			if(!$dbEntry->getRecordedEntryId())
@@ -119,6 +119,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if($recordedEntry)
 			{
+				if($recordedEntry->getSourceType() !== EntrySourceType::RECORDED_LIVE)
+				{
+					$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+					$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+					$recordedEntry->save();
+				}
 				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
 			}
 		}
@@ -303,14 +309,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setRootEntryId($dbEntry->getId());
 			$recordedEntry->setName($recordedEntryName);
 			$recordedEntry->setDescription($dbEntry->getDescription());
-			$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+			$recordedEntry->setSourceType(EntrySourceType::KALTURA_RECORDED_LIVE);
 			$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
-			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 			$recordedEntry->setKuserId($dbEntry->getKuserId());
 			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
+			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
@@ -405,7 +411,19 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->validateMediaServers();
 	}
 	
-	function setRecordedContent($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
+	/**
+	 * Sey recorded video to live entry
+	 *
+	 * @action setRecordedContent
+	 * @param string $entryId Live entry id
+	 * @param KalturaEntryServerNodeType $mediaServerIndex
+	 * @param KalturaDataCenterContentResource $resource
+	 * @param float $duration in seconds
+	 * @return KalturaLiveEntry The updated live entry
+	 *
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $recordingDuration)
 	{
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
@@ -414,7 +432,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)
 		{
 			$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
-			return $entry->fromObject($dbLiveEntry, $this->getResponseProfile());
+			$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
+			return $entry;
 		}
 		
 		if(!$dbLiveEntry->getRecordedEntryId())
@@ -424,8 +443,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if(!$recordedEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbLiveEntry->getRecordedEntryId());
 		
-		$currentDuration = $dbLiveEntry->getLengthInMsecs();
-		$dbLiveEntry->setLengthInMsecs($currentDuration + $duration);
+		$recordingDuration = (int)($recordingDuration * 1000);
+		
+		$recordedEntry->setLengthInMsecs($recordingDuration);
+		$recordedEntry->save();
+		
+		$dbLiveEntry->setLengthInMsecs($recordingDuration);
 		$dbLiveEntry->save();
 		
 		$service = new MediaService();

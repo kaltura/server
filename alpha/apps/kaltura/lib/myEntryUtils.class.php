@@ -1484,6 +1484,18 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
 		$recordedEntry->save();
 	}
+	
+	/*
+	 * Check if recorded entry should be served from live
+	 */
+	public static function shouldServeVodFromLive(entry $entry)
+	{
+		$typeMatch = $entry->getType() == entryType::MEDIA_CLIP;
+		$sourceMatch = $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
+		$statusMatch = $entry->getStatus() == entryStatus::PENDING;
+		
+		return $typeMatch && $sourceMatch && $statusMatch;
+	}
 
 	public static function isEntryReady($entryId)
 	{
