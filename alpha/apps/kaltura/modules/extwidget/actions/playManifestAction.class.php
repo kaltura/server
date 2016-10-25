@@ -490,16 +490,6 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
-	private function addAltAudioTag()
-	{
-		$tags = $this->deliveryAttributes->getTags();
-		foreach ($tags as &$tagsFallback)
-		{
-			$tagsFallback[] = assetParams::TAG_ALT_AUDIO;
-		}
-		$this->deliveryAttributes->setTags($tags);
-	}
-
 	protected function initPlaylistFlavorAssetArray()
 	{
 		list($entryIds, $durations, $mediaEntry) =
@@ -518,9 +508,9 @@ class playManifestAction extends kalturaAction
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 		{
-			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
-				$this->addAltAudioTag();
 			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
 		$this->deliveryAttributes->setStorageId(null);
@@ -600,9 +590,9 @@ class playManifestAction extends kalturaAction
 
 		if ($flavorByTags)
 		{
-			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
-				$this->addAltAudioTag();
 			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
 		$flavorAssets = $filteredFlavorAssets;
