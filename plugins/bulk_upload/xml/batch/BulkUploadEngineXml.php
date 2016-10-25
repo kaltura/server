@@ -608,7 +608,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$resource = null;
 			}
 		}
-		
+
+		$keepManualThumbnails = false;
+		if(isset($item->keepManualThumbnails) && $item->keepManualThumbnails == 1)
+			$keepManualThumbnails = true;
+
 		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
 		
 		switch($contentAssetsAction)
@@ -619,7 +623,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			case self::$actionsMap[KalturaBulkUploadAction::REPLACE]:
 				list($entry, $nonCriticalErrors) = $this->sendItemReplaceData($entryId, $entry, $resource,
 												  $noParamsFlavorAssets, $noParamsFlavorResources,
-												  $noParamsThumbAssets, $noParamsThumbResources, $pluginReplacementOptions);
+												  $noParamsThumbAssets, $noParamsThumbResources, $pluginReplacementOptions, $keepManualThumbnails);
 				$entryId = $entry->id;
 				break;
 			default :
@@ -674,11 +678,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param array $noParamsFlavorResources - Holds the no flavor params flavor resources
 	 * @param array $noParamsThumbAssets - Holds the no flavor params thumb assets
 	 * @param array $noParamsThumbResources - Holds the no flavor params thumb resources
+	 * @param boolean $keepManualThumbnails - flag to keep thumbnails
 	 * @return $requestResults - the multi request result
 	 */
 	protected function sendItemReplaceData($entryId, KalturaBaseEntry $entry ,KalturaResource $resource = null,
 										array $noParamsFlavorAssets, array $noParamsFlavorResources,
-										array $noParamsThumbAssets, array $noParamsThumbResources, array $pluginReplacementOptions)
+										array $noParamsThumbAssets, array $noParamsThumbResources, array $pluginReplacementOptions, $keepManualThumbnails = false)
 	{
 		
 		KalturaLog::info("Resource is: " . print_r($resource, true));
@@ -708,6 +713,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 			
 			$advancedOptions->pluginOptionItems[] = $replacementObject;
+		}
+		if ($keepManualThumbnails)
+		{
+			if (is_null($advancedOptions))
+				$advancedOptions = new KalturaEntryReplacementOptions();
+			$advancedOptions->keepManualThumbnails = 1;
 		}
 		
 		if($resource)
