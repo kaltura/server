@@ -162,7 +162,21 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		
 		return $scheduleEvent;
 	}
-	
+
+	/**
+	 * @param int $parentId
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveByParentId($parentId)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
+		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
+		return ScheduleEventPeer::doSelect($criteria);
+	}
+
+
+
 	/**
 	 * @param int $parentId
 	 * @param array $dates
@@ -202,10 +216,13 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		{
 			$categories =  categoryPeer::retrieveByPKs(explode(',', $object->getCategoryIds()));
 			$entries =  entryPeer::retrieveByPKs(explode(',', $object->getEntryIds()));
-			
-			$roots = array_merge($categories, $entries);
+			$recurrenceObjects = array();
+			if($object->getRecurrenceType()==ScheduleEventRecurrenceType::RECURRING) {
+				$recurrenceObjects = self::retrieveByParentId($object->getId(), array());
+			}
+			$roots = array_merge($categories, $entries, $recurrenceObjects);
 		}
-		
+
 		return $roots;
 	}
 
