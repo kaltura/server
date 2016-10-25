@@ -163,45 +163,6 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	}
 	
 	/**
-	 * Returns a list of timestamps in the specified period.
-	 * @param int $periodStart the starting timestamp of the period
-	 * @param int $periodEnd the ending timestamp of the period
-	 * @return array
-	 */
-	public function getDates($periodStart = null, $periodEnd = null, $limit = null)
-	{
-		if($this->getRecurrenceType() == ScheduleEventRecurrenceType::NONE)
-		{
-			return array($this->getStartDate(null));
-		}
-		
-		if(!$periodStart)
-		{
-			$periodStart = time();
-		}
-		if(!$periodEnd)
-		{
-			$periodEnd = strtotime('+2 year', $periodStart);
-		}
-		if(!$limit)
-		{
-			$limit = SchedulePlugin::getScheduleEventmaxRecurrences();
-		}
-		
-		$recurrence = $this->getRecurrence();
-		$dates = $recurrence->getDates($periodStart, $this->getStartDate(null), $limit);
-		
-		sort($dates);
-		if(count($dates) > $limit)
-		{
-			$dates = array_slice($dates, 0, $limit);
-		}
-		
-		return $dates;
-	}
-
-
-	/**
 	 * {@inheritDoc}
 	 * @see IIndexable::getIntId()
 	 */
@@ -310,5 +271,16 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 			}
 		}
 		return implode(' ', $system_names);
+	}
+
+	public function getSummary()
+	{
+		if (parent::getSummary())
+			return parent::getSummary();
+		if ($this->parent_id)
+		{
+			$parentObj = ScheduleEventPeer::retrieveByPK($this->parent_id);
+			return $parentObj->getSummary();
+		}
 	}
 } // ScheduleEvent

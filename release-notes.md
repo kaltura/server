@@ -1,3 +1,68 @@
+# Lynx 12.4.0 #
+
+## Allow Play Server to Run Flavor Asset List ##
+- Issue Type: Privileges
+
+### Deployment scripts ###
+- Run 'php deployment/updates/scripts/add_permissions/2016_10_18_update_play_server_list_flavor_asset_service_permission.php'
+
+## 2-Factor Admin Console Authentication ##
+- Issue Type: New Feature 
+- Issue ID: PLAT-6125 
+
+### Configuration ###
+- Mandatory: in admin.ini, set settings.remoteAddrHeaderSalt to the same value as remote_addr_header_salt in local.ini
+- In local.ini add the following parameters:  
+    	partner_otp_internal_ips = @IP_RANGE@  
+	otp_required_partners[] = -2  
+
+
+## Enable sort by summary for schedule events##
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6164
+
+### Configuration ###
+ - update sphinx kaltura.conf:
+	 Add index to kaltura_schedule_event:
+	- rt_attr_string = summary
+
+### Deployment scripts ###
+ - Reindex sphinx and re-populate schedule-event
+ 
+#### Known Issues & Limitations ####
+None.
+
+## Support re-generating live stream token##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6211
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	run:
+	 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_10_10_add_regenerate_secure_token_liveStream.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Lynx 12.3.0 #
+
+## push notifications ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6186
+
+### Configuration ###
+ - update OVP push servers to latest version
+ - add an exchange on each server named "kaltura_exchange"
+
+### Deployment scripts ###
+None.
+
 # Lynx 12.2.0 #
 
 ## http attachment notifications ##

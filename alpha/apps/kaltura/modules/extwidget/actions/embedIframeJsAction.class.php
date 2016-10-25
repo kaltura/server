@@ -63,13 +63,14 @@ class embedIframeJsAction extends sfAction
 			if (!$iframeEmbed)
 				$host = "$protocol://". kConf::get('html5lib_host') ."/";
 			
+			$html5_version = kConf::get('html5_version');
 			if ($ui_conf_html5_url)
 			{
 				$url =  $host . $ui_conf_html5_url;
+				$url = str_replace("{latest}", $html5_version, $url);
 			}
 			else
 			{
-				$html5_version = kConf::get('html5_version');
 				$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
 			}
 		}

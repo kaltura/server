@@ -43,9 +43,17 @@ class serveFlavorAction extends kalturaAction
 		if (method_exists($asset, 'getLanguage') && $asset->getLanguage())
 		{
 			$language = languageCodeManager::getObjectFromKalturaName($asset->getLanguage());
-			if ($language[1] && $language[1] != 'und')
+			$language = $language[1];
+			
+			// map enu / enb to eng, since these are not supported by the packager 
+			if ($language == 'enu' || $language == 'enb')
 			{
-				$sequence['language'] = $language[1];		// ISO639_T
+				$language = 'eng';
+			} 
+			
+			if ($language && $language != 'und')
+			{
+				$sequence['language'] = $language;		// ISO639_T
 			}
 		}
 
@@ -207,11 +215,28 @@ class serveFlavorAction extends kalturaAction
 				{
 					// don't have a flavor for this entry in the desired flavor params, 
 					// choose the one with the closest bitrate
-					$flavor = null;
+					$flavor = reset($groupedFlavors[$entryId]);
 					foreach ($groupedFlavors[$entryId] as $curFlavor)
 					{
-						if (!$flavor ||
-							abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
+						// first priority - matching tags
+						if ($flavor->getTags() == $referenceFlavor->getTags())
+						{
+							if ($curFlavor->getTags() != $referenceFlavor->getTags())
+							{
+								continue;
+							}
+						}
+						else
+						{
+							if ($curFlavor->getTags() == $referenceFlavor->getTags())
+							{
+								$flavor = $curFlavor;
+								continue;
+							}
+						}
+
+						// second priority - bitrate
+						if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
 							abs($flavor->getBitrate() - $referenceFlavor->getBitrate()))
 						{
 							$flavor = $curFlavor;

@@ -148,7 +148,10 @@ class KalturaScheduleEventRecurrence extends KalturaObject
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, 'until / count');
 		}
-		
+
+		if($this->isNull('frequency'))
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'frequency');
+
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	

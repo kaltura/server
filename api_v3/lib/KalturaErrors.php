@@ -88,6 +88,14 @@ class KalturaErrors extends APIErrors
 
 	const SYSTEM_NAME_ALREADY_EXISTS = "SYSTEM_NAME_ALREADY_EXISTS;SYS_NAME;System name [@SYS_NAME@] already exists";
 
+	const SCHEDULE_EVENT_RESOURCE_ALREADY_EXISTS= "SCHEDULE_EVENT_RESOURCE_ALREADY_EXISTS;EVENT_ID,RESOURCE_ID;Schedule event resource already exists with eventId[@EVENT_ID@] and resourceId (@RESOURCE_ID@)";
+
+	const RESOURCE_PARENT_ID_NOT_FOUND = "RESOURCE_PARENT_ID_NOT_FOUND;PARENT_ID;Resource parent id [@PARENT_ID@] not found";
+
+	const SCHEDULE_RESOURCE_ID_NOT_FOUND = "SCHEDULE_RESOURCE_ID_NOT_FOUND;ID;Schedule Resource id [@ID@] not found";
+
+	const SCHEDULE_EVENT_ID_NOT_FOUND = "SCHEDULE_EVENT_ID_NOT_FOUND;ID;Schedule Event id [@ID@] not found";
+
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 	
 	const MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED = "MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED;OBJECT_ID;Max update limit was reached. Object ID \"@OBJECT_ID@\" will not updated with latest chnages";
@@ -637,4 +645,8 @@ class KalturaErrors extends APIErrors
 	const MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE = "MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE;Must filter on entry id or server type";
 	const ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR = "ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR;OBJ_TYPE,ENTRY_SERVER_NODE_ID;There is an error in the DB, object type [@OBJ_TYPE@] of EntryServerNode id [@ENTRY_SERVER_NODE_ID@] is unknown";
 	
+	/*
+	 * OTP error
+	 */
+	const INVALID_OTP = 'INVALID_OTP;OTP provided failed to validate';
 }

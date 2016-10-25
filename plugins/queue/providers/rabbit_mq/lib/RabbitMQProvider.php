@@ -23,6 +23,7 @@ class RabbitMQProvider extends QueueProvider
 	private $curlPort;
 	private $port;
 	private $timeout;
+	private $exchangeName;
 
 	public function __construct(array $rabbitConfig)
 	{
@@ -32,6 +33,7 @@ class RabbitMQProvider extends QueueProvider
 		$this->port = $rabbitConfig['port'];
 		$this->curlPort = $rabbitConfig['curl_port'];
 		$this->timeout = $rabbitConfig['timeout'];
+		$this->exchangeName = kConf::get("push_server_exchange");
 	}
 	
 	/*
@@ -65,7 +67,7 @@ class RabbitMQProvider extends QueueProvider
 		// establish connection to RabbitMQ
 		$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password);
 		$channel = $connection->channel();
-		
+
 		// durable = true to make sure that RabbitMQ will never lose our queue (if RabbitMQ server stops)
 		// exclusive=false to be accessed by other connections
 		// auto-delete the queue after 12hours (43200000 ms)
@@ -92,9 +94,10 @@ class RabbitMQProvider extends QueueProvider
 		$msg = new PhpAmqpLib\Message\AMQPMessage($data, array(
 			'delivery_mode' => 2
 		));
-		
-		$channel->basic_publish($msg, '', $queueName);
-		
+
+		$channel->basic_publish($msg, $this->exchangeName, $queueName);
+
 		KalturaLog::info("Message [$data] was sent to [$queueName].");
+		$connection->close();
 	}
 }

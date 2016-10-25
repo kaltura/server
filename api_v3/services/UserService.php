@@ -349,11 +349,13 @@ class UserService extends KalturaBaseUserService
 	 * Logs a user into a partner account with a user login ID and a user password.
 	 * 
 	 * @action loginByLoginId
-	 * @param int $partnerId The identifier of the partner account
+	 * 
 	 * @param string $loginId The user's email address that identifies the user for login
 	 * @param string $password The user's password
+	 * @param int $partnerId The identifier of the partner account
 	 * @param int $expiry The requested time (in seconds) before the generated KS expires (By default, a KS expires after 24 hours).
 	 * @param string $privileges Special privileges
+	 * @param string $otp the user's one-time password
 	 * @return string A session KS for the user
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
@@ -364,10 +366,10 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
 	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 */		
-	public function loginByLoginIdAction($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*')
+	public function loginByLoginIdAction($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
 		// exceptions might be thrown
-		return parent::loginImpl(null, $loginId, $password, $partnerId, $expiry, $privileges);
+		return parent::loginImpl(null, $loginId, $password, $partnerId, $expiry, $privileges, $otp);
 	}
 	
 	

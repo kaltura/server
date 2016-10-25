@@ -184,8 +184,8 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'endDate',
 		'referenceId',
 		'classificationType',
-		'geoLatitude',
-		'geoLongitude',
+		'geoLatitude' => 'GeoLat',
+		'geoLongitude' => 'GeoLong',
 		'location',
 		'organizer',
 		'ownerId',
@@ -288,9 +288,23 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		$this->validatePropertyNotNull('startDate');
 		$this->validatePropertyNotNull('endDate');
 		$this->validate($this->startDate, $this->endDate);
-		
+
+
+		$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
+
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
+		{
 			$this->validatePropertyNotNull('recurrence');
+			$this->validatePropertyNotNull('duration');
+			if ($this->duration > $maxSingleEventDuration)
+				throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+		}
+
+		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
+		{
+			if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
+				throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+		}
 
 		parent::validateForInsert($propertiesToSkip);
 	}
@@ -300,52 +314,67 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if($this->endDate instanceof KalturaNullField)
+		if ($this->endDate instanceof KalturaNullField)
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('endDate'));
 		}
-		
+
 		/* @var $sourceObject ScheduleEvent */
 		$startDate = $sourceObject->getStartDate(null);
 		$endDate = $sourceObject->getEndDate(null);
-		
-		if($this->startDate)
+
+		if ($this->startDate)
 			$startDate = $this->startDate;
-		if($this->endDate)
+		if ($this->endDate)
 			$endDate = $this->endDate;
-			
+
 		$this->validate($startDate, $endDate);
 
 		$this->validateScheduleEventType($this->recurrenceType, $sourceObject->getRecurrenceType());
 
-		if($this->isNull('sequence') || $this->sequence <= $sourceObject->getSequence())
+		if ($this->isNull('sequence') || $this->sequence <= $sourceObject->getSequence())
 		{
 			$sourceObject->incrementSequence();
 		}
 
-		if(!$this->isNull('duration'))
+		if (!$this->isNull('duration'))
 		{
-			if(!$this->isNull('endDate'))
+			if (!$this->isNull('endDate'))
 			{
-				if(($startDate + $this->duration) != $this->endDate)
-				{
+				if (($startDate + $this->duration) != $this->endDate)
 					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_MUST_MATCH_END_TIME);
-				}
 			}
-			else
+
+			if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING)
 			{
-				if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING )
-				{
-					$this->endDate = $startDate + $this->duration;
-					$this->duration = null;
-				}
+				$this->endDate = $startDate + $this->duration;
+				$this->duration = null;
+			}
+
+			$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
+
+			// validate single event duration in recurring event or in single event is 24 hours at most
+			if ($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
+			{
+				if ($this->duration > $maxSingleEventDuration)
+					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+			} elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
+			{
+				if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
+					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
 			}
 		}
 
+
+		// we can't update a recurrence object and set both until and count so if one of them is going to be updated we set remove the other one.
+		if(!is_null($this->recurrence->until) && !is_null($sourceObject->getRecurrence()) &&  !is_null($sourceObject->getRecurrence()->getCount()))
+			$this->recurrence->count = null;
+		if(!is_null($this->recurrence->count) && !is_null($sourceObject->getRecurrence()) &&  !is_null($sourceObject->getRecurrence()->getUntil()))
+			$this->recurrence->until = null;
+
+		//if we are updating an event from recurring to single event we need to remove the duration on the object since we calculate it from scratch according to start and end date
 		if (!is_null($this->recurrenceType) && $this->recurrenceType == ScheduleEventRecurrenceType::NONE && $sourceObject->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
-		{
 			$this->duration = null;
-		}
 
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -372,23 +401,25 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			}
 			if(count($skipAttributes) < count($attributes))
 			{
+				$parentResponseProfile = new KalturaDetachedResponseProfile();
 				if(is_null($responseProfile))
 				{
-					$responseProfile = new KalturaDetachedResponseProfile();
-					$responseProfile->type = KalturaResponseProfileType::EXCLUDE_FIELDS;
-					$responseProfile->fields = implode(',', $skipAttributes);
+					$parentResponseProfile->type = KalturaResponseProfileType::EXCLUDE_FIELDS;
+					$parentResponseProfile->fields = implode(',', $skipAttributes);
 				}
 				elseif($responseProfile->type == KalturaResponseProfileType::EXCLUDE_FIELDS)
 				{
-					$responseProfile->fields = implode(',', array_intersect(explode(',', $responseProfile->fields), $skipAttributes));
+					$parentResponseProfile->type = KalturaResponseProfileType::EXCLUDE_FIELDS;
+					$parentResponseProfile->fields = implode(',', array_merge(explode(',', $responseProfile->fields), $skipAttributes));
 				}
 				elseif($responseProfile->type == KalturaResponseProfileType::INCLUDE_FIELDS)
 				{
-					$responseProfile->fields = implode(',', array_diff(explode(',', $responseProfile->fields), $skipAttributes));
+					$parentResponseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+					$parentResponseProfile->fields = implode(',', array_diff(explode(',', $responseProfile->fields), $skipAttributes));
 				}
 				
 				$parentObj = ScheduleEventPeer::retrieveByPK($srcObj->getParentId());
-				$this->fromObject($parentObj, $responseProfile);
+				$this->fromObject($parentObj, $parentResponseProfile);
 			}
 		}
 		
