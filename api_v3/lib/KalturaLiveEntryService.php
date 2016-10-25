@@ -455,14 +455,16 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($recordedEntry->getStatus() == entryStatus::PENDING)
 		{
 			$service->initService('media', 'media', 'addContent');
-			$entry = $service->addContentAction($recordedEntry->getId(), $resource);	
+			$service->addContentAction($recordedEntry->getId(), $resource);	
 		}
 		else
 		{
 			$service->initService('media', 'media', 'updateContent');
-			$entry = $service->updateContentAction($recordedEntry->getId(), $resource);
+			$service->updateContentAction($recordedEntry->getId(), $resource);
 		}
 		
+		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
+		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
 		return $entry;
 	}
 }
