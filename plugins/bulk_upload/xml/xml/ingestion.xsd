@@ -141,7 +141,7 @@
 					<xs:documentation>Text that describes the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element maxOccurs="1" minOccurs="0" name="keepManualThumbnails" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="keepManualThumbnails" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>flag to keep original thumbnails</xs:documentation>
 				</xs:annotation>

@@ -609,9 +609,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 
-		$keepManualThumbnails = false;
-		if(isset($item->keepManualThumbnails) && $item->keepManualThumbnails == 1)
-			$keepManualThumbnails = true;
+		$keepManualThumbnails = isset($item->keepManualThumbnails) && (strtolower($item->keepManualThumbnails) === 'true');
 
 		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
 		
