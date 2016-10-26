@@ -609,8 +609,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 
-		$keepManualThumbnails = isset($item->keepManualThumbnails) && (strtolower($item->keepManualThumbnails) === 'true');
-
 		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
 		
 		switch($contentAssetsAction)
@@ -621,7 +619,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			case self::$actionsMap[KalturaBulkUploadAction::REPLACE]:
 				list($entry, $nonCriticalErrors) = $this->sendItemReplaceData($entryId, $entry, $resource,
 												  $noParamsFlavorAssets, $noParamsFlavorResources,
-												  $noParamsThumbAssets, $noParamsThumbResources, $pluginReplacementOptions, $keepManualThumbnails);
+												  $noParamsThumbAssets, $noParamsThumbResources, $pluginReplacementOptions, $item->keepManualThumbnails);
 				$entryId = $entry->id;
 				break;
 			default :
