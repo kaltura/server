@@ -15,4 +15,6 @@ class KalturaScheduleEventOrderBy extends KalturaStringEnum
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";
 	const UPDATED_AT_DESC = "-updatedAt";
+	const SUMMARY_AT_ASC = "+summary";
+	const SUMMARY_AT_DESC = "-summary";
 }
