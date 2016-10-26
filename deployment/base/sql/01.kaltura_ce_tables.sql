@@ -2347,6 +2347,7 @@ CREATE TABLE  IF NOT EXISTS business_process_server
 	status TINYINT,
 	type INTEGER,
 	custom_data TEXT,
+	dc INTEGER,
 	PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

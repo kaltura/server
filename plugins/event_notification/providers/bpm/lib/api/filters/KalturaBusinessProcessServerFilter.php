@@ -6,12 +6,12 @@
 class KalturaBusinessProcessServerFilter extends KalturaBusinessProcessServerBaseFilter
 {
 	/**
-	 * @var KalturaNullableBoolean
+	 * @var bool
 	 */
-	public $currentDcOrNull;
+	public $currentDcOrExternal;
 
 	/**
-	 * @var KalturaNullableBoolean
+	 * @var bool
 	 */
 	public $currentDc;
 
@@ -28,15 +28,12 @@ class KalturaBusinessProcessServerFilter extends KalturaBusinessProcessServerBas
 	 */
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{
-		if(!$this->isNull('currentDc') && KalturaNullableBoolean::toBoolean($this->currentDc))
+		if(!$this->isNull('currentDc') && $this->currentDc)
 			$this->dcEqual = kDataCenterMgr::getCurrentDcId();
 
-		elseif(!$this->isNull('currentDcOrNull') && KalturaNullableBoolean::toBoolean($this->currentDcOrNull))
+		elseif(!$this->isNull('currentDcOrExternal') && $this->currentDcOrExternal)
 		{
-			if(kDataCenterMgr::getCurrentDcId())
-				$this->dcGreaterThenOrNull = kDataCenterMgr::getCurrentDcId() - 1;
-			else
-				$this->dcLessThenOrNull = kDataCenterMgr::getCurrentDcId() + 1;
+			$this->dcEqOrNull = kDataCenterMgr::getCurrentDcId();
 		}
 
 		return parent::toObject($object_to_fill, $props_to_skip);

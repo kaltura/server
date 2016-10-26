@@ -45,7 +45,7 @@ class BusinessProcessNotificationTemplatesListProcessesAction extends KalturaApp
 			if($serverId == 0)
 			{
 				$filter = new Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerFilter();
-				$filter->currentDc = Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE;
+				$filter->currentDc = true;
 				$pager = new Kaltura_Client_Type_FilterPager();
 				$pager->pageSize = 1;
 				$serversList = $businessProcessNotificationPlugin->businessProcessServer->listAction($filter, $pager);

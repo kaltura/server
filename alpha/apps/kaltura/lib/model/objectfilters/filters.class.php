@@ -43,6 +43,7 @@ abstract class baseObjectFilter extends myBaseObject
 	const MATCH_AND = "matchand";
 	const NOT_CONTAINS = "notcontains";
 	const IS_EMPTY = "empty";
+	const EQ_OR_NULL = "eqornull";
 
 	// TODO - make sure client-generators know how to generate this OR_SEPARATOR
 	const OR_SEPARATOR = "-";
@@ -691,7 +692,7 @@ abstract class baseObjectFilter extends myBaseObject
 			else
 			{
 				// add or null
-				if (in_array($operator_str, array(self::LT_OR_NULL, self::GT_OR_NULL, self::LTE_OR_NULL, self::GTE_OR_NULL)))
+				if (in_array($operator_str, array(self::LT_OR_NULL, self::GT_OR_NULL, self::LTE_OR_NULL, self::GTE_OR_NULL, self::EQ_OR_NULL)))
 				{
 					$accumulated_criterion = $criteria->getNewCriterion($colname , $value_to_set  , $criteria_operator);
 					$or_null_criterion = $criteria->getNewCriterion($colname, null);
@@ -792,7 +793,7 @@ abstract class baseObjectFilter extends myBaseObject
 		//echo ( "getCriteriaOperatorFromStr [" . $operator_str . "," . $value );
 		$new_value = $value;
 		$query_append_method = self::QUERY_AND;
-		if ( $operator_str == self::EQ )			$crit = Criteria::EQUAL;
+		if ( $operator_str == self::EQ  || $operator_str == self::EQ_OR_NULL )			$crit = Criteria::EQUAL;
 		elseif ( $operator_str == self::LT 	|| $operator_str == self::LT_OR_NULL )		$crit = Criteria::LESS_THAN;
 		elseif ( $operator_str == self::LTE || $operator_str == self::LTE_OR_NULL )		$crit = Criteria::LESS_EQUAL ;
 		elseif ( $operator_str == self::GT 	|| $operator_str == self::GT_OR_NULL )		$crit = Criteria::GREATER_THAN;

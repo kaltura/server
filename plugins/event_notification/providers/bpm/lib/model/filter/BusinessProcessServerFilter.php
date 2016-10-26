@@ -45,8 +45,7 @@ class BusinessProcessServerFilter extends baseObjectFilter
 			"_eq_type",
 			"_in_type",
 			"_eq_dc",
-			"_ltornull_dc",
-			"_gtornull_dc",
+			"_eqornull_dc",
 		), NULL);	
 		
 		$this->allowed_order_fields = array ("created_at" , "updated_at");

@@ -69,9 +69,8 @@ abstract class KalturaBusinessProcessServer extends KalturaObject implements IFi
 	public $type;
 	
 	/**
-	 * The dc of the server 0,1,null(-1)
-	 * @var KalturaNullableBoolean
-	 * @filter eq,gt,lt
+	 * The dc of the server
+	 * @var int
 	 */
 	public $dc;
 

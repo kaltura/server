@@ -21,13 +21,12 @@ class Form_BusinessProcessNotificationTemplateConfiguration extends Form_EventNo
 		$businessProcessNotificationPlugin = Kaltura_Client_BusinessProcessNotification_Plugin::get($client);
 
 		$filter = new Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerFilter();
-		$filter->currentDcOrNull = Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE;
+		$filter->currentDcOrExternal = true;
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageSize = 500;
 		
 		$serversList = $businessProcessNotificationPlugin->businessProcessServer->listAction($filter, $pager);
 		/* @var $serversList Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerListResponse */
-		
 		$businessProcessProvider = null;
 		$servers = array('' => 'Select Server');
 		foreach($serversList->objects as $server)

@@ -48,26 +48,20 @@ class BusinessProcessServerPeer extends BaseBusinessProcessServerPeer {
 	}
 
 	/**
-	 * Retrieve a single object by pk or current dc.
+	 * Retrieve a single object by dc.
 	 *
-	 * @param      int $pk
+	 * @param      int $dc
 	 * @param      PropelPDO $con the connection to use
 	 * @return     BusinessProcessServer
 	 */
-	public static function retrieveByPkOrCurrentDc($pk, PropelPDO $con = null)
+	public static function retrieveByDc($dc, PropelPDO $con = null)
 	{
-		if($pk !== 0)
-			return self::retrieveByPK($pk, $con);
-
-		else //get by current dc
-		{
 			$criteria = new Criteria(BusinessProcessServerPeer::DATABASE_NAME);
-			$criteria->add(BusinessProcessServerPeer::DC, kDataCenterMgr::getCurrentDcId());
+			$criteria->add(BusinessProcessServerPeer::DC, $dc);
 
 			$result = BusinessProcessServerPeer::doSelectOne($criteria, $con);
 
 			return $result;
-		}
 	}
 	
 } // BusinessProcessServerPeer

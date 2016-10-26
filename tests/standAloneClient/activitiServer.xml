@@ -20,7 +20,7 @@
 				<protocol>{prompt:Activiti server protocol (http/https):}</protocol>
 				<username>{prompt:Activiti server username:}</username>
 				<password>{prompt:Activiti server password:}</password>
-				<dc>{prompt:Activiti server dc (-1/0/1):}</dc>
+				<dc>{prompt:Activiti server dc (0/1):}</dc>
 			</template>
 		</request>
 	</multirequest>
