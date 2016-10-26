@@ -21,7 +21,7 @@ class Form_BusinessProcessNotificationTemplateConfiguration extends Form_EventNo
 		$businessProcessNotificationPlugin = Kaltura_Client_BusinessProcessNotification_Plugin::get($client);
 
 		$filter = new Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerFilter();
-		$filter->currentDcOrExternal = true;
+		$filter->currentDcOrExternal = Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE;
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageSize = 500;
 		

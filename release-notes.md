@@ -1,5 +1,13 @@
 # Lynx 12.4.0 #
 
+## Add dc column to business_process_server table ##
+- Issue Type: New Feature
+- Issue ID: PLAT-6093
+
+### Deployment scripts ###
+- Run 'mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2016_10_20_alter_business_process_server_table_add_dc_column.sql'
+
+
 ## Allow Play Server to Run Flavor Asset List ##
 - Issue Type: Privileges
 
