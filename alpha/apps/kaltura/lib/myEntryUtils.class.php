@@ -1492,7 +1492,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
 		$typeMatch = $entry->getType() == entryType::MEDIA_CLIP;
 		$sourceMatch = $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
-		$statusMatch = $entry->getStatus() == entryStatus::PENDING;
+		$statusMatch = in_array($entry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT));
 		
 		return $typeMatch && $sourceMatch && $statusMatch;
 	}

@@ -29,7 +29,7 @@ class kUploadTokenMgr
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		$this->_uploadToken->save();
 		
-		self::setUploadTokenTempPath();
+		$this->setUploadTokenTempPath();
 	}
 	
 	/**
@@ -248,20 +248,6 @@ class kUploadTokenMgr
 	 */
 	protected function handleMoveFile($fileData)
 	{
-		/*
-		// get the upload path
-		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
-
-		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
-		// the original file name that was passed to the uploadToken
-		if ($extension === "" || ($extension == "tmp" && $this->_uploadToken->getFileName()))
-			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
-
-		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
-		$this->_uploadToken->setUploadTempPath($uploadFilePath);
-		kFile::fullMkdir($uploadFilePath, 0700);
-		*/
-		
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$moveFileSuccess = kFile::moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
@@ -303,7 +289,7 @@ class kUploadTokenMgr
 		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
 		if($extension !== "")
 		{
-			$newTempFilePath = preg_replace('/\\.[^.]+$/', '.$extension', $tempFilePath);
+			$newTempFilePath = preg_replace('/\\.[^.]+$/', ".$extension", $tempFilePath);
 			$this->_uploadToken->setUploadTempPath($tempFilePath);
 			$this->_uploadToken->save();
 			

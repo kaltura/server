@@ -7,6 +7,7 @@
 class kContextDataHelper
 {
 	const ALL_TAGS = 'all';
+	const DEFAULT_SERVE_VOD_FROM_LIVE_DURATION = 300000;
 	
 	/**
 	 * 
@@ -203,7 +204,7 @@ class kContextDataHelper
 			if($mediaEntryId)
 				$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
 			
-			$this->msDuration = ($liveEntry && $liveEntry->getLengthInMsecs()) ? $liveEntry->getLengthInMsecs() : 300000;
+			$this->msDuration = ($liveEntry && $liveEntry->getLengthInMsecs()) ? $liveEntry->getLengthInMsecs() : self::DEFAULT_SERVE_VOD_FROM_LIVE_DURATION;
 		}
 		else
 		{

@@ -420,5 +420,5 @@ class APIErrors
 
 	const UNSAFE_HTML_TAGS = "UNSAFE_HTML_TAGS;CLASS_NAME,PROPERTY_NAME;Potential Unsafe HTML tags found in [@CLASS_NAME@]::[@PROPERTY_NAME@]";
 	
-	const RECORDED_NOT_READY = "RECORDED_NOT_READY;ENTRY_ID;Recorded entry not in ready status yet, live entry [@ENTRY_ID@] cannot be deleted";
+	const RECORDED_NOT_READY = "RECORDED_NOT_READY;ENTRY_ID;Live entry [@ENTRY_ID@] cannot be deleted, recorded entry not in ready status yet";
 }
