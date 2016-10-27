@@ -406,9 +406,6 @@ class DatesGenerator
 	public function getRecurrencesDates($periodStart, $seed = null, $limit = null)
 	{
 		$periodEnd = strtotime('+2 year', $periodStart);
-
-		if (is_null($this->until) && is_null($this->count))
-			$this->until = strtotime('+1 month', $periodStart);
 		if(!is_null($this->until) && $this->until < $periodEnd)
 			$periodEnd = $this->until;
 
