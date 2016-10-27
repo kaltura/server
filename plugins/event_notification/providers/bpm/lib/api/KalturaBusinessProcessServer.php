@@ -69,6 +69,12 @@ abstract class KalturaBusinessProcessServer extends KalturaObject implements IFi
 	public $type;
 	
 	/**
+	 * The dc of the server
+	 * @var int
+	 */
+	public $dc;
+
+	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
@@ -81,6 +87,7 @@ abstract class KalturaBusinessProcessServer extends KalturaObject implements IFi
 		'description',
 		'status',
 		'type',
+		'dc',
 	);
 		 
 	/* (non-PHPdoc)

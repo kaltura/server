@@ -80,6 +80,12 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	protected $custom_data;
 
 	/**
+	 * The value for the dc field.
+	 * @var        int
+	 */
+	protected $dc;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -282,6 +288,16 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [dc] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDc()
+	{
+		return $this->dc;
 	}
 
 	/**
@@ -564,6 +580,29 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	} // setCustomData()
 
 	/**
+	 * Set the value of [dc] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BusinessProcessServer The current object (for fluent API support)
+	 */
+	public function setDc($v)
+	{
+		if(!isset($this->oldColumnsValues[BusinessProcessServerPeer::DC]))
+			$this->oldColumnsValues[BusinessProcessServerPeer::DC] = $this->dc;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->dc !== $v) {
+			$this->dc = $v;
+			$this->modifiedColumns[] = BusinessProcessServerPeer::DC;
+		}
+
+		return $this;
+	} // setDc()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -593,6 +632,9 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -605,6 +647,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->dc = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -614,7 +657,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = BusinessProcessServerPeer::NUM_COLUMNS - BusinessProcessServerPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = BusinessProcessServerPeer::NUM_COLUMNS - BusinessProcessServerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BusinessProcessServer object", $e);
@@ -668,7 +711,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 
 		BusinessProcessServerPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		entryPeer::addSelectColumns($criteria);
+		BusinessProcessServerPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
 		BusinessProcessServerPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
@@ -763,35 +806,61 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
                 if ($affectedRows || !$this->isColumnModified(BusinessProcessServerPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
-                KalturaLog::info("was unable to save! retrying for the $retries time");
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(BusinessProcessServerPeer::CUSTOM_DATA);
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
 
 				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = BusinessProcessServerPeer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
+						$newValue = null;
 						if ($namespace)
 						{
-							$newValue = $valuesToChangeTo[$namespace][$name];
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
 						}
 						else
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						$this->putInCustomData($name, $newValue, $namespace);
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
 					}
-                   }
+				}
                    
+				if(!$validUpdate) 
+					break;
+					                   
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -884,7 +953,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -948,7 +1017,9 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -1136,6 +1207,9 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			case 9:
 				return $this->getCustomData();
 				break;
+			case 10:
+				return $this->getDc();
+				break;
 			default:
 				return null;
 				break;
@@ -1167,6 +1241,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			$keys[7] => $this->getStatus(),
 			$keys[8] => $this->getType(),
 			$keys[9] => $this->getCustomData(),
+			$keys[10] => $this->getDc(),
 		);
 		return $result;
 	}
@@ -1228,6 +1303,9 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 			case 9:
 				$this->setCustomData($value);
 				break;
+			case 10:
+				$this->setDc($value);
+				break;
 		} // switch()
 	}
 
@@ -1262,6 +1340,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setType($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setDc($arr[$keys[10]]);
 	}
 
 	/**
@@ -1283,6 +1362,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 		if ($this->isColumnModified(BusinessProcessServerPeer::STATUS)) $criteria->add(BusinessProcessServerPeer::STATUS, $this->status);
 		if ($this->isColumnModified(BusinessProcessServerPeer::TYPE)) $criteria->add(BusinessProcessServerPeer::TYPE, $this->type);
 		if ($this->isColumnModified(BusinessProcessServerPeer::CUSTOM_DATA)) $criteria->add(BusinessProcessServerPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(BusinessProcessServerPeer::DC)) $criteria->add(BusinessProcessServerPeer::DC, $this->dc);
 
 		return $criteria;
 	}
@@ -1378,6 +1458,8 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 		$copyObj->setType($this->type);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setDc($this->dc);
 
 
 		$copyObj->setNew(true);
@@ -1550,6 +1632,16 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
