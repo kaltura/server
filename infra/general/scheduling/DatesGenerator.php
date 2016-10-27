@@ -861,20 +861,9 @@ class DatesGenerator
 		{
 			// Find the target day in the current week
 			$t = $cal;
-			// Back up to the start of th week
-			$startDay = $this->getDayName($this->weekStartDay);
 			$current = getdate($t);
-			if($current['weekday'] != $startDay)
-			{
-				$firstDay = getdate(strtotime("-1 $startDay", $cal));
-				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $firstDay['mon'], $firstDay['mday'], $firstDay['year']);
-			}
-			// Move head to the target day
-			if($calDay != $startDay)
-			{
-				$target = getdate(strtotime("+1 $calDay", $t));
-				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
-			}
+			$target = getdate(strtotime("+1 $calDay", $t));
+			$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
 			$days[] = $t;
 		}
 		elseif($this->frequency == DatesGenerator::MONTHLY || $this->byMonth)
