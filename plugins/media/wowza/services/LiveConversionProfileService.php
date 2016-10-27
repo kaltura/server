@@ -141,9 +141,15 @@ class LiveConversionProfileService extends KalturaBaseService
 				$member->addChild('EncodeName', $groupMember);
 			}
 		}
-		
+
 		$properties = $transcode->addChild('Properties');
-		
+		if ($liveParamsItem->getFrameRate() && $liveParamsItem->getFrameRate() !== 0) {
+			KalturaLog::INFO("Setting default frame rate to " . $liveParamsItem->getFrameRate());
+			$properties->addChild('Name', 'sourceStreamFrameRate');
+			$properties->addChild('Value', $liveParamsItem->getFrameRate());
+			$properties->addChild('Type', 'Double');
+		}
+
 		$dom = new DOMDocument("1.0");
 		$dom->preserveWhiteSpace = false;
 		$dom->formatOutput = true;
@@ -211,7 +217,7 @@ class LiveConversionProfileService extends KalturaBaseService
 					KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
 					break;
 			}
-		
+
 			if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
 			{
 				switch ($liveParams->getAudioCodec())
@@ -259,7 +265,14 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
-		
+
+		$skipFrameCountPos = strpos($liveParams->getConversionEnginesExtraParams(), 'SkipFrameCount');
+		if ($skipFrameCountPos !== false) {
+			$skipFrameCount = $video->addChild('SkipFrameCount');
+			preg_match('/SkipFrameCount\s(\d+)', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
+			$skipFrameCount->addChild('Value', (int)$skipFrameValue[1]);
+		}
+
 		$audio->addChild('Codec', $audioCodec);
 		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
 	}
