@@ -280,7 +280,8 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		if ($this->parent_id)
 		{
 			$parentObj = ScheduleEventPeer::retrieveByPK($this->parent_id);
-			return $parentObj->getSummary();
+			if ($parentObj)
+				return $parentObj->getSummary();
 		}
 	}
 } // ScheduleEvent
