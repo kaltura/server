@@ -584,7 +584,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		$entry->setStreamBitrates($streamBitrates);
 		$entry->save();
 	}
-	
+
 	public static function generateAdStitchingCmdline($flavorParams, $flavorParamsOutput, $ffprobeJson = null, $duration = null)
 	{
 		if($ffprobeJson){
@@ -597,20 +597,20 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 				$isAdImage = true;
 			}
 		}
-			/*
-			 * Nulled 'ffprobeJson' ==> 'filler-case', create black and silent video
-			 */
+		/*
+		 * Nulled 'ffprobeJson' ==> 'filler-case', create black and silent video
+		 */
 		else {
 			$srcMedSet = new KDLMediaDataSet();
 			$isAdImage = false;
 		}
 		$isAdAudio = isset($srcMedSet->_audio);
 		$isAdVideo = isset($srcMedSet->_video);
-			/*
-			 * For image AD or in 'filler-case', 
-			 * make sure that the 'duration' is set,
-			 * otherwise - set to default 10 sec
-			 */
+		/*
+		 * For image AD or in 'filler-case',
+		 * make sure that the 'duration' is set,
+		 * otherwise - set to default 10 sec
+		 */
 		if(!($duration) && ($isAdImage || !($isAdAudio && $isAdVideo)) ) {
 			$duration = 10;
 		}
@@ -629,6 +629,17 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		 * - other extra params (from live sticthing)
 		 */
 		$kdlFlavor = KDLWrap::ConvertFlavorCdl2Kdl($flavorParams);
+		/*
+		 * Verify flavor params settings
+		 */
+		{
+			if(!isset($kdlFlavor->_video->_id) || $kdlFlavor->_video->_id==KDLVideoTarget::COPY){
+				throw new kCoreException("Flavor params missing correct video settings");
+			}
+			if(!isset($kdlFlavor->_audio->_id) || $kdlFlavor->_audio->_id==KDLAudioTarget::COPY){
+				throw new kCoreException("Flavor params missing correct audio settings");
+			}
+		}
 		$kdlFlavor->_isTwoPass = false;
 		$kdlFlavor->_isEncrypted = false;
 		$kdlFlavor->_video->_arProcessingMode = 2; // letter boxing
@@ -660,11 +671,11 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 				$kdlFlavor->_clipDur = $duration*1000;
 			}
 		}
-	
+
 		{
 			/*
 			 * KDL does not support (yet ...) image-2-video generation,
-			 * meanwhile following dummy '_audio' & '_video' initializations 
+			 * meanwhile following dummy '_audio' & '_video' initializations
 			 * imitate 'normal' aud/vid behaviour
 			 */
 			if($isAdAudio==false){
@@ -674,26 +685,38 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 				$srcMedSet->_video = clone($kdlFlavor->_video);
 			}
 		}
-		
+
 		$target = $kdlFlavor->GenerateTarget($srcMedSet);
+		/*
+		 * Validate resultant target flavor
+		 */
+		if(!isset($target->_transcoders) || count($target->_transcoders)==0 || !isset($target->_transcoders[0]->_cmd)){
+			$errDesc = '';
+			if(is_array($target->_errors) && count($target->_errors))			{
+				foreach($target->_errors as $section => $errors){
+					$errDesc .= "$section errors: " . join("; ", $errors) . "\n";
+				}
+			}
+			throw new kCoreException("Failed to generate appropriate command line ($errDesc)");
+		}
 		$cmdLine = $target->_transcoders[0]->_cmd;
-			// 'image' source needs 'looping' 
+		// 'image' source needs 'looping'
 		if($isAdImage){
 			$cmdLine = str_replace(" -i "," -loop 1 -i ", $cmdLine);
 		}
-		
-			// Add 'silent' source, if no AD audio source
+
+		// Add 'silent' source, if no AD audio source
 		if($isAdAudio==false){
-			$cmdLine = str_replace(array(KDLCmdlinePlaceholders::InFileName), 
-							array(KDLCmdlinePlaceholders::InFileName." -f s16le -acodec pcm_s16le -i /dev/zero"), 
-							$cmdLine);	
+			$cmdLine = str_replace(array(KDLCmdlinePlaceholders::InFileName),
+				array(KDLCmdlinePlaceholders::InFileName." -f s16le -acodec pcm_s16le -i /dev/zero"),
+				$cmdLine);
 		}
-	
-			// Add 'black' source, if no AD video source
+
+		// Add 'black' source, if no AD video source
 		if($isAdVideo==false){
-			$cmdLine = " -f rawvideo -pix_fmt rgb24 -s 480x270".str_replace(array(KDLCmdlinePlaceholders::InFileName), 
-							array("/dev/zero"), 
-							$cmdLine);	
+			$cmdLine = " -f rawvideo -pix_fmt rgb24 -s 480x270".str_replace(array(KDLCmdlinePlaceholders::InFileName),
+					array("/dev/zero"),
+					$cmdLine);
 		}
 		return $cmdLine;
 	}

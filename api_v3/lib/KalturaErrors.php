@@ -262,6 +262,8 @@ class KalturaErrors extends APIErrors
 
 	const NO_EXTERNAL_CONTENT_EXISTS = "NO_EXTERNAL_CONTENT_EXISTS;;Can't delete local content because no external content exists";
 
+	const GENERATE_TRANSCODING_COMMAND_FAIL = "GENERATE_TRANSCODING_COMMAND_FAIL;ASSET_ID,MEDIA_INFO,REASON;Failed to create proper transcoding command for asset id \"@ASSET_ID@\" and ffprobe info [@MEDIA_INFO] due to @REASON@";
+
 	/**
 	 * ThumbAsset Service
 	 */
