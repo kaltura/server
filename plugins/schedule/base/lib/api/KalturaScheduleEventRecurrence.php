@@ -144,7 +144,7 @@ class KalturaScheduleEventRecurrence extends KalturaObject
 	 */
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		if(!$this->isNull('until') && !$this->isNull('count'))
+		if($this->isNull('until') == $this->isNull('count'))
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, 'until / count');
 		}

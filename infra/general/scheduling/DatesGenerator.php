@@ -366,9 +366,11 @@ class DatesGenerator
 	 * @param int $maxRecurrences
 	 * @param array $paramsArray
 	 */
-	public function __construct($maxRecurrences = 1000, $paramsArray = array())
+	public function __construct($maxRecurrences = null, $paramsArray = array())
 	{
 		$this->maxRecurrences = $maxRecurrences;
+		if (!$this->maxRecurrences)
+			$this->maxRecurrences = 10;
 		foreach($paramsArray as $param => $value)
 		{
 			$this->$param = $value;
