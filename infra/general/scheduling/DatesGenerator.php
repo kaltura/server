@@ -432,7 +432,12 @@ class DatesGenerator
 		if(!is_null($this->byMonth))
 			$calParts['mon'] = $this->byMonth;
 
-		$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
+		$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $calParts['mon'], $calParts['year']);
+		if ($calParts['mday'] >= $daysInMonth)
+			$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon']+1, 0, $calParts['year']);
+		else
+			$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
+
 		KalturaLog::debug("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
 
 		$invalidCandidateCount = 0;
@@ -456,6 +461,7 @@ class DatesGenerator
 				KalturaLog::debug("Count [" . count($dates) . "] passed limit [$limit]");
 				break;
 			}
+
 			$candidates = $this->getCandidates($cal);
 			foreach($candidates as $candidate)
 			{
@@ -762,11 +768,21 @@ class DatesGenerator
 		}
 		$monthDayDates = array();
 		$monthDays = explode(',', $this->byMonthDay);
+		natsort($monthDays);
+
 		foreach($dates as $date)
 		{
 			$cal = getdate($date);
+			$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $cal['mon'], $cal['year']);
+
 			foreach($monthDays as $monthDay)
 			{
+				if ($monthDay >= $daysInMonth)
+				{
+					$monthDayDates[] = mktime($cal['hours'], $cal['minutes'], $cal['seconds'], $cal['mon']+1, 0, $cal['year']);
+					break;
+				}
+
 				$monthDayDates[] = mktime($cal['hours'], $cal['minutes'], $cal['seconds'], $cal['mon'], $monthDay, $cal['year']);
 			}
 		}
