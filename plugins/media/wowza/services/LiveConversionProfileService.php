@@ -102,13 +102,23 @@ class LiveConversionProfileService extends KalturaBaseService
 		$transcode = $root->addChild('Transcode');
 		
 		$encodes = $transcode->addChild('Encodes');
+		$properties = $transcode->addChild('Properties');
+
 		$groups = array();
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem liveParams */
 			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
 				continue;
-				
+
+			if ($liveParamsItem->hasTag(assetParams::TAG_SOURCE)) {
+				if ($liveParamsItem->getFrameRate() && $liveParamsItem->getFrameRate() !== 0) {
+					KalturaLog::info("Setting default frame rate to " . $liveParamsItem->getFrameRate());
+					$properties->addChild('Name', 'sourceStreamFrameRate');
+					$properties->addChild('Value', (int)$liveParamsItem->getFrameRate());
+					$properties->addChild('Type', 'Double');
+				}
+			}
 			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
 			$tags = $liveParamsItem->getTagsArray();
 			$tags[] = 'all';
@@ -140,14 +150,6 @@ class LiveConversionProfileService extends KalturaBaseService
 				$member = $members->addChild('Member');
 				$member->addChild('EncodeName', $groupMember);
 			}
-		}
-
-		$properties = $transcode->addChild('Properties');
-		if ($liveParamsItem->getFrameRate() && $liveParamsItem->getFrameRate() !== 0) {
-			KalturaLog::INFO("Setting default frame rate to " . $liveParamsItem->getFrameRate());
-			$properties->addChild('Name', 'sourceStreamFrameRate');
-			$properties->addChild('Value', $liveParamsItem->getFrameRate());
-			$properties->addChild('Type', 'Double');
 		}
 
 		$dom = new DOMDocument("1.0");
@@ -269,7 +271,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$skipFrameCountPos = strpos($liveParams->getConversionEnginesExtraParams(), 'SkipFrameCount');
 		if ($skipFrameCountPos !== false) {
 			$skipFrameCount = $video->addChild('SkipFrameCount');
-			preg_match('/SkipFrameCount\s(\d+)', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
+			preg_match('/SkipFrameCount=(\d+)/', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
 			$skipFrameCount->addChild('Value', (int)$skipFrameValue[1]);
 		}
 
