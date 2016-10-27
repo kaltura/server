@@ -119,7 +119,7 @@ class DatesGenerator
 	 * This is also significant when in a YEARLY frequency when a byWeekNumber rule part is specified.
 	 * The default value is MONDAY.
 	 */
-	private $weekStartDay;
+	private $weekStartDay = 'MO';
 
 
 	/**
@@ -861,15 +861,16 @@ class DatesGenerator
 		{
 			// Find the target day in the current week
 			$t = $cal;
-			// Back up to Sunday
+			// Back up to the start of th week
+			$startDay = $this->getDayName($this->weekStartDay);
 			$current = getdate($t);
-			if($current['weekday'] != 'Sunday')
+			if($current['weekday'] != $startDay)
 			{
-				$sunday = getdate(strtotime('-1 Sunday', $cal));
+				$sunday = getdate(strtotime("-1 $startDay", $cal));
 				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $sunday['mon'], $sunday['mday'], $sunday['year']);
 			}
 			// Move head to the target day
-			if($calDay != 'Sunday')
+			if($calDay != $startDay)
 			{
 				$target = getdate(strtotime("+1 $calDay", $t));
 				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
