@@ -866,8 +866,8 @@ class DatesGenerator
 			$current = getdate($t);
 			if($current['weekday'] != $startDay)
 			{
-				$sunday = getdate(strtotime("-1 $startDay", $cal));
-				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $sunday['mon'], $sunday['mday'], $sunday['year']);
+				$firstDay = getdate(strtotime("-1 $startDay", $cal));
+				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $firstDay['mon'], $firstDay['mday'], $firstDay['year']);
 			}
 			// Move head to the target day
 			if($calDay != $startDay)
