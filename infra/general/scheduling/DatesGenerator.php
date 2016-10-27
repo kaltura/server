@@ -366,9 +366,11 @@ class DatesGenerator
 	 * @param int $maxRecurrences
 	 * @param array $paramsArray
 	 */
-	public function __construct($maxRecurrences = 1000, $paramsArray = array())
+	public function __construct($maxRecurrences = null, $paramsArray = array())
 	{
 		$this->maxRecurrences = $maxRecurrences;
+		if (!$this->maxRecurrences)
+			$this->maxRecurrences = 10;
 		foreach($paramsArray as $param => $value)
 		{
 			$this->$param = $value;
@@ -404,6 +406,9 @@ class DatesGenerator
 	public function getRecurrencesDates($periodStart, $seed = null, $limit = null)
 	{
 		$periodEnd = strtotime('+2 year', $periodStart);
+
+		if (is_null($this->until) && is_null($this->count))
+			$this->until = strtotime('+1 month', $periodStart);
 		if(!is_null($this->until) && $this->until < $periodEnd)
 			$periodEnd = $this->until;
 
