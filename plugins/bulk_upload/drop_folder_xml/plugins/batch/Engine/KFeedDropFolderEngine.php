@@ -282,11 +282,15 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			KalturaLog::info("XPath not provided.");
 			return null;
 		}
-		$itemXPathRes = $element->xpath ($fieldXpath);
-		if (count ($itemXPathRes))
-			return $itemXPathRes[0];
-			
-		return null;
+		$dom = dom_import_simplexml($element);
+		$doc = new DOMDocument();
+		$dom = $doc->importNode($dom, true);
+		$dom = $doc->appendChild($dom);
+		$domXpath = new DOMXPath($doc);
+		
+		$itemXPathRes = strval($domXpath->evaluate($fieldXpath));
+		
+		return $itemXPathRes;
 	}
 
 	protected function getMaxFeedBitrate (SimpleXMLElement $feedItem)
@@ -295,6 +299,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		if (!count($allBitrates))
 		{
 			KalturaLog::info("No bitrate tags found ");
+			return;
 		}
 		
 		$bitrates = array();
