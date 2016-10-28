@@ -10,6 +10,20 @@
  */ 
 class BatchJobPeer extends BaseBatchJobPeer
 {
+	/* (non-PHPdoc)
+	 * @see BaseBatchJobPeer::setDefaultCriteriaFilter()
+	 */
+	public static function setDefaultCriteriaFilter()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+	
+		$c = new myCriteria();
+		$c->addAnd(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_DELETED, Criteria::NOT_EQUAL);
+		
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
 	public static function getInProcStatus()
 	{
 		return BatchJob::BATCHJOB_STATUS_QUEUED;
