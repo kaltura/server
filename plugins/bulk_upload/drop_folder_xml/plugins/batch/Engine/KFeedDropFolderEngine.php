@@ -288,7 +288,11 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		$dom = $doc->appendChild($dom);
 		$domXpath = new DOMXPath($doc);
 		
-		$itemXPathRes = strval($domXpath->evaluate($fieldXpath));
+		if (!is_object($domXpath->evaluate($fieldXpath))) {
+			$itemXPathRes = $domXpath->evaluate($fieldXpath);
+		} else {
+			$itemXPathRes = strval($domXpath->evaluate($fieldXpath)->item(0)->nodeValue);
+		}
 		
 		return $itemXPathRes;
 	}
