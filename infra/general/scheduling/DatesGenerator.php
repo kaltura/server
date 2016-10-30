@@ -121,6 +121,11 @@ class DatesGenerator
 	 */
 	private $weekStartDay = 'MO';
 
+	/**
+	 * @var string
+	 * this string as function name who can print data to the log
+	 */
+	private $logger;
 
 	/**
 	 * @return the $name
@@ -365,12 +370,14 @@ class DatesGenerator
 	/**
 	 * @param int $maxRecurrences
 	 * @param array $paramsArray
+	 * @param string $logger
 	 */
-	public function __construct($maxRecurrences = null, $paramsArray = array())
+	public function __construct($maxRecurrences = null, $paramsArray = array(), $logger = null)
 	{
 		$this->maxRecurrences = $maxRecurrences;
 		if (!$this->maxRecurrences)
 			$this->maxRecurrences = 10;
+		$this->logger = $logger;
 		foreach($paramsArray as $param => $value)
 		{
 			$this->$param = $value;
@@ -409,7 +416,7 @@ class DatesGenerator
 		if(!is_null($this->until) && $this->until < $periodEnd)
 			$periodEnd = $this->until;
 
-		KalturaLog::debug("Fetching dates name [$this->name] start-time[" . date('d/n/y G:i:s', $periodStart) . "] end-time[" . date('d/n/y G:i:s', $periodEnd) . "] seed[" . date('d/n/y G:i:s', $seed) . "] max-recurrences [$limit]");
+		$this->log("Fetching dates name [$this->name] start-time[" . date('d/n/y G:i:s', $periodStart) . "] end-time[" . date('d/n/y G:i:s', $periodEnd) . "] seed[" . date('d/n/y G:i:s', $seed) . "] max-recurrences [$limit]");
 		if(!$seed)
 			$seed = $periodStart;
 
@@ -438,7 +445,7 @@ class DatesGenerator
 		else
 			$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
 
-		KalturaLog::debug("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
+		$this->log("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
 
 		$invalidCandidateCount = 0;
 		if($limit && $this->count && $this->count < $limit)
@@ -448,17 +455,17 @@ class DatesGenerator
 		{
 			if($this->until && $cal > $this->until)
 			{
-				KalturaLog::debug("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed until [" . date('d/n/y G:i:s', $this->until) . "]");
+				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed until [" . date('d/n/y G:i:s', $this->until) . "]");
 				break;
 			}
 			if($cal > $periodEnd)
 			{
-				KalturaLog::debug("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed period-end [" . date('d/n/y G:i:s', $periodEnd) . "]");
+				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed period-end [" . date('d/n/y G:i:s', $periodEnd) . "]");
 				break;
 			}
 			if($limit && (count($dates) + $invalidCandidateCount) >= $limit)
 			{
-				KalturaLog::debug("Count [" . count($dates) . "] passed limit [$limit]");
+				$this->log("Count [" . count($dates) . "] passed limit [$limit]");
 				break;
 			}
 
@@ -1004,6 +1011,12 @@ class DatesGenerator
 			}
 		}
 		return $minutelyDates;
+	}
+
+	private function log($str)
+	{
+		if ($this->logger)
+			call_user_func($this->logger, '[From DatesGenerator] ' .$str);
 	}
 
 }
