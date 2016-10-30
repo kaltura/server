@@ -1,5 +1,28 @@
 # Lynx 12.4.0 #
 
+## Initial support for Kaltura liveRecording ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5809
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+Add new liveStream service setRecordedContent Action:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_10_20_live_stream_service_set_recorded_content.php
+
+Add new permissions to mediaServer partner:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_09_21_media_Server_upload_token_list.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## Add dc column to business_process_server table ##
 - Issue Type: New Feature
 - Issue ID: PLAT-6093
