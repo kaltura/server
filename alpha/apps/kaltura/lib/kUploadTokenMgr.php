@@ -228,7 +228,7 @@ class kUploadTokenMgr
 				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 			
 			if($verifyFinalChunk)
-				self::updateFileExtension($fileData);
+				$this->updateFileExtension($fileData);
 		} else {
 			$uploadFileResource = fopen($uploadFilePath, 'r+b');
 			fseek($uploadFileResource, 0, SEEK_END);

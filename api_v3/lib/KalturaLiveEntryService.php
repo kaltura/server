@@ -423,7 +423,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $recordingDuration)
+	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
 	{
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
@@ -443,7 +443,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if(!$recordedEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbLiveEntry->getRecordedEntryId());
 		
-		$recordingDuration = (int)($recordingDuration * 1000);
+		$recordingDuration = (int)($duration * 1000);
 		
 		$recordedEntry->setLengthInMsecs($recordingDuration);
 		$recordedEntry->save();
