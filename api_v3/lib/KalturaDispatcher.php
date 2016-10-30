@@ -213,8 +213,8 @@ class KalturaDispatcher
 			}
 			
 		}
-
-		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid))
+		
+		if ((strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid)) && (kCurrentContext::$ks_partner_id != Partner::MEDIA_SERVER_PARTNER_ID))
 		{
 			$optionsArray = array();
 			if ( $options ) {

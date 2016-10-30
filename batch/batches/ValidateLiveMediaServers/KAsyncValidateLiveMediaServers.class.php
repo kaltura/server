@@ -37,7 +37,8 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		
 		$entryServerNodeFilter->statusIn = KalturaEntryServerNodeStatus::PLAYABLE . ',' . 
 				KalturaEntryServerNodeStatus::BROADCASTING . ',' .
-				KalturaEntryServerNodeStatus::AUTHENTICATED;
+				KalturaEntryServerNodeStatus::AUTHENTICATED . ',' .
+				KalturaEntryServerNodeStatus::MARKED_FOR_DELETION;
 		
 		$entryServerNodePager = new KalturaFilterPager();
 		$entryServerNodePager->pageSize = 500;

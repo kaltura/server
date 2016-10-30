@@ -80,7 +80,7 @@ class EntryServerNodeService extends KalturaBaseService
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
 		if (!$dbEntryServerNode)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-		$dbEntryServerNode->delete();
+		$dbEntryServerNode->deleteOrMarkForDeletion();
 
 	}
 

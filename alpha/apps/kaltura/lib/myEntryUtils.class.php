@@ -329,6 +329,17 @@ class myEntryUtils
 				return;
 			}
 		}
+		
+		if($entry->getType() === entryType::LIVE_STREAM && $entry->getRecordedEntryId())
+		{
+			$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
+			if($recordedEntry && in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+			{
+				KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");  
+				throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getRecordedEntryId());
+			}
+				
+		}
 
 		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
 		
@@ -1472,6 +1483,18 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$recordedEntry->setReplacingEntryId(null);
 		$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
 		$recordedEntry->save();
+	}
+	
+	/*
+	 * Check if recorded entry should be served from live
+	 */
+	public static function shouldServeVodFromLive(entry $entry)
+	{
+		$typeMatch = $entry->getType() == entryType::MEDIA_CLIP;
+		$sourceMatch = $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
+		$statusMatch = in_array($entry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT));
+		
+		return $typeMatch && $sourceMatch && $statusMatch;
 	}
 
 	public static function isEntryReady($entryId)

@@ -7,6 +7,7 @@
 class kContextDataHelper
 {
 	const ALL_TAGS = 'all';
+	const DEFAULT_SERVE_VOD_FROM_LIVE_DURATION = 300000;
 	
 	/**
 	 * 
@@ -197,6 +198,14 @@ class kContextDataHelper
 			$mediaEntryId = $mediaEntry->getId();
 			$this->msDuration = array_sum($durations);
 		}
+		elseif (myEntryUtils::shouldServeVodFromLive($this->entry))
+		{
+			$mediaEntryId = $this->entry->getRootEntryId();
+			if($mediaEntryId)
+				$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
+			
+			$this->msDuration = ($liveEntry && $liveEntry->getLengthInMsecs()) ? $liveEntry->getLengthInMsecs() : self::DEFAULT_SERVE_VOD_FROM_LIVE_DURATION;
+		}
 		else
 		{
 			$mediaEntryId = $this->entry->getId();
@@ -248,6 +257,13 @@ class kContextDataHelper
 				$flavorAssets[] = $this->asset;
 		}
 		$this->filterFlavorAssetsByTags($flavorAssets, $flavorTags);
+		
+		//If serving vod from live use live entry to select the correct playback protocols
+		if(myEntryUtils::shouldServeVodFromLive($this->entry))
+		{
+			$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
+			$this->entry = $liveEntry;
+		}
 	}
 	
 	private function isFlavorAllowed($flavorParamsId, array $flavorParamsIds, $flavorParamsNotIn)
@@ -410,7 +426,6 @@ class kContextDataHelper
 			$this->streamerType = $pluginInstance->getContextDataStreamerType($scope, $flavorTags, $this->streamerType);
 			$this->mediaProtocol = $pluginInstance->getContextDataMediaProtocol($scope, $flavorTags, $this->streamerType, $this->mediaProtocol);
 		}
-		
 	}
 	
 	private function selectDeliveryTypeForAuto()

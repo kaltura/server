@@ -132,6 +132,16 @@ class DeliveryProfileDynamicAttributes {
 	 * @var bool
 	 */
 	protected $addThumbnailExtension;
+	
+	/**
+	 * @var bool
+	 */
+	protected $serveVodFromLive;
+	
+	/**
+	 * @var string
+	 */
+	protected $serveLiveAsVodEntryId;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -482,6 +492,26 @@ class DeliveryProfileDynamicAttributes {
 		$this->edgeServerIds = $edgeServerIds;
 	}
 	
+	public function setServeVodFromLive($serveVodFromLive)
+	{
+		$this->serveVodFromLive = $serveVodFromLive;
+	}
+	
+	public function getServeVodFromLive()
+	{
+		return $this->serveVodFromLive;
+	}
+	
+	public function setServeLiveAsVodEntryId($serveLiveAsVodEntryId)
+	{
+		$this->serveLiveAsVodEntryId = $serveLiveAsVodEntryId;
+	}
+	
+	public function getServeLiveAsVodEntryId()
+	{
+		return $this->serveLiveAsVodEntryId;
+	}
+	
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
@@ -552,6 +582,8 @@ class DeliveryProfileDynamicAttributes {
 		$this->playerConfig = $newObj->getPlayerConfig();
 		$this->uiConfId = $newObj->getUiConfId();
 		$this->edgeServerIds = $newObj->getEdgeServerIds();
+		$this->serveVodFromLive = $newObj->getServeVodFromLive();
+		$this->serveLiveAsVodEntryId = $newObj->getServeLiveAsVodEntryId();
 	}
 }
 
