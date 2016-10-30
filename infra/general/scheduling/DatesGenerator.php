@@ -122,8 +122,8 @@ class DatesGenerator
 	private $weekStartDay = 'MO';
 
 	/**
-	 * @var string
-	 * this string as function name who can print data to the log
+	 * @var array
+	 * this array callable as function name who can print data to the log
 	 */
 	private $logger;
 
