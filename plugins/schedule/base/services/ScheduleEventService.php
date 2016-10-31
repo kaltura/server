@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ScheduleEvent service lets you create and manage schedule events
+ * The ScheduleEvent service enables you to create and manage (update, delete, retrieve, etc.) scheduled recording events.
  * @service scheduleEvent
  * @package plugins.schedule
  * @subpackage api.services
