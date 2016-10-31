@@ -115,6 +115,7 @@ $html5Version = $_GET['playerVersion'];
 					 wid: '_' + partnerId,
 					 "uiconf_id": uiConfId,
 					 "flashvars": {
+						 	 "playServerUrls": {"plugin": false},
 							 "streamerType": "hds",
 							 "autoPlay": true,
 							 "forceHDS": true,
