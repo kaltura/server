@@ -126,26 +126,11 @@ $html5Version = $_GET['playerVersion'];
 					 "readyCallback": function( playerId ){
 						var adminKdp = document.getElementById( playerId );
 						adminKdp.addJsListener( 'videoMetadataReceived', 'onSyncPoint' );
-						 adminKdp.addJsListener( 'videoMetadataReceived', 'onId3TagHandler' )
+						adminKdp.addJsListener( 'onId3Tag', 'onSyncPoint' );
 					}
 			 });
 		}
 
-		function onId3TagHandler(metadata){
-                                if ( metadata && metadata.objectType == "KalturaSyncPoint") {
-                                if(lastSyncPointTimestamp && lastSyncPointTimestamp >= metadata.timestamp)
-                                        return;
-                                var date = new Date();
-                                lastSyncPointTime = date.getTime();
-                                lastSyncPointTimestamp = metadata.timestamp;
-                                $('#last_cue_point_time').html(new Date(lastSyncPointTimestamp).toUTCString());
-
-                                $('#btnSendAd').removeAttr('disabled');
-                                log('(onId3Tag) - Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
-                        }
-
-                }
-		
 		function onSyncPoint(metadata){
 			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
 				if(lastSyncPointTimestamp && lastSyncPointTimestamp >= metadata.timestamp)
