@@ -4,8 +4,7 @@ chdir(__DIR__ . '/../');
 require_once(__DIR__ . '/../bootstrap.php');
 
 // add google authenticator library to include path
-set_include_path(get_include_path() . PATH_SEPARATOR.KALTURA_ROOT_PATH . '/vendor/phpGangsta/');
-require_once 'GoogleAuthenticator.php';
+require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 
 $criteria = KalturaCriteria::create(kuserPeer::OM_CLASS);
 $criteria->add(kuserPeer::PARTNER_ID, -2);
