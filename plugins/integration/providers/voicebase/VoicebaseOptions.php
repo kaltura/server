@@ -13,6 +13,11 @@ class VoicebaseOptions
 	 * Voicebase password
 	 */
 	public $apiPassword;
+
+	/**
+	 * Should transform DFXP to a more "common" format
+	 */
+	public $transformDfxp;
 	
 	function __construct($apiKey, $apiPassword)
 	{
