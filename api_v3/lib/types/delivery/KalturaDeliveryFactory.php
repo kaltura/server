@@ -40,6 +40,10 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileGenericRtmp();
 			case KalturaDeliveryProfileType::VOD_PACKAGER_HLS:
 				return new KalturaDeliveryProfileVodPackagerHls();
+			case KalturaDeliveryProfileType::VOD_PACKAGER_DASH:
+				return new KalturaDeliveryProfileVodPackagerPlayServer();
+			case KalturaDeliveryProfileType::VOD_PACKAGER_MSS:
+				return new KalturaDeliveryProfileVodPackagerPlayServer();
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaDeliveryProfile', $type);
 				if(!$obj)

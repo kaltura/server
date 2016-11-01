@@ -140,12 +140,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 */
 	public $supplementaryAssetsFilter;
 
-	/**
-	 * @var bool
-	 */
-	public $adStitchingEnabled;
-	
- 	private static $map_between_objects = array
+	private static $map_between_objects = array
 	(
 			"createdAt",
 			"description",
@@ -167,7 +162,6 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"priority",
 			"extraParams",
 			"supplementaryAssetsFilter",
-			"adStitchingEnabled",
 	);
 	
 	public function getMapBetweenObjects ( )
