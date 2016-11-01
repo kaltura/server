@@ -382,7 +382,13 @@ class DatesGenerator
 		{
 			$this->$param = $value;
 		}
+
+		if (!$this->interval)
+			$this->interval = 1;
+		if (!$this->maxRecurrences)
+			$this->maxRecurrences = 10;
 	}
+
 
 	/**
 	 * Returns a list of timestamps in the specified period.
