@@ -167,7 +167,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"priority",
 			"extraParams",
 			"supplementaryAssetsFilter",
-	        "adStitchingEnabled",
+			"adStitchingEnabled",
 	);
 	
 	public function getMapBetweenObjects ( )
