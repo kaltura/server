@@ -830,7 +830,18 @@ class playManifestAction extends kalturaAction
 		$this->deliveryProfile = $this->initDeliveryProfile();
 		if(!$this->deliveryProfile)
 			return null;
-		
+
+		$this->deliveryAttributes->setUsePlayServer((bool) $this->deliveryProfile->getAdStitchingEnabled() && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
+		if($this->deliveryAttributes->getUsePlayServer())
+		{
+			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
+			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
+			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
+			if(!$this->deliveryAttributes->getUiConfId())
+				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
+		}
+
+
 		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
 		if ($filter)
 		{

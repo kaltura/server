@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_Delivery_DeliveryProfileVodPackagerHls extends Form_Delivery_DeliveryProfileConfiguration
+class Form_Delivery_DeliveryProfileVodPackagerHls extends Form_Delivery_DeliveryProfileVodPackagerPlayServer
 {
 
 	public function getAdvancedSettings()
@@ -12,7 +12,7 @@ class Form_Delivery_DeliveryProfileVodPackagerHls extends Form_Delivery_Delivery
 			'label'			=> 'Allow Fairplay Offline:',
 		));
 
-		return array('allowFairplayOffline');
+		return array_merge(parent::getAdvancedSettings(), array('allowFairplayOffline'));
 	}
 
 }
