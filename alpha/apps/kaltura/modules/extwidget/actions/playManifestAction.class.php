@@ -992,6 +992,7 @@ class playManifestAction extends kalturaAction
 
 	private function setParamsForPlayServer($usePlayServer)
 	{
+		$usePlayServer = $this->deliveryAttributes->getUsePlayServer() || (bool)$usePlayServer;
 		$this->deliveryAttributes->setUsePlayServer((bool) $usePlayServer && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
 		if($this->deliveryAttributes->getUsePlayServer())
 		{
