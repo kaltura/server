@@ -47,6 +47,10 @@ None.
     	partner_otp_internal_ips = @IP_RANGE@  
 	otp_required_partners[] = -2  
 
+### Deployment scripts ###
+- Run 'php alpha/scripts/utils/updateUserLoginData.php'
+
+
 
 ## Enable sort by summary for schedule events##
  - Issue Type: New Feature
