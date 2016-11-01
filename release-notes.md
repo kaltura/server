@@ -48,7 +48,7 @@ None.
 	otp_required_partners[] = -2  
 
 ### Deployment scripts ###
-- Run 'php alpha/scripts/utils/updateUserLoginData.php'
+- Run 'php alpha/scripts/utils/updateAdminConsoleUserLoginData.php'
 
 
 
