@@ -28,8 +28,6 @@ class kUploadTokenMgr
 		$this->_uploadToken->setUserIp(requestUtils::getRemoteAddress());
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		$this->_uploadToken->save();
-		
-		$this->setUploadTokenTempPath();
 	}
 	
 	/**
@@ -226,9 +224,6 @@ class kUploadTokenMgr
 
 			if ($verifyFinalChunk && $currentFileSize != $expectedFileSize)
 				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
-			
-			if($verifyFinalChunk)
-				$this->updateFileExtension($fileData);
 		} else {
 			$uploadFileResource = fopen($uploadFilePath, 'r+b');
 			fseek($uploadFileResource, 0, SEEK_END);
@@ -248,7 +243,18 @@ class kUploadTokenMgr
 	 */
 	protected function handleMoveFile($fileData)
 	{
-		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
+		// get the upload path
+		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
+
+		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
+		// the original file name that was passed to the uploadToken
+		if ($extension === "" || ($extension == "tmp" && $this->_uploadToken->getFileName()))
+			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
+
+		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
+		$this->_uploadToken->setUploadTempPath($uploadFilePath);
+		kFile::fullMkdir($uploadFilePath, 0700);
+		
 		$moveFileSuccess = kFile::moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
 		{
@@ -258,43 +264,6 @@ class kUploadTokenMgr
 		}
 		
 		chmod($uploadFilePath, 0600);
-	}
-	
-	protected function setUploadTokenTempPath()
-	{
-		//if file name is provided take file extension from it
-		$fileName = $this->_uploadToken->getFileName();
-		$extension = $fileName ? strtolower(pathinfo($fileName, PATHINFO_EXTENSION)) : "";
-		
-		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
-		$this->_uploadToken->setUploadTempPath($uploadFilePath);
-		$this->_uploadToken->save();
-		
-		kFile::fullMkdir($uploadFilePath, 0700);
-		touch($uploadFilePath);
-		chmod($uploadFilePath, 0600);
-	}
-	
-	protected function updateFileExtension($fileData)
-	{
-		//check if extension is already defined
-		$tempFilePath = $this->_uploadToken->getUploadTempPath();
-		$extension = strtolower(pathinfo($tempFilePath, PATHINFO_EXTENSION));
-		
-		//check if extension is already defined
-		if($extension !== "" && $extension !== self::NO_EXTENSION_IDENTIFIER)
-			return;
-		
-		//check if file data name contains extension and update file
-		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
-		if($extension !== "")
-		{
-			$newTempFilePath = preg_replace('/\\.[^.]+$/', ".$extension", $tempFilePath);
-			$this->_uploadToken->setUploadTempPath($tempFilePath);
-			$this->_uploadToken->save();
-			
-			kFile::moveFile($tempFilePath, $newTempFilePath);
-		}
 	}
 
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
