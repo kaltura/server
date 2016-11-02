@@ -171,6 +171,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 	private function transformDfxp($content)
 	{
 		$doc = new DOMDocument();
+
 		/**
 		 * Replaces unescaped ampersands
 		 *
@@ -227,8 +228,9 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$divElement = $xpath->query('//ns:div')->item(0);
 		if ($divElement instanceof DOMElement) {
 			$divElement->setAttribute('begin', '00:00:00.000');
-			$divElement->setAttribute('dur', formatDuration($totalDuration));
+			$divElement->setAttribute('dur', $this->formatDuration($totalDuration));
 			$divElement->setAttribute('timeContainer', 'seq');
+			$divElement->parentNode->insertBefore($doc->createTextNode("\n"), $divElement);
 		}
 
 		return $doc->saveXML();
