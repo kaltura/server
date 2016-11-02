@@ -181,7 +181,6 @@ class kUploadTokenMgr
 			
 		if($shouldSave)
 			$this->_uploadToken->save();
-		
 	}
 	
 	/**
@@ -291,28 +290,6 @@ class kUploadTokenMgr
 		kFile::fullMkdir($uploadFilePath, 0700);
 		touch($uploadFilePath);
 		chmod($uploadFilePath, 0600);
-	}
-	
-	protected function updateFileExtension($fileData)
-	{
-		//check if extension is already defined
-		$tempFilePath = $this->_uploadToken->getUploadTempPath();
-		$extension = strtolower(pathinfo($tempFilePath, PATHINFO_EXTENSION));
-		
-		//check if extension is already defined
-		if($extension !== "" && $extension !== self::NO_EXTENSION_IDENTIFIER)
-			return;
-		
-		//check if file data name contains extension and update file
-		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
-		if($extension !== "")
-		{
-			$newTempFilePath = preg_replace('/\\.[^.]+$/', ".$extension", $tempFilePath);
-			$this->_uploadToken->setUploadTempPath($newTempFilePath);
-			$this->_uploadToken->save();
-			
-			kFile::moveFile($tempFilePath, $newTempFilePath);
-		}
 	}
 
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
