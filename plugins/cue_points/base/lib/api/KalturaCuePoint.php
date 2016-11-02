@@ -269,7 +269,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	public function validateStartTime($cuePointId = null)
 	{
 		if ($this->startTime === null) {
-			if(!$this->isNull('duration') || !$this->isNull('endTime'))
+			if((!$this->triggeredAt && !$this->isNull('duration')) || !$this->isNull('endTime'))
 				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
 			$this->startTime = 0;
 		}
