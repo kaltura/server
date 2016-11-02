@@ -17,7 +17,7 @@ class CaptionAssetItemIndex extends BaseIndexObject
 
 	public static function getSphinxIdField()
 	{
-		return 'int_id';
+		return 'id';
 	}
 
 	public static function getPropelIdField()
