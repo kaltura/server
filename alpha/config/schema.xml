@@ -1536,6 +1536,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" default="2"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creator_id" type="varchar" size="100" />
 		<index name="partner_id_category_id_index">
 			<index-column name="partner_id" />
 			<index-column name="category_id" />
