@@ -102,7 +102,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$transcode = $root->addChild('Transcode');
 		
 		$encodes = $transcode->addChild('Encodes');
-		$sourceFrameRate = null;
+		$defaultFrameRate = null;
 
 		$groups = array();
 		foreach($liveParams as $liveParamsItem)
@@ -114,12 +114,11 @@ class LiveConversionProfileService extends KalturaBaseService
 			if ($liveParamsItem->hasTag(assetParams::TAG_SOURCE)) {
 				if ($liveParamsItem->getFrameRate() && $liveParamsItem->getFrameRate() !== 0) {
 					KalturaLog::info("Setting default frame rate to " . $liveParamsItem->getFrameRate());
-					$sourceFrameRate = (int)$liveParamsItem->getFrameRate();
+					$defaultFrameRate = (int)$liveParamsItem->getFrameRate();
 				}
 			}
 			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
-			$liveParamsItem->getTagsArray();
-			$tags[] = 'all';
+			$tags = array("all");
 			foreach($tags as $tag)
 			{
 				if(!isset($groups[$tag]))
@@ -151,10 +150,10 @@ class LiveConversionProfileService extends KalturaBaseService
 		}
 
 		$properties = $transcode->addChild('Properties');
-		if ($sourceFrameRate) {
+		if ($defaultFrameRate) {
 			$property = $properties->addChild('Property');
 			$property->addChild('Name', 'sourceStreamFrameRate');
-			$property->addChild('Value', $sourceFrameRate);
+			$property->addChild('Value', $defaultFrameRate);
 			$property->addChild('Type', 'Double');
 		}
 
