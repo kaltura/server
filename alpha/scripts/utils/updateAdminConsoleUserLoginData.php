@@ -14,6 +14,9 @@ foreach ($kusers as $kuser)
 {
 	/*@var $kuser kuser */
 	$userLoginData = $kuser->getLoginData();
+	if (!$userLoginData)
+		continue;
+	
 	KalturaLog::info ("setting user hash for user: " . $kuser->getPuserId());
 	$userLoginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
 	$userLoginData->save();
