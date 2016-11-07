@@ -1185,9 +1185,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
+			if (self::shouldCopyAsset($sourceAsset))
+				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 	}
 
+	private static function shouldCopyAsset($sourceAsset)
+	{
+		// timedThumbAsset are copied when ThumbCuePoint are copied
+		if (get_class($sourceAsset) === 'timedThumbAsset')
+			return false;
+		return true;
+	}
 
 	/**
 	 * @param entry $entry
