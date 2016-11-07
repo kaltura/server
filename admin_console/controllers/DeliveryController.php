@@ -179,10 +179,9 @@ class DeliveryController extends Zend_Controller_Action
 			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS:
 				return 'Kaltura_Client_Type_DeliveryProfileVodPackagerHls';
 			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH:
-				return 'Form_Delivery_DeliveryProfileVodPackagerPlayServer';
+				return 'Kaltura_Client_Type_DeliveryProfileVodPackagerPlayServer';
 			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_MSS:
-				return 'Form_Delivery_DeliveryProfileVodPackagerPlayServer';
-
+				return 'Kaltura_Client_Type_DeliveryProfileVodPackagerPlayServer';
 			default:
 				return 'Kaltura_Client_Type_DeliveryProfile';
 		}
