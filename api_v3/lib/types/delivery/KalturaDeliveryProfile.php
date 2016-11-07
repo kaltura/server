@@ -139,8 +139,8 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 * @var KalturaAssetFilter
 	 */
 	public $supplementaryAssetsFilter;
-	
- 	private static $map_between_objects = array
+
+	private static $map_between_objects = array
 	(
 			"createdAt",
 			"description",

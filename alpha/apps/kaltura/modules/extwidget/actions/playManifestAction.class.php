@@ -830,7 +830,10 @@ class playManifestAction extends kalturaAction
 		$this->deliveryProfile = $this->initDeliveryProfile();
 		if(!$this->deliveryProfile)
 			return null;
-		
+
+
+		$this->setParamsForPlayServer($this->deliveryProfile->getAdStitchingEnabled());
+
 		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
 		if ($filter)
 		{
@@ -986,7 +989,21 @@ class playManifestAction extends kalturaAction
 			);
 		}
 	}
-	
+
+	private function setParamsForPlayServer($usePlayServer)
+	{
+		$usePlayServer = $this->deliveryAttributes->getUsePlayServer() || (bool)$usePlayServer;
+		$this->deliveryAttributes->setUsePlayServer((bool) $usePlayServer && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
+		if($this->deliveryAttributes->getUsePlayServer())
+		{
+			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
+			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
+			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
+			if(!$this->deliveryAttributes->getUiConfId())
+				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
+		}
+	}
+
 	public function execute()
 	{
 		if($this->getRequestParameter("format", "Empty") !== PlaybackProtocol::APPLE_HTTP_TO_MC)
@@ -1047,15 +1064,7 @@ class playManifestAction extends kalturaAction
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
-		$this->deliveryAttributes->setUsePlayServer((bool) $this->getRequestParameter("usePlayServer") && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
-		if($this->deliveryAttributes->getUsePlayServer())
-		{
-			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
-			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
-			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
-			if(!$this->deliveryAttributes->getUiConfId())
-				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
-		}
+		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
 
 		if($this->secureEntryHelper)
 			$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
