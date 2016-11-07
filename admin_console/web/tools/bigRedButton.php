@@ -115,6 +115,7 @@ $html5Version = $_GET['playerVersion'];
 					 wid: '_' + partnerId,
 					 "uiconf_id": uiConfId,
 					 "flashvars": {
+						 	 "playServerUrls": {"plugin": false},
 							 "streamerType": "hds",
 							 "autoPlay": true,
 							 "forceHDS": true,
@@ -125,6 +126,7 @@ $html5Version = $_GET['playerVersion'];
 					 "readyCallback": function( playerId ){
 						var adminKdp = document.getElementById( playerId );
 						adminKdp.addJsListener( 'videoMetadataReceived', 'onSyncPoint' );
+						adminKdp.addJsListener( 'onId3Tag', 'onSyncPoint' );
 					}
 			 });
 		}

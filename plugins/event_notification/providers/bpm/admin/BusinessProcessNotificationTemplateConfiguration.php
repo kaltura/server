@@ -19,24 +19,28 @@ class Form_BusinessProcessNotificationTemplateConfiguration extends Form_EventNo
 			
 		$client = Infra_ClientHelper::getClient();
 		$businessProcessNotificationPlugin = Kaltura_Client_BusinessProcessNotification_Plugin::get($client);
-		
+
+		$filter = new Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerFilter();
+		$filter->currentDcOrExternal = Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE;
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageSize = 500;
 		
-		$serversList = $businessProcessNotificationPlugin->businessProcessServer->listAction(null, $pager);
+		$serversList = $businessProcessNotificationPlugin->businessProcessServer->listAction($filter, $pager);
 		/* @var $serversList Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerListResponse */
-		
 		$businessProcessProvider = null;
 		$servers = array('' => 'Select Server');
 		foreach($serversList->objects as $server)
 		{
 			/* @var $server Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServer */
-			$servers[$server->id] = $server->name;
-			
-			if($server->id == $eventNotificationTemplate->serverId)
+			if(!is_null($server->dc))
+				$servers[0] = 'Kaltura';
+			else
+				$servers[$server->id] = $server->name;
+
+			if($server->id == $eventNotificationTemplate->serverId || (!is_null($server->dc) && 0 == $eventNotificationTemplate->serverId))
 				$businessProcessProvider = kBusinessProcessProvider::get($server);
 		}
-		
+
 		$processes = array();
 		if($businessProcessProvider)
 		{

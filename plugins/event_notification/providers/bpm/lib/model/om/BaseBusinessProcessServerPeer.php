@@ -26,7 +26,7 @@ abstract class BaseBusinessProcessServerPeer {
 	const TM_CLASS = 'TableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -61,6 +61,9 @@ abstract class BaseBusinessProcessServerPeer {
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'business_process_server.CUSTOM_DATA';
 
+	/** the column name for the DC field */
+	const DC = 'business_process_server.DC';
+
 	/**
 	 * An identiy map to hold any loaded instances of BusinessProcessServer objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -77,11 +80,11 @@ abstract class BaseBusinessProcessServerPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Description', 'Status', 'Type', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'description', 'status', 'type', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::STATUS, self::TYPE, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'description', 'status', 'type', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Description', 'Status', 'Type', 'CustomData', 'Dc', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'description', 'status', 'type', 'customData', 'dc', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::STATUS, self::TYPE, self::CUSTOM_DATA, self::DC, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'description', 'status', 'type', 'custom_data', 'dc', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -91,11 +94,11 @@ abstract class BaseBusinessProcessServerPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Name' => 4, 'SystemName' => 5, 'Description' => 6, 'Status' => 7, 'Type' => 8, 'CustomData' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'name' => 4, 'systemName' => 5, 'description' => 6, 'status' => 7, 'type' => 8, 'customData' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::NAME => 4, self::SYSTEM_NAME => 5, self::DESCRIPTION => 6, self::STATUS => 7, self::TYPE => 8, self::CUSTOM_DATA => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'name' => 4, 'system_name' => 5, 'description' => 6, 'status' => 7, 'type' => 8, 'custom_data' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Name' => 4, 'SystemName' => 5, 'Description' => 6, 'Status' => 7, 'Type' => 8, 'CustomData' => 9, 'Dc' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'name' => 4, 'systemName' => 5, 'description' => 6, 'status' => 7, 'type' => 8, 'customData' => 9, 'dc' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::NAME => 4, self::SYSTEM_NAME => 5, self::DESCRIPTION => 6, self::STATUS => 7, self::TYPE => 8, self::CUSTOM_DATA => 9, self::DC => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'name' => 4, 'system_name' => 5, 'description' => 6, 'status' => 7, 'type' => 8, 'custom_data' => 9, 'dc' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -175,6 +178,7 @@ abstract class BaseBusinessProcessServerPeer {
 		$criteria->addSelectColumn(BusinessProcessServerPeer::STATUS);
 		$criteria->addSelectColumn(BusinessProcessServerPeer::TYPE);
 		$criteria->addSelectColumn(BusinessProcessServerPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(BusinessProcessServerPeer::DC);
 	}
 
 	/**
@@ -489,7 +493,7 @@ abstract class BaseBusinessProcessServerPeer {
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
 			}
-			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
 			{
 				// all is allowed - don't add anything to the criteria
 			}
@@ -864,6 +868,15 @@ abstract class BaseBusinessProcessServerPeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}

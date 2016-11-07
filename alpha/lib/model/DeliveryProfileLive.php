@@ -101,8 +101,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$this->initManualLiveStreamConfiguration($entry);
 			return;
 		}
+		$status = array(EntryServerNodeStatus::PLAYABLE);
+		if($this->getDynamicAttributes()->getServeVodFromLive())
+			$status[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
 		
-		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getDynamicAttributes()->getEntryId());
+		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($this->getDynamicAttributes()->getEntryId(), $status);
 		if(!count($liveEntryServerNodes))
 			return;
 		
@@ -123,7 +126,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			}
 		}
 		
-		if(!$this->liveStreamConfig->getUrl())
+		if(!$this->liveStreamConfig->getUrl() && count($liveEntryServerNodes))
 		{
 			$liveEntryServerNode = array_shift($liveEntryServerNodes);
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
@@ -287,7 +290,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$livePackagerUrl = rtrim($livePackagerUrl, "/");
 		
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
-		$entryId = $this->getDynamicAttributes()->getEntryId();
+		
+		if($this->getDynamicAttributes()->getServeVodFromLive())
+			$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
+		else
+			$entryId = $this->getDynamicAttributes()->getEntryId();
 		
 		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);

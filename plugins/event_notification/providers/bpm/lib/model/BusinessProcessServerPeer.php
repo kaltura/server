@@ -46,5 +46,22 @@ class BusinessProcessServerPeer extends BaseBusinessProcessServerPeer {
 			
 		return null;
 	}
+
+	/**
+	 * Retrieve a single object by dc.
+	 *
+	 * @param      int $dc
+	 * @param      PropelPDO $con the connection to use
+	 * @return     BusinessProcessServer
+	 */
+	public static function retrieveByDc($dc, PropelPDO $con = null)
+	{
+			$criteria = new Criteria(BusinessProcessServerPeer::DATABASE_NAME);
+			$criteria->add(BusinessProcessServerPeer::DC, $dc);
+
+			$result = BusinessProcessServerPeer::doSelectOne($criteria, $con);
+
+			return $result;
+	}
 	
 } // BusinessProcessServerPeer

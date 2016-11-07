@@ -262,6 +262,8 @@ class KalturaErrors extends APIErrors
 
 	const NO_EXTERNAL_CONTENT_EXISTS = "NO_EXTERNAL_CONTENT_EXISTS;;Can't delete local content because no external content exists";
 
+	const GENERATE_TRANSCODING_COMMAND_FAIL = "GENERATE_TRANSCODING_COMMAND_FAIL;ASSET_ID,MEDIA_INFO,REASON;Failed to create proper transcoding command for asset id \"@ASSET_ID@\" and ffprobe info [@MEDIA_INFO] due to @REASON@";
+
 	/**
 	 * ThumbAsset Service
 	 */
@@ -645,4 +647,8 @@ class KalturaErrors extends APIErrors
 	const MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE = "MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE;Must filter on entry id or server type";
 	const ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR = "ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR;OBJ_TYPE,ENTRY_SERVER_NODE_ID;There is an error in the DB, object type [@OBJ_TYPE@] of EntryServerNode id [@ENTRY_SERVER_NODE_ID@] is unknown";
 	
+	/*
+	 * OTP error
+	 */
+	const INVALID_OTP = 'INVALID_OTP;OTP provided failed to validate';
 }

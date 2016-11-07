@@ -3265,6 +3265,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$this->setSource($value);
 	}
 	
+	public function setSource($v)
+	{
+		if($this->getSource() != EntrySourceType::KALTURA_RECORDED_LIVE)
+			parent::setSource($v);
+	}
+	
 	public function setSearchProviderType($value)
 	{
 		$this->setSource($value);

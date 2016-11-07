@@ -620,7 +620,7 @@ abstract class LiveEntry extends entry
 			if ($dbLiveEntryServerNode->getDc() === kDataCenterMgr::getCurrentDcId() && !$this->isCacheValid($dbLiveEntryServerNode))
 			{
 				KalturaLog::info("Removing media server id [" . $dbLiveEntryServerNode->getServerNodeId() . "]");
-				$dbLiveEntryServerNode->delete();
+				$dbLiveEntryServerNode->deleteOrMarkForDeletion();
 			}
 		}
 	}
@@ -789,7 +789,7 @@ abstract class LiveEntry extends entry
 			$protocol = null;
 			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
 			{
-				$config = $dbEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
+				$config = $this->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
 				if ($config)
 				{
 					$url = $config->getUrl();
@@ -802,7 +802,7 @@ abstract class LiveEntry extends entry
 			{
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
 				$dpda= new DeliveryProfileDynamicAttributes();
-				$dpda->setEntryId($entryId);
+				$dpda->setEntryId($this->getEntryId());
 				$dpda->setFormat($protocol);
 				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 				if($deliveryProfile && $deliveryProfile->isLive($url))
@@ -813,5 +813,53 @@ abstract class LiveEntry extends entry
 		}
 		
 		return false;
+	}
+	
+	public function getCurrentDuration($currChunkDuration, $maxRecordingDuration)
+	{
+		$lastDuration = 0;
+		$recordedEntry = null;
+		$recordedEntryId = $this->getRecordedEntryId();
+		
+		if ($recordedEntryId)
+		{
+			$recordedEntry = entryPeer::retrieveByPK($recordedEntryId);
+			if ($recordedEntry) 
+			{
+				if ($recordedEntry->getReachedMaxRecordingDuration()) 
+				{
+					KalturaLog::err("Entry [{$this->getId()}] has already reached its maximal recording duration.");
+					return $maxRecordingDuration + 1;
+				}
+				// if entry is in replacement, the replacement duration is more accurate
+				if ($recordedEntry->getReplacedEntryId()) 
+				{
+					$replacementRecordedEntry = entryPeer::retrieveByPK($recordedEntry->getReplacedEntryId());
+					if ($replacementRecordedEntry) 
+					{
+						$lastDuration = $replacementRecordedEntry->getLengthInMsecs();
+					}
+				}
+				else 
+				{
+					$lastDuration = $recordedEntry->getLengthInMsecs();
+				}
+			}
+		}
+		
+		$liveSegmentDurationInMsec = (int)($currChunkDuration * 1000);
+		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
+		
+		if($currentDuration > $maxRecordingDuration)
+		{
+			if ($recordedEntry) {
+				$recordedEntry->setReachedMaxRecordingDuration(true);
+				$recordedEntry->save();
+			}
+			KalturaLog::err("Entry [{$this->getId()}] duration [" . $lastDuration . "] and current duration [$currentDuration] is more than max allowed duration [$maxRecordingDuration]");
+			return $maxRecordingDuration + 1;
+		}
+		
+		return $currentDuration;
 	}
 }

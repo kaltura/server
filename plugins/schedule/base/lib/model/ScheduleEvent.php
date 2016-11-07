@@ -272,4 +272,16 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		}
 		return implode(' ', $system_names);
 	}
+
+	public function getSummary()
+	{
+		if (parent::getSummary())
+			return parent::getSummary();
+		if ($this->parent_id)
+		{
+			$parentObj = ScheduleEventPeer::retrieveByPK($this->parent_id);
+			if ($parentObj)
+				return $parentObj->getSummary();
+		}
+	}
 } // ScheduleEvent

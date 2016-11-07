@@ -107,4 +107,13 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		}
 		return $playableEntryServerNodes;
 	}
+	
+	public static function retrieveByEntryIdAndStatuses($entryId, $statuses)
+	{
+		$c = new Criteria();
+		$c->add(EntryServerNodePeer::ENTRY_ID, $entryId);
+		$c->add(EntryServerNodePeer::STATUS, $statuses, Criteria::IN);
+		
+		return EntryServerNodePeer::doSelect($c);
+	}
 } // EntryServerNodePeer

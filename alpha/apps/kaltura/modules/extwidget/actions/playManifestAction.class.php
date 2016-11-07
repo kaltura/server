@@ -234,6 +234,17 @@ class playManifestAction extends kalturaAction
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->entry->getPartnerId()) || 
 			$this->secureEntryHelper->hasRules())
 			$this->forceUrlTokenization = true;
+		
+		//check if recorded entry is ready if not than serve the live entry
+		if(myEntryUtils::shouldServeVodFromLive($this->entry))
+		{
+			$this->deliveryAttributes->setServeVodFromLive(true);
+			$this->deliveryAttributes->setServeLiveAsVodEntryId($this->entryId);
+			$this->entryId = $this->entry->getRootEntryId();
+			$this->entry = entryPeer::retrieveByPK($this->entryId);
+			if (!$this->entry || $this->entry->getStatus() == entryStatus::DELETED)
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
 	}
 	
 	protected function initFlavorIds()
@@ -490,16 +501,6 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
-	private function addAltAudioTag()
-	{
-		$tags = $this->deliveryAttributes->getTags();
-		foreach ($tags as &$tagsFallback)
-		{
-			$tagsFallback[] = assetParams::TAG_ALT_AUDIO;
-		}
-		$this->deliveryAttributes->setTags($tags);
-	}
-
 	protected function initPlaylistFlavorAssetArray()
 	{
 		list($entryIds, $durations, $mediaEntry) =
@@ -518,9 +519,9 @@ class playManifestAction extends kalturaAction
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 		{
-			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
-				$this->addAltAudioTag();
 			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
 		$this->deliveryAttributes->setStorageId(null);
@@ -600,9 +601,9 @@ class playManifestAction extends kalturaAction
 
 		if ($flavorByTags)
 		{
-			if(self::shouldAddAltAudioFlavors(($this->deliveryAttributes->getFormat())))
-				$this->addAltAudioTag();
 			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
 		$flavorAssets = $filteredFlavorAssets;
@@ -912,10 +913,10 @@ class playManifestAction extends kalturaAction
 	{
 		$this->initFlavorParamsIds();
 
-		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes) && !$this->deliveryAttributes->getServeVodFromLive())
  		{
  			if (!$this->entry->hasMediaServer())
- 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
  			
  			kApiCache::setExpiry(120);
  		}

@@ -52,6 +52,16 @@ class LiveEntryServerNode extends EntryServerNode
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
 				$liveEntry->setLastBroadcast(time());
 			
+			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::MARKED_FOR_DELETION)
+			{
+				$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getEntryId());
+				if(!count($playableServerNodes))
+				{
+					$liveEntry->unsetMediaServer();
+					$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
+				}
+			}
+			
 			if(!$liveEntry->getCurrentBroadcastStartTime() && $this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 				$liveEntry->setCurrentBroadcastStartTime(time());
 			
@@ -70,7 +80,7 @@ class LiveEntryServerNode extends EntryServerNode
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":dc=".$this->getDc());
 		
 		$liveEntry = $this->getLiveEntry();
-		if($liveEntry)
+		if($liveEntry && $this->getStatus() !== EntryServerNodeStatus::MARKED_FOR_DELETION)
 		{
 			/* @var $liveEntry LiveEntry */
 			$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($liveEntry->getId());
@@ -138,7 +148,8 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
 		if(!$liveEntry)
 		{
-			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, will not validate entryServerNode registered");
+			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
+			$this->delete();
 			return;
 		}
 		
@@ -146,7 +157,45 @@ class LiveEntryServerNode extends EntryServerNode
 		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this))
 		{
 			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
-			$this->delete();
+			$this->deleteOrMarkForDeletion($liveEntry);
 		}
+	}
+	
+	public function deleteOrMarkForDeletion($entry = null)
+	{
+		$liveEntry = $entry ? $entry : entryPeer::retrieveByPK($this->getEntryId());
+		if(!$liveEntry)
+		{
+			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
+			$this->delete();
+			return;
+		}
+		
+		$recordStatus = $liveEntry->getRecordStatus();
+		if($recordStatus && $recordStatus !== RecordStatus::DISABLED)
+		{
+			$recordedEntryId = $liveEntry->getRecordedEntryId();
+			$recordedEntry = $recordedEntryId ? entryPeer::retrieveByPK($recordedEntryId) : null;
+			if(!$recordedEntry)
+			{
+				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
+				$this->delete();
+				return;
+			}
+			
+			if($recordedEntry && $recordedEntry->getStatus() === entryStatus::READY)
+			{
+				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] found and ready, clearing entry server node from db");
+				$this->delete();
+				return;
+			}
+			
+			$this->setStatus(EntryServerNodeStatus::MARKED_FOR_DELETION);
+			$this->save();
+			return;
+		}
+		
+		KalturaLog::debug("Live entry with id [{$liveEntry->getId()}], is set with recording disabled, clearing entry server node id [{$this->getId()}] from db");
+		$this->delete();
 	}
 }

@@ -381,6 +381,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 			baseObjectFilter::MATCH_AND => "MatchAnd",
 			baseObjectFilter::NOT_CONTAINS => "NotContains",
 			baseObjectFilter::IS_EMPTY => "Empty",
+			baseObjectFilter::EQ_OR_NULL => "EqualOrNull",
 		);
 		
 		

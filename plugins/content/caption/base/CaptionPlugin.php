@@ -8,7 +8,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	const PLUGIN_NAME = 'caption';
 	const KS_PRIVILEGE_CAPTION = 'caption';
 
-	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager'; 
+	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
+
+       const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -434,14 +436,40 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$partnerId = $captionAsset->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$secret = $partner->getSecret();
-		$privilege = self::KS_PRIVILEGE_CAPTION.":".$captionAsset->getEntryId();
+		$privileges = self::KS_PRIVILEGE_CAPTION.":".$captionAsset->getEntryId();
+       	$privileges .= "," . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ":" . $captionAsset->getEntryId();
+        	$privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . self::SERVE_WEBVTT_URL_PREFIX . '*';
 		$ksStr = '';
 		
-		kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
+		kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privileges);
 		
 		return $ksStr;
 	}
 
+	static protected function getLocalCaptionUrl($config, asset $captionAsset)
+	{
+		$deliveryProfile = $config->deliveryProfile;
+			
+		$url = $deliveryProfile->getAssetUrl($captionAsset, false);
+		$url = preg_replace('/^https?:\/\//', '', $url);
+		$url = ltrim($url, "/");
+			
+		$urlPrefix = $deliveryProfile->getUrl();
+		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
+		$urlPrefix = $deliveryProfile->getDynamicAttributes()->getMediaProtocol() . '://' . $urlPrefix;
+		$urlPrefix = rtrim($urlPrefix, "/") . "/";
+		
+		$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
+		if ($urlPrefixPath &&
+				substr($urlPrefix, -strlen($urlPrefixPath)) == $urlPrefixPath)
+		{
+			$urlPrefix = substr($urlPrefix, 0, -strlen($urlPrefixPath));
+			$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
+		}
+		
+		return array($urlPrefix, $url);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlayManifestContributor::getManifestEditors()
 	 */
@@ -474,10 +502,27 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$captionAssetObj = array();
 
 					if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)
-						$captionAssetObj['url'] = $captionAsset->getExternalUrl($config->storageId);    // Currently only external caption assets are supported
+					{
+						// pass null as storageId in order to support any storage profile and not the one selected by the current video flavors
+						$url = $captionAsset->getExternalUrl(null);
+						if (!$url)
+						{
+							list($urlPrefix, $url) = self::getLocalCaptionUrl($config, $captionAsset);
+							
+							$captionAssetObj['urlPrefix'] = $urlPrefix;
+							$captionAssetObj['tokenizer'] = $config->deliveryProfile->getTokenizer();
+						}
+						
+						$captionAssetObj['url'] = $url;
+					}
 					else
 					{
 						if (!PermissionPeer::isValidForPartner(CaptionPermissionName::FEATURE_GENERATE_WEBVTT_CAPTIONS, $captionAsset->getPartnerId()))
+							continue;
+						
+						$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+						$fs = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
+						if (reset($fs) === null)
 							continue;
 
 						$cdnHost = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
@@ -492,7 +537,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							$ksStr = '/ks/' . self::generateKsForCaptionServe($captionAsset);
 						}
 
-						$captionAssetObj['url'] = $cdnHost . '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT' .
+						$captionAssetObj['url'] = $cdnHost . self::SERVE_WEBVTT_URL_PREFIX .
 							'/captionAssetId/' . $captionAsset->getId() . $ksStr . $versionStr . '/a.m3u8';
 					}
 					$label = $captionAsset->getLabel();

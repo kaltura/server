@@ -119,8 +119,13 @@ class DatesGenerator
 	 * This is also significant when in a YEARLY frequency when a byWeekNumber rule part is specified.
 	 * The default value is MONDAY.
 	 */
-	private $weekStartDay;
+	private $weekStartDay = 'MO';
 
+	/**
+	 * @var array
+	 * this array callable as function name who can print data to the log
+	 */
+	private $logger;
 
 	/**
 	 * @return the $name
@@ -365,15 +370,23 @@ class DatesGenerator
 	/**
 	 * @param int $maxRecurrences
 	 * @param array $paramsArray
+	 * @param string $logger
 	 */
-	public function __construct($maxRecurrences = 1000, $paramsArray = array())
+	public function __construct($maxRecurrences = null, $paramsArray = array(), $logger = null)
 	{
 		$this->maxRecurrences = $maxRecurrences;
+		$this->logger = $logger;
 		foreach($paramsArray as $param => $value)
 		{
 			$this->$param = $value;
 		}
+
+		if (!$this->interval)
+			$this->interval = 1;
+		if (!$this->maxRecurrences)
+			$this->maxRecurrences = 10;
 	}
+
 
 	/**
 	 * Returns a list of timestamps in the specified period.
@@ -407,7 +420,7 @@ class DatesGenerator
 		if(!is_null($this->until) && $this->until < $periodEnd)
 			$periodEnd = $this->until;
 
-		KalturaLog::debug("Fetching dates name [$this->name] start-time[" . date('d/n/y G:i:s', $periodStart) . "] end-time[" . date('d/n/y G:i:s', $periodEnd) . "] seed[" . date('d/n/y G:i:s', $seed) . "] max-recurrences [$limit]");
+		$this->log("Fetching dates name [$this->name] start-time[" . date('d/n/y G:i:s', $periodStart) . "] end-time[" . date('d/n/y G:i:s', $periodEnd) . "] seed[" . date('d/n/y G:i:s', $seed) . "] max-recurrences [$limit]");
 		if(!$seed)
 			$seed = $periodStart;
 
@@ -425,13 +438,18 @@ class DatesGenerator
 			$calParts['hours'] = $this->byHour;
 
 		if(!is_null($this->byMonthDay))
-			$calParts['mday'] = $this->byHour;
+			$calParts['mday'] = $this->byMonthDay;
 
 		if(!is_null($this->byMonth))
-			$calParts['mon'] = $this->byHour;
+			$calParts['mon'] = $this->byMonth;
 
-		$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
-		KalturaLog::debug("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
+		$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $calParts['mon'], $calParts['year']);
+		if ($calParts['mday'] >= $daysInMonth)
+			$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon']+1, 0, $calParts['year']);
+		else
+			$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
+
+		$this->log("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
 
 		$invalidCandidateCount = 0;
 		if($limit && $this->count && $this->count < $limit)
@@ -441,19 +459,20 @@ class DatesGenerator
 		{
 			if($this->until && $cal > $this->until)
 			{
-				KalturaLog::debug("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed until [" . date('d/n/y G:i:s', $this->until) . "]");
+				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed until [" . date('d/n/y G:i:s', $this->until) . "]");
 				break;
 			}
 			if($cal > $periodEnd)
 			{
-				KalturaLog::debug("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed period-end [" . date('d/n/y G:i:s', $periodEnd) . "]");
+				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed period-end [" . date('d/n/y G:i:s', $periodEnd) . "]");
 				break;
 			}
 			if($limit && (count($dates) + $invalidCandidateCount) >= $limit)
 			{
-				KalturaLog::debug("Count [" . count($dates) . "] passed limit [$limit]");
+				$this->log("Count [" . count($dates) . "] passed limit [$limit]");
 				break;
 			}
+
 			$candidates = $this->getCandidates($cal);
 			foreach($candidates as $candidate)
 			{
@@ -481,7 +500,7 @@ class DatesGenerator
 			switch($this->frequency)
 			{
 				case DatesGenerator::MONTHLY:
-					$cal = mktime(0, 0, 0, $d['mon'] + 1, 1, $d['year']);
+					$cal = mktime($d['hours'], $d['minutes'], $d['seconds'], $d['mon'] + $this->interval, 1, $d['year']);
 					break;
 
 				default:
@@ -760,11 +779,21 @@ class DatesGenerator
 		}
 		$monthDayDates = array();
 		$monthDays = explode(',', $this->byMonthDay);
+		natsort($monthDays);
+
 		foreach($dates as $date)
 		{
 			$cal = getdate($date);
+			$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $cal['mon'], $cal['year']);
+
 			foreach($monthDays as $monthDay)
 			{
+				if ($monthDay >= $daysInMonth)
+				{
+					$monthDayDates[] = mktime($cal['hours'], $cal['minutes'], $cal['seconds'], $cal['mon']+1, 0, $cal['year']);
+					break;
+				}
+
 				$monthDayDates[] = mktime($cal['hours'], $cal['minutes'], $cal['seconds'], $cal['mon'], $monthDay, $cal['year']);
 			}
 		}
@@ -861,19 +890,9 @@ class DatesGenerator
 		{
 			// Find the target day in the current week
 			$t = $cal;
-			// Back up to Sunday
 			$current = getdate($t);
-			if($current['weekday'] != 'Sunday')
-			{
-				$sunday = getdate(strtotime('-1 Sunday', $cal));
-				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $sunday['mon'], $sunday['mday'], $sunday['year']);
-			}
-			// Move head to the target day
-			if($calDay != 'Sunday')
-			{
-				$target = getdate(strtotime("+1 $calDay", $t));
-				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
-			}
+			$target = getdate(strtotime("+1 $calDay", $t));
+			$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
 			$days[] = $t;
 		}
 		elseif($this->frequency == DatesGenerator::MONTHLY || $this->byMonth)
@@ -996,6 +1015,12 @@ class DatesGenerator
 			}
 		}
 		return $minutelyDates;
+	}
+
+	private function log($str)
+	{
+		if ($this->logger)
+			call_user_func($this->logger, '[From DatesGenerator] ' .$str);
 	}
 
 }

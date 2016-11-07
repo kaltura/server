@@ -47,6 +47,7 @@ class BusinessProcessServerTableMap extends TableMap {
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

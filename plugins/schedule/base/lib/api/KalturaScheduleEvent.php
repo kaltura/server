@@ -30,6 +30,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	/**
 	 * Defines a short summary or subject for the event
 	 * @var string
+	 * @filter order
 	 * @minLength 1
 	 * @maxLength 256
 	 */

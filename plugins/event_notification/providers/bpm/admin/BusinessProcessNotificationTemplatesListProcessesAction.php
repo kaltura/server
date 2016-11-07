@@ -42,9 +42,20 @@ class BusinessProcessNotificationTemplatesListProcessesAction extends KalturaApp
 			Infra_ClientHelper::impersonate($partnerId);
 		
 		try{
-			$server = $businessProcessNotificationPlugin->businessProcessServer->get($serverId);
-			/* @var $server Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServer */
-	
+			if($serverId == 0)
+			{
+				$filter = new Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerFilter();
+				$filter->currentDc = Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE;
+				$pager = new Kaltura_Client_Type_FilterPager();
+				$pager->pageSize = 1;
+				$serversList = $businessProcessNotificationPlugin->businessProcessServer->listAction($filter, $pager);
+				/* @var $serversList Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServerListResponse */
+				$server = $serversList->objects[0];
+			}
+			else
+				$server = $businessProcessNotificationPlugin->businessProcessServer->get($serverId);
+				/* @var $server Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessServer */
+
 			$businessProcessProvider = kBusinessProcessProvider::get($server);
 			$processes = $businessProcessProvider->listBusinessProcesses();
 			asort($processes);

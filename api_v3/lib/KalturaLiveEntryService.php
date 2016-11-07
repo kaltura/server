@@ -76,41 +76,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbAsset = assetPeer::retrieveById($assetId);
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
-
-		$lastDuration = 0;
-		$recordedEntry = null;
-		if ($dbEntry->getRecordedEntryId())
-		{
-			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
-			if ($recordedEntry) {
-				if ($recordedEntry->getReachedMaxRecordingDuration()) {
-					KalturaLog::err("Entry [$entryId] has already reached its maximal recording duration.");
-					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
-				}
-				// if entry is in replacement, the replacement duration is more accurate
-				if ($recordedEntry->getReplacedEntryId()) {
-					$replacementRecordedEntry = entryPeer::retrieveByPK($recordedEntry->getReplacedEntryId());
-					if ($replacementRecordedEntry) {
-						$lastDuration = $replacementRecordedEntry->getLengthInMsecs();
-					}
-				}
-				else {
-					$lastDuration = $recordedEntry->getLengthInMsecs();
-				}
-			}
-		}
-
-		$liveSegmentDurationInMsec = (int)($duration * 1000);
-		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
-
+		
 		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
+		$currentDuration = $dbEntry->getCurrentDuration($duration, $maxRecordingDuration);
 		if($currentDuration > $maxRecordingDuration)
 		{
-			if ($recordedEntry) {
-				$recordedEntry->setReachedMaxRecordingDuration(true);
-				$recordedEntry->save();
-			}
-			KalturaLog::err("Entry [$entryId] duration [" . $lastDuration . "] and current duration [$currentDuration] is more than max allwoed duration [$maxRecordingDuration]");
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
 		}
 
@@ -123,7 +93,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($filename, kConf::get('content_group'));
 			chmod($filename, 0640);
 		}
-
+		
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
@@ -138,7 +108,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 
 		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
-
+		
 		if($mediaServerIndex ==EntryServerNodeType::LIVE_PRIMARY)
 		{
 			if(!$dbEntry->getRecordedEntryId())
@@ -149,6 +119,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if($recordedEntry)
 			{
+				if($recordedEntry->getSourceType() !== EntrySourceType::RECORDED_LIVE)
+				{
+					$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+					$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+					$recordedEntry->save();
+				}
 				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
 			}
 		}
@@ -333,14 +309,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setRootEntryId($dbEntry->getId());
 			$recordedEntry->setName($recordedEntryName);
 			$recordedEntry->setDescription($dbEntry->getDescription());
-			$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+			$recordedEntry->setSourceType(EntrySourceType::KALTURA_RECORDED_LIVE);
 			$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
-			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 			$recordedEntry->setKuserId($dbEntry->getKuserId());
 			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
+			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
@@ -408,7 +384,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if(!$dbLiveEntryServerNode)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $entryId, $mediaServerIndex);
 
-		$dbLiveEntryServerNode->delete();
+		$dbLiveEntryServerNode->deleteOrMarkForDeletion();
 
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
 		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
@@ -433,5 +409,62 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		/* @var $dbEntry LiveEntry */
 		$dbEntry->validateMediaServers();
+	}
+	
+	/**
+	 * Sey recorded video to live entry
+	 *
+	 * @action setRecordedContent
+	 * @param string $entryId Live entry id
+	 * @param KalturaEntryServerNodeType $mediaServerIndex
+	 * @param KalturaDataCenterContentResource $resource
+	 * @param float $duration in seconds
+	 * @return KalturaLiveEntry The updated live entry
+	 *
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
+	{
+		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		if($mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)
+		{
+			$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
+			$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
+			return $entry;
+		}
+		
+		if(!$dbLiveEntry->getRecordedEntryId())
+			$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
+		
+		$recordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
+		if(!$recordedEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbLiveEntry->getRecordedEntryId());
+		
+		$recordingDuration = (int)($duration * 1000);
+		
+		$recordedEntry->setLengthInMsecs($recordingDuration);
+		$recordedEntry->save();
+		
+		$dbLiveEntry->setLengthInMsecs($recordingDuration);
+		$dbLiveEntry->save();
+		
+		$service = new MediaService();
+		if($recordedEntry->getStatus() == entryStatus::PENDING)
+		{
+			$service->initService('media', 'media', 'addContent');
+			$service->addContentAction($recordedEntry->getId(), $resource);	
+		}
+		else
+		{
+			$service->initService('media', 'media', 'updateContent');
+			$service->updateContentAction($recordedEntry->getId(), $resource);
+		}
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
+		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
+		return $entry;
 	}
 }

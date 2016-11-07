@@ -51,6 +51,8 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
+		"+summary" => "+summary",
+		"-summary" => "-summary",
 	);
 
 	public function getMapBetweenObjects()

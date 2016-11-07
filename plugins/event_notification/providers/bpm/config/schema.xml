@@ -10,6 +10,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="description" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="type" type="integer" inheritance="single" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
 	</table>
 </database>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ScheduleEvent service lets you create and manage schedule events
+ * The ScheduleEvent service enables you to create and manage (update, delete, retrieve, etc.) scheduled recording events.
  * @service scheduleEvent
  * @package plugins.schedule
  * @subpackage api.services
@@ -214,12 +214,9 @@ class ScheduleEventService extends KalturaBaseService
 	 */
 	private function getRecurrencesDates(ScheduleEvent $dbScheduleEvent)
 	{
-		$now = kApiCache::getTime();
-
 		$maxRecurrences = SchedulePlugin::getScheduleEventmaxRecurrences();
-		$startTime = max($now, $dbScheduleEvent->getStartDate(null));
-		$datesGenerator = new DatesGenerator($maxRecurrences, $dbScheduleEvent->getRecurrence()->asArray());
-		$dates = $datesGenerator->getDates($startTime);
+		$datesGenerator = new DatesGenerator($maxRecurrences, $dbScheduleEvent->getRecurrence()->asArray(), array('KalturaLog', 'debug'));
+		$dates = $datesGenerator->getDates($dbScheduleEvent->getStartDate(null));
 
 		KalturaLog::debug("Found [" . count($dates) . "] dates");
 		return $dates;

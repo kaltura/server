@@ -253,7 +253,7 @@ class ActivitiTasksService extends ActivitiService
 	 * 
 	 * @see {@link http://www.activiti.org/userguide/#N14F02 Get all identitylinks for a task for either groups or users}
 	 */
-	public function getAllIdentitylinksForTaskForEitherGroupsOrUsers($taskId, $taskId)
+	public function getAllIdentitylinksForTaskForEitherGroupsOrUsers($taskId)
 	{
 		$data = array();
 		

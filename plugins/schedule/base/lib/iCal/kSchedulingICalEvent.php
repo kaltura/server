@@ -259,6 +259,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
+		$resourceIds = array_diff($resourceIds, array(0)); //resource 0 should not be exported outside of kaltura BE.
 		if (count($resourceIds))
 			$object->setField('x-kaltura-resource-ids', implode(',', $resourceIds));
 
