@@ -83,6 +83,12 @@ class LiveConversionProfileService extends KalturaBaseService
 			}
 		}
 		
+		if (!$liveParamsInput)
+		{
+			KalturaLog::err("Conversion profile of entry [" . $entryId . "] doesn't contain ingest [" . $suffix . "]");
+			throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $streamName);
+		}
+		
 		$ignoreLiveParamsIds = array();
 		if($disableIngested)
 		{
