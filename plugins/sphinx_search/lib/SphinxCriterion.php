@@ -211,7 +211,12 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 						return "(@$sphinxField $val)";
 					}
 					break;
-				
+			case Criteria::LIKE:
+				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
+				if($obejctClass::isNullableField($sphinxField))
+					return "@$sphinxField \\\"$value\\\"|\\\"$notEmpty\\\"";
+				else
+					return "@$sphinxField $value";
 			default:
 				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
 				return "@$sphinxField $value";
