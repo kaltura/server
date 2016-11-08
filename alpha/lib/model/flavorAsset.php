@@ -14,7 +14,6 @@ class flavorAsset extends exportableAsset
 	const KALTURA_TOKEN_MARKER = '{kt}';
 	const KALTURA_TOKEN_PARAM_NAME = '/kt/';
 	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
-	const CUSTOM_DATA_FIELD_LABEL = "label";
 	
 	/**
 	 * Applies default values to this object.
@@ -181,8 +180,6 @@ class flavorAsset extends exportableAsset
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $key);
 	}
 
-	public function getLabel()  {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LABEL); }
-	public function setLabel($v){$this->putInCustomData(self::CUSTOM_DATA_FIELD_LABEL, $v);}
 
 	/**
 	 * @param int $type

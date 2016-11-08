@@ -848,9 +848,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$assetResourceContainer->resource = $assetResource;
 					$resource->resources[] = $assetResourceContainer;
 				}
-
-				if(isset($contentElement->streams))
-					$this->handleStreamsElement($contentElement->streams, $entry);
 			}
 		}
 
@@ -929,26 +926,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new Exception(implode(', ', $pluginsErrorResults));
 	
 	}
-
-	private function handleStreamsElement($streams, $entry)
-	{
-		$streamsArray = array();
-		foreach ($streams->stream as $stream)
-		{
-			$streamContainer = new KalturaStreamContainer();
-			$streamContainer->type = kXml::getXmlAttributeAsString($stream, "type");
-			$streamContainer->trackIndex = kXml::getXmlAttributeAsString($stream, "trackIndex");
-			$streamContainer->channelIndex = kXml::getXmlAttributeAsString($stream, "channelIndex");
-			$streamContainer->channelLayout = kXml::getXmlAttributeAsString($stream, "channelLayout");
-			$streamContainer->language = kXml::getXmlAttributeAsString($stream, "language");
-			$streamContainer->label = kXml::getXmlAttributeAsString($stream, "label");
-
-			$streamsArray[] = $streamContainer;
-		}
-
-		$entry->streams = $streamsArray;
-	}
-
+	
 	/**
 	 * Sends the data using a multi requsest according to the given data
 	 * @param KalturaBaseEntry $entry

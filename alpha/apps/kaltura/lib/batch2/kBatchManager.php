@@ -266,14 +266,11 @@ class kBatchManager
 		 * If the flavorParams has explicit language settings, 
 		 * use the first flavorParams language to set/overwrite the flavorAsset language
 		 */
-		if(isset($flavorParams) && ($multiStreamJson=$flavorParams->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null) {
-			if(isset($multiStream->audio->languages) && count($multiStream->audio->languages)>0){
+		if(isset($flavorParams)){
+			$multiStreamJson = $flavorParams->getMultiStream();
+			$multiStream = json_decode($multiStreamJson);
+			if(isset($multiStream->audio->languages)){
 				$lang = $multiStream->audio->languages[0];
-			}
-			else if(KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "lang")){
-				$lang = $multiStreamObj->audio->streams[0]->lang;
-			}
-			if(isset($lang)){
 				KalturaLog::log("Flavor asset(".$flavorAsset->getId().") language overloaded with flavor Params(".$flavorParams->getId().") language($lang)");
 				$flavorAsset->setLanguage($lang);
 			}
