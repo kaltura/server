@@ -101,9 +101,10 @@ class TagService extends KalturaBaseService
 	{
 	    $c = KalturaCriteria::create(entryPeer::OM_CLASS);
 	    $c->add(entryPeer::PARTNER_ID, $tag->getPartnerId());
-	    if ($tag->getPrivacyContext() != kTagFlowManager::NULL_PC)
+		$privacyContext = $tag->getPrivacyContext();
+	    if ( ($privacyContext != kTagFlowManager::NULL_PC) && !empty($privacyContext) )
 	    	$c->addAnd(entryPeer::PRIVACY_BY_CONTEXTS, $tag->getPrivacyContext(), Criteria::LIKE);
-			
+
 	    $entryFilter = new entryFilter();
 	    $tagString = str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $tag->getTag());
 	    $entryFilter->set('_mlikeand_tags', $tagString);
