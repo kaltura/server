@@ -85,7 +85,7 @@ class kXslPathManager extends kPathManager
 	        'entryId' => $entry->getId(),
 	        'partnerId' => $entry->getPartnerId(),
 	        'defaultFileName' => $object->generateFileName($subType, $version),
-			'replacedEntryId' => (!is_null($entry->getReplacedEntryId())) ? $entry->getReplacedEntryId() : '',
+	        'replacedEntryId' => (!is_null($entry->getReplacedEntryId())) ? $entry->getReplacedEntryId() : '',
 	    );
 	}
 	
