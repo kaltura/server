@@ -452,10 +452,7 @@ class DatesGenerator
 			$cal = mktime($calParts['hours'], $calParts['minutes'], $calParts['seconds'], $calParts['mon'], $calParts['mday'], $calParts['year']);
 
 		$this->log("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
-
-		$this->log("asdf");
-		$this->log("start day is: $this->weekStartDay");
-
+		
 		$invalidCandidateCount = 0;
 		if($limit && $this->count && $this->count < $limit)
 			$limit = $this->count;
@@ -477,11 +474,9 @@ class DatesGenerator
 				$this->log("Count [" . count($dates) . "] passed limit [$limit]");
 				break;
 			}
-			$this->log("cal is $cal");
 			$candidates = $this->getCandidates($cal);
 			foreach($candidates as $candidate)
 			{
-				$this->log("candidate is $candidate");
 				// don't count candidates that occur before the seed date..
 				if($candidate >= $seed)
 				{
@@ -909,7 +904,7 @@ class DatesGenerator
 				$target = getdate(strtotime("+1 $calDay", $t));
 				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
 			}
-			
+
 			$days[] = $t;
 		}
 		elseif($this->frequency == DatesGenerator::MONTHLY || $this->byMonth)
