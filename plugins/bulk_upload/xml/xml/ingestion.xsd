@@ -603,51 +603,6 @@
 		</xs:attribute>
 	</xs:complexType>
 
-	<xs:complexType name="T_stream">
-		<xs:attribute name="type" type="xs:string" use="required">
-			<xs:annotation>
-				<xs:documentation>stream type</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="trackIndex" type="xs:string" use="required">
-			<xs:annotation>
-				<xs:documentation>int specifying the stream location(s) in video file</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="language" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>specifying the language of the audio stream. If not present - mp4 tagging will be assumed</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="channelIndex" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>the stream channel to select the audio from</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="label" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>UI label specifications marking the language (will affect how the language is displayed on the multi audio selector on the player)</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="channelLayout" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>specifying the role of the specific channel</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-	</xs:complexType>
-
-	<xs:complexType name="T_streams">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="1" ref="stream">
-				<xs:annotation>
-					<xs:documentation>streams composed of 1..n stream elements</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-
-
-
 	<xs:complexType name="T_content">
 		<xs:sequence>
 			<xs:element maxOccurs="1" minOccurs="0" ref="tags">
@@ -716,13 +671,7 @@
 			</xs:choice>
 
 			<xs:element maxOccurs="unbounded" minOccurs="0" ref="content-extension"/>
-			<xs:element maxOccurs="1" minOccurs="0" ref="streams">
-				<xs:annotation>
-					<xs:documentation>
-						Holds stream elements that specifies instructions to the transcoding process
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
+
 		</xs:sequence>
 		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
 			<xs:annotation>
@@ -1126,46 +1075,6 @@
 									<tag>mbr</tag>
 								</tags>
 								<urlContentResource>...</urlContentResource>
-							</content>
-						</contentAssets>
-					</item>
-				</example>
-			</xs:appinfo>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="streams" type="T_streams">
-		<xs:annotation>
-			<xs:documentation>Holds stream elements that specifies instructions to the transcoding process</xs:documentation>
-			<xs:appinfo>
-				<example>
-					<item>
-						<action>add</action>
-						<type>1</type>
-						<media>...</media>
-						<contentAssets>
-							<content>
-								<streams>...</streams>
-							</content>
-						</contentAssets>
-					</item>
-				</example>
-			</xs:appinfo>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="stream" type="T_stream">
-		<xs:annotation>
-			<xs:documentation>Specifies instructions to the transcoding process on how to handle the multiple audio tracks</xs:documentation>
-			<xs:appinfo>
-				<example>
-					<item>
-						<action>add</action>
-						<type>1</type>
-						<media>...</media>
-						<contentAssets>
-							<content>
-								<streams>
-									<stream type="audio" trackIndex="1" language="eng" label="something"/>
-								</streams>
 							</content>
 						</contentAssets>
 					</item>

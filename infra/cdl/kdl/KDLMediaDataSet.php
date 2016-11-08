@@ -17,7 +17,7 @@ class KDLMediaDataSet  {
 	public	$_video=null;
 	public	$_audio=null;
 	public	$_image=null;
-	public	$_multiStream=null;
+//	public	$_multiStream=null;
 	public  $_errors=array(),
 			$_warnings=array();
 	

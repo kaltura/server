@@ -345,16 +345,12 @@
 			self::DOWNMIX => array("downmix"),
 			self::MONO =>array("mono"),	
 			self::STEREO =>array("stereo"),
-			"4"   => array(self::FL, self::FR, self::FC, self::BC),
 			"4.0" => array(self::FL, self::FR, self::FC, self::BC),
 			"4.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BC),
-			"5"   => array(self::FL, self::FR, self::FC, self::BL, self::BR),
 			"5.0" => array(self::FL, self::FR, self::FC, self::BL, self::BR),
 			"5.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BL, self::BR),	
-			"6"   => array(self::FL, self::FR, self::FC, self::BC, self::SL, self::SR),
 			"6.0" => array(self::FL, self::FR, self::FC, self::BC, self::SL, self::SR),
 			"6.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BC, self::SL, self::SR),
-			"7"   => array(self::FL, self::FR, self::FC, self::BL, self::BR, self::SL, self::SR),  
 			"7.0" => array(self::FL, self::FR, self::FC, self::BL, self::BR, self::SL, self::SR),  
 			"7.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BL, self::BR, self::SL, self::SR),
 		);
@@ -423,16 +419,11 @@
 		 */
 		public static function getLayoutChannels($layout)
 		{
-			$n1;$n2;
-			$n = sscanf($layout,"%d.%d",$n1, $n2);
-			switch($n){
-				case 1:
-					return $n1;
-				case 2:
-					return ($n1+$n2);
-				default:
-					return 0;
+			$channelsNum = (int)round($layout);
+			if($channelsNum<$layout){
+				$channelsNum++;
 			}
+			return $channelsNum;
 		}
 	}
 	

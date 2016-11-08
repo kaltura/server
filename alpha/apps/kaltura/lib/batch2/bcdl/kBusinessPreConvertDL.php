@@ -430,8 +430,7 @@ class kBusinessPreConvertDL
 				/*
 				 * Update flavorParams settings with overloaded params from 'conversionProfileFlavorParams'
 				 */
-				self::overrideFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile);
-				self::overrideFlavorParamsWithMultistreamData($flavorParams, $entryId);
+				self::overloadFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile);
 			}
 		}
 
@@ -472,14 +471,6 @@ class kBusinessPreConvertDL
 			 */
 		if($flavor->_isEncrypted==true){
 			self::setEncryptionAtRest($flavor, $flavorAsset);
-		}
-			/*
-			 * Add label notation
-			 */
-		if(($multiStreamJson=$flavor->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
-		&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
-			$flavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
-			$flavorAsset->save();
 		}
 
 		if(!$flavorAsset->getIsOriginal())
@@ -579,10 +570,8 @@ class kBusinessPreConvertDL
 		 */
 		foreach($flavors as $flavor) {
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getId()];
-			self::overrideFlavorParamsWithConversionProfileSettings($flavor, $flavorParamsConversionProfile);
-			self::overrideFlavorParamsWithMultistreamData($flavor, $entryId);
+			self::overloadFlavorParamsWithConversionProfileSettings($flavor, $flavorParamsConversionProfile);
 		}
-
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
 		KalturaLog::log("Generate Target " . count($cdl->_targetList) . " Flavors returned");
 
@@ -1383,15 +1372,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			if($flavor->_isEncrypted==true){
 				self::setEncryptionAtRest($flavor, $flavorAsset);
 			}
-			
-				/*
-				 * Add label notation
-				 */
-			if(($multiStreamJson=$flavor->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
-			&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
-				$flavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
-				$flavorAsset->save();
-			}
 
 			$collectionTag = $flavor->getCollectionTag();
 			/*
@@ -1552,8 +1532,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			/*
 			 * Update flavorParams settings with overloaded params from 'conversionProfileFlavorParams'
 			 */
-			self::overrideFlavorParamsWithConversionProfileSettings($sourceFlavor, $flavorParamsConversionProfile);
-			self::overrideFlavorParamsWithMultistreamData($sourceFlavor, $entryId);
+			self::overloadFlavorParamsWithConversionProfileSettings($sourceFlavor, $flavorParamsConversionProfile);
 
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
@@ -1563,22 +1542,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			if(isset($sourceFlavorOutput->_isEncrypted) && $sourceFlavorOutput->_isEncrypted==true){
 				self::setEncryptionAtRest($sourceFlavorOutput, $originalFlavorAsset);
 			}
-
 			/*
 			 * Source auto-decrypt
 			 */
 			if(isset($mediaInfo) && $originalFlavorAsset->getEncryptionKey()){
 				KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$originalFlavorAsset->getEncryptionKey().")");
 				$mediaInfo->decryptionKey = bin2hex(base64_decode($originalFlavorAsset->getEncryptionKey()));
-			}
-
-			/*
-			 * Add label notation
-			 */
-			if(($multiStreamJson=$sourceFlavorOutput->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
-			&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
-				$originalFlavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
-				$originalFlavorAsset->save();
 			}
 
 			if(!$sourceFlavorOutput)
@@ -1871,7 +1840,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$flavor->save();
 			// Save encryption key on flavorAsset obj
 		$flavorAsset->setEncryptionKey($encryptionParams->key);
-
 		$flavorAsset->save();
 	}
 
@@ -1949,7 +1917,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 * @param unknown_type $flavorParams
 	 * @param unknown_type $flavorParamsConversionProfile
 	 */
-	private static function overrideFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile)
+	private static function overloadFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile)
 	{
 		if($flavorParamsConversionProfile){
 			/*
@@ -1967,61 +1935,4 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 	}
 
-	/**
-	 *
-	 * @param unknown_type $flavorParams
-	 * @param int $entryId
-	 */
-	private static function overrideFlavorParamsWithMultistreamData($flavorParams, $entryId)
-	{
-		KalturaLog::log("entry($entryId)");
-		$entry = entryPeer::retrieveByPK($entryId);
-		if(!isset($entry))
-			return;
-		
-		$overrideSourceStreams = $entry->getStreams();	
-		if(!isset($overrideSourceStreams)){
-			KalturaLog::log("Nothing to override");
-			return;
-		}
-		
-		$overrides = array();
-		KalturaLog::log("entry($entryId) - streams - ".print_r($overrideSourceStreams,1));
-		foreach($overrideSourceStreams as $obj){
-			$override = new stdClass();
-			if($obj->getType()!='audio')
-				continue;
-			if($obj->getTrackIndex()) $override->id = $obj->getTrackIndex();
-			else continue;
-			if($obj->getChannelLayout()) $override->audioChannelLayout = $obj->getChannelLayout();
-			if($obj->getChannelIndex()) $override->audioChannelIndex = $obj->getChannelIndex();
-			if($obj->getLanguage()) $override->audioLanguage = $obj->getLanguage();
-			if($obj->getLabel()) $override->audioLabel = $obj->getLabel();
-			$overrides[] = $override;
-		}
-
-		if(count($overrides)==0){
-			return;
-		}
-		
-		$returnOverideObj = new stdClass();
-		$returnOverideObj->audio = $overrides;
-		
-		$jsonMultiStream = $flavorParams->getMultiStream();
-		KalturaLog::log("entry($entryId) - json - original($jsonMultiStream)");
-		if(isset($jsonMultiStream)){
-			$multiStreamObj = json_decode($jsonMultiStream);
-			if(!isset($multiStreamObj)) {
-				$multiStreamObj = new stdClass();
-			}
-		}
-		else {
-			$multiStreamObj = new stdClass();
-		}
-		$multiStreamObj->source = $returnOverideObj;
-		$jsonMultiStream = json_encode($multiStreamObj);
-		KalturaLog::log("entry($entryId) - json - updated($jsonMultiStream)");
-		$flavorParams->setMultiStream($jsonMultiStream);
-	}
-	
 }

@@ -547,8 +547,8 @@ $plannedDur = 0;
 			/*
 			 * For surround - make sure all streams have the same sampleRate
 			 */
-			$target->_multiStream = self::evaluateTargetAudioMultiStream($source, $target);
-	
+		$target->_multiStream = self::evaluateTargetAudioMultiStream($source, $target);
+		
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}
@@ -657,17 +657,12 @@ $plannedDur = 0;
 				
 				/*
 				 * On multi-lingual flavor, 
-				 * if required language does not exist in the target, although it is in the flavor(this) - set NonComply flag.
-				 * Check both old and new formats of the this::multiStream
+				 * if required language does not exist - set NonComply flag 
 				 */
-				if((isset($this->_multiStream->audio->languages) && count($this->_multiStream->audio->languages)>0)
-				|| KDLAudioMultiStreaming::IsStreamFieldSet($this->_multiStream, "lang")) {
-					
-					if(!KDLAudioMultiStreaming::IsStreamFieldSet($target->_multiStream,"lang")) {
+				if(isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)==0){
 					$target->_flags = $this->_flags | self::MissingContentNonComplyFlagBit;
 					$target->_warnings[KDLConstants::AudioIndex][] = 
 						KDLWarnings::ToString(KDLWarnings::MissingMediaStream);
-					}
 				}
 			}
 		}
@@ -1578,13 +1573,20 @@ $plannedDur = 0;
 		* 		- {"audio":{"streams":["all"],"olayout":5.1},"detect":"auto"}
 		* 		- {"audio":{"olayout":5.1},"detect":"auto"}
 		* 		-- If 'olayout' is set and 'streams' ommitted - assume 'streams:all'
+class Stream {
+	mapping = array();
+	layout
+	language
+}
+class Settings {
+	streams = array(Stream)
+	languages = 
 		*/
 		
 		if (!isset($source->_contentStreams->audio))
 			return null;
 
 		$setupMultiStream = isset($target->_multiStream->audio)? $target->_multiStream->audio: null;
-		$overrideStreams   = isset($target->_multiStream->source)? $target->_multiStream->source: null;
 			/*
 			 * The 'default' flow - 
 			 * Check analyze results for
@@ -1593,7 +1595,7 @@ $plannedDur = 0;
 			 * - otherwise remove the 'multiStream' object'
 			 */
 		$multiStreamHelper = new KDLAudioMultiStreamingHelper($setupMultiStream);
-		$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams);
+		$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams);
 		if(isset($audioStreams)){
 			$targetMultiStream = new stdClass();
 			$targetMultiStream->audio = $audioStreams;

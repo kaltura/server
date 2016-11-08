@@ -348,7 +348,7 @@
 					continue;
 	//		sscanf($line,"PSNR y:%s u:%s v:%s average:%s min:%s max:%s", &$yVal, &$uVal, &$vVal, &$avgVal, &$minVal, &$maxVal);
 	// [libx264 @ 0x1ea33a0] frame=  44 QP=25.33 NAL=2 Slice:P Poc:88  I:501  P:881  SKIP:238  size=17499 bytes
-				sscanf($line, "frame=  %d QP=%g NAL=%d Slice:%s Poc:%d  I:%d  P:%d  SKIP:%d  size=%d ", $framesStat->num, $qp, $nal, $slice, $poc, $i, $p, $skip, $size);
+				sscanf($line, "frame=  %d QP=%g NAL=%d Slice:%s Poc:%d  I:%d  P:%d  SKIP:%d  size=%d ",&$framesStat->num,&$qp,&$nal,&$slice,&$poc, &$i, &$p, &$skip, &$size);
 				KalturaLog::log($line);
 				KalturaLog::log("$framesStat->num,$qp,$nal,$slice,$poc, $i, $p, $skip, $size");
 				switch($slice){
