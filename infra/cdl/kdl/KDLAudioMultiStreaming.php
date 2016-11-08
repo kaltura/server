@@ -4,20 +4,28 @@
  * class KDLStreamDescriptor
  */
 class KDLStreamDescriptor {
-	public 	$mapping = null;
+	protected $mapping = null;
 	public	$olayout = null;
 	public	$lang = null;
-	public function __construct($mapping=null, $olayout=null, $lang=null){
-		$this->mapping = $mapping;
+	public	$label = null;
+	public $channels = null;
+	public function __construct($mapping=null, $olayout=null, $lang=null, $label=null){
+		$this->setMapping($mapping);
 		$this->olayout = $olayout;
 		$this->lang = $lang;
+		$this->label = $label;
 	}
 	public function set($obj){
-		if(isset($obj->mapping))	{ $this->mapping = $obj->mapping; }
+		if(isset($obj->mapping))	{ $this->setMapping($obj->mapping); }
 		if(isset($obj->olayout))	{ $this->olayout = $obj->olayout; }
 		if(isset($obj->lang))		{ $this->lang = $obj->lang; }
+		if(isset($obj->label))		{ $this->label = $obj->label; }
 	}
 
+	/**
+	 * 
+	 * @return Ambigous <number, unknown, number>|number
+	 */
 	public function getLayoutChannels()
 	{
 		if (isset($this->olayout) ) {
@@ -27,88 +35,100 @@ class KDLStreamDescriptor {
 	}
 
 	/**
+	 * 
+	 * @return number
+	 */
+	public function getChannelsNum()
+	{
+		if(isset($this->channels)){
+			$cnt = 0;
+			foreach ($this->channels as $chIds){
+				$cnt+=count($chIds);
+			}
+			return $cnt;
+		}
+		else {
+			return count($this->mapping);
+		}
+			
+	}
+	
+	/**
+	 * 
+	 * @return NULL
+	 */
+	public function getMapping(){
+		if(isset($this->mapping))
+			return $this->mapping;
+		else
+			return null;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $mapping
+	 */
+	public function setMapping($mapping){
+		$this->mapping = $mapping;
+		if(!isset($mapping)){
+			return;
+		}
+		$channels = array();
+		foreach ($mapping as $mIdx=>$map){
+			$s;$c;
+			$map=trim($map);
+			if($map[0]=="*"){
+				$s="*";
+				$chr;
+				$n = sscanf($map,"%c.%d",$chr, $c);
+			}
+			else {
+				$n = sscanf($map,"%d.%d",$s, $c);
+			}
+			if($n<2)
+				continue;
+			
+			if(!array_key_exists($s,$channels)) {
+				$channels[$s] = array($c);
+				$this->mapping[$mIdx] = $s;
+			}
+			else {
+				$channels[$s][] = $c;
+				unset($this->mapping[$mIdx]);
+			}
+		}
+		$this->channels = count($channels)>0? $channels: null;
+	}
+	
+	/**
 	 *
 	 * @param unknown_type $sourceStreams
 	 * @param unknown_type $sourceAnalize
 	 * @return NULL|KDLStreamDescriptor
 	 */
-	public function GetSettings($sourceStreams, $sourceAnalize)
+	public function generateTarget($sourceAudioStreams, $sourceAnalize)
 	{
-		if(!isset($this->olayout) && (!isset($this->mapping) || count($this->mapping)==0)){
-			return null;
+		/*
+		 * Porcess mapped channels - both from flavor params and from override
+		 */
+		if(isset($this->channels) || isset($sourceAnalize->override->perTrackChannelIndexLabel) ){
+			$target = $this->generateTargetMappedChannels($sourceAudioStreams, $sourceAnalize);
 		}
-
 		/*
-		 * Determine how many channels are required for the requested olayout
+		 * If no mapping and olayout - try to generate using lingual notation
+		 * 	go to default/nonmapped flow
 		 */
-		$olayoutNum = $this->getLayoutChannels();
-		$target = clone $this;
-
-		if(isset($this->olayout) && isset($sourceAnalize->byChannelNumber)
-				&& array_key_exists($olayoutNum, $sourceAnalize->byChannelNumber)){
-			$sourceStream = $sourceAnalize->byChannelNumber[$olayoutNum][0];
-			if(!isset($this->mapping) || in_array($sourceStream->id, $this->mapping)){
-				$target->mapping = array($sourceStream->id);
-				return $target;
-			}
-		}
-
-		/*
-		 * Check whether the 'olayout' value is in the list of the 'supported layouts'
-		 * If it is - get the layout and filter the mapped streams that are in the layout
-		 */
-		if(key_exists((string)$this->olayout, KDLAudioLayouts::$layouts)) {
-			$layout = KDLAudioLayouts::$layouts[$this->olayout];
-			$matchedStreams = KDLAudioLayouts::matchLayouts($sourceStreams, $layout);
-			/*
-			 * There are channel notations in the source file -
-			* and the matching succeeded - use the matched streames instead of mapped streams
-			* even so try to use the non notated mapped streams
-			*/
-			if(count($matchedStreams)>0){
-				$sourceStreams = $matchedStreams;
-			}
-		}
-
-		/*
-		 * Filter-in the required streams -
-		 * either from the 'setupStreams' array or 'all'
-		 */
-		$mappingStreams = array();
-		if(!isset($this->olayout)) {
-			$target->filterToMapping($sourceStreams, false, $mappingStreams);
-			$target->olayout = null;
-			return $target;
-		}
-		$target->filterToMapping($sourceStreams, true, $mappingStreams);
-
-		/*
-		 * Verify matching between matchedStreams and setupMultiStream::olayout
-		 */
-
-		/*
-		 * If there are not enough matchedStreams to match the olayout
-		 * or the number of mapping ids is less than required for the olayout
-		 * - fallback to default (stereo)
-		 */
-		if($olayoutNum>count($mappingStreams) || $olayoutNum>count($target->mapping)){
-			$target->olayout = null;
+		else if(!isset($this->olayout) && (!isset($this->mapping) || count($this->mapping)==0)){
+			return $this->generateTargetLingualNotated($sourceAudioStreams, $sourceAnalize);
 		}
 		else {
-			/*
-			 * Too many mappedStreams - cut to the number of 'olayout' streams
-			 
-			if($olayoutNum<count($sourceStreams)){
-				$sourceStreams = array_slice($sourceStreams, 0, $olayoutNum);
-			}*/
-			$target->olayout = $this->olayout;
+			$target = $this->generateTargetMappedStreams($sourceAudioStreams, $sourceAnalize);
 		}
-
-		$target->mapping = array();
-		foreach ($mappingStreams as $stream){
-			$target->mapping[] = $stream->id;
+		
+		if(isset($target)){
+			// Turn on downmix, if any
+			$target->adjustForDownmix($sourceAudioStreams);
 		}
-
 		return $target;
 	}
 
@@ -117,12 +137,12 @@ class KDLStreamDescriptor {
 	 * @param unknown_type $sourceStreams
 	 * @return boolean
 	 */
-	public function adjustForDownmix($sourceStreams)
+	private function adjustForDownmix($sourceAudioStreams)
 	{
 		if(!isset($this->mapping) || count($this->mapping)>1)
 			return false;
 		foreach($this->mapping as $m){
-			foreach($sourceStreams->audio as $sourceStream){
+			foreach($sourceAudioStreams as $sourceStream){
 				if($sourceStream->id==$m
 						&& isset($sourceStream->audioChannelLayout)	&& $sourceStream->audioChannelLayout==KDLAudioLayouts::DOWNMIX){
 					$this->downmix = 1;
@@ -141,7 +161,7 @@ class KDLStreamDescriptor {
 	 * @param array $filteredStreams
 	 * @return number
 	 */
-	private function filterToMapping(array $sourceStreams, $verifyFields=false, array &$filteredStreams)
+	private function filterSourceToMapping(array $sourceStreams, $verifyFields=false, array &$filteredStreams)
 	{
 		$streamsIds = array();
 		foreach($sourceStreams as $sourceStream){
@@ -156,7 +176,384 @@ class KDLStreamDescriptor {
 		$this->mapping = $streamsIds;
 		return count($filteredStreams);
 	}
+	
+	/**
+	 *
+	 * Multichannel source streams -
+	 * 	Check for multichannel source streams that match the required layout (by number of channels)
+	 * 	If there are such source streams, choose one that inlcuded in the this::mapping list,
+	 * 	if there is no this::mapping - use the first multichannel source stream (that matches ...) 
+	 * 
+	 * otherwise - 
+	 * 1 ch source streams
+	 * 	If this::olayout represents 'supported layout', filter in the source streams for that layout
+	 * 		Check compliance with the predefined mapping
+	 * 
+	 * @param unknown_type $sourceStreams
+	 * @param unknown_type $sourceAnalize
+	 * @return NULL|KDLStreamDescriptor
+	 */
+	private function generateTargetMappedStreams($sourceStreams, $sourceAnalize)
+	{
+		/*
+		 * Determine how many channels are required for the requested olayout
+		 */
+		$olayoutNum = $this->getLayoutChannels();
+		$target = clone $this;
+	
+		/*
+		 * Check for multichannel source streams that match the required layout ... 
+		 */
+		if(isset($this->olayout) 
+		&& isset($sourceAnalize->perChannelNumber) && array_key_exists($olayoutNum, $sourceAnalize->perChannelNumber)){
+			if(!isset($this->mapping)){
+				$sourceStream = $sourceAnalize->perChannelNumber[$olayoutNum][0];
+				$target->mapping = array($sourceStream->id);
+				if(isset($sourceStream->audioLabel)) $target->label = $sourceStream->audioLabel;
+				return $target;
+			}
+			foreach($sourceAnalize->perChannelNumber[$olayoutNum] as $sourceStream){
+				if(in_array($sourceStream->id, $this->mapping)){
+					$target->mapping = array($sourceStream->id);
+					if(isset($sourceStream->audioLabel)) $target->label = $sourceStream->audioLabel;
+					return $target;
+				}
+			}
+		}
+	
+		/*
+		 * The rest of the flow requires ????
+		 */
+		
+		/*
+		 * Check whether the 'olayout' value is in the list of the 'supported layouts'
+		 * If it is - get the layout and filter the mapped streams that are in the layout
+		 */
+		if(key_exists((string)$this->olayout, KDLAudioLayouts::$layouts)) {
+			$layout = KDLAudioLayouts::$layouts[$this->olayout];
+			$layoutStreams = KDLAudioLayouts::matchLayouts($sourceStreams, $layout);
+			/*
+			 * There are channel notations in the source file -
+			 * and the layout matching succeeded - use only the matched streams as source streams
+			 * for the following phases
+			 */
+			if(count($layoutStreams)>0){
+				$sourceStreams = $layoutStreams;
+			}
+		}
+	
+		/*
+		 * Filter-in the source streams to match the predifined mapping
+		 */
+		$sourceToMappingStreams = array();
+		if(isset($this->olayout)) {
+			$sourceStreamCnt = $target->filterSourceToMapping($sourceStreams, true, $sourceToMappingStreams);
+		}
+		else {
+			$sourceStreamCnt = $target->filterSourceToMapping($sourceStreams, false, $sourceToMappingStreams);
+			/*
+			 * The this::olayout is not set -
+			 * ==> leave with mapping only.
+			 */
+			if($sourceStreamCnt>0) {
+				$target->olayout = null;
+				if(isset($sourceToMappingStreams[0]->audioLabel)) $target->label = $sourceToMappingStreams[0]->audioLabel;
+				return $target;
+			}
+		}
+			/*
+			 * If there is no source streams that match the predifiend mapping - 
+			 * ==> multi-stream won't work, leave w/out multistream setting
+			 */
+		if($sourceStreamCnt==0)
+			return null;
+		
+		/*
+		 * Verify matching between matched source streams and target::::olayout
+		 */
+	
+		/*
+		 * If there are not enough matchedStreams to match the olayout
+		* or the number of mapping ids is less than required for the olayout
+		* - fallback to default (stereo)
+		*/
+		if($olayoutNum>$target->getChannelsNum()){
+			if($sourceStreamCnt==1)
+				return null;
+			
+			$target->olayout = null;
+		}
+		else {
+			/*
+			 * Too many mappedStreams - cut to the number of 'olayout' streams
+	
+			if($olayoutNum<count($sourceStreams)){
+			$sourceStreams = array_slice($sourceStreams, 0, $olayoutNum);
+			}*/
+			$target->olayout = $this->olayout;
+		}
+	
+		if(isset($sourceToMappingStreams[0]->audioLabel)) $target->label = $sourceToMappingStreams[0]->audioLabel;
+		return $target;
+	}
+	
+	/**
+	 * Filter in the source streams that are included in the this::mapping(streams/channels) definition
+	 * Try to match between the filtered sources and this::olayout
+	 * The 'channels' option support only a single(first) input stream!!!
+	 * 
+	 * On 'override' (sourceAnalize::override)
+	 * 	If language is set (this::lang) - check availability of the required language in the overriden objects
+	 * 	otherwise - leave with null (fullback to default flow)
+	 * 	Non 'override' flow does not requires source-to-this::channels language matching, because it assumed 
+	 * 	that regular source streams cannot have per channel language notation
+	 *  
+	 * Channels availability - 
+	 * 	Check availability (in source) of all mapped channels (this::channels), filter out unavailable streams/channels
+	 * 	If no channels are left, the default flow (non mapped) will be applied
+	 * 
+	 * Layout -
+	 * 	Check whether there are enough channels to support the required olayout,
+	 * 	if not - fallback to stereo (but still use the mapped channels)
+	 * 
+	 * @param unknown_type $sourceStreams
+	 * @param unknown_type $sourceAnalize
+	 * @return NULL|KDLStreamDescriptor
+	 */
+	private function generateTargetMappedChannels($sourceStreams, $sourceAnalize)
+	{
+		/*
+		 * Adjust stream settings to 'wildcarded' channel mapping ("*.1,*.2, ..."), by choosing the first 
+		 * source stream that contains enough channels to support the channel mapping
+		 */
+		if($this->mapping[0]=='*'){
+			$maxChanId = 0;
+			foreach ($this->channels['*'] as $channelId){
+				if($maxChanId<$channelId) $maxChanId=$channelId;
+			}
+			ksort($sourceAnalize->perChannelNumber);
+			foreach($sourceAnalize->perChannelNumber as $sorceChannelsNum=>$subArr){
+				if($sorceChannelsNum>=$maxChanId) {
+					$this->mapping[0]=$sourceAnalize->perChannelNumber[$sorceChannelsNum][0]->id;
+					$this->channels[$this->mapping[0]] = $this->channels['*'];
+					unset($this->channels['*']);
+					break;
+				}
+			}
+			if($sorceChannelsNum<$maxChanId){
+				;
+			}
+		}
+		
+		$thisLayoutChannels = $this->getLayoutChannels();
+		/*
+		 * If override channel mapped data is provided, 
+		 * use it instead of 'plain' sourcestream settings
+		 */
+		if(isset($sourceAnalize->override->perTrackChannelIndexLabel)){
+			/*
+			 * On output stream language flow, look for mapping for required language (this::lang),
+			 * otherwise leave with null (fallback to default flow)
+			 */
+			if(isset($this->lang)) {
+				/*
+				 * If specific language is required, but it does not exist in the override settings - 
+				 * 	return null (fallback to default)
+				 */
+				if(!(isset($sourceAnalize->override->perLanguage) && key_exists($this->lang, $sourceAnalize->override->perLanguage)) ){
+					return null;
+				}
 
+				/*
+				 * Verify that the selected override::source is conatined in the current stream mapping (this::mapping)
+				 */
+				foreach ($sourceAnalize->override->perTrackChannelIndexLanguage as $streaamIdx=>$perTrackChannelIndexLanguage) {
+					if(isset($this->mapping) && array_search($streaamIdx, $this->mapping)===false){
+						continue;			
+					}
+					if(key_exists($this->lang, $perTrackChannelIndexLanguage)) {
+						$target = $this->generateTargetChannels($perTrackChannelIndexLanguage[$this->lang]);
+						if(isset($target)){
+							break;
+						}
+					}
+				}
+			}
+			/*
+			 * Non language flow - 
+			 * Scan through the defined (or auto) labels to look for the stream that best matches the 
+			 * olayout settings (this::olayout) by checking the number of target channeles
+			 */
+			else {
+				$auxTarget = null;
+				foreach ($sourceAnalize->override->perTrackChannelIndexLabel as $trackIdx=>$perLabel){
+					if(isset($this->mapping) && array_search($trackIdx, $this->mapping)===false){
+						continue;			
+					}
+					foreach ($perLabel as $labelName=>$overrideChannels){
+						$target = $this->generateTargetChannels($overrideChannels);
+						if(isset($target)){
+							/*
+							 * If sufficent number of channels (for this::olayout) -
+							 * skip following optional mappings
+							 */
+							if($target->getChannelsNum()>=$thisLayoutChannels)
+								break;
+							if(!isset($auxTarget) || $auxTarget->getChannelsNum()<$target->getChannelsNum()){
+								$auxTarget = $target;
+								$target = null;
+							}
+						}
+					}
+					if(isset($target)){
+						break;
+					}
+				}
+			}
+		}
+		else {
+			/*
+			 * Channel processing is limited to a single audio stream (track) - 
+			 * look for the stream that best matches the olayout settings (this::olayout) 
+			 * by checking the number of target channeles
+			 */
+			$auxTarget = null;
+			foreach($this->channels as $streamIdx=>$streamChannels){
+				foreach($sourceStreams as $sourceStream){
+					if($streamIdx!=$sourceStream->id)
+						continue;
+
+					$matchedChannelsArr = array();
+					foreach ($streamChannels as $channelId){
+						if(isset($sourceStream->audioChannels) && $sourceStream->audioChannels>$channelId){
+							$matchedChannelsArr[] = $channelId;
+						}
+					}
+					if(count($matchedChannelsArr)>0){
+						$target = new KDLStreamDescriptor();
+						$target->channels[$streamIdx] = $matchedChannelsArr;
+						$target->mapping[] = $streamIdx;
+						if($target->getChannelsNum()>=$thisLayoutChannels)
+							break;
+						if(!isset($auxTarget) || $auxTarget->getChannelsNum()<$target->getChannelsNum()){
+							$auxTarget = $target;
+							$target = null;
+						}
+					}
+				}
+				if(isset($target)){
+					break;
+				}
+			}
+		}
+		
+		/*
+		 * Verify that there is a valid target,
+		 * if not leave with null (fallback to default flow)
+		 * 
+		 */
+		{
+			if(!isset($target)){
+				if(isset($auxTarget)){
+					$target = $auxTarget;
+				}
+				else {
+					return null;
+				}
+			}
+			$targetChannelsNum = $target->getChannelsNum();
+			if($targetChannelsNum==0){
+				return null;
+			}
+		}
+		
+		/*
+		 * Determine how many channels are required for the requested olayout
+		 */
+		if(isset($this->olayout) && $targetChannelsNum>=$this->getLayoutChannels()){
+			$target->olayout = $this->olayout;
+		}
+		else {
+			$target->olayout=$targetChannelsNum>=2? 2: 0;
+		}
+
+		$target->lang = isset($this->lang)? $this->lang: null;
+		
+		return $target;
+	}
+
+	/**
+	 * 
+	 * @param unknown_type $overrideChannels
+	 * @return NULL
+	 */
+	private function generateTargetChannels($overrideChannels){
+		$matchedChannelsArr = array();
+		foreach($overrideChannels as $overrideItem){
+			if(!isset($this->channels)
+			|| (key_exists($overrideItem->id, $this->channels) && isset($overrideItem->audioChannelIndex) && array_search($overrideItem->audioChannelIndex, $this->channels[$overrideItem->id])!==false)){
+				$matchedChannelsArr[] = $overrideItem->audioChannelIndex;
+			}
+		}
+		if(count($matchedChannelsArr)==0) {
+			return null;
+		}
+		
+		$target = new KDLStreamDescriptor();
+		
+		if(isset($overrideItem->audioChannelIndex)){
+			$target->channels[$overrideItem->id] = $matchedChannelsArr;
+		}
+		$target->mapping[] = $overrideItem->id;
+		if(isset($overrideItem->audioLabel)) $target->label = $overrideItem->audioLabel;
+/**/		
+		$targetChannelsNum = $target->getChannelsNum();
+		if($targetChannelsNum==0){
+			return null;
+		}
+		
+		$olayoutNum = $this->getLayoutChannels();
+	
+		if($targetChannelsNum>=$olayoutNum){
+			$target->olayout = $this->olayout;
+		}
+		else {
+			$target->olayout=$targetChannelsNum>=2? 2: 0;
+		}
+
+		return $target;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $sourceStreams
+	 * @param unknown_type $sourceAnalize
+	 */
+	private function generateTargetLingualNotated($sourceStreams, $sourceAnalize)
+	{
+		if(!isset($this->lang)){
+			return null;
+		}
+		
+		if(!isset($sourceAnalize->languages) || !key_exists($this->lang, $sourceAnalize->languages)){
+			return null;
+		}
+
+		$streams = $sourceAnalize->languages[$this->lang];
+		/*
+		 * Currently handle just the first language entity
+		 */
+		if(isset($streams[0]->audioChannels)){
+			$target = new KDLStreamDescriptor(array($streams[0]->id),$streams[0]->audioChannels,$this->lang);
+		}
+		else {
+			$target =  new KDLStreamDescriptor(array($streams[0]->id),0,$this->lang);
+		}
+		if(isset($streams[0]->audioLabel)) {
+			$target->label = $streams[0]->audioLabel;
+		}
+		return $target;
+	}
 }
 
 /***************************************
@@ -165,10 +562,10 @@ class KDLStreamDescriptor {
 class KDLAudioMultiStreaming {
 	public $streams = array();
 	public $action;
-
-	public function __construct($settings=null)
+	
+	public function __construct($settings=null, $sourceOverride=null)
 	{
-		$this->LoadSettings($settings);
+		$this->LoadSettings($settings, $sourceOverride);
 	}
 
 	/**
@@ -180,34 +577,42 @@ class KDLAudioMultiStreaming {
 		if(!isset($settings))
 			return;
 
+		if(isset($settings->action)) $this->action = $settings->action;
+		
 		$toLoad = array();
+		/*
+		 * 'New' multiStream format
+		 */
+		if(isset($settings->streams)){
+			foreach ($settings->streams as $obj){
+				$this->addStream($obj);		
+			}
+			return;
+		}
+
+		/*
+		 * 'Old' mu;ltistream format,
+		 * 	convert into new format 
+		 */
 		if(is_array($settings)) {
 			$toLoad = $settings;
 		}
-		else if(isset($settings->streams)){
-			$toLoad = $settings->streams;
-		}
-		else {
+		else  {
 			$toLoad = array($settings);
 		}
-
 		foreach ($toLoad as $obj){
-			if(isset($obj->languages)){
-				foreach ($obj->languages as $lang){
-					if(is_object($lang)){
-						$this->addStream($lang);
-					}
-					else {
-						$this->addStream(null, $lang);
-					}
-				}
+			if(!isset($obj->languages))
 				continue;
-			}
-			else
-				$this->addStream($obj);
-		}
 
-		if(isset($settings->action)) $this->action = $settings->action;
+			foreach ($obj->languages as $lang){
+				if(is_object($lang)){
+					$this->addStream($lang);
+				}
+				else {
+					$this->addStream(null, $lang);
+				}
+			}
+		}
 	}
 
 	/**
@@ -231,7 +636,7 @@ class KDLAudioMultiStreaming {
 	{
 		$num = 0;
 		foreach ($this->streams as $stream) {
-			$num = max($num, count($stream->mapping));
+			$num = max($num, $stream->getChannelsNum());
 		}
 		return $num;
 	}
@@ -273,7 +678,7 @@ class KDLAudioMultiStreaming {
 	{
 		if(count($this->streams)<=$oStreamIdx)
 			return null;
-		return $this->streams[$oStreamIdx]->mapping;
+		return $this->streams[$oStreamIdx]->getMapping();
 	}
 
 	/**
@@ -303,6 +708,25 @@ class KDLAudioMultiStreaming {
 		}
 		$this->streams[] = $stream;
 	}
+	
+	/**
+	 * 
+	 * @param unknown_type $multiStreamObj
+	 * @param unknown_type $field
+	 * @param unknown_type $idx
+	 * @return boolean
+	 */
+	public static function IsStreamFieldSet($multiStreamObj, $field, $idx=0)
+	{
+		if(isset($multiStreamObj->audio->streams)
+				&& count($multiStreamObj->audio->streams)>0
+				&& isset($multiStreamObj->audio->streams[$idx]->$field)){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
 
 /***************************************************
@@ -315,28 +739,41 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	 * @param unknown_type $sourceStreams
 	 * @return Ambigous <-, NULL, KDLAudioMultiStreaming>|Ambigous <NULL, KDLAudioMultiStreaming>|NULL|KDLAudioMultiStreamingHelper
 	 */
-	public function GetSettings($sourceStreams)
+	public function GetSettings($sourceStreams, $overrideStreams=null)
 	{
-
+		$sourceAudioStreams = isset($sourceStreams->audio)? $sourceStreams->audio: null;
+		$overrideStreams = isset($overrideStreams->audio)? $overrideStreams->audio: null;
+		
+		$overrideAudio = self::prepareSourceOverride($overrideStreams, $sourceAudioStreams);
+		if(isset($overrideAudio)){
+			self::applyOverrideToSource($overrideAudio->perTrack, $sourceAudioStreams);
+		}
 		$sourceAnalize = self::analizeSourceContentStreams($sourceStreams);
-
+		$sourceAnalize->override = $overrideAudio;
+		
 		/*
-		 * The 'default' flow -
-		* Check analyze results for
-		* - 'streamsAsChannels' - process them as sorround streams
-		* - 'languages - process them as multi-lingual
-		* - otherwise remove the 'multiStream' object'
-		*/
+		 * The 'default' flow (multiStream object is not provided) -
+		 * Check analyze results for
+		 * - 'streamsAsChannels' - process them as sorround streams
+		 * - otherwise remove the 'multiStream' object'
+		 */
 		{
-			$setupLanguages = $this->getLanguages();
-			if(isset($setupLanguages) && isset($sourceAnalize->languages)){
-				return $this->multiLingualAudioSurceToTarget($sourceAnalize->languages);
-			}
-			else if(!$this->isInitialzed()){
-				if(isset($sourceAnalize->streamsAsChannels)){
-					return self::surroundAudioSurceToTarget($sourceStreams, $sourceAnalize->streamsAsChannels);
+			if(!$this->isInitialzed()){
+				$targetMultiAudio =  self::overrideChannelsToTarget($sourceAudioStreams, $sourceAnalize);
+				if(isset($targetMultiAudio))
+					return $targetMultiAudio;
+
+				$targetMultiAudio =  self::surroundAudioSourceToTarget($sourceAudioStreams, $sourceAnalize);
+				if(isset($targetMultiAudio))
+					return $targetMultiAudio;
+
+				/*
+				 * If there are at least two mono streams - auto-setup 2 channel multiStream in order to support stereo output
+				 */
+				if(isset($sourceAnalize->perChannelNumber) && key_exists(1, $sourceAnalize->perChannelNumber) && count($sourceAnalize->perChannelNumber[1])>=2){
+					$targetMultiAudio = self::multipleMonoSourceStreamsToTarget($sourceAudioStreams, $sourceAnalize->perChannelNumber[1]);
 				}
-				return null;
+				return $targetMultiAudio;
 			}
 		}
 
@@ -349,21 +786,21 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 		* - for 'separate' as standalone streams
 		* - otherwise - as mapping in the first stream and remove the rest
 		*/
-		$streams = $this->initializeStreams($sourceStreams);
+		$streams = $this->initializeSetupStreams($sourceAudioStreams);
 
 		/*
 		 *
-		*/
+		 */
 		$targetMultiAudio = new KDLAudioMultiStreamingHelper();
 		foreach ($streams as $idx=>$stream){
-			$stream = $stream->GetSettings($sourceStreams->audio, $sourceAnalize);
-			if(isset($stream)){
-				// Turn on downmix, if any
-				$stream->adjustForDownmix($sourceStreams);
-				$targetMultiAudio->streams[] = $stream;
+			$target = $stream->generateTarget($sourceAudioStreams, $sourceAnalize);
+			if(isset($target)){
+				$targetMultiAudio->streams[] = $target;
 			}
 		}
 		if(isset($this->action)) $targetMultiAudio->action = $this->action;
+		if(count($targetMultiAudio->streams)==0)
+			return null;
 
 		return $targetMultiAudio;
 	}
@@ -372,7 +809,7 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	 *
 	 * @param unknown_type $sourceStreams
 	 */
-	private function initializeStreams($sourceStreams)
+	private function initializeSetupStreams($sourceAudioStreams)
 	{
 		/*
 		 * If 'all' isset, then filter in all source streams -
@@ -381,16 +818,17 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 		*/
 		$streams = array();
 		$firstStream = $this->streams[0];
-		if(isset($firstStream->mapping) && count($firstStream->mapping)>0 && $firstStream->mapping[0]=='all'){
+		$firstStreamMapping = $firstStream->getMapping();
+		if(isset($firstStreamMapping) && count($firstStreamMapping)>0 && (string)$firstStreamMapping[0]=='all'){
 			if($this->action=='separate'){
-				foreach($sourceStreams->audio as $sourceStream){
+				foreach($sourceAudioStreams as $sourceStream){
 					$stream = new KDLStreamDescriptor(array($sourceStream->id), $firstStream->olayout, $firstStream->lang);
 					$streams[] = $stream;
 				}
 			}
 			else {
 				$streamIds = array();
-				foreach($sourceStreams->audio as $sourceStream){
+				foreach($sourceAudioStreams as $sourceStream){
 					$streamIds[] = $sourceStream->id;
 				}
 				$stream = new KDLStreamDescriptor($streamIds, $firstStream->olayout, $firstStream->lang);
@@ -446,11 +884,13 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 				}
 
 				$dlt = abs($dursAvg[$t]-$dur);
-				// Identical concidered to be less than 1sec delta and the delta is less than 0.1%
-				if($dlt<1000 && $dlt/$dur<0.001)
+				// Identical concidered to be less than 500msec delta
+				if($dlt<500){
 					$identicalDur[$t][] = $stream;
-				else
+				}
+				else {
 					$differentDur[$t][] = $stream;
+				}
 
 			}
 		}
@@ -498,13 +938,13 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 		/*
 		 * Sort audio streams by the number of channels
 		 */
+		$perChannelNumber = array();
 		if(isset($contentStreams->audio)){
 			// Get all streams that have 'surround' like audio layout - FR, FL, ...
 			// Sort the audio streams for channel number. We are looking for mono streams
-			$byChannelNumber = array();
 			foreach ($contentStreams->audio as $stream){
 				if(isset($stream->audioChannels))
-					$byChannelNumber[$stream->audioChannels][] = $stream;
+					$perChannelNumber[$stream->audioChannels][] = $stream;
 			}
 		}
 
@@ -520,11 +960,110 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 		if(count($identicalDur)>0) $rvAnalize->identicalDur = $identicalDur;
 		if(count($differentDur)>0) $rvAnalize->differentDur = $differentDur;
 		if(count($zeroedDur)>0) $rvAnalize->zeroedDur = $zeroedDur;
-		if(count($byChannelNumber)>0) $rvAnalize->byChannelNumber = $byChannelNumber;
+		if(count($perChannelNumber)>0) $rvAnalize->perChannelNumber = $perChannelNumber;
 
 		return $rvAnalize;
 	}
 
+	/**
+	 * Override records should be gathered by -
+	 * 	track id
+	 * 	language
+	 * 	label
+	 * @param unknown_type $sourceOverride
+	 */
+	protected static function prepareSourceOverride($overrides, $sourceAudioStreams)
+	{
+		if(!isset($overrides))
+			return null;
+		
+		$auxSources = array();
+		foreach ($sourceAudioStreams as $sourceAudioStream){
+			$auxSources[$sourceAudioStream->id] = $sourceAudioStream; 
+		}
+			
+		/*
+		 * Gather together all sourceOverride's that belong to the same track/stream (id)/label/channels.
+		 */
+		$perTrack = array();
+		$perLanguage = array();
+		$perLabel = array();
+		$perTrackChannelIndexLanguage = array();
+		$perTrackChannelIndexLabel = array();
+		foreach ($overrides as $idx=>$override){
+/**/
+			/*
+			 * Filter out overrides that do not match source tracks(streams)/channels
+			 */
+			if(!key_exists($override->id, $auxSources)) {
+				continue;
+			}
+			$auxSource = $auxSources[$override->id];
+			if(isset($override->audioChannelIndex) && isset($auxSource->audioChannels) 
+			&& $override->audioChannelIndex>=$auxSource->audioChannels) {
+				continue;
+			}
+
+			$perTrack[$override->id][] = $override;
+			if(isset($override->audioLanguage)){
+				$perLanguage[$override->audioLanguage][] = $override;
+			}
+			if(isset($override->audioLabel)){
+				$perLabel[$override->audioLabel][] = $override;
+			}
+			
+			if(isset($override->audioChannelIndex)){
+					if(isset($override->audioLabel)){
+						$perTrackChannelIndexLabel[$override->id][$override->audioLabel][] = $override;
+					}
+					else {
+						$perTrackChannelIndexLabel[$override->id]["und"][] = $override;
+					}
+					if(isset($override->audioLanguage)){
+						$perTrackChannelIndexLanguage[$override->id][$override->audioLanguage][] = $override;
+					}
+					else {
+//						$perTrackChannelIndexLanguage[$override->id]["und"][] = $override;
+					}
+			}
+		}
+		
+		
+		$rv = new stdClass();
+		$rv->perTrack = 	count($perTrack)>0? $perTrack: null;
+		$rv->perLanguage = 	count($perLanguage)>0? $perLanguage: null;
+		$rv->perLabel = 	count($perLabel)>0? $perLabel: null;
+		$rv->perTrackChannelIndexLabel = 	count($perTrackChannelIndexLabel)>0? $perTrackChannelIndexLabel: null;
+		$rv->perTrackChannelIndexLanguage = count($perTrackChannelIndexLanguage)>0? $perTrackChannelIndexLanguage: null;
+	
+		return $rv;
+	}
+
+	/**
+	 * Override original source values
+	 * 	Only the first override record (per track) is applied and only if there is no channel settings there, 
+	 * 	otherwise assume it is channel mapping and skip 
+	 * @param unknown_type $overridesPerTrack
+	 * @param unknown_type $sourceAudioStreams
+	 */
+	protected static function applyOverrideToSource($overridesPerTrack, $sourceAudioStreams)
+	{
+		if(!isset($overridesPerTrack))
+			return;
+		foreach($sourceAudioStreams as $idx=>$sourceAudioStream){
+			if(key_exists($sourceAudioStream->id, $overridesPerTrack) && !isset($overridesPerTrack[$sourceAudioStream->id][0]->audioChannelIndex)){
+				$override = $overridesPerTrack[$sourceAudioStream->id][0];
+				$fields = get_object_vars($override);
+				foreach ($fields as $field=>$val){
+					if(isset($override->$field)){
+						$sourceAudioStream->$field=$val;
+					}
+				}
+				$sourceAudioStreams[$idx] = $sourceAudioStream;
+			}
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -538,23 +1077,35 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	 * @param unknown_type $source
 	 * @param unknown_type $analyzedStreams
 	 */
-	public static function surroundAudioSurceToTarget($sourceStreams, $analyzedStreams)
-	{
-		if(!isset($sourceStreams->audio))
+	public static function surroundAudioSourceToTarget($sourceAudioStreams, $sourceAnalize)
+	{	
+		if(!isset($sourceAnalize->streamsAsChannels))
 			return null;
-
-
-		$mappedStreams = KDLAudioLayouts::matchLayouts($sourceStreams->audio, KDLAudioLayouts::DOWNMIX);
+		if(!isset($sourceAudioStreams))
+			return null;
+		
+		$analyzedStreams = $sourceAnalize->streamsAsChannels;
+			/*
+			 * Try to find most suitible source streams to resample into stereo output -
+			 * - downmix
+			 * - FL,FR,mono(center) 
+			 * - DL,DR
+			 * If found the source can be porcessed into stereo
+			 */
+		$mappedStreams = KDLAudioLayouts::matchLayouts($sourceAudioStreams, KDLAudioLayouts::DOWNMIX);
 		if(count($mappedStreams)==0) {
 			$mappedStreams = KDLAudioLayouts::matchLayouts($analyzedStreams, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
 			if(count($mappedStreams)==0) {
 				$mappedStreams = KDLAudioLayouts::matchLayouts($analyzedStreams, array(KDLAudioLayouts::DL, KDLAudioLayouts::DR));
 			}
 		}
-		$stream = new KDLStreamDescriptor();
+		
+		$mapping = array();
 		foreach ($mappedStreams as $mappedStream){
-			$stream->mapping[] = $mappedStream->id;
+			$mapping[] = $mappedStream->id;
 		}
+		$stream = new KDLStreamDescriptor();
+		$stream->setMapping(count($mapping)>0? $mapping: null);
 		if(count($mappedStreams)==1){
 			if(isset($mappedStream->audioChannels)){
 				$stream->olayout = $mappedStream->audioChannels;
@@ -572,52 +1123,134 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	}
 
 	/**
-	 *
+	 * Setup automatic multistream out of several un notated mono audio streams.
+	 * Mix the fist 2 mono streams into a stereo
+	 * 
 	 * @param unknown_type $source
-	 * @param unknown_type $languages
-	 * @return -
-	 * 	null - not applicable for that source (non multi-lingual) or for the required multiStream settings (no multi-lingual requirement)
-	 * 	stdClass obj with set audio-languages array - holding matched languages
-	 * 	stdClass obj with empty audio-languages array - no matched languages
+	 * @param unknown_type $analyzedStreams
 	 */
-	public function multiLingualAudioSurceToTarget($sourceLanguages)
+	public static function multipleMonoSourceStreamsToTarget($sourceAudioStreams, $analyzedStreams)
 	{
-		/*
-		 * If no multi-lingual data in the source, get out
-		*/
-		if(!(is_array($sourceLanguages) && count($sourceLanguages)>0)){
+		if(!isset($sourceAudioStreams))
 			return null;
-		}
 
-		/*
-		 * Sample json string:
-		* 		- {"audio":{"languages":["eng","esp"]}}
-		*/
+		$mapping = array();
+		$mapping[] = $analyzedStreams[0]->id;
+		$mapping[] = $analyzedStreams[1]->id;
+		$stream = new KDLStreamDescriptor();
+		$stream->olayout = 2;
+		$stream->setMapping($mapping);
+		
 		$target = new KDLAudioMultiStreaming();
-		foreach ($sourceLanguages as $lang=>$streamsPerLanguage){
-			if(count($streamsPerLanguage)>1) {
-				return null;
-			}
-			if(($idx=$this->lookForLanguage($lang))===false){
-				continue;
-			}
-				
-			/*
-			 * Currently handle just the first language entity
-			*/
-			if(isset($streamsPerLanguage[0]->audioChannels))
-				$stream = new KDLStreamDescriptor(array($streamsPerLanguage[0]->id),$streamsPerLanguage[0]->audioChannels,$lang);
-			else
-				$stream = new KDLStreamDescriptor(array($streamsPerLanguage[0]->id),null,$lang);
-			$target->streams[] = $stream;
-		}
-
-		if(count($target->streams)==0)
-			return null;
-
-		return($target);
+		$target->streams[] = $stream;
+		return $target;
 	}
 
+	/**
+	 * 
+	 * @param unknown_type $sourceAudioStreams
+	 * @param unknown_type $sourceAnalize
+	 */
+	public static function overrideChannelsToTarget($sourceAudioStreams, $sourceAnalize)
+	{
+		$layoutMajor = array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO);
+		$layoutMinor = array(KDLAudioLayouts::DL, KDLAudioLayouts::DR);
+
+		/*
+		 * Look for labled channels, try to adjust one of the 'downmix'able layout (majir/minor)
+		 * If not found - look for channels with language notation
+		 */
+		$mappedChannels = array();
+		if(isset($sourceAnalize->override->perTrackChannelIndexLabel)) {
+			$mappedChannels = self::searchThroughOverride($sourceAnalize->override->perTrackChannelIndexLabel, $layoutMajor);
+			if(count($mappedChannels)<count($layoutMajor))
+				$mappedChannels = self::searchThroughOverride($sourceAnalize->override->perTrackChannelIndexLabel, $layoutMinor);
+		}
+		if(isset($sourceAnalize->override->perTrackChannelIndexLanguage)) {
+			if(count($mappedChannels)<count($layoutMinor))
+				$mappedChannels = self::searchThroughOverride($sourceAnalize->override->perTrackChannelIndexLanguage, $layoutMajor);
+			if(count($mappedChannels)<count($layoutMajor))
+				$mappedChannels = self::searchThroughOverride($sourceAnalize->override->perTrackChannelIndexLanguage, $layoutMinor);
+		}
+		/*
+		 * If 'labled' and 'languaged' records not found,
+		 * try to match non notated channels.
+		 * Peference order - 2channels per track, more than 2channels, one channel
+		 
+		if(count($mappedChannels)==0){
+			$perChannelCnt = array();
+			if(isset($sourceAnalize->override->perTrack))
+				foreach($sourceAnalize->override->perTrack as $trackIdx=>$track){
+					$perChannelCnt[count($track)][] = $track;
+				}
+			if(key_exists(2, $perChannelCnt)){
+				$mappedChannels = $perChannelCnt[2][0];
+			}
+			else {
+				if(key_exists(1, $perChannelCnt)){
+					$mappedOneChannel = $perChannelCnt[1][0];
+				}
+				foreach($perChannelCnt as $cnt=>$aux){
+					if($cnt>2){
+						$mappedManyChannels = $aux[0];
+						break;
+					}
+				}
+				if(isset($mappedManyChannels))
+					$mappedChannels = array_slice($mappedManyChannels, 0, 2);
+				else if(isset($mappedOneChannel))
+					$mappedChannels = $mappedOneChannel;
+			}
+		}
+		*/
+		/*
+		 * If no mapped channels - get out
+		 */
+		if(count($mappedChannels)==0){
+			return null;
+		}
+
+		/*
+		 * 
+		 */
+		$stream = new KDLStreamDescriptor();
+		$mapping = array();
+		foreach ($mappedChannels as $mappedChannel){
+			$mapping[] = $mappedChannels[0]->id.".".$mappedChannel->audioChannelIndex;
+		}
+		if(count($mapping)>1){
+			$stream->olayout = 2;
+		}
+		$stream->setMapping($mapping);
+		
+		$target = new KDLAudioMultiStreaming();
+		$target->streams[] = $stream;
+		return $target;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $override
+	 * @param unknown_type $layouts
+	 * @return Ambigous <multitype:, multitype:unknown, multitype:unknown >|multitype:
+	 */
+	public static function searchThroughOverride($override, $layouts)
+	{
+		$mappedStreams = array();
+		if(isset($override)) {
+			foreach ($override as $trkIdx=>$perTrack){
+				foreach($perTrack as $langIdx=>$perLang){
+					$mappedStreams = KDLAudioLayouts::matchLayouts($perLang, $layouts);
+					if(count($mappedStreams)==count($layouts)) {
+						return $mappedStreams;
+					}
+					$mappedStreams = array();
+				}
+			}
+		}
+		return $mappedStreams;
+	}
+	
 	/**
 	 *
 	 * @param unknown_type $stream1

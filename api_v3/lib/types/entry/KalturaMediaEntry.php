@@ -95,9 +95,15 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public $isTrimDisabled;
 
+	/**
+	 * Array of streams that exists on the entry
+	 * @var KalturaStreamContainerArray
+	 */
+	public $streams;
+
 	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType" , "searchProviderType", // see special logic for this field below
 	//"searchProviderType", // see special logic for this field below
-	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled" );
+	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled", "streams" );
 	
 	public function __construct() {
 		$this->type = KalturaEntryType::MEDIA_CLIP;
