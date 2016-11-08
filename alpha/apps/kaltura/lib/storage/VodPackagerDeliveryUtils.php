@@ -2,7 +2,7 @@
 
 class VodPackagerDeliveryUtils
 {
-	protected static function generateMultiUrl(array $flavors, entry $entry)
+	protected static function generateMultiUrl(array $flavors, entry $entry, DeliveryProfileDynamicAttributes $params)
 	{
 		$urls = array();
 		foreach ($flavors as $flavor)
@@ -42,8 +42,8 @@ class VodPackagerDeliveryUtils
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
 		
-		if ($entry->getType() == entryType::PLAYLIST &&
-			strpos($middlePart, '/') === false)
+		if ( ($entry->getType() == entryType::PLAYLIST &&
+			strpos($middlePart, '/') === false) || ($params->getUsePlayServer()))
 		{
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
 			$result = $prefix . $middlePart . $postfix;
@@ -60,7 +60,7 @@ class VodPackagerDeliveryUtils
 	{
 		$entry = entryPeer::retrieveByPK($params->getEntryId());
 		
-		$url = self::generateMultiUrl($flavors, $entry);
+		$url = self::generateMultiUrl($flavors, $entry, $params);
 		$url .= $urlSuffix;
 	
 		// move any folders on the url prefix to the url part, so that the protocol folder will always be first
