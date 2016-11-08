@@ -119,7 +119,7 @@ class DatesGenerator
 	 * This is also significant when in a YEARLY frequency when a byWeekNumber rule part is specified.
 	 * The default value is MONDAY.
 	 */
-	private $weekStartDay = 'MO';
+	private $weekStartDay;
 
 	/**
 	 * @var array
@@ -385,6 +385,8 @@ class DatesGenerator
 			$this->interval = 1;
 		if (!$this->maxRecurrences)
 			$this->maxRecurrences = 10;
+		if (!$this->weekStartDay)
+			$this->weekStartDay = 'MO';
 	}
 
 
@@ -451,6 +453,9 @@ class DatesGenerator
 
 		$this->log("Start calendar [" . date('d/n/y G:i:s', $cal) . "]");
 
+		$this->log("asdf");
+		$this->log("start day is: $this->weekStartDay");
+
 		$invalidCandidateCount = 0;
 		if($limit && $this->count && $this->count < $limit)
 			$limit = $this->count;
@@ -472,10 +477,11 @@ class DatesGenerator
 				$this->log("Count [" . count($dates) . "] passed limit [$limit]");
 				break;
 			}
-
+			$this->log("cal is $cal");
 			$candidates = $this->getCandidates($cal);
 			foreach($candidates as $candidate)
 			{
+				$this->log("candidate is $candidate");
 				// don't count candidates that occur before the seed date..
 				if($candidate >= $seed)
 				{
@@ -888,11 +894,22 @@ class DatesGenerator
 		}
 		elseif($this->frequency == DatesGenerator::WEEKLY || $this->byWeekNumber)
 		{
-			// Find the target day in the current week
+			// Back up to WeekStartDay
 			$t = $cal;
 			$current = getdate($t);
-			$target = getdate(strtotime("+1 $calDay", $t));
-			$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
+			$weekStartDay = self::$dayNames[$this->weekStartDay];
+			if($current['weekday'] != $weekStartDay)
+			{
+				$startDay = getdate(strtotime("-1 $weekStartDay", $cal));
+				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $startDay['mon'], $startDay['mday'], $startDay['year']);
+			}
+			// if wanted day is not startDay then move forward to him
+			if ($calDay != $weekStartDay)
+			{
+				$target = getdate(strtotime("+1 $calDay", $t));
+				$t = mktime($current['hours'], $current['minutes'], $current['seconds'], $target['mon'], $target['mday'], $target['year']);
+			}
+			
 			$days[] = $t;
 		}
 		elseif($this->frequency == DatesGenerator::MONTHLY || $this->byMonth)
