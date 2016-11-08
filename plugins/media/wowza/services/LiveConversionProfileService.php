@@ -11,6 +11,9 @@ class LiveConversionProfileService extends KalturaBaseService
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
 	 */
+
+	const MINIMAL_DEFAULT_FRAME_RATE = 12.5;
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -85,8 +88,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		if (!$liveParamsInput)
 		{
-			KalturaLog::err("Conversion profile of entry [" . $entryId . "] doesn't contain ingest [" . $suffix . "]");
-			throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $streamName);
+			throw new KalturaAPIException(KalturaErrors::INGEST_NOT_FOUND_IN_CONVERSION_PROFILE, $streamName);
 		}
 		
 		$ignoreLiveParamsIds = array();
@@ -117,10 +119,12 @@ class LiveConversionProfileService extends KalturaBaseService
 			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
 				continue;
 
-			if ($liveParamsItem->hasTag(assetParams::TAG_SOURCE)) {
-				if ($liveParamsItem->getFrameRate() && $liveParamsItem->getFrameRate() !== 0) {
-					KalturaLog::info("Setting default frame rate to " . $liveParamsItem->getFrameRate());
-					$defaultFrameRate = (int)$liveParamsItem->getFrameRate();
+			if ($liveParamsItem->hasTag(assetParams::TAG_SOURCE))
+			{
+				if ($liveParamsItem->getFrameRate() >= self::MINIMAL_DEFAULT_FRAME_RATE)
+				{
+					KalturaLog::debug("Setting default frame rate to " . $liveParamsItem->getFrameRate());
+					$defaultFrameRate = $liveParamsItem->getFrameRate();
 				}
 			}
 			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
@@ -280,7 +284,8 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval->addChild('Interval', 60);
 
 		$skipFrameCountPos = strpos($liveParams->getConversionEnginesExtraParams(), 'SkipFrameCount');
-		if ($skipFrameCountPos !== false) {
+		if ($skipFrameCountPos !== false)
+		{
 			$skipFrameCount = $video->addChild('SkipFrameCount');
 			preg_match('/SkipFrameCount=(\d+)/', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
 			$skipFrameCount->addChild('Value', (int)$skipFrameValue[1]);

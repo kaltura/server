@@ -224,6 +224,8 @@ class KalturaErrors extends APIErrors
 
 	const CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND = "CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND;PROFILE_ID,PARAMS_ID;Conversion profile id \"@PROFILE_ID@\" asset params id \"@PARAMS_ID@\" not found";
 
+	const INGEST_NOT_FOUND_IN_CONVERSION_PROFILE = "INGEST_NOT_FOUND_IN_CONVERSION_PROFILE;Ingest \"@STREAM_NAME@\" is not in conversion profile";
+
 	/**
 	 * FlavorParams Service
 	 */
