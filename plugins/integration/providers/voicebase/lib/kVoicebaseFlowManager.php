@@ -243,20 +243,17 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		return $durationSeconds . '.' . str_pad($durationMilliseconds, 3, 0, STR_PAD_LEFT);
 	}
 
+	/**
+	 * Wraps kXml::integerToTime to force milliseconds and pad it
+	 *
+	 * @param $int
+	 * @return string
+	 */
 	private function integerToTime($int)
 	{
-		$hours = floor($int / (60 * 60 * 1000));
-		$int -= ($hours * 60 * 60 * 1000);
-		$minutes = floor($int / (60 * 1000));
-		$int -= ($minutes * 60 * 1000);
-		$seconds = floor($int / 1000);
-		$millis = round(($int % 1000));
-		$ret = array(
-			str_pad($hours, 2, 0, STR_PAD_LEFT),
-			str_pad($minutes, 2, 0, STR_PAD_LEFT),
-			str_pad($seconds, 2, 0, STR_PAD_LEFT) . '.' . str_pad($millis, 3, 0, STR_PAD_LEFT),
-		);
-
-		return implode(':', $ret);
+		$milliseconds = $int % 1000;
+		$stringTime = kXml::integerToTime($int - $milliseconds);
+		$stringTime .= '.' . str_pad($milliseconds, 3, 0, STR_PAD_LEFT);
+		return $stringTime;
 	}
 }
