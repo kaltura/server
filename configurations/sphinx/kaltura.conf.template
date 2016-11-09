@@ -370,7 +370,6 @@ index kaltura_caption_item:kaltura_base
 	rt_field	 = language
 	rt_field	 = label
 	rt_field	 = format
-	rt_attr_uint	 = int_id
 	rt_attr_uint	 = caption_params_id
 	rt_attr_bigint	 = partner_id
 	rt_attr_uint	 = version

@@ -52,8 +52,6 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			'language' => SphinxFieldType::RT_FIELD,
 			'label' => SphinxFieldType::RT_FIELD,
 			'format' => SphinxFieldType::RT_FIELD,
-			
-			'int_id' => SphinxFieldType::RT_ATTR_BIGINT,
 			'caption_params_id' => SphinxFieldType::RT_ATTR_BIGINT,
 			'partner_id' => SphinxFieldType::RT_ATTR_BIGINT,
 			'version' => SphinxFieldType::RT_ATTR_BIGINT,
