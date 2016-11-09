@@ -615,7 +615,8 @@ class ks extends kSessionBase
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE){
 				$c = new Criteria();
 				$c->addAnd(is_numeric($exPrivileges[1]) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME, $exPrivileges[1], Criteria::EQUAL);
-				$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+				$partnerIdsArray = array_map('strval', array($partnerId, PartnerPeer::GLOBAL_PARTNER));
+				$c->addAnd(UserRolePeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 				$roleId = UserRolePeer::doSelectOne($c);
 				
 				if ($roleId){
