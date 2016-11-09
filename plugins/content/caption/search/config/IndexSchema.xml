@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schema>
-	<object name="CaptionAssetItem" indexId="int_id" indexName="caption_item" >
+	<object name="CaptionAssetItem" indexId="id" indexName="caption_item" >
 	        <field name="entry_id" indexName="entry_id" type="string" matchable="yes" />
 	        <field name="caption_asset_id" indexName="caption_asset_id" type="string" matchable="yes" />
 	        <field name="tags" indexName="tags" type="string" matchable="yes" />
@@ -9,7 +9,6 @@
 	        <field name="language" indexName="language" type="string" matchable="yes" />
 	        <field name="label" indexName="label" type="string" matchable="yes" />
 	        <field name="format" indexName="format" type="string" matchable="yes" />
-	        <field name="int_id" indexName="int_id" type="int" />
 	        <field name="caption_params_id" indexName="caption_params_id" type="int" />
 	        <field name="partner_id" indexName="partner_id" type="bint" />
 	        <field name="version" indexName="version" type="int" />
