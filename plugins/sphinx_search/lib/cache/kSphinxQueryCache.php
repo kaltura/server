@@ -177,6 +177,7 @@ class kSphinxQueryCache extends kQueryCache
 		{
 			// in case of sphinx conditional queries, shorten the cache expiry till the sphinx server will reach the required invalidation update time
 			self::$reduceConditionalExpiry = self::$maxInvalidationTime - $queryTime;
+			$currentTime = time();
 			KalturaLog::debug("kQueryCache: using an out of date sphinx  -> not caching the result, peer=$objectClass, invkey=".self::$maxInvalidationKey." querytime=$currentTime invtime=".self::$maxInvalidationTime." sphinxLag=$queryTime");
 			return false;
 		}
