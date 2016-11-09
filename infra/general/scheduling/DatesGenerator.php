@@ -41,6 +41,11 @@ class DatesGenerator
 	private $until;
 
 	/**
+	 * @var string timeZone
+	 */
+	private $timeZone = null;
+
+	/**
 	 * @var int
 	 */
 	private $count;
@@ -149,6 +154,14 @@ class DatesGenerator
 	public function getUntil()
 	{
 		return $this->until;
+	}
+
+	/**
+	 * @return tge $timeZone
+	 */
+	public function getTimeZone()
+	{
+		return $this->timeZone;
 	}
 
 	/**
@@ -269,6 +282,14 @@ class DatesGenerator
 	public function setUntil($until)
 	{
 		$this->until = $until;
+	}
+
+	/**
+	 * @param string $timeZone
+	 */
+	public function setTimeZone($timeZone)
+	{
+		$this->timeZone = $timeZone;
 	}
 
 	/**
@@ -397,6 +418,13 @@ class DatesGenerator
 	 */
 	public function getDates($periodStart = null)
 	{
+		$original = null;
+		if (!is_null($this->timeZone))
+		{
+			$original = date_default_timezone_get();
+			date_default_timezone_set($this->timeZone);
+		}
+
 		if(!$periodStart)
 			$periodStart = time();
 
@@ -405,6 +433,9 @@ class DatesGenerator
 		sort($dates);
 		if(count($dates) > $this->maxRecurrences)
 			$dates = array_slice($dates, 0, $this->maxRecurrences);
+
+		if (!is_null($original))
+			date_default_timezone_set($original);;
 
 		return $dates;
 	}

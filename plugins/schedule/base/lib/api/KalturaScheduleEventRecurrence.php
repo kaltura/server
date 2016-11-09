@@ -19,6 +19,12 @@ class KalturaScheduleEventRecurrence extends KalturaObject
 	 * @var time
 	 */
 	public $until;
+
+	/**
+	 * TimeZone String
+	 * @var string
+	 */
+	public $timeZone;
 	
 	/**
 	 * @var int
@@ -129,6 +135,7 @@ class KalturaScheduleEventRecurrence extends KalturaObject
 		'byMonth',
 		'byOffset',
 		'weekStartDay',
+		'timeZone',
 	 );
 		 
 	/* (non-PHPdoc)
