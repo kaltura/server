@@ -8,6 +8,8 @@
  */
 class LiveConversionProfileService extends KalturaBaseService
 {
+	const MINIMAL_DEFAULT_FRAME_RATE = 12.5;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
 	 */
@@ -20,7 +22,6 @@ class LiveConversionProfileService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('assetParams');
 	}
 
-	const MINIMAL_DEFAULT_FRAME_RATE = 12.5;
 	/**
 	 * Serve XML rendition of the Kaltura Live Transcoding Profile usable by the Wowza transcoding add-on
 	 * 
