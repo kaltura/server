@@ -28,12 +28,24 @@ class KalturaLiveToVodJobData extends KalturaJobData
 	 * @var float
 	 */
 	public $lastSegmentDuration;
+	
 	/**
 	 * amf Array File Path
 	 * @var string
 	 */
 	public $amfArray;
-
+	
+	/**
+	 * last live to vod sync time 
+	 * @var time
+	 */
+	public $lastCuePointSyncTime;
+	
+	/**
+	 * last segment drift
+	 * @var int
+	 */
+	public $lastSegmentDrift;
 
 	private static $map_between_objects = array
 	(
@@ -42,6 +54,8 @@ class KalturaLiveToVodJobData extends KalturaJobData
 		'totalVodDuration',
 		'lastSegmentDuration',
 		'amfArray',
+		'lastCuePointSyncTime',
+		'lastSegmentDrift',
 	);
 
 	/* (non-PHPdoc)

@@ -48,8 +48,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 					// Get the redirected entry and check if it exists and is ready
 					$redirectedEntry = entryPeer::retrieveByPK( $redirectEntryId );
 					
-					if ( ! empty( $redirectedEntry )
-							&& $redirectedEntry->getStatus() == entryStatus::READY )
+					if (!empty($redirectedEntry) && 
+						($redirectedEntry->getStatus() == entryStatus::READY || 
+							myEntryUtils::shouldServeVodFromLive($redirectEntryId)
+						)
+					)
 					{
 						// Redirected entry is ready.
 						// Set it as the replacement of the original one

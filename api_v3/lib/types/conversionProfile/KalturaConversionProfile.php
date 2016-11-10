@@ -148,6 +148,13 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	 */
 	public $mediaParserType;
 	
+	/**
+	 * Should calculate complexity
+	 *
+	 * @var KalturaNullableBoolean
+	 */
+	public $calculateComplexity;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -166,6 +173,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		"clipDuration",
 		"storageProfileId",
 		"mediaParserType",
+		"calculateComplexity",
 	);
 	
 	public function getMapBetweenObjects ( )

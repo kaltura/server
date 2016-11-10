@@ -24,12 +24,21 @@ class kLiveToVodJobData extends kJobData
 	 * @var float
 	 */
 	private $lastSegmentDuration;
+	
 	/** amf Array
 	 * @var string
 	 */
 	private $amfArray;
-
-
+	
+	/** vod Entry Id
+	 * @var time
+	 */
+	private $lastCuePointSyncTime;
+	
+	/** last segment drift
+	 * @var int
+	 */
+	private $lastSegmentDrift;
 
 	/**
 	 * @return string vodEntryId
@@ -65,6 +74,20 @@ class kLiveToVodJobData extends kJobData
 	public function getAmfArray()
 	{
 		return $this->amfArray;
+	}
+	/**
+	 * @return time $lastCuePointSyncTime
+	 */
+	public function getLastCuePointSyncTime()
+	{
+		return $this->lastCuePointSyncTime;
+	}
+	/**
+	 * @return int $lastSegmentDrift
+	 */
+	public function getLastSegmentDrift()
+	{
+		return $this->lastSegmentDrift;
 	}
 
 
@@ -103,6 +126,18 @@ class kLiveToVodJobData extends kJobData
 	{
 		$this->amfArray = $amfArray;
 	}
-
-
+	/**
+	 * @param time $lastCuePointSyncTime
+	 */
+	public function setLastCuePointSyncTime($lastCuePointSyncTime)
+	{
+		$this->lastCuePointSyncTime = $lastCuePointSyncTime;
+	}
+	/**
+	 * @param time $lastSegmentDrift
+	 */
+	public function setLastSegmentDrift($lastSegmentDrift)
+	{
+		$this->lastSegmentDrift = $lastSegmentDrift;
+	}
 }

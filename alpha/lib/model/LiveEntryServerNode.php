@@ -58,8 +58,9 @@ class LiveEntryServerNode extends EntryServerNode
 				if(!count($playableServerNodes))
 				{
 					$liveEntry->unsetMediaServer();
-					$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 				}
+				
+				$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			}
 			
 			if(!$liveEntry->getCurrentBroadcastStartTime() && $this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
@@ -183,7 +184,7 @@ class LiveEntryServerNode extends EntryServerNode
 				return;
 			}
 			
-			if($recordedEntry && $recordedEntry->getStatus() === entryStatus::READY)
+			if($recordedEntry->getStatus() === entryStatus::READY || $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			{
 				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] found and ready, clearing entry server node from db");
 				$this->delete();
