@@ -153,7 +153,6 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		{
 			$kalturaId3TagParser = new KSyncPointsMediaInfoParser($filePath);
 			$syncPointArray = $kalturaId3TagParser->getStreamSyncPointData();
-			array_unshift($syncPointArray, $duration);
 			
 			$outputFileName = pathinfo($filePath, PATHINFO_FILENAME) . ".data";
 			$localTempSyncPointsFilePath = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $outputFileName;
@@ -174,20 +173,16 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 	private function moveDataFile(KalturaExtractMediaJobData $data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath)
 	{
 		KalturaLog::debug("moving file from [$localTempSyncPointsFilePath] to [$sharedTempSyncPointFilePath]");
-		$fileSize = kFile::fileSize($sharedTempSyncPointFilePath);
+		$fileSize = kFile::fileSize($localTempSyncPointsFilePath);
+		
 		kFile::moveFile($localTempSyncPointsFilePath, $sharedTempSyncPointFilePath, true);
-		$this->setFilePermissions($sharedTempSyncPointFilePath);
 		clearstatcache();
 		
-		// directory sizes may differ on different devices
-		if(!file_exists($sharedTempSyncPointFilePath) || (is_file($sharedTempSyncPointFilePath) && kFile::fileSize($sharedTempSyncPointFilePath) != $fileSize))
-		{
-			KalturaLog::err("Error: Failed to move file from [$localTempSyncPointsFilePath] to [$sharedTempSyncPointFilePath]");
-		}
+		$this->setFilePermissions($sharedTempSyncPointFilePath);
+		if(!$this->checkFileExists($sharedTempSyncPointFilePath, $fileSize))
+			KalturaLog::warning("Failed to move file to [$sharedTempSyncPointFilePath]");
 		else
-		{
 			$data->destDataFilePath = $sharedTempSyncPointFilePath;
-		}
 	}
 }
 

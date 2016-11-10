@@ -184,9 +184,9 @@ class LiveEntryServerNode extends EntryServerNode
 				return;
 			}
 			
-			if($recordedEntry->getStatus() === entryStatus::READY || $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			if($recordedEntry->getStatus() === entryStatus::READY || $recordedEntry->getSourceType() == EntrySourceType::RECORDED_LIVE)
 			{
-				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] found and ready, clearing entry server node from db");
+				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] found and ready or recorded is of old source type, clearing entry server node from db");
 				$this->delete();
 				return;
 			}

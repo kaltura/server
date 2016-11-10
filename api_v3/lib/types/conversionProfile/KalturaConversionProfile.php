@@ -149,7 +149,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	public $mediaParserType;
 	
 	/**
-	 * Should calculate complexity
+	 * Should calculate file conversion complexity
 	 *
 	 * @var KalturaNullableBoolean
 	 */
