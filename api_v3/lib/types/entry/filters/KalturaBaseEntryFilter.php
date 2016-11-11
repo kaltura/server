@@ -99,25 +99,6 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		}
 	}
 
-	private function preparePusersToKusersFilter( $puserIdsCsv )
-	{
-		$kuserIdsArr = array();
-		$puserIdsArr = explode(',',$puserIdsCsv);
-		$kuserArr = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $puserIdsArr);
-
-		foreach($kuserArr as $kuser)
-		{
-			$kuserIdsArr[] = $kuser->getId();
-		}
-
-		if(!empty($kuserIdsArr))
-		{
-			return implode(',',$kuserIdsArr);
-		}
-
-		return -1; // no result will be returned if no puser exists
-	}
-	
 	/**
 	 * The user_id is infact a puser_id and the kuser_id should be retrieved
 	 */

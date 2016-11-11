@@ -47,7 +47,7 @@ class categoryEntryTableMap extends TableMap {
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, 2);
 		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', false, 255, null);
-		$this->addColumn('CREATOR_ID', 'CreatorId', 'VARCHAR', false, 100, null);
+		$this->addColumn('CREATOR_KUSER_ID', 'CreatorKuserId', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

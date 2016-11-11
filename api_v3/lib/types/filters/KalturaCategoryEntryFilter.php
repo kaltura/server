@@ -5,6 +5,8 @@
  */
 class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 {
+	
+	
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()
 	 */
@@ -83,6 +85,7 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 			}
 		}
 			
+		$this->fixUserIds();
 		$categoryEntryFilter = $this->toObject();
 		 
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
@@ -151,6 +154,23 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 			}
 			
 			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
+		}
+	}
+	
+	private function fixUserIds ()
+	{
+		if ($this->creatorPuserIdEqual !== null)
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->creatorPuserIdEqual);
+			if ($kuser)
+				$this->creatorPuserIdEqual = $kuser->getId();
+			else 
+				$this->creatorPuserIdEqual = -1; // no result will be returned when the user is missing
+		}
+
+		if(!empty($this->creatorPuserIdIn))
+		{
+			$this->creatorPuserIdIn = $this->preparePusersToKusersFilter( $this->creatorPuserIdIn );
 		}
 	}
 }

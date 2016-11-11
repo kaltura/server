@@ -54,7 +54,7 @@ class KalturaCategoryEntry extends KalturaObject implements IRelatedFilterable
 	 * @readonly
 	 * @filter eq,in
 	 */
-	public $creatorId;
+	public $creatorPuserId;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -63,6 +63,7 @@ class KalturaCategoryEntry extends KalturaObject implements IRelatedFilterable
 		"createdAt",
 		"categoryFullIds",
 		"status",
+		"creatorPuserId",
 	);
 	
 	/* (non-PHPdoc)

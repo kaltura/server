@@ -81,10 +81,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	protected $privacy_context;
 
 	/**
-	 * The value for the creator_id field.
-	 * @var        string
+	 * The value for the creator_kuser_id field.
+	 * @var        int
 	 */
-	protected $creator_id;
+	protected $creator_kuser_id;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -313,13 +313,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [creator_id] column value.
+	 * Get the [creator_kuser_id] column value.
 	 * 
-	 * @return     string
+	 * @return     int
 	 */
-	public function getCreatorId()
+	public function getCreatorKuserId()
 	{
-		return $this->creator_id;
+		return $this->creator_kuser_id;
 	}
 
 	/**
@@ -602,27 +602,27 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	} // setPrivacyContext()
 
 	/**
-	 * Set the value of [creator_id] column.
+	 * Set the value of [creator_kuser_id] column.
 	 * 
-	 * @param      string $v new value
+	 * @param      int $v new value
 	 * @return     categoryEntry The current object (for fluent API support)
 	 */
-	public function setCreatorId($v)
+	public function setCreatorKuserId($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::CREATOR_ID]))
-			$this->oldColumnsValues[categoryEntryPeer::CREATOR_ID] = $this->creator_id;
+		if(!isset($this->oldColumnsValues[categoryEntryPeer::CREATOR_KUSER_ID]))
+			$this->oldColumnsValues[categoryEntryPeer::CREATOR_KUSER_ID] = $this->creator_kuser_id;
 
 		if ($v !== null) {
-			$v = (string) $v;
+			$v = (int) $v;
 		}
 
-		if ($this->creator_id !== $v) {
-			$this->creator_id = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::CREATOR_ID;
+		if ($this->creator_kuser_id !== $v) {
+			$this->creator_kuser_id = $v;
+			$this->modifiedColumns[] = categoryEntryPeer::CREATOR_KUSER_ID;
 		}
 
 		return $this;
-	} // setCreatorId()
+	} // setCreatorKuserId()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -673,7 +673,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->privacy_context = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->creator_id = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->creator_kuser_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1245,7 +1245,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				return $this->getPrivacyContext();
 				break;
 			case 10:
-				return $this->getCreatorId();
+				return $this->getCreatorKuserId();
 				break;
 			default:
 				return null;
@@ -1278,7 +1278,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$keys[7] => $this->getCustomData(),
 			$keys[8] => $this->getStatus(),
 			$keys[9] => $this->getPrivacyContext(),
-			$keys[10] => $this->getCreatorId(),
+			$keys[10] => $this->getCreatorKuserId(),
 		);
 		return $result;
 	}
@@ -1341,7 +1341,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				$this->setPrivacyContext($value);
 				break;
 			case 10:
-				$this->setCreatorId($value);
+				$this->setCreatorKuserId($value);
 				break;
 		} // switch()
 	}
@@ -1377,7 +1377,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setPrivacyContext($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCreatorId($arr[$keys[10]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCreatorKuserId($arr[$keys[10]]);
 	}
 
 	/**
@@ -1399,7 +1399,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) $criteria->add(categoryEntryPeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(categoryEntryPeer::STATUS)) $criteria->add(categoryEntryPeer::STATUS, $this->status);
 		if ($this->isColumnModified(categoryEntryPeer::PRIVACY_CONTEXT)) $criteria->add(categoryEntryPeer::PRIVACY_CONTEXT, $this->privacy_context);
-		if ($this->isColumnModified(categoryEntryPeer::CREATOR_ID)) $criteria->add(categoryEntryPeer::CREATOR_ID, $this->creator_id);
+		if ($this->isColumnModified(categoryEntryPeer::CREATOR_KUSER_ID)) $criteria->add(categoryEntryPeer::CREATOR_KUSER_ID, $this->creator_kuser_id);
 
 		return $criteria;
 	}
@@ -1496,7 +1496,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 
 		$copyObj->setPrivacyContext($this->privacy_context);
 
-		$copyObj->setCreatorId($this->creator_id);
+		$copyObj->setCreatorKuserId($this->creator_kuser_id);
 
 
 		$copyObj->setNew(true);

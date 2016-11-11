@@ -61,8 +61,8 @@ abstract class BasecategoryEntryPeer {
 	/** the column name for the PRIVACY_CONTEXT field */
 	const PRIVACY_CONTEXT = 'category_entry.PRIVACY_CONTEXT';
 
-	/** the column name for the CREATOR_ID field */
-	const CREATOR_ID = 'category_entry.CREATOR_ID';
+	/** the column name for the CREATOR_KUSER_ID field */
+	const CREATOR_KUSER_ID = 'category_entry.CREATOR_KUSER_ID';
 
 	/**
 	 * An identiy map to hold any loaded instances of categoryEntry objects.
@@ -80,10 +80,10 @@ abstract class BasecategoryEntryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'EntryId', 'CategoryId', 'CategoryFullIds', 'CreatedAt', 'UpdatedAt', 'CustomData', 'Status', 'PrivacyContext', 'CreatorId', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'entryId', 'categoryId', 'categoryFullIds', 'createdAt', 'updatedAt', 'customData', 'status', 'privacyContext', 'creatorId', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::ENTRY_ID, self::CATEGORY_ID, self::CATEGORY_FULL_IDS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::STATUS, self::PRIVACY_CONTEXT, self::CREATOR_ID, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'entry_id', 'category_id', 'category_full_ids', 'created_at', 'updated_at', 'custom_data', 'status', 'privacy_context', 'creator_id', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'EntryId', 'CategoryId', 'CategoryFullIds', 'CreatedAt', 'UpdatedAt', 'CustomData', 'Status', 'PrivacyContext', 'CreatorKuserId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'entryId', 'categoryId', 'categoryFullIds', 'createdAt', 'updatedAt', 'customData', 'status', 'privacyContext', 'creatorKuserId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::ENTRY_ID, self::CATEGORY_ID, self::CATEGORY_FULL_IDS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::STATUS, self::PRIVACY_CONTEXT, self::CREATOR_KUSER_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'entry_id', 'category_id', 'category_full_ids', 'created_at', 'updated_at', 'custom_data', 'status', 'privacy_context', 'creator_kuser_id', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
@@ -94,10 +94,10 @@ abstract class BasecategoryEntryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'EntryId' => 2, 'CategoryId' => 3, 'CategoryFullIds' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'CustomData' => 7, 'Status' => 8, 'PrivacyContext' => 9, 'CreatorId' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'entryId' => 2, 'categoryId' => 3, 'categoryFullIds' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'customData' => 7, 'status' => 8, 'privacyContext' => 9, 'creatorId' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::ENTRY_ID => 2, self::CATEGORY_ID => 3, self::CATEGORY_FULL_IDS => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::CUSTOM_DATA => 7, self::STATUS => 8, self::PRIVACY_CONTEXT => 9, self::CREATOR_ID => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'entry_id' => 2, 'category_id' => 3, 'category_full_ids' => 4, 'created_at' => 5, 'updated_at' => 6, 'custom_data' => 7, 'status' => 8, 'privacy_context' => 9, 'creator_id' => 10, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'EntryId' => 2, 'CategoryId' => 3, 'CategoryFullIds' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'CustomData' => 7, 'Status' => 8, 'PrivacyContext' => 9, 'CreatorKuserId' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'entryId' => 2, 'categoryId' => 3, 'categoryFullIds' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'customData' => 7, 'status' => 8, 'privacyContext' => 9, 'creatorKuserId' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::ENTRY_ID => 2, self::CATEGORY_ID => 3, self::CATEGORY_FULL_IDS => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::CUSTOM_DATA => 7, self::STATUS => 8, self::PRIVACY_CONTEXT => 9, self::CREATOR_KUSER_ID => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'entry_id' => 2, 'category_id' => 3, 'category_full_ids' => 4, 'created_at' => 5, 'updated_at' => 6, 'custom_data' => 7, 'status' => 8, 'privacy_context' => 9, 'creator_kuser_id' => 10, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
@@ -178,7 +178,7 @@ abstract class BasecategoryEntryPeer {
 		$criteria->addSelectColumn(categoryEntryPeer::CUSTOM_DATA);
 		$criteria->addSelectColumn(categoryEntryPeer::STATUS);
 		$criteria->addSelectColumn(categoryEntryPeer::PRIVACY_CONTEXT);
-		$criteria->addSelectColumn(categoryEntryPeer::CREATOR_ID);
+		$criteria->addSelectColumn(categoryEntryPeer::CREATOR_KUSER_ID);
 	}
 
 	/**
