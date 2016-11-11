@@ -100,7 +100,8 @@ class CategoryEntryService extends KalturaBaseService
 		$dbCategoryEntry->setPartnerId($partnerId);
 		
 		$kuser = kCurrentContext::getCurrentKsKuser();
-		$dbCategoryEnry->setCreatorKuserId();
+		$dbCategoryEnry->setCreatorKuserId($kuser->getId());
+		$dbCategoryEnry->setCreatorPuserId($kuser->getPuserId());
 		
 		$dbCategoryEntry->save();
 		
