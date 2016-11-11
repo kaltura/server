@@ -37,7 +37,7 @@ class Form_BusinessProcessNotificationTemplateConfiguration extends Form_EventNo
 			else
 				$servers[$server->id] = $server->name;
 
-			if($server->id == $eventNotificationTemplate->serverId)
+			if($server->id == $eventNotificationTemplate->serverId || (!is_null($server->dc) && 0 == $eventNotificationTemplate->serverId))
 				$businessProcessProvider = kBusinessProcessProvider::get($server);
 		}
 

@@ -1,3 +1,22 @@
+# Lynx 12.5.0 #
+
+## CaptionAssetItem - remove column - int_id ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6327
+
+### Configuration ###
+update app/configurations/sphinx/kaltura.conf file and remove the following from kaltura_caption_item:
+rt_attr_uint = int_id 
+
+### Deployment scripts ###
+	
+ReIndex and repopulate kaltura_caption tabel in sphinx.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.4.0 #
 
 ## Initial support for Kaltura liveRecording ##
@@ -46,6 +65,10 @@ None.
 - In local.ini add the following parameters:  
     	partner_otp_internal_ips = @IP_RANGE@  
 	otp_required_partners[] = -2  
+
+### Deployment scripts ###
+- Run 'php alpha/scripts/utils/updateAdminConsoleUserLoginData.php'
+
 
 
 ## Enable sort by summary for schedule events##

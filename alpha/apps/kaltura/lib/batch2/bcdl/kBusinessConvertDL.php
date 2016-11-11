@@ -644,7 +644,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		$kdlFlavor->_isEncrypted = false;
 		$kdlFlavor->_video->_arProcessingMode = 2; // letter boxing
 		$kdlFlavor->_video->_isShrinkFramesizeToSource = false;
-		$kdlFlavor->_transcoders[0]->_extra.= " -x264opts sps-id=27:colorprim=undef:transfer=undef:colormatrix=undef -movflags +faststart";
+		$kdlFlavor->_transcoders[0]->_extra.= " -x264opts colorprim=undef:transfer=undef:colormatrix=undef -movflags +faststart";
 		if($flavorParamsOutput->getWidth()){
 			$kdlFlavor->_video->_width = $flavorParamsOutput->getWidth();
 		}

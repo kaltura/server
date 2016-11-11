@@ -53,18 +53,17 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, categoryFilter::FREE_TEXT_FIELDS, $additionalConditions);
 		}
 		$filter->unsetByName('_free_text');
-		
+
 		if($filter->get('_eq_privacy_context'))
 		{
 			if ($filter->get('_eq_privacy_context') == '*')
 			{
-				$this->addOr(CategoryPeer::PRIVACY_CONTEXT, kEntitlementUtils::NOT_DEFAULT_CONTEXT, Criteria::EQUAL);
-				$filter->set('_matchor_privacy_context', kEntitlementUtils::NOT_DEFAULT_CONTEXT);
+				$this->addOr(CategoryPeer::PRIVACY_CONTEXT, kEntitlementUtils::NOT_DEFAULT_CONTEXT, Criteria::LIKE);
 				$filter->unsetByName('_eq_privacy_context');
 			}
 			elseif ($filter->get('_eq_privacy_context') != '')
 			{
-				$this->addAnd(CategoryPeer::PRIVACY_CONTEXT, $filter->get('_eq_privacy_context'), Criteria::EQUAL);
+				$this->addOr(CategoryPeer::PRIVACY_CONTEXT, $filter->get('_eq_privacy_context'), Criteria::LIKE);
 				$filter->unsetByName('_eq_privacy_context');
 			}
 		}
@@ -225,6 +224,12 @@ class SphinxCategoryCriteria extends SphinxCriteria
 				categoryPeer::PRIVACY_CONTEXT,
 				Criteria::IN_LIKE,
 				kEntitlementUtils::addPrivacyContextsPrefix($crit->getValue(),$partnerId));
+		}else if ($field == categoryPeer::PRIVACY_CONTEXT && $crit->getComparison() == Criteria::LIKE)
+		{
+			return array(
+				categoryPeer::PRIVACY_CONTEXT,
+				Criteria::LIKE,
+				kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId . $crit->getValue());
 		}else if ($field == categoryPeer::PRIVACY_CONTEXTS  && $crit->getComparison() == Criteria::EQUAL)
 		{
 			return array(

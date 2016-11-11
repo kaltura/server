@@ -1818,6 +1818,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setIsTrimDisabled ( $v )	{	$this->putInCustomData ( "isTrimDisabled" , $v );	}
 	public function getIsTrimDisabled (  )		{	return $this->getFromCustomData( "isTrimDisabled" );	}
+
+	public function setStreams ( $v )	{	$this->putInCustomData ( "streams" , $v );	}
+	public function getStreams(  )		{	return $this->getFromCustomData( "streams" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
@@ -3267,7 +3270,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setSource($v)
 	{
-		if($this->getSource() != EntrySourceType::KALTURA_RECORDED_LIVE)
+		if($this->getSource() != EntrySourceType::KALTURA_RECORDED_LIVE || $v == EntrySourceType::RECORDED_LIVE)
 			parent::setSource($v);
 	}
 	

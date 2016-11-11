@@ -94,6 +94,14 @@ class KalturaFlavorAsset extends KalturaAsset
 	 */
 	public $language;
 	
+	/**
+	 * The label of the flavor asset
+	 * 
+	 * @var string
+	 * @readonly
+	 */
+	public $label;
+	
 	private static $map_between_objects = array
 	(
 		"flavorParamsId",
@@ -107,6 +115,7 @@ class KalturaFlavorAsset extends KalturaAsset
 		"videoCodecId",
 		"status",
 		"language",
+		"label",
 	);
 	
 	public function getMapBetweenObjects ( )

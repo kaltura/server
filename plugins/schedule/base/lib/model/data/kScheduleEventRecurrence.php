@@ -19,7 +19,13 @@ class kScheduleEventRecurrence
 	 * @var int unix timestamp
 	 */
 	private $until;
-	
+
+
+	/**
+	 * @var string timeZone
+	 */
+	private $timeZone;
+
 	/**
 	 * @var int
 	 */
@@ -123,6 +129,14 @@ class kScheduleEventRecurrence
 	public function getUntil()
 	{
 		return $this->until;
+	}
+
+	/**
+	 * @return the $timeZone
+	 */
+	public function getTimeZone()
+	{
+		return $this->timeZone;
 	}
 
 	/**
@@ -243,6 +257,14 @@ class kScheduleEventRecurrence
 	public function setUntil($until)
 	{
 		$this->until = $until;
+	}
+
+	/**
+	 * @parma string $timeZone
+	 */
+	public function setTimeZone($timeZone)
+	{
+		$this->timeZone = $timeZone;
 	}
 
 	/**
