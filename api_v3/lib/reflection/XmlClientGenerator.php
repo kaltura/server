@@ -281,6 +281,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		asort($constants);
 		foreach ($constants as $name => $value)
 		{
+			if(!is_string($value) && !is_int($value))
+				throw new Exception("Invalid enum value [" . $typeReflector->getType() . "::$name]");
+			
 			$const = $this->_doc->createElement("const");
 			$const->setAttribute("name", $name);
 			$const->setAttribute("value", $value);
