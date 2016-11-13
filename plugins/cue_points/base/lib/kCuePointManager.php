@@ -19,6 +19,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
+		KalturaLog::debug("Testing inside updatedJob with dbBatchJob type: [{$dbBatchJob->getJobType()}] and for entry [{$dbBatchJob->getEntryId()}]");
 		if ($dbBatchJob->getJobType() == BatchJobType::CONCAT)
 		{
 			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
@@ -73,7 +74,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 			if (self::getSegmentIndexFromFileName($file) <= $lastFileIndex)
 			{
-				$arr = unserialize(file_get_contents($file));
+				$arr = unserialize(file_get_contents($files[0]));
 				$currentSegmentDuration = $arr[0];
 				array_shift($arr);
 
@@ -100,7 +101,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if(!$entry)
 		{
 			KalturaLog::warning("Failed to get entry [{$dbBatchJob->getEntryId()}], not calling copyCuePointsFromLiveToVodEntry");
-			return;
+			return $dbBatchJob;
 		}
 		
 		KalturaLog::debug("Testing:: inside extract media closed with status finished");
@@ -117,14 +118,14 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			if(!$rawSyncPointDataPath)
 			{
 				KalturaLog::debug("SyncPoint data file pat not found, copy live to vod will not execute");
-				return;
+				return $dbBatchJob;
 			}
 			
 			$rawSyncPointInfo = file_get_contents($rawSyncPointDataPath);
 			if($rawSyncPointInfo == '')
 			{
 				KalturaLog::debug("Failed to read sync point info from file [$rawSyncPointDataPath], copy live to vod will not execute");
-				return;
+				return $dbBatchJob;
 			}
 			
 			$syncPointInfoArr = unserialize($rawSyncPointInfo);
@@ -147,7 +148,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 				$segmentDrift = ($lastAmf->ts - $firstAmf->ts) - ($lastAmf->pts - $firstAmf->pts);
 			}
 			
+			//get last cue points sync, to avoid two sequential jobs working on the same cue points  
 			$lastCuePointSyncTime = self::getLatestCuePointSyncTime($liveEntryId, reset($syncPointIntoToAmfArr), $lastSegmentDuration, $segmentDrift);
+			KalturaLog::debug("Testing:: lastCuePointSyncTime value is [$lastCuePointSyncTime]");
 			
 			$liveToVodJobData = new kLiveToVodJobData();
 			$liveToVodJobData->setLiveEntryId($liveEntryId);
@@ -222,17 +225,31 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	
 	private static function getLatestCuePointSyncTime($liveEntryId, $syncPoint, $lastSegmentDuration, $segmentDrift)
 	{
-		$currentSegmentEndTime =  (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
+		$liveEntry = entryPeer::retrieveByPK($liveEntryId);
+		if(!$liveEntry)
+		{
+			KalturaLog::debug("Live entry with id [$liveEntryId] not found, this should not happen, sync time is 0");
+			return 0;
+		}
 		
-		$c = new KalturaCriteria();
-		$c->add( CuePointPeer::ENTRY_ID, $liveEntryId );
-		$c->add( CuePointPeer::CREATED_AT, $currentSegmentEndTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuePoints
-		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
-		$c->addDescendingOrderByColumn(CuePointPeer::CREATED_AT);
-		
-		$latestCuePoint = CuePointPeer::doSelectOne($c);
-		
-		return $latestCuePoint ? $latestCuePoint->getCreatedAt() : 0;
+		$lastCuePointSyncTime = $liveEntry->getLastCuePointSyncTime();
+		if($lastCuePointSyncTime)
+		{
+			KalturaLog::debug("LastCuePointSyncTime found with value [$lastCuePointSyncTime], calculating new one");
+			
+			$currentCuePointSyncTime = (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
+			$liveEntry->setLastCuePointSyncTime($currentCuePointSyncTime);
+			$liveEntry->save();
+			return $lastCuePointSyncTime;	
+		}
+		else
+		{
+			KalturaLog::debug("First live to vod iteration, returning 0");
+			$lastCuePointSyncTime =  (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
+			$liveEntry->setLastCuePointSyncTime($lastCuePointSyncTime);
+			$liveEntry->save();
+			return $liveEntry->getCreatedAt(null);
+		}
 	}
 
 	private function getAssetDataFilesArray(kConvertLiveSegmentJobData $data){
@@ -260,20 +277,23 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$data = $dbBatchJob->getData();
 
 		// copy cue points only if it's the first file and this is the primary server
-		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
-			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
-			$data->getFileIndex() == 0 &&
-			$data->getMediaServerIndex() == EntryServerNodeType::LIVE_PRIMARY){
+		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
+			$data->getFileIndex() == 0 && $data->getMediaServerIndex() == EntryServerNodeType::LIVE_PRIMARY)
+		{
 			$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 				return true;
 		}
-
-		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+		{
 			$convertLiveSegmentJobData = $dbBatchJob->getParentJob()->getData();
 			$asset = assetPeer::retrieveByIdNoFilter($convertLiveSegmentJobData->getAssetId());
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 				return true;
+		}
+		elseif ($jobType == BatchJobType::EXTRACT_MEDIA && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+		{
+			return true;
 		}
 
 		return false;

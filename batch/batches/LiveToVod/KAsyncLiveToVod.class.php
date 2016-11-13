@@ -141,7 +141,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 
 	private static function getSegmentEndTime($amfArray, $segmentDuration)
 	{
-		return (($amfArray[0]->ts - $amfArray[0]->pts) + $segmentDuration) / 1000;
+		return ((self::getSegmentStartTime($amfArray) * 1000) + $segmentDuration) / 1000;
 	}
 	// change the PTS of every amf to be relative to the beginning of the recording, and not to the beginning of the segment
 	private static function normalizeAMFTimes(&$amfArray, $totalVodDuration, $currentSegmentDuration)
