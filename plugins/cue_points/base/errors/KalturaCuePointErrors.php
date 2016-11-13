@@ -15,9 +15,9 @@ class KalturaCuePointErrors extends KalturaErrors implements kCuePointErrors
 	
 	const CUE_POINT_SYSTEM_NAME_EXISTS = "CUE_POINT_SYSTEM_NAME_EXISTS;NAME,ID;Cue point system name already exists [@NAME@] with id [@ID@]";
 
-	const PARENT_CUE_POINT_NOT_FOUND = "PARENT_CUE_POINT_NOT_FOUND;ID; Parent cue point id [@ID@] not found";
+	const PARENT_CUE_POINT_NOT_FOUND = "PARENT_CUE_POINT_NOT_FOUND;ID;Parent cue point id [@ID@] not found";
 
-	const PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY = "PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY;Parent cue point does not belong to the same entry";
+	const PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY = "PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY;;Parent cue point does not belong to the same entry";
 	
 	const USER_KS_CANNOT_LIST_RELATED_CUE_POINTS = "USER_KS_CANNOT_LIST_RELATED_CUE_POINTS;FILTER;Cue-points should not be listed [@FILTER@] as related-objects with unprivileged user ks";
 
