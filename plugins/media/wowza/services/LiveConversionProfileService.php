@@ -174,12 +174,12 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		return new kRendererString($dom->saveXML(), 'text/xml');
 	}
-	
+
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
 	{
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = 'AAC';
+		$audioCodec = (strpos($liveParams->getConversionEnginesExtraParams(), 'audioPassthrough') !== false) ? 'PassThru' : 'AAC';
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
@@ -199,8 +199,10 @@ class LiveConversionProfileService extends KalturaBaseService
 		{
 			$video->addChild('Codec', $videoCodec);
 			$audio->addChild('Codec', $audioCodec);
-			$audio->addChild('Bitrate', 96000);
-			
+			if ($audioCodec !== 'PassThru') 
+			{
+				$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
+			}
 			return;
 		}
 		
