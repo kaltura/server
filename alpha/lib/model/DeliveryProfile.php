@@ -356,7 +356,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'height' => $height,
 				'audioLanguage' => $audioLanguage,
 				'audioLanguageName' => $audioLanguageName,
-				'$audioLabel' => $audioLabel,
+				'audioLabel' => $audioLabel,
 			);
 	}
 	
