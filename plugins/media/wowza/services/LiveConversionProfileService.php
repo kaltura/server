@@ -199,7 +199,8 @@ class LiveConversionProfileService extends KalturaBaseService
 		{
 			$video->addChild('Codec', $videoCodec);
 			$audio->addChild('Codec', $audioCodec);
-			if ($audioCodec !== 'PassThru') {
+			if ($audioCodec !== 'PassThru') 
+			{
 				$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
 			}
 			return;
