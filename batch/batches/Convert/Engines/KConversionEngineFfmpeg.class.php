@@ -287,7 +287,7 @@ $pixFmt = "yuv420p";
 	 */
 	public static function buildWatermarkedCommandLine($watermMarkData, $destFileSyncLocalPath, $cmdLine, $ffmpegBin = "ffmpeg", $mediaInfoBin = "mediainfo")
 	{
-		KalturaLog::log("Iמ:cmdline($cmdLine)");
+		KalturaLog::log("In:cmdline($cmdLine)");
 		if(!isset($mediaInfoBin) || strlen($mediaInfoBin)==0)
 			$mediaInfoBin = "mediainfo";
 
