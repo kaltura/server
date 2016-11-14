@@ -137,6 +137,11 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			$this->userIdIn = $this->preparePusersToKusersFilter( $this->userIdIn );
 		}
 
+		if(!empty($this->userIdNotIn))
+		{
+			$this->userIdNotIn = $this->preparePusersToKusersFilter($this->userIdNotIn);
+		}
+
 		if(!empty($this->entitledUsersEditMatchAnd))
 		{
 			$this->entitledUsersEditMatchAnd = $this->preparePusersToKusersFilter( $this->entitledUsersEditMatchAnd );
@@ -170,11 +175,11 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 	
 		if( $this->idEqual == null && $this->redirectFromEntryId == null )
-		{
-			$this->setDefaultStatus();
-			$this->setDefaultModerationStatus($this);
-			if(($this->parentEntryIdEqual == null) && ($this->idIn == null))
-				$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+        {
+        	$this->setDefaultStatus();
+            $this->setDefaultModerationStatus($this);
+            if($this->parentEntryIdEqual == null)
+            	$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		}
 		
 		$this->fixFilterUserId($this);
@@ -183,6 +188,8 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		
 		$this->toObject($entryFilter);
+
+		KalturaLog::debug("XXXXX - entry filter - " . print_r($entryFilter,true));
 		
 		if($pager)
 			$pager->attachToCriteria($c);
@@ -209,12 +216,8 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		$c = $this->prepareEntriesCriteriaFilter($pager);
 		
 		if ($disableWidgetSessionFilters)
-		{
-			if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
-					entryPeer::setFilterResults(true);
-
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
-		}
+			
 		$list = entryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
 		
