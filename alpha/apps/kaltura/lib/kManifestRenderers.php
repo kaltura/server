@@ -781,9 +781,9 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		foreach($this->flavors as $flavor)
 		{
 			// Sperate audio flavors from video flavors
-			if ( isset($flavor['audioLanguage']) || isset($flavor['label']) ) {
+			if ( isset($flavor['audioLanguage']) || isset($flavor['$audioLabel']) ) {
 				$language = (isset($flavor['audioLanguage'])) ? $flavor['audioLanguage'] : 'und';
-				$languageName = (isset($flavor['label'])) ? $flavor['label'] : $flavor['audioLanguageName'];
+				$languageName = (isset($flavor['$audioLabel'])) ? $flavor['$audioLabel'] : $flavor['audioLanguageName'];
 				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\",URI=\"{$flavor['url']}\"";
 				$audioFlavorsArr[] = $content;
 			}

@@ -315,7 +315,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$ext = null;
 		$audioLanguage = null;
 		$audioLanguageName = null;
-		$label = null;
+		$audioLabel = null;
 		if ($flavor) {
 			if (is_callable(array($flavor, 'getFileExt'))) {
 				$ext = $flavor->getFileExt();
@@ -323,7 +323,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			//Extract the audio language code from flavor
 			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
 				if(is_callable(array($flavor, 'getLabel'))) {
-					$label = $flavor->getLabel();
+					$audioLabel = $flavor->getLabel();
 				}
 				$audioLanguageData = $this->getAudioLanguage($flavor);
 				if (!$audioLanguageData) {
@@ -356,7 +356,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'height' => $height,
 				'audioLanguage' => $audioLanguage,
 				'audioLanguageName' => $audioLanguageName,
-				'label' => $label,
+				'$audioLabel' => $audioLabel,
 			);
 	}
 	
