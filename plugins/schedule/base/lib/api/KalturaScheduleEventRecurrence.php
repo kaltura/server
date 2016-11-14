@@ -159,15 +159,6 @@ class KalturaScheduleEventRecurrence extends KalturaObject
 		if($this->isNull('frequency'))
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'frequency');
 
-		if(!$this->isNull('byDay'))
-		{
-			$days = explode(',', $this->byDay);
-			foreach ($days as $day)
-				if (!array_key_exists($day, DatesGenerator::$dayNames))
-					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_WRONG_FORMAT, 'byDay', '2 upper-case letter');
-		}
-			
-
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
