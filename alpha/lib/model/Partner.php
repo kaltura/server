@@ -1144,7 +1144,7 @@ class Partner extends BasePartner
 		$c->addAnd(kuserPeer::IS_ADMIN , true);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		$c->applyFilters();
-		return $c->getRecordsCount();
+		return kuserPeer::doCount($c);
 	}
 	
 	public function setPassResetUrlPrefixName($name)
