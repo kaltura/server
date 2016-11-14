@@ -844,7 +844,12 @@ $plannedDur = 0;
 			/*
 			 * Watermarks, if any ...
 			 */
-		self::evaluateTargetWaterMark($sourceVid, $targetVid);
+		if(isset($targetVid->_watermarkData)){
+				/*
+			 	 * Evaluate source frame dims - dar adjustment and rotation
+			 	 */
+			$targetVid->_watermarkData = self::evaluateTargetWaterMark($sourceVid, $targetVid->_watermarkData);
+		}
 		
 		$targetVid->_rotation = $sourceVid->_rotation;
 		$targetVid->_scanType = $sourceVid->_scanType;
@@ -1287,44 +1292,111 @@ $plannedDur = 0;
 	 * @param KDLVideoData $target
 	 * @param KDLVideoData $target
 	 */
-	private static function evaluateTargetWaterMark(KDLVideoData $sourceVid, KDLVideoData $target) 
+	private static function evaluateTargetWaterMark(KDLVideoData $sourceVid, $watermarkData) 
 	{
-		if(!isset($target->_watermarkData))
-			return;
+		if(!isset($watermarkData)){
+			return null;
+		}
 		
+		$srcWid = $srcHgt = $fixImageDar = null;
+		if(isset($sourceVid->_width) && isset($sourceVid->_height)){
+			list($srcWid, $srcHgt,$fixImageDar) = self::adjustFrameSizeToDarAndRotation(
+					$sourceVid->_width, $sourceVid->_height, 
+					isset($sourceVid->_dar)? $sourceVid->_dar: null, 
+					isset($sourceVid->_rotation)? $sourceVid->_rotation: null);
+		}
+
 		/*
 		 * Handle multiple WM settings - WMdata array
 		 */
-		if(is_array($target->_watermarkData))
-			$watermarkDataArr = $target->_watermarkData;
+		if(is_array($watermarkData))
+			$watermarkDataArr = $watermarkData;
 		else
-			$watermarkDataArr = array($target->_watermarkData);
-		foreach($watermarkDataArr as $wmI=>$watermarkData){
-			if(isset($watermarkData->scale)){
-				$scaleArrNew = array();
-				$scaleArr = explode("x",$watermarkData->scale);
-				foreach ($scaleArr as $i=>$val){
-					if(isset($val) && strlen($val)>0) {
-						$percentArr = explode('%', $val);
-						if(count($percentArr)==2){
-							if(isset($sourceVid->_width) && isset($sourceVid->_height)) {
-								// For 'portrait' sources (rotation -90,90,270) - switch the scaled dims
-								if(isset($sourceVid->_rotation) && in_array($sourceVid->_rotation, array(-90,90,270)))
-									$val =($i==0?$sourceVid->_height: $sourceVid->_width);
-								else
-									$val =($i==0?$sourceVid->_width: $sourceVid->_height);
-								$val = round($val*$percentArr[0]/100);
-							}
-							else $val = "";
-						}
+			$watermarkDataArr = array($watermarkData);
+
+		KalturaLog::log("WM objects:".count($watermarkDataArr));
+
+		foreach($watermarkDataArr as $wmI=>$wmData){
+			KalturaLog::log("In WM($wmI):".json_encode($wmData));
+			if(isset($wmData->scale)){
+				$scaleArr = explode("x",$wmData->scale); 
+				$widScale = trim($scaleArr[0]); 
+				$hgtScale = trim($scaleArr[1]);
+				if(strchr($widScale,'%')){
+					$widScale = trim($widScale,'%');
+					if(isset($srcWid)) {
+						$widScale = round($srcWid*$widScale/100);
 					}
-					$scaleArrNew[$i] = $val;
+					else $widScale = 0;
 				}
-				$watermarkData->scale = implode('x', $scaleArrNew);
+				if(strchr($hgtScale,'%')){
+					$hgtScale = trim($hgtScale,'%');
+					if(isset($srcHgt)){
+						$hgtScale = round($srcHgt*$hgtScale/100);
+					}
+					else $hgtScale = 0;
+				}
+				$wmData->scale = "$widScale"."x$hgtScale";
 			}
-			$watermarkDataArr[$wmI] = $watermarkData;
+				/*
+				 * fixImageDar - to adjust WM dar/dims in case of anamorphic source
+				 */
+			$wmData->fixImageDar = $fixImageDar;
+			$watermarkDataArr[$wmI] = $wmData;
+			KalturaLog::log("Final WM($wmI):".json_encode($wmData));
 		}
-		$target->_watermarkData = $watermarkDataArr;
+		return $watermarkDataArr;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $width
+	 * @param unknown_type $height
+	 * @param unknown_type $dar
+	 * @param unknown_type $rotation
+	 * @return multitype:NULL |multitype:unknown Ambigous <unknown, number>
+	 */
+	private static function adjustFrameSizeToDarAndRotation($width, $height, $dar, $rotation)
+	{
+		KalturaLog::log("In: width($width), height($height), dar($dar), rotation($rotation)");
+		/*
+		 * Evaluate source frame dims - dar adjustment and rotation
+		 */
+		if(!isset($width) || !isset($height))
+			return null;
+			
+		$adjustedHgt = $height;
+		$adjustedWid = $width;
+		$fixImageDar = null;
+		if(isset($dar)) {
+			$aux = round($adjustedHgt*$dar);
+			if(abs($aux-$adjustedWid)>10){
+				KalturaLog::log("Adjust width($adjustedWid) with dar($dar): $aux");
+				$adjustedWid = $aux;
+			}
+			
+			if($width>0 && $height>0){
+				/*
+				 * fixImageDar - to adjust WM dar/dims in case of anamorphic source - 
+				 * 	the image dims should be set into 'opposite direction' in order 
+				 *	to allow the anamorphic normalization procideure to restore the correct WM dar/dims
+				 *	Applied on;y if the diference to 'normal' dar is >10%
+				 */
+				$fixImageDar = ($dar*$height)/$width;
+				if(abs(1-$fixImageDar)<0.1)
+					$fixImageDar = null;
+			}
+			KalturaLog::log("Adjusted for dar($dar) - ($adjustedWid), height($adjustedHgt),fixImageDar($fixImageDar) ");
+		}
+		// For 'portrait' sources (rotation -90,90,270) - switch the source dims
+		if(isset($rotation) && in_array($rotation, array(-90,90,270))){
+			$aux = $adjustedHgt;
+			$adjustedHgt = $adjustedWid;
+			$adjustedWid = $aux;
+			KalturaLog::log("Adjust frame dims to rotation($rotation): width($adjustedWid),height($adjustedHgt)");
+		}
+		KalturaLog::log("Final: width($adjustedWid),height($adjustedHgt),fixImageDar($fixImageDar)");
+		return array($adjustedWid,$adjustedHgt,$fixImageDar);
 	}
 	
 	/* ---------------------------
