@@ -159,18 +159,18 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 	
 	private function fixUserIds ()
 	{
-		if ($this->creatorPuserIdEqual !== null)
+		if ($this->creatorUserIdEqual !== null)
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->creatorPuserIdEqual);
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->creatorUserIdEqual);
 			if ($kuser)
-				$this->creatorPuserIdEqual = $kuser->getId();
+				$this->creatorUserIdEqual = $kuser->getId();
 			else 
-				$this->creatorPuserIdEqual = -1; // no result will be returned when the user is missing
+				$this->creatorUserIdEqual = -1; // no result will be returned when the user is missing
 		}
 
-		if(!empty($this->creatorPuserIdIn))
+		if(!empty($this->creatorUserIdIn))
 		{
-			$this->creatorPuserIdIn = $this->preparePusersToKusersFilter( $this->creatorPuserIdIn );
+			$this->creatorUserIdIn = $this->preparePusersToKusersFilter( $this->creatorUserIdIn );
 		}
 	}
 }
