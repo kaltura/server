@@ -34,7 +34,8 @@ class Kaltura_View_Helper_EntryBusinessProcess extends Kaltura_View_Helper_Parti
 		{
 			Infra_ClientHelper::impersonate($this->partnerId);
 			$objectType = Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::ENTRY;
-			$businessProcessCases = $businessProcessNotificationPlugin->businessProcessCase->listAction($objectType, $this->entryId);
+			//Disabled until PLAT-6415 is fixed.
+			//$businessProcessCases = $businessProcessNotificationPlugin->businessProcessCase->listAction($objectType, $this->entryId);
 			Infra_ClientHelper::unimpersonate();
 		}
 		catch (Exception $e)
