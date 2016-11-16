@@ -14,9 +14,9 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 	public $inputMetadataProfileId;
 
 	/**
-	 * comma-separated values of {input metadata xpath location,entry field}
+	 * array of {input metadata xpath location,entry field} objects
 	 *
-	 * @var KalturaStringArray
+	 * @var KalturaKeyValueArray
 	 */
 	public $inputMetadata;
 
@@ -28,18 +28,32 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 	public $outputMetadataProfileId;
 
 	/**
-	 * comma-separated values of {output metadata xpath location,entry field}
+	 * array of {output metadata xpath location,entry field} objects
 	 *
-	 * @var KalturaStringArray
+	 * @var KalturaKeyValueArray
 	 */
 	public $outputMetadata;
 
 	/**
-	 * comma-separated values of {value,entry field}
+	 * The input user id to set on the entry
 	 *
-	 * @var KalturaStringArray
+	 * @var string
 	 */
-	public $fieldValues;
+	public $inputUserId;
+	
+	/**
+	 * The input entitled users edit to set on the entry
+	 *
+	 * @var string
+	 */
+	public $inputEntitledUsersEdit;
+	
+	/**
+	 * The input entitled users publish to set on the entry
+	 *
+	 * @var string
+	 */
+	public $inputEntitledUsersPublish;
 
 	public function __construct()
 	{
@@ -54,7 +68,9 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 		$dbObject->setDataValue('inputMetadata', $this->inputMetadata);
 		$dbObject->setDataValue('outputMetadataProfileId', $this->outputMetadataProfileId);
 		$dbObject->setDataValue('outputMetadata', $this->outputMetadata);
-		$dbObject->setDataValue('fieldValues', $this->fieldValues);
+		$dbObject->setDataValue('inputUserId', $this->inputUserId);
+		$dbObject->setDataValue('inputEntitledUsersEdit', $this->inputEntitledUsersEdit);
+		$dbObject->setDataValue('inputEntitledUsersPublish', $this->inputEntitledUsersPublish);
 		return $dbObject;
 	}
 
@@ -67,6 +83,8 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 		$this->inputMetadata = $srcObj->getDataValue('inputMetadata');
 		$this->outputMetadataProfileId = $srcObj->getDataValue('outputMetadataProfileId');
 		$this->outputMetadata = $srcObj->getDataValue('outputMetadata');
-		$this->fieldValues = $srcObj->getDataValue('fieldValues');
+		$this->inputUserId = $srcObj->getDataValue('inputUserId');
+		$this->inputEntitledUsersEdit = $srcObj->getDataValue('inputEntitledUsersEdit');
+		$this->inputEntitledUsersPublish = $srcObj->getDataValue('inputEntitledUsersPublish');
 	}
 }
