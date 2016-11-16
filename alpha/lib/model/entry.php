@@ -3058,11 +3058,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	}
 	
 
-public function copyTemplate($copyPartnerId = false, entry $template)
+public function copyTemplate($copyPartnerId = false, $template)
 {
+	
 	if (!$template)
 		return null;
-	
+	/* entry $template */
 	$this->setTemplateEntryId($template->getId());
 	$this->setKuserId($template->getKuserId());
 	$this->setName($template->getKuserId());

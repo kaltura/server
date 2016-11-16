@@ -62,7 +62,7 @@ class ExternalMediaEntry extends entry
 		return $copyObj;
 	}
 
-	public function copyTemplate($copyPartnerId = false, entry $template)
+	public function copyTemplate($copyPartnerId = false, $template)
 	{
 		if ($template instanceof ExternalMediaEntry)
 		{
