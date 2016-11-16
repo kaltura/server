@@ -152,12 +152,6 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 			}
 		}
-		
-		if($this->getDynamicAttributes()->getUsePlayServer() || 
-				(!count($this->liveStreamConfig->getPrimaryStreamInfo()) && !count($this->liveStreamConfig->getBackupStreamInfo())))
-		{
-			$this->shouldRedirect = true;
-		}
 	}
 	
 	protected function initManualLiveStreamConfiguration(LiveStreamEntry $entry)
