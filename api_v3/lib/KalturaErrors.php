@@ -604,11 +604,11 @@ class KalturaErrors extends APIErrors
 	 * Analytics Service
 	 */
 	const ANALYTICS_QUERY_FAILURE = 'REPORTS_QUERY_FAILURE;ERROR_MSG;Failed to retrieve analytics data';
-	const ANALYTICS_FORBIDDEN_FILTER = 'REPORTS_FORBIDDEN_FILTER;Forbidden filter for dimension "partner" - queries are implicitly performed for the current partner';
-	const ANALYTICS_INCORRECT_INPUT_TYPE = 'ANALYTICS_INCORRECT_INPUT_TYPE;Ensure Content-Type is set to application/json';
+	const ANALYTICS_FORBIDDEN_FILTER = 'REPORTS_FORBIDDEN_FILTER;;Forbidden filter for dimension "partner" - queries are implicitly performed for the current partner';
+	const ANALYTICS_INCORRECT_INPUT_TYPE = 'ANALYTICS_INCORRECT_INPUT_TYPE;;Ensure Content-Type is set to application/json';
 	const ANALYTICS_INCORRECT_INPUT = 'ANALYTICS_INCORRECT_INPUT;ERRONOUS_FIELD;Error parsing field - [@ERRONOUS_FIELD@]';
 	const ANALYTICS_UNSUPPORTED_DIMENSION = 'ANALYTICS_UNSUPPORTED_DIMENSION;DIMENSION;Dimension [@DIMENSION@] is not supported';
-	const ANALYTICS_UNSUPPORTED_QUERY = 'ANALYTICS_UNSUPPORTED_QUERY;Query for the given dimensions and metrics is currently not supported';
+	const ANALYTICS_UNSUPPORTED_QUERY = 'ANALYTICS_UNSUPPORTED_QUERY;;Query for the given dimensions and metrics is currently not supported';
 
 	
 	/*
@@ -633,7 +633,7 @@ class KalturaErrors extends APIErrors
 	 */
 	const USER_ENTRY_NOT_FOUND = 'USER_ENTRY_NOT_FOUND;USER_ENTRY_ID; User-Entry id [@USER_ENTRY_ID@] not found';
 	const USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID = 'USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID;USER_ENTRY_ID;The entry id in the user-entry [@USER_ENTRY_ID@] does not match the entry-id given';
-	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE;USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
+	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE,USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
 
 	/*
 	 * serverNode service
@@ -646,11 +646,11 @@ class KalturaErrors extends APIErrors
 	 */
 	const ENTRY_SERVER_NODE_NOT_FOUND = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;Entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@] not found";
 	const ENTRY_SERVER_NODE_MULTI_RESULT = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;There were several results for entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@]";
-	const MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE = "MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE;Must filter on entry id or server type";
+	const MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE = "MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE;;Must filter on entry id or server type";
 	const ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR = "ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR;OBJ_TYPE,ENTRY_SERVER_NODE_ID;There is an error in the DB, object type [@OBJ_TYPE@] of EntryServerNode id [@ENTRY_SERVER_NODE_ID@] is unknown";
 	
 	/*
 	 * OTP error
 	 */
-	const INVALID_OTP = 'INVALID_OTP;OTP provided failed to validate';
+	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
 }
