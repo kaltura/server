@@ -123,12 +123,8 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 				{					
 					$xpathName = $inputMetadataItem->key;
 					$fieldName = $inputMetadataItem->value;
-					KalturaLog::debug("ZZZZ - " . print_r($inputMetadataItem, true));
-					KalturaLog::debug("YYYYY - " . print_r($xmlObj, true));
-					KalturaLog::debug("XXXXX - xpathName $xpathName fieldName $fieldName");
 
 					$metadataValue = $xmlObj->$xpathName;
-					KalturaLog::debug("WWWWW - metadataValue $metadataValue");
 					$entryObj->$fieldName = $metadataValue;
 				}	
 			}
@@ -145,7 +141,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		if(isset($objectTask->inputEntitledUsersPublish) && $objectTask->inputEntitledUsersPublish != '')
 			$entryObj->entitledUsersPublish = $objectTask->inputEntitledUsersPublish != 'null' ? $objectTask->inputEntitledUsersPublish : '';
 
-			try
+		try
 		{
 			$client->baseEntry->update($entryId, $entryObj);
 		}
