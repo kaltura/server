@@ -421,7 +421,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$cachedResult = kSphinxQueryCache::getCachedSphinxQueryResults($this, $objectClass, $cacheKey);
 		if ($cachedResult)
 		{
-			list($ids, $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit) = $cachedResult;
+			list($ids, $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit, $this->applySortRequired) = $cachedResult;
 			$this->setFetchedIds($ids);
 			$this->applySphinxResult($setLimit);
 			return;
@@ -583,7 +583,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		list($pdo, $sqlConditions) = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
 
-		$queryResult = array($this->getFetchedIds(), $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit);
+		$queryResult = array($this->getFetchedIds(), $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit, $this->applySortRequired);
 		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult, $sqlConditions);
 
 		$this->applySphinxResult($setLimit);
