@@ -402,6 +402,7 @@ class entryPeer extends BaseentryPeer
 
 				if (count($categoriesIds))
 				{
+					sort($categoriesIds); // sort categories in order to later create identical queries which enable better caching  
 					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
 					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 					$critEntitled->addOr($critCategories);
