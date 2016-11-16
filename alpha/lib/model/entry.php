@@ -3060,11 +3060,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	/**
 	 * @return entry
 	 */
-	public function copyTemplate($coptPartnerId = false)
+	public function copyTemplate($coptPartnerId = false, $object_to_fill = null)
 	{
 		// we use get_class(), because this might be a subclass
 		$clazz = get_class($this);
 		$copyObj = new $clazz();
+		if ($object_to_fill)
+			$copyObj = $object_to_fill;
 		/* @var $copyObj entry */
 
 		$copyObj->setTemplateEntryId($this->id);

@@ -970,7 +970,7 @@ class KalturaEntryService extends KalturaBaseService
 		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
-	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId)
+	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId, entry $object_to_fill = null)
 	{
 		if(!$templateEntryId)
 		{
@@ -984,7 +984,7 @@ class KalturaEntryService extends KalturaBaseService
 			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
 			if ($templateEntry)
 			{
-				return $templateEntry->copyTemplate(true);
+				return $templateEntry->copyTemplate(true, $object_to_fill);
 			}
 		}
 		
