@@ -198,6 +198,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$this->liveStreamConfig->setUrl($playServerManifestUrl);
 		}
 		
+		if($this->getDynamicAttributes()->getUsePlayServer() || (!count($primaryStreamInfo) && !count($backupStreamInfo)))
+			$this->shouldRedirect = true;
+		
 		if($this->shouldRedirect)
 		{
 			return parent::buildHttpFlavorsArray();
