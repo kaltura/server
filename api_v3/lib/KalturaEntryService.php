@@ -970,7 +970,16 @@ class KalturaEntryService extends KalturaBaseService
 		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
-	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId, entry $object_to_fill = null)
+	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId, entry $baseTo = null)
+	{
+		$templateEntry = $this->getTemplateEntry($conversionProfileId, $templateEntryId);
+		if (!$baseTo)
+			$baseTo = new entry();
+
+		return $baseTo->copyTemplate(true, $templateEntry);
+	}
+
+	protected function getTemplateEntry($conversionProfileId, $templateEntryId)
 	{
 		if(!$templateEntryId)
 		{
@@ -978,16 +987,13 @@ class KalturaEntryService extends KalturaBaseService
 			if($conversionProfile)
 				$templateEntryId = $conversionProfile->getDefaultEntryId();
 		}
-		
+
 		if($templateEntryId)
 		{
 			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
 			if ($templateEntry)
-			{
-				return $templateEntry->copyTemplate(true, $object_to_fill);
-			}
+				return $templateEntry;
 		}
-		
 		return null;
 	}
 	

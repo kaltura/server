@@ -118,8 +118,9 @@ class ExternalMediaService extends KalturaEntryService
 		return parent::countEntriesByFilter($filter);
 	}
 
-	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId)
+	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId, $baseTo = null)
 	{
 		return parent::duplicateTemplateEntry($conversionProfileId, $templateEntryId, new ExternalMediaEntry());
+
 	}
 }

@@ -61,5 +61,16 @@ class ExternalMediaEntry extends entry
 		}
 		return $copyObj;
 	}
+
+	public function copyTemplate($copyPartnerId = false, entry $template)
+	{
+		if ($template instanceof ExternalMediaEntry)
+		{
+			$this->setExternalSourceType($template->getExternalSourceType());
+			$this->setReferenceID($template->getReferenceID());
+		}
+		return parent::copyTemplate($copyPartnerId, $template);
+
+	}
 	
 }
