@@ -65,8 +65,8 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 	
 				foreach($outputMetadataArr as $outputMetadataItem)
 				{
-					$value = $outputMetadataItem->value;
-					list($xpathName, $fieldName) = explode(",", $value);
+					$xpathName = $outputMetadataItem->key;
+					$fieldName = $outputMetadataItem->value;
 					$xmlObj->$xpathName = $entryResultForMetadataUpdate->$fieldName;
 				}
 	
@@ -120,30 +120,32 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 				$xmlObj = new SimpleXMLElement($metadataInputXmlStr);
 				$inputMetadataArr = $objectTask->inputMetadata;
 				foreach($inputMetadataArr as $inputMetadataItem)
-				{
-					$value = $inputMetadataItem->value;
-					list($xpathName, $fieldName) = explode(",", $value);
+				{					
+					$xpathName = $inputMetadataItem->key;
+					$fieldName = $inputMetadataItem->value;
+					KalturaLog::debug("ZZZZ - " . print_r($inputMetadataItem, true));
+					KalturaLog::debug("YYYYY - " . print_r($xmlObj, true));
+					KalturaLog::debug("XXXXX - xpathName $xpathName fieldName $fieldName");
 
 					$metadataValue = $xmlObj->$xpathName;
+					KalturaLog::debug("WWWWW - metadataValue $metadataValue");
 					$entryObj->$fieldName = $metadataValue;
-				}
-				
+				}	
 			}
 			else
 				KalturaLog::info("found no input metadata objects for entry $entryId");
 		}
 
-		$fieldValues = $objectTask->fieldValues;
+		if(isset($objectTask->inputUserId) && $objectTask->inputUserId != '')
+			$entryObj->userId = $objectTask->inputUserId != 'null' ? $objectTask->inputUserId : null;
+		
+		if(isset($objectTask->inputUserId) && $objectTask->inputEntitledUsersEdit != '')
+			$entryObj->entitledUsersEdit = $objectTask->inputEntitledUsersEdit != 'null' ? $objectTask->inputEntitledUsersEdit : '';
+		
+		if(isset($objectTask->inputEntitledUsersPublish) && $objectTask->inputEntitledUsersPublish != '')
+			$entryObj->entitledUsersPublish = $objectTask->inputEntitledUsersPublish != 'null' ? $objectTask->inputEntitledUsersPublish : '';
 
-		foreach($fieldValues as $fieldValueItem)
-		{
-			$value = $fieldValueItem->value;
-			list($fieldValue, $fieldName) = explode(",", $value);
-
-			$entryObj->$fieldName = $fieldValue;
-		}
-
-		try
+			try
 		{
 			$client->baseEntry->update($entryId, $entryObj);
 		}
