@@ -1,3 +1,20 @@
+# Lynx 12.6.0 #  
+
+## CategoryEntry - new column ##  
+
+- Issue type: Task
+- Issue ID - PS-2666
+
+### Configuration ###  
+
+None.
+
+### Deployment Scripts ###  
+
+Add a new column to the category_entry table:
+
+mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_11_11_alter_category_entry_table_add_creator_kuser_id_table.sql
+
 # Lynx 12.5.0 #
 
 ## CaptionAssetItem - remove column - int_id ##
