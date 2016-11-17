@@ -34,7 +34,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 			$entryResultForMetadataUpdate = $client->baseEntry->get($entryId);
 			
 			$metadataFilter->metadataProfileIdEqual = $outputMetadataProfileId;
-			self::updateMetadataObj($entryResultForMetadataUpdate, $metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter);
+			$this->updateMetadataObj($entryResultForMetadataUpdate, $metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter);
 		}
 		
 		KalturaLog::info("updating entry $entryId");
@@ -44,7 +44,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		{
 			$metadataFilter->metadataProfileIdEqual = $inputMetadataProfileId;
 			
-			$entryObj = self::updateEntryFromMetadata($metadataPlugin, $inputMetadataArr, $entryObj, $metadataFilter);
+			$entryObj = $this->updateEntryFromMetadata($metadataPlugin, $inputMetadataArr, $entryObj, $metadataFilter);
 		}
 
 		if(is_null($entryObj->userId))
@@ -65,7 +65,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		KBatchBase::unimpersonate();
 	}
 	
-	private static function updateMetadataObj(KalturaBaseEntry $entryResultForMetadataUpdate, &$metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter)
+	private function updateMetadataObj(KalturaBaseEntry $entryResultForMetadataUpdate, &$metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter)
 	{
 		$entryId = $entryResultForMetadataUpdate->id;
 		
@@ -77,28 +77,34 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		{
 			KalturaLog::notice("problem with metadata list with entry id $entryId - " . $e->getMessage());
 		}
+		
+		$tepmlateXmlObj = $this->getMetadataXmlTemplate($metadataPlugin, $outputMetadataProfileId);
 	
 		if($metadataInputResult && $metadataInputResult->totalCount != 0)
 		{
 			$metadataId = $metadataInputResult->objects[0]->id;
 			$metadataInputXmlStr = $metadataInputResult->objects[0]->xml;
-			$xmlObj = new SimpleXMLElement($metadataInputXmlStr);
+			$currentXmlObj = new SimpleXMLElement($metadataInputXmlStr);
 			
-			$xmlData = self::updateMetadataFromEntry($entryResultForMetadataUpdate, $xmlObj, $outputMetadataArr);
+			if(!is_null($tepmlateXmlObj))
+			{
+				$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $tepmlateXmlObj, $currentXmlObj, $outputMetadataArr);
 			
-			try
-			{
-				$metadataPlugin->metadata->update($metadataId, $xmlData, null);
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::notice("problem with metadata update entry id $entryId - " . $e->getMessage());
+				try
+				{
+					$metadataPlugin->metadata->update($metadataId, $xmlData, null);
+				}
+				catch(Exception $e)
+				{
+					KalturaLog::notice("problem with metadata update entry id $entryId - " . $e->getMessage());
+				}
 			}
 		}
 		else
 		{
+			
 			$xmlObj = new SimpleXMLElement("<metadata></metadata>");
-			$xmlData = self::updateMetadataFromEntry($entryResultForMetadataUpdate, $xmlObj, $outputMetadataArr);
+			$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $tepmlateXmlObj, $xmlObj, $outputMetadataArr);
 	
 			try
 			{
@@ -111,19 +117,39 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		}
 	}
 	
-	private static function updateMetadataFromEntry(KalturaBaseEntry $entryResultForMetadataUpdate, SimpleXMLElement $xmlObj, array $outputMetadataArr)
+	private function getUpdatedMetadataXmlStrFromEntry(KalturaBaseEntry $entryResultForMetadataUpdate, SimpleXMLElement $emptyXmlObj, SimpleXMLElement $currentXmlObj, array $outputMetadataArr)
 	{
-		foreach($outputMetadataArr as $outputMetadataItem)
+		$tempXmlObj = $emptyXmlObj;		
+		
+		KalturaLog::debug("currentXmlObj - " . print_r($currentXmlObj, true));
+		KalturaLog::debug("outputMetadataArr - " . print_r($outputMetadataArr, true));
+		
+		foreach($tempXmlObj as $metadataFieldName => $emptyXmlObjItem)
 		{
-			$xpathName = $outputMetadataItem->key;
-			$fieldName = $outputMetadataItem->value;
-			$xmlObj->$xpathName = $entryResultForMetadataUpdate->$fieldName;
+			foreach($currentXmlObj as $currMetadataFieldName => $currentXmlObjItem)
+			{
+				if($currMetadataFieldName == $metadataFieldName && (string)$currentXmlObjItem != '')
+				{
+					$tempXmlObj->$metadataFieldName = $currentXmlObjItem;	
+					continue 2;
+				}				
+			}
+			
+			foreach($outputMetadataArr as $outputMetadataArrItem)
+			{
+				if($outputMetadataArrItem->key == $metadataFieldName)
+				{
+					$entryFieldName = $outputMetadataArrItem->value;
+					$emptyXmlObjItem = (string)$entryResultForMetadataUpdate->$entryFieldName;
+					$tempXmlObj->$metadataFieldName = (string)$entryResultForMetadataUpdate->$entryFieldName;
+					break;
+				}
+			}
 		}
-	
-		return $xmlObj->asXML();
+		return $tempXmlObj->asXml();
 	}
 	
-	private static function updateEntryFromMetadata(&$metadataPlugin, array $inputMetadataArr, KalturaBaseEntry $entryObj, $metadataFilter)
+	private function updateEntryFromMetadata(&$metadataPlugin, array $inputMetadataArr, KalturaBaseEntry $entryObj, $metadataFilter)
 	{
 		$entryId = $entryObj->id;
 		
@@ -142,7 +168,8 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 			$xmlObj = new SimpleXMLElement($metadataInputXmlStr);
 			
 			foreach($inputMetadataArr as $inputMetadataItem)
-			{					
+			{
+				KalturaLog::debug("xpathName - $xpathName, fieldName - $fieldName");
 				$xpathName = $inputMetadataItem->key;
 				$fieldName = $inputMetadataItem->value;
 	
@@ -152,7 +179,39 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		}
 		else
 			KalturaLog::info("found no input metadata objects for entry $entryId");
-
+		
 		return $entryObj;
+	}
+	
+	private function getMetadataXmlTemplate(&$metadataPlugin, $outputMetadataProfileId)
+	{
+		try
+		{
+			$outputMetadataProfile = $metadataPlugin->metadataProfile->get($outputMetadataProfileId);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::notice("problem with metadataProfile get entry id $entryId - " . $e->getMessage());
+			return null;
+		}
+		
+		$metadataXsd = $outputMetadataProfile->xsd;
+		
+		$xsdSchema = new DOMDocument();
+		$xsdSchema->loadXml($metadataXsd);
+		
+		$elements = $xsdSchema->getElementsByTagName('element');
+		
+		$metadataStr = "<metadata>";
+		foreach ($elements as $element)
+		{
+			if ($element->hasAttribute('type') == false)
+				continue;
+			$key = $element->getAttribute('name');
+			$metadataStr .= '<' . $key . '>' . '</' . $key . '>';
+		}
+		$metadataStr .= "</metadata>";
+
+		return new SimpleXMLElement($metadataStr);
 	}
 }
