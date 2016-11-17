@@ -84,7 +84,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 			$metadataInputXmlStr = $metadataInputResult->objects[0]->xml;
 			$xmlObj = new SimpleXMLElement($metadataInputXmlStr);
 			
-			$xmlData = self::insertMetadataValuesToEntryObj($entryResultForMetadataUpdate, $xmlObj, $outputMetadataArr);
+			$xmlData = self::updateMetadataFromEntry($entryResultForMetadataUpdate, $xmlObj, $outputMetadataArr);
 			
 			try
 			{
@@ -98,7 +98,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		else
 		{
 			$xmlObj = new SimpleXMLElement("<metadata></metadata>");
-			$xmlData = self::insertMetadataValuesToEntryObj($entryResultForMetadataUpdate, $xmlObj, $outputMetadataArr);
+			$xmlData = self::updateMetadataFromEntry($entryResultForMetadataUpdate, $xmlObj, $outputMetadataArr);
 	
 			try
 			{
@@ -111,7 +111,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		}
 	}
 	
-	private static function insertMetadataValuesToEntryObj(KalturaBaseEntry $entryResultForMetadataUpdate, SimpleXMLElement $xmlObj, array $outputMetadataArr)
+	private static function updateMetadataFromEntry(KalturaBaseEntry $entryResultForMetadataUpdate, SimpleXMLElement $xmlObj, array $outputMetadataArr)
 	{
 		foreach($outputMetadataArr as $outputMetadataItem)
 		{
