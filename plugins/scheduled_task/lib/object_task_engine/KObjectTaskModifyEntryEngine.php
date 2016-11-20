@@ -121,8 +121,8 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 	{
 		$tempXmlObj = $emptyXmlObj;		
 		
-		KalturaLog::debug("currentXmlObj - " . print_r($currentXmlObj, true));
-		KalturaLog::debug("outputMetadataArr - " . print_r($outputMetadataArr, true));
+		KalturaLog::debug("current xml object - " . print_r($currentXmlObj, true));
+		KalturaLog::debug("output metadata array - " . print_r($outputMetadataArr, true));
 		
 		foreach($tempXmlObj as $metadataFieldName => $emptyXmlObjItem)
 		{
@@ -149,7 +149,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		return $tempXmlObj->asXml();
 	}
 	
-	private function updateEntryFromMetadata(&$metadataPlugin, array $inputMetadataArr, KalturaBaseEntry $entryObj, $metadataFilter)
+	private function updateEntryFromMetadata($metadataPlugin, array $inputMetadataArr, KalturaBaseEntry $entryObj, $metadataFilter)
 	{
 		$entryId = $entryObj->id;
 		
@@ -169,7 +169,6 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 			
 			foreach($inputMetadataArr as $inputMetadataItem)
 			{
-				KalturaLog::debug("xpathName - $xpathName, fieldName - $fieldName");
 				$xpathName = $inputMetadataItem->key;
 				$fieldName = $inputMetadataItem->value;
 	
@@ -183,7 +182,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		return $entryObj;
 	}
 	
-	private function getMetadataXmlTemplate(&$metadataPlugin, $outputMetadataProfileId)
+	private function getMetadataXmlTemplate($metadataPlugin, $outputMetadataProfileId)
 	{
 		try
 		{
@@ -201,17 +200,18 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		$xsdSchema->loadXml($metadataXsd);
 		
 		$elements = $xsdSchema->getElementsByTagName('element');
+		$emptyXmlObj = new SimpleXMLElement("<metadata></metadata>");
 		
-		$metadataStr = "<metadata>";
-		foreach ($elements as $element)
+		foreach($elements as $element)
 		{
 			if ($element->hasAttribute('type') == false)
 				continue;
 			$key = $element->getAttribute('name');
-			$metadataStr .= '<' . $key . '>' . '</' . $key . '>';
+			$emptyXmlObj->addChild($key);
 		}
-		$metadataStr .= "</metadata>";
 
-		return new SimpleXMLElement($metadataStr);
+		KalturaLog::debug("metadata profile schema - " . $emptyXmlObj->asXml());
+
+		return $emptyXmlObj;
 	}
 }
