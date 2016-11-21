@@ -31,45 +31,26 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		
 		if($outputMetadataProfileId != 0 && !empty($outputMetadataArr))
 		{
-			try
-			{
-				$entryResultForMetadataUpdate = $client->baseEntry->get($entryId);
-			}
-			catch(Exception $e)
-			{
-				KBatchBase::unimpersonate();
-				throw $e;
-			}
+			$entryResultForMetadataUpdate = $client->baseEntry->get($entryId);
 			
 			$metadataFilter->metadataProfileIdEqual = $outputMetadataProfileId;
 			$this->updateMetadataObj($entryResultForMetadataUpdate, $metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter);
 		}
 		
-		KalturaLog::info("updating entry $entryId");
+		KalturaLog::debug("updating entry $entryId");
 		$entryObj = new KalturaBaseEntry();
 		
 		if($inputMetadataProfileId != 0 && !empty($inputMetadataArr))
 		{
 			$metadataFilter->metadataProfileIdEqual = $inputMetadataProfileId;
-			
 			$entryObj = $this->updateEntryFromMetadata($metadataPlugin, $inputMetadataArr, $entryObj, $metadataFilter);
 		}
 
-		if(is_null($entryObj->userId))
-			$entryObj->userId = $objectTask->inputUserId;
-		if(is_null($entryObj->entitledUsersEdit))
-			$entryObj->entitledUsersEdit = $objectTask->inputEntitledUsersEdit;
-		if(is_null($entryObj->entitledUsersPublish))
-			$entryObj->entitledUsersPublish = $objectTask->inputEntitledUsersPublish;
+		$entryObj->userId = is_null($entryObj->userId) ? $objectTask->inputUserId : null;
+		$entryObj->entitledUsersEdit = is_null($entryObj->entitledUsersEdit) ? $objectTask->inputEntitledUsersEdit : null;
+		$entryObj->entitledUsersPublish = is_null($entryObj->entitledUsersPublish) ? $objectTask->inputEntitledUsersPublish : null;
 
-		try
-		{
-			$client->baseEntry->update($entryId, $entryObj);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::notice("problem with entry update entry id $entryId - " . $e->getMessage());
-		}
+		$client->baseEntry->update($entryId, $entryObj);
 		KBatchBase::unimpersonate();
 	}
 	
@@ -77,15 +58,8 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 	{
 		$entryId = $entryResultForMetadataUpdate->id;
 		
-		try
-		{
-			$metadataInputResult = $metadataPlugin->metadata->listAction($metadataFilter, null);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::notice("problem with metadata list with entry id $entryId - " . $e->getMessage());
-		}
-		
+		$metadataInputResult = $metadataPlugin->metadata->listAction($metadataFilter, null);
+
 		$tepmlateXmlObj = $this->getMetadataXmlTemplate($metadataPlugin, $outputMetadataProfileId);
 	
 		if($metadataInputResult && $metadataInputResult->totalCount != 0)
@@ -96,16 +70,8 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 			
 			if(!is_null($tepmlateXmlObj))
 			{
-				$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $tepmlateXmlObj, $currentXmlObj, $outputMetadataArr);
-			
-				try
-				{
-					$metadataPlugin->metadata->update($metadataId, $xmlData, null);
-				}
-				catch(Exception $e)
-				{
-					KalturaLog::notice("problem with metadata update entry id $entryId - " . $e->getMessage());
-				}
+				$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $tepmlateXmlObj, $currentXmlObj, $outputMetadataArr);			
+				$metadataPlugin->metadata->update($metadataId, $xmlData, null);
 			}
 		}
 		else
@@ -114,61 +80,42 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 			$xmlObj = new SimpleXMLElement("<metadata></metadata>");
 			$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $tepmlateXmlObj, $xmlObj, $outputMetadataArr);
 	
-			try
-			{
-				$metadataPlugin->metadata->add($outputMetadataProfileId, KalturaMetadataObjectType::ENTRY, $entryId, $xmlData);
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::notice("problem with metadata add entry id $entryId - " . $e->getMessage());
-			}
+			$metadataPlugin->metadata->add($outputMetadataProfileId, KalturaMetadataObjectType::ENTRY, $entryId, $xmlData);
 		}
 	}
 	
-	private function getUpdatedMetadataXmlStrFromEntry(KalturaBaseEntry $entryResultForMetadataUpdate, SimpleXMLElement $emptyXmlObj, SimpleXMLElement $currentXmlObj, array $outputMetadataArr)
-	{
-		$tempXmlObj = $emptyXmlObj;		
-		
+	private function getUpdatedMetadataXmlStrFromEntry(KalturaBaseEntry $entryResultForMetadataUpdate, SimpleXMLElement $templateXmlObj, SimpleXMLElement $currentXmlObj, array $outputMetadataArr)
+	{		
 		KalturaLog::debug("current xml object - " . print_r($currentXmlObj, true));
 		KalturaLog::debug("output metadata array - " . print_r($outputMetadataArr, true));
 		
-		foreach($tempXmlObj as $metadataFieldName => $emptyXmlObjItem)
+		foreach($templateXmlObj as $metadataFieldName => $templateXmlObjItem)
 		{
-			foreach($currentXmlObj as $currMetadataFieldName => $currentXmlObjItem)
+			$element = $currentXmlObj->xpath($metadataFieldName);
+			if(isset($element[0]) &&  isset($element[0][0]) && $element[0][0] != '')
 			{
-				if($currMetadataFieldName == $metadataFieldName && (string)$currentXmlObjItem != '')
-				{
-					$tempXmlObj->$metadataFieldName = $currentXmlObjItem;	
-					continue 2;
-				}				
+				$templateXmlObj->$metadataFieldName = $element[0][0];
+				continue;
 			}
-			
+
 			foreach($outputMetadataArr as $outputMetadataArrItem)
 			{
 				if($outputMetadataArrItem->key == $metadataFieldName)
 				{
 					$entryFieldName = $outputMetadataArrItem->value;
-					$emptyXmlObjItem = (string)$entryResultForMetadataUpdate->$entryFieldName;
-					$tempXmlObj->$metadataFieldName = (string)$entryResultForMetadataUpdate->$entryFieldName;
+					$entryFieldValue = (string)$entryResultForMetadataUpdate->$entryFieldName;
+					$templateXmlObj->$metadataFieldName = $entryFieldValue;
 					break;
 				}
 			}
 		}
-		return $tempXmlObj->asXml();
+		return $templateXmlObj->asXml();
 	}
 	
 	private function updateEntryFromMetadata($metadataPlugin, array $inputMetadataArr, KalturaBaseEntry $entryObj, $metadataFilter)
 	{
 		$entryId = $entryObj->id;
-		
-		try
-		{
-			$metadataInputResult = $metadataPlugin->metadata->listAction($metadataFilter, null);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::notice("problem with metadata list - " . $e->getMessage());
-		}
+		$metadataInputResult = $metadataPlugin->metadata->listAction($metadataFilter, null);
 	
 		if($metadataInputResult->totalCount != 0)
 		{
@@ -212,10 +159,11 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		
 		foreach($elements as $element)
 		{
-			if ($element->hasAttribute('type') == false)
-				continue;
-			$key = $element->getAttribute('name');
-			$emptyXmlObj->addChild($key);
+			if ($element->hasAttribute('type') != false)
+			{
+				$key = $element->getAttribute('name');
+				$emptyXmlObj->addChild($key);
+			}
 		}
 
 		KalturaLog::debug("metadata profile schema - " . $emptyXmlObj->asXml());
