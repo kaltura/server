@@ -177,9 +177,10 @@ class LiveConversionProfileService extends KalturaBaseService
 
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
 	{
+		$conversionExtraParam = json_decode($liveParams->getConversionEnginesExtraParams());
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = (strpos($liveParams->getConversionEnginesExtraParams(), 'audioPassthrough') !== false) ? 'PassThru' : 'AAC';
+        $audioCodec = ($conversionExtraParam !== null && $conversionExtraParam->audioPassthrough !== null) ? 'PassThru' : 'AAC';
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
@@ -285,22 +286,20 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
 
-		$skipFrameCountPos = strpos($liveParams->getConversionEnginesExtraParams(), 'SkipFrameCount');
-		if ($skipFrameCountPos !== false)
-		{
-			$skipFrameCount = $video->addChild('SkipFrameCount');
-			preg_match('/SkipFrameCount=(\d+)/', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
-			$skipFrameCount->addChild('Value', (int)$skipFrameValue[1]);
-		}
-		
-		if (strpos($liveParams->getConversionEnginesExtraParams(), 'CBR') !== false)
-		{
-			$parameters = $video->addChild('Parameters');
-			$parameter = $parameters->addChild('Parameter');
-			$parameter->addChild('Name', 'mainconcept.bit_rate_mode');
-			$parameter->addChild('Value', 0);
-			$parameter->addChild('Type', 'Long');
-		}
+        if ($conversionExtraParam !== null && $conversionExtraParam->skipFrameCount !== null)
+        {
+            $skipFrameCount = $video->addChild('SkipFrameCount');
+            $skipFrameCount->addChild('Value', (int)$conversionExtraParam->skipFrameCount->value);
+        }
+
+		if ($conversionExtraParam !== null && $conversionExtraParam->constantBitrate !== null)
+        {
+            $parameters = $video->addChild('Parameters');
+            $parameter = $parameters->addChild('Parameter');
+            $parameter->addChild('Name', 'mainconcept.bit_rate_mode');
+            $parameter->addChild('Value', 0);
+            $parameter->addChild('Type', 'Long');
+        }
 
 		$audio->addChild('Codec', $audioCodec);
 		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
