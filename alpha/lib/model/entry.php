@@ -3057,48 +3057,46 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return array("entry:id=".strtolower($this->getId()), "entry:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
-	/**
-	 * @return entry
-	 */
-	public function copyTemplate($coptPartnerId = false)
-	{
-		// we use get_class(), because this might be a subclass
-		$clazz = get_class($this);
-		$copyObj = new $clazz();
-		/* @var $copyObj entry */
 
-		$copyObj->setTemplateEntryId($this->id);
-		$copyObj->setKuserId($this->kuser_id);
-		$copyObj->setName($this->name);
-		$copyObj->setTags($this->tags);
-		$copyObj->setAnonymous($this->anonymous);
-		$copyObj->setSource($this->source);
-		$copyObj->setSourceId($this->source_id);
-		$copyObj->setSourceLink($this->source_link);
-		$copyObj->setLicenseType($this->license_type);
-		$copyObj->setCredit($this->credit);
-		$copyObj->setScreenName($this->screen_name);
-		$copyObj->setSiteUrl($this->site_url);
-		$copyObj->setPermissions($this->permissions);
-		$copyObj->setGroupId($this->group_id);
-		$copyObj->setPartnerData($this->partner_data);
-		$copyObj->setIndexedCustomData1($this->indexed_custom_data_1);
-		$copyObj->setDescription($this->description);
-		$copyObj->setAdminTags($this->admin_tags);
-		$copyObj->setPuserId($this->puser_id);
-		$copyObj->setAccessControlId($this->access_control_id);
-		$copyObj->setConversionProfileId($this->conversion_profile_id);
-		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
-		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
-
-		if($coptPartnerId)
-			$copyObj->setPartnerId($this->getPartnerId());
-		
-		$copyObj->setNew(true);
-		$copyObj->setCopiedFrom($this);
-		return $copyObj;
-	}
+public function copyTemplate($copyPartnerId = false, $template)
+{
 	
+	if (!$template)
+		return null;
+	/* entry $template */
+	$this->setTemplateEntryId($template->getId());
+	$this->setKuserId($template->getKuserId());
+	$this->setName($template->getKuserId());
+	$this->setTags($template->getTags());
+	$this->setAnonymous($template->getAnonymous());
+	$this->setSource($template->getSource());
+	$this->setSourceId($template->getSourceId());
+	$this->setSourceLink($template->getSourceLink());
+	$this->setLicenseType($template->getLicenseType());
+	$this->setCredit($template->getCredit());
+	$this->setScreenName($template->getScreenName());
+	$this->setSiteUrl($template->getSiteUrl());
+	$this->setPermissions($template->getPermissions());
+	$this->setGroupId($template->getGroupId());
+	$this->setPartnerData($template->getPartnerData());
+	$this->setIndexedCustomData1($template->getIndexedCustomData1());
+	$this->setDescription($template->getDescription());
+	$this->setAdminTags($template->getAdminTags());
+	$this->setPuserId($template->getPuserId());
+	$this->setAccessControlId($template->getAccessControlId());
+	$this->setConversionProfileId($template->getConversionProfileId());
+	$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
+	$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
+
+
+	if($copyPartnerId)
+		$this->setPartnerId($template->getPartnerId());
+
+
+	$this->setNew(true);
+	$this->setCopiedFrom($template);
+	return $this;
+}
 	
 	public function getDynamicFlavorAttributesForAssetParams($assetParamsId)
 	{
