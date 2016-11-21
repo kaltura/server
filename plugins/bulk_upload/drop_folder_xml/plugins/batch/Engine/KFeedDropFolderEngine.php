@@ -87,7 +87,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		foreach ($existingDropFolderFilesMap as $existingDropFolderFile)
 		{
-			$this->handleFilePurged($existingDropFolderFile->id);
+			$this->handleFeedItemPurged($existingDropFolderFile);
 		}
 		
 	}
@@ -350,6 +350,36 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		KalturaLog::info("For URL [$url], the curl result is: " . print_r($res, true));
 		return $res;
+	}
+
+	/**
+	 * Mark file status as PURGED
+	 * @param KalturaDropFolderFile $dropFolderFile
+	 */
+	protected function handleFeedItemPurged($dropFolderFile)
+	{
+		try 
+		{
+			if ($this->dropFolder->fileDeletePolicy == KalturaDropFolderFileDeletePolicy::AUTO_DELETE && 
+				$this->dropFolder->autoFileDeleteDays)
+			{
+				$deleteAt = $this->dropFolder->autoFileDeleteDays*24*60*60 + $dropFolderFile->createdAt;
+				if (time () < $deleteAt)
+				{
+					KalturaLog::info ("Drop Folder File is not ready to be purged.");
+					return;
+				}	
+			}
+			
+			return $this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+		}
+		catch(Exception $e)
+		{
+			$this->handleFileError($dropFolderFileId, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE, 
+									DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
+			
+			return null;
+		}		
 	}
 	
 	
