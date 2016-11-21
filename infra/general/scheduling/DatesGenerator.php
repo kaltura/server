@@ -850,7 +850,7 @@ class DatesGenerator
 		$weekDayDates = array();
 		$days = explode(',', $this->byDay);
 
-		$order = $this->$dayOrder;
+		$order = $this->dayOrder;
 		usort($days, function ($a, $b) use ($order) {
 			return ($order[$a] - $order[$b]);
 		});
@@ -899,9 +899,9 @@ class DatesGenerator
 	);
 
 	private function reOrderDays($first) {
-		$diff = $this->$dayOrder[$first];
-		foreach ($this->$dayOrder as $key => $value)
-			$this->$dayOrder[$key] = ($value - $diff + 7) % 7;
+		$diff = $this->dayOrder[$first];
+		foreach ($this->dayOrder as $key => $value)
+			$this->dayOrder[$key] = ($value - $diff + 7) % 7;
 	}
 
 	private function getDayName($day){
