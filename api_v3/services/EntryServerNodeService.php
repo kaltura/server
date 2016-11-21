@@ -13,6 +13,7 @@ class EntryServerNodeService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		$this->applyPartnerFilterForClass("entry");
+		$this->applyPartnerFilterForClass("entryServerNode");
 	}
 
 	/**
