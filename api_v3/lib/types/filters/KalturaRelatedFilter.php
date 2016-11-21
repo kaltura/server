@@ -16,5 +16,4 @@ abstract class KalturaRelatedFilter extends KalturaFilter
 	{
 		
 	}
-	
 }
