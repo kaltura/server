@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2016-03-14
+/*! KMC - v6.0.11 - 2016-11-21
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2016 Amir Chervinsky; Licensed GNU */
 /**
@@ -3655,7 +3655,7 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 				// Check for library minimum version to eanble embed type. remove legacy embed for version 2 and up players
 				var libVersion = kmc.functions.getVersionFromPath(player.html5Url);
 				if((this.minVersion && !kmc.functions.versionIsAtLeast(this.minVersion, libVersion)) ||
-                    (libVersion[0] == "2" && this.id == "legacy")) {
+                    ((libVersion == "latest" || libVersion[0] == "2") && this.id == "legacy")) {
 					if(this.id == defaultType) {
 						defaultType = null;
 					}
@@ -4009,6 +4009,9 @@ kmc.functions = {
 		if( ! clientVersion || ! minVersion ){
 			return false;
 		}
+		if (clientVersion === "latest"){
+			return true;
+		}
 		minVersion = minVersion.replace(/[^\d.]/g, '');
 		clientVersion = clientVersion.replace(/[^\d.]/g, '');
 		var minVersionParts = minVersion.split('.');
@@ -4025,7 +4028,13 @@ kmc.functions = {
 		return true;
 	},
 	getVersionFromPath: function( path ) {
-		return (typeof path == 'string') ? path.split("/v")[1].split("/")[0] : false;
+		var version = false;
+		if (path.indexOf("{latest}") !== -1){
+			version = "latest";
+		}else{
+			version = (typeof path == 'string') ? path.split("/v")[1].split("/")[0] : false;
+		}
+		return version;
 	}
 };
 
@@ -4481,21 +4490,11 @@ kmc.preview_embed = {
 			dataType: "json",
 			success: function(data) {
 				if (data && data.length) {
-					// sort players list by HTML5 lib version (descending)
-					for (var i = 0; i < data.length; i++){
-						var player = data[i];
-						if (!player.html5Url){
-							continue;
-						}
-						var version = player.html5Url.substr(player.html5Url.indexOf("/v")+2,5);
-						var major = parseInt(version[0]);
-						var minor = parseInt(version.split(".")[1]);
-						player["version"] = major * 100 + minor;
-					}
+					// sort players list by last update
 					data.sort(function(a,b){
-						if (a.version > b.version)
+						if (a.updatedAt > b.updatedAt)
 							return -1;
-						else if (a.version < b.version)
+						else if (a.updatedAt < b.updatedAt)
 							return 1;
 						else
 							return 0;
