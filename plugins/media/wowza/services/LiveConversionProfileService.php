@@ -292,6 +292,15 @@ class LiveConversionProfileService extends KalturaBaseService
 			preg_match('/SkipFrameCount=(\d+)/', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
 			$skipFrameCount->addChild('Value', (int)$skipFrameValue[1]);
 		}
+		
+		if (strpos($liveParams->getConversionEnginesExtraParams(), 'CBR') !== false)
+		{
+			$parameters = $video->addChild('Parameters');
+			$parameter = $parameters->addChild('Parameter');
+			$parameter->addChild('Name', 'mainconcept.bit_rate_mode');
+			$parameter->addChild('Value', 0);
+			$parameter->addChild('Type', 'Long');
+		}
 
 		$audio->addChild('Codec', $audioCodec);
 		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
