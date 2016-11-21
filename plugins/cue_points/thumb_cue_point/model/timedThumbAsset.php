@@ -37,7 +37,7 @@ class timedThumbAsset extends thumbAsset
 		return true;
 	}
 	
-	final public function shouldCopyAssetInEntry()
+	final public function shouldCopyOnEntryCopy()
 	{
 		return false;
 	}

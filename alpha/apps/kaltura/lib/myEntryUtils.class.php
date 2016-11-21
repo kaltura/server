@@ -1185,7 +1185,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if ($sourceAsset->shouldCopyAssetInEntry())
+			if ($sourceAsset->shouldCopyOnEntryCopy())
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 	}
 
