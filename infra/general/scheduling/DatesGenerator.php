@@ -408,7 +408,7 @@ class DatesGenerator
 			$this->maxRecurrences = 10;
 		if (!$this->weekStartDay)
 			$this->weekStartDay = 'MO';
-		self::reOrderDays($this->weekStartDay);
+		$this->reOrderDays($this->weekStartDay);
 	}
 
 
@@ -851,7 +851,7 @@ class DatesGenerator
 		$weekDayDates = array();
 		$days = explode(',', $this->byDay);
 
-		$order = self::$dayOrder;
+		$order = $this->dayOrder;
 		usort($days, function ($a, $b) use ($order) {
 			return ($order[$a] - $order[$b]);
 		});
@@ -889,7 +889,7 @@ class DatesGenerator
 		'SA'=>'Saturday'
 	);
 
-	private static $dayOrder = array(
+	private $dayOrder = array(
 		'SU'=>0,
 		'MO'=>1,
 		'TU'=>2,
@@ -899,10 +899,10 @@ class DatesGenerator
 		'SA'=>6
 	);
 
-	private static function reOrderDays($first) {
-		$diff = self::$dayOrder[$first];
-		foreach (self::$dayOrder as $key => $value)
-			self::$dayOrder[$key] = ($value - $diff + 7) % 7;
+	private function reOrderDays($first) {
+		$diff = $this->dayOrder[$first];
+		foreach ($this->dayOrder as $key => $value)
+			$this->dayOrder[$key] = ($value - $diff + 7) % 7;
 	}
 
 	private function getDayName($day){
