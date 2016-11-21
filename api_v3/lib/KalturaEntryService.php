@@ -990,8 +990,7 @@ class KalturaEntryService extends KalturaBaseService
 		if($templateEntryId)
 		{
 			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
-			if ($templateEntry)
-				return $templateEntry;
+			return $templateEntry;
 		}
 		return null;
 	}
