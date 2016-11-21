@@ -389,6 +389,9 @@ class KalturaTypeReflector
 			$contants = $reflectClass->getConstants();
 			foreach($contants as $enum => $value)
 			{
+				if(!is_string($value) && !is_int($value))
+					continue;
+				
 				if ($this->isEnum())
 					$prop = new KalturaPropertyInfo("int", $enum);
 				else

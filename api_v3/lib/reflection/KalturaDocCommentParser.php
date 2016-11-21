@@ -343,7 +343,7 @@ class KalturaDocCommentParser
             
 	            if(isset($apiErrors[$error]))
 	            {
-                	$error_array[] = array ( $error , $apiErrors[$error]);
+                	$error_array[] = array($error, $apiErrors[$error], $errorClass);
 	            }
 	            else
 	            {

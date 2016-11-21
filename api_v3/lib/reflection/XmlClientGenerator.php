@@ -16,6 +16,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	 */
 	private $_requiredPlugins = array();
 	
+	/**
+	 * @var array
+	 */
+	private $_errorClasses = array('KalturaErrors');
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -101,9 +106,12 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			
 			$servicesElement->appendChild($serviceElement);
 		}
-		
+
 		$pluginsElement = $this->_doc->createElement("plugins");
 		$this->appendPlugins($pluginsElement);
+
+		$errorsElement = $this->_doc->createElement("errors");
+		$this->appendErrors($errorsElement);
 		
 		$configurationsElement = $this->_doc->createElement("configurations");
 		$this->appendConfigurations($configurationsElement);
@@ -112,6 +120,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$this->_xmlElement->appendChild($classesElement);
 		$this->_xmlElement->appendChild($servicesElement);
 		$this->_xmlElement->appendChild($pluginsElement);
+		$this->_xmlElement->appendChild($errorsElement);
 		$this->_xmlElement->appendChild($configurationsElement);
 		
 		$this->addFile("KalturaClient.xml", $this->_doc->saveXML());
@@ -125,6 +134,47 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			
 		$pluginName = $pluginInstance->getPluginName();
 		return count($servicesInterface->getServicesMap());
+	}
+	
+	private function appendErrors(DOMElement $errorsElement)
+	{
+		$appended = array();
+		foreach($this->_errorClasses as $errorsClass)
+		{
+			$apiErrorsReflected = new ReflectionClass($errorsClass);
+			$apiErrors = $apiErrorsReflected->getConstants();
+
+			foreach($apiErrors as $errorCode => $errorData)
+			{
+				if(isset($appended[$errorCode]))
+					continue;
+				
+				$errorParts = explode(';', $errorData);
+				if(count($errorParts) != 3)
+					throw new Exception("Missing error info in $errorsClass::$errorCode: $errorData");
+				
+				list($errorCode, $errorParams, $errorMessage) = $errorParts;
+				$errorElement = $this->_doc->createElement('error');
+				$errorElement->setAttribute('name', $errorCode);
+				$errorElement->setAttribute('code', $errorCode);
+				$errorElement->setAttribute('message', $errorMessage);
+				
+				if(trim($errorParams))
+				{
+					$errorParameters = explode(',', $errorParams);
+					foreach($errorParameters as $errorParameter)
+					{
+						$errorParameterElement = $this->_doc->createElement('parameter');
+						$errorParameterElement->setAttribute('name', $errorParameter);
+						$errorElement->appendChild($errorParameterElement);
+					}
+				}
+				
+				$errorsElement->appendChild($errorElement);
+				
+				$appended[$errorCode] = true;
+			}
+		}
 	}
 	
 	private function appendPlugins(DOMElement $pluginsElement)
@@ -281,6 +331,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		asort($constants);
 		foreach ($constants as $name => $value)
 		{
+			if(!is_string($value) && !is_int($value))
+				throw new Exception("Invalid enum value [" . $typeReflector->getType() . "::$name]");
+			
 			$const = $this->_doc->createElement("const");
 			$const->setAttribute("name", $name);
 			$const->setAttribute("value", $value);
@@ -511,6 +564,16 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		if(!empty($actionInfo->actionAlias))
 			$actionElement->setAttribute('actionAlias', $actionInfo->actionAlias);
 		
+		foreach($actionInfo->errors as $error)
+		{
+			list($errorCode, $content, $errorClass) = $error;
+			if(!in_array($errorClass, $this->_errorClasses))
+				$this->_errorClasses[] = $errorClass;
+
+			$throws = $this->_doc->createElement("throws");
+			$throws->setAttribute("name", $errorCode);
+			$actionElement->appendChild($throws);
+		}
 		return $actionElement;
 	}
 	
