@@ -31,7 +31,15 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		
 		if($outputMetadataProfileId != 0 && !empty($outputMetadataArr))
 		{
-			$entryResultForMetadataUpdate = $client->baseEntry->get($entryId);
+			try
+			{
+				$entryResultForMetadataUpdate = $client->baseEntry->get($entryId);
+			}
+			catch(Exception $e)
+			{
+				KBatchBase::unimpersonate();
+				throw $e;
+			}
 			
 			$metadataFilter->metadataProfileIdEqual = $outputMetadataProfileId;
 			$this->updateMetadataObj($entryResultForMetadataUpdate, $metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter);
