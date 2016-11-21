@@ -2,7 +2,7 @@
 
 class VodPackagerDeliveryUtils
 {
-	protected static function generateMultiUrl(array $flavors, entry $entry)
+	protected static function generateMultiUrl(array $flavors, entry $entry, DeliveryProfileDynamicAttributes $params)
 	{
 		$urls = array();
 		foreach ($flavors as $flavor)
@@ -20,7 +20,7 @@ class VodPackagerDeliveryUtils
 		$prefix = kString::getCommonPrefix($urls);
 		$postfix = kString::getCommonPostfix($urls);
 		
-		if ($entry->getType() == entryType::PLAYLIST)
+		if ( ($entry->getType() == entryType::PLAYLIST) || ($params->getUsePlayServer()) )
 		{
 			// in case of a playlist, need to merge the flavor params of the urls
 			// instead of using a urlset, since nginx-vod does not support urlsets of 
@@ -42,8 +42,8 @@ class VodPackagerDeliveryUtils
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
 		
-		if ($entry->getType() == entryType::PLAYLIST &&
-			strpos($middlePart, '/') === false)
+		if ( ($entry->getType() == entryType::PLAYLIST &&
+			strpos($middlePart, '/') === false) || ($params->getUsePlayServer()))
 		{
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
 			$result = $prefix . $middlePart . $postfix;
@@ -60,7 +60,7 @@ class VodPackagerDeliveryUtils
 	{
 		$entry = entryPeer::retrieveByPK($params->getEntryId());
 		
-		$url = self::generateMultiUrl($flavors, $entry);
+		$url = self::generateMultiUrl($flavors, $entry, $params);
 		$url .= $urlSuffix;
 	
 		// move any folders on the url prefix to the url part, so that the protocol folder will always be first

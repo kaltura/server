@@ -1,3 +1,22 @@
+# Lynx 12.5.0 #
+
+## CaptionAssetItem - remove column - int_id ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6327
+
+### Configuration ###
+update app/configurations/sphinx/kaltura.conf file and remove the following from kaltura_caption_item:
+rt_attr_uint = int_id 
+
+### Deployment scripts ###
+	
+ReIndex and repopulate kaltura_caption tabel in sphinx.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.4.0 #
 
 ## Initial support for Kaltura liveRecording ##

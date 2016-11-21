@@ -855,6 +855,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$assetResourceContainer->resource = $assetResource;
 					$resource->resources[] = $assetResourceContainer;
 				}
+
+				if(isset($contentElement->streams))
+					$this->handleStreamsElement($contentElement->streams, $entry);
 			}
 		}
 
@@ -933,7 +936,26 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new Exception(implode(', ', $pluginsErrorResults));
 	
 	}
-	
+
+	private function handleStreamsElement($streams, $entry)
+	{
+		$streamsArray = array();
+		foreach ($streams->stream as $stream)
+		{
+			$streamContainer = new KalturaStreamContainer();
+			$streamContainer->type = kXml::getXmlAttributeAsString($stream, "type");
+			$streamContainer->trackIndex = kXml::getXmlAttributeAsString($stream, "trackIndex");
+			$streamContainer->channelIndex = kXml::getXmlAttributeAsString($stream, "channelIndex");
+			$streamContainer->channelLayout = kXml::getXmlAttributeAsString($stream, "channelLayout");
+			$streamContainer->language = kXml::getXmlAttributeAsString($stream, "language");
+			$streamContainer->label = kXml::getXmlAttributeAsString($stream, "label");
+
+			$streamsArray[] = $streamContainer;
+		}
+
+		$entry->streams = $streamsArray;
+	}
+
 	/**
 	 * Sends the data using a multi requsest according to the given data
 	 * @param KalturaBaseEntry $entry
@@ -1285,13 +1307,37 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 			}
 			
+			if ($update)
+			{
+				$categoryIdsToRemove = array_diff($existingCategoryIds, $requiredCategoryIds);
+				
+				if (count ($categoryIdsToRemove))
+				{
+					//If any of these categories are aggregation categories - the deletion will occur automatically, and is not required here.
+					$categoryFilter = new KalturaCategoryFilter();
+					$categoryFilter->idIn = implode(',', $categoryIdsToRemove);
+					$response = KBatchBase::$kClient->category->listAction($categoryFilter);
+					
+					$categoriesToCheck = array();
+					foreach ($response->objects as $category)
+					{
+						$categoriesToCheck[$category->id] = $category;
+					}
+				}
+			}
+			
 			KBatchBase::$kClient->startMultiRequest();
 			
 			if($update) // Remove existing categories and associations
 			{
-				$categoryIdsToRemove = array_diff($existingCategoryIds, $requiredCategoryIds);
 				foreach($categoryIdsToRemove as $categoryIdToRemove)
 				{
+					if (isset ($categoriesToCheck[$categoryIdToRemove]) && $categoriesToCheck[$categoryIdToRemove]->isAggregationCategory)
+					{
+						KalturaLog::info ("No need to remove entry from category $categoryIdToRemove - this is an aggregation category.");
+						continue;
+					}
+					
 					KalturaLog::info("Removing category ID [$categoryIdToRemove] from entry [$entryId]");
 					KBatchBase::$kClient->categoryEntry->delete($entryId, $categoryIdToRemove);
 				}

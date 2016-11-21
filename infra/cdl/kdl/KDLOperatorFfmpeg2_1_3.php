@@ -10,6 +10,15 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	 */
     public function generateSinglePassCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
+		/*
+		 * Disable any multistream processing if 'extra' setting contains
+		 * hardcoded channel/track manipulations
+		 */
+		if(strstr($extra, "pan=")!==false || strstr($extra, "amerge=")!==false 
+		|| strstr($extra, "amix=")!==false || strstr($extra, "channelsplit=")!==false
+		|| strstr($extra, "-map")!==false){
+			$target->_multiStream = null;
+		}
 		$cmdStr = parent::generateSinglePassCommandLine($design, $target, $extra);
 		$cmdValsArr = explode(' ', $cmdStr);
 		
@@ -331,8 +340,12 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		
 		$mapArr = array();
 		foreach($multiStream->audio->streams as $stream){
+			if(isset($stream->channels)){
+				return null;
+			}
 			$mapStr = null;
-			$mapping = $stream->mapping;
+			$mapping = $stream->getMapping();
+
 			if(count($mapping)==1 && !(isset($stream->downmix) && $stream->downmix>0))
 				continue;
 			foreach($mapping as $m){
@@ -340,21 +353,22 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			}
 			if(!isset($mapStr))
 				continue;
-			
+			$inputs = count($mapping);
+				
 				/*
 				 * The following code (pan=stereo) is a hack to overcome ffmpeg bug with 'downmix' streams
 				 * TO CHECK whether it is relevant for 2.7.2
 				 */
-			switch(count($mapping)){
+			switch($inputs){
 				case 1:
 					$mapStr.= "pan=stereo:c0=c0:c1=c1";
 					break;
 				case 2:
 				case 3:
-					$mapStr.= "amix=inputs=".count($mapping);
+					$mapStr.= "amix=inputs=$inputs";
 					break;
 				default:
-					$mapStr.= "amerge=inputs=".count($mapping);
+					$mapStr.= "amerge=inputs=$inputs";
 					break;
 			}
 			$mapArr[] = $mapStr;
@@ -767,11 +781,19 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 			// Add language prop to the mapped output audio streams
 			$auxIdx = 0;
 			foreach ($target->_multiStream->audio->streams as $stream){
-				foreach ($stream->mapping as $m) {
+				$streamMapping = $stream->getMapping();
+				foreach ($streamMapping as $m) {
 					$auxArr[] = "-map 0:$m";
 				}
 				if(isset($stream->lang)){
 					$auxArr[] = "-metadata:s:a:$auxIdx language=$stream->lang";
+				}
+				if(isset($stream->channels)){
+					foreach ($stream->channels as $strId=>$chanIds) {
+						foreach ($chanIds as $chanId) {
+							$auxArr[] ="-map_channel 0.$strId.$chanId";
+						}
+					}
 				}
 				$auxIdx++;
 			}

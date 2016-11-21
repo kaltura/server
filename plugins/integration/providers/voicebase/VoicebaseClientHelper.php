@@ -52,7 +52,7 @@ class VoicebaseClientHelper
 		$postParams = array("mediaURL" => $flavorUrl);
 		if($fileLocation)
 		{
-			$adjustedLocation = "@" . $fileLocation;
+			$adjustedLocation = $this->getFile($fileLocation);
 			$postParams["transcript"] = $adjustedLocation;
 			$postParams["transcriptType"] = "human";
 			$postParams["humanReadyCallBack"] = $callBackUrl;
@@ -112,8 +112,8 @@ class VoicebaseClientHelper
 	{
 		$params = array("action" => "updateTranscript", "externalID" => $entryId);
 		$updateTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
-	
-		$transcriptContent = "@" . $transcriptContent;
+
+		$transcriptContent = $this->getFile($transcriptContent);
 		$postFields = array(
 				"transcript" => $transcriptContent,
 				"machineReadyCallBack" => $callBack,
@@ -168,7 +168,15 @@ class VoicebaseClientHelper
 	
 		$curlResult = $this->sendAPICall($deleteUrl);
 	}
-	
+
+	private function getFile($path)
+	{
+		if (PHP_VERSION_ID >= 50500)
+			return new \CURLFile($path);
+		else
+			return '@' . $path;
+	}
+
 	private function addUrlParams($url, array $params, $init = false)
 	{
 		$url .= $init ? '?' : '&' ;
