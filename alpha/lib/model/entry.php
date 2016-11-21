@@ -2737,8 +2737,28 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	}
 	
 // ----------- Extra object connections ----------------
-
 	
+	
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		//When working with Kaltura live recording the recorded entry is playable immediately after the first duration reporting
+		//Check the entry is no the replacement one to avoid marking replacement recorded entries as Ready before all conversion are done 
+		if(!$this->getIsTemporary() && 
+			$this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && 
+			$this->isColumnModified(entryPeer::LENGTH_IN_MSECS) &&
+			$this->getLengthInMsecs() > 0 &&
+			$this->getColumnsOldValue(entryPeer::LENGTH_IN_MSECS) == 0)
+		{
+			$this->setStatus(entryStatus::READY);	
+		}
+		return parent::preUpdate($con);
+	}
+
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postUpdate()
 	 */

@@ -139,7 +139,7 @@ class KalturaEntryService extends KalturaBaseService
 		$entryType = kPluginableEnumsManager::apiToCore('entryType', $tempMediaEntry->type);
 		$class = entryPeer::getEntryClassByType($entryType);
 			
-		KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
+		KalturaLog::debug("Creating new entry of API type [{$tempMediaEntry->type}] core type [$entryType] class [$class]");
 		$tempDbEntry = new $class();
 		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);

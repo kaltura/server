@@ -38,6 +38,7 @@ class getuiconfsAction extends kalturaAction
 			//$uiconf_array["swfUrlVersion"] = $uiconf->getSwfUrlVersion();
 			$uiconf_array["swf_version"] = "v" . $uiconf->getSwfUrlVersion();
 			$uiconf_array["html5Url"] = $uiconf->getHtml5Url();
+			$uiconf_array["updatedAt"] = $uiconf->getUpdatedAt(null);
 
 			$partner_uiconfs_array[] = $uiconf_array;
 		}

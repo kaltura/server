@@ -1500,9 +1500,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
 		$typeMatch = $entry->getType() == entryType::MEDIA_CLIP;
 		$sourceMatch = $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
-		$statusMatch = in_array($entry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT));
+		$statusMatch = $entry->getStatus() == entryStatus::READY;
 		
-		return $typeMatch && $sourceMatch && $statusMatch;
+		if($typeMatch && $sourceMatch && $statusMatch)
+		{
+			$readyAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusIn($entry->getId(), array(asset::ASSET_STATUS_READY));
+			if(!count($readyAssets))
+				return true;
+		}
+		
+		return false;
 	}
 
 	public static function isEntryReady($entryId)
