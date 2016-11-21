@@ -315,12 +315,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$ext = null;
 		$audioLanguage = null;
 		$audioLanguageName = null;
+		$audioLabel = null;
 		if ($flavor) {
 			if (is_callable(array($flavor, 'getFileExt'))) {
 				$ext = $flavor->getFileExt();
 			}
 			//Extract the audio language code from flavor
 			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
+				if(is_callable(array($flavor, 'getLabel'))) {
+					$audioLabel = $flavor->getLabel();
+				}
 				$audioLanguageData = $this->getAudioLanguage($flavor);
 				if (!$audioLanguageData) {
 					$audioLanguage = 'und';
@@ -342,7 +346,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$bitrate = ($flavor && is_callable(array($flavor, 'getVideoBitrate')) ? $flavor->getVideoBitrate() : 0);
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
-	
+
 		return array(
 				'url' => $url,
 				'urlPrefix' => $urlPrefix,
@@ -351,7 +355,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'width' => $width,
 				'height' => $height,
 				'audioLanguage' => $audioLanguage,
-				'audioLanguageName' => $audioLanguageName);
+				'audioLanguageName' => $audioLanguageName,
+				'audioLabel' => $audioLabel,
+			);
 	}
 	
 	public function getCacheInvalidationKeys()

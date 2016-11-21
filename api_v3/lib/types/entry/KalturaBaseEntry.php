@@ -44,7 +44,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * The ID of the user who is the owner of this entry 
 	 * 
 	 * @var string
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
 	public $userId;
 	

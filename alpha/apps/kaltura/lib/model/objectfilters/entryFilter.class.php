@@ -30,7 +30,8 @@ class entryFilter extends baseObjectFilter
 			"_in_id" , 
 			"_notin_id" , 
 			"_eq_id" ,
-			"_in_user_id", 
+			"_in_user_id",
+			"_notin_user_id",
 			"_eq_user_id" ,  // is in fact the kuser_id - see aliases
 			"_eq_kshow_id" ,
 			"_eq_status" ,

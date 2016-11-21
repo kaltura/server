@@ -287,7 +287,7 @@ $pixFmt = "yuv420p";
 	 */
 	public static function buildWatermarkedCommandLine($watermMarkData, $destFileSyncLocalPath, $cmdLine, $ffmpegBin = "ffmpeg", $mediaInfoBin = "mediainfo")
 	{
-		KalturaLog::log("After:cmdline($cmdLine)");
+		KalturaLog::log("In:cmdline($cmdLine)");
 		if(!isset($mediaInfoBin) || strlen($mediaInfoBin)==0)
 			$mediaInfoBin = "mediainfo";
 
@@ -361,39 +361,33 @@ $pixFmt = "yuv420p";
 				/*
 				 * Query the image file for format and dims
 				 */
-			$output = array();
-			exec("$mediaInfoBin  $wmTmpFilepath | grep -i \"width\|height\|format\"",$ouput, $rv);
-			$mediaInfoCmdLine =$mediaInfoBin.' --Output="Image;format:%Format%\nheight:%Height%\nwidth:%Width%" '.$wmTmpFilepath;
-			exec($mediaInfoCmdLine,$ouput, $rv); //--Output="Image;format=%Format%,height=%Height%,width=%Width%"
-			if($rv!=0) {
-				KalturaLog::notice("Failed to retrieve media data from watermark file ($wmTmpFilepath). rv($rv). Carry on without watermark.");
+			$medPrsr = new KMediaInfoMediaParser($wmTmpFilepath, $mediaInfoBin);
+			$imageMediaInfo=$medPrsr->getMediaInfo();
+			if(!isset($imageMediaInfo)){
+				KalturaLog::notice("Failed to retrieve media data from watermark file ($wmTmpFilepath). Carry on without watermark.");
 				return null;
 			}
-			foreach($ouput as $line){
-				if(!isset($wmData->format) && stristr($line,"format")!=false) {
-					$str = stristr($line,":");
-					$wmData->format = strtolower(trim($str,": "));
+			if(isset($imageMediaInfo->containerFormat)) $wmData->format = $imageMediaInfo->containerFormat;
+			if(isset($imageMediaInfo->videoHeight)) $wmData->height = $imageMediaInfo->videoHeight;
+			if(isset($imageMediaInfo->videoWidth))  {
+				if(isset($wmData->fixImageDar) && $wmData->fixImageDar>0){
+					$wmData->width = round($imageMediaInfo->videoWidth/$wmData->fixImageDar);
 				}
-				else if(stristr($line,"width")!=false) {
-					$str = stristr($line,":");
-					$wmData->width = (int)trim($str,": ");
-				}
-				else if(stristr($line,"height")!=false) {
-					$str = stristr($line,":");
-					$wmData->height = (int)trim($str,": ");
+				else {
+					$wmData->width = $imageMediaInfo->videoWidth;
 				}
 			}
-			switch($wmData->format){
-			case "jpeg":
+			
+			if(strstr($wmData->format, "jpeg")!==false || strstr($wmData->format, "jpg")!==false) {
 				$wmData->format = "jpg";
-			case "jpg";
-			case "png":
-			default:
-				rename($wmTmpFilepath, "$wmTmpFilepath.$wmData->format");
-				$wmTmpFilepath = "$wmTmpFilepath.$wmData->format";
-				break;
 			}
-			KalturaLog::log("Updated Watermark data:\n".print_r($wmData,1));
+			else if(strstr($wmData->format, "png")!==false){
+				$wmData->format = "png";
+			}
+			rename($wmTmpFilepath, "$wmTmpFilepath.$wmData->format");
+			$wmTmpFilepath = "$wmTmpFilepath.$wmData->format";
+
+			KalturaLog::log("Updated Watermark data:".json_encode($wmData));
 
 			$cmdLine = KDLOperatorFfmpeg::AdjustCmdlineWithWatermarkData($cmdLine, $wmData, $wmTmpFilepath, $wmImgIdx);
 			$wmImgIdx++;
