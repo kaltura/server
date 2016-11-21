@@ -17,6 +17,8 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaRelatedFilter
 		"categoryFullIdsStartsWith" => "_likex_category_full_ids",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"creatorUserIdEqual" => "_eq_creator_user_id",
+		"creatorUserIdIn" => "_in_creator_user_id",
 	);
 
 	static private $order_by_map = array
@@ -79,4 +81,14 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $statusIn;
+
+	/**
+	 * @var string
+	 */
+	public $creatorUserIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $creatorUserIdIn;
 }

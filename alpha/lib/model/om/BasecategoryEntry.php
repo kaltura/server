@@ -81,6 +81,12 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	protected $privacy_context;
 
 	/**
+	 * The value for the creator_kuser_id field.
+	 * @var        int
+	 */
+	protected $creator_kuser_id;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -304,6 +310,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	public function getPrivacyContext()
 	{
 		return $this->privacy_context;
+	}
+
+	/**
+	 * Get the [creator_kuser_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getCreatorKuserId()
+	{
+		return $this->creator_kuser_id;
 	}
 
 	/**
@@ -586,6 +602,29 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	} // setPrivacyContext()
 
 	/**
+	 * Set the value of [creator_kuser_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     categoryEntry The current object (for fluent API support)
+	 */
+	public function setCreatorKuserId($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryEntryPeer::CREATOR_KUSER_ID]))
+			$this->oldColumnsValues[categoryEntryPeer::CREATOR_KUSER_ID] = $this->creator_kuser_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->creator_kuser_id !== $v) {
+			$this->creator_kuser_id = $v;
+			$this->modifiedColumns[] = categoryEntryPeer::CREATOR_KUSER_ID;
+		}
+
+		return $this;
+	} // setCreatorKuserId()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -634,6 +673,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->privacy_context = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->creator_kuser_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -643,7 +683,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating categoryEntry object", $e);
@@ -1204,6 +1244,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			case 9:
 				return $this->getPrivacyContext();
 				break;
+			case 10:
+				return $this->getCreatorKuserId();
+				break;
 			default:
 				return null;
 				break;
@@ -1235,6 +1278,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$keys[7] => $this->getCustomData(),
 			$keys[8] => $this->getStatus(),
 			$keys[9] => $this->getPrivacyContext(),
+			$keys[10] => $this->getCreatorKuserId(),
 		);
 		return $result;
 	}
@@ -1296,6 +1340,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			case 9:
 				$this->setPrivacyContext($value);
 				break;
+			case 10:
+				$this->setCreatorKuserId($value);
+				break;
 		} // switch()
 	}
 
@@ -1330,6 +1377,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setPrivacyContext($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCreatorKuserId($arr[$keys[10]]);
 	}
 
 	/**
@@ -1351,6 +1399,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) $criteria->add(categoryEntryPeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(categoryEntryPeer::STATUS)) $criteria->add(categoryEntryPeer::STATUS, $this->status);
 		if ($this->isColumnModified(categoryEntryPeer::PRIVACY_CONTEXT)) $criteria->add(categoryEntryPeer::PRIVACY_CONTEXT, $this->privacy_context);
+		if ($this->isColumnModified(categoryEntryPeer::CREATOR_KUSER_ID)) $criteria->add(categoryEntryPeer::CREATOR_KUSER_ID, $this->creator_kuser_id);
 
 		return $criteria;
 	}
@@ -1446,6 +1495,8 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		$copyObj->setStatus($this->status);
 
 		$copyObj->setPrivacyContext($this->privacy_context);
+
+		$copyObj->setCreatorKuserId($this->creator_kuser_id);
 
 
 		$copyObj->setNew(true);
