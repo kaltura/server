@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <!-- script will ask for username / password interactively -->
+    </session>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Ad Cue Point updated</name>
+                <systemName>AD_CUEPOINT_UPDATED</systemName>
+                <description>HTTP notification template to be sent when a ad cue point is updated</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>11</eventType> <!-- EventNotificationEventType::OBJECT_UPDATED -->
+                <eventObjectType>adCuePointEventNotifications.AdCuePoint</eventObjectType>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>cupoint_id</key>
+                        <description>Cue Point ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <method>1</method> <!-- KalturaHttpNotificationMethod::GET -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>
