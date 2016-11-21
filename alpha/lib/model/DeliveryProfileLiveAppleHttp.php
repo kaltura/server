@@ -6,11 +6,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	const M3U8_MASTER_PLAYLIST_IDENTIFIER = "EXT-X-STREAM-INF";
 	const M3U8_PLAYLIST_END_LIST_IDENTIFIER = "#EXT-X-ENDLIST";
 	const MAX_IS_LIVE_ATTEMPTS = 3;
-	
-	/**
-	 * @var bool
-	 */
-	private $shouldRedirect = false;
 
 	public function setDisableExtraAttributes($v)
 	{
@@ -204,8 +199,10 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 		
 		if($this->getDynamicAttributes()->getUsePlayServer() || (!count($primaryStreamInfo) && !count($backupStreamInfo)))
-		{
 			$this->shouldRedirect = true;
+		
+		if($this->shouldRedirect)
+		{
 			return parent::buildHttpFlavorsArray();
 		}
 		
@@ -236,9 +233,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	public function getRenderer($flavors)
 	{
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
-		if($this->shouldRedirect) {
-			$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
-		}
 		$renderer = parent::getRenderer($flavors);
 		return $renderer;
 	}

@@ -10,7 +10,7 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Kaltura Video Platfrom - Home Page</title>
+		<title>Kaltura Video Platform - Home Page</title>
 		<link rel="stylesheet" rev="stylesheet" media="screen" href="./css/style.css">
 		<style type="text/css">
 

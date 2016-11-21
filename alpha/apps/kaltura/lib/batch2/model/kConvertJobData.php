@@ -195,7 +195,7 @@ class kConvertJobData extends kConvartableJobData
 		// If you have no conversion profile, there is no point in this calculation
 		if(is_null($this->conversionProfileId))
 		{
-			if ( $this->getFlavorParamsOutput()->getFlavorParamsId() == -1 ) //intermediate source flow
+			if ($flavorParamsId == -1 ) //intermediate source flow
 				return ($isBulkupload? BatchJobUrgencyType::REQUIRED_BULK_UPLOAD : BatchJobUrgencyType::REQUIRED_REGULAR_UPLOAD);
 
 			return BatchJobUrgencyType::DEFAULT_URGENCY;
@@ -260,6 +260,8 @@ class kConvertJobData extends kConvartableJobData
 			return ($isBulkupload? BatchJobUrgencyType::REQUIRED_BULK_UPLOAD : BatchJobUrgencyType::REQUIRED_REGULAR_UPLOAD);
 		else if($readiness == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)
 			return ($isBulkupload? BatchJobUrgencyType::OPTIONAL_BULK_UPLOAD : BatchJobUrgencyType::OPTIONAL_REGULAR_UPLOAD);
+		else if ($flavorParamsId == -1)
+			return ($isBulkupload? BatchJobUrgencyType::REQUIRED_BULK_UPLOAD : BatchJobUrgencyType::REQUIRED_REGULAR_UPLOAD);
 		else
 			return (BatchJobUrgencyType::DEFAULT_URGENCY);
 	}

@@ -8,9 +8,12 @@
  */
 class LiveConversionProfileService extends KalturaBaseService
 {
+	const MINIMAL_DEFAULT_FRAME_RATE = 12.5;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
 	 */
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -18,7 +21,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('conversionProfile2');
 		$this->applyPartnerFilterForClass('assetParams');
 	}
-	
+
 	/**
 	 * Serve XML rendition of the Kaltura Live Transcoding Profile usable by the Wowza transcoding add-on
 	 * 
@@ -83,6 +86,11 @@ class LiveConversionProfileService extends KalturaBaseService
 			}
 		}
 		
+		if (!$liveParamsInput)
+		{
+			throw new KalturaAPIException(KalturaErrors::INGEST_NOT_FOUND_IN_CONVERSION_PROFILE, $streamName);
+		}
+		
 		$ignoreLiveParamsIds = array();
 		if($disableIngested)
 		{
@@ -102,21 +110,30 @@ class LiveConversionProfileService extends KalturaBaseService
 		$transcode = $root->addChild('Transcode');
 		
 		$encodes = $transcode->addChild('Encodes');
+		$defaultFrameRate = null;
+
 		$groups = array();
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem liveParams */
 			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
 				continue;
-				
+
+			if ($liveParamsItem->hasTag(assetParams::TAG_SOURCE))
+			{
+				if ($liveParamsItem->getFrameRate() >= self::MINIMAL_DEFAULT_FRAME_RATE)
+				{
+					KalturaLog::debug("Setting default frame rate to " . $liveParamsItem->getFrameRate());
+					$defaultFrameRate = $liveParamsItem->getFrameRate();
+				}
+			}
 			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
-			$tags = $liveParamsItem->getTagsArray();
-			$tags[] = 'all';
+			$tags = array("all");
 			foreach($tags as $tag)
 			{
 				if(!isset($groups[$tag]))
 					$groups[$tag] = array();
-					
+
 				$systemName = $liveParamsItem->getSystemName() ? $liveParamsItem->getSystemName() : $liveParamsItem->getId();
 				$groups[$tag][] = $systemName;
 			}
@@ -141,9 +158,15 @@ class LiveConversionProfileService extends KalturaBaseService
 				$member->addChild('EncodeName', $groupMember);
 			}
 		}
-		
+
 		$properties = $transcode->addChild('Properties');
-		
+		if ($defaultFrameRate) {
+			$property = $properties->addChild('Property');
+			$property->addChild('Name', 'sourceStreamFrameRate');
+			$property->addChild('Value', $defaultFrameRate);
+			$property->addChild('Type', 'Double');
+		}
+
 		$dom = new DOMDocument("1.0");
 		$dom->preserveWhiteSpace = false;
 		$dom->formatOutput = true;
@@ -151,12 +174,12 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		return new kRendererString($dom->saveXML(), 'text/xml');
 	}
-	
+
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
 	{
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = 'AAC';
+		$audioCodec = (strpos($liveParams->getConversionEnginesExtraParams(), 'audioPassthrough') !== false) ? 'PassThru' : 'AAC';
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
@@ -176,8 +199,10 @@ class LiveConversionProfileService extends KalturaBaseService
 		{
 			$video->addChild('Codec', $videoCodec);
 			$audio->addChild('Codec', $audioCodec);
-			$audio->addChild('Bitrate', 96000);
-			
+			if ($audioCodec !== 'PassThru') 
+			{
+				$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
+			}
 			return;
 		}
 		
@@ -211,7 +236,7 @@ class LiveConversionProfileService extends KalturaBaseService
 					KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
 					break;
 			}
-		
+
 			if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
 			{
 				switch ($liveParams->getAudioCodec())
@@ -259,7 +284,15 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
-		
+
+		$skipFrameCountPos = strpos($liveParams->getConversionEnginesExtraParams(), 'SkipFrameCount');
+		if ($skipFrameCountPos !== false)
+		{
+			$skipFrameCount = $video->addChild('SkipFrameCount');
+			preg_match('/SkipFrameCount=(\d+)/', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
+			$skipFrameCount->addChild('Value', (int)$skipFrameValue[1]);
+		}
+
 		$audio->addChild('Codec', $audioCodec);
 		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
 	}
