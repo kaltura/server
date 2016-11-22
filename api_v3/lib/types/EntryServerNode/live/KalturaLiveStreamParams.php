@@ -29,6 +29,16 @@ class KalturaLiveStreamParams extends KalturaObject {
 	 * @var string
 	 */
 	public $codec;
+	/**
+	 * Live stream's farme rate
+	 * @var int
+	 */
+	public $frameRate;
+	/**
+	 * Live stream's key frame interval
+	 * @var int
+	 */
+	public $keyFrameInterval;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -37,6 +47,8 @@ class KalturaLiveStreamParams extends KalturaObject {
 			"width",
 			"height",
 			"codec",
+			"frameRate",
+			"keyFrameInterval"
 	);
 	
 	/* (non-PHPdoc)
