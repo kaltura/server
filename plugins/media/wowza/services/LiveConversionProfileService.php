@@ -177,9 +177,10 @@ class LiveConversionProfileService extends KalturaBaseService
 
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
 	{
+		$conversionExtraParam = json_decode($liveParams->getConversionEnginesExtraParams());
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = (strpos($liveParams->getConversionEnginesExtraParams(), 'audioPassthrough') !== false) ? 'PassThru' : 'AAC';
+		$audioCodec = ($conversionExtraParam && $conversionExtraParam->audioPassthrough) ? 'PassThru' : 'AAC';
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
@@ -284,13 +285,20 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
-
-		$skipFrameCountPos = strpos($liveParams->getConversionEnginesExtraParams(), 'SkipFrameCount');
-		if ($skipFrameCountPos !== false)
+		
+		if ($conversionExtraParam && $conversionExtraParam->skipFrameCount)
 		{
 			$skipFrameCount = $video->addChild('SkipFrameCount');
-			preg_match('/SkipFrameCount=(\d+)/', $liveParams->getConversionEnginesExtraParams(), $skipFrameValue, $skipFrameCountPos);
-			$skipFrameCount->addChild('Value', (int)$skipFrameValue[1]);
+			$skipFrameCount->addChild('Value', $conversionExtraParam->skipFrameCount);
+		}
+		
+		if ($conversionExtraParam && $conversionExtraParam->constantBitrate)
+		{
+			$parameters = $video->addChild('Parameters');
+			$parameter = $parameters->addChild('Parameter');
+			$parameter->addChild('Name', 'mainconcept.bit_rate_mode');
+			$parameter->addChild('Value', 0);
+			$parameter->addChild('Type', 'Long');
 		}
 
 		$audio->addChild('Codec', $audioCodec);
