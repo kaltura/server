@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<!-- script will ask for username / password interactively -->
+	</session>
+	<multirequest continueOnError="1">
+		<!-- Entry Status Equal For Audio Aseets Replacement-->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
+				<systemNameEqual>entry_status_equal_for_audio_aseets_replacement</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
+				<name>Entry Status Equal For Audio Aseets Replacement</name>
+				<systemName>entry_status_equal_for_audio_aseets_replacement</systemName>
+				<description>Entry Status Equal For Audio Aseets Replacement</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Entry is not a temporary replacement entry</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getEvent()->getObject()->getIsTemporary()</code>
+						</field>
+						<not>1</not>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>endPoint</key>
+						<description>Server Host</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get('apphome_url')</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>partnerId</key>
+						<description>Partner ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getPartnerId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>adminSecret</key>
+						<description>Partner Administrator Secret</description>
+						<value objectType="KalturaEvalStringField">
+							<code>PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())->getAdminSecret()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entryId</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntryId()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Entry status that triggers the event, See:KalturaEntryStatus:/api_v3/testmeDoc/?object=KalturaEntryStatus</description>
+						<value objectType="KalturaStringValue">
+							<description>Ready</description>
+							<value>2</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>first_flavor_param_id</key>
+						<description>First flavor param id for replacement</description>
+						<value objectType="KalturaStringValue">
+							<description>source flavor param</description>
+							<value>0</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>second_flavor_param_id</key>
+						<description>Second flavor param id for replacement</description>
+						<value objectType="KalturaStringValue">
+							<description>source flavor param</description>
+							<value>0</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_system_name</key>
+						<description>Metadata profile system name for language extraction</description>
+						<value objectType="KalturaStringValue">
+							<description></description>
+							<value></value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_field_xpath</key>
+						<description>Metadata field xpath for language extraction</description>
+						<value objectType="KalturaStringValue">
+							<description></description>
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{3:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>

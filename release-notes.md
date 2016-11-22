@@ -1,5 +1,17 @@
 # Lynx 12.4.0 #
 
+## BPM - Replace audio channel names with the real ones ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6299
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationEntryReadyAudioAssetReplacement.xml
+
 ## Initial support for Kaltura liveRecording ##
 
  - Issue Type: New Feature
