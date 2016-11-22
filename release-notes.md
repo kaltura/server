@@ -1,6 +1,6 @@
 # Lynx 12.6.0 #
 
-## Initial support for Kaltura liveRecording ##
+## Allow entryServerNode get and list actions for partners ##
 
  - Issue Type: Task
  - Issue ID: PLAT-6234
