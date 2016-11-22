@@ -180,7 +180,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$conversionExtraParam = json_decode($liveParams->getConversionEnginesExtraParams());
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-        $audioCodec = ($conversionExtraParam !== null && $conversionExtraParam->audioPassthrough !== null) ? 'PassThru' : 'AAC';
+        $audioCodec = ($conversionExtraParam && $conversionExtraParam->audioPassthrough) ? 'PassThru' : 'AAC';
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
@@ -286,13 +286,13 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
 
-        if ($conversionExtraParam !== null && $conversionExtraParam->skipFrameCount !== null)
+        if ($conversionExtraParam && $conversionExtraParam->skipFrameCount)
         {
             $skipFrameCount = $video->addChild('SkipFrameCount');
-            $skipFrameCount->addChild('Value', (int)$conversionExtraParam->skipFrameCount->value);
+            $skipFrameCount->addChild('Value', $conversionExtraParam->skipFrameCount);
         }
 
-		if ($conversionExtraParam !== null && $conversionExtraParam->constantBitrate !== null)
+		if ($conversionExtraParam && $conversionExtraParam->constantBitrate)
         {
             $parameters = $video->addChild('Parameters');
             $parameter = $parameters->addChild('Parameter');
