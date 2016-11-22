@@ -21,6 +21,7 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaRelatedFilter
 		"userIdIn" => "_in_user_id",
 		"userIdNotIn" => "_notin_user_id",
 		"creatorIdEqual" => "_eq_creator_id",
+		"creatorIdNotIn" => "_notin_creator_id",
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
@@ -206,6 +207,11 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $creatorIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $creatorIdNotIn;
 
 	/**
 	 * This filter should be in use for retrieving specific entries. It should include only one string to search for in entry tags (no wildcards, spaces are treated as part of the string).
