@@ -91,7 +91,9 @@ class CategoryEntryService extends KalturaBaseService
 				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
-		if (kEntitlementUtils::getCategoryModeration() && $category->getModeration())
+		
+		if (kEntitlementUtils::getCategoryModeration() && $category->getModeration() ||
+			$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_DISABLE_CATEGORY_LEVEL_AUTO_APPROVE))
 		{
 			$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
