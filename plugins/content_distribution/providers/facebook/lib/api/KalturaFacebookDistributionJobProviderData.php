@@ -16,7 +16,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 	public $thumbAssetFilePath;
 
 	/**
-	 * @var KalturaCaptionDistributionInfoArray
+	 * @var KalturaFacebookCaptionDistributionInfoArray
 	 */
 	public $captionsInfo;
 
@@ -41,13 +41,12 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		if(count($thumbAssets))
 		{
-			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 
 		$this->addCaptionsData($distributionJobData);
-
 	}
 	
 	private static $map_between_objects = array
@@ -65,8 +64,8 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 	private function addCaptionsData(KalturaDistributionJobData $distributionJobData) 
 	{
 		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->assetIds );
-		if (empty($assetIdsArray)) return;
-		$this->captionsInfo = new KalturaCaptionDistributionInfoArray();
+		if (empty($distributionJobData->entryDistribution->assetIds) || empty($assetIdsArray)) return;
+		$this->captionsInfo = new KalturaFacebookCaptionDistributionInfoArray();
 		
 		foreach ( $assetIdsArray as $assetId ) 
 		{
@@ -83,10 +82,10 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 			}
 			if ($asset->getStatus() == asset::ASSET_STATUS_READY) 
 			{
-				$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
+				$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
 				if (kFileSyncUtils::fileSync_exists ( $syncKey )) 
 				{
-					$captionInfo = $this->getCaptionInfo($asset, $distributionJobData, KalturaDistributionAction::SUBMIT);
+					$captionInfo = $this->getCaptionInfo($asset);
 					if($captionInfo)
 					{
 						$captionInfo->filePath = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
@@ -94,24 +93,16 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 					}					 
 				}						
 			}
-			elseif($asset->getStatus()== asset::ASSET_STATUS_DELETED) 
-			{
-				$captionInfo = $this->getCaptionInfo($asset, $distributionJobData, KalturaDistributionAction::DELETE);
-				if($captionInfo)
-				{
-						$this->captionsInfo [] = $captionInfo;
-				}	
-			}
 			else
 			{
-				KalturaLog::err("Asset [$assetId] has status [".$asset->getStatus()."]. not added to provider data");
+				KalturaLog::debug("Asset [$assetId] has status [".$asset->getStatus()."]. not added to provider data");
 			}
 		}
 	}
 	
-	private function getCaptionInfo($asset, KalturaDistributionJobData $distributionJobData, $action)
+	private function getCaptionInfo($asset)
 	{
-		$captionInfo = new KalturaCaptionDistributionInfo ();		
+		$captionInfo = new KalturaFacebookCaptionDistributionInfo();
 		$captionInfo->assetId = $asset->getId();
 		$captionInfo->version = $asset->getVersion();
 		$captionInfo->label = $asset->getLabel();
@@ -122,25 +113,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 			KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().'] and label ['.$asset->getLabel().']');
 			return null;
 		}
-		
-		$distributed = false;
-		foreach ( $distributionJobData->mediaFiles as $mediaFile ) 
-		{
-			if ($mediaFile->assetId == $asset->getId ()) {
-				$distributed = true;
-				break;
-			}
-		}
-		if ($distributed && $action == KalturaDistributionAction::DELETE || 
-			!$distributed && $action == KalturaDistributionAction::SUBMIT)
-		{
-			$captionInfo->action = $action;
-		}
-		else 
-		{
-			return null;
-		}
-			
+
 		return $captionInfo;
 	}
 	
@@ -161,7 +134,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		
 		foreach ($flavorAssets as $flavorAsset) 
 		{
-			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 			{
 				$videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);

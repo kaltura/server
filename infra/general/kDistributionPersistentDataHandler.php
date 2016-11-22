@@ -70,6 +70,10 @@ class kDistributionPersistentDataHandler implements \Facebook\PersistentData\Per
 		} catch (Exception $e) {
 			throw new Exception("Failed to parse response[content] as XML, result was:" . $response);
 		}
+		if (!$xml)
+		{
+			throw new Exception("Failed to parse response[content] as XML, result was:" . $response);
+		}
 
 		if($xml->xpath('result/'.$key)){
 			return ''.$xml->result->$key;

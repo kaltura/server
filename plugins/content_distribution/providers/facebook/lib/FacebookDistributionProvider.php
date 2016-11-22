@@ -62,7 +62,7 @@ class FacebookDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isMediaUpdateEnabled()
 	{
-		return false;
+		return true;
 	}	
 	
 	/* (non-PHPdoc)

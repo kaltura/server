@@ -390,7 +390,7 @@ class FacebookGraphSdkUtils
 	 */
 	public static function deleteUploadedVideo($appId, $appSecret, $accessToken, $videoId)
 	{
-		return self::helperChangeVideo($appId, $appSecret, $accessToken, array(), $videoId, true);
+		self::helperChangeVideo($appId, $appSecret, $accessToken, array(), $videoId, true);
 	}
 
 	/**
@@ -404,7 +404,7 @@ class FacebookGraphSdkUtils
 	 */
 	public static function updateUploadedVideo($appId, $appSecret, $accessToken, $data, $videoId)
 	{
-		return self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, false);
+		self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, false);
 	}
 
 	private static function helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, $isDelete, $subCategory=null)
