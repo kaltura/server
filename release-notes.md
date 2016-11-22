@@ -1,5 +1,24 @@
 # Lynx 12.6.0 #
 
+## Allow entryServerNode get and list actions for partners ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6234
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+Add additional permissions to liveEntryServerNode service: 	
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_11_21_entry_server_node_allow_partner_list.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## CategoryEntry - new column ##
 
 - Issue type: Task
