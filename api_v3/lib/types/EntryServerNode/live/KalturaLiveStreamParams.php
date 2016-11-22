@@ -36,7 +36,7 @@ class KalturaLiveStreamParams extends KalturaObject {
 	public $frameRate;
 	/**
 	 * Live stream's key frame interval
-	 * @var int
+	 * @var float
 	 */
 	public $keyFrameInterval;
 	
