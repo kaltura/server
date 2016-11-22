@@ -139,6 +139,17 @@ class KSecureEntryHelper
 
 	public function validateForPlay($performApiAccessCheck = true)
 	{
+        if ($this->ks)
+        {
+            if ( $this->isKsAdmin() || // no need to validate when ks is admin
+                // no need to validate when a wildcard or a the specific entry are mentioned
+                $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+                ( $this->entry && $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, $this->entry->getId())))
+            {
+                return;
+            }
+        }
+
 	    if ($this->contexts != array(ContextType::THUMBNAIL))
 	    {
 		    $this->validateModeration();
@@ -153,15 +164,14 @@ class KSecureEntryHelper
 		
 		if ($this->ks)
 		{
-			if ($this->isKsAdmin()) // no need to validate when ks is admin
-				return;
-			
-			if ($this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, ks::PRIVILEGE_WILDCARD)) // no need to validate when we have wildcard download privilege
-				return;
-				
-			if ($this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $this->entry->getId())) // no need to validate when we have specific entry download privilege
-				return;
-		}	
+			if ($this->isKsAdmin() ||  // no need to validate when ks is admin
+                // no need to validate when a wildcard or a the specific entry are mentioned
+			    $this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, ks::PRIVILEGE_WILDCARD) ||
+                ($this->entry && $this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $this->entry->getId())))
+            {
+                return;
+            }
+		}
 			
 		$this->validateForPlay(false);
 	}
