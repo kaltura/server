@@ -3066,7 +3066,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	/* entry $template */
 	$this->setTemplateEntryId($template->getId());
 	$this->setKuserId($template->getKuserId());
-	$this->setName($template->getKuserId());
+	$this->setName($template->getName());
 	$this->setTags($template->getTags());
 	$this->setAnonymous($template->getAnonymous());
 	$this->setSource($template->getSource());
