@@ -19,13 +19,18 @@ class categoryEntryFilter extends baseObjectFilter
 			"_likex_category_full_ids",
 			"_eq_status",
 			"_in_status",
+			"_eq_creator_user_id",
+			"_in_creator_user_id",
+			
 			) , NULL );
 
 		$this->allowed_order_fields = array (
 			'created_at',
 		);
 
-		$this->aliases = array ();
+		$this->aliases = array (
+			"creator_user_id" => "creator_kuser_id",
+		);
 	}
 
 	public function describe()

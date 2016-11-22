@@ -80,6 +80,7 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$categoryEntry->toInsertableObject($dbCategoryEntry);
 		
+		/* @var $dbCategoryEnry categoryEntry */
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
@@ -97,6 +98,15 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$dbCategoryEntry->setPartnerId($partnerId);
+		
+		$kuser = kCurrentContext::getCurrentKsKuser();
+		
+		if ($kuser)
+		{
+			$dbCategoryEntry->setCreatorKuserId($kuser->getId());
+			$dbCategoryEntry->setCreatorPuserId($kuser->getPuserId());
+		}
+		
 		$dbCategoryEntry->save();
 		
 		//need to select the entry again - after update
