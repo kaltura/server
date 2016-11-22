@@ -40,7 +40,7 @@ class kLiveStreamParams
 	protected $frameRate;
 	
 	/**
-	 * @var int
+	 * @var float
 	 */
 	protected $keyFrameInterval;
 
@@ -109,7 +109,7 @@ class kLiveStreamParams
 	public function getKeyFrameInterval() { return $this->keyFrameInterval; }
 	
 	/**
-	 * @param int $keyFrameInterval
+	 * @param float $keyFrameInterval
 	 */
 	public function setKeyFrameInterval($keyFrameInterval) { $this->keyFrameInterval = $keyFrameInterval; }
 }
