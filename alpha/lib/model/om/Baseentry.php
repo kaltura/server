@@ -7113,6 +7113,10 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	{
 		$customData = $this->getCustomDataObj( );
 		
+		$customDataOldValue = $customData->get($name, $namespace);
+		if($customDataOldValue && serialize($customDataOldValue) === serialize($value))
+			return;
+		
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
