@@ -180,7 +180,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$conversionExtraParam = json_decode($liveParams->getConversionEnginesExtraParams());
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-        $audioCodec = ($conversionExtraParam && $conversionExtraParam->audioPassthrough) ? 'PassThru' : 'AAC';
+		$audioCodec = ($conversionExtraParam && $conversionExtraParam->audioPassthrough) ? 'PassThru' : 'AAC';
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
@@ -285,21 +285,21 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
-
-        if ($conversionExtraParam && $conversionExtraParam->skipFrameCount)
-        {
-            $skipFrameCount = $video->addChild('SkipFrameCount');
-            $skipFrameCount->addChild('Value', $conversionExtraParam->skipFrameCount);
-        }
-
+		
+		if ($conversionExtraParam && $conversionExtraParam->skipFrameCount)
+		{
+			$skipFrameCount = $video->addChild('SkipFrameCount');
+			$skipFrameCount->addChild('Value', $conversionExtraParam->skipFrameCount);
+		}
+		
 		if ($conversionExtraParam && $conversionExtraParam->constantBitrate)
-        {
-            $parameters = $video->addChild('Parameters');
-            $parameter = $parameters->addChild('Parameter');
-            $parameter->addChild('Name', 'mainconcept.bit_rate_mode');
-            $parameter->addChild('Value', 0);
-            $parameter->addChild('Type', 'Long');
-        }
+		{
+			$parameters = $video->addChild('Parameters');
+			$parameter = $parameters->addChild('Parameter');
+			$parameter->addChild('Name', 'mainconcept.bit_rate_mode');
+			$parameter->addChild('Value', 0);
+			$parameter->addChild('Type', 'Long');
+		}
 
 		$audio->addChild('Codec', $audioCodec);
 		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
