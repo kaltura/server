@@ -7,6 +7,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	 */
 	protected $liveStreamConfig;
 	
+	/**
+	 * @var bool
+	 */
+	protected $shouldRedirect = false;
+	
 	function __construct() {
 		parent::__construct();
 		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
@@ -286,8 +291,19 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
 		
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
-		$livePackagerUrl = str_replace("{DC}", "DC-".$serverNode->getDc(), $livePackagerUrl);
+		$livePackagerUrl = str_replace("{DC}", "dc-".$serverNode->getDc(), $livePackagerUrl);
 		$livePackagerUrl = rtrim($livePackagerUrl, "/");
+		
+		if(strpos($livePackagerUrl, "{m}") !== false)
+		{
+			$this->shouldRedirect = true;
+			
+			$hostname = $serverNode->getHostname();
+			if(!$serverNode->getIsExternalMediaServer())
+				$hostname = preg_replace('/\..*$/', '', $hostname);
+			
+			$livePackagerUrl = str_replace("{m}", $hostname, $livePackagerUrl);
+		}
 		
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
 		
@@ -312,6 +328,17 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$token = rtrim(strtr(base64_encode($token), '+/', '-_'), '=');
 		
 		return $token;
+	}
+	
+	protected function getRenderer($flavors)
+	{
+		if($this->shouldRedirect) 
+		{
+			$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+		}
+		
+		$renderer = parent::getRenderer($flavors);
+		return $renderer;
 	}
 }
 

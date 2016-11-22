@@ -22,7 +22,7 @@ class ContentDistributionBatchService extends KalturaBaseService
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::STATUS, EntryDistributionStatus::READY);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::AFTER_SUNSET , Criteria::NOT_EQUAL);
-		$crit1 = $criteria->getNewCriterion(EntryDistributionPeer::SUNSET, time(), Criteria::LESS_THAN);
+		$crit1 = $criteria->getNewCriterion(EntryDistributionPeer::SUNSET, kApiCache::getTime(), Criteria::LESS_THAN);
 		$criteria->add($crit1);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
 		foreach($entryDistributions as $entryDistribution)
@@ -44,7 +44,7 @@ class ContentDistributionBatchService extends KalturaBaseService
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::STATUS, EntryDistributionStatus::QUEUED);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::BEFORE_SUNRISE);
-		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::LESS_THAN);
+		$criteria->add(EntryDistributionPeer::SUNRISE, kApiCache::getTime(), Criteria::LESS_THAN);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
 		foreach($entryDistributions as $entryDistribution)
 		{

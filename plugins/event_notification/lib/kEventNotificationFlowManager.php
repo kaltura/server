@@ -131,7 +131,11 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		$this->notificationTemplates = array();
 		
 		$scope = $event->getScope();
-		if($scope->getPartnerId() <= 0 || !EventNotificationPlugin::isAllowedPartner($scope->getPartnerId()))
+		
+		$partnerId = $scope->getPartnerId();
+		$ksPartnerId = kCurrentContext::$ks_partner_id;
+		
+		if( ($ksPartnerId && $ksPartnerId == Partner::MEDIA_SERVER_PARTNER_ID) || $partnerId <= 0 || !EventNotificationPlugin::isAllowedPartner($partnerId) )
 			return false;
 			
 		$eventType = self::getEventType($event);

@@ -5,7 +5,7 @@
  */
 class KalturaCaptionErrors extends KalturaErrors
 {
-	const CAPTION_ASSET_ALREADY_EXISTS = "ASSET_ID;;PARAM_ID;Caption asset \"@ASSET_ID@\" already exists for params id \"@PARAM_ID@\"";
+	const CAPTION_ASSET_ALREADY_EXISTS = "CAPTION_ASSET_ALREADY_EXISTS;ASSET_ID,PARAM_ID;Caption asset \"@ASSET_ID@\" already exists for params id \"@PARAM_ID@\"";
 	const CAPTION_ASSET_PARAMS_ID_NOT_FOUND = "CAPTION_ASSET_PARAMS_ID_NOT_FOUND;PARAM_ID;Caption params id \"@PARAM_ID@\" not found";
 	const CAPTION_ASSET_ID_NOT_FOUND = "CAPTION_ASSET_ID_NOT_FOUND;ASSET_ID;Caption asset id \"@ASSET_ID@\" not found";
 	const CAPTION_ASSET_IS_NOT_READY = "CAPTION_ASSET_IS_NOT_READY;ASSET_ID;Caption asset \"@ASSET_ID@\" is not ready";

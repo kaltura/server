@@ -408,6 +408,7 @@ class DatesGenerator
 			$this->maxRecurrences = 10;
 		if (!$this->weekStartDay)
 			$this->weekStartDay = 'MO';
+		$this->reOrderDays($this->weekStartDay);
 	}
 
 
@@ -490,21 +491,6 @@ class DatesGenerator
 
 		while(!$limit || $limit > count($dates))
 		{
-			if($this->until && $cal > $this->until)
-			{
-				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed until [" . date('d/n/y G:i:s', $this->until) . "]");
-				break;
-			}
-			if($cal > $periodEnd)
-			{
-				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed period-end [" . date('d/n/y G:i:s', $periodEnd) . "]");
-				break;
-			}
-			if($limit && (count($dates) + $invalidCandidateCount) >= $limit)
-			{
-				$this->log("Count [" . count($dates) . "] passed limit [$limit]");
-				break;
-			}
 			$candidates = $this->getCandidates($cal);
 			foreach($candidates as $candidate)
 			{
@@ -525,6 +511,22 @@ class DatesGenerator
 					}
 				}
 			}
+			if($this->until && $cal > $this->until)
+			{
+				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed until [" . date('d/n/y G:i:s', $this->until) . "]");
+				break;
+			}
+			if($cal > $periodEnd)
+			{
+				$this->log("Calendar [" . date('d/n/y G:i:s', $cal) . "] passed period-end [" . date('d/n/y G:i:s', $periodEnd) . "]");
+				break;
+			}
+			if($limit && (count($dates) + $invalidCandidateCount) >= $limit)
+			{
+				$this->log("Count [" . count($dates) . "] passed limit [$limit]");
+				break;
+			}
+
 
 			// We went through all the candidates, and still need more
 			// Go to the start of the next time period
@@ -848,6 +850,12 @@ class DatesGenerator
 		}
 		$weekDayDates = array();
 		$days = explode(',', $this->byDay);
+
+		$order = $this->dayOrder;
+		usort($days, function ($a, $b) use ($order) {
+			return ($order[$a] - $order[$b]);
+		});
+
 		foreach($dates as $date)
 		{
 			foreach($days as $weekDay)
@@ -880,6 +888,22 @@ class DatesGenerator
 		'FR'=>'Friday',
 		'SA'=>'Saturday'
 	);
+
+	private $dayOrder = array(
+		'SU'=>0,
+		'MO'=>1,
+		'TU'=>2,
+		'WE'=>3,
+		'TH'=>4,
+		'FR'=>5,
+		'SA'=>6
+	);
+
+	private function reOrderDays($first) {
+		$diff = $this->dayOrder[$first];
+		foreach ($this->dayOrder as $key => $value)
+			$this->dayOrder[$key] = ($value - $diff + 7) % 7;
+	}
 
 	private function getDayName($day){
 		if (strlen($day) > 2) {

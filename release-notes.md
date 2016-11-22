@@ -1,3 +1,39 @@
+# Lynx 12.6.0 #
+
+## Allow entryServerNode get and list actions for partners ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6234
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+Add additional permissions to liveEntryServerNode service: 	
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_11_21_entry_server_node_allow_partner_list.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## CategoryEntry - new column ##
+
+- Issue type: Task
+- Issue ID - PS-2666
+
+### Configuration ###
+
+None.
+
+### Deployment Scripts ###
+
+Add a new column to the category_entry table:
+
+			mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_11_11_alter_category_entry_table_add_creator_kuser_id_table.sql
+
 # Lynx 12.5.0 #
 
 ## CaptionAssetItem - remove column - int_id ##
