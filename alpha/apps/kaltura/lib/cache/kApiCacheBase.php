@@ -304,9 +304,9 @@ class kApiCacheBase
 	/**
 	 * @return int
 	 */
-	public static function getTime()
+	public static function getTime($expiry = 600)
 	{
-		self::setConditionalCacheExpiry(600);
+		self::setConditionalCacheExpiry($expiry);
 		return time();
 	}
 
