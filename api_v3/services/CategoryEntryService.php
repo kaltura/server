@@ -312,6 +312,12 @@ class CategoryEntryService extends KalturaBaseService
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
+					
+			if ($this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_DISABLE_CATEGORY_MODERATION_AUTO_APPROVE) &&
+				$categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId())
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
+			}
 		}
 			
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
@@ -354,6 +360,12 @@ class CategoryEntryService extends KalturaBaseService
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
+					
+			if ($this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_DISABLE_CATEGORY_MODERATION_AUTO_APPROVE) &&
+				$categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId())
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
+			}
 		}
 			
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
