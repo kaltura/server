@@ -50,7 +50,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if (!isset($entry))
 		{
 			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
-			return;
+			return $dbBatchJob;
 		}
 		self::copyCuePointsFromLiveToVodEntry($entry->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $amfArray);
 	}
@@ -60,7 +60,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if (!$dbBatchJob->getParentJob() || !$dbBatchJob->getParentJob()->getData())
 		{
 			KalturaLog::warning("failed to get parent job data, not calling copyCuePointsFromLiveToVodEntry");
-			return;
+			return $dbBatchJob;
 		}
 		$convertJobData = ($dbBatchJob->getParentJob()->getData());
 
@@ -89,7 +89,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if (!isset($entry))
 		{
 			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
-			return;
+			return $dbBatchJob;
 		}
 
 		self::copyCuePointsFromLiveToVodEntry( $entry->getRecordedEntryId(), $data->getConcatenatedDuration(), $segmentDuration, $amfArray);
@@ -150,7 +150,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			
 			//get last cue points sync, to avoid two sequential jobs working on the same cue points  
 			$lastCuePointSyncTime = self::getLatestCuePointSyncTime($liveEntryId, reset($syncPointIntoToAmfArr), $lastSegmentDuration, $segmentDrift);
-			KalturaLog::debug("Testing:: lastCuePointSyncTime value is [$lastCuePointSyncTime]");
 			
 			$liveToVodJobData = new kLiveToVodJobData();
 			$liveToVodJobData->setLiveEntryId($liveEntryId);
@@ -235,20 +234,20 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$lastCuePointSyncTime = $liveEntry->getLastCuePointSyncTime();
 		if($lastCuePointSyncTime)
 		{
-			KalturaLog::debug("LastCuePointSyncTime found with value [$lastCuePointSyncTime], calculating new one");
-			
 			$currentCuePointSyncTime = (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
 			$liveEntry->setLastCuePointSyncTime($currentCuePointSyncTime);
 			$liveEntry->save();
+			KalturaLog::debug("LastCuePointSyncTime found with value [$lastCuePointSyncTime], new one is set to [$currentCuePointSyncTime]");
 			return $lastCuePointSyncTime;	
 		}
 		else
 		{
-			KalturaLog::debug("First live to vod iteration, returning 0");
-			$lastCuePointSyncTime =  (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
-			$liveEntry->setLastCuePointSyncTime($lastCuePointSyncTime);
+			$lastCuePointSyncTime = $liveEntry->getCreatedAt(null);
+			$currentCuePointSyncTime =  (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
+			$liveEntry->setLastCuePointSyncTime($currentCuePointSyncTime);
 			$liveEntry->save();
-			return $liveEntry->getCreatedAt(null);
+			KalturaLog::debug("First live to vod iteration, returning live entries creation time [$lastCuePointSyncTime], new one is set to [$currentCuePointSyncTime] ");
+			return $lastCuePointSyncTime;
 		}
 	}
 
