@@ -149,14 +149,14 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		{
 			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol());
 		
-			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, null, false);
+			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
 			if ($delivery)
 				return $delivery;
 			
 			// if a delivery profile wasn't found try again without forcing the request protocol  
 			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol() == 'http' ? 'https' : 'http');
 		}
-		return self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, null, false);	
+		return self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);	
 	}
 	
 	/**
