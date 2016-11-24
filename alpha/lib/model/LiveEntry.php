@@ -149,7 +149,19 @@ abstract class LiveEntry extends entry
 	{
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
-			
+		
+		//When working with Kaltura live recording the recorded entry is playable immediately after the first duration reporting
+		//Check the entry is no the replacement one to avoid marking replacement recorded entries as Ready before all conversion are done 
+		if($this->isColumnModified(entryPeer::LENGTH_IN_MSECS) && $this->getLengthInMsecs() > 0 && $this->getRecordStatus() !== RecordStatus::DISABLED && $this->getRecordedEntryId())
+		{
+			$recordedEntry = entryPeer::retrieveByPK($this->getRecordedEntryId());
+			if($recordedEntry && $recordedEntry->getStatus() !== entryStatus::READY)
+			{
+				$recordedEntry->setStatus(entryStatus::READY);
+				$recordedEntry->save();
+			}
+		}
+		
 		if((!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS])) || $this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID))
 		{
 			$this->decidingLiveProfile = true;

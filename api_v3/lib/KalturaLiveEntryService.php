@@ -318,7 +318,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
-			$recordedEntry->setStatus(entryStatus::PENDING);
+			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
@@ -445,11 +445,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if(!$recordedEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbLiveEntry->getRecordedEntryId());
 		
-		$recordingDuration = (int)($duration * 1000);
-		$dbLiveEntry->setLengthInMsecs($recordingDuration);
+		$totalDuration = (int)($duration * 1000);
+		$dbLiveEntry->setLengthInMsecs($totalDuration);
 		$dbLiveEntry->save();
 		
-		//Add content is not being called to not change vod entry status and avoid error in playback
 		$service = new MediaService();
 		$service->initService('media', 'media', 'updateContent');
 		$service->updateContentAction($recordedEntry->getId(), $resource);
