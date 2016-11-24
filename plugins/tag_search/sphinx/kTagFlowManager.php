@@ -246,6 +246,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	        	$missingPrivacyContexts = array_diff($privacyContexts, $foundPrivacyContexts);
 	        	if (!is_null($missingPrivacyContexts) && count($missingPrivacyContexts))
 	        	{
+			        $missingPrivacyContexts = $missingPrivacyContexts ? $missingPrivacyContexts : array(self::NULL_PC);
 	        		$tagsToAdd [$tag] = $missingPrivacyContexts;
 	        	}
 	        }
