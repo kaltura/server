@@ -246,6 +246,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	        	$missingPrivacyContexts = array_diff($privacyContexts, $foundPrivacyContexts);
 	        	if (!is_null($missingPrivacyContexts) && count($missingPrivacyContexts))
 	        	{
+			        $missingPrivacyContexts = $missingPrivacyContexts ? $missingPrivacyContexts : array(self::NULL_PC);
 	        		$tagsToAdd [$tag] = $missingPrivacyContexts;
 	        	}
 	        }
@@ -308,7 +309,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    	        $tag->setTag(trim($tagToAdd));
 	    	        $tag->setObjectType($objectType);
 	    	        $tag->setPartnerId($partnerId);
-	    	        $tag->setPrivacyContext($privacyContext);
+			        $tag->setPrivacyContext($privacyContext ? $privacyContext : self::NULL_PC);
 	    	        $tag->save();
 		        }
 	    	}
