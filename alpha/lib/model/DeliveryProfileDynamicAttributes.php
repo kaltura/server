@@ -100,7 +100,7 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var string
 	 */
-	protected $mediaProtocol = PlaybackProtocol::HTTP;
+	protected $mediaProtocol = infraRequestUtils::PROTOCOL_HTTP;
 	
 	/**
 	 * @var boolean
