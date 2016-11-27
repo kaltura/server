@@ -1991,12 +1991,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$override = new stdClass();
 			if($obj->getType()!='audio')
 				continue;
-			if($obj->getTrackIndex()) $override->id = $obj->getTrackIndex();
+			if($obj->getTrackIndex()!==null) 	$override->id = $obj->getTrackIndex();
 			else continue;
-			if($obj->getChannelLayout()) $override->audioChannelLayout = $obj->getChannelLayout();
-			if($obj->getChannelIndex()) $override->audioChannelIndex = $obj->getChannelIndex();
-			if($obj->getLanguage()) $override->audioLanguage = $obj->getLanguage();
-			if($obj->getLabel()) $override->audioLabel = $obj->getLabel();
+			if($obj->getChannelLayout()!==null) 	$override->audioChannelLayout = $obj->getChannelLayout();
+			if($obj->getChannelIndex()!==null) 	$override->audioChannelIndex = $obj->getChannelIndex();
+			if($obj->getLanguage()!==null) 		$override->audioLanguage = $obj->getLanguage();
+			if($obj->getLabel()!==null) 		$override->audioLabel = $obj->getLabel();
 			$overrides[] = $override;
 		}
 
