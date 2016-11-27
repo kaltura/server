@@ -103,14 +103,15 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		KBatchBase::$kClient->doMultiRequest();
 	}
 
-	private static function getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime)
+	private static function getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime = null)
 	{
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
 		$filter->statusIn = CuePointStatus::READY;
 		$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb,annotation.Annotation';
 		$filter->createdAtLessThanOrEqual = $currentSegmentEndTime;
-		$filter->createdAtGreaterThanOrEqual = $lastCuePointSyncTime;
+		if($lastCuePointSyncTime)
+			$filter->createdAtGreaterThanOrEqual = $lastCuePointSyncTime;
 		return $filter;
 	}
 
