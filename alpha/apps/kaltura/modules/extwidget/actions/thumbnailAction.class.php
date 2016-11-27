@@ -41,7 +41,8 @@ class thumbnailAction extends sfAction
 			
 		return min($max, $val);
 	}
-
+  
+  
 	/**
 	 * Will forward to the regular swf player according to the widget_id
 	 */
