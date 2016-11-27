@@ -249,7 +249,7 @@ abstract class kManifestRenderer
 
 	protected static function generateSessionId()
 	{
-		return infraRequestUtils::getRemoteAddress(). '_' .((float) mt_rand() / (float) mt_getrandmax());
+		return mt_rand();
 	}
 }
 
