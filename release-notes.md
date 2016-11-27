@@ -1,5 +1,28 @@
 # Lynx 12.6.0 #
 
+## support for Kaltura liveRecording - Full Live to Vod flow ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5807
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+Add live flavor params tag to include hls required tags:
+
+	php /opt/kaltura/app/deployment/updates/scripts/2016_10_30_update_live_flavor_tags.php
+
+Add new permissions to mediaServer partner for media->update:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_11_22_media_server_media_update.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## Ad cue points http notifications ##
 
  - Issue Type: New Feature
