@@ -41,8 +41,7 @@ class thumbnailAction extends sfAction
 			
 		return min($max, $val);
 	}
-  
-  
+
 	/**
 	 * Will forward to the regular swf player according to the widget_id
 	 */
@@ -477,8 +476,9 @@ class thumbnailAction extends sfAction
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
 
-		$lastModified = $entry->getAssetCacheTime();
-		
+		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
+		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt() : null;
+
 		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified);
 		$renderer->partnerId = $entry->getPartnerId();
 		

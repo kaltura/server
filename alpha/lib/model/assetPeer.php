@@ -662,6 +662,16 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		
 		return self::doSelect($c);
 	}
+
+	public static function retrieveLastModifiedFlavorByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::TYPE, assetType::FLAVOR, Criteria::EQUAL);
+		$c->addDescendingOrderByColumn(assetPeer::UPDATED_AT);
+
+		return self::doSelectOne($c);
+	}
 	
 	public static function getAtomicColumns()
 	{
