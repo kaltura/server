@@ -19,7 +19,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		KalturaLog::debug("Testing inside updatedJob with dbBatchJob type: [{$dbBatchJob->getJobType()}] and for entry [{$dbBatchJob->getEntryId()}]");
 		if ($dbBatchJob->getJobType() == BatchJobType::CONCAT)
 		{
 			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
@@ -103,8 +102,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			KalturaLog::warning("Failed to get entry [{$dbBatchJob->getEntryId()}], not calling copyCuePointsFromLiveToVodEntry");
 			return $dbBatchJob;
 		}
-		
-		KalturaLog::debug("Testing:: inside extract media closed with status finished");
 		
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $data->getDestDataFilePath())
 		{
