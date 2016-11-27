@@ -6,6 +6,7 @@
 class KalturaLiveEntryServerNode extends KalturaEntryServerNode 
 {
 	const MAX_BITRATE_PERCENTAGE_DIFF_ALLOWED = 10;
+	const MAX_FRAMERATE_PERCENTAGE_DIFF_ALLOWED = 15;
 	
 	/**
 	 * parameters of the stream we got
@@ -54,19 +55,23 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	private function clearInputStreamInfoIfoNotChanged($dbStreams, $inputStreamInfo)
 	{
 		$clearInputStreamInfo = true;
-		$dbStreamsBitrateInfo = $this->buildStreamInfoKeyValueArray($dbStreams);
-		$inputStreamsBitarteInfo = $this->buildStreamInfoKeyValueArray($inputStreamInfo);
+		$dbStreamsInfo = $this->buildStreamInfoKeyValueArray($dbStreams);
+		$inputStreamsInfo = $this->buildStreamInfoKeyValueArray($inputStreamInfo);
 		
-		foreach ($inputStreamsBitarteInfo as $flavorId => $inputBitarte)
+		foreach ($inputStreamsInfo as $flavorId => $flavorInfo)
 		{
-			if(!isset($dbStreamsBitrateInfo[$flavorId]))
+			$dbStreamInfo = $dbStreamsInfo[$flavorId] ? $dbStreamsInfo[$flavorId] : null;
+			/* @var $dbStreamInfo kLiveStreamParams */
+			/* @var $flavorInfo kLiveStreamParams */
+			if(!$dbStreamInfo)
 			{
 				$clearInputStreamInfo = false;
 				break;
 			}
 		
-			$precentageDiff = $this->getBitaretPercentageDiff($inputBitarte, $dbStreamsBitrateInfo[$flavorId]);
-			if($precentageDiff > self::MAX_BITRATE_PERCENTAGE_DIFF_ALLOWED)
+			$bitratePrecentageDiff = $this->getPercentageDiff($flavorInfo->getBitrate(), $dbStreamInfo->getBitrate());
+			$frameRatePrecentageDiff = $this->getPercentageDiff($flavorInfo->getFrameRate(), $dbStreamInfo->getFrameRate());
+			if($bitratePrecentageDiff > self::MAX_BITRATE_PERCENTAGE_DIFF_ALLOWED || $frameRatePrecentageDiff > self::MAX_FRAMERATE_PERCENTAGE_DIFF_ALLOWED)
 			{
 				$clearInputStreamInfo = false;
 				break;
@@ -77,9 +82,9 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 			$this->streams = null;
 	}
 	
-	private function getBitaretPercentageDiff($inputBitarte, $dbBitarte)
+	private function getPercentageDiff($newValue, $oldValue)
 	{
-		$percentChange = (1 - $dbBitarte/$inputBitarte) * 100;
+		$percentChange = (1 - $oldValue/$newValue) * 100;
 		return abs(round($percentChange, 0));
 	}
 	
@@ -89,9 +94,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 		foreach($streamInfo as $info)
 		{
 			/* @var $info kLiveStreamParams */
-			$bitrate = $info->getBitrate();
-			$flavorId = $info->getFlavorId();
-			$result[$flavorId] = $bitrate;
+			$result[$info->getFlavorId()] = $info;
 		}
 		
 		return $result;

@@ -210,4 +210,14 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	public function setBulkUploadId ( $bulkUploadId )	{		$this->putInCustomData ( "bulk_upload_id" , $bulkUploadId );	}
 	public function getBulkUploadId (  )	{		return $this->getFromCustomData( "bulk_upload_id" );	}
 	
+	public function getCreatorPuserId () 
+	{
+		return $this->getFromCustomData('creatorPuserId');
+	}
+	
+	public function setCreatorPuserId ($v)
+	{
+		$this->putInCustomData('creatorPuserId', $v);
+	}
+	
 } // categoryEntry

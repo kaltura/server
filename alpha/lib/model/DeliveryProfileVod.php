@@ -21,7 +21,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 
 	protected  function generatePlayServerUrl()
 	{
-		$prefix = '/usePlayServer/1';
+		$prefix = '';
 		if($this->getDynamicAttributes()->getUiConfId())
 			$prefix .= '/uiConfId/'.$this->getDynamicAttributes()->getUiConfId();
 

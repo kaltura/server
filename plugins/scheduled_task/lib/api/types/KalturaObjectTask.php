@@ -64,6 +64,8 @@ abstract class KalturaObjectTask extends KalturaObject
 				return new KalturaDeleteLocalContentObjectTask();
 			case ObjectTaskType::STORAGE_EXPORT:
 				return new KalturaStorageExportObjectTask();
+			case ObjectTaskType::MODIFY_ENTRY:
+				return new KalturaModifyEntryObjectTask();
 			default:
 				return KalturaPluginManager::loadObject('KalturaObjectTask', $dbObject->getType());
 		}

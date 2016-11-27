@@ -6,6 +6,7 @@
  */
 class ContentDistributionBatchService extends KalturaBaseService
 {
+	const FIVE_MINUTES_IN_SECONDS = 300;
 
 // --------------------------------- Distribution Synchronizer functions 	--------------------------------- //
 
@@ -16,6 +17,8 @@ class ContentDistributionBatchService extends KalturaBaseService
 	 */
 	function updateSunStatusAction()
 	{
+		kApiCache::setConditionalCacheExpiry(self::FIVE_MINUTES_IN_SECONDS);
+
 		$updatedEntries = array();
 		
 		// serach all records that their sun status changed to after sunset

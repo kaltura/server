@@ -33,6 +33,16 @@ class kLiveStreamParams
 	 * @var string
 	 */
 	protected $codec;
+	
+	/**
+	 * @var int
+	 */
+	protected $frameRate;
+	
+	/**
+	 * @var float
+	 */
+	protected $keyFrameInterval;
 
 	/**
 	 * @return the $bitrate
@@ -82,4 +92,24 @@ class kLiveStreamParams
 	 * @param string $codec
 	 */
 	public function setCodec($codec) { $this->codec = $codec; }
+	
+	/**
+	 * @return the $frameRate
+	 */
+	public function getFrameRate() { return $this->frameRate; }
+	
+	/**
+	 * @param int $frameRate
+	 */
+	public function setFrameRate($frameRate) { $this->frameRate = $frameRate; }
+	
+	/**
+	 * @return the $keyFrameInterval
+	 */
+	public function getKeyFrameInterval() { return $this->keyFrameInterval; }
+	
+	/**
+	 * @param float $keyFrameInterval
+	 */
+	public function setKeyFrameInterval($keyFrameInterval) { $this->keyFrameInterval = $keyFrameInterval; }
 }
