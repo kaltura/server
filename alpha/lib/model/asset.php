@@ -264,17 +264,9 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		return $ret;
 	}
 
-	/**
-	 * Notify the associated entry that an asset was modified
-	 */	
 	protected function onAssetContentModified()
 	{
-		$entry = $this->getentry();
-		if($entry)
-		{
-			$entry->onAssetContentModified();
-			$entry->save();
-		}
+
 	}
 		
 	public function incrementVersion()

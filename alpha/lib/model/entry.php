@@ -1037,15 +1037,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getAssetCacheTime()			{ return $this->getFromCustomData( "assetCacheTime", null, null ); }
 	
 	protected function setAssetCacheTime( $v )	{ $this->putInCustomData( "assetCacheTime" , $v ); }
-	
-	/**
-	 * This function is used for updates on the entry when assets content is modified
-	 */
-	public function onAssetContentModified()
-	{
 
-	}
-	
 	public function getThumbnail()
 	{
 		$thumbnail = parent::getThumbnail();
