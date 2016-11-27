@@ -1,5 +1,17 @@
 # Lynx 12.6.0 #
 
+## Ad cue points http notifications ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6235
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/adCuePointHttpNotification.xml
+
 ## Allow entryServerNode get and list actions for partners ##
 
  - Issue Type: Task
