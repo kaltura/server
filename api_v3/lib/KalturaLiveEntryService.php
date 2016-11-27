@@ -231,6 +231,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 					$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
 					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbLiveEntry->getCurrentBroadcastStartTime();
 
+					KalturaLog::debug("isNewSession [$isNewSession] getLastBroadcastEndTime [{$dbLiveEntry->getLastBroadcastEndTime()}] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
+					KalturaLog::debug("recordedEntryCreationTime [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]"); 
 					if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
 						if ($isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
 						{
@@ -285,7 +287,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			return;
 		}
-	
+			
 		// If while we were waiting for the lock, someone has updated the recorded entry id - we should use it.
 		$dbEntry->reload();
 		if(($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId())) {
@@ -443,25 +445,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if(!$recordedEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbLiveEntry->getRecordedEntryId());
 		
-		$recordingDuration = (int)($duration * 1000);
-		
-		$recordedEntry->setLengthInMsecs($recordingDuration);
-		$recordedEntry->save();
-		
-		$dbLiveEntry->setLengthInMsecs($recordingDuration);
+		$totalDuration = (int)($duration * 1000);
+		$dbLiveEntry->setLengthInMsecs($totalDuration);
 		$dbLiveEntry->save();
 		
 		$service = new MediaService();
-		if($recordedEntry->getStatus() == entryStatus::PENDING)
-		{
-			$service->initService('media', 'media', 'addContent');
-			$service->addContentAction($recordedEntry->getId(), $resource);	
-		}
-		else
-		{
-			$service->initService('media', 'media', 'updateContent');
-			$service->updateContentAction($recordedEntry->getId(), $resource);
-		}
+		$service->initService('media', 'media', 'updateContent');
+		$service->updateContentAction($recordedEntry->getId(), $resource);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
 		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());

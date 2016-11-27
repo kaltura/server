@@ -45,10 +45,10 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	{
 		$amfArray = json_decode($data->amfArray);
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
-		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration);
+		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift);
 		self::normalizeAMFTimes($amfArray, $data->totalVodDuration, $data->lastSegmentDuration);
 
-		$totalCount = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime);
+		$totalCount = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime, $data->lastCuePointSyncTime);
 		if ($totalCount == 0)
 			return $this->closeJob($job, null, null, "No cue point to copy", KalturaBatchJobStatus::FINISHED);
 		else
@@ -57,7 +57,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		do
 		{
 			$copiedCuePointIds = array();
-			$liveCuePointsToCopy = self::getCuePointListForEntry($data->liveEntryId, $currentSegmentEndTime);
+			$liveCuePointsToCopy = self::getCuePointListForEntry($data->liveEntryId, $currentSegmentEndTime, $data->lastCuePointSyncTime);
 			if (count($liveCuePointsToCopy) == 0)
 				break;
 
@@ -103,26 +103,27 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		KBatchBase::$kClient->doMultiRequest();
 	}
 
-	private static function getCuePointFilter($entryId, $currentSegmentEndTime)
+	private static function getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime = null)
 	{
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
 		$filter->statusIn = CuePointStatus::READY;
-		//$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb';
 		$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb,annotation.Annotation';
 		$filter->createdAtLessThanOrEqual = $currentSegmentEndTime;
+		if($lastCuePointSyncTime)
+			$filter->createdAtGreaterThanOrEqual = $lastCuePointSyncTime;
 		return $filter;
 	}
 
-	private static function getCuePointCount($entryId, $currentSegmentEndTime)
+	private static function getCuePointCount($entryId, $currentSegmentEndTime, $lastCuePointSyncTime)
 	{
-		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime);
+		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime);
 		return KBatchBase::$kClient->cuePoint->count($filter);
 	}
 
-	private static function getCuePointListForEntry($entryId, $currentSegmentEndTime)
+	private static function getCuePointListForEntry($entryId, $currentSegmentEndTime, $lastCuePointSyncTime)
 	{
-		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime);
+		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime);
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::MAX_CUE_POINTS_TO_COPY_TO_VOD;
 		$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);

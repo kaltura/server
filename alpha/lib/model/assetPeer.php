@@ -663,6 +663,19 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		return self::doSelect($c);
 	}
 	
+	public static function retrieveFlavorsByEntryIdAndStatusIn($entryId, array $statusIn = array())
+	{
+		if(!count($statusIn))
+			return array();
+		
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, $statusIn, Criteria::IN);
+		$c->add(assetPeer::TYPE, assetType::FLAVOR);
+		
+		return self::doSelect($c);
+	}
+	
 	public static function getAtomicColumns()
 	{
 		return array(assetPeer::STATUS);

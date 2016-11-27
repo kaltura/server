@@ -2738,7 +2738,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 // ----------- Extra object connections ----------------
 
-	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postUpdate()
 	 */

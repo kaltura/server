@@ -87,6 +87,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobType::INDEX => 'Index',
 		BatchJobType::COPY => 'Copy',
 		BatchJobType::MOVE_CATEGORY_ENTRIES => 'Move Category Entries',
+		BatchJobType::LIVE_TO_VOD => "Live To Vod",
 	);
 	
 	private static $BATCHJOB_STATUS_NAMES = array(

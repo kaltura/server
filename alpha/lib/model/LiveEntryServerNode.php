@@ -58,8 +58,9 @@ class LiveEntryServerNode extends EntryServerNode
 				if(!count($playableServerNodes))
 				{
 					$liveEntry->unsetMediaServer();
-					$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 				}
+				
+				$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			}
 			
 			if(!$liveEntry->getCurrentBroadcastStartTime() && $this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
@@ -166,7 +167,7 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = $entry ? $entry : entryPeer::retrieveByPK($this->getEntryId());
 		if(!$liveEntry)
 		{
-			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
+			KalturaLog::debug("Entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
 			$this->delete();
 			return;
 		}
@@ -178,14 +179,14 @@ class LiveEntryServerNode extends EntryServerNode
 			$recordedEntry = $recordedEntryId ? entryPeer::retrieveByPK($recordedEntryId) : null;
 			if(!$recordedEntry)
 			{
-				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
+				KalturaLog::debug("Recorded entry with id [{$this->getEntryId()}] not found, clearing entry server node from db");
 				$this->delete();
 				return;
 			}
 			
-			if($recordedEntry && $recordedEntry->getStatus() === entryStatus::READY)
+			if(!myEntryUtils::shouldServeVodFromLive($recordedEntry))
 			{
-				KalturaLog::err("Recorded entry with id [{$this->getEntryId()}] found and ready, clearing entry server node from db");
+				KalturaLog::debug("Recorded entry with id [{$this->getEntryId()}] found and ready or recorded is of old source type, clearing entry server node from db");
 				$this->delete();
 				return;
 			}

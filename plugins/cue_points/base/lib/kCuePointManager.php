@@ -4,7 +4,6 @@ class KAMFData
 {
 	public $pts;
 	public $ts;
-
 };
 
 /**
@@ -20,11 +19,17 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONCAT){
+		if ($dbBatchJob->getJobType() == BatchJobType::CONCAT)
+		{
 			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
 		}
-		else if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONVERT_LIVE_SEGMENT) {
+		else if ($dbBatchJob->getJobType() == BatchJobType::CONVERT_LIVE_SEGMENT) 
+		{
 			self::handleConvertLiveSegmentJobFinished($dbBatchJob, $dbBatchJob->getData());
+		}
+		else if($dbBatchJob->getJobType() == BatchJobType::EXTRACT_MEDIA && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+		{
+			self::handleExtractMediaFinished($dbBatchJob, $dbBatchJob->getData());
 		}
 		return true;
 	}
@@ -44,7 +49,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if (!isset($entry))
 		{
 			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
-			return;
+			return $dbBatchJob;
 		}
 		self::copyCuePointsFromLiveToVodEntry($entry->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $amfArray);
 	}
@@ -54,7 +59,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if (!$dbBatchJob->getParentJob() || !$dbBatchJob->getParentJob()->getData())
 		{
 			KalturaLog::warning("failed to get parent job data, not calling copyCuePointsFromLiveToVodEntry");
-			return;
+			return $dbBatchJob;
 		}
 		$convertJobData = ($dbBatchJob->getParentJob()->getData());
 
@@ -66,7 +71,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		foreach($files as $file){
 			KalturaLog::debug('file is: ' . $file);
 
-			if (self::getSegmentIndexFromFileName($file) <= $lastFileIndex){
+			if (self::getSegmentIndexFromFileName($file) <= $lastFileIndex)
+			{
 				$arr = unserialize(file_get_contents($files[0]));
 				$currentSegmentDuration = $arr[0];
 				array_shift($arr);
@@ -82,12 +88,120 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if (!isset($entry))
 		{
 			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
-			return;
+			return $dbBatchJob;
 		}
 
 		self::copyCuePointsFromLiveToVodEntry( $entry->getRecordedEntryId(), $data->getConcatenatedDuration(), $segmentDuration, $amfArray);
 	}
 
+	private function handleExtractMediaFinished(BatchJob $dbBatchJob, kExtractMediaJobData $data)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		if(!$entry)
+		{
+			KalturaLog::warning("Failed to get entry [{$dbBatchJob->getEntryId()}], not calling copyCuePointsFromLiveToVodEntry");
+			return $dbBatchJob;
+		}
+		
+		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $data->getDestDataFilePath())
+		{
+			$replacedEntry = $entry->getReplacedEntryId() ? entryPeer::retrieveByPK($entry->getReplacedEntryId()) : null;
+			$liveEntryId = $replacedEntry ? $replacedEntry->getRootEntryId() : $entry->getRootEntryId();
+			$vodEntryId = $replacedEntry ? $replacedEntry->getId() : $entry->getId();
+			$lastSegmentDuration = $replacedEntry ? $entry->getLengthInMsecs() - $replacedEntry->getLengthInMsecs() : $entry->getLengthInMsecs();
+			$totalVodDuration = $entry->getLengthInMsecs();
+			
+			$rawSyncPointDataPath = $data->getDestDataFilePath();
+			if(!$rawSyncPointDataPath)
+			{
+				KalturaLog::debug("SyncPoint data file pat not found, copy live to vod will not execute");
+				return $dbBatchJob;
+			}
+			
+			$rawSyncPointInfo = file_get_contents($rawSyncPointDataPath);
+			if($rawSyncPointInfo == '')
+			{
+				KalturaLog::debug("Failed to read sync point info from file [$rawSyncPointDataPath], copy live to vod will not execute");
+				return $dbBatchJob;
+			}
+			
+			$syncPointInfoArr = unserialize($rawSyncPointInfo);
+			$syncPointIntoToAmfArr = array();
+			foreach($syncPointInfoArr as $syncPoint)
+			{
+				$amfParts = explode(';', $syncPoint);
+				$curr = new KAMFData();
+				$curr->pts = $amfParts[0];
+				$curr->ts = $amfParts[1];
+				array_push($syncPointIntoToAmfArr, $curr);
+			}
+			
+			$segmentDrift = 0;
+			$syncPointIntoToAmfArr = self::getCurrentSessionSyncPointInfo($syncPointIntoToAmfArr, $totalVodDuration, $lastSegmentDuration);
+			if(count($syncPointIntoToAmfArr) > 1)
+			{
+				$firstAmf = reset($syncPointIntoToAmfArr);
+				$lastAmf = end($syncPointIntoToAmfArr);
+				$segmentDrift = ($lastAmf->ts - $firstAmf->ts) - ($lastAmf->pts - $firstAmf->pts);
+			}
+			
+			//get last cue points sync, to avoid two sequential jobs working on the same cue points  
+			$lastCuePointSyncTime = self::getLatestCuePointSyncTime($liveEntryId, reset($syncPointIntoToAmfArr), $lastSegmentDuration, $segmentDrift);
+			
+			$liveToVodJobData = new kLiveToVodJobData();
+			$liveToVodJobData->setLiveEntryId($liveEntryId);
+			$liveToVodJobData->setLastSegmentDuration($lastSegmentDuration);
+			$liveToVodJobData->setTotalVodDuration($totalVodDuration);
+			$liveToVodJobData->setVodEntryId($vodEntryId);
+			$liveToVodJobData->setLastCuePointSyncTime($lastCuePointSyncTime);
+			$liveToVodJobData->setLastSegmentDrift($segmentDrift);
+			$liveToVodJobData->setAmfArray(json_encode($syncPointIntoToAmfArr));
+			
+			$liveToVodBatchJob = new BatchJob();
+			$liveToVodBatchJob->setEntryId($entry->getId());
+			$liveToVodBatchJob->setPartnerId($entry->getPartnerId());
+			
+			kJobsManager::addJob($liveToVodBatchJob, $liveToVodJobData, BatchJobType::LIVE_TO_VOD);
+		}
+	}
+	
+	private static function getCurrentSessionSyncPointInfo($syncPointIntoToAmfArr, $totalVodDuration, $lastSegmentDuration)
+	{
+		$currentSessionAmfArr = array();
+		
+		$closest = self::getClosestSyncPointPts($totalVodDuration - $lastSegmentDuration, $syncPointIntoToAmfArr);
+		if(!$closest)
+		{
+			KalturaLog::debug("Closest pts not found for current segment");
+			return $syncPointIntoToAmfArr;
+		}
+		
+		foreach($syncPointIntoToAmfArr as $amf)
+		{
+			if($amf->pts < $closest)
+				continue;
+			
+			$amf->pts = $amf->pts - $totalVodDuration + $lastSegmentDuration;
+			$currentSessionAmfArr[] = $amf;
+		}
+		
+		return $currentSessionAmfArr;
+	}
+	
+	private static function getClosestSyncPointPts($pts, $amfArr) 
+	{
+		$closest = null;
+		
+		foreach ($amfArr as $item) 
+		{
+			if ($closest === null || abs($pts - $closest->pts) > abs($item->pts - $pts)) 
+			{
+				$closest = $item;
+			}
+		}
+		
+		return $closest->pts;
+	}
 
 	// Get an array of strings of the form pts;ts and return an array of KAMFData
 	private static function parseAmfArrayAndShift($amfArray, $shift){
@@ -103,6 +217,35 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			array_push($retArr, $amf);
 		}
 		return $retArr;
+	}
+	
+	private static function getLatestCuePointSyncTime($liveEntryId, $syncPoint, $lastSegmentDuration, $segmentDrift)
+	{
+		$liveEntry = entryPeer::retrieveByPK($liveEntryId);
+		if(!$liveEntry)
+		{
+			KalturaLog::debug("Live entry with id [$liveEntryId] not found, this should not happen, sync time is 0");
+			return 0;
+		}
+		
+		$lastCuePointSyncTime = $liveEntry->getLastCuePointSyncTime();
+		if($lastCuePointSyncTime)
+		{
+			$currentCuePointSyncTime = (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
+			$liveEntry->setLastCuePointSyncTime($currentCuePointSyncTime);
+			$liveEntry->save();
+			KalturaLog::debug("LastCuePointSyncTime found with value [$lastCuePointSyncTime], new one is set to [$currentCuePointSyncTime]");
+			return $lastCuePointSyncTime;	
+		}
+		else
+		{
+			$lastCuePointSyncTime = $liveEntry->getCreatedAt(null);
+			$currentCuePointSyncTime =  (($syncPoint->ts - $syncPoint->pts) + $lastSegmentDuration + $segmentDrift) / 1000;
+			$liveEntry->setLastCuePointSyncTime($currentCuePointSyncTime);
+			$liveEntry->save();
+			KalturaLog::debug("First live to vod iteration, returning live entries creation time [$lastCuePointSyncTime], new one is set to [$currentCuePointSyncTime] ");
+			return $lastCuePointSyncTime;
+		}
 	}
 
 	private function getAssetDataFilesArray(kConvertLiveSegmentJobData $data){
@@ -130,20 +273,23 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$data = $dbBatchJob->getData();
 
 		// copy cue points only if it's the first file and this is the primary server
-		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
-			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
-			$data->getFileIndex() == 0 &&
-			$data->getMediaServerIndex() == EntryServerNodeType::LIVE_PRIMARY){
+		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
+			$data->getFileIndex() == 0 && $data->getMediaServerIndex() == EntryServerNodeType::LIVE_PRIMARY)
+		{
 			$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 				return true;
 		}
-
-		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+		{
 			$convertLiveSegmentJobData = $dbBatchJob->getParentJob()->getData();
 			$asset = assetPeer::retrieveByIdNoFilter($convertLiveSegmentJobData->getAssetId());
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 				return true;
+		}
+		elseif ($jobType == BatchJobType::EXTRACT_MEDIA && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+		{
+			return true;
 		}
 
 		return false;
@@ -753,7 +899,11 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$jobData->setTotalVodDuration($totalVODDuration);
 		$jobData->setLastSegmentDuration($lastSegmentDuration);
 		$jobData->setAmfArray(json_encode($amfArray));
+		
 		$batchJob = new BatchJob();
+		$batchJob->setEntryId($vodEntryId);
+		$batchJob->setPartnerId($vodEntry->getPartnerId());
+		
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
 		return;
  	}

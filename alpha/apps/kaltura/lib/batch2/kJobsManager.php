@@ -1534,6 +1534,12 @@ class kJobsManager
 		$srcFileSyncDescriptor->setFileSyncLocalPath($inputFileSyncLocalPath);
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
+		$extractMediaData->setCalculateComplexity($profile->getCalculateComplexity());
+		
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$entry = $flavorAsset->getentry();
+		if($entry && $entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			$extractMediaData->setExtractId3Tags(true);
 		
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);
