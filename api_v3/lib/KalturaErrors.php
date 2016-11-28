@@ -562,6 +562,8 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY = "CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY;FIELD;Cannot update [@FIELD@] while all vod entry flavors are not ready";
 	
+	const CANNOT_REGENERATE_STREAM_TOKEN_FOR_EXTERNAL_LIVE_STREAMS = "CANNOT_REGENERATE_STREAM_TOKEN_FOR_EXTERNAL_LIVE_STREAMS;TYPE;Cannot regenerate stream token for external type [@TYPE@] live stream";
+	
 	/*
 	 * BaseEntry Service
 	 */
