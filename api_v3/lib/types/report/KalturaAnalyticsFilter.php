@@ -45,7 +45,7 @@ class KalturaAnalyticsFilter extends KalturaObject
 	 * Query order by metric/dimension
          * @var string
          */
-        public $orderBy
+        public $orderBy;
 
 	public function __construct() {
 		$this->utcOffset = 0;
