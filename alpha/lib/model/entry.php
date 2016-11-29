@@ -3456,6 +3456,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		parent::copyInto($copyObj,$deepCopy);
 		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
 		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
+		$copyObj->setPartnerSortValue($this->getPartnerSortValue());
 	}
 	
 	public function getkshow(PropelPDO $con = null)
