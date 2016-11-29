@@ -88,12 +88,12 @@ class CategoryEntryService extends KalturaBaseService
 			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser ||
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
-				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR) ||
-				$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
+				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
 		
-		if (kEntitlementUtils::getCategoryModeration() && $category->getModeration())
+		if ($category->getModeration() && 
+		   (kEntitlementUtils::getCategoryModeration() || $this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE)))
 		{
 			$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
@@ -313,11 +313,12 @@ class CategoryEntryService extends KalturaBaseService
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
 					
-			if ($categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
-				$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
-			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
-			}
+		}
+		
+		if ($categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
+			$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
 		}
 			
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
@@ -361,13 +362,14 @@ class CategoryEntryService extends KalturaBaseService
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
 					
-			if ($categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
-				$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
-			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
-			}
 		}
 			
+		if ($categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
+			$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
+		}
+		
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
 			
