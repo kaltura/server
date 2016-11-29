@@ -315,7 +315,7 @@ class CategoryEntryService extends KalturaBaseService
 					
 		}
 		
-		if ($categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
+		if (kCurrentContext::getCurrentKsKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
 			$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
@@ -364,7 +364,7 @@ class CategoryEntryService extends KalturaBaseService
 					
 		}
 			
-		if ($categoryKuser->getKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
+		if (kCurrentContext::getCurrentKsKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
 			$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
