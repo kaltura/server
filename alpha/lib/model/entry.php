@@ -135,7 +135,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const PARTNER_STATUS_FORMAT = 'P%sST%s';
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 	
-	const DEFAULT_ASSETCACHEVERSION = 1;
 
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
@@ -1035,29 +1034,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return "";
 	}
 
-	/**
-	 * AssetCacheVersion will get incremented every time an asset is added/modified
-	 * @return int Asset update version (default = entry::DEFAULT_ASSETCACHEVERSION)
-	 */
-	public function getAssetCacheVersion()			{ return $this->getFromCustomData( "assetCacheVersion", null, entry::DEFAULT_ASSETCACHEVERSION ); }
-
-	protected function setAssetCacheVersion( $v )	{ $this->putInCustomData( "assetCacheVersion" , $v ); }
-
 	public function getAssetCacheTime()			{ return $this->getFromCustomData( "assetCacheTime", null, null ); }
 	
 	protected function setAssetCacheTime( $v )	{ $this->putInCustomData( "assetCacheTime" , $v ); }
-	
-	/**
-	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
-	 */
-	public function onAssetContentModified()
-	{
-		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
-		$this->setAssetCacheVersion($assetCacheVersion);
-		$this->setAssetCacheTime(time());
-		return $assetCacheVersion;
-	}
-	
+
 	public function getThumbnail()
 	{
 		$thumbnail = parent::getThumbnail();
@@ -1165,15 +1145,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		else
 			$path .= "/version/$current_version";
 
-		$assetCacheVersion = $this->getAssetCacheVersion();
-		if ( $assetCacheVersion != self::DEFAULT_ASSETCACHEVERSION )
-		{
-			// If the version is not the default, include it as part of the URL in order
-			// to bypass existing image cache and produce a fresh thumbnail (which will
-			// persist until assetCacheVersion is modified again)
-			$path .= "/acv/$assetCacheVersion";
-		}
-
 		$url = myPartnerUtils::getThumbnailHost($this->getPartnerId(), $protocol) . $path ;
 		return $url;
 	}
@@ -1213,7 +1184,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		else
 			$data = myContentStorage::generateRandomFileName($filename, $this->getThumbnail());
 
-		$this->onAssetContentModified();
 
 		parent::setThumbnail($data);
 		return $this->getThumbnail();
