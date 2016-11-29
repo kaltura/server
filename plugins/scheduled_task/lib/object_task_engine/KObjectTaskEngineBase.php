@@ -109,15 +109,15 @@ abstract class KObjectTaskEngineBase
 
 	protected function impersonate($partnerId)
 	{
-		$config = $this->_client->getConfig();
 		if (is_null($this->_originalPartnerId))
-			$this->_originalPartnerId = $config->partnerId;
-		$config->partnerId = $partnerId;
+			$this->_originalPartnerId = $this->_client->getPartnerId();
+
+		$this->_client->setPartnerId($partnerId);
 	}
 
 	protected function unimpersonate()
 	{
-		$this->_client->getConfig()->partnerId = $this->_originalPartnerId;
+		$this->_client->setPartnerId($this->_originalPartnerId);
 		$this->_originalPartnerId = null;
 	}
 
