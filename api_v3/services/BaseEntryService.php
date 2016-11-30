@@ -216,13 +216,11 @@ class BaseEntryService extends KalturaEntryService
     	$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 
     	if(!$ext)
-	{
-
-		$ext = myFileUploadService::getExtensionByContentType($fullPath);
-		if(!$ext)
-
-			return;
-	}
+		{
+			$ext = myFileUploadService::getExtensionByContentType($fullPath);
+			if(!$ext)
+				return;
+		}
     	
     	$mediaType = myFileUploadService::getMediaTypeFromFileExt($ext);
     	if($mediaType != entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
