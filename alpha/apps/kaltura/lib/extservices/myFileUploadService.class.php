@@ -36,21 +36,17 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 		$curlHeaderResponse = $curlWrapper->getHeader($url, false);
 		$curlWrapper->close();
 
-		$headerContentType = isset($curlHeaderResponse->headers["content-type"]) ? $curlHeaderResponse->headers["content-type"] : null;
+		$headerContentType = isset($curlHeaderResponse->headers["content-type"]) ? strtolower($curlHeaderResponse->headers["content-type"]) : null;
 		$contentTypes = kConf::get("video_curl_content_type", 'base', array());
 
-		if($headerContentType)
+		if($headerContentType && isset($contentTypes[$headerContentType]))
 		{
-			$headerContentType = strtolower($headerContentType);
-			if(isset($contentTypes[$headerContentType]))
-			{
-				$ext = $contentTypes[$headerContentType];
-				KalturaLog::debug("extension - $ext");
-				return $ext;
-			}
+			$ext = $contentTypes[$headerContentType];
+			KalturaLog::debug("extension - $ext");
+			return $ext;
 		}
-		else
-			return null;
+		
+		return null;
 	}
 
 	static public function getMediaTypeFromFileExt ( $ext )
