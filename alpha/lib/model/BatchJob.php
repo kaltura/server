@@ -38,7 +38,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
 	
-	const HISTORY_LENGTH = 100;
+	const HISTORY_LENGTH = 20;
 	
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
 	
