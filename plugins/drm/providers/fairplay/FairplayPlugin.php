@@ -2,7 +2,7 @@
 /**
  * @package plugins.fairplay
  */
-class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor
+class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor, IKalturaEntryPlayingDataContributor
 {
 	const PLUGIN_NAME = 'fairplay';
 	const SEARCH_DATA_SUFFIX = 's';
@@ -169,6 +169,28 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			return true;
 
 		return false;
+	}
+
+	public function contributeToEntryPlayingDataResult(entry $entry, KalturaEntryPlayingDataParams $entryPlayingDataParams, KalturaEntryPlayingDataResult $result)
+	{
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->deliverProfile->getStreamerType()))
+		{
+			$data = new KalturaFairPlayEntryPlayingPluginData();
+			$data->scheme = $this->getPluginName();
+			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
+			if (!is_null($fairplayProfile))
+			{
+				/* @var FairplayDrmProfile $fairplayProfile */
+				$data->certificate = $fairplayProfile->getPublicCertificate();
+				$data->licenseURL = $fairplayProfile->getLicenseServerUrl();
+				$result->pluginData[get_class($this)] = $data;
+			}
+		}
+	}
+
+	public function isSupportStreamerTypes($streamerType)
+	{
+		return in_array($streamerType ,[PlaybackProtocol::APPLE_HTTP]);
 	}
 
 }

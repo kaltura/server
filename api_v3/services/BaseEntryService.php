@@ -896,4 +896,49 @@ class BaseEntryService extends KalturaEntryService
 		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreClonedOptionsArray);
 		return $this->getEntry($clonedEntry->getId());
 	}
+
+	/**
+	 * This action delivers all data relevant for player
+	 * @action getPlayingData
+	 * @param string $entryId
+	 * @param KalturaEntryContextDataParams $contextDataParams
+	 * @return KalturaPlayingResult
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getPlayingDataAction($entryId, KalturaEntryContextDataParams $contextDataParams)
+	{
+		$result = new KalturaPlayingResult();
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		if ($dbEntry->getStatus() != entryStatus::READY)
+		{
+			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
+			// and the request becomes cached for a long time, preventing playback even after the entry
+			// becomes ready
+			kApiCache::setExpiry(60);
+		}
+
+		$entryPlayingDataHelper = new kEntryPlayingDataHelper();
+		$contextDataHelper = $entryPlayingDataHelper->initContextDataHelper($dbEntry, $this->getPartner(), $contextDataParams);
+
+		$result->messages = KalturaStringArray::fromDbArray($contextDataHelper->getContextDataResult()->getMessages());
+		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
+
+		if ($entryPlayingDataHelper->hasBlockAction($contextDataHelper))
+			return $result;
+
+		$flavorAssets = $entryPlayingDataHelper->getRelevantFlavorAssets($dbEntry, $contextDataHelper);
+		list($localFlavors, $remoteFlavorsByDc, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile) = $entryPlayingDataHelper->getFlavorsMapping($dbEntry, $flavorAssets);
+
+		$localSources = $entryPlayingDataHelper->constructLocalSources($entryId, $dbEntry, $localFlavors, $contextDataHelper);
+		$remoteSources = $entryPlayingDataHelper->constructRemoteSources($entryId, $dbEntry, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile, $remoteFlavorsByDc, $contextDataHelper);
+
+		$result->sources = $entryPlayingDataHelper->sortSources($localSources, $remoteSources, $dbEntry->getPartner()->getStorageServePriority());
+		$entryPlayingDataHelper->filterFlavorsBySources($flavorAssets, $result->sources);
+		$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssets);
+
+		return $result;
+	}
 }

@@ -2,7 +2,7 @@
 /**
  * @package plugins.widevine
  */
-class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPending
+class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPending, IKalturaEntryPlayingDataContributor
 {
 	const PLUGIN_NAME = 'widevine';
 	const WIDEVINE_EVENTS_CONSUMER = 'kWidevineEventsConsumer';
@@ -316,5 +316,63 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getWidevineConfigParam($key)
 	{
 		return DrmPlugin::getConfigParam(self::PLUGIN_NAME, $key);
+	}
+
+	public function contributeToEntryPlayingDataResult(entry $entry, KalturaEntryPlayingDataParams $entryPlayingDataParams, KalturaEntryPlayingDataResult $result)
+	{
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->deliverProfile->getStreamerType()))
+		{
+			if ($entryPlayingDataParams->deliverProfile->getStreamerType() == PlaybackProtocol::HTTP)
+			{
+				foreach ($entryPlayingDataParams->flavors as $flavor)
+				{
+					/* var $flavor KalturaFlavorAsset */
+					if ( !in_array("widevine",explode(",",$flavor->tags)))
+						$result->flavorIdsToRemove[] = $flavor->id;
+				}
+			}
+
+			$widevineProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(WidevinePlugin::getWidevineProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
+			if (!is_null($widevineProfile))
+			{
+				$data = new KalturaDrmEntryPlayingPluginData();
+				$data->licenseURL = $widevineProfile->getLicenseServerUrl();
+				$data->scheme = $this->getPluginName();
+				$result->pluginData[get_class($this)] = $data;
+			}
+		}
+	}
+
+	public function isSupportStreamerTypes($streamerType)
+	{
+		return in_array($streamerType ,[PlaybackProtocol::HTTP, PlaybackProtocol::MPEG_DASH]);
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	protected function shouldContribute(entry $entry)
+	{
+		if ($entry->getAccessControl())
+		{
+			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
+			{
+				/**
+				 * @var kRule $rule
+				 */
+				foreach ($rule->getActions() as $action)
+				{
+					/**
+					 * @var kRuleAction $action
+					 */
+					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

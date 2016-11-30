@@ -2,7 +2,7 @@
 /**
  * @package plugins.playReady
  */
-class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaEventConsumers
+class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaEventConsumers, IKalturaEntryPlayingDataContributor
 {
 	const PLUGIN_NAME = 'playReady';
 	const SEARCH_DATA_SUFFIX = 's';
@@ -224,6 +224,54 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if($permissionName == 'PLAYREADY_PLUGIN_PERMISSION')
 			kPlayReadyPartnerSetup::setupPartner($partnerId);
 		
+	}
+
+	public function contributeToEntryPlayingDataResult(entry $entry, KalturaEntryPlayingDataParams $entryPlayingDataParams, KalturaEntryPlayingDataResult $result)
+	{
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->deliverProfile->getStreamerType()) )
+		{
+			$playReadyProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(PlayReadyPlugin::getPlayReadyProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
+			if (!is_null($playReadyProfile))
+			{
+				$data = new KalturaDrmEntryPlayingPluginData();
+				$data->licenseURL = $playReadyProfile->getLicenseServerUrl();
+				$data->scheme = $this->getPluginName();
+				$result->pluginData[get_class($this)] = $data;
+			}
+		}
+	}
+
+	public function isSupportStreamerTypes($streamerType)
+	{
+		return in_array($streamerType ,[PlaybackProtocol::SILVER_LIGHT, PlaybackProtocol::MPEG_DASH]);
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	protected function shouldContribute(entry $entry)
+	{
+		if ($entry->getAccessControl())
+		{
+			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
+			{
+				/**
+				 * @var kRule $rule
+				 */
+				foreach ($rule->getActions() as $action)
+				{
+					/**
+					 * @var kRuleAction $action
+					 */
+					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }
 
