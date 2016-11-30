@@ -214,6 +214,7 @@ class BaseEntryService extends KalturaEntryService
     protected function setEntryTypeByExtension(entry $dbEntry, $fullPath)
     {
     	$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+
     	if(!$ext)
 		{
 			$redirectedExt = myFileUploadService::getExtensionByContentType($fullPath);

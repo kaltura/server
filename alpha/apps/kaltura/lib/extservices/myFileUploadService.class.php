@@ -30,15 +30,15 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 		return array("maxFiles" => self::MAX_FILES );
 	}
 	
-	public static function getRedirectedUrlContentType($url)
+	public static function getExtensionByContentType($url)
 	{
 		$curlWrapper = new KCurlWrapper();
 		$curlHeaderResponse = $curlWrapper->getHeader($url, false);
 		$curlWrapper->close();
-		
-		$headerContentType = $curlHeaderResponse->headers["content-type"];
+
+		$headerContentType = isset($curlHeaderResponse->headers["content-type"]) ? $curlHeaderResponse->headers["content-type"] : null;
 		$contentTypes = kConf::get("video_curl_content_type", 'base', array());
-		
+
 		if($headerContentType)
 		{
 			$headerContentType = strtolower($headerContentType);
@@ -53,7 +53,6 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 			return null;
 	}
 
-	
 	static public function getMediaTypeFromFileExt ( $ext )
 	{
 		// notice that video is checked first since it has precedence over audio (both may have the same ext.)
