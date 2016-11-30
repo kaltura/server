@@ -36,14 +36,18 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 		$curlHeaderResponse = $curlWrapper->getHeader($url, false);
 		$curlWrapper->close();
 		
-		$redirectedUrlContentType = $curlHeaderResponse->headers["content-type"];
+		$headerContentType = $curlHeaderResponse->headers["content-type"];
 		$contentTypes = kConf::get("video_curl_content_type", 'base', array());
 		
-		if(isset($contentTypes[$redirectedUrlContentType]))
+		if($headerContentType)
 		{
-			$ext = $contentTypes[$redirectedUrlContentType];
-			KalturaLog::debug("extension - $ext");
-			return $ext;
+			$headerContentType = strtolower($headerContentType);
+			if(isset($contentTypes[$headerContentType]))
+			{
+				$ext = $contentTypes[$headerContentType];
+				KalturaLog::debug("extension - $ext");
+				return $ext;
+			}
 		}
 		else
 			return null;
