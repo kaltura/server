@@ -20,14 +20,6 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>11</eventType> <!-- EventNotificationEventType::OBJECT_UPDATED -->
                 <eventObjectType>adCuePointEventNotifications.AdCuePoint</eventObjectType>
-                <eventConditions objectType="array">
-                <item objectType="KalturaEventFieldCondition">
-                    <description>play server permission</description>
-                    <field objectType="KalturaEvalBooleanField">
-                        <code>PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $scope->getEvent()->getObject()->getPartnerId())</code>
-                    </field>
-                </item>
-                </eventConditions>
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_id</key>
@@ -55,14 +47,6 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
                 <eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
-                <eventConditions objectType="array">
-                    <item objectType="KalturaEventFieldCondition">
-                        <description>play server permission</description>
-                        <field objectType="KalturaEvalBooleanField">
-                            <code>PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $scope->getEvent()->getObject()->getPartnerId())</code>
-                        </field>
-                    </item>
-                </eventConditions>
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_id</key>
