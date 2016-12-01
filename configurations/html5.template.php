@@ -28,6 +28,10 @@ $wgKalturaServiceUrl = wgGetUrl('cdn_api_host');
 $wgKalturaCDNUrl = wgGetUrl('cdn_host');
 // Default Stats URL
 $wgKalturaStatsServiceUrl = wgGetUrl('stats_host');
+// Default Live Stats URL
+$wgKalturaLiveStatsServiceUrl = wgGetUrl('live_stats_host');
+// Default Kaltura Analytics URL
+$wgKalturaAnalyticsServiceUrl = wgGetUrl('analytics_host');
 
 // SSL host names
 if( $wgHTTPProtocol == 'https' ){
