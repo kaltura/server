@@ -25,7 +25,7 @@
                         <key>entry_id</key>
                         <description>Entry ID</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getEntryId()</code>
+                            <code>$scope->getEvent()->getObject()->getEntryId()</code>
                         </value>
                     </item>
                 </contentParameters>
@@ -52,7 +52,7 @@
                         <key>entry_id</key>
                         <description>Entry ID</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getId()</code>
+                            <code>$scope->getEvent()->getObject()->getId()</code>
                         </value>
                     </item>
                 </contentParameters>
