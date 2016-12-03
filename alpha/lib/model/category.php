@@ -94,18 +94,21 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		if ($this->isNew())
 		{
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$c->add (categoryPeer::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL);
-			$c->add (categoryPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-			
-			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-			$numOfCatsForPartner = categoryPeer::doCount($c);
-			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-
-			$chunkedCategoryLoadThreshold = kConf::get('kmc_chunked_category_load_threshold');
-			if ($numOfCatsForPartner >= $chunkedCategoryLoadThreshold)
-				PermissionPeer::enableForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, PermissionType::SPECIAL_FEATURE);
+				
+			if (!PermissionPeer::isValidForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, $partnerId))
+			{
+				$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+				$c->add (categoryPeer::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL);
+				$c->add (categoryPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+				
+				KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+				$numOfCatsForPartner = categoryPeer::doCount($c);
+				KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+	
+				$chunkedCategoryLoadThreshold = kConf::get('kmc_chunked_category_load_threshold');
+				if ($numOfCatsForPartner >= $chunkedCategoryLoadThreshold)
+					PermissionPeer::enableForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, PermissionType::SPECIAL_FEATURE);
+			}
 
 			if ($this->getParentId() && ($this->getPrivacyContext() == '' || $this->getPrivacyContext() == null))
 			{
