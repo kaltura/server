@@ -106,7 +106,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	
 	public function incrementVersion()
 	{
-		$this->setVersion($this->getFileSyncVersion());
+		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 	
 	public function incrementFileSyncVersion() {
