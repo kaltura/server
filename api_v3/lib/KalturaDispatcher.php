@@ -89,8 +89,12 @@ class KalturaDispatcher
 			KalturaLog::debug("Response profile: " . print_r($responseProfile, true));
 		}
 		
-		kPermissionManager::init(kConf::get('enable_cache'));
-		kEntitlementUtils::initEntitlementEnforcement();
+		$preFetch = self::preFetchPermissions();
+		$endUserReportsPreFetch = (isset($preFetch[0]) && $preFetch[0] instanceof Permission)  ? $preFetch[0] : null;
+		$entitlementPreFetch = (isset($preFetch[1]) && $preFetch[1] instanceof Permission) ? $preFetch[1] : null;
+
+		kPermissionManager::init(kConf::get('enable_cache'),$endUserReportsPreFetch);
+		kEntitlementUtils::initEntitlementEnforcement(null ,null ,$entitlementPreFetch);
 		
 	    $disableTags = $actionInfo->disableTags;
 		if($disableTags && is_array($disableTags) && count($disableTags))
@@ -140,7 +144,15 @@ class KalturaDispatcher
 		
 		return $res;
 	}
-	
+
+	private static function preFetchPermissions()
+	{
+		if(kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
+			return PermissionPeer::getByNamesAndPartner(array(PermissionName::FEATURE_END_USER_REPORTS, PermissionName::FEATURE_ENTITLEMENT) , array(kCurrentContext::$ks_partner_id, PartnerPeer::GLOBAL_PARTNER));
+		else
+			return null;
+	}
+
 	/**
 	 * @param string $objectClass
 	 * @param string $objectId

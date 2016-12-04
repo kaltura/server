@@ -437,7 +437,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * @param boolean $useCache use cache or not
 	 * @throws TODO: add all exceptions
 	 */
-	public static function init($useCache = null)
+	public static function init($useCache = null , $endUserReportsPreFetch = null)
 	{
 		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
 		if ($securityContext === self::$lastInitializedContext) {
@@ -482,7 +482,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		self::$adminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 		
 		// if ks defined - check that it is valid
-		self::errorIfKsNotValid();
+		self::errorIfKsNotValid($endUserReportsPreFetch);
 		
 		// init partner, user, and role objects
 		self::initPartnerUserObjects();
@@ -685,7 +685,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	
 	
-	private static function errorIfKsNotValid()
+	private static function errorIfKsNotValid($endUserReportsPreFetch = null)
 	{
 		// if no ks in current context - no need to check anything
 		if (!self::$ksString) {
@@ -693,7 +693,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		
 		$ksObj = null;
-		$res = kSessionUtils::validateKSessionNoTicket(self::$ksPartnerId, self::$ksUserId, self::$ksString, $ksObj);
+		$res = kSessionUtils::validateKSessionNoTicket(self::$ksPartnerId, self::$ksUserId, self::$ksString, $ksObj, $endUserReportsPreFetch);
 
 		if ( 0 >= $res )
 		{

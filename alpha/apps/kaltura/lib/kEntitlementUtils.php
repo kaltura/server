@@ -235,7 +235,7 @@ class kEntitlementUtils
 	 * @param int $kuser
 	 * @return bool
 	 */
-	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
+	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null, $entitlementPreFetch = null)
 	{
 		self::$initialized = true;
 		self::$entitlementForced = $enableEntit;
@@ -258,8 +258,8 @@ class kEntitlementUtils
 		}
 		
 		self::initCategoryModeration($ks);
-		
-		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
+
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId, true, $entitlementPreFetch))
 			return;
 		
 		$partnerDefaultEntitlementEnforcement = $partner->getDefaultEntitlementEnforcement();

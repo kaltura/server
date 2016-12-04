@@ -144,7 +144,7 @@ class PermissionPeer extends BasePermissionPeer
 	}
 	
 	
-	public static function isValidForPartner($permissionName, $partnerId, $checkDependency = true)
+	public static function isValidForPartner($permissionName, $partnerId, $checkDependency = true, $preFetch = null)
 	{
 		if(!isset(self::$allowedPermissions[$partnerId]))
 		{
@@ -154,8 +154,8 @@ class PermissionPeer extends BasePermissionPeer
 		{
 			return self::$allowedPermissions[$partnerId][$permissionName];
 		}
-			
-		$permission = self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
+
+		$permission = ($preFetch && $preFetch instanceof Permission && $permissionName == $preFetch->getName() ) ? $preFetch : self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
 		if (!$permission) {
 			self::$allowedPermissions[$partnerId][$permissionName] = false;
 			return false;
@@ -208,6 +208,40 @@ class PermissionPeer extends BasePermissionPeer
 		$permission = PermissionPeer::doSelectOne($c);
 		PermissionPeer::setUseCriteriaFilter(true);
 		return $permission;
+	}
+
+	public static function getByNamesAndPartner($permissionNamesArray, $partnerIdsArray)
+	{
+		$c = new Criteria();
+
+		if(!is_array($partnerIdsArray))
+			$partnerIdsArray = array($partnerIdsArray);
+
+		if(!in_array('*', $partnerIdsArray, true))
+		{
+			$partnerIdsArray = array_map('strval', $partnerIdsArray);
+			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
+		}
+		if(!in_array('*', $permissionNamesArray, true))
+		{
+			$permissionNamesArray = array_map('strval', $permissionNamesArray);
+			$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
+		}
+
+		$c->addGroupByColumn(PermissionPeer::NAME);
+		$c->addGroupByColumn(PermissionPeer::STATUS);
+
+		$c->addAscendingOrderByColumn(PermissionPeer::STATUS);
+		$c->addAscendingOrderByColumn(PermissionPeer::NAME);
+
+		PermissionPeer::setUseCriteriaFilter(false);
+		$critcopy = clone $c;
+		$limit = count($permissionNamesArray);
+		$critcopy->setLimit($limit);//limit 2
+		$permissions = PermissionPeer::doSelect($critcopy);
+		PermissionPeer::setUseCriteriaFilter(true);
+
+		return $permissions;
 	}
 	
 	public static function isAllowedPlugin($pluginName, $partnerId)

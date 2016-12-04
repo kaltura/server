@@ -177,14 +177,14 @@ class kSessionUtils
 		return $res;
 	}
 	
-	public static function validateKSessionNoTicket($partner_id, $puser_id, $ks_str, &$ks)
+	public static function validateKSessionNoTicket($partner_id, $puser_id, $ks_str, &$ks, $endUserReportsPreFetch = null)
 	{
 		if ( !$ks_str )
 		{
 			return false;
 		}
 		$ks = ks::fromSecureString( $ks_str );
-		return $ks->isValid( $partner_id, $puser_id, false );
+		return $ks->isValid( $partner_id, $puser_id, false, $endUserReportsPreFetch );
 	}
 	
 	/**
@@ -311,7 +311,7 @@ class ks extends kSessionBase
 			$this->additional_data);
 	}
 	
-	public function isValid( $partner_id , $puser_id , $type = false)
+	public function isValid( $partner_id , $puser_id , $type = false , $endUserReportsPreFetch = null)
 	{		
 		$result = $this->tryToValidateKS();
 		if ($result != self::UNKNOWN && $result != self::OK)
@@ -361,8 +361,8 @@ class ks extends kSessionBase
 		}
 		
 		// creates the kuser
-		if($partner_id != Partner::BATCH_PARTNER_ID &&
-			PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
+		if($partner_id != Partner::BATCH_PARTNER_ID && 
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id, true, $endUserReportsPreFetch))
 		{
 			$this->kuser = kuserPeer::createKuserForPartner($partner_id, $puser_id);
 			if(!$puser_id && $this->kuser->getScreenName() != 'Unknown')
