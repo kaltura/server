@@ -923,4 +923,37 @@ class FlavorAssetService extends KalturaAssetService
 			$fileSync->save();
 		}
 	}
+
+	/**
+	 * serve cmd line to transcode the ad
+	 *
+	 * @action serveAdStitchCmd
+	 * @param string $assetId
+	 * @param string $mediaInfoJson
+	 *
+	 * @throws KalturaAPIException
+	 */
+	public function serveAdStitchCmdAction($assetId , $mediaInfoJson)
+	{
+		$asset = assetPeer::retrieveById($assetId);
+		if(is_null($asset))
+			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
+
+		$flavorParamsId = $asset->getFlavorParamsId();
+
+		$flavorParamsDb = assetParamsPeer::retrieveByPK($flavorParamsId);
+
+		if (!$flavorParamsDb)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+
+		$flavorParamsOutputDb = assetParamsOutputPeer::retrieveByAssetId($assetId);
+
+		if (!$flavorParamsOutputDb)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $assetId);
+
+		$cmdLine = kBusinessConvertDL::generateAdStitchingCmdline($mediaInfoJson, $flavorParamsDb, $flavorParamsOutputDb);
+
+		return $cmdLine;
+	}
 }
+

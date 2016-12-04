@@ -584,4 +584,51 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		$entry->setStreamBitrates($streamBitrates);
 		$entry->save();
 	}
+	
+	public static function generateAdStitchingCmdline($ffprobeJson, $flavorParams, $flavorParamsOutput)
+	{
+		$parser = new KFFMpegMediaParserAdStitchHelper($ffprobeJson);
+		$srcMedInf = $parser->getMediaInfo();
+		$srcMedSet = KFFMpegMediaParserAdStitchHelper::mediaInfoToKDL($srcMedInf);
+
+		/**
+		 * To match from flavor params output-
+		 * - frame size
+		 * - fps
+		 * - gop
+		 * - audio params
+		 * Other matching
+		 * - AvoidVideoShrinkFramesizeToSource = on
+		 * - two pass - off
+		 * - encypted - off
+		 * - letter boxing
+		 * - other extra params (from live sticthing)
+		 */
+		$kdlFlavor = KDLWrap::ConvertFlavorCdl2Kdl($flavorParams);
+		$kdlFlavor->_isTwoPass = false;
+		$kdlFlavor->_isEncrypted = false;
+		$kdlFlavor->_video->_arProcessingMode = 2; // letter boxing
+		$kdlFlavor->_video->_isShrinkFramesizeToSource = false;
+		if($flavorParamsOutput->getWidth()){
+			$kdlFlavor->_video->_width = $flavorParamsOutput->getWidth();
+		}
+		if($flavorParamsOutput->getHeight()){
+			$kdlFlavor->_video->_height = $flavorParamsOutput->getHeight();
+		}
+		if($flavorParamsOutput->getGopSize()){
+			$kdlFlavor->_video->_gop = $flavorParamsOutput->getGopSize();
+		}
+		if($flavorParamsOutput->getFrameRate()){
+			$kdlFlavor->_video->_frameRate = $flavorParamsOutput->getFrameRate();
+		}
+		if($flavorParamsOutput->getAudioBitrate()){
+			$kdlFlavor->_audio->_bitRate = $flavorParamsOutput->getAudioBitrate();
+		}
+		if($flavorParamsOutput->getAudioSampleRate()){
+			$kdlFlavor->_audio->_sampleRate = $flavorParamsOutput->getAudioSampleRate();
+		}
+		$target = $kdlFlavor->GenerateTarget($srcMedSet);
+		$cmdLine = $target->_transcoders[0]->_cmd;
+		return $cmdLine;
+	}
 }
