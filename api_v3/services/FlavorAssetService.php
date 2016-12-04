@@ -923,4 +923,19 @@ class FlavorAssetService extends KalturaAssetService
 			$fileSync->save();
 		}
 	}
+
+	/**
+	 * serve cmd line to transcode the ad
+	 *
+	 * @action serveAdStitchCmd
+	 * @param string $assetId
+	 * @param string $mediaInfoJson
+	 *
+	 * @throws KalturaAPIException
+	 */
+	public function serveAdStitchCmdAction($assetId , $mediaInfoJson)
+	{
+		//todo - implement and return the command line
+		
+	}
 }
