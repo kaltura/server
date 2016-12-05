@@ -256,6 +256,17 @@ class LiveConversionProfileService extends KalturaBaseService
 		return $resolutionObject;
 	}
 	
+	private function checkMaxFramerate($ingestFramerate, $flavorMaxFramerate)
+	{
+		if ($flavorMaxFramerate)
+		{
+			$skipCount = ($ingestFramerate / $flavorMaxFramerate) - 1;
+			$noise = (round($skipCount) == 0) ? 0.1 : ((110 / 100) * round($skipCount));
+			return $skipCount < $noise ? round($skipCount) : ceil($skipCount);
+		}
+		
+		return $flavorMaxFramerate;
+	}
 	
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams, $streamParametersArray)
 	{
@@ -369,10 +380,13 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
 		
-		if ($conversionExtraParam && $conversionExtraParam->skipFrameCount)
+		$skipFrameCountByMaxFramerate = $this->checkMaxFramerate($streamParametersArray['framerate'], $liveParams->getMaxFrameRate());
+		$configuredSkipFrameRate = ($conversionExtraParam && $conversionExtraParam->skipFrameCount) ? $conversionExtraParam->skipFrameCount : 0;
+		if ($configuredSkipFrameRate || $skipFrameCountByMaxFramerate)
 		{
+			$value = $skipFrameCountByMaxFramerate ? $skipFrameCountByMaxFramerate : $configuredSkipFrameRate;
 			$skipFrameCount = $video->addChild('SkipFrameCount');
-			$skipFrameCount->addChild('Value', $conversionExtraParam->skipFrameCount);
+			$skipFrameCount->addChild('Value', $value);
 		}
 		
 		if ($conversionExtraParam && $conversionExtraParam->constantBitrate)
