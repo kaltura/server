@@ -21,20 +21,40 @@ class LiveConversionProfileService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('conversionProfile2');
 		$this->applyPartnerFilterForClass('assetParams');
 	}
-
+	
 	/**
 	 * Serve XML rendition of the Kaltura Live Transcoding Profile usable by the Wowza transcoding add-on
-	 * 
+	 *
 	 * @action serve
 	 * @param string $streamName the id of the live entry with it's stream suffix
 	 * @param string $hostname the media server host name
+	 * @param string $audiodatarate
+	 * @param string $videodatarate
+	 * @param string $width
+	 * @param string $height
+	 * @param string $framerate
+	 * @param string $videocodecidstring
+	 * @param string $audiocodecidstring
 	 * @return file
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws WowzaErrors::INVALID_STREAM_NAME
 	 */
-	public function serveAction($streamName, $hostname = null)
+	//public function serveAction($streamName, $hostname = null)
+	public function serveAction($streamName, $hostname = null, $audiodatarate = null, $videodatarate = null, $width = null, $height = null, $framerate = null, $videocodecidstring = null,  $audiocodecidstring = null)
 	{
+		$streamParametersArray = array(
+			'streamName' => $streamName,
+			'hostname' => $hostname,
+			'audiodatarate' => $audiodatarate * 1024,
+			'videodatarate' => $videodatarate * 1024,
+			'width' => $width,
+			'height' => $height,
+			'framerate' => $framerate,
+			'videocodecidstring' => $videocodecidstring,
+			'audiocodecidstring' => $audiocodecidstring
+		);
+				
 		$matches = null;
 		if(!preg_match('/^(\d_.{8})_(\d+)$/', $streamName, $matches))
 			throw new KalturaAPIException(WowzaErrors::INVALID_STREAM_NAME, $streamName);
@@ -127,7 +147,7 @@ class LiveConversionProfileService extends KalturaBaseService
 					$defaultFrameRate = $liveParamsItem->getFrameRate();
 				}
 			}
-			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
+			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $streamParametersArray);
 			$tags = array("all");
 			foreach($tags as $tag)
 			{
@@ -174,15 +194,89 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		return new kRendererString($dom->saveXML(), 'text/xml');
 	}
-
-	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
+	
+	private function calculateFlavorHeight($flavorResolution, $ingestParameters)
+	{
+		return $flavorResolution['width'] * $ingestParameters['height'] / $ingestParameters['width'];
+	}
+	
+	private function isFlavorCompatibile($ingestParameters, $flavorBitrate, $flavorResolution)
+	{
+		$flavorHeight = 0;
+		switch ($flavorResolution['fitMode'])
+		{
+			case 'match-source':
+				break;
+			case 'fit-height':
+				$flavorHeight = $flavorResolution['height'];
+				break;
+			case 'fit-width':
+				$flavorHeight = $this->calculateFlavorHeight($flavorResolution, $ingestParameters);
+				break;
+		}
+		
+		if (isset($ingestParameters['height']) && $ingestParameters['height'] < $flavorHeight)
+		{
+			return false;
+		}
+		else if (isset($ingestParameters['videodatarate']) && $ingestParameters['videodatarate'] < $flavorBitrate)
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private function getResolutionParameters($liveParams)
+	{
+		$resolutionObject = array(
+			'fitMode' => ''
+		);
+		if(!$liveParams->getWidth() && !$liveParams->getHeight())
+		{
+			$resolutionObject['fitMode'] = 'match-source';
+		}
+		elseif($liveParams->getWidth() && $liveParams->getHeight())
+		{
+			$resolutionObject['fitMode'] = 'fit-height';
+			$resolutionObject['width'] = $liveParams->getWidth();
+			$resolutionObject['height'] = $liveParams->getHeight();
+		}
+		elseif($liveParams->getWidth())
+		{
+			$resolutionObject['fitMode'] = 'fit-width';
+			$resolutionObject['width'] = $liveParams->getWidth();
+		}
+		elseif($liveParams->getHeight())
+		{
+			$resolutionObject['fitMode'] = 'fit-height';
+			$resolutionObject['height'] = $liveParams->getHeight();
+		}
+		
+		return $resolutionObject;
+	}
+	
+	
+	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams, $streamParametersArray)
 	{
 		$conversionExtraParam = json_decode($liveParams->getConversionEnginesExtraParams());
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = ($conversionExtraParam && $conversionExtraParam->audioPassthrough) ? 'PassThru' : 'AAC';
+		$audioCodec = (isset($streamParametersArray['audiocodecidstring']) && $streamParametersArray['audiocodecidstring'] === 'AAC') ? 'PassThru' : 'AAC';
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
+		
+		$flavorResolutionInfo = $this->getResolutionParameters($liveParams);
+		$flavorBitrateValue = $liveParams->getVideoBitrate() ? $liveParams->getVideoBitrate() * 1024 : 240000;
+		
+		if (!$liveParams->hasTag(liveParams::TAG_INGEST))
+		{
+			if (!$this->isFlavorCompatibile($streamParametersArray, $flavorBitrateValue, $flavorResolutionInfo))
+			{
+				// Flavor is not compatible with the ingest's parameters -> discard it.
+				return;
+			}
+		}
 		
 		$encode = $encodes->addChild('Encode');
 		$encode->addChild('Enable', 'true');
@@ -257,31 +351,20 @@ class LiveConversionProfileService extends KalturaBaseService
 		$video->addChild('Transcoder', $mediaServer ? $mediaServer->getTranscoder() : WowzaMediaServerNode::DEFAULT_TRANSCODER);
 		$video->addChild('GPUID', $mediaServer ? $mediaServer->getGPUID() : WowzaMediaServerNode::DEFAULT_GPUID);
 		$frameSize = $video->addChild('FrameSize');
-	
-		if(!$liveParams->getWidth() && !$liveParams->getHeight())
+		
+		$frameSize->addChild('FitMode', $flavorResolutionInfo['fitMode']);
+		if (isset($flavorResolutionInfo['width']))
 		{
-			$frameSize->addChild('FitMode', 'match-source');
+			$frameSize->addChild('Width', $flavorResolutionInfo['width']);
 		}
-		elseif($liveParams->getWidth() && $liveParams->getHeight())
+		if (isset($flavorResolutionInfo['height']))
 		{
-			$frameSize->addChild('FitMode', 'fit-height');
-			$frameSize->addChild('Width', $liveParams->getWidth());
-			$frameSize->addChild('Height', $liveParams->getHeight());
-		}
-		elseif($liveParams->getWidth())
-		{
-			$frameSize->addChild('FitMode', 'fit-width');
-			$frameSize->addChild('Width', $liveParams->getWidth());
-		}
-		elseif($liveParams->getHeight())
-		{
-			$frameSize->addChild('FitMode', 'fit-height');
-			$frameSize->addChild('Height', $liveParams->getHeight());
+			$frameSize->addChild('Height', $flavorResolutionInfo['height']);
 		}
 		
 		$video->addChild('Codec', $videoCodec);
 		$video->addChild('Profile', $profile);
-		$video->addChild('Bitrate', $liveParams->getVideoBitrate() ? $liveParams->getVideoBitrate() * 1024 : 240000);
+		$video->addChild('Bitrate', $flavorBitrateValue);
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
