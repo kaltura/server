@@ -18,15 +18,16 @@ class kChtHttpUrlTokenizer extends kUrlTokenizer
 	 * @param string $fileExtension
 	 * @return string
 	 */
-	public function tokenizeUrl($url, $baseUrl = null, $fileExtension = null)
+	public function tokenizeUrl($url)
 	{
 		$expiryTime = time() + $this->window;
 
 		$hashData = $url . $this->key . $expiryTime	;
 		$token = base64_encode(md5($hashData, true));
+		
+		//remove = character from the token
 		$token = strtr($token, '+/', '-_');
 		$token = str_replace('=', '', $token);
-		
 		
 		if (strpos($url, '?') !== false)
 			$s = '&';
