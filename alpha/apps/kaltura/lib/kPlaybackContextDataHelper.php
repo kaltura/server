@@ -1,45 +1,72 @@
 <?php
-class kEntryPlayingDataHelper
+class kPlaybackContextDataHelper
 {
 	const MEDIA_PROTOCOL_HTTP = 'http';
 	const MEDIA_PROTOCOL_HTTPS = 'https';
 
 	/**
-	 * @param $dbEntry
-	 * @param $partner
-	 * @param $contextDataParams
-	 * @return kContextDataHelper
+	 * @var kPlaybackContextResult
 	 */
-	public function initContextDataHelper($dbEntry, $partner, $contextDataParams)
+	private $playbackContextResult;
+
+	/**
+	 * @var array
+	 */
+	private $restrictedMessages;
+
+	/**
+	 * @var bool
+	 */
+	private $isScheduledNow;
+
+	public function getPlaybackContextResult()
 	{
-		$asset = null;
-		if ($contextDataParams->flavorAssetId)
-		{
-			$asset = assetPeer::retrieveById($contextDataParams->flavorAssetId);
-			if (!$asset)
-				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
-		}
+		return $this->playbackContextResult;
+	}
 
-		$contextDataHelper = new kContextDataHelper($dbEntry, $partner, $asset);
 
-		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
-			$accessControlScope = $dbEntry->getAccessControl()->getScope();
-		else
-			$accessControlScope = new accessControlScope();
-		$contextDataParams->toObject($accessControlScope);
+	public function setIsScheduledNow($isScheduledNow)
+	{
+		$this->isScheduledNow = $isScheduledNow;
+	}
 
-		$contextDataHelper->buildContextDataResult($accessControlScope, $contextDataParams->flavorTags, $contextDataParams->streamerType, $contextDataParams->mediaProtocol);
-		if ($contextDataHelper->getDisableCache())
-			KalturaResponseCacher::disableCache();
+	public function getIsScheduledNow()
+	{
+		$this->isScheduledNow;
+	}
 
-		return $contextDataHelper;
+	/**
+	 * @param kContextDataHelper $contextDataHelper
+	 * @param entry $dbEntry
+	 * @throws kCoreException
+	 */
+	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
+	{
+		$this->playbackContextResult = new kPlaybackContextResult();
+		$this->generateRestrictedMessages($contextDataHelper);
+
+		if ($this->hasBlockAction($contextDataHelper))
+			return;
+
+		$flavorAssets = $this->getRelevantFlavorAssets($dbEntry, $contextDataHelper);
+
+		list($localFlavors, $remoteFlavorsByDc, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile) = $this->getFlavorsMapping($dbEntry, $flavorAssets);
+
+		$localSources = $this->constructLocalSources($dbEntry, $localFlavors, $contextDataHelper);
+		$remoteSources = $this->constructRemoteSources($dbEntry, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile, $remoteFlavorsByDc, $contextDataHelper);
+
+		$sources = $this->sortSources($localSources, $remoteSources, $dbEntry->getPartner()->getStorageServePriority());
+		$this->filterFlavorsBySources($flavorAssets, $sources);
+
+		$this->playbackContextResult->setSources($sources);
+		$this->playbackContextResult->setFlavorAssets($flavorAssets);
 	}
 
 	/**
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return boolean
 	 */
-	public function hasBlockAction($contextDataHelper)
+	public function hasBlockAction(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
 
@@ -56,9 +83,40 @@ class kEntryPlayingDataHelper
 
 	/**
 	 * @param kContextDataHelper $contextDataHelper
+	 * @return boolean
+	 */
+	public function generateRestrictedMessages($contextDataHelper)
+	{
+		$playbackRestrictions = array();
+
+		foreach ($contextDataHelper->getContextDataResult()->getRulesCodesMap() as $code => $messages)
+		{
+			foreach ($messages as $message)
+				$playbackRestrictions[] = new kPlaybackRestriction($code, $message);
+		}
+
+		if ($contextDataHelper->getContextDataResult()->getIsCountryRestricted())
+			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::COUNTRY_RESTRICTED_CODE, RuleRestrictions::COUNTRY_RESTRICTED);
+		if ($contextDataHelper->getContextDataResult()->getIsIpAddressRestricted())
+			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::IP_RESTRICTED_CODE, RuleRestrictions::IP_RESTRICTED);
+		if ($contextDataHelper->getContextDataResult()->getIsSessionRestricted()
+			&& ($contextDataHelper->getContextDataResult()->getPreviewLength() == -1 || is_null($contextDataHelper->getContextDataResult()->getPreviewLength())))
+			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::SESSION_RESTRICTED_CODE, RuleRestrictions::SESSION_RESTRICTED);
+		if ($contextDataHelper->getContextDataResult()->getIsUserAgentRestricted())
+			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::USER_AGENT_RESTRICTED_CODE, RuleRestrictions::USER_AGENT_RESTRICTED);
+		if ($contextDataHelper->getContextDataResult()->getIsSiteRestricted())
+			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::SITE_RESTRICTED_CODE, RuleRestrictions::SITE_RESTRICTED);
+		if (!$this->isScheduledNow)
+			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::SCHEDULED_RESTRICTED_CODE, RuleRestrictions::SCHEDULED_RESTRICTED);
+
+		$this->playbackContextResult->setRestrictions($playbackRestrictions);
+	}
+
+	/**
+	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	public function getProfileIdsToFilter($contextDataHelper)
+	public function getProfileIdsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
 		$deliveryProfileIds = null;
@@ -81,7 +139,7 @@ class kEntryPlayingDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	public function getFlavorsToFilter($contextDataHelper)
+	public function getFlavorsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
 		$flavorsIds = null;
@@ -102,18 +160,18 @@ class kEntryPlayingDataHelper
 
 
 	/**
-	 * @param $dbEntry
+	 * @param entry $dbEntry
 	 * @param kContextDataHelper $contextDataHelper
-	 * @return KalturaFlavorAssetArray
+	 * @return array
 	 */
-	public function getRelevantFlavorAssets($dbEntry, kContextDataHelper $contextDataHelper)
+	public function getRelevantFlavorAssets(entry $dbEntry, kContextDataHelper $contextDataHelper)
 	{
 		$parentEntryId = $dbEntry->getSecurityParentId();
 		if ($parentEntryId)
 		{
 			$dbEntry = $dbEntry->getParentEntry();
 			if (!$dbEntry)
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
+				throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
 		}
 
 		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
@@ -127,11 +185,11 @@ class kEntryPlayingDataHelper
 
 
 	/**
-	 * @param $dbEntry
-	 * @param $flavorAssets
+	 * @param entry $dbEntry
+	 * @param array $flavorAssets
 	 * @return array
 	 */
-	public function getFlavorsMapping($dbEntry, $flavorAssets)
+	public function getFlavorsMapping(entry $dbEntry, $flavorAssets)
 	{
 		// get flavors availability
 		$servePriority = $dbEntry->getPartner()->getStorageServePriority();
@@ -212,20 +270,19 @@ class kEntryPlayingDataHelper
 
 
 	/**
-	 * @param $entryId
-	 * @param $dbEntry
+	 * @param entry $dbEntry
 	 * @param $localFlavors
-	 * @param $contextDataHelper
-	 * @return KalturaPlayingSourceArray
+	 * @param kContextDataHelper $contextDataHelper
+	 * @return array
 	 */
-	public function constructLocalSources($entryId, $dbEntry, $localFlavors, $contextDataHelper)
+	public function constructLocalSources(entry $dbEntry, $localFlavors, kContextDataHelper $contextDataHelper)
 	{
 		$sources = array();
 
 		if (!count($localFlavors))
 			return $sources;
 
-		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, null);
+		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 		$localDeliveryProfileIds = call_user_func_array('array_merge', $dbEntry->getPartner()->getDeliveryProfileIds());
 		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveriesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
@@ -247,28 +304,27 @@ class kEntryPlayingDataHelper
 			$drmData = $this->getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile);
 
 			if (count($deliveryProfileFlavors))
-				$sources[] = new KalturaPlayingSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), array_keys($deliveryProfileFlavors), null, $drmData);
+				$sources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), array_keys($deliveryProfileFlavors), null, $drmData);
 		}
 
 		return $sources;
 	}
 
 	/**
-	 * @param $entryId
-	 * @param $dbEntry
+	 * @param entry $dbEntry
 	 * @param $remoteDeliveryProfileIds
 	 * @param $remoteDcByDeliveryProfile
 	 * @param $remoteFlavorsByDc
-	 * @param $contextDataHelper
-	 * @return KalturaPlayingSourceArray
+	 * @param kContextDataHelper $contextDataHelper
+	 * @return array
 	 */
-	public function constructRemoteSources($entryId, $dbEntry, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile, $remoteFlavorsByDc, $contextDataHelper)
+	public function constructRemoteSources(entry $dbEntry, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile, $remoteFlavorsByDc, kContextDataHelper $contextDataHelper)
 	{
 		$sources = array();
 		if (!count($remoteFlavorsByDc))
 			return $sources;
 
-		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, null);
+		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveriesByIds($dbEntry, $remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
@@ -291,7 +347,7 @@ class kEntryPlayingDataHelper
 				{
 					foreach ($deliveryProfileFlavorsForDc as $flavorAssetForDc)
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
-					$sources[] = new KalturaPlayingSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), $dcFlavorIds, null, $flavorToDrmData);
+					$sources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), $dcFlavorIds, null, $flavorToDrmData);
 				}
 			}
 		}
@@ -352,32 +408,27 @@ class kEntryPlayingDataHelper
 		return $streamTypes;
 	}
 
-	/* @param $dbEntry
+	/* @param entry $dbEntry
 	 * @param $flavorAssets
 	 * @param $deliveryProfile
-	 * @return KalturaEntryPlayingDataResult
+	 * @return array
 	 */
-	protected function getDrmData($dbEntry, &$flavorAssets, $deliveryProfile)
+	protected function getDrmData(entry $dbEntry, &$flavorAssets, $deliveryProfile)
 	{
-		$playingDataParams = new KalturaEntryPlayingDataParams();
-		$playingDataParams->deliverProfile = $deliveryProfile;
-		$playingDataParams->flavors = KalturaFlavorAssetArray::fromDbArray(array_values($flavorAssets));
+		$playbackContextDataParams = new kPlaybackContextDataParams();
+		$playbackContextDataParams->setDeliveryProfile($deliveryProfile);
+		$playbackContextDataParams->setFlavors(array_values($flavorAssets));
 
-		$result = new KalturaEntryPlayingDataResult();
-		$result->pluginData = new KalturaPluginDataArray();
-
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryPlayingDataContributor');
+		$result = new kPlaybackContextDataResult();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlaybackContextDataContributor');
 		foreach ($pluginInstances as $pluginInstance)
-		{
-			$pluginInstance->contributeToEntryPlayingDataResult($dbEntry, $playingDataParams, $result);
-		}
+			$pluginInstance->contributeToPlaybackContextDataResult($dbEntry, $playbackContextDataParams, $result);
 
-		if (count($result->flavorIdsToRemove))
-			$this->filterFlavorAssets($flavorAssets, $result->flavorIdsToRemove, true);
+		if (count($result->getFlavorIdsToRemove()))
+			$this->filterFlavorAssets($flavorAssets, $result->getFlavorIdsToRemove(), true);
 
-		return $result->pluginData;
+		return $result->getPluginData();
 	}
-
 
 	public function sortSources($localSources, $remoteSources, $servePriority)
 	{
@@ -386,16 +437,16 @@ class kEntryPlayingDataHelper
 
 		switch ($servePriority)
 		{
-			case KalturaStorageServePriority::KALTURA_ONLY:
+			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 				return $localSources;
 				break;
-			case KalturaStorageServePriority::KALTURA_FIRST:
+			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
 				return array_merge($localSources, $remoteSources);
 				break;
-			case KalturaStorageServePriority::EXTERNAL_ONLY:
+			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				return $remoteSources;
 				break;
-			case KalturaStorageServePriority::EXTERNAL_FIRST:
+			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
 				return array_merge($remoteSources, $localSources);
 				break;
 			default:
@@ -406,9 +457,9 @@ class kEntryPlayingDataHelper
 	{
 		usort($sourcesArray, function ($a, $b)
 		{
-			/* @var $a KalturaPlayingSource */
-			/* @var $b KalturaPlayingSource */
-			return (intval($a->priority) - intval($b->priority));
+			/* @var $a kPlaybackSource */
+			/* @var $b kPlaybackSource */
+			return (intval($a->getPriority()) - intval($b->getPriority()));
 		});
 	}
 
@@ -417,8 +468,8 @@ class kEntryPlayingDataHelper
 		$flavorAssetsIds = array();
 		foreach ($sources as $source)
 		{
-			/* @var $source KalturaPlayingSource */
-			$flavorAssetsIds = array_merge($flavorAssetsIds,$source->flavors);
+			/* @var $source kPlaybackSource */
+			$flavorAssetsIds = array_merge($flavorAssetsIds,$source->getFlavors());
 		}
 
 		$this->filterFlavorAssets($flavorAssets, $flavorAssetsIds, false );

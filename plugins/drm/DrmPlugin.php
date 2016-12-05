@@ -2,9 +2,10 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler
+class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'drm';
+	const schemes = ['cenc/widevine', 'cenc/playready'];
 
     /* (non-PHPdoc)
      * @see IKalturaPlugin::getPluginName()
@@ -12,6 +13,14 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+   * @see IKalturaPlugin::getSchemes()
+   */
+	public static function getSchemes()
+	{
+		return self::schemes;
 	}
 
 	/* (non-PHPdoc)
@@ -151,6 +160,40 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 		    }
 	    }
     }
+
+	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result)
+	{
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		{
+			$dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
+			if (!is_null($dbProfile))
+			{
+				$signingKey = $dbProfile->getSigningKey();
+				if (!is_null($signingKey))
+				{
+					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
+					$customDataObject = reset($customDataJson);
+					foreach ($this->getSchemes() as $scheme)
+					{
+						$data = new KalturaDrmEntryPlayingPluginData();
+						$data->licenseURL = $this->constructUrl($dbProfile, $scheme, $customDataObject);
+						$data->scheme = $scheme;
+						$result->addToPluginData($scheme, $data);
+					}
+				}
+			}
+		}
+	}
+
+	public function isSupportStreamerTypes($streamerType)
+	{
+		return in_array($streamerType ,[PlaybackProtocol::MPEG_DASH]);
+	}
+
+	public function constructUrl($dbProfile, $scheme, $customDataObject)
+	{
+		return $dbProfile->getLicenseServerUrl() . "/" . $scheme . "/license?custom_data=" . $customDataObject['custom_data'] . "&signature=" . $customDataObject['signature'];
+	}
 
     private function getSigningKey()
     {

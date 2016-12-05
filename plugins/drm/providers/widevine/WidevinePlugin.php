@@ -2,9 +2,10 @@
 /**
  * @package plugins.widevine
  */
-class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPending, IKalturaEntryPlayingDataContributor
+class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPending, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'widevine';
+	const SCHEME_NAME = 'widevine';
 	const WIDEVINE_EVENTS_CONSUMER = 'kWidevineEventsConsumer';
 	const WIDEVINE_RESPONSE_TYPE = 'widevine';
 	const WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC_PERMISSION = 'WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC';
@@ -18,7 +19,7 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	const DEFAULT_POLICY = 'default';
 	const DEFAULT_LICENSE_START = '1970-01-01 00:00:01';
 	const DEFAULT_LICENSE_END = '2033-05-18 00:00:00';
-	
+
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -26,6 +27,14 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPluginName()
+	 */
+	public static function getSchemeName()
+	{
+		return self::SCHEME_NAME;
 	}
 	
 	/* (non-PHPdoc)
@@ -318,34 +327,44 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return DrmPlugin::getConfigParam(self::PLUGIN_NAME, $key);
 	}
 
-	public function contributeToEntryPlayingDataResult(entry $entry, KalturaEntryPlayingDataParams $entryPlayingDataParams, KalturaEntryPlayingDataResult $result)
+	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->deliverProfile->getStreamerType()))
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
-			if ($entryPlayingDataParams->deliverProfile->getStreamerType() == PlaybackProtocol::HTTP)
+			foreach ($entryPlayingDataParams->getFlavors() as $flavor)
 			{
-				foreach ($entryPlayingDataParams->flavors as $flavor)
-				{
-					/* var $flavor KalturaFlavorAsset */
-					if ( !in_array("widevine",explode(",",$flavor->tags)))
-						$result->flavorIdsToRemove[] = $flavor->id;
-				}
+					if ( !in_array("widevine",explode(",",$flavor->getTags())))
+						$result->addToFlavorIdsToRemove($flavor->getId());
 			}
 
 			$widevineProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(WidevinePlugin::getWidevineProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if (!is_null($widevineProfile))
 			{
-				$data = new KalturaDrmEntryPlayingPluginData();
-				$data->licenseURL = $widevineProfile->getLicenseServerUrl();
-				$data->scheme = $this->getPluginName();
-				$result->pluginData[get_class($this)] = $data;
+				/* @var WidevineProfile $widevineProfile */
+
+				$signingKey = kConf::get('signing_key', 'drm', null);
+				if (!is_null($signingKey))
+				{
+					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
+					$customDataObject = reset($customDataJson);
+					$data = new KalturaDrmEntryPlayingPluginData();
+					$scheme = $this->getSchemeName();
+					$data->licenseURL = $this->constructUrl($widevineProfile, $scheme, $customDataObject);
+					$data->scheme = $scheme;
+					$result->addToPluginData($scheme, $data);
+				}
 			}
 		}
 	}
 
 	public function isSupportStreamerTypes($streamerType)
 	{
-		return in_array($streamerType ,[PlaybackProtocol::HTTP, PlaybackProtocol::MPEG_DASH]);
+		return in_array($streamerType ,[PlaybackProtocol::HTTP]);
+	}
+
+	public function constructUrl($widevineProfile, $scheme, $customDataObject)
+	{
+		return $widevineProfile->getLicenseServerUrl() . "/" . $scheme . "/license?custom_data=" . $customDataObject['custom_data'] . "&signature=" . $customDataObject['signature'];
 	}
 
 	/**

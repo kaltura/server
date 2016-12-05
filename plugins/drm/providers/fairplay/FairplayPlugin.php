@@ -2,9 +2,10 @@
 /**
  * @package plugins.fairplay
  */
-class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor, IKalturaEntryPlayingDataContributor
+class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'fairplay';
+	const SCHEME_NAME = 'fps';
 	const SEARCH_DATA_SUFFIX = 's';
 
 	/* (non-PHPdoc)
@@ -13,6 +14,14 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPlugin()
+	 */
+	public static function getScheme()
+	{
+		return self::SCHEME_NAME;
 	}
 
 	/* (non-PHPdoc)
@@ -98,7 +107,6 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		if ($this->shouldContribute($entry))
 		{
 			$fairplayContextData = new KalturaFairplayEntryContextPluginData();
-
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if (!is_null($fairplayProfile))
 			{
@@ -171,19 +179,27 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return false;
 	}
 
-	public function contributeToEntryPlayingDataResult(entry $entry, KalturaEntryPlayingDataParams $entryPlayingDataParams, KalturaEntryPlayingDataResult $result)
+	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->deliverProfile->getStreamerType()))
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
-			$data = new KalturaFairPlayEntryPlayingPluginData();
-			$data->scheme = $this->getPluginName();
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if (!is_null($fairplayProfile))
 			{
 				/* @var FairplayDrmProfile $fairplayProfile */
-				$data->certificate = $fairplayProfile->getPublicCertificate();
-				$data->licenseURL = $fairplayProfile->getLicenseServerUrl();
-				$result->pluginData[get_class($this)] = $data;
+
+				$signingKey = kConf::get('signing_key', 'drm', null);
+				if (!is_null($signingKey))
+				{
+					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
+					$customDataObject = reset($customDataJson);
+					$data = new KalturaFairPlayEntryPlayingPluginData();
+					$scheme = $this->getScheme();
+					$data->licenseURL = $this->constructUrl($fairplayProfile, $scheme, $customDataObject);
+					$data->scheme = $scheme;
+					$data->certificate = $fairplayProfile->getPublicCertificate();
+					$result->addToPluginData($scheme, $data);
+				}
 			}
 		}
 	}
@@ -191,6 +207,11 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public function isSupportStreamerTypes($streamerType)
 	{
 		return in_array($streamerType ,[PlaybackProtocol::APPLE_HTTP]);
+	}
+
+	public function constructUrl($fairplayProfile, $scheme, $customDataObject)
+	{
+		return $fairplayProfile->getLicenseServerUrl() . "/" . $scheme . "/license?custom_data=" . $customDataObject['custom_data'] . "&signature=" . $customDataObject['signature'];
 	}
 
 }

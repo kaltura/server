@@ -2,9 +2,10 @@
 /**
  * @package plugins.playReady
  */
-class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaEventConsumers, IKalturaEntryPlayingDataContributor
+class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaEventConsumers, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'playReady';
+	const SCHEME_NAME = 'playReady';
 	const SEARCH_DATA_SUFFIX = 's';
 	const PLAY_READY_EVENTS_CONSUMER = 'kPlayReadyEventsConsumer';
 	
@@ -17,6 +18,14 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getSchemeName()
+	 */
+	public static function getSchemeName()
+	{
+		return self::SCHEME_NAME;
 	}
 	
 	/* (non-PHPdoc)
@@ -226,24 +235,38 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		
 	}
 
-	public function contributeToEntryPlayingDataResult(entry $entry, KalturaEntryPlayingDataParams $entryPlayingDataParams, KalturaEntryPlayingDataResult $result)
+	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->deliverProfile->getStreamerType()) )
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()) )
 		{
 			$playReadyProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(PlayReadyPlugin::getPlayReadyProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if (!is_null($playReadyProfile))
 			{
-				$data = new KalturaDrmEntryPlayingPluginData();
-				$data->licenseURL = $playReadyProfile->getLicenseServerUrl();
-				$data->scheme = $this->getPluginName();
-				$result->pluginData[get_class($this)] = $data;
+				/* @var PlayReadyProfile $playReadyProfile */
+
+				$signingKey = kConf::get('signing_key', 'drm', null);
+				if (!is_null($signingKey))
+				{
+					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
+					$customDataObject = reset($customDataJson);
+					$data = new KalturaDrmEntryPlayingPluginData();
+					$scheme = $this->getSchemeName();
+					$data->licenseURL = $this->constructUrl($playReadyProfile, $scheme, $customDataObject);
+					$data->scheme = $scheme;
+					$result->addToPluginData($scheme, $data);
+				}
 			}
 		}
 	}
 
 	public function isSupportStreamerTypes($streamerType)
 	{
-		return in_array($streamerType ,[PlaybackProtocol::SILVER_LIGHT, PlaybackProtocol::MPEG_DASH]);
+		return in_array($streamerType ,[PlaybackProtocol::SILVER_LIGHT]);
+	}
+
+	public function constructUrl($playReadyProfile, $scheme, $customDataObject)
+	{
+		return $playReadyProfile->getLicenseServerUrl() . "/" . $scheme . "/license?custom_data=" . $customDataObject['custom_data'] . "&signature=" . $customDataObject['signature'];
 	}
 
 	/**
