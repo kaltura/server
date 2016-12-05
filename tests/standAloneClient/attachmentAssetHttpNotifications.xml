@@ -15,7 +15,7 @@
 		<!-- Attachemnt Asset Added -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaHttpNotificationTemplate">
-				<name>Attachemnt Asset Added</name>
+				<name>Attachment Asset Added</name>
 				<systemName>HTTP_Attachemnt_Asset_Added</systemName>
 				<description>HTTP notification template to be sent when a new Attachemnt asset is added to an entry.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
@@ -34,7 +34,7 @@
 		<!-- Attachemnt Asset Changed -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaHttpNotificationTemplate">
-				<name>Attachemnt Asset Changed</name>
+				<name>Attachment Asset Changed</name>
 				<systemName>HTTP_Attachemnt_Asset_Changed</systemName>
 				<description>HTTP notification template to be sent when a new Attachemnt asset changed.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
@@ -100,7 +100,7 @@
 		<!-- Attachemnt Asset Deleted -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaHttpNotificationTemplate">
-				<name>Attachemnt Asset Deleted</name>
+				<name>Attachment Asset Deleted</name>
 				<systemName>HTTP_Attachemnt_Asset_Deleted</systemName>
 				<description>HTTP notification template to be sent when a new Attachemnt asset is deleted.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
