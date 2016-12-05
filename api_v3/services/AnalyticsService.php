@@ -15,9 +15,10 @@ class AnalyticsService extends KalturaBaseService
 	 *
 	 * @action query
 	 * @param KalturaAnalyticsFilter $filter the analytics query filter
+         * @param KalturaFilterPager $pager the analytics query result pager
 	 * @return KalturaReportResponse
 	 */
-	public function queryAction($filter)
+	public function queryAction($filter, KalturaFilterPager $pager = null)
 	{
 
 		$filter->validateForUsage($filter);
@@ -28,8 +29,8 @@ class AnalyticsService extends KalturaBaseService
 		KalturaLog::debug('Extracted metrics: ' . var_export($metricsArr, true));
 		$filtersArr = $this->extractFilters($filter->filters);
 		KalturaLog::debug('Extracted filters: ' . var_export($filtersArr, true));
-
-		$internalApiRequest = $this->constructInternalRequest($filter->from_time, $filter->to_time, $dimensionsArr, $metricsArr, $filtersArr, $filter->utcOffset);
+                $pagerArr = $this->extractPager($pager);
+		$internalApiRequest = $this->constructInternalRequest($filter->from_time, $filter->to_time, $dimensionsArr, $metricsArr, $filtersArr, $filter->utcOffset, $filter->orderBy, $pagerArr);
 		KalturaLog::info('Constructed request: ' . var_export($internalApiRequest, true));
 
 		$internalApiServer = kConf::get('analytics_internal_API_url');
@@ -93,6 +94,24 @@ class AnalyticsService extends KalturaBaseService
 		return $res;
 	}
 
+        private function extractPager($pager)
+	{
+		KalturaLog::debug('Extracting pager: ' . var_export($pager, true));
+		
+		$res = array();
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+
+                $res['size'] = $pager->pageSize;
+                $res['index'] = $pager->pageIndex;
+
+		KalturaLog::debug('Extracted pager: ' . var_export($res, true));
+
+                return $res;
+	}
+
 	private function implodeWithComma($arr)
 	{
 		return implode(",", $arr);
@@ -118,10 +137,10 @@ class AnalyticsService extends KalturaBaseService
 		return array_map('trim', explode(",",$arr));
 	}
 
-	private function constructInternalRequest($from, $to, $dimensionsArr, $metricsArr, $filtersArr, $utcOffset)
+	private function constructInternalRequest($from, $to, $dimensionsArr, $metricsArr, $filtersArr, $utcOffset, $orderBy, $pager)
 	{
-		$data = array("from" => $from, "to" => $to, "dimensions" => $dimensionsArr, "filters" => $filtersArr, "metrics" => $metricsArr, "utcOffset" => $utcOffset);
-		//e.g. {"from":"1","to":"2","dimensions":["partner"], "filters":[{"dimension":"partner","values":["1"]}], "metrics":["play"], "utcOffset":"240"}
+		$data = array("from" => $from, "to" => $to, "dimensions" => $dimensionsArr, "filters" => $filtersArr, "metrics" => $metricsArr, "utcOffset" => $utcOffset, "orderBy" => $orderBy, "pager" => $pager);
+		//e.g. {"from":"1","to":"2","dimensions":["partner"], "filters":[{"dimension":"partner","values":["1"]}], "metrics":["play"], "utcOffset":"240", "orderBy":"+play", "pager":{"size": 100, "index":1}}
 		return json_encode($data);
 	}
 

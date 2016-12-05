@@ -20,7 +20,7 @@ class VodPackagerDeliveryUtils
 		$prefix = kString::getCommonPrefix($urls);
 		$postfix = kString::getCommonPostfix($urls);
 		
-		if ( ($entry->getType() == entryType::PLAYLIST) || ($params->getUsePlayServer()) )
+		if ( ($entry->getType() == entryType::PLAYLIST) )
 		{
 			// in case of a playlist, need to merge the flavor params of the urls
 			// instead of using a urlset, since nginx-vod does not support urlsets of 
@@ -42,15 +42,16 @@ class VodPackagerDeliveryUtils
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
 		
-		if ( ($entry->getType() == entryType::PLAYLIST &&
-			strpos($middlePart, '/') === false) || ($params->getUsePlayServer()))
+		if ($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false)
 		{
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
 			$result = $prefix . $middlePart . $postfix;
 		}
 		else
 		{
-			$result = $prefix . $middlePart . $postfix . '.urlset';
+			$result = $prefix . $middlePart . $postfix;
+			if (!$params->getUsePlayServer())
+				$result .= '.urlset';
 		}
 	
 		return '/' . ltrim($result, '/');

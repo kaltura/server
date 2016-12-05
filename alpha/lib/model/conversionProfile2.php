@@ -302,4 +302,14 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 			
 		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
 	}
+	
+	public function getCalculateComplexity()
+	{
+		return $this->getFromCustomData('calculateComplexity', null, true);
+	}
+	
+	public function setCalculateComplexity($v)
+	{
+		$this->putInCustomData('calculateComplexity', $v);
+	}
 }

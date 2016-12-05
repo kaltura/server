@@ -537,11 +537,15 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function regenerateStreamTokenAction($entryId)
 	{
+		
 		$this->dumpApiRequest($entryId);
 	
 		$liveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$liveEntry || $liveEntry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+		
+		if (!in_array($liveEntry->getSourceType(), LiveEntry::$kalturaLiveSourceTypes))
+			throw new KalturaAPIException(KalturaErrors::CANNOT_REGENERATE_STREAM_TOKEN_FOR_EXTERNAL_LIVE_STREAMS, $liveEntry->getSourceType());
 		
 		$password = sha1(md5(uniqid(rand(), true)));
 		$password = substr($password, rand(0, strlen($password) - 8), 8);

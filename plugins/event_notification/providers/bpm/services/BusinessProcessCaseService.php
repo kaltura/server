@@ -180,20 +180,18 @@ class BusinessProcessCaseService extends KalturaBaseService
 				KalturaLog::info("Provider [" . $businessProcessServer->type . "] not found");
 				continue;
 			}
-			
-			foreach($caseIds as $caseId)
+
+			$latestCaseId = array_pop($caseIds);
+			if($latestCaseId)
 			{
-				try
-				{
-					$case = $provider->getCase($caseId);
+				try {
+					$case = $provider->getCase($latestCaseId);
 					$businessProcessCase = new KalturaBusinessProcessCase();
 					$businessProcessCase->businessProcessStartNotificationTemplateId = $templateId;
 					$businessProcessCase->fromObject($case);
 					$array[] = $businessProcessCase;
-				}
-				catch(ActivitiClientException $e)
-				{
-					KalturaLog::err("Case [$caseId] not found: " . $e->getMessage());
+				} catch (ActivitiClientException $e) {
+					KalturaLog::err("Case [$latestCaseId] not found: " . $e->getMessage());
 				}
 			}
 		}

@@ -164,6 +164,7 @@ class MediaService extends KalturaEntryService
 			$tempMediaEntry = new KalturaMediaEntry();
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
+			$tempMediaEntry->sourceType = $dbEntry->getSourceType();
 
 			if ( !$conversionProfileId ) {
 				$originalConversionProfileId = $dbEntry->getConversionQuality();

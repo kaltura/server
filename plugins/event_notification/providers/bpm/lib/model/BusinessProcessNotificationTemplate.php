@@ -149,6 +149,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 			}
 			
 			$values = $this->getCaseValues($object, true, $processId);
+			$values = array_slice($values,-100);
 			$values[] = array(
 				'caseId' => $caseId,
 				'processId' => $processId,

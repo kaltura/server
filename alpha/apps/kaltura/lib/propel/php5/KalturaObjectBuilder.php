@@ -1042,6 +1042,10 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	{
 		\$customData = \$this->getCustomDataObj( );
 		
+		\$customDataOldValue = \$customData->get(\$name, \$namespace);
+		if(!is_null(\$customDataOldValue) && serialize(\$customDataOldValue) === serialize(\$value))
+			return;
+				
 		\$currentNamespace = '';
 		if(\$namespace)
 			\$currentNamespace = \$namespace;
@@ -1049,7 +1053,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		if(!isset(\$this->oldCustomDataValues[\$currentNamespace]))
 			\$this->oldCustomDataValues[\$currentNamespace] = array();
 		if(!isset(\$this->oldCustomDataValues[\$currentNamespace][\$name]))
-			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customData->get(\$name, \$namespace);
+			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customDataOldValue;
 		
 		\$customData->put ( \$name , \$value , \$namespace );
 	}

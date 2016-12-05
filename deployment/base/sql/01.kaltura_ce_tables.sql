@@ -374,6 +374,7 @@ CREATE TABLE IF NOT EXISTS `category_entry` (
   `category_full_ids` text NOT NULL,
   `status` int(11) DEFAULT '2',
   `privacy_context` VARCHAR(255),
+  `creator_kuser_id` INTEGER,
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `category_id_index` (`category_id`),

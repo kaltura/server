@@ -80,6 +80,7 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$categoryEntry->toInsertableObject($dbCategoryEntry);
 		
+		/* @var $dbCategoryEnry categoryEntry */
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
@@ -90,13 +91,24 @@ class CategoryEntryService extends KalturaBaseService
 				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
-		if (kEntitlementUtils::getCategoryModeration() && $category->getModeration())
+		
+		if ($category->getModeration() && 
+		   (kEntitlementUtils::getCategoryModeration() || $this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE)))
 		{
 			$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
 		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$dbCategoryEntry->setPartnerId($partnerId);
+		
+		$kuser = kCurrentContext::getCurrentKsKuser();
+		
+		if ($kuser)
+		{
+			$dbCategoryEntry->setCreatorKuserId($kuser->getId());
+			$dbCategoryEntry->setCreatorPuserId($kuser->getPuserId());
+		}
+		
 		$dbCategoryEntry->save();
 		
 		//need to select the entry again - after update
@@ -300,6 +312,13 @@ class CategoryEntryService extends KalturaBaseService
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
+					
+		}
+		
+		if (kCurrentContext::getCurrentKsKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
+			$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
 		}
 			
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
@@ -342,8 +361,15 @@ class CategoryEntryService extends KalturaBaseService
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
+					
 		}
 			
+		if (kCurrentContext::getCurrentKsKuserId() == $dbCategoryEntry->getCreatorKuserId() &&
+			$this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
+		}
+		
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
 			

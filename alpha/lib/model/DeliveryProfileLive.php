@@ -308,9 +308,14 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
 		
 		if($this->getDynamicAttributes()->getServeVodFromLive())
+		{
 			$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
+			$livePackagerUrl = str_replace("live", "recording", $livePackagerUrl);
+		}
 		else
+		{
 			$entryId = $this->getDynamicAttributes()->getEntryId();
+		}
 		
 		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);

@@ -1,3 +1,74 @@
+# Lynx 12.6.0 #
+
+## support for Kaltura liveRecording - Full Live to Vod flow ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5807
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+Add live flavor params tag to include hls required tags:
+
+	php /opt/kaltura/app/deployment/updates/scripts/2016_10_30_update_live_flavor_tags.php
+
+Add new permissions to mediaServer partner for media->update:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_11_22_media_server_media_update.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Ad cue points http notifications ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6235
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/adCuePointHttpNotification.xml
+
+## Allow entryServerNode get and list actions for partners ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6234
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+Add additional permissions to liveEntryServerNode service: 	
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_11_21_entry_server_node_allow_partner_list.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## CategoryEntry - new column ##
+
+- Issue type: Task
+- Issue ID - PS-2666
+
+### Configuration ###
+
+None.
+
+### Deployment Scripts ###
+
+Add a new column to the category_entry table:
+
+			mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_11_11_alter_category_entry_table_add_creator_kuser_id_table.sql
+
 # Lynx 12.5.0 #
 
 ## CaptionAssetItem - remove column - int_id ##

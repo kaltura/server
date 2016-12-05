@@ -47,6 +47,15 @@ class KalturaCategoryEntry extends KalturaObject implements IRelatedFilterable
 	 */
 	public $status;
 	
+	/**
+	 * 
+	 * CategroyEntry creator puser ID
+	 * @var string
+	 * @readonly
+	 * @filter eq,in
+	 */
+	public $creatorUserId;
+	
 	private static $mapBetweenObjects = array
 	(
 		"entryId",
@@ -54,6 +63,7 @@ class KalturaCategoryEntry extends KalturaObject implements IRelatedFilterable
 		"createdAt",
 		"categoryFullIds",
 		"status",
+		"creatorUserId" => "creatorPuserId",
 	);
 	
 	/* (non-PHPdoc)

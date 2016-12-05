@@ -6,13 +6,13 @@
 class KalturaAnalyticsFilter extends KalturaObject
 {
 	/**
-	 * Query start time (in local time)
+	 * Query start time (in local time) MM/dd/yyyy HH:mi
 	 * @var string
 	 */
 	public $from_time;
 
 	/**
-	 * Query end time (in local time)
+	 * Query end time (in local time) MM/dd/yyyy HH:mi
 	 * @var string
 	 */
 	public $to_time;
@@ -41,8 +41,15 @@ class KalturaAnalyticsFilter extends KalturaObject
 	 */
 	public $filters;
 
+	/**
+	 * Query order by metric/dimension
+         * @var string
+         */
+        public $orderBy;
+
 	public function __construct() {
 		$this->utcOffset = 0;
+		$this->orderBy="";
 	}
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())

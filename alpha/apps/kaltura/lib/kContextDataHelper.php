@@ -201,10 +201,14 @@ class kContextDataHelper
 		elseif (myEntryUtils::shouldServeVodFromLive($this->entry))
 		{
 			$mediaEntryId = $this->entry->getRootEntryId();
-			if($mediaEntryId)
-				$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
+			$liveEntry = entryPeer::retrieveByPK($mediaEntryId);
 			
-			$this->msDuration = ($liveEntry && $liveEntry->getLengthInMsecs()) ? $liveEntry->getLengthInMsecs() : self::DEFAULT_SERVE_VOD_FROM_LIVE_DURATION;
+			if($liveEntry && $liveEntry->getLengthInMsecs())
+				$this->msDuration = $liveEntry->getLengthInMsecs();
+			elseif($this->entry->getLengthInMsecs())
+				$this->msDuration = $this->entry->getLengthInMsecs();
+			else
+				$this->msDuration = self::DEFAULT_SERVE_VOD_FROM_LIVE_DURATION;
 		}
 		else
 		{

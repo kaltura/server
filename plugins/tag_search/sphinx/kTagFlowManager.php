@@ -308,7 +308,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    	        $tag->setTag(trim($tagToAdd));
 	    	        $tag->setObjectType($objectType);
 	    	        $tag->setPartnerId($partnerId);
-	    	        $tag->setPrivacyContext($privacyContext);
+			        $tag->setPrivacyContext($privacyContext ? $privacyContext : self::NULL_PC);
 	    	        $tag->save();
 		        }
 	    	}
