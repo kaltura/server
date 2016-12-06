@@ -6,7 +6,7 @@
 	<dd>
 		<input type="text" value="<?php echo $this->element->getValue(); ?>" id="api_authorize_url">
 		<?php if ($this->element->hasToken){ ?>
-			<p class="description">If you want to re-authenticate the Youtube API distribution then send this like to a person who has access to the KMC and Youtube channel.</p>
+			<p class="description">If you want to re-authenticate the Youtube API distribution then send this link to a person who has access to the KMC and Youtube channel.</p>
 		<?php } else { ?>
 			<p class="description">Send this link to the person who has access to the KMC and the YouTube channel. He should login using his KMC credentials and then authenticate at Google using his Google Account that is linked with his YouTube channel. This authorization process is only required when using playlists.</p>
 		<?php } ?>
