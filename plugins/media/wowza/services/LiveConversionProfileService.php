@@ -39,6 +39,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws WowzaErrors::INVALID_STREAM_NAME
+	 * @throws KalturaErrors::INGEST_NOT_FOUND_IN_CONVERSION_PROFILE
 	 */
 	//public function serveAction($streamName, $hostname = null)
 	public function serveAction($streamName, $hostname = null, $audiodatarate = null, $videodatarate = null, $width = null, $height = null, $framerate = null, $videocodecidstring = null,  $audiocodecidstring = null)
@@ -204,7 +205,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		return 0;
 	}
 	
-	private function isFlavorCompatibile($ingestParameters, $flavorBitrate, $flavorResolution)
+	private function isFlavorCompatibile($ingestParameters, $flavorBitrate, $flavorResolution, $flavorId)
 	{
 		$flavorHeight = 0;
 		switch ($flavorResolution['fitMode'])
@@ -222,10 +223,14 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		if (isset($ingestParameters['height']) && $ingestParameters['height'] < $flavorHeight)
 		{
+			$ingestResolutionString = $ingestParameters['width'] . 'x' . $ingestParameters['height'];
+			$flavorResolutionString = $flavorResolution['width'] . 'x' . $flavorHeight;
+			KalturaLog::info('Flavor [' . $flavorId . '] rejected due to Resolution; Ingest: [' . $ingestResolutionString . '], Flavor: [' . $flavorResolutionString . ']');
 			return false;
 		}
 		else if (isset($ingestParameters['videodatarate']) && ($ingestParameters['videodatarate'] * 1024) < $flavorBitrate)
 		{
+			KalturaLog::info('Flavor [' . $flavorId . '] rejected due to VideoBitrate; Ingest: [' . $ingestParameters['videodatarate'] * 1024 . '], Flavor: [' . $flavorBitrate . ']');
 			return false;
 		}
 		
@@ -240,26 +245,22 @@ class LiveConversionProfileService extends KalturaBaseService
 		if(!$liveParams->getWidth() && !$liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'match-source';
-			$resolutionObject['value'] = 'match-source';
 		}
 		elseif($liveParams->getWidth() && $liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'fit-height';
 			$resolutionObject['width'] = $liveParams->getWidth();
 			$resolutionObject['height'] = $liveParams->getHeight();
-			$resolutionObject['value'] = $liveParams->getHeight() . ' x ' . $liveParams->getWidth();
 		}
 		elseif($liveParams->getWidth())
 		{
 			$resolutionObject['fitMode'] = 'fit-width';
 			$resolutionObject['width'] = $liveParams->getWidth();
-			$resolutionObject['value'] = 'fit-width x' . $liveParams->getWidth();
 		}
 		elseif($liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'fit-height';
 			$resolutionObject['height'] = $liveParams->getHeight();
-			$resolutionObject['value'] = $liveParams->getHeight() . ' x fit-height';
 		}
 		
 		return $resolutionObject;
@@ -290,10 +291,9 @@ class LiveConversionProfileService extends KalturaBaseService
 		if (!$liveParams->hasTag(liveParams::TAG_INGEST))
 		{
 			// Reject all transcoded flavors that their parameters are higher that the incoming stream -> VideoBitRate, Resolution
-			if (!$this->isFlavorCompatibile($streamParametersArray, $flavorBitrateValue, $flavorResolutionInfo))
+			if (!$this->isFlavorCompatibile($streamParametersArray, $flavorBitrateValue, $flavorResolutionInfo, $liveParams->getId()))
 			{
 				// Flavor is not compatible with the ingest's parameters -> discard it.
-				KalturaLog::info('Transcoded flavor [' . $liveParams->getId() . '] rejected. Resolution: [' . $flavorResolutionInfo['value'] . ']; Bitrate: [' . $flavorBitrateValue . ']');
 				return;
 			}
 		}
