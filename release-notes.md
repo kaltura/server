@@ -1,5 +1,17 @@
 # Lynx 12.7.0 #
 
+## Ad cue points and entry changed http notifications ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6235
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/adCuePointHttpNotification.xml
+
 ## support for Kaltura liveRecording - Full Live to Vod flow ##
 
  - Issue Type: New Feature
