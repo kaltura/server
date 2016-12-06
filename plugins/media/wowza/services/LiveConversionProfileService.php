@@ -46,8 +46,8 @@ class LiveConversionProfileService extends KalturaBaseService
 		$streamParametersArray = array(
 			'streamName' => $streamName,
 			'hostname' => $hostname,
-			'audiodatarate' => $audiodatarate * 1024,
-			'videodatarate' => $videodatarate * 1024,
+			'audiodatarate' => $audiodatarate,
+			'videodatarate' => $videodatarate,
 			'width' => $width,
 			'height' => $height,
 			'framerate' => $framerate,
@@ -197,7 +197,11 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function calculateFlavorHeight($flavorResolution, $ingestParameters)
 	{
-		return $flavorResolution['width'] * $ingestParameters['height'] / $ingestParameters['width'];
+		if (isset($ingestParameters['height']) && isset($ingestParameters['width']) && $ingestParameters['width'] != 0)
+		{
+			return $flavorResolution['width'] * $ingestParameters['height'] / $ingestParameters['width'];
+		}
+		return 0;
 	}
 	
 	private function isFlavorCompatibile($ingestParameters, $flavorBitrate, $flavorResolution)
@@ -211,6 +215,7 @@ class LiveConversionProfileService extends KalturaBaseService
 				$flavorHeight = $flavorResolution['height'];
 				break;
 			case 'fit-width':
+				// Flavor's height is not defined in KMC, calculate it according to ingest/flavor ratio
 				$flavorHeight = $this->calculateFlavorHeight($flavorResolution, $ingestParameters);
 				break;
 		}
@@ -219,7 +224,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		{
 			return false;
 		}
-		else if (isset($ingestParameters['videodatarate']) && $ingestParameters['videodatarate'] < $flavorBitrate)
+		else if (isset($ingestParameters['videodatarate']) && ($ingestParameters['videodatarate'] * 1024) < $flavorBitrate)
 		{
 			return false;
 		}
@@ -235,22 +240,26 @@ class LiveConversionProfileService extends KalturaBaseService
 		if(!$liveParams->getWidth() && !$liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'match-source';
+			$resolutionObject['value'] = 'match-source';
 		}
 		elseif($liveParams->getWidth() && $liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'fit-height';
 			$resolutionObject['width'] = $liveParams->getWidth();
 			$resolutionObject['height'] = $liveParams->getHeight();
+			$resolutionObject['value'] = $liveParams->getHeight() . ' x ' . $liveParams->getWidth();
 		}
 		elseif($liveParams->getWidth())
 		{
 			$resolutionObject['fitMode'] = 'fit-width';
 			$resolutionObject['width'] = $liveParams->getWidth();
+			$resolutionObject['value'] = 'fit-width x' . $liveParams->getWidth();
 		}
 		elseif($liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'fit-height';
 			$resolutionObject['height'] = $liveParams->getHeight();
+			$resolutionObject['value'] = $liveParams->getHeight() . ' x fit-height';
 		}
 		
 		return $resolutionObject;
@@ -258,14 +267,12 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function checkMaxFramerate($ingestFramerate, $flavorMaxFramerate)
 	{
-		if ($flavorMaxFramerate)
-		{
-			$skipCount = ($ingestFramerate / $flavorMaxFramerate) - 1;
-			$noise = (round($skipCount) == 0) ? 0.1 : ((110 / 100) * round($skipCount));
-			return $skipCount < $noise ? round($skipCount) : ceil($skipCount);
-		}
-		
-		return $flavorMaxFramerate;
+		return $flavorMaxFramerate ? ceil(($ingestFramerate / $flavorMaxFramerate) - 1 - 0.05) : 0;
+	}
+	
+	private function getIngestAudioCodec($ingestParameters)
+	{
+		return (isset($ingestParameters['audiocodecidstring']) && $ingestParameters['audiocodecidstring'] === 'AAC') ? 'PassThru' : 'AAC';
 	}
 	
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams, $streamParametersArray)
@@ -273,7 +280,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$conversionExtraParam = json_decode($liveParams->getConversionEnginesExtraParams());
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = (isset($streamParametersArray['audiocodecidstring']) && $streamParametersArray['audiocodecidstring'] === 'AAC') ? 'PassThru' : 'AAC';
+		$audioCodec = $this->getIngestAudioCodec($streamParametersArray);
 		$profile = 'main';
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
@@ -282,9 +289,11 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		if (!$liveParams->hasTag(liveParams::TAG_INGEST))
 		{
+			// Reject all transcoded flavors that their parameters are higher that the incoming stream -> VideoBitRate, Resolution
 			if (!$this->isFlavorCompatibile($streamParametersArray, $flavorBitrateValue, $flavorResolutionInfo))
 			{
 				// Flavor is not compatible with the ingest's parameters -> discard it.
+				KalturaLog::info('Transcoded flavor [' . $liveParams->getId() . '] rejected. Resolution: [' . $flavorResolutionInfo['value'] . ']; Bitrate: [' . $flavorBitrateValue . ']');
 				return;
 			}
 		}
