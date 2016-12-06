@@ -1,3 +1,27 @@
+# Lynx 12.7.0 #
+
+## support for Kaltura liveRecording - Full Live to Vod flow ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5807
+
+### Configuration ###
+
+Add the following to worrkers.in file:
+
+	;The path for finished products, acessable from the apache
+	params.sharedTempPath	= @WEB_DIR@/tmp/convert 
+	(should be identical to the shared path configurued on KAsyncConvertWorker)
+
+### Deployment scripts ###
+	
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Lynx 12.6.0 #
 
 ## support for Kaltura liveRecording - Full Live to Vod flow ##
