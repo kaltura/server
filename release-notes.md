@@ -19,11 +19,10 @@ None.
 
 ### Configuration ###
 
-Add the following to worrkers.in file:
+Add the following to workers.ini under KAsyncExtractMedia:
 
 	;The path for finished products, acessable from the apache
-	params.sharedTempPath	= @WEB_DIR@/tmp/convert 
-	(should be identical to the shared path configurued on KAsyncConvertWorker)
+	params.sharedTempPath	= (should be identical to the shared path configurued on KAsyncConvertWorker)
 
 ### Deployment scripts ###
 	
