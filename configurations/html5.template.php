@@ -38,6 +38,7 @@ if( $wgHTTPProtocol == 'https' ){
         $wgKalturaServiceUrl = wgGetUrl('cdn_api_host_https');
         $wgKalturaCDNUrl = wgGetUrl('cdn_host_https');
         $wgKalturaStatsServiceUrl = wgGetUrl('stats_host_https');
+	$wgKalturaLiveStatsServiceUrl = wgGetUrl('live_stats_host_https');
 }
 
 // Default Asset CDN Path (used in ResouceLoader.php):
