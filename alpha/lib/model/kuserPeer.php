@@ -90,10 +90,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
 		$lockKey = "user_add_" . $partner_id . $puser_id;
-		return kLock::runLocked($lockKey, array('kuserPeer','getOrCreateKuserForPartner'), array($partner_id, $puser_id, $is_admin));
+		return kLock::runLocked($lockKey, array('kuserPeer','createUniqueKuserForPartner'), array($partner_id, $puser_id, $is_admin));
 	}
 
-	public static function getOrCreateKuserForPartner($partner_id, $puser_id, $is_admin = false)
+	public static function createUniqueKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
 		$kuser = kuserPeer::getKuserForPartner($partner_id, $puser_id);
 		if (!$kuser)
