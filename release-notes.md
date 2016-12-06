@@ -7,7 +7,7 @@
 
 ### Configuration ###
 
-Add the following to workers.ini under KAsyncExtractMedia file:
+Add the following to workers.ini under KAsyncExtractMedia:
 
 	;The path for finished products, acessable from the apache
 	params.sharedTempPath	= (should be identical to the shared path configurued on KAsyncConvertWorker)
