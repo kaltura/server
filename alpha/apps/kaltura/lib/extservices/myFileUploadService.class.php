@@ -8,7 +8,7 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 	const MAX_FILES = 100;
 	
 	private static $NEED_MEDIA_INFO = "0";
-	
+		
 	protected $source_type ="upload";
 	protected $supported_media_types = 7 ; // bitwise for all 3 
 	protected $source_name = "File Upload";
@@ -29,12 +29,29 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 	{
 		return array("maxFiles" => self::MAX_FILES );
 	}
-	
-	
+
+	public static function getExtensionByContentType($url)
+	{
+		$curlWrapper = new KCurlWrapper();
+		$curlHeaderResponse = $curlWrapper->getHeader($url, false);
+		$curlWrapper->close();
+
+		$headerContentType = $curlHeaderResponse && isset($curlHeaderResponse->headers["content-type"]) ? strtolower($curlHeaderResponse->headers["content-type"]) : null;
+		$contentTypes = kConf::get("video_curl_content_type", 'base', array());
+
+		if($headerContentType && isset($contentTypes[$headerContentType]))
+		{
+			$ext = $contentTypes[$headerContentType];
+			KalturaLog::debug("extension - $ext");
+			return $ext;
+		}
+
+		return null;
+	}
+
 	static public function getMediaTypeFromFileExt ( $ext )
 	{
 		// notice that video is checked first since it has precedence over audio (both may have the same ext.)
-		
 		$ext = strtolower($ext);
 	    if (in_array($ext, kConf::get("video_file_ext")))
 	    {
