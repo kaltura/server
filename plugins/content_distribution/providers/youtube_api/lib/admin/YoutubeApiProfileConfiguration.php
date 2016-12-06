@@ -26,12 +26,16 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
 
+		$hasToken = false;
+		if ($this->distributionProfile->googleTokenData)
+			$hasToken = true;
 		$this->addElement('text', 'api_authorize_url', array(
 			'label'			=> 'Authorize API Access:',
 			'decorators' => array(array('ViewScript', array(
 				'viewScript' => 'youtube-distribution-api-authorize-field.phtml',
 
-			)))
+			))),
+		'hasToken' => $hasToken
 		));
 		
 		// General
