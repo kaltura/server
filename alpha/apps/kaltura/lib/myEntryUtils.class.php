@@ -1519,4 +1519,70 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			return false;
 		return $entry->isReady();
 	}
+
+	/*
+	 * Builds a manifest request for entry according to relevant flavors, delivery profile type and location of deliveryProfile(local/remote)
+	 */
+	public static function buildManifestUrl($entry, $format, $flavors, $storageId = null)
+	{
+		$entryId = $entry->getId();
+		$partnerId = $entry->getPartnerId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $partnerId);
+		$protocol = requestUtils::getProtocol();
+		$cdnApiHost = requestUtils::getApiCdnHost();
+
+		$flavorIds = array();
+		$fileExtension = null;
+
+		foreach ( $flavors as $flavor)
+		{
+			$flavorIds[] = $flavor->getId();
+			$fileExtension = $flavor->getFileExt();
+		}
+
+		$flavorIdsAsString = implode(",", $flavorIds);
+		$url = $cdnApiHost. "$partnerPath/playManifest/entryId/$entryId/flavorIds/$flavorIdsAsString/protocol/$protocol";
+
+		if($storageId)
+			$url .= "/storageId/" . $storageId;
+
+		$url .= "/format/" . self::getFileExtensionByFormat($format, $fileExtension);
+
+		return $url;
+	}
+
+	public static function getFileExtensionByFormat($format, $fileExtension = "" )
+	{
+		switch ($format)
+		{
+			case PlaybackProtocol::AKAMAI_HD:
+				return PlaybackProtocol::AKAMAI_HD . "/manifest.f4m";
+			case PlaybackProtocol::MULTICAST_SL:
+				return PlaybackProtocol::MULTICAST_SL . "/a.ism";
+			case PlaybackProtocol::RTMP:
+				return PlaybackProtocol::RTMP . "/a.f4m";
+			case PlaybackProtocol::APPLE_HTTP:
+				return PlaybackProtocol::APPLE_HTTP . "/a.m3u8";
+			case PlaybackProtocol::HDS:
+				return PlaybackProtocol::HDS . "/a.f4m";
+			case PlaybackProtocol::SILVER_LIGHT:
+				return PlaybackProtocol::SILVER_LIGHT . "/a.ism";
+			case PlaybackProtocol::HLS:
+				return PlaybackProtocol::APPLE_HTTP . "/a.m3u8";
+			case PlaybackProtocol::MPEG_DASH:
+				return PlaybackProtocol::MPEG_DASH . "/manifest.mpd";
+			case PlaybackProtocol::APPLE_HTTP_TO_MC:
+				return PlaybackProtocol::APPLE_HTTP_TO_MC . "/a.m3u8";
+			case PlaybackProtocol::RTSP:
+				return PlaybackProtocol::RTSP . "/name/a.3gp";
+			case PlaybackProtocol::AKAMAI_HDS:
+				return PlaybackProtocol::AKAMAI_HDS . "/manifest.f4m";
+			case PlaybackProtocol::HTTP:
+				return PlaybackProtocol::HTTP . "/name/a.$fileExtension";
+			default:
+				return "";
+		}
+	}
+
+
 }

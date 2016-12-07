@@ -25,6 +25,13 @@ class KalturaRule extends KalturaObject
 	 * @var string
 	 */
 	public $message;
+
+	/**
+	 * Code to be thrown to the player in case the rule is fulfilled
+	 *
+	 * @var string
+	 */
+	public $code;
 	
 	/**
 	 * Actions to be performed by the player in case the rule is fulfilled
@@ -66,6 +73,7 @@ class KalturaRule extends KalturaObject
 		'description',
 		'ruleData',
 		'message',
+		'code',
 		'actions',
 		'conditions',
 		'contexts',
