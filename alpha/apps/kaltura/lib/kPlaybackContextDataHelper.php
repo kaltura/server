@@ -284,7 +284,7 @@ class kPlaybackContextDataHelper
 		foreach ($localDeliveryProfiles as $deliveryProfile)
 		{
 			$deliveryProfileFlavors = $this->localFlavors;
-			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile);
+			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile, $contextDataHelper);
 
 			if (count($playbackFlavors))
 			{
@@ -321,7 +321,7 @@ class kPlaybackContextDataHelper
 			{
 				$deliveryProfileFlavorsForDc = $flavorAssetsForDc;
 
-				list($flavorToDrmData, $filteredDeliveryProfileFlavorsForDc) = self::getDrmData($dbEntry, $deliveryProfileFlavorsForDc, $deliveryProfile);
+				list($flavorToDrmData, $filteredDeliveryProfileFlavorsForDc) = self::getDrmData($dbEntry, $deliveryProfileFlavorsForDc, $deliveryProfile, $contextDataHelper);
 
 				if (count($filteredDeliveryProfileFlavorsForDc))
 				{
@@ -393,7 +393,7 @@ class kPlaybackContextDataHelper
 	 * @param $deliveryProfile
 	 * @return array
 	 */
-	private static function getDrmData(entry $dbEntry, $flavorAssets, $deliveryProfile)
+	private static function getDrmData(entry $dbEntry, $flavorAssets, $deliveryProfile, $contextDataHelper)
 	{
 		$playbackContextDataParams = new kPlaybackContextDataParams();
 		$playbackContextDataParams->setDeliveryProfile($deliveryProfile);
@@ -402,7 +402,7 @@ class kPlaybackContextDataHelper
 		$result = new kPlaybackContextDataResult();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlaybackContextDataContributor');
 		foreach ($pluginInstances as $pluginInstance)
-			$pluginInstance->contributeToPlaybackContextDataResult($dbEntry, $playbackContextDataParams, $result);
+			$pluginInstance->contributeToPlaybackContextDataResult($dbEntry, $playbackContextDataParams, $result, $contextDataHelper);
 
 		if (count($result->getFlavorIdsToRemove()))
 			self::filterFlavorAssets($flavorAssets, $result->getFlavorIdsToRemove(), true);

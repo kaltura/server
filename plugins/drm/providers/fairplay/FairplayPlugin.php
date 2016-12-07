@@ -175,9 +175,9 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return false;
 	}
 
-	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result)
+    public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if ($fairplayProfile)
@@ -189,11 +189,11 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
-					$data = new KalturaFairPlayEntryPlayingPluginData();
+					$data = new kFairPlayEntryPlayingPluginData();
 					$scheme = $this->getScheme();
-					$data->licenseURL = $this->constructUrl($fairplayProfile, $scheme, $customDataObject);
-					$data->scheme = $scheme;
-					$data->certificate = $fairplayProfile->getPublicCertificate();
+					$data->setLicenseURL($this->constructUrl($fairplayProfile, $scheme, $customDataObject));
+					$data->setScheme($scheme);
+					$data->setCertificate($fairplayProfile->getPublicCertificate());
 					$result->addToPluginData($scheme, $data);
 				}
 			}
@@ -202,7 +202,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
 	public function isSupportStreamerTypes($streamerType)
 	{
-		return in_array($streamerType ,[PlaybackProtocol::APPLE_HTTP]);
+		return in_array($streamerType ,array(PlaybackProtocol::APPLE_HTTP));
 	}
 
 	public function constructUrl($fairplayProfile, $scheme, $customDataObject)

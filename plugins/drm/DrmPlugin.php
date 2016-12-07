@@ -5,7 +5,7 @@
 class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'drm';
-	const schemes = ['cenc/widevine', 'cenc/playready'];
+	private static $schemes = array('cenc/widevine', 'cenc/playready');
 
     /* (non-PHPdoc)
      * @see IKalturaPlugin::getPluginName()
@@ -20,7 +20,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
    */
 	public static function getSchemes()
 	{
-		return self::schemes;
+		return self::$schemes;
 	}
 
 	/* (non-PHPdoc)
@@ -166,9 +166,9 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	    return null;
     }
 
-	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result)
+	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
 			if ($dbProfile)
@@ -180,9 +180,9 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 					$customDataObject = reset($customDataJson);
 					foreach ($this->getSchemes() as $scheme)
 					{
-						$data = new KalturaDrmEntryPlayingPluginData();
-						$data->licenseURL = $this->constructUrl($dbProfile, $scheme, $customDataObject);
-						$data->scheme = $scheme;
+						$data = new kDrmEntryPlayingPluginData();
+						$data->setLicenseURL($this->constructUrl($dbProfile, $scheme, $customDataObject));
+						$data->setScheme($scheme);
 						$result->addToPluginData($scheme, $data);
 					}
 				}
@@ -192,7 +192,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 
 	public function isSupportStreamerTypes($streamerType)
 	{
-		return in_array($streamerType ,[PlaybackProtocol::MPEG_DASH]);
+		return in_array($streamerType ,array(PlaybackProtocol::MPEG_DASH));
 	}
 
 	public function constructUrl($dbProfile, $scheme, $customDataObject)

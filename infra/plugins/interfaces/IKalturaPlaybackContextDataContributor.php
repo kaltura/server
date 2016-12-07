@@ -13,8 +13,9 @@ interface IKalturaPlaybackContextDataContributor
      * @param entry $entry
      * @param kPlaybackContextDataParams $entryPlayingDataParams
      * @param kPlaybackContextDataResult $result
+     * @param kContextDataHelper $contextDataHelper
      */
-    public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result);
+    public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper);
 
     /**
      * @param $streamerType
