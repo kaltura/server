@@ -114,6 +114,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return new KalturaAccessControlDrmPolicyAction();
 	    if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
 		    return new KalturaDrmEntryContextPluginData();
+	    if ($baseClass == 'KalturaDrmEntryPlayingPluginData' && $enumValue == 'kDrmEntryPlayingPluginData')
+		    return new KalturaDrmEntryPlayingPluginData();
         return null;
     }
 

@@ -59,8 +59,9 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		}
 		if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
 			return new KalturaFairplayEntryContextPluginData();
-
-			return null;
+		if ($baseClass == 'KalturaDrmEntryPlayingPluginData' && $enumValue == 'kFairPlayEntryPlayingPluginData')
+			return new KalturaFairPlayEntryPlayingPluginData();
+		return null;
 	}
 
 	/* (non-PHPdoc)
@@ -86,7 +87,6 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		}
 		if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
 			return 'KalturaFairplayEntryContextPluginData';
-		
 		return null;
 	}
 
