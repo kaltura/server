@@ -224,7 +224,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			return array(
 				categoryPeer::PRIVACY_CONTEXT,
 				Criteria::IN_LIKE,
-				kString::addPrefixToArray($crit->getValue(), kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId));
+				kEntitlementUtils::handlePrivacyContexts($crit->getValue(),$partnerId));
 		}else if ($field == categoryPeer::PRIVACY_CONTEXTS  && $crit->getComparison() == Criteria::EQUAL)
 		{
 			return array(
@@ -236,7 +236,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			return array(
 				categoryPeer::PRIVACY_CONTEXTS,
 				Criteria::IN_LIKE,
-				kString::addPrefixToArray($crit->getValue(), kEntitlementUtils::PARTNER_ID_PREFIX . $partnerId));
+				kEntitlementUtils::handlePrivacyContexts($crit->getValue(),$partnerId));
 		}
 
 		return parent::translateSphinxCriterion($crit);
