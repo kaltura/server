@@ -61,6 +61,10 @@ class DrmLicenseUtils {
         return rawurlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
     }
 
+	public static function createCustomDataForEntry($entryId, $flavors, $signingKey){
+		return self::createCustomData($entryId, KalturaFlavorAssetArray::fromDbArray($flavors), $signingKey);
+	}
+
 	public static function createCustomData($entryId, KalturaFlavorAssetArray $flavorAssets, $signingKey)
 	{
 		$flavorIds = "";

@@ -2,9 +2,10 @@
 /**
  * @package plugins.playReady
  */
-class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaEventConsumers
+class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaEventConsumers, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'playReady';
+	const SCHEME_NAME = 'playReady';
 	const SEARCH_DATA_SUFFIX = 's';
 	const PLAY_READY_EVENTS_CONSUMER = 'kPlayReadyEventsConsumer';
 	
@@ -17,6 +18,14 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getSchemeName()
+	 */
+	public static function getSchemeName()
+	{
+		return self::SCHEME_NAME;
 	}
 	
 	/* (non-PHPdoc)
@@ -224,6 +233,68 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if($permissionName == 'PLAYREADY_PLUGIN_PERMISSION')
 			kPlayReadyPartnerSetup::setupPartner($partnerId);
 		
+	}
+
+	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result)
+	{
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()) )
+		{
+			$playReadyProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(PlayReadyPlugin::getPlayReadyProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
+			if ($playReadyProfile)
+			{
+				/* @var PlayReadyProfile $playReadyProfile */
+
+				$signingKey = kConf::get('signing_key', 'drm', null);
+				if ($signingKey)
+				{
+					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
+					$customDataObject = reset($customDataJson);
+					$data = new KalturaDrmEntryPlayingPluginData();
+					$scheme = $this->getSchemeName();
+					$data->licenseURL = $this->constructUrl($playReadyProfile, $scheme, $customDataObject);
+					$data->scheme = $scheme;
+					$result->addToPluginData($scheme, $data);
+				}
+			}
+		}
+	}
+
+	public function isSupportStreamerTypes($streamerType)
+	{
+		return in_array($streamerType ,[PlaybackProtocol::SILVER_LIGHT]);
+	}
+
+	public function constructUrl($playReadyProfile, $scheme, $customDataObject)
+	{
+		return $playReadyProfile->getLicenseServerUrl() . "/" . $scheme . "/license?custom_data=" . $customDataObject['custom_data'] . "&signature=" . $customDataObject['signature'];
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	protected function shouldContribute(entry $entry)
+	{
+		if ($entry->getAccessControl())
+		{
+			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
+			{
+				/**
+				 * @var kRule $rule
+				 */
+				foreach ($rule->getActions() as $action)
+				{
+					/**
+					 * @var kRuleAction $action
+					 */
+					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }
 
