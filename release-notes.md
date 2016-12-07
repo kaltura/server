@@ -1,6 +1,6 @@
 # Lynx 12.7.0 #
 
-## Ad new action getPlaybackContext to baseEntry##
+## New action getPlaybackContext to baseEntryService ##
 
  - Issue Type: New Feature
  - Issue ID: PLAT-6283
