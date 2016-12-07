@@ -266,7 +266,11 @@ class kPlaybackContextDataHelper
 			return;
 
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
-		$localDeliveryProfileIds = call_user_func_array('array_merge', $dbEntry->getPartner()->getDeliveryProfileIds());
+
+		$localDeliveryProfileIds = array();
+		if (count($dbEntry->getPartner()->getDeliveryProfileIds()))
+			$localDeliveryProfileIds = call_user_func_array('array_merge', $dbEntry->getPartner()->getDeliveryProfileIds());
+
 		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
 		if ($dbEntry->getPartner()->getEnforceDelivery())
