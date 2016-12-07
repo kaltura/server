@@ -36,7 +36,7 @@ class KalturaPlaybackSource extends KalturaObject{
 	public $url;
 
 	/**
-	 * @var KalturaStringArray
+	 * @var KalturaDrmEntryPlayingPluginDataArray
 	 */
 	public $drm;
 
