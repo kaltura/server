@@ -184,12 +184,12 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
-			if (!is_null($fairplayProfile))
+			if ($fairplayProfile)
 			{
 				/* @var FairplayDrmProfile $fairplayProfile */
 
 				$signingKey = kConf::get('signing_key', 'drm', null);
-				if (!is_null($signingKey))
+				if ($signingKey)
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);

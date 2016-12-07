@@ -240,12 +240,12 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()) )
 		{
 			$playReadyProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(PlayReadyPlugin::getPlayReadyProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
-			if (!is_null($playReadyProfile))
+			if ($playReadyProfile)
 			{
 				/* @var PlayReadyProfile $playReadyProfile */
 
 				$signingKey = kConf::get('signing_key', 'drm', null);
-				if (!is_null($signingKey))
+				if ($signingKey)
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);

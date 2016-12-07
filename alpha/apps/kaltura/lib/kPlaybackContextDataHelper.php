@@ -10,20 +10,26 @@ class kPlaybackContextDataHelper
 	private $playbackContextResult;
 
 	/**
-	 * @var array
-	 */
-	private $restrictedMessages;
-
-	/**
 	 * @var bool
 	 */
 	private $isScheduledNow;
+
+	/**
+	 * @var array
+	 */
+	private $flavorAssets = array();
+	private $localFlavors = array();
+	private $remoteFlavorsByDc = array();
+	private $remoteDeliveryProfileIds = array();
+	private $remoteDcByDeliveryProfile = array();
+
+	private $localPlaybackSources = array();
+	private $remotePlaybackSources = array();
 
 	public function getPlaybackContextResult()
 	{
 		return $this->playbackContextResult;
 	}
-
 
 	public function setIsScheduledNow($isScheduledNow)
 	{
@@ -48,25 +54,20 @@ class kPlaybackContextDataHelper
 		if ($this->hasBlockAction($contextDataHelper))
 			return;
 
-		$flavorAssets = $this->getRelevantFlavorAssets($dbEntry, $contextDataHelper);
-
-		list($localFlavors, $remoteFlavorsByDc, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile) = $this->getFlavorsMapping($dbEntry, $flavorAssets);
-
-		$localSources = $this->constructLocalSources($dbEntry, $localFlavors, $contextDataHelper);
-		$remoteSources = $this->constructRemoteSources($dbEntry, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile, $remoteFlavorsByDc, $contextDataHelper);
-
-		$sources = $this->sortSources($localSources, $remoteSources, $dbEntry->getPartner()->getStorageServePriority());
-		$this->filterFlavorsBySources($flavorAssets, $sources);
-
-		$this->playbackContextResult->setSources($sources);
-		$this->playbackContextResult->setFlavorAssets($flavorAssets);
+		$this->getRelevantFlavorAssets($contextDataHelper);
+		$this->createFlavorsMapping($dbEntry);
+		$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
+		$this->constructRemotePlaybackSources($dbEntry,$contextDataHelper);
+		$this->sortAndSetPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
+		$this->filterFlavorsBySources();
+		$this->playbackContextResult->setFlavorAssets($this->flavorAssets);
 	}
 
 	/**
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return boolean
 	 */
-	public function hasBlockAction(kContextDataHelper $contextDataHelper)
+	private function hasBlockAction(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
 
@@ -85,7 +86,7 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return boolean
 	 */
-	public function generateRestrictedMessages($contextDataHelper)
+	private function generateRestrictedMessages($contextDataHelper)
 	{
 		$playbackRestrictions = array();
 
@@ -116,7 +117,7 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	public function getProfileIdsToFilter(kContextDataHelper $contextDataHelper)
+	private function getProfileIdsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
 		$deliveryProfileIds = null;
@@ -139,7 +140,7 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	public function getFlavorsToFilter(kContextDataHelper $contextDataHelper)
+	private function getFlavorsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
 		$flavorsIds = null;
@@ -162,50 +163,36 @@ class kPlaybackContextDataHelper
 	/**
 	 * @param entry $dbEntry
 	 * @param kContextDataHelper $contextDataHelper
-	 * @return array
 	 */
-	public function getRelevantFlavorAssets(entry $dbEntry, kContextDataHelper $contextDataHelper)
+	private function getRelevantFlavorAssets(kContextDataHelper $contextDataHelper)
 	{
-		$parentEntryId = $dbEntry->getSecurityParentId();
-		if ($parentEntryId)
-		{
-			$dbEntry = $dbEntry->getParentEntry();
-			if (!$dbEntry)
-				throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
-		}
-
 		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
 
 		list($flavorsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorsToFilter($contextDataHelper);
-		if (count($flavorsIdsToFilter))
-			$this->filterFlavorAssets($flavorAssets, $flavorsIdsToFilter, $flavorsParamsNotIn);
 
-		return $flavorAssets;
+		if(count($flavorsIdsToFilter) || $flavorsParamsNotIn)
+			self::filterFlavorAssets($flavorAssets, $flavorsIdsToFilter, $flavorsParamsNotIn);
+
+		$this->flavorAssets = $flavorAssets;
 	}
 
 
 	/**
 	 * @param entry $dbEntry
-	 * @param array $flavorAssets
 	 * @return array
 	 */
-	public function getFlavorsMapping(entry $dbEntry, $flavorAssets)
+	private function createFlavorsMapping(entry $dbEntry)
 	{
 		// get flavors availability
 		$servePriority = $dbEntry->getPartner()->getStorageServePriority();
 
-		$localFlavors = array();
-		$remoteFlavorsByDc = array();
-		$remoteDeliveryProfileIds = array();
-		$remoteDcByDeliveryProfile = array();
 		$remoteFileSyncs = array();
 
-		foreach ($flavorAssets as $flavorAsset)
+		foreach ($this->flavorAssets as $flavorAsset)
 		{
 			$flavorId = $flavorAsset->getId();
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-			$c = new Criteria();
 			$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
 			$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 
@@ -216,7 +203,9 @@ class kPlaybackContextDataHelper
 					break;
 
 				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-					$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+					$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+					break;
+				default:
 					break;
 			}
 
@@ -227,11 +216,11 @@ class kPlaybackContextDataHelper
 				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 				{
 					$dc = $fileSync->getDc();
-					$remoteFlavorsByDc[$dc] [] = $flavorAsset;
+					$this->remoteFlavorsByDc[$dc] [] = $flavorAsset;
 					$remoteFileSyncs[$dc][$flavorId] = $fileSync;
 				} else
 				{
-					$localFlavors[$fileSync->getObjectId()] = $flavorAsset;
+					$this->localFlavors[$fileSync->getObjectId()] = $flavorAsset;
 				}
 			}
 		}
@@ -249,9 +238,9 @@ class kPlaybackContextDataHelper
 				$deliveryProfilesIds = call_user_func_array('array_merge', $storageProfile->getFromCustomData("delivery_profile_ids"));
 
 				foreach ($deliveryProfilesIds as $deliveryProfileId)
-					$remoteDcByDeliveryProfile[$deliveryProfileId] = $storageProfile->getId();
+					$this->remoteDcByDeliveryProfile[$deliveryProfileId] = $storageProfile->getId();
 
-				$remoteDeliveryProfileIds = array_merge($remoteDeliveryProfileIds, $deliveryProfilesIds);
+				$this->remoteDeliveryProfileIds = array_merge($this->remoteDeliveryProfileIds, $deliveryProfilesIds);
 			}
 
 			foreach ($storageProfileIds as $storageProfileId)
@@ -260,31 +249,25 @@ class kPlaybackContextDataHelper
 					continue;
 
 				unset($remoteFileSyncs[$storageProfileId]);
-				unset($remoteFlavorsByDc[$storageProfileId]);
+				unset($this->remoteFlavorsByDc[$storageProfileId]);
 			}
-
-			return array($localFlavors, $remoteFlavorsByDc, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile);
 		}
-		return array($localFlavors, $remoteFlavorsByDc, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile);
 	}
 
 
 	/**
 	 * @param entry $dbEntry
-	 * @param $localFlavors
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	public function constructLocalSources(entry $dbEntry, $localFlavors, kContextDataHelper $contextDataHelper)
+	private function constructLocalPlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper)
 	{
-		$sources = array();
-
-		if (!count($localFlavors))
-			return $sources;
+		if (!count($this->localFlavors))
+			return;
 
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 		$localDeliveryProfileIds = call_user_func_array('array_merge', $dbEntry->getPartner()->getDeliveryProfileIds());
-		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveriesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
+		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
 		if ($dbEntry->getPartner()->getEnforceDelivery())
 		{
@@ -295,76 +278,73 @@ class kPlaybackContextDataHelper
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
 
-		if (count($deliveryProfileIds))
+		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($localDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
 
 		foreach ($localDeliveryProfiles as $deliveryProfile)
 		{
-			$deliveryProfileFlavors = $localFlavors;
-			$drmData = $this->getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile);
+			$deliveryProfileFlavors = $this->localFlavors;
+			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile);
 
-			if (count($deliveryProfileFlavors))
-				$sources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), array_keys($deliveryProfileFlavors), null, $drmData);
+			if (count($playbackFlavors))
+			{
+				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $playbackFlavors, null);
+				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), array_keys($playbackFlavors), $manifestUrl, $drmData);
+			}
 		}
-
-		return $sources;
 	}
 
 	/**
 	 * @param entry $dbEntry
-	 * @param $remoteDeliveryProfileIds
-	 * @param $remoteDcByDeliveryProfile
-	 * @param $remoteFlavorsByDc
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	public function constructRemoteSources(entry $dbEntry, $remoteDeliveryProfileIds, $remoteDcByDeliveryProfile, $remoteFlavorsByDc, kContextDataHelper $contextDataHelper)
+	private function constructRemotePlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper)
 	{
-		$sources = array();
-		if (!count($remoteFlavorsByDc))
-			return $sources;
+		if (!count($this->remoteFlavorsByDc))
+			return;
 
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
-		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveriesByIds($dbEntry, $remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
+		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $this->remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
-		if (count($deliveryProfileIds))
+		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($remoteDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
 
 		foreach ($remoteDeliveryProfiles as $deliveryProfile)
 		{
 			$dcFlavorIds = array();
-			$dc = $remoteDcByDeliveryProfile[$deliveryProfile->getId()];
-			$flavorAssetsForDc = $remoteFlavorsByDc[$dc];
+			$dcId = $this->remoteDcByDeliveryProfile[$deliveryProfile->getId()];
+			$flavorAssetsForDc = $this->remoteFlavorsByDc[$dcId];
 
 			if (count($flavorAssetsForDc))
 			{
 				$deliveryProfileFlavorsForDc = $flavorAssetsForDc;
 
-				$flavorToDrmData = $this->getDrmData($dbEntry, $deliveryProfileFlavorsForDc, $deliveryProfile);
+				list($flavorToDrmData, $filteredDeliveryProfileFlavorsForDc) = self::getDrmData($dbEntry, $deliveryProfileFlavorsForDc, $deliveryProfile);
 
-				if (count($deliveryProfileFlavorsForDc))
+				if (count($filteredDeliveryProfileFlavorsForDc))
 				{
-					foreach ($deliveryProfileFlavorsForDc as $flavorAssetForDc)
+					foreach ($filteredDeliveryProfileFlavorsForDc as $flavorAssetForDc)
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
-					$sources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), $dcFlavorIds, null, $flavorToDrmData);
+
+					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $dcId);
+					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), $dcFlavorIds, $manifestUrl, $flavorToDrmData);
 				}
 			}
 		}
-
-		return $sources;
 	}
 
 	/**
 	 * @param $flavorAssets
-	 * @param $flavorAssetsIds
+	 * @param $flavorAssetsIdsToFilter
 	 * @param $flavorAssetsParamsNotIn
 	 */
-	protected function filterFlavorAssets(&$flavorAssets, $flavorAssetsIds, $flavorAssetsParamsNotIn)
+	private static function filterFlavorAssets(&$flavorAssets, $flavorAssetsIdsToFilter, $flavorAssetsParamsNotIn)
 	{
 		foreach ($flavorAssets as $key => $flavorAsset)
 		{
-			if (in_array($flavorAsset->getId(), $flavorAssetsIds))
+			if (in_array($flavorAsset->getId(), $flavorAssetsIdsToFilter))
 			{
 				if ($flavorAssetsParamsNotIn)
 					unset($flavorAssets[$key]);
@@ -378,14 +358,14 @@ class kPlaybackContextDataHelper
 
 	/**
 	 * @param $deliveryProfiles
-	 * @param $deliveryProfileIds
+	 * @param $deliveryProfileIdsToFilter
 	 * @param $deliveryProfilesParamsNotIn
 	 */
-	protected function filterDeliveryProfiles(&$deliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn)
+	private function filterDeliveryProfiles(&$deliveryProfiles, $deliveryProfileIdsToFilter, $deliveryProfilesParamsNotIn)
 	{
 		foreach ($deliveryProfiles as $key => $deliveryProfile)
 		{
-			if (in_array($deliveryProfile->getId(), $deliveryProfileIds))
+			if (in_array($deliveryProfile->getId(), $deliveryProfileIdsToFilter))
 			{
 				if ($deliveryProfilesParamsNotIn)
 				{
@@ -399,7 +379,7 @@ class kPlaybackContextDataHelper
 		}
 	}
 
-	protected function getStreamsTypeToExclude($localCustomDeliveries)
+	private function getStreamsTypeToExclude($localCustomDeliveries)
 	{
 		$streamTypes = array();
 		foreach ($localCustomDeliveries as $deliveryProfile)
@@ -413,7 +393,7 @@ class kPlaybackContextDataHelper
 	 * @param $deliveryProfile
 	 * @return array
 	 */
-	protected function getDrmData(entry $dbEntry, &$flavorAssets, $deliveryProfile)
+	private static function getDrmData(entry $dbEntry, $flavorAssets, $deliveryProfile)
 	{
 		$playbackContextDataParams = new kPlaybackContextDataParams();
 		$playbackContextDataParams->setDeliveryProfile($deliveryProfile);
@@ -425,35 +405,37 @@ class kPlaybackContextDataHelper
 			$pluginInstance->contributeToPlaybackContextDataResult($dbEntry, $playbackContextDataParams, $result);
 
 		if (count($result->getFlavorIdsToRemove()))
-			$this->filterFlavorAssets($flavorAssets, $result->getFlavorIdsToRemove(), true);
+			self::filterFlavorAssets($flavorAssets, $result->getFlavorIdsToRemove(), true);
 
-		return $result->getPluginData();
+		return array($result->getPluginData(),$flavorAssets) ;
 	}
 
-	public function sortSources($localSources, $remoteSources, $servePriority)
+	private function sortAndSetPlaybackSources($servePriority)
 	{
-		$this->sortSourcesByPriority($localSources);
-		$this->sortSourcesByPriority($remoteSources);
+		self::sortSourcesByPriority($this->localPlaybackSources);
+		self::sortSourcesByPriority($this->remotePlaybackSources);
 
 		switch ($servePriority)
 		{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				return $localSources;
+				$this->playbackContextResult->setSources($this->localPlaybackSources);
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				return array_merge($localSources, $remoteSources);
+				$this->playbackContextResult->setSources(array_merge($this->localPlaybackSources,$this->remotePlaybackSources));
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-				return $remoteSources;
+				$this->playbackContextResult->setSources($this->remotePlaybackSources);
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				return array_merge($remoteSources, $localSources);
+				$this->playbackContextResult->setSources(array_merge($this->remotePlaybackSources,$this->localPlaybackSources));
 				break;
 			default:
+				$this->playbackContextResult->setSources(array());
+				break;
 		}
 	}
 
-	protected function sortSourcesByPriority(&$sourcesArray)
+	private static function sortSourcesByPriority(&$sourcesArray)
 	{
 		usort($sourcesArray, function ($a, $b)
 		{
@@ -463,23 +445,23 @@ class kPlaybackContextDataHelper
 		});
 	}
 
-	public function filterFlavorsBySources(&$flavorAssets, $sources)
+	private function filterFlavorsBySources()
 	{
 		$flavorAssetsIds = array();
-		foreach ($sources as $source)
+		foreach ($this->playbackContextResult->getSources() as $source)
 		{
 			/* @var $source kPlaybackSource */
 			$flavorAssetsIds = array_merge($flavorAssetsIds,$source->getFlavors());
 		}
 
-		$this->filterFlavorAssets($flavorAssets, $flavorAssetsIds, false );
+		self::filterFlavorAssets($this->flavorAssets, $flavorAssetsIds, false );
 	}
 
 	/**
 	 * @param $deliveryProfile
 	 * @return array
 	 * */
-	protected function constructProtocol($deliveryProfile)
+	private function constructProtocol($deliveryProfile)
 	{
 		if (is_null($deliveryProfile->getMediaProtocols()))
 		{

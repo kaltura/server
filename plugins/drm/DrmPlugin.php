@@ -166,10 +166,10 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
-			if (!is_null($dbProfile))
+			if ($dbProfile)
 			{
 				$signingKey = $dbProfile->getSigningKey();
-				if (!is_null($signingKey))
+				if ($signingKey)
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);

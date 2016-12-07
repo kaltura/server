@@ -338,12 +338,12 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			}
 
 			$widevineProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(WidevinePlugin::getWidevineProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
-			if (!is_null($widevineProfile))
+			if ($widevineProfile)
 			{
 				/* @var WidevineProfile $widevineProfile */
 
 				$signingKey = kConf::get('signing_key', 'drm', null);
-				if (!is_null($signingKey))
+				if ($signingKey)
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
