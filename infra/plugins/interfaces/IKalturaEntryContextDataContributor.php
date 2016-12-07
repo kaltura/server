@@ -11,8 +11,9 @@ interface IKalturaEntryContextDataContributor {
      * the specific plugins context-data.
      *
      * @param entry $entry
-     * @param KalturaEntryContextDataParams $contextDataParams
-     * @param KalturaEntryContextDataResult $result
+     * @param accessControlScope $contextDataParams
+     * @param contributeToEntryContextDataResult $result
+     * @return PluginData
      */
-    public function contributeToEntryContextDataResult(entry $entry, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result);
+    public function contributeToEntryContextDataResult(entry $entry, accessControlScope $contextDataParams, kContextDataHelper $contextDataHelper);
 }

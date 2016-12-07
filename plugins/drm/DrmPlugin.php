@@ -103,6 +103,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return new kAccessControlDrmPolicyAction();
         if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
             return new KalturaAccessControlDrmPolicyAction();
+	    if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
+		    return new KalturaDrmEntryContextPluginData();
         return null;
     }
 
@@ -125,6 +127,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return 'kAccessControlDrmPolicyAction';
         if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
             return 'KalturaAccessControlDrmPolicyAction';
+	    if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
+		    return 'KalturaDrmEntryContextPluginData';
         return null;
     }
 
@@ -136,20 +140,21 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
     }
 
-    public function contributeToEntryContextDataResult(entry $entry, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result)
+    public function contributeToEntryContextDataResult(entry $entry, accessControlScope $contextDataParams, kContextDataHelper $contextDataHelper)
     {
-	    if ($this->shouldContribute($entry))
+	    if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions() ))
 	    {
 		    $signingKey = $this->getSigningKey();
 		    if (!is_null($signingKey))
 		    {
 			    KalturaLog::info("Signing key is '$signingKey'");
-			    $customDataJson = DrmLicenseUtils::createCustomData($entry->getId(), $result->flavorAssets, $signingKey);
-			    $drmContextData = new KalturaDrmEntryContextPluginData();
-			    $drmContextData->flavorData = $customDataJson;
-			    $result->pluginData[get_class($drmContextData)] = $drmContextData;
+			    $customDataJson = DrmLicenseUtils::createCustomData($entry->getId(), $contextDataHelper->getAllowedFlavorAssets(), $signingKey);
+			    $drmContextData = new kDrmEntryContextPluginData();
+			    $drmContextData->setFlavorData($customDataJson);
+			    return $drmContextData;
 		    }
 	    }
+	    return null;
     }
 
     private function getSigningKey()
@@ -164,28 +169,19 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
     }
 
 	/**
-	 * @param entry $entry
+	 * @param array<kRuleAction> $actions
 	 * @return bool
 	 */
-	protected function shouldContribute(entry $entry)
+	protected function shouldContribute(array $actions)
 	{
-		if ($entry->getAccessControl())
+		foreach ($actions as $action)
 		{
-			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
+			/**
+			 * @var kRuleAction $action
+			 */
+			if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
 			{
-				/**
-				 * @var kRule $rule
-				 */
-				foreach ($rule->getActions() as $action)
-				{
-					/**
-					 * @var kRuleAction $action
-					 */
-					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
-					{
-						return true;
-					}
-				}
+				return true;
 			}
 		}
 		return false;

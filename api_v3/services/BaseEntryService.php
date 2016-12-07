@@ -783,7 +783,13 @@ class BaseEntryService extends KalturaEntryService
         $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
         foreach ($pluginInstances as $pluginInstance)
         {
-            $pluginInstance->contributeToEntryContextDataResult($dbEntry, $contextDataParams, $result);
+            $pluginDataCore = $pluginInstance->contributeToEntryContextDataResult($dbEntry, $accessControlScope, $contextDataHelper);
+	        if (!is_null($pluginDataCore))
+	        {
+		        $pluginDataApi = KalturaPluginManager::loadObject('KalturaPluginData', $pluginInstance->getPluginName());
+		        $pluginDataApi->fromObject($pluginDataCore);
+		        $result->pluginData[get_class($pluginDataApi)] = $pluginDataApi;
+	        }
         }
 
 		return $result;

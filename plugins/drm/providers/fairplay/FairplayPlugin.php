@@ -48,6 +48,8 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				return new Form_FairplayProfileConfigureExtend_SubForm();
 			}
 		}
+		if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
+			return new KalturaFairplayEntryContextPluginData();
 
 			return null;
 	}
@@ -73,6 +75,8 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				return 'Form_FairplayProfileConfigureExtend_SubForm';
 			}
 		}
+		if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
+			return 'KalturaFairplayEntryContextPluginData';
 		
 		return null;
 	}
@@ -93,11 +97,12 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return DrmPlugin::isAllowedPartner($partnerId);
 	}
 
-	public function contributeToEntryContextDataResult(entry $entry, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result)
+	public function contributeToEntryContextDataResult(entry $entry, accessControlScope $contextDataParams, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($entry))
+		if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions() ))
 		{
-			$fairplayContextData = new KalturaFairplayEntryContextPluginData();
+//			$fairplayContextData = new KalturaFairplayEntryContextPluginData();
+			$fairplayContextData = new kFairplayEntryContextPluginData();
 
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if (!is_null($fairplayProfile))
@@ -106,34 +111,26 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				 * @var FairplayDrmProfile $fairplayProfile
 				 */
 				$fairplayContextData->publicCertificate = $fairplayProfile->getPublicCertificate();
-				$result->pluginData[get_class($fairplayContextData)] = $fairplayContextData;
+				return $fairplayContextData;
 			}
 		}
+		return null;
 	}
 
 	/**
-	 * @param entry $entry
+	 * @param array<kRuleAction> $actions
 	 * @return bool
 	 */
-	protected function shouldContribute(entry $entry)
+	protected function shouldContribute(array $actions)
 	{
-		if ($entry->getAccessControl())
+		foreach ($actions as $action)
 		{
-			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
+			/**
+			 * @var kRuleAction $action
+			 */
+			if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
 			{
-				/**
-				 * @var kRule $rule
-				 */
-				foreach ($rule->getActions() as $action)
-				{
-					/**
-					 * @var kRuleAction $action
-					 */
-					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
-					{
-						return true;
-					}
-				}
+				return true;
 			}
 		}
 		return false;
