@@ -503,11 +503,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 				
 		// get all partner administrators
-		$c = new Criteria();
-		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
-		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-		$adminKusers = kuserPeer::doSelect($c);
-		
+		$adminKusers = partner::getAdminLoginUsersList($partnerId);
 		foreach ($adminKusers as $admin)
 		{
 			// don't send mail to the created user
