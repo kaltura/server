@@ -1,5 +1,16 @@
 # Lynx 12.7.0 #
 
+## Ad new action getPlaybackContext to baseEntry##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6283
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_06_update_base_entry_get_playing_data_permissions.php
+	
 ## Ad cue points and entry changed http notifications ##
 
  - Issue Type: New Feature
