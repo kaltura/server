@@ -11,7 +11,7 @@ None.
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_06_update_base_entry_get_playing_data_permissions.php
 	
-## Ad cue points and entry changed http notifications ##
+## Ad cue points and flavor changed http notifications ##
 
  - Issue Type: New Feature
  - Issue ID: PLAT-6235
@@ -22,6 +22,7 @@ None.
 ### Deployment scripts ###
 
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/adCuePointHttpNotification.xml
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/playServerFlavorHttpEventNotification.xml
 
 ## support for Kaltura liveRecording - Full Live to Vod flow ##
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <!-- script will ask for username / password interactively -->
+    </session>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Flavor Asset changed - PlayServer</name>
+                <systemName>FLAVOR_ASSET_CHANGED_PS</systemName>
+                <description>HTTP notification template to be sent when a flavor asset is changed</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>4</eventObjectType> <!-- EventNotificationEventObjectType::FLAVORASSET -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Play server feature is set for partner</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $scope->getObject()->getPartnerId())</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <method>1</method> <!-- KalturaHttpNotificationMethod::GET -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>
