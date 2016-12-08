@@ -56,13 +56,13 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 
 		$entry = entryPeer::retrieveByPK($this->getEntryId());
 		
-		if ($this->getStatus() == CategoryEntryStatus::PENDING)
+		if ($category && $this->getStatus() == CategoryEntryStatus::PENDING)
 			$category->incrementPendingEntriesCount();
 
 		if($this->getStatus() == CategoryEntryStatus::ACTIVE)
 			$this->setEntryOnCategory($category, $entry);
 			
-		if(!categoryEntryPeer::getSkipSave())
+		if($entry && !categoryEntryPeer::getSkipSave())
 			$entry->indexToSearchIndex();
 			
 		if (!$this->alreadyInSave)
