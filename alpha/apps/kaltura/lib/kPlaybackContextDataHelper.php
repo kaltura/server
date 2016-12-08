@@ -26,6 +26,9 @@ class kPlaybackContextDataHelper
 	private $localPlaybackSources = array();
 	private $remotePlaybackSources = array();
 
+	private $localPriorities = array();
+	private $remotePriorities = array();
+
 	public function getPlaybackContextResult()
 	{
 		return $this->playbackContextResult;
@@ -58,7 +61,7 @@ class kPlaybackContextDataHelper
 		$this->createFlavorsMapping($dbEntry);
 		$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
 		$this->constructRemotePlaybackSources($dbEntry,$contextDataHelper);
-		$this->sortAndSetPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
+		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
 		$this->filterFlavorsBySources();
 		$this->playbackContextResult->setFlavorAssets($this->flavorAssets);
 	}
@@ -235,7 +238,10 @@ class kPlaybackContextDataHelper
 			foreach ($storageProfiles as $storageProfile)
 			{
 				$activeStorageProfileIds[] = $storageProfile->getId();
-				$deliveryProfilesIds = call_user_func_array('array_merge', $storageProfile->getFromCustomData("delivery_profile_ids"));
+
+				$deliveryProfilesIds = array();
+				if(!is_null($storageProfile->getFromCustomData("delivery_profile_ids")))
+					$deliveryProfilesIds = call_user_func_array('array_merge', $storageProfile->getFromCustomData("delivery_profile_ids"));
 
 				foreach ($deliveryProfilesIds as $deliveryProfileId)
 					$this->remoteDcByDeliveryProfile[$deliveryProfileId] = $storageProfile->getId();
@@ -293,9 +299,20 @@ class kPlaybackContextDataHelper
 			if (count($playbackFlavors))
 			{
 				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $playbackFlavors, null);
-				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), array_keys($playbackFlavors), $manifestUrl, $drmData);
+				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->getLocalPriority($deliveryProfile), $this->constructProtocol($deliveryProfile), array_keys($playbackFlavors), $manifestUrl, $drmData);
 			}
 		}
+	}
+
+	private function getLocalPriority($deliveryProfile)
+	{
+		if (!array_key_exists($deliveryProfile->getStreamerType(), $this->localPriorities))
+			$this->localPriorities[$deliveryProfile->getStreamerType()] = 1;
+		else
+			$this->localPriorities[$deliveryProfile->getStreamerType()] ++;
+
+		return "local_" .$deliveryProfile->getStreamerType()."_". $this->localPriorities[$deliveryProfile->getStreamerType()];
+
 	}
 
 	/**
@@ -333,10 +350,21 @@ class kPlaybackContextDataHelper
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
 
 					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $dcId);
-					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $deliveryProfile->getPriority(), $this->constructProtocol($deliveryProfile), $dcFlavorIds, $manifestUrl, $flavorToDrmData);
+					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->getRemotePriority($deliveryProfile), $this->constructProtocol($deliveryProfile), $dcFlavorIds, $manifestUrl, $flavorToDrmData);
 				}
 			}
 		}
+	}
+
+	private function getRemotePriority($deliveryProfile)
+	{
+		if (!array_key_exists($deliveryProfile->getStreamerType(), $this->remotePriorities))
+			$this->remotePriorities[$deliveryProfile->getStreamerType()] = 1;
+		else
+			$this->remotePriorities[$deliveryProfile->getStreamerType()]++;
+
+		return "remote_" .$deliveryProfile->getStreamerType() . "_" . $this->remotePriorities[$deliveryProfile->getStreamerType()];
+
 	}
 
 	/**
@@ -414,11 +442,8 @@ class kPlaybackContextDataHelper
 		return array($result->getPluginData(),$flavorAssets) ;
 	}
 
-	private function sortAndSetPlaybackSources($servePriority)
+	private function setPlaybackSources($servePriority)
 	{
-		self::sortSourcesByPriority($this->localPlaybackSources);
-		self::sortSourcesByPriority($this->remotePlaybackSources);
-
 		switch ($servePriority)
 		{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
@@ -437,16 +462,6 @@ class kPlaybackContextDataHelper
 				$this->playbackContextResult->setSources(array());
 				break;
 		}
-	}
-
-	private static function sortSourcesByPriority(&$sourcesArray)
-	{
-		usort($sourcesArray, function ($a, $b)
-		{
-			/* @var $a kPlaybackSource */
-			/* @var $b kPlaybackSource */
-			return (intval($a->getPriority()) - intval($b->getPriority()));
-		});
 	}
 
 	private function filterFlavorsBySources()
