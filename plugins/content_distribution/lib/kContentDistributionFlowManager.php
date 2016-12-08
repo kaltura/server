@@ -1342,9 +1342,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 							}
 						}
 					}
-					else
-						$updateRequired = true;
-
+				
 					if($updateRequired)
 						break;
 				}
