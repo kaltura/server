@@ -311,7 +311,6 @@ class playManifestAction extends kalturaAction
 		{
 			$this->addAudioOnlyFlavors();
 		}
-
 	}
 	
 	protected function initFlavorParamsIds()
