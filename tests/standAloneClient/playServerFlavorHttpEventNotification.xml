@@ -27,6 +27,17 @@
                             <code>PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $scope->getObject()->getPartnerId())</code>
                         </field>
                     </item>
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Entry type equal</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getentry()->getType()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>1</value>
+                            </item>
+                        </values>
+                    </item>
                 </eventConditions>
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
