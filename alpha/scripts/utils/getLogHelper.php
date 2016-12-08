@@ -11,18 +11,13 @@ if ($argv[1] == '-help') {
 }
 
 $jobId = $argv[1];
-$iniFile = '/opt/kaltura/app/configurations/batch/worker.ini';
-if ($argv[2])
+$iniFile = '/opt/kaltura/app/configurations/batch/workers.ini';
+if (count($argv) > 2)
 	$iniFile = $argv[2];
 
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
-// load zend config classes
-if(!class_exists('Zend_Config_Ini'))
-{
-	require_once 'Zend/Config/Exception.php';
-	require_once 'Zend/Config/Ini.php';
-}
+
 
 
 $firstRecord = retrieveHistoryRecord($jobId);
@@ -30,11 +25,9 @@ $schedulerId = $firstRecord->getSchedulerId();
 $workerId = $firstRecord->getWorkerId();
 $batchIndex = $firstRecord->getBatchIndex();
 
-$name = retrieveNameByScheduler($schedulerId);
-$logName = getName($iniFile, $workerId);
-
-printCommand($name, $jobId, $logName, $batchIndex);
-
+$machineName = retrieveNameByScheduler($schedulerId);
+//$logName = getName($iniFile, $workerId);
+printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId);
 return;
 
 function retrieveNameByScheduler($schedulerId) {
@@ -52,6 +45,12 @@ function retrieveHistoryRecord($jobId) {
 }
 
 function getName($iniPath, $workerId) {
+	// load zend config classes
+	if(!class_exists('Zend_Config_Ini'))
+	{
+		require_once 'Zend/Config/Exception.php';
+		require_once 'Zend/Config/Ini.php';
+	}
 	$config = new Zend_Config_Ini($iniPath);
 	$result = $config->toArray();
 	foreach($result as $key=>$value) {
@@ -59,16 +58,14 @@ function getName($iniPath, $workerId) {
 			return substr($key, 6 ,strlen($key)); // len of 'KAsync' = 6
 	}
 }
-function printCommand($machineName, $jobId, $logName, $batchIndex) {
-	printInRed("Command to execute: \n");
-	printInGreen("    ssh $machineName \n");
-	printInGreen("    cd /opt/kalture/log \n");
-	printInGreen("    zgrep -C30 $jobId $logName-$batchIndex-2016....log.gz \n");
+
+function printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId) {
+	printInGreen("Connect to machine: [$machineName] \n");
+	printInGreen("schedulerId: [$schedulerId], workerId: [$workerId], batchIndex: [$batchIndex] \n");
+	printInGreen("exe in /opt/var/log:    zgrep -C30 $jobId @BATCH_NAME@-$batchIndex-@DATE@.log.gz \n");
 }
 function printInGreen($str) {
 	echo "\033[32m$str\033[0m";
 }
-function printInRed($str) {
-	echo "\033[31m$str\033[0m";
-}
+
 
