@@ -136,12 +136,4 @@ class kMetadataField extends kStringField
 	{
 		$this->profileSystemName = $profileSystemName;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see kMatchCondition::shouldFieldDisableCache()
-	 */
-	public function shouldFieldDisableCache($scope)
-	{
-		return false;
-	}	
 }
