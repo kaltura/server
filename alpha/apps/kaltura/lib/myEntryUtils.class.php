@@ -1469,4 +1469,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
 		$recordedEntry->save();
 	}
+
+	public static function isEntryReady($entryId)
+	{
+		$entry = entryPeer::retrieveByPk($entryId);
+		if (!$entry)
+			return false;
+		return $entry->isReady();
+	}
 }
