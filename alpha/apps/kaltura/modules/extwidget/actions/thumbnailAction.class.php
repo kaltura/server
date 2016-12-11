@@ -478,7 +478,7 @@ class thumbnailAction extends sfAction
 		}
 
 		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
-		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt() : null;
+		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
 
 		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified);
 		$renderer->partnerId = $entry->getPartnerId();
