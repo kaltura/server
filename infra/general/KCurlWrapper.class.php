@@ -78,6 +78,14 @@ class KCurlHeaderResponse
 		return isset($goodCodes[$this->code]);
 	}
 
+	public static function isError($httpCode)
+	{
+		$restype = floor($httpCode / 100);
+		if ($restype == 4 || $restype == 5)
+			return true;
+		return false;
+	}
+
 	public function storeCookie($value)
 	{
 		$cookieKey=trim($this->getCookieKey($value));
