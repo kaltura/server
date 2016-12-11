@@ -1,3 +1,22 @@
+# Kajam 11.17.0 #
+
+## Update entry ready email notification  ##
+
+- Issue Type: Support
+- Issue ID: SUP-8208
+
+### Configuration ###
+	
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/2016_05_31_updateEntryReadyTemplateForReplace.xml
+		
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam 11.16.0 #
 
 ## entryServerNode validate registered serverNodes ##
