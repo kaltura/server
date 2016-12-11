@@ -145,12 +145,26 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	 */
 	public static function create($objectType)
 	{
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCriteriaFactory');
+		$pluginClassName = null;
+		$cacheKey = null;
+		if (function_exists('apc_fetch'))
+		{
+			$cacheKey = "criteriaClass-$objectType";
+			$pluginClassName = apc_fetch($cacheKey);
+		}
+		
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCriteriaFactory', $pluginClassName);
 		foreach($pluginInstances as $pluginInstance)
 		{
 			$criteria = $pluginInstance->getKalturaCriteria($objectType);
 			if($criteria)
+			{
+				if (!$pluginClassName && $cacheKey)
+				{
+					apc_store($cacheKey, get_class($pluginInstance));
+				}
 				return $criteria;
+			}
 		}
 			
 		return new KalturaCriteria();
