@@ -33,7 +33,7 @@ class kMetadataField extends kStringField
 		if(!$scope || (is_null($this->profileId) && is_null($this->profileSystemName)))
 			return null;
 		
-		$profileId = $this->$profileId;
+		$profileId = $this->profileId;
 		if(is_null($profileId))
 		{
 			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
