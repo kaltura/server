@@ -44,6 +44,31 @@ None.
 
 None.
 
+## New FFMpeg 3.2 ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6478
+
+### Configuration ###
+
+Binaries
+	http://ny-www.kaltura.com/content/shared/bin/ffmpeg-3.2-bin.tar.gz
+	
+Following bins/scripts should be switched -
+- ffmpeg.sh
+- ffprobe.sh
+- ismindex.sh
+- qt-faststart
+- x264.sh
+
+### Deployment scripts ###
+	
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 
 # Lynx 12.6.0 #
 
