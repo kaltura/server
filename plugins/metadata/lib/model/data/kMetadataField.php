@@ -30,15 +30,18 @@ class kMetadataField extends kStringField
 	 */
 	protected function getFieldValue(kScope $scope = null)
 	{
+		if(!$scope || (is_null($this->profileId) && is_null($this->profileSystemName)))
+			return null;
+		
 		$profileId = $this->$profileId;
-		if(!$profileId)
+		if(is_null($profileId))
 		{
 			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
 			if($profile)
 				$profileId = $profile->getId();
 		}
 		
-		if(!$profileId)
+		if(is_null($profileId))
 		{
 			KalturaLog::err("No metadata profile found matching input values of profileId [{$this->profileId}] systemName [{$this->profileSystemName}]");
 			return null;

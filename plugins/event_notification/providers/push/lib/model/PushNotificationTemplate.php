@@ -84,9 +84,11 @@ class PushNotificationTemplate extends EventNotificationTemplate
         }
         // sort array according to created keys
         ksort($contentParametersValues);
-        
+        kalturaLog::debug("Testing:: partnerId [$partnerId]");
+        kalturaLog::debug("Testing:: contentParametersValues " . print_r($contentParametersValues, true));
         $contentParamsHash = md5($partnerId . '_' . implode( '_' , array_values($contentParametersValues) ) );
         // prepare queue key to return
+        kalturaLog::debug("Testing:: templateId [$templateId] contentParamsHash [$contentParamsHash]");
         return 'pn_' . $templateId . '_' . $contentParamsHash;
     }
     

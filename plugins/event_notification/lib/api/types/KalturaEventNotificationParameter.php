@@ -57,6 +57,10 @@ class KalturaEventNotificationParameter extends KalturaObject
 		KalturaLog::debug("Loading KalturaStringValue from type [$valueType]");
 		switch ($valueType)
 		{
+			case 'kMetadataField':
+				$this->value = new KalturaMetadataField();
+				break;
+				
 			case 'kStringValue':
 				$this->value = new KalturaStringValue();
 				break;
