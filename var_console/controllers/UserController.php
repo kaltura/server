@@ -66,8 +66,8 @@ class UserController extends Zend_Controller_Action
 			try
 			{
 				$result = $auth->authenticate($adapter);
-				if ($result->isValid()) {
-					// Zend_Session::getSaveHandler()->write(uniqid(), $result->getIdentity());
+				if ($result->isValid())
+				{
 					if ($request->getPost('remember_me'))
 						Zend_Session::rememberMe(60 * 60 * 24 * 7); // 1 week
 
@@ -76,7 +76,9 @@ class UserController extends Zend_Controller_Action
 						$this->_helper->redirector->gotoUrl($nextUri);
 					else
 						$this->_helper->redirector('list-by-user', 'partner');
-				} else {
+				}
+				else
+				{
 					$loginForm->setDescription('invalid login');
 				}
 			}
