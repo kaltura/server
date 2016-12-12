@@ -60,7 +60,7 @@ class kMetadataField extends kStringField
 				$objectType = kMetadataManager::getTypeNameFromObject($object);
 				$metadata = MetadataPeer::retrieveByObject($profileId, $objectType, $object->getId());
 			}
-			else if ($object instanceof Metadata)
+			elseif ($object instanceof Metadata)
 			{
 				$metadata = $object;
 			}

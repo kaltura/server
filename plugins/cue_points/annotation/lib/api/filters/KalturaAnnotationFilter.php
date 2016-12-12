@@ -8,8 +8,8 @@ class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 	const CHAPTERS_PUBLIC_TAG = 'chaptering';
 	
 	/* (non-PHPdoc)
- * @see KalturaFilter::getCoreFilter()
- */
+ 	 * @see KalturaFilter::getCoreFilter()
+ 	 */
 	protected function getCoreFilter()
 	{
 		return new AnnotationFilter();
