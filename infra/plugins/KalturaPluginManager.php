@@ -86,12 +86,28 @@ class KalturaPluginManager
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader');
+		$pluginClassName = null;
+		$cacheKey = null;
+		if (function_exists('apc_fetch'))
+		{
+			$cacheKey = "loadObject-$baseClass-$enumValue";
+			$pluginClassName = apc_fetch($cacheKey);
+		}
+		
+		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader', $pluginClassName);
+		
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
 			$obj = $pluginInstance->loadObject($baseClass, $enumValue, $constructorArgs);
 			if($obj)
+			{
+				if (!$pluginClassName && $cacheKey)
+				{
+					apc_store($cacheKey, get_class($pluginInstance));
+				}
+				
 				return $obj;
+			}
 		}
 		
 		KalturaLog::info("Object [$baseClass] not found, enum value [$enumValue], constructor arguments [" . print_r($constructorArgs, true) . "], plugins [" . print_r(array_keys($pluginInstances), true) . "]");
@@ -192,12 +208,27 @@ class KalturaPluginManager
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
+		$cacheKey = null;
+		if (function_exists('apc_fetch'))
+		{
+			$cacheKey = "objectClass-$baseClass-$enumValue";
+			$cls = apc_fetch($cacheKey);
+			if ($cls)
+			{
+				return $cls;
+			}
+		}
+		
 		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader');
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
 			$cls = $pluginInstance->getObjectClass($baseClass, $enumValue);
 			if($cls)
 			{
+				if ($cacheKey)
+				{
+					apc_store($cacheKey, $cls);
+				}
 //				KalturaLog::debug("Found class[$cls] in plugin[$pluginName] for object type[$objectType] and enum value[$enumValue]");
 				return $cls;
 			}
@@ -360,7 +391,7 @@ class KalturaPluginManager
 	 * @param string $interface
 	 * @return array<KalturaPlugin>
 	 */
-	public static function getPluginInstances($interface = null)
+	public static function getPluginInstances($interface = null, $className = null)
 	{
 		if (function_exists('apc_fetch') && self::$useCache)
 		{
@@ -370,8 +401,23 @@ class KalturaPluginManager
 			{
 				if (!in_array($interface, self::$loadedInterfaces))
 				{
+					if ($className)
+					{
+						$pluginName = array_search($className, $plugins);
+						if ($pluginName)
+						{
+							$plugins = array($pluginName => $className);
+						}
+						else
+						{
+							self::$loadedInterfaces[] = $interface;
+						}
+					}
+					else
+					{
+						self::$loadedInterfaces[] = $interface;
+					}
 					self::loadPlugins($plugins, false);
-					self::$loadedInterfaces[] = $interface;
 				}
 				return self::getPluginInstancesByNames(array_keys($plugins), $interface);
 			}
