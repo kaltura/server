@@ -51,8 +51,8 @@ None.
 
 ### Configuration ###
 
-Binaries
-	http://ny-www.kaltura.com/content/shared/bin/ffmpeg-3.2-bin.tar.gz
+Binaries:
+	Provided in the PLAT-6478
 	
 Following bins/scripts should be switched -
 - ffmpeg.sh
