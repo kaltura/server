@@ -26,8 +26,9 @@ $workerId = $firstRecord->getWorkerId();
 $batchIndex = $firstRecord->getBatchIndex();
 
 $machineName = retrieveNameByScheduler($schedulerId);
-//$logName = getName($iniFile, $workerId);
-printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId);
+$logName = getName($iniFile, $workerId);
+
+printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId, $logName);
 return;
 
 function retrieveNameByScheduler($schedulerId) {
@@ -45,6 +46,15 @@ function retrieveHistoryRecord($jobId) {
 }
 
 function getName($iniPath, $workerId) {
+	$lines = file($iniPath);
+	for ($i = 0; $i < count($lines); $i++) {
+		if (isIdLineForWorker($lines[$i],$workerId ))
+			return getNameFromTag($lines[--$i]);
+	}
+
+}
+
+function getNameWithConf($iniPath, $workerId) {
 	// load zend config classes
 	if(!class_exists('Zend_Config_Ini'))
 	{
@@ -59,10 +69,25 @@ function getName($iniPath, $workerId) {
 	}
 }
 
-function printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId) {
+function getNameFromTag($str) {
+	$parts = explode(":", $str);
+	$name = substr($parts[0], strlen('[KAsync'));
+	return rtrim($name, " ");
+}
+
+function isIdLineForWorker($str, $workerId) {
+	$len  = strlen($workerId) + 1;
+	if ((substr($str, 0, strlen('id')) === 'id')
+		&& (substr($str, -$len) == $workerId)
+		&& ($str[strlen($str) - $len - 1] == ' '))
+		return true;
+	return false;
+}
+
+function printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId, $logName) {
 	printInGreen("Connect to machine: [$machineName] \n");
 	printInGreen("schedulerId: [$schedulerId], workerId: [$workerId], batchIndex: [$batchIndex] \n");
-	printInGreen("exe in /opt/var/log:    zgrep -C30 $jobId @BATCH_NAME@-$batchIndex-@DATE@.log.gz \n");
+	printInGreen("exe in /var/log/batch:    zgrep -C30 $jobId $logName-$batchIndex-@DATE@.log.gz \n");
 }
 function printInGreen($str) {
 	echo "\033[32m$str\033[0m";
