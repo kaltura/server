@@ -27,6 +27,8 @@ $batchIndex = $firstRecord->getBatchIndex();
 
 $machineName = retrieveNameByScheduler($schedulerId);
 $logName = getName($iniFile, $workerId);
+if (!$logName)
+	$logName = "@BATCH_NAME@";
 
 printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId, $logName);
 return;
@@ -51,7 +53,6 @@ function getName($iniPath, $workerId) {
 		if (isIdLineForWorker($lines[$i],$workerId ))
 			return getNameFromTag($lines[--$i]);
 	}
-
 }
 
 function getNameWithConf($iniPath, $workerId) {
@@ -71,7 +72,10 @@ function getNameWithConf($iniPath, $workerId) {
 
 function getNameFromTag($str) {
 	$parts = explode(":", $str);
-	$name = substr($parts[0], strlen('[KAsync'));
+	$prefix = '[KAsync';
+	if (!(substr($str, 0, strlen($prefix)) === $prefix))
+		return null;
+	$name = substr($parts[0], strlen($prefix));
 	return rtrim($name, " ");
 }
 
