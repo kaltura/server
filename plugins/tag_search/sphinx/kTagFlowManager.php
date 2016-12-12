@@ -9,7 +9,12 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     public static $specialCharactersReplacement = array ('\\\\', '\\!', '\\*', '\\"');
     
     const NULL_PC = "NO_PC";
-    
+
+	function addNullPC($privacyContext)
+	{
+		return $privacyContext ? $privacyContext : self::NULL_PC;
+	}
+
 	/* (non-PHPdoc)
      * @see kObjectDeletedEventConsumer::objectDeleted()
      */
@@ -23,7 +28,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     	{
     		$privacyContexts = $object->getPrivacyContext() != "" ? explode(",", $object->getPrivacyContext()) : array();
     		if (!count($privacyContexts))
-    				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
+    				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT;
+		    $privacyContexts = array_map('addNullPC', $privacyContexts);
 			$entry = $this->getEntryByIdNoFilter($object->getEntryId());
     		self::decrementExistingTagsInstanceCount($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
     	}  
@@ -73,7 +79,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     			/* @var $object categoryEntry */
      			$privacyContexts = $object->getPrivacyContext() != "" ? self::trimObjectTags($object->getPrivacyContext()) : array();
     			if (!count($privacyContexts))
-    				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
+    				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT;
+			    $privacyContexts = array_map('addNullPC', $privacyContexts);
     			$entry = $this->getEntryByIdNoFilter($object->getEntryId());
     			self::addOrIncrementTags($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
     		}
