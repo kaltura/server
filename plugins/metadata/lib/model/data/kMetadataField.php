@@ -36,7 +36,7 @@ class kMetadataField extends kStringField
 		$profileId = $this->profileId;
 		if(is_null($profileId))
 		{
-			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
+			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName);
 			if($profile)
 				$profileId = $profile->getId();
 		}
