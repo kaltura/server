@@ -13,8 +13,8 @@ class kPlayReadyPartnerSetup
 		if(!count($policies))
 		{
 			KalturaLog::info("playready setup for partner ".$partnerId);
-			list ($defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy) = self::createPartnerPolicies($partnerId);
-			self::createDefaultAccessControl($partnerId, $defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy);
+			list ($defaultPolicy) = self::createPartnerPolicies($partnerId);
+			self::createDefaultAccessControl($partnerId, $defaultPolicy);
 		}
 	}
 	
@@ -30,7 +30,7 @@ class kPlayReadyPartnerSetup
 		return array($defaultPolicy);
 	}
 	
-	private static function createDefaultAccessControl($partnerId, $defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy)
+	private static function createDefaultAccessControl($partnerId, $defaultPolicy)
 	{
 		$accessControlProfile = new accessControl();
 		$accessControlProfile->setDescription('Play Ready default access control');
@@ -38,12 +38,9 @@ class kPlayReadyPartnerSetup
 		$accessControlProfile->setPartnerId($partnerId);
 		$accessControlProfile->setSystemName('play_ready_default_'.$partnerId);
 		
-		$rulePurchase = self::addAccessControlRule('scenario_purchase', $purchasePolicy->getId());		
-		$ruleRental = self::addAccessControlRule('scenario_rental', $rentalPolicy->getId());		
 		$ruleDefault = self::addAccessControlRule('scenario_default', $defaultPolicy->getId());
-		$ruleSubscription = self::addAccessControlRule('scenario_subscription', $subscriptionPolicy->getId());
-		
-		$accessControlProfile->setRulesArray(array($rulePurchase, $ruleRental, $ruleDefault, $ruleSubscription));
+
+		$accessControlProfile->setRulesArray(array($ruleDefault));
 		
 		$accessControlProfile->save();
 		
