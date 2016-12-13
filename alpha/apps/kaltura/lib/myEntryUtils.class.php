@@ -1575,7 +1575,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			case PlaybackProtocol::AKAMAI_HDS:
 				return PlaybackProtocol::AKAMAI_HDS . "/manifest.f4m";
 			case PlaybackProtocol::HTTP:
-				return "url/name/a.$fileExtension";
+				return PlaybackProtocol::URL . "/name/a.$fileExtension";
 			default:
 				return "";
 		}
