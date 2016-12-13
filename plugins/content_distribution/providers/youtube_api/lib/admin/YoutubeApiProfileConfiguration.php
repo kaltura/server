@@ -27,7 +27,7 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 		$this->addElements(array($element));
 
 		$hasToken = false;
-		if ($this->distributionProfile->googleTokenData)
+		if (isset($this->distributionProfile) && $this->distributionProfile && $this->distributionProfile->googleTokenData)
 			$hasToken = true;
 		$this->addElement('text', 'api_authorize_url', array(
 			'label'			=> 'Authorize API Access:',
