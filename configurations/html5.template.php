@@ -28,12 +28,18 @@ $wgKalturaServiceUrl = wgGetUrl('cdn_api_host');
 $wgKalturaCDNUrl = wgGetUrl('cdn_host');
 // Default Stats URL
 $wgKalturaStatsServiceUrl = wgGetUrl('stats_host');
+// Default Live Stats URL
+$wgKalturaLiveStatsServiceUrl = wgGetUrl('live_stats_host');
+// Default Kaltura Analytics URL
+$wgKalturaAnalyticsServiceUrl = wgGetUrl('analytics_host');
 
 // SSL host names
 if( $wgHTTPProtocol == 'https' ){
         $wgKalturaServiceUrl = wgGetUrl('cdn_api_host_https');
         $wgKalturaCDNUrl = wgGetUrl('cdn_host_https');
         $wgKalturaStatsServiceUrl = wgGetUrl('stats_host_https');
+	$wgKalturaLiveStatsServiceUrl = wgGetUrl('live_stats_host_https');
+	$wgKalturaAnalyticsServiceUrl = wgGetUrl('analytics_host_https');
 }
 
 // Default Asset CDN Path (used in ResouceLoader.php):
