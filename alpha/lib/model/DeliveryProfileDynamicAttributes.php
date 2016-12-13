@@ -144,6 +144,12 @@ class DeliveryProfileDynamicAttributes {
 	protected $serveLiveAsVodEntryId;
 
 	/**
+	 * request a specific delivery profile id
+	 * @var int
+	 */
+	protected $deliveryProfileId = null;
+
+	/**
 	 * @return the $addThumbnailExtension
 	 */
 	public function getAddThumbnailExtension() {
@@ -268,6 +274,20 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function getPreferredBitrate() {
 		return $this->preferredBitrate;
+	}
+
+	/**
+	 * @return int $deliveryProfileId
+	 */
+	public function getDeliveryProfileId() {
+		return $this->deliveryProfileId;
+	}
+
+	/**
+	 * @param $deliveryProfileId
+	 */
+	public function setDeliveryProfileId($deliveryProfileId) {
+		$this->deliveryProfileId = $deliveryProfileId;
 	}
 
 	/**
@@ -584,6 +604,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->edgeServerIds = $newObj->getEdgeServerIds();
 		$this->serveVodFromLive = $newObj->getServeVodFromLive();
 		$this->serveLiveAsVodEntryId = $newObj->getServeLiveAsVodEntryId();
+		$this->deliveryProfileId = $newObj->getDeliveryProfileId();
 	}
 }
 
