@@ -670,7 +670,6 @@ class playManifestAction extends kalturaAction
 		if ($remoteFileSyncs)
 		{
 			$storageProfileIds = array_keys($remoteFileSyncs);
-
 			$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId(
 				$this->entry->getPartnerId(), 
 				$storageProfileIds);
@@ -681,7 +680,7 @@ class playManifestAction extends kalturaAction
 				if($this->shouldIncludeStorageProfile($storageProfile))
 					$activeStorageProfileIds[] = $storageProfile->getId();
 			}
-
+			
 			foreach ($storageProfileIds as $storageProfileId)
 			{
 				if (in_array($storageProfileId, $activeStorageProfileIds))
@@ -720,8 +719,8 @@ class playManifestAction extends kalturaAction
 		}
 	
 		if (!$this->deliveryAttributes->getFlavorAssets())
-
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+	
 		if ($oneOnly) {
 			$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
 			$this->deliveryAttributes->setFlavorAssets(array(reset($flavorAssets)));
