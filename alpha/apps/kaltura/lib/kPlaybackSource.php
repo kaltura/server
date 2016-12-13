@@ -8,45 +8,43 @@ class kPlaybackSource {
 	/**
 	 * @var string
 	 */
-	private $deliveryProfileId;
+	protected $deliveryProfileId;
 
 	/**
 	 * @var string
 	 */
-	private $format;
+	protected $format;
 
 	/**
 	 * @var string
 	 */
-	private $priority;
-
-	/**
-	 * @var array
-	 */
-	private $protocols;
-
-	/**
-	 * @var array
-	 */
-	private $flavors;
+	protected $protocols;
 
 	/**
 	 * @var string
 	 */
-	private $url;
+	protected $flavorIds;
+
+	/**
+	 * @var string
+	 */
+	protected $url;
 
 	/**
 	 * @var array
 	 */
-	private $drm;
+	protected $drm;
 
-	public function __construct($deliveryProfileId = null, $format  = null, $priority  = null, $protocols = null , $flavors = null, $url = null, $drm = null )
+	public function __construct($deliveryProfileId = null, $format  = null, $protocols = null , $flavorIds = null, $url = null, $drm = null )
 	{
 		$this->deliveryProfileId = $deliveryProfileId;
-		$this->format = $format;
-		$this->priority = $priority;
+		if ( $format == PlaybackProtocol::HTTP)
+			$this->format = PlaybackProtocol::URL;
+		else
+			$this->format = $format;
+
 		$this->protocols = $protocols;
-		$this->flavors = $flavors;
+		$this->flavorIds = $flavorIds;
 		$this->url = $url;
 		$this->drm = $drm;
 	}
@@ -84,35 +82,19 @@ class kPlaybackSource {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getPriority()
-	{
-		return $this->priority;
-	}
-
-	/**
-	 * @param string $priority
-	 */
-	public function setPriority($priority)
-	{
-		$this->priority = $priority;
-	}
-
-	/**
 	 * @return array
 	 */
-	public function getFlavors()
+	public function getFlavorIds()
 	{
-		return $this->flavors;
+		return $this->flavorIds;
 	}
 
 	/**
-	 * @param array $flavors
+	 * @param array $flavorIds
 	 */
-	public function setFlavors($flavors)
+	public function setFlavorIds($flavorIds)
 	{
-		$this->flavors = $flavors;
+		$this->flavorIds = $flavorIds;
 	}
 
 	/**

@@ -249,7 +249,7 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
-					$data = new kDrmEntryPlayingPluginData();
+					$data = new kDrmPlaybackPluginData();
 					$scheme = $this->getSchemeName();
 					$data->setLicenseURL($this->constructUrl($playReadyProfile, $scheme, $customDataObject));
 					$data->setScheme($scheme);

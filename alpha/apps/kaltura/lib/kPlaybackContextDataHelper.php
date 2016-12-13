@@ -1,13 +1,10 @@
 <?php
 class kPlaybackContextDataHelper
 {
-	const MEDIA_PROTOCOL_HTTP = 'http';
-	const MEDIA_PROTOCOL_HTTPS = 'https';
-
 	/**
-	 * @var kPlaybackContextResult
+	 * @var kPlaybackContext
 	 */
-	private $playbackContextResult;
+	private $playbackContext;
 
 	/**
 	 * @var bool
@@ -26,12 +23,9 @@ class kPlaybackContextDataHelper
 	private $localPlaybackSources = array();
 	private $remotePlaybackSources = array();
 
-	private $localPriorities = array();
-	private $remotePriorities = array();
-
-	public function getPlaybackContextResult()
+	public function getPlaybackContext()
 	{
-		return $this->playbackContextResult;
+		return $this->playbackContext;
 	}
 
 	public function setIsScheduledNow($isScheduledNow)
@@ -51,7 +45,7 @@ class kPlaybackContextDataHelper
 	 */
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
-		$this->playbackContextResult = new kPlaybackContextResult();
+		$this->playbackContext = new kPlaybackContext();
 		$this->generateRestrictedMessages($contextDataHelper);
 
 		if ($this->hasBlockAction($contextDataHelper))
@@ -63,7 +57,7 @@ class kPlaybackContextDataHelper
 		$this->constructRemotePlaybackSources($dbEntry,$contextDataHelper);
 		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
 		$this->filterFlavorsBySources();
-		$this->playbackContextResult->setFlavorAssets($this->flavorAssets);
+		$this->playbackContext->setFlavorAssets($this->flavorAssets);
 	}
 
 	/**
@@ -91,29 +85,29 @@ class kPlaybackContextDataHelper
 	 */
 	private function generateRestrictedMessages($contextDataHelper)
 	{
-		$playbackRestrictions = array();
+		$playbackAccessContorlMessages = array();
 
 		foreach ($contextDataHelper->getContextDataResult()->getRulesCodesMap() as $code => $messages)
 		{
 			foreach ($messages as $message)
-				$playbackRestrictions[] = new kPlaybackRestriction($code, $message);
+				$playbackAccessContorlMessages[] = new kAccessControlMessage($code, $message);
 		}
 
 		if ($contextDataHelper->getContextDataResult()->getIsCountryRestricted())
-			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::COUNTRY_RESTRICTED_CODE, RuleRestrictions::COUNTRY_RESTRICTED);
+			$playbackAccessContorlMessages[] = new kAccessControlMessage(RuleRestrictions::COUNTRY_RESTRICTED_CODE, RuleRestrictions::COUNTRY_RESTRICTED);
 		if ($contextDataHelper->getContextDataResult()->getIsIpAddressRestricted())
-			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::IP_RESTRICTED_CODE, RuleRestrictions::IP_RESTRICTED);
+			$playbackAccessContorlMessages[] = new kAccessControlMessage(RuleRestrictions::IP_RESTRICTED_CODE, RuleRestrictions::IP_RESTRICTED);
 		if ($contextDataHelper->getContextDataResult()->getIsSessionRestricted()
 			&& ($contextDataHelper->getContextDataResult()->getPreviewLength() == -1 || is_null($contextDataHelper->getContextDataResult()->getPreviewLength())))
-			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::SESSION_RESTRICTED_CODE, RuleRestrictions::SESSION_RESTRICTED);
+			$playbackAccessContorlMessages[] = new kAccessControlMessage(RuleRestrictions::SESSION_RESTRICTED_CODE, RuleRestrictions::SESSION_RESTRICTED);
 		if ($contextDataHelper->getContextDataResult()->getIsUserAgentRestricted())
-			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::USER_AGENT_RESTRICTED_CODE, RuleRestrictions::USER_AGENT_RESTRICTED);
+			$playbackAccessContorlMessages[] = new kAccessControlMessage(RuleRestrictions::USER_AGENT_RESTRICTED_CODE, RuleRestrictions::USER_AGENT_RESTRICTED);
 		if ($contextDataHelper->getContextDataResult()->getIsSiteRestricted())
-			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::SITE_RESTRICTED_CODE, RuleRestrictions::SITE_RESTRICTED);
+			$playbackAccessContorlMessages[] = new kAccessControlMessage(RuleRestrictions::SITE_RESTRICTED_CODE, RuleRestrictions::SITE_RESTRICTED);
 		if (!$this->isScheduledNow)
-			$playbackRestrictions[] = new kPlaybackRestriction(RuleRestrictions::SCHEDULED_RESTRICTED_CODE, RuleRestrictions::SCHEDULED_RESTRICTED);
+			$playbackAccessContorlMessages[] = new kAccessControlMessage(RuleRestrictions::SCHEDULED_RESTRICTED_CODE, RuleRestrictions::SCHEDULED_RESTRICTED);
 
-		$this->playbackContextResult->setRestrictions($playbackRestrictions);
+		$this->playbackContext->setMessages($playbackAccessContorlMessages);
 	}
 
 	/**
@@ -226,6 +220,7 @@ class kPlaybackContextDataHelper
 					$this->localFlavors[$fileSync->getObjectId()] = $flavorAsset;
 				}
 			}
+
 		}
 
 		// get Active remote profiles
@@ -279,7 +274,7 @@ class kPlaybackContextDataHelper
 
 		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
-		if ($dbEntry->getPartner()->getEnforceDelivery())
+		if (!$dbEntry->getPartner()->getEnforceDelivery())
 		{
 			$streamsTypesToExclude = $this->getStreamsTypeToExclude($localDeliveryProfiles);
 			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude);
@@ -298,21 +293,10 @@ class kPlaybackContextDataHelper
 
 			if (count($playbackFlavors))
 			{
-				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $playbackFlavors, null);
-				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->getLocalPriority($deliveryProfile), $this->constructProtocol($deliveryProfile), array_keys($playbackFlavors), $manifestUrl, $drmData);
+				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode("','", array_keys($playbackFlavors)), $manifestUrl, $drmData);
 			}
 		}
-	}
-
-	private function getLocalPriority($deliveryProfile)
-	{
-		if (!array_key_exists($deliveryProfile->getStreamerType(), $this->localPriorities))
-			$this->localPriorities[$deliveryProfile->getStreamerType()] = 1;
-		else
-			$this->localPriorities[$deliveryProfile->getStreamerType()] ++;
-
-		return "local_" .$deliveryProfile->getStreamerType()."_". $this->localPriorities[$deliveryProfile->getStreamerType()];
-
 	}
 
 	/**
@@ -349,22 +333,11 @@ class kPlaybackContextDataHelper
 					foreach ($filteredDeliveryProfileFlavorsForDc as $flavorAssetForDc)
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
 
-					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $dcId);
-					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->getRemotePriority($deliveryProfile), $this->constructProtocol($deliveryProfile), $dcFlavorIds, $manifestUrl, $flavorToDrmData);
+					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
+					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode("','", array_keys($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
 				}
 			}
 		}
-	}
-
-	private function getRemotePriority($deliveryProfile)
-	{
-		if (!array_key_exists($deliveryProfile->getStreamerType(), $this->remotePriorities))
-			$this->remotePriorities[$deliveryProfile->getStreamerType()] = 1;
-		else
-			$this->remotePriorities[$deliveryProfile->getStreamerType()]++;
-
-		return "remote_" .$deliveryProfile->getStreamerType() . "_" . $this->remotePriorities[$deliveryProfile->getStreamerType()];
-
 	}
 
 	/**
@@ -447,19 +420,19 @@ class kPlaybackContextDataHelper
 		switch ($servePriority)
 		{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$this->playbackContextResult->setSources($this->localPlaybackSources);
+				$this->playbackContext->setSources($this->localPlaybackSources);
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				$this->playbackContextResult->setSources(array_merge($this->localPlaybackSources,$this->remotePlaybackSources));
+				$this->playbackContext->setSources(array_merge($this->localPlaybackSources,$this->remotePlaybackSources));
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-				$this->playbackContextResult->setSources($this->remotePlaybackSources);
+				$this->playbackContext->setSources($this->remotePlaybackSources);
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				$this->playbackContextResult->setSources(array_merge($this->remotePlaybackSources,$this->localPlaybackSources));
+				$this->playbackContext->setSources(array_merge($this->remotePlaybackSources,$this->localPlaybackSources));
 				break;
 			default:
-				$this->playbackContextResult->setSources(array());
+				$this->playbackContext->setSources(array());
 				break;
 		}
 	}
@@ -467,10 +440,10 @@ class kPlaybackContextDataHelper
 	private function filterFlavorsBySources()
 	{
 		$flavorAssetsIds = array();
-		foreach ($this->playbackContextResult->getSources() as $source)
+		foreach ($this->playbackContext->getSources() as $source)
 		{
 			/* @var $source kPlaybackSource */
-			$flavorAssetsIds = array_merge($flavorAssetsIds,$source->getFlavors());
+			$flavorAssetsIds = array_merge($flavorAssetsIds,explode(",", $source->getFlavorIds()));
 		}
 
 		self::filterFlavorAssets($this->flavorAssets, $flavorAssetsIds, false );
@@ -478,18 +451,18 @@ class kPlaybackContextDataHelper
 
 	/**
 	 * @param $deliveryProfile
-	 * @return array
+	 * @return string
 	 * */
 	private function constructProtocol($deliveryProfile)
 	{
 		if (is_null($deliveryProfile->getMediaProtocols()))
 		{
 			if ($deliveryProfile->getStreamerType() == PlaybackProtocol::RTMP)
-				return array(PlaybackProtocol::RTMP);
+				return PlaybackProtocol::RTMP;
 			else
-				return array(self::MEDIA_PROTOCOL_HTTP, self::MEDIA_PROTOCOL_HTTPS);
+				return infraRequestUtils::PROTOCOL_HTTP .",". infraRequestUtils::PROTOCOL_HTTPS;
 		}
-		return explode(",",$deliveryProfile->getMediaProtocols());
+		return $deliveryProfile->getMediaProtocols();
 	}
 
 }

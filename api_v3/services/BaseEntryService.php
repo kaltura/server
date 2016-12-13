@@ -920,10 +920,10 @@ class BaseEntryService extends KalturaEntryService
 	 * @action getPlaybackContext
 	 * @param string $entryId
 	 * @param KalturaEntryContextDataParams $contextDataParams
-	 * @return KalturaPlaybackContextResult
+	 * @return KalturaPlaybackContextOptions
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function getPlaybackContextAction($entryId, KalturaEntryContextDataParams $contextDataParams)
+	function getPlaybackContextAction($entryId, KalturaPlaybackContextOptions $contextDataParams)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
@@ -978,9 +978,8 @@ class BaseEntryService extends KalturaEntryService
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
 		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
 
-		$result = new KalturaPlaybackContextResult();
-		$result->fromObject($playbackContextDataHelper->getPlaybackContextResult());
-		$result->messages = KalturaStringArray::fromDbArray($contextDataHelper->getContextDataResult()->getMessages());
+		$result = new KalturaPlaybackContext();
+		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
 		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
 
 		return $result;

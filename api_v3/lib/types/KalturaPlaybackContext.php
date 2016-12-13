@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaPlaybackContextResult extends KalturaObject{
+class KalturaPlaybackContext extends KalturaObject{
 
 	/**
 	 * @var KalturaPlaybackSourceArray
@@ -16,12 +16,6 @@ class KalturaPlaybackContextResult extends KalturaObject{
 	public $flavorAssets;
 
 	/**
-	 * Array of messages as received from the rules that invalidated
-	 * @var KalturaStringArray
-	 */
-	public $messages;
-
-	/**
 	 * Array of actions as received from the rules that invalidated
 	 * @var KalturaRuleActionArray
 	 */
@@ -29,15 +23,15 @@ class KalturaPlaybackContextResult extends KalturaObject{
 
 	/**
 	 * Array of actions as received from the rules that invalidated
-	 * @var KalturaPlaybackRestrictionsArray
+	 * @var KalturaAccessControlMessageArray
 	 */
-	public $restrictions;
+	public $messages;
 
 	private static $mapBetweenObjects = array
 	(
 		'flavorAssets',
 		'sources',
-		'restrictions',
+		'messages',
 	);
 
 	/* (non-PHPdoc)

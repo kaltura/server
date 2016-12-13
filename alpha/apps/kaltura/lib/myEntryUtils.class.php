@@ -1523,7 +1523,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/*
 	 * Builds a manifest request for entry according to relevant flavors, delivery profile type and location of deliveryProfile(local/remote)
 	 */
-	public static function buildManifestUrl($entry, $format, $flavors, $storageId = null)
+	public static function buildManifestUrl($entry, $format, $flavors, $profileId = "")
 	{
 		$entryId = $entry->getId();
 		$partnerId = $entry->getPartnerId();
@@ -1541,10 +1541,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		$flavorIdsAsString = implode(",", $flavorIds);
-		$url = $cdnApiHost. "$partnerPath/playManifest/entryId/$entryId/flavorIds/$flavorIdsAsString/protocol/$protocol";
-
-		if($storageId)
-			$url .= "/storageId/" . $storageId;
+		$url = $cdnApiHost. "$partnerPath/playManifest/entryId/$entryId/flavorIds/$flavorIdsAsString/deliveryProfileId/$profileId/protocol/$protocol";
 
 		$url .= "/format/" . self::getFileExtensionByFormat($format, $fileExtension);
 
@@ -1578,7 +1575,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			case PlaybackProtocol::AKAMAI_HDS:
 				return PlaybackProtocol::AKAMAI_HDS . "/manifest.f4m";
 			case PlaybackProtocol::HTTP:
-				return PlaybackProtocol::HTTP . "/name/a.$fileExtension";
+				return "url/name/a.$fileExtension";
 			default:
 				return "";
 		}

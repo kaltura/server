@@ -11,24 +11,22 @@ class KalturaPlaybackSource extends KalturaObject{
 	public $deliveryProfileId;
     
 	/**
+	 * source format according to delivery profile streamer type (applehttp, mpegdash etc.)
 	 * @var string
 	 */
 	public $format;
 
 	/**
+	 * comma separated string according to deliveryProfile media protocols ('http,https' etc.)
 	 * @var string
-	 */
-	public $priority;
-
-	/**
-	 * @var KalturaStringArray
 	 */
 	public $protocols;
 
 	/**
-	 * @var KalturaStringArray
+	 * comma separated string of flavor ids
+	 * @var string
 	 */
-	public $flavors;
+	public $flavorIds;
 
 	/**
 	 * @var string
@@ -36,7 +34,8 @@ class KalturaPlaybackSource extends KalturaObject{
 	public $url;
 
 	/**
-	 * @var KalturaDrmEntryPlayingPluginDataArray
+	 * drm data object containing relevant license url ,scheme name and certificate
+	 * @var KalturaDrmPlaybackPluginDataArray
 	 */
 	public $drm;
 
@@ -44,9 +43,8 @@ class KalturaPlaybackSource extends KalturaObject{
 	(
 		"deliveryProfileId",
 		"format",
-		"priority",
 		"protocols",
-		"flavors",
+		"flavorIds",
 		"url",
 		"drm",
 	);

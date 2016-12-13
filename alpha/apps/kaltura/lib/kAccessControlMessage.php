@@ -3,17 +3,17 @@
  * @package Core
  * @subpackage model.data
  */
-class kPlaybackRestriction {
+class kAccessControlMessage {
 
 	/**
 	 * @var string
 	 */
-	private $code;
+	protected $code;
 
 	/**
 	 * @var string
 	 */
-	private $message;
+	protected $message;
 
 	public function __construct($code = null, $message  = null)
 	{

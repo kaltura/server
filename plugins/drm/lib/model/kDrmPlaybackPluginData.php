@@ -1,6 +1,6 @@
 <?php
 
-class kDrmEntryPlayingPluginData extends PluginData {
+class kDrmPlaybackPluginData extends PluginData {
 
 	/**
 	 * @var string
@@ -44,4 +44,4 @@ class kDrmEntryPlayingPluginData extends PluginData {
 		$this->licenseURL = $licenseURL;
 	}
 
-} // kDrmEntryPlayingPluginData
+} // kDrmPlaybackPluginData
