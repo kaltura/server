@@ -116,7 +116,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
 				$data = $serializer->serialize($notification);
 				if (!$httpNotificationTemplate->getUrlEncode())
-					return $data;
+					return "data=$data";
 				
 				$data = urlencode($data);
 				break;
