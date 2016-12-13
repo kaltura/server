@@ -114,6 +114,11 @@ class playManifestAction extends kalturaAction
 	 * @var DeliveryProfileDynamicAttributes
 	 */
 	private $deliveryAttributes = null;
+
+	/**
+	 * @var int
+	 */
+	private $deliveryProfileId = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -665,6 +670,7 @@ class playManifestAction extends kalturaAction
 		if ($remoteFileSyncs)
 		{
 			$storageProfileIds = array_keys($remoteFileSyncs);
+
 			$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId(
 				$this->entry->getPartnerId(), 
 				$storageProfileIds);
@@ -672,9 +678,10 @@ class playManifestAction extends kalturaAction
 			$activeStorageProfileIds = array();
 			foreach ($storageProfiles as $storageProfile)
 			{
-				$activeStorageProfileIds[] = $storageProfile->getId();
+				if($this->shouldIncludeStorageProfile($storageProfile))
+					$activeStorageProfileIds[] = $storageProfile->getId();
 			}
-			
+
 			foreach ($storageProfileIds as $storageProfileId)
 			{
 				if (in_array($storageProfileId, $activeStorageProfileIds))
@@ -713,12 +720,29 @@ class playManifestAction extends kalturaAction
 		}
 	
 		if (!$this->deliveryAttributes->getFlavorAssets())
+
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-	
 		if ($oneOnly) {
 			$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
 			$this->deliveryAttributes->setFlavorAssets(array(reset($flavorAssets)));
 		}
+	}
+
+	private function shouldIncludeStorageProfile($storageProfile)
+	{
+		if($this->deliveryProfileId)
+		{
+			$deliveryExist = false;
+			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
+			foreach ($deliveryIdsByStreamerType as $deliveryByStreamer)
+			{
+				if(!$deliveryExist)
+					$deliveryExist = in_array($this->deliveryProfileId, $deliveryByStreamer);
+			}
+			return $deliveryExist;
+		}
+
+		return true;
 	}
 
 	/**
@@ -1059,7 +1083,10 @@ class playManifestAction extends kalturaAction
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
-		
+
+		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
+		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
+
 		// Initialize
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
