@@ -59,8 +59,8 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		}
 		if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
 			return new KalturaFairplayEntryContextPluginData();
-		if ($baseClass == 'KalturaDrmEntryPlayingPluginData' && $enumValue == 'kFairPlayEntryPlayingPluginData')
-			return new KalturaFairPlayEntryPlayingPluginData();
+		if ($baseClass == 'KalturaDrmPlaybackPluginData' && $enumValue == 'kFairPlayPlaybackPluginData')
+			return new KalturaFairPlayPlaybackPluginData();
 		return null;
 	}
 
@@ -189,7 +189,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
-					$data = new kFairPlayEntryPlayingPluginData();
+					$data = new kFairPlayPlaybackPluginData();
 					$scheme = $this->getScheme();
 					$data->setLicenseURL($this->constructUrl($fairplayProfile, $scheme, $customDataObject));
 					$data->setScheme($scheme);

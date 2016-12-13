@@ -114,8 +114,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return new KalturaAccessControlDrmPolicyAction();
 	    if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
 		    return new KalturaDrmEntryContextPluginData();
-	    if ($baseClass == 'KalturaDrmEntryPlayingPluginData' && $enumValue == 'kDrmEntryPlayingPluginData')
-		    return new KalturaDrmEntryPlayingPluginData();
+	    if ($baseClass == 'KalturaDrmPlaybackPluginData' && $enumValue == 'kDrmPlaybackPluginData')
+		    return new KalturaDrmPlaybackPluginData();
         return null;
     }
 
@@ -182,7 +182,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 					$customDataObject = reset($customDataJson);
 					foreach ($this->getSchemes() as $scheme)
 					{
-						$data = new kDrmEntryPlayingPluginData();
+						$data = new kDrmPlaybackPluginData();
 						$data->setLicenseURL($this->constructUrl($dbProfile, $scheme, $customDataObject));
 						$data->setScheme($scheme);
 						$result->addToPluginData($scheme, $data);

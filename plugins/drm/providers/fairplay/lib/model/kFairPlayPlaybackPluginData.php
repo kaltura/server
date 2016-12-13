@@ -1,6 +1,6 @@
 <?php
 
-class kFairPlayEntryPlayingPluginData extends kDrmEntryPlayingPluginData {
+class kFairPlayPlaybackPluginData extends kDrmPlaybackPluginData {
 
 	/**
 	 * @var string
@@ -23,4 +23,4 @@ class kFairPlayEntryPlayingPluginData extends kDrmEntryPlayingPluginData {
 		$this->certificate = $certificate;
 	}
 
-} // kFairPlayEntryPlayingPluginData
+} // kFairPlayPlaybackPluginData
