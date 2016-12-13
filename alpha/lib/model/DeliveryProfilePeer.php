@@ -213,7 +213,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		{
 			$delivery = self::retrieveByPK($deliveryAttributes->getDeliveryProfileId());
 			$deliveries = array ();
-			if($delivery && $delivery->getStreamerType() == $streamerType)
+			if($delivery && $delivery->getStreamerType() == $streamerType && $delivery->getPartnerId() == $partner->getId())
 				$deliveries[] = $delivery;
 		}
 		else
