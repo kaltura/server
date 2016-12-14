@@ -421,6 +421,8 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			else
 			{
 				$propertyElement->setAttribute("type", $propType);
+				if($property->isTime())
+					$propertyElement->setAttribute("isTime", "1");
 			}
 			
 			$propertyElement->setAttribute("readOnly", $property->isReadOnly() ? "1" : "0");
@@ -494,6 +496,8 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			else
 			{
 				$actionParamElement->setAttribute("type", $actionParam->getType());
+				if($actionParam->isTime())
+					$actionParamElement->setAttribute("isTime", "1");
 			}
 			$actionParamElement->setAttribute("optional", $actionParam->isOptional() ? "1" : "0");
 			if ($actionParam->isOptional())
@@ -551,6 +555,8 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			else 
 			{
 				$resultElement->setAttribute("type", $outputType);
+				if($outputTypeReflector->isTime())
+					$resultElement->setAttribute("isTime", "1");
 			}
 		}
 
