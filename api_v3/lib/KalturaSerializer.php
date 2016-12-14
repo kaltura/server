@@ -56,7 +56,7 @@ abstract class KalturaSerializer
     	return $object;
 	}
 	
-	protected function convertTypedArraysToPhpArrays($object)
+	protected function convertTypedArraysToPhpArrays($object, $wantedType = null)
 	{
 	    if (is_object($object))
     	{
@@ -64,10 +64,16 @@ abstract class KalturaSerializer
 			{
     			return $this->convertTypedArraysToPhpArrays($object->toArray());
 			}
-			
+
+		    $reflector = new  KalturaTypeReflectorCacher::get(get_class($object));
+
 			foreach($object as $key => $value)
 			{
-				$object->$key = $this->convertTypedArraysToPhpArrays($value);
+				$propertyInfo = $reflector->getProperty($key);
+				$expectedType = null;
+				if ($propertyInfo)
+					$expectedType = $propertyInfo->getType();
+				$object->$key = $this->convertTypedArraysToPhpArrays($value, $expectedType);
 			}
 				
 			return $object;
@@ -83,6 +89,25 @@ abstract class KalturaSerializer
 			
     		return $array;
     	}
+
+		switch ($wantedType)
+		{
+			case 'bool':
+				$object =  ($object)? true:false;
+				break;
+			case 'int':
+				$object = (int)$object;
+				break;
+			case 'double':
+				$object = (double)$object;
+				break;
+			case 'float':
+				$object = (float)$object;
+				break;
+			case 'string':
+				$object = strval($object);
+				break;
+		}
     	
     	return $object;
 	}
