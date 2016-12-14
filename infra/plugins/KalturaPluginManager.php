@@ -88,7 +88,7 @@ class KalturaPluginManager
 	{
 		$pluginClassName = null;
 		$cacheKey = null;
-		if (function_exists('apc_fetch'))
+		if (function_exists('apc_fetch') && !$constructorArgs)
 		{
 			$cacheKey = "loadObject-$baseClass-$enumValue";
 			$pluginClassName = apc_fetch($cacheKey);
