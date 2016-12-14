@@ -74,7 +74,9 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaUrlTokenizerVnpt();
 			case 'kChtHttpUrlTokenizer':
 				return new KalturaUrlTokenizerCht();	
-			
+			case 'kKsUrlTokenizer':
+				return new KalturaUrlTokenizerKs();
+
 			// Add other tokenizers here
 			default:
 				$apiObject = KalturaPluginManager::loadObject('KalturaTokenizer', $type);

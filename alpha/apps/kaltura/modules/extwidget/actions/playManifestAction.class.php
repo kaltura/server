@@ -1119,7 +1119,14 @@ class playManifestAction extends kalturaAction
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
+		{
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
+			if ($renderer->tokenizer)
+			{
+				$renderer->tokenizer->setEntryId($this->entryId);
+				$renderer->tokenizer->setPartnerId($this->entry->getPartnerId());
+			}
+		}
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		$renderer->lastModified = time();
 
