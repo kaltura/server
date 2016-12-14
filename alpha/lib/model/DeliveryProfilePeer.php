@@ -636,5 +636,52 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return $deliveries;
 	}
 
+	public static function getCustomDeliveryProfileIds($entry, $partner, DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
+		$deliveryIds = array();
+
+		if( $entry->getType() == entryType::LIVE_STREAM )
+		{
+			/* @var $entry LiveEntry */
+			/* @var $partner Partner */
+			$playableServerNode = $entry->getMediaServer();
+			if($playableServerNode)
+			{
+				/* @var WowzaMediaServerNode $playableServerNode */
+				$deliveryIds[] = $playableServerNode->getDeliveryProfileIds();
+			}
+
+			$deliveryIds[] = $partner->getLiveDeliveryProfileIds();
+
+			if( in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
+			{
+				$customLiveStreamConfigurations = array();
+				if($entry->getHlsStreamUrl())
+				{
+					$hlsLiveStreamConfig = new kLiveStreamConfiguration();
+					$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl());
+					$hlsLiveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
+					$customLiveStreamConfigurations[] = $hlsLiveStreamConfig;
+				}
+
+				$customLiveStreamConfigurations = array_merge($entry->getCustomLiveStreamConfigurations(), $customLiveStreamConfigurations);
+				foreach($customLiveStreamConfigurations as $customLiveStreamConfiguration)
+				{
+					/* @var $customLiveStreamConfiguration kLiveStreamConfiguration */
+						$cdnHost = parse_url($customLiveStreamConfiguration->getUrl(), PHP_URL_HOST);
+						$customLiveDelivery = self::getLiveDeliveryProfileByHostName($cdnHost, $deliveryAttributes);
+						$deliveryIds[] = array($customLiveDelivery->getId());
+				}
+			}
+			$deliveryIds = call_user_func_array('array_merge', $deliveryIds);
+		}
+		else
+		{
+			$deliveryIds = $partner->getDeliveryProfileIds();
+		}
+
+		return $deliveryIds;
+	}
+
 } // DeliveryProfilePeer
 
