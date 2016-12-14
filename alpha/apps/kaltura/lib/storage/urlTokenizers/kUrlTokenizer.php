@@ -29,6 +29,16 @@ abstract class kUrlTokenizer
 	protected $limitIpAddress;
 	
 	/**
+	 * @var string
+	 */
+	protected $entryId;
+
+	/**
+	 * @var int
+	 */
+	protected $partnerId;
+	
+	/**
 	 * @param string $playbackContext
 	 */
 	public function setPlaybackContext($playbackContext)
@@ -113,5 +123,19 @@ abstract class kUrlTokenizer
 	 */
 	public function setLimitIpAddress($limitIpAddress) {
 		$this->limitIpAddress = $limitIpAddress;
+	}
+
+	/**
+	 * @param string $entryId
+	 */
+	public function setEntryId($entryId) {
+		$this->entryId = $entryId;
+	}
+
+	/**
+	 * @param int $partnerId
+	 */
+	public function setPartnerId($partnerId) {
+		$this->partnerId = $partnerId;
 	}
 }
