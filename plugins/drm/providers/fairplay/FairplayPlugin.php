@@ -5,7 +5,7 @@
 class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'fairplay';
-	const SCHEME_NAME = 'fps';
+	const URL_NAME = 'fps';
 	const SEARCH_DATA_SUFFIX = 's';
 
 	/* (non-PHPdoc)
@@ -17,11 +17,11 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	}
 
 	/* (non-PHPdoc)
-	 * @see IKalturaPlugin::getPlugin()
+	 * @see IKalturaPlugin::getPluginName()
 	 */
-	public static function getScheme()
+	public static function getUrlName()
 	{
-		return self::SCHEME_NAME;
+		return self::URL_NAME;
 	}
 
 	/* (non-PHPdoc)
@@ -30,9 +30,11 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
-			return array('FairplayProviderType');
+			return array('FairplayProviderType', 'FairplaySchemeName');
 		if ($baseEnumName == 'DrmProviderType')
 			return array('FairplayProviderType');
+		if ($baseEnumName == 'DrmSchemeName')
+			return array('FairplaySchemeName');
 		return array();
 	}
 
@@ -190,15 +192,24 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
 					$data = new kFairPlayPlaybackPluginData();
-					$scheme = $this->getScheme();
-					$data->setLicenseURL($this->constructUrl($fairplayProfile, $scheme, $customDataObject));
-					$data->setScheme($scheme);
+					$data->setLicenseURL($this->constructUrl($fairplayProfile, self::getUrlName(), $customDataObject));
+					$data->setScheme($this->getDrmSchemeCoreValue());
 					$data->setCertificate($fairplayProfile->getPublicCertificate());
-					$result->addToPluginData($scheme, $data);
+					$result->addToPluginData(self::getPluginName(), $data);
 				}
 			}
 		}
 	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDrmSchemeCoreValue()
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . FairplaySchemeName::FAIRPLAY;
+		return kPluginableEnumsManager::apiToCore('DrmSchemeName', $value);
+	}
+
 
 	public function isSupportStreamerTypes($streamerType)
 	{
