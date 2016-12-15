@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.quiz
+ * @package plugins.annotation
  * @subpackage model.filters
  */
 class AnnotationFilter extends CuePointFilter
