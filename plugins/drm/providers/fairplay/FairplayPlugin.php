@@ -108,7 +108,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
 	public function contributeToEntryContextDataResult(entry $entry, accessControlScope $contextDataParams, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions() ))
+		if ($this->shouldContribute($entry))
 		{
 			$fairplayContextData = new kFairplayEntryContextPluginData();
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
@@ -125,19 +125,28 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	}
 
 	/**
-	 * @param array<kRuleAction> $actions
+	 * @param entry $entry
 	 * @return bool
 	 */
-	protected function shouldContribute(array $actions)
+	protected function shouldContribute(entry $entry)
 	{
-		foreach ($actions as $action)
+		if ($entry->getAccessControl())
 		{
-			/**
-			 * @var kRuleAction $action
-			 */
-			if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
 			{
-				return true;
+				/**
+				 * @var kRule $rule
+				 */
+				foreach ($rule->getActions() as $action)
+				{
+					/**
+					 * @var kRuleAction $action
+					 */
+					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+					{
+						return true;
+					}
+				}
 			}
 		}
 		return false;
@@ -177,7 +186,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
     public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if ($fairplayProfile)
