@@ -112,6 +112,13 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 * @readonly
 	 */
 	public $primaryServerNodeId;
+
+	/**
+	 * The low latency flag
+	 *
+	 * @var KalturaNullableBoolean
+	 */
+	public $lowLatency;
 	
 	private static $map_between_objects = array
 	(
@@ -130,6 +137,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"streamUsername",
 		"bitrates" => "streamBitrates",
 		"primaryServerNodeId",
+		"lowLatency",
 	);
 
 	public function __construct()

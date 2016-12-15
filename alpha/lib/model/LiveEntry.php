@@ -746,7 +746,10 @@ abstract class LiveEntry extends entry
 	{
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
-	
+
+	public function setLowLatency ( $v )	{	$this->putInCustomData ( "lowLatency" , $v );	}
+	public function getLowLatency (  )	{	return $this->getFromCustomData( "lowLatency", null, false);	}
+
 	/**
 	 * @return boolean
 	 */
