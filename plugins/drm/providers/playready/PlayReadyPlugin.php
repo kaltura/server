@@ -237,7 +237,7 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 
     public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()) )
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()) )
 		{
 			$playReadyProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(PlayReadyPlugin::getPlayReadyProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if ($playReadyProfile)
@@ -270,19 +270,28 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 	}
 
 	/**
-	 * @param array<kRuleAction> $actions
+	 * @param entry $entry
 	 * @return bool
 	 */
-	protected function shouldContribute(array $actions)
+	protected function shouldContribute(entry $entry)
 	{
-		foreach ($actions as $action)
+		if ($entry->getAccessControl())
 		{
-			/**
-			 * @var kRuleAction $action
-			 */
-			if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
 			{
-				return true;
+				/**
+				 * @var kRule $rule
+				 */
+				foreach ($rule->getActions() as $action)
+				{
+					/**
+					 * @var kRuleAction $action
+					 */
+					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+					{
+						return true;
+					}
+				}
 			}
 		}
 		return false;
