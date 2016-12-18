@@ -48,14 +48,16 @@ class kApiCacheBase
 	// status
 	protected $_expiry = 0;								// the expiry used for anonymous caching, if 0 ANONYMOUS_CACHE_EXPIRY will be used
 	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the cacher initializes
-	protected static $_lockEnabled = false;
+	protected static $_lockEnabled = false;				// when enabled, if multiple requests are issued for the same cache key at the same time
+														// only one will enter, and the rest will wait for it to complete
 
 	// conditional cache fields
 	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used
 	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
 	protected $_sqlConditions = array();				// list of sql queries that the api depends on
-	protected static $_allowStaleResponse = false;
+	protected static $_allowStaleResponse = false;		// when enabled, sql conditions will not be used and database access will not disable the cache
+														// instead, the cache expiration time will be shortened
 
 	// extra fields
 	protected $_extraFields = array();
