@@ -38,6 +38,7 @@ class kApiCacheBase
 	const MAX_INVALIDATION_KEYS = 250;
 	const MAX_SQL_CONDITION_CONNS = 1;			// max number of connections required to verify the SQL conditions
 	const MAX_SQL_CONDITION_QUERIES = 4;		// max number of queries per connection required to verify the SQL conditions
+	const STALE_RESPONSE_EXPIRY = 5;
 		
 	// cache instances
 	protected $_instanceId = 0;
@@ -47,12 +48,16 @@ class kApiCacheBase
 	// status
 	protected $_expiry = 0;								// the expiry used for anonymous caching, if 0 ANONYMOUS_CACHE_EXPIRY will be used
 	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the cacher initializes
+	protected static $_lockEnabled = false;				// when enabled, if multiple requests are issued for the same cache key at the same time
+														// only one will enter, and the rest will wait for it to complete
 
 	// conditional cache fields
 	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used
 	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
 	protected $_sqlConditions = array();				// list of sql queries that the api depends on
+	protected static $_allowStaleResponse = false;		// when enabled, sql conditions will not be used and database access will not disable the cache
+														// instead, the cache expiration time will be shortened
 
 	// extra fields
 	protected $_extraFields = array();
@@ -110,6 +115,12 @@ class kApiCacheBase
 
 	public static function disableConditionalCache()
 	{
+		if (self::$_allowStaleResponse)
+		{
+			self::setConditionalCacheExpiry(self::STALE_RESPONSE_EXPIRY);
+			return;
+		}
+
 		foreach (self::$_activeInstances as $curInstance)
 		{
 			// no need to check for CACHE_STATUS_DISABLED, since the instances are removed from the list when they get this status
@@ -135,6 +146,11 @@ class kApiCacheBase
 	public static function isCacheEnabled()
 	{
 		return count(self::$_activeInstances);
+	}
+
+	public static function enableLock()
+	{
+		self::$_lockEnabled = true;
 	}
 
 	// expiry control functions
@@ -185,6 +201,12 @@ class kApiCacheBase
 	
 	public static function addSqlQueryCondition($configKey, $sql, $fetchStyle, $columnIndex, $filter, $result)
 	{
+		if (self::$_allowStaleResponse)
+		{
+			self::setConditionalCacheExpiry(self::STALE_RESPONSE_EXPIRY);
+			return;
+		}
+
 		foreach (self::$_activeInstances as $curInstance)
 		{
 			if ($curInstance->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
@@ -232,7 +254,12 @@ class kApiCacheBase
 			}
 		}
 	}
-		
+
+	public static function enableStaleResponse()
+	{
+		self::$_allowStaleResponse = true;
+	}
+
 	// extra fields functions
 	static public function hasExtraFields()
 	{
