@@ -144,16 +144,17 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$apiErrorsReflected = new ReflectionClass($errorsClass);
 			$apiErrors = $apiErrorsReflected->getConstants();
 
-			foreach($apiErrors as $errorCode => $errorData)
+			foreach($apiErrors as $constName => $errorData)
 			{
+				$errorParts = explode(';', $errorData);
+				if(count($errorParts) != 3)
+					throw new Exception("Missing error info in $errorsClass::$constName: $errorData");
+
+				list($errorCode, $errorParams, $errorMessage) = $errorParts;
+					
 				if(isset($appended[$errorCode]))
 					continue;
 				
-				$errorParts = explode(';', $errorData);
-				if(count($errorParts) != 3)
-					throw new Exception("Missing error info in $errorsClass::$errorCode: $errorData");
-				
-				list($errorCode, $errorParams, $errorMessage) = $errorParts;
 				$errorElement = $this->_doc->createElement('error');
 				$errorElement->setAttribute('name', $errorCode);
 				$errorElement->setAttribute('code', $errorCode);
