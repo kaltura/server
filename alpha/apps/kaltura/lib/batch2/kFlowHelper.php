@@ -374,6 +374,7 @@ class kFlowHelper
 	{
 		$advancedOptions = new kEntryReplacementOptions();
 		$advancedOptions->setKeepManualThumbnails(true);
+		$advancedOptions->setKeepOldAssets(true);
 		$recordedEntry->setReplacementOptions($advancedOptions);
 
 		$replacingEntry = new entry();
