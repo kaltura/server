@@ -919,8 +919,8 @@ class BaseEntryService extends KalturaEntryService
 	 * This action delivers all data relevant for player
 	 * @action getPlaybackContext
 	 * @param string $entryId
-	 * @param KalturaEntryContextDataParams $contextDataParams
-	 * @return KalturaPlaybackContextOptions
+	 * @param KalturaPlaybackContextOptions $contextDataParams
+	 * @return KalturaPlaybackContext
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
 	function getPlaybackContextAction($entryId, KalturaPlaybackContextOptions $contextDataParams)

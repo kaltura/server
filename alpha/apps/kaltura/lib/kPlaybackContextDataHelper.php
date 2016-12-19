@@ -342,7 +342,7 @@ class kPlaybackContextDataHelper
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
 
 					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
-					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode(",", array_keys($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
+					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
 				}
 			}
 		}
