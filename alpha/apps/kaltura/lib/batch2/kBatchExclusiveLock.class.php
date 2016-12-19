@@ -86,7 +86,8 @@ class kBatchExclusiveLock
 		$c = new Criteria();
 		$filter->attachToCriteria($c);
 		
-		return self::getExclusive($c, $lockKey, $max_execution_time, $number_of_objects, $jobType, $maxOffset);
+		$objects = kJobsCacher::getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset);
+		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	
 	public static function getQueueSize(Criteria $c, $schedulerId, $workerId, $jobType)
@@ -221,7 +222,7 @@ class kBatchExclusiveLock
 	 *
 	 * @param Criteria $c
 	 */
-	private static function getExclusive(Criteria $c, kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType, $maxOffset = null)
+	public static function getExclusive(Criteria $c, $number_of_objects, $jobType, $maxOffset = null)
 	{
 		$schd = BatchJobLockPeer::SCHEDULER_ID;
 		$work = BatchJobLockPeer::WORKER_ID;
@@ -231,10 +232,7 @@ class kBatchExclusiveLock
 		$expr = BatchJobLockPeer::EXPIRATION;
 		$recheck = BatchJobLockPeer::START_AT;
 		$partnerLoadQuota = PartnerLoadPeer::QUOTA;
-		
-		$schd_id = $lockKey->getSchedulerId();
-		$work_id = $lockKey->getWorkerId();
-		$btch_id = $lockKey->getBatchIndex();
+
 		$now = time();
 		$now_str = date('Y-m-d H:i:s', $now);
 		
@@ -271,8 +269,6 @@ class kBatchExclusiveLock
 			$newJobsCond .= " AND $partnerLoadCondition";
 		}
 		
-		
-		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
 			
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
 		$jobWasntExecutedTooMany = "$atmp <= $max_exe_attempts OR $atmp IS NULL";
@@ -282,7 +278,6 @@ class kBatchExclusiveLock
 					AND	(
 						$lockExpiredCondition
 						OR	($newJobsCond)
-						OR ($jobAlreadyHandledByWorker)
 					)
 					AND ($jobWasntExecutedTooMany)";
 				
@@ -295,8 +290,7 @@ class kBatchExclusiveLock
 
 		$c->setLimit($number_of_objects);
 		
-		$objects = BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
-		return self::lockObjects($lockKey, $objects, $max_execution_time);
+		return BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 	}
 	
 	/**
