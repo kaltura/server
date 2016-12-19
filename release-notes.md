@@ -1,3 +1,16 @@
+# Lynx 12.8.0 #
+
+## Need to verify ability to list occurrences by resource of their parent for Extron ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6557
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	reindex schedule_event table in sphinx
+	
 # Lynx 12.7.0 #
 
 ## New action getPlaybackContext to baseEntryService ##
