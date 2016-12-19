@@ -219,8 +219,8 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 
 	public function getResourceIdsForIndex()
 	{
-		$resources = ScheduleEventResourcePeer::retrieveByEventId($this->getId());
-	
+		$resources = ScheduleEventResourcePeer::retrieveByEventIdOrItsParentId($this->getId());
+
 		$index = array();
 		foreach($resources as $resource)
 		{
