@@ -303,7 +303,7 @@ class kFlowHelper
 		if(count($files) > 1)
 		{
 			$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
-			$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $asset));
+			$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $asset, count($files)));
 			if(!$replacingEntry)
 			{
 				KalturaLog::err('Failed to allocate replacing entry');
@@ -366,7 +366,7 @@ class kFlowHelper
 		return $fileIndex;
 	}
 
-	private static function createReplacigEntry($recordedEntry)
+	private static function createReplacigEntry($recordedEntry, $liveSegmentCount)
 	{
 		$advancedOptions = new kEntryReplacementOptions();
 		$advancedOptions->setKeepManualThumbnails(true);
@@ -385,6 +385,7 @@ class kFlowHelper
 		$replacingEntry->setDefaultModerationStatus();
 		$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$replacingEntry->setReplacedEntryId($recordedEntry->getId());
+		$replacingEntry->setRecordedEntrySegmentCounnd($liveSegmentCount);
 		$replacingEntry->save();
 
 		$recordedEntry->setReplacingEntryId($replacingEntry->getId());
@@ -393,7 +394,7 @@ class kFlowHelper
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset) 
+	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount) 
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -404,19 +405,27 @@ class kFlowHelper
 				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
 				if ($replacingEntry)
 				{
+					$recordedEntrySegmentCount = $replacingEntry->getRecordedEntrySegmentCounnd(); 
+					if($recordedEntrySegmentCount && $recordedEntrySegmentCount > $liveSegmentCount)
+					{
+						KalturaLog::debug("Entry in replacment with higher segment count [$recordedEntrySegmentCount] > [$liveSegmentCount]");
+					}
+					else 
+					{
 						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
 						if($replacingAsset)
 						{
-								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
-								myEntryUtils::deleteReplacingEntry($recordedEntry, $replacingEntry);
-								$replacingEntry = null;
-						}
+							KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
+							myEntryUtils::deleteReplacingEntry($recordedEntry, $replacingEntry);
+							$replacingEntry = null;
+						}	
+					}
 				}
 		}
 		
 		if(is_null($replacingEntry))
 		{
-			$replacingEntry = self::createReplacigEntry($recordedEntry);
+			$replacingEntry = self::createReplacigEntry($recordedEntry, $liveSegmentCount);
 		}
 		return $replacingEntry;
 	}	

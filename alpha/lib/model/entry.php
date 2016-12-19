@@ -1792,6 +1792,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setStreams ( $v )	{	$this->putInCustomData ( "streams" , $v );	}
 	public function getStreams(  )		{	return $this->getFromCustomData( "streams" );	}
 	
+	public function setRecordedEntrySegmentCounnd ( $v )	{	$this->putInCustomData ( "recordedEntrySegmentCount" , $v );	}
+	public function getRecordedEntrySegmentCounnd(  )		{	return $this->getFromCustomData( "recordedEntrySegmentCount" );	}
+	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
