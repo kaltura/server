@@ -4,18 +4,14 @@ class kBusinessConvertDL
 {
 
 
-private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$entry)
-{
-	if ($oldAsset instanceof flavorAsset) {
+	private static function shouldDeleteMissingAssetDuringReplacement($oldAsset)
+	{		
 		// In case of live recording entry Don't drop the old asset
-		if (!$entry->getIsRecordedEntry())
-			return true;
-	}
-	elseif ($oldAsset instanceof thumbAsset)
+		if($oldAsset instanceof flavorAsset && $oldAsset->getKeepOldAssetOnEntryReplacement())
+			return false;
+	
 		return true;
-
-	return false;
-}
+	}
 
 	/**
 	 * @param entry $entry
@@ -120,7 +116,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 						$defaultThumbAssetOld = $oldAsset;
 					}
 				}
-				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset,$tempEntry))
+				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset))
 				{
 					KalturaLog::info("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
 					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);

@@ -283,4 +283,14 @@ class flavorAsset extends exportableAsset
 			$this->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM),
 			$this->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
 	}
+	
+	public function getKeepOldAssetOnEntryReplacement()
+	{
+		if($this->getentry()->getReplacementOptions()->getKeepOldAssets()) 
+		{
+			return true;
+		}
+	
+		return false;
+	}
 }

@@ -302,17 +302,13 @@ class kFlowHelper
 
 		if(count($files) > 1)
 		{
-			$retryCounter=5;
-			while(!$replacingEntry = self::getReplacingEntry($recordedEntry, $asset))
+			$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
+			$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $asset));
+			if(!$replacingEntry)
 			{
-				sleep(5);
-				if(!$retryCounter--)
-				{
-					kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
-					KalturaLog::err('Failed to allocate replacing entry');
-					return $dbBatchJob;
-				}
-				KalturaLog::log("Failed to get replacing entry {$recordedEntry->getId()} asset {$asset->getId()} retrying .. {$retryCounter}");
+				KalturaLog::err('Failed to allocate replacing entry');
+				kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
+				return $dbBatchJob;
 			}
 
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
@@ -374,6 +370,7 @@ class kFlowHelper
 	{
 		$advancedOptions = new kEntryReplacementOptions();
 		$advancedOptions->setKeepManualThumbnails(true);
+		$advancedOptions->setKeepOldAssets(true);
 		$recordedEntry->setReplacementOptions($advancedOptions);
 
 		$replacingEntry = new entry();
@@ -396,7 +393,7 @@ class kFlowHelper
 		return $replacingEntry;
 	}
 
-	protected static function getReplacingEntry($recordedEntry, $asset) 
+	public static function getReplacingEntry($recordedEntry, $asset) 
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -410,8 +407,9 @@ class kFlowHelper
 						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
 						if($replacingAsset)
 						{
-								KalturaLog::debug("Entry in replacement with this asset type {$asset->getFlavorParamsId()}");
-								return null;
+								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
+								myEntryUtils::deleteReplacingEntry($recordedEntry, $replacingEntry);
+								$replacingEntry = null;
 						}
 				}
 		}
