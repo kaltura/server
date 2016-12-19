@@ -8,6 +8,7 @@
  */
 class kJobsCacher
 {
+	CONST TIME_IN_CACHE = 30;
 	/**
 	 * will return BatchJob objects.
 	 *@param Criteria $c
@@ -21,40 +22,32 @@ class kJobsCacher
 	public static function getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset)
 	{
 		$workerId = $lockKey->getWorkerId();
+		$maxObject = self::getMaxJobToPull($workerId);
+
+		if (!$maxObject)
+			return kBatchExclusiveLock::getExclusive($c, $number_of_objects, $jobType, $maxOffset);
+
+		$key = self::getCacheKey($workerId);
+
 		$cache = self::getCache();
-		$jobsList = self::getListFromCache($workerId, $cache);
+		$jobsList = $cache->get($key);
 		if ($jobsList)
 			return array_slice($jobsList, 0, $number_of_objects);
-		$maxObject = self::getMaxJobToPull($workerId);
+
 		$objects = kBatchExclusiveLock::getExclusive($c, $maxObject, $jobType, $maxOffset);
-
-		$cache->set(self::getCacheKey($workerId), $objects, 30);
-
+		$cache->set($key, $objects, self::TIME_IN_CACHE);
 		return array_slice($objects, 0, $number_of_objects);
-	}
-
-	/**
-	 * will return list of job from cache
-	 * @param int $workerId
-	 * @param kBaseCacheWrapper $cache
-	 * @return array
-	 */
-	private static function getListFromCache($workerId, $cache)
-	{
-		if (!self::getMaxJobToPull($workerId))
-			return null;
-		$key = self::getCacheKey($workerId);
-		return $cache->get($key);
 	}
 	
 	/**
-	 * will return list max Job To Pull To Cache, if not config for worker return 0
+	 * will return list max Job To Pull To Cache, if not config for worker return null
 	 * @param int $workerId
 	 * @return int
 	 */
 	private static function getMaxJobToPull($workerId)
 	{
 		try {
+			// in production 'batch/worker'
 			$map = kConf::getMap('batch/batch');
 			foreach ($map as $value)
 				if (array_key_exists('id', $value) && $value['id'] == $workerId &&
