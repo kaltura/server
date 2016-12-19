@@ -363,10 +363,13 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 				case 1:
 					$mapStr.= "pan=stereo:c0=c0:c1=c1";
 					break;
+/*
+Disabled 'amix', for better stereo by 'amerge'
 				case 2:
 				case 3:
 					$mapStr.= "amix=inputs=$inputs";
 					break;
+*/
 				default:
 					$mapStr.= "amerge=inputs=$inputs";
 					break;

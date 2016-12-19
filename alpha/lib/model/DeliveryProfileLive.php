@@ -329,6 +329,20 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		$livePackagerToken = kConf::get("live_packager_secure_token");
 		
+		$signingDomain = $this->getLivePackagerSigningDomain(); 
+		if($signingDomain && $signingDomain != '')
+		{
+			$domain = parse_url($url, PHP_URL_HOST);
+			if($domain && $domain != '')
+			{
+				$url = str_replace($domain, $signingDomain, $url);
+			}
+			else
+			{ 
+				KalturaLog::debug("Failed to parse domain from original url, signed domain will not be modified");
+			}
+		}
+		
 		$token = md5("$livePackagerToken $url", true);
 		$token = rtrim(strtr(base64_encode($token), '+/', '-_'), '=');
 		
@@ -344,6 +358,16 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		$renderer = parent::getRenderer($flavors);
 		return $renderer;
+	}
+	
+	public function setLivePackagerSigningDomain($v)
+	{
+		$this->putInCustomData("livePackagerSigningDomain", $v);
+	}
+	
+	public function getLivePackagerSigningDomain()
+	{
+		return $this->getFromCustomData("livePackagerSigningDomain");
 	}
 }
 

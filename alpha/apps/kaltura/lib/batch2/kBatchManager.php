@@ -237,22 +237,8 @@ class kBatchManager
 				$assetTagsArray = $flavorAsset->getTagsArray();
 				foreach($assetTagsArray as $tag)
 					$tagsArray[] = $tag;
-					
-				$maxMbrBitrate = 8000;
-				if (kConf::hasParam('max_mbr_flavor_bitrate'))
-					$maxMbrBitrate = kConf::get('max_mbr_flavor_bitrate');
-				
-				if ($mediaInfoDb->getContainerBitRate() >= $maxMbrBitrate)
-				{
-					$tagsArray = array_unique($tagsArray);
-					$key = array_search(flavorParams::TAG_MBR, $tagsArray);
-					if($key !== false)
-						unset($tagsArray[$key]);
-				}
 				
 				$finalTagsArray = $tagsArray;
-//				bypass, KDLWrap::CDLMediaInfo2Tags doesn't support destination flavors and mobile tags
-//				$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfoDb, $tagsArray);
 
 				$finalTags = join(',', array_unique($finalTagsArray));
 				KalturaLog::log("Flavor asset tags from KDL [$finalTags]");

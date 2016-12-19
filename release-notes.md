@@ -1,3 +1,75 @@
+# Lynx 12.7.0 #
+
+## New action getPlaybackContext to baseEntryService ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6283
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_06_update_base_entry_get_playing_data_permissions.php
+	
+## Ad cue points and flavor changed http notifications ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6235
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/adCuePointHttpNotification.xml
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/playServerFlavorHttpEventNotification.xml
+
+## support for Kaltura liveRecording - Full Live to Vod flow ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5807
+
+### Configuration ###
+
+Add the following to workers.ini under KAsyncExtractMedia:
+
+	;The path for finished products, acessable from the apache
+	params.sharedTempPath	= (should be identical to the shared path configurued on KAsyncConvertWorker)
+
+### Deployment scripts ###
+	
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## New FFMpeg 3.2 ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6478
+
+### Configuration ###
+
+Binaries:
+	Provided in the PLAT-6478
+	
+Following bins/scripts should be switched -
+- ffmpeg.sh
+- ffprobe.sh
+- ismindex.sh
+- qt-faststart
+- x264.sh
+
+### Deployment scripts ###
+	
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Lynx 12.6.0 #
 
 ## support for Kaltura liveRecording - Full Live to Vod flow ##

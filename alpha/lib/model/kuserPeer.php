@@ -89,14 +89,16 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	
 	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
-		
+		$lockKey = "user_add_" . $partner_id . $puser_id;
+		return kLock::runLocked($lockKey, array('kuserPeer','createUniqueKuserForPartner'), array($partner_id, $puser_id, $is_admin));
+	}
+
+	public static function createUniqueKuserForPartner($partner_id, $puser_id, $is_admin = false)
+	{
 		$kuser = kuserPeer::getKuserForPartner($partner_id, $puser_id);
-		
 		if (!$kuser)
-		{
-			$lockKey = "user_add_" . $partner_id . $puser_id;
-			return kLock::runLocked($lockKey, array('kuserPeer','createNewUser'), array($partner_id, $puser_id, $is_admin));
-		}
+			return kuserPeer::createNewUser($partner_id, $puser_id, $is_admin);
+
 		return $kuser;
 	}
 	
@@ -501,11 +503,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 				
 		// get all partner administrators
-		$c = new Criteria();
-		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
-		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-		$adminKusers = kuserPeer::doSelect($c);
-		
+		$adminKusers = partner::getAdminLoginUsersList($partnerId);
 		foreach ($adminKusers as $admin)
 		{
 			// don't send mail to the created user

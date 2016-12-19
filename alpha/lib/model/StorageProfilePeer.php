@@ -65,7 +65,7 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
 		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
 		$criteria->add(StorageProfilePeer::STATUS, array(StorageProfile::STORAGE_STATUS_AUTOMATIC, StorageProfile::STORAGE_STATUS_MANUAL), Criteria::IN);
-		if (!is_null($ids))
+		if (!is_null($ids) && !(empty($ids)))
 			$criteria->add(StorageProfilePeer::ID, $ids, Criteria::IN);	
 		return StorageProfilePeer::doSelect($criteria, $con);
 	}

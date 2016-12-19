@@ -61,7 +61,11 @@ class DrmLicenseUtils {
         return rawurlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
     }
 
-	public static function createCustomData($entryId, KalturaFlavorAssetArray $flavorAssets, $signingKey)
+    public static function createCustomDataForEntry($entryId, $flavors, $signingKey){
+        return self::createCustomData($entryId, $flavors, $signingKey);
+    }
+
+	public static function createCustomData($entryId, $flavorAssets, $signingKey)
 	{
 		$flavorIds = "";
         $first = true;
@@ -78,7 +82,7 @@ class DrmLicenseUtils {
 			{
 				$flavorIds .=",";
 			}
-			$flavorIds .= $flavor->id;
+			$flavorIds .= $flavor->getId();
 		}
 
         $innerData = array();
@@ -98,9 +102,9 @@ class DrmLicenseUtils {
 			$innerDataSignature = self::signDataWithKey($innerDataJson, $signingKey);
 			$innerDataJsonEncoded = rawurlencode(base64_encode($innerDataJson));
 
-			$customData[$flavor->id] = array();
-			$customData[$flavor->id]["custom_data"] = $innerDataJsonEncoded;
-			$customData[$flavor->id]["signature"] = $innerDataSignature;
+			$customData[$flavor->getId()] = array();
+			$customData[$flavor->getId()]["custom_data"] = $innerDataJsonEncoded;
+			$customData[$flavor->getId()]["signature"] = $innerDataSignature;
 		}
 		return $customData;
 	}

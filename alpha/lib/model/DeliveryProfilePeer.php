@@ -209,7 +209,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
+		if($deliveryAttributes->getDeliveryProfileId())
+			$deliveryIds = array($deliveryAttributes->getDeliveryProfileId());
+		else
+			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))
@@ -312,7 +315,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 		$c = new Criteria();
 		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
-		$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
+		if (!(empty($deliveryIds)))
+			$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
 
 		if($isLive)
 			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
@@ -334,6 +338,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
 		$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
+
 		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
 
 		if($isLive)
@@ -588,6 +593,51 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		return DeliveryProfilePeer::doSelect($criteria);
 	}
-	
+
+	public static function getDeliveryProfilesByIds($entry, $deliveryIds, Partner $partner, DeliveryProfileDynamicAttributes $deliveryAttributes, $checkSecured = true)
+	{
+		if (count($deliveryIds))
+		{
+			$isSecured = $checkSecured ? self::isSecured($partner, $entry) : false;
+			$isLive = $entry->getType() == entryType::LIVE_STREAM;
+			return self::getDeliveryByIds($deliveryIds, $partner, null, $deliveryAttributes, null, $isSecured, $isLive);
+		}
+
+		return array();
+	}
+
+	public static function getDefaultDeliveriesFilteredByStreamerTypes($entry, Partner $partner, $excludedStreamerTypes)
+	{
+		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
+		$isLive = $entry->getType() == entryType::LIVE_STREAM;
+
+		return self::getDefaultDeliveryProfiles($partner, $deliveryAttributes, $isLive, $excludedStreamerTypes);
+	}
+
+	protected static function getDefaultDeliveryProfiles(Partner $partner, DeliveryProfileDynamicAttributes $deliveryAttributes, $isLive = false, $excludedStreamerTypes = array())
+	{
+		$c = new Criteria();
+		$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+		$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+		if (count($excludedStreamerTypes))
+			$c->add(DeliveryProfilePeer::STREAMER_TYPE, $excludedStreamerTypes, Criteria::NOT_IN);
+
+		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
+
+		if($isLive)
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
+		else
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
+
+		self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
+
+		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partner->getId()})";
+		$c->addAscendingOrderByColumn($orderBy);
+
+		$deliveries = self::doSelect($c);
+
+		return $deliveries;
+	}
+
 } // DeliveryProfilePeer
 

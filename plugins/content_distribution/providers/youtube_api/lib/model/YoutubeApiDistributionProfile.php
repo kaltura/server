@@ -317,17 +317,8 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		return null;
 	}
 	
-	public function getApiAuthorizeUrl($enforce = false)
+	public function getApiAuthorizeUrl()
 	{
-		if(!$enforce)
-		{
-			$tokenData = $this->getGoogleOAuth2Data();
-			if(!is_null($tokenData))
-			{
-				return null;
-			}
-		}
-	
 		$appId = YoutubeApiDistributionPlugin::GOOGLE_APP_ID;
 		$subId = $this->getGoogleOAuth2ObjectIdentifier();
 					

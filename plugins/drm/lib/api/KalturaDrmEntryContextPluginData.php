@@ -13,4 +13,13 @@ class KalturaDrmEntryContextPluginData extends KalturaPluginData{
      */
     public $flavorData;
 
+    private static $map_between_objects = array(
+        'flavorData',
+    );
+
+    public function getMapBetweenObjects()
+    {
+        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+    }
+
 }
