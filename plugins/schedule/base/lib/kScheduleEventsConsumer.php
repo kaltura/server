@@ -5,6 +5,8 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
     {
         if ($object instanceof categoryEntry && $object->getStatus() == categoryEntryStatus::ACTIVE)
             return true;
+        if ($object instanceof ScheduleEventResource )
+            return true;
         return false;
     }
 
@@ -12,12 +14,16 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
     {
         if ($object instanceof categoryEntry)
             return true;
+        if ($object instanceof ScheduleEventResource )
+            return true;
         return false;
     }
 
     public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
     {
         if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == categoryEntryStatus::ACTIVE)
+            return true;
+        if ($object instanceof ScheduleEventResource )
             return true;
         return false;
     }
@@ -27,8 +33,11 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
      */
     public function objectChanged(BaseObject $object, array $modifiedColumns)
     {
-        $this->reindexScheduleEvents($object->getEntryId());
-        return true;
+        if ($object instanceof categoryEntry)
+            $this->reindexScheduleEvents($object->getEntryId());
+        if ($object instanceof ScheduleEventResource)
+            $this->updateScheduleEvent($object->getEventId());
+            return true;
     }
 
     /* (non-PHPdoc)
@@ -36,7 +45,11 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
      */
     public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
     {
-        $this->reindexScheduleEvents($object->getEntryId());
+        if ($object instanceof categoryEntry)
+            $this->reindexScheduleEvents($object->getEntryId());
+        if ($object instanceof ScheduleEventResource)
+            $this->updateScheduleEvent($object->getEventId());
+
         return true;
     }
 
@@ -46,8 +59,11 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
      */
     public function objectCreated(BaseObject $object)
     {
-        $this->reindexScheduleEvents($object->getEntryId());
-        return true;
+        if ($object instanceof categoryEntry)
+            $this->reindexScheduleEvents($object->getEntryId());
+        if ($object instanceof ScheduleEventResource)
+            $this->updateScheduleEvent($object->getEventId());
+            return true;
     }
 
 
@@ -62,4 +78,26 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
             $scheduleEvent->indexToSearchIndex();
         }
     }
+
+    public function updateScheduleEvent($eventId)
+    {
+        $scheduleEvent = ScheduleEventPeer::retrieveByPK($eventId);
+        if (empty($scheduleEvent))
+            return;
+
+        $scheduleEvent->setUpdatedAt(time());
+        $scheduleEvent->save();
+        $scheduleEvent->indexToSearchIndex();
+
+        if ($scheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
+        {
+            $scheduleEvents = ScheduleEventPeer::retrieveByParentId($scheduleEvent->getId());
+            foreach ($scheduleEvents as $scheduleEvent)
+            {
+                /* @var $scheduleEvent ScheduleEvent */
+                $scheduleEvent->indexToSearchIndex();
+            }
+        }
+    }
+
 }

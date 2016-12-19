@@ -27,20 +27,20 @@ class ScheduleEventResource extends BaseScheduleEventResource implements IRelate
 		return parent::preInsert($con);
 	}
 
-	protected function updateScheduleEvent()
-	{
-		$event = ScheduleEventPeer::retrieveByPK($this->getEventId());
-		$event->setUpdatedAt(time());
-		$event->save();
-		$event->indexToSearchIndex();
-	}
+//	protected function updateScheduleEvent()
+//	{
+//		$event = ScheduleEventPeer::retrieveByPK($this->getEventId());
+//		$event->setUpdatedAt(time());
+//		$event->save();
+//		$event->indexToSearchIndex();
+//	}
 
 	/* (non-PHPdoc)
 	 * @see BaseScheduleEvent::postSave()
 	 */
 	public function postSave(PropelPDO $con = null)
 	{
-		$this->updateScheduleEvent();
+//		$this->updateScheduleEvent();
     	
 		parent::postSave($con);
 	}
@@ -50,7 +50,7 @@ class ScheduleEventResource extends BaseScheduleEventResource implements IRelate
 	 */
 	public function postDelete(PropelPDO $con = null)
 	{
-		$this->updateScheduleEvent();
+//		$this->updateScheduleEvent();
     	
 		parent::postDelete($con);
 	}
