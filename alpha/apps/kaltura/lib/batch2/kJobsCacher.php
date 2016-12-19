@@ -24,7 +24,7 @@ class kJobsCacher
 		$workerId = $lockKey->getWorkerId();
 		$maxObject = self::getMaxJobToPull($workerId);
 
-		if (!$maxObject)
+		if (!$maxObject || $maxOffset)
 			return kBatchExclusiveLock::getExclusive($c, $number_of_objects, $jobType, $maxOffset);
 
 		$key = self::getCacheKey($workerId);
