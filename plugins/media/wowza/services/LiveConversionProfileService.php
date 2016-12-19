@@ -13,7 +13,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
 	 */
-
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -28,13 +28,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	 * @action serve
 	 * @param string $streamName the id of the live entry with it's stream suffix
 	 * @param string $hostname the media server host name
-	 * @param string $audiodatarate
-	 * @param string $videodatarate
-	 * @param string $width
-	 * @param string $height
-	 * @param string $framerate
-	 * @param string $videocodecidstring
-	 * @param string $audiocodecidstring
+	 * @param string $extraParams is a json object containing the stream parameters transfered by the encoder
 	 * @return file
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
@@ -42,24 +36,28 @@ class LiveConversionProfileService extends KalturaBaseService
 	 * @throws KalturaErrors::INGEST_NOT_FOUND_IN_CONVERSION_PROFILE
 	 */
 	//public function serveAction($streamName, $hostname = null)
-	public function serveAction($streamName, $hostname = null, $audiodatarate = null, $videodatarate = null, $width = null, $height = null, $framerate = null, $videocodecidstring = null,  $audiocodecidstring = null)
+	public function serveAction($streamName, $hostname = null, $extraParams = null)
 	{
 		$streamParametersArray = array(
 			'streamName' => $streamName,
 			'hostname' => $hostname,
-			'audiodatarate' => $audiodatarate,
-			'videodatarate' => $videodatarate,
-			'width' => $width,
-			'height' => $height,
-			'framerate' => $framerate,
-			'videocodecidstring' => $videocodecidstring,
-			'audiocodecidstring' => $audiocodecidstring
+			'audiodatarate' => 0,
+			'videodatarate' => 0,
+			'width' => 0,
+			'height' => 0,
+			'framerate' => 0,
+			'videocodecidstring' => "",
+			'audiocodecidstring' => ""
 		);
-				
+		if ($extraParams !== "")
+		{
+			$streamParametersArray = array_merge($streamParametersArray, json_decode($extraParams, true));
+		}
+		
 		$matches = null;
 		if(!preg_match('/^(\d_.{8})_(\d+)$/', $streamName, $matches))
 			throw new KalturaAPIException(WowzaErrors::INVALID_STREAM_NAME, $streamName);
-			
+		
 		$entryId = $matches[1];
 		$suffix = $matches[2];
 		
@@ -71,22 +69,22 @@ class LiveConversionProfileService extends KalturaBaseService
 			
 			if (!$entry || $entry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-				
+			
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 		}
-		else 
-		{	
+		else
+		{
 			$entry = entryPeer::retrieveByPK($entryId);
 		}
-			
+		
 		if (!$entry || $entry->getType() != KalturaEntryType::LIVE_STREAM || !in_array($entry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
+		
 		$mediaServer = null;
 		if($hostname)
 			$mediaServer = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
-			
+		
 		$conversionProfileId = $entry->getConversionProfileId();
 		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
 		
@@ -132,14 +130,14 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		$encodes = $transcode->addChild('Encodes');
 		$defaultFrameRate = null;
-
+		
 		$groups = array();
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem liveParams */
 			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
 				continue;
-
+			
 			if ($liveParamsItem->hasTag(assetParams::TAG_SOURCE))
 			{
 				if ($liveParamsItem->getFrameRate() >= self::MINIMAL_DEFAULT_FRAME_RATE)
@@ -154,7 +152,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			{
 				if(!isset($groups[$tag]))
 					$groups[$tag] = array();
-
+				
 				$systemName = $liveParamsItem->getSystemName() ? $liveParamsItem->getSystemName() : $liveParamsItem->getId();
 				$groups[$tag][] = $systemName;
 			}
@@ -179,7 +177,7 @@ class LiveConversionProfileService extends KalturaBaseService
 				$member->addChild('EncodeName', $groupMember);
 			}
 		}
-
+		
 		$properties = $transcode->addChild('Properties');
 		if ($defaultFrameRate) {
 			$property = $properties->addChild('Property');
@@ -187,7 +185,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			$property->addChild('Value', $defaultFrameRate);
 			$property->addChild('Type', 'Double');
 		}
-
+		
 		$dom = new DOMDocument("1.0");
 		$dom->preserveWhiteSpace = false;
 		$dom->formatOutput = true;
@@ -198,11 +196,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function calculateFlavorHeight($flavorResolution, $ingestParameters)
 	{
-		if (isset($ingestParameters['height']) && isset($ingestParameters['width']) && $ingestParameters['width'] != 0)
-		{
-			return $flavorResolution['width'] * $ingestParameters['height'] / $ingestParameters['width'];
-		}
-		return 0;
+		return ($ingestParameters['width'] != 0) ? (($flavorResolution['width'] * $ingestParameters['height']) / $ingestParameters['width']) : 0;
 	}
 	
 	private function isFlavorCompatibile($ingestParameters, $flavorBitrate, $flavorResolution, $flavorId)
@@ -221,14 +215,14 @@ class LiveConversionProfileService extends KalturaBaseService
 				break;
 		}
 		
-		if (isset($ingestParameters['height']) && $ingestParameters['height'] < $flavorHeight)
+		if ($ingestParameters['height'] !== 0 && $ingestParameters['height'] < $flavorHeight)
 		{
 			$ingestResolutionString = $ingestParameters['width'] . 'x' . $ingestParameters['height'];
 			$flavorResolutionString = $flavorResolution['width'] . 'x' . $flavorHeight;
 			KalturaLog::info('Flavor [' . $flavorId . '] rejected due to Resolution; Ingest: [' . $ingestResolutionString . '], Flavor: [' . $flavorResolutionString . ']');
 			return false;
 		}
-		else if (isset($ingestParameters['videodatarate']) && ($ingestParameters['videodatarate'] * 1024) < $flavorBitrate)
+		else if ($ingestParameters['videodatarate'] !== 0 && ($ingestParameters['videodatarate'] * 1024) < $flavorBitrate)
 		{
 			KalturaLog::info('Flavor [' . $flavorId . '] rejected due to VideoBitrate; Ingest: [' . $ingestParameters['videodatarate'] * 1024 . '], Flavor: [' . $flavorBitrate . ']');
 			return false;
@@ -268,12 +262,12 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function checkMaxFramerate($ingestFramerate, $flavorMaxFramerate)
 	{
-		return $flavorMaxFramerate ? ceil(($ingestFramerate / $flavorMaxFramerate) - 1 - 0.05) : 0;
+		return $flavorMaxFramerate ? ceil(($ingestFramerate / $flavorMaxFramerate) - 1.05) : 0;
 	}
 	
 	private function getIngestAudioCodec($ingestParameters)
 	{
-		return (isset($ingestParameters['audiocodecidstring']) && $ingestParameters['audiocodecidstring'] === 'AAC') ? 'PassThru' : 'AAC';
+		return ($ingestParameters['audiocodecidstring'] === 'AAC') ? 'PassThru' : 'AAC';
 	}
 	
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams, $streamParametersArray)
@@ -314,7 +308,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		{
 			$video->addChild('Codec', $videoCodec);
 			$audio->addChild('Codec', $audioCodec);
-			if ($audioCodec !== 'PassThru') 
+			if ($audioCodec !== 'PassThru')
 			{
 				$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
 			}
@@ -328,30 +322,30 @@ class LiveConversionProfileService extends KalturaBaseService
 				case flavorParams::VIDEO_CODEC_COPY:
 					$videoCodec = 'PassThru';
 					break;
-					
+				
 				case flavorParams::VIDEO_CODEC_FLV:
 				case flavorParams::VIDEO_CODEC_VP6:
 				case flavorParams::VIDEO_CODEC_H263:
 					$profile = 'baseline';
 					$videoCodec = 'H.263';
 					break;
-					
+				
 				case flavorParams::VIDEO_CODEC_H264:
 				case flavorParams::VIDEO_CODEC_H264B:
 					$profile = 'baseline';
-					// don't break
-					
+				// don't break
+				
 				case flavorParams::VIDEO_CODEC_H264H:
 				case flavorParams::VIDEO_CODEC_H264M:
 					$streamName = "mp4:$streamName";
 					$videoCodec = 'H.264';
 					break;
-					
+				
 				default:
 					KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
 					break;
 			}
-
+			
 			if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
 			{
 				switch ($liveParams->getAudioCodec())
@@ -406,7 +400,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			$parameter->addChild('Value', 0);
 			$parameter->addChild('Type', 'Long');
 		}
-
+		
 		$audio->addChild('Codec', $audioCodec);
 		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
 	}
