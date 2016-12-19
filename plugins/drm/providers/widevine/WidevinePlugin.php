@@ -5,7 +5,6 @@
 class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPending, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'widevine';
-	const SCHEME_NAME = 'widevine';
 	const WIDEVINE_EVENTS_CONSUMER = 'kWidevineEventsConsumer';
 	const WIDEVINE_RESPONSE_TYPE = 'widevine';
 	const WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC_PERMISSION = 'WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC';
@@ -30,14 +29,6 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	}
 
 	/* (non-PHPdoc)
-	 * @see IKalturaPlugin::getPluginName()
-	 */
-	public static function getSchemeName()
-	{
-		return self::SCHEME_NAME;
-	}
-	
-	/* (non-PHPdoc)
 	 * @see IKalturaPending::dependsOn()
 	 */
 	public static function dependsOn()
@@ -53,7 +44,7 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{	
 		if(is_null($baseEnumName))
-			return array('WidevineConversionEngineType', 'WidevineAssetType', 'WidevinePermissionName', 'WidevineBatchJobType', 'WidevineProviderType');		
+			return array('WidevineConversionEngineType', 'WidevineAssetType', 'WidevinePermissionName', 'WidevineBatchJobType', 'WidevineProviderType', 'WidevineSchemeName');
 		if($baseEnumName == 'conversionEngineType')
 			return array('WidevineConversionEngineType');
 		if($baseEnumName == 'assetType')
@@ -63,7 +54,9 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		if($baseEnumName == 'BatchJobType')
 			return array('WidevineBatchJobType');		
 		if($baseEnumName == 'DrmProviderType')
-			return array('WidevineProviderType');		
+			return array('WidevineProviderType');
+		if ($baseEnumName == 'DrmSchemeName')
+			return array('WidevineSchemeName');
 			
 		return array();
 	}
@@ -348,14 +341,23 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
 					$data = new kDrmPlaybackPluginData();
-					$scheme = $this->getSchemeName();
-					$data->setLicenseURL($this->constructUrl($widevineProfile, $scheme, $customDataObject));
-					$data->setScheme( $scheme);
-					$result->addToPluginData($scheme, $data);
+					$data->setLicenseURL($this->constructUrl($widevineProfile, self::getPluginName(), $customDataObject));
+					$data->setScheme($this->getDrmSchemeCoreValue());
+					$result->addToPluginData(self::getPluginName(), $data);
 				}
 			}
 		}
 	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDrmSchemeCoreValue()
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . WidevineSchemeName::WIDEVINE;
+		return kPluginableEnumsManager::apiToCore('DrmSchemeName', $value);
+	}
+
 
 	public function isSupportStreamerTypes($streamerType)
 	{

@@ -5,22 +5,13 @@
 class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'drm';
-	private static $schemes = array('cenc/widevine', 'cenc/playready');
 
-    /* (non-PHPdoc)
+	/* (non-PHPdoc)
      * @see IKalturaPlugin::getPluginName()
      */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
-	}
-
-	/* (non-PHPdoc)
-   * @see IKalturaPlugin::getSchemes()
-   */
-	public static function getSchemes()
-	{
-		return self::$schemes;
 	}
 
 	/* (non-PHPdoc)
@@ -66,16 +57,17 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	 * @see IKalturaEnumerator::getEnums()
 	 */
 	public static function getEnums($baseEnumName = null)
-	{	
+	{
 		if(is_null($baseEnumName))
-			return array('DrmPermissionName', 'DrmConversionEngineType', 'DrmAccessControlActionType');
+			return array('DrmPermissionName', 'DrmConversionEngineType', 'DrmAccessControlActionType', 'CencSchemeName' );
 		if($baseEnumName == 'PermissionName')
 			return array('DrmPermissionName');
         if($baseEnumName == 'conversionEngineType')
             return array('DrmConversionEngineType');
         if($baseEnumName == 'RuleActionType')
             return array('DrmAccessControlActionType');
-
+		if ($baseEnumName == 'DrmSchemeName')
+			return array('CencSchemeName');
 		return array();
 	}
 
@@ -180,16 +172,42 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 				{
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
-					foreach ($this->getSchemes() as $scheme)
+
+					foreach (CencSchemeName::getAdditionalValues() as $scheme)
 					{
 						$data = new kDrmPlaybackPluginData();
-						$data->setLicenseURL($this->constructUrl($dbProfile, $scheme, $customDataObject));
-						$data->setScheme($scheme);
+						$data->setLicenseURL($this->constructUrl($dbProfile, $this->getUrlName($scheme), $customDataObject));
+						$data->setScheme($this->getDrmSchemeCoreValue($scheme));
 						$result->addToPluginData($scheme, $data);
 					}
 				}
 			}
 		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPluginName()
+	 */
+	public function getUrlName($scheme)
+	{
+		switch ($scheme)
+		{
+			case CencSchemeName::PLAYREADY_CENC:
+				return 'cenc/playready';
+			case CencSchemeName::WIDEVINE_CENC:
+				return 'cenc/widevine';
+			default:
+				return '';
+		}
+	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDrmSchemeCoreValue($scheme)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $scheme;
+		return kPluginableEnumsManager::apiToCore('DrmSchemeName', $value);
 	}
 
 	public function isSupportStreamerTypes($streamerType)
