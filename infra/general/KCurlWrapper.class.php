@@ -492,6 +492,7 @@ class KCurlWrapper
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
 		$returnTransfer = is_null($destFile);
+		$destFd = null;
 		if (!is_null($destFile))
 			$destFd = fopen($destFile, "ab");
 
