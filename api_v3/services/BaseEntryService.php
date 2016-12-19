@@ -28,6 +28,9 @@ class BaseEntryService extends KalturaEntryService
 	{
 		if($actionName == 'getContextData')
 			return true;
+
+		if($actionName == 'getPlaybackContext')
+			return true;
 		
 		return parent::globalPartnerAllowed($actionName);
 	}
@@ -43,6 +46,10 @@ class BaseEntryService extends KalturaEntryService
 		if ($actionName === 'getContextData') {
 			return true;
 		}
+		if($actionName == 'getPlaybackContext'){
+			return true;
+		}
+
 		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
@@ -214,8 +221,13 @@ class BaseEntryService extends KalturaEntryService
     protected function setEntryTypeByExtension(entry $dbEntry, $fullPath)
     {
     	$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+
     	if(!$ext)
-   			return;
+		{
+			$ext = myFileUploadService::getExtensionByContentType($fullPath);
+			if(!$ext)
+				return;
+		}
     	
     	$mediaType = myFileUploadService::getMediaTypeFromFileExt($ext);
     	if($mediaType != entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
@@ -778,7 +790,13 @@ class BaseEntryService extends KalturaEntryService
         $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
         foreach ($pluginInstances as $pluginInstance)
         {
-            $pluginInstance->contributeToEntryContextDataResult($dbEntry, $contextDataParams, $result);
+            $pluginDataCore = $pluginInstance->contributeToEntryContextDataResult($dbEntry, $accessControlScope, $contextDataHelper);
+	        if (!is_null($pluginDataCore))
+	        {
+		        $pluginDataApi = KalturaPluginManager::loadObject('KalturaPluginData', $pluginInstance->getPluginName());
+		        $pluginDataApi->fromObject($pluginDataCore);
+		        $result->pluginData[get_class($pluginDataApi)] = $pluginDataApi;
+	        }
         }
 
 		return $result;
@@ -896,4 +914,75 @@ class BaseEntryService extends KalturaEntryService
 		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreClonedOptionsArray);
 		return $this->getEntry($clonedEntry->getId());
 	}
+
+	/**
+	 * This action delivers all data relevant for player
+	 * @action getPlaybackContext
+	 * @param string $entryId
+	 * @param KalturaEntryContextDataParams $contextDataParams
+	 * @return KalturaPlaybackContextOptions
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getPlaybackContextAction($entryId, KalturaPlaybackContextOptions $contextDataParams)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		if ($dbEntry->getStatus() != entryStatus::READY)
+		{
+			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
+			// and the request becomes cached for a long time, preventing playback even after the entry
+			// becomes ready
+			kApiCache::setExpiry(60);
+		}
+
+		$parentEntryId = $dbEntry->getSecurityParentId();
+		if ($parentEntryId)
+		{
+			$dbEntry = $dbEntry->getParentEntry();
+			if(!$dbEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
+		}
+
+		$asset = null;
+		if ($contextDataParams->flavorAssetId)
+		{
+			$asset = assetPeer::retrieveById($contextDataParams->flavorAssetId);
+			if (!$asset)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
+		}
+
+		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset);
+
+		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
+			$accessControlScope = $dbEntry->getAccessControl()->getScope();
+		else
+			$accessControlScope = new accessControlScope();
+		$contextDataParams->toObject($accessControlScope);
+
+		$contextDataHelper->buildContextDataResult($accessControlScope, $contextDataParams->flavorTags, $contextDataParams->streamerType, $contextDataParams->mediaProtocol, true);
+		if ($contextDataHelper->getDisableCache())
+			KalturaResponseCacher::disableCache();
+
+		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
+		if (!($isScheduledNow) && $this->getKs() ){
+			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
+			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
+				$isScheduledNow = true;
+			}
+		}
+
+		$playbackContextDataHelper = new kPlaybackContextDataHelper();
+		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
+		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
+
+		$result = new KalturaPlaybackContext();
+		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
+		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
+
+		return $result;
+	}
+
 }

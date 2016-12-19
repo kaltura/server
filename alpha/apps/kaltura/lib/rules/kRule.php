@@ -35,7 +35,15 @@ class kRule
 	 * @var string
 	 */
 	protected $message;
-	
+
+
+	/**
+	 * Rule code to be thrown to the player in case the rule
+	 *
+	 * @var string
+	 */
+	protected $code;
+
 	/**
 	 * Actions to be performed by the player in case the rule fulfilled
 	 * 
@@ -179,14 +187,19 @@ class kRule
 		if ($this->message)
 		{
 			$context->addMessage($this->message);
+
+			if ($context->shouldHandleRuleCodes())
+				$context->addCodeAndMessage($this->message, $this->code);
 		}
 		
 		if(is_array($this->actions))
 		{
-			foreach($this->actions as $action)
+			foreach ($this->actions as $action)
+			{
 				$context->addAction($action);
+			}
 		}
-				
+
 		return true;
 	}
 	
@@ -205,13 +218,21 @@ class kRule
 	{
 		return $this->ruleData;
 	}
-	
+
 	/**
 	 * @return string message
 	 */
-	public function getMessage() 
+	public function getMessage()
 	{
 		return $this->message;
+	}
+
+	/**
+	 * @return string code
+	 */
+	public function getCode()
+	{
+		return $this->code;
 	}
 
 	/**
@@ -260,6 +281,14 @@ class kRule
 	public function setMessage($message) 
 	{
 		$this->message = $message;
+	}
+
+	/**
+	 * @param string $code
+	 */
+	public function setCode($code)
+	{
+		$this->code = $code;
 	}
 
 	/**

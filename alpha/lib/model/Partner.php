@@ -1134,16 +1134,27 @@ class Partner extends BasePartner
         }
         return $provisionParams;
     }
-	
-    
-	public function getAdminLoginUsersNumber()
+
+	private static function getAdminUserCriteria($partnerId)
 	{
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
-		$c->addAnd(kuserPeer::PARTNER_ID, $this->getId());
+		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId);
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::NOT_EQUAL);
 		$c->addAnd(kuserPeer::IS_ADMIN , true);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		$c->applyFilters();
+		return $c;
+	}
+
+	public static function getAdminLoginUsersList($partnerId)
+	{
+		$c = self::getAdminUserCriteria($partnerId);
+		return kuserPeer::doSelect($c);
+	}
+    
+	public function getAdminLoginUsersNumber()
+	{
+		$c = self::getAdminUserCriteria($this->getId());
 		return kuserPeer::doCount($c);
 	}
 	

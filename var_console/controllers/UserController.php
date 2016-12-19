@@ -63,22 +63,28 @@ class UserController extends Zend_Controller_Action
 			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
 			//$adapter = new Zend_Auth_Adapter_DbTable($zendDb);
 		    $auth = Infra_AuthHelper::getAuthInstance();
-			$result = $auth->authenticate($adapter);
-			if ($result->isValid())
+			try
 			{
-			   // Zend_Session::getSaveHandler()->write(uniqid(), $result->getIdentity());
-				if ($request->getPost('remember_me'))
-					Zend_Session::rememberMe(60*60*24*7); // 1 week
-					
-				$nextUri = $this->_getParam('next_uri');
-				if ($nextUri && strlen($nextUri) > 1)
-					$this->_helper->redirector->gotoUrl($nextUri);
+				$result = $auth->authenticate($adapter);
+				if ($result->isValid())
+				{
+					if ($request->getPost('remember_me'))
+						Zend_Session::rememberMe(60 * 60 * 24 * 7); // 1 week
+
+					$nextUri = $this->_getParam('next_uri');
+					if ($nextUri && strlen($nextUri) > 1)
+						$this->_helper->redirector->gotoUrl($nextUri);
+					else
+						$this->_helper->redirector('list-by-user', 'partner');
+				}
 				else
-					$this->_helper->redirector('list-by-user', 'partner');
+				{
+					$loginForm->setDescription('invalid login');
+				}
 			}
-			else
+			catch(Exception	$e)
 			{
-		         $loginForm->setDescription('invalid login');
+				$loginForm->setDescription('invalid login');
 			}
 		}
 		
@@ -108,7 +114,7 @@ class UserController extends Zend_Controller_Action
 			$form->isValid($request->getPost());
 			$client = Infra_ClientHelper::getClient();
 			$userEmail = $request->getPost('email');
-            try 
+            try
             {
     			$client->user->resetPassword($userEmail); // ask to reset password
     			$tranlsate = $this->getFrontController()->getParam('bootstrap')->getResource('translate'); // TODO: add translate action helper

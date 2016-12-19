@@ -2,9 +2,10 @@
 /**
  * @package plugins.fairplay
  */
-class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor
+class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'fairplay';
+	const SCHEME_NAME = 'fps';
 	const SEARCH_DATA_SUFFIX = 's';
 
 	/* (non-PHPdoc)
@@ -13,6 +14,14 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPlugin()
+	 */
+	public static function getScheme()
+	{
+		return self::SCHEME_NAME;
 	}
 
 	/* (non-PHPdoc)
@@ -48,8 +57,11 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				return new Form_FairplayProfileConfigureExtend_SubForm();
 			}
 		}
-
-			return null;
+		if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
+			return new KalturaFairplayEntryContextPluginData();
+		if ($baseClass == 'KalturaDrmPlaybackPluginData' && $enumValue == 'kFairPlayPlaybackPluginData')
+			return new KalturaFairPlayPlaybackPluginData();
+		return null;
 	}
 
 	/* (non-PHPdoc)
@@ -73,7 +85,8 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				return 'Form_FairplayProfileConfigureExtend_SubForm';
 			}
 		}
-		
+		if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
+			return 'KalturaFairplayEntryContextPluginData';
 		return null;
 	}
 
@@ -93,12 +106,11 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return DrmPlugin::isAllowedPartner($partnerId);
 	}
 
-	public function contributeToEntryContextDataResult(entry $entry, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result)
+	public function contributeToEntryContextDataResult(entry $entry, accessControlScope $contextDataParams, kContextDataHelper $contextDataHelper)
 	{
 		if ($this->shouldContribute($entry))
 		{
-			$fairplayContextData = new KalturaFairplayEntryContextPluginData();
-
+			$fairplayContextData = new kFairplayEntryContextPluginData();
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if (!is_null($fairplayProfile))
 			{
@@ -106,9 +118,10 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 				 * @var FairplayDrmProfile $fairplayProfile
 				 */
 				$fairplayContextData->publicCertificate = $fairplayProfile->getPublicCertificate();
-				$result->pluginData[get_class($fairplayContextData)] = $fairplayContextData;
+				return $fairplayContextData;
 			}
 		}
+		return null;
 	}
 
 	/**
@@ -169,6 +182,41 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			return true;
 
 		return false;
+	}
+
+    public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
+	{
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		{
+			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
+			if ($fairplayProfile)
+			{
+				/* @var FairplayDrmProfile $fairplayProfile */
+
+				$signingKey = kConf::get('signing_key', 'drm', null);
+				if ($signingKey)
+				{
+					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
+					$customDataObject = reset($customDataJson);
+					$data = new kFairPlayPlaybackPluginData();
+					$scheme = $this->getScheme();
+					$data->setLicenseURL($this->constructUrl($fairplayProfile, $scheme, $customDataObject));
+					$data->setScheme($scheme);
+					$data->setCertificate($fairplayProfile->getPublicCertificate());
+					$result->addToPluginData($scheme, $data);
+				}
+			}
+		}
+	}
+
+	public function isSupportStreamerTypes($streamerType)
+	{
+		return in_array($streamerType ,array(PlaybackProtocol::APPLE_HTTP));
+	}
+
+	public function constructUrl($fairplayProfile, $scheme, $customDataObject)
+	{
+		return $fairplayProfile->getLicenseServerUrl() . "/" . $scheme . "/license?custom_data=" . $customDataObject['custom_data'] . "&signature=" . $customDataObject['signature'];
 	}
 
 }

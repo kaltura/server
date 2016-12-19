@@ -421,11 +421,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaEntryServerNodeType $mediaServerIndex
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
+	 * @param string $recordedEntryId Recorded entry Id
 	 * @return KalturaLiveEntry The updated live entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
+	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $recordedEntryId = null)
 	{
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
@@ -438,12 +439,23 @@ class KalturaLiveEntryService extends KalturaEntryService
 			return $entry;
 		}
 		
-		if(!$dbLiveEntry->getRecordedEntryId())
-			$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
+		if($recordedEntryId)
+		{
+			$recordedEntry = entryPeer::retrieveByPK($recordedEntryId);
+			if($recordedEntry && $recordedEntry->getRootEntryId() != $entryId)
+				$recordedEntry = null;
+		}
+		else
+		{
+			if(!$dbLiveEntry->getRecordedEntryId())
+				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
+			
+			$recordedEntryId = $dbLiveEntry->getRecordedEntryId();
+			$recordedEntry = entryPeer::retrieveByPK($recordedEntryId);
+		}
 		
-		$recordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
 		if(!$recordedEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbLiveEntry->getRecordedEntryId());
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $recordedEntryId);
 		
 		$totalDuration = (int)($duration * 1000);
 		$dbLiveEntry->setLengthInMsecs($totalDuration);

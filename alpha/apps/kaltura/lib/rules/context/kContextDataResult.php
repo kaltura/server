@@ -48,5 +48,46 @@ class kContextDataResult
 	{
 		$this->actions[] = $action;
 	}
+
+	/**
+	 * code to messages map received from the invalidated rules
+	 * @var array
+	 */
+	private $ruleCodeToMessages = array();
+
+	/**
+	 * @var bool
+	 */
+	private $shouldHandleRuleCodes = false;
+
+	/**
+	 * @param $flag
+	 */
+	public function setShouldHandleRuleCodes($flag)
+	{
+		$this->shouldHandleRuleCodes = $flag;
+	}
+
+	/**
+	 * @param $ruleCode
+	 * @param $message
+	 */
+	public function addCodeAndMessage($message, $ruleCode = "")
+	{
+		$this->ruleCodeToMessages[$ruleCode][] = $message;
+	}
+
+	/**
+	 * @param array
+	 */
+	public function getRulesCodesMap()
+	{
+		return $this->ruleCodeToMessages;
+	}
+
+	public function shouldHandleRuleCodes()
+	{
+		return $this->shouldHandleRuleCodes;
+	}
 	
 }

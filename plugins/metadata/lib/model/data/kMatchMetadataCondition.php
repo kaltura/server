@@ -65,7 +65,7 @@ class kMatchMetadataCondition extends kMatchCondition
 				return null;
 			}
 				
-			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
+			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName);
 			if(!$profile)
 			{
 				KalturaLog::notice("Metadata profile with system-name [$this->profileSystemName] not found");

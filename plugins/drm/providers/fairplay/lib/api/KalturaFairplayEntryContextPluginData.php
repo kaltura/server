@@ -13,4 +13,13 @@ class KalturaFairplayEntryContextPluginData extends KalturaPluginData{
 	 */
 	public $publicCertificate;
 
+	private static $map_between_objects = array(
+		'publicCertificate',
+	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
 }

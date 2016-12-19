@@ -14,20 +14,13 @@
     <multirequest>
         <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
             <template objectType="KalturaHttpNotificationTemplate">
-                <name>Ad Cue Point updated</name>
-                <systemName>AD_CUEPOINT_UPDATED</systemName>
+                <name>Ad Cue Point updated - PlayServer</name>
+                <systemName>AD_CUEPOINT_UPDATED_PS</systemName>
                 <description>HTTP notification template to be sent when a ad cue point is updated</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>11</eventType> <!-- EventNotificationEventType::OBJECT_UPDATED -->
                 <eventObjectType>adCuePointEventNotifications.AdCuePoint</eventObjectType>
                 <contentParameters objectType="array">
-                    <item objectType="KalturaEventNotificationParameter">
-                        <key>cupoint_id</key>
-                        <description>Cue Point ID</description>
-                        <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getId()</code>
-                        </value>
-                    </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_id</key>
                         <description>Entry ID</description>
@@ -44,4 +37,59 @@
             <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
         </request>
     </multirequest>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Ad Cue Point added - PlayServer</name>
+                <systemName>AD_CUEPOINT_ADDED_PS</systemName>
+                <description>HTTP notification template to be sent when a ad cue point is added</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>2</eventType> <!-- EventNotificationEventType::OBJECT_ADDED -->
+                <eventObjectType>adCuePointEventNotifications.AdCuePoint</eventObjectType>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <method>1</method> <!-- KalturaHttpNotificationMethod::GET -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Ad Cue Point deleted - PlayServer</name>
+                <systemName>AD_CUEPOINT_DELETED_PS</systemName>
+                <description>HTTP notification template to be sent when a ad cue point is deleted</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>7</eventType> <!-- EventNotificationEventType::OBJECT_DELETED -->
+                <eventObjectType>adCuePointEventNotifications.AdCuePoint</eventObjectType>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <method>1</method> <!-- KalturaHttpNotificationMethod::GET -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
 </xml>

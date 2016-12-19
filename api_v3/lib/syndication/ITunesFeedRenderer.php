@@ -103,7 +103,10 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 			}
 			$res .= $this->writeClosingXmlNode('itunes:category', 2);
 		}
-		
+
+		if($this->syndicationFeed->adultContent)
+			$res .= $this->writeFullXmlNode('itunes:explicit', $this->syndicationFeed->adultContent, 2);
+
 		return $res;
 	}
 
