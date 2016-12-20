@@ -89,7 +89,8 @@ class kAssetUtils
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 			if(!$urlManager)
-				throw new kCoreException('Could not retrieve Delivery Profile for entry '.$asset->getEntryId());
+				return null;
+
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
 			$profileAttributes = $urlManager->getDynamicAttributes();

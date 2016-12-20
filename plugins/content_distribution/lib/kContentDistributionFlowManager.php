@@ -1212,6 +1212,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($metadata->getObjectType() != MetadataObjectType::ENTRY)
 			return true;
 		
+		$entryId = $metadata->getObjectId();
+		$entry = entryPeer::retrieveByPK($entryId);
+		if($entry->getType() == entryType::LIVE_STREAM)
+			return true;
+
 		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] changed");
 		
 		$syncKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
