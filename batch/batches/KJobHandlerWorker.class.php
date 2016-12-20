@@ -63,8 +63,9 @@ abstract class KJobHandlerWorker extends KBatchBase
 	protected function getJobs()
 	{
 		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
+		$maxJobToPull = KBatchBase::$taskConfig->maxJobToPullToCache;
 		return KBatchBase::$kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime, 
-				$this->getMaxJobsEachRun(), $this->getFilter(), static::getType(), $maxOffset);
+				$this->getMaxJobsEachRun(), $this->getFilter(), static::getType(), $maxOffset, $maxJobToPull);
 	}
 	
 	public function run($jobs = null)

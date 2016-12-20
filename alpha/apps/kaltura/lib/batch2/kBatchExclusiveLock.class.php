@@ -79,14 +79,15 @@ class kBatchExclusiveLock
 	 * @param int $jobType
 	 * @param BatchJobFilter $filter
 	 * @param int $maxOffset
+	 * @param int $maxJobToPullForCache
 	 */
 	public static function getExclusiveJobs(kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType,
-			BatchJobFilter $filter, $maxOffset = null)
+			BatchJobFilter $filter, $maxOffset = null, $maxJobToPullForCache = 0)
 	{
 		$c = new Criteria();
 		$filter->attachToCriteria($c);
 		
-		$objects = kJobsCacher::getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset);
+		$objects = kJobsCacher::getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset, $maxJobToPullForCache);
 		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	

@@ -16,64 +16,52 @@ class kJobsCacher
 	 * @param int $number_of_objects
 	 * @param int $jobType
 	 * @param int $maxOffset
+	 * @param int $maxJobToPull
 	 *
 	 * @return array
 	 */
-	public static function getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset)
+	public static function getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset, $maxJobToPull)
 	{
 		$workerId = $lockKey->getWorkerId();
-		$maxObject = self::getMaxJobToPull($workerId);
-		$key = self::getCacheKeyForWorker($workerId);
 		$cache = self::getCache();
-		if (!$maxObject || $maxOffset || !$cache) //skip cache and get jobs from DB
+		if (!$maxJobToPull || $maxOffset || !$cache) //skip cache and get jobs from DB
 			return kBatchExclusiveLock::getExclusive($c, $number_of_objects, $jobType, $maxOffset);
 
-		$jobsList = $cache->get($key);
-		if ($jobsList && ($allocated = self::getUnallocatedJobs($jobsList,$number_of_objects, $cache)))
-			return $allocated;
-		$objects = kBatchExclusiveLock::getExclusive($c, $maxObject, $jobType, $maxOffset);
-		$cache->set($key, $objects, self::TIME_IN_CACHE);
-
-		return self::getUnallocatedJobs($objects, $number_of_objects, $cache);
-	}
-	
-	/**
-	 * will return list max Job To Pull To Cache, if not config for worker return null
-	 * @param int $workerId
-	 * @return int
-	 */
-	private static function getMaxJobToPull($workerId)
-	{
-		try {
-			// in production 'batch/worker'
-			$map = kConf::getMap('batch/batch');
-			foreach ($map as $value)
-				if (array_key_exists('id', $value) && $value['id'] == $workerId &&
-						array_key_exists('maxJobToPullToCache', $value))
-					return $value['maxJobToPullToCache'];
-			return null;
-		} catch (Exception $e) {
-			return null;
+		$key = self::getCacheKeyForWorker($workerId);
+		$allocated = self::getUnallocatedJobs($key,$number_of_objects, $cache);
+		while (empty($allocated)) {
+			$objects = kBatchExclusiveLock::getExclusive($c, $maxJobToPull, $jobType, $maxOffset);
+			if (empty($objects))
+				return $objects;
+			$cache->set($key, $objects, self::TIME_IN_CACHE);
+			$allocated = self::getUnallocatedJobs($key, $number_of_objects, $cache);
 		}
+		return $allocated;
+
 	}
 
 	/**
 	 * will return cache-key for worker
-	 * @param array $jobs
+	 * @param string $workerKey
 	 * @param int $numberOfJobs
 	 * @param kBaseCacheWrapper $cache
 	 * @return string
 	 */
-	private static function getUnallocatedJobs($jobs, $numberOfJobs, $cache)
+	private static function getUnallocatedJobs($workerKey, $numberOfJobs, $cache)
 	{
+		$jobs = $cache->get($workerKey);
+		if (!$jobs)
+			return array();
 		$allocatedJob = array();
+		$cnt = 0;
 		foreach ($jobs as $job)
 		{
 			$key = self::getCacheKeyForJob($job->getId());
 			if ($cache->add($key, true, self::TIME_IN_CACHE)) {
 				$allocatedJob[] = $job;
+				$cnt++;
 			}
-			if (count($allocatedJob) >= $numberOfJobs)
+			if ($cnt >= $numberOfJobs)
 				break;
 		}
 		return $allocatedJob;
