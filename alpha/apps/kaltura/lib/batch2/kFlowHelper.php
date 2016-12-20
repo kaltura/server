@@ -385,7 +385,7 @@ class kFlowHelper
 		$replacingEntry->setDefaultModerationStatus();
 		$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$replacingEntry->setReplacedEntryId($recordedEntry->getId());
-		$replacingEntry->setRecordedEntrySegmentCounnd($liveSegmentCount);
+		$replacingEntry->setRecordedEntrySegmentCount($liveSegmentCount);
 		$replacingEntry->save();
 
 		$recordedEntry->setReplacingEntryId($replacingEntry->getId());
@@ -405,10 +405,11 @@ class kFlowHelper
 				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
 				if ($replacingEntry)
 				{
-					$recordedEntrySegmentCount = $replacingEntry->getRecordedEntrySegmentCounnd(); 
-					if($recordedEntrySegmentCount && $recordedEntrySegmentCount > $liveSegmentCount)
+					/* @var $replacingEntry entry */
+					$recordedEntrySegmentCount = $replacingEntry->getRecordedEntrySegmentCount(); 
+					if($recordedEntrySegmentCount > $liveSegmentCount)
 					{
-						KalturaLog::debug("Entry in replacment with higher segment count [$recordedEntrySegmentCount] > [$liveSegmentCount]");
+						KalturaLog::debug("Entry [{$recordedEntry->getId()}] in replacment with higher segment count [$recordedEntrySegmentCount] > [$liveSegmentCount]");
 					}
 					else 
 					{
