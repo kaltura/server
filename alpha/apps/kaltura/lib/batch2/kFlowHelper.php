@@ -410,6 +410,7 @@ class kFlowHelper
 					if($recordedEntrySegmentCount > $liveSegmentCount)
 					{
 						KalturaLog::debug("Entry [{$recordedEntry->getId()}] in replacment with higher segment count [$recordedEntrySegmentCount] > [$liveSegmentCount]");
+						return null;
 					}
 					else 
 					{
