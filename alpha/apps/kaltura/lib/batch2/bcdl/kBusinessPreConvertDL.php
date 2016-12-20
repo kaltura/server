@@ -702,9 +702,18 @@ class kBusinessPreConvertDL
 				 * therefore anyhow at least one ipad flavor will be always generated.
 				 * The other tags are less relevant for the framesize adjustment cases.
 				 */
-		if(isset($mediaInfo)) {
-			if(array_key_exists(flavorParams::TAG_MBR, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_MBR]);
-			if(array_key_exists(flavorParams::TAG_ISM, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_ISM]);
+		if(isset($mediaInfo) && ($profile=myPartnerUtils::getConversionProfile2ForEntry($entryId))!=null) {
+			if(($collectionTags=$profile->getCollectionTags())==null ) {
+				$collectionTagsArr = array(flavorParams::TAG_MBR, flavorParams::TAG_ISM);
+			}
+			else {
+				$collectionTagsArr = explode(',',$collectionTags);
+				if(count($collectionTagsArr)==0)
+					$collectionTagsArr = array(flavorParams::TAG_MBR, flavorParams::TAG_ISM);
+			}
+			foreach($collectionTagsArr as $collectionTag) {
+				if(array_key_exists($collectionTag, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[$collectionTag]);
+			}
 		}
 		// filter out all not forced, none complied, and invalid flavors
 		$finalTagedFlavors = array();
@@ -1964,6 +1973,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$overrideParam = $flavorParamsConversionProfile->getTwoPass();
 			if(isset($overrideParam))
 				$flavorParams->setTwoPass($overrideParam);
+			if($flavorParamsConversionProfile->getTags()!==null) $flavorParams->setTags($flavorParamsConversionProfile->getTags());
 		}
 	}
 
