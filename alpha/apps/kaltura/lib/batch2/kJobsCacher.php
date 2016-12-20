@@ -39,7 +39,6 @@ class kJobsCacher
 			$allocated = self::getUnallocatedJobs($key, $number_of_objects, $cache);
 		}
 		return $allocated;
-
 	}
 
 	/**
@@ -86,6 +85,89 @@ class kJobsCacher
 	private static function getCacheKeyForJob($jobId)
 	{
 		return "jobs_cache_job_$jobId";
+	}
+
+
+
+
+
+
+	CONST TIME_IN_CACHE_FOR_LOCK = 5;
+	CONST SLEEP_TIME_WHEN_LOCKED = 1;
+
+	/**
+	 * will return BatchJob objects.
+	 *@param Criteria $c
+	 * @param kExclusiveLockKey $lockKey
+	 * @param int $number_of_objects
+	 * @param int $jobType
+	 * @param int $maxOffset
+	 * @param int $maxJobToPull
+	 *
+	 * @return array
+	 */
+	public static function getExclusive2($c, $lockKey, $number_of_objects, $jobType, $maxOffset, $maxJobToPull)
+	{
+		$workerId = $lockKey->getWorkerId();
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
+
+		if (!$maxJobToPull || $maxOffset || !$cache) //skip cache and get jobs from DB
+			return kBatchExclusiveLock::getExclusive($c, $number_of_objects, $jobType, $maxOffset);
+
+		KalturaLog::info("Using cache mechanism for worker [$workerId]");
+		$allocated = array();
+		$cnt = 0;
+		for($attempt = 1; $attempt < 20; $attempt++)
+		{
+			$job = self::getJob($cache, $workerId, $c, $maxJobToPull, $jobType);
+			if (!$job) {
+				if ($cnt > 0)
+					return $allocated;
+				sleep(self::SLEEP_TIME_WHEN_LOCKED);
+				continue;
+			}
+			$allocated[] = $job;
+			if (++$cnt >= $number_of_objects)
+				break;
+
+		}
+		return $allocated;
+	}
+
+	/**
+	 * will return BatchJob.
+	 * @param kBaseCacheWrapper $cache
+	 * @param int $workerId
+	 * @param Criteria $c
+	 * @param int $maxJobToPull
+	 * @param int $jobType
+	 *
+	 * @return BatchJob
+	 */
+	private static function getJob($cache, $workerId, $c, $maxJobToPull, $jobType)
+	{
+		$workerKey = "jobs_cache_worker_$workerId";
+		$indexKey = "jobs_cache_worker_$workerId-index";
+		$workerLockKey = "jobs_cache_worker_$workerId-Lock";
+		$cache->add($indexKey, 0); //just init index - ignore if exist
+
+		$jobs = $cache->get($workerKey);
+		$index = $cache->increment($indexKey);
+		if ($index < count($jobs))
+			return $jobs[$index];
+
+		KalturaLog::info("Cannot get job from cache for workerId [$workerId] when index [$index] and number of job is " .count($jobs));
+		if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
+			return null;
+		$objects = kBatchExclusiveLock::getExclusive($c, $maxJobToPull, $jobType, null);
+		$cache->set($workerKey, $objects, self::TIME_IN_CACHE);
+		$numOfObj = count($objects);
+		KalturaLog::info("Got $numOfObj jobs to insert to cache for workerId [$workerId]");
+		if ($numOfObj == 0)
+			return null;
+		$cache->set($indexKey, 0);
+		$cache->delete($workerLockKey);
+		return $objects[0];
 	}
 
 }
