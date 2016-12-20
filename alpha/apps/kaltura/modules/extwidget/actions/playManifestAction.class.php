@@ -1152,6 +1152,9 @@ class playManifestAction extends kalturaAction
 			// Note: kApiCache::hasExtraFields is checked in kManifestRenderers
 			$renderer->cachingHeadersAge = 60;
 		}
+		if ($this->deliveryProfile && $this->deliveryProfile->getAdStitchingEnabled())
+			$renderer->cachingHeadersAge = 0;
+
 		
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
