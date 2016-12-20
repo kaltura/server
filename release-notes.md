@@ -1,5 +1,16 @@
 # Lynx 12.8.0 #
 
+## Scheduling - validate resourceEvent is not already allocated at a specific time ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6543
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_20_update_schedule_event_permissions.php
+	                
 ## Need to verify ability to list occurrences by resource of their parent for Extron ##
 
  - Issue Type: Bug
