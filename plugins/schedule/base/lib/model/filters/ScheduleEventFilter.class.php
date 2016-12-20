@@ -105,5 +105,10 @@ class ScheduleEventFilter extends baseObjectFilter
 	{
 		$this->set('_eq_template_entry_id', ($v));
 	}
+
+	public function setResourceIdsIn($ids)
+	{
+		$this->set('_mlikeor_resource_ids', $ids);
+	}
 }
 
