@@ -848,7 +848,7 @@ $plannedDur = 0;
 				/*
 			 	 * Evaluate source frame dims - dar adjustment and rotation
 			 	 */
-			$targetVid->_watermarkData = self::evaluateTargetWaterMark($sourceVid, $targetVid->_watermarkData);
+			$targetVid->_watermarkData = self::evaluateTargetWaterMark($sourceVid, $flavorVid, $targetVid->_watermarkData);
 		}
 		
 		$targetVid->_rotation = $sourceVid->_rotation;
@@ -1300,10 +1300,18 @@ $plannedDur = 0;
 		
 		$srcWid = $srcHgt = $fixImageDar = null;
 		if(isset($sourceVid->_width) && isset($sourceVid->_height)){
+				/*
+				 * On 'fixed/forced-frame-size' mode (flavorVid::_width/flavorVid::_height != 0),
+				 * use the calculated 'forced-dar', rather than source::dar.
+				 */
+			if(isset($flavorVid->_width) && $flavorVid->_width>0 && isset($flavorVid->_height) && $flavorVid->_height>0)
+				$dar = $flavorVid->_width/$flavorVid->_height;
+			else if(isset($sourceVid->_dar))
+				$dar = $sourceVid->_dar;
+			else $dar = null;
+			$rotation = isset($sourceVid->_rotation)? $sourceVid->_rotation: null;
 			list($srcWid, $srcHgt,$fixImageDar) = self::adjustFrameSizeToDarAndRotation(
-					$sourceVid->_width, $sourceVid->_height, 
-					isset($sourceVid->_dar)? $sourceVid->_dar: null, 
-					isset($sourceVid->_rotation)? $sourceVid->_rotation: null);
+									$sourceVid->_width, $sourceVid->_height, $dar, $rotation);
 		}
 
 		/*
