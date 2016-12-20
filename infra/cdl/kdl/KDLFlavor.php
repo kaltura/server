@@ -1238,13 +1238,35 @@ $plannedDur = 0;
 		if($target->_frameRate==0) {
 			$target->_frameRate = $source->_frameRate;
 			if(isset($target->_maxFrameRate) && $target->_maxFrameRate>0)
-				$maxFR = $target->_maxFrameRate;
+				$maxFrameRate = $target->_maxFrameRate;
 			else
-				$maxFR = KDLConstants::MaxFramerate;
-			if($target->_frameRate>$maxFR) {
+				$maxFrameRate = KDLConstants::MaxFramerate;
+			if($target->_frameRate>$maxFrameRate) {
 				$target->_warnings[KDLConstants::VideoIndex][] =
-					KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, $maxFR, $target->_frameRate);
-				$target->_frameRate=$target->_frameRate==50?25:$maxFR;
+					KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, $maxFrameRate, $target->_frameRate);
+				/*
+				 * On special HFR (High Frane Rate) cases, apply following truncating logic 
+				 */
+				switch ($target->_frameRate){
+					case 47.96:
+						$target->_frameRate = 23.98;
+						break;
+					case 48:
+						$target->_frameRate = 24;
+						break;
+					case 50:
+						$target->_frameRate = 25;
+						break;
+					case 59.94:
+						$target->_frameRate = 29.97;
+						break;
+					case 60:
+						$target->_frameRate = 30;
+						break;
+					default:
+						$target->_frameRate = $maxFrameRate;
+						break;
+				}
 			}
 			// For webcam/h263 - if FR==0, set FR=24
 			else if($target->_frameRate==0 && $source->IsFormatOf(array("h.263","h263","sorenson spark","vp6")) ){
