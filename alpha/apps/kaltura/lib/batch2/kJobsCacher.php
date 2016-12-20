@@ -23,20 +23,18 @@ class kJobsCacher
 	{
 		$workerId = $lockKey->getWorkerId();
 		$maxObject = self::getMaxJobToPull($workerId);
-
-		if (!$maxObject || $maxOffset)
+		$key = self::getCacheKeyForWorker($workerId);
+		$cache = self::getCache();
+		if (!$maxObject || $maxOffset || !$cache) //skip cache and get jobs from DB
 			return kBatchExclusiveLock::getExclusive($c, $number_of_objects, $jobType, $maxOffset);
 
-		$key = self::getCacheKey($workerId);
-
-		$cache = self::getCache();
 		$jobsList = $cache->get($key);
-		if ($jobsList)
-			return array_slice($jobsList, 0, $number_of_objects);
-
+		if ($jobsList && ($allocated = self::getUnallocatedJobs($jobsList,$number_of_objects, $cache)))
+			return $allocated;
 		$objects = kBatchExclusiveLock::getExclusive($c, $maxObject, $jobType, $maxOffset);
 		$cache->set($key, $objects, self::TIME_IN_CACHE);
-		return array_slice($objects, 0, $number_of_objects);
+
+		return self::getUnallocatedJobs($objects, $number_of_objects, $cache);
 	}
 	
 	/**
@@ -61,12 +59,43 @@ class kJobsCacher
 
 	/**
 	 * will return cache-key for worker
+	 * @param array $jobs
+	 * @param int $numberOfJobs
+	 * @param kBaseCacheWrapper $cache
+	 * @return string
+	 */
+	private static function getUnallocatedJobs($jobs, $numberOfJobs, $cache)
+	{
+		$allocatedJob = array();
+		foreach ($jobs as $job)
+		{
+			$key = self::getCacheKeyForJob($job->getId());
+			if ($cache->add($key, true, self::TIME_IN_CACHE)) {
+				$allocatedJob[] = $job;
+			}
+			if (count($allocatedJob) >= $numberOfJobs)
+				break;
+		}
+		return $allocatedJob;
+	}
+
+	/**
+	 * will return cache-key for worker
 	 * @param int $workerId
 	 * @return string
 	 */
-	private static function getCacheKey($workerId)
+	private static function getCacheKeyForWorker($workerId)
 	{
-		return "job_cache_$workerId";
+		return "jobs_cache_worker_$workerId";
+	}
+	/**
+	 * will return cache-key for worker
+	 * @param int $jobId
+	 * @return string
+	 */
+	private static function getCacheKeyForJob($jobId)
+	{
+		return "jobs_cache_job_$jobId";
 	}
 
 	/**
@@ -74,12 +103,8 @@ class kJobsCacher
 	 */
 	private static function getCache()
 	{
-		//$name = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_BATCH);
-		//$cache = kCacheManager::getCache($name);
-		$cache = new kMemcacheCacheWrapper();
-		$config = array("host" => "127.0.0.1", "port" => 11211, "serializeData" => true);
-		$ret = $cache->init($config);
-		KalturaLog::info("back from init as $ret --- Done create cache in kJobsCacher");
+		$name = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_BATCH_JOBS);
+		$cache = kCacheManager::getCache($name[0]);
 		return $cache;
 	}
 }
