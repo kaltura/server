@@ -421,7 +421,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$partialSupport = null;
-		
+		$deliveries = self::filterByDeliveryIdAttribute($deliveries, $deliveryAttributes);
+
 		// find either a fully supported deliveryProfile or the first partial supported one
 		foreach ($deliveries as $delivery) {
 			$result = $delivery->supportsDeliveryDynamicAttributes($deliveryAttributes);
@@ -432,6 +433,31 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 		
 		return $partialSupport;
+	}
+
+	/**
+	 * filter deliveries by delivery Profile Id
+	 * @param $deliveries list of deliveries
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 * @return array
+	 */
+	protected static function filterByDeliveryIdAttribute($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
+		$filteredDeliveries = array();
+		$deliveryId = $deliveryAttributes->getDeliveryProfileId();
+		if($deliveryId)
+		{
+			foreach($deliveries as $delivery)
+			{
+				if($delivery->getId() == $deliveryId)
+				{
+					$filteredDeliveries[] = $delivery;
+					break;
+				}
+			}
+			return $filteredDeliveries;
+		}
+		return $deliveries;
 	}
 	
 	/**

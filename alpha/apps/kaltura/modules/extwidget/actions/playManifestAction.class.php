@@ -677,7 +677,8 @@ class playManifestAction extends kalturaAction
 			$activeStorageProfileIds = array();
 			foreach ($storageProfiles as $storageProfile)
 			{
-				$activeStorageProfileIds[] = $storageProfile->getId();
+				if($this->shouldIncludeStorageProfile($storageProfile))
+					$activeStorageProfileIds[] = $storageProfile->getId();
 			}
 			
 			foreach ($storageProfileIds as $storageProfileId)
@@ -724,6 +725,23 @@ class playManifestAction extends kalturaAction
 			$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
 			$this->deliveryAttributes->setFlavorAssets(array(reset($flavorAssets)));
 		}
+	}
+
+	private function shouldIncludeStorageProfile($storageProfile)
+	{
+		if($this->deliveryProfileId)
+		{
+			$deliveryExist = false;
+			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
+			foreach ($deliveryIdsByStreamerType as $deliveryByStreamer)
+			{
+				if(!$deliveryExist)
+					$deliveryExist = in_array($this->deliveryProfileId, $deliveryByStreamer);
+			}
+			return $deliveryExist;
+		}
+
+		return true;
 	}
 
 	/**
