@@ -23,13 +23,15 @@ class kJobsCacher
 	public static function getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset, $maxJobToPull)
 	{
 		$workerId = $lockKey->getWorkerId();
-		$cache = self::getCache();
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
+
 		if (!$maxJobToPull || $maxOffset || !$cache) //skip cache and get jobs from DB
 			return kBatchExclusiveLock::getExclusive($c, $number_of_objects, $jobType, $maxOffset);
 
 		$key = self::getCacheKeyForWorker($workerId);
 		$allocated = self::getUnallocatedJobs($key,$number_of_objects, $cache);
 		while (empty($allocated)) {
+			KalturaLog::info("Job couldn't be allocated for worker [$workerId], searching the DB ");
 			$objects = kBatchExclusiveLock::getExclusive($c, $maxJobToPull, $jobType, $maxOffset);
 			if (empty($objects))
 				return $objects;
@@ -86,13 +88,4 @@ class kJobsCacher
 		return "jobs_cache_job_$jobId";
 	}
 
-	/**
-	 * @return kBaseCacheWrapper
-	 */
-	private static function getCache()
-	{
-		$name = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_BATCH_JOBS);
-		$cache = kCacheManager::getCache($name[0]);
-		return $cache;
-	}
 }
