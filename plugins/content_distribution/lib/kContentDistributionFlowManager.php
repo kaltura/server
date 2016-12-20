@@ -1214,6 +1214,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		$entryId = $metadata->getObjectId();
 		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			KalturaLog::info("Entry [".$entryId."] not found");
+			return true;
+		}
 		if($entry->getType() == entryType::LIVE_STREAM)
 			return true;
 
@@ -1241,11 +1246,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			}
 		}
 		
-		$entry = entryPeer::retrieveByPK($metadata->getObjectId());
-		if (!$entry){
-			KalturaLog::info("Entry [".$metadata->getObjectId()."] not found");
-			return true; 
-		}
 		
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
