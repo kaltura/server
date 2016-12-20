@@ -71,4 +71,6 @@ class flavorParamsConversionProfile extends BaseflavorParamsConversionProfile
 	public function setTwoPass($v)		{$this->putInCustomData('TwoPass', $v);}
 	public function getTwoPass()		{return $this->getFromCustomData('TwoPass', null, null);}
 
+        public function setTags($v)		{$this->putInCustomData('Tags', $v);}
+        public function getTags()           	{return $this->getFromCustomData('Tags', null, null);}
 }
