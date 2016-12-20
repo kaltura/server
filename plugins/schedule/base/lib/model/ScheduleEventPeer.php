@@ -205,6 +205,26 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 		return self::doSelect($c);
 	}
+
+	/**
+	 * @param string $resourceIds
+	 * @param date $startDate
+	 * @param date $endDate
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate)
+	{
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
+		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
+
+		$filter = new ScheduleEventFilter();
+		$filter->setResourceIdsIn($resourceIds);
+
+		$filter->attachToCriteria($c);
+
+		return self::doSelect($c);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()

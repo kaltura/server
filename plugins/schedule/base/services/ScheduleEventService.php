@@ -271,4 +271,38 @@ class ScheduleEventService extends KalturaBaseService
 		}
 		$dbScheduleEvent->save();
 	}
+
+	/**
+	 * List conflicting events for resourcesIds by event's dates
+	 *
+	 * @action getConflicts
+	 * @param string $resourceIds
+	 * @param KalturaScheduleEvent $scheduleEvent
+	 * @return KalturaScheduleEventArray
+	 */
+	public function getConflictsAction($resourceIds, KalturaScheduleEvent $scheduleEvent)
+	{
+		if (!$resourceIds)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'resourceIds');
+
+		$dbScheduleEvent = $scheduleEvent->toInsertableObject();
+		/* @var $dbScheduleEvent ScheduleEvent */
+
+		$events = array();
+
+		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
+		{
+			$maxRecurrences = SchedulePlugin::getScheduleEventmaxRecurrences();
+			$datesGenerator = new DatesGenerator($maxRecurrences, $dbScheduleEvent->getRecurrence()->asArray(), array('KalturaLog', 'debug'));
+			$dates = $datesGenerator->getDates($dbScheduleEvent->getStartDate(null));
+
+			foreach($dates as $date)
+				$events[] = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $date, ($date + $dbScheduleEvent->getDuration()));
+		}
+		else {
+			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null));
+		}
+
+		return KalturaScheduleEventArray::fromDbArray($events);
+	}
 }
