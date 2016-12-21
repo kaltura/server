@@ -170,14 +170,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	
 	private function validateMaxStreamsNotReached(LiveEntry $liveEntry)
 	{
-		//Fetch all current live entries
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setIsLive(true);
-		$filter->setIdNotIn(array($liveEntry->getId()));
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->attachToCriteria($baseCriteria);
-		$entries = entryPeer::doSelect($baseCriteria);
+		//Fetch all entries currently being streamed by partner
+		$liveEntries = $this->getLiveEntriesForPartner($liveEntry);
 		
 		$maxPassthroughStreams = $this->getPartner()->getMaxLiveStreamInputs();
 		if(!$maxPassthroughStreams)
@@ -194,7 +188,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		KalturaLog::debug("Max transcoded streams [$maxTranscodedStreams]");
 		
 		$entryConversionProfiles = array();
-		foreach($entries as $entry)
+		foreach($liveEntries as $entry)
 		{
 			/* @var $entry LiveEntry */
 			$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
@@ -225,6 +219,34 @@ class LiveStreamService extends KalturaLiveEntryService
 		KalturaLog::debug("Live Passthrough entries [$PassthroughEntriesCount], max live Passthrough streams [$maxPassthroughStreams]");
 		if($PassthroughEntriesCount > $maxPassthroughStreams)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $liveEntry->getId());
+	}
+	
+	private function getLiveEntriesForPartner(LiveEntry $liveEntry)
+	{
+		//Fetch all entries currently being streamed by partner
+		$connectedLiveEntryStatuses = array(
+			KalturaEntryServerNodeStatus::AUTHENTICATED,
+			KalturaEntryServerNodeStatus::BROADCASTING,
+			KalturaEntryServerNodeStatus::PLAYABLE
+		);
+		
+		$c = KalturaCriteria::create(EntryServerNodePeer::OM_CLASS);
+		$c->add(EntryServerNodePeer::PARTNER_ID, $liveEntry->getPartnerId());
+		$c->add(EntryServerNodePeer::ENTRY_ID, $liveEntry->getId(), Criteria::NOT_EQUAL);
+		$c->add(EntryServerNodePeer::STATUS, $connectedLiveEntryStatuses, Criteria::IN);
+		$c->addGroupByColumn(EntryServerNodePeer::ENTRY_ID);
+		$connectedEntryServerNodes  = EntryServerNodePeer::doSelect($c);
+		
+		$connectedLiveEntryIds = array();
+		if(!count($connectedEntryServerNodes))
+			return $connectedLiveEntryIds;
+		
+		foreach($connectedEntryServerNodes as $connectedEntryServerNode)
+			$connectedLiveEntryIds[] = $connectedEntryServerNode->getEntryId();
+		
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$c->add(entryPeer::ID, $connectedLiveEntryIds, Criteria::IN);
+		return entryPeer::doSelect($c);
 	}
 
 	/**
