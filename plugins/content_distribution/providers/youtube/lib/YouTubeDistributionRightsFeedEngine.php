@@ -264,7 +264,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$pager->pageSize = 1;
 		$pager->pageIndex = 1;
 		
-		$filesyncPlugin = KalturaFilesyncClientPlugin::get( KBatchBase::$kClient );
+		$filesyncPlugin = KalturaFileSyncClientPlugin::get( KBatchBase::$kClient );
 		$result = $filesyncPlugin->fileSync->listAction($filter, $pager);
 		if ( ! empty( $result->objects ) )
 		{

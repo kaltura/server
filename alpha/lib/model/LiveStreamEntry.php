@@ -8,7 +8,7 @@ class LiveStreamEntry extends LiveEntry
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->setType(EntryType::LIVE_STREAM);
+		$this->setType(entryType::LIVE_STREAM);
 		$this->setStatus(entryStatus::NO_CONTENT);
 	}
 	
