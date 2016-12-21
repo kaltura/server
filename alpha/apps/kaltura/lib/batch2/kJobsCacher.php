@@ -116,20 +116,18 @@ class kJobsCacher
 
 		KalturaLog::info("Using cache mechanism for worker [$workerId]");
 		$allocated = array();
-		$cnt = 0;
 		for($attempt = 1; $attempt < 20; $attempt++)
 		{
 			$job = self::getJob($cache, $workerId, $c, $maxJobToPull, $jobType);
 			if (!$job) {
-				if ($cnt > 0)
+				if (!empty($allocated))
 					return $allocated;
 				sleep(self::SLEEP_TIME_WHEN_LOCKED);
 				continue;
 			}
 			$allocated[] = $job;
-			if (++$cnt >= $number_of_objects)
+			if (count($allocated) >= $number_of_objects)
 				break;
-
 		}
 		return $allocated;
 	}
@@ -149,12 +147,15 @@ class kJobsCacher
 		$workerKey = "jobs_cache_worker_$workerId";
 		$indexKey = "jobs_cache_worker_$workerId-index";
 		$workerLockKey = "jobs_cache_worker_$workerId-Lock";
-		$cache->add($indexKey, 0); //just init index - ignore if exist
+		$cache->add($indexKey, 0, self::TIME_IN_CACHE); //just init index - ignore if exist
 
 		$jobs = $cache->get($workerKey);
-		$index = $cache->increment($indexKey);
-		if ($index < count($jobs))
-			return $jobs[$index];
+		if ($jobs)
+		{
+			$index = $cache->increment($indexKey);
+			if ($index < count($jobs))
+				return $jobs[$index];
+		}
 
 		KalturaLog::info("Cannot get job from cache for workerId [$workerId] when index [$index] and number of job is " .count($jobs));
 		if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
@@ -165,7 +166,7 @@ class kJobsCacher
 		KalturaLog::info("Got $numOfObj jobs to insert to cache for workerId [$workerId]");
 		if ($numOfObj == 0)
 			return null;
-		$cache->set($indexKey, 0);
+		$cache->set($indexKey, 0, self::TIME_IN_CACHE);
 		$cache->delete($workerLockKey);
 		return $objects[0];
 	}
