@@ -137,14 +137,14 @@ class ScheduleEventService extends KalturaBaseService
 	private function updateRecurrences(ScheduleEvent $dbScheduleEvent)
 	{
 		$newDates = $this->getRecurrencesDates($dbScheduleEvent);
+		self::setRecurringDates($newDates, $dbScheduleEvent);
 		if (is_null($newDates) || empty($newDates))
 		{
 			KalturaLog::debug("No dates have been received - deleting old recurrences");
-			//ScheduleEventPeer::deleteByParentId($dbScheduleEvent->getId());
+			ScheduleEventPeer::deleteByParentId($dbScheduleEvent->getId());
 			return;
 		}
 
-		self::setRecurringDates($newDates, $dbScheduleEvent);
 		$ends = $this->getEndsTime($newDates, $dbScheduleEvent->getDuration());
 		//get all the recurrences that wasn't changed
 		$existingScheduleEvents = ScheduleEventPeer::retrieveByParentIdAndTimes($dbScheduleEvent->getId(), $newDates , $ends);
