@@ -1040,11 +1040,11 @@ $plannedDur = 0;
 				$target->_height=$hgtSrc;
 			}
 				/*
-				 * If the target AR is similar/close (up to 10%) to the src AR,
+				 * If the target AR is similar/close (up to 5%) to the src AR,
 				 * just trim to the source dims.
 				 * Otherwise (src AR != trg AR) - calc the trg wid from trg AR and hgt.
 				 */
-			if(abs(1-$darTrg/$darSrcFrame)<0.1) {
+			if(abs(1-$darTrg/$darSrcFrame)<0.05) {
 				if($target->_width>$widSrc) {
 					$target->_width=$widSrc;
 				}
