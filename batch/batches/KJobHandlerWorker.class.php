@@ -62,10 +62,9 @@ abstract class KJobHandlerWorker extends KBatchBase
 	
 	protected function getJobs()
 	{
-		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
 		$maxJobToPull = KBatchBase::$taskConfig->maxJobToPullToCache;
 		return KBatchBase::$kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime, 
-				$this->getMaxJobsEachRun(), $this->getFilter(), static::getType(), $maxOffset, $maxJobToPull);
+				$this->getMaxJobsEachRun(), $this->getFilter(), static::getType(), $maxJobToPull);
 	}
 	
 	public function run($jobs = null)
@@ -197,14 +196,6 @@ abstract class KJobHandlerWorker extends KBatchBase
 		}
 		
 		return $filter;
-	}
-	
-	protected function getMaxOffset() 
-	{
-		$maxOffset = KBatchBase::$taskConfig->maxOffset;
-		if(!is_null($maxOffset))
-			return $maxOffset;
-		return 0;
 	}
 	
 	/**

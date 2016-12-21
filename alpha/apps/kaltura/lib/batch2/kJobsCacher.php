@@ -1,14 +1,8 @@
 <?php
 
-/**
- * Created by IntelliJ IDEA.
- * User: David.Winder
- * Date: 12/19/2016
- * Time: 3:21 PM
- */
 class kJobsCacher
 {
-	CONST TIME_IN_CACHE = 30;
+	CONST TIME_IN_CACHE = 10;
 	CONST TIME_IN_CACHE_FOR_LOCK = 5;
 
 	/**
@@ -41,15 +35,12 @@ class kJobsCacher
 	 *
 	 * @return array
 	 */
-	public static function getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset, $maxJobToPull)
+	public static function getJobs($c, $lockKey, $number_of_objects, $jobType, $maxJobToPull)
 	{
 		$workerId = $lockKey->getWorkerId();
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
-
-		if (!$maxJobToPull || $maxOffset || !$cache) //skip cache and get jobs from DB
-			return kBatchExclusiveLock::getExclusive($c, $number_of_objects, $jobType, $maxOffset);
-
-		KalturaLog::info("Using cache mechanism for worker [$workerId]");
+		if (!$maxJobToPull || !$cache) //skip cache and get jobs from DB
+			return kBatchExclusiveLock::getJobs($c, $number_of_objects, $jobType);
 		$allocated = array();
 		for($i = 0; $i < $number_of_objects; $i++)
 		{
@@ -62,6 +53,7 @@ class kJobsCacher
 			}
 			$allocated[] = $job;
 		}
+		KalturaLog::debug("Return allocated job with ids: " .print_r(array_map(function($job){return $job->getId();},$allocated), true));
 		return $allocated;
 	}
 
@@ -76,10 +68,9 @@ class kJobsCacher
 	{
 		$workerKey = self::getCacheKeyForWorker($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
-		$cache->add($indexKey, 0, self::TIME_IN_CACHE); //just init index - ignore if exist
 
 		$jobs = $cache->get($workerKey);
-		if (!$jobs)
+		if (!$jobs || empty($jobs))
 		{
 			KalturaLog::debug("No job in cache for workerId [$workerId]");
 			return null;
@@ -112,7 +103,8 @@ class kJobsCacher
 		$workerKey = self::getCacheKeyForWorker($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
-		$objects = kBatchExclusiveLock::getExclusive($c, $maxJobToPull, $jobType, null);
+		$objects = kBatchExclusiveLock::getJobs($c, $maxJobToPull, $jobType);
+		$cache->add($indexKey, 0, self::TIME_IN_CACHE); //init as 0 if key is not exist
 		$cache->set($workerKey, $objects, self::TIME_IN_CACHE);
 
 		$numOfObj = count($objects);

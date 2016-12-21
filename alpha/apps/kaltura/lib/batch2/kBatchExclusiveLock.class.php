@@ -82,12 +82,12 @@ class kBatchExclusiveLock
 	 * @param int $maxJobToPullForCache
 	 */
 	public static function getExclusiveJobs(kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType,
-			BatchJobFilter $filter, $maxOffset = null, $maxJobToPullForCache = 0)
+			BatchJobFilter $filter, $maxJobToPullForCache = 0)
 	{
 		$c = new Criteria();
 		$filter->attachToCriteria($c);
 		
-		$objects = kJobsCacher::getExclusive($c, $lockKey, $number_of_objects, $jobType, $maxOffset, $maxJobToPullForCache);
+		$objects = kJobsCacher::getJobs($c, $lockKey, $number_of_objects, $jobType, $maxJobToPullForCache);
 		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	
@@ -223,7 +223,7 @@ class kBatchExclusiveLock
 	 *
 	 * @param Criteria $c
 	 */
-	public static function getExclusive(Criteria $c, $number_of_objects, $jobType, $maxOffset = null)
+	public static function getJobs(Criteria $c, $number_of_objects, $jobType)
 	{
 		$schd = BatchJobLockPeer::SCHEDULER_ID;
 		$work = BatchJobLockPeer::WORKER_ID;
@@ -283,11 +283,6 @@ class kBatchExclusiveLock
 					AND ($jobWasntExecutedTooMany)";
 				
 		$c->add($stat, $query, Criteria::CUSTOM);
-
-		// In case maxOffset isn't null, we want to take the chunk out of a random offset in between.
-		// That's usefull for load handling
-		if ($maxOffset)
-			$c->setOffset(rand(0, $maxOffset));
 
 		$c->setLimit($number_of_objects);
 		
