@@ -54,10 +54,11 @@ class kJobsCacher
 		for($i = 0; $i < $number_of_objects; $i++)
 		{
 			$job = self::getJobFromCache($cache, $workerId);
-			if ($job)
-				$allocated[] = $job;
-			else
-				$allocated[] = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
+			if (!$job)
+				$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
+			if (!$job)
+				break;
+			$allocated[] = $job;
 		}
 		return $allocated;
 	}
@@ -78,14 +79,14 @@ class kJobsCacher
 		$jobs = $cache->get($workerKey);
 		if (!$jobs)
 		{
-			KalturaLog::info("No job in cache for workerId [$workerId]");
+			KalturaLog::debug("No job in cache for workerId [$workerId]");
 			return null;
 		}
 		$index = $cache->increment($indexKey);
 		if ($index < count($jobs))
 			return $jobs[$index];
 
-		KalturaLog::info("Cannot get job from cache for workerId [$workerId] when index [$index] and number of job is " .count($jobs));
+		KalturaLog::debug("Cannot get job from cache for workerId [$workerId] when index [$index] and number of job is " .count($jobs));
 		return null;
 
 	}
