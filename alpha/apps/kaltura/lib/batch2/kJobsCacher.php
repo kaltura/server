@@ -55,9 +55,11 @@ class kJobsCacher
 		{
 			$job = self::getJobFromCache($cache, $workerId);
 			if (!$job)
+			{
 				$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
-			if (!$job)
-				break;
+				if (!$job)
+					break;
+			}
 			$allocated[] = $job;
 		}
 		return $allocated;
