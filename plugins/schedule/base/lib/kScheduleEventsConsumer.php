@@ -110,6 +110,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
             foreach ($scheduleEvents as $scheduleEvent)
             {
                 /* @var $scheduleEvent ScheduleEvent */
+                $scheduleEvent->indexToSearchIndex();
             }
         }
     }
