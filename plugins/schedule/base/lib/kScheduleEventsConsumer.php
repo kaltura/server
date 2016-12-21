@@ -3,7 +3,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 {
     public function shouldConsumeCreatedEvent(BaseObject $object)
     {
-        if ($object instanceof categoryEntry && $object->getStatus() == categoryEntryStatus::ACTIVE)
+        if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
             return true;
         if ($object instanceof ScheduleEventResource )
             return true;
@@ -21,7 +21,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 
     public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
     {
-        if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == categoryEntryStatus::ACTIVE)
+        if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
             return true;
 
         return false;
@@ -110,7 +110,6 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
             foreach ($scheduleEvents as $scheduleEvent)
             {
                 /* @var $scheduleEvent ScheduleEvent */
-                $scheduleEvent->indexToSearchIndex();
             }
         }
     }

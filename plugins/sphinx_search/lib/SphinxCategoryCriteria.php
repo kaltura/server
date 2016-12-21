@@ -58,12 +58,12 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		{
 			if ($filter->get('_eq_privacy_context') == '*')
 			{
-				$this->addOr(CategoryPeer::PRIVACY_CONTEXT, kEntitlementUtils::NOT_DEFAULT_CONTEXT, Criteria::LIKE);
+				$this->addOr(categoryPeer::PRIVACY_CONTEXT, kEntitlementUtils::NOT_DEFAULT_CONTEXT, Criteria::LIKE);
 				$filter->unsetByName('_eq_privacy_context');
 			}
 			elseif ($filter->get('_eq_privacy_context') != '')
 			{
-				$this->addOr(CategoryPeer::PRIVACY_CONTEXT, $filter->get('_eq_privacy_context'), Criteria::LIKE);
+				$this->addOr(categoryPeer::PRIVACY_CONTEXT, $filter->get('_eq_privacy_context'), Criteria::LIKE);
 				$filter->unsetByName('_eq_privacy_context');
 			}
 		}

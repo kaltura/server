@@ -8,7 +8,7 @@ class LiveChannel extends LiveEntry
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->setType(EntryType::LIVE_CHANNEL);
+		$this->setType(entryType::LIVE_CHANNEL);
 	}
 	
 	public function updateStatus()
