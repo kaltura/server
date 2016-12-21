@@ -121,10 +121,9 @@ class ScheduleEventService extends KalturaBaseService
 	private function createRecurrences(ScheduleEvent $dbScheduleEvent)
 	{
 		$dates = $this->getRecurrencesDates($dbScheduleEvent);
+		self::setRecurringDates($dates, $dbScheduleEvent);
 		if (!$dates)
 			return;
-
-		self::setRecurringDates($dates, $dbScheduleEvent);
 		$class = get_class($dbScheduleEvent);
 		foreach($dates as $date)
 			$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
@@ -271,9 +270,6 @@ class ScheduleEventService extends KalturaBaseService
 
 	private function recurrencesChanged(KalturaScheduleEvent $scheduleEvent)
 	{
-		return true;
-
-
 		$timeChangeFields = array($scheduleEvent->startDate, $scheduleEvent->endDate, $scheduleEvent->recurrence,
 			$scheduleEvent->recurrenceType, $scheduleEvent->duration);
 		foreach ($timeChangeFields as $val)
