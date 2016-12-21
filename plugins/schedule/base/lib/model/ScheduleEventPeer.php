@@ -89,17 +89,20 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 * Deletes entirely from the DB all occurences of event from now on
 	 * @param int $parentId
 	 * @param array $exceptForDates
+	 * @param array $exceptForIds
 	 */
-	public static function deleteByParentId($parentId, array $exceptForDates = null)
+	public static function deleteByParentId($parentId, array $exceptForDates = null, array $exceptForIds = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
 		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
 		
 		if($exceptForDates)
-		{
 			$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $exceptForDates, Criteria::NOT_IN);
-		}
+
+		if($exceptForIds)
+			$criteria->add(ScheduleEventPeer::ID, $exceptForIds, Criteria::NOT_IN);
+
 
 		$scheduleEvents = ScheduleEventPeer::doSelect($criteria);
 		ScheduleEventPeer::doDelete($criteria);
@@ -189,6 +192,23 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
 		$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $dates, Criteria::IN);
 		
+		return ScheduleEventPeer::doSelect($criteria);
+	}
+
+	/**
+	 * @param int $parentId
+	 * @param array $startDates
+	 * @param array $endDates
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveByParentIdAndTimes($parentId, $startDates, $endDates)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
+		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
+		$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $startDates, Criteria::IN);
+		$criteria->add(ScheduleEventPeer::END_DATE, $endDates, Criteria::IN);
+
 		return ScheduleEventPeer::doSelect($criteria);
 	}
 

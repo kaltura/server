@@ -36,11 +36,7 @@ class ScheduleEventService extends KalturaBaseService
 		$dates = null;
 
 		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
-		{
-			$dates = $this->getRecurrencesDates($dbScheduleEvent);
-			self::setRecurringDates($dates, $dbScheduleEvent);
-			$this->createRecurrences($dbScheduleEvent, $dates);
-		}
+			$this->createRecurrences($dbScheduleEvent);
 		else
 			$dbScheduleEvent->save();
 
@@ -105,12 +101,9 @@ class ScheduleEventService extends KalturaBaseService
 			$dbScheduleEvent->setSequence(1);
 		}
 
-		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
-		{
-			$dates = $this->getRecurrencesDates($dbScheduleEvent);
-			self::setRecurringDates($dates, $dbScheduleEvent);
-			$this->createRecurrences($dbScheduleEvent, $dates);
-		}else
+		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING && $this->recurrencesChanged($scheduleEvent))
+			$this->updateRecurrences($dbScheduleEvent);
+		else
 			$dbScheduleEvent->save();
 
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
@@ -118,6 +111,60 @@ class ScheduleEventService extends KalturaBaseService
 
 		return $scheduleEvent;
 	}
+
+	/**
+	 * Create schedule recurrences for recurring event
+	 *
+	 * @param ScheduleEvent $dbScheduleEvent
+	 * @param array $dates
+	 */
+	private function createRecurrences(ScheduleEvent $dbScheduleEvent)
+	{
+		$dates = $this->getRecurrencesDates($dbScheduleEvent);
+		if (!$dates)
+			return;
+
+		self::setRecurringDates($dates, $dbScheduleEvent);
+		$class = get_class($dbScheduleEvent);
+		foreach($dates as $date)
+			$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
+	}
+
+	/**
+	 * Create schedule recurrences for recurring event
+	 *
+	 * @param ScheduleEvent $dbScheduleEvent
+	 */
+	private function updateRecurrences(ScheduleEvent $dbScheduleEvent)
+	{
+		$newDates = $this->getRecurrencesDates($dbScheduleEvent);
+		if (is_null($newDates) || empty($newDates))
+		{
+			KalturaLog::debug("No dates have been received - deleting old recurrences");
+			//ScheduleEventPeer::deleteByParentId($dbScheduleEvent->getId());
+			return;
+		}
+
+		self::setRecurringDates($newDates, $dbScheduleEvent);
+		$ends = $this->getEndsTime($newDates, $dbScheduleEvent->getDuration());
+		//get all the recurrences that wasn't changed
+		$existingScheduleEvents = ScheduleEventPeer::retrieveByParentIdAndTimes($dbScheduleEvent->getId(), $newDates , $ends);
+
+		$existingScheduleEventIds = $this->getFieldVals($existingScheduleEvents, 'getId');
+		$existingScheduleEventStartTime = $this->getFieldVals($existingScheduleEvents, 'getOriginalStartDate');
+		// delete all old recurrences except the one's that hadn't changed
+		KalturaLog::debug("Deleting old recurrences except for ids: " . print_r($existingScheduleEventIds, true));
+		ScheduleEventPeer::deleteByParentId($dbScheduleEvent->getId(), null, $existingScheduleEventIds);
+
+		//create only the new/changed ones
+		$dates = array_diff($newDates, $existingScheduleEventStartTime);
+		KalturaLog::debug("Adding " .count($dates) . " new recurrences");
+
+		$class = get_class($dbScheduleEvent);
+		foreach($dates as $date)
+			$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
+	}
+
 
 	/**
 	 * Mark the KalturaScheduleEvent object as deleted
@@ -222,42 +269,49 @@ class ScheduleEventService extends KalturaBaseService
 		return $dates;
 	}
 
-	/**
-	 * Create schedule recurrences for recurring event
-	 *
-	 * @param ScheduleEvent $dbScheduleEvent
-	 * @param array $dates
-	 */
-	private function createRecurrences(ScheduleEvent $dbScheduleEvent, $dates)
+	private function recurrencesChanged(KalturaScheduleEvent $scheduleEvent)
 	{
-		if (is_null($dates))
-		{
-			KalturaLog::debug("No dates have been received");
-			return;
-		}
+		return true;
 
-		ScheduleEventPeer::deleteByParentId($dbScheduleEvent->getId(), $dates);
-		$existingScheduleEvents = ScheduleEventPeer::retrieveByParentIdAndDates($dbScheduleEvent->getId(), $dates);
-		$existingDates = array();
-		foreach($existingScheduleEvents as $existingScheduleEvent)
-		{
-			/* @var $existingScheduleEvent ScheduleEvent */
-			$existingDates[] = $existingScheduleEvent->getOriginalStartDate(null);
-		}
-		$dates = array_diff($dates, $existingDates);
-		$class = get_class($dbScheduleEvent);
-		foreach($dates as $date)
-		{
-			$scheduleEvent = new $class();
-			$scheduleEvent->setRecurrenceType(ScheduleEventRecurrenceType::RECURRENCE);
-			$scheduleEvent->setParentId($dbScheduleEvent->getId());
-			$scheduleEvent->setStartDate($date);
-			$scheduleEvent->setOriginalStartDate($date);
-			$scheduleEvent->setEndDate($date + $dbScheduleEvent->getDuration());
-			$scheduleEvent->save();
-		}
+
+		$timeChangeFields = array($scheduleEvent->startDate, $scheduleEvent->endDate, $scheduleEvent->recurrence,
+			$scheduleEvent->recurrenceType, $scheduleEvent->duration);
+		foreach ($timeChangeFields as $val)
+			if ($val)
+				return true;
+		return false;
+	}
+	
+	private function getEndsTime($startTimes, $duration)
+	{
+		$ends = array();
+		foreach($startTimes as $start)
+			$ends[] = $start + $duration;
+		return $ends;
 	}
 
+	private function createRecurrence($class, $recurringScheduleEventId, $date, $duration)
+	{
+		$scheduleEvent = new $class();
+		$scheduleEvent->setRecurrenceType(ScheduleEventRecurrenceType::RECURRENCE);
+		$scheduleEvent->setParentId($recurringScheduleEventId);
+		$scheduleEvent->setStartDate($date);
+		$scheduleEvent->setOriginalStartDate($date);
+		$scheduleEvent->setEndDate($date + $duration);
+		$scheduleEvent->save();
+	}
+
+	private function getFieldVals($scheduleEventArray, $field)
+	{
+		$newArray = array();
+		foreach($scheduleEventArray as $scheduleEvent) {
+			/* @var $scheduleEvent ScheduleEvent */
+			$newArray[] = $scheduleEvent->$field(null);
+		}
+		return $newArray;
+	}
+
+	
 	/**
 	 * @param $dates
 	 * @param $dbScheduleEvent
