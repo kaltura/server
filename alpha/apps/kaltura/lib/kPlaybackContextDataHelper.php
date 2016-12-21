@@ -164,7 +164,6 @@ class kPlaybackContextDataHelper
 	private function getRelevantFlavorAssets(kContextDataHelper $contextDataHelper)
 	{
 		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
-
 		list($flavorsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorsToFilter($contextDataHelper);
 
 		if(count($flavorsIdsToFilter) || $flavorsParamsNotIn)
@@ -184,6 +183,13 @@ class kPlaybackContextDataHelper
 		$servePriority = $dbEntry->getPartner()->getStorageServePriority();
 
 		$remoteFileSyncs = array();
+
+		if ( $dbEntry->getType() == entryType::LIVE_STREAM )
+		{
+			foreach ($this->flavorAssets as $flavorAsset)
+				$this->localFlavors[$flavorAsset->getId()] = $flavorAsset;
+			return;
+		}
 
 		foreach ($this->flavorAssets as $flavorAsset)
 		{
@@ -269,8 +275,10 @@ class kPlaybackContextDataHelper
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 
 		$localDeliveryProfileIds = array();
-		if (count($dbEntry->getPartner()->getDeliveryProfileIds()))
-			$localDeliveryProfileIds = call_user_func_array('array_merge', $dbEntry->getPartner()->getDeliveryProfileIds());
+
+		$customDeliveryProfilesIds = DeliveryProfilePeer::getCustomDeliveryProfileIds($dbEntry, $dbEntry->getPartner(), $deliveryAttributes);
+		if (count($customDeliveryProfilesIds))
+			$localDeliveryProfileIds = call_user_func_array('array_merge', $customDeliveryProfilesIds);
 
 		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
