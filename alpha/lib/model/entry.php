@@ -2796,9 +2796,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 
 		//Has entitledUserPuserEdit/Publish changed for current entry
-		if (  isset($this->oldCustomDataValues['']) &&
-			($this->oldCustomDataValues['']['entitledUserPuserEdit'] != $this->getEntitledPusersEdit() ||
-			$this->oldCustomDataValues['']['entitledUserPuserPublish'] != $this->getEntitledPusersPublish()) )
+		if ($this->customDataValueHasChanged('entitledUserPuserEdit') ||
+			$this->customDataValueHasChanged('entitledUserPuserPublish') )
 		{
 			//Change for parent entry (and thus changing all brother entries.
 			$parentEntry = $this->getParentEntry();
@@ -2811,8 +2810,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			}
 
 			//Change all child entries.
-			$children = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->getId(), $this->getPartnerId());
-			foreach ($children as $childEntry)
+			$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->getId(), $this->getPartnerId());
+			foreach ($childEntries as $childEntry)
 			{
 				/**
 				 * @var entry $childEntry
@@ -3547,5 +3546,14 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function setTemplateEntryId($v)
 	{
 		$this->putInCustomData(self::TEMPLATE_ENTRY_ID, $v);
+	}
+
+	public function customDataValueHasChanged($name, $namespace = '')
+	{
+		if ( isset($this->oldCustomDataValues[$namespace]) &&
+			 isset($this->oldCustomDataValues[$namespace][$name]) &&
+			 $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
+				return true;
+		return false;
 	}
 }
