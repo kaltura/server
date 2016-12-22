@@ -2796,8 +2796,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 
 		//Has entitledUserPuserEdit/Publish changed for current entry
-		if ( ($this->oldCustomDataValues['']['entitledUserPuserEdit'] != $this->getEntitledPusersEdit()) ||
-			($this->oldCustomDataValues['']['entitledUserPuserPublish'] != $this->getEntitledPusersPublish()) )
+		if (  isset($this->oldCustomDataValues['']) &&
+			($this->oldCustomDataValues['']['entitledUserPuserEdit'] != $this->getEntitledPusersEdit() ||
+			$this->oldCustomDataValues['']['entitledUserPuserPublish'] != $this->getEntitledPusersPublish()) )
 		{
 			//Change for parent entry (and thus changing all brother entries.
 			$parentEntry = $this->getParentEntry();
