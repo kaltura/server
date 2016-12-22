@@ -438,7 +438,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		return $partialSupport;
 	}
-
+	
 	/**
 	 * Filters an array of delivery profile ids according to the access control set in the $deliveryAttributes
 	 * @param array $deliveryIds an array of delivery profile ids
