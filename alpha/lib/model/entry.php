@@ -2794,7 +2794,39 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				$redirectEntry->save();
 			}
 		}
-		
+
+		//Has entitledUserPuserEdit/Publish changed for current entry
+		if ( ($this->oldCustomDataValues['']['entitledUserPuserEdit'] != $this->getEntitledPusersEdit()) ||
+			($this->oldCustomDataValues['']['entitledUserPuserPublish'] != $this->getEntitledPusersPublish()) )
+		{
+			//Change for parent entry (and thus changing all brother entries.
+			$parentEntry = $this->getParentEntry();
+			if ( $parentEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit() ||
+				$parentEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() )
+			{
+				$parentEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
+				$parentEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
+				$parentEntry->save();
+			}
+
+			//Change all child entries.
+			$children = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->getId(), $this->getPartnerId());
+			foreach ($children as $childEntry)
+			{
+				/**
+				 * @var entry $childEntry
+				 */
+				if ( $childEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit()	||
+					$childEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish())
+				{
+					$childEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
+					$childEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
+					$childEntry->save();
+				}
+			}
+
+		}
+
 		$ret = parent::postUpdate($con);
 	
 		if($objectDeleted)
