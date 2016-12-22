@@ -79,14 +79,16 @@ class kBatchExclusiveLock
 	 * @param int $jobType
 	 * @param BatchJobFilter $filter
 	 * @param int $maxOffset
+	 * @param int $maxJobToPullForCache
 	 */
 	public static function getExclusiveJobs(kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType,
-			BatchJobFilter $filter, $maxOffset = null)
+			BatchJobFilter $filter, $maxJobToPullForCache = 0)
 	{
 		$c = new Criteria();
 		$filter->attachToCriteria($c);
 		
-		return self::getExclusive($c, $lockKey, $max_execution_time, $number_of_objects, $jobType, $maxOffset);
+		$objects = kJobsCacher::getJobs($c, $lockKey, $number_of_objects, $jobType, $maxJobToPullForCache);
+		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	
 	public static function getQueueSize(Criteria $c, $schedulerId, $workerId, $jobType)
@@ -221,7 +223,7 @@ class kBatchExclusiveLock
 	 *
 	 * @param Criteria $c
 	 */
-	private static function getExclusive(Criteria $c, kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType, $maxOffset = null)
+	public static function getJobs(Criteria $c, $number_of_objects, $jobType)
 	{
 		$schd = BatchJobLockPeer::SCHEDULER_ID;
 		$work = BatchJobLockPeer::WORKER_ID;
@@ -231,10 +233,7 @@ class kBatchExclusiveLock
 		$expr = BatchJobLockPeer::EXPIRATION;
 		$recheck = BatchJobLockPeer::START_AT;
 		$partnerLoadQuota = PartnerLoadPeer::QUOTA;
-		
-		$schd_id = $lockKey->getSchedulerId();
-		$work_id = $lockKey->getWorkerId();
-		$btch_id = $lockKey->getBatchIndex();
+
 		$now = time();
 		$now_str = date('Y-m-d H:i:s', $now);
 		
@@ -271,8 +270,6 @@ class kBatchExclusiveLock
 			$newJobsCond .= " AND $partnerLoadCondition";
 		}
 		
-		
-		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
 			
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
 		$jobWasntExecutedTooMany = "$atmp <= $max_exe_attempts OR $atmp IS NULL";
@@ -282,21 +279,14 @@ class kBatchExclusiveLock
 					AND	(
 						$lockExpiredCondition
 						OR	($newJobsCond)
-						OR ($jobAlreadyHandledByWorker)
 					)
 					AND ($jobWasntExecutedTooMany)";
 				
 		$c->add($stat, $query, Criteria::CUSTOM);
 
-		// In case maxOffset isn't null, we want to take the chunk out of a random offset in between.
-		// That's usefull for load handling
-		if ($maxOffset)
-			$c->setOffset(rand(0, $maxOffset));
-
 		$c->setLimit($number_of_objects);
 		
-		$objects = BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
-		return self::lockObjects($lockKey, $objects, $max_execution_time);
+		return BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 	}
 	
 	/**
