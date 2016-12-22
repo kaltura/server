@@ -1314,7 +1314,7 @@ $plannedDur = 0;
 	 * @param KDLVideoData $target
 	 * @param KDLVideoData $target
 	 */
-	private static function evaluateTargetWaterMark(KDLVideoData $sourceVid, $watermarkData) 
+	private static function evaluateTargetWaterMark(KDLVideoData $sourceVid, KDLVideoData $flavorVid, $watermarkData) 
 	{
 		if(!isset($watermarkData)){
 			return null;
