@@ -229,7 +229,7 @@ class PdfGenerator extends FPDF
         {
             $this->addSignature();
         }
-        return ($this->Output($this->outputFileName.'.pdf','D'));
+        return ($this->Output($this->outputFileName.'.pdf','S'));
     }
 
 }
