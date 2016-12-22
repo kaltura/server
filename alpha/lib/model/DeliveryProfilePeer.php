@@ -402,7 +402,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-
+		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
@@ -426,7 +426,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$partialSupport = null;
-
+		
 		// find either a fully supported deliveryProfile or the first partial supported one
 		foreach ($deliveries as $delivery) {
 			$result = $delivery->supportsDeliveryDynamicAttributes($deliveryAttributes);
