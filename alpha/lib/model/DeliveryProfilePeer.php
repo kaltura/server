@@ -209,10 +209,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		if($deliveryAttributes->getDeliveryProfileId())
-			$deliveryIds = array($deliveryAttributes->getDeliveryProfileId());
-		else
-			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
+		$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))
@@ -421,7 +418,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$partialSupport = null;
-		
+		if($deliveryAttributes->getDeliveryProfileId())
+			$deliveries = self::filterByDeliveryIdAttribute($deliveries, $deliveryAttributes->getDeliveryProfileId());
+
 		// find either a fully supported deliveryProfile or the first partial supported one
 		foreach ($deliveries as $delivery) {
 			$result = $delivery->supportsDeliveryDynamicAttributes($deliveryAttributes);
@@ -432,6 +431,27 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 		
 		return $partialSupport;
+	}
+
+	/**
+	 * filter deliveries by delivery Profile Id
+	 * @param $deliveries list of deliveries
+	 * @param $deliveryId
+	 * @return array
+	 */
+	protected static function filterByDeliveryIdAttribute($deliveries, $deliveryId)
+	{
+		$filteredDeliveries = array();
+		foreach($deliveries as $delivery)
+		{
+			if($delivery->getId() == $deliveryId)
+			{
+				$filteredDeliveries[] = $delivery;
+				break;
+			}
+		}
+
+		return $filteredDeliveries;
 	}
 	
 	/**
