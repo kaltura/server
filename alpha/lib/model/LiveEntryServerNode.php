@@ -155,7 +155,7 @@ class LiveEntryServerNode extends EntryServerNode
 		}
 		
 		/* @var $liveEntry LiveEntry */
-		$timeFromLastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
+		$timeFromLastUpdate = time() - $this->getUpdatedAt(null);
 		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this) && $timeFromLastUpdate > LiveEntry::DEFAULT_CACHE_EXPIRY)
 		{
 			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
