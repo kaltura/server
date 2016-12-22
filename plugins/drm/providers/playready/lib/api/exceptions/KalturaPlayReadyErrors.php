@@ -13,4 +13,5 @@ class KalturaPlayReadyErrors
 	const ANALOG_OUTPUT_PROTECTION_ID_NOT_ALLOWED = "ANALOG_OUTPUT_PROTECTION_ID_NOT_ALLOWED;ID_1,ID_2;Analog video output protection ID [@ID_1@] maybe specified only if ID [@ID_2@] is not specified.";
 	const COPY_ENABLER_TYPE_MISSING = "COPY_ENABLER_TYPE_MISSING;;At least one copy enabler type should be specified";
 	const FAILED_TO_GET_ENTRY_KEY_ID = "FAILED_TO_GET_ENTRY_KEY_ID;ENTRY_ID;Failed to get PlayReady key id for entry [@ENTRY_ID@].";
+	const DRM_DEVICE_NOT_SUPPORTED = "DRM_DEVICE_NOT_SUPPORTED;DRM_DEVICE_TYPE;DRM DEVICE \"@DRM_DEVICE_TYPE@\" is not supported";
 }
