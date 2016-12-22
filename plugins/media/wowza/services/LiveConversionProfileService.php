@@ -38,7 +38,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	public function serveAction($streamName, $hostname = null, $extraParams = null)
 	{
 		$streamParametersArray = array(
-			'streamName' => $streamName,
+			'streamname' => $streamName,
 			'hostname' => $hostname,
 			'audiodatarate' => 0,
 			'videodatarate' => 0,
@@ -48,7 +48,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			'videocodecidstring' => "",
 			'audiocodecidstring' => ""
 		);
-		if ($extraParams !== "")
+		if ($extraParams !== "" && $this->isValidJson($extraParams))
 		{
 			$streamParametersArray = array_merge($streamParametersArray, json_decode($extraParams, true));
 		}
@@ -193,6 +193,12 @@ class LiveConversionProfileService extends KalturaBaseService
 		return new kRendererString($dom->saveXML(), 'text/xml');
 	}
 	
+	private function isValidJson($strJson)
+	{
+		json_decode($strJson);
+		return (json_last_error() === JSON_ERROR_NONE);
+	}
+	
 	private function calculateFlavorHeight($flavorResolution, $ingestParameters)
 	{
 		return ($ingestParameters['width'] != 0) ? (($flavorResolution['width'] * $ingestParameters['height']) / $ingestParameters['width']) : 0;
@@ -233,13 +239,9 @@ class LiveConversionProfileService extends KalturaBaseService
 	private function getResolutionParameters($liveParams)
 	{
 		$resolutionObject = array(
-			'fitMode' => ''
+			'fitMode' => 'match-source'
 		);
-		if(!$liveParams->getWidth() && !$liveParams->getHeight())
-		{
-			$resolutionObject['fitMode'] = 'match-source';
-		}
-		elseif($liveParams->getWidth() && $liveParams->getHeight())
+		if($liveParams->getWidth() && $liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'fit-height';
 			$resolutionObject['width'] = $liveParams->getWidth();
