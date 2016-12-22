@@ -121,11 +121,11 @@ class ScheduleEventService extends KalturaBaseService
 	{
 		$dates = $this->getRecurrencesDates($dbScheduleEvent);
 		self::setRecurringDates($dates, $dbScheduleEvent);
-		if (!$dates)
-			return;
 		$class = get_class($dbScheduleEvent);
-		foreach($dates as $date)
-			$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
+
+		if ($dates)
+			foreach($dates as $date)
+				$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
 	}
 
 	/**
