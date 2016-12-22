@@ -731,14 +731,8 @@ class playManifestAction extends kalturaAction
 	{
 		if($this->deliveryProfileId)
 		{
-			$deliveryExist = false;
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			foreach ($deliveryIdsByStreamerType as $deliveryByStreamer)
-			{
-				if(!$deliveryExist)
-					$deliveryExist = in_array($this->deliveryProfileId, $deliveryByStreamer);
-			}
-			return $deliveryExist;
+			return in_array($this->deliveryProfileId, $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]);
 		}
 
 		return true;

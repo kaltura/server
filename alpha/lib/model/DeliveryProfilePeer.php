@@ -209,7 +209,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
+		if($deliveryAttributes->getDeliveryProfileId())
+			$deliveryIds = array($deliveryAttributes->getDeliveryProfileId());
+		else
+			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))
@@ -387,14 +390,19 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 
 		$streamerType = $deliveryAttributes->getFormat();
-		$deliveryIds = $storageProfile->getDeliveryProfileIds();
+
+		if($deliveryAttributes->getDeliveryProfileId())
+			$deliveryIds[$streamerType] = array($deliveryAttributes->getDeliveryProfileId());
+		else
+			$deliveryIds = $storageProfile->getDeliveryProfileIds();
+
 		if(!array_key_exists($streamerType, $deliveryIds)) {
 			KalturaLog::err("Delivery ID can't be determined for storageId [$storageId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
 			return null;
 		}
 
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-		
+
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
@@ -418,8 +426,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$partialSupport = null;
-		if($deliveryAttributes->getDeliveryProfileId())
-			$deliveries = self::filterByDeliveryIdAttribute($deliveries, $deliveryAttributes->getDeliveryProfileId());
 
 		// find either a fully supported deliveryProfile or the first partial supported one
 		foreach ($deliveries as $delivery) {
@@ -433,27 +439,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return $partialSupport;
 	}
 
-	/**
-	 * filter deliveries by delivery Profile Id
-	 * @param $deliveries list of deliveries
-	 * @param $deliveryId
-	 * @return array
-	 */
-	protected static function filterByDeliveryIdAttribute($deliveries, $deliveryId)
-	{
-		$filteredDeliveries = array();
-		foreach($deliveries as $delivery)
-		{
-			if($delivery->getId() == $deliveryId)
-			{
-				$filteredDeliveries[] = $delivery;
-				break;
-			}
-		}
-
-		return $filteredDeliveries;
-	}
-	
 	/**
 	 * Filters an array of delivery profile ids according to the access control set in the $deliveryAttributes
 	 * @param array $deliveryIds an array of delivery profile ids
