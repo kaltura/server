@@ -15,6 +15,11 @@
  */
 class BusinessProcessCasePeer extends BaseBusinessProcessCasePeer {
 
+	public static function getOMClass($withPrefix = true)
+	{
+		return parent::OM_CLASS;
+	}
+
 	public static function retrieveCasesByObjectIdObjecType ($objectId, $objectType, $partnerId)
 	{
 		KalturaLog::info ("Retrieving cases for object ID [$objectId], object type [$objectType]");
@@ -23,6 +28,6 @@ class BusinessProcessCasePeer extends BaseBusinessProcessCasePeer {
 		$criteria->add (BusinessProcessCasePeer::OBJECT_ID, $objectId);
 		$criteria->add (BusinessProcessCasePeer::OBJECT_TYPE, $objectType);
 		
-		return BusinessProcessCasePeer::doSelect($criteria);
+		return self::doSelect($criteria);
 	}
 } // BusinessProcessCasePeer
