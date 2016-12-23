@@ -78,24 +78,46 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 	
 	public static function getCaseTemplatesIds(BaseObject $object)
 	{
-		if(method_exists($object, 'getFromCustomData'))
+		//Dtermine object type
+		//Get all templates
+		$criteria = new Criteria();
+		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, kCurrentContext::$partner_id);
+		
+		$bpmProcessTypes = array ();
+		$bpmProcessTypes[] = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue (BusinessProcessNotificationTemplateType::BPM_START);
+		$bpmProcessTypes[] = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue (BusinessProcessNotificationTemplateType::BPM_ABORT);
+		$bpmProcessTypes[] = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue (BusinessProcessNotificationTemplateType::BPM_SIGNAL);
+		$criteria->add(EventnotificationTemplatePeer::TYPE, $bpmProcessTypes, Criteria::IN);
+		
+		$templates = EventNotificationTemplatePeer::doSelect($criteria);
+		
+		$eventObjectType = null;
+		foreach ($templates as $template)
 		{
-			$values = $object->getFromCustomData(null, 'businessProcessCases', array());
-			if(!$values || !count($values))
+			$templateObjectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $template->getObjectType());
+			if(!strcmp(get_class($object), $templateObjectClassName) || is_subclass_of(get_class ($object), $templateObjectClassName))
 			{
-				return array();
+				$eventObjectType = $template->getObjectType ();
+				break;
 			}
-			$templatesIds = array();
-			foreach($values as $cases)
-			{
-				foreach($cases as $case)
-				{
-					$templatesIds[] = $case['templateId'];
-				}
-			}
-			return $templatesIds;
 		}
-		return array();
+		
+		if (!$eventObjectType)
+		{
+			KalturaLog::info ("There are currently no Business Process Templates for objects of type [" . get_class($object) . "]");
+			return array ();
+		}
+		
+		$cases = BusinessProcessCasePeer::retrieveCasesByObjectIdObjecType($object->getId(), $eventObjectType);
+		
+		$templatesIds = array();
+		foreach ($cases as $case)
+		{
+			/* @var $case BusinessProcessCase */
+			$templatesIds[] = $case->getTemplateId();
+		}
+		
+		return $templatesIds;
 	}
 
 	public function getCaseValues(BaseObject $object, $applyMainObject = true, $processId = null)
@@ -104,27 +126,29 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		{
 			$object = $this->getMainObject($object);
 		}
-
-		if(method_exists($object, 'getFromCustomData'))
+		
+		if(is_null($processId))
 		{
-			if(is_null($processId))
-			{
-				$processId = $this->getProcessId();
-			}
-			$customDataKey = $this->getServerId() . '_' . $processId;
-			$values = $object->getFromCustomData($customDataKey, 'businessProcessCases', array());
-			if(!$values || !count($values))
-			{
-				KalturaLog::info('Object [' . get_class($object) . '][' . $object->getPrimaryKey() . '] case id not found in custom-data');
-			}
-			else
-			{
-				KalturaLog::debug('Case values for [' . $customDataKey . ']: ' . json_encode($values));
-			}
-			return $values;
+			$processId = $this->getProcessId();
 		}
-		KalturaLog::err('Object [' . get_class($object) . '] does not support custom-data');
-		return array();
+		
+		$criteria = new Criteria ();
+		$criteria->add(BusinessProcessCasePeer::SERVER_ID, $this->getServerId());
+		$criteria->add(BusinessProcessCasePeer::PROCESS_ID, $processId);
+		$criteria->add(BusinessProcessCasePeer::OBJECT_ID, $object->getId());
+		$criteria->add(BusinessProcessCasePeer::OBJECT_TYPE, $this->getObjectType());
+		
+		$results = BusinessProcessCasePeer::doSelect($criteria);
+		if(!$results || !count($results))
+		{
+			KalturaLog::info('Object [' . get_class($object) . '][' . $object->getPrimaryKey() . '] case id not found in custom-data');
+		}
+		else
+		{
+			KalturaLog::debug('Case values for [' . $this->getServerId() . '_' . $processId . ']: ' . json_encode($values));
+		}
+
+		return $results;
 	}
 
 	public function getCaseIds(BaseObject $object, $applyMainObject = true)
@@ -133,31 +157,31 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		$caseIds = array();
 		foreach($values as $value)
 		{
-			$caseIds[] = $value['caseId'];
+			/* @var $value BusinessProcessCase */
+			$caseIds[] = $value->getCaseId();
 		}
+		
 		return $caseIds;
 	}
 	
 	public function addCaseId(BaseObject $object, $caseId, $processId = null)
 	{
 		$objectToAdd = $this->getMainObject($object);
-		if(method_exists($objectToAdd, 'putInCustomData'))
+		
+		if(is_null($processId))
 		{
-			if(is_null($processId))
-			{
-				$processId = $this->getProcessId();
-			}
-			
-			$values = $this->getCaseValues($object, true, $processId);
-			$values = array_slice($values,-100);
-			$values[] = array(
-				'caseId' => $caseId,
-				'processId' => $processId,
-				'templateId' => $this->getId(),
-			);
-			$objectToAdd->putInCustomData($this->getServerId() . '_' . $processId, $values, 'businessProcessCases');
-			$objectToAdd->save();
+			$processId = $this->getProcessId();
 		}
+		
+		$businessProcessCase = new BusinessProcessCase();
+		$businessProcessCase->setCaseId($caseId);
+		$businessProcessCase->setProcessId($processId);
+		$businessProcessCase->setTemplateId($this->getId());
+		$businessProcessCase->setServerId($this->getServerId());
+		$businessProcessCase->setObjectId($object->getId());
+		$businessProcessCase->setObjectType($this->getObjectType());
+		
+		$businessProcessCase->save();
 	}
 
 	protected function getMainObject(BaseObject $object)

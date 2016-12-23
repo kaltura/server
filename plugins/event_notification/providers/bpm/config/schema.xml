@@ -13,4 +13,29 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
 	</table>
+	<table skipSql="false" abstract="true" name="business_process_case">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="case_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="process_id" type="varchar" size="255" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="template_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="server_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="object_id" type="varchar" size="20" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="object_type" type="integer" />
+		<index name="partner_id">
+			<index-column name="partner_id" />
+		</index>
+		<index name="object_id_and_type">
+			<index-column name="object_type" />
+			<index-column name="object_id" />
+		</index>
+		<index name="server_id_and_process_id">
+			<index-column name="server_id" />
+			<index-column name="process_id" />
+			<index-column name="object_type" />
+			<index-column name="object_id" />
+		</index>
+	</table>
 </database>
