@@ -26,12 +26,6 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	protected $id;
 
 	/**
-	 * The value for the partner_id field.
-	 * @var        int
-	 */
-	protected $partner_id;
-
-	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -132,16 +126,6 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Get the [partner_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getPartnerId()
-	{
-		return $this->partner_id;
 	}
 
 	/**
@@ -306,29 +290,6 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 
 		return $this;
 	} // setId()
-
-	/**
-	 * Set the value of [partner_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BusinessProcessCase The current object (for fluent API support)
-	 */
-	public function setPartnerId($v)
-	{
-		if(!isset($this->oldColumnsValues[BusinessProcessCasePeer::PARTNER_ID]))
-			$this->oldColumnsValues[BusinessProcessCasePeer::PARTNER_ID] = $this->partner_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->partner_id !== $v) {
-			$this->partner_id = $v;
-			$this->modifiedColumns[] = BusinessProcessCasePeer::PARTNER_ID;
-		}
-
-		return $this;
-	} // setPartnerId()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -599,15 +560,14 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->created_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->updated_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->case_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->process_id = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->template_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->server_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->object_id = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->object_type = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->created_at = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->case_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->process_id = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->template_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->server_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->object_id = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->object_type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -617,7 +577,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = BusinessProcessCasePeer::NUM_COLUMNS - BusinessProcessCasePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = BusinessProcessCasePeer::NUM_COLUMNS - BusinessProcessCasePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BusinessProcessCase object", $e);
@@ -1070,30 +1030,27 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getPartnerId();
-				break;
-			case 2:
 				return $this->getCreatedAt();
 				break;
-			case 3:
+			case 2:
 				return $this->getUpdatedAt();
 				break;
-			case 4:
+			case 3:
 				return $this->getCaseId();
 				break;
-			case 5:
+			case 4:
 				return $this->getProcessId();
 				break;
-			case 6:
+			case 5:
 				return $this->getTemplateId();
 				break;
-			case 7:
+			case 6:
 				return $this->getServerId();
 				break;
-			case 8:
+			case 7:
 				return $this->getObjectId();
 				break;
-			case 9:
+			case 8:
 				return $this->getObjectType();
 				break;
 			default:
@@ -1118,15 +1075,14 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		$keys = BusinessProcessCasePeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getPartnerId(),
-			$keys[2] => $this->getCreatedAt(),
-			$keys[3] => $this->getUpdatedAt(),
-			$keys[4] => $this->getCaseId(),
-			$keys[5] => $this->getProcessId(),
-			$keys[6] => $this->getTemplateId(),
-			$keys[7] => $this->getServerId(),
-			$keys[8] => $this->getObjectId(),
-			$keys[9] => $this->getObjectType(),
+			$keys[1] => $this->getCreatedAt(),
+			$keys[2] => $this->getUpdatedAt(),
+			$keys[3] => $this->getCaseId(),
+			$keys[4] => $this->getProcessId(),
+			$keys[5] => $this->getTemplateId(),
+			$keys[6] => $this->getServerId(),
+			$keys[7] => $this->getObjectId(),
+			$keys[8] => $this->getObjectType(),
 		);
 		return $result;
 	}
@@ -1162,30 +1118,27 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setPartnerId($value);
-				break;
-			case 2:
 				$this->setCreatedAt($value);
 				break;
-			case 3:
+			case 2:
 				$this->setUpdatedAt($value);
 				break;
-			case 4:
+			case 3:
 				$this->setCaseId($value);
 				break;
-			case 5:
+			case 4:
 				$this->setProcessId($value);
 				break;
-			case 6:
+			case 5:
 				$this->setTemplateId($value);
 				break;
-			case 7:
+			case 6:
 				$this->setServerId($value);
 				break;
-			case 8:
+			case 7:
 				$this->setObjectId($value);
 				break;
-			case 9:
+			case 8:
 				$this->setObjectType($value);
 				break;
 		} // switch()
@@ -1213,15 +1166,14 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		$keys = BusinessProcessCasePeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setCaseId($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setProcessId($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setTemplateId($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setServerId($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setObjectId($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setObjectType($arr[$keys[9]]);
+		if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setCaseId($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setProcessId($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setTemplateId($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setServerId($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setObjectId($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setObjectType($arr[$keys[8]]);
 	}
 
 	/**
@@ -1234,7 +1186,6 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		$criteria = new Criteria(BusinessProcessCasePeer::DATABASE_NAME);
 
 		if ($this->isColumnModified(BusinessProcessCasePeer::ID)) $criteria->add(BusinessProcessCasePeer::ID, $this->id);
-		if ($this->isColumnModified(BusinessProcessCasePeer::PARTNER_ID)) $criteria->add(BusinessProcessCasePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(BusinessProcessCasePeer::CREATED_AT)) $criteria->add(BusinessProcessCasePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(BusinessProcessCasePeer::UPDATED_AT)) $criteria->add(BusinessProcessCasePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(BusinessProcessCasePeer::CASE_ID)) $criteria->add(BusinessProcessCasePeer::CASE_ID, $this->case_id);
@@ -1311,8 +1262,6 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
-
-		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setCreatedAt($this->created_at);
 

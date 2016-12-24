@@ -36,7 +36,6 @@ DROP TABLE IF EXISTS `business_process_case`;
 CREATE TABLE `business_process_case`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`partner_id` INTEGER  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`case_id` INTEGER,

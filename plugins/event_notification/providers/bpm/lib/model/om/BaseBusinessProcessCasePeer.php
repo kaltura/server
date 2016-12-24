@@ -26,16 +26,13 @@ abstract class BaseBusinessProcessCasePeer {
 	const TM_CLASS = 'BusinessProcessCaseTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 9;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
 	const ID = 'business_process_case.ID';
-
-	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'business_process_case.PARTNER_ID';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'business_process_case.CREATED_AT';
@@ -77,11 +74,11 @@ abstract class BaseBusinessProcessCasePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'CaseId', 'ProcessId', 'TemplateId', 'ServerId', 'ObjectId', 'ObjectType', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'createdAt', 'updatedAt', 'caseId', 'processId', 'templateId', 'serverId', 'objectId', 'objectType', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::CASE_ID, self::PROCESS_ID, self::TEMPLATE_ID, self::SERVER_ID, self::OBJECT_ID, self::OBJECT_TYPE, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'created_at', 'updated_at', 'case_id', 'process_id', 'template_id', 'server_id', 'object_id', 'object_type', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'CaseId', 'ProcessId', 'TemplateId', 'ServerId', 'ObjectId', 'ObjectType', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'caseId', 'processId', 'templateId', 'serverId', 'objectId', 'objectType', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::CASE_ID, self::PROCESS_ID, self::TEMPLATE_ID, self::SERVER_ID, self::OBJECT_ID, self::OBJECT_TYPE, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'case_id', 'process_id', 'template_id', 'server_id', 'object_id', 'object_type', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -91,11 +88,11 @@ abstract class BaseBusinessProcessCasePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'CaseId' => 4, 'ProcessId' => 5, 'TemplateId' => 6, 'ServerId' => 7, 'ObjectId' => 8, 'ObjectType' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'caseId' => 4, 'processId' => 5, 'templateId' => 6, 'serverId' => 7, 'objectId' => 8, 'objectType' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::CASE_ID => 4, self::PROCESS_ID => 5, self::TEMPLATE_ID => 6, self::SERVER_ID => 7, self::OBJECT_ID => 8, self::OBJECT_TYPE => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'created_at' => 2, 'updated_at' => 3, 'case_id' => 4, 'process_id' => 5, 'template_id' => 6, 'server_id' => 7, 'object_id' => 8, 'object_type' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'CaseId' => 3, 'ProcessId' => 4, 'TemplateId' => 5, 'ServerId' => 6, 'ObjectId' => 7, 'ObjectType' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'caseId' => 3, 'processId' => 4, 'templateId' => 5, 'serverId' => 6, 'objectId' => 7, 'objectType' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::CASE_ID => 3, self::PROCESS_ID => 4, self::TEMPLATE_ID => 5, self::SERVER_ID => 6, self::OBJECT_ID => 7, self::OBJECT_TYPE => 8, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'case_id' => 3, 'process_id' => 4, 'template_id' => 5, 'server_id' => 6, 'object_id' => 7, 'object_type' => 8, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -166,7 +163,6 @@ abstract class BaseBusinessProcessCasePeer {
 	public static function addSelectColumns(Criteria $criteria)
 	{
 		$criteria->addSelectColumn(BusinessProcessCasePeer::ID);
-		$criteria->addSelectColumn(BusinessProcessCasePeer::PARTNER_ID);
 		$criteria->addSelectColumn(BusinessProcessCasePeer::CREATED_AT);
 		$criteria->addSelectColumn(BusinessProcessCasePeer::UPDATED_AT);
 		$criteria->addSelectColumn(BusinessProcessCasePeer::CASE_ID);
@@ -458,65 +454,6 @@ abstract class BaseBusinessProcessCasePeer {
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
-		$criteriaFilter = self::getCriteriaFilter();
-		$criteria = $criteriaFilter->getFilter();
-		
-		if(!$privatePartnerData)
-		{
-			// the private partner data is not allowed - 
-			if($kalturaNetwork)
-			{
-				// allow only the kaltura netword stuff
-				if($partnerId)
-				{
-					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
-					myCriteria::addComment($criteria , "Only Kaltura Network");
-					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
-				}
-			}
-			else
-			{
-				// no private data and no kaltura_network - 
-				// add a criteria that will return nothing
-				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
-			}
-		}
-		else
-		{
-			// private data is allowed
-			if(!strlen(strval($partnerGroup)))
-			{
-				// the default case
-				$criteria->addAnd(self::PARTNER_ID, $partnerId);
-			}
-			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
-			{
-				// all is allowed - don't add anything to the criteria
-			}
-			else 
-			{
-				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
-				$partners = explode(',', trim($partnerGroup));
-				foreach($partners as &$p)
-					trim($p); // make sure there are not leading or trailing spaces
-
-				// add the partner_id to the partner_group
-				if (!in_array(strval($partnerId), $partners))
-					$partners[] = strval($partnerId);
-				
-				if(count($partners) == 1 && reset($partners) == $partnerId)
-				{
-					$criteria->addAnd(self::PARTNER_ID, $partnerId);
-				}
-				else 
-				{
-					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
-					$criteria->addAnd($criterion);
-				}
-			}
-		}
-			
-		$criteriaFilter->enable();
 	}
 	
 	/**

@@ -145,7 +145,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		}
 		else
 		{
-			KalturaLog::debug('Case values for [' . $this->getServerId() . '_' . $processId . ']: ' . json_encode($values));
+			KalturaLog::debug('Case values for [' . $this->getServerId() . '_' . $processId . ']: ' . print_r($results, true));
 		}
 
 		return $results;
