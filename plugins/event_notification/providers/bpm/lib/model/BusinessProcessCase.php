@@ -13,6 +13,6 @@
  * @package plugins.businessProcessNotification
  * @subpackage model
  */
-abstract class BusinessProcessCase extends BaseBusinessProcessCase {
+class BusinessProcessCase extends BaseBusinessProcessCase {
 
 } // BusinessProcessCase
