@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.businessProcessNotification">
-	<table skipSql="false" abstract="true" name="business_process_server">
+	<table skipSql="false" abstract="false" name="business_process_server">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
@@ -13,7 +13,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
 	</table>
-	<table skipSql="false" abstract="true" name="business_process_case">
+	<table skipSql="false" abstract="false" name="business_process_case">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />

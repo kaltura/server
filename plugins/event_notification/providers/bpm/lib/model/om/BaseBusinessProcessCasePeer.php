@@ -17,13 +17,13 @@ abstract class BaseBusinessProcessCasePeer {
 	const TABLE_NAME = 'business_process_case';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = '';
+	const OM_CLASS = 'BusinessProcessCase';
 
 	/** A class that can be returned by this peer. */
 	const CLASS_DEFAULT = 'plugins.businessProcessNotification.BusinessProcessCase';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'TableMap';
+	const TM_CLASS = 'BusinessProcessCaseTableMap';
 	
 	/** The total number of columns. */
 	const NUM_COLUMNS = 10;
@@ -761,17 +761,25 @@ abstract class BaseBusinessProcessCasePeer {
 	  $dbMap = Propel::getDatabaseMap(BaseBusinessProcessCasePeer::DATABASE_NAME);
 	  if (!$dbMap->hasTable(BaseBusinessProcessCasePeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new TableMap());
+	    $dbMap->addTableObject(new BusinessProcessCaseTableMap());
 	  }
 	}
 
 	/**
 	 * The class that the Peer will make instances of.
 	 *
-	 * This method must be overridden by the stub subclass, because
-	 * BusinessProcessCase is declared abstract in the schema.
+	 * If $withPrefix is true, the returned path
+	 * uses a dot-path notation which is tranalted into a path
+	 * relative to a location on the PHP include_path.
+	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
+	 *
+	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @return     string path.to.ClassName
 	 */
-	abstract public static function getOMClass($withPrefix = true);
+	public static function getOMClass($withPrefix = true)
+	{
+		return $withPrefix ? BusinessProcessCasePeer::CLASS_DEFAULT : BusinessProcessCasePeer::OM_CLASS;
+	}
 
 	/**
 	 * Method perform an INSERT on the database, given a BusinessProcessCase or Criteria object.
