@@ -132,7 +132,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -276,7 +276,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -401,7 +401,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -534,7 +534,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -607,7 +607,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -680,7 +680,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -885,7 +885,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -1066,7 +1066,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1141,7 +1141,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 				</item>
 			</contentParameters>
@@ -1285,7 +1285,7 @@
 						<key>user_id</key>
 						<description>User ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kCurrentContext::getCurrentKsKuser()->getPuserId()</code>
+							<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
 						</value>
 					</item>						
 				</contentParameters>

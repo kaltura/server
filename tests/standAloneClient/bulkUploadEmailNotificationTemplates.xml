@@ -82,7 +82,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -200,7 +200,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -318,7 +318,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -436,7 +436,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -554,7 +554,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -672,7 +672,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -789,7 +789,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -907,7 +907,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1025,7 +1025,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1143,7 +1143,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1261,7 +1261,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1379,7 +1379,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1497,7 +1497,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1615,7 +1615,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1733,7 +1733,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
