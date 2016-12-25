@@ -69,6 +69,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $isLastChunk = false)
 	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_KALTURA_RECORDING, kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::KALTURA_RECORDING_ENABLED, kCurrentContext::$partner_id);
+		}
+		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -428,6 +433,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $recordedEntryId = null)
 	{
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_KALTURA_RECORDING, kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::KALTURA_RECORDING_DISABLED, kCurrentContext::$partner_id);
+		}
+		
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
