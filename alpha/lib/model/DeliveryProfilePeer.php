@@ -390,15 +390,22 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 
 		$streamerType = $deliveryAttributes->getFormat();
-
-		if($deliveryAttributes->getDeliveryProfileId())
-			$deliveryIds[$streamerType] = array($deliveryAttributes->getDeliveryProfileId());
-		else
-			$deliveryIds = $storageProfile->getDeliveryProfileIds();
+		$deliveryIds = $storageProfile->getDeliveryProfileIds();
 
 		if(!array_key_exists($streamerType, $deliveryIds)) {
 			KalturaLog::err("Delivery ID can't be determined for storageId [$storageId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
 			return null;
+		}
+
+		if($deliveryAttributes->getDeliveryProfileId())
+		{
+			if(in_array($deliveryAttributes->getDeliveryProfileId(), $deliveryIds[$streamerType]))
+				$deliveryIds = array($streamerType => array($deliveryAttributes->getDeliveryProfileId()));
+			else
+			{
+				KalturaLog::err('Requested delivery profile id ['. $deliveryAttributes->getDeliveryProfileId()."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
+				return null;
+			}
 		}
 
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
