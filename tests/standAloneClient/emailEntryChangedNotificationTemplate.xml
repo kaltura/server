@@ -120,14 +120,14 @@
 						<key>creator_name</key>
 						<description>Entry creator name</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+							<code>!is_null($kuser = $scope->getEvent()->getObject()->getkuser()) ? $kuser->getFirstName() . ' ' . $kuser->getLastName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>creator_email</key>
 						<description>Entry creator email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getkuser()->getEmail()</code>
+							<code>!is_null($kuser = $scope->getEvent()->getObject()->getkuser()) ? $kuser->getEmail() : ''</code>
 						</value>
 					</item>
 				</contentParameters>

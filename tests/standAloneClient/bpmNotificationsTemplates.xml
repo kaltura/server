@@ -157,7 +157,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret()</code>
+							<code>!is_null(PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -298,7 +298,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())->getAdminSecret()</code>
+							<code>!is_null(PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -376,7 +376,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())->getAdminSecret()</code>
+							<code>!is_null(PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -872,7 +872,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret()</code>
+							<code>!is_null(PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -952,7 +952,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret()</code>
+							<code>!is_null(PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">

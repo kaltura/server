@@ -28,10 +28,10 @@
 				<emailRecipients objectType="array">
 					<item objectType = "KalturaEmailNotificationRecipient">
 						<email objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getkuser()->getEmail()</code>
+							<code>!is_null($scope->getEvent()->getObject()->getkuser()) ? $scope->getEvent()->getObject()->getkuser()->getEmail() : ''</code>
 						</email>
 						<name objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+							<code>!is_null($scope->getEvent()->getObject()->getkuser()) ? $scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName() : ''</code>
 						</name>
 					</item>
 				</emailRecipients>

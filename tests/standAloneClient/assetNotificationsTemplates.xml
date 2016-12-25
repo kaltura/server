@@ -121,7 +121,7 @@
 						<key>entry_name</key>
 						<description>entry name</description>
 						<value objectType="KalturaEvalStringField">
-							<code>entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName()</code>
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ?  entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">

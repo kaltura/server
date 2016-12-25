@@ -52,7 +52,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getPartner()->getAdminSecret()</code>
+							<code>!is_null($scope->getEvent()->getObject()->getentry()->getPartner()) ? $scope->getEvent()->getObject()->getentry()->getPartner()->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -366,7 +366,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getEntry()->getPartner()->getAdminSecret()</code>
+							<code>!is_null($scope->getEvent()->getObject()->getEntry()->getPartner()) ? $scope->getEvent()->getObject()->getEntry()->getPartner()->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
