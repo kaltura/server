@@ -1,5 +1,29 @@
 # Lynx 12.8.0 #
 
+## Add temporary flag for new live recording LA ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6659
+
+### Configuration ###
+- Add new permission to admin.ini:
+
+		moduls.kalturaLiveStreamRecording.enabled = true
+		moduls.kalturaLiveStreamRecording.permissionType = 2
+		moduls.kalturaLiveStreamRecording.label = Kaltura Live Stream Recording
+		moduls.kalturaLiveStreamRecording.permissionName = FEATURE_LIVE_STREAM_KALTURA_RECORDING
+		moduls.kalturaLiveStreamRecording.basePermissionType = 2
+		moduls.kalturaLiveStreamRecording.basePermissionName = FEATURE_LIVE_STREAM
+		moduls.kalturaLiveStreamRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
+
 ## Scheduling - validate resourceEvent is not already allocated at a specific time ##
 
  - Issue Type: Task
