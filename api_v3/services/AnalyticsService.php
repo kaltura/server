@@ -20,7 +20,7 @@ class AnalyticsService extends KalturaBaseService
 	 */
 	public function queryAction($filter, KalturaFilterPager $pager = null)
 	{
-
+                kApiCache::disableConditionalCache();
 		$filter->validateForUsage($filter);
 		
 		$dimensionsArr = $this->extractDimensions($filter->dimensions);
