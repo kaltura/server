@@ -397,13 +397,14 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			return null;
 		}
 
-		if($deliveryAttributes->getDeliveryProfileId())
+		$deliveryProfileId = $deliveryAttributes->getDeliveryProfileId();
+		if($deliveryProfileId)
 		{
-			if(in_array($deliveryAttributes->getDeliveryProfileId(), $deliveryIds[$streamerType]))
-				$deliveryIds = array($streamerType => array($deliveryAttributes->getDeliveryProfileId()));
+			if(in_array($deliveryProfileId, $deliveryIds[$streamerType]))
+				$deliveryIds = array($streamerType => array($deliveryProfileId));
 			else
 			{
-				KalturaLog::err('Requested delivery profile id ['. $deliveryAttributes->getDeliveryProfileId()."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
+				KalturaLog::err('Requested delivery profile id ['. $deliveryProfileId."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
 				return null;
 			}
 		}
