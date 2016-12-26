@@ -8,7 +8,7 @@ class kEntryIdentifier extends kObjectIdentifier
 	/* (non-PHPdoc)
 	 * @see KObjectIdentifier::retrieveByIdentifier()
 	 */
-	public function retrieveByIdentifier($value) 
+	public function retrieveByIdentifier($value, $partnerId = null)
 	{
 		switch ($this->identifier)
 		{

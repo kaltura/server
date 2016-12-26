@@ -2797,15 +2797,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 		//Has entitledUserPuserEdit/Publish changed for current entry
 		if ($this->customDataValueHasChanged('entitledUserPuserEdit') ||
-			$this->customDataValueHasChanged('entitledUserPuserPublish') )
+			$this->customDataValueHasChanged('entitledUserPuserPublish') ||
+			$this->isColumnModified(entryPeer::PUSER_ID) )
 		{
 			//Change for parent entry (and thus changing all brother entries.
 			$parentEntry = $this->getParentEntry();
 			if ( $parentEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit() ||
-				$parentEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() )
+				$parentEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
+				$parentEntry->getPuserId() != $this->getPuserId())
 			{
 				$parentEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
 				$parentEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
+				$parentEntry->setPuserId($this->getPuserId());
 				$parentEntry->save();
 			}
 
@@ -2817,10 +2820,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				 * @var entry $childEntry
 				 */
 				if ( $childEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit()	||
-					$childEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish())
+					$childEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
+					$childEntry->getPuserId() != $this->getPuserId() )
 				{
 					$childEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
 					$childEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
+					$childEntry->setPuserId($this->getPuserId());
 					$childEntry->save();
 				}
 			}
