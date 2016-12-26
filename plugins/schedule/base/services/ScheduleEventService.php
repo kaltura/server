@@ -297,7 +297,7 @@ class ScheduleEventService extends KalturaBaseService
 			$dates = $datesGenerator->getDates($dbScheduleEvent->getStartDate(null));
 
 			foreach($dates as $date)
-				$events[] = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $date, ($date + $dbScheduleEvent->getDuration()));
+				$events = array_merge($events, ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $date, ($date + $dbScheduleEvent->getDuration())));
 		}
 		else {
 			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null));
