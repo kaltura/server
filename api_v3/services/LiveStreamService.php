@@ -237,10 +237,10 @@ class LiveStreamService extends KalturaLiveEntryService
 		$c->addGroupByColumn(EntryServerNodePeer::ENTRY_ID);
 		$connectedEntryServerNodes  = EntryServerNodePeer::doSelect($c);
 		
-		$connectedLiveEntryIds = array();
 		if(!count($connectedEntryServerNodes))
-			return $connectedLiveEntryIds;
+			return array();
 		
+		$connectedLiveEntryIds = array();
 		foreach($connectedEntryServerNodes as $connectedEntryServerNode)
 			$connectedLiveEntryIds[] = $connectedEntryServerNode->getEntryId();
 		
