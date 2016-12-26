@@ -5,7 +5,8 @@ SELECT total_bandwidth.bandwidth/1024 bandwidth_consumption,
                total_storage.deleted_storage deleted_storage,
                total_bandwidth.bandwidth/1024 + total_storage.avg_storage combined_bandwidth_storage,
                total_bandwidth.transcoding transcoding_consumption,
-               total_avg_storage.total_avg_storage_mb aggregated_monthly_avg_storage
+               total_avg_storage.total_avg_storage_mb aggregated_monthly_avg_storage,
+	       total_bandwidth.bandwidth/1024 + total_avg_storage.total_avg_storage_mb combined_bandwidth_aggregated_storage
 FROM     
 (SELECT
             SUM(IFNULL(count_bandwidth_kb,0)) as bandwidth,
