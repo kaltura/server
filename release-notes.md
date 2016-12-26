@@ -1,5 +1,17 @@
 # Lynx 12.8.0 #
 
+## Play-server flavor changed and deleted http notifications ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6565
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/playServerFlavorHttpEventNotification.xml
+
 ## Add temporary flag for new live recording LA ##
 
  - Issue Type: New Feature
