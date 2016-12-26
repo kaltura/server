@@ -4,6 +4,8 @@ class kJobsCacher
 {
 	CONST TIME_IN_CACHE = 10;
 	CONST TIME_IN_CACHE_FOR_LOCK = 5;
+	CONST PULL_FROM_DB_ATTEMPT = 5;
+	CONST TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS = 20;
 
 	/**
 	 * will return cache-key for worker
@@ -94,7 +96,7 @@ class kJobsCacher
 	 *
 	 * @return BatchJob or null
 	 */
-	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
+	private static function doGetJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
 	{
 		$workerLockKey = "jobs_cache_worker_$workerId-Lock";
 		if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
@@ -117,4 +119,15 @@ class kJobsCacher
 		return $objects[0];
 	}
 
+	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
+	{
+		for($i = 0; $i < self::PULL_FROM_DB_ATTEMPT; $i++)
+		{
+			$job = self::doGetJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
+			if ($job)
+				return $job;
+			usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
+		}
+		return null;
+	}
 }
