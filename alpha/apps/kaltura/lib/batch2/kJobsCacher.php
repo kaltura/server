@@ -32,7 +32,6 @@ class kJobsCacher
 	 * @param kExclusiveLockKey $lockKey
 	 * @param int $number_of_objects
 	 * @param int $jobType
-	 * @param int $maxOffset
 	 * @param int $maxJobToPull
 	 *
 	 * @return array
@@ -47,24 +46,25 @@ class kJobsCacher
 		$allocated = array();
 		for($i = 0; $i < self::GET_JOB_ATTEMPTS; $i++)
 		{
-			$job = self::getJobFromCache($cache, $workerId);
-			if ($job)
-				$allocated[] = $job;
-			else 
-			{
-				$workerLockKey = "jobs_cache_worker_$workerId-Lock";
-				if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
-					usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
-				else {
-					$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
-					if (!$job)
-						break; // without delete lock to avoid DB calls in the next TIME_IN_CACHE_FOR_LOCK
-					$allocated[] = $job;
-					$cache->delete($workerLockKey);
-				}
-			}
 			if (count($allocated) >= $number_of_objects)
 				break;
+			$job = self::getJobFromCache($cache, $workerId);
+			if ($job)
+			{
+				$allocated[] = $job;
+				continue;
+			}
+			$workerLockKey = "jobs_cache_worker_$workerId-Lock";
+			if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
+			{
+				usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
+				continue;
+			}
+			$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
+			if (!$job)
+				break; // without delete lock to avoid DB calls in the next TIME_IN_CACHE_FOR_LOCK sec
+			$allocated[] = $job;
+			$cache->delete($workerLockKey);
 		}
 		KalturaLog::debug("Return allocated job with ids: " .print_r(array_map(function($job){return $job->getId();},$allocated), true));
 		return $allocated;
