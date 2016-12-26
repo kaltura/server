@@ -45,7 +45,19 @@ None.
 
 ### Deployment scripts ###
 	reindex schedule_event table in sphinx
-	
+
+## Update entry ready email notification template ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-9870
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/2016_12_23_updateEntryReadyTemplateForLive.xml
+
+
 # Lynx 12.7.0 #
 
 ## New action getPlaybackContext to baseEntryService ##
