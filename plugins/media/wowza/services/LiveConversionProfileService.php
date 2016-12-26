@@ -9,6 +9,9 @@
 class LiveConversionProfileService extends KalturaBaseService
 {
 	const MINIMAL_DEFAULT_FRAME_RATE = 12.5;
+	const WIDTH = 'width';
+	const HEIGHT = 'height';
+	const MATCH_SOURCE = 'match-source';
 	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
@@ -201,7 +204,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function calculateFlavorHeight($flavorResolution, $ingestParameters)
 	{
-		return ($ingestParameters['width'] != 0) ? (($flavorResolution['width'] * $ingestParameters['height']) / $ingestParameters['width']) : 0;
+		return ($ingestParameters[self::WIDTH] != 0) ? (($flavorResolution[self::WIDTH] * $ingestParameters[self::HEIGHT]) / $ingestParameters[self::WIDTH]) : 0;
 	}
 	
 	private function isFlavorCompatibile($ingestParameters, $flavorBitrate, $flavorResolution, $flavorId)
@@ -209,10 +212,8 @@ class LiveConversionProfileService extends KalturaBaseService
 		$flavorHeight = 0;
 		switch ($flavorResolution['fitMode'])
 		{
-			case 'match-source':
-				break;
 			case 'fit-height':
-				$flavorHeight = $flavorResolution['height'];
+				$flavorHeight = $flavorResolution[self::HEIGHT];
 				break;
 			case 'fit-width':
 				// Flavor's height is not defined in KMC, calculate it according to ingest/flavor ratio
@@ -220,10 +221,10 @@ class LiveConversionProfileService extends KalturaBaseService
 				break;
 		}
 		
-		if ($ingestParameters['height'] !== 0 && $ingestParameters['height'] < $flavorHeight)
+		if ($ingestParameters[self::HEIGHT] !== 0 && $ingestParameters[self::HEIGHT] < $flavorHeight)
 		{
-			$ingestResolutionString = $ingestParameters['width'] . 'x' . $ingestParameters['height'];
-			$flavorResolutionString = $flavorResolution['width'] . 'x' . $flavorHeight;
+			$ingestResolutionString = $ingestParameters[self::WIDTH] . 'x' . $ingestParameters[self::HEIGHT];
+			$flavorResolutionString = $flavorResolution[self::WIDTH] . 'x' . $flavorHeight;
 			KalturaLog::info('Flavor [' . $flavorId . '] rejected due to Resolution; Ingest: [' . $ingestResolutionString . '], Flavor: [' . $flavorResolutionString . ']');
 			return false;
 		}
@@ -239,23 +240,23 @@ class LiveConversionProfileService extends KalturaBaseService
 	private function getResolutionParameters($liveParams)
 	{
 		$resolutionObject = array(
-			'fitMode' => 'match-source'
+			'fitMode' => self::MATCH_SOURCE
 		);
 		if($liveParams->getWidth() && $liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'fit-height';
-			$resolutionObject['width'] = $liveParams->getWidth();
-			$resolutionObject['height'] = $liveParams->getHeight();
+			$resolutionObject[self::WIDTH] = $liveParams->getWidth();
+			$resolutionObject[self::HEIGHT] = $liveParams->getHeight();
 		}
 		elseif($liveParams->getWidth())
 		{
 			$resolutionObject['fitMode'] = 'fit-width';
-			$resolutionObject['width'] = $liveParams->getWidth();
+			$resolutionObject[self::WIDTH] = $liveParams->getWidth();
 		}
 		elseif($liveParams->getHeight())
 		{
 			$resolutionObject['fitMode'] = 'fit-height';
-			$resolutionObject['height'] = $liveParams->getHeight();
+			$resolutionObject[self::HEIGHT] = $liveParams->getHeight();
 		}
 		
 		return $resolutionObject;
@@ -273,7 +274,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams, $streamParametersArray)
 	{
-		$conversionExtraParam = json_decode($liveParams->getConversionEnginesExtraParams());
+		$conversionExtraParam = ($this->isValidJson($liveParams->getConversionEnginesExtraParams())) ? json_decode($liveParams->getConversionEnginesExtraParams()) : null;
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
 		$audioCodec = $this->getIngestAudioCodec($streamParametersArray);
@@ -368,13 +369,13 @@ class LiveConversionProfileService extends KalturaBaseService
 		$frameSize = $video->addChild('FrameSize');
 		
 		$frameSize->addChild('FitMode', $flavorResolutionInfo['fitMode']);
-		if (isset($flavorResolutionInfo['width']))
+		if (isset($flavorResolutionInfo[self::WIDTH]))
 		{
-			$frameSize->addChild('Width', $flavorResolutionInfo['width']);
+			$frameSize->addChild('Width', $flavorResolutionInfo[self::WIDTH]);
 		}
-		if (isset($flavorResolutionInfo['height']))
+		if (isset($flavorResolutionInfo[self::HEIGHT]))
 		{
-			$frameSize->addChild('Height', $flavorResolutionInfo['height']);
+			$frameSize->addChild('Height', $flavorResolutionInfo[self::HEIGHT]);
 		}
 		
 		$video->addChild('Codec', $videoCodec);
@@ -384,13 +385,15 @@ class LiveConversionProfileService extends KalturaBaseService
 		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
 		
-		$skipFrameCountByMaxFramerate = $this->checkMaxFramerate($streamParametersArray['framerate'], $liveParams->getMaxFrameRate());
-		$configuredSkipFrameRate = ($conversionExtraParam && $conversionExtraParam->skipFrameCount) ? $conversionExtraParam->skipFrameCount : 0;
-		if ($configuredSkipFrameRate || $skipFrameCountByMaxFramerate)
+		$skipFrameCountValue = $this->checkMaxFramerate($streamParametersArray['framerate'], $liveParams->getMaxFrameRate());
+		if (!$skipFrameCountValue)
 		{
-			$value = $skipFrameCountByMaxFramerate ? $skipFrameCountByMaxFramerate : $configuredSkipFrameRate;
+			$skipFrameCountValue = 	($conversionExtraParam && $conversionExtraParam->skipFrameCount) ? $conversionExtraParam->skipFrameCount : 0;
+		}
+		if ($skipFrameCountValue)
+		{
 			$skipFrameCount = $video->addChild('SkipFrameCount');
-			$skipFrameCount->addChild('Value', $value);
+			$skipFrameCount->addChild('Value', $skipFrameCountValue);
 		}
 		
 		if ($conversionExtraParam && $conversionExtraParam->constantBitrate)
