@@ -4,7 +4,7 @@ class kJobsCacher
 {
 	CONST TIME_IN_CACHE = 10;
 	CONST TIME_IN_CACHE_FOR_LOCK = 5;
-	CONST PULL_FROM_DB_ATTEMPT = 5;
+	CONST GET_JOB_ATTEMPTS = 10;
 	CONST TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS = 20000;
 
 	/**
@@ -43,17 +43,28 @@ class kJobsCacher
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
 		if (!$maxJobToPull || !$cache) //skip cache and get jobs from DB
 			return kBatchExclusiveLock::getJobs($c, $number_of_objects, $jobType);
+
 		$allocated = array();
-		for($i = 0; $i < $number_of_objects; $i++)
+		for($i = 0; $i < self::GET_JOB_ATTEMPTS; $i++)
 		{
 			$job = self::getJobFromCache($cache, $workerId);
-			if (!$job)
+			if ($job)
+				$allocated[] = $job;
+			else 
 			{
-				$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
-				if (!$job)
-					break;
+				$workerLockKey = "jobs_cache_worker_$workerId-Lock";
+				if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
+					usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
+				else {
+					$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
+					if (!$job)
+						break; // without delete lock to avoid DB calls in the next TIME_IN_CACHE_FOR_LOCK
+					$allocated[] = $job;
+					$cache->delete($workerLockKey);
+				}
 			}
-			$allocated[] = $job;
+			if (count($allocated) >= $number_of_objects)
+				break;
 		}
 		KalturaLog::debug("Return allocated job with ids: " .print_r(array_map(function($job){return $job->getId();},$allocated), true));
 		return $allocated;
@@ -96,7 +107,7 @@ class kJobsCacher
 	 *
 	 * @return BatchJob or null
 	 */
-	private static function doGetJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
+	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
 	{
 		$workerKey = self::getCacheKeyForWorker($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
@@ -114,35 +125,4 @@ class kJobsCacher
 		return $objects[0];
 	}
 
-	/**
-	 * will check lock to get bulk of job from cache 
-	 * @param kBaseCacheWrapper $cache
-	 * @param int $workerId
-	 * @param Criteria $c
-	 * @param int $maxJobToPull
-	 * @param int $jobType
-	 *
-	 * @return BatchJob or null
-	 */
-	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
-	{
-		$workerLockKey = "jobs_cache_worker_$workerId-Lock";
-		for($i = 0; $i < self::PULL_FROM_DB_ATTEMPT; $i++)
-		{
-			if ($cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
-			{
-				$job = self::doGetJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
-				if ($job) 
-				{
-					$cache->delete($workerLockKey);
-					return $job;
-				}
-				// without delete to lock to avoid DB calls in the next TIME_IN_CACHE_FOR_LOCK
-				return null;
-			}
-			usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
-		}
-		
-		return null;
-	}
 }
