@@ -87,7 +87,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		$bpmProcessTypes[] = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue (BusinessProcessNotificationTemplateType::BPM_START);
 		$bpmProcessTypes[] = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue (BusinessProcessNotificationTemplateType::BPM_ABORT);
 		$bpmProcessTypes[] = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue (BusinessProcessNotificationTemplateType::BPM_SIGNAL);
-		$criteria->add(EventnotificationTemplatePeer::TYPE, $bpmProcessTypes, Criteria::IN);
+		$criteria->add(EventNotificationTemplatePeer::TYPE, $bpmProcessTypes, Criteria::IN);
 		
 		$templates = EventNotificationTemplatePeer::doSelect($criteria);
 		

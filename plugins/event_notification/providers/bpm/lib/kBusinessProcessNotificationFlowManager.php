@@ -85,6 +85,7 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
 		$templates = BusinessProcessNotificationTemplate::getCaseTemplatesIds($object);
+		if (count($templates))
 			return true;
 			
 		return false;
