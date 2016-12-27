@@ -51,10 +51,6 @@ class LiveConversionProfileService extends KalturaBaseService
 			'videocodecidstring' => "",
 			'audiocodecidstring' => ""
 		);
-		if ($extraParams !== "" && $this->isValidJson($extraParams))
-		{
-			$streamParametersArray = array_merge($streamParametersArray, json_decode($extraParams, true));
-		}
 		
 		$matches = null;
 		if(!preg_match('/^(\d_.{8})_(\d+)$/', $streamName, $matches))
@@ -78,6 +74,13 @@ class LiveConversionProfileService extends KalturaBaseService
 		else
 		{
 			$entry = entryPeer::retrieveByPK($entryId);
+		}
+		
+		// Check if to perform smart transcoding for partner
+		$isSmartTranscodingDisabled = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DISABLE_SMART_TRANSCODING, kCurrentContext::getCurrentPartnerId());
+		if ($extraParams !== "" && $this->isValidJson($extraParams) && !$isSmartTranscodingDisabled)
+		{
+			$streamParametersArray = array_merge($streamParametersArray, json_decode($extraParams, true));
 		}
 		
 		if (!$entry || $entry->getType() != KalturaEntryType::LIVE_STREAM || !in_array($entry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
@@ -209,7 +212,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function checkFlavorsDataRate($ingestDataRate, $flavorDataRate)
 	{
-		$percentageFactor = 1 + (kConf::get('video_data_rate_percentage_gap_between_flavors') / 100);
+		$percentageFactor = 1 + (kConf::get('transcoding_profile_bitrate_percentage_gap_between_flavors') / 100);
 		return ($ingestDataRate !== 0) && (($ingestDataRate * 1024) < ($flavorDataRate * $percentageFactor));
 	}
 	
