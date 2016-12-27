@@ -12,6 +12,6 @@ CREATE TABLE `business_process_case`
 	`object_type` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`),
-	KEY `object_id_and_type`(`object_type`, `object_id`),
-	KEY `server_id_and_process_id`(`server_id`, `process_id`, `object_type`, `object_id`)
+	KEY `object_id_and_type`(`object_type`, `object_id`, `partner_id`),
+	KEY `server_id_and_process_id`(`server_id`, `process_id`, `object_type`, `object_id`, `partner_id`)
 )Type=InnoDB DEFAULT CHARSET=utf8;
