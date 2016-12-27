@@ -71,8 +71,9 @@ class ClamAVScanEngine extends VirusScanEngine
 			$errorDescription = 'Unknown error - return value ['.$return_value.']';
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
-		
-		$scanStatus = trim(end(explode(' ', $statusLine)));
+
+		$tmp = explode(' ', $statusLine);
+		$scanStatus = trim(end($tmp));
 		
 		if ($scanStatus == 'OK' || strpos($statusLine , 'Empty file') != 0)
 		{
