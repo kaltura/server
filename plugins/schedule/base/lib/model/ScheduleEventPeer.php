@@ -17,12 +17,14 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 	const LIVE_STREAM_OM_CLASS = 'LiveStreamScheduleEvent';
 	const RECORD_OM_CLASS = 'RecordScheduleEvent';
-	
+	const SIMU_LIVE_CLASS = 'SimulatedLiveEntryScheduleEvent';
+
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		ScheduleEventType::LIVE_STREAM => self::LIVE_STREAM_OM_CLASS,
 		ScheduleEventType::RECORD => self::RECORD_OM_CLASS,
+		ScheduleEventType::SIMU_LIVE => self::SIMU_LIVE_CLASS,
 	);
 	
 	/*
