@@ -12,7 +12,6 @@ class LiveConversionProfileService extends KalturaBaseService
 	const WIDTH = 'width';
 	const HEIGHT = 'height';
 	const MATCH_SOURCE = 'match-source';
-	const VIDEO_DATA_RATE_PERCENTAGE_GAP_BETWEEN_FLAVORS = 40;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
@@ -210,7 +209,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function checkFlavorsDataRate($ingestDataRate, $flavorDataRate)
 	{
-		$percentageFactor = 1 + (self::VIDEO_DATA_RATE_PERCENTAGE_GAP_BETWEEN_FLAVORS / 100);
+		$percentageFactor = 1 + (kConf::get('video_data_rate_percentage_gap_between_flavors') / 100);
 		return ($ingestDataRate !== 0) && (($ingestDataRate * 1024) < ($flavorDataRate * $percentageFactor));
 	}
 	
