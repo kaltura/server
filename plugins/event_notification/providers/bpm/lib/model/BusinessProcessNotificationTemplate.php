@@ -108,7 +108,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 			return array ();
 		}
 		
-		$cases = BusinessProcessCasePeer::retrieveCasesByObjectIdObjecType($object->getId(), $eventObjectType);
+		$cases = BusinessProcessCasePeer::retrieveCasesByObjectIdObjecType($object->getId(), $eventObjectType, kCurrentContext::getCurrentPartnerId());
 		
 		$templatesIds = array();
 		foreach ($cases as $case)
@@ -137,6 +137,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		$criteria->add(BusinessProcessCasePeer::PROCESS_ID, $processId);
 		$criteria->add(BusinessProcessCasePeer::OBJECT_ID, $object->getId());
 		$criteria->add(BusinessProcessCasePeer::OBJECT_TYPE, $this->getObjectType());
+		$criteria->add(BusinessProcessCasePeer::PARTNER_ID, $this->getPartnerId());
 		
 		$results = BusinessProcessCasePeer::doSelect($criteria);
 		if(!$results || !count($results))
@@ -174,6 +175,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		}
 		
 		$businessProcessCase = new BusinessProcessCase();
+		$businessProcessCase->setPartnerId($this->getPartnerId());
 		$businessProcessCase->setCaseId($caseId);
 		$businessProcessCase->setProcessId($processId);
 		$businessProcessCase->setTemplateId($this->getId());

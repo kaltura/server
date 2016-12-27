@@ -15,6 +15,7 @@
 	</table>
 	<table skipSql="false" abstract="false" name="business_process_case">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="case_id" type="integer" />
