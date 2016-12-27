@@ -4,6 +4,8 @@ class kJobsCacher
 {
 	CONST TIME_IN_CACHE = 10;
 	CONST TIME_IN_CACHE_FOR_LOCK = 5;
+	CONST GET_JOB_ATTEMPTS = 10;
+	CONST TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS = 20000;
 
 	/**
 	 * will return cache-key for worker
@@ -30,7 +32,6 @@ class kJobsCacher
 	 * @param kExclusiveLockKey $lockKey
 	 * @param int $number_of_objects
 	 * @param int $jobType
-	 * @param int $maxOffset
 	 * @param int $maxJobToPull
 	 *
 	 * @return array
@@ -41,17 +42,29 @@ class kJobsCacher
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
 		if (!$maxJobToPull || !$cache) //skip cache and get jobs from DB
 			return kBatchExclusiveLock::getJobs($c, $number_of_objects, $jobType);
+
 		$allocated = array();
-		for($i = 0; $i < $number_of_objects; $i++)
+		for($i = 0; $i < self::GET_JOB_ATTEMPTS; $i++)
 		{
+			if (count($allocated) >= $number_of_objects)
+				break;
 			$job = self::getJobFromCache($cache, $workerId);
-			if (!$job)
+			if ($job)
 			{
-				$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
-				if (!$job)
-					break;
+				$allocated[] = $job;
+				continue;
 			}
+			$workerLockKey = "jobs_cache_worker_$workerId-Lock";
+			if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
+			{
+				usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
+				continue;
+			}
+			$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
+			if (!$job)
+				break; // without delete lock to avoid DB calls in the next TIME_IN_CACHE_FOR_LOCK sec
 			$allocated[] = $job;
+			$cache->delete($workerLockKey);
 		}
 		KalturaLog::debug("Return allocated job with ids: " .print_r(array_map(function($job){return $job->getId();},$allocated), true));
 		return $allocated;
@@ -96,10 +109,6 @@ class kJobsCacher
 	 */
 	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
 	{
-		$workerLockKey = "jobs_cache_worker_$workerId-Lock";
-		if (!$cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
-			return null;
-
 		$workerKey = self::getCacheKeyForWorker($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
@@ -110,10 +119,9 @@ class kJobsCacher
 		$numOfObj = count($objects);
 		KalturaLog::info("Got $numOfObj jobs to insert to cache for workerId [$workerId]");
 		if ($numOfObj == 0)
-			return null; // without delete to lock to avoid DB calls in the next TIME_IN_CACHE_FOR_LOCK
+			return null; 
 
 		$cache->set($indexKey, 0, self::TIME_IN_CACHE);
-		$cache->delete($workerLockKey);
 		return $objects[0];
 	}
 
