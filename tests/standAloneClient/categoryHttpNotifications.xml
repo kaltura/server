@@ -44,7 +44,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Status not equal</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getStatus()</code>
+							<code>$scope->getObject()->getStatus()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">

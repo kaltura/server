@@ -28,10 +28,10 @@
 				<emailRecipients objectType="array">
 					<item objectType = "KalturaEmailNotificationRecipient">
 						<email objectType="KalturaEvalStringField">
-							<code>!is_null($scope->getEvent()->getObject()->getkuser()) ? $scope->getEvent()->getObject()->getkuser()->getEmail() : ''</code>
+							<code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getEmail() : ''</code>
 						</email>
 						<name objectType="KalturaEvalStringField">
-							<code>!is_null($scope->getEvent()->getObject()->getkuser()) ? $scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName() : ''</code>
+							<code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getFirstName() . ' ' . $scope->getObject()->getkuser()->getLastName() : ''</code>
 						</name>
 					</item>
 				</emailRecipients>
@@ -52,13 +52,13 @@
 				<item objectType="KalturaEventNotificationParameter">
 					<key>entry_id</key>
 					<value objectType="KalturaEvalStringField">
-						<code>$scope->getEvent()->getObject()->getId()</code>
+						<code>$scope->getObject()->getId()</code>
 					</value>
 				</item>
 				<item objectType="KalturaEventNotificationParameter">
 					<key>entry_name</key>
 					<value objectType="KalturaEvalStringField">
-						<code>$scope->getEvent()->getObject()->getName()</code>
+						<code>$scope->getObject()->getName()</code>
 					</value>
 				</item>
 			</contentParameters>

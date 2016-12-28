@@ -28,7 +28,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>only non-temporary entries</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getEvent()->getObject()->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM </code>
+							<code>$scope->getObject()->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM </code>
 						</field>
 					</item>	
 				</eventConditions>
@@ -65,10 +65,10 @@
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
-								<code>!is_null($entry = entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? $entry->getPartner()->getAdminEmail() : ''</code>
+								<code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getPartner()->getAdminEmail() : ''</code>
 							</email>
 							<name objectType="KalturaEvalStringField">
-								<code>!is_null($entry = entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? $entry->getPartner()->getPartnerName() : ''</code>
+								<code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getPartner()->getPartnerName() : ''</code>
 							</name>
 						</item>
 					</emailRecipients>
@@ -92,42 +92,42 @@
 						<key>entry_id</key>
 						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getId()</code>
+							<code>$scope->getObject()->getId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
 						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getName()</code>
+							<code>$scope->getObject()->getName()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>owner_name</key>
 						<description>Account owner name</description>
 						<value objectType="KalturaEvalStringField">
-							<code>!is_null($entry = entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? $entry->getPartner()->getPartnerName() : ''</code>
+							<code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getPartner()->getPartnerName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>owner_email</key>
 						<description>Account owner email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>!is_null($entry = entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? $entry->getPartner()->getAdminEmail() : ''</code>
+							<code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>creator_name</key>
 						<description>Entry creator name</description>
 						<value objectType="KalturaEvalStringField">
-							<code>!is_null($kuser = $scope->getEvent()->getObject()->getkuser()) ? $kuser->getFirstName() . ' ' . $kuser->getLastName() : ''</code>
+							<code>!is_null($kuser = $scope->getObject()->getkuser()) ? $kuser->getFirstName() . ' ' . $kuser->getLastName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>creator_email</key>
 						<description>Entry creator email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>!is_null($kuser = $scope->getEvent()->getObject()->getkuser()) ? $kuser->getEmail() : ''</code>
+							<code>!is_null($kuser = $scope->getObject()->getkuser()) ? $kuser->getEmail() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
