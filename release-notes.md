@@ -69,6 +69,16 @@ None.
 ### Deployment scripts ###
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/2016_12_23_updateEntryReadyTemplateForLive.xml
 
+## Add new bpm_process_case table to the DB ##
+
+- Issue Type: Task
+- Issue ID: PLAT-6459
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql 
 
 # Lynx 12.7.0 #
 

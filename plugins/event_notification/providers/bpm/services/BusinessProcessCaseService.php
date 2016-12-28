@@ -142,30 +142,17 @@ class BusinessProcessCaseService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::OBJECT_NOT_FOUND);
 		}
 		
-		$templatesIds = BusinessProcessNotificationTemplate::getCaseTemplatesIds($dbObject);
-		if(!count($templatesIds))
+		$cases = BusinessProcessCasePeer::retrieveCasesByObjectIdObjecType($objectId, $objectType);
+		if(!count($cases))
 		{
 			throw new KalturaAPIException(KalturaBusinessProcessNotificationErrors::BUSINESS_PROCESS_CASE_NOT_FOUND);
 		}
 		
 		$array = new KalturaBusinessProcessCaseArray();
-		foreach($templatesIds as $templateId)
+		foreach($cases as $case)
 		{
-			$dbTemplate = EventNotificationTemplatePeer::retrieveByPK($templateId);
-			if(!$dbTemplate || !($dbTemplate instanceof BusinessProcessStartNotificationTemplate))
-			{
-				KalturaLog::info("Template [$templateId] not found");
-				continue;
-			}
-			
-			$caseIds = $dbTemplate->getCaseIds($dbObject, false);
-			if(!count($caseIds))
-			{
-				KalturaLog::info("No cases found");
-				continue;
-			}
-			
-			$dbBusinessProcessServer = BusinessProcessServerPeer::retrieveByPK($dbTemplate->getServerId());
+			/* @var $case BusinessProcessCase */
+			$dbBusinessProcessServer = BusinessProcessServerPeer::retrieveByPK($case->getServerId());
 			if (!$dbBusinessProcessServer)
 			{
 				KalturaLog::info("Business-Process server [" . $dbTemplate->getServerId() . "] not found");
@@ -181,7 +168,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 				continue;
 			}
 
-			$latestCaseId = array_pop($caseIds);
+			$latestCaseId = $case->getCaseId();
 			if($latestCaseId)
 			{
 				try {
