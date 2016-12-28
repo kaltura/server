@@ -31,7 +31,7 @@ None.
 None.
 
 ### Deployment scripts ###
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_20_update_schedule_event_permissions.php  
+	mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql 
 
 # Lynx 12.7.0 #
 
@@ -44,7 +44,7 @@ None.
 None.
 
 ### Deployment scripts ###
-	mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_06_update_base_entry_get_playing_data_permissions.php
 	
 ## Ad cue points and flavor changed http notifications ##
 
