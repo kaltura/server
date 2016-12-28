@@ -30,14 +30,6 @@
 		<index name="object_id_and_type">
 			<index-column name="object_type" />
 			<index-column name="object_id" />
-			<index-column name="partner_id" />
-		</index>
-		<index name="server_id_and_process_id">
-			<index-column name="server_id" />
-			<index-column name="process_id" />
-			<index-column name="object_type" />
-			<index-column name="object_id" />
-			<index-column name="partner_id" />
 		</index>
 	</table>
 </database>
