@@ -21,7 +21,18 @@ None.
 
 ### Deployment scripts ###
 	reindex schedule_event table in sphinx
-	
+
+## Add new bpm_process_case table to the DB ##
+
+- Issue Type: Task
+- Issue ID: PLAT-6459
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_20_update_schedule_event_permissions.php  
+
 # Lynx 12.7.0 #
 
 ## New action getPlaybackContext to baseEntryService ##
@@ -33,7 +44,7 @@ None.
 None.
 
 ### Deployment scripts ###
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_06_update_base_entry_get_playing_data_permissions.php
+	mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql
 	
 ## Ad cue points and flavor changed http notifications ##
 
