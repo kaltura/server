@@ -284,4 +284,14 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 				return $parentObj->getSummary();
 		}
 	}
+
+	public static function getEventValues($scheduleEvents, $field)
+	{
+		$fieldVals = array();
+		foreach($scheduleEvents as $scheduleEvent) {
+			/* @var $scheduleEvent ScheduleEvent */
+			$fieldVals[] = $scheduleEvent->$field(null);
+		}
+		return $fieldVals;
+	}
 } // ScheduleEvent

@@ -149,11 +149,9 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 				$remote_addr = $str;
 			else
 			{
-				//$remote_addr = requestUtils::getRemoteAddress();// to do ->api Extension
-				$remote_addr = $internalToolsPlugin->KalturaInternalToolsSystemHelper->getRemoteAddress();
+				$remote_addr = $internalToolsPlugin->kalturaInternalToolsSystemHelper->getRemoteAddress();
 			} 
-			//$res = $ip_geo->iptocountry( $remote_addr );
-			$res = $internalToolsPlugin->KalturaInternalToolsSystemHelper->iptocountry($remote_addr);
+			$res = $internalToolsPlugin->kalturaInternalToolsSystemHelper->iptocountry($remote_addr);
 		}
 		
 				

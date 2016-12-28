@@ -268,14 +268,6 @@ $pixFmt = "yuv420p";
 			$cmdStr = implode(" ", $cmdValsArr);
 		}
 		
-			/*
-			 * VP9 - switch to 'experimental ffmpeg'
-			 */
-		else if($flavorParamsOutput->videoCodec==KDLVideoTarget::VP9){ //video_codec ||!flavorParamsOutput->videoCodec
-			$cmdValsArr = explode(' ', $cmdStr);
-			$cmdValsArr[0] = $ffmpegExperimBin;
-			$cmdStr = implode(" ", $cmdValsArr);
-		}
 		return $cmdStr;
 	}
 	

@@ -1,5 +1,41 @@
 # Lynx 12.8.0 #
 
+## Play-server flavor changed and deleted http notifications ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6565
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/playServerFlavorHttpEventNotification.xml
+
+## Add temporary flag for new live recording LA ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6659
+
+### Configuration ###
+- Add new permission to admin.ini:
+
+		moduls.kalturaLiveStreamRecording.enabled = true
+		moduls.kalturaLiveStreamRecording.permissionType = 2
+		moduls.kalturaLiveStreamRecording.label = Kaltura Live Stream Recording
+		moduls.kalturaLiveStreamRecording.permissionName = FEATURE_LIVE_STREAM_KALTURA_RECORDING
+		moduls.kalturaLiveStreamRecording.basePermissionType = 2
+		moduls.kalturaLiveStreamRecording.basePermissionName = FEATURE_LIVE_STREAM
+		moduls.kalturaLiveStreamRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
+
 ## Scheduling - validate resourceEvent is not already allocated at a specific time ##
 
  - Issue Type: Task
@@ -22,16 +58,27 @@ None.
 ### Deployment scripts ###
 	reindex schedule_event table in sphinx
 
+## Update entry ready email notification template ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-9870
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/2016_12_23_updateEntryReadyTemplateForLive.xml
+
 ## Add new bpm_process_case table to the DB ##
 
 - Issue Type: Task
 - Issue ID: PLAT-6459
 
 ### Configuration ###
-None.
+None.  
 
 ### Deployment scripts ###
-	mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql 
+mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql 
 
 # Lynx 12.7.0 #
 

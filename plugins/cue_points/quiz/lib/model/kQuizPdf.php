@@ -91,6 +91,6 @@ class kQuizPdf
 
     public function submitDocument()
     {
-        return new kRendererPdfFile($this->pdf);
+        return $this->pdf->Submit();
     }
 }
