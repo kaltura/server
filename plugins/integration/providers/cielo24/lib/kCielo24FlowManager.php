@@ -116,6 +116,12 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 					$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 					$caption->save();
 				}
+				if ($captionFormatConst == KalturaCaptionType::DFXP)
+				{
+					$cielo24Options = Cielo24Plugin::getPartnerCielo24Options($partnerId);
+					if ($cielo24Options->transformDfxp)
+						$content = $this->transformDfxp($content);
+				}
 				$this->setObjectContent($caption, $content, $accuracyRate, $format);
 			}
 		}
@@ -178,5 +184,98 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		$assetObject->setAccuracy($accuracy);
 		$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$assetObject->save();
-	} 
+	}
+	
+	private function transformDfxp($content)
+	{
+		$doc = new DOMDocument();
+		/**
+		* Replaces unescaped ampersands
+		*
+		* Ignores:
+		* - Entity: &[anything];
+		* - Dec: &#[numbers];
+		* - Hex: &#x[numbers or A-F];
+		*/
+		$content = preg_replace('/&(?!(?:#x?[0-9a-f]+|[a-z]+);)/i', '&amp;', $content);
+	
+		if (!$doc->loadXML($content)) {
+			KalturaLog::err('Failed to load XML');
+			return $content;
+		}
+	
+		$xpath = new DOMXPath($doc);
+		$xpath->registerNamespace('ns', 'http://www.w3.org/ns/ttml');
+		
+		$bodyElement = $xpath->query('//ns:body')->item(0);
+		if ($bodyElement instanceof DOMElement) {
+			$bodyElement->setAttribute('timeContainer', 'par');
+		}
+	
+		$pElements = $xpath->query('//ns:p');
+		$totalDuration = 0;
+		foreach ($pElements as $pElement) {
+			if ($pElement instanceof DOMElement) {
+				$pElement->setAttribute('region', 'default');
+	
+				// add "end" attribute
+				$beginValue = trim($pElement->getAttribute('begin'));
+				$durationValue = trim($pElement->getAttribute('dur'));
+				$endValue = trim($pElement->getAttribute('end'));
+				$beginTime = kXml::timeToInteger($beginValue);
+				$endTime = kXml::timeToInteger($endValue);
+				// reformat "begin" attribute, transforms "00:00:29.73" to "00:00:29.730"
+				if ($beginValue) {
+					$pElement->removeAttribute('begin'); // remove to change order of attributes
+					$pElement->setAttribute('begin', $this->integerToTime($beginTime));
+				}
+				// reformat "end" attribute, transforms "00:01:55.7" to "00:01:55.700"
+				if ($endValue) {
+					$pElement->removeAttribute('end'); // remove to change order of attributes
+					$pElement->setAttribute('end', $this->integerToTime($endTime));
+				}
+				if ($beginValue && $endValue && !$durationValue) {
+					$duration = $endTime - $beginTime;
+					$pElement->setAttribute('dur', $this->formatDuration($duration));
+					$totalDuration += $duration;
+				}
+			}
+		}
+	
+		$divElement = $xpath->query('//ns:div')->item(0);
+		if ($divElement instanceof DOMElement) {
+			$divElement->setAttribute('begin', '00:00:00.000');
+			$divElement->setAttribute('dur', $this->formatDuration($totalDuration));
+			$divElement->setAttribute('timeContainer', 'seq');
+		}
+	
+		return $doc->saveXML();
+	}
+	
+	/*
+	 * returns argument in miliseconds, three digits after decimal point
+	 * 
+	 *	@param $int
+	 *	@return string
+	 */
+	private function formatDuration($int)
+	{
+		$durationSeconds = floor($int / 1000);
+		$durationMilliseconds = $int % 1000;
+		return $durationSeconds . '.' . str_pad($durationMilliseconds, 3, 0, STR_PAD_LEFT);
+	}
+	
+	/**
+	 * Wraps kXml::integerToTime to force milliseconds and pad it
+	 *
+	 * @param $int
+	 * @return string
+	 */
+  	private function integerToTime($int)
+  	{
+		$milliseconds = $int % 1000;
+		$stringTime = kXml::integerToTime($int - $milliseconds);
+		$stringTime .= '.' . str_pad($milliseconds, 3, 0, STR_PAD_LEFT);
+		return $stringTime;
+	}
 }
