@@ -20,15 +20,46 @@ class BusinessProcessCasePeer extends BaseBusinessProcessCasePeer {
 		return parent::OM_CLASS;
 	}
 
+	/**
+	 * @param mixed $objectId 
+	 * @param int $objectType
+	 * @param int $partnerId
+	 * 
+	 * @return array
+	 */
 	public static function retrieveCasesByObjectIdObjecType ($objectId, $objectType, $partnerId = null)
 	{
 		KalturaLog::info ("Retrieving cases for object ID [$objectId], object type [$objectType]");
 		$criteria = new Criteria ();
-		if($partnerId)
+		if(!is_null($partnerId))
 			$criteria->add (BusinessProcessCasePeer::PARTNER_ID, $partnerId);
 		
 		$criteria->add (BusinessProcessCasePeer::OBJECT_ID, $objectId);
 		$criteria->add (BusinessProcessCasePeer::OBJECT_TYPE, $objectType);
+		
+		return self::doSelect($criteria);
+	}
+	
+	/**
+	 * @param mixed $objectId 
+	 * @param int $objectType
+	 * @param int $serverId
+	 * @param string $processId
+	 * @param int $partnerId
+	 * 
+	 * @return array
+	 */
+	public static function retrieveCasesByObjectIdObjectTypeProcessIdServerId ($objectId, $objectType, $serverId, $processId, $partnerId = null)
+	{
+		KalturaLog::info ("Retrieving cases for object ID [$objectId], object type [$objectType], server Id [$serverId], process ID [$processId]");
+		$criteria = new Criteria ();
+		$criteria->add(BusinessProcessCasePeer::SERVER_ID, $serverId);
+		$criteria->add(BusinessProcessCasePeer::PROCESS_ID, $processId);
+		$criteria->add(BusinessProcessCasePeer::OBJECT_ID, $objectId);
+		$criteria->add(BusinessProcessCasePeer::OBJECT_TYPE, $objectType);
+		
+		if (!is_null($partnerId))
+			$criteria->add(BusinessProcessCasePeer::PARTNER_ID, $partnerId);
 		
 		return self::doSelect($criteria);
 	}

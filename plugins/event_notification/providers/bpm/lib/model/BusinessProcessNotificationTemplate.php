@@ -132,14 +132,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 			$processId = $this->getProcessId();
 		}
 		
-		$criteria = new Criteria ();
-		$criteria->add(BusinessProcessCasePeer::SERVER_ID, $this->getServerId());
-		$criteria->add(BusinessProcessCasePeer::PROCESS_ID, $processId);
-		$criteria->add(BusinessProcessCasePeer::OBJECT_ID, $object->getId());
-		$criteria->add(BusinessProcessCasePeer::OBJECT_TYPE, $this->getObjectType());
-		$criteria->add(BusinessProcessCasePeer::PARTNER_ID, $this->getPartnerId());
-		
-		$results = BusinessProcessCasePeer::doSelect($criteria);
+		$results = BusinessProcessCasePeer::retrieveCasesByObjectIdObjectTypeProcessIdServerId($object->getId(), $this->getObjectType(), $this->getServerId(), $processId, $this->getPartnerId());
 		if(!$results || !count($results))
 		{
 			KalturaLog::info('Object [' . get_class($object) . '][' . $object->getPrimaryKey() . '] case id not found in custom-data');
