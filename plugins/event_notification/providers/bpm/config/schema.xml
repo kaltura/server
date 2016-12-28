@@ -24,6 +24,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="server_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="partner_id">
 			<index-column name="partner_id" />
 		</index>

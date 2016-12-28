@@ -26,7 +26,7 @@ abstract class BaseBusinessProcessCasePeer {
 	const TM_CLASS = 'BusinessProcessCaseTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -61,6 +61,9 @@ abstract class BaseBusinessProcessCasePeer {
 	/** the column name for the OBJECT_TYPE field */
 	const OBJECT_TYPE = 'business_process_case.OBJECT_TYPE';
 
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'business_process_case.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of BusinessProcessCase objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -77,11 +80,11 @@ abstract class BaseBusinessProcessCasePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'CaseId', 'ProcessId', 'TemplateId', 'ServerId', 'ObjectId', 'ObjectType', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'createdAt', 'updatedAt', 'caseId', 'processId', 'templateId', 'serverId', 'objectId', 'objectType', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::CASE_ID, self::PROCESS_ID, self::TEMPLATE_ID, self::SERVER_ID, self::OBJECT_ID, self::OBJECT_TYPE, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'created_at', 'updated_at', 'case_id', 'process_id', 'template_id', 'server_id', 'object_id', 'object_type', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'CaseId', 'ProcessId', 'TemplateId', 'ServerId', 'ObjectId', 'ObjectType', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'createdAt', 'updatedAt', 'caseId', 'processId', 'templateId', 'serverId', 'objectId', 'objectType', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::CASE_ID, self::PROCESS_ID, self::TEMPLATE_ID, self::SERVER_ID, self::OBJECT_ID, self::OBJECT_TYPE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'created_at', 'updated_at', 'case_id', 'process_id', 'template_id', 'server_id', 'object_id', 'object_type', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -91,11 +94,11 @@ abstract class BaseBusinessProcessCasePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'CaseId' => 4, 'ProcessId' => 5, 'TemplateId' => 6, 'ServerId' => 7, 'ObjectId' => 8, 'ObjectType' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'caseId' => 4, 'processId' => 5, 'templateId' => 6, 'serverId' => 7, 'objectId' => 8, 'objectType' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::CASE_ID => 4, self::PROCESS_ID => 5, self::TEMPLATE_ID => 6, self::SERVER_ID => 7, self::OBJECT_ID => 8, self::OBJECT_TYPE => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'created_at' => 2, 'updated_at' => 3, 'case_id' => 4, 'process_id' => 5, 'template_id' => 6, 'server_id' => 7, 'object_id' => 8, 'object_type' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'CaseId' => 4, 'ProcessId' => 5, 'TemplateId' => 6, 'ServerId' => 7, 'ObjectId' => 8, 'ObjectType' => 9, 'CustomData' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'caseId' => 4, 'processId' => 5, 'templateId' => 6, 'serverId' => 7, 'objectId' => 8, 'objectType' => 9, 'customData' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::CASE_ID => 4, self::PROCESS_ID => 5, self::TEMPLATE_ID => 6, self::SERVER_ID => 7, self::OBJECT_ID => 8, self::OBJECT_TYPE => 9, self::CUSTOM_DATA => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'created_at' => 2, 'updated_at' => 3, 'case_id' => 4, 'process_id' => 5, 'template_id' => 6, 'server_id' => 7, 'object_id' => 8, 'object_type' => 9, 'custom_data' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -175,6 +178,7 @@ abstract class BaseBusinessProcessCasePeer {
 		$criteria->addSelectColumn(BusinessProcessCasePeer::SERVER_ID);
 		$criteria->addSelectColumn(BusinessProcessCasePeer::OBJECT_ID);
 		$criteria->addSelectColumn(BusinessProcessCasePeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::CUSTOM_DATA);
 	}
 
 	/**

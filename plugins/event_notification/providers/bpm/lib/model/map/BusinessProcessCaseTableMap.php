@@ -47,6 +47,7 @@ class BusinessProcessCaseTableMap extends TableMap {
 		$this->addColumn('SERVER_ID', 'ServerId', 'INTEGER', false, null, null);
 		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 20, null);
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

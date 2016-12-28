@@ -45,6 +45,7 @@ CREATE TABLE `business_process_case`
 	`server_id` INTEGER,
 	`object_id` VARCHAR(20),
 	`object_type` INTEGER,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`),
 	KEY `object_id_and_type`(`object_type`, `object_id`)

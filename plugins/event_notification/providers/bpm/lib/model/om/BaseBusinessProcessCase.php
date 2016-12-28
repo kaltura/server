@@ -80,6 +80,12 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	protected $object_type;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -282,6 +288,16 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	public function getObjectType()
 	{
 		return $this->object_type;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -567,6 +583,26 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	} // setObjectType()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     BusinessProcessCase The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = BusinessProcessCasePeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -596,6 +632,9 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -608,6 +647,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			$this->server_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->object_id = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->object_type = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -617,7 +657,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = BusinessProcessCasePeer::NUM_COLUMNS - BusinessProcessCasePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = BusinessProcessCasePeer::NUM_COLUMNS - BusinessProcessCasePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BusinessProcessCase object", $e);
@@ -754,18 +794,84 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				BusinessProcessCasePeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(BusinessProcessCasePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(BusinessProcessCasePeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = BusinessProcessCasePeer::getAtomicCustomDataFields();
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
+					}
+				}
+                   
+				if(!$validUpdate) 
+					break;
+					                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			BusinessProcessCasePeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -851,6 +957,8 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -861,7 +969,9 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -908,6 +1018,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		{
 			kQueryCache::invalidateQueryCache($this);
 			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
@@ -1096,6 +1207,9 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			case 9:
 				return $this->getObjectType();
 				break;
+			case 10:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -1127,6 +1241,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			$keys[7] => $this->getServerId(),
 			$keys[8] => $this->getObjectId(),
 			$keys[9] => $this->getObjectType(),
+			$keys[10] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1188,6 +1303,9 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			case 9:
 				$this->setObjectType($value);
 				break;
+			case 10:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1222,6 +1340,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		if (array_key_exists($keys[7], $arr)) $this->setServerId($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setObjectId($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setObjectType($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
 	}
 
 	/**
@@ -1243,6 +1362,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		if ($this->isColumnModified(BusinessProcessCasePeer::SERVER_ID)) $criteria->add(BusinessProcessCasePeer::SERVER_ID, $this->server_id);
 		if ($this->isColumnModified(BusinessProcessCasePeer::OBJECT_ID)) $criteria->add(BusinessProcessCasePeer::OBJECT_ID, $this->object_id);
 		if ($this->isColumnModified(BusinessProcessCasePeer::OBJECT_TYPE)) $criteria->add(BusinessProcessCasePeer::OBJECT_TYPE, $this->object_type);
+		if ($this->isColumnModified(BusinessProcessCasePeer::CUSTOM_DATA)) $criteria->add(BusinessProcessCasePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1263,6 +1383,15 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		
 		if($this->alreadyInSave)
 		{
+			if ($this->isColumnModified(BusinessProcessCasePeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(BusinessProcessCasePeer::CUSTOM_DATA, "MD5(cast(" . BusinessProcessCasePeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(BusinessProcessCasePeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
 			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(BusinessProcessCasePeer::UPDATED_AT))
 			{
 				$theModifiedColumn = null;
@@ -1329,6 +1458,8 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 		$copyObj->setObjectId($this->object_id);
 
 		$copyObj->setObjectType($this->object_type);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1409,4 +1540,151 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$customDataOldValue = $customData->get($name, $namespace);
+		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
+			return;
+				
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseBusinessProcessCase
