@@ -12,6 +12,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	const WIDTH = 'width';
 	const HEIGHT = 'height';
 	const MATCH_SOURCE = 'match-source';
+	const KILO = 1000;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
@@ -213,7 +214,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	private function checkFlavorsDataRate($ingestDataRate, $flavorDataRate)
 	{
 		$percentageFactor = 1 + (kConf::get('transcoding_profile_bitrate_percentage_gap_between_flavors') / 100);
-		return ($ingestDataRate !== 0) && (($ingestDataRate * 1024) < ($flavorDataRate * $percentageFactor));
+		return ($ingestDataRate !== 0) && (($ingestDataRate * self::KILO) < ($flavorDataRate * $percentageFactor));
 	}
 	
 	private function checkFlavorsHeight($ingestHeight, $flavorHeight)
@@ -244,7 +245,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		}
 		else if ($this->checkFlavorsDataRate($ingestParameters['videodatarate'], $flavorBitrate))
 		{
-			KalturaLog::info('Flavor [' . $flavorId . '] rejected due to VideoBitrate; Ingest: [' . $ingestParameters['videodatarate'] * 1024 . '], Flavor: [' . $flavorBitrate . ']');
+			KalturaLog::info('Flavor [' . $flavorId . '] rejected due to VideoBitrate; Ingest: [' . $ingestParameters['videodatarate'] * self::KILO . '], Flavor: [' . $flavorBitrate . ']');
 			return false;
 		}
 		
@@ -296,7 +297,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
 		$flavorResolutionInfo = $this->getResolutionParameters($liveParams);
-		$flavorBitrateValue = $liveParams->getVideoBitrate() ? $liveParams->getVideoBitrate() * 1024 : 240000;
+		$flavorBitrateValue = $liveParams->getVideoBitrate() ? $liveParams->getVideoBitrate() * self::KILO : 240000;
 		
 		if (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->hasTag(liveParams::TAG_OPTIONAL_FLAVOR))
 		{
@@ -326,7 +327,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			$audio->addChild('Codec', $audioCodec);
 			if ($audioCodec !== 'PassThru')
 			{
-				$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
+				$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * self::KILO : 96000);
 			}
 			return;
 		}
@@ -420,6 +421,6 @@ class LiveConversionProfileService extends KalturaBaseService
 		}
 
 		$audio->addChild('Codec', $audioCodec);
-		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
+		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * self::KILO : 96000);
 	}
 }
