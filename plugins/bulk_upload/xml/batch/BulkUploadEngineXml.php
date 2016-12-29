@@ -1034,6 +1034,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$nonCriticalErrors .= $requestResult->getMessage()."\n";
 			}
 		}
+		else
+			KalturaLog::log('Failed to get response from multiRequest');
 
 		return array($createdEntry, $nonCriticalErrors);
 	}
