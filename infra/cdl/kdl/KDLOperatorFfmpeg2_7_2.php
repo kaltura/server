@@ -103,20 +103,27 @@ $nullDev ="/dev/null";
 	 */
 	protected function getVideoCodecSpecificParams(KDLFlavor $design, KDLFlavor $target)
 	{
-			/*
-			 * There is some quality degradation on old-style VP8 cmd line.
-			 * 'qmax=8' fixes it. 
-			 */
-		$vidCodecSpecStr = parent::getVideoCodecSpecificParams($design, $target);
-		if($target->_video->_id==KDLVideoTarget::VP8) {
-			$vidCodecSpecStr.= " -quality good -cpu-used 0 -qmin 10";
-		}
-		else if($target->_video->_id==KDLVideoTarget::H265) {
-			$vidCodecSpecStr = "libx265".$this->calcForcedKeyFrames($target->_video, $target);
-			$vidCodecSpecStr.= " -x265-params min-keyint=1";
-			if(isset($target->_video->_gop) && $target->_video->_gop>0){
-				$vidCodecSpecStr.= ":keyint=".$target->_video->_gop;
-			}
+		switch ($target->_video->_id){
+			case  KDLVideoTarget::VP8:
+				/*
+				 * There is some quality degradation on old-style VP8 cmd line.
+				 * 'qmax=8' fixes it. 
+				 */
+				$vidCodecSpecStr = "libvpx -quality good -cpu-used 0 -qmin 10";
+				break;
+			case  KDLVideoTarget::VP9:
+				$vidCodecSpecStr = "libvpx-vp9".$this->calcForcedKeyFrames($target->_video, $target);
+				break;
+			case  KDLVideoTarget::H265:
+				$vidCodecSpecStr = "libx265".$this->calcForcedKeyFrames($target->_video, $target);
+				$vidCodecSpecStr.= " -x265-params min-keyint=1";
+				if(isset($target->_video->_gop) && $target->_video->_gop>0){
+					$vidCodecSpecStr.= ":keyint=".$target->_video->_gop;
+				}
+				break;
+			default:
+				$vidCodecSpecStr = parent::getVideoCodecSpecificParams($design, $target);
+				break;
 		}
 		
 		return $vidCodecSpecStr;
