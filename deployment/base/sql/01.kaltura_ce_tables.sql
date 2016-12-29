@@ -2547,4 +2547,4 @@ CREATE TABLE `business_process_case`
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`),
 	KEY `object_id_and_type`(`object_type`, `object_id`)
-)Type=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
