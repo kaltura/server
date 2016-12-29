@@ -377,7 +377,8 @@ class KDLWrap
 				}
 				
 					// Add qt-faststart processing for mp4 targets (relevant to pre-opertors mode) 
-				if($flavor->getFormat()=="mp4" && ($cdlTrnsId==conversionEngineType::FFMPEG || $cdlTrnsId==conversionEngineType::FFMPEG_AUX || $cdlTrnsId==conversionEngineType::MENCODER)){
+				if($flavor->getFormat()=="mp4" 
+				&& in_array($cdlTrnsId, array(conversionEngineType::FFMPEG, conversionEngineType::FFMPEG_AUX, conversionEngineType::FFMPEG_VP8, conversionEngineType::MENCODER))){
 					$fsAddonStr = kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
 					$commandLines[$cdlTrnsId].=$fsAddonStr;
 				}
