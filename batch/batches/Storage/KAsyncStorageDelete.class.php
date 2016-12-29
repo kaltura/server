@@ -30,10 +30,10 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 	{
 		$filter = parent::getFilter();
 		
-		if(KBatchBase::$taskConfig->params->minFileSize && is_numeric(KBatchBase::$taskConfig->params->minFileSize))
+		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->minFileSize && is_numeric(KBatchBase::$taskConfig->params->minFileSize))
 			$filter->fileSizeGreaterThan = KBatchBase::$taskConfig->params->minFileSize;
 		
-		if(KBatchBase::$taskConfig->params->maxFileSize && is_numeric(KBatchBase::$taskConfig->params->maxFileSize))
+		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->maxFileSize && is_numeric(KBatchBase::$taskConfig->params->maxFileSize))
 			$filter->fileSizeLessThan = KBatchBase::$taskConfig->params->maxFileSize;
 			
 		return $filter;

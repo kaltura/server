@@ -300,7 +300,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	}
 	
 	
-    protected function updateObjectsResults($requestResults, $bulkUploadResults)
+    protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
