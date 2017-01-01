@@ -725,17 +725,9 @@ class kBusinessConvertDL
 
 		$inVideo = $asset->getServeFlavorUrl();
 		$adImage = KDLCmdlinePlaceholders::InFileName;
-		
 		$outputPath = KDLCmdlinePlaceholders::OutFileName;
-		//$inVideo = 'bigBuck.mov'; $adImage = 'test_3.JPG'; $outputPath = 'output.mp4';
-		$dataObject = new AdCuePointMetadataOverlay($cuePointId);
-//		$width = 320;
-//		$height = 240;
-//		$x = 0.5;
-//		$y = 0.9;
-//		$startTime = 10;
-//		$duration = 5;
 
+		$dataObject = new AdCuePointMetadataOverlay($cuePointId);
 		$width = $dataObject->getWidth();
 		$height = $dataObject->getHeight();
 		$x = $dataObject->getX();
@@ -743,19 +735,29 @@ class kBusinessConvertDL
 		$startTime = $dataObject->getStartTime();
 		$duration = $dataObject->getDuration();
 
+//		$inVideo = 'bigBuck.mov'; $adImage = 'test_3.JPG'; $outputPath = 'output.mp4';
+//		$width = 320;
+//		$height = 240;
+//		$x = 0.5;
+//		$y = 0.9;
+//		$startTime = 10;
+//		$duration = 5;
 
 		$fadeTime = 2;
+		$blendRate = 0.95;
+
 		$totalTime = $duration + 2*$fadeTime;
 		$startTimeFade = max(0, $startTime-$fadeTime);
 		$fadeOutTime = $totalTime - $fadeTime;
 
 		$cmd = "-ss $startTimeFade -t $totalTime -i '$inVideo' -loop 1 -i $adImage -b:v 1M -filter_complex";
-		$size = " \"[1:v]scale=$width:$height, fade=in:st=0:d=$fadeTime:alpha=1,fade=out:st=$fadeOutTime:d=$fadeTime:alpha=1[ovrl], ";
-		$pos = "[0:v][ovrl]overlay=(main_w-overlay_w)*$x:(main_h-overlay_h)*$y";
-		$time = ":enable='between(t,0,$totalTime)'\" ";
+		$size = " \"[1:v]scale=$width:$height, fade=in:st=0:d=$fadeTime:alpha=1,fade=out:st=$fadeOutTime:d=$fadeTime:alpha=1[ad], ";
+		$pos = "[0:v][ad]overlay=(main_w-overlay_w)*$x:(main_h-overlay_h)*$y";
+		$time = ":enable='between(t,0,$totalTime)'[stitched], ";
+		$blend = " [stitched][0:v]blend=all_mode='overlay':all_opacity=$blendRate\" ";
 		$flags = '-map 0:a -c:v libx264 -c:a copy -shortest ';
 
-		$cmd .= $size .$pos .$time. $flags .$outputPath;
+		$cmd .= $size .$pos .$time .$blend .$flags .$outputPath;
 		return $cmd;
 
 
