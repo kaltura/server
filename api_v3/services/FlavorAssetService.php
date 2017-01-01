@@ -932,12 +932,12 @@ class FlavorAssetService extends KalturaAssetService
 	 * @param string $assetId
 	 * @param string $ffprobeJson
 	 * @param string $duration
-	 * @param string $cuepointId
+	 * @param string $cuePointId
 	 *
 	 * @throws KalturaAPIException
 	 * @return string command to transcode with
 	 */
-	public function serveAdStitchCmdAction($assetId, $ffprobeJson = null ,$duration = null, $cuepointId = null)
+	public function serveAdStitchCmdAction($assetId, $ffprobeJson = null ,$duration = null, $cuePointId = null)
 	{
 		$asset = assetPeer::retrieveById($assetId);
 		if(is_null($asset))
@@ -951,14 +951,13 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
 
 		$flavorParamsOutputDb = assetParamsOutputPeer::retrieveByAssetId($assetId);
-
 		if (!$flavorParamsOutputDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $assetId);
 
 		try
 		{
-			if ($cuepointId)
-				return kBusinessConvertDL::generateAdStitchingCmdlineForOverlay($flavorParamsDb, $cuepointId);
+			if ($cuePointId)
+				return kBusinessConvertDL::generateAdStitchingCmdlineForOverlay($cuePointId);
 			
 			$cmdLine = kBusinessConvertDL::generateAdStitchingCmdline($flavorParamsDb, $flavorParamsOutputDb, $ffprobeJson, $duration);
 			if (empty($cmdLine))

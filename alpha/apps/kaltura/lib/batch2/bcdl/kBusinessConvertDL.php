@@ -717,26 +717,31 @@ class kBusinessConvertDL
 		return $cmdLine;
 	}
 
-	public static function generateAdStitchingCmdlineForOverlay($flavorParams, $cuePointId)
+	public static function generateAdStitchingCmdlineForOverlay($cuePointId)
 	{
-		$cuePoint =  CuePointPeer::retrieveByPK($cuePointId);
-
+		
 		$inVideo = KDLCmdlinePlaceholders::InFileName;
 		$outputPath = KDLCmdlinePlaceholders::OutFileName;
 		$adImage = KDLCmdlinePlaceholders::OverlayInFileName;
 		//$inVideo = 'bigBuck.mov'; $adImage = 'test_3.JPG'; $outputPath = 'output.mp4';
+		$dataObject = new AdCuePointMetadataOverlay($cuePointId);
+//		$width = 320;
+//		$height = 240;
+//		$x = 0.5;
+//		$y = 0.9;
+//		$startTime = 10;
+//		$duration = 5;
 
-		$width = 320;
-		$height = 240;
-		$x = 0.5;
-		$y = 0.9;
-		$startTime = 10;
-		$endTime = 15;
+		$width = $dataObject->getWidth();
+		$height = $dataObject->getHeight();
+		$x = $dataObject->getX();
+		$y = $dataObject->getY();
+		$startTime = $dataObject->getStartTime();
+		$duration = $dataObject->getDuration();
 
-		$duration = $endTime - $startTime;
+
 		$fadeTime = 2;
 		$totalTime = $duration + 2*$fadeTime;
-
 		$startTimeFade = max(0, $startTime-$fadeTime);
 		$fadeOutTime = $totalTime - $fadeTime;
 
