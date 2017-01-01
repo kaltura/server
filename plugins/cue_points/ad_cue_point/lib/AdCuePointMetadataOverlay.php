@@ -19,27 +19,29 @@ class AdCuePointMetadataOverlay
 	
 	function __construct($cuePointId)
 	{
-
-		KalturaLog::debug("asdf - 1 with [$cuePointId]");
+		$this->setGeneralMembers($cuePointId);
 		$metadata = $this->getAdCuePointMetadata($cuePointId);
-
 		if (!$metadata)
 			return;
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xml = kFileSyncUtils::file_get_contents($key, true, false);
-		$this->setMembers($xml);
+		$this->setVisualMembers($xml);
 	}
 
-	private function setMembers($xml)
+	private function setVisualMembers($xml)
 	{
 		$xmlObj = simplexml_load_string($xml);
 		$this->width = $xmlObj->width;
 		$this->height = $xmlObj->height;
 		$this->x = $xmlObj->x;
 		$this->y = $xmlObj->y;
-		$this->startTime = $xmlObj->startTime;
-		$this->duration = $xmlObj->duration;
+	}
 
+	private function setGeneralMembers($cuePointId)
+	{
+		$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
+		$this->startTime = $cuePoint->getStartTime();
+		$this->duration = $cuePoint->getDuration();
 	}
 	
 	private function getAdCuePointMetadata($cuePointId) {

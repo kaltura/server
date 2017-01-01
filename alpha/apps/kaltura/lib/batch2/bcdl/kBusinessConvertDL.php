@@ -717,12 +717,16 @@ class kBusinessConvertDL
 		return $cmdLine;
 	}
 
-	public static function generateAdStitchingCmdlineForOverlay($cuePointId)
+	public static function generateAdStitchingCmdlineForOverlay($asset, $cuePointId)
 	{
+		// all file with patch-holder
+		//$inVideo = KDLCmdlinePlaceholders::InFileName;
+		//$adImage = KDLCmdlinePlaceholders::OverlayInFileName;
+
+		$inVideo = $asset->getServeFlavorUrl();
+		$adImage = KDLCmdlinePlaceholders::InFileName;
 		
-		$inVideo = KDLCmdlinePlaceholders::InFileName;
 		$outputPath = KDLCmdlinePlaceholders::OutFileName;
-		$adImage = KDLCmdlinePlaceholders::OverlayInFileName;
 		//$inVideo = 'bigBuck.mov'; $adImage = 'test_3.JPG'; $outputPath = 'output.mp4';
 		$dataObject = new AdCuePointMetadataOverlay($cuePointId);
 //		$width = 320;
@@ -745,7 +749,7 @@ class kBusinessConvertDL
 		$startTimeFade = max(0, $startTime-$fadeTime);
 		$fadeOutTime = $totalTime - $fadeTime;
 
-		$cmd = "-ss $startTimeFade -t $totalTime -i $inVideo -loop 1 -i $adImage -b:v 1M -filter_complex";
+		$cmd = "-ss $startTimeFade -t $totalTime -i '$inVideo' -loop 1 -i $adImage -b:v 1M -filter_complex";
 		$size = " \"[1:v]scale=$width:$height, fade=in:st=0:d=$fadeTime:alpha=1,fade=out:st=$fadeOutTime:d=$fadeTime:alpha=1[ovrl], ";
 		$pos = "[0:v][ovrl]overlay=(main_w-overlay_w)*$x:(main_h-overlay_h)*$y";
 		$time = ":enable='between(t,0,$totalTime)'\" ";

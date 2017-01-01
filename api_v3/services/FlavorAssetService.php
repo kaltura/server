@@ -944,7 +944,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 
 		$flavorParamsId = $asset->getFlavorParamsId();
-
+		
 		$flavorParamsDb = assetParamsPeer::retrieveByPK($flavorParamsId);
 
 		if (!$flavorParamsDb)
@@ -957,7 +957,7 @@ class FlavorAssetService extends KalturaAssetService
 		try
 		{
 			if ($cuePointId)
-				return kBusinessConvertDL::generateAdStitchingCmdlineForOverlay($cuePointId);
+				return kBusinessConvertDL::generateAdStitchingCmdlineForOverlay($asset, $cuePointId);
 			
 			$cmdLine = kBusinessConvertDL::generateAdStitchingCmdline($flavorParamsDb, $flavorParamsOutputDb, $ffprobeJson, $duration);
 			if (empty($cmdLine))
