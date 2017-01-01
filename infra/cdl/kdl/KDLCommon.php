@@ -236,6 +236,7 @@
 	class KDLCmdlinePlaceholders {
 		const InFileName	= "__inFileName__";
 		const OutFileName	= "__outFileName__";
+		const OverlayInFileName	= "__overlayInFileName__";
 		const OutDir		= "__outDir__";
 		const ConfigFileName= "__configFileName__";
 		const BinaryName	= "__binaryName__";
