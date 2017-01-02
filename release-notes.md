@@ -80,6 +80,58 @@ None.
 ### Deployment scripts ###
 mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql 
 
+## Burned watermark aspect ratio ##
+
+- Issue Type: BUG
+- Issue ID: SUP-9869
+
+### Configuration ###
+None.  
+
+## Support for H265 and VP9 codecs ##
+
+- Issue Type: Task
+- Issue ID: PLAT-6650
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
+## flavorParams::tags override ##
+
+An option to override flavorPrams::tags setting via flavorParamsConversionProfile::tags field
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
+## ‘Collection’/’grouping/multi-flavor tagging support ##
+
+Define which tags represent flavors ‘grouping’ (aka ‘mbr’,’ism’).
+‘Collection-tag’ causes activation of ‘flavor optimization’ heuristics.
+It can be used to define playback sets as well.
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
+## Fix encryption at rest with tr.operators ##
+
+- Issue Type: Bug
+- Issue ID:PLAT-6708
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
 # Lynx 12.7.0 #
 
 ## New action getPlaybackContext to baseEntryService ##
