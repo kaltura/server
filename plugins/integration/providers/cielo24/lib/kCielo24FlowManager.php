@@ -189,6 +189,8 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 	private function transformDfxp($content)
 	{
 		$doc = new DOMDocument();
+		$doc->formatOutput = true;
+
 		/**
 		* Replaces unescaped ampersands
 		*
@@ -203,12 +205,49 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err('Failed to load XML');
 			return $content;
 		}
-	
+
+		$doc->encoding  = "UTF-8";
+		
 		$xpath = new DOMXPath($doc);
 		$xpath->registerNamespace('ns', 'http://www.w3.org/ns/ttml');
 		
+		$ttElement = $xpath->query('//ns:tt')->item(0);
+		if($ttElement instanceof DOMElement)
+		{
+			$ttElement->removeAttribute('xml:lang');
+		}
+		
+		$layoutElement = $xpath->query('//ns:layout')->item(0);
+		if($layoutElement instanceof DOMElement)
+		{
+			$layoutElement->parentNode->removeChild($layoutElement);
+		}
+	
+		$stylingExistingElement = $xpath->query('//ns:styling')->item(0);
+		if($stylingExistingElement instanceof DOMElement)
+		{
+			$stylingExistingElement->parentNode->removeChild($stylingExistingElement);
+		}
+		
+		$stylingElementForAddtion = new DOMElement('styling');
+		$styleElementForAddtion = new DOMElement('style');
+		
+		$headElement = $xpath->query('//ns:head')->item(0);
+		$headElement->appendChild($stylingElementForAddtion);
+		$stylingElementForAddtion->appendChild($styleElementForAddtion);
+		$styleElementForAddtion->setAttribute('id','defaultCaption');
+		$styleElementForAddtion->setAttribute('tts:fontSize','12');
+		$styleElementForAddtion->setAttribute('tts:fontFamily','SansSerif');
+		$styleElementForAddtion->setAttribute('tts:fontWeight','normal');
+		$styleElementForAddtion->setAttribute('tts:fontStyle','normal');
+		$styleElementForAddtion->setAttribute('tts:textDecoration','none');
+		$styleElementForAddtion->setAttribute('tts:color','white');
+		$styleElementForAddtion->setAttribute('tts:backgroundColor','black');
+		$styleElementForAddtion->setAttribute('tts:textAlign','left');
+		
 		$bodyElement = $xpath->query('//ns:body')->item(0);
 		if ($bodyElement instanceof DOMElement) {
+			$bodyElement->setAttribute('id', 'thebody');
 			$bodyElement->setAttribute('timeContainer', 'par');
 		}
 	
@@ -244,6 +283,8 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 	
 		$divElement = $xpath->query('//ns:div')->item(0);
 		if ($divElement instanceof DOMElement) {
+			$divElement->setAttribute('style','defaultCaption');
+			$divElement->setAttribute('xml:lang','en');
 			$divElement->setAttribute('begin', '00:00:00.000');
 			$divElement->setAttribute('dur', $this->formatDuration($totalDuration));
 			$divElement->setAttribute('timeContainer', 'seq');
