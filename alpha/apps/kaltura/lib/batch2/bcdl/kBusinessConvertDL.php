@@ -734,8 +734,8 @@ class kBusinessConvertDL
 		$outputPath = KDLCmdlinePlaceholders::OutFileName;
 
 		$dataObject = new AdCuePointMetadataOverlay($cuePointId);
-		$width = $dataObject->getWidth() ;
-		$height = $dataObject->getHeight() ;
+		$width = $dataObject->getWidth() / $entryWidth;
+		$height = $dataObject->getHeight() / $entryWidth;
 		$x = $dataObject->getX() / $entryWidth;
 		$y = $dataObject->getY() / $entryHeight;
 		$startTime = $dataObject->getStartTime();
