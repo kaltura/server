@@ -723,6 +723,7 @@ class kBusinessConvertDL
 		//$inVideo = KDLCmdlinePlaceholders::InFileName;
 		//$adImage = KDLCmdlinePlaceholders::OverlayInFileName;
 
+		KalturaLog::debug("@@DW: got to overlay flow with cuePointId [$cuePointId]");
 		$inVideoPath = kBusinessConvertDL::getAssetPath($asset);
 		$adImage = KDLCmdlinePlaceholders::InFileName;
 		$outputPath = KDLCmdlinePlaceholders::OutFileName;
@@ -731,7 +732,9 @@ class kBusinessConvertDL
 		$entry = $asset->getentry();
 		$entryHeight = $entry->getHeight();
 		$entryWidth = $entry->getWidth();
-		
+		$entryId = $entry->getId();
+		KalturaLog::debug("@@DW: got entryId [$entryId] with width [$entryWidth] and height [$entryHeight]");
+
 		$dataObject = new AdCuePointMetadataOverlay($cuePointId);
 		$width = $dataObject->getWidth() / $entryWidth;
 		$height = $dataObject->getHeight() / $entryWidth;
@@ -740,6 +743,7 @@ class kBusinessConvertDL
 		$startTime = $dataObject->getStartTime();
 		$duration = $dataObject->getDuration();
 
+		KalturaLog::debug("@@DW: Data: width [$width], height [$height], x [$x], y [$y], startTime [$startTime], duration [$duration]");
 //		$inVideo = 'bigBuck.mov'; $adImage = 'test_3.JPG'; $outputPath = 'output.mp4';
 //		$width = 0.2;
 //		$height = 0.2;
@@ -763,6 +767,7 @@ class kBusinessConvertDL
 		$flags = '-map 0:a -c:v libx264 -c:a copy -shortest ';
 
 		$cmd .= $size .$pos .$time .$blend .$flags .$outputPath;
+		KalturaLog::debug("@@DW: return command: $cmd ");
 		return $cmd;
 	}
 	

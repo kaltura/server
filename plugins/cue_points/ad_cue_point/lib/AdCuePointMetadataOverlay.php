@@ -43,8 +43,8 @@ class AdCuePointMetadataOverlay
 	private function setGeneralMembers($cuePointId)
 	{
 		$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
-		$this->startTime = $cuePoint->getStartTime();
-		$this->duration = $cuePoint->getDuration();
+		$this->startTime = $cuePoint->getStartTime() ? $cuePoint->getStartTime():0;
+		$this->duration = $cuePoint->getDuration() ? $cuePoint->getDuration():0;
 	}
 	
 	private function getAdCuePointMetadata($cuePointId) {
