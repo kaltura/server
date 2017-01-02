@@ -750,16 +750,16 @@ class kBusinessConvertDL
 		$fadeTime = 2;
 		$blendRate = 0.95;
 
-		$totalTime = floor(($duration + 2*$fadeTime) / 1000);
-		$startTimeFade = floor(max(0, ($startTime/1000 - $fadeTime)));
+		$startTimeSec = floor($startTime / 1000);
+		$totalTime = floor($duration / 1000);
 		$fadeOutTime = $totalTime - $fadeTime;
 
-		$cmd = "-ss $startTimeFade -t $totalTime -i $inVideoPath -loop 1 -t $totalTime -i $adImage -b:v 1M -filter_complex";
+		$cmd = "-ss $startTimeSec -t $totalTime -i $inVideoPath -loop 1 -t $totalTime -i $adImage -b:v 1M -filter_complex";
 		$size = " \"[1:v]scale=iw*$width:ih*$height, fade=in:st=0:d=$fadeTime:alpha=1,fade=out:st=$fadeOutTime:d=$fadeTime:alpha=1[ad], ";
 		$pos = "[0:v][ad]overlay=(main_w-overlay_w)*$x:(main_h-overlay_h)*$y";
 		$time = ":enable='between(t,0,$totalTime)'[stitched], ";
 		$blend = " [stitched][0:v]blend=all_mode='overlay':all_opacity=$blendRate\" ";
-		$flags = '-map 0:a -c:v libx264 -c:a copy -shortest -f mp4 ';
+		$flags = '-map 0:a -c:v libx264 -c:a copy -shortest -f mp4 -y ';
 
 		$cmd .= $size .$pos .$time .$blend .$flags .$outputPath;
 		KalturaLog::debug("@@DW: return command: $cmd ");
