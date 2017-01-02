@@ -1868,19 +1868,30 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	{
 		KalturaLog::log("for asset".$flavorAsset->getId());
 		$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
-		$commandLines = $flavor->getCommandLines();
-		KalturaLog::log("CommandLines Pre:".serialize($commandLines));
-			// Update the cmd-lines with correct key/key_id values
-		$commandLines = str_replace (
-			array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-			array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
-			$commandLines);
-			// Save updated cmd-lines
-		$flavor->setCommandLines($commandLines);
-		$flavor->save();
-			// Save encryption key on flavorAsset obj
+		if(($commandLines=$flavor->getCommandLines())!=null) {
+				// Update the transcoding engines cmd-lines with encryption key/key_id values
+			KalturaLog::log("CommandLines Pre:".serialize($commandLines));
+			$commandLines = str_replace (
+				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
+				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				$commandLines);
+				// Save updated cmd-lines
+			$flavor->setCommandLines($commandLines);
+			$flavor->save();
+		}
+		else if(($operatorsJsonStr=$flavor->getOperators())!=null){
+				// Update the transcoding operators cmd-lines with encryption key/key_id values
+			KalturaLog::log("Operators Pre:".($operatorsJsonStr));
+			$operatorsJsonStr = str_replace (
+				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
+				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				$operatorsJsonStr);
+				// Save updated cmd-lines
+			$flavor->setOperators($operatorsJsonStr);
+			$flavor->save();
+		}
+			// Save encryption key on the flavorAsset obj
 		$flavorAsset->setEncryptionKey($encryptionParams->key);
-
 		$flavorAsset->save();
 	}
 
