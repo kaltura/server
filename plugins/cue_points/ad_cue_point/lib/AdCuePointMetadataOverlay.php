@@ -22,7 +22,10 @@ class AdCuePointMetadataOverlay
 		$this->setGeneralMembers($cuePointId);
 		$metadata = $this->getAdCuePointMetadata($cuePointId);
 		if (!$metadata)
+		{
+			KalturaLog::info("No metadata on cuePoint [$cuePointId]");
 			return;
+		}
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xml = kFileSyncUtils::file_get_contents($key, true, false);
 		$this->setVisualMembers($xml);
@@ -31,10 +34,10 @@ class AdCuePointMetadataOverlay
 	private function setVisualMembers($xml)
 	{
 		$xmlObj = simplexml_load_string($xml);
-		$this->width = $xmlObj->width;
-		$this->height = $xmlObj->height;
-		$this->x = $xmlObj->x;
-		$this->y = $xmlObj->y;
+		$this->width = $xmlObj->width ? $xmlObj->width:0;
+		$this->height = $xmlObj->height? $xmlObj->width:0;
+		$this->x = $xmlObj->x ? $xmlObj->x:0;
+		$this->y = $xmlObj->y ? $xmlObj->y:0;
 	}
 
 	private function setGeneralMembers($cuePointId)
@@ -59,6 +62,7 @@ class AdCuePointMetadataOverlay
 	}
 	public function getHeight() {
 		return $this->height;
+
 	}
 	public function getX() {
 		return $this->x;
