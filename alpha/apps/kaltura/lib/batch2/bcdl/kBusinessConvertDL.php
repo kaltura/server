@@ -759,7 +759,7 @@ class kBusinessConvertDL
 		$startTimeFade = max(0, $startTime-$fadeTime);
 		$fadeOutTime = $totalTime - $fadeTime;
 
-		$cmd = "-ss $startTimeFade -t $totalTime -i '$inVideoPath' -loop 1 -i $adImage -b:v 1M -filter_complex";
+		$cmd = "-ss $startTimeFade -t $totalTime -i $inVideoPath -loop 1 -i $adImage -b:v 1M -filter_complex";
 		$size = " \"[1:v]scale=iw*$width:ih*$height, fade=in:st=0:d=$fadeTime:alpha=1,fade=out:st=$fadeOutTime:d=$fadeTime:alpha=1[ad], ";
 		$pos = "[0:v][ad]overlay=(main_w-overlay_w)*$x:(main_h-overlay_h)*$y";
 		$time = ":enable='between(t,0,$totalTime)'[stitched], ";

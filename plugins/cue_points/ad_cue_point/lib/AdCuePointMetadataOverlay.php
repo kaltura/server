@@ -34,10 +34,11 @@ class AdCuePointMetadataOverlay
 	private function setVisualMembers($xml)
 	{
 		$xmlObj = simplexml_load_string($xml);
-		$this->width = $xmlObj->width ? $xmlObj->width:0;
-		$this->height = $xmlObj->height? $xmlObj->width:0;
-		$this->x = $xmlObj->x ? $xmlObj->x:0;
-		$this->y = $xmlObj->y ? $xmlObj->y:0;
+		KalturaLog::info("@@DW: got xml metadata with" .print_r($xmlObj, true));
+		$this->width = $xmlObj->Width ? $xmlObj->Width:0;
+		$this->height = $xmlObj->Height? $xmlObj->Height:0;
+		$this->x = $xmlObj->X ? $xmlObj->X:0;
+		$this->y = $xmlObj->Y ? $xmlObj->Y:0;
 	}
 
 	private function setGeneralMembers($cuePointId)
