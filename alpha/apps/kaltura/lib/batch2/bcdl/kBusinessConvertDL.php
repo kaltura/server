@@ -745,12 +745,7 @@ class kBusinessConvertDL
 
 		KalturaLog::debug("@@DW: Data: width [$width], height [$height], x [$x], y [$y], startTime [$startTime], duration [$duration]");
 //		$inVideo = 'bigBuck.mov'; $adImage = 'test_3.JPG'; $outputPath = 'output.mp4';
-//		$width = 0.2;
-//		$height = 0.2;
-//		$x = 0.5;
-//		$y = 0.9;
-//		$startTime = 10;
-//		$duration = 5;
+//		$width = 0.2; $height = 0.2; $x = 0.5; $y = 0.9; $startTime = 10; $duration = 5;
 
 		$fadeTime = 2;
 		$blendRate = 0.95;
@@ -759,7 +754,7 @@ class kBusinessConvertDL
 		$startTimeFade = floor(max(0, ($startTime/1000 - $fadeTime)));
 		$fadeOutTime = $totalTime - $fadeTime;
 
-		$cmd = "-ss $startTimeFade -t $totalTime -i $inVideoPath -loop 1 -i $adImage -b:v 1M -filter_complex";
+		$cmd = "-ss $startTimeFade -t $totalTime -i $inVideoPath -loop 1 -t $totalTime -i $adImage -b:v 1M -filter_complex";
 		$size = " \"[1:v]scale=iw*$width:ih*$height, fade=in:st=0:d=$fadeTime:alpha=1,fade=out:st=$fadeOutTime:d=$fadeTime:alpha=1[ad], ";
 		$pos = "[0:v][ad]overlay=(main_w-overlay_w)*$x:(main_h-overlay_h)*$y";
 		$time = ":enable='between(t,0,$totalTime)'[stitched], ";
