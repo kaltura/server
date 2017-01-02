@@ -737,7 +737,7 @@ class kBusinessConvertDL
 
 		$dataObject = new AdCuePointMetadataOverlay($cuePointId);
 		$width = $dataObject->getWidth() / $entryWidth;
-		$height = $dataObject->getHeight() / $entryWidth;
+		$height = $dataObject->getHeight() / $entryHeight;
 		$x = $dataObject->getX() / $entryWidth;
 		$y = $dataObject->getY() / $entryHeight;
 		$startTime = $dataObject->getStartTime();
@@ -755,8 +755,8 @@ class kBusinessConvertDL
 		$fadeTime = 2;
 		$blendRate = 0.95;
 
-		$totalTime = $duration + 2*$fadeTime;
-		$startTimeFade = max(0, $startTime-$fadeTime);
+		$totalTime = floor(($duration + 2*$fadeTime) / 1000);
+		$startTimeFade = floor(max(0, ($startTime/1000 - $fadeTime)));
 		$fadeOutTime = $totalTime - $fadeTime;
 
 		$cmd = "-ss $startTimeFade -t $totalTime -i $inVideoPath -loop 1 -i $adImage -b:v 1M -filter_complex";
@@ -764,7 +764,7 @@ class kBusinessConvertDL
 		$pos = "[0:v][ad]overlay=(main_w-overlay_w)*$x:(main_h-overlay_h)*$y";
 		$time = ":enable='between(t,0,$totalTime)'[stitched], ";
 		$blend = " [stitched][0:v]blend=all_mode='overlay':all_opacity=$blendRate\" ";
-		$flags = '-map 0:a -c:v libx264 -c:a copy -shortest ';
+		$flags = '-map 0:a -c:v libx264 -c:a copy -shortest -f mp4 ';
 
 		$cmd .= $size .$pos .$time .$blend .$flags .$outputPath;
 		KalturaLog::debug("@@DW: return command: $cmd ");
