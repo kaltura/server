@@ -210,7 +210,7 @@ class DeliveryController extends Zend_Controller_Action
 			case 'Kaltura_Client_Type_UrlTokenizerVnpt':
 					return new Form_Delivery_UrlTokenizerVnpt();
 			case 'Kaltura_Client_Type_UrlTokenizerCht':
-					return new Form_Delivery_UrlTokenizerLimeLight();
+					return new Form_Delivery_UrlTokenizerBitGravity();
 				
 			default:
 				return KalturaPluginManager::loadObject('Form_Delivery_DeliveryProfileTokenizer', $type, array());
