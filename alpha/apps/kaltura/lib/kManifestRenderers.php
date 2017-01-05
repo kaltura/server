@@ -202,6 +202,7 @@ abstract class kManifestRenderer
 		if ($this->tokenizer)
 		{
 			$result[] = dirname(__file__) . '/storage/urlTokenizers/kUrlTokenizer.php';
+			$result[] = dirname(__file__) . '/storage/urlTokenizers/kHashPatternUrlTokenizer.php';
 			$tokenizerClass = new ReflectionClass(get_class($this->tokenizer));
 			$result[] = $tokenizerClass->getFileName();
 		}
