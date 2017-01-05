@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUrlTokenizerCht extends KalturaUrlTokenizer {
+class KalturaUrlTokenizerCht extends KalturaHashPatternUrlTokenizer {
 
 	public function toObject($dbObject = null, $skip = array())
 	{
