@@ -1,7 +1,6 @@
 <?php
-class kChtHttpUrlTokenizer extends kUrlTokenizer
+class kChtHttpUrlTokenizer extends kHashPatternUrlTokenizer
 {
-	
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
@@ -20,20 +19,28 @@ class kChtHttpUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeUrl($url)
 	{
-		$expiryTime = time() + $this->window;
-
-		$hashData = $url . $this->key . $expiryTime	;
-		$token = base64_encode(md5($hashData, true));
+		if (!$this->hashPatternRegex)
+			return $url;
 		
-		//remove = character from the token
-		$token = strtr($token, '+/', '-_');
-		$token = str_replace('=', '', $token);
+		if (preg_match($this->hashPatternRegex, $url, $matches))
+		{
+			$expiryTime = time() + $this->window;
+	
+			$hashData = $matches[0] . $this->key . $expiryTime	;
+			$token = base64_encode(md5($hashData, true));
+			
+			//remove = character from the token
+			$token = strtr($token, '+/', '-_');
+			$token = str_replace('=', '', $token);
+			
+			if (strpos($url, '?') !== false)
+				$s = '&';
+			else
+				$s = '?';
+			
+			return $url.$s.'token='.$token.'&expires='.$expiryTime;
+		}
 		
-		if (strpos($url, '?') !== false)
-			$s = '&';
-		else
-			$s = '?';
-		
-		return $url.$s.'token='.$token.'&expires='.$expiryTime;
+		return $url;
 	}
 }

@@ -1,13 +1,7 @@
 <?php
-class kBitGravityUrlTokenizer extends kUrlTokenizer
+class kBitGravityUrlTokenizer extends kHashHttpUrlTokenizer
 {
-	/**
-	 * Regex pattern to find the part of the URL that should be hashed
-	 *
-	 * @var string
-	 */
-	protected $hashPatternRegex;
-
+	
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
@@ -62,20 +56,6 @@ class kBitGravityUrlTokenizer extends kUrlTokenizer
 			return $url.$s.'e='.$expiryTime.'&h='.$hash;
 		}
 		return $url;
-	}
-	
-	/**
-	 * @return the $hashPatternRegex
-	 */
-	public function getHashPatternRegex() {
-		return $this->hashPatternRegex;
-	}
-
-	/**
-	 * @param string $hashPatternRegex
-	 */
-	public function setHashPatternRegex($hashPatternRegex) {
-		$this->hashPatternRegex = $hashPatternRegex;
 	}
 
 }
