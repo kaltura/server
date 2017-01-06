@@ -43,7 +43,7 @@ class kJobsCacher
 		if (!$maxJobToPull || !$cache) //skip cache and get jobs from DB
 			return kBatchExclusiveLock::getJobs($c, $number_of_objects, $jobType);
 
-        KalturaResponseCacher::disableCache();
+		KalturaResponseCacher::disableCache();
 
 		$allocated = array();
 		for($i = 0; $i < self::GET_JOB_ATTEMPTS; $i++)
