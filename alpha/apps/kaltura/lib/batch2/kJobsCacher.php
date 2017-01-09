@@ -62,7 +62,7 @@ class kJobsCacher
 				usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
 				continue;
 			}
-			$job = self::getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType);
+			$job = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType);
 			if (!$job)
 				break; // without delete lock to avoid DB calls in the next TIME_IN_CACHE_FOR_LOCK sec
 			$allocated[] = $job;
