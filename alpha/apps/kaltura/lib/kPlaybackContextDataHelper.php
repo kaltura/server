@@ -185,11 +185,7 @@ class kPlaybackContextDataHelper
 		$remoteFileSyncs = array();
 
 		if ( $dbEntry->getType() == entryType::LIVE_STREAM )
-		{
-			foreach ($this->flavorAssets as $flavorAsset)
-				$this->localFlavors[$flavorAsset->getId()] = $flavorAsset;
 			return;
-		}
 
 		foreach ($this->flavorAssets as $flavorAsset)
 		{
@@ -269,7 +265,7 @@ class kPlaybackContextDataHelper
 	 */
 	private function constructLocalPlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper)
 	{
-		if (!count($this->localFlavors))
+		if (!count($this->localFlavors) && $dbEntry->getType() != entryType::LIVE_STREAM)
 			return;
 
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
@@ -299,11 +295,12 @@ class kPlaybackContextDataHelper
 			$deliveryProfileFlavors = $this->localFlavors;
 			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile, $contextDataHelper);
 
-			if (count($playbackFlavors))
-			{
-				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
-				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
-			}
+				if (count($playbackFlavors) || $dbEntry->getType() == entryType::LIVE_STREAM )
+				{
+					$protocols = $this->constructProtocol($deliveryProfile);
+					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+					$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+				}
 		}
 	}
 
@@ -341,8 +338,9 @@ class kPlaybackContextDataHelper
 					foreach ($filteredDeliveryProfileFlavorsForDc as $flavorAssetForDc)
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
 
-					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
-					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
+					$protocols = $this->constructProtocol($deliveryProfile);
+					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",",$protocols), $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
+					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
 				}
 			}
 		}

@@ -1523,13 +1523,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/*
 	 * Builds a manifest request for entry according to relevant flavors, delivery profile type and location of deliveryProfile(local/remote)
 	 */
-	public static function buildManifestUrl($entry, $format, $flavors, $profileId = "")
+	public static function buildManifestUrl($entry, $protocols, $format, $flavors, $profileId = "")
 	{
 		$entryId = $entry->getId();
 		$partnerId = $entry->getPartnerId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $partnerId);
-		$protocol = requestUtils::getProtocol();
-		$cdnApiHost = requestUtils::getApiCdnHost();
+
+		$protocol = null;
+		if ( in_array(infraRequestUtils::PROTOCOL_HTTPS ,$protocols))
+			$protocol = infraRequestUtils::PROTOCOL_HTTPS;
+		else
+			$protocol = infraRequestUtils::PROTOCOL_HTTP;
+
+		$cdnApiHost = null;
+		if ($protocol == infraRequestUtils::PROTOCOL_HTTPS && kConf::hasParam('cdn_api_host_https'))
+			$cdnApiHost = "$protocol://" . kConf::get('cdn_api_host_https');
+		else
+			$cdnApiHost =  "$protocol://" . kConf::get('cdn_api_host');
 
 		$flavorIds = array();
 		$fileExtension = null;
@@ -1541,7 +1551,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		$flavorIdsAsString = implode(",", $flavorIds);
-		$url = $cdnApiHost. "$partnerPath/playManifest/entryId/$entryId/flavorIds/$flavorIdsAsString/deliveryProfileId/$profileId/protocol/$protocol";
+		$url = $cdnApiHost. "$partnerPath/playManifest/entryId/$entryId/";
+
+		if (count($flavors))
+			$url = $url."flavorIds/$flavorIdsAsString/";
+
+		$url = $url."deliveryProfileId/$profileId/protocol/$protocol";
 
 		$url .= "/format/" . self::getFileExtensionByFormat($format, $fileExtension);
 
