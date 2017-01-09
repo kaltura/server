@@ -686,6 +686,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 					/* @var $customLiveStreamConfiguration kLiveStreamConfiguration */
 						$cdnHost = parse_url($customLiveStreamConfiguration->getUrl(), PHP_URL_HOST);
 						$customLiveDelivery = self::getLiveDeliveryProfileByHostName($cdnHost, $deliveryAttributes);
+					if($customLiveDelivery)
 						$deliveryIds[] = array($customLiveDelivery->getId());
 				}
 			}
