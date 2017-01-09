@@ -393,7 +393,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 	 * {@inheritDoc}
 	 * @see KBulkUploadEngine::updateObjectsResults()
 	 */
-	protected function updateObjectsResults($requestResults, $bulkUploadResults)
+	protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 		KBatchBase::$kClient->startMultiRequest();
 		

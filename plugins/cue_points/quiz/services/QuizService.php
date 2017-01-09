@@ -161,7 +161,10 @@ class QuizService extends KalturaBaseService
 		//create a pdf
 		$kp = new kQuizPdf($entryId);
 		$kp->createQuestionPdf();
-		return $kp->submitDocument();
+		$resultPdf = $kp->submitDocument();
+		$fileName = $dbEntry->getName().".pdf";
+		header('Content-Disposition: attachment; filename="'.$fileName.'"');
+		return new kRendererString($resultPdf, 'application/x-download');
 	}
 
 

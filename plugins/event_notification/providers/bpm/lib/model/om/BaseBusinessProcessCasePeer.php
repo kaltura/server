@@ -1,62 +1,74 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'drm_device' table.
+ * Base static class for performing query and update operations on the 'business_process_case' table.
  *
  * 
  *
- * @package plugins.drm
+ * @package plugins.businessProcessNotification
  * @subpackage model.om
  */
-abstract class BaseDrmDevicePeer {
+abstract class BaseBusinessProcessCasePeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'drm_device';
+	const TABLE_NAME = 'business_process_case';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'DrmDevice';
+	const OM_CLASS = 'BusinessProcessCase';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'plugins.drm.DrmDevice';
+	const CLASS_DEFAULT = 'plugins.businessProcessNotification.BusinessProcessCase';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'DrmDeviceTableMap';
+	const TM_CLASS = 'BusinessProcessCaseTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 7;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'drm_device.ID';
+	const ID = 'business_process_case.ID';
 
 	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'drm_device.PARTNER_ID';
-
-	/** the column name for the DEVICE_ID field */
-	const DEVICE_ID = 'drm_device.DEVICE_ID';
-
-	/** the column name for the PROVIDER field */
-	const PROVIDER = 'drm_device.PROVIDER';
+	const PARTNER_ID = 'business_process_case.PARTNER_ID';
 
 	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'drm_device.CREATED_AT';
+	const CREATED_AT = 'business_process_case.CREATED_AT';
 
 	/** the column name for the UPDATED_AT field */
-	const UPDATED_AT = 'drm_device.UPDATED_AT';
+	const UPDATED_AT = 'business_process_case.UPDATED_AT';
+
+	/** the column name for the CASE_ID field */
+	const CASE_ID = 'business_process_case.CASE_ID';
+
+	/** the column name for the PROCESS_ID field */
+	const PROCESS_ID = 'business_process_case.PROCESS_ID';
+
+	/** the column name for the TEMPLATE_ID field */
+	const TEMPLATE_ID = 'business_process_case.TEMPLATE_ID';
+
+	/** the column name for the SERVER_ID field */
+	const SERVER_ID = 'business_process_case.SERVER_ID';
+
+	/** the column name for the OBJECT_ID field */
+	const OBJECT_ID = 'business_process_case.OBJECT_ID';
+
+	/** the column name for the OBJECT_TYPE field */
+	const OBJECT_TYPE = 'business_process_case.OBJECT_TYPE';
 
 	/** the column name for the CUSTOM_DATA field */
-	const CUSTOM_DATA = 'drm_device.CUSTOM_DATA';
+	const CUSTOM_DATA = 'business_process_case.CUSTOM_DATA';
 
 	/**
-	 * An identiy map to hold any loaded instances of DrmDevice objects.
+	 * An identiy map to hold any loaded instances of BusinessProcessCase objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array DrmDevice[]
+	 * @var        array BusinessProcessCase[]
 	 */
 	public static $instances = array();
 
@@ -68,11 +80,11 @@ abstract class BaseDrmDevicePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'DeviceId', 'Provider', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'deviceId', 'provider', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::DEVICE_ID, self::PROVIDER, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'device_id', 'provider', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'CaseId', 'ProcessId', 'TemplateId', 'ServerId', 'ObjectId', 'ObjectType', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'createdAt', 'updatedAt', 'caseId', 'processId', 'templateId', 'serverId', 'objectId', 'objectType', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::CASE_ID, self::PROCESS_ID, self::TEMPLATE_ID, self::SERVER_ID, self::OBJECT_ID, self::OBJECT_TYPE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'created_at', 'updated_at', 'case_id', 'process_id', 'template_id', 'server_id', 'object_id', 'object_type', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -82,11 +94,11 @@ abstract class BaseDrmDevicePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'DeviceId' => 2, 'Provider' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'CustomData' => 6, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'deviceId' => 2, 'provider' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'customData' => 6, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::DEVICE_ID => 2, self::PROVIDER => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::CUSTOM_DATA => 6, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'device_id' => 2, 'provider' => 3, 'created_at' => 4, 'updated_at' => 5, 'custom_data' => 6, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'CaseId' => 4, 'ProcessId' => 5, 'TemplateId' => 6, 'ServerId' => 7, 'ObjectId' => 8, 'ObjectType' => 9, 'CustomData' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'caseId' => 4, 'processId' => 5, 'templateId' => 6, 'serverId' => 7, 'objectId' => 8, 'objectType' => 9, 'customData' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::CASE_ID => 4, self::PROCESS_ID => 5, self::TEMPLATE_ID => 6, self::SERVER_ID => 7, self::OBJECT_ID => 8, self::OBJECT_TYPE => 9, self::CUSTOM_DATA => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'created_at' => 2, 'updated_at' => 3, 'case_id' => 4, 'process_id' => 5, 'template_id' => 6, 'server_id' => 7, 'object_id' => 8, 'object_type' => 9, 'custom_data' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -135,12 +147,12 @@ abstract class BaseDrmDevicePeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. DrmDevicePeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. BusinessProcessCasePeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(DrmDevicePeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(BusinessProcessCasePeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -156,13 +168,17 @@ abstract class BaseDrmDevicePeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(DrmDevicePeer::ID);
-		$criteria->addSelectColumn(DrmDevicePeer::PARTNER_ID);
-		$criteria->addSelectColumn(DrmDevicePeer::DEVICE_ID);
-		$criteria->addSelectColumn(DrmDevicePeer::PROVIDER);
-		$criteria->addSelectColumn(DrmDevicePeer::CREATED_AT);
-		$criteria->addSelectColumn(DrmDevicePeer::UPDATED_AT);
-		$criteria->addSelectColumn(DrmDevicePeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::ID);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::PARTNER_ID);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::CREATED_AT);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::UPDATED_AT);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::CASE_ID);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::PROCESS_ID);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::TEMPLATE_ID);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::SERVER_ID);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::OBJECT_ID);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(BusinessProcessCasePeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -181,27 +197,27 @@ abstract class BaseDrmDevicePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(DrmDevicePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(BusinessProcessCasePeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			DrmDevicePeer::addSelectColumns($criteria);
+			BusinessProcessCasePeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		DrmDevicePeer::attachCriteriaFilter($criteria);
+		BusinessProcessCasePeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'DrmDevicePeer', 
+			'BusinessProcessCasePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
@@ -210,7 +226,7 @@ abstract class BaseDrmDevicePeer {
 		}
 		
 		// select the connection for the query
-		$con = DrmDevicePeer::alternativeCon ($con, $queryDB);
+		$con = BusinessProcessCasePeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -234,7 +250,7 @@ abstract class BaseDrmDevicePeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     DrmDevice
+	 * @return     BusinessProcessCase
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -242,7 +258,7 @@ abstract class BaseDrmDevicePeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = DrmDevicePeer::doSelect($critcopy, $con);
+		$objects = BusinessProcessCasePeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -284,10 +300,10 @@ abstract class BaseDrmDevicePeer {
 	{
 		foreach ($queryResult as $curIndex => $curObject)
 		{
-			$objFromPool = DrmDevicePeer::getInstanceFromPool($curObject->getPrimaryKey());
+			$objFromPool = BusinessProcessCasePeer::getInstanceFromPool($curObject->getPrimaryKey());
 			if ($objFromPool === null)
 			{
-				DrmDevicePeer::addInstanceToPool($curObject);
+				BusinessProcessCasePeer::addInstanceToPool($curObject);
 			}
 			else
 			{
@@ -309,7 +325,7 @@ abstract class BaseDrmDevicePeer {
 			{  
 				foreach ($queryResult as $curResult)
 				{
-					DrmDevicePeer::addInstanceToPool($curResult);
+					BusinessProcessCasePeer::addInstanceToPool($curResult);
 				}
 			}
 		}
@@ -326,27 +342,27 @@ abstract class BaseDrmDevicePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = DrmDevicePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = BusinessProcessCasePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'DrmDevicePeer', 
+			'BusinessProcessCasePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			$cacheKey = null;
-			DrmDevicePeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			DrmDevicePeer::updateInstancePool($cachedResult);
+			BusinessProcessCasePeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			BusinessProcessCasePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
-		$con = DrmDevicePeer::alternativeCon($con, $queryDB);
+		$con = BusinessProcessCasePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = DrmDevicePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = BusinessProcessCasePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
@@ -357,9 +373,9 @@ abstract class BaseDrmDevicePeer {
 			$cacheKey = null;
 		}
 		
-		DrmDevicePeer::filterSelectResults($queryResult, $criteria);
+		BusinessProcessCasePeer::filterSelectResults($queryResult, $criteria);
 		
-		DrmDevicePeer::addInstancesToPool($queryResult);
+		BusinessProcessCasePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
 
@@ -383,7 +399,7 @@ abstract class BaseDrmDevicePeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(DrmDevicePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(BusinessProcessCasePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -395,7 +411,7 @@ abstract class BaseDrmDevicePeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = DrmDevicePeer::getCriteriaFilter();
+		$criteria_filter = BusinessProcessCasePeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -409,12 +425,12 @@ abstract class BaseDrmDevicePeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			DrmDevicePeer::setDefaultCriteriaFilter();
+			BusinessProcessCasePeer::setDefaultCriteriaFilter();
 		
-		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('DrmDevice');
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('BusinessProcessCase');
 		if ($partnerCriteria)
 		{
-			call_user_func_array(array('DrmDevicePeer','addPartnerToCriteria'), $partnerCriteria);
+			call_user_func_array(array('BusinessProcessCasePeer','addPartnerToCriteria'), $partnerCriteria);
 		}
 		
 		return self::$s_criteria_filter;
@@ -441,7 +457,7 @@ abstract class BaseDrmDevicePeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		DrmDevicePeer::getCriteriaFilter()->applyFilter($criteria);
+		BusinessProcessCasePeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
@@ -477,7 +493,7 @@ abstract class BaseDrmDevicePeer {
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
 			}
-			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
 			{
 				// all is allowed - don't add anything to the criteria
 			}
@@ -523,10 +539,10 @@ abstract class BaseDrmDevicePeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		DrmDevicePeer::attachCriteriaFilter($criteria);
+		BusinessProcessCasePeer::attachCriteriaFilter($criteria);
 		
 		// select the connection for the query
-		$con = DrmDevicePeer::alternativeCon ( $con );
+		$con = BusinessProcessCasePeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -540,20 +556,20 @@ abstract class BaseDrmDevicePeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				DrmDevicePeer::addSelectColumns($criteria);
+				BusinessProcessCasePeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			DrmDevicePeer::addSelectColumns($criteria);
+			BusinessProcessCasePeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		DrmDevicePeer::attachCriteriaFilter($criteria);
+		BusinessProcessCasePeer::attachCriteriaFilter($criteria);
 
 		return $criteria;
 	}
@@ -573,9 +589,9 @@ abstract class BaseDrmDevicePeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = DrmDevicePeer::alternativeCon($con);
+		$con = BusinessProcessCasePeer::alternativeCon($con);
 		
-		$criteria = DrmDevicePeer::prepareCriteriaForSelect($criteria);
+		$criteria = BusinessProcessCasePeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -589,10 +605,10 @@ abstract class BaseDrmDevicePeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      DrmDevice $value A DrmDevice object.
+	 * @param      BusinessProcessCase $value A BusinessProcessCase object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(DrmDevice $obj, $key = null)
+	public static function addInstanceToPool(BusinessProcessCase $obj, $key = null)
 	{
 		if ( Propel::isInstancePoolingEnabled() )
 		{
@@ -606,7 +622,7 @@ abstract class BaseDrmDevicePeer {
 				)
 			{
 				self::$instances[$key] = $obj;
-				kMemoryManager::registerPeer('DrmDevicePeer');
+				kMemoryManager::registerPeer('BusinessProcessCasePeer');
 			}
 		}
 	}
@@ -619,18 +635,18 @@ abstract class BaseDrmDevicePeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A DrmDevice object or a primary key value.
+	 * @param      mixed $value A BusinessProcessCase object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof DrmDevice) {
+			if (is_object($value) && $value instanceof BusinessProcessCase) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or DrmDevice object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or BusinessProcessCase object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -645,7 +661,7 @@ abstract class BaseDrmDevicePeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     DrmDevice Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     BusinessProcessCase Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -673,7 +689,7 @@ abstract class BaseDrmDevicePeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to drm_device
+	 * Method to invalidate the instance pool of all tables related to business_process_case
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -710,18 +726,17 @@ abstract class BaseDrmDevicePeer {
 	{
 		$results = array();
 	
+		// set the class once to avoid overhead in the loop
+		$cls = BusinessProcessCasePeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = DrmDevicePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = DrmDevicePeer::getInstanceFromPool($key))) {
+			$key = BusinessProcessCasePeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = BusinessProcessCasePeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
 				$results[] = $obj;
 			} else {
-				// class must be set each time from the record row
-				$cls = DrmDevicePeer::getOMClass($row, 0);
-				$cls = substr('.'.$cls, strrpos('.'.$cls, '.') + 1);
 				$obj = new $cls();
 				$obj->hydrate($row);
 				$results[] = $obj;
@@ -747,39 +762,33 @@ abstract class BaseDrmDevicePeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseDrmDevicePeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseDrmDevicePeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BaseBusinessProcessCasePeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BaseBusinessProcessCasePeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new DrmDeviceTableMap());
+	    $dbMap->addTableObject(new BusinessProcessCaseTableMap());
 	  }
 	}
 
 	/**
-	 * The returned Class will contain objects of the default type or
-	 * objects that inherit from the default.
+	 * The class that the Peer will make instances of.
 	 *
-	 * @param      array $row PropelPDO result row.
-	 * @param      int $colnum Column to examine for OM class information (first is 0).
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * If $withPrefix is true, the returned path
+	 * uses a dot-path notation which is tranalted into a path
+	 * relative to a location on the PHP include_path.
+	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
+	 *
+	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @return     string path.to.ClassName
 	 */
-	public static function getOMClass($row, $colnum)
+	public static function getOMClass($withPrefix = true)
 	{
-		try {
-
-			$omClass = $row[$colnum + 3];
-			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
-
-		} catch (Exception $e) {
-			throw new PropelException('Unable to get OM class.', $e);
-		}
-		return $omClass;
+		return $withPrefix ? BusinessProcessCasePeer::CLASS_DEFAULT : BusinessProcessCasePeer::OM_CLASS;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a DrmDevice or Criteria object.
+	 * Method perform an INSERT on the database, given a BusinessProcessCase or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or DrmDevice object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or BusinessProcessCase object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -788,17 +797,17 @@ abstract class BaseDrmDevicePeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(DrmDevicePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(BusinessProcessCasePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from DrmDevice object
+			$criteria = $values->buildCriteria(); // build Criteria from BusinessProcessCase object
 		}
 
-		if ($criteria->containsKey(DrmDevicePeer::ID) && $criteria->keyContainsValue(DrmDevicePeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.DrmDevicePeer::ID.')');
+		if ($criteria->containsKey(BusinessProcessCasePeer::ID) && $criteria->keyContainsValue(BusinessProcessCasePeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.BusinessProcessCasePeer::ID.')');
 		}
 
 
@@ -820,9 +829,9 @@ abstract class BaseDrmDevicePeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a DrmDevice or Criteria object.
+	 * Method perform an UPDATE on the database, given a BusinessProcessCase or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or DrmDevice object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or BusinessProcessCase object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -831,7 +840,7 @@ abstract class BaseDrmDevicePeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(DrmDevicePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(BusinessProcessCasePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -839,10 +848,10 @@ abstract class BaseDrmDevicePeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(DrmDevicePeer::ID);
-			$selectCriteria->add(DrmDevicePeer::ID, $criteria->remove(DrmDevicePeer::ID), $comparison);
+			$comparison = $criteria->getComparison(BusinessProcessCasePeer::ID);
+			$selectCriteria->add(BusinessProcessCasePeer::ID, $criteria->remove(BusinessProcessCasePeer::ID), $comparison);
 
-		} else { // $values is DrmDevice object
+		} else { // $values is BusinessProcessCase object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -861,28 +870,37 @@ abstract class BaseDrmDevicePeer {
 	{
 		return array();
 	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
+	{
+		return array();
+	}
 
 	/**
-	 * Method to DELETE all rows from the drm_device table.
+	 * Method to DELETE all rows from the business_process_case table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(DrmDevicePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(BusinessProcessCasePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(DrmDevicePeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(BusinessProcessCasePeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			DrmDevicePeer::clearInstancePool();
-			DrmDevicePeer::clearRelatedInstancePool();
+			BusinessProcessCasePeer::clearInstancePool();
+			BusinessProcessCasePeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -892,9 +910,9 @@ abstract class BaseDrmDevicePeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a DrmDevice or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a BusinessProcessCase or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or DrmDevice object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or BusinessProcessCase object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -905,27 +923,27 @@ abstract class BaseDrmDevicePeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(DrmDevicePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(BusinessProcessCasePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			DrmDevicePeer::clearInstancePool();
+			BusinessProcessCasePeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof DrmDevice) { // it's a model object
+		} elseif ($values instanceof BusinessProcessCase) { // it's a model object
 			// invalidate the cache for this single object
-			DrmDevicePeer::removeInstanceFromPool($values);
+			BusinessProcessCasePeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(DrmDevicePeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(BusinessProcessCasePeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				DrmDevicePeer::removeInstanceFromPool($singleval);
+				BusinessProcessCasePeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -940,7 +958,7 @@ abstract class BaseDrmDevicePeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			DrmDevicePeer::clearRelatedInstancePool();
+			BusinessProcessCasePeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -950,24 +968,24 @@ abstract class BaseDrmDevicePeer {
 	}
 
 	/**
-	 * Validates all modified columns of given DrmDevice object.
+	 * Validates all modified columns of given BusinessProcessCase object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      DrmDevice $obj The object to validate.
+	 * @param      BusinessProcessCase $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(DrmDevice $obj, $cols = null)
+	public static function doValidate(BusinessProcessCase $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(DrmDevicePeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(DrmDevicePeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(BusinessProcessCasePeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(BusinessProcessCasePeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -983,7 +1001,7 @@ abstract class BaseDrmDevicePeer {
 
 		}
 
-		return BasePeer::doValidate(DrmDevicePeer::DATABASE_NAME, DrmDevicePeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(BusinessProcessCasePeer::DATABASE_NAME, BusinessProcessCasePeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -991,19 +1009,19 @@ abstract class BaseDrmDevicePeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     DrmDevice
+	 * @return     BusinessProcessCase
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = DrmDevicePeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = BusinessProcessCasePeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(DrmDevicePeer::DATABASE_NAME);
-		$criteria->add(DrmDevicePeer::ID, $pk);
+		$criteria = new Criteria(BusinessProcessCasePeer::DATABASE_NAME);
+		$criteria->add(BusinessProcessCasePeer::ID, $pk);
 
-		$v = DrmDevicePeer::doSelect($criteria, $con);
+		$v = BusinessProcessCasePeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -1022,16 +1040,16 @@ abstract class BaseDrmDevicePeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(DrmDevicePeer::DATABASE_NAME);
-			$criteria->add(DrmDevicePeer::ID, $pks, Criteria::IN);
-			$objs = DrmDevicePeer::doSelect($criteria, $con);
+			$criteria = new Criteria(BusinessProcessCasePeer::DATABASE_NAME);
+			$criteria->add(BusinessProcessCasePeer::ID, $pks, Criteria::IN);
+			$objs = BusinessProcessCasePeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BaseDrmDevicePeer
+} // BaseBusinessProcessCasePeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseDrmDevicePeer::buildTableMap();
+BaseBusinessProcessCasePeer::buildTableMap();
 

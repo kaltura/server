@@ -22,7 +22,8 @@ class kChtHttpUrlTokenizer extends kUrlTokenizer
 	{
 		$expiryTime = time() + $this->window;
 
-		$hashData = $url . $this->key . $expiryTime	;
+		$hashit = dirname($url) . "/";
+		$hashData = $hashit . $this->key . $expiryTime	;
 		$token = base64_encode(md5($hashData, true));
 		
 		//remove = character from the token

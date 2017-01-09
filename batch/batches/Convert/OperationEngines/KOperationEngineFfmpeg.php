@@ -8,7 +8,9 @@ class KOperationEngineFfmpeg  extends KSingleOutputOperationEngine
 	protected function getCmdLine()
 	{
 		$cmdLine=parent::getCmdLine();
-		$cmdLine=KConversionEngineFfmpeg::experimentalFixing($cmdLine, $this->data->flavorParamsOutput, $this->cmd, $this->inFilePath, $this->outFilePath);
+		if(get_class($this)=='KOperationEngineFfmpegVp8'){
+			$cmdLine=KConversionEngineFfmpeg::experimentalFixing($cmdLine, $this->data->flavorParamsOutput, $this->cmd, $this->inFilePath, $this->outFilePath);
+		}
 		$cmdLine=KDLOperatorFfmpeg::ExpandForcedKeyframesParams($cmdLine);
 		
 		// impersonite

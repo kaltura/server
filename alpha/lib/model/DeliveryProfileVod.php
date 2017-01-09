@@ -402,16 +402,6 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $flavors;
 	}
 
-	public function setAdStitchingEnabled($v)
-	{
-		$this->putInCustomData("adStitchingEnabled", $v);
-	}
-
-	public function getAdStitchingEnabled()
-	{
-		return $this->getFromCustomData("adStitchingEnabled", null, false);
-	}
-
 	public function setDynamicAttributes(DeliveryProfileDynamicAttributes $params) {
 		parent::setDynamicAttributes($params);
 		if (is_null($this->params->getUsePlayServer()))

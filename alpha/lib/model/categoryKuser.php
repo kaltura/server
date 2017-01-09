@@ -346,7 +346,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 
-		if($this->getColumnsOldValue(CategoryKuserPeer::STATUS) != CategoryKuserStatus::DELETED  && $this->getStatus() == CategoryKuserStatus::DELETED)
+		if($this->getColumnsOldValue(categoryKuserPeer::STATUS) != CategoryKuserStatus::DELETED  && $this->getStatus() == CategoryKuserStatus::DELETED)
 		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 		}

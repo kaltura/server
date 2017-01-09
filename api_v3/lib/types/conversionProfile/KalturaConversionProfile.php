@@ -155,6 +155,14 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	 */
 	public $calculateComplexity;
 	
+	/**
+	 * Defines the tags that should be used to define 'collective'/group/multi-flavor processing,
+	 * like 'mbr' or 'ism'
+	 *
+	 * @var string
+	 */
+	public $collectionTags;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -174,6 +182,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		"storageProfileId",
 		"mediaParserType",
 		"calculateComplexity",
+		"collectionTags",
 	);
 	
 	public function getMapBetweenObjects ( )

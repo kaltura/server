@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'drm_device' table.
+ * This class defines the structure of the 'business_process_case' table.
  *
  *
  *
@@ -11,15 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package plugins.drm
+ * @package plugins.businessProcessNotification
  * @subpackage model.map
  */
-class DrmDeviceTableMap extends TableMap {
+class BusinessProcessCaseTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'plugins.drm.DrmDeviceTableMap';
+	const CLASS_NAME = 'plugins.businessProcessNotification.BusinessProcessCaseTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -31,18 +31,22 @@ class DrmDeviceTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('drm_device');
-		$this->setPhpName('DrmDevice');
-		$this->setClassname('DrmDevice');
-		$this->setPackage('plugins.drm');
+		$this->setName('business_process_case');
+		$this->setPhpName('BusinessProcessCase');
+		$this->setClassname('BusinessProcessCase');
+		$this->setPackage('plugins.businessProcessNotification');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('DEVICE_ID', 'DeviceId', 'VARCHAR', true, 128, null);
-		$this->addColumn('PROVIDER', 'Provider', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('CASE_ID', 'CaseId', 'INTEGER', false, null, null);
+		$this->addColumn('PROCESS_ID', 'ProcessId', 'VARCHAR', false, 255, null);
+		$this->addColumn('TEMPLATE_ID', 'TemplateId', 'INTEGER', false, null, null);
+		$this->addColumn('SERVER_ID', 'ServerId', 'INTEGER', false, null, null);
+		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 20, null);
+		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
@@ -54,4 +58,4 @@ class DrmDeviceTableMap extends TableMap {
 	{
 	} // buildRelations()
 
-} // DrmDeviceTableMap
+} // BusinessProcessCaseTableMap

@@ -5,7 +5,6 @@
 class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaEventConsumers, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'playReady';
-	const SCHEME_NAME = 'playReady';
 	const SEARCH_DATA_SUFFIX = 's';
 	const PLAY_READY_EVENTS_CONSUMER = 'kPlayReadyEventsConsumer';
 	
@@ -20,14 +19,6 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		return self::PLUGIN_NAME;
 	}
 
-	/* (non-PHPdoc)
-	 * @see IKalturaPlugin::getSchemeName()
-	 */
-	public static function getSchemeName()
-	{
-		return self::SCHEME_NAME;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IKalturaPending::dependsOn()
 	 */
@@ -44,13 +35,15 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 	public static function getEnums($baseEnumName = null)
 	{	
 		if(is_null($baseEnumName))
-			return array('PlayReadyLicenseScenario', 'PlayReadyLicenseType', 'PlayReadyProviderType');
+			return array('PlayReadyLicenseScenario', 'PlayReadyLicenseType', 'PlayReadyProviderType', 'PlayReadySchemeName');
 		if($baseEnumName == 'DrmLicenseScenario')
 			return array('PlayReadyLicenseScenario');
 		if($baseEnumName == 'DrmLicenseType')
 			return array('PlayReadyLicenseType');
 		if($baseEnumName == 'DrmProviderType')
-			return array('PlayReadyProviderType');		
+			return array('PlayReadyProviderType');
+		if ($baseEnumName == 'DrmSchemeName')
+			return array('PlayReadySchemeName');
 			
 		return array();
 	}
@@ -250,13 +243,21 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
 					$data = new kDrmPlaybackPluginData();
-					$scheme = $this->getSchemeName();
-					$data->setLicenseURL($this->constructUrl($playReadyProfile, $scheme, $customDataObject));
-					$data->setScheme($scheme);
-					$result->addToPluginData($scheme, $data);
+					$data->setScheme($this->getDrmSchemeCoreValue());
+					$data->setLicenseURL($this->constructUrl($playReadyProfile, self::PLUGIN_NAME, $customDataObject));
+					$result->addToPluginData(self::PLUGIN_NAME, $data);
 				}
 			}
 		}
+	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDrmSchemeCoreValue()
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . PlayReadySchemeName::PLAYREADY;
+		return kPluginableEnumsManager::apiToCore('DrmSchemeName', $value);
 	}
 
 	public function isSupportStreamerTypes($streamerType)

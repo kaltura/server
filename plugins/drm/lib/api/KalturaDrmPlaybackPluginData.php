@@ -6,7 +6,7 @@
 class KalturaDrmPlaybackPluginData extends KalturaPluginData{
 
     /**
-     * @var string
+     * @var KalturaDrmSchemeName
      */
     public $scheme;
 

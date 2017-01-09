@@ -300,7 +300,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	}
 	
 	
-    protected function updateObjectsResults($requestResults, $bulkUploadResults)
+    protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
@@ -328,7 +328,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				continue;
 			}
 			
-			if ($bulkUploadResult->action != KalturaBulkUploadAction::DELETE)
+			if (($bulkUploadResult->action != KalturaBulkUploadAction::DELETE)&&($bulkUploadResult->group))
 				$bulkUploadResult = $this->handleGroupUser($bulkUploadResult);
 			$this->addBulkUploadResult($bulkUploadResult);
 		}

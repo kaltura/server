@@ -200,7 +200,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 		KalturaLog::info("job[{$this->job->id}] finished creating objects");
 	}
 	
-    protected function updateObjectsResults($requestResults, $bulkUploadResults)
+    protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 	    KBatchBase::$kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");

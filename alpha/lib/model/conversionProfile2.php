@@ -312,4 +312,11 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		$this->putInCustomData('calculateComplexity', $v);
 	}
+	
+	/*
+	 * Defines the tags that should be used to define 'collective'/group/multi-flavor processing,
+	 * like 'mbr' or 'ism'
+	 */
+	public function getCollectionTags() { return $this->getFromCustomData('collectionTags', null, 'mbr,ism'); }
+	public function setCollectionTags($v) {	$this->putInCustomData('collectionTags', $v); }
 }

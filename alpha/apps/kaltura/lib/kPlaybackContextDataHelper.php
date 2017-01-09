@@ -164,7 +164,6 @@ class kPlaybackContextDataHelper
 	private function getRelevantFlavorAssets(kContextDataHelper $contextDataHelper)
 	{
 		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
-
 		list($flavorsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorsToFilter($contextDataHelper);
 
 		if(count($flavorsIdsToFilter) || $flavorsParamsNotIn)
@@ -184,6 +183,13 @@ class kPlaybackContextDataHelper
 		$servePriority = $dbEntry->getPartner()->getStorageServePriority();
 
 		$remoteFileSyncs = array();
+
+		if ( $dbEntry->getType() == entryType::LIVE_STREAM )
+		{
+			foreach ($this->flavorAssets as $flavorAsset)
+				$this->localFlavors[$flavorAsset->getId()] = $flavorAsset;
+			return;
+		}
 
 		foreach ($this->flavorAssets as $flavorAsset)
 		{
@@ -269,8 +275,10 @@ class kPlaybackContextDataHelper
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 
 		$localDeliveryProfileIds = array();
-		if (count($dbEntry->getPartner()->getDeliveryProfileIds()))
-			$localDeliveryProfileIds = call_user_func_array('array_merge', $dbEntry->getPartner()->getDeliveryProfileIds());
+
+		$customDeliveryProfilesIds = DeliveryProfilePeer::getCustomDeliveryProfileIds($dbEntry, $dbEntry->getPartner(), $deliveryAttributes);
+		if (count($customDeliveryProfilesIds))
+			$localDeliveryProfileIds = call_user_func_array('array_merge', $customDeliveryProfilesIds);
 
 		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
@@ -334,7 +342,7 @@ class kPlaybackContextDataHelper
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
 
 					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
-					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode(",", array_keys($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
+					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $this->constructProtocol($deliveryProfile), implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
 				}
 			}
 		}
