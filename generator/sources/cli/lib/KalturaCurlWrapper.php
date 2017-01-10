@@ -91,7 +91,6 @@ class KalturaCurlWrapper
 		if(curl_errno($ch))
 		{
 			echo 'curl error: ' . curl_error($ch);
-			$data = false;
 		}
 		else
 		{
