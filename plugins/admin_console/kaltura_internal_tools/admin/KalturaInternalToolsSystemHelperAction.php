@@ -117,7 +117,7 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 				$expired_str = self::formatThisData($expired); 
 				$now = time();
 				$now_str = self::formatThisData($now);
-				$res .= "<br>" . "valid until: " . $expired_str . "<br>now: $now ($now_str)";
+				$res .= "\n" . "KS valid until: " . $expired_str . "\nTime now: $now ($now_str)";
 			} 
 		}
 		elseif ( $algo == "kwid" )
