@@ -310,7 +310,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if($this->getDynamicAttributes()->getServeVodFromLive())
 		{
 			$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
-			$livePackagerUrl = str_replace("live", "recording", $livePackagerUrl);
+			$livePackagerUrl = str_replace("/live/", "/recording/", $livePackagerUrl);
 		}
 		else
 		{
