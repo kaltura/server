@@ -127,7 +127,7 @@ class Infra_ControllerPluginAcl extends Zend_Controller_Plugin_Abstract
 
         /** Check if the controller/action can be accessed by the current user */
         if (!$this->getAcl()->isAllowed($this->_roleName, $resourceName, $request->getActionName())) {
-			$message = "Access denied to resource[$resourceName], needed privilege [' . $request->getActionName() . '] with role [{$this->_roleName}]";
+	    $message = "Access denied to resource[$resourceName], needed privilege [" . $request->getActionName() . "] with role [".$this->_roleName."]";
 			KalturaLog::err($message);
 			throw new Infra_Exception($message, Infra_Exception::ERROR_CODE_ACCESS_DENIED);
         }
