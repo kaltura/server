@@ -915,25 +915,14 @@ class myEntryUtils
 		if (!$packagerCaptureUrl)
 			return false;
 
-		//look for the highest bitrate flavor tagged with thumbsource
-		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
-
-		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
-		{
-			// look for the highest bitrate flavor the packager can parse
-			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR);
-			if (is_null($flavorAsset))
-			{
-				//retrieve original ready
-				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
-					return false;
-			}
-		}
+		$flavorAsset = self::getFlavorSupportedByPackager($entry->getId());
+		if(!$flavorAsset)
+			return false;
 
 		$flavorAssetId = $flavorAsset->getId();
-		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
 
 		if (!$entry_data_path)
 			return false;
@@ -952,9 +941,30 @@ class myEntryUtils
 		return true;
 	}
 
+	private static function getFlavorSupportedByPackager($entryId)
+	{
+		//look for the highest bitrate flavor tagged with thumbsource
+		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
+
+		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
+		{
+			// look for the highest bitrate flavor the packager can parse
+			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+			if (is_null($flavorAsset))
+			{
+				//retrieve original ready
+				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
+					return null;
+			}
+		}
+		return $flavorAsset;
+	}
+
 	public static function isFlavorSupportedByPackager($flavorAsset)
 	{
-		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), array('mp42','isom','f4v'))))
+		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM, assetParams::CONTAINER_FORMAT_F4V);
+		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
 			return true;
 		return false;
 	}

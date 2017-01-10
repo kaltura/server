@@ -33,6 +33,9 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_M4V = "m4v";
 	const CONTAINER_FORMAT_MXF = "mxf";
 	const CONTAINER_FORMAT_COPY = "copy";
+	const CONTAINER_FORMAT_MP42 = "mp42";
+	const CONTAINER_FORMAT_ISOM = "isom";
+	const CONTAINER_FORMAT_F4V = "f4v";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
