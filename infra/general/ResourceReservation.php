@@ -4,88 +4,100 @@
 class ResourceReservation
 {
 	CONST DEFAULT_TIME_IN_CACHE_FOR_RESERVATION = 5;
-	
+
+	/**
+	 * @var kBaseCacheWrapper $cache
+	 */
+	private $cache;
+
+	/**
+	 * @var int $ttl
+	 */
+	private $ttl;
+
+	/**
+	 * @var string $userToken
+	 */
+	private $userToken;
+
+
+	function __construct($cache, $ttl, $userToken)
+	{
+		$this->cache = $cache;
+		$this->userToken = $userToken;
+		$this->ttl = intval($ttl);
+		if (!$this->ttl)
+			$this->ttl = ResourceReservation::DEFAULT_TIME_IN_CACHE_FOR_RESERVATION;
+	}
+
+
 	/**
 	 * will return cache-key for resource
 	 * @param string $resourceId
 	 * @return string
 	 */
-	private static function getCacheKeyForResource($resourceId)
+	private function getCacheKeyForResource($resourceId)
 	{
 		return "resource_reservation_cache_key_$resourceId";
 	}
 
 	/**
 	 * will reserve the resource for some time
-	 * @param kBaseCacheWrapper $cache
 	 * @param string $resourceId
-	 * @param string $userToken
-	 * @param int $ttl
 	 *
 	 * @return bool - true if reserve and false if could not
 	 */
-	public static function reserve($cache, $resourceId, $userToken, $ttl)
+	public function reserve($resourceId)
 	{
-		if (!$ttl)
-			$ttl = ResourceReservation::DEFAULT_TIME_IN_CACHE_FOR_RESERVATION;
-		if ($cache)
-			return $cache->add(self::getCacheKeyForResource($resourceId), $userToken, $ttl);
+		if ($this->cache)
+			return $this->cache->add($this->getCacheKeyForResource($resourceId), $this->userToken, $this->ttl);
 		return false;
 	}
 
 	/**
 	 * will reserve the resource for some time ignoring if the resource was already reserved
-	 * @param kBaseCacheWrapper $cache
 	 * @param string $resourceId
-	 * @param string $userToken
-	 * @param int $ttl
 	 *
 	 * @return bool - true if reserve and false if could not
 	 */
-	public static function reserveByForce($cache, $resourceId, $userToken, $ttl)
+	public function reserveByForce($resourceId)
 	{
-		if (!$ttl)
-			$ttl = ResourceReservation::DEFAULT_TIME_IN_CACHE_FOR_RESERVATION;
-		if ($cache)
-			return $cache->set(self::getCacheKeyForResource($resourceId), $userToken, $ttl);
+		if ($this->cache)
+			return $this->cache->set($this->getCacheKeyForResource($resourceId), $this->userToken, $this->ttl);
 		return false;
 	}
 
 	/**
 	 * will delete the reservation of the resource from cache
-	 * @param kBaseCacheWrapper $cache
 	 * @param string $resourceId
-	 * @param string $userToken
 	 *
 	 * @return bool - true if reservation was deleted
 	 */
-	public static function deleteReservation($cache, $resourceId, $userToken)
+	public function deleteReservation($resourceId)
 	{
-		if ($cache) 
+		if ($this->cache) 
 		{
-			$val = $cache->get(self::getCacheKeyForResource($resourceId));
+			$val = $this->cache->get($this->getCacheKeyForResource($resourceId));
 			if (!$val)
 				return true;
-			if ($val == $userToken)
-				return $cache->delete(self::getCacheKeyForResource($resourceId));
+			if ($val == $this->userToken) //only the one that reserve the resource can delete reservation
+				return $this->cache->delete($this->getCacheKeyForResource($resourceId));
 		}
 		return false;
 	}
 
 	/**
 	 * will return BatchJob objects.
-	 * @param kBaseCacheWrapper $cache
 	 * @param string $resourceId
-	 * @param string $userToken
 	 *
 	 * @return bool - true mean the resource is available
 	 */
-	public static function checkAvailable($cache, $resourceId, $userToken)
+	public function checkAvailable($resourceId)
 	{
-		if ($cache)
+		if ($this->cache)
 		{
-			$val = $cache->get(self::getCacheKeyForResource($resourceId));
-			if (!$val || $val == $userToken) //if not in cache or the caller was the one that reserve it
+			$val = $this->cache->get($this->getCacheKeyForResource($resourceId));
+			if (!$val || $val == $this->userToken) //if not in cache or the caller was the one that reserve it
 				return true;
 		}
 		return false;

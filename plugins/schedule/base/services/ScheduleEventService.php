@@ -358,7 +358,7 @@ class ScheduleEventService extends KalturaBaseService
 			{
 				KalturaLog::info("Could not reserve all resource id [$resourceId]");
 				$this->clearAllReservation($resourceReservator, $resourceIdsArray);
-				throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $scheduleEventResource->resourceId);
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $resourceId);
 			}
 	}
 
