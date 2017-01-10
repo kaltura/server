@@ -711,6 +711,7 @@ class myEntryUtils
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 		$flavorAssetId = null;
+		$packagerRetries = 3;
 
 		while($count--)
 		{
@@ -754,10 +755,22 @@ class myEntryUtils
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
-						
-					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
-						self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
-						
+
+					$success = false;
+
+					if($multi && $packagerRetries)
+					{
+						$success = self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+						if(!$success)
+							$packagerRetries--;
+					}
+
+					if (!$success)
+					{
+						$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
+							self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+					}
+
 					if ($cache)
 						$cache->delete($cacheLockKeyProcessing);
 					
@@ -895,7 +908,67 @@ class myEntryUtils
 		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
 		return true;
 	}
-	
+
+	public static function captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	{
+		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
+		if (!$packagerCaptureUrl)
+			return false;
+
+		$flavorAsset = self::getFlavorSupportedByPackager($entry->getId());
+		if(!$flavorAsset)
+			return false;
+
+		$flavorAssetId = $flavorAsset->getId();
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
+
+		if (!$entry_data_path)
+			return false;
+
+		$packagerThumbCapture = str_replace(
+			array ( "{url}", "{offset}" ),
+			array ( $entry_data_path , floor($calc_vid_sec*1000)  ) ,
+			$packagerCaptureUrl );
+
+		$tempThumbPath = $capturedThumbPath.'temp_1.jpg';
+		kFile::closeDbConnections();
+		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath);
+		if(!$success)
+			return false;
+
+		return true;
+	}
+
+	private static function getFlavorSupportedByPackager($entryId)
+	{
+		//look for the highest bitrate flavor tagged with thumbsource
+		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
+
+		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
+		{
+			// look for the highest bitrate flavor the packager can parse
+			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+			if (is_null($flavorAsset))
+			{
+				//retrieve original ready
+				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
+					return null;
+			}
+		}
+		return $flavorAsset;
+	}
+
+	public static function isFlavorSupportedByPackager($flavorAsset)
+	{
+		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM, assetParams::CONTAINER_FORMAT_F4V);
+		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
+			return true;
+		return false;
+	}
+
 	public static function captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, &$flavorAssetId)
 	{
 		$packagerCaptureUrl = kConf::get('packager_thumb_capture_url', 'local', null);
