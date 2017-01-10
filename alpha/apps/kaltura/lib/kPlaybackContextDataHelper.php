@@ -51,13 +51,20 @@ class kPlaybackContextDataHelper
 		if ($this->hasBlockAction($contextDataHelper))
 			return;
 
-		$this->getRelevantFlavorAssets($contextDataHelper);
-		$this->createFlavorsMapping($dbEntry);
-		$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
-		$this->constructRemotePlaybackSources($dbEntry,$contextDataHelper);
-		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
-		$this->filterFlavorsBySources();
-		$this->playbackContext->setFlavorAssets($this->flavorAssets);
+		if ($dbEntry->getType() == entryType::LIVE_STREAM)
+		{
+			$this->constructLivePlaybackSources($dbEntry, $contextDataHelper);
+			$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
+		}
+		else
+		{
+			$this->getRelevantFlavorAssets($contextDataHelper);
+			$this->createFlavorsMapping($dbEntry);
+			$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
+			$this->constructRemotePlaybackSources($dbEntry, $contextDataHelper);
+			$this->filterFlavorsBySources();
+			$this->playbackContext->setFlavorAssets($this->flavorAssets);
+		}
 	}
 
 	/**
@@ -263,9 +270,47 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
+	private function constructLivePlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper)
+	{
+		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
+
+		$liveDeliveryProfileIds = array();
+
+		$customDeliveryProfilesIds = DeliveryProfilePeer::getCustomDeliveryProfileIds($dbEntry, $dbEntry->getPartner(), $deliveryAttributes);
+		if (count($customDeliveryProfilesIds))
+			$liveDeliveryProfileIds = call_user_func_array('array_merge', $customDeliveryProfilesIds);
+
+		$liveDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $liveDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
+
+		if (!$dbEntry->getPartner()->getEnforceDelivery() && !in_array($dbEntry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
+		{
+			$streamsTypesToExclude = $this->getStreamsTypeToExclude($liveDeliveryProfiles);
+			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude);
+			$liveDeliveryProfiles = array_merge($liveDeliveryProfiles, $defaultDeliveryProfiles);
+		}
+
+		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
+
+		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
+			$this->filterDeliveryProfiles($liveDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
+
+		foreach ($liveDeliveryProfiles as $deliveryProfile)
+		{
+			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, array(), $deliveryProfile, $contextDataHelper);
+			$protocols = $this->constructProtocol($deliveryProfile);
+			$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+			$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+		}
+	}
+
+	/**
+	 * @param entry $dbEntry
+	 * @param kContextDataHelper $contextDataHelper
+	 * @return array
+	 */
 	private function constructLocalPlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper)
 	{
-		if (!count($this->localFlavors) && $dbEntry->getType() != entryType::LIVE_STREAM)
+		if (!count($this->localFlavors))
 			return;
 
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
@@ -295,12 +340,12 @@ class kPlaybackContextDataHelper
 			$deliveryProfileFlavors = $this->localFlavors;
 			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile, $contextDataHelper);
 
-				if (count($playbackFlavors) || $dbEntry->getType() == entryType::LIVE_STREAM )
-				{
-					$protocols = $this->constructProtocol($deliveryProfile);
-					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
-					$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
-				}
+			if (count($playbackFlavors))
+			{
+				$protocols = $this->constructProtocol($deliveryProfile);
+				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+			}
 		}
 	}
 
