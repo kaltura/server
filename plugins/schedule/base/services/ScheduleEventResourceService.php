@@ -29,9 +29,9 @@ class ScheduleEventResourceService extends KalturaBaseService
 	 */
 	public function addAction(KalturaScheduleEventResource $scheduleEventResource)
 	{
-		$resourceId = $scheduleEventResource->resourceId;
-		if (!kResourceReservation::checkAvailable($resourceId))
-			throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $resourceId);
+		$resourceReservator = new kResourceReservation();
+		if (!$resourceReservator->checkAvailable($scheduleEventResource->resourceId))
+			throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $scheduleEventResource->resourceId);
 		
 		// save in database
 		$dbScheduleEventResource = $scheduleEventResource->toInsertableObject();

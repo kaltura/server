@@ -2,28 +2,62 @@
 
 class kResourceReservation
 {
+	/**
+	 * @var kBaseCacheWrapper $cache
+	 */
+	private $cache;
+
+	/**
+	 * @var int $ttl
+	 */
+	private $ttl;
+
+	/**
+	 * @var string $ks
+	 */
+	private $ks;
+
+	function __construct($ttl = null)
+	{
+		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_RESOURCE_RESERVATION);
+		$this->ks = kCurrentContext::$ks;
+		if (!$ttl)
+			$ttl = kConf::get('ResourceReservationTime');
+		$this->ttl = $ttl;
+	}
+
 
 	/**
 	 * will reserve the resource for some time
 	 * @param string $resourceId
-	 * @param int $ttl
 	 *
 	 * @return bool - true if reserve and false if could not
 	 */
-	public static function reserve($resourceId, $ttl = null)
+	public function reserve($resourceId)
 	{
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_RESOURCE_RESERVATION);
-		if (!$cache)
-			return false;
-		if (!$ttl)
-			$ttl = kConf::get('ResourceReservationTime');
-		$ks = kCurrentContext::$ks;
-		if (ResourceReservation::reserve($cache, $resourceId, $ks, $ttl))
+		if (ResourceReservation::reserve($this->cache, $resourceId, $this->ks, $this->ttl))
 		{
-			KalturaLog::info("Resource reservation was done successfully for resource id [$resourceId] for [$ttl] seconds");
+			KalturaLog::info("Resource reservation was done successfully for resource id [$resourceId] for [$this->ttl] seconds");
 			return true;
 		}
 		KalturaLog::info("Could not reserve resource id [$resourceId]");
+		return false;
+	}
+
+	/**
+	 * will delete the reservation of the resource from cache
+	 * @param string $resourceId
+	 *
+	 * @return bool - true if reserve and false if could not
+	 */
+	public function deleteReservation($resourceId)
+	{
+		if (ResourceReservation::deleteReservation($this->cache, $resourceId, $this->ks))
+		{
+			KalturaLog::info("Resource reservation was deleted successfully for resource id [$resourceId]");
+			return true;
+		}
+		KalturaLog::info("Could not delete reservation for resource id [$resourceId]");
 		return false;
 	}
 
@@ -33,13 +67,9 @@ class kResourceReservation
 	 *
 	 * @return bool - true mean the resource is available
 	 */
-	public static function checkAvailable($resourceId)
+	public function checkAvailable($resourceId)
 	{
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_RESOURCE_RESERVATION);
-		if (!$cache)
-			return false;
-		$ks = kCurrentContext::$ks;
-		if (ResourceReservation::checkAvailable($cache, $resourceId, $ks))
+		if (ResourceReservation::checkAvailable($this->cache, $resourceId, $this->ks))
 		{
 			KalturaLog::info("Resource id [$resourceId] is available for usage");
 			return true;

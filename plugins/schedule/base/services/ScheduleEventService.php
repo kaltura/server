@@ -344,21 +344,28 @@ class ScheduleEventService extends KalturaBaseService
 		else {
 			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null));
 		}
-		self::reserveResources($resourceIds);
+		$this->reserveResources($resourceIds);
 
 		return KalturaScheduleEventArray::fromDbArray($events);
 	}
 
-	private function reserveResources($resourceId)
+	private function reserveResources($resourceIds)
 	{
-		$resourceIdsArray = explode(",", $resourceId);
-		$flag = true;
+		$resourceIdsArray = explode(",", $resourceIds);
+		$resourceReservator = new kResourceReservation();
 		foreach($resourceIdsArray as $resourceId)
-			if (!kResourceReservation::reserve($resourceId))
+			if (!$resourceReservator->reserve($resourceId))
 			{
 				KalturaLog::info("Could not reserve all resource id [$resourceId]");
-				$flag = false;
+				$this->clearAllReservation($resourceReservator, $resourceIdsArray);
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $scheduleEventResource->resourceId);
 			}
-		return $flag;
+	}
+
+	private function clearAllReservation($resourceReservator, $resourceIds)
+	{
+		/* @var kResourceReservation $resourceReservator*/
+		foreach($resourceIds as $resourceId)
+			$resourceReservator->deleteReservation($resourceId);
 	}
 }
