@@ -318,7 +318,7 @@ class ScheduleEventService extends KalturaBaseService
 	 * List conflicting events for resourcesIds by event's dates
 	 *
 	 * @action getConflicts
-	 * @param string $resourceIds comma sperated
+	 * @param string $resourceIds comma separated
 	 * @param KalturaScheduleEvent $scheduleEvent
 	 * @return KalturaScheduleEventArray
 	 */
@@ -344,7 +344,8 @@ class ScheduleEventService extends KalturaBaseService
 		else {
 			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null));
 		}
-		$this->reserveResources($resourceIds);
+		if (!count($events))
+			$this->reserveResources($resourceIds);
 
 		return KalturaScheduleEventArray::fromDbArray($events);
 	}

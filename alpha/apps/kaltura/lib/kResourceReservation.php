@@ -12,7 +12,7 @@ class kResourceReservation
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_RESOURCE_RESERVATION);
 		$ks = kCurrentContext::$ks;
 		if (!$ttl)
-			$ttl = kConf::get('ResourceReservationTime');
+			$ttl = kConf::get('ResourceReservationDuration');
 		$this->resourceReservator = new ResourceReservation($cache, $ttl, $ks);
 	}
 

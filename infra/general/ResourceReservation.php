@@ -60,7 +60,7 @@ class ResourceReservation
 	 *
 	 * @return bool - true if reserve and false if could not
 	 */
-	public function reserveByForce($resourceId)
+	public function forceReserve($resourceId)
 	{
 		if ($this->cache)
 			return $this->cache->set($this->getCacheKeyForResource($resourceId), $this->userToken, $this->ttl);
