@@ -335,7 +335,7 @@ None.
 
 ## 2-Factor Admin Console Authentication ##
 - Issue Type: New Feature 
-- Issue ID: PLAT-6125 
+- Issue ID: PLAT-6215 
 
 ### Configuration ###
 - Mandatory: in admin.ini, set settings.remoteAddrHeaderSalt to the same value as remote_addr_header_salt in local.ini
