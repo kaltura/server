@@ -62,6 +62,7 @@ class kPlaybackContextDataHelper
 			$this->createFlavorsMapping($dbEntry);
 			$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
 			$this->constructRemotePlaybackSources($dbEntry, $contextDataHelper);
+			$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
 			$this->filterFlavorsBySources();
 			$this->playbackContext->setFlavorAssets($this->flavorAssets);
 		}
