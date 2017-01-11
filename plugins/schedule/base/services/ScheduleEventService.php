@@ -318,7 +318,7 @@ class ScheduleEventService extends KalturaBaseService
 	 * List conflicting events for resourcesIds by event's dates
 	 *
 	 * @action getConflicts
-	 * @param string $resourceIds
+	 * @param string $resourceIds comma separated
 	 * @param KalturaScheduleEvent $scheduleEvent
 	 * @return KalturaScheduleEventArray
 	 */
@@ -344,7 +344,29 @@ class ScheduleEventService extends KalturaBaseService
 		else {
 			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null));
 		}
+		if (!count($events))
+			$this->reserveResources($resourceIds);
 
 		return KalturaScheduleEventArray::fromDbArray($events);
+	}
+
+	private function reserveResources($resourceIds)
+	{
+		$resourceIdsArray = explode(",", $resourceIds);
+		$resourceReservator = new kResourceReservation();
+		foreach($resourceIdsArray as $resourceId)
+			if (!$resourceReservator->reserve($resourceId))
+			{
+				KalturaLog::info("Could not reserve all resource id [$resourceId]");
+				$this->clearAllReservation($resourceReservator, $resourceIdsArray);
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $resourceId);
+			}
+	}
+
+	private function clearAllReservation($resourceReservator, $resourceIds)
+	{
+		/* @var kResourceReservation $resourceReservator*/
+		foreach($resourceIds as $resourceId)
+			$resourceReservator->deleteReservation($resourceId);
 	}
 }
