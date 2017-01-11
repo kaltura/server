@@ -5,22 +5,22 @@ require_once(dirname(__FILE__).'/../config/kConf.php');
 
 function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
 {
-	if ($max_age)
-	{
-		$cache_scope = $private ? "private" : "public";
-		header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
-		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
-		if ($last_modified)
-			header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
-		else
-			header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
-	}
-	else
-	{
-		header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
-		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-		header("Pragma: no-cache" );
-	}
+//	if ($max_age)
+//	{
+//		$cache_scope = $private ? "private" : "public";
+//		header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
+//		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
+//		if ($last_modified)
+//			header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
+//		else
+//			header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+//	}
+//	else
+//	{
+//		header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+//		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+//		header("Pragma: no-cache" );
+//	}
 }
 
 function checkCache()
@@ -236,7 +236,7 @@ function checkCache()
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
 		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$uri;
 		
-		$renderer = apc_fetch($cacheKey);
+		$renderer = null;//apc_fetch($cacheKey);
 		if ($renderer)
 		{
 			KalturaMonitorClient::initApiMonitor(true, 'extwidget.serveFlavor', $renderer->partnerId);
@@ -247,7 +247,7 @@ function checkCache()
 	}
 }
 
-checkCache();
+//checkCache();
 
 define('KALTURA_LOG', 		'ps2');
 define('SF_ENVIRONMENT',	'prod');
