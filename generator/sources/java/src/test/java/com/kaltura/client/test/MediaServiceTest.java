@@ -178,7 +178,7 @@ public class MediaServiceTest extends BaseTest {
 	
 	public void testUploadUnexistingFile() throws Exception {
 		
-		File file = new File("bin/nonExistingfile.flv");
+		File file = new File("src/test/resources/nonExistingfile.flv");
 		
 		startUserSession();
 		

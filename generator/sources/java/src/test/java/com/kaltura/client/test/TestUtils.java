@@ -39,7 +39,7 @@ public class TestUtils {
 			testConfig = new KalturaTestConfig();
 		}
 		
-		return new FileInputStream("bin/" + testConfig.getUploadVideo());
+		return new FileInputStream("src/test/resources/" + testConfig.getUploadVideo());
 	}
 	
 	static public InputStream getTestImage() throws IOException {
@@ -47,6 +47,6 @@ public class TestUtils {
 			testConfig = new KalturaTestConfig();
 		}
 		
-		return new FileInputStream("bin/" + testConfig.getUploadImage());
+		return new FileInputStream("src/test/resources/" + testConfig.getUploadImage());
 	}
 }
