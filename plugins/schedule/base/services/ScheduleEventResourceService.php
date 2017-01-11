@@ -40,6 +40,8 @@ class ScheduleEventResourceService extends KalturaBaseService
 		// return the saved object
 		$scheduleEventResource = new KalturaScheduleEventResource();
 		$scheduleEventResource->fromObject($dbScheduleEventResource, $this->getResponseProfile());
+
+		$resourceReservator->deleteReservation($scheduleEventResource->resourceId);
 		return $scheduleEventResource;
 	
 	}
