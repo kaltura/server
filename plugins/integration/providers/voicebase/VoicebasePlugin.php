@@ -11,12 +11,31 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 	const INTEGRATION_PLUGIN_VERSION_MINOR = 0;
 	const INTEGRATION_PLUGIN_VERSION_BUILD = 0;
 	
+	const TRANSCRIPT_PLUGIN_VERSION_MAJOR = 1;
+	const TRANSCRIPT_PLUGIN_VERSION_MINOR = 0;
+	const TRANSCRIPT_PLUGIN_VERSION_BUILD = 0;
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$transcriptVersion = new KalturaVersion(
+			self::TRANSCRIPT_PLUGIN_VERSION_MAJOR,
+			self::TRANSCRIPT_PLUGIN_VERSION_MINOR,
+			self::TRANSCRIPT_PLUGIN_VERSION_BUILD
+		);
+		$transcriptDependency = new KalturaDependency(TranscriptPlugin::getPluginName(), $transcriptVersion);
+
+		return array_merge(parent::dependsOn(), array($transcriptDependency));
 	}
 	
 	/* (non-PHPdoc)
