@@ -65,6 +65,8 @@ enabledWorkers.KAsyncIntegrateCloser				= 1
 enabledWorkers.KAsyncClearCuePoints					= 1
 enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 enabledWorkers.KAsyncLiveToVod      				= 1
+enabledWorkers.KAsyncSimuLiveClearScheduleEvents    = 1
+enabledWorkers.KAsyncSimuLiveAddScheduleEvent       = 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -774,3 +776,17 @@ params.skipSourceValidation             = 1
 id													= 640
 type												= KAsyncLiveToVod
 scriptPath											= batches/LiveToVod/KAsyncLiveToVodExe.php
+
+[KAsyncSimuLiveClearScheduleEvents : PeriodicWorker]
+id																	= 650
+friendlyName                                        				= Clear pld simulive schedule events
+type                                                				= KAsyncSimuLiveClearScheduleEvents
+scriptPath                                          				= batches/SimuLive/KAsyncSimuLiveClearScheduleEventsExe.php
+params.dvrWindow                                                    = 1000
+
+[KAsyncSimuLiveAddScheduleEvents : PeriodicWorker]
+id																	= 660
+friendlyName                                        				= add schedule events from simulive playlist
+type                                                				= KAsyncSimuLiveAddScheduleEvents
+scriptPath                                          				= batches/SimuLive/KAsyncSimuLiveAddScheduleEventsExe.php
+params.forwardBufferWindow                                          = 1000
