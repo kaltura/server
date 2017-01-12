@@ -747,8 +747,8 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
 
-	public function setLowLatency ( $v )	{	$this->putInCustomData ( "lowLatency" , $v );	}
-	public function getLowLatency (  )	{	return $this->getFromCustomData( "lowLatency", null, false);	}
+	public function setLowLatencySettings ( $v )	{	$this->putInCustomData ( "$lowLatencySettings" , $v );	}
+	public function getLowLatencySettings (  )	{	return $this->getFromCustomData( "$lowLatencySettings", null, KalturaLowLatencyChunkDurationValue::TEN_SECONDS_CHUNK_DURATION);	}
 
 	/**
 	 * @return boolean
