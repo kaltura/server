@@ -25,7 +25,7 @@ class KalturaTranscriptAsset extends KalturaAttachmentAsset
 	
 	/**
 	 * The provider of the transcript
-	 * @var int
+	 * @var KalturaTranscriptProviderType
 	 */
 	public $providerType;
 	
