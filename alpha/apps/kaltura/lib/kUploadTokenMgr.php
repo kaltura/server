@@ -56,6 +56,8 @@ class kUploadTokenMgr
 		try
 		{
 			$this->checkIfFileIsValid($fileData);
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+				$this->checkIfFileIsAllowed($fileData);
 		}
 		catch(kUploadTokenException $ex)
 		{
@@ -146,6 +148,18 @@ class kUploadTokenMgr
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
 		}
+	}
+
+	/**
+	 * Validate the file data
+	 * @param file $fileData
+	 */
+	protected function checkIfFileIsAllowed($fileData)
+	{
+		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
+		$allowFileTypes = kConf::get('allowed_file_type');
+		if (!in_array($extension, $allowFileTypes))
+			throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
 	}
 	
 	/**
