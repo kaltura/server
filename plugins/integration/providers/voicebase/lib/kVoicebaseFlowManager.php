@@ -50,7 +50,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			{
 				if (!isset ($transcripts[$containerFormat]))
 				{
-					$transcript = kTranscriptHelper::createTranscript($entryId, $partnerId, $language, $containerFormat);
+					$transcript = kTranscriptHelper::createTranscript($entryId, $partnerId, $spokenLanguage, $containerFormat);
 				}
 				else {
 					$transcript = $transcripts[$containerFormat];

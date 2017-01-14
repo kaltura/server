@@ -7,7 +7,6 @@ class kTranscriptHelper
 {
 	public static function getAssetsByLanguage($entryId, array $assetTypes, $spokenLanguage, $additionalStatuses = array ())
 	{
-		$objects = $returnSingleObject ? null : array();
 		$statuses = array(asset::ASSET_STATUS_QUEUED, asset::ASSET_STATUS_READY);
 		
 		if (count($additionalStatuses))
@@ -17,6 +16,7 @@ class kTranscriptHelper
 		
 		$resultArray = assetPeer::retrieveByEntryId($entryId, $assetTypes, $statuses);
 	
+		$objects = array ();
 		foreach($resultArray as $object)
 		{
 			if($object->getLanguage() == $spokenLanguage)
