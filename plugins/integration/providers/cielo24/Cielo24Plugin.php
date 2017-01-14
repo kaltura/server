@@ -152,18 +152,20 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		$res = parent::getEnums();
+		$res = parent::getEnums($baseEnumName);
 		
 		if (is_null ($baseEnumName))
 		{
 			$res[] = "Cielo24TranscriptProviderType";
+			return $res;
 		}
 		
 		if ($baseEnumName == 'TranscriptionProviderType')
 		{
 			$res = array ('Cielo24TranscriptProviderType');
+			return $res;
 		}
 		
-		return $res;
+		return array ();
 	}
 }

@@ -152,18 +152,20 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		$res = parent::getEnums();
+		$res = parent::getEnums($baseEnumName);
 		
 		if (is_null ($baseEnumName))
 		{
 			$res[] = "VoicebaseTranscriptProviderType";
+			return $res;
 		}
 		
-		if ($baseEnumName == 'TranscriptionProviderType')
+		if ($baseEnumName == 'TranscriptProviderType')
 		{
 			$res = array ('VoicebaseTranscriptProviderType');
+			return $res;
 		}
 		
-		return $res;
+		return array ();
 	}
 }
