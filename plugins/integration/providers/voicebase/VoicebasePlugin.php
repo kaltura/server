@@ -112,6 +112,15 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('IntegrationProviderType', $value);
 	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getTranscriptProviderTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('TranscriptProviderType', $value);
+	}
 	
 	public static function getClientHelper($apiKey, $apiPassword)
 	{
@@ -136,5 +145,25 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 			return;
 		$partner->putInCustomData(VoicebaseIntegrationProviderType::VOICEBASE, $options);
 		$partner->save();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		$res = parent::getEnums();
+		
+		if (is_null ($baseEnumName))
+		{
+			$res[] = "VoicebaseTranscriptProviderType";
+		}
+		
+		if ($baseEnumName == 'TranscriptionProviderType')
+		{
+			$res = array ('VoicebaseTranscriptProviderType');
+		}
+		
+		return $res;
 	}
 }

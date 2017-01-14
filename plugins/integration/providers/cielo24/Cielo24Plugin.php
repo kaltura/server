@@ -113,6 +113,15 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 		return kPluginableEnumsManager::apiToCore('IntegrationProviderType', $value);
 	}
 	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getTranscriptProviderTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('TranscriptProviderType', $value);
+	}
+	
 	public static function getClientHelper($username, $password, $baseUrl = null)
 	{
 		return new Cielo24ClientHelper($username, $password, $baseUrl);
@@ -136,5 +145,25 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 			return;
 		$partner->putInCustomData(Cielo24IntegrationProviderType::CIELO24, $options);
 		$partner->save();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		$res = parent::getEnums();
+		
+		if (is_null ($baseEnumName))
+		{
+			$res[] = "Cielo24TranscriptProviderType";
+		}
+		
+		if ($baseEnumName == 'TranscriptionProviderType')
+		{
+			$res = array ('Cielo24TranscriptProviderType');
+		}
+		
+		return $res;
 	}
 }
