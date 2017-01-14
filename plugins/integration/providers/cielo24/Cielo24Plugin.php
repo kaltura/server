@@ -160,7 +160,7 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 			return $res;
 		}
 		
-		if ($baseEnumName == 'TranscriptionProviderType')
+		if ($baseEnumName == 'TranscriptProviderType')
 		{
 			$res = array ('Cielo24TranscriptProviderType');
 			return $res;
