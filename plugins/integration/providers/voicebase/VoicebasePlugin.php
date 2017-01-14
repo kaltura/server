@@ -166,6 +166,6 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 			return $res;
 		}
 		
-		return array ();
+		return $res;
 	}
 }

@@ -166,6 +166,6 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 			return $res;
 		}
 		
-		return array ();
+		return $res;
 	}
 }
