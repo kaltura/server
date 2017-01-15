@@ -11,8 +11,8 @@ class myBatchPartnerUsage extends myBatchBase
 	{
 		self::initDb();
 		$partners_exists = true;
-		$start_pos = 0;
 		$bulk_size = 500;
+		$highest_partner_id = -100;
 		while($partners_exists)
 		{
 			$c = new Criteria();
@@ -24,17 +24,18 @@ class myBatchPartnerUsage extends myBatchBase
 			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, $partnerPackage); 
 			$c->addAnd(PartnerPeer::MONITOR_USAGE, 1);
 			$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_DELETED, Criteria::NOT_EQUAL);
-			$c->setOffset($start_pos);
+
+			$c->addAnd(PartnerPeer::ID, $highest_partner_id, Criteria::GREATER_THAN);
 			$c->setLimit($bulk_size);
 			$partners = PartnerPeer::doSelect($c);
 			if (!$partners)
 			{
-				KalturaLog::debug( "No more partners. offset: $start_pos , limit: $bulk_size ." );
+				KalturaLog::debug( "No more partners." );
 				$partners_exists = false;
 			} 
 			else
 			{
-				KalturaLog::debug( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
+				KalturaLog::debug( "Looping ". count($partners) ." partners" );
 				foreach($partners as $partner)
 				{
 					if($partnerPackage == 1) //free
@@ -45,11 +46,11 @@ class myBatchPartnerUsage extends myBatchBase
 					{
 						myPartnerUtils::doMonthlyPartnerUsage($partner);
 					}
+					$highest_partner_id = max($highest_partner_id, $partner->getId());
 				}
 			}
 			unset($partners);
 			PartnerPeer::clearInstancePool();
-			$start_pos += $bulk_size;
 		}
 	}
 
