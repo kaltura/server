@@ -62,7 +62,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		if(!count($jobs) > 0)
 		{
 			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
+			$this->saveSchedulerQueue(self::getType(), 0);
 			return;
 		}
 				
