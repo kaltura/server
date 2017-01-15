@@ -179,6 +179,7 @@ class serveFlavorAction extends kalturaAction
 			unset($entryIds[$i]);
 			unset($durations[$i]);
 		}
+		$durations = array_values($durations);		// if some duration was unset, this makes sure that durations will be rendered as an array in the json
 
 		// get the flavor params of the reference entry that should be returned
 		$referenceEntryFlavorParamsIds = array_keys($groupedFlavors[$referenceEntry->getId()]);
