@@ -118,13 +118,18 @@ class LiveChannelService extends KalturaLiveEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
+	//TODO: this method should be changed to reflect the actual live status
 	public function isLiveAction ($id)
 	{
+		return true;
 		$dbEntry = entryPeer::retrieveByPK($id);
 
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::LIVE_CHANNEL)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
 
+		/**
+		 * @var LiveChannel $dbEntry
+		 */
 		return $dbEntry->hasMediaServer();
 	}
 }

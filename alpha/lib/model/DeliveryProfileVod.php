@@ -53,7 +53,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '');
 			$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
 		}
-		else
+		else if ($entry->getType() != entryType::LIVE_CHANNEL)
 		{
 			$url .= $this->getFlavorVersionString($flavorAsset);
 			$url .= '/flavorId/' . $flavorAsset->getId();

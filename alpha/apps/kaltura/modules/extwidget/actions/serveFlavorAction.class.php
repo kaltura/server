@@ -407,7 +407,8 @@ class serveFlavorAction extends kalturaAction
 		$playlistEntries = array();
 		try
 		{
-			$playlistEntries = myPlaylistUtils::executePlaylistById($entry->getPartnerId(), $entry->getPlaylistId());
+			if ($entry->getPlaylistId())
+				$playlistEntries = myPlaylistUtils::executePlaylistById($entry->getPartnerId(), $entry->getPlaylistId());
 		}
 		catch (kCoreException $e)
 		{
@@ -445,6 +446,8 @@ class serveFlavorAction extends kalturaAction
 			/**
 			 * @var SimulatedLiveEntryScheduleEvent $scheduledEvent
 			 */
+			if (!isset($playlistEntriesById[$scheduledEvent->getEntryIds()]))
+				$playlistEntriesById[$scheduledEvent->getEntryIds()] = entryPeer::retrieveByPK($scheduledEvent->getEntryIds());
 			$entries[] = $playlistEntriesById[$scheduledEvent->getEntryIds()];
 		}
 
