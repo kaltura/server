@@ -66,19 +66,17 @@ class KAsyncSimuLiveAddScheduleEvents extends KPeriodicWorker
 			self::impersonate($liveChannel->partnerId);
 			$playList = self::$kClient->playlist->get($playListId);
 			self::unimpersonate();
-			$playlistDuration = $playList->duration;
+			$playlistDuration = ceil($playList->duration);
 			$offset = floor(($currTime - $totalTime) / $playlistDuration) * $playlistDuration;
 			$totalTime += $offset;
 		}
-
 		$schedulePlugin = KalturaScheduleClientPlugin::get(KBatchBase::$kClient);
 		$events = array();
 		$loop = true;
 		while($loop)
 		{
-			$loop = self::addPlaylistEvents($playListEntries, $totalTime, $currTime, $dvrWindow, $forwardBufferWindow, $liveChannel, $schedulePlugin);
+			$loop = self::addPlaylistEvents($playListEntries, $totalTime, $currTime, $dvrWindow, $forwardBufferWindow, $liveChannel, $schedulePlugin, $events);
 		}
-
 		self::impersonate($liveChannel->partnerId);
 		self::$kClient->startMultiRequest();
 		foreach ($events as $event)
@@ -98,9 +96,10 @@ class KAsyncSimuLiveAddScheduleEvents extends KPeriodicWorker
 	 * @param $forwardBufferWindow
 	 * @param $liveChannel
 	 * @param $schedulePlugin
+	 * @param $events
 	 * @return bool
 	 */
-	private static function addPlaylistEvents($playListEntries, &$offset, $currTime, $dvrWindow, $forwardBufferWindow, $liveChannel ,$schedulePlugin)
+	private static function addPlaylistEvents($playListEntries, &$offset, $currTime, $dvrWindow, $forwardBufferWindow, $liveChannel ,$schedulePlugin, &$events)
 	{
 		foreach ($playListEntries as $entry)
 		{
