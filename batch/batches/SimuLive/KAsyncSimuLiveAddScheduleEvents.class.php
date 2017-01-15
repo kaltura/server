@@ -28,8 +28,8 @@ class KAsyncSimuLiveAddScheduleEvents extends KPeriodicWorker
 		$currTime = time();
 
 		$filter = new KalturaLiveChannelFilter();
-		$filter->startTimeLessThenEqual = $currTime;
-		$filter->endTimeGreaterThenEqual = $currTime;
+		$filter->startDateLessThanOrEqual = $currTime;
+		$filter->endDateGreaterThanOrEqual = $currTime;
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 100;
@@ -66,10 +66,12 @@ class KAsyncSimuLiveAddScheduleEvents extends KPeriodicWorker
 			self::impersonate($liveChannel->partnerId);
 			$playList = self::$kClient->playlist->get($playListId);
 			self::unimpersonate();
-			$playlistDuration = ceil($playList->duration);
-			$offset = floor(($currTime - $totalTime) / $playlistDuration) * $playlistDuration;
-			$totalTime += $offset;
+			$playlistDuration = $playList->duration;
+			$offset = floor( floor(($currTime - $totalTime) / $playlistDuration) * $playlistDuration);
+			if($offset > 0)
+				$totalTime += $offset;
 		}
+
 		$schedulePlugin = KalturaScheduleClientPlugin::get(KBatchBase::$kClient);
 		$events = array();
 		$loop = true;
