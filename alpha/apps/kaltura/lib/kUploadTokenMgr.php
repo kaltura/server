@@ -57,7 +57,7 @@ class kUploadTokenMgr
 		{
 			$this->checkIfFileIsValid($fileData);
 			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId()))
-				$this->checkIfFileIsAllowed($fileData);
+				$this->checkIfFileIsAllowed();
 		}
 		catch(kUploadTokenException $ex)
 		{
@@ -152,13 +152,22 @@ class kUploadTokenMgr
 
 	/**
 	 * Validate the file data
-	 * @param file $fileData
+	 * @throw kUploadTokenException
 	 */
-	protected function checkIfFileIsAllowed($fileData)
+	protected function checkIfFileIsAllowed()
 	{
-		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
+		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
+		$fileType = kFile::mimeType($uploadFilePath);
 		$allowFileTypes = kConf::get('allowed_file_type');
-		if (!in_array($extension, $allowFileTypes))
+
+		$NoTypeMatch = true;
+		foreach($allowFileTypes as $type)
+		{
+			$NoTypeMatch &= strcmp($fileType,$type);
+			if (!$NoTypeMatch)
+				break;
+		}
+		if ($NoTypeMatch)
 			throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
 	}
 	
