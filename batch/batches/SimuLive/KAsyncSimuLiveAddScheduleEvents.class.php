@@ -56,23 +56,27 @@ class KAsyncSimuLiveAddScheduleEvents extends KPeriodicWorker
 		$dvrWindow = KBatchBase::$taskConfig->params->dvrWindow;
 		$forwardBufferWindow = KBatchBase::$taskConfig->params->forwardBufferWindow;
 		$playListId = $liveChannel->playlistId;
+		self::impersonate($liveChannel->partnerId);
 		$playListEntries = self::$kClient->playlist->execute($playListId);
+		self::unimpersonate();
+
 		$totalTime = $liveChannel->startDate;
+		if($liveChannel->loop)
+		{
+			self::impersonate($liveChannel->partnerId);
+			$playList = self::$kClient->playlist->get($playListId);
+			self::unimpersonate();
+			$playlistDuration = $playList->duration;
+			$offset = floor(($currTime - $totalTime) / $playlistDuration) * $playlistDuration;
+			$totalTime += $offset;
+		}
 
 		$schedulePlugin = KalturaScheduleClientPlugin::get(KBatchBase::$kClient);
 		$events = array();
-
-		foreach ($playListEntries as $entry)
+		$loop = true;
+		while($loop)
 		{
-			$totalTime += $entry->duration;
-			if($totalTime < $currTime - $dvrWindow)
-				continue;
-			if($currTime + $forwardBufferWindow < $totalTime)
-				break;
-			//else we need to add schedule event if doesnt exist
-			$startTime = $totalTime - $entry->duration;
-			$endTime = $totalTime;
-			self::addEvent($events, $startTime, $endTime, $playListId, $entry, $schedulePlugin);
+			$loop = self::addPlaylistEvents($playListEntries, $totalTime, $currTime, $dvrWindow, $forwardBufferWindow, $liveChannel, $schedulePlugin);
 		}
 
 		self::impersonate($liveChannel->partnerId);
@@ -86,18 +90,50 @@ class KAsyncSimuLiveAddScheduleEvents extends KPeriodicWorker
 	}
 
 	/**
+	 * loops over the playlist entries and adds events in the correct offset
+	 * @param $playListEntries
+	 * @param $offset
+	 * @param $currTime
+	 * @param $dvrWindow
+	 * @param $forwardBufferWindow
+	 * @param $liveChannel
+	 * @param $schedulePlugin
+	 * @return bool
+	 */
+	private static function addPlaylistEvents($playListEntries, &$offset, $currTime, $dvrWindow, $forwardBufferWindow, $liveChannel ,$schedulePlugin)
+	{
+		foreach ($playListEntries as $entry)
+		{
+			$offset += $entry->duration;
+			if($offset < $currTime - $dvrWindow)
+				continue;
+			if($currTime + $forwardBufferWindow < $offset)
+				return false;
+			//else we need to add schedule event if doesnt exist
+			$startTime = $offset - $entry->duration;
+			$endTime = $offset;
+			self::addEvent($events, $startTime, $endTime, $liveChannel->id, $entry->id, $schedulePlugin);
+		}
+
+		if($liveChannel->loop)
+			return true;
+		return false;
+	}
+
+	/**
+	 * checks if the event already exist and if not adds it
 	 * @param $events
 	 * @param $startDate
 	 * @param $endDate
-	 * @param $playListId
+	 * @param $ChannelId
 	 * @param $entryId
-	 * @param $schedulePlugin\
+	 * @param $schedulePlugin
 	 */
-	private static function addEvent(&$events, $startDate, $endDate, $playListId, $entryId, $schedulePlugin)
+	private static function addEvent(&$events, $startDate, $endDate, $ChannelId, $entryId, $schedulePlugin)
 	{
 		$filter = new KalturaSimulatedLiveEntryScheduleEventFilter();
-		$filter->entryIdsLike = $playListId;
-		$filter->referenceIdEqual = $entryId;
+		$filter->entryIdsLike = $entryId;
+		$filter->referenceIdEqual = $ChannelId;
 		$filter->startDateGreaterThanOrEqual = $startDate;
 		$filter->endDateLessThanOrEqual = $endDate;
 		$filter->statusIn = KalturaScheduleEventStatus::ACTIVE;
@@ -112,8 +148,8 @@ class KAsyncSimuLiveAddScheduleEvents extends KPeriodicWorker
 			$event = new KalturaSimulatedLiveEntryScheduleEvent();
 			$event->startDate = $startDate;
 			$event->endDate = $endDate;
-			$event->entryIds = $playListId;
-			$event->referenceId = $entryId;
+			$event->entryIds = $entryId;
+			$event->referenceId = $ChannelId;
 			$events[] = $event;
 		}
 	}

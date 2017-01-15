@@ -42,7 +42,9 @@ class KAsyncSimuLiveClearScheduleEvents extends KPeriodicWorker
 			self::$kClient->startMultiRequest();
 			foreach ($events->objects as $event)
 			{
+				self::impersonate($event->partnerId);
 				$schedulePlugin->scheduleEvent->delete($event->id);
+				self::unimpersonate();
 			}
 			self::$kClient->doMultiRequest();
 			$pager->pageIndex++;
