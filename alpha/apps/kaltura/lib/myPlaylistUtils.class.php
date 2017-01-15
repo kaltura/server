@@ -841,8 +841,40 @@ HTML;
 			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		}
 	}
-	
-	
+
+	/**
+	 * @param $entries
+	 * @return array
+	 */
+	public static function getPlaylistDataFromEntries($entries)
+	{
+		$entryIds = array();
+		$durations = array();
+		$mediaEntry = null;
+		$maxFlavorCount = 0;
+		foreach ($entries as $entry)
+		{
+			$entryIds[] = $entry->getId();
+			$durations[] = $entry->getLengthInMsecs();
+
+			// Note: choosing a reference entry that has max(flavor count) and min(int id)
+			//	the reason for the int id condition is to avoid frequent changes to the
+			//	reference entry in case the playlist content changes
+			$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
+			if (!$mediaEntry ||
+				$flavorCount > $maxFlavorCount ||
+				($flavorCount == $maxFlavorCount && $entry->getIntId() < $mediaEntry->getIntId())
+			)
+			{
+				$mediaEntry = $entry;
+				$maxFlavorCount = $flavorCount;
+			}
+		}
+
+		return array($entryIds, $durations, $mediaEntry);
+	}
+
+
 	private static function getIds ( $list )
 	{
 		$id_list  =array();
@@ -1039,29 +1071,7 @@ HTML;
 				null,
 				false, 
 				$pager);
-		
-		$entryIds = array();
-		$durations = array();
-		$mediaEntry = null;
-		$maxFlavorCount = 0;
-		foreach ($entries as $entry)
-		{
-			$entryIds[] = $entry->getId();
-			$durations[] = $entry->getLengthInMsecs();
 
-			// Note: choosing a reference entry that has max(flavor count) and min(int id)
-			//	the reason for the int id condition is to avoid frequent changes to the 
-			//	reference entry in case the playlist content changes 
-			$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
-			if (!$mediaEntry ||
-				$flavorCount > $maxFlavorCount ||
-				($flavorCount == $maxFlavorCount && $entry->getIntId() < $mediaEntry->getIntId()))
-			{
-				$mediaEntry = $entry;
-				$maxFlavorCount = $flavorCount;
-			}
-		}
-
-		return array($entryIds, $durations, $mediaEntry);
+		return self::getPlaylistDataFromEntries($entries);
 	}
 }

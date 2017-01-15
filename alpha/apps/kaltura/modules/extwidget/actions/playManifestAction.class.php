@@ -339,20 +339,24 @@ class playManifestAction extends kalturaAction
 	{
 		switch ($this->entry->getType())
 		{
-		case entryType::MEDIA_CLIP:
-			if(!in_array($this->entry->getMediaType(), array(
-					entry::ENTRY_MEDIA_TYPE_VIDEO,
-					entry::ENTRY_MEDIA_TYPE_AUDIO)))
+			case entryType::MEDIA_CLIP:
+				if(!in_array($this->entry->getMediaType(), array(
+						entry::ENTRY_MEDIA_TYPE_VIDEO,
+						entry::ENTRY_MEDIA_TYPE_AUDIO)))
+					KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+				break;
+
+			case entryType::PLAYLIST:
+				if ($this->entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
+					KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+				break;
+			case entryType::LIVE_CHANNEL:
+//				$playlist = entryPeer::retrieveByPK($this->entry->getPlaylistId());
+//				if ($playlist->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
+//					KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+				break;
+			default:
 				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-			break;
-			
-		case entryType::PLAYLIST: 
-			if ($this->entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
-				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-			break;
-				
-		default:
-			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 		}
 	}
 	
@@ -506,10 +510,13 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
-	protected function initPlaylistFlavorAssetArray()
+	protected function initPlaylistFlavorAssetArray($playlist = null)
 	{
+		$entry = $this->entry;
+		if (!is_null($playlist))
+			$entry = $playlist;
 		list($entryIds, $durations, $mediaEntry) =
-			myPlaylistUtils::executeStitchedPlaylist($this->entry);
+			myPlaylistUtils::executeStitchedPlaylist($entry);
 		if (!$mediaEntry)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
@@ -801,14 +808,17 @@ class playManifestAction extends kalturaAction
 		
 		switch($this->entry->getType())
 		{
-		case entryType::PLAYLIST:
-			$this->initPlaylistFlavorAssetArray();
-			break;
-		
-		case entryType::MEDIA_CLIP:
-			$this->initFlavorAssetArray();
-			$this->initEntryDuration();
-			break;
+			case entryType::PLAYLIST:
+				$this->initPlaylistFlavorAssetArray();
+				break;
+			case entryType::LIVE_CHANNEL:
+				$playlist = entryPeer::retrieveByPK($this->entry->getPlaylistId());
+				$this->initPlaylistFlavorAssetArray($playlist);
+				break;
+			case entryType::MEDIA_CLIP:
+				$this->initFlavorAssetArray();
+				$this->initEntryDuration();
+				break;
 		}
 		
 		if ($this->duration && $this->duration < 10 && $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
@@ -1097,12 +1107,12 @@ class playManifestAction extends kalturaAction
 		{
 			case entryType::PLAYLIST:
 			case entryType::MEDIA_CLIP:
+			case entryType::LIVE_CHANNEL:
 				// VOD
 				$renderer = $this->serveVodEntry();
 				break;
 				
 			case entryType::LIVE_STREAM:			
-			case entryType::LIVE_CHANNEL:
 				// Live stream
 				$renderer = $this->serveLiveEntry();
 				break;

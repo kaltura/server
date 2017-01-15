@@ -5,6 +5,8 @@
  */
 class LiveChannel extends LiveEntry
 {
+	const CUSTOM_DATA_LIVE_CHANNEL_STATUS = 'live_channel_status';
+
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
@@ -63,5 +65,15 @@ class LiveChannel extends LiveEntry
 	public function getRepeat()
 	{
 		return $this->getFromCustomData('repeat');
+	}
+
+	public function setLiveChannelStatus($v)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_LIVE_CHANNEL_STATUS, $v);
+	}
+
+	public function getLiveChannelStatus()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_CHANNEL_STATUS);
 	}
 }
