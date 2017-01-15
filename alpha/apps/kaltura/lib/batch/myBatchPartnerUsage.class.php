@@ -26,6 +26,7 @@ class myBatchPartnerUsage extends myBatchBase
 			$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_DELETED, Criteria::NOT_EQUAL);
 
 			$c->addAnd(PartnerPeer::ID, $highest_partner_id, Criteria::GREATER_THAN);
+			$c->addAscendingOrderByColumn(PartnerPeer::ID);
 			$c->setLimit($bulk_size);
 			$partners = PartnerPeer::doSelect($c);
 			if (!$partners)
