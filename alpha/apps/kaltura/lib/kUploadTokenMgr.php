@@ -164,11 +164,7 @@ class kUploadTokenMgr
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFile::mimeType($uploadFilePath);
 		$allowFileTypes = kConf::get('allowed_file_type');
-		foreach($allowFileTypes as $type)
-			if ($fileType == $type)
-				return true;
-		//if got here means type wasn't one of the allowed types
-		return false;
+		return in_array($fileType, $allowFileTypes);
 	}
 	
 	/**
