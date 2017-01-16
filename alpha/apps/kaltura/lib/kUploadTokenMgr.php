@@ -44,6 +44,7 @@ class kUploadTokenMgr
 	 * @param bool $resume
 	 * @param bool $finalChunk
 	 * @param int $resumeAt
+	 * @throw kUploadTokenException
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $finalChunk = true, $resumeAt = -1)
 	{
@@ -56,8 +57,6 @@ class kUploadTokenMgr
 		try
 		{
 			$this->checkIfFileIsValid($fileData);
-			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId()))
-				$this->checkIfFileIsAllowed();
 		}
 		catch(kUploadTokenException $ex)
 		{
@@ -78,6 +77,12 @@ class kUploadTokenMgr
 		
 		if ($finalChunk)
 		{
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId())
+				&& !$this->checkIfFileIsAllowed())
+			{
+				kFlowHelper::handleUploadFailed($this->_uploadToken);
+				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
+			}
 			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
 		}
 		else 
@@ -151,7 +156,7 @@ class kUploadTokenMgr
 	}
 
 	/**
-	 * Validate the file data
+	 * Validate the file type
 	 * @throw kUploadTokenException
 	 */
 	protected function checkIfFileIsAllowed()
@@ -159,16 +164,11 @@ class kUploadTokenMgr
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFile::mimeType($uploadFilePath);
 		$allowFileTypes = kConf::get('allowed_file_type');
-
-		$NoTypeMatch = true;
 		foreach($allowFileTypes as $type)
-		{
-			$NoTypeMatch &= strcmp($fileType,$type);
-			if (!$NoTypeMatch)
-				break;
-		}
-		if ($NoTypeMatch)
-			throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
+			if ($fileType == $type)
+				return true;
+		//if got here means type wasn't one of the allowed types
+		return false;
 	}
 	
 	/**
