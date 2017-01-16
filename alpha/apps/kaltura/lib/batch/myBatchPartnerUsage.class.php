@@ -7,12 +7,12 @@ class myBatchPartnerUsage extends myBatchBase
 {
 	const SLEEP_TIME = 1;
 	
-	public function __construct($partnerId = null, $partnerPackage = 1)
+	public function __construct($partnerId = null, $partnerPackage = PartnerPackages::PARTNER_PACKAGE_FREE)
 	{
 		self::initDb();
 		$partners_exists = true;
 		$bulk_size = 500;
-		$highest_partner_id = -100;
+		$highest_partner_id = 100;
 		while($partners_exists)
 		{
 			$c = new Criteria();
@@ -39,17 +39,18 @@ class myBatchPartnerUsage extends myBatchBase
 				KalturaLog::debug( "Looping ". count($partners) ." partners" );
 				foreach($partners as $partner)
 				{
-					if($partnerPackage == 1) //free
+					if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 					{
 						myPartnerUtils::doPartnerUsage($partner, true);
 					}
-					else if($partnerPackage == 100) //monthly developer
+					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
 					{
 						myPartnerUtils::doMonthlyPartnerUsage($partner);
 					}
-					$highest_partner_id = max($highest_partner_id, $partner->getId());
 				}
 			}
+			$partner = end($partners);
+			$highest_partner_id = $partner->getId();
 			unset($partners);
 			PartnerPeer::clearInstancePool();
 		}
