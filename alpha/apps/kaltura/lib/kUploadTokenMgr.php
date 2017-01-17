@@ -163,8 +163,8 @@ class kUploadTokenMgr
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFile::mimeType($uploadFilePath);
-		$allowFileTypes = kConf::get('allowed_file_type');
-		return in_array($fileType, $allowFileTypes);
+		$fileTypes = kConf::get('file_type');
+		return in_array($fileType, $fileTypes['allowed']);
 	}
 	
 	/**
