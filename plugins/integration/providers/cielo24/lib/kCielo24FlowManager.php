@@ -112,7 +112,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
 					{
 						$transcriptContent = $clientHelper->getRemoteTranscriptTokens($remoteJobId);
-						$transcriptContent = normalizeJson ($transcriptContent);
+						$transcriptContent = $this->normalizeJson ($transcriptContent);
 						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, "JSON", true);
 					}
 					

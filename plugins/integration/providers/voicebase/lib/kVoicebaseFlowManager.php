@@ -97,7 +97,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 						$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
 					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
 					{
-						$transcript = normalizeJson ($transcript);
+						$tokenizedTranscript = $this->normalizeJson ($contentsArray["JSON"]);
 						$this->setObjectContent($transcript, $contentsArray["JSON"], $accuracy, "JSON", true);
 					}
 				}
