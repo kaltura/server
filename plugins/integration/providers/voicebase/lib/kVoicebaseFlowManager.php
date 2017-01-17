@@ -96,7 +96,10 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
 						$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
 					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
+					{
+						$transcript = normalizeJson ($transcript);
 						$this->setObjectContent($transcript, $contentsArray["JSON"], $accuracy, "JSON", true);
+					}
 				}
 			}
 			unset($contentsArray["TXT"]);
@@ -278,5 +281,24 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$stringTime = kXml::integerToTime($int - $milliseconds);
 		$stringTime .= '.' . str_pad($milliseconds, 3, 0, STR_PAD_LEFT);
 		return $stringTime;
+	}
+	
+	private function normalizeJson ($transcript)
+	{
+		$tokens = json_decode($transcript, true);
+		
+		$normalizedTokens = array ();
+		foreach ($tokens as $token)
+		{
+			$normalizedToken = array ();
+			$normalizedToken['i'] = $token['p'];
+			$normalizedToken['c'] = $token['c'];
+			$normalizedToken['s'] = $token['s'] / 1000;
+			$normalizedToken['d'] = ($token['s'] - $token['e']) / 1000;
+			
+			$normalizedTokens[] = $normalizedToken;
+		}
+		
+		return json_encode($normalizedTokens);
 	}
 }
