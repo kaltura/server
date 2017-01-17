@@ -137,6 +137,15 @@ class Cielo24ClientHelper
 		return $transcriptContentResult;
 	}
 	
+	public function getRemoteTranscriptTokens ($externalServiceJobId)
+	{
+		$transcriptRetrievalParams = array("job_id" => $externalServiceJobId);
+		$getTranscriptAPIUrl = $this->createAPIUrl("job/get_elementlist", $transcriptRetrievalParams);
+		$transcriptContentResult = $this->sendAPICall($getTranscriptAPIUrl, true);
+		
+		return $transcriptContentResult;
+	}
+	
 	public function getRemoteCaptions($externalServiceJobId, array $formats)
 	{
 		$captionContents = array();
