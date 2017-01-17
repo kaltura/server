@@ -684,14 +684,14 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		KalturaLog::info("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
     		
     		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		    if (!kFileSyncUtils::compareContent($key, $xmlData))
-		    {
+			if (!kFileSyncUtils::compareContent($key, $xmlData))
+			{
 			    $dbMetadata->incrementVersion();
 			    $key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 			    kFileSyncUtils::file_put_contents($key, $xmlData);
 			    $dbMetadata->save();
 			    kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
-		    }
+			}
 	    }
 	}
 	
