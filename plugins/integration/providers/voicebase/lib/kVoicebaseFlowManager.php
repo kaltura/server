@@ -283,6 +283,9 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		return $stringTime;
 	}
 	
+	/*
+	 * 
+	 */
 	private function normalizeJson ($transcript)
 	{
 		$tokens = json_decode($transcript, true);
@@ -290,13 +293,20 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$normalizedTokens = array ();
 		foreach ($tokens as $token)
 		{
-			$normalizedToken = array ();
-			$normalizedToken['i'] = $token['p'];
-			$normalizedToken['c'] = $token['c'];
-			$normalizedToken['s'] = $token['s'] / 1000;
-			$normalizedToken['d'] = ($token['s'] - $token['e']) / 1000;
+			if (!isset ($token['m']) || (isset ($token['m'])  && $token['m'] == 'punc'))
+			{
+				$normalizedToken = array ();
+				$normalizedToken['i'] = $token['p'];
+				$normalizedToken['s'] = $token['s'];
+				$normalizedToken['e'] = $token['e'];
+				
+				if (isset ($token['m']))
+					$normalizedToken['t'] = $token['m'];
+					
+				$normalizedToken['w'] = $token['w'];
 			
-			$normalizedTokens[] = $normalizedToken;
+				$normalizedTokens[] = $normalizedToken;
+			}
 		}
 		
 		return json_encode($normalizedTokens);
