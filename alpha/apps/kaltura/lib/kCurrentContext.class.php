@@ -123,6 +123,11 @@ class kCurrentContext
 	 * @var int
 	 */
 	public static $HTMLPurifierBehaviour = null;
+
+	/**
+	 * @var bool
+	 */
+	public static $HTMLPurifierBaseListOnlyUsage = null;
 	
 	public static function getEntryPoint()
 	{
