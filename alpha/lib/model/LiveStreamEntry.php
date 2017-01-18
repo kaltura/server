@@ -50,7 +50,12 @@ class LiveStreamEntry extends LiveEntry
 	
 	public function getHlsStreamUrl ()
 	{
-	    return $this->getFromCustomData("hls_stream_url");
+		$hlsStreamUrl = $this->getFromCustomData("hls_stream_url");
+		
+		if($hlsStreamUrl)
+			$hlsStreamUrl =  preg_replace('/^https?/', requestUtils::getRequestProtocol() , $hlsStreamUrl);
+		
+	    return $hlsStreamUrl;
 	}
 	
 	public function setHlsStreamUrl ($v)
