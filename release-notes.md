@@ -1,3 +1,17 @@
+# Lynx 12.9.0 #
+
+## Transcription engines operation changes ##
+
+- Issue Type: Feature
+- Issue ID: TR-1761
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+	php /opt/kaltura/app/deployments/scripts/base/installPlugins.php
+
 # Lynx 12.8.0 #
 
 ## Play-server flavor changed and deleted http notifications ##
