@@ -362,7 +362,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 				foreach ($tokens as $token)
 				{
 					if (!isset ($token['type']) || 
-					(isset ($token['type'])  && ($token['type'] == 'word' || $token['type'] == 'punctuation')))
+					in_array ($token['type'], array ('word', 'punctuation')))
 					{
 						$normalizedToken = array ();
 						$normalizedToken['i'] = count ($normalizedTokens);

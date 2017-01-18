@@ -293,22 +293,18 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$normalizedTokens = array ();
 		foreach ($tokens as $token)
 		{
-			if (!isset ($token['m']) || (isset ($token['m'])  && $token['m'] == 'punc'))
+			if (!isset ($token['m']) || $token['m'] == 'punc')
 			{
 				$normalizedToken = array ();
 				$normalizedToken['i'] = $token['p'];
 				$normalizedToken['s'] = $token['s'];
 				$normalizedToken['e'] = $token['e'];
 				
+				$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_WORD;
 				if (isset ($token['m']) && $token['m'] == 'punc')
 				{
 					$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_PUNC;
 				}
-				else
-				{
-					$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_WORD;
-				}
-					
 				$normalizedToken['w'] = $token['w'];
 			
 				$normalizedTokens[] = $normalizedToken;
