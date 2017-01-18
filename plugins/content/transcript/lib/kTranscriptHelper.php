@@ -5,6 +5,10 @@
  */
 class kTranscriptHelper
 {
+	const TOKEN_TYPE_WORD = 'word';
+	
+	const TOKEN_TYPE_PUNC = 'punc';
+	
 	public static function getAssetsByLanguage($entryId, array $assetTypes, $spokenLanguage, $additionalStatuses = array ())
 	{
 		$statuses = array(asset::ASSET_STATUS_QUEUED, asset::ASSET_STATUS_READY);
