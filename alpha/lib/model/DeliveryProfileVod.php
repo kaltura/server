@@ -14,14 +14,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * Functionality 
 	 * --------------------*/
 
-	protected function getPlayServerUrl($entryId)
+	protected function getPlayServerUrl($flavorAsset)
 	{
 		return '';
 	}
 
-	protected  function generatePlayServerUrl($entryId)
+	protected  function generatePlayServerUrl($flavorAsset)
 	{
-		$prefix = '/dc/'.$this->getDcId($entryId);
+		$prefix = $this->getDcPrefix($flavorAsset);
 
 		if($this->getDynamicAttributes()->getUiConfId())
 			$prefix .= '/uiConfId/'.$this->getDynamicAttributes()->getUiConfId();
@@ -31,21 +31,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $prefix;
 	}
 
-	protected function getDcId($entryId)
+	protected function getDcPrefix($flavorAsset)
 	{
-		$dc = kDataCenterMgr::getCurrentDcId();
-		$flavors = assetPeer::retrieveByEntryId($entryId, array(assetType::FLAVOR), array(asset::ASSET_STATUS_READY));
-		foreach ($flavors as $flavorAsset)
-		{
-			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-			list($filesync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
-			if(!$filesync)
-			{
-				$dc = $dc ? 0 : 1;
-				break;
-			}
-		}
-		return $dc;
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		list($filesync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		if(!$filesync)
+			return '';
+
+		return '/dc/'.$filesync->getDc();
 	}
 	
 	/**
@@ -59,7 +52,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
-		$url .= $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrl($entry->getId()) : '';
+		$url .= $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrl($flavorAsset) : '';
 
 		if ($entry->getType() == entryType::PLAYLIST)
 		{

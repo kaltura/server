@@ -19,9 +19,9 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		return $url . '/index.m3u8';
 	}
 
-	protected function getPlayServerUrl($entryId)
+	protected function getPlayServerUrl($flavorAsset)
 	{
-		return $this->generatePlayServerUrl($entryId);
+		return $this->generatePlayServerUrl($flavorAsset);
 	}
 
 	public function setAllowFairplayOffline($v)
