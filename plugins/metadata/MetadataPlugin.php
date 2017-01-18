@@ -33,6 +33,21 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 
+	/**
+	 * @param Metadata $dbMetadata
+	 * @param $xmlData
+	 * @throws kFileSyncException
+	 */
+	public static function updateMetadataFileSync(Metadata $dbMetadata, $xmlData)
+	{
+		$previousVersion = $dbMetadata->getVersion();
+		$dbMetadata->incrementVersion();
+		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		kFileSyncUtils::file_put_contents($key, $xmlData);
+		$dbMetadata->save();
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaPlugin::getInstance()
 	 */
@@ -539,9 +554,10 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		KalturaLog::info("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
 		
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		kFileSyncUtils::file_put_contents($key, $xmlData);
-		
-		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
+		if (!kFileSyncUtils::compareContent($key, $xmlData))
+		{
+			self::updateMetadataFileSync($dbMetadata, $xmlData);
+		}
 	}
 	
 	/**
@@ -679,9 +695,10 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		KalturaLog::info("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
     		
     		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-    		kFileSyncUtils::file_put_contents($key, $xmlData);
-    		
-		    kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
+    		if (!kFileSyncUtils::compareContent($key, $xmlData))
+    		{
+			    self::updateMetadataFileSync($dbMetadata, $xmlData);
+    		}
 	    }
 	}
 	
@@ -712,12 +729,6 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		$dbMetadata->setStatus(Metadata::STATUS_VALID);
     		$dbMetadata->save();
 	    }
-	    else
-	    {
-	        $dbMetadata->incrementVersion();
-	        $dbMetadata->save();
-	    }
-	    
 	    return $dbMetadata;
 	}
 	
