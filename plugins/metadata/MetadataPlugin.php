@@ -33,6 +33,21 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 
+	/**
+	 * @param Metadata $dbMetadata
+	 * @param $xmlData
+	 * @throws kFileSyncException
+	 */
+	public static function updateMetadataFileSync(Metadata $dbMetadata, $xmlData)
+	{
+		$previousVersion = $dbMetadata->getVersion();
+		$dbMetadata->incrementVersion();
+		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		kFileSyncUtils::file_put_contents($key, $xmlData);
+		$dbMetadata->save();
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaPlugin::getInstance()
 	 */
@@ -541,11 +556,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		if (!kFileSyncUtils::compareContent($key, $xmlData))
 		{
-			$dbMetadata->incrementVersion();
-			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			kFileSyncUtils::file_put_contents($key, $xmlData);
-			$dbMetadata->save();
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));		
+			self::updateMetadataFileSync($dbMetadata, $xmlData);
 		}
 	}
 	
@@ -686,11 +697,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
     		if (!kFileSyncUtils::compareContent($key, $xmlData))
     		{
-    		    $dbMetadata->incrementVersion();
-    		    $key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-    		    kFileSyncUtils::file_put_contents($key, $xmlData);
-    		    $dbMetadata->save();
-    		    kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
+			    self::updateMetadataFileSync($dbMetadata, $xmlData);
     		}
 	    }
 	}
