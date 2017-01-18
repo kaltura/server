@@ -12,11 +12,7 @@ class kTranscriptHelper
 	public static function getAssetsByLanguage($entryId, array $assetTypes, $spokenLanguage, $additionalStatuses = array ())
 	{
 		$statuses = array(asset::ASSET_STATUS_QUEUED, asset::ASSET_STATUS_READY);
-		
-		if (count($additionalStatuses))
-		{
-			$statuses = array_merge($statuses, $additionalStatuses);
-		}
+		$statuses = array_merge($statuses, $additionalStatuses);
 		
 		$resultArray = assetPeer::retrieveByEntryId($entryId, $assetTypes, $statuses);
 	
