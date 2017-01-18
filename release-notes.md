@@ -1,3 +1,22 @@
+# Lynx 12.9.0 #
+
+## File type restriction for uploading files ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6505
+
+### Configuration ###
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.FileTypeRestriction.enabled = true
+		moduls.FileTypeRestriction.permissionType = 2
+		moduls.FileTypeRestriction.label = "Enable file type restriction"
+		moduls.FileTypeRestriction.permissionName = FEATURE_FILE_TYPE_RESTRICTION_PERMISSION
+		moduls.FileTypeRestriction.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+None.
+
 # Lynx 12.8.0 #
 
 ## Play-server flavor changed and deleted http notifications ##
