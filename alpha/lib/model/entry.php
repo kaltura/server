@@ -3561,4 +3561,13 @@ public function copyTemplate($copyPartnerId = false, $template)
 				return true;
 		return false;
 	}
+
+	public function setInClone($v)
+	{
+		$this->putInCustomData("in_clone", $v);
+	}
+	public function getInClone()
+	{
+		return $this->getFromCustomData("in_clone");
+	}
 }
