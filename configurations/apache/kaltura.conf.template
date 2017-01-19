@@ -1,3 +1,4 @@
+ServerName @KALTURA_VIRTUAL_HOST_NAME@
 <VirtualHost *:@KALTURA_VIRTUAL_HOST_PORT@>
 	# for SSL offloading support, if LB has X_FORWARDED_PROTO set to 'https', set HTTPS to 'on'
 	SetEnvIf X-Forwarded-Proto https HTTPS=on

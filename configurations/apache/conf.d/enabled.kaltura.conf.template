@@ -1,5 +1,4 @@
 ProxyTimeout 30
-ServerName @KALTURA_VIRTUAL_HOST_NAME@
 DocumentRoot "@APP_DIR@/alpha/web"
 LogFormat "%h %l %u %t \"%r\" %>s %O %T/%D \"%{Referer}i\" \"%{User-Agent}i\" \"%{uv}C\" %a \"%{X-Kaltura}o\" \"%{HOST}i\" %P %{X-Kaltura-Session}o %X %I \"%{Content-Range}o\" \"%{X-FORWARDED-FOR}i\" \"%{X-FORWARDED-SERVER}i\" \"%{X-FORWARDED-HOST}i\" \"%{Cache-Control}o\" %{Kaltura_PartnerId}n" vhost_kalt
 DirectoryIndex index.html
