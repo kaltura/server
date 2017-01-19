@@ -224,18 +224,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	private function getLiveEntriesForPartner(LiveEntry $liveEntry)
 	{
 		//Fetch all entries currently being streamed by partner
-		$connectedLiveEntryStatuses = array(
-			KalturaEntryServerNodeStatus::AUTHENTICATED,
-			KalturaEntryServerNodeStatus::BROADCASTING,
-			KalturaEntryServerNodeStatus::PLAYABLE
-		);
-		
-		$c = KalturaCriteria::create(EntryServerNodePeer::OM_CLASS);
-		$c->add(EntryServerNodePeer::PARTNER_ID, $liveEntry->getPartnerId());
-		$c->add(EntryServerNodePeer::ENTRY_ID, $liveEntry->getId(), Criteria::NOT_EQUAL);
-		$c->add(EntryServerNodePeer::STATUS, $connectedLiveEntryStatuses, Criteria::IN);
-		$c->addGroupByColumn(EntryServerNodePeer::ENTRY_ID);
-		$connectedEntryServerNodes  = EntryServerNodePeer::doSelect($c);
+		$connectedEntryServerNodes  = EntryServerNodePeer::retrieveConnectedEntryServerNodesByPartner($liveEntry->getPartnerId(), $liveEntry->getId());
 		
 		$connectedLiveEntryIds = array();
 		if(!count($connectedEntryServerNodes))
@@ -244,9 +233,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		foreach($connectedEntryServerNodes as $connectedEntryServerNode)
 			$connectedLiveEntryIds[] = $connectedEntryServerNode->getEntryId();
 		
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->add(entryPeer::ID, $connectedLiveEntryIds, Criteria::IN);
-		return entryPeer::doSelect($c);
+		return entryPeer::retrieveByPKs($connectedLiveEntryIds);
 	}
 
 	/**
