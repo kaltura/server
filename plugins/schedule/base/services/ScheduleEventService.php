@@ -327,7 +327,7 @@ class ScheduleEventService extends KalturaBaseService
 		if (!$resourceIds)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'resourceIds');
 
-		$dbScheduleEvent = $scheduleEvent->toInsertableObject();
+		$dbScheduleEvent = $scheduleEvent->toObject();
 		/* @var $dbScheduleEvent ScheduleEvent */
 
 		$events = array();
