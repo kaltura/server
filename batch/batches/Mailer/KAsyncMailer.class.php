@@ -146,10 +146,10 @@ class KAsyncMailer extends KJobHandlerWorker
 		$mailerPassword = KBatchBase::$taskConfig->mailerSmtpPassword;
 		$mailerPort = KBatchBase::$taskConfig->mailerSmtpPort;
 
-		if (isset($mailerHost) && !is_empty($mailerHost) &&
-			isset($mailerUserName) && !is_empty($mailerUserName) &&
-			isset($mailerPassword) && !is_empty($mailerPassword) &&
-			isset($mailerPort) && !is_empty($mailerPort))
+		if (isset($mailerHost) && !empty($mailerHost) &&
+			isset($mailerUserName) && !empty($mailerUserName) &&
+			isset($mailerPassword) && !empty($mailerPassword) &&
+			isset($mailerPort) && !empty($mailerPort))
 		{
 			$this->mail->isSMTP();
 			$this->mail->Host = $mailerHost;                        // Specify main and backup SMTP servers
