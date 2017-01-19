@@ -1061,11 +1061,12 @@ class playManifestAction extends kalturaAction
 		foreach ($this->localflavorIdsByDc as $dc => $curDcFlavorIds)
 		{
 			$curDcFlavorCount = count($curDcFlavorIds);
-			if ($curDcFlavorCount <= $maxDcFlavorCount)
-				continue;
-			$selectedDc = $dc;
-			$maxDcFlavorCount = $curDcFlavorCount;
-			$selectedFlavorIds = $curDcFlavorIds;
+			if ($curDcFlavorCount > $maxDcFlavorCount)
+			{
+				$selectedDc = $dc;
+				$maxDcFlavorCount = $curDcFlavorCount;
+				$selectedFlavorIds = $curDcFlavorIds;
+			}
 		}
 
 		return array($selectedFlavorIds, $selectedDc);

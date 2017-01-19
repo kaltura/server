@@ -32,7 +32,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 
 		return $prefix;
 	}
-
+	
 	/**
 	 * @param asset $flavorAsset
 	 * @return string representing the basic url.
