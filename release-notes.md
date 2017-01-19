@@ -1,21 +1,5 @@
 # Lynx 12.9.0 #
 
-## Support SMTP mailing with new phpmailer ##
-
-- Issue Type: Task
-- Issue ID: PLAT-6681
-
-### Configuration ###
-	update batch.ini file: 
-	update [KAsyncMailer : JobHandlerWorker] section and add the following (insert relevant data for the params):
-	mailerSmtpHost                                      =
-	mailerSmtpUserName                                  =
-	mailerSmtpPassword                                  =
-	mailerSmtpPort                                      = 
-
-### Deployment scripts ###
-	None.
-
 ## Transcription engines operation changes ##
 
 - Issue Type: Feature
