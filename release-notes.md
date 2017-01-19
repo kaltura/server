@@ -10,7 +10,7 @@ None.
 
 ### Deployment scripts ###
 	
-	php /opt/kaltura/app/deployments/scripts/base/installPlugins.php
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 ## File type restriction for uploading files ##
 
