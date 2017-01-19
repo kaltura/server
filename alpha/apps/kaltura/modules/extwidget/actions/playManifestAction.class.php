@@ -668,7 +668,7 @@ class playManifestAction extends kalturaAction
 				else
 				{
 					$dc = $fileSync->getDc();
-					$localFlavorIdsByDc[$dc][$flavorId] = $flavorId;
+					$localFlavorIdsByDc[$dc][] = $flavorId;
 					$localFlavors[$flavorId] = $flavorAsset;
 				}
 			}
@@ -870,7 +870,7 @@ class playManifestAction extends kalturaAction
 				$playServerFlavors = array();
 				foreach($this->deliveryAttributes->getFlavorAssets() as $flavor)
 				{
-					if(isset($playServerFlavorsIds[$flavor->getId()]))
+					if(in_array($flavor->getId(), $playServerFlavorsIds))
 						$playServerFlavors[$flavor->getId()] = $flavor;
 				}
 				$this->deliveryAttributes->setFlavorAssets($playServerFlavors);
