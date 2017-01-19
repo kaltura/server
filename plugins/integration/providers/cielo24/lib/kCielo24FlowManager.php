@@ -2,7 +2,7 @@
 class kCielo24FlowManager implements kBatchJobStatusEventConsumer 
 {
 	private $baseEndpointUrl = null;
-	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
+	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.{ext}";
 	const MECHNICAL_TRANSCRIPTION_ACCURACY_VALUE = 0.7;
 	const PREMIUM_TRANSCRIPTION_ACCURACY_VALUE = 0.95;
 	const PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE = 0.99;
@@ -32,30 +32,36 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		$partnerId = $dbBatchJob->getPartnerId();
 		$spokenLanguage = $providerData->getSpokenLanguage();
 	
-		$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
+		$transcripts = kTranscriptHelper::getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, array (asset::FLAVOR_ASSET_STATUS_ERROR));
 		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
 		{
-			if($transcript)
+			if(count ($transcripts))
 			{
-				$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$transcript->save();
+				foreach ($transcripts as $transcript)
+				{
+					$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+					$transcript->save();
+				}
 			}
 		}
 		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_DONT_PROCESS)
 		{	
-			if(!$transcript)
+			foreach (array (AttachmentType::JSON, AttachmentType::TEXT) as $containerFormat)
 			{
-				$transcript = new TranscriptAsset();
-				$transcript->setType(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
-				$transcript->setEntryId($entryId);
-				$transcript->setPartnerId($partnerId);
-				$transcript->setLanguage($spokenLanguage);
-				$transcript->setContainerFormat(AttachmentType::TEXT);
+				if (!isset ($transcripts[$containerFormat]))
+				{
+					$transcript = kTranscriptHelper::createTranscript($entryId, $partnerId, $spokenLanguage, $containerFormat);
+				}
+				else {
+					$transcript = $transcripts[$containerFormat];
+				}
+				
+				$transcript->setProviderType (Cielo24Plugin::getTranscriptProviderTypeCoreValue(Cielo24TranscriptProviderType::CIELO24));
+				$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
+				$transcript->save();
 			}
-			$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
-			$transcript->save();
 	
 			return true;
 		}
@@ -78,14 +84,8 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 				$transcript->save();
 				return true;     	
 			}
-	
-			$formatsArray = explode(',',$formatsString);
-			$transcriptContent = $clientHelper->getRemoteTranscript($remoteJobId);
-			KalturaLog::debug("transcript content - $transcriptContent");
-			$captionsContentArray = $clientHelper->getRemoteCaptions($remoteJobId, $formatsArray);
-			KalturaLog::debug("captions content - " . print_r($captionsContentArray, true));
-	
-			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
+			
+			$accuracyRate = null;
 			switch ($providerData->getFidelity())
 			{
 				case KalturaCielo24Fidelity::MECHANICAL:
@@ -98,9 +98,33 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 					$accuracyRate = self::PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE;
 					break;
 			}
-
-			$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true);
+			
+			if(count ($transcripts))
+			{
+				foreach ($transcripts as $transcript)
+				{
+					/* @var $transcript TranscriptAsset */
+					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
+					{
+						$transcriptContent = $clientHelper->getRemoteTranscript($remoteJobId);
+						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true);
+					}
+					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
+					{
+						$transcriptContent = $clientHelper->getRemoteTranscriptTokens($remoteJobId);
+						$transcriptContent = $this->normalizeJson ($transcriptContent);
+						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, "JSON", true);
+					}
+					
+					KalturaLog::debug("transcript content - $transcriptContent");
+				}
+			}
+			
+			$formatsArray = explode(',',$formatsString);
+			$captionsContentArray = $clientHelper->getRemoteCaptions($remoteJobId, $formatsArray);
+			KalturaLog::debug("captions content - " . print_r($captionsContentArray, true));
 	
+			$captions = kTranscriptHelper::getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage, array (asset::FLAVOR_ASSET_STATUS_ERROR));
 			foreach ($captionsContentArray as $format => $content)
 			{        
 				$captionFormatConst = constant("KalturaCaptionType::" . $format);
@@ -158,6 +182,8 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 				$ext = "xml";
 			if ($format == "SRT")
 				$ext = "srt";
+			if ($format == "JSON")
+				$ext = 'json';
 		}
 	
 		$assetObject->setFileExt($ext);
@@ -175,8 +201,8 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		{
 			$language = str_replace(" ", "", $assetObject->getLanguage());
 			
-			$patterns = array("{entryId}","{language}");
-			$replacements = array($assetObject->getEntryId(), $language);
+			$patterns = array("{entryId}","{language}", "{ext}");
+			$replacements = array($assetObject->getEntryId(), $language, $ext);
 			$fileName = str_replace($patterns, $replacements, self::FILE_NAME_PATTERN);
 			$assetObject->setFileName($fileName);
 		}
@@ -318,5 +344,56 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		$stringTime = kXml::integerToTime($int - $milliseconds);
 		$stringTime .= '.' . str_pad($milliseconds, 3, 0, STR_PAD_LEFT);
 		return $stringTime;
+	}
+	
+	private function normalizeJson ($transcript)
+	{
+		$jsonElements = json_decode($transcript, true);
+		$segments = $jsonElements["segments"];
+		
+		$normalizedTokens = array ();
+		
+		foreach ($segments as $segment)
+		{
+			$sequences = $segment ['sequences'];
+			foreach ($sequences as $sequence)
+			{
+				$tokens = $sequence['tokens'];
+				foreach ($tokens as $token)
+				{
+					if (!isset ($token['type']) || 
+					in_array ($token['type'], array ('word', 'punctuation')))
+					{
+						$normalizedToken = array ();
+						$normalizedToken['i'] = count ($normalizedTokens);
+						$normalizedToken['s'] = $token['start_time'];
+						$normalizedToken['e'] = $token['end_time'];
+						
+						if (isset ($token['type']))
+						{
+							switch ($token['type'])
+							{
+								case 'word':
+									$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_WORD;
+									break;
+								case 'punctuation':
+									$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_PUNC;
+									break;
+								default:
+									KalturaLog::info ('Unrecognized token type!');
+									break;
+									
+							}
+						}
+							
+						$normalizedToken['w'] = $token['display_as'];
+					
+						$normalizedTokens[] = $normalizedToken;
+					}
+				}				
+			}
+		}
+		
+		return json_encode($normalizedTokens);
 	}
 }

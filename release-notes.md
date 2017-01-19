@@ -1,5 +1,17 @@
 # Lynx 12.9.0 #
 
+## Transcription engines operation changes ##
+
+- Issue Type: Feature
+- Issue ID: TR-1761
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+	php /opt/kaltura/app/deployments/scripts/base/installPlugins.php
+
 ## File type restriction for uploading files ##
 
  - Issue Type: New Feature

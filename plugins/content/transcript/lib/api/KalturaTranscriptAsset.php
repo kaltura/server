@@ -23,11 +23,18 @@ class KalturaTranscriptAsset extends KalturaAttachmentAsset
 	 */
 	public $language;
 	
+	/**
+	 * The provider of the transcript
+	 * @var KalturaTranscriptProviderType
+	 */
+	public $providerType;
+	
 	private static $map_between_objects = array
 	(
 		"accuracy",
 		"humanVerified",
 		"language",
+		"providerType",
 	);
 	
 	public function getMapBetweenObjects ( )

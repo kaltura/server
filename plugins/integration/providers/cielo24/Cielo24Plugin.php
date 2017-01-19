@@ -11,12 +11,31 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 	const INTEGRATION_PLUGIN_VERSION_MINOR = 0;
 	const INTEGRATION_PLUGIN_VERSION_BUILD = 0;
 	
+	const TRANSCRIPT_PLUGIN_VERSION_MAJOR = 1;
+	const TRANSCRIPT_PLUGIN_VERSION_MINOR = 0;
+	const TRANSCRIPT_PLUGIN_VERSION_BUILD = 0;
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$transcriptVersion = new KalturaVersion(
+			self::TRANSCRIPT_PLUGIN_VERSION_MAJOR,
+			self::TRANSCRIPT_PLUGIN_VERSION_MINOR,
+			self::TRANSCRIPT_PLUGIN_VERSION_BUILD
+		);
+		$transcriptDependency = new KalturaDependency(TranscriptPlugin::getPluginName(), $transcriptVersion);
+
+		return array_merge(parent::dependsOn(), array($transcriptDependency));
 	}
 	
 	/* (non-PHPdoc)
@@ -94,6 +113,15 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 		return kPluginableEnumsManager::apiToCore('IntegrationProviderType', $value);
 	}
 	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getTranscriptProviderTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('TranscriptProviderType', $value);
+	}
+	
 	public static function getClientHelper($username, $password, $baseUrl = null)
 	{
 		return new Cielo24ClientHelper($username, $password, $baseUrl);
@@ -117,5 +145,26 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 			return;
 		$partner->putInCustomData(Cielo24IntegrationProviderType::CIELO24, $options);
 		$partner->save();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		$enums = parent::getEnums($baseEnumName);
+		
+		if (is_null ($baseEnumName))
+		{
+			$enums[] = 'Cielo24TranscriptProviderType';
+			return $enums;
+		}
+		
+		if ($baseEnumName == 'TranscriptProviderType')
+		{
+			return array ('Cielo24TranscriptProviderType');
+		}
+		
+		return $enums;
 	}
 }
