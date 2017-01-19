@@ -3,6 +3,7 @@
 class kJobsCacher
 {
 	CONST TIME_IN_CACHE = 10;
+	CONST TIME_IN_CACHE_FOR_QUEUE = 3;
 	CONST TIME_IN_CACHE_FOR_LOCK = 5;
 	CONST GET_JOB_ATTEMPTS = 10;
 	CONST TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS = 20000;
@@ -12,10 +13,21 @@ class kJobsCacher
 	 * @param int $workerId
 	 * @return string
 	 */
-	private static function getCacheKeyForWorker($workerId)
+	private static function getCacheKeyForWorkerJobs($workerId)
 	{
-		return "jobs_cache_worker_$workerId";
+		return "jobs_cache_jobs_worker_$workerId";
 	}
+
+	/**
+	 * will return cache-key for worker queue
+	 * @param int $workerId
+	 * @return string
+	 */
+	private static function getCacheKeyForWorkerQueue($workerId)
+	{
+		return "jobs_cache_queue_worker_$workerId";
+	}
+
 	/**
 	 * will return cache-key for worker
 	 * @param int $workerId
@@ -81,7 +93,7 @@ class kJobsCacher
 	 */
 	private static function getJobFromCache($cache, $workerId)
 	{
-		$workerKey = self::getCacheKeyForWorker($workerId);
+		$workerKey = self::getCacheKeyForWorkerJobs($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
 		$jobs = $cache->get($workerKey);
@@ -111,7 +123,7 @@ class kJobsCacher
 	 */
 	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType)
 	{
-		$workerKey = self::getCacheKeyForWorker($workerId);
+		$workerKey = self::getCacheKeyForWorkerJobs($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
 		$objects = kBatchExclusiveLock::getJobs($c, $maxJobToPull, $jobType);
@@ -125,6 +137,49 @@ class kJobsCacher
 
 		$cache->set($indexKey, 0, self::TIME_IN_CACHE);
 		return $objects[0];
+	}
+
+	/**
+	 * will return queue size for the worker
+	 * @param Criteria $c
+	 * @param int $workerId
+	 * @param int $max_exe_attempts
+	 *
+	 * @return int
+	 */
+	public static function getQueue($c, $workerId, $max_exe_attempts)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
+		if (!$cache) //skip cache and get jobs from DB
+			return kBatchExclusiveLock::getQueue($c, $max_exe_attempts);
+
+		kApiCache::disableConditionalCache();
+
+		$workerKey = self::getCacheKeyForWorkerQueue($workerId);
+		$queueSizeFromCache = $cache->get($workerKey);
+		if ($queueSizeFromCache !== false)
+		{
+			KalturaLog::info("Got cached queue size for worker Id [$workerId] as [$queueSizeFromCache]");
+			return $queueSizeFromCache;
+		}
+		KalturaLog::info("No cached queue for worker Id [$workerId]");
+		return self::getQueueFromDB($cache, $workerKey, $c, $max_exe_attempts);
+	}
+
+	/**
+	 * will return BatchJob and insert bulk of jobs to the cache
+	 * @param kBaseCacheWrapper $cache
+	 * @param string $workerKey
+	 * @param Criteria $c
+	 * @param int $max_exe_attempts
+	 *
+	 * @return int
+	 */
+	private static function getQueueFromDB($cache, $workerKey, $c, $max_exe_attempts)
+	{
+		$queueSize = kBatchExclusiveLock::getQueue($c, $max_exe_attempts);
+		$cache->set($workerKey, $queueSize, self::TIME_IN_CACHE_FOR_QUEUE);
+		return $queueSize;
 	}
 
 }

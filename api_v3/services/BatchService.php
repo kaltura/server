@@ -430,7 +430,7 @@ class BatchService extends KalturaBatchService
 		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $workerQueueFilter->jobType);
 		$filter = $workerQueueFilter->filter->toFilter($jobType);
 
-		return kBatchManager::getQueueSize($workerQueueFilter->schedulerId, $workerQueueFilter->workerId, $jobType, $filter);
+		return kBatchManager::getQueueSize($workerQueueFilter->workerId, $jobType, $filter);
 	}
 
 
