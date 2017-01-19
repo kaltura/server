@@ -14,14 +14,16 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * Functionality 
 	 * --------------------*/
 
-	protected function getPlayServerUrl($flavorAsset)
+	protected function getPlayServerUrl()
 	{
 		return '';
 	}
 
-	protected  function generatePlayServerUrl($flavorAsset)
+	protected  function generatePlayServerUrl()
 	{
-		$prefix = $this->getDcPrefix($flavorAsset);
+		$prefix = '';
+		if(!is_null($this->getDynamicAttributes()->getDc()))
+			$prefix .='/dc/'.$this->getDynamicAttributes()->getDc();
 
 		if($this->getDynamicAttributes()->getUiConfId())
 			$prefix .= '/uiConfId/'.$this->getDynamicAttributes()->getUiConfId();
@@ -31,16 +33,6 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $prefix;
 	}
 
-	protected function getDcPrefix($flavorAsset)
-	{
-		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		list($filesync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-		if(!$filesync)
-			return '';
-
-		return '/dc/'.$filesync->getDc();
-	}
-	
 	/**
 	 * @param asset $flavorAsset
 	 * @return string representing the basic url.
