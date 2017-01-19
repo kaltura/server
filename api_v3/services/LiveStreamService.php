@@ -226,10 +226,10 @@ class LiveStreamService extends KalturaLiveEntryService
 		//Fetch all entries currently being streamed by partner
 		$connectedEntryServerNodes  = EntryServerNodePeer::retrieveConnectedEntryServerNodesByPartner($liveEntry->getPartnerId(), $liveEntry->getId());
 		
-		$connectedLiveEntryIds = array();
 		if(!count($connectedEntryServerNodes))
-			return $connectedLiveEntryIds;
+			return array();
 		
+		$connectedLiveEntryIds = array();
 		foreach($connectedEntryServerNodes as $connectedEntryServerNode)
 			$connectedLiveEntryIds[] = $connectedEntryServerNode->getEntryId();
 		
