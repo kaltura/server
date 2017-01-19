@@ -51,6 +51,8 @@
 						</value>
 					</item>
 				</userParameters>
+				
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification">

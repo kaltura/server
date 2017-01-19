@@ -105,7 +105,8 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 				$acl = Zend_Registry::get('acl');
 				$acl->addResource(new Zend_Acl_Resource($resource));
 				
-				if(!($pluginPage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
+                		$currentPermissions = Infra_AclHelper::getCurrentPermissions();
+				if($currentPermissions && !($pluginPage->accessCheck($currentPermissions)))
 				{
 					$acl->deny(Infra_AclHelper::getCurrentRole(), $resource);
 					KalturaLog::err("Class [" . get_class($pluginPage) . "] requires permissions [" . print_r($pluginPage->getRequiredPermissions(), true) . "]");

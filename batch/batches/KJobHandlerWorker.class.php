@@ -90,7 +90,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 		if(! count($jobs) > 0)
 		{
 			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(static::getType());
+			$this->saveSchedulerQueue(static::getType(), 0);
 			return null;
 		}
 		

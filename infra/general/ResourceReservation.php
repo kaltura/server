@@ -50,7 +50,14 @@ class ResourceReservation
 	public function reserve($resourceId)
 	{
 		if ($this->cache)
-			return $this->cache->add($this->getCacheKeyForResource($resourceId), $this->userToken, $this->ttl);
+		{
+			$key = $this->getCacheKeyForResource($resourceId);
+			if ($this->cache->add($key, $this->userToken, $this->ttl))
+				return true;
+			$val = $this->cache->get($key);
+			if ($val == $this->userToken) //only the one that reserve the resource can ovreride the reserve (time extention)
+				return $this->cache->set($key, $this->userToken, $this->ttl);
+		}
 		return false;
 	}
 

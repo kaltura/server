@@ -1355,7 +1355,7 @@ class KalturaEntryService extends KalturaBaseService
 		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
 		{
 			//non owner cannot change entitledUsersEdit and entitledUsersPublish
-			if($this->getKuser()->getId() != $dbEntry->getKuserId())
+			if(!$dbEntry->isOwnerActionsAllowed($this->getKuser()->getId()))
 			{
 				if($entry->entitledUsersEdit !== null && strtolower($entry->entitledUsersEdit) != strtolower($dbEntry->getEntitledPusersEdit())){
 					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));					
