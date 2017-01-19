@@ -259,10 +259,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			if(!count($deliveryIds) && in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
 			{
 				$customLiveStreamConfigurations = array();
-				if($entry->getHlsStreamUrl())
+				if($entry->getHlsStreamUrl($deliveryAttributes->getMediaProtocol()))
 				{
 					$hlsLiveStreamConfig = new kLiveStreamConfiguration();
-					$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl());
+					$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl($deliveryAttributes->getMediaProtocol()));
 					$hlsLiveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
 					$customLiveStreamConfigurations[] = $hlsLiveStreamConfig;
 				}
@@ -661,10 +661,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			if( in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
 			{
 				$customLiveStreamConfigurations = array();
-				if($entry->getHlsStreamUrl())
+				if($entry->getHlsStreamUrl($deliveryAttributes->getMediaProtocol()))
 				{
 					$hlsLiveStreamConfig = new kLiveStreamConfiguration();
-					$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl());
+					$hlsLiveStreamConfig->setUrl($entry->getHlsStreamUrl($deliveryAttributes->getMediaProtocol()));
 					$hlsLiveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
 					$customLiveStreamConfigurations[] = $hlsLiveStreamConfig;
 				}

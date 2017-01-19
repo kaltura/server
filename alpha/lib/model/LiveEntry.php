@@ -333,11 +333,8 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = null, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
-		if(!$protocol)
-			$protocol = requestUtils::getRequestProtocol();
-		
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
 		{
@@ -346,16 +343,6 @@ abstract class LiveEntry extends entry
 			{
 				$pushPublishConfigurations = $this->getPushPublishConfigurations();
 				$configurations = array_merge($configurations, $pushPublishConfigurations);
-			}
-			
-			foreach($configurations as $configuration)
-			{
-				$liveUrl = $configuration->getUrl();
-					
-				if($liveUrl)
-					$liveUrl =  preg_replace('/^https?/', $protocol , $liveUrl);
-				
-				$configuration->setUrl($liveUrl);
 			}
 			
 			return $configurations;
