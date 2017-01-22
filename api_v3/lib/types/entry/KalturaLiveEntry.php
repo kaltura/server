@@ -172,15 +172,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForInsert()
-	 */
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull("conversionProfileId");
-		parent::validateForInsert($propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate($source_object)
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
