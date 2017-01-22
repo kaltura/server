@@ -27,6 +27,8 @@ class CuePointFilter extends baseObjectFilter
 				"_lte_created_at",
 				"_gte_updated_at",
 				"_lte_updated_at",
+				"_lte_triggered_at",
+				"_gte_triggered_at",
 				"_like_name",
 				"_mlikeor_name",
 				"_mlikeand_name",

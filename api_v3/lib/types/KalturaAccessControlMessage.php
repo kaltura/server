@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaPlaybackRestriction extends KalturaObject{
+class KalturaAccessControlMessage extends KalturaObject{
 
 	/**
 	 * @var string

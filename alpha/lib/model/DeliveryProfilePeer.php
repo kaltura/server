@@ -209,7 +209,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
+		if($deliveryAttributes->getDeliveryProfileId())
+			$deliveryIds = array($deliveryAttributes->getDeliveryProfileId());
+		else
+			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))

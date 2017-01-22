@@ -503,6 +503,10 @@ class infraRequestUtils
 			}
 		}
 
+		require_once(__dir__ . '/requestParamsPreprocessor.php');
+
+		requestParamsPreprocessor::editParams(self::$requestParams);
+
 		return self::$requestParams;
 	}
 

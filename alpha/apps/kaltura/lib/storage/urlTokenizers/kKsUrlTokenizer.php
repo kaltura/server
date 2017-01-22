@@ -3,29 +3,24 @@
 class kKsUrlTokenizer extends kUrlTokenizer
 {
 	/**
-	 * @var string
+	 * @var bool
 	 */
-	protected $entryId;
-
-	/**
-	 * @var int
-	 */
-	protected $partnerId;
+	protected $usePath;
 	
 	/**
-	 * @param string $entryId
+	 * @return $usePath
 	 */
-	public function setEntryId($entryId)
+	public function getUsePath() 
 	{
-		$this->entryId = $entryId;
+		return $this->usePath;
 	}
-
+	
 	/**
-	 * @param int $partnerId
+	 * @param bool $usePath
 	 */
-	public function setPartnerId($partnerId)
+	public function setUsePath($usePath) 
 	{
-		$this->partnerId = $partnerId;
+		$this->usePath = $usePath;
 	}
 	
 	/**
@@ -62,7 +57,15 @@ class kKsUrlTokenizer extends kUrlTokenizer
 			$privileges, 
 			null, 
 			null);
-		
+
+		if ($this->usePath)
+		{
+			$insertPos = strpos($url, '/name/');
+			if ($insertPos !== false)
+			{
+				return substr($url, 0, $insertPos) . '/ks/' . $ks . substr($url, $insertPos);
+			}
+		}
 		return $url . '?ks=' . $ks;
 	}
 }

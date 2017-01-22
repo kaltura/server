@@ -3,14 +3,14 @@
  * @package plugins.metadata
  * @subpackage model.data
  */
-class kMatchMetadataCondition extends kMatchCondition
+class kMetadataField extends kStringField
 {
 	/**
 	 * May contain the full xpath to the field in two formats
 	 * 1. Slashed xPath, e.g. /metadata/myElementName
 	 * 2. Using local-name function, e.g. /*[local-name()='metadata']/*[local-name()='myElementName']
 	 * 3. Using only the field name, e.g. myElementName, it will be searched as //myElementName
-	 * 
+	 *
 	 * @var string
 	 */
 	private $xPath;
@@ -26,53 +26,25 @@ class kMatchMetadataCondition extends kMatchCondition
 	private $profileSystemName;
 	
 	/* (non-PHPdoc)
-	 * @see kCondition::__construct()
+	 * @see kIntegerField::getFieldValue()
 	 */
-	public function __construct($not = false)
+	protected function getFieldValue(kScope $scope = null)
 	{
-		$this->setType(MetadataPlugin::getConditionTypeCoreValue(MetadataConditionType::METADATA_FIELD_MATCH));
-		parent::__construct($not);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see kCondition::applyDynamicValues()
-	 */
-	protected function applyDynamicValues(kScope $scope)
-	{
-		parent::applyDynamicValues($scope);
+		if(!$scope || (is_null($this->profileId) && is_null($this->profileSystemName)))
+			return null;
 		
-		$dynamicValues = $scope->getDynamicValues('{', '}');
-		
-		if(is_array($dynamicValues) && count($dynamicValues))
-		{
-			$this->xPath = str_replace(array_keys($dynamicValues), $dynamicValues, $this->xPath);
-			if($this->profileSystemName)
-				$this->profileSystemName = str_replace(array_keys($dynamicValues), $dynamicValues, $this->profileSystemName);
-		}
-	}
-	
-	/* (non-PHPdoc)
-	 * @see kMatchCondition::getFieldValue()
-	 */
-	public function getFieldValue(kScope $scope)
-	{
 		$profileId = $this->profileId;
-		if(!$profileId)
+		if(is_null($profileId))
 		{
-			if(!$this->profileSystemName)
-			{
-				KalturaLog::err("No metadata profile id and system-name supplied");
-				return null;
-			}
-				
 			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName);
-			if(!$profile)
-			{
-				KalturaLog::notice("Metadata profile with system-name [$this->profileSystemName] not found");
-				return null;
-			}
-				
-			$profileId = $profile->getId();
+			if($profile)
+				$profileId = $profile->getId();
+		}
+		
+		if(is_null($profileId))
+		{
+			KalturaLog::err("No metadata profile found matching input values of profileId [{$this->profileId}] systemName [{$this->profileSystemName}]");
+			return null;
 		}
 		
 		$metadata = null;
@@ -88,7 +60,7 @@ class kMatchMetadataCondition extends kMatchCondition
 				$objectType = kMetadataManager::getTypeNameFromObject($object);
 				$metadata = MetadataPeer::retrieveByObject($profileId, $objectType, $object->getId());
 			}
-			else if ($object instanceof Metadata)
+			elseif ($object instanceof Metadata)
 			{
 				$metadata = $object;
 			}
@@ -106,10 +78,16 @@ class kMatchMetadataCondition extends kMatchCondition
 				$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $object->getEntryId());
 			}
 		}
-			
+		
 		if($metadata)
-			return kMetadataManager::parseMetadataValues($metadata, $this->xPath);
-			
+		{
+			$values = kMetadataManager::parseMetadataValues($metadata, $this->xPath);
+			if($values && count($values))
+			{
+				return reset($values);
+			}
+		}
+		
 		KalturaLog::notice("Metadata object not found for scope [" . get_class($scope) . "]");
 		return null;
 	}
@@ -117,11 +95,11 @@ class kMatchMetadataCondition extends kMatchCondition
 	/**
 	 * @return string $xPath
 	 */
-	public function getXPath() 
+	public function getXPath()
 	{
 		return $this->xPath;
 	}
-
+	
 	/**
 	 * @return int $profileId
 	 */
@@ -129,44 +107,36 @@ class kMatchMetadataCondition extends kMatchCondition
 	{
 		return $this->profileId;
 	}
-
+	
 	/**
 	 * @param string $xPath
 	 */
-	public function setXPath($xPath) 
+	public function setXPath($xPath)
 	{
 		$this->xPath = $xPath;
 	}
-
+	
 	/**
 	 * @param int $profileId
 	 */
-	public function setProfileId($profileId) 
+	public function setProfileId($profileId)
 	{
 		$this->profileId = $profileId;
 	}
-
+	
 	/**
 	 * @return string
 	 */
-	public function getProfileSystemName() 
+	public function getProfileSystemName()
 	{
 		return $this->profileSystemName;
 	}
-
+	
 	/**
 	 * @param string $profileSystemName
 	 */
-	public function setProfileSystemName($profileSystemName) 
+	public function setProfileSystemName($profileSystemName)
 	{
 		$this->profileSystemName = $profileSystemName;
 	}
-
-	/* (non-PHPdoc)
-	 * @see kMatchCondition::shouldFieldDisableCache()
-	 */
-	public function shouldFieldDisableCache($scope)
-	{
-		return false;
-	}	
 }

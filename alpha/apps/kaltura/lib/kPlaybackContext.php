@@ -3,35 +3,29 @@
  * @package Core
  * @subpackage model.data
  */
-class kPlaybackContextResult {
+class kPlaybackContext {
 
 	/**
 	 * @var array<kPlaybackSource>
 	 */
-	private $sources;
+	protected $sources;
 
 	/**
 	 * @var array
 	 */
-	private $flavorAssets;
-
-	/**
-	 * Array of messages as received from the invalidated rules
-	 * @var array<string>
-	 */
-	private $messages;
+	protected $flavorAssets;
 
 	/**
 	 * Array of actions as received from the invalidated rules
 	 * @var array<kRuleAction>
 	 */
-	private $actions;
+	protected $actions;
 
 	/**
 	 * Array of actions as received from the invalidated rules
-	 * @var array<kPlaybackRestriction>
+	 * @var array<kAccessControlMessage>
 	 */
-	private $restrictions;
+	protected $messages;
 
 
 	/**
@@ -97,23 +91,5 @@ class kPlaybackContextResult {
 	{
 		$this->actions = $actions;
 	}
-
-	/**
-	 * @return array<kPlaybackRestriction>
-	 */
-	public function getRestrictions()
-	{
-		return $this->restrictions;
-	}
-
-	/**
-	 * @param array $restrictions
-	 */
-	public function setRestrictions($restrictions)
-	{
-		$this->restrictions = $restrictions;
-	}
-
-
 
 }

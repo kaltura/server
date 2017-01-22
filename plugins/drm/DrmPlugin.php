@@ -114,8 +114,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return new KalturaAccessControlDrmPolicyAction();
 	    if ($baseClass == 'KalturaPluginData' && $enumValue == self::getPluginName())
 		    return new KalturaDrmEntryContextPluginData();
-	    if ($baseClass == 'KalturaDrmEntryPlayingPluginData' && $enumValue == 'kDrmEntryPlayingPluginData')
-		    return new KalturaDrmEntryPlayingPluginData();
+	    if ($baseClass == 'KalturaDrmPlaybackPluginData' && $enumValue == 'kDrmPlaybackPluginData')
+		    return new KalturaDrmPlaybackPluginData();
         return null;
     }
 
@@ -153,7 +153,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 
     public function contributeToEntryContextDataResult(entry $entry, accessControlScope $contextDataParams, kContextDataHelper $contextDataHelper)
     {
-	    if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions() ))
+	    if ($this->shouldContribute($entry ))
 	    {
 		    $signingKey = $this->getSigningKey();
 		    if (!is_null($signingKey))
@@ -170,7 +170,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
 			if ($dbProfile)
@@ -182,7 +182,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 					$customDataObject = reset($customDataJson);
 					foreach ($this->getSchemes() as $scheme)
 					{
-						$data = new kDrmEntryPlayingPluginData();
+						$data = new kDrmPlaybackPluginData();
 						$data->setLicenseURL($this->constructUrl($dbProfile, $scheme, $customDataObject));
 						$data->setScheme($scheme);
 						$result->addToPluginData($scheme, $data);
@@ -214,19 +214,28 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
     }
 
 	/**
-	 * @param array<kRuleAction> $actions
+	 * @param entry $entry
 	 * @return bool
 	 */
-	protected function shouldContribute(array $actions)
+	protected function shouldContribute(entry $entry)
 	{
-		foreach ($actions as $action)
+		if ($entry->getAccessControl())
 		{
-			/**
-			 * @var kRuleAction $action
-			 */
-			if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
 			{
-				return true;
+				/**
+				 * @var kRule $rule
+				 */
+				foreach ($rule->getActions() as $action)
+				{
+					/**
+					 * @var kRuleAction $action
+					 */
+					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+					{
+						return true;
+					}
+				}
 			}
 		}
 		return false;

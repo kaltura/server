@@ -3,17 +3,17 @@
  * @package api
  * @subpackage objects
  */
-class KalturaPlaybackRestrictionsArray extends KalturaTypedArray
+class KalturaAccessControlMessageArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$newArr = new KalturaPlaybackRestrictionsArray();
+		$newArr = new KalturaAccessControlMessageArray();
 		if ($arr == null)
 			return $newArr;
 
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaPlaybackRestriction();
+			$nObj = new KalturaAccessControlMessage();
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
@@ -23,6 +23,6 @@ class KalturaPlaybackRestrictionsArray extends KalturaTypedArray
 
 	public function __construct()
 	{
-		parent::__construct("KalturaPlaybackRestriction");
+		parent::__construct("KalturaAccessControlMessage");
 	}
 }

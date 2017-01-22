@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaDrmEntryPlayingPluginData extends KalturaPluginData{
+class KalturaDrmPlaybackPluginData extends KalturaPluginData{
 
     /**
      * @var string

@@ -5,30 +5,34 @@ if($argc < 2) {
 	echo "Usage: php getLogHelper.php {job id}\n";
 	exit;
 }
-if ($argv[1] == '-help') {
-	echo "Usage: php getLogHelper.php {job id} {path to batch ini file (optional)}\n";
-	exit;
-}
 
 $jobId = $argv[1];
-$iniFile = '/opt/kaltura/app/configurations/batch/workers.ini';
-if (count($argv) > 2)
-	$iniFile = $argv[2];
-
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
+$batchConfigDir = KALTURA_ROOT_PATH .'/configurations/batch/';
 
 
 
 $firstRecord = retrieveHistoryRecord($jobId);
+exitIfNull($firstRecord, "Can't retrieve history record for job [$jobId]\n");
+
 $schedulerId = $firstRecord->getSchedulerId();
 $workerId = $firstRecord->getWorkerId();
 $batchIndex = $firstRecord->getBatchIndex();
 
 $machineName = retrieveNameByScheduler($schedulerId);
-//$logName = getName($iniFile, $workerId);
-printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId);
+printData($machineName, $schedulerId, $workerId, $batchIndex);
+
+$config = getAllConf($batchConfigDir);
+exitIfNull($config, "Can't retrieve config files\n");
+
+$logName = getNameFromConf($config, $workerId);
+$logDir = $config['template']['logDir'];
+
+printInGreen("exe in $logDir:    zgrep -C30 $jobId $logName-$batchIndex-@DATE@.log.gz \n");
 return;
+
+function exitIfNull($val, $error) {if (!$val) exit("\n$error\n");}
 
 function retrieveNameByScheduler($schedulerId) {
 	$criteria = new Criteria(SchedulerPeer::DATABASE_NAME);
@@ -44,26 +48,35 @@ function retrieveHistoryRecord($jobId) {
 	return $history[0];
 }
 
-function getName($iniPath, $workerId) {
-	// load zend config classes
-	if(!class_exists('Zend_Config_Ini'))
-	{
-		require_once 'Zend/Config/Exception.php';
-		require_once 'Zend/Config/Ini.php';
-	}
-	$config = new Zend_Config_Ini($iniPath);
-	$result = $config->toArray();
-	foreach($result as $key=>$value) {
-		if (isset($value['id']) && $value['id'] == $workerId)
-			return substr($key, 6 ,strlen($key)); // len of 'KAsync' = 6
-	}
+function getAllConf($path) {
+	$content = '';
+	$files = glob($path. '*.ini');
+	foreach($files as $file)
+		$content .= file_get_contents($file) . "\n";
+	return parse_ini_string($content, true);
 }
 
-function printData($machineName, $schedulerId, $workerId, $batchIndex, $jobId) {
+function getNameFromConf($conf, $workerId) {
+	foreach($conf as $key=>$value)
+		if (isset($value['id']) && $value['id'] == $workerId)
+			return getNameFromKey($key);
+	return "@BATCH_NAME@";
+}
+
+function getNameFromKey($str) {
+	$parts = explode(":", $str);
+	$prefix = 'KAsync';
+	if (!(substr($str, 0, strlen($prefix)) === $prefix))
+		return null;
+	$name = substr($parts[0], strlen($prefix));
+	return strtolower(rtrim($name, " "));
+}
+
+function printData($machineName, $schedulerId, $workerId, $batchIndex){
 	printInGreen("Connect to machine: [$machineName] \n");
 	printInGreen("schedulerId: [$schedulerId], workerId: [$workerId], batchIndex: [$batchIndex] \n");
-	printInGreen("exe in /opt/var/log:    zgrep -C30 $jobId @BATCH_NAME@-$batchIndex-@DATE@.log.gz \n");
 }
+
 function printInGreen($str) {
 	echo "\033[32m$str\033[0m";
 }

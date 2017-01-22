@@ -257,8 +257,7 @@ class kFile
 				return NULL;
 			if($from_byte > 0)
 			{
-				$from_byte = max(0, $from_byte);
-				$dummy = fread($fh, $from_byte);
+				fseek($fh, $from_byte);
 			}
 			
 			if($to_byte > 0)

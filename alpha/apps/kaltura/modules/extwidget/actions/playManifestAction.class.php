@@ -114,6 +114,11 @@ class playManifestAction extends kalturaAction
 	 * @var DeliveryProfileDynamicAttributes
 	 */
 	private $deliveryAttributes = null;
+
+	/**
+	 * @var int
+	 */
+	private $deliveryProfileId = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -1059,7 +1064,10 @@ class playManifestAction extends kalturaAction
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
-		
+
+		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
+		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
+
 		// Initialize
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
@@ -1111,7 +1119,14 @@ class playManifestAction extends kalturaAction
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
+		{
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
+			if ($renderer->tokenizer)
+			{
+				$renderer->tokenizer->setEntryId($this->entryId);
+				$renderer->tokenizer->setPartnerId($this->entry->getPartnerId());
+			}
+		}
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		$renderer->lastModified = time();
 

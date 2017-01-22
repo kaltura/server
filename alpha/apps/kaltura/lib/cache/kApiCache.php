@@ -587,7 +587,7 @@ class kApiCache extends kApiCacheBase
 				if (count(self::$_activeInstances) > 1)
 				{
 					// in case of multirequest need to add the current conditions to the conditions of the full multirequest
-					self::setConditionalCacheExpiry($cacheTTL);
+					self::setConditionalCacheExpiry(max($cacheTTL, 5));
 					self::addInvalidationKeys($invalidationKeys, $cachedInvalidationTime);
 					self::addSqlQueryConditions($sqlConditions);
 				}
@@ -695,7 +695,26 @@ class kApiCache extends kApiCacheBase
 	 */
 	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
 	{
-		$result = $this->checkCacheInternal($cacheHeaderName, $cacheHeader);
+		for ($attempt = 0; $attempt < 20; $attempt++)
+		{
+			$result = $this->checkCacheInternal($cacheHeaderName, $cacheHeader);
+			if ($result !== false)
+			{
+				break;
+			}
+
+			if (!self::$_lockEnabled)
+			{
+				break;
+			}
+
+			if (apc_add('apiCacheLock-'.$this->_cacheKey, true, 1))
+			{
+				break;
+			}
+
+			usleep(50000);
+		}
 		
 		if(isset($this->_params['service']))
 		{
@@ -715,6 +734,7 @@ class kApiCache extends kApiCacheBase
 		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
 			return false;
 
+		$this->_cacheStores = array();
 		$startTime = microtime(true);
 		list($cacheMode, $cacheStore) = $this->getCacheStoreForRead();
 		if (!$cacheStore)

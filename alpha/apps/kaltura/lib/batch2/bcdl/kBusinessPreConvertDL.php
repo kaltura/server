@@ -1575,7 +1575,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			/*
 			 * Add label notation
 			 */
-			if(($multiStreamJson=$sourceFlavorOutput->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
+			if(isset($sourceFlavorOutput) && ($multiStreamJson=$sourceFlavorOutput->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
 			&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
 				$originalFlavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
 				$originalFlavorAsset->save();

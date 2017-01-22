@@ -24,7 +24,8 @@ class kEvalBooleanField extends kBooleanField
 		/* @var $scope kEventScope */
 		if(strpos($this->code, ';') !== false)
 			throw new kCoreException("Evaluated code may be simple value only");
-			
+		
+		KalturaLog::debug("Evaluating code [$this->code]" . ($this->description ? " for description [$this->description]" : ''));
 		return eval("return (bool)({$this->code});");
 	}
 	
