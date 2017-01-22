@@ -284,10 +284,6 @@ class MetadataService extends KalturaBaseService
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $dbMetadata->getMetadataProfileId());
 		
-		$previousVersion = null;
-		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
-			$previousVersion = $dbMetadata->getVersion();
-				
 		if($xmlData)
 		{
 			// if a metadata xslt is defined on the metadata profile - transform the given metadata
