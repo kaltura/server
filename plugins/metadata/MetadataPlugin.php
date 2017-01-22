@@ -43,7 +43,6 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$previousVersion = null;
 		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
 			$previousVersion = $dbMetadata->getVersion();
-		$dbMetadata->getVersion();
 		$dbMetadata->incrementVersion();
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		kFileSyncUtils::file_put_contents($key, $xmlData);
