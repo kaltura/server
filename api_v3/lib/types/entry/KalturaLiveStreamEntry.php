@@ -137,7 +137,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"streamUsername",
 		"bitrates" => "streamBitrates",
 		"primaryServerNodeId",
-		"segmentDuration",
+		"segmentDuration"
 	);
 
 	public function __construct()
