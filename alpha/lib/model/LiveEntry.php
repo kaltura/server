@@ -16,6 +16,7 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
 	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
+	const DEFAULT_SEGMENT_DURATION_SECONDS = 10;
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
@@ -747,8 +748,8 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
 
-	public function setLowLatencySettings ( $v )	{	$this->putInCustomData ( "$lowLatencySettings" , $v );	}
-	public function getLowLatencySettings (  )	{	return $this->getFromCustomData( "$lowLatencySettings", null, KalturaLowLatencyChunkDurationValue::TEN_SECONDS_CHUNK_DURATION);	}
+	public function setSegmentDuration ( $v )	{	$this->putInCustomData ( "segmentDuration" , $v );	}
+	public function getSegmentDuration (  )	{	return $this->getFromCustomData( "segmentDuration", null, LiveEntry::DEFAULT_SEGMENT_DURATION_SECONDS);	}
 
 	/**
 	 * @return boolean
