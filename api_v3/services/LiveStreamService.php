@@ -161,29 +161,23 @@ class LiveStreamService extends KalturaLiveEntryService
 		if($hostname && isset($mediaServerIndex))
 			$this->setMediaServerWrapper($dbEntry, $mediaServerIndex, $hostname, KalturaEntryServerNodeStatus::AUTHENTICATED, $applicationName);
 		
-		// fetch current stream live params
-		$liveParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($dbEntry->getConversionProfileId());
-		$usedLiveParamsIds = array();
-		foreach($liveParamsIds as $liveParamsId)
-		{
-			$usedLiveParamsIds[$liveParamsId] = array($entryId);
-		}
-			
-		// fetch all live entries that currently are live
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setIsLive(true);
-		$filter->setIdNotIn(array($entryId));
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->attachToCriteria($baseCriteria);
+		$this->validateMaxStreamsNotReached($dbEntry);
 		
-		$entries = entryPeer::doSelect($baseCriteria);
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
+		return $entry;
+	}
 	
-		$maxInputStreams = $this->getPartner()->getMaxLiveStreamInputs();
-		if(!$maxInputStreams)
-			$maxInputStreams = kConf::get('partner_max_live_stream_inputs', 'local', 10);
-		KalturaLog::debug("Max live stream inputs [$maxInputStreams]");
-			
+	private function validateMaxStreamsNotReached(LiveEntry $liveEntry)
+	{
+		//Fetch all entries currently being streamed by partner
+		$liveEntries = $this->getLiveEntriesForPartner($liveEntry);
+		
+		$maxPassthroughStreams = $this->getPartner()->getMaxLiveStreamInputs();
+		if(!$maxPassthroughStreams)
+			$maxPassthroughStreams = kConf::get('partner_max_live_stream_inputs', 'local', 10);
+		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
+		
 		$maxTranscodedStreams = 0;
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $this->getPartnerId()))
 		{
@@ -191,67 +185,55 @@ class LiveStreamService extends KalturaLiveEntryService
 			if(!$maxTranscodedStreams)
 				$maxTranscodedStreams = kConf::get('partner_max_live_stream_outputs', 'local', 10);
 		}
-		KalturaLog::debug("Max live stream outputs [$maxTranscodedStreams]");
+		KalturaLog::debug("Max transcoded streams [$maxTranscodedStreams]");
 		
-		$totalInputStreams = count($entries) + 1;
-		if($totalInputStreams > ($maxInputStreams + $maxTranscodedStreams))
+		$entryConversionProfiles = array();
+		foreach($liveEntries as $entry)
 		{
-			KalturaLog::debug("Live input stream [$totalInputStreams]");
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $entryId);
+			/* @var $entry LiveEntry */
+			$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
 		}
 		
-		$entryIds = array($entryId);
-		foreach($entries as $liveEntry)
+		$passthroughEntriesCount = 0;
+		$transcodedEntriesCount = 0;
+		foreach($entryConversionProfiles as $conversionProfileId => $entriesArray)
 		{
-			/* @var $liveEntry LiveEntry */
-			$entryIds[] = $liveEntry->getId();
-			$liveParamsIds = array_map('intval', explode(',', $liveEntry->getFlavorParamsIds()));
-			
-			foreach($liveParamsIds as $liveParamsId)
+			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
+			foreach($flavorParamsConversionProfile as $flavorParamConversionProfile)
 			{
-				if(isset($usedLiveParamsIds[$liveParamsId]))
+				/* @var $flavorParamConversionProfile flavorParamsConversionProfile */
+				if($flavorParamConversionProfile->getOrigin() == KalturaAssetParamsOrigin::CONVERT)
 				{
-					$usedLiveParamsIds[$liveParamsId][] = $liveEntry->getId();
-				}
-				else
-				{
-					$usedLiveParamsIds[$liveParamsId] = array($liveEntry->getId());
+					$transcodedEntriesCount += count($entriesArray);
+					break;
 				}
 			}
-		}
 			
-		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($usedLiveParamsIds));
-		$passthruEntries = null;
-		$transcodedEntries = null;
-		foreach($liveParams as $liveParamsItem)
-		{
-			/* @var $liveParamsItem LiveParams */
-			if($liveParamsItem->hasTag(liveParams::TAG_INGEST))
-			{
-				$passthruEntries = array_intersect(is_array($passthruEntries) ? $passthruEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
-			}
-			else
-			{
-				$transcodedEntries = array_intersect(is_array($transcodedEntries) ? $transcodedEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
-			}
+			$PassthroughEntriesCount += count($entriesArray);
 		}
-		$passthruEntries = array_diff($passthruEntries, $transcodedEntries);
-		
-		$passthruEntriesCount = count($passthruEntries);
-		$transcodedEntriesCount = count($transcodedEntries);
 		
 		KalturaLog::debug("Live transcoded entries [$transcodedEntriesCount], max live transcoded streams [$maxTranscodedStreams]");
 		if($transcodedEntriesCount > $maxTranscodedStreams)
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED, $entryId);
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED, $liveEntry->getId());
 		
-		$maxInputStreams += ($maxTranscodedStreams - $transcodedEntriesCount);
-		KalturaLog::debug("Live params inputs [$passthruEntriesCount], max live stream inputs [$maxInputStreams]");
-		if($passthruEntriesCount > $maxInputStreams)
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $entryId);
-
-		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry, $this->getResponseProfile());
-		return $entry;
+		KalturaLog::debug("Live Passthrough entries [$PassthroughEntriesCount], max live Passthrough streams [$maxPassthroughStreams]");
+		if($PassthroughEntriesCount > $maxPassthroughStreams)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $liveEntry->getId());
+	}
+	
+	private function getLiveEntriesForPartner(LiveEntry $liveEntry)
+	{
+		//Fetch all entries currently being streamed by partner
+		$connectedEntryServerNodes  = EntryServerNodePeer::retrieveConnectedEntryServerNodesByPartner($liveEntry->getPartnerId(), $liveEntry->getId());
+		
+		if(!count($connectedEntryServerNodes))
+			return array();
+		
+		$connectedLiveEntryIds = array();
+		foreach($connectedEntryServerNodes as $connectedEntryServerNode)
+			$connectedLiveEntryIds[] = $connectedEntryServerNode->getEntryId();
+		
+		return entryPeer::retrieveByPKs($connectedLiveEntryIds);
 	}
 
 	/**
