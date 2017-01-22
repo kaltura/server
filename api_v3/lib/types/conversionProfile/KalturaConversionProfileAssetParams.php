@@ -75,6 +75,11 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 	 */
 	public $twoPass;
 
+        /**
+         * @var string
+         */
+        public $tags;
+
 	private static $map_between_objects = array
 	(
 		'conversionProfileId',
@@ -87,6 +92,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 		'isEncrypted',
 		'contentAwareness',
 		'twoPass',
+		'tags',
 	);
 	
 	/* (non-PHPdoc)

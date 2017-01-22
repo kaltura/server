@@ -39,10 +39,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		 */
 		self::adjustForSubtitles($target, $cmdValsArr);
 		
-		if(isset($target->_video) && in_array($target->_video->_id, array(KDLVideoTarget::H264,KDLVideoTarget::H264B,KDLVideoTarget::H264M,KDLVideoTarget::H264H))){
-			self::adjustH264Level($target->_video, $cmdValsArr);
-			self::adjustX264Opts($cmdValsArr);
-		}	
+		$this->adjustVideoCodecSpecificParams($target->_video, $cmdValsArr);
 		
 		/*
 		 * For resample-filter case -
@@ -384,18 +381,32 @@ Disabled 'amix', for better stereo by 'amerge'
 	
 	/**
 	 * 
-	 * @param string $cmdStr
+	 * @param unknown_type $targetVid
+	 * @param array $cmdValsArr
 	 */
-	private static function adjustX264Opts(array &$cmdValsArr)
+	protected static function adjustVideoCodecSpecificParams($targetVid, array &$cmdValsArr)
 	{
-		$keys=array_keys($cmdValsArr, "-x264opts");
+		if(isset($targetVid) && in_array($targetVid->_id, array(KDLVideoTarget::H264,KDLVideoTarget::H264B,KDLVideoTarget::H264M,KDLVideoTarget::H264H))){
+			self::adjustH264Level($targetVid, $cmdValsArr);
+			self::mergeOpts("-x264opts", $cmdValsArr);
+		}	
+	}
+
+	/**
+	 * 
+	 * @param unknown_type $optsName
+	 * @param array $cmdValsArr
+	 */
+	protected static function mergeOpts($optsName, array &$cmdValsArr)
+	{
+		$keys=array_keys($cmdValsArr, $optsName);
 		if(count($keys>1)) {
 			$first = array_shift($keys);
-			$x264opts = $cmdValsArr[$first+1];
+			$optsStr = $cmdValsArr[$first+1];
 			foreach ($keys as $key){
-				$x264opts.= ':'.$cmdValsArr[$key+1];
+				$optsStr.= ':'.$cmdValsArr[$key+1];
 			}
-			$cmdValsArr[$first+1] = $x264opts;
+			$cmdValsArr[$first+1] = $optsStr;
 			
 			$keys  = array_reverse($keys);
 			foreach ($keys as $key){

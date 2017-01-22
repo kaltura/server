@@ -88,6 +88,9 @@ class kAssetUtils
 		else
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
+			if(!$urlManager)
+				return null;
+
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
 			$profileAttributes = $urlManager->getDynamicAttributes();

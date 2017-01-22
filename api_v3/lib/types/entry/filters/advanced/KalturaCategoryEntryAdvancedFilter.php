@@ -11,7 +11,6 @@ class KalturaCategoryEntryAdvancedFilter extends KalturaSearchItem
 	public $categoriesMatchOr;
 	
 	/**
-	 * @dynamicType KalturaCategoryEntryStatus
 	 * @var string
 	 */
 	public $categoryEntryStatusIn;

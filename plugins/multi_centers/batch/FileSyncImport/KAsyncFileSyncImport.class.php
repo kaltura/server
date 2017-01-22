@@ -168,7 +168,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			$responseProfile->fields = '';		// don't need the response
 			self::$kClient->setResponseProfile($responseProfile);
 				
-			$fileSyncPlugin = KalturaFilesyncClientPlugin::get(self::$kClient);
+			$fileSyncPlugin = KalturaFileSyncClientPlugin::get(self::$kClient);
 			$fileSyncPlugin->fileSync->update($fileSync->id, $updateFileSync);
 		}
 		catch(KalturaException $e)

@@ -1,3 +1,137 @@
+# Lynx 12.8.0 #
+
+## Play-server flavor changed and deleted http notifications ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6565
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/playServerFlavorHttpEventNotification.xml
+
+## Add temporary flag for new live recording LA ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6659
+
+### Configuration ###
+- Add new permission to admin.ini:
+
+		moduls.kalturaLiveStreamRecording.enabled = true
+		moduls.kalturaLiveStreamRecording.permissionType = 2
+		moduls.kalturaLiveStreamRecording.label = Kaltura Live Stream Recording
+		moduls.kalturaLiveStreamRecording.permissionName = FEATURE_LIVE_STREAM_KALTURA_RECORDING
+		moduls.kalturaLiveStreamRecording.basePermissionType = 2
+		moduls.kalturaLiveStreamRecording.basePermissionName = FEATURE_LIVE_STREAM
+		moduls.kalturaLiveStreamRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Scheduling - validate resourceEvent is not already allocated at a specific time ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-6543
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_20_update_schedule_event_permissions.php
+	                
+## Need to verify ability to list occurrences by resource of their parent for Extron ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6557
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	reindex schedule_event table in sphinx
+
+## Update entry ready email notification template ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-9870
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/2016_12_23_updateEntryReadyTemplateForLive.xml
+
+## Add new bpm_process_case table to the DB ##
+
+- Issue Type: Task
+- Issue ID: PLAT-6459
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+mysql -hHOST_NAME -uUSER -pPASS DB_NAME < deployment/updates/sql/2016_12_22_create_table_business_process_case.sql 
+
+## Burned watermark aspect ratio ##
+
+- Issue Type: BUG
+- Issue ID: SUP-9869
+
+### Configuration ###
+None.  
+
+## Support for H265 and VP9 codecs ##
+
+- Issue Type: Task
+- Issue ID: PLAT-6650
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
+## flavorParams::tags override ##
+
+An option to override flavorPrams::tags setting via flavorParamsConversionProfile::tags field
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
+## ‘Collection’/’grouping/multi-flavor tagging support ##
+
+Define which tags represent flavors ‘grouping’ (aka ‘mbr’,’ism’).
+‘Collection-tag’ causes activation of ‘flavor optimization’ heuristics.
+It can be used to define playback sets as well.
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
+## Fix encryption at rest with tr.operators ##
+
+- Issue Type: Bug
+- Issue ID:PLAT-6708
+
+### Configuration ###
+None.  
+
+### Deployment scripts ###
+None
+
 # Lynx 12.7.0 #
 
 ## New action getPlaybackContext to baseEntryService ##
@@ -201,7 +335,7 @@ None.
 
 ## 2-Factor Admin Console Authentication ##
 - Issue Type: New Feature 
-- Issue ID: PLAT-6125 
+- Issue ID: PLAT-6215 
 
 ### Configuration ###
 - Mandatory: in admin.ini, set settings.remoteAddrHeaderSalt to the same value as remote_addr_header_salt in local.ini

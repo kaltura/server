@@ -57,8 +57,13 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 		foreach($templateIds as $templateId)
 		{
 			$notificationTemplate = EventNotificationTemplatePeer::retrieveByPK($templateId);
-			/* @var $notificationTemplate BusinessProcessStartNotificationTemplate */
+			if (!$notificationTemplate)
+			{
+				KalturaLog::info ("Notification template with ID [$templateId] could not be found.");
+				continue;
+			}
 			
+			/* @var $notificationTemplate BusinessProcessStartNotificationTemplate */
 			if($notificationTemplate->getStatus() != EventNotificationTemplateStatus::ACTIVE || !$notificationTemplate->getAbortOnDeletion())
 			{
 				continue;
@@ -79,8 +84,8 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
-		$cases = BusinessProcessNotificationTemplate::getCaseTemplatesIds($object);
-		if($cases)
+		$templates = BusinessProcessNotificationTemplate::getCaseTemplatesIds($object);
+		if (count($templates))
 			return true;
 			
 		return false;

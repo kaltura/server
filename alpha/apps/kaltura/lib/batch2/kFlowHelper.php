@@ -394,7 +394,7 @@ class kFlowHelper
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount) 
+	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount)
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -406,7 +406,7 @@ class kFlowHelper
 				if ($replacingEntry)
 				{
 					/* @var $replacingEntry entry */
-					$recordedEntrySegmentCount = $replacingEntry->getRecordedEntrySegmentCount(); 
+					$recordedEntrySegmentCount = $replacingEntry->getRecordedEntrySegmentCount();
 					if($recordedEntrySegmentCount > $liveSegmentCount)
 					{
 						KalturaLog::debug("Entry [{$recordedEntry->getId()}] in replacment with higher segment count [$recordedEntrySegmentCount] > [$liveSegmentCount]");
@@ -420,7 +420,7 @@ class kFlowHelper
 							KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
 							myEntryUtils::deleteReplacingEntry($recordedEntry, $replacingEntry);
 							$replacingEntry = null;
-						}	
+						}
 					}
 				}
 		}
@@ -1914,7 +1914,7 @@ class kFlowHelper
 		$c->addAnd ( FileSyncPeer::VERSION , $fileSync->getVersion() );
 		$c->addAnd ( FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
 		$c->addAnd ( FileSyncPeer::DC, $fileSync->getDc());
-		$c->addAnd ( FileSyncPeer::STATUS, Filesync::FILE_SYNC_STATUS_PENDING);
+		$c->addAnd ( FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_PENDING);
 		$pendingFileSync = FileSyncPeer::doSelectOne($c);
 		if($pendingFileSync)
 			return false;

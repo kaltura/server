@@ -702,9 +702,18 @@ class kBusinessPreConvertDL
 				 * therefore anyhow at least one ipad flavor will be always generated.
 				 * The other tags are less relevant for the framesize adjustment cases.
 				 */
-		if(isset($mediaInfo)) {
-			if(array_key_exists(flavorParams::TAG_MBR, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_MBR]);
-			if(array_key_exists(flavorParams::TAG_ISM, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_ISM]);
+		if(isset($mediaInfo) && ($profile=myPartnerUtils::getConversionProfile2ForEntry($entryId))!=null) {
+			if(($collectionTags=$profile->getCollectionTags())==null ) {
+				$collectionTagsArr = array(flavorParams::TAG_MBR, flavorParams::TAG_ISM);
+			}
+			else {
+				$collectionTagsArr = explode(',',$collectionTags);
+				if(count($collectionTagsArr)==0)
+					$collectionTagsArr = array(flavorParams::TAG_MBR, flavorParams::TAG_ISM);
+			}
+			foreach($collectionTagsArr as $collectionTag) {
+				if(array_key_exists($collectionTag, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[$collectionTag]);
+			}
 		}
 		// filter out all not forced, none complied, and invalid flavors
 		$finalTagedFlavors = array();
@@ -1859,19 +1868,30 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	{
 		KalturaLog::log("for asset".$flavorAsset->getId());
 		$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
-		$commandLines = $flavor->getCommandLines();
-		KalturaLog::log("CommandLines Pre:".serialize($commandLines));
-			// Update the cmd-lines with correct key/key_id values
-		$commandLines = str_replace (
-			array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-			array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
-			$commandLines);
-			// Save updated cmd-lines
-		$flavor->setCommandLines($commandLines);
-		$flavor->save();
-			// Save encryption key on flavorAsset obj
+		if(($commandLines=$flavor->getCommandLines())!=null) {
+				// Update the transcoding engines cmd-lines with encryption key/key_id values
+			KalturaLog::log("CommandLines Pre:".serialize($commandLines));
+			$commandLines = str_replace (
+				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
+				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				$commandLines);
+				// Save updated cmd-lines
+			$flavor->setCommandLines($commandLines);
+			$flavor->save();
+		}
+		else if(($operatorsJsonStr=$flavor->getOperators())!=null){
+				// Update the transcoding operators cmd-lines with encryption key/key_id values
+			KalturaLog::log("Operators Pre:".($operatorsJsonStr));
+			$operatorsJsonStr = str_replace (
+				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
+				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				$operatorsJsonStr);
+				// Save updated cmd-lines
+			$flavor->setOperators($operatorsJsonStr);
+			$flavor->save();
+		}
+			// Save encryption key on the flavorAsset obj
 		$flavorAsset->setEncryptionKey($encryptionParams->key);
-
 		$flavorAsset->save();
 	}
 
@@ -1964,6 +1984,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$overrideParam = $flavorParamsConversionProfile->getTwoPass();
 			if(isset($overrideParam))
 				$flavorParams->setTwoPass($overrideParam);
+			if($flavorParamsConversionProfile->getTags()!==null) $flavorParams->setTags($flavorParamsConversionProfile->getTags());
 		}
 	}
 

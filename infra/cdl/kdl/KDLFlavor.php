@@ -848,7 +848,7 @@ $plannedDur = 0;
 				/*
 			 	 * Evaluate source frame dims - dar adjustment and rotation
 			 	 */
-			$targetVid->_watermarkData = self::evaluateTargetWaterMark($sourceVid, $targetVid->_watermarkData);
+			$targetVid->_watermarkData = self::evaluateTargetWaterMark($sourceVid, $flavorVid, $targetVid->_watermarkData);
 		}
 		
 		$targetVid->_rotation = $sourceVid->_rotation;
@@ -1040,11 +1040,11 @@ $plannedDur = 0;
 				$target->_height=$hgtSrc;
 			}
 				/*
-				 * If the target AR is similar/close (up to 10%) to the src AR,
+				 * If the target AR is similar/close (up to 5%) to the src AR,
 				 * just trim to the source dims.
 				 * Otherwise (src AR != trg AR) - calc the trg wid from trg AR and hgt.
 				 */
-			if(abs(1-$darTrg/$darSrcFrame)<0.1) {
+			if(abs(1-$darTrg/$darSrcFrame)<0.05) {
 				if($target->_width>$widSrc) {
 					$target->_width=$widSrc;
 				}
@@ -1238,13 +1238,35 @@ $plannedDur = 0;
 		if($target->_frameRate==0) {
 			$target->_frameRate = $source->_frameRate;
 			if(isset($target->_maxFrameRate) && $target->_maxFrameRate>0)
-				$maxFR = $target->_maxFrameRate;
+				$maxFrameRate = $target->_maxFrameRate;
 			else
-				$maxFR = KDLConstants::MaxFramerate;
-			if($target->_frameRate>$maxFR) {
+				$maxFrameRate = KDLConstants::MaxFramerate;
+			if($target->_frameRate>$maxFrameRate) {
 				$target->_warnings[KDLConstants::VideoIndex][] =
-					KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, $maxFR, $target->_frameRate);
-				$target->_frameRate=$target->_frameRate==50?25:$maxFR;
+					KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, $maxFrameRate, $target->_frameRate);
+				/*
+				 * On special HFR (High Frane Rate) cases, apply following truncating logic 
+				 */
+				switch ($target->_frameRate){
+					case 47.96:
+						$target->_frameRate = 23.98;
+						break;
+					case 48:
+						$target->_frameRate = 24;
+						break;
+					case 50:
+						$target->_frameRate = 25;
+						break;
+					case 59.94:
+						$target->_frameRate = 29.97;
+						break;
+					case 60:
+						$target->_frameRate = 30;
+						break;
+					default:
+						$target->_frameRate = $maxFrameRate;
+						break;
+				}
 			}
 			// For webcam/h263 - if FR==0, set FR=24
 			else if($target->_frameRate==0 && $source->IsFormatOf(array("h.263","h263","sorenson spark","vp6")) ){
@@ -1292,7 +1314,7 @@ $plannedDur = 0;
 	 * @param KDLVideoData $target
 	 * @param KDLVideoData $target
 	 */
-	private static function evaluateTargetWaterMark(KDLVideoData $sourceVid, $watermarkData) 
+	private static function evaluateTargetWaterMark(KDLVideoData $sourceVid, KDLVideoData $flavorVid, $watermarkData) 
 	{
 		if(!isset($watermarkData)){
 			return null;
@@ -1300,10 +1322,18 @@ $plannedDur = 0;
 		
 		$srcWid = $srcHgt = $fixImageDar = null;
 		if(isset($sourceVid->_width) && isset($sourceVid->_height)){
+				/*
+				 * On 'fixed/forced-frame-size' mode (flavorVid::_width/flavorVid::_height != 0),
+				 * use the calculated 'forced-dar', rather than source::dar.
+				 */
+			if(isset($flavorVid->_width) && $flavorVid->_width>0 && isset($flavorVid->_height) && $flavorVid->_height>0)
+				$dar = $flavorVid->_width/$flavorVid->_height;
+			else if(isset($sourceVid->_dar))
+				$dar = $sourceVid->_dar;
+			else $dar = null;
+			$rotation = isset($sourceVid->_rotation)? $sourceVid->_rotation: null;
 			list($srcWid, $srcHgt,$fixImageDar) = self::adjustFrameSizeToDarAndRotation(
-					$sourceVid->_width, $sourceVid->_height, 
-					isset($sourceVid->_dar)? $sourceVid->_dar: null, 
-					isset($sourceVid->_rotation)? $sourceVid->_rotation: null);
+									$sourceVid->_width, $sourceVid->_height, $dar, $rotation);
 		}
 
 		/*

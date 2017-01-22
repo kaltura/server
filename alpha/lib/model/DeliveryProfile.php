@@ -161,8 +161,18 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		{
 			KalturaLog::err('Given input is not an instance of kUrlRecognizer - ignoring');
 		}
-	}	
-	
+	}
+
+	public function setAdStitchingEnabled($v)
+	{
+		$this->putInCustomData("adStitchingEnabled", $v);
+	}
+
+	public function getAdStitchingEnabled()
+	{
+		return $this->getFromCustomData("adStitchingEnabled", null, false);
+	}
+
 	/**
 	 * This function returns the tokenizer this delivery profile is working with
 	 * @return kUrlRecognizer
