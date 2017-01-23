@@ -443,7 +443,9 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			case ScheduleEventType::LIVE_STREAM:
 				$object = new KalturaLiveStreamScheduleEvent();
 				break;
-			
+			case ScheduleEventType::SIMU_LIVE:
+				$object = new KalturaSimulatedLiveEntryScheduleEvent();
+				break;
 			default:
 				$object = KalturaPluginManager::loadObject('KalturaScheduleEvent', $sourceObject->getType());
 				if(!$object)

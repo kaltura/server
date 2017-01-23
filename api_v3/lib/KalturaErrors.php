@@ -659,4 +659,10 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
+
+	/*
+	 * SIMU live
+	 */
+	const SIMU_LIVE_END_DATE_OR_LOOP = "SIMU_LIVE_END_DATE_OR_LOOP;;Either an endDate must be defined or loop must be true";
+	const SIMU_LIVE_START_DATE_GREATER_THAN_END_DATE = "SIMU_LIVE_START_DATE_GREATER_THAN_END_DATE;;End date must be bigger than start date";
 }

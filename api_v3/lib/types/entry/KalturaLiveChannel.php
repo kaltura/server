@@ -16,12 +16,19 @@ class KalturaLiveChannel extends KalturaLiveEntry
 	 * Indicates that the segments should be repeated for ever
 	 * @var KalturaNullableBoolean
 	 */
-	public $repeat;
-	
+	public $loop;
+
+	/**
+	 * the status of the entry of type EntryServerNodeStatus
+	 * @var KalturaEntryServerNodeStatus
+	 */
+	public $liveChannelStatus;
+
 	private static $map_between_objects = array
 	(
 		'playlistId',
-		'repeat',
+		'loop' => 'repeat',
+		'liveChannelStatus',
 	);
 
 	/* (non-PHPdoc)
@@ -53,5 +60,35 @@ class KalturaLiveChannel extends KalturaLiveEntry
 	protected function toSourceType(entry $entry) 
 	{
 		$entry->setSource(KalturaSourceType::LIVE_CHANNEL);
+	}
+
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		$this->validteInsertOrUpdate();
+		$this->validatePropertyNotNull('startDate');
+		$this->validatePropertyNotNull('playlistId');
+		if (!(isset($this->endDate)|| is_null($this->endDate)) && !(isset($this->loop) || $this->loop === false))
+			throw new KalturaAPIException(KalturaErrors::SIMU_LIVE_END_DATE_OR_LOOP);
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+		$this->validteInsertOrUpdate();
+	}
+
+
+	private function validteInsertOrUpdate()
+	{
+		if (isset($this->endDate) && $this->endDate < $this->startDate)
+			throw new KalturaAPIException(KalturaErrors::SIMU_LIVE_START_DATE_GREATER_THAN_END_DATE);
+
+		if (isset($this->playlistId))
+		{
+			$playlist = entryPeer::retrieveByPK($this->playlistId);
+			if (!$playlist)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->playlistId);
+		}
 	}
 }
