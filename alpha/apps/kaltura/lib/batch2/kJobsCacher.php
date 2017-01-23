@@ -40,18 +40,18 @@ class kJobsCacher
 	 * will return BatchJob objects.
 	 *@param Criteria $c
 	 * @param kExclusiveLockKey $lockKey
-	 * @param int $numberOfObjects
+	 * @param int $numOfJobsToPull
 	 * @param int $jobType
 	 * @param int $maxJobToPull
 	 *
 	 * @return array
 	 */
-	public static function getJobs($c, $lockKey, $numberOfObjects, $jobType, $maxJobToPull)
+	public static function getJobs($c, $lockKey, $numOfJobsToPull, $jobType, $maxJobToPull)
 	{
 
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
 		if (!$maxJobToPull || !$cache) //skip cache and get jobs from DB
-			return kBatchExclusiveLock::getJobs($c, $numberOfObjects, $jobType);
+			return kBatchExclusiveLock::getJobs($c, $numOfJobsToPull, $jobType);
 
 		kApiCache::disableConditionalCache();
 		$workerId = $lockKey->getWorkerId();
@@ -60,17 +60,17 @@ class kJobsCacher
 		$allocated = array();
 		for($i = 0; $i < self::GET_JOB_FROM_CACHE_ATTEMPTS; $i++)
 		{
-			$numOfJobToGet = $numberOfObjects - count($allocated);
+			$numOfJobToGet = $numOfJobsToPull - count($allocated);
 			$jobsFromCache = self::getJobsFromCache($cache, $workerId, $numOfJobToGet);
 			$allocated = array_merge($allocated, $jobsFromCache);
-			if (count($allocated) >= $numberOfObjects)
+			if (count($allocated) >= $numOfJobsToPull)
 				return $allocated;
 
 			if ($cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
 			{
-				$numOfJobToGet = $numberOfObjects - count($allocated);
-				$jobFromDB = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType, $numOfJobToGet, $workerLockKey);
-				return array_merge($allocated, $jobFromDB);
+				$numOfJobToGet = $numOfJobsToPull - count($allocated);
+				$jobsFromDB = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType, $numOfJobToGet, $workerLockKey);
+				return array_merge($allocated, $jobsFromDB);
 			}
 
 			usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
@@ -83,11 +83,11 @@ class kJobsCacher
 	 * will return BatchJob from cache if exist
 	 * @param kBaseCacheWrapper $cache
 	 * @param int $workerId
-	 * @param int $numOfJobs
+	 * @param int $numOfJobsToPull
 	 *
 	 * @return array of BatchJob
 	 */
-	private static function getJobsFromCache($cache, $workerId, $numOfJobs)
+	private static function getJobsFromCache($cache, $workerId, $numOfJobsToPull)
 	{
 		$workerKey = self::getCacheKeyForWorker($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
@@ -97,11 +97,12 @@ class kJobsCacher
 		$allocated = array();
 		if ($jobs && !empty($jobs))
 		{
-			for ($i = 0; $i < $numOfJobs; $i++)
+			for ($i = 0; $i < $numOfJobsToPull; $i++)
 			{
 				$index = $cache->increment($indexKey);
-				if ($index < count($jobs))
-					$allocated[] = $jobs[$index];
+				if ($index >= count($jobs))
+					break;
+				$allocated[] = $jobs[$index];
 			}
 		}
 		KalturaLog::debug("Allocated " .count($allocated). " jobs from cache for workerId [$workerId]");
@@ -115,29 +116,29 @@ class kJobsCacher
 	 * @param Criteria $c
 	 * @param int $maxJobToPull
 	 * @param int $jobType
-	 * @param int $numOfJobs
+	 * @param int $numOfJobsToPull
 	 * @param string $workerLockKey
 	 *
 	 * @return array of BatchJob
 	 */
-	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType, $numOfJobs, $workerLockKey)
+	private static function getJobsFromDB($cache, $workerId, $c, $maxJobToPull, $jobType, $numOfJobsToPull, $workerLockKey)
 	{
 		$workerKey = self::getCacheKeyForWorker($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
-		$objects = kBatchExclusiveLock::getJobs($c, $maxJobToPull, $jobType);
+		$jobFromDB = kBatchExclusiveLock::getJobs($c, $maxJobToPull, $jobType);
 		$cache->add($indexKey, 0, self::TIME_IN_CACHE); //init as 0 if key is not exist
-		$cache->set($workerKey, $objects, self::TIME_IN_CACHE);
+		$cache->set($workerKey, $jobFromDB, self::TIME_IN_CACHE);
 
-		$numOfObj = count($objects);
-		KalturaLog::info("Got $numOfObj jobs to insert to cache for workerId [$workerId]");
-		if ($numOfObj == 0)
-			return array();
+		$numOfJobsFromDB = count($jobFromDB);
+		KalturaLog::info("Got $numOfJobsFromDB jobs to insert to cache for workerId [$workerId]");
+		if ($numOfJobsFromDB == 0)
+			return array(); // without delete the lock key to avoid calling the DB again for the next TIME_IN_CACHE_FOR_LOCK seconds
 
-		$numOfJobs = min($numOfJobs, $numOfObj);
+		$numOfJobsToPull = min($numOfJobsToPull, $numOfJobsFromDB);
+		$cache->set($indexKey, $numOfJobsToPull - 1, self::TIME_IN_CACHE);
 		$cache->delete($workerLockKey);
-		$cache->set($indexKey, $numOfJobs - 1, self::TIME_IN_CACHE);
-		return array_slice($objects, 0, $numOfJobs);
+		return array_slice($jobFromDB, 0, $numOfJobsToPull);
 	}
 
 }
