@@ -7,8 +7,9 @@ class Cielo24ClientHelper
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;
 	private $apiCredentialsStr = null;
+	private $additionalParams = array();
 	
-	public function __construct($username, $password, $baseUrl = null)
+	public function __construct($username, $password, $baseUrl = null, $additionalParams = array())
 	{
 		$cielo24ParamsMap = kConf::get('cielo24','integration');
 		if(!is_null($baseUrl))
@@ -28,6 +29,7 @@ class Cielo24ClientHelper
 		$this->apiCredentialsStr .= "&api_token=$apiToken";   
 		
 		$this->supportedLanguages = $cielo24ParamsMap['languages'];
+		$this->additionalParams = $additionalParams;
 	}
 
 	public function getRemoteJobIdByName($entryId, $jobName, $multiple = false)
@@ -131,6 +133,8 @@ class Cielo24ClientHelper
 							"remove_disfluencies" => "true",
 							"timecode_every_paragraph" => "false"
 							);
+							
+		$transcriptRetrievalParams = array_merge($transcriptRetrievalParams, $this->additionalParams['get_transcript']);
 		$getTranscriptAPIUrl = $this->createAPIUrl("job/get_transcript", $transcriptRetrievalParams);
 		$transcriptContentResult = $this->sendAPICall($getTranscriptAPIUrl, true);
 		
@@ -149,8 +153,10 @@ class Cielo24ClientHelper
 	public function getRemoteCaptions($externalServiceJobId, array $formats)
 	{
 		$captionContents = array();
-		$captionRetrievalParam = array("job_id" => $externalServiceJobId);
-		$baseGetCaptionAPIUrl = $this->createAPIUrl("job/get_caption", $captionRetrievalParam);
+		$captionRetrievalParams = array("job_id" => $externalServiceJobId);
+		$captionRetrievalParams = array_merge($captionRetrievalParams, $this->additionalParams['get_caption']);
+		
+		$baseGetCaptionAPIUrl = $this->createAPIUrl("job/get_caption", $captionRetrievalParams);
 		foreach($formats as $format)
 		{
 			$getCaptionAPIUrl = $this->appendToUrl($baseGetCaptionAPIUrl, array("caption_format" => $format));
