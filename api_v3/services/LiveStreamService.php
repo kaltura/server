@@ -209,15 +209,15 @@ class LiveStreamService extends KalturaLiveEntryService
 				}
 			}
 			
-			$PassthroughEntriesCount += count($entriesArray);
+			$passthroughEntriesCount += count($entriesArray);
 		}
 		
 		KalturaLog::debug("Live transcoded entries [$transcodedEntriesCount], max live transcoded streams [$maxTranscodedStreams]");
 		if($transcodedEntriesCount > $maxTranscodedStreams)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED, $liveEntry->getId());
 		
-		KalturaLog::debug("Live Passthrough entries [$PassthroughEntriesCount], max live Passthrough streams [$maxPassthroughStreams]");
-		if($PassthroughEntriesCount > $maxPassthroughStreams)
+		KalturaLog::debug("Live Passthrough entries [$passthroughEntriesCount], max live Passthrough streams [$maxPassthroughStreams]");
+		if($passthroughEntriesCount > $maxPassthroughStreams)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $liveEntry->getId());
 	}
 	
