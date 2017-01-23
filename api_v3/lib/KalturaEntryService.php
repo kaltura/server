@@ -1532,11 +1532,11 @@ class KalturaEntryService extends KalturaBaseService
 		if ($updatedOccurred)
 			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
 
-        $trackEntry = new TrackEntry();
-        $trackEntry->setEntryId($dbEntry->getId());
-        $trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY);
-        $trackEntry->setDescription($dbEntry->getTags().'|'.$dbEntry->getCategories());
-        TrackEntry::addTrackEntry($trackEntry);
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($dbEntry->getId());
+		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY);
+		$trackEntry->setDescription($dbEntry->getTags().'|'.$dbEntry->getCategories());
+		TrackEntry::addTrackEntry($trackEntry);
 
 		return $entry;
 	}
