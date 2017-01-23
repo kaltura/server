@@ -1689,7 +1689,7 @@ $plannedDur = 0;
 		/*
 		 * For audio COPY cases there should be no 'default' multiStream processing (when the setupMultiStream is not set)
 		 */
-		if(!isset($setupMultiStream) && $target->_audio->IsFormatOf(array(KDLAudioTarget::COPY))){
+		if(!isset($setupMultiStream) && isset($target->_audio) && $target->_audio->IsFormatOf(array(KDLAudioTarget::COPY))){
 			return null;
 		}
 		
