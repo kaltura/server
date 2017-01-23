@@ -88,6 +88,7 @@ class kBatchExclusiveLock
 		$filter->attachToCriteria($c);
 		
 		$objects = kJobsCacher::getJobs($c, $lockKey, $number_of_objects, $jobType, $maxJobToPullForCache);
+		KalturaLog::debug("Return allocated job with ids: " .print_r(array_map(function($job){return $job->getId();},$objects), true));
 		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	
