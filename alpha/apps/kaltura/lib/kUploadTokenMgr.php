@@ -157,16 +157,18 @@ class kUploadTokenMgr
 
 	/**
 	 * Validate the file type
-	 * @throw kUploadTokenException
 	 */
 	protected function checkIfFileIsAllowed()
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFile::mimeType($uploadFilePath);
+		if ($fileType == 'application/octet-stream') //stream of byte - can be media or executable
+			$fileType = kFile::getMediaInfoFormat($uploadFilePath);
+
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
 	}
-	
+
 	/**
 	 * Updates the file name of the token (if empty) using the file name from the file data 
 	 */
