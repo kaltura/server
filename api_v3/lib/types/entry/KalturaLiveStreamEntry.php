@@ -115,7 +115,6 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 
 	/**
 	 * The chunk duration value in seconds
-	 * @requiresPermission all
 	 * @var int
 	 */
 	public $segmentDuration;
@@ -229,6 +228,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
 		}
+		$this->validatePropertyNumeric("segmentDuration");
+		$this->validatePropertyMinMaxValue("segmentDuration",1000 ,20000 );
 		
 		parent::validateForInsert($propertiesToSkip);
 	}
