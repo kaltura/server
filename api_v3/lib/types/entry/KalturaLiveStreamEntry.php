@@ -4,7 +4,10 @@
  * @subpackage objects
  */
 class KalturaLiveStreamEntry extends KalturaLiveEntry
-{	
+{
+	const MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS = 1000;
+	const MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS = 20000;
+
 	/**
 	 * The stream id as provided by the provider
 	 * 
@@ -229,7 +232,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP2");
 		}
 		$this->validatePropertyNumeric("segmentDuration");
-		$this->validatePropertyMinMaxValue("segmentDuration",1000 ,20000 );
+		$this->validatePropertyMinMaxValue("segmentDuration",MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS ,MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS );
 		
 		parent::validateForInsert($propertiesToSkip);
 	}
