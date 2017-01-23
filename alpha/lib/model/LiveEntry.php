@@ -347,6 +347,7 @@ abstract class LiveEntry extends entry
 				$pushPublishConfigurations = $this->getPushPublishConfigurations();
 				$configurations = array_merge($configurations, $pushPublishConfigurations);
 			}
+			
 			return $configurations;
 		}
 

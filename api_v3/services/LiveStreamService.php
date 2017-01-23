@@ -373,7 +373,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		{
 			case KalturaPlaybackProtocol::HLS:
 			case KalturaPlaybackProtocol::APPLE_HTTP:
-				$url = $liveStreamEntry->getHlsStreamUrl();
+				$url = $liveStreamEntry->getHlsStreamUrl('http');
 				
 				foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol){
 					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::getProtocol());
