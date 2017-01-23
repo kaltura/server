@@ -126,11 +126,11 @@ class kJobsCacher
 		$workerKey = self::getCacheKeyForWorker($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
-		$jobFromDB = kBatchExclusiveLock::getJobs($c, $maxJobToPull, $jobType);
+		$jobsFromDB = kBatchExclusiveLock::getJobs($c, $maxJobToPull, $jobType);
 		$cache->add($indexKey, 0, self::TIME_IN_CACHE); //init as 0 if key is not exist
-		$cache->set($workerKey, $jobFromDB, self::TIME_IN_CACHE);
+		$cache->set($workerKey, $jobsFromDB, self::TIME_IN_CACHE);
 
-		$numOfJobsFromDB = count($jobFromDB);
+		$numOfJobsFromDB = count($jobsFromDB);
 		KalturaLog::info("Got $numOfJobsFromDB jobs to insert to cache for workerId [$workerId]");
 		if ($numOfJobsFromDB == 0)
 			return array(); // without delete the lock key to avoid calling the DB again for the next TIME_IN_CACHE_FOR_LOCK seconds
@@ -138,7 +138,7 @@ class kJobsCacher
 		$numOfJobsToPull = min($numOfJobsToPull, $numOfJobsFromDB);
 		$cache->set($indexKey, $numOfJobsToPull - 1, self::TIME_IN_CACHE);
 		$cache->delete($workerLockKey);
-		return array_slice($jobFromDB, 0, $numOfJobsToPull);
+		return array_slice($jobsFromDB, 0, $numOfJobsToPull);
 	}
 
 }
