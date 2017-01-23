@@ -58,14 +58,20 @@ class kJobsCacher
 		$workerLockKey = self::getCacheKeyForDBLock($workerId);
 
 		$allocated = array();
-		for($i = 0; $i < self::GET_JOB_FROM_CACHE_ATTEMPTS; $i++) {
-			$allocated = array_merge($allocated, self::getJobsFromCache($cache, $workerId, $numberOfObjects - count($allocated)));
+		for($i = 0; $i < self::GET_JOB_FROM_CACHE_ATTEMPTS; $i++)
+		{
+			$numOfJobToGet = $numberOfObjects - count($allocated);
+			$jobsFromCache = self::getJobsFromCache($cache, $workerId, $numOfJobToGet);
+			$allocated = array_merge($allocated, $jobsFromCache);
 			if (count($allocated) >= $numberOfObjects)
 				return $allocated;
 
 			if ($cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
-				return array_merge($allocated, self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType,
-						$numberOfObjects - count($allocated), $workerLockKey));
+			{
+				$numOfJobToGet = $numberOfObjects - count($allocated);
+				$jobFromDB = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType, $numOfJobToGet, $workerLockKey);
+				return array_merge($allocated, $jobFromDB);
+			}
 
 			usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
 		}
@@ -87,21 +93,19 @@ class kJobsCacher
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
 		$jobs = $cache->get($workerKey);
-		if (!$jobs || empty($jobs))
-		{
-			KalturaLog::debug("No job in cache for workerId [$workerId]");
-			return array();
-		}
-		$allocated = array();
-		for($i = 0; $i < $numOfJobs; $i++)
-		{
-			$index = $cache->increment($indexKey);
-			if ($index < count($jobs))
-				$allocated[] = $jobs[$index];
-		}
-		KalturaLog::debug("Was able to allocated $numOfJobs job from cache for workerId [$workerId]. Index was [$index] and number of job in cache was " .count($jobs));
-		return $allocated;
 
+		$allocated = array();
+		if ($jobs && !empty($jobs))
+		{
+			for ($i = 0; $i < $numOfJobs; $i++)
+			{
+				$index = $cache->increment($indexKey);
+				if ($index < count($jobs))
+					$allocated[] = $jobs[$index];
+			}
+		}
+		KalturaLog::debug("Allocated " .count($allocated). " jobs from cache for workerId [$workerId]");
+		return $allocated;
 	}
 
 	/**
