@@ -45,35 +45,35 @@
 						<key>partnerId</key>
 						<description>Partner ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getPartnerId()</code>
+							<code>$scope->getObject()->getentry()->getPartnerId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getPartner()->getAdminSecret()</code>
+							<code>!is_null($scope->getObject()->getentry()->getPartner()) ? $scope->getObject()->getentry()->getPartner()->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entryId</key>
 						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getId()</code>
+							<code>$scope->getObject()->getentry()->getId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>captionAssetId</key>
 						<description>Caption Asset ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getId()</code>
+							<code>$scope->getObject()->getId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>captionLanguage</key>
 						<description>Caption Asset Language</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getLanguage()</code>
+							<code>$scope->getObject()->getLanguage()</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -87,7 +87,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Status equals</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getStatus()</code>
+							<code>$scope->getObject()->getStatus()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">
@@ -98,7 +98,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Format equals</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getContainerFormat()</code>
+							<code>$scope->getObject()->getContainerFormat()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">
@@ -109,7 +109,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>No Parent Entry</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getParentEntryId()</code>
+							<code>$scope->getObject()->getentry()->getParentEntryId()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">
@@ -176,7 +176,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Status equals</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getStatus()</code>
+							<code>$scope->getObject()->getStatus()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">
@@ -187,7 +187,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Flavor-params-id equals</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getFlavorParamsId()</code>
+							<code>$scope->getObject()->getFlavorParamsId()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">
@@ -201,7 +201,7 @@
 						<key>flavorAssetId</key>
 						<description>Flavor Asset ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getId()</code>
+							<code>$scope->getObject()->getId()</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -266,21 +266,21 @@
 						<key>partnerId</key>
 						<description>Partner ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getPartnerId()</code>
+							<code>$scope->getObject()->getPartnerId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getPartner()->getAdminSecret()</code>
+							<code>$scope->getObject()->getPartner()->getAdminSecret()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entryId</key>
 						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getId()</code>
+							<code>$scope->getObject()->getId()</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -359,21 +359,21 @@
 						<key>partnerId</key>
 						<description>Partner ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getEntry()->getPartnerId()</code>
+							<code>$scope->getObject()->getEntry()->getPartnerId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getEntry()->getPartner()->getAdminSecret()</code>
+							<code>!is_null($scope->getObject()->getEntry()->getPartner()) ? $scope->getObject()->getEntry()->getPartner()->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entryId</key>
 						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getEntry()->getId()</code>
+							<code>$scope->getObject()->getEntry()->getId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -387,7 +387,7 @@
 						<key>metadata_version</key>
 						<description>Metadata version</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getVersion()</code>
+							<code>$scope->getObject()->getVersion()</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -402,7 +402,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>No Parent Entry</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getEntry()->getParentEntryId()</code>
+							<code>$scope->getObject()->getEntry()->getParentEntryId()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">

@@ -35,7 +35,7 @@
                         <key>entry_created_at</key>
                         <description>Entry created at</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getCreatedAt()</code>
+                            <code>$scope->getObject()->getCreatedAt()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -56,70 +56,70 @@
                         <key>entry_name</key>
                         <description>Entry name</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getName()</code>
+                            <code>$scope->getObject()->getName()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_id</key>
                         <description>Entry ID</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getId()</code>
+                            <code>$scope->getObject()->getId()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_status</key>
                         <description>Entry status</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getStatus()</code>
+                            <code>$scope->getObject()->getStatus()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_reference_id</key>
                         <description>Entry reference ID</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getReferenceID()</code>
+                            <code>$scope->getObject()->getReferenceID()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_duration</key>
                         <description>Entry duration in HH:MM:SS</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>sprintf('%02d:%02d:%02d', ($scope->getEvent()->getObject()->getDuration()/3600),($scope->getEvent()->getObject()->getDuration()/60%60), $scope->getEvent()->getObject()->getDuration()%60)</code>
+                            <code>sprintf('%02d:%02d:%02d', ($scope->getObject()->getDuration()/3600),($scope->getObject()->getDuration()/60%60), $scope->getObject()->getDuration()%60)</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_asset_ids</key>
                         <description>Entry ready flavor IDs</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>implode(',',$scope->getEvent()->getObject()->getReadyFlavorAssetIds())</code>
+                            <code>implode(',',$scope->getObject()->getReadyFlavorAssetIds())</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>entry_download_url</key>
                         <description>Entry download URL</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getDownloadUrl()</code>
+                            <code>$scope->getObject()->getDownloadUrl()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>creator_name</key>
                         <description>Entry creator name</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+                            <code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getFirstName() . ' ' . $scope->getObject()->getkuser()->getLastName() : ''</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>creator_id</key>
                         <description>Entry creator ID</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getPuserId()</code>
+                            <code>$scope->getObject()->getPuserId()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>creator_email</key>
                         <description>Entry creator email</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getkuser()->getEmail()</code>
+                            <code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getEmail() : ''</code>
                         </value>
                     </item>
                 </contentParameters>

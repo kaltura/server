@@ -24,7 +24,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Object type verified</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getEvent()->getObject() instanceof Annotation</code>
+							<code>$scope->getObject() instanceof Annotation</code>
 						</field>
 					</item>
 				</eventConditions>
