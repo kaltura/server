@@ -345,6 +345,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $htmlPurifierBehaviour;
 
+	/**
+	 * @var bool
+	 */
+	public $htmlPurifierBaseListUsage;
 	
 	
 	private static $map_between_objects = array
@@ -413,6 +417,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"liveDeliveryProfileIds",
 	    "timeAlignedRenditions",
 		"htmlPurifierBehaviour",
+		"htmlPurifierBaseListUsage",
 	);
 
 	public function getMapBetweenObjects()
@@ -429,6 +434,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->limits = KalturaSystemPartnerLimitArray::fromPartner($source_object);
 		
 		$this->restrictEntryByMetadata = $source_object->getShouldApplyAccessControlOnEntryMetadata();
+		$this->htmlPurifierBaseListUsage = $source_object->getHtmlPurifierBaseListUsage();
 		
 		$dbAutoModerationEntryFilter = $source_object->getAutoModerateEntryFilter();
 		if ($dbAutoModerationEntryFilter)
