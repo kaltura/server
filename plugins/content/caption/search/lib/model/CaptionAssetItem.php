@@ -39,7 +39,19 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 			
 		return $this->aAsset;
 	}
-	
+
+	/**
+	 * @return CaptionAsset
+	 */
+	public function getAssetNoFilter()
+	{
+		if(!$this->aAsset && $this->getCaptionAssetId())
+			$this->aAsset = assetPeer::retrieveByIdNoFilter($this->getCaptionAssetId());
+
+		return $this->aAsset;
+	}
+
+
 	/**
 	 * @return entry
 	 */
@@ -155,7 +167,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	 */
 	public function getUpdatedAt($format = 'Y-m-d H:i:s')
 	{
-		return $this->getAsset()->getUpdatedAt($format);
+		return $this->getAssetNoFilter()->getUpdatedAt($format);
 	}
 	
 	/**
