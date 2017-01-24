@@ -1,5 +1,17 @@
 # Lynx 12.9.0 #
 
+## Update notification templates ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-6586
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/contentUpdateNotifications.xml
+
 ## Transcription engines operation changes ##
 
 - Issue Type: Feature
