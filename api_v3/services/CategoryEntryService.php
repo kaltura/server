@@ -205,8 +205,8 @@ class CategoryEntryService extends KalturaBaseService
 	public function isUserEntitledToRemoveEntryFromCategory($kuserId, $entry)
 	{
 		$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
-		$kgroupIds[] = $kuserId;
-		if (in_array($entry->getKuserId(), $kgroupIds) || in_array($entry->getCreatorKuserId(), $kgroupIds))
+		$allowedKuserIds = array_merge($kgroupIds, array($kuserId));
+		if (in_array($entry->getKuserId(), $allowedKuserIds) || in_array($entry->getCreatorKuserId(), $allowedKuserIds))
 			return true;
 		if ($entry->isEntitledKuserPublish($kuserId))
 			return true;
