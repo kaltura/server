@@ -188,6 +188,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		KalturaLog::debug("Max transcoded streams [$maxTranscodedStreams]");
 		
 		$entryConversionProfiles = array();
+		$entryConversionProfiles[$liveEntry->getConversionProfileId()][] = $liveEntry->getId();
 		foreach($liveEntries as $entry)
 		{
 			/* @var $entry LiveEntry */
@@ -198,18 +199,22 @@ class LiveStreamService extends KalturaLiveEntryService
 		$transcodedEntriesCount = 0;
 		foreach($entryConversionProfiles as $conversionProfileId => $entriesArray)
 		{
+			$isCloud = false;
 			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
 			foreach($flavorParamsConversionProfile as $flavorParamConversionProfile)
 			{
 				/* @var $flavorParamConversionProfile flavorParamsConversionProfile */
 				if($flavorParamConversionProfile->getOrigin() == KalturaAssetParamsOrigin::CONVERT)
 				{
-					$transcodedEntriesCount += count($entriesArray);
+					$isCloud = true;
 					break;
 				}
 			}
 			
-			$passthroughEntriesCount += count($entriesArray);
+			if($isCloud)
+				$transcodedEntriesCount += count($entriesArray);
+			else
+				$passthroughEntriesCount += count($entriesArray);
 		}
 		
 		KalturaLog::debug("Live transcoded entries [$transcodedEntriesCount], max live transcoded streams [$maxTranscodedStreams]");
