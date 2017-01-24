@@ -225,23 +225,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	}
 	
 	/**
-	 * @return bool
-	 */
-	public function getReplaceMediaContent()
-	{
-		return $this->replaceMediaContent;
-	}
-	
-	/**
-	 * @param bool $replaceMediaContent
-	 */
-	public function setReplaceMediaContent($replaceMediaContent)
-	{
-		$this->replaceMediaContent = $replaceMediaContent;
-	}
-
-	/**
-	 * @return bool
+	 * @return string
 	 */
 	public function getAdditionalParameters()
 	{
@@ -249,7 +233,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	}
 	
 	/**
-	 * @param bool $replaceMediaContent
+	 * @param string $additionalParameters
 	 */
 	public function setAdditionalParameters($additionalParameters)
 	{

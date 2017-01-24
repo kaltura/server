@@ -68,7 +68,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	
 	/**
 	 * additional parameters to send to Cielo24
-	 * @string
+	 * @var string
 	 */
 	public $additionalParameters;
 	

@@ -134,7 +134,9 @@ class Cielo24ClientHelper
 							"timecode_every_paragraph" => "false"
 							);
 							
-		$transcriptRetrievalParams = array_merge($transcriptRetrievalParams, $this->additionalParams['get_transcript']);
+		if (isset($this->additionalParams['get_transcript']))
+			$transcriptRetrievalParams = array_merge($transcriptRetrievalParams, $this->additionalParams['get_transcript']);
+			
 		$getTranscriptAPIUrl = $this->createAPIUrl("job/get_transcript", $transcriptRetrievalParams);
 		$transcriptContentResult = $this->sendAPICall($getTranscriptAPIUrl, true);
 		
@@ -154,7 +156,9 @@ class Cielo24ClientHelper
 	{
 		$captionContents = array();
 		$captionRetrievalParams = array("job_id" => $externalServiceJobId);
-		$captionRetrievalParams = array_merge($captionRetrievalParams, $this->additionalParams['get_caption']);
+		
+		if (isset($this->additionalParams['get_caption']))
+			$captionRetrievalParams = array_merge($captionRetrievalParams, $this->additionalParams['get_caption']);
 		
 		$baseGetCaptionAPIUrl = $this->createAPIUrl("job/get_caption", $captionRetrievalParams);
 		foreach($formats as $format)
