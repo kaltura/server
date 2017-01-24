@@ -8,6 +8,21 @@ class Cielo24ClientHelper
 	private $baseEndpointUrl = null;
 	private $apiCredentialsStr = null;
 	private $additionalParams = array();
+	private static $getTranscriptWhitelistedParams = array (
+															"emit_speaker_change_tokens_as",
+															"newlines_after_paragraph",
+															"newlines_after_sentence",
+															"mask_profanity",
+															"remove_sounds_list",
+															"remove_sound_references",
+															"replace_slang",
+															"timecode_every_paragraph",
+														);
+	private static $getCaptionWhitelistedParams = array (
+															"disallow_dangling",
+															"remove_disfluencies",
+															);
+	 
 	
 	public function __construct($username, $password, $baseUrl = null, $additionalParams = array())
 	{
@@ -135,7 +150,16 @@ class Cielo24ClientHelper
 							);
 							
 		if (isset($this->additionalParams['get_transcript']))
-			$transcriptRetrievalParams = array_merge($transcriptRetrievalParams, $this->additionalParams['get_transcript']);
+		{
+			$additionalParameters = array ();
+			foreach ($this->additionalParams['get_transcript'] as $key => $value)
+			{
+				if (in_array ($key, self::$getTranscriptWhitelistedParams))
+					$additionalParameters[$key] = $value;
+			}
+			
+			$transcriptRetrievalParams = array_merge($transcriptRetrievalParams, $additionalParameters);
+		}
 			
 		$getTranscriptAPIUrl = $this->createAPIUrl("job/get_transcript", $transcriptRetrievalParams);
 		$transcriptContentResult = $this->sendAPICall($getTranscriptAPIUrl, true);
@@ -158,7 +182,15 @@ class Cielo24ClientHelper
 		$captionRetrievalParams = array("job_id" => $externalServiceJobId);
 		
 		if (isset($this->additionalParams['get_caption']))
-			$captionRetrievalParams = array_merge($captionRetrievalParams, $this->additionalParams['get_caption']);
+		{
+			$additionalParameters = array ();
+			foreach ($this->additionalParams['get_caption'] as $key => $value)
+			{
+				if (in_array ($key, self::$getCaptionWhitelistedParams))
+					$additionalParameters[$key] = $value;
+			}
+			$captionRetrievalParams = array_merge($captionRetrievalParams, $additionalParameters);
+		}
 		
 		$baseGetCaptionAPIUrl = $this->createAPIUrl("job/get_caption", $captionRetrievalParams);
 		foreach($formats as $format)
