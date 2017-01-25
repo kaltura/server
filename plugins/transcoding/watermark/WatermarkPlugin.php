@@ -4,7 +4,7 @@
  *
  * @package plugins.watermark
  */
-class WatermarkPlugin extends KalturaPlugin implements IKalturaPending, IKalturaAssetParamsAdjuster
+class WatermarkPlugin extends KalturaPlugin implements IKalturaPending, IKalturaAssetParamsAdjuster, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'watermark';
 	
@@ -18,6 +18,8 @@ class WatermarkPlugin extends KalturaPlugin implements IKalturaPending, IKaltura
 	const TRANSCODING_METADATA_WATERMMARK_SETTINGS = 'WatermarkSettings';
 	const TRANSCODING_METADATA_WATERMMARK_IMAGE_ENTRY = 'WatermarkImageEntry';
 	const TRANSCODING_METADATA_WATERMMARK_IMAGE_URL = 'WatermarkImageURL';
+	
+	const WATERMARK_FLOW_MANAGER_CLASS = 'kWatermarkFlowManager';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -36,6 +38,16 @@ class WatermarkPlugin extends KalturaPlugin implements IKalturaPending, IKaltura
 		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME, $metadataVersion);
 		
 		return array($metadataDependency);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+ 	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::WATERMARK_FLOW_MANAGER_CLASS,
+		);
 	}
 		
 	/* (non-PHPdoc)
