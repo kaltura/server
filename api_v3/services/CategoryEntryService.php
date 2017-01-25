@@ -150,7 +150,6 @@ class CategoryEntryService extends KalturaBaseService
 		//validate user is entitled to remove entry from category
 		if(kEntitlementUtils::getEntitlementEnforcement() &&
 			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()))
-
 		{
 			$kuserIsEntitled = false;
 			$kuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());

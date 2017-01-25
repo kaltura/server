@@ -1952,13 +1952,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return true;
 		
 		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
-		foreach($kuserKGroupIds as $groupKId)
-		{
-			if($ownerKuserId == $groupKId)
-				return true;
-		}
-		
-		return false;
+		return in_array($ownerKuserId, $kuserKGroupIds);
 	}
 	
 	public function isEntitledKuserEdit($kuserId, $useUserGroups = true)
