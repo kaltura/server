@@ -122,12 +122,15 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			 * @var entry $toObject
 			 */
 			if ( ($toObject->getPartnerId() == $fromObject->getPartnerId()) && ($toObject->shouldCloneByProperty(BaseEntryCloneOptions::CATEGORIES) === true) ){  
-				$categoryEntriesObjects = categoryEntryPeer::retrieveActiveByEntryId($fromObject->getId());
+				$categoryEntriesObjects = categoryEntryPeer::retrieveActiveAndPendingByEntryId($fromObject->getId());
 				$categoryIds = array();
+				$categoryEntryStatusById = array();
 				foreach ($categoryEntriesObjects as $categoryEntryObject)
 				{
-					/* @var $categoryEntry categoryEntry */ 
-					$categoryIds[] = $categoryEntryObject->getCategoryId();
+					/* @var $categoryEntry categoryEntry */
+					$categoryId = $categoryEntryObject->getCategoryId();
+					$categoryIds[] = $categoryId;
+					$categoryEntryStatusById[$categoryId] = $categoryEntryObject->getStatus();
 				}
 				if (count($categoryIds)){
 			  		$categories = categoryPeer::retrieveByPKs($categoryIds); //which will return only the entiteled ones
@@ -136,7 +139,7 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			  			$categoryEntry = new categoryEntry();
 		                $categoryEntry->setEntryId($toObject->getId());
 		                $categoryEntry->setCategoryId($category->getId());
-		                $categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+		                $categoryEntry->setStatus($categoryEntryStatusById[$category->getId()]);
 		                $categoryEntry->setPartnerId($toObject->getPartnerId());
 		                $categoryEntry->save();	  			
 			  		}
