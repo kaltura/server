@@ -232,7 +232,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP2");
 		}
 		$this->validatePropertyNumeric("segmentDuration");
-		$this->validatePropertyMinMaxValue("segmentDuration",MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS ,MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS );
+		$this->validatePropertyMinMaxValue("segmentDuration",self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS ,self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS );
 		
 		parent::validateForInsert($propertiesToSkip);
 	}

@@ -12,11 +12,11 @@ abstract class LiveEntry extends entry
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
+	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 1000;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
 	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
-	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 1000;
 	const CUSTOM_DATA_SEGMENT_DURATION = 'segmentDuration';
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
