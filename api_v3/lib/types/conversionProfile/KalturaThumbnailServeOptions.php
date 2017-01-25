@@ -3,15 +3,6 @@
  * @package api
  * @subpackage objects
  */
-class KalturaThumbnailServeOptions extends KalturaObject 
+class KalturaThumbnailServeOptions extends KalturaAssetServeOptions 
 {
-	/**
-	 * @var bool
-	 */
-	public $download;
-
-	/**
-	 * @var string
-	 */
-	public $referrer;
 }
