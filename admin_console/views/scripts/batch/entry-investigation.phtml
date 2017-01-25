@@ -161,7 +161,7 @@
 						}
 					?>
 					<td><?php echo $entry->partnerData; ?></td>
-					<td><?php echo $entry->searchText; ?></td>
+					<td><?php echo htmlentities($entry->searchText); ?></td>
 					<td><?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
 					<td><?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
 					<?php if($enableActions): ?>
