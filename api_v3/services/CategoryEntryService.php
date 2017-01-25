@@ -148,8 +148,9 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 
 		//validate user is entitled to remove entry from category
-		if(kEntitlementUtils::getEntitlementEnforcement() && 
-			!$this->isUserEntitledToRemoveEntryFromCategory(kCurrentContext::getCurrentKsKuserId(), $entry))
+		if(kEntitlementUtils::getEntitlementEnforcement() &&
+			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()))
+
 		{
 			$kuserIsEntitled = false;
 			$kuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
@@ -191,26 +192,6 @@ class CategoryEntryService extends KalturaBaseService
 		//need to select the entry again - after update
 		$entry = entryPeer::retrieveByPK($entryId);		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
-	}
-
-	/**
-	 * Check if user is entitled to remove entry from category
-	 *
-	 * @param string $kuserId
-	 * @param entry $entry
-	 * 
-	 * @return boolean
-	 *
-	 */
-	public function isUserEntitledToRemoveEntryFromCategory($kuserId, $entry)
-	{
-		$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
-		$allowedKuserIds = array_merge($kgroupIds, array($kuserId));
-		if (in_array($entry->getKuserId(), $allowedKuserIds) || in_array($entry->getCreatorKuserId(), $allowedKuserIds))
-			return true;
-		if ($entry->isEntitledKuserPublish($kuserId))
-			return true;
-		return false;
 	}
 	
 	/**
