@@ -117,7 +117,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	public $primaryServerNodeId;
 
 	/**
-	 * The chunk duration value in seconds
+	 * The chunk duration value in milliseconds
 	 * @var int
 	 */
 	public $segmentDuration;
