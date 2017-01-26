@@ -106,7 +106,7 @@ class kWatermarkManager
 		KalturaLog::debug("copyWatermarkData from [{$fromEntry->getId()}] to [{$toEntry->getId()}]");
 		$copyWatermarkMetadata = $watermarkMetadata->copy();
 		$copyWatermarkMetadata->setObjectId($toEntry->getId());
-		$copyWatermarkMetadata->save;
+		$copyWatermarkMetadata->save();
 		
 		$srcSyncKey = $watermarkMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$destinationSyncKey = $copyWatermarkMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
