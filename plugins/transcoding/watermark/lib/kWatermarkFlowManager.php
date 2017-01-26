@@ -11,7 +11,7 @@ class kWatermarkFlowManager implements kObjectAddedEventConsumer
  	*/
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof entry && $object->getReplacedEntryId() && !in_array($object->getReplacementStatus(), array(entryReplacementStatus::NONE, entryReplacementStatus::FAILED)))
+		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary())
 			return true;
 		
 		return false;
@@ -22,7 +22,7 @@ class kWatermarkFlowManager implements kObjectAddedEventConsumer
  	*/
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof entry && $object->getReplacedEntryId() && !in_array($object->getReplacementStatus(), array(entryReplacementStatus::NONE, entryReplacementStatus::FAILED)))
+		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary())
 		{
 			$this->copyWatermarkData($object);
 		}
