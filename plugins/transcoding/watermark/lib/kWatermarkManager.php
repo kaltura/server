@@ -111,6 +111,6 @@ class kWatermarkManager
 		$srcSyncKey = $watermarkMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$destinationSyncKey = $copyWatermarkMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		
-		kFileSyncUtils::softCopy($destinationSyncKey, $srcSyncKey);
+		kFileSyncUtils::softCopy($srcSyncKey, $destinationSyncKey);
 	}
 }
