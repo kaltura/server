@@ -155,6 +155,8 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_CANNOT_BE_TRIMMED = "ENTRY_CANNOT_BE_TRIMMED;;Entry cannot be trimmed";
 
+	const SEGMENT_DURATION_EDIT_DISALLOWED = "SEGMENT_DURATION_EDIT_DISALLOWED;;Cannot edit segment duration. Dynamic segment duration feature is disabled";
+
 	/**
 	 * Notification Service
 	 */

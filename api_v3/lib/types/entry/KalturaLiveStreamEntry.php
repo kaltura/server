@@ -231,8 +231,16 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
 		}
-		$this->validatePropertyNumeric("segmentDuration");
-		$this->validatePropertyMinMaxValue("segmentDuration",self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS ,self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS );
+		if (!$this->isNull("segmentDuration")) {
+			// todo: check if feature is enabled for the partner
+			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SEGMENT_DURATION_EDIT, kCurrentContext::getCurrentPartnerId()))
+			{
+				throw new KalturaAPIException(KalturaErrors::SEGMENT_DURATION_EDIT_DISALLOWED, $this->getFormattedPropertyNameWithClassName("segmentDuration"));
+			}
+
+			$this->validatePropertyNumeric("segmentDuration");
+			$this->validatePropertyMinMaxValue("segmentDuration", self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
+		}
 		
 		parent::validateForInsert($propertiesToSkip);
 	}
