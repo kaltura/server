@@ -57,25 +57,20 @@ class kJobsCacher
 		$workerId = $lockKey->getWorkerId();
 		$workerLockKey = self::getCacheKeyForDBLock($workerId);
 
-		$allocated = array();
 		for($i = 0; $i < self::GET_JOB_FROM_CACHE_ATTEMPTS; $i++)
 		{
-			$numOfJobToGet = $numOfJobsToPull - count($allocated);
-			$jobsFromCache = self::getJobsFromCache($cache, $workerId, $numOfJobToGet);
-			$allocated = array_merge($allocated, $jobsFromCache);
-			if (count($allocated) >= $numOfJobsToPull)
-				return $allocated;
+			$jobsFromCache = self::getJobsFromCache($cache, $workerId, $numOfJobsToPull);
+			if (count($jobsFromCache) > 0)
+				return $jobsFromCache;
 
 			if ($cache->add($workerLockKey, true, self::TIME_IN_CACHE_FOR_LOCK))
 			{
-				$numOfJobToGet = $numOfJobsToPull - count($allocated);
-				$jobsFromDB = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType, $numOfJobToGet, $workerLockKey);
-				return array_merge($allocated, $jobsFromDB);
+				$jobsFromDB = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType, $numOfJobsToPull, $workerLockKey);
+				return $jobsFromDB;
 			}
-
 			usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
 		}
-		return $allocated;
+		return array();
 
 	}
 
