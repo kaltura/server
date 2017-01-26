@@ -1945,14 +1945,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return implode(',', $this->getEntitledUserPuserEditArray());
 	}
 	
-	public function isOwnerActionsAllowed($kuserId)
+	public function isOwnerActionsAllowed($kuserId, $useUserGroups = true)
 	{
 		$ownerKuserId = $this->getKuserId();
 		if($kuserId == $ownerKuserId)
 			return true;
-		
-		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
-		return in_array($ownerKuserId, $kuserKGroupIds);
+
+		if ($useUserGroups)
+		{
+			$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+			if (in_array($ownerKuserId, $kuserKGroupIds))
+				return true;
+		}
+		return false;
 	}
 	
 	public function isEntitledKuserEdit($kuserId, $useUserGroups = true)
@@ -1969,11 +1974,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				if(in_array($groupKId, $entitledKuserArray))
 					return true;
 			}
-
-			return $this->isOwnerActionsAllowed($kuserId);
 		}
-		
-		return false;
+		return $this->isOwnerActionsAllowed($kuserId, $useUserGroups);
 	}
 
 	private function getEntitledUserPuserEditArray()
