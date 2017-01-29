@@ -23,15 +23,6 @@ class PushNotificationTemplate extends EventNotificationTemplate
         if(!parent::fulfilled($scope))
             return false;
         
-        // check if queue exists
-        $contentParameters = $this->getContentParameters();
-        $queueKey = $this->getQueueKey($contentParameters, null, $scope);
-        $queueProvider = QueueProvider::getInstance();
-        if (!$queueProvider->exists($queueKey))
-        {
-            KalturaLog::info("Queue [$queueKey] doesn't exist.");
-            return false;
-        }
         return true;
     }
     
@@ -81,6 +72,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
             $key = $contentParameter->getKey();
             $contentParametersValues[$key] = $value->getValue();
+
         }
         // sort array according to created keys
         ksort($contentParametersValues);
@@ -120,10 +112,12 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
         $contentParameters = $this->getContentParameters();
         $queueKey = $this->getQueueKey($contentParameters, null, $scope);
-        
+
+        $msg = json_encode(array("clientId" => "id", "data" =>  $this->getMessage($scope), "queueKey" => $queueKey, "msgId"=>guid, "msgTime"=>time ));
         // get instance of activated queue proivder and send message
         $queueProvider = QueueProvider::getInstance();
-        $queueProvider->send($queueKey, $this->getMessage($scope));
+
+        $queueProvider->send('', $msg);
     }
     
     public function create($queueKey)

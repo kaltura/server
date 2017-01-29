@@ -1,28 +1,24 @@
 <?php
 /**
+ * Object which contains contextual entry-related data.
  * @package plugins.pushNotification
  * @subpackage api.objects
  */
-class KalturaPushNotificationData extends KalturaObject 
+class KalturaPushNotificationParamas extends KalturaObject
 {
 	/**
+	 * PushNotificationSystemName
 	 * @var string
-	 * @readonly
 	 */
-	public $key;
+	public $systemName;
 	
 	/**
-	 * @var string
-	 * @readonly
+	 * User params
+	 * @var KalturaEventNotificationParameterArray
 	 */
-	public $url;
+	public $userParams;
 
-	/**
-	 * @var string
-	 */
-	public $clientId;
-
-	private static $map_between_objects = array('key', 'url', 'clientId');
+	private static $map_between_objects = array('systemName', 'userParams');
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
@@ -38,8 +34,9 @@ class KalturaPushNotificationData extends KalturaObject
 	public function toObject($dbObject = null, $propertiesToSkip = array())
 	{
 		if(is_null($dbObject))
-			$dbObject = new kPushNotificationData();
+			$dbObject = new kPushNotificationParams();
 
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
+	
 }
