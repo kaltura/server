@@ -16,4 +16,17 @@
 class DrmPolicy extends BaseDrmPolicy implements IBaseObject
 {
 
+	const CUSTOM_DATA_EXTRA_SECURITY_PARAMS = 'extraSecurityParams';
+
+	/**
+	 * Extra security parameters like OPL
+	 *
+	 * @var array of KalturaString
+	 */
+	public $extraSecurityParams;
+
+	public function setExtraSecurityParams($v) {return $this->putInCustomData(self::CUSTOM_DATA_EXTRA_SECURITY_PARAMS, $v);}
+
+	public function getExtraSecurityParams() {return $this->getFromCustomData(self::CUSTOM_DATA_EXTRA_SECURITY_PARAMS);}
+
 } // DrmPolicy
