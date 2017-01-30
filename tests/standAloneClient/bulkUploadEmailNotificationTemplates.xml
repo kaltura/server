@@ -82,7 +82,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -110,14 +110,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -200,7 +200,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -228,14 +228,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -318,7 +318,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -346,14 +346,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -436,7 +436,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -464,14 +464,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -554,7 +554,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -582,14 +582,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -672,7 +672,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -699,14 +699,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -789,7 +789,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -817,14 +817,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -907,7 +907,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -935,14 +935,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -1025,7 +1025,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1053,14 +1053,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -1143,7 +1143,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1171,14 +1171,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -1261,7 +1261,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1289,14 +1289,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -1379,7 +1379,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1407,14 +1407,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -1497,7 +1497,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1525,14 +1525,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -1615,7 +1615,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1643,14 +1643,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>
@@ -1733,7 +1733,7 @@
 						<key>log_url</key>
 						<description>Bulk upload log url</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob())</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -1761,14 +1761,14 @@
 						<key>to_email_admin</key>
 						<description>Recepient admin email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail()</code>
+							<code>!is_null($scope->getEvent()->getBatchJob()->getPartner()) ? $scope->getEvent()->getBatchJob()->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>	
 					<item objectType="KalturaEventNotificationParameter">
 						<key>to_email_user</key>
 						<description>Recepient user email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail()</code>
+							<code>!is_null(kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())) ? kuserPeer::getKuserByPartnerAndUid($scope->getPartnerId(), $scope->getEvent()->getBatchJob()->getData()->getUserId())->getEmail() : ''</code>
 						</value>
 					</item>	
 				</contentParameters>

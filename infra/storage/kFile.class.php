@@ -666,6 +666,19 @@ class kFile
 		}
 	}
 
+	/**
+	 * Check if the file is executable
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	public static function getMediaInfoFormat($path)
+	{
+		$mediaInfoParser = new KMediaInfoMediaParser($path);
+		$mediaInfo = $mediaInfoParser->getMediaInfo();
+		return $mediaInfo->containerFormat;
+	}
+
 	public static function safeFilePutContents($filePath, $var, $mode=null)
 	{
 		// write to a temp file and then rename, so that the write will be atomic

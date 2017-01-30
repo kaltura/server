@@ -27,6 +27,7 @@ class kCacheManager
 	const CACHE_TYPE_RESPONSE_PROFILE = 'responseProfile';
 	const CACHE_TYPE_RESPONSE_PROFILE_INVALIDATION = 'responseProfileInvalidation';
 	const CACHE_TYPE_BATCH_JOBS = 'batchJobs';
+	const CACHE_TYPE_RESOURCE_RESERVATION = 'resourceReservation';
 	
 	protected static $caches = array();
 	

@@ -151,7 +151,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$dbEntry->setReplacingEntryId($tempDbEntry->getId());
 		$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
-		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
+		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL) || $dbEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 		$dbEntry->save();
 		
@@ -1355,7 +1355,7 @@ class KalturaEntryService extends KalturaBaseService
 		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
 		{
 			//non owner cannot change entitledUsersEdit and entitledUsersPublish
-			if($this->getKuser()->getId() != $dbEntry->getKuserId())
+			if(!$dbEntry->isOwnerActionsAllowed($this->getKuser()->getId()))
 			{
 				if($entry->entitledUsersEdit !== null && strtolower($entry->entitledUsersEdit) != strtolower($dbEntry->getEntitledPusersEdit())){
 					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));					

@@ -424,11 +424,12 @@ class AttachmentAssetService extends KalturaAssetService
 	 *  
 	 * @action serve
 	 * @param string $attachmentAssetId
+	 * @param KalturaAttachmentServeOptions $serveOptions
 	 * @return file
 	 *  
 	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
 	 */
-	public function serveAction($attachmentAssetId)
+	public function serveAction($attachmentAssetId, KalturaAttachmentServeOptions $serveOptions = null)
 	{
 		$attachmentAsset = null;
 		if (!kCurrentContext::$ks)
@@ -468,7 +469,9 @@ class AttachmentAssetService extends KalturaAssetService
 		if (!$fileName)	
 			$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		
-		header("Content-Disposition: attachment; filename=\"$fileName\"");
+		if(!$serveOptions || ($serveOptions && $serveOptions->download == true))
+			header("Content-Disposition: attachment; filename=\"$fileName\"");
+		
 		return $this->serveAsset($attachmentAsset, $fileName);
 	}
 

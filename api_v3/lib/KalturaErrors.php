@@ -99,6 +99,8 @@ class KalturaErrors extends APIErrors
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 	
 	const MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED = "MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED;OBJECT_ID;Max update limit was reached. Object ID \"@OBJECT_ID@\" will not updated with latest chnages";
+
+	const RESOURCE_IS_RESERVED = "RESOURCE_IS_RESERVED;RESOURCE_ID;Resource with id @RESOURCE_ID@ is already reserved";
 	
 	/**
 	 * Service Oriented Errors
@@ -385,6 +387,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_CANNOT_RESUME = "UPLOAD_TOKEN_CANNOT_RESUME;;Cannot resume the upload, original file was not found";
 
 	const UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE = "UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE;;Failed to match expected file size";
+
+	const UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD = "UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD;;Upload token is restricted due to the file type";
 
 	/*
 	 * Partenrs service

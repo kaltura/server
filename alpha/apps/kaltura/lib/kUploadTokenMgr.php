@@ -44,6 +44,7 @@ class kUploadTokenMgr
 	 * @param bool $resume
 	 * @param bool $finalChunk
 	 * @param int $resumeAt
+	 * @throw kUploadTokenException
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $finalChunk = true, $resumeAt = -1)
 	{
@@ -76,6 +77,12 @@ class kUploadTokenMgr
 		
 		if ($finalChunk)
 		{
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId())
+				&& !$this->checkIfFileIsAllowed())
+			{
+				kFlowHelper::handleUploadFailed($this->_uploadToken);
+				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
+			}
 			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
 		}
 		else 
@@ -147,7 +154,21 @@ class kUploadTokenMgr
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
 		}
 	}
-	
+
+	/**
+	 * Validate the file type
+	 */
+	protected function checkIfFileIsAllowed()
+	{
+		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
+		$fileType = kFile::mimeType($uploadFilePath);
+		if ($fileType == 'application/octet-stream') //stream of byte - can be media or executable
+			$fileType = kFile::getMediaInfoFormat($uploadFilePath);
+
+		$fileTypes = kConf::get('file_type');
+		return in_array($fileType, $fileTypes['allowed']);
+	}
+
 	/**
 	 * Updates the file name of the token (if empty) using the file name from the file data 
 	 */

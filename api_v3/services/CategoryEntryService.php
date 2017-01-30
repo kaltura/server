@@ -60,7 +60,7 @@ class CategoryEntryService extends KalturaBaseService
 			}
 				
 			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) && !$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
-				$entry->getKuserId() != kCurrentContext::getCurrentKsKuserId() && 
+				!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
 				$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
 				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);				
 		}
@@ -146,10 +146,10 @@ class CategoryEntryService extends KalturaBaseService
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if (!$category && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
-		
-		//validate user is entiteld to remove entry from category 
-		if(kEntitlementUtils::getEntitlementEnforcement() && 
-			$entry->getKuserId() != kCurrentContext::getCurrentKsKuserId() && 
+
+		//validate user is entitled to remove entry from category
+		if(kEntitlementUtils::getEntitlementEnforcement() &&
+			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
 			$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
 		{
 			$kuserIsEntitled = false;

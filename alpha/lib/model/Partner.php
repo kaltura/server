@@ -62,6 +62,8 @@ class Partner extends BasePartner
 
 	const HTML_PURIFIER_BEHAVIOUR = "htmlPurifierBehaviour";
 
+	const HTML_PURIFIER_BASE_LIST_USAGE = "htmlPurifierBaseListUsage";
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -1790,5 +1792,15 @@ class Partner extends BasePartner
 	public function setHtmlPurifierBehaviour($v)
 	{
 		return $this->putInCustomData( self::HTML_PURIFIER_BEHAVIOUR, $v );
+	}
+
+	public function getHtmlPurifierBaseListUsage()
+	{
+		return $this->getFromCustomData( self::HTML_PURIFIER_BASE_LIST_USAGE, null , false );
+	}
+
+	public function setHtmlPurifierBaseListUsage($v)
+	{
+		return $this->putInCustomData( self::HTML_PURIFIER_BASE_LIST_USAGE, $v );
 	}
 }

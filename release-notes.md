@@ -1,3 +1,46 @@
+# Lynx 12.9.0 #
+
+## Update notification templates ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-6586
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/contentUpdateNotifications.xml
+
+## Transcription engines operation changes ##
+
+- Issue Type: Feature
+- Issue ID: TR-1761
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## File type restriction for uploading files ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6505
+
+### Configuration ###
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.FileTypeRestriction.enabled = true
+		moduls.FileTypeRestriction.permissionType = 2
+		moduls.FileTypeRestriction.label = "Enable file type restriction"
+		moduls.FileTypeRestriction.permissionName = FEATURE_FILE_TYPE_RESTRICTION_PERMISSION
+		moduls.FileTypeRestriction.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+None.
+
 # Lynx 12.8.0 #
 
 ## Play-server flavor changed and deleted http notifications ##
@@ -335,7 +378,7 @@ None.
 
 ## 2-Factor Admin Console Authentication ##
 - Issue Type: New Feature 
-- Issue ID: PLAT-6125 
+- Issue ID: PLAT-6215 
 
 ### Configuration ###
 - Mandatory: in admin.ini, set settings.remoteAddrHeaderSalt to the same value as remote_addr_header_salt in local.ini

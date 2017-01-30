@@ -711,6 +711,7 @@ class myEntryUtils
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 		$flavorAssetId = null;
+		$packagerRetries = 3;
 
 		while($count--)
 		{
@@ -754,10 +755,22 @@ class myEntryUtils
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
-						
-					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
-						self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
-						
+
+					$success = false;
+
+					if($multi && $packagerRetries)
+					{
+						$success = self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+						if(!$success)
+							$packagerRetries--;
+					}
+
+					if (!$success)
+					{
+						$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
+							self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+					}
+
 					if ($cache)
 						$cache->delete($cacheLockKeyProcessing);
 					
@@ -895,7 +908,67 @@ class myEntryUtils
 		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
 		return true;
 	}
-	
+
+	public static function captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	{
+		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
+		if (!$packagerCaptureUrl)
+			return false;
+
+		$flavorAsset = self::getFlavorSupportedByPackager($entry->getId());
+		if(!$flavorAsset)
+			return false;
+
+		$flavorAssetId = $flavorAsset->getId();
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
+
+		if (!$entry_data_path)
+			return false;
+
+		$packagerThumbCapture = str_replace(
+			array ( "{url}", "{offset}" ),
+			array ( $entry_data_path , floor($calc_vid_sec*1000)  ) ,
+			$packagerCaptureUrl );
+
+		$tempThumbPath = $capturedThumbPath.'temp_1.jpg';
+		kFile::closeDbConnections();
+		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath);
+		if(!$success)
+			return false;
+
+		return true;
+	}
+
+	private static function getFlavorSupportedByPackager($entryId)
+	{
+		//look for the highest bitrate flavor tagged with thumbsource
+		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
+
+		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
+		{
+			// look for the highest bitrate flavor the packager can parse
+			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+			if (is_null($flavorAsset))
+			{
+				//retrieve original ready
+				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
+					return null;
+			}
+		}
+		return $flavorAsset;
+	}
+
+	public static function isFlavorSupportedByPackager($flavorAsset)
+	{
+		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM, assetParams::CONTAINER_FORMAT_F4V);
+		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
+			return true;
+		return false;
+	}
+
 	public static function captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, &$flavorAssetId)
 	{
 		$packagerCaptureUrl = kConf::get('packager_thumb_capture_url', 'local', null);
@@ -1220,6 +1293,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		$copyUsers = true;
 		$copyCategories = true;
+	    $copyChildren = false;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1235,6 +1309,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if ($currentOption == BaseEntryCloneOptions::CATEGORIES && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 			{
 				$copyCategories = false;
+			}
+			if ($currentOption == BaseEntryCloneOptions::CHILD_ENTRIES && $currentType == CloneComponentSelectorType::INCLUDE_COMPONENT)
+			{
+				$copyChildren = true;
 			}
 		}
 
@@ -1373,88 +1451,94 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		if ($copyCategories)
 		{
-		// copy relationships to categories
-		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entry->getId());
-		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
-		$c->addAnd(categoryEntryPeer::PARTNER_ID, $entry->getPartnerId());
-		
- 		categoryEntryPeer::setUseCriteriaFilter(false);
-		$categoryEntries = categoryEntryPeer::doSelect($c);
-		categoryEntryPeer::setUseCriteriaFilter(true);
-		
-		// Create srcCategoryIdToDstCategoryIdMap - a map of source partner category ids -> dst. partner category ids
-		//
-		// Build src category IDs set
-		$srcCategoryIdSet = array();
-		foreach($categoryEntries as $categoryEntry)
-		{
-			$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
-		}
+			// copy relationships to categories
+			KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
+			$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+			$c->addAnd(categoryEntryPeer::ENTRY_ID, $entry->getId());
+			$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+			$c->addAnd(categoryEntryPeer::PARTNER_ID, $entry->getPartnerId());
 
-		$illegalCategoryStatus = array( CategoryStatus::DELETED, CategoryStatus::PURGED );
+	        categoryEntryPeer::setUseCriteriaFilter(false);
+			$categoryEntries = categoryEntryPeer::doSelect($c);
+			categoryEntryPeer::setUseCriteriaFilter(true);
 
-		// Get src category objects
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::ID, $srcCategoryIdSet, Criteria::IN);
-		$c->addAnd(categoryPeer::PARTNER_ID, $entry->getPartnerId());
-		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
-		categoryPeer::setUseCriteriaFilter(false);
-		$srcCategories = categoryPeer::doSelect($c);
-		categoryPeer::setUseCriteriaFilter(true);
-		
-		// Map the category names to their IDs
-		$fullNamesToSrcCategoryIdMap = array();
-		foreach ( $srcCategories as $category )
-		{
-			$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
-		}
-
-		// Get dst. partner categories based on src. category full-names
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::FULL_NAME, array_keys( $fullNamesToSrcCategoryIdMap ), KalturaCriteria::IN);
-		$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
-		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
-		categoryPeer::setUseCriteriaFilter(false);
-		$dstCategories = categoryPeer::doSelect($c);
-		categoryPeer::setUseCriteriaFilter(true);
-
-		$srcCategoryIdToDstCategoryIdMap = array();
-		foreach ( $dstCategories as $dstCategory )
-		{
-			$fullName = $dstCategory->getFullName();
-			if ( array_key_exists( $fullName, $fullNamesToSrcCategoryIdMap ) )
+			// Create srcCategoryIdToDstCategoryIdMap - a map of source partner category ids -> dst. partner category ids
+			//
+			// Build src category IDs set
+			$srcCategoryIdSet = array();
+			foreach($categoryEntries as $categoryEntry)
 			{
-				$srcCategoryId = $fullNamesToSrcCategoryIdMap[ $fullName ];
-				$srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ] = $dstCategory->getId();
-			}
-		}
-
-		foreach($categoryEntries as $categoryEntry)
-		{
-			/* @var $categoryEntry categoryEntry */
-			$newCategoryEntry = $categoryEntry->copy();
-			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
-			$newCategoryEntry->setEntryId($newEntry->getId());
-		
-			$srcCategoryId = $categoryEntry->getCategoryId();
-			if ( ! array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
-			{
-				continue; // Skip the category_entry's creation
+				$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
 			}
 
-			$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
-			$newCategoryEntry->setCategoryId( $dstCategoryId );
+			$illegalCategoryStatus = array( CategoryStatus::DELETED, CategoryStatus::PURGED );
 
+			// Get src category objects
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->add(categoryPeer::ID, $srcCategoryIdSet, Criteria::IN);
+			$c->addAnd(categoryPeer::PARTNER_ID, $entry->getPartnerId());
+			$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
 			categoryPeer::setUseCriteriaFilter(false);
-			entryPeer::setUseCriteriaFilter(false);
-			$newCategoryEntry->save();
-			entryPeer::setUseCriteriaFilter(true);
+			$srcCategories = categoryPeer::doSelect($c);
 			categoryPeer::setUseCriteriaFilter(true);
+
+			// Map the category names to their IDs
+			$fullNamesToSrcCategoryIdMap = array();
+			foreach ( $srcCategories as $category )
+			{
+				$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
+			}
+
+			// Get dst. partner categories based on src. category full-names
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->add(categoryPeer::FULL_NAME, array_keys( $fullNamesToSrcCategoryIdMap ), KalturaCriteria::IN);
+			$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
+			$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
+			categoryPeer::setUseCriteriaFilter(false);
+			$dstCategories = categoryPeer::doSelect($c);
+			categoryPeer::setUseCriteriaFilter(true);
+
+			$srcCategoryIdToDstCategoryIdMap = array();
+			foreach ( $dstCategories as $dstCategory )
+			{
+				$fullName = $dstCategory->getFullName();
+				if ( array_key_exists( $fullName, $fullNamesToSrcCategoryIdMap ) )
+				{
+					$srcCategoryId = $fullNamesToSrcCategoryIdMap[ $fullName ];
+					$srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ] = $dstCategory->getId();
+				}
+			}
+
+			foreach($categoryEntries as $categoryEntry)
+			{
+				/* @var $categoryEntry categoryEntry */
+				$newCategoryEntry = $categoryEntry->copy();
+				$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
+				$newCategoryEntry->setEntryId($newEntry->getId());
+
+				$srcCategoryId = $categoryEntry->getCategoryId();
+				if ( ! array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
+				{
+					continue; // Skip the category_entry's creation
+				}
+
+				$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
+				$newCategoryEntry->setCategoryId( $dstCategoryId );
+
+				categoryPeer::setUseCriteriaFilter(false);
+				entryPeer::setUseCriteriaFilter(false);
+				$newCategoryEntry->save();
+				entryPeer::setUseCriteriaFilter(true);
+				categoryPeer::setUseCriteriaFilter(true);
+			}
 		}
-		}
-		return $newEntry;
+
+
+	    if ($copyChildren)
+	    {
+		    self::cloneFamilyEntries($entry, $toPartner, $cloneOptions, $newEntry);
+	    }
+	    return $newEntry;
  	} 	
  	
  	/*
@@ -1523,13 +1607,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/*
 	 * Builds a manifest request for entry according to relevant flavors, delivery profile type and location of deliveryProfile(local/remote)
 	 */
-	public static function buildManifestUrl($entry, $format, $flavors, $profileId = "")
+	public static function buildManifestUrl($entry, $protocols, $format, $flavors, $profileId = "")
 	{
 		$entryId = $entry->getId();
 		$partnerId = $entry->getPartnerId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $partnerId);
-		$protocol = requestUtils::getProtocol();
-		$cdnApiHost = requestUtils::getApiCdnHost();
+
+		$protocol = null;
+		if ( in_array(infraRequestUtils::PROTOCOL_HTTPS ,$protocols))
+			$protocol = infraRequestUtils::PROTOCOL_HTTPS;
+		else
+			$protocol = infraRequestUtils::PROTOCOL_HTTP;
+
+		$cdnApiHost = null;
+		if ($protocol == infraRequestUtils::PROTOCOL_HTTPS && kConf::hasParam('cdn_api_host_https'))
+			$cdnApiHost = "$protocol://" . kConf::get('cdn_api_host_https');
+		else
+			$cdnApiHost =  "$protocol://" . kConf::get('cdn_api_host');
 
 		$flavorIds = array();
 		$fileExtension = null;
@@ -1541,7 +1635,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		$flavorIdsAsString = implode(",", $flavorIds);
-		$url = $cdnApiHost. "$partnerPath/playManifest/entryId/$entryId/flavorIds/$flavorIdsAsString/deliveryProfileId/$profileId/protocol/$protocol";
+		$url = $cdnApiHost. "$partnerPath/playManifest/entryId/$entryId/";
+
+		if (count($flavors))
+			$url = $url."flavorIds/$flavorIdsAsString/";
+
+		$url = $url."deliveryProfileId/$profileId/protocol/$protocol";
 
 		$url .= "/format/" . self::getFileExtensionByFormat($format, $fileExtension);
 
@@ -1579,6 +1678,45 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			default:
 				return "";
 		}
+	}
+
+	/**
+	 * @param entry $entry
+	 * @param Partner $toPartner
+	 * @param array $cloneOptions
+	 * @param $newEntry
+	 */
+	protected static function cloneFamilyEntries(entry $entry, Partner $toPartner, array $cloneOptions, $newEntry)
+	{
+		$entry->setInClone(true);
+		$entry->save();
+		$parentEntry = $entry->getParentEntry();
+		if ($parentEntry->getId() != $entry->getId())
+		{
+			if (!$parentEntry->getInClone())
+			{
+				$parentClone = self::copyEntry($parentEntry, $toPartner, $cloneOptions);
+				$newEntry->setParentEntryId($parentClone->getId());
+				$newEntry->save();
+
+			}
+		}
+
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getId(), $entry->getPartnerId());
+		foreach ($childEntries as $child)
+		{
+			/**
+			 * @var entry $child
+			 */
+			if (!$child->getInClone())
+			{
+				$childCopy = self::copyEntry($child, $toPartner, $cloneOptions);
+				$childCopy->setParentEntryId($newEntry->getId());
+				$childCopy->save();
+			}
+		}
+		$entry->setInClone(false);
+		$entry->save();
 	}
 
 
