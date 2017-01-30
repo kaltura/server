@@ -55,7 +55,13 @@ class LiveStreamEntry extends LiveEntry
 		
 		$hlsStreamUrl = $this->getFromCustomData("hls_stream_url");
 		if($hlsStreamUrl)
-			$hlsStreamUrl =  preg_replace('/^https?/', $protocol , $hlsStreamUrl);
+		{
+			$urlProtocol = parse_url($hlsStreamUrl, PHP_URL_SCHEME);
+			
+			//If url was configured with https don't return http even if request was made over http
+			if($urlProtocol != "https")
+				$hlsStreamUrl =  preg_replace('/^https?/', $protocol , $hlsStreamUrl);
+		}
 		
 	    return $hlsStreamUrl;
 	}
