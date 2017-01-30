@@ -54,8 +54,11 @@ class LiveStreamEntry extends LiveEntry
 			$protocol = requestUtils::getRequestProtocol();
 		
 		$hlsStreamUrl = $this->getFromCustomData("hls_stream_url");
-		if($hlsStreamUrl)
-			$hlsStreamUrl =  preg_replace('/^https?/', $protocol , $hlsStreamUrl);
+		//If request protocol is https modify hls stream url to return https to avoid mixed content browser errors
+		if($hlsStreamUrl && kString::beginsWith($hlsStreamUrl, 'http://') && $protocol == 'https')
+		{
+			$hlsStreamUrl =  preg_replace('/^http/', 'https' , $hlsStreamUrl);
+		}
 		
 	    return $hlsStreamUrl;
 	}
