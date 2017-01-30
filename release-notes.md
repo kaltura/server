@@ -1,5 +1,21 @@
 # Lynx 12.9.0 #
 
+## Add new permissions for capture device role ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6877
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_01_30_expend_capture_role_permissions.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
 ## Update notification templates ##
 
 - Issue Type: Bug
