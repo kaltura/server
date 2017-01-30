@@ -950,7 +950,7 @@ class myEntryUtils
 		{
 			// look for the highest bitrate flavor the packager can parse
 			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
-			if (is_null($flavorAsset))
+			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
 			{
 				//retrieve original ready
 				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
@@ -963,6 +963,10 @@ class myEntryUtils
 
 	public static function isFlavorSupportedByPackager($flavorAsset)
 	{
+		//filter audio flavors
+		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0))
+			return false;
+
 		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM, assetParams::CONTAINER_FORMAT_F4V);
 		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
 			return true;
