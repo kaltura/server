@@ -91,10 +91,10 @@ class DrmLicenseAccessService extends KalturaBaseService
 
     protected function buildPolicy(DrmPolicy $dbDrmPolicy)
     {
-        $extraSecurityParams = $dbDrmPolicy->getExtraSecurityParams();
-        if (is_null($extraSecurityParams))
+        $oplParams = $dbDrmPolicy->getOplParams();
+        if (is_null($oplParams))
             return $dbDrmPolicy->getName();
-        return json_encode($extraSecurityParams);
+        return json_encode($oplParams);
     }
 
 }

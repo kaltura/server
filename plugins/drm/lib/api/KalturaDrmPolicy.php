@@ -85,7 +85,7 @@ class KalturaDrmPolicy extends KalturaObject implements IFilterable
 	/**
 	 * @var KalturaKeyValueArray
 	 */
-	public $extraSecurityParams;
+	public $oplParams;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -104,7 +104,7 @@ class KalturaDrmPolicy extends KalturaObject implements IFilterable
 		'duration',
 		'createdAt',
 		'updatedAt',
-		'extraSecurityParams',
+		'oplParams',
 	 );
 		 
 	public function getMapBetweenObjects()
