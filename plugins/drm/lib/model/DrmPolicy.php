@@ -16,10 +16,10 @@
 class DrmPolicy extends BaseDrmPolicy implements IBaseObject
 {
 
-	const CUSTOM_DATA_EXTRA_SECURITY_PARAMS = 'opl_params';
+	const CUSTOM_DATA_OPL_PARAMS = 'opl_params';
 
-	public function setOplParams($v) {return $this->putInCustomData(self::CUSTOM_DATA_EXTRA_SECURITY_PARAMS, $v);}
+	public function setOplParams($v) {return $this->putInCustomData(self::CUSTOM_DATA_OPL_PARAMS, $v);}
 
-	public function getOplParams() {return $this->getFromCustomData(self::CUSTOM_DATA_EXTRA_SECURITY_PARAMS);}
+	public function getOplParams() {return $this->getFromCustomData(self::CUSTOM_DATA_OPL_PARAMS);}
 
 } // DrmPolicy
