@@ -59,7 +59,7 @@ class LiveStreamEntry extends LiveEntry
 			$urlProtocol = parse_url($hlsStreamUrl, PHP_URL_SCHEME);
 			
 			//If url was configured with https don't return http even if request was made over http
-			if($urlProtocol != "https")
+			if($urlProtocol && strtolower($urlProtocol) != "https")
 				$hlsStreamUrl =  preg_replace('/^https?/', $protocol , $hlsStreamUrl);
 		}
 		
