@@ -1945,37 +1945,28 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return implode(',', $this->getEntitledUserPuserEditArray());
 	}
 	
-	public function isOwnerActionsAllowed($kuserId, $useUserGroups = true)
+	public function isOwnerActionsAllowed($kuserId)
 	{
 		$ownerKuserId = $this->getKuserId();
 		if($kuserId == $ownerKuserId)
 			return true;
 
-		if ($useUserGroups)
-		{
-			$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
-			if (in_array($ownerKuserId, $kuserKGroupIds))
-				return true;
-		}
-		return false;
+		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+		return in_array($ownerKuserId, $kuserKGroupIds);
 	}
 	
-	public function isEntitledKuserEdit($kuserId, $useUserGroups = true)
+	public function isEntitledKuserEdit($kuserId)
 	{
 		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
 		if(in_array(trim($kuserId), $entitledKuserArray))
 			return true;
 
-		if($useUserGroups == true)
-		{
-			$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
-			foreach($kuserKGroupIds as $groupKId)
-			{
-				if(in_array($groupKId, $entitledKuserArray))
-					return true;
-			}
-		}
-		return $this->isOwnerActionsAllowed($kuserId, $useUserGroups);
+		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+		foreach($kuserKGroupIds as $groupKId)
+			if(in_array($groupKId, $entitledKuserArray))
+				return true;
+
+		return $this->isOwnerActionsAllowed($kuserId);
 	}
 
 	private function getEntitledUserPuserEditArray()
