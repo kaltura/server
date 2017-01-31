@@ -284,10 +284,6 @@ class MetadataService extends KalturaBaseService
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $dbMetadata->getMetadataProfileId());
 		
-		$previousVersion = null;
-		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
-			$previousVersion = $dbMetadata->getVersion();
-				
 		if($xmlData)
 		{
 			// if a metadata xslt is defined on the metadata profile - transform the given metadata
@@ -320,11 +316,7 @@ class MetadataService extends KalturaBaseService
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 			if (!kFileSyncUtils::compareContent($key, $xmlData))
 			{
-				$dbMetadata->incrementVersion();
-				$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-				kFileSyncUtils::file_put_contents($key, $xmlData);
-				$dbMetadata->save();
-				kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+				MetadataPlugin::updateMetadataFileSync($dbMetadata, $xmlData);
 			}
 			else 
 			{

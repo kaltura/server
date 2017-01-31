@@ -118,6 +118,8 @@ class UploadTokenService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_CANNOT_RESUME);
 				case kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
+				case kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD);
 				default:
 					throw $ex;
 			}

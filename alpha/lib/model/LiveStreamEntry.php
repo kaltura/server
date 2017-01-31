@@ -48,9 +48,19 @@ class LiveStreamEntry extends LiveEntry
 	public function setPrimaryServerNodeId ( $v )	{	$this->putInCustomData ( "primaryServerNodeId" , $v );	}
 	public function getPrimaryServerNodeId (  )	{	return $this->getFromCustomData( "primaryServerNodeId", null, null );	}
 	
-	public function getHlsStreamUrl ()
+	public function getHlsStreamUrl ($protocol = null)
 	{
-	    return $this->getFromCustomData("hls_stream_url");
+		if(!$protocol)
+			$protocol = requestUtils::getRequestProtocol();
+		
+		$hlsStreamUrl = $this->getFromCustomData("hls_stream_url");
+		//If request protocol is https modify hls stream url to return https to avoid mixed content browser errors
+		if($hlsStreamUrl && kString::beginsWith($hlsStreamUrl, 'http://') && $protocol == 'https')
+		{
+			$hlsStreamUrl =  preg_replace('/^http/', 'https' , $hlsStreamUrl);
+		}
+		
+	    return $hlsStreamUrl;
 	}
 	
 	public function setHlsStreamUrl ($v)

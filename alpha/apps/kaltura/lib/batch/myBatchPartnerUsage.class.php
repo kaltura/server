@@ -7,12 +7,12 @@ class myBatchPartnerUsage extends myBatchBase
 {
 	const SLEEP_TIME = 1;
 	
-	public function __construct($partnerId = null, $partnerPackage = 1)
+	public function __construct($partnerId = null, $partnerPackage = PartnerPackages::PARTNER_PACKAGE_FREE)
 	{
 		self::initDb();
 		$partners_exists = true;
-		$start_pos = 0;
 		$bulk_size = 500;
+		$highest_partner_id = 100;
 		while($partners_exists)
 		{
 			$c = new Criteria();
@@ -24,32 +24,35 @@ class myBatchPartnerUsage extends myBatchBase
 			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, $partnerPackage); 
 			$c->addAnd(PartnerPeer::MONITOR_USAGE, 1);
 			$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_DELETED, Criteria::NOT_EQUAL);
-			$c->setOffset($start_pos);
+
+			$c->addAnd(PartnerPeer::ID, $highest_partner_id, Criteria::GREATER_THAN);
+			$c->addAscendingOrderByColumn(PartnerPeer::ID);
 			$c->setLimit($bulk_size);
 			$partners = PartnerPeer::doSelect($c);
 			if (!$partners)
 			{
-				KalturaLog::debug( "No more partners. offset: $start_pos , limit: $bulk_size ." );
+				KalturaLog::debug( "No more partners." );
 				$partners_exists = false;
 			} 
 			else
 			{
-				KalturaLog::debug( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
+				KalturaLog::debug( "Looping ". count($partners) ." partners" );
 				foreach($partners as $partner)
 				{
-					if($partnerPackage == 1) //free
+					if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 					{
 						myPartnerUtils::doPartnerUsage($partner, true);
 					}
-					else if($partnerPackage == 100) //monthly developer
+					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
 					{
 						myPartnerUtils::doMonthlyPartnerUsage($partner);
 					}
 				}
 			}
+			$partner = end($partners);
+			$highest_partner_id = $partner->getId();
 			unset($partners);
 			PartnerPeer::clearInstancePool();
-			$start_pos += $bulk_size;
 		}
 	}
 

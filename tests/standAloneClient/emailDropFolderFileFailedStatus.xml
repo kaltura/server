@@ -29,7 +29,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Status equals ERROR_DOWNLOADING or ERROR_HANDLING</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getStatus()</code>
+							<code>$scope->getObject()->getStatus()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">
@@ -65,14 +65,14 @@
 						<key>drop_folder_file_id</key>
 						<description>Drop Folder File ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getId()</code>
+							<code>$scope->getObject()->getId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>drop_folder_file_name</key>
 						<description>Drop folder file name</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getFileName()</code>
+							<code>$scope->getObject()->getFileName()</code>
 						</value>
 					</item>
 				</contentParameters>

@@ -1,4 +1,4 @@
-CREATE TABLE `business_process_case`
+CREATE TABLE IF NOT EXISTS `business_process_case`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,

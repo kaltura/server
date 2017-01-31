@@ -27,6 +27,7 @@
 		const BitrateVP6Factor = 1.5;
 		const BitrateH264Factor = 2.0;
 		const BitrateScreencastFactor = 6.0;
+		const BitrateH265Factor = 3.0;
 		const BitrateOthersRatio = 1.3;
 		
 					/*
@@ -45,6 +46,8 @@
 											   "avc", "wmv3", "wmva", "rv40", "realvideo4", "rv30", "realvideo3");
 		static $BitrateFactorCategory4 = array("g2m3", "g2m4", "gotomeeting3", "gotomeeting4", "gotomeeting", 
 												"tsc2", "tscc", "techsmith", "mss1", "mss2");
+		static $BitrateFactorCategory5 = array(KDLVideoTarget::H265, "hevc", "hev1", "h.evc", "h.265", "v_mpegh/iso/hevc", 
+											   KDLVideoTarget::VP9, "v_vp9");
 		
 		public static function NormalizeSourceToTarget($sourceCodec, $sourceBitrate, $targetCodec, $transcodingFactor=self::TranscodingFactor)
 		{
@@ -55,7 +58,9 @@
 				$ratioTrg = self::BitrateVP6Factor;
 			else if(in_array($targetCodec, self::$BitrateFactorCategory3))
 				$ratioTrg = self::BitrateH264Factor;
-	
+			else if(in_array($targetCodec, self::$BitrateFactorCategory5))
+				$ratioTrg = self::BitrateH265Factor;
+
 			$ratioSrc = self::BitrateOthersRatio;
 			if(in_array($sourceCodec, self::$BitrateFactorCategory1))
 				$ratioSrc = self::BitrateH263Factor;
@@ -65,6 +70,8 @@
 				$ratioSrc = self::BitrateH264Factor;
 			else if(in_array($sourceCodec, self::$BitrateFactorCategory4))
 				$ratioSrc = self::BitrateScreencastFactor;
+			else if(in_array($sourceCodec, self::$BitrateFactorCategory5))
+				$ratioSrc = self::BitrateH265Factor;
 	
 			$brSrcNorm = $sourceBitrate*($ratioSrc/$ratioTrg)*$transcodingFactor;
 			return round($brSrcNorm, 0);								   		}

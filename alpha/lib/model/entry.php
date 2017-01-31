@@ -1945,6 +1945,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return implode(',', $this->getEntitledUserPuserEditArray());
 	}
 	
+	public function isOwnerActionsAllowed($kuserId)
+	{
+		$ownerKuserId = $this->getKuserId();
+		if($kuserId == $ownerKuserId)
+			return true;
+		
+		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+		return in_array($ownerKuserId, $kuserKGroupIds);
+	}
+	
 	public function isEntitledKuserEdit($kuserId, $useUserGroups = true)
 	{
 		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
@@ -1960,7 +1970,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 					return true;
 			}
 
+			return $this->isOwnerActionsAllowed($kuserId);
 		}
+		
 		return false;
 	}
 
@@ -3560,5 +3572,14 @@ public function copyTemplate($copyPartnerId = false, $template)
 			 $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
 				return true;
 		return false;
+	}
+
+	public function setInClone($v)
+	{
+		$this->putInCustomData("in_clone", $v);
+	}
+	public function getInClone()
+	{
+		return $this->getFromCustomData("in_clone");
 	}
 }

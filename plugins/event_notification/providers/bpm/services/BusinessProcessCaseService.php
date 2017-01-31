@@ -155,7 +155,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 			$dbBusinessProcessServer = BusinessProcessServerPeer::retrieveByPK($case->getServerId());
 			if (!$dbBusinessProcessServer)
 			{
-				KalturaLog::info("Business-Process server [" . $dbTemplate->getServerId() . "] not found");
+				KalturaLog::info("Business-Process server [" . $case->getServerId() . "] not found");
 				continue;
 			}
 			

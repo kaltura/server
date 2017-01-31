@@ -1,3 +1,62 @@
+# Lynx 12.9.0 #
+
+## Add new permissions for capture device role ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6877
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_01_30_expend_capture_role_permissions.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Update notification templates ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-6586
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/contentUpdateNotifications.xml
+
+## Transcription engines operation changes ##
+
+- Issue Type: Feature
+- Issue ID: TR-1761
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## File type restriction for uploading files ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6505
+
+### Configuration ###
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.FileTypeRestriction.enabled = true
+		moduls.FileTypeRestriction.permissionType = 2
+		moduls.FileTypeRestriction.label = "Enable file type restriction"
+		moduls.FileTypeRestriction.permissionName = FEATURE_FILE_TYPE_RESTRICTION_PERMISSION
+		moduls.FileTypeRestriction.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+None.
+
 # Lynx 12.8.0 #
 
 ## Play-server flavor changed and deleted http notifications ##

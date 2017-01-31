@@ -439,6 +439,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label' => 'HTML Purifier Behaviour',
 			'filters' => array('StringTrim')));
 		$this->getElement('html_purifier_behaviour')->setMultiOptions($htmlPurifierOptions);
+
+		$this->addElement('checkbox', 'html_purifier_base_list_usage', array(
+			'label'	  => 'Use only basic list for purification',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
 //-----------------------------------------------------------------------
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
@@ -912,7 +917,8 @@ class Form_PartnerConfiguration extends Infra_Form
 			array('legend' => 'Live Stream Config')
 		);
 		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
-		$this->addDisplayGroup(array('html_purifier_behaviour'), 'htmlPurifierBehaviour');
+		$this->addDisplayGroup(array('html_purifier_base_list_usage', 'html_purifier_behaviour'), 'htmlPurifierBehaviour');
+
 
 
 	}

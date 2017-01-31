@@ -104,7 +104,11 @@ class kHtmlPurifier
 		
 		if ( ! self::$AllowedProperties )
 		{
-			self::$AllowedProperties = kConf::get("xss_allowed_object_properties");
+			$allowedProperties = kConf::get("xss_allowed_object_properties");
+			self::$AllowedProperties = $allowedProperties['base_list'];
+			
+			if (!kCurrentContext::$HTMLPurifierBaseListOnlyUsage)
+				self::$AllowedProperties = array_merge($allowedProperties['base_list'], $allowedProperties['extend_list']);
 
 			// Convert values to keys (we don't care about the values) in order to test via array_key_exists.
 			self::$AllowedProperties = array_flip(self::$AllowedProperties);
