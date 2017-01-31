@@ -5,9 +5,6 @@
  */
 class KalturaLiveStreamEntry extends KalturaLiveEntry
 {
-	const MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS = 1000;
-	const MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS = 20000;
-
 	/**
 	 * The stream id as provided by the provider
 	 * 
@@ -116,12 +113,6 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 */
 	public $primaryServerNodeId;
 
-	/**
-	 * The chunk duration value in milliseconds
-	 * @var int
-	 */
-	public $segmentDuration;
-	
 	private static $map_between_objects = array
 	(
 		"streamRemoteId",
@@ -138,8 +129,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"streamPassword",
 		"streamUsername",
 		"bitrates" => "streamBitrates",
-		"primaryServerNodeId",
-		"segmentDuration"
+		"primaryServerNodeId"
 	);
 
 	public function __construct()
@@ -195,7 +185,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		if(($this->streamPassword == null) || (strlen(trim($this->streamPassword)) <= 0))
 		{
 			$tempPassword = sha1(md5(uniqid(rand(), true)));
-			$this->streamPassword = substr($tempPassword, rand(0, strlen($tempPassword) - 8), 8);		
+			$this->streamPassword = substr($tempPassword, rand(0, strlen($tempPassword) - 8), 8);
 		}
 	
 		return parent::toInsertableObject($dbObject, $props_to_skip);
@@ -232,17 +222,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
 		}
-		if (!$this->isNull("segmentDuration")) {
-			// todo: check if feature is enabled for the partner
-			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SEGMENT_DURATION_EDIT, kCurrentContext::getCurrentPartnerId()))
-			{
-				throw new KalturaAPIException(KalturaErrors::SEGMENT_DURATION_EDIT_DISALLOWED, $this->getFormattedPropertyNameWithClassName("segmentDuration"));
-			}
 
-			$this->validatePropertyNumeric("segmentDuration");
-			$this->validatePropertyMinMaxValue("segmentDuration", self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
-		}
-		
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
