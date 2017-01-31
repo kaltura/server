@@ -213,7 +213,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				"recordingOptions" => array("validateRecordingOptionsChanged"),
 				"recordStatus" => array("validatePropertyChanged","validateRecordedEntryId"), 
 				"conversionProfileId" => array("validatePropertyChanged","validateRecordedEntryId"),
-				"segmentDuration" => array("validateSegmentDurationValue"),
+				"segmentDuration" => array("validatePropertyChanged", "validateSegmentDurationValue"),
 		);
 		
 		foreach ($updateValidateAttributes as $attr => $validateFucntions)
