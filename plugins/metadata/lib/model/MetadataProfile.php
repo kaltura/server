@@ -312,4 +312,18 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	}
 
 
+	public function getXsltFields()
+	{
+		$key = $this->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		$xsdstr = kFileSyncUtils::file_get_contents($key, true, false);
+		$xsdXml = new SimpleXMLElement($xsdstr);
+		
+		$xsltKeys = array();
+		$metadataElements = $xsdXml->xpath('//xsd:element[@name="metadata"]//xsd:sequence/xsd:element'); //$metadataElements array of SimpleXMLElement
+		foreach ($metadataElements as $elem)
+			$xsltKeys[] = kXml::getXmlAttributeAsString($elem, 'name');
+		
+		return $xsltKeys;
+
+	}
 } // MetadataProfile
