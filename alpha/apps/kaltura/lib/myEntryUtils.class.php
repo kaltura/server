@@ -879,7 +879,7 @@ class myEntryUtils
 				$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
 			}
 		}
-		
+
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
@@ -963,8 +963,8 @@ class myEntryUtils
 
 	public static function isFlavorSupportedByPackager($flavorAsset)
 	{
-		//filter audio flavors
-		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0))
+		//filter audio flavors and encrypted flavors
+		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0) || $flavorAsset->getEncryptionKey())
 			return false;
 
 		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM, assetParams::CONTAINER_FORMAT_F4V);
