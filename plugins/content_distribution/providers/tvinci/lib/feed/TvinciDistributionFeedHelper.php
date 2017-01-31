@@ -186,30 +186,31 @@ class TvinciDistributionFeedHelper
 	private static function addEmptyValueInMetadataObjects($feedAsXmlForEntry)
 	{
 		$metadataObjects = $feedAsXmlForEntry->customData;
-		if (!$metadataObjects)
-			return $feedAsXmlForEntry;
-		
-		foreach($metadataObjects as $metadataObject)
-			self::addEmptyValueInMetadataObject($metadataObject);
+		if ($metadataObjects)
+		{
+			foreach($metadataObjects as $metadataObject)
+				self::addEmptyValueInMetadataObject($metadataObject);
+		}
 	}
 
 	private static function addEmptyValueInMetadataObject($metadataObject)
 	{
 		$metadataProfileId = kXml::getXmlAttributeAsInt($metadataObject, 'metadataProfileId');
-		$profile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
-		if (!$profile)
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+		if (!$metadataProfile)
 			return;
 
-		$xsltFields = $profile->getXsltFields();
-		$xsltKeys = array_flip($xsltFields); //because we only need the names of the fields
+		$metadataFieldsKeys = $metadataProfile->getMetadataFieldsKeys();
+		$metadataFieldsKeys = array_flip($metadataFieldsKeys); //because we only need the names of the fields
 		$entryKeys = (array)$metadataObject->metadata;
-		$diffKeys = array_diff_key($xsltKeys, $entryKeys);
+		$diffKeys = array_diff_key($metadataFieldsKeys, $entryKeys);
 
-		if (count($diffKeys) == 0)
-			return;
-		KalturaLog::info("Adding fields to metadata with profileID [$metadataProfileId] with the keys: " .print_r($diffKeys, true));
-		foreach($diffKeys as $key => $val)
-			$metadataObject->metadata->addChild($key, '');
+		if (count($diffKeys) > 0)
+		{
+			KalturaLog::debug("Adding fields to metadata with profileID [$metadataProfileId] with the keys: " .print_r($diffKeys, true));
+			foreach($diffKeys as $key => $val)
+				$metadataObject->metadata->addChild($key, '');
+		}
 	}
 
 	
