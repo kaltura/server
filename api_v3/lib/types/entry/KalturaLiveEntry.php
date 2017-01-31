@@ -312,17 +312,17 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		}
 	}
 
-	protected function validateSegmentDurationValue()
+	private function validateSegmentDurationValue()
 	{
-		$attr = "segmentDuration";
+		$attrName = "segmentDuration";
 
-		if (!$this->isNull($attr)) {
+		if (!$this->isNull($attrName)) {
 			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SEGMENT_DURATION_EDIT, kCurrentContext::getCurrentPartnerId())) {
-				throw new KalturaAPIException(KalturaErrors::SEGMENT_DURATION_EDIT_DISALLOWED, $this->getFormattedPropertyNameWithClassName($attr));
+				throw new KalturaAPIException(KalturaErrors::SEGMENT_DURATION_EDIT_DISALLOWED, $this->getFormattedPropertyNameWithClassName($attrName));
 			}
 
-			$this->validatePropertyNumeric($attr);
-			$this->validatePropertyMinMaxValue($attr, self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
+			$this->validatePropertyNumeric($attrName);
+			$this->validatePropertyMinMaxValue($attrName, self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
 	}
 
