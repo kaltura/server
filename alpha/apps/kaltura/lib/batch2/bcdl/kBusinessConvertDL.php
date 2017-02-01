@@ -43,6 +43,12 @@ class kBusinessConvertDL
 				KalturaLog::info("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
 				continue;
 			}
+			
+			if(!$newAsset->shouldCopyOnReplacement())
+			{
+				KalturaLog::info("Asset defined to not copy on replacement, not adding new asset [{$newAsset->getId()}] of type [{$newAsset->getType()}]");
+				continue;
+			}
 
 			//If doesn't exist - create a new array for the current asset's type.
 			if (!isset($newAssets[$newAsset->getType()]))
