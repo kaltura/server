@@ -317,7 +317,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		$attrName = "segmentDuration";
 
 		if (!$this->isNull($attrName)) {
-			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SEGMENT_DURATION_EDIT, kCurrentContext::getCurrentPartnerId())) {
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
 				throw new KalturaAPIException(KalturaErrors::SEGMENT_DURATION_EDIT_DISALLOWED, $this->getFormattedPropertyNameWithClassName($attrName));
 			}
 
