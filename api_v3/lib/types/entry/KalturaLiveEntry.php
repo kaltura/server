@@ -198,7 +198,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	{
 		return parent::validateForInsert($propertiesToSkip);
 
-		$this->validateSegmentDurationValue();
+		$this->validateSegmentDurationValue("segmentDuration");
 
 	}
 
@@ -213,7 +213,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				"recordingOptions" => array("validateRecordingOptionsChanged"),
 				"recordStatus" => array("validatePropertyChanged","validateRecordedEntryId"), 
 				"conversionProfileId" => array("validatePropertyChanged","validateRecordedEntryId"),
-				"segmentDuration" => array("validatePropertyChanged", "validateSegmentDurationValue"),
+				"segmentDuration" => array("validateSegmentDurationChanged"),
 		);
 		
 		foreach ($updateValidateAttributes as $attr => $validateFucntions)
@@ -308,13 +308,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		/* @var $sourceObject LiveEntry */
 		$getter = "get" . ucfirst($resolvedAttrName);
 		if($sourceObject->$getter() !== $this->$attr) {
-			$this->validateSegmentDurationValue();
+			$this->validateSegmentDurationValue($resolvedAttrName);
 		}
 	}
 
-	private function validateSegmentDurationValue()
+	private function validateSegmentDurationValue($attrName)
 	{
-		$attrName = "segmentDuration";
 
 		if (!$this->isNull($attrName)) {
 			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
