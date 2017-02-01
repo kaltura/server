@@ -37,7 +37,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @return KalturaPushNotificationData
 	 */
 	function registerAction($pushNotificationParamas, $notificationUserId = null)
-	{
+	{		
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
 		$partnersIds = array(
@@ -72,7 +72,12 @@ class PushNotificationTemplateService extends KalturaBaseService
 		foreach ($templateParams as $templateParam)
 		{
 			if (!in_array($templateParam->getKey(), $userParamsArrayKeys))
+			{
+				if($templateParam instanceof kPushEventNotificationParameter && $templateParam->getIncludeInQueueKey() == false)
+					continue;
+				
 				array_push($missingParams, $templateParam->getKey());
+			}
 		}
 
 		if ($missingParams != null)
@@ -98,8 +103,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		$protocol = infraRequestUtils::getProtocol();
 		$host = kConf::get("push_server_host");
 		$secret = kConf::get("push_server_secret");
-		$ip = kCurrentContext::$user_ip;
-		$token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . $ip . ":" . $hash . ":" . uniqid()));
+		$token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . $hash . ":" . uniqid()));
 		$result->url = $protocol . "://" . $host . "/?p=" . $partnerId . "&x=" . urlencode($token);
 		$result->clientId = "{CLIENT_ID}";
 		return $result;

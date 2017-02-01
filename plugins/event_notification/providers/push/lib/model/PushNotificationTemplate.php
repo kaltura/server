@@ -104,6 +104,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
     
     public function dispatch(kScope $scope) 
     {
+    	KalturaLog::debug("Dispatching event notification with name [{$this->getName()}] systemName [{$this->getSystemName()}]");
         if (!$scope || !($scope instanceof kEventScope))
         {
             KalturaLog::err('Failed to dispatch due to incorrect scope [' .$scope . ']');
@@ -112,8 +113,15 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
         $contentParameters = $this->getContentParameters();
         $queueKey = $this->getQueueKey($contentParameters, null, $scope);
+        $message = $this->getMessage($scope);
+        $time = time();
 
-        $msg = json_encode(array("clientId" => "id", "data" =>  $this->getMessage($scope), "queueKey" => $queueKey, "msgId"=>guid, "msgTime"=>time ));
+        $msg = json_encode(array(
+        		"data" 		=> $message, 
+        		"queueKey" 	=> $queueKey, 
+        		"msgId"		=> md5("$message_$time"), 
+        		"msgTime"	=> $time
+        ));
         // get instance of activated queue proivder and send message
         $queueProvider = QueueProvider::getInstance();
 
