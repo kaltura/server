@@ -37,7 +37,7 @@ class kWatermarkFlowManager implements kObjectAddedEventConsumer
 		if(!$originalEntry)
 		{
 			KalturaLog::debug("Original entry with id [$originalEntryId], not found");
-			return true;
+			return;
 		}
 		
 		KalturaLog::debug("Original entry id $originalEntryId");

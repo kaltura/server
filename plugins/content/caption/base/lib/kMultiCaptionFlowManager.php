@@ -71,7 +71,7 @@ class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer, kObjectA
 		if(!$originalEntry)
 		{
 			KalturaLog::debug("Original entry with id [$originalEntryId], not found");
-			return true;
+			return;
 		}
 		
 		KalturaLog::debug("Original entry id $originalEntryId");
