@@ -196,9 +196,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		return parent::validateForInsert($propertiesToSkip);
-
 		$this->validateSegmentDurationValue("segmentDuration");
+
+		return parent::validateForInsert($propertiesToSkip);
 
 	}
 
@@ -317,7 +317,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 
 		if (!$this->isNull($attrName)) {
 			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
-				throw new KalturaAPIException(KalturaErrors::SEGMENT_DURATION_EDIT_DISALLOWED, $this->getFormattedPropertyNameWithClassName($attrName));
+				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName($attrName));
 			}
 
 			$this->validatePropertyNumeric($attrName);
