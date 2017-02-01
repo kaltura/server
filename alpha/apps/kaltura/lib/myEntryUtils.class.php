@@ -655,7 +655,14 @@ class myEntryUtils
 		if($stripProfiles)
 			$thumbName .= "_stp_{$stripProfiles}";
 				
-		$entryThumbFilename = ($entry->getThumbnail() ? $entry->getThumbnail() : "0.jpg");
+		$entryThumbFilename = $entry->getThumbnail();
+		if(!$entryThumbFilename)
+		{
+			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+				$entryThumbFilename = $entry->getVersion().".jpg";
+			else
+				$entryThumbFilename = "0.jpg";
+		}
 		if ($entry->getStatus() != entryStatus::READY || @$entryThumbFilename[0] == '&')
 			$thumbName .= "_NOCACHE_";
 		
