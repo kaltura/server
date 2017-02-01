@@ -64,7 +64,7 @@ class KAsyncClearCuePoints extends KPeriodicWorker
 	{
 		$cuePointPlugin = KalturaCuePointClientPlugin::get(self::$kClient);
 		
-		$cuePointFilter = $this->getFilter("KalturaCuePointFilter");
+		$cuePointFilter = $this->getAdvancedFilter("KalturaCuePointFilter");
 		$cuePointFilter->entryIdEqual = $entry->id;
 		
 		$pager = new KalturaFilterPager();
