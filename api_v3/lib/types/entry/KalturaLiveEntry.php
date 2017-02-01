@@ -196,7 +196,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validateSegmentDurationValue("segmentDuration");
+		$this->validateSegmentDurationValue(null, "segmentDuration");
 
 		return parent::validateForInsert($propertiesToSkip);
 
@@ -213,7 +213,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				"recordingOptions" => array("validateRecordingOptionsChanged"),
 				"recordStatus" => array("validatePropertyChanged","validateRecordedEntryId"), 
 				"conversionProfileId" => array("validatePropertyChanged","validateRecordedEntryId"),
-				"segmentDuration" => array("validateSegmentDurationChanged"),
+				"segmentDuration" => array("validatePropertyChanged", "validateSegmentDurationValue"),
 		);
 		
 		foreach ($updateValidateAttributes as $attr => $validateFucntions)
@@ -299,29 +299,16 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		}
 	}
 
-	protected function validateSegmentDurationChanged($sourceObject, $attr)
-	{
-		$resolvedAttrName = $this->getObjectPropertyName($attr);
-		if(!$resolvedAttrName)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
-
-		/* @var $sourceObject LiveEntry */
-		$getter = "get" . ucfirst($resolvedAttrName);
-		if($sourceObject->$getter() !== $this->$attr) {
-			$this->validateSegmentDurationValue($resolvedAttrName);
-		}
-	}
-
-	private function validateSegmentDurationValue($attrName)
+	private function validateSegmentDurationValue($sourceObject, $attr)
 	{
 
-		if (!$this->isNull($attrName)) {
+		if (!$this->isNull($attr)) {
 			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
-				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName($attrName));
+				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName($attr));
 			}
 
-			$this->validatePropertyNumeric($attrName);
-			$this->validatePropertyMinMaxValue($attrName, self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
+			$this->validatePropertyNumeric($attr);
+			$this->validatePropertyMinMaxValue($attr, self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
 	}
 
