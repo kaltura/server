@@ -1,6 +1,29 @@
 # Lynx 12.10.0 #
 
-## added support API in segment duration edit. Feature PLAT-6593, and epic PLAT-5602
+## Added dynamic segment duration feature ## 
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6593 (part of epic PLAT-5602)
+ 
+### Configuration ###
+None.
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.liveStreamSegmentDuration.enabled = true
+		moduls.liveStreamSegmentDuration.permissionType = 2
+		moduls.liveStreamSegmentDuration.label = Kaltura Live Dynamic Segment Duration
+		moduls.liveStreamSegmentDuration.permissionName = FEATURE_DYNAMIC_SEGMENT_DURATION
+		moduls.liveStreamSegmentDuration.basePermissionType = 2
+		moduls.liveStreamSegmentDuration.basePermissionName = FEATURE_LIVE_STREAM
+		moduls.liveStreamSegmentDuration.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
 
 # Lynx 12.9.0 #
 
