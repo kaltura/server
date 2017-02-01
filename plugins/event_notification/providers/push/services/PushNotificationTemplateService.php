@@ -66,7 +66,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		$userParamsArrayKeys = array();
 		foreach ($userParamsArray as $userParam)
 		{
-			array_push($userParamsArrayKeys, $userParam->toObject()->getKey());
+			array_push($userParamsArrayKeys, $userParam->getKey());
 		}
 
 		foreach ($templateParams as $templateParam)
@@ -86,14 +86,11 @@ class PushNotificationTemplateService extends KalturaBaseService
 		//check that keys actually have values
 		foreach ($userParamsArray as $userParam)
 		{
-			$userParamObj = $userParam->toObject();
-			if (!$userParamObj->getValue())
-			{
+			if (!$userParam->getValue())
 				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "Value of " . $userParamObj->getKey());
-			}
 		}
 
-		$key = $dbEventNotificationTemplate->getQueueKey($userParamsArray->toObjectsArray(), $partnerId, null);
+		$key = $dbEventNotificationTemplate->getQueueKey($userParamsArray, $partnerId, null);
 		$hash = kCurrentContext::$ks_object->getHash();
 
 		$result = new KalturaPushNotificationData();
