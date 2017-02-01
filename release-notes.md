@@ -1,3 +1,7 @@
+# Lynx 12.10.0 #
+
+## added support API in segment duration edit. Feature PLAT-6593, and epic PLAT-5602
+
 # Lynx 12.9.0 #
 
 ## Add new permissions for capture device role ##
