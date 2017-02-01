@@ -42,7 +42,7 @@ class extloginAction extends kalturaAction
 		$ksObj = kSessionUtils::crackKs($ks);
 		$ksPartnerId = $ksObj->partner_id;
 		
-		if($ksObj->getPrivilegeByName(kSessionBase::PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT && $requestedPartnerId != $ksPartnerId))
+		if($ksObj->getPrivilegeByName(kSessionBase::PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT) && $requestedPartnerId != $ksPartnerId)
 			$this->dieOnError  ( APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED );
 
 		if (!$requestedPartnerId) {
