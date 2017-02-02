@@ -443,7 +443,30 @@ class ks extends kSessionBase
 		{
 			return true;
 		}
-		
+
+		if ( $required_priv_name == ks::PRIVILEGE_VIEW &&
+			$this->verifyRedirectEntryId(ks::PRIVILEGE_VIEW, $required_priv_value))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public function verifyRedirectEntryId($privilegeName, $entryId)
+	{
+		$allPrivileges = explode(',', $this->privileges);
+		foreach($allPrivileges as $privilege)
+		{
+			$exPrivilege = explode(':', $privilege);
+			if ($exPrivilege[0] == $privilegeName)
+			{
+				$privilegeObjectId = $exPrivilege[1];
+				$entry = entryPeer::retrieveByPK($privilegeObjectId);
+				if($entry && $entry->getRedirectEntryId() == $entryId)
+					return true;
+			}
+		}
 		return false;
 	}
 	
