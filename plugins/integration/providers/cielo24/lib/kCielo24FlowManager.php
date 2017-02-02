@@ -77,8 +77,14 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 				$additionalParams = json_decode($cielo24Options->defaultParams, true);
 			
 			$providerDataParams = json_decode($providerData->getAdditionalParameters(), true);
+			
 			if ($providerDataParams)
-				$additionalParams = array_merge ($providerDataParams,$additionalParams); 
+			{
+				foreach ($providerDataParams as $action => $params)
+				{
+					$additionalParams[$action] = array_merge (isset($additionalParams[$action]) ? $additionalParams[$action] : array(), $params);
+				}
+			}
 			
 			$clientHelper = Cielo24Plugin::getClientHelper($providerData->getUsername(), $providerData->getPassword(), $providerData->getBaseUrl(), $additionalParams);
 		
