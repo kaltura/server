@@ -116,22 +116,22 @@ class kJobsCacher
 	 * @param kBaseCacheWrapper $cache
 	 * @param int $workerId
 	 *
-	 * @return BatchJob or null
+	 * @return int
 	 */
-	private static function isAvailableJobsInCache($cache, $workerId)
+	private static function getNumberOfAvailableJobsInCache($cache, $workerId)
 	{
 		$workerKey = self::getCacheKeyForWorkerJobs($workerId);
 		$indexKey = self::getCacheKeyForIndex($workerId);
 
 		$jobs = $cache->get($workerKey);
 		if (!$jobs || empty($jobs))
-			return false;
+			return 0;
 
 		$indexForNextJob = $cache->get($indexKey) + 1;
 		if ($indexForNextJob < count($jobs))
-			return true;
+			return (count($jobs) - $indexForNextJob);
 
-		return false;
+		return 0;
 	}
 
 	/**
@@ -178,9 +178,9 @@ class kJobsCacher
 
 		kApiCache::disableConditionalCache();
 
-
-		if (self::isAvailableJobsInCache($cache, $workerId))
-			return 1; //if there're jobs waiting in the job-cache no need the check queue size
+		$NumberOfJobsInCache = self::getNumberOfAvailableJobsInCache($cache, $workerId);
+		if ($NumberOfJobsInCache)
+			return $NumberOfJobsInCache; //if there're jobs waiting in the job-cache no need the check queue size
 
 		$workerKey = self::getCacheKeyForWorkerQueue($workerId);
 		$queueSizeFromCache = $cache->get($workerKey);
