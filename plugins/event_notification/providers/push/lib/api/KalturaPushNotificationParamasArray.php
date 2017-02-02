@@ -13,7 +13,7 @@ class KalturaPushNotificationParamasArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaPushNotificationParamas();
+			$nObj = new KalturaPushNotificationParams();
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
@@ -23,6 +23,6 @@ class KalturaPushNotificationParamasArray extends KalturaTypedArray
 
 	public function __construct()
 	{
-		parent::__construct("KalturaPushNotificationParamas");
+		parent::__construct("KalturaPushNotificationParams");
 	}
 }

@@ -33,7 +33,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @action register
 	 * @actionAlias eventNotification_eventNotificationTemplate.register
 	 * @param string $notificationTemplateSystemName Existing push notification template system name
-	 * @param KalturaPushNotificationParamas $pushNotificationParamas
+	 * @param KalturaPushNotificationParams $pushNotificationParamas
 	 * @return KalturaPushNotificationData
 	 */
 	function registerAction($notificationTemplateSystemName, $pushNotificationParamas)
@@ -80,7 +80,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		foreach ($userParamsArray as $userParam)
 		{
 			if (!$userParam->getValue())
-				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "Value of " . $userParamObj->getKey());
+				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "Value of " . $userParam->getKey());
 		}
 
 		$key = $dbEventNotificationTemplate->getQueueKey($userParamsArray, $partnerId, null);
