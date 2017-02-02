@@ -140,8 +140,30 @@ class KAsyncMailer extends KJobHandlerWorker
 	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $language = 'en', $isHtml = false  )
 	{
 		$this->mail = new PHPMailer();
-		$this->mail->CharSet = 'utf-8';
-		$this->mail->Encoding = 'base64';
+
+		$mailerHost = KBatchBase::$taskConfig->mailerSmtpHost;
+		$mailerUserName = KBatchBase::$taskConfig->mailerSmtpUserName;
+		$mailerPassword = KBatchBase::$taskConfig->mailerSmtpPassword;
+		$mailerPort = KBatchBase::$taskConfig->mailerSmtpPort;
+
+		if (isset($mailerHost) && $mailerHost !='' &&
+			isset($mailerUserName) && $mailerUserName !=''&&
+			isset($mailerPassword) && $mailerPassword !='' &&
+			isset($mailerPort) && $mailerPort !='')
+		{
+			$this->mail->isSMTP();
+			$this->mail->Host = $mailerHost;                        // Specify main and backup SMTP servers
+			$this->mail->SMTPAuth = true;                           // Enable SMTP authentication
+			$this->mail->Username = $mailerUserName;                // SMTP username
+			$this->mail->Password = $mailerPassword;                // SMTP password
+			$this->mail->Port = $mailerPort;                        // TCP port to connect to// Set mailer to use SMTP
+		}
+		else
+		{
+			$this->mail->CharSet = 'utf-8';
+			$this->mail->Encoding = 'base64';
+		}
+
 		$this->mail->IsHTML($isHtml);
 		$this->mail->AddAddress($recipientemail);
 			
