@@ -84,6 +84,8 @@ class APIErrors
 	
 	// PID - partner_id
 	const START_SESSION_ERROR = "START_SESSION_ERROR;PID;Error while starting session for partner [@PID@]";
+	
+	const PARTNER_CHANGE_ACCOUNT_DISABLED = "PARTNER_CHANGE_ACCOUNT_DISABLED;;Partner change account is disabled for current session";
 
 	const INVALID_ACTIONS_LIMIT = "INVALID_ACTIONS_LIMIT;;Invalid actions limit";
 	

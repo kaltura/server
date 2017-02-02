@@ -556,6 +556,20 @@ class ks extends kSessionBase
 		return $entries;
 	}
 	
+	public function getPrivilegeByName($privilegeName)
+	{
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $privilege)
+		{
+			if ($privilege == $privilegeName)
+				return true;
+		}
+		
+		return false;
+	}
+	
 	public function getPrivacyContext()
 	{
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
