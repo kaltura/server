@@ -92,12 +92,12 @@ class kBatchExclusiveLock
 		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	
-	public static function getQueueSize(Criteria $c, $schedulerId, $workerId, $jobType)
+	public static function getQueueSize(Criteria $c, $workerId, $jobType)
 	{
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
 		
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
-		return self::getQueue($c, $schedulerId, $workerId, $max_exe_attempts);
+		return kJobsCacher::getQueue($c, $workerId, $max_exe_attempts);
 	}
 
 	public static function getExclusiveAlmostDone(Criteria $c, kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType)
@@ -159,40 +159,30 @@ class kBatchExclusiveLock
 	}
 	
 	
-	private static function getQueue(Criteria $c, $schedulerId, $workerId, $max_exe_attempts)
+	public static function getQueue(Criteria $c, $max_exe_attempts)
 	{
 		$schd = BatchJobLockPeer::SCHEDULER_ID;
-		$work = BatchJobLockPeer::WORKER_ID;
 		$stat = BatchJobLockPeer::STATUS;
 		$atmp = BatchJobLockPeer::EXECUTION_ATTEMPTS;
 		$expr = BatchJobLockPeer::EXPIRATION;
 		$recheck = BatchJobLockPeer::START_AT;
 		
-		$schd_id = $schedulerId;
-		$work_id = $workerId;
 		$now = time();
 		$now_str = date('Y-m-d H:i:s', $now);
 		
-		// same workers unfinished jobs
-		$query1 = "(
-							$schd = $schd_id
-						AND $work = $work_id
-						AND $stat IN (" . BatchJobPeer::getInProcStatusList() . ")
-					)";
-			
 			
 		//	"others unfinished jobs " - the expiration should be SMALLER than the current time to make sure the job is not
 		// being processed
 		$unclosedStatuses = BatchJobPeer::getUnClosedStatusList();
 		$unclosedStatuses = implode(',', $unclosedStatuses);
 		
-		$query2 = "(
+		$query1 = "(
 							$stat IN ($unclosedStatuses)
 						AND	$expr <= '$now_str'
 					)";
 		
 		// "retry jobs"
-		$query3 = "(
+		$query2 = "(
 						$stat IN (" . BatchJob::BATCHJOB_STATUS_RETRY  . ", " . BatchJob::BATCHJOB_STATUS_ALMOST_DONE  . ")
 						AND $recheck <= '$now_str'
 					)";
@@ -205,10 +195,9 @@ class kBatchExclusiveLock
 							)";
 								
 		$crit1 = $c->getNewCriterion($stat, BatchJob::BATCHJOB_STATUS_PENDING);
-		if($schedulerId && $workerId)
-			$crit1->addOr($c->getNewCriterion($schd, $query1, Criteria::CUSTOM));
+
+		$crit1->addOr($c->getNewCriterion($schd, $query1, Criteria::CUSTOM));
 		$crit1->addOr($c->getNewCriterion($schd, $query2, Criteria::CUSTOM));
-		$crit1->addOr($c->getNewCriterion($schd, $query3, Criteria::CUSTOM));
 		
 		$c->addAnd($crit1);
 		$c->addAnd($c->getNewCriterion($atmp, $queryMaxAttempts, Criteria::CUSTOM));
