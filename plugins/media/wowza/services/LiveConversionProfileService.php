@@ -284,7 +284,13 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function getIngestAudioCodec($ingestParameters)
 	{
-		return ($ingestParameters['audiocodecidstring'] === 'AAC') ? 'PassThru' : 'AAC';
+		switch ($ingestParameters['audiocodecidstring']) {
+			case 'AAC':
+			case 'avc1':
+				return 'PassThru';
+			default:
+				return 'AAC';
+		}
 	}
 	
 	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams, $streamParametersArray)
