@@ -1141,7 +1141,7 @@ class Partner extends BasePartner
 	{
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
 		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId);
-		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::NOT_EQUAL);
+		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::ISNOTNULL);
 		$c->addAnd(kuserPeer::IS_ADMIN , true);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		$c->applyFilters();
