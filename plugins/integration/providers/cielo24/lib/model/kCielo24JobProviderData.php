@@ -59,12 +59,6 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	private $replaceMediaContent;
 	
 	/**
-	 * 
-	 * @var string
-	 */
-	private $additionalParameters;
-	
-	/**
 	 * @return string
 	 */
 	public function getEntryId()
@@ -222,21 +216,5 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	public function setReplaceMediaContent($replaceMediaContent)
 	{
 		$this->replaceMediaContent = $replaceMediaContent;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getAdditionalParameters()
-	{
-		return $this->additionalParameters;
-	}
-	
-	/**
-	 * @param string $additionalParameters
-	 */
-	public function setAdditionalParameters($additionalParameters)
-	{
-		$this->additionalParameters = $additionalParameters;
 	}
 }
