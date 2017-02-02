@@ -128,8 +128,9 @@ class kJobsCacher
 			return 0;
 
 		$indexForNextJob = $cache->get($indexKey) + 1;
-		if ($indexForNextJob < count($jobs))
-			return (count($jobs) - $indexForNextJob);
+		$numOfJobs = count($jobs);
+		if ($indexForNextJob < $numOfJobs)
+			return ($numOfJobs - $indexForNextJob);
 
 		return 0;
 	}
