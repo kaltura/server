@@ -955,7 +955,16 @@ HTML;
 			// assume static playlist
 			$static_playlist_str = $playlistEntry->getDataContent();
 			$static_playlist = explode ( "," , $static_playlist_str );
-			if(in_array($entryId, $static_playlist)) return true;
+			if(in_array($entryId, $static_playlist))
+				return true;
+
+			//check if entryId is redirectEntryId of an entry in the playlist
+			$playlistEntries = entryPeer::retrieveByPKs($static_playlist);
+			foreach ($playlistEntries as $entry)
+			{
+				if($entry->getRedirectEntryId() == $entryId)
+					return true;
+			}
 		}
 		/*
 		elseif ( $playlistEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
