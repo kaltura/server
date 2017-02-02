@@ -12,10 +12,12 @@ abstract class LiveEntry extends entry
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
+	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 10000;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
 	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
+	const CUSTOM_DATA_SEGMENT_DURATION = 'segmentDuration';
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
@@ -155,12 +157,9 @@ abstract class LiveEntry extends entry
 		if($this->isColumnModified(entryPeer::LENGTH_IN_MSECS) && $this->getLengthInMsecs() > 0 && $this->getRecordStatus() !== RecordStatus::DISABLED && $this->getRecordedEntryId())
 		{
 			$recordedEntry = entryPeer::retrieveByPK($this->getRecordedEntryId());
-			if($recordedEntry && $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			if($recordedEntry && $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $recordedEntry->getStatus() != entryStatus::READY)
 			{
-				if($recordedEntry->getStatus() != entryStatus::READY)
-					$recordedEntry->setStatus(entryStatus::READY);
-				
-				$recordedEntry->setLengthInMsecs($this->getLengthInMsecs());
+				$recordedEntry->setStatus(entryStatus::READY);
 				$recordedEntry->save();
 			}
 		}
@@ -663,6 +662,16 @@ abstract class LiveEntry extends entry
 		throw new KalturaAPIException("This function is deprecated - you cannot set the live status");
 	}
 
+	public function setSegmentDuration($v)
+	{
+		$this->putInCustomData (LiveEntry::CUSTOM_DATA_SEGMENT_DURATION , $v);
+	}
+
+	public function getSegmentDuration()
+	{
+		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS);
+	}
+
 	/**
 	 * @return array<LiveEntryServerNode>
 	 */
@@ -750,7 +759,7 @@ abstract class LiveEntry extends entry
 	{
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
-	
+
 	/**
 	 * @return boolean
 	 */

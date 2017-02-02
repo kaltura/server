@@ -4,7 +4,7 @@
  * @subpackage objects
  */
 class KalturaLiveStreamEntry extends KalturaLiveEntry
-{	
+{
 	/**
 	 * The stream id as provided by the provider
 	 * 
@@ -112,7 +112,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 * @readonly
 	 */
 	public $primaryServerNodeId;
-	
+
 	private static $map_between_objects = array
 	(
 		"streamRemoteId",
@@ -129,7 +129,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"streamPassword",
 		"streamUsername",
 		"bitrates" => "streamBitrates",
-		"primaryServerNodeId",
+		"primaryServerNodeId"
 	);
 
 	public function __construct()
@@ -185,7 +185,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		if(($this->streamPassword == null) || (strlen(trim($this->streamPassword)) <= 0))
 		{
 			$tempPassword = sha1(md5(uniqid(rand(), true)));
-			$this->streamPassword = substr($tempPassword, rand(0, strlen($tempPassword) - 8), 8);		
+			$this->streamPassword = substr($tempPassword, rand(0, strlen($tempPassword) - 8), 8);
 		}
 	
 		return parent::toInsertableObject($dbObject, $props_to_skip);
@@ -222,7 +222,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
 		}
-		
+
 		parent::validateForInsert($propertiesToSkip);
 	}
 	

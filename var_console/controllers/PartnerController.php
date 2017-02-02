@@ -211,7 +211,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		
 		/* @var $currentPartner Kaltura_Client_Type_Partner */
-		$client->session->impersonate('{1:result:adminSecret}', $partnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement");
+		$client->session->impersonate('{1:result:adminSecret}', $partnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement,disablechangeaccount");
 		
 		$result = $client->doMultiRequest();
 		

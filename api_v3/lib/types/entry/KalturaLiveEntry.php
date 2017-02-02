@@ -5,6 +5,9 @@
  */
 abstract class KalturaLiveEntry extends KalturaMediaEntry
 {
+	const MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS = 1000;
+	const MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS = 20000;
+
 	/**
 	 * The message to be presented when the stream is offline
 	 * 
@@ -101,6 +104,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $liveStatus;
 
+	/**
+	 * The chunk duration value in milliseconds
+	 * @var int
+	 */
+	public $segmentDuration;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -116,7 +125,8 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"publishConfigurations",
 		"currentBroadcastStartTime",
 		"recordingOptions",
-		"liveStatus"
+		"liveStatus",
+		"segmentDuration"
 	);
 	
 	/* (non-PHPdoc)
@@ -149,6 +159,8 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			}
 			$this->recordingOptions->shouldCopyEntitlement = true;
 		}
+
+
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
 	
@@ -178,7 +190,18 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
 		}
 	}
-	
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validateSegmentDurationValue(null, "segmentDuration");
+
+		return parent::validateForInsert($propertiesToSkip);
+
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate($source_object)
 	 */
@@ -189,7 +212,8 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				"dvrWindow" => array("validatePropertyChanged"), 
 				"recordingOptions" => array("validateRecordingOptionsChanged"),
 				"recordStatus" => array("validatePropertyChanged","validateRecordedEntryId"), 
-				"conversionProfileId" => array("validatePropertyChanged","validateRecordedEntryId")
+				"conversionProfileId" => array("validatePropertyChanged","validateRecordedEntryId"),
+				"segmentDuration" => array("validatePropertyChanged", "validateSegmentDurationValue"),
 		);
 		
 		foreach ($updateValidateAttributes as $attr => $validateFucntions)
@@ -274,4 +298,18 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->validateRecordingDone($sourceObject, "recordingOptions");
 		}
 	}
+
+	private function validateSegmentDurationValue($sourceObject, $attr)
+	{
+
+		if (!$this->isNull($attr)) {
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
+				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName($attr));
+			}
+
+			$this->validatePropertyNumeric($attr);
+			$this->validatePropertyMinMaxValue($attr, self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
+		}
+	}
+
 }

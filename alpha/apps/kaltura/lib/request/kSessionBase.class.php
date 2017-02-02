@@ -47,6 +47,7 @@ class kSessionBase
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
 	const PRIVILEGE_APP_TOKEN = "apptoken";
 	const PRIVILEGES_DELIMITER = "/";
+	const PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT = "disablechangeaccount";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
