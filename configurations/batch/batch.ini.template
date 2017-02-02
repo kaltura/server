@@ -757,10 +757,10 @@ id																	= 620
 friendlyName                                        				= Clear old cue points from live entry
 type                                                				= KAsyncClearCuePoints
 scriptPath                                          				= ../plugins/cue_points/base/batch/clearCuePonts/KAsyncClearCuePointsExe.php
-filter.KalturaCuePointFilter.cuePointTypeIn							= "thumbCuePoint.Thumb,adCuePoint.Ad,codeCuePoint.Code"
-filter.KalturaCuePointFilter.orderBy								= "+createdAt"
-filter.KalturaCuePointFilter.createdAtLessThanOrEqual				= "-86400"
-filter.KalturaCuePointFilter.statusEqual							= 1
+advancedFilter.KalturaCuePointFilter.cuePointTypeIn							= "thumbCuePoint.Thumb,adCuePoint.Ad,codeCuePoint.Code"
+advancedFilter.KalturaCuePointFilter.orderBy								= "+createdAt"
+advancedFilter.KalturaCuePointFilter.createdAtLessThanOrEqual				= "-86400"
+advancedFilter.KalturaCuePointFilter.statusEqual							= 1
 
 [KAsyncConvertThumbAssetsGenerator : KAsyncConvertWorker]
 id                                      = 630
