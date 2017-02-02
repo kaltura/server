@@ -1,12 +1,24 @@
 # Lynx 12.10.0 #
 
+## Add user list permissions for capture device role ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6898
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_02_01_user_list_for_capture_role_permissions.php
+
 ## Added dynamic segment duration feature ## 
 
  - Issue Type: New Feature
  - Issue ID: PLAT-6593 (part of epic PLAT-5602)
  
 ### Configuration ###
-None.
+
 - Add new permission to admin.ini: (taken from new admin.ini.temple)
 
 		moduls.liveStreamSegmentDuration.enabled = true
