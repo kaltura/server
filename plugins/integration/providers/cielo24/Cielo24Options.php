@@ -17,12 +17,18 @@ class Cielo24Options
 	/**
 	 * cielo24 base url
 	 */
-        public $baseUrl;
+	 public $baseUrl;
 	
 	/**
  	 * Should transform DFXP
  	 */
  	public $transformDfxp;
+	
+	/**
+	 * Default set of parameters to be sent for get_caption and get_transcript
+	 * @var string
+	 */
+	public $defaultParams;
 
 	function __construct($username, $password, $baseUrl = null)
 	{

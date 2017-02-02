@@ -9,6 +9,7 @@
 	$password = $argv[3];
 	$baseUrl = isset($argv[4]) ? $argv[4] : null;
 	$transformDfxp = isset($argv[5]) ? (bool)$argv[5] : false;
+	$defaultParams = isset($argv[6]) ? $argv[6] : "";
 
 	$partner = PartnerPeer::retrieveByPK($partnerId);
 
@@ -20,5 +21,6 @@
 	
 	$options = new Cielo24Options($username, $password, $baseUrl);
 	$options->transformDfxp = $transformDfxp;
+	$options->defaultParams = $defaultParams;
 	Cielo24Plugin::setPartnerCielo24Options($partnerId, $options);
 	
