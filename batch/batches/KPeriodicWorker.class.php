@@ -9,17 +9,17 @@ abstract class KPeriodicWorker extends KBatchBase
 	/**
 	 * @return filter by object class name
 	 */
-	protected function getFilter($clsName)
+	protected function getAdvancedFilter($clsName)
 	{
-		if(!KBatchBase::$taskConfig->filter)
-			throw new Exception("Filter undefined");
+		if(!KBatchBase::$taskConfig->advancedFilter)
+			throw new Exception("Advanced filter undefined");
 		
-		if(!KBatchBase::$taskConfig->filter->$clsName)
-			throw new Exception("Trying to get undefined filter for filter of type [$clsName]");
+		if(!KBatchBase::$taskConfig->advancedFilter->$clsName)
+			throw new Exception("Trying to get undefined advanced-filter for filter of type [$clsName]");
 		
 		$filter = new $clsName();
 		
-		foreach (KBatchBase::$taskConfig->filter->$clsName as $key => $value)
+		foreach (KBatchBase::$taskConfig->advancedFilter->$clsName as $key => $value)
 		{
 			$filter->$key = $value;
 		}
