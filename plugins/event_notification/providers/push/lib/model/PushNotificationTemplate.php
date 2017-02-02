@@ -65,6 +65,9 @@ class PushNotificationTemplate extends EventNotificationTemplate
         // currently contentParams contains only one param (entryId), but for further support
         foreach ($contentParameters as $contentParameter)
         {
+        	if($contentParameter instanceof kPushEventNotificationParameter && !$includeKeyParams && $contentParameter->getIsQueueKeyParam() == true)
+        		continue;
+        	
             /* @var $contentParameter kEventNotificationParameter */
             $value = $contentParameter->getValue();
             if (($value instanceof kStringField) && ($scope) )
@@ -118,12 +121,14 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
         $contentParameters = $this->getContentParameters();
         $queueKey = $this->getQueueKey($contentParameters, null, $scope);
+        $eventName = $this->getEventName($contentParameters, null, $scope);
         $message = $this->getMessage($scope);
         $time = time();
 
         $msg = json_encode(array(
         		"data" 		=> $message, 
         		"queueKey" 	=> $queueKey, 
+        		"eventName"	=> $eventName,
         		"msgId"		=> md5("$message_$time"), 
         		"msgTime"	=> $time
         ));

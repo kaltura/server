@@ -5,13 +5,7 @@
  * @subpackage api.objects
  */
 class KalturaPushNotificationParamas extends KalturaObject
-{
-	/**
-	 * PushNotificationSystemName
-	 * @var string
-	 */
-	public $systemName;
-	
+{	
 	/**
 	 * User params
 	 * @var KalturaEventNotificationParameterArray
