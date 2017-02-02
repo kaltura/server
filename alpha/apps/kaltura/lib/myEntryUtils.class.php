@@ -967,7 +967,7 @@ class myEntryUtils
 		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0) || $flavorAsset->getEncryptionKey())
 			return false;
 
-		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM, assetParams::CONTAINER_FORMAT_F4V);
+		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM);
 		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
 			return true;
 		return false;
