@@ -64,23 +64,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 	
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
-			$cielo24Options = Cielo24Plugin::getPartnerCielo24Options($partnerId);
-			
-			$additionalParams = array();
-			if($cielo24Options->defaultParams)
-				$additionalParams = json_decode($cielo24Options->defaultParams, true);
-			
-			$providerDataParams = json_decode($providerData->getAdditionalParameters(), true);
-			
-			if ($providerDataParams)
-			{
-				foreach ($providerDataParams as $action => $params)
-				{
-					$additionalParams[$action] = array_merge (isset($additionalParams[$action]) ? $additionalParams[$action] : array(), $params);
-				}
-			}
-			
-			$clientHelper = Cielo24Plugin::getClientHelper($providerData->getUsername(), $providerData->getPassword(), $providerData->getBaseUrl(), $additionalParams);
+			$clientHelper = Cielo24Plugin::getClientHelper($providerData->getUsername(), $providerData->getPassword(), $providerData->getBaseUrl());
 		
 			$languageName = $clientHelper->getLanguageConstantName($spokenLanguage);
 			$jobId = $dbBatchJob->getId();

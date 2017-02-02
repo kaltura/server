@@ -122,9 +122,9 @@ class Cielo24Plugin extends IntegrationProviderPlugin implements IKalturaEventCo
 		return kPluginableEnumsManager::apiToCore('TranscriptProviderType', $value);
 	}
 	
-	public static function getClientHelper($username, $password, $baseUrl = null, $additionalParams = array())
+	public static function getClientHelper($username, $password, $baseUrl = null)
 	{
-		return new Cielo24ClientHelper($username, $password, $baseUrl, $additionalParams);
+		return new Cielo24ClientHelper($username, $password, $baseUrl);
 	}
 	
 	/**

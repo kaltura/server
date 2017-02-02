@@ -66,12 +66,6 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	 */
 	public $replaceMediaContent;
 	
-	/**
-	 * additional parameters to send to Cielo24
-	 * @var string
-	 */
-	public $additionalParameters;
-	
 	private static $map_between_objects = array
 	(
 		"entryId",
@@ -84,7 +78,6 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 		"baseUrl",
 		"spokenLanguage",
 		"replaceMediaContent",
-		"additionalParameters",
 	);
 	
 	/* (non-PHPdoc)
