@@ -9,6 +9,12 @@ class KalturaPushNotificationData extends KalturaObject
 	 * @var string
 	 * @readonly
 	 */
+	public $eventName;
+	
+	/**
+	 * @var string
+	 * @readonly
+	 */
 	public $key;
 	
 	/**
@@ -22,7 +28,7 @@ class KalturaPushNotificationData extends KalturaObject
 	 */
 	public $clientId;
 
-	private static $map_between_objects = array('key', 'url', 'clientId');
+	private static $map_between_objects = array('eventName', 'key', 'url', 'clientId');
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()

@@ -8,6 +8,11 @@ class kPushNotificationData extends KalturaObject
 	/**
 	 * @var string
 	 */
+	public $eventName;
+	
+	/**
+	 * @var string
+	 */
 	public $key;
 	
 	/**
@@ -25,6 +30,21 @@ class kPushNotificationData extends KalturaObject
 	 */
 	public $errorMessage;
 
+	/**
+	 * @return string
+	 */
+	public function getEventName()
+	{
+		return $this->eventName;
+	}
+	
+	/**
+	 * @param string $eventName
+	 */
+	public function setEventName($eventName)
+	{
+		$this->eventName = $eventName;
+	}
 
 	/**
 	 * @return string

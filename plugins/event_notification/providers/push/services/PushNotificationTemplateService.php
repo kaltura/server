@@ -36,7 +36,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @param string $notificationUserId notificationUserId
 	 * @return KalturaPushNotificationData
 	 */
-	function registerAction($pushNotificationParamas, $notificationUserId = null)
+	function registerAction($systemName, $pushNotificationParamas)
 	{		
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
@@ -46,11 +46,9 @@ class PushNotificationTemplateService extends KalturaBaseService
 		);
 
 		/* @var $kPushNotificationParams kPushNotificationParams */
-		$kPushNotificationParams = $pushNotificationParamas->toObject();
-		$notificationTemplateSystemName = $kPushNotificationParams->getSystemName();
-		$userParamsArray = $kPushNotificationParams->getUserParams();
+		$userParamsArray = $pushNotificationParamas->toObject()->getUserParams();
 
-		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveBySystemName($notificationTemplateSystemName, null, $partnersIds);
+		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveBySystemName($systemName, null, $partnersIds);
 		if (!$dbEventNotificationTemplate)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_SYSTEM_NAME_NOT_FOUND, $notificationTemplateSystemName);
 
@@ -72,12 +70,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		foreach ($templateParams as $templateParam)
 		{
 			if (!in_array($templateParam->getKey(), $userParamsArrayKeys))
-			{
-				if($templateParam instanceof kPushEventNotificationParameter && $templateParam->getIncludeInQueueKey() == false)
-					continue;
-				
 				array_push($missingParams, $templateParam->getKey());
-			}
 		}
 
 		if ($missingParams != null)
@@ -91,9 +84,11 @@ class PushNotificationTemplateService extends KalturaBaseService
 		}
 
 		$key = $dbEventNotificationTemplate->getQueueKey($userParamsArray, $partnerId, null);
+		$eventName = $dbEventNotificationTemplate->getEventName($userParamsArray, $partnerId, null);
 		$hash = kCurrentContext::$ks_object->getHash();
 
 		$result = new KalturaPushNotificationData();
+		$result->eventName = $this->encode($eventName . ":" . $hash);
 		$result->key = $this->encode($key . ":" . $hash);
 
 		// build the url to return

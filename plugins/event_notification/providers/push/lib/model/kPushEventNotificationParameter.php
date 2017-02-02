@@ -8,24 +8,24 @@ class kPushEventNotificationParameter extends kEventNotificationParameter
 	/**
 	 * @var bool
 	 */
-	public $includeInQueueKey;
+	public $isQueueKeyParam;
 
 	/**
-	 * @return string
+	 * @return bool
 	 */
-	public function getIncludeInQueueKey()
+	public function getIsQueueKeyParam()
 	{
-		if(!isset($this->includeInQueueKey))
+		if(!isset($this->isQueueKeyParam))
 			return false;
 		
-		return $this->includeInQueueKey;
+		return $this->isQueueKeyParam;
 	}
 
 	/**
-	 * @param string $key
+	 * @param bool $isQueueKeyParam
 	 */
-	public function setIncludeInQueueKey($includeInQueueKey)
+	public function setIsQueueKeyParam($isQueueKeyParam)
 	{
-		$this->includeInQueueKey = $includeInQueueKey;
+		$this->isQueueKeyParam = $isQueueKeyParam;
 	}
 }

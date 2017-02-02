@@ -56,7 +56,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
         return $this->getFromCustomData(self::CUSTOM_DATA_RESPONSE_PROFILE_ID);
     }    
     
-    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null)
+    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null, $includeKeyParams = true)
     {
         $templateId = $this->getId();
         if ($scope)
@@ -80,6 +80,11 @@ class PushNotificationTemplate extends EventNotificationTemplate
         $contentParamsHash = md5($partnerId . '_' . implode( '_' , array_values($contentParametersValues) ) );
         // prepare queue key to return
         return 'pn_' . $templateId . '_' . $contentParamsHash;
+    }
+    
+    public function getEventName($contentParameters, $partnerId = null, kScope $scope = null)
+    {
+    	return $this->getQueueKey($contentParameters, $partnerId, $scope, false);
     }
     
     protected function getMessage(kScope $scope)
