@@ -460,7 +460,7 @@ class ks extends kSessionBase
 			if($exPrivileges[0] == $required_priv_name)
 			{
 				// if found in playlist - return true
-				if(myPlaylistUtils::isEntryInPlaylist($entryId, $exPrivileges[1], $partnerId))
+				if(myPlaylistUtils::isEntryReferredInPlaylist($entryId, $exPrivileges[1], $partnerId))
 				{
 					return true;
 				}

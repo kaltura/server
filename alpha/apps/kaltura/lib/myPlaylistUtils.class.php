@@ -945,7 +945,7 @@ HTML;
 	/**
 	 * @return bool
 	 */
-	public static function isEntryInPlaylist($entryId, $playlistId, $partnerId)
+	public static function isEntryReferredInPlaylist($entryId, $playlistId, $partnerId)
 	{
 		$playlistEntry = entryPeer::retrieveByPK($playlistId);
 		if(!$playlistEntry) return false;
