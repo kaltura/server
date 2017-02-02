@@ -38,7 +38,7 @@ function retrieveNameByScheduler($schedulerId) {
 	$criteria = new Criteria(SchedulerPeer::DATABASE_NAME);
 	$criteria->add(SchedulerPeer::CONFIGURED_ID, $schedulerId);
 	$v = SchedulerPeer::doSelect($criteria);
-	return $v[0]->getName();
+	return $v[0]->getHost();
 }
 
 function retrieveHistoryRecord($jobId) {
