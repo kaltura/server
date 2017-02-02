@@ -32,11 +32,11 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 *
 	 * @action register
 	 * @actionAlias eventNotification_eventNotificationTemplate.register
+	 * @param string $notificationTemplateSystemName Existing push notification template system name
 	 * @param KalturaPushNotificationParamas $pushNotificationParamas
-	 * @param string $notificationUserId notificationUserId
 	 * @return KalturaPushNotificationData
 	 */
-	function registerAction($systemName, $pushNotificationParamas)
+	function registerAction($notificationTemplateSystemName, $pushNotificationParamas)
 	{		
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
@@ -48,7 +48,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		/* @var $kPushNotificationParams kPushNotificationParams */
 		$userParamsArray = $pushNotificationParamas->toObject()->getUserParams();
 
-		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveBySystemName($systemName, null, $partnersIds);
+		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveBySystemName($notificationTemplateSystemName, null, $partnersIds);
 		if (!$dbEventNotificationTemplate)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_SYSTEM_NAME_NOT_FOUND, $notificationTemplateSystemName);
 
