@@ -119,6 +119,11 @@ class playManifestAction extends kalturaAction
 	 * @var int
 	 */
 	private $deliveryProfileId = null;
+
+	/**
+	 * @var array
+	 */
+	private $localflavorIdsByDc  = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -624,6 +629,7 @@ class playManifestAction extends kalturaAction
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
 		$localFlavors = array();
+		$localFlavorIdsByDc = array();
 		$remoteFlavorsByDc = array();
 		$remoteFileSyncs = array();
 		
@@ -661,10 +667,14 @@ class playManifestAction extends kalturaAction
 				}
 				else
 				{
+					$dc = $fileSync->getDc();
+					$localFlavorIdsByDc[$dc][] = $flavorId;
 					$localFlavors[$flavorId] = $flavorAsset;
 				}
 			}
 		}
+
+		$this->localflavorIdsByDc = $localFlavorIdsByDc;
 		
 		// filter out any invalid / disabled storage profiles
 		if ($remoteFileSyncs)
@@ -850,6 +860,24 @@ class playManifestAction extends kalturaAction
 
 
 		$this->setParamsForPlayServer($this->deliveryProfile->getAdStitchingEnabled());
+		if($this->deliveryAttributes->getUsePlayServer())
+		{
+			list($playServerFlavorsIds, $selectedDc) = $this->selectPlayServerFlavorIds();
+
+			if(count($playServerFlavorsIds))
+			{
+				$this->deliveryAttributes->setDc($selectedDc);
+				$playServerFlavors = array();
+				foreach($this->deliveryAttributes->getFlavorAssets() as $flavor)
+				{
+					if(in_array($flavor->getId(), $playServerFlavorsIds))
+						$playServerFlavors[$flavor->getId()] = $flavor;
+				}
+				$this->deliveryAttributes->setFlavorAssets($playServerFlavors);
+			}
+			else
+				$this->deliveryAttributes->setUsePlayServer(false);
+		}
 
 		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
 		if ($filter)
@@ -1019,6 +1047,29 @@ class playManifestAction extends kalturaAction
 			if(!$this->deliveryAttributes->getUiConfId())
 				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
 		}
+	}
+
+	private function selectPlayServerFlavorIds()
+	{
+		// choose the dc with the highest number of flavors
+		$selectedDc = null;
+		$maxDcFlavorCount = 0;
+		$selectedFlavorIds = array();
+		if(!$this->localflavorIdsByDc)
+			return array($selectedFlavorIds, $selectedDc);
+
+		foreach ($this->localflavorIdsByDc as $dc => $curDcFlavorIds)
+		{
+			$curDcFlavorCount = count($curDcFlavorIds);
+			if ($curDcFlavorCount > $maxDcFlavorCount)
+			{
+				$selectedDc = $dc;
+				$maxDcFlavorCount = $curDcFlavorCount;
+				$selectedFlavorIds = $curDcFlavorIds;
+			}
+		}
+
+		return array($selectedFlavorIds, $selectedDc);
 	}
 
 	public function execute()
