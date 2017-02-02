@@ -5,7 +5,7 @@
 	if(!(isset($options['r']) && isset($options['p']) && isset($options['i'])) || !(isset($options['status']) || isset($options['maxValues'])))
 		die("Usage: php ". basename(__FILE__) ." -r [realRun] -p [partner-id] -i [profile-id] --status {status} --maxValues {maxValues}" . PHP_EOL);
 
-	require_once("/opt/kaltura/app/alpha/scripts/bootstrap.php");
+	require_once(__DIR__ . "/../bootstrap.php");
 
 	$dryRun= $options['r'] !== 'realRun';
 	KalturaStatement::setDryRun($dryRun);
