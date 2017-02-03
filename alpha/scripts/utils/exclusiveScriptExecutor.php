@@ -40,12 +40,11 @@ class ExclusiveScriptExecutor
     {
         $cache = kCacheManager::getSingleLayerCache($this->cacheName);
         if(!$cache)
-            throw new Exception ("Could not allocate cache named - ".$this->cacheName);
+            throw new Exception ("\nCould not allocate cache named - ".$this->cacheName."\n");
 
         return $cache;
     }
 }
-
 
 if (in_array($argv[1],array('usage','?','help','-h')) || $argc!=3)
 {
