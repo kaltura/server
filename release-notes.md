@@ -37,6 +37,20 @@ None.
 
 None.
 
+## Fix FFmpeg 3.2 decryption issue ##
+
+ - Issue Type: Bug fix
+ - Issue ID: PLAT-6718
+
+### Configuration ###
+Binaries: Provided in the PLAT-6718
+
+Following bins/scripts should be switched -
+- ffmpeg.sh
+- ffprobe.sh
+- ismindex.sh
+- qt-faststart
+
 # Lynx 12.9.0 #
 
 ## Add new permissions for capture device role ##
