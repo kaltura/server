@@ -1301,7 +1301,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$copyUsers = true;
 		$copyCategories = true;
 	    $copyChildren = false;
-	    $copyAccessControl = false;
+	    $copyAccessControl = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1322,9 +1322,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$copyChildren = true;
 			}
-			if ($currentOption == BaseEntryCloneOptions::ACCESS_CONTROL && $currentType == CloneComponentSelectorType::INCLUDE_COMPONENT)
+			if ($currentOption == BaseEntryCloneOptions::ACCESS_CONTROL && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 			{
-				$copyAccessControl = true;
+				$copyAccessControl = false;
 			}
 		}
 
@@ -1338,7 +1338,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		{
  			$newEntry->setPartnerId($toPartner->getId());
  			$newEntry->setSubpId($toPartner->getId() * 100);
-		    if (!$copyAccessControl)
+		    if ($toPartner->getId() != $entry->getPartnerId() || !$copyAccessControl)
 				$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
  		}
  		
