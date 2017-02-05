@@ -17,6 +17,11 @@ abstract class kMatchCondition extends kCondition
 	protected $dynamicValues;
 	
 	/**
+	 * @var bool
+	 */
+	protected $restrictEmptyFieldValues;
+	
+	/**
 	 * @param array $values
 	 */
 	function setValues(array $values)
@@ -35,6 +40,22 @@ abstract class kMatchCondition extends kCondition
 	function getValues()
 	{
 		return $this->values;
+	}
+	
+	/**
+	 * @param bool $restrictEmptyFieldValues
+	 */
+	function setRestrictEmptyFieldValues($restrictEmptyFieldValues)
+	{
+		$this->restrictEmptyFieldValues = $restrictEmptyFieldValues;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	function getRestrictEmptyFieldValues()
+	{
+		return $this->restrictEmptyFieldValues;
 	}
 
 	/* (non-PHPdoc)
@@ -149,6 +170,9 @@ abstract class kMatchCondition extends kCondition
 
 		if(is_array($field))
 		{
+			if(!$this->restrictEmptyFieldValues && !count($field))
+					return false;
+			
 			foreach($field as $fieldItem)
 			{
 				if(!$this->fieldFulfilled($fieldItem, $values))
