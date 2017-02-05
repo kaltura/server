@@ -170,7 +170,7 @@ abstract class kMatchCondition extends kCondition
 
 		if(is_array($field))
 		{
-			if(!$this->restrictEmptyFieldValues && !count($field))
+			if($this->restrictEmptyFieldValues && !count($field))
 					return false;
 			
 			foreach($field as $fieldItem)
