@@ -279,7 +279,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		if(count($types))
 			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
 		
-		$criteria->addAscendingOrderByColumn(CuePointPeer::START_TIME);
+		$criteria->addDescendingOrderByColumn(CuePointPeer::START_TIME);
 		return CuePointPeer::doSelect($criteria, $con);
 	}
 	

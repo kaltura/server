@@ -17,6 +17,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	const ENTRY_CUE_POINT_INDEX_SUB_TYPE = 'cpst';
 	
 	const CUE_POINT_FETCH_LIMIT = 1000;
+	const MAX_CUE_POINT_FOR_SEARCH_DATA = 1000;
 	
 	
 	/* (non-PHPdoc)
@@ -311,7 +312,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			$handledObjectsCount = count($cuePointObjects);
 			$offset += $handledObjectsCount;
 		} 
-		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT); //In case cue point was deleted during index execution than offset will not reach count so break when count is 0
+		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT && $offset < self::MAX_CUE_POINT_FOR_SEARCH_DATA); //In case cue point was deleted during index execution than offset will not reach count so break when count is 0
 		
 		
 		$dataField  = CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);
