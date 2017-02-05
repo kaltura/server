@@ -76,13 +76,12 @@ class PartnerService extends KalturaBaseService
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			
 			$ignorePassword = false;
-			if ($existingUser && ($this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID || $this->getKs()->partner_id == $parentPartnerId)){
+			if ($existingUser && ($this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)){
 				kuserPeer::setUseCriteriaFilter(false);
 				$kuserOfLoginData = kuserPeer::getKuserByEmail($partner->adminEmail, $existingUser->getConfigPartnerId());
 				kuserPeer::setUseCriteriaFilter(true);
-				if ($kuserOfLoginData){
+				if ($kuserOfLoginData && ($parentPartnerId == $kuserOfLoginData->getPartnerId()))
 					$ignorePassword = true;
-				}
 			}
 			
 			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName() , $dbPartner->getAdminName() , $dbPartner->getAdminEmail() ,
