@@ -192,7 +192,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$this->clearOrderByColumns();
 		if ($this->nonSphinxOrderColumns)
 		{
-			foreach($this->nonSphinxOrderColumns as $orderColoumn)
+			foreach($this->nonSphinxOrderColumns as $orderColumn)
 			{
 				list($column, $direction) = $orderColumn;
 				if($direction == Criteria::DESC)
