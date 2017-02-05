@@ -13,6 +13,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	
 	const CACHE_PREFIX = 'executed_sphinx_server_';
 
+	const MAX_SIZE_FOR_PLUGIN_SEARCH_DATA = 800000; // 1MB * 0.8. In bytes
+
 	/**
 	 * @param string $baseName
 	 * @return string
