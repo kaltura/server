@@ -58,7 +58,14 @@ class CuePointService extends KalturaBaseService
 	function addAction(KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = $cuePoint->toInsertableObject();
-		
+
+		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
+		$limitEntry = $this->getKs()->getLimitEntry();
+		if ($limitEntry && $limitEntry != $cuePoint->entryId)
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $cuePoint->entryId);
+		}
+
 		if($cuePoint->systemName)
 		{
 			$existingCuePoint = CuePointPeer::retrieveBySystemName($cuePoint->entryId, $cuePoint->systemName);
@@ -233,13 +240,20 @@ class CuePointService extends KalturaBaseService
 	function updateAction($id, KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($id);
-		
+
 		if (!$dbCuePoint)
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
-			
+
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
-		
+
+		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
+		$limitEntry = $this->getKs()->getLimitEntry();
+		if ($limitEntry && $limitEntry != $dbCuePoint->getEntryId())
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $dbCuePoint->getEntryId());
+		}
+
 		if($cuePoint->systemName)
 		{
 			$existingCuePoint = CuePointPeer::retrieveBySystemName($dbCuePoint->getEntryId(), $cuePoint->systemName);

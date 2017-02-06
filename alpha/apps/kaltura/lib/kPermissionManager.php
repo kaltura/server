@@ -523,7 +523,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 
 		$ks = ks::fromSecureString($ksString);
-		$ksSetRoleId = $ks->getSetRole();
+		$ksSetRoleId = $ks->getRole();
 
 		if ($ksSetRoleId)
 		{
