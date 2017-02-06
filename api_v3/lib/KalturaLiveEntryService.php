@@ -14,6 +14,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 	//amount of time for holding kLock
 	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 3;
+	
+	//Max time from recording created time before creating new recorded entry
+	const SEVEN_DAYS_IN_SECONDS = 604800;
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -235,11 +238,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 					$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
 					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbLiveEntry->getCurrentBroadcastStartTime();
+					$maxAppendTimeReached = $recordedEntryCreationTime + self::SEVEN_DAYS_IN_SECONDS < time();
 
 					KalturaLog::debug("isNewSession [$isNewSession] getLastBroadcastEndTime [{$dbLiveEntry->getLastBroadcastEndTime()}] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
-					KalturaLog::debug("recordedEntryCreationTime [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]"); 
+					KalturaLog::debug("recordedEntryCreationTime [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
+					KalturaLog::debug("maxAppendTimeReached [$maxAppendTimeReached] recordedEntryCreationTime [$recordedEntryCreationTime]");
 					if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
-						if ($isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
+						if (($isNewSession && $recordedEntryNotYetCreatedForCurrentSession) || ($dbRecordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $maxAppendTimeReached))
 						{
 							KalturaLog::info("Creating a recorded entry for $entryId ");
 							$createRecordedEntry = true;
