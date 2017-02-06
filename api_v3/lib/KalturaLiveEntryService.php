@@ -102,11 +102,15 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 			// Extract the exact video segment duration from the recorded file
 			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
-			$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
+			$recordedSegmentDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
 
-			$currentSegmentVodToLiveDeltaTime = $liveSegmentDurationInMsec - $recordedSegmentDurationInMsec;
+			KalturaLog::debug("about to call amfParser->getMediaInfo()");
+			// Extract AMF data from all data frames in the segment
+			$amfParser = new KAMFMediaInfoParser($filename, kConf::get('bin_path_ffprobe'));
+			$AMFs = $amfParser->getAMFInfo();
+
 			$recordedSegmentsInfo = $dbEntry->getRecordedSegmentsInfo();
-			$recordedSegmentsInfo->addSegment( $lastDuration, $recordedSegmentDurationInMsec, $currentSegmentVodToLiveDeltaTime );
+			$recordedSegmentsInfo->addSegment( $recordedSegmentDurationInMS, $AMFs);
 			$dbEntry->setRecordedSegmentsInfo( $recordedSegmentsInfo );
 
 			if ( $isLastChunk )

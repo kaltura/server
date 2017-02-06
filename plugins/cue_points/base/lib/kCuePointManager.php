@@ -577,6 +577,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
 
+		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
 		$c->add( CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
@@ -594,22 +595,20 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if ( $numLiveCuePointsToCopy > 0 )
 		{
 			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
+
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
 				$processedCuePointIds[] = $liveCuePoint->getId();
 
-				$startTime = $liveCuePoint->getStartTime();
+				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
+				$offsetForTS = $recordedSegmentsInfo->getOffsetForTimestamp($cuePointCreationTime);
 
-				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
-				KalturaLog::info("Preparing to copy $copyMsg");
+				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]";
+				KalturaLog::debug("Preparing to copy $copyMsg");
 
-				$totalVodOffsetTime = $recordedSegmentsInfo->getTotalVodTimeOffset( $startTime );
-
-				if ( ! is_null( $totalVodOffsetTime ) )
+				if ( ! is_null( $offsetForTS ) )
 				{
-					$adjustedStartTime = $startTime - $totalVodOffsetTime;
-					KalturaLog::info("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
-					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime );
+					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $offsetForTS );
 				}
 				else
 				{
