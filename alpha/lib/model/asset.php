@@ -759,5 +759,8 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	public function getassetParams(PropelPDO $con = null)
 	{
 		return assetParamsPeer::retrieveByPk($this->flavor_params_id);
-	}	
+	}
+	
+	public function shouldCopyOnReplacement($v) {return true;}
+		
 }

@@ -1,5 +1,5 @@
 <?php
-class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer
+class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer
 {
 	
 	/* (non-PHPdoc)
@@ -38,5 +38,50 @@ class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer
 		$captionAsset = assetPeer::retrieveById($captionId);
 		$captionAsset->setStatus(asset::ASSET_STATUS_ERROR);
 		$captionAsset->save();
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+ 	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary())
+			return true;
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see kObjectAddedEventConsumer::objectAdded()
+ 	 */
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary())
+		{
+			$this->copyCaptionAssets($object);
+		}
+		
+		return true;
+	}
+	
+	protected function copyCaptionAssets(entry $entry)
+	{
+		$originalEntryId = $entry->getReplacedEntryId();
+		$originalEntry = entryPeer::retrieveByPK($originalEntryId);
+		if(!$originalEntry)
+		{
+			KalturaLog::debug("Original entry with id [$originalEntryId], not found");
+			return true;
+		}
+		
+		KalturaLog::debug("Original entry id $originalEntryId");
+		KalturaLog::debug("Replacing entry id [{$entry->getId()}]");
+		
+		$captions = assetPeer::retrieveByEntryId($originalEntryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		foreach($captions as $caption)
+		{
+			/* @var asset $caption */
+			$caption->copyToEntry($entry->getId());
+		}
 	}
 }

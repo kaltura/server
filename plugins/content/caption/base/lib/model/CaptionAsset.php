@@ -64,4 +64,6 @@ class CaptionAsset extends asset
 		$this->setLanguage($dbAssetParams->getLanguage());
 		$this->setLabel($dbAssetParams->getLabel());
 	}
+	
+	public function shouldCopyOnReplacement($v) {return false;}
 }
