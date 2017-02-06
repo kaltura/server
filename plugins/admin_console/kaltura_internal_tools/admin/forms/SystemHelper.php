@@ -12,7 +12,6 @@ class Form_SystemHelper extends Infra_Form
 			'required' => true,
 			'filters'		=> array('StringTrim'),
 			'multiOptions' => array(
-				'wiki_decode' => 'Wiki Decode',
 				'wiki_decode_no_serialize' => 'Wiki Decode (No unserialize)',
 				'base64_encode' => 'Base64 Encode',
 				'base64_decode' => 'Base64 Decode',
