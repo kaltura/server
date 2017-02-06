@@ -151,15 +151,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			
 			$scope->resetDynamicValues();
 			
-			$notificationParameters = $notificationTemplate->getContentParameters();
-			foreach($notificationParameters as $notificationParameter)
-			{
-				/* @var $notificationParameter kEventNotificationParameter */
-				if(!is_null($notificationParameter->getValue()))
-					$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
-			}
-			
-			$notificationParameters = $notificationTemplate->getUserParameters();
+			$notificationParameters = $notificationTemplate->getNotificationParameters();
 			foreach($notificationParameters as $notificationParameter)
 			{
 				/* @var $notificationParameter kEventNotificationParameter */

@@ -59,6 +59,19 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 		return array("eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
+	public function getContentParametersKeyValueArray()
+	{
+		$contentParametersKeyValueArray = array();
+	
+		$contentParams = $this->getContentParameters();
+		foreach ($contentParams as $contentParam)
+		{
+			$contentParametersKeyValueArray[$contentParam->getKey()] = $contentParam;
+		}
+	
+		return $contentParametersKeyValueArray;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see BaseEventNotificationTemplate::preSave()
 	 */
@@ -92,6 +105,11 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 	    }
 	
 	    return true;
+	}
+	
+	public function getNotificationParameters()
+	{
+		return array_merge($this->getContentParameters(), $this->getUserParameters());
 	}
 	
 } // EventNotificationTemplate

@@ -8,12 +8,12 @@ class kPushNotificationData extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $eventName;
+	public $queueName;
 	
 	/**
 	 * @var string
 	 */
-	public $key;
+	public $queueKey;
 	
 	/**
 	 * @var string
@@ -21,45 +21,35 @@ class kPushNotificationData extends KalturaObject
 	public $url;
 
 	/**
-	 * @var string
-	 */
-	public $clientId;
-
-	/**
-	 * @var exception
-	 */
-	public $errorMessage;
-
-	/**
 	 * @return string
 	 */
-	public function getEventName()
+	public function getQueueName()
 	{
-		return $this->eventName;
+		return $this->queueName;
 	}
 	
 	/**
-	 * @param string $eventName
+	 * @param string $queueName
 	 */
-	public function setEventName($eventName)
+	public function setQueueName($queueName)
 	{
-		$this->eventName = $eventName;
+		$this->queueName = $queueName;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getKey()
+	public function getQueueKey()
 	{
-		return $this->key;
+		return $this->queueKey;
 	}
 
 	/**
 	 * @param string $key
 	 */
-	public function setKey($key)
+	public function setQueueKey($queueKey)
 	{
-		$this->key = $key;
+		$this->queueKey = $queueKey;
 	}
 
 	/**
@@ -77,22 +67,4 @@ class kPushNotificationData extends KalturaObject
 	{
 		$this->url = $url;
 	}
-
-	/**
-	 * @return string
-	 */
-	public function getClientId()
-	{
-		return $this->clientId;
-	}
-
-	/**
-	 * @param string $clientId
-	 */
-	public function setClientId($clientId)
-	{
-		$this->clientId = $clientId;
-	}
-
-
 }

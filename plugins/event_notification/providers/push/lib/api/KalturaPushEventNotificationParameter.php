@@ -6,11 +6,11 @@
 class KalturaPushEventNotificationParameter extends KalturaEventNotificationParameter
 {
 	/**
-	 * @var bool
+	 * @var string
 	 */
-	public $isQueueKeyParam;
+	public $queueKeyToken;
 
-	private static $map_between_objects = array('isQueueKeyParam');
+	private static $map_between_objects = array('queueKeyToken');
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()

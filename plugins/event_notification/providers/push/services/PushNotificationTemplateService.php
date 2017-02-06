@@ -26,6 +26,23 @@ class PushNotificationTemplateService extends KalturaBaseService
 
 		return bin2hex($cipherData);
 	}
+	
+	private function buildResult($queueName, $queueKey)
+	{
+		$hash = kCurrentContext::$ks_object->getHash();
+		$result = new KalturaPushNotificationData();
+		$result->queueName = $this->encode($queueName . ":" . $hash);
+		$result->queueKey = $this->encode($queueKey . ":" . $hash);
+		
+		// build the url to return
+		$protocol = infraRequestUtils::getProtocol();
+		$host = kConf::get("push_server_host");
+		$secret = kConf::get("push_server_secret");
+		$token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . $hash . ":" . uniqid()));
+		$result->url = $protocol . "://" . $host . "/?p=" . $partnerId . "&x=" . urlencode($token);
+		
+		return $result;
+	}
 
 	/**
 	 * Register to a queue from which event messages will be provided according to given template. Queue will be created if not already exists
@@ -33,20 +50,14 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @action register
 	 * @actionAlias eventNotification_eventNotificationTemplate.register
 	 * @param string $notificationTemplateSystemName Existing push notification template system name
-	 * @param KalturaPushNotificationParams $pushNotificationParamas
+	 * @param KalturaPushNotificationParams $pushNotificationParams
 	 * @return KalturaPushNotificationData
 	 */
-	function registerAction($notificationTemplateSystemName, $pushNotificationParamas)
+	function registerAction($notificationTemplateSystemName, $pushNotificationParams)
 	{		
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
-		$partnersIds = array(
-			PartnerPeer::GLOBAL_PARTNER,
-			$partnerId,
-		);
-
-		/* @var $kPushNotificationParams kPushNotificationParams */
-		$userParamsArray = $pushNotificationParamas->toObject()->getUserParams();
+		$partnersIds = array(PartnerPeer::GLOBAL_PARTNER, $partnerId);
 
 		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveBySystemName($notificationTemplateSystemName, null, $partnersIds);
 		if (!$dbEventNotificationTemplate)
@@ -56,48 +67,79 @@ class PushNotificationTemplateService extends KalturaBaseService
 		if (!$dbEventNotificationTemplate instanceof PushNotificationTemplate)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $notificationTemplateSystemName, get_class($dbEventNotificationTemplate));
 
-		// Check all template needed params were actually given
+		/* @var $kPushNotificationParams kPushNotificationParams */
 		$missingParams = array();
-		$templateParams = $dbEventNotificationTemplate->getContentParameters();
-
-		// create array of all keys
+		$userContnetParams = array();
+		$userQueueKeyParams = array();
 		$userParamsArrayKeys = array();
+		$userParamsArray = $pushNotificationParams->toObject()->getUserParams();
+		
+		// get template configured params
+		$contnetParams = $dbEventNotificationTemplate->getContentParametersKeyValueArray();
+		$queueKeyParams = $dbEventNotificationTemplate->getQueueKeyParametersKeyValueArray();
+		$templateParams = array_merge($contnetParams, $queueKeyParams);
+		
 		foreach ($userParamsArray as $userParam)
 		{
-			array_push($userParamsArrayKeys, $userParam->getKey());
+			$userParamKey = $userParam->getKey();
+			array_push($userParamsArrayKeys, $userParamKey);
+			
+			if(isset($contnetParams[$userParamKey]))
+			{
+				$userContnetParams[] = $userParam;
+				continue;
+			}
+			
+			if(isset($queueKeyParams[$userParamKey]))
+			{
+				$valueToken = $queueKeyParams[$userParamKey]->getQueueKeyToken();
+				if($valueToken)
+					$userParam->setValue(new kStringValue($valueToken));
+				
+				$userQueueKeyParams[] = $userParam;
+			}
 		}
-
-		foreach ($templateParams as $templateParam)
+		
+		foreach ($templateParams as $templateParamKey => $templateParamValue)
 		{
-			if (!in_array($templateParam->getKey(), $userParamsArrayKeys))
+			if (!in_array($templateParamKey, $userParamsArrayKeys))
 				array_push($missingParams, $templateParam->getKey());
 		}
-
+		
 		if ($missingParams != null)
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
-
-		//check that keys actually have values
-		foreach ($userParamsArray as $userParam)
-		{
-			if (!$userParam->getValue())
-				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "Value of " . $userParam->getKey());
-		}
-
-		$key = $dbEventNotificationTemplate->getQueueKey($userParamsArray, $partnerId, null);
-		$eventName = $dbEventNotificationTemplate->getEventName($userParamsArray, $partnerId, null);
-		$hash = kCurrentContext::$ks_object->getHash();
-
-		$result = new KalturaPushNotificationData();
-		$result->eventName = $this->encode($eventName . ":" . $hash);
-		$result->key = $this->encode($key . ":" . $hash);
-
-		// build the url to return
-		$protocol = infraRequestUtils::getProtocol();
-		$host = kConf::get("push_server_host");
-		$secret = kConf::get("push_server_secret");
-		$token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . $hash . ":" . uniqid()));
-		$result->url = $protocol . "://" . $host . "/?p=" . $partnerId . "&x=" . urlencode($token);
-		$result->clientId = "{CLIENT_ID}";
-		return $result;
+		
+		$queueName = $dbEventNotificationTemplate->getQueueName($userContnetParams, $partnerId, null);
+		$queueKey = $dbEventNotificationTemplate->getQueueKey(array_merge($userContnetParams, $userQueueKeyParams), $partnerId, null);
+		
+		return $this->buildResult($queueName, $queueKey);
+	}
+	
+	/**
+	 * Clear queue messages 
+	 *
+	 * @action sendComman
+	 * @actionAlias eventNotification_eventNotificationTemplate.sendComman
+	 * @param string $queueName QueueNAme to clear messages for
+	 * @param KalturaPushNotificationCommandType $command Command to be sent to push server
+	 * @return bool Allwyas true
+	 */
+	function sendCommandAction($queueName, KalturaPushNotificationCommandType $command)
+	{
+		$time = time();
+		$msg = json_encode(array(
+				"data" 		=> null,
+				"queueKey" 	=> null,
+				"queueName"	=> $queueName,
+				"msgId"		=> md5("$queueName $time"),
+				"msgTime"	=> $time,
+				"command"	=> $command
+		));
+		
+		// get instance of activated queue proivder and send message
+		$queueProvider = QueueProvider::getInstance();
+		$queueProvider->send('', $msg);
+		
+		return true;
 	}
 }

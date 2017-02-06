@@ -8,6 +8,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
     const CUSTOM_DATA_API_OBJECT_TYPE = 'apiObjectType';
     const CUSTOM_DATA_OBJECT_FORMAT = 'objectFormat';
     const CUSTOM_DATA_RESPONSE_PROFILE_ID = 'responseProfileId';
+    const CUSTOM_DATA_QUEUE_KEY_PARAMETERS = 'queueKeyParameters';
     
     public function __construct()
     {
@@ -54,9 +55,37 @@ class PushNotificationTemplate extends EventNotificationTemplate
     public function getResponseProfileId()
     {
         return $this->getFromCustomData(self::CUSTOM_DATA_RESPONSE_PROFILE_ID);
-    }    
+    }
+
+    public function setQueueKeyParameters(array $v)
+	{
+    	return $this->putInCustomData(self::CUSTOM_DATA_QUEUE_KEY_PARAMETERS, $v);
+	}
+	
+	public function getQueueKeyParameters()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_QUEUE_KEY_PARAMETERS, null, array());
+	}
+	
+	public function getQueueKeyParametersKeyValueArray()
+	{
+		$queueKeyParametersKeyValueArray = array();
+		
+		$queueParams = $this->getQueueKeyParameters();
+		foreach ($queueParams as $queueParam)
+		{
+			$queueKeyParametersKeyValueArray[$queueParam->getKey()] = $queueParam;
+		}
+		
+		return $queueKeyParametersKeyValueArray;
+	}
+	
+	public function getNotificationParameters()
+	{
+		return array_merge($this->getQueueKeyParameters(), parent::getNotificationParameters());
+	}
     
-    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null, $includeKeyParams = true)
+    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null)
     {
         $templateId = $this->getId();
         if ($scope)
@@ -64,10 +93,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
         // currently contentParams contains only one param (entryId), but for further support
         foreach ($contentParameters as $contentParameter)
-        {
-        	if($contentParameter instanceof kPushEventNotificationParameter && !$includeKeyParams && $contentParameter->getIsQueueKeyParam() == true)
-        		continue;
-        	
+        {        	
             /* @var $contentParameter kEventNotificationParameter */
             $value = $contentParameter->getValue();
             if (($value instanceof kStringField) && ($scope) )
@@ -85,9 +111,9 @@ class PushNotificationTemplate extends EventNotificationTemplate
         return 'pn_' . $templateId . '_' . $contentParamsHash;
     }
     
-    public function getEventName($contentParameters, $partnerId = null, kScope $scope = null)
+    public function getQueueName($contentParameters, $partnerId = null, kScope $scope = null)
     {
-    	return $this->getQueueKey($contentParameters, $partnerId, $scope, false);
+    	return $this->getQueueKey($contentParameters, $partnerId, $scope);
     }
     
     protected function getMessage(kScope $scope)
@@ -119,18 +145,20 @@ class PushNotificationTemplate extends EventNotificationTemplate
             return;
         }
         
+        $queueParameters = $this->getQueueKeyParameters();
         $contentParameters = $this->getContentParameters();
-        $queueKey = $this->getQueueKey($contentParameters, null, $scope);
-        $eventName = $this->getEventName($contentParameters, null, $scope);
+        $queueKey = $this->getQueueKey(array_merge($contentParameters, $queueParameters), null, $scope);
+        $queueName = $this->getQueueName($contentParameters, null, $scope);
         $message = $this->getMessage($scope);
         $time = time();
 
         $msg = json_encode(array(
         		"data" 		=> $message, 
         		"queueKey" 	=> $queueKey, 
-        		"eventName"	=> $eventName,
-        		"msgId"		=> md5("$message_$time"), 
-        		"msgTime"	=> $time
+        		"queueName"	=> $queueName,
+        		"msgId"		=> md5("$message $time"), 
+        		"msgTime"	=> $time,
+        		"command"	=> null 
         ));
         // get instance of activated queue proivder and send message
         $queueProvider = QueueProvider::getInstance();
