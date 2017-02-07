@@ -149,6 +149,9 @@ abstract class kMatchCondition extends kCondition
 
 		if(is_array($field))
 		{
+			if(!count($field))
+				return false;
+
 			foreach($field as $fieldItem)
 			{
 				if(!$this->fieldFulfilled($fieldItem, $values))
