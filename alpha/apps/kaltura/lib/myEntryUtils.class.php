@@ -1305,6 +1305,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$copyUsers = true;
 		$copyCategories = true;
 	    $copyChildren = false;
+	    $copyAccessControl = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1325,6 +1326,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$copyChildren = true;
 			}
+			if ($currentOption == BaseEntryCloneOptions::ACCESS_CONTROL && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyAccessControl = false;
+			}
 		}
 
  		$newEntry = $entry->copy();
@@ -1337,7 +1342,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		{
  			$newEntry->setPartnerId($toPartner->getId());
  			$newEntry->setSubpId($toPartner->getId() * 100);
-			$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());		
+		    if ($toPartner->getId() != $entry->getPartnerId() || !$copyAccessControl)
+				$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
  		}
  		
  		$newKuser = null;
