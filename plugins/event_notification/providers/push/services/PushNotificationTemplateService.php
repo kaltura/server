@@ -27,7 +27,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		return bin2hex($cipherData);
 	}
 	
-	private function buildResult($queueName, $queueKey)
+	private function buildResult($partnerId, $queueName, $queueKey)
 	{
 		$hash = kCurrentContext::$ks_object->getHash();
 		$result = new KalturaPushNotificationData();
@@ -103,7 +103,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		foreach ($templateParams as $templateParamKey => $templateParamValue)
 		{
 			if (!in_array($templateParamKey, $userParamsArrayKeys))
-				array_push($missingParams, $templateParam->getKey());
+				array_push($missingParams, $templateParamKey);
 		}
 		
 		if ($missingParams != null)
@@ -112,7 +112,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		$queueName = $dbEventNotificationTemplate->getQueueName($userContnetParams, $partnerId, null);
 		$queueKey = $dbEventNotificationTemplate->getQueueKey(array_merge($userContnetParams, $userQueueKeyParams), $partnerId, null);
 		
-		return $this->buildResult($queueName, $queueKey);
+		return $this->buildResult($partnerId, $queueName, $queueKey);
 	}
 	
 	/**
