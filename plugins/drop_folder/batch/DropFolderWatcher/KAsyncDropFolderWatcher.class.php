@@ -44,9 +44,10 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 					continue;
 				$this->impersonate($folder->partnerId);
 				$engine = KDropFolderEngine::getInstance($folder->type);			    	
-				$engine->watchFolder($folder);					    
+				$engine->watchFolder($folder);
+				$this->unimpersonate();
 				$this->freeExclusiveDropFolder($folder->id);		
-				$this->unimpersonate();					    
+									    
 			}
 			catch (kFileTransferMgrException $e)
 			{
@@ -97,11 +98,12 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			KalturaLog::err("Error with folder id [$dropFolderId] - $errorDescription");
 		try 
 		{
+			$this->unimpersonate();
 	    	$this->dropFolderPlugin->dropFolder->freeExclusiveDropFolder($dropFolderId, $status, $errorCode, $errorDescription);
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err('Error when trying to free drop folder [$dropFolderId] - '.$e->getMessage());
+			KalturaLog::err("Error when trying to free drop folder [$dropFolderId] - ".$e->getMessage());
 		}	
 	}	
 			

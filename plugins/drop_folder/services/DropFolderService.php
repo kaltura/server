@@ -247,7 +247,6 @@ class DropFolderService extends KalturaBaseService
 			$dropFolder->fromObject($allocateDropFolder, $this->getResponseProfile());
 			return $dropFolder;
 		}
-
 	}
  	
 	/**
@@ -255,7 +254,7 @@ class DropFolderService extends KalturaBaseService
 	 *
 	 * @action freeExclusiveDropFolder
 	 * @param int $dropFolderId
-	 * @param DropFolderStatus $status
+	 * @param int $status
 	 * @param string $errorCode
 	 * @param string $errorDescription
 	 * @throws KalturaAPIException
