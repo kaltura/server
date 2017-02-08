@@ -23,11 +23,6 @@ class KalturaPushNotificationData extends KalturaObject
 	 */
 	public $url;
 
-	/**
-	 * @var string
-	 */
-	public $clientId;
-
 	private static $map_between_objects = array('queueName', 'queueKey', 'url');
 
 	/* (non-PHPdoc)
