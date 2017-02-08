@@ -18,7 +18,7 @@ class KalturaBooleanValueArray extends KalturaTypedArray
 		{
 			foreach($bools as $bool)
 			{
-				$boolObject = new KalturaStringValue();
+				$boolObject = new KalturaBooleanValue();
 				
 				if($bool instanceof kValue)
 				{
