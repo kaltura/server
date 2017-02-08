@@ -241,10 +241,13 @@ class DropFolderService extends KalturaBaseService
 	public function getExclusiveDropFolderAction($tag, $maxTime)
 	{
 		$allocateDropFolder = kDropFolderAllocator::getDropFolder($tag, $maxTime);
+		if ($allocateDropFolder)
+		{
+			$dropFolder = KalturaDropFolder::getInstanceByType($allocateDropFolder->getType());
+			$dropFolder->fromObject($allocateDropFolder, $this->getResponseProfile());
+			return $dropFolder;
+		}
 
-		$dropFolder = KalturaDropFolder::getInstanceByType($allocateDropFolder->getType());
-		$dropFolder->fromObject($allocateDropFolder, $this->getResponseProfile());
-		return $dropFolder;
 	}
  	
 	/**
