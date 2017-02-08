@@ -459,7 +459,7 @@ class ks extends kSessionBase
 		foreach($allPrivileges as $privilege)
 		{
 			$exPrivilege = explode(':', $privilege);
-			if ($exPrivilege[0] == $privilegeName)
+			if ($exPrivilege[0] == $privilegeName && isset($exPrivilege[1]))
 			{
 				$privilegeObjectId = $exPrivilege[1];
 				$entry = entryPeer::retrieveByPK($privilegeObjectId);
