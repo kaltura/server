@@ -32,9 +32,9 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			return $this->init();
 
 
-		$attempts = 5;
-		KalturaLog::log("Start running to watch $attempts folders");
-		for ($i = 0; $i < 5; $i++)
+		$numberOfFolderEachRun = self::$taskConfig->numberOfFolderEachRun;
+		KalturaLog::log("Start running to watch $numberOfFolderEachRun folders");
+		for ($i = 0; $i < $numberOfFolderEachRun; $i++)
 		{
 			/* @var $folder KalturaDropFolder */
 			$folder = $this->getDropFolder();
@@ -78,7 +78,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		$folderTag = self::$taskConfig->params->tags;
 		$maxTimeForFolder = self::$taskConfig->params->maxTimeForFolder;
-		if (strlen($folderTag) == 0 || $folderTag = '*') {		
+		if (strlen($folderTag) == 0 || $folderTag == '*') {
 			KalturaLog::err('Tags must be specify in configuration - cannot continue');			
 			return null;
 		}
