@@ -41,7 +41,7 @@ class BusinessProcessCaseTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('CASE_ID', 'CaseId', 'INTEGER', false, null, null);
+		$this->addColumn('CASE_ID', 'CaseId', 'VARCHAR', false, 64, null);
 		$this->addColumn('PROCESS_ID', 'ProcessId', 'VARCHAR', false, 255, null);
 		$this->addColumn('TEMPLATE_ID', 'TemplateId', 'INTEGER', false, null, null);
 		$this->addColumn('SERVER_ID', 'ServerId', 'INTEGER', false, null, null);
