@@ -54,7 +54,7 @@ class PartnerService extends KalturaBaseService
 				$parentPartnerId = $this->getKs()->partner_id;
 				if ($parentPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) {
 		                    $parentPartnerId = null;
-							$isAdminOrVarConsole = true;
+		                    $isAdminOrVarConsole = true;
 				}
                 else
                 {
@@ -65,7 +65,7 @@ class PartnerService extends KalturaBaseService
 					{
 						throw new KalturaAPIException( KalturaErrors::NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD , $parentPartnerId );
 					}
-	                $isAdminOrVarConsole = true;
+					$isAdminOrVarConsole = true;
 					if ($templatePartnerId)
 					{
 					    $templatePartner = PartnerPeer::retrieveByPK($templatePartnerId);
