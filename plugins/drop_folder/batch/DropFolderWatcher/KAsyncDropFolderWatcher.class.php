@@ -32,41 +32,46 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			return $this->init();
 
 
-		$numberOfFolderEachRun = self::$taskConfig->numberOfFolderEachRun;
-		KalturaLog::log("Start running to watch $numberOfFolderEachRun folders");
-		for ($i = 0; $i < $numberOfFolderEachRun; $i++)
+		$numberOfFoldersEachRun = self::$taskConfig->numberOfFoldersEachRun;
+		KalturaLog::log("Start running to watch $numberOfFoldersEachRun folders");
+		for ($i = 0; $i < $numberOfFoldersEachRun; $i++)
 		{
-			/* @var $folder KalturaDropFolder */
-			$folder = $this->getDropFolder();
-			if (!$folder)
-				continue;
-			
 			try 
-			{	
+			{
+				/* @var $folder KalturaDropFolder */
+				$folder = $this->getExclusiveDropFolder();
 				$this->impersonate($folder->partnerId);	
 				$engine = KDropFolderEngine::getInstance($folder->type);			    	
 				$engine->watchFolder($folder);					    
-				$this->setDropFolderOK($folder);		
+				$this->freeExclusiveDropFolder($folder->id);		
 				$this->unimpersonate();					    
 			}
 			catch (kFileTransferMgrException $e)
 			{
+				KalturaLog::err('Error with folder id ['.$folder->id.'] - '.$e->getMessage());
 				if($e->getCode() == kFileTransferMgrException::cantConnect)
-					$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_CONNECT, DropFolderPlugin::ERROR_CONNECT_MESSAGE, $e);
+					$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR,
+						KalturaDropFolderErrorCode::ERROR_CONNECT, DropFolderPlugin::ERROR_CONNECT_MESSAGE);
 				else if($e->getCode() == kFileTransferMgrException::cantAuthenticate)
-					$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_AUTENTICATE, DropFolderPlugin::ERROR_AUTENTICATE_MESSAGE, $e);
+					$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR,
+						KalturaDropFolderErrorCode::ERROR_AUTENTICATE, DropFolderPlugin::ERROR_AUTENTICATE_MESSAGE);
 				else
-					$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_GET_PHISICAL_FILE_LIST, DropFolderPlugin::ERROR_GET_PHISICAL_FILE_LIST_MESSAGE, $e);
+					$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR,
+						KalturaDropFolderErrorCode::ERROR_GET_PHISICAL_FILE_LIST, DropFolderPlugin::ERROR_GET_PHISICAL_FILE_LIST_MESSAGE);
 				$this->unimpersonate();
 			}
 			catch (KalturaException $e)
 			{
-				$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_GET_DB_FILE_LIST, DropFolderPlugin::ERROR_GET_DB_FILE_LIST_MESSAGE, $e);
+				KalturaLog::err('Error with folder id ['.$folder->id.'] - '.$e->getMessage());
+				$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR, 
+					KalturaDropFolderErrorCode::ERROR_GET_DB_FILE_LIST, DropFolderPlugin::ERROR_GET_DB_FILE_LIST_MESSAGE);
 				$this->unimpersonate();
 			}
 			catch (Exception $e) 
-			{			        
-				$this->setDropFolderError($folder, KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::DROP_FOLDER_APP_ERROR_MESSAGE.$e->getMessage(), $e);	
+			{
+				KalturaLog::err('Error with folder id ['.$folder->id.'] - '.$e->getMessage());
+				$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR, 
+					KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::DROP_FOLDER_APP_ERROR_MESSAGE.$e->getMessage());
 				$this->unimpersonate();
 			}
 		}
@@ -74,14 +79,13 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	}
 	
 		
-	private function getDropFolder() 
+	private function getExclusiveDropFolder() 
 	{
 		$folderTag = self::$taskConfig->params->tags;
 		$maxTimeForFolder = self::$taskConfig->params->maxTimeForFolder;
-		if (strlen($folderTag) == 0 || $folderTag == '*') {
-			KalturaLog::err('Tags must be specify in configuration - cannot continue');			
-			return null;
-		}
+		if (strlen($folderTag) == 0 || $folderTag == '*')
+			throw new KalturaException('Tags must be specify in configuration - cannot continue');
+		
 		try 
 		{
 			$dropFolders = $this->dropFolderPlugin->dropFolder->getExclusiveDropFolder($folderTag, $maxTimeForFolder);
@@ -94,35 +98,15 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		}
 	}
 	
-	private function setDropFolderError(KalturaDropFolder $folder, $errorCode, $errorDescirption, Exception $e)
-	{
-		KalturaLog::err('Error with folder id ['.$folder->id.'] - '.$e->getMessage());
-		try 
-		{
-			$folder->status = KalturaDropFolderStatus::ERROR;
-			$updateDropFolder = new KalturaDropFolder();
-			$updateDropFolder->status = KalturaDropFolderStatus::ERROR;
-			$updateDropFolder->errorCode = $errorCode;
-			$updateDropFolder->errorDescription = $errorDescirption;
-			$updateDropFolder->lastAccessedAt = time();
-			
-    		$this->dropFolderPlugin->dropFolder->update($folder->id, $updateDropFolder);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::err('Error updating drop folder ['.$folder->id.'] - '.$e->getMessage());
-		}	
-	}	
-	
-	private function setDropFolderOK(KalturaDropFolder $folder)
+	private function freeExclusiveDropFolder($dropFolderId, $status = KalturaDropFolderStatus::ENABLED , $errorCode = null, $errorDescription = null)
 	{
 		try 
 		{
-	    	$this->dropFolderPlugin->dropFolder->freeExclusiveDropFolder($folder->id);
+	    	$this->dropFolderPlugin->dropFolder->freeExclusiveDropFolder($dropFolderId, $status, $errorCode, $errorDescription);
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err('Error try to free drop folder ['.$folder->id.'] - '.$e->getMessage());
+			KalturaLog::err('Error when trying to free drop folder [$dropFolderId] - '.$e->getMessage());
 		}	
 	}	
 			

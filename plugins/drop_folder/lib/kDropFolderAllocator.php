@@ -55,21 +55,22 @@ class kDropFolderAllocator
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
 		kApiCache::disableConditionalCache();
-
-
+		
 		$tagKey = self::getCacheKeyForDropFolderTag($tag);
 		$dropFolders = $cache->get($tagKey);
 		if (!$dropFolders || empty($dropFolders))
 			$dropFolders = self::refreshDropFolderListFromDB($cache, $tag);
 
-
-		$indexKey = self::getCacheKeyForIndex($tag);
-		$allocateDropFolder = self::allocateDropFolderFromList($cache, $dropFolders, $indexKey,  $maxTimeForWatch);
-		if ($allocateDropFolder)
+		if ($dropFolders)
 		{
-			$dropFolderId = $allocateDropFolder->getId();
-			KalturaLog::debug("Allocate drop folder [$dropFolderId] for [$maxTimeForWatch] seconds with tag [$tag]");
-			return $allocateDropFolder;
+			$indexKey = self::getCacheKeyForIndex($tag);
+			$allocateDropFolder = self::allocateDropFolderFromList($cache, $dropFolders, $indexKey,  $maxTimeForWatch);
+			if ($allocateDropFolder)
+			{
+				$dropFolderId = $allocateDropFolder->getId();
+				KalturaLog::debug("Allocate drop folder [$dropFolderId] for [$maxTimeForWatch] seconds with tag [$tag]");
+				return $allocateDropFolder;
+			}
 		}
 		return null;
 	}

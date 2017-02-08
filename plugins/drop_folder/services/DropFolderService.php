@@ -252,30 +252,31 @@ class DropFolderService extends KalturaBaseService
 	 *
 	 * @action freeExclusiveDropFolder
 	 * @param int $dropFolderId
+	 * @param DropFolderStatus $status
+	 * @param string $errorCode
+	 * @param string $errorDescription
 	 * @throws KalturaAPIException
 	 *
 	 * @return KalturaDropFolder
 	 */
-	public function freeExclusiveDropFolderAction($dropFolderId)
+	public function freeExclusiveDropFolderAction($dropFolderId, $status, $errorCode = null, $errorDescription = null)
 	{
 		kDropFolderAllocator::freeDropFolder($dropFolderId);
 
 		$dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
-
 		if (!$dbDropFolder)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
 
-
 		$dbDropFolder->setLastAccessedAt(time());
-		$dbDropFolder->setStatus(KalturaDropFolderStatus::ENABLED);
+		$dbDropFolder->setStatus($status);
+		$dbDropFolder->setErrorCode($errorCode);
+		$dbDropFolder->setErrorDescription($errorDescription);
 		$dbDropFolder->save();
-
 
 		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
 		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
 
 		return $dropFolder;
-
 	}
 	
 	
