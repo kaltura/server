@@ -9,7 +9,7 @@ class registerNotificationPostProcessor
 	 * @var array 
 	 * search by key if exists in the request params and replace the toekn value with the request parsms value 
 	 */
-	public $tokensToReplace;
+	public $tokensToReplace = array();
 	
 	/*
 	 * @var array
@@ -36,10 +36,9 @@ class registerNotificationPostProcessor
 		return bin2hex($cipherData);
 	}
 	
-	public function processResponse(&$response, $ksObj)
+	public function processResponse(&$response)
 	{
 		$params = infraRequestUtils::getRequestParams();
-		$notificationParameters = $params['pushNotificationParams'];
 		$params = $this->buildKeyValueArrayuFromRawParams($params);
 		
 		foreach ($this->tokensToReplace as $key => $value)
@@ -50,15 +49,15 @@ class registerNotificationPostProcessor
 			}	
 		}
 		
-		if(preg_match('/<queueKey>(md5_.*?)<\/queueKey>/', $response, $matches))
+		if(preg_match('/<queueKey>(.*?)<\/queueKey>/', $response, $matches))
 		{
 			$queueKey = $matches[1];
-			$encodedQueueKey = $this->encode($queueKey . ":" . $this->hash);
+			$encodedQueueKey = $this->encode(md5($queueKey) . ":" . $this->hash);
 			$response = str_replace($queueKey, $encodedQueueKey, $response);
 		}
 	}
 	
-	public function buildKeyValueArrayuFromRawParams($params, $myfile)
+	public function buildKeyValueArrayuFromRawParams($params)
 	{
 		$result = array();
 		

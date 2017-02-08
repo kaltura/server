@@ -107,7 +107,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
         $queueConentParams = $partnerId . '_' . implode( '_' , array_values($contentParametersValues));
         if($returnRaw)
-        	return 'md5_pn_' . $templateId . '_' . $queueConentParams;
+        	return 'pn_' . $templateId . '_' . $queueConentParams;
         else
         	return md5('pn_' . $templateId . '_' . $queueConentParams);
     }

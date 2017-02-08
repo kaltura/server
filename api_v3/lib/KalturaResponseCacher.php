@@ -254,7 +254,6 @@ class KalturaResponseCacher extends kApiCache
 			// In multi request we cache objects and not string so need to check if this works with multi request
 			if(self::$_responsePostProccesor)
 			{
-				self::$_responsePostProccesor->processResponse($response);
 				$postProccesorClass = new ReflectionClass(self::$_responsePostProccesor);
 				$fileName = $postProccesorClass->getFileName();
 				$responsePostProccesor = array($fileName => serialize(self::$_responsePostProccesor));
@@ -271,6 +270,9 @@ class KalturaResponseCacher extends kApiCache
 		}
 		else
 		{
+			if(self::$_responsePostProccesor)
+				self::$_responsePostProccesor->processResponse($response);
+			
 			echo $response;
 			die;
 		}
