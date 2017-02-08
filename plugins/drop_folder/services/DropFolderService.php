@@ -229,5 +229,54 @@ class DropFolderService extends KalturaBaseService
 		
 		return $response;
 	}
+
+	/**
+	 * getExclusive KalturaDropFolder object
+	 *
+	 * @action getExclusiveDropFolder
+	 * @param string $tag
+	 * @param int $maxTime
+	 * @return KalturaDropFolder
+	 */
+	public function getExclusiveDropFolderAction($tag, $maxTime)
+	{
+		$allocateDropFolder = kDropFolderAllocator::getDropFolder($tag, $maxTime);
+
+		$dropFolder = KalturaDropFolder::getInstanceByType($allocateDropFolder->getType());
+		$dropFolder->fromObject($allocateDropFolder, $this->getResponseProfile());
+		return $dropFolder;
+	}
+ 	
+	/**
+	 * freeExclusive KalturaDropFolder object
+	 *
+	 * @action freeExclusiveDropFolder
+	 * @param int $dropFolderId
+	 * @throws KalturaAPIException
+	 *
+	 * @return KalturaDropFolder
+	 */
+	public function freeExclusiveDropFolderAction($dropFolderId)
+	{
+		kDropFolderAllocator::freeDropFolder($dropFolderId);
+
+		$dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
+
+		if (!$dbDropFolder)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
+
+
+		$dbDropFolder->setLastAccessedAt(time());
+		$dbDropFolder->setStatus(KalturaDropFolderStatus::ENABLED);
+		$dbDropFolder->save();
+
+
+		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
+		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
+
+		return $dropFolder;
+
+	}
+	
 	
 }
