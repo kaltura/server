@@ -21,6 +21,9 @@ class KAsyncDeleteFile extends KJobHandlerWorker
 		$this->updateJob($job, "File deletion started", KalturaBatchJobStatus::PROCESSING);
 		$jobData = $job->data;
 		
+		if (!is_file($jobData->localFileSyncPath))
+			return $this->closeJob($job, null, null, 'File already deleted', KalturaBatchJobStatus::FINISHED);
+		
 		/* @var $jobData KalturaDeleteFileJobData */
 		$result = unlink($jobData->localFileSyncPath);
 		
