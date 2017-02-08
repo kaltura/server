@@ -7,38 +7,20 @@
  * @subpackage api.services
  */
 class PushNotificationTemplateService extends KalturaBaseService
-{
-	private function encode($data)
-	{
-		// use a 128 Rijndael encyrption algorithm with Cipher-block chaining (CBC) as mode of AES encryption
-		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
-		$secret = kConf::get("push_server_secret");
-		$iv = kConf::get("push_server_secret_iv");
-
-		// pad the rest of the block to suit Node crypto functions padding scheme (PKCS5)
-		$blocksize = 16;
-		$pad = $blocksize - (strlen($data) % $blocksize);
-		$data = $data . str_repeat(chr($pad), $pad);
-
-		mcrypt_generic_init($cipher, $secret, $iv);
-		$cipherData = mcrypt_generic($cipher, $data);
-		mcrypt_generic_deinit($cipher);
-
-		return bin2hex($cipherData);
-	}
-	
-	private function buildResult($partnerId, $queueName, $queueKey)
+{	
+	private function buildResult($partnerId, $queueName, $queueKey, $postProccesor)
 	{
 		$hash = kCurrentContext::$ks_object->getHash();
-		$result = new KalturaPushNotificationData();
-		$result->queueName = $this->encode($queueName . ":" . $hash);
-		$result->queueKey = $this->encode($queueKey . ":" . $hash);
-		
-		// build the url to return
 		$protocol = infraRequestUtils::getProtocol();
 		$host = kConf::get("push_server_host");
 		$secret = kConf::get("push_server_secret");
-		$token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . $hash . ":" . uniqid()));
+		$token = base64_encode($partnerId . ":" . $postProccesor->encode($secret . ":" . $hash . ":" . uniqid()));
+		$postProccesor->setHash($hash);
+		
+		$postProccesor->setHash($hash);
+		$result = new KalturaPushNotificationData();
+		$result->queueName = $postProccesor->encode($queueName . ":" . $hash);
+		$result->queueKey = $queueKey;
 		$result->url = $protocol . "://" . $host . "/?p=" . $partnerId . "&x=" . urlencode($token);
 		
 		return $result;
@@ -66,6 +48,9 @@ class PushNotificationTemplateService extends KalturaBaseService
 		// verify template is push typed
 		if (!$dbEventNotificationTemplate instanceof PushNotificationTemplate)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $notificationTemplateSystemName, get_class($dbEventNotificationTemplate));
+		
+		$postProccesor = new registerNotificationPostProcessor();
+		kApiCache::setResponsePostProccesor($postProccesor);
 
 		/* @var $kPushNotificationParams kPushNotificationParams */
 		$missingParams = array();
@@ -94,8 +79,10 @@ class PushNotificationTemplateService extends KalturaBaseService
 			{
 				$valueToken = $queueKeyParams[$userParamKey]->getQueueKeyToken();
 				if($valueToken)
+				{
 					$userParam->setValue(new kStringValue($valueToken));
-				
+					$postProccesor->addToken($userParamKey, $valueToken);
+				}
 				$userQueueKeyParams[] = $userParam;
 			}
 		}
@@ -110,15 +97,15 @@ class PushNotificationTemplateService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
 		
 		$queueName = $dbEventNotificationTemplate->getQueueName($userContnetParams, $partnerId, null);
-		$queueKey = $dbEventNotificationTemplate->getQueueKey(array_merge($userContnetParams, $userQueueKeyParams), $partnerId, null);
+		$queueKey = $dbEventNotificationTemplate->getQueueKey(array_merge($userContnetParams, $userQueueKeyParams), $partnerId, null, true);
 		
-		return $this->buildResult($partnerId, $queueName, $queueKey);
+		return $this->buildResult($partnerId, $queueName, $queueKey, $postProccesor);
 	}
 	
 	/**
 	 * Clear queue messages 
 	 *
-	 * @action sendComman
+	 * @action sendCommand
 	 * @actionAlias eventNotification_eventNotificationTemplate.sendComman
 	 * @param string $queueName QueueNAme to clear messages for
 	 * @param KalturaPushNotificationCommandType $command Command to be sent to push server

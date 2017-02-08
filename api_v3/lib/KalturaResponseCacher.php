@@ -199,6 +199,17 @@ class KalturaResponseCacher extends kApiCache
 			}
 		}
 
+		if ($responseMetadata['responsePostProccesor'])
+		{
+			$responsePostProccesor = $responseMetadata['responsePostProccesor'];
+			foreach ($responsePostProccesor as $filePath => $postProccesor)
+			{
+				require_once $filePath;
+				$postProccesor = unserialize($postProccesor);
+				$postProccesor->processResponse($response);
+			}
+		}
+		
 		echo $response;
 		die;
 	}
@@ -238,6 +249,17 @@ class KalturaResponseCacher extends kApiCache
 				'headers' => $contentHeaders, 
 				'class' => $responseClass
 			);
+			
+			// serilize class and file path wiht reflection as being done in kManifestRenderer
+			// In multi request we cache objects and not string so need to check if this works with multi request
+			if(self::$_responsePostProccesor)
+			{
+				self::$_responsePostProccesor->processResponse($response);
+				$postProccesorClass = new ReflectionClass(self::$_responsePostProccesor);
+				$fileName = $postProccesorClass->getFileName();
+				$responsePostProccesor = array($fileName => serialize(self::$_responsePostProccesor));
+				$responseMetadata = array_merge($responseMetadata, array('responsePostProccesor' => $responsePostProccesor));
+			}
 						
 			$this->storeCache($response, serialize($responseMetadata), $serializeResponse);
 		}

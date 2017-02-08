@@ -193,7 +193,10 @@ class kApiCache extends kApiCacheBase
 		$this->_params["___cache___partnerId"] =  $this->_ksPartnerId;
 		$this->_params["___cache___ksStatus"] =   $this->_ksStatus;
 		$this->_params["___cache___ksType"] = 	  ($this->_ksObj ? $this->_ksObj->type		 : null);
-		$this->_params["___cache___userId"] =     ($this->_ksObj ? $this->_ksObj->user		 : null);
+		
+		if(!self::$_ignoreKsKuserId)
+			$this->_params["___cache___userId"] =     ($this->_ksObj ? $this->_ksObj->user		 : null);
+		
 		$this->_params["___cache___privileges"] = ($this->_ksObj ? $this->_ksObj->privileges : null);
 	}
 

@@ -85,7 +85,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
 		return array_merge($this->getQueueKeyParameters(), parent::getNotificationParameters());
 	}
     
-    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null)
+    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null, $returnRaw = false)
     {
         $templateId = $this->getId();
         if ($scope)
@@ -101,14 +101,15 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
             $key = $contentParameter->getKey();
             $contentParametersValues[$key] = $value->getValue();
-
         }
         // sort array according to created keys
         ksort($contentParametersValues);
         
-        $contentParamsHash = md5($partnerId . '_' . implode( '_' , array_values($contentParametersValues) ) );
-        // prepare queue key to return
-        return 'pn_' . $templateId . '_' . $contentParamsHash;
+        $queueConentParams = $partnerId . '_' . implode( '_' , array_values($contentParametersValues));
+        if($returnRaw)
+        	return 'md5_pn_' . $templateId . '_' . $queueConentParams;
+        else
+        	return md5('pn_' . $templateId . '_' . $queueConentParams);
     }
     
     public function getQueueName($contentParameters, $partnerId = null, kScope $scope = null)

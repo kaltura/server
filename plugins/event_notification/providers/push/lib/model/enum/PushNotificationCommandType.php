@@ -7,5 +7,5 @@
  */
 interface PushNotificationCommandType extends BaseEnum
 {
-	const CLEAR_QUEUE = 1;
+	const CLEAR_QUEUE = "CLEAR_QUEUE";
 }
