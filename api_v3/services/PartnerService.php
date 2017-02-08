@@ -76,7 +76,7 @@ class PartnerService extends KalturaBaseService
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			
 			$ignorePassword = false;
-			if ($existingUser && ($this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)){
+			if ($existingUser && ($this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID) && !is_null($parentPartnerId)){
 				kuserPeer::setUseCriteriaFilter(false);
 				$kuserOfLoginData = kuserPeer::getKuserByEmail($partner->adminEmail, $existingUser->getConfigPartnerId());
 				kuserPeer::setUseCriteriaFilter(true);
