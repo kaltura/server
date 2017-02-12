@@ -62,7 +62,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 				$enumElement = $this->getEnumElement($typeReflector);
 				$enumsElement->appendChild($enumElement);
 			}
-			else if (!$typeReflector->isArray())
+			else
 			{
 				$classElement = $this->getClassElement($typeReflector);
 				$classesElement->appendChild($classElement);
@@ -481,7 +481,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			}
 			elseif ($actionParam->isArray())
 			{
-				$actionParamElement->setAttribute("type", "array");
+				$actionParamElement->setAttribute("type", $actionParam->getType());
 				$actionParamElement->setAttribute("arrayType", $actionParam->getArrayType());
 			}
 			elseif ($actionParam->isEnum())
