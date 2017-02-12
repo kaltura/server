@@ -155,7 +155,7 @@ class registerNotificationPostProcessor
 	private function buildUnCachableResponse($partnerId, $queueName, $queueKey)
 	{		
 		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData(kCurrentContext::$ks_object)));
-		$urlData = urlencode(base64_encode("$ksPartnerId:" . self::encode($urlData)));
+		$urlData = urlencode(base64_encode(self::encode($urlData)));
 		
 		$result = new KalturaPushNotificationData();
 		$result->queueName = $this->encode($queueName . ":" . $this->hash);
