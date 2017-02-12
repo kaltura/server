@@ -199,14 +199,14 @@ class KalturaResponseCacher extends kApiCache
 			}
 		}
 
-		if ($responseMetadata['responsePostProccesor'])
+		if ($responseMetadata['responsePostProcessor'])
 		{
-			$responsePostProccesor = $responseMetadata['responsePostProccesor'];
-			foreach ($responsePostProccesor as $filePath => $postProccesor)
+			$responsePostProcessor = $responseMetadata['responsePostProcessor'];
+			foreach ($responsePostProcessor as $filePath => $postProcessor)
 			{
 				require_once $filePath;
-				$postProccesor = unserialize($postProccesor);
-				$postProccesor->processResponse($response);
+				$postProcessor = unserialize($postProcessor);
+				$postProcessor->processResponse($response);
 			}
 		}
 		
@@ -252,12 +252,12 @@ class KalturaResponseCacher extends kApiCache
 			
 			// serilize class and file path wiht reflection as being done in kManifestRenderer
 			// In multi request we cache objects and not string so need to check if this works with multi request
-			if(self::$_responsePostProccesor)
+			if(self::$_responsePostProcessor)
 			{
-				$postProccesorClass = new ReflectionClass(self::$_responsePostProccesor);
-				$fileName = $postProccesorClass->getFileName();
-				$responsePostProccesor = array($fileName => serialize(self::$_responsePostProccesor));
-				$responseMetadata = array_merge($responseMetadata, array('responsePostProccesor' => $responsePostProccesor));
+				$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
+				$fileName = $postProcessorClass->getFileName();
+				$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
+				$responseMetadata = array_merge($responseMetadata, array('responsePostProcessor' => $responsePostProcessor));
 			}
 						
 			$this->storeCache($response, serialize($responseMetadata), $serializeResponse);
@@ -270,8 +270,8 @@ class KalturaResponseCacher extends kApiCache
 		}
 		else
 		{
-			if(self::$_responsePostProccesor)
-				self::$_responsePostProccesor->processResponse($response);
+			if(self::$_responsePostProcessor)
+				self::$_responsePostProcessor->processResponse($response);
 			
 			echo $response;
 			die;

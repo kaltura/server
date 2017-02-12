@@ -26,7 +26,7 @@ class ResponseProfileService extends KalturaBaseService
 		{
 			case 'get':
 				return $this->partnerGroup . ',0';
-			//When requesting response profiles allow defualt once in case requesting partner is internal
+			//When requesting response profiles allow default once in case requesting partner is internal
 			case 'list':
 				if(kCurrentContext::$ks_partner_id <= 0)
 					return $this->partnerGroup . ',0';

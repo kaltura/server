@@ -17,7 +17,7 @@ class registerNotificationPostProcessor
 	 */
 	public $hash;
 	
-	public function encode($data)
+	private function encode($data)
 	{
 		// use a 128 Rijndael encyrption algorithm with Cipher-block chaining (CBC) as mode of AES encryption
 		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
@@ -38,28 +38,48 @@ class registerNotificationPostProcessor
 	
 	public function processResponse(&$response)
 	{
-		$params = infraRequestUtils::getRequestParams();
-		$params = $this->buildKeyValueArrayuFromRawParams($params);
+		$requestParams = infraRequestUtils::getRequestParams();
+		$this->updateResponseQueueKey($response, $requestParams);
+		$this->updateResponseUrl($response, $requestParams);
+	}
+	
+	public function updateResponseQueueKey(&$response, $requestParams)
+	{
+		$params = $this->buildParamsKeyValueArrayFromRawParams($requestParams);
 		
 		foreach ($this->tokensToReplace as $key => $value)
 		{
 			if(isset($params[$key]))
 			{
 				$response = str_replace($value, $params[$key], $response);
-			}	
+			}
 		}
 		
-		if(preg_match('/<queueKey>(.*?)<\/queueKey>/', $response, $matches))
+		if(preg_match('/(pn_.*?)md5s_(.*?)_md5e/', $response, $matches))
 		{
-			$queueKey = $matches[1];
-			$encodedQueueKey = $this->encode(md5($queueKey) . ":" . $this->hash);
-			$response = str_replace($queueKey, $encodedQueueKey, $response);
+			$queueKeyToReplace = $matches[0];
+			$queuKeyPrefix = $matches[1];
+			$md5String = md5($matches[2]);
+				
+			$encodedQueueKey = $this->encode($queuKeyPrefix.$md5String . ":" . $this->hash);
+			$response = str_replace($queueKeyToReplace, $encodedQueueKey, $response);
 		}
 	}
 	
-	public function buildKeyValueArrayuFromRawParams($params)
+	public function updateResponseUrl(&$response, $requestParams)
+	{		
+		$ksObject = $this->getKsObject($requestParams);
+		
+		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData($ksObject)));
+		
+		$urlData = urlencode(base64_encode("$ksPartnerId:" . $this->encode($urlData)));
+		
+		$response = str_replace("{urlData}", $urlData, $response);
+	}
+	
+	public function buildParamsKeyValueArrayFromRawParams()
 	{
-		$result = array();
+		$paramsKeyValue = array();
 		
 		foreach ($params as $key => $value)
 		{
@@ -69,11 +89,25 @@ class registerNotificationPostProcessor
 				$resKey = $matches[1];
 				$resKey = $resKey . "value:value";
 				$resValue = $params[$resKey];
-				$result[$value] = $resValue;
+				$paramsKeyValue[$value] = $resValue;
 			}
 		}
 
-		return $result;
+		return $paramsKeyValue;
+	}
+	
+	public function getKsObject($requestParams)
+	{
+		if(isset($requestParams['ks']))
+		{
+			$ksObj = new kSessionBase();
+			$parseResult = $ksObj->parseKS($requestParams['ks']);
+			$ksStatus = $ksObj->tryToValidateKS();
+			if($parseResult && $ksStatus == kSessionBase::OK)
+				return $ksObj;
+		}
+		
+		return null;
 	}
 	
 	public function addToken($key, $token)
@@ -84,5 +118,60 @@ class registerNotificationPostProcessor
 	public function setHash($hash)
 	{
 		$this->hash = $hash;
+	}
+	
+	private function getBasicUrlData()
+	{
+		return array(
+				"secret"	=> kConf::get("push_server_secret"),
+				"ip"		=> infraRequestUtils::getRemoteAddress(),
+				"hash"		=> $this->hash,
+        );
+	}
+	
+	private function getKsUrlData(kSessionBase $ksObject = null)
+	{
+		if(!$ksObject)
+			return array();
+		
+		return array(
+				"ksPartnerId"	=> $ksObject->partner_id, 
+				"ksUserId" 		=> $ksObject->user,
+				"ksPrivileges"	=> $ksObject->getParsedPrivileges(), 
+				"ksExpiry" 		=> $ksObject->valid_until
+		);
+	}
+	
+	private function buildCachableResponse($partnerId, $queueName, $queueKey)
+	{
+		$result = new KalturaPushNotificationData();
+		$result->queueName = $this->encode($queueName . ":" . $hash);
+		$result->queueKey = $queueKey;
+		$result->url = infraRequestUtils::getProtocol() . "://" . kConf::get("push_server_host") . "/?p=" . $partnerId . "&x={urlData}";;
+		
+		return $result;
+	}
+	
+	private function buildUnCachableResponse($partnerId, $queueName, $queueKey)
+	{		
+		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData(kCurrentContext::$ks_object)));
+		$urlData = urlencode(base64_encode("$ksPartnerId:" . self::encode($urlData)));
+		
+		$result = new KalturaPushNotificationData();
+		$result->queueName = $this->encode($queueName . ":" . $this->hash);
+		$result->queueKey = $this->encode($queueKey . ":" . $this->hash);
+		$result->url = infraRequestUtils::getProtocol() . "://" . kConf::get("push_server_host") . "/?p=" . $partnerId . "&x=$urlData";
+		
+		return $result;
+	}
+	
+	public function buildResponse($partnerId, $queueName, $queueKey)
+	{
+		$this->setHash(kCurrentContext::$ks_object->getHash());
+		
+		if(kApiCache::getEnableResponsePostProcessor())
+			return $this->buildCachableResponse();
+		else 
+			return $this->buildUnCachableResponse();
 	}
 }

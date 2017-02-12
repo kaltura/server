@@ -105,11 +105,11 @@ class PushNotificationTemplate extends EventNotificationTemplate
         // sort array according to created keys
         ksort($contentParametersValues);
         
-        $queueConentParams = $partnerId . '_' . implode( '_' , array_values($contentParametersValues));
+        $queueContentParams = $partnerId . '_' . implode( '_' , array_values($contentParametersValues));
         if($returnRaw)
-        	return 'pn_' . $templateId . '_' . $queueConentParams;
+        	return 'pn_' . $templateId . '_md5s_' . $queueContentParams . "_md5e";
         else
-        	return md5('pn_' . $templateId . '_' . $queueConentParams);
+        	return 'pn_' . $templateId . '_' . md5($queueContentParams);
     }
     
     public function getQueueName($contentParameters, $partnerId = null, kScope $scope = null)
