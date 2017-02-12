@@ -72,23 +72,23 @@ class registerNotificationPostProcessor
 		
 		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData($ksObject)));
 		
-		$urlData = urlencode(base64_encode("$ksPartnerId:" . $this->encode($urlData)));
+		$urlData = urlencode(base64_encode($this->encode($urlData)));
 		
 		$response = str_replace("{urlData}", $urlData, $response);
 	}
 	
-	public function buildParamsKeyValueArrayFromRawParams()
+	public function buildParamsKeyValueArrayFromRawParams($requestParams)
 	{
 		$paramsKeyValue = array();
 		
-		foreach ($params as $key => $value)
+		foreach ($requestParams as $key => $value)
 		{
 			preg_match('/(pushNotificationParams:userParams:item\\d:).*key/', $key, $matches);
 			if(count($matches))
 			{
 				$resKey = $matches[1];
 				$resKey = $resKey . "value:value";
-				$resValue = $params[$resKey];
+				$resValue = $requestParams[$resKey];
 				$paramsKeyValue[$value] = $resValue;
 			}
 		}
@@ -145,7 +145,7 @@ class registerNotificationPostProcessor
 	private function buildCachableResponse($partnerId, $queueName, $queueKey)
 	{
 		$result = new KalturaPushNotificationData();
-		$result->queueName = $this->encode($queueName . ":" . $hash);
+		$result->queueName = $this->encode($queueName . ":" . $this->hash);
 		$result->queueKey = $queueKey;
 		$result->url = infraRequestUtils::getProtocol() . "://" . kConf::get("push_server_host") . "/?p=" . $partnerId . "&x={urlData}";;
 		
