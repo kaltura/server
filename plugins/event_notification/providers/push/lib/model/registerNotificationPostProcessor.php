@@ -170,8 +170,8 @@ class registerNotificationPostProcessor
 		$this->setHash(kCurrentContext::$ks_object->getHash());
 		
 		if(kApiCache::getEnableResponsePostProcessor())
-			return $this->buildCachableResponse();
+			return $this->buildCachableResponse($partnerId, $queueName, $queueKey);
 		else 
-			return $this->buildUnCachableResponse();
+			return $this->buildUnCachableResponse($partnerId, $queueName, $queueKey);
 	}
 }
