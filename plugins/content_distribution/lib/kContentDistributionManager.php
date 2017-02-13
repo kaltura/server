@@ -47,21 +47,9 @@ class kContentDistributionManager
 		
 		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::IMPORT);
 	}
-	
-	/**
-	 * @param EntryDistribution $entryDistribution
-	 * @param DistributionProfile $distributionProfile
-	 * @param int $dc
-	 * @return bool true if the job could be created
-	 */
-	protected static function prepareDistributionJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile, &$dc)
+
+	private static function getAssetsObjectsForEntryDistribution($assetIds)
 	{
-		// prepare ids list of all the assets
-		$assetIds = explode(',', implode(',', array(
-			$entryDistribution->getThumbAssetIds(),
-			$entryDistribution->getFlavorAssetIds()
-		)));
-		
 		$assets = assetPeer::retrieveByIds($assetIds);
 		$assetObjects = array();
 		foreach($assets as $asset)
@@ -72,117 +60,155 @@ class kContentDistributionManager
 				'downloadUrl' => null,
 			);
 		}
-		
-		// lists all files from all assets
+		return $assetObjects;
+	}
+
+	private static function getFileSyncsForEntryDistribution($assetIds, $partnerId)
+	{
 		$c = new Criteria();
 		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
 		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$c->add(FileSyncPeer::OBJECT_ID, $assetIds, Criteria::IN);
-		$c->add(FileSyncPeer::PARTNER_ID, $entryDistribution->getPartnerId());
+		$c->add(FileSyncPeer::PARTNER_ID, $partnerId);
 		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 		$fileSyncs = FileSyncPeer::doSelect($c);
+		return $fileSyncs;
+	}
 
-		if(!$fileSyncs)
-  		{
-   			KalturaLog::info("No file syncs to distribute");
-   			return true;
-  		}
-  		
-		$dcs = array();
+	private static function initFileSyncDownloadUrl($fileSync, $entryId, $recommendedStorageProfileForDownload, &$assetObjects, $assetId)
+	{
+		if(!is_null($assetObjects[$assetId]['downloadUrl']) && $fileSync->getDc() != $recommendedStorageProfileForDownload)
+			return;
+
+		$downloadUrl = $fileSync->getExternalUrl($entryId);
+		if($downloadUrl)
+		{
+			$assetObjects[$assetId]['downloadUrl'] = $downloadUrl;
+		}
+	}
+
+	private static function getFileSyncsPerDc($fileSyncs, $entryId, $recommendedStorageProfileForDownload, &$assetObjects)
+	{
+		$fileSyncsPerDc = array();
 		foreach($fileSyncs as $fileSync)
 		{
 			/* @var $fileSync FileSync */
 			$assetId = $fileSync->getObjectId();
-			
-			if(!isset($assetObjects[$assetId])) // the object is not in the list of assets
-				continue;
-			
+
 			$asset = $assetObjects[$assetId]['asset'];
 			/* @var $asset asset */
-			
+
 			if($asset->getVersion() != $fileSync->getVersion()) // the file sync is not of the current asset version
 				continue;
-			
+
 			$fileSync = kFileSyncUtils::resolve($fileSync);
-			
+
 			// use the best URL as the source for download in case it will be needed
 			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
-				if(!is_null($assetObjects[$assetId]['downloadUrl']) && $fileSync->getDc() != $distributionProfile->getRecommendedStorageProfileForDownload())
-					continue;
-				
-				$downloadUrl = $fileSync->getExternalUrl($entryDistribution->getEntryId());
-				if(!$downloadUrl)
-					continue;
-				
-				$assetObjects[$assetId]['downloadUrl'] = $downloadUrl;
+				self::initFileSyncDownloadUrl($fileSync, $entryId, $recommendedStorageProfileForDownload, $assetObjects, $assetId);
 				continue;
 			}
-			
+
 			// populates the list of files in each dc
 			$fileSyncDc = $fileSync->getDc();
-			if(!isset($dcs[$fileSyncDc]))
-				$dcs[$fileSyncDc] = array();
-			
-			$dcs[$fileSyncDc][$assetId] = $fileSync->getId();
+			if(!isset($fileSyncsPerDc[$fileSyncDc]))
+				$fileSyncsPerDc[$fileSyncDc] = array();
+
+			$fileSyncsPerDc[$fileSyncDc][$assetId] = $fileSync->getId();
 		}
-		
-		if(isset($dcs[$dc]) && count($dcs[$dc]) == count($assets))
+		return $fileSyncsPerDc;
+	}
+
+	private static function areAllFileSyncsReadyInDc($fileSyncsPerDc, $neededAssets, $dcId)
+	{
+		if(isset($fileSyncsPerDc[$dcId]) && count($fileSyncsPerDc[$dcId]) == count($neededAssets))
+			return true;
+		return false;
+	}
+
+	private static function shouldAddImportJobForAsset($assetObjectDownloadUrl, $dcExistingFiles, $assetId)
+	{
+		if(!isset($dcExistingFiles[$assetId]) && !is_null($assetObjectDownloadUrl))
+			return true;
+		return false;
+	}
+
+	private static function createImportJobsForDistribution($destinationDc, $assetObjects, $fileSyncsPerDc)
+	{
+		$dcExistingFiles = isset($fileSyncsPerDc[$destinationDc]) ? $fileSyncsPerDc[$destinationDc] : null;
+		foreach($assetObjects as $assetId => $assetObject)
 		{
-			KalturaLog::info("All files exist in the preferred dc [$dc]");
+			if(self::shouldAddImportJobForAsset($assetObject['downloadUrl'], $dcExistingFiles, $assetId))
+			{
+				KalturaLog::info("adding import job for [$assetId] in dc [$destinationDc]");
+				$asset = $assetObject['asset'];
+				self::addImportJob($destinationDc, $assetObject['downloadUrl'], $asset);
+			}
+		}
+	}
+
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @param int $recommendedDcForExecute
+	 * @return bool true if the job could be created
+	 */
+	protected static function prepareDistributionJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile, &$recommendedDcForExecute)
+	{
+		// prepare ids list of all the assets
+		$assetIds = explode(',', implode(',', array(
+			$entryDistribution->getThumbAssetIds(),
+			$entryDistribution->getFlavorAssetIds()
+		)));
+
+		//create temp 2 dimensional array with assets and download url
+		$assetObjects = self::getAssetsObjectsForEntryDistribution($assetIds);
+
+		// lists all files from all assets
+		$fileSyncs = self::getFileSyncsForEntryDistribution($assetIds, $entryDistribution->getPartnerId());
+
+		if(!$fileSyncs)
+		{
+			KalturaLog::info("No file syncs to distribute");
 			return true;
 		}
-		
-		// check if all files exist on any of the remote dcs
-		$otherDcs = kDataCenterMgr::getAllDcs(true);
-		foreach($otherDcs as $remoteDc)
+
+		$fileSyncsPerDc = self::getFileSyncsPerDc($fileSyncs, $entryDistribution->getEntryId(), $distributionProfile->getRecommendedStorageProfileForDownload(), $assetObjects);
+
+		if(self::areAllFileSyncsReadyInDc($fileSyncsPerDc, $assetObjects, $recommendedDcForExecute))
 		{
-			$remoteDcId = $remoteDc['id'];
-			if(!isset($dcs[$remoteDcId]) || count($dcs[$remoteDcId]) != count($assets))
-				continue;
-			
-			$dc = $remoteDcId;
-			KalturaLog::info("All files exist in none-preferred dc [$dc]");
+			KalturaLog::info("All file syncs exist in the preferred dc [$recommendedDcForExecute]");
 			return true;
 		}
-		
-		if(
-			$entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_SUBMITTING
-			||
-			$entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING
-		)
+
+		// check if all file syncs exist on any of the remote dcs
+		$dcIds = kDataCenterMgr::getDcIds();
+		foreach($dcIds as $dcId)
+		{
+			if(self::areAllFileSyncsReadyInDc($fileSyncsPerDc, $assetObjects, $dcId))
+			{
+				$recommendedDcForExecute = $dcId;
+				KalturaLog::info("All files exist in dc [$recommendedDcForExecute]");
+				return true;
+			}
+		}
+
+		$alreadyImportingDistributionStatus = array(EntryDistributionStatus::IMPORT_SUBMITTING,	EntryDistributionStatus::IMPORT_UPDATING);
+
+		if(in_array($entryDistribution->getStatus(), $alreadyImportingDistributionStatus))
 		{
 			KalturaLog::info("Entry distribution already importing");
 			return false;
 		}
-		
-		// create all needed import jobs
-		$destinationDc = $distributionProfile->getRecommendedDcForDownload();
-		//if there is no recommended dc to import choose the distribution job dc
-		if(!$destinationDc)
-			$destinationDc = $dc;
 
-		$dcExistingFiles = $dcs[$destinationDc];
-		foreach($assetObjects as $assetId => $assetObject)
-		{
-			if(is_null($assetObject['downloadUrl']))
-			{
-				KalturaLog::info("Download URL not found for asset [$assetId]");
-				continue;
-			}
-			
-			$asset = $assetObject['asset'];
-			/* @var $asset asset */
-			
-			if(isset($dcExistingFiles[$assetId]))
-				continue;
-			
-			$jobData = new kImportJobData();
-			$jobData->setCacheOnly(true);
-			
-			self::addImportJob($destinationDc, $assetObject['downloadUrl'], $asset);
-		}
-		
+		$destinationDc = $distributionProfile->getRecommendedDcForDownload();
+		if(!$destinationDc)
+			$destinationDc = $recommendedDcForExecute;
+
+		// create all needed import jobs
+		self::createImportJobsForDistribution($destinationDc, $assetObjects, $fileSyncsPerDc);
+
 		return false;
 	}
 	
@@ -198,8 +224,9 @@ class kContentDistributionManager
 			KalturaLog::info("Entry distribution [" . $entryDistribution->getId() . "] already submitting");
 			return null;
 		}
-		
-		$entryDistribution->setStatus(EntryDistributionStatus::SUBMITTING);
+
+		if($entryDistribution->getStatus() != EntryDistributionStatus::IMPORT_SUBMITTING)
+			$entryDistribution->setStatus(EntryDistributionStatus::SUBMITTING);
 		
 		if(!$entryDistribution->save())
 		{
@@ -226,6 +253,8 @@ class kContentDistributionManager
 				
 				return null;
 			}
+			$entryDistribution->setStatus(EntryDistributionStatus::SUBMITTING);
+			$entryDistribution->save();
 		}
 		
  		$jobData = new kDistributionSubmitJobData();
@@ -330,8 +359,9 @@ class kContentDistributionManager
 	{
 		if($entryDistribution->getStatus() == EntryDistributionStatus::UPDATING)
 			return null;
-	
-		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
+
+		if($entryDistribution->getStatus() != EntryDistributionStatus::IMPORT_UPDATING)
+			$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
 		
 		if(!$entryDistribution->save())
 		{
@@ -358,6 +388,8 @@ class kContentDistributionManager
 				
 				return null;
 			}
+			$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
+			$entryDistribution->save();
 		}
 		
  		$jobData = new kDistributionUpdateJobData();
