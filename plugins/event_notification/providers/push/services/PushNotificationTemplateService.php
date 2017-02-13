@@ -17,7 +17,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @param KalturaPushNotificationParams $pushNotificationParams
 	 * @return KalturaPushNotificationData
 	 */
-	function registerAction($notificationTemplateSystemName, $pushNotificationParams)
+	function registerAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams)
 	{		
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
@@ -35,7 +35,6 @@ class PushNotificationTemplateService extends KalturaBaseService
 		if(kApiCache::getEnableResponsePostProcessor())
 			kApiCache::setResponsePostProcessor($postProcessor);
 
-		/* @var $kPushNotificationParams kPushNotificationParams */
 		$missingParams = array();
 		$userContentParams = array();
 		$userQueueKeyParams = array();
@@ -76,7 +75,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 				array_push($missingParams, $templateParamKey);
 		}
 		
-		if ($missingParams != null)
+		if (!empty($missingParams))
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
 		
 		$queueName = $dbEventNotificationTemplate->getQueueName($userContentParams, $partnerId, null);
@@ -90,12 +89,49 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 *
 	 * @action sendCommand
 	 * @actionAlias eventNotification_eventNotificationTemplate.sendComman
-	 * @param string $queueName QueueNAme to clear messages for
+	 * @param string $notificationTemplateSystemName Existing push notification template system name
+	 * @param KalturaPushNotificationParams $pushNotificationParams
 	 * @param KalturaPushNotificationCommandType $command Command to be sent to push server
-	 * @return bool Allwyas true
 	 */
-	function sendCommandAction($queueName, KalturaPushNotificationCommandType $command)
+	function sendCommandAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams, KalturaPushNotificationCommandType $command)
 	{
+		// find the template, according to its system name, on both current partner and partner 0
+		$partnerId = $this->getPartnerId();
+		$partnersIds = array(PartnerPeer::GLOBAL_PARTNER, $partnerId);
+		
+		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveBySystemName($notificationTemplateSystemName, null, $partnersIds);
+		if (!$dbEventNotificationTemplate)
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_SYSTEM_NAME_NOT_FOUND, $notificationTemplateSystemName);
+		
+		// verify template is push typed
+		if (!$dbEventNotificationTemplate instanceof PushNotificationTemplate)
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $notificationTemplateSystemName, get_class($dbEventNotificationTemplate));
+		
+		$missingParams = array();
+		$queuNameParams = array();
+		$userParamsArray = $pushNotificationParams->toObject()->getUserParams();
+		$templateContentParams = $dbEventNotificationTemplate->getContentParametersKeyValueArray();
+		
+		foreach ($userParamsArray as $userParam)
+		{
+			$userParamKey = $userParam->getKey();
+			array_push($userParamsArrayKeys, $userParam->getKey());
+			
+			if(isset($templateContentParams[$userParamKey]))
+				$queuNameParams[] = $userParam;
+		}
+		
+		foreach ($templateParams as $templateParamKey => $templateParamValue)
+		{
+			if (!in_array($templateParamKey, $userParamsArrayKeys))
+				array_push($missingParams, $templateParamKey);
+		}
+		
+		if (!empty($missingParams))
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
+		
+		$queueName = $dbEventNotificationTemplate->getQueueName($queuNameParams, $partnerId, null);
+		
 		$time = time();
 		$msg = json_encode(array(
 				"data" 		=> null,
@@ -109,7 +145,5 @@ class PushNotificationTemplateService extends KalturaBaseService
 		// get instance of activated queue proivder and send message
 		$queueProvider = QueueProvider::getInstance();
 		$queueProvider->send('', $msg);
-		
-		return true;
 	}
 }

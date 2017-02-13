@@ -72,7 +72,7 @@ class registerNotificationPostProcessor
 		
 		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData($ksObject)));
 		
-		$urlData = urlencode(base64_encode($this->encode($urlData)));
+		$urlData = urlencode(base64_encode($ksObject->getPartnerId() . ":" . $this->encode($urlData)));
 		
 		$response = str_replace("{urlData}", $urlData, $response);
 	}
@@ -123,7 +123,7 @@ class registerNotificationPostProcessor
 	private function getBasicUrlData()
 	{
 		return array(
-				"secret"	=> kConf::get("push_server_secret"),
+				"key"	=> kConf::get("push_server_secret"),
 				"ip"		=> infraRequestUtils::getRemoteAddress(),
 				"hash"		=> $this->hash,
         );
@@ -137,7 +137,7 @@ class registerNotificationPostProcessor
 		return array(
 				"ksPartnerId"	=> $ksObject->partner_id, 
 				"ksUserId" 		=> $ksObject->user,
-				"ksPrivileges"	=> $ksObject->getParsedPrivileges(), 
+				"ksPrivileges"	=> $ksObject->getPrivileges(), 
 				"ksExpiry" 		=> $ksObject->valid_until
 		);
 	}
@@ -155,7 +155,7 @@ class registerNotificationPostProcessor
 	private function buildUnCachableResponse($partnerId, $queueName, $queueKey)
 	{		
 		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData(kCurrentContext::$ks_object)));
-		$urlData = urlencode(base64_encode(self::encode($urlData)));
+		$urlData = urlencode(base64_encode("$partnerId:" . self::encode($urlData)));
 		
 		$result = new KalturaPushNotificationData();
 		$result->queueName = $this->encode($queueName . ":" . $this->hash);
