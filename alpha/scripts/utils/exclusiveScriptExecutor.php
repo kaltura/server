@@ -10,30 +10,40 @@ class ExclusiveScriptExecutor
     private $cacheHandler;
     private $cacheName=kCacheManager::CACHE_TYPE_LOCK_KEYS;
 
-    public function __construct($pathToScript,$ttl=3600)
+    public function __construct($lockingTag,$ttl=3600)
     {
-        $this->pathToScript=$pathToScript;
+        $this->lockingTag=$lockingTag;
         $this->ttl=$ttl;
         $this->cacheHandler=$this->initCache();
     }
 
-    public function execute()
+    public function execute($commandLine)
     {
-        if ($this->tryLock($this->pathToScript,$this->ttl))
+        if ($this->tryLock($this->lockingTag,$this->ttl))
         {
-            print("\nExclusively running script {".$this->pathToScript."} with TTL {".$this->ttl."} \n");
-            $output = shell_exec($this->pathToScript);
+            print("\nExclusively running script {".$commandLine."} with TTL {".$this->ttl."} locked with tag {".$this->lockingTag."}\n");
+            $output = shell_exec($commandLine);
             print ("\n".$output );
         }
         else
         {
-            print("\nCommand ".$this->pathToScript." is locked for execution.\n");
+            $value = $this->cacheHandler->get($this->lockingTag);
+            print("\nCommand $commandLine is locked for execution. Because tag: $value \n");
         }
     }
 
     private function tryLock($key,$ttl)
     {
-        return $this->cacheHandler->add($key,$key." is locked for ".$ttl,$ttl);
+        $hostName=gethostname();
+        $prettyTime=$this->getPrettyTime();
+        return $this->cacheHandler->add($key,$key." is locked for ".$ttl." seconds by:".$hostName." since:".$prettyTime,$ttl);
+    }
+
+    private function getPrettyTime()
+    {
+        $t = time();
+        $prettyTime = date('y-m-d:h-i-s',$t);
+        return $prettyTime;
     }
 
     private function initCache()
@@ -46,18 +56,18 @@ class ExclusiveScriptExecutor
     }
 }
 
-if (in_array($argv[1],array('usage','?','help','-h')) || $argc!=3)
+if ($argc!=4 || in_array($argv[1],array('usage','?','help','-h')))
 {
-    $strMsg = "This script is used for single execution of another script , even if it is called from several process or devices at the same time.\n".
-              "The execution will be locked using memcache.\n".
-              "Usage -  $argv[0] <script to run> <ttl>\n".
-              "Example: $argv[0] 'ls -ltr' 100\n".
-              " The command 'ls -ltr' will be executed once , then it could be executed until 100 seconds will pass.\n";
+    $strMsg = "\nThis script is used for single execution of a script , even if it is called from several process or devices at the same time.".
+              "\nThe execution will be locked using memcache.".
+              "\nUsage -  $argv[0] <Locking tag> <script to run> <ttl>".
+              "\nExample: $argv[0] LockMe 'ls -ltr' 100\n";
     print ($strMsg);
     exit(0);
 }
 
-$pathToScript = $argv[1];
-$ttl          = $argv[2];
-$executor = new ExclusiveScriptExecutor($pathToScript,$ttl);
-$executor->execute();
+$lockingTag   = $argv[1];
+$commandLine = $argv[2];
+$ttl          = $argv[3];
+$executor = new ExclusiveScriptExecutor($lockingTag,$ttl);
+$executor->execute($commandLine);
