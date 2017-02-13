@@ -10,21 +10,21 @@ class kMatchMetadataCondition extends kMatchCondition
 	 * 1. Slashed xPath, e.g. /metadata/myElementName
 	 * 2. Using local-name function, e.g. /*[local-name()='metadata']/*[local-name()='myElementName']
 	 * 3. Using only the field name, e.g. myElementName, it will be searched as //myElementName
-	 *
+	 * 
 	 * @var string
 	 */
 	private $xPath;
-
+	
 	/**
 	 * @var int
 	 */
 	private $profileId;
-
+	
 	/**
 	 * @var string
 	 */
 	private $profileSystemName;
-
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
@@ -33,16 +33,16 @@ class kMatchMetadataCondition extends kMatchCondition
 		$this->setType(MetadataPlugin::getConditionTypeCoreValue(MetadataConditionType::METADATA_FIELD_MATCH));
 		parent::__construct($not);
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::applyDynamicValues()
 	 */
 	protected function applyDynamicValues(kScope $scope)
 	{
 		parent::applyDynamicValues($scope);
-
+		
 		$dynamicValues = $scope->getDynamicValues('{', '}');
-
+		
 		if(is_array($dynamicValues) && count($dynamicValues))
 		{
 			$this->xPath = str_replace(array_keys($dynamicValues), $dynamicValues, $this->xPath);
@@ -50,7 +50,7 @@ class kMatchMetadataCondition extends kMatchCondition
 				$this->profileSystemName = str_replace(array_keys($dynamicValues), $dynamicValues, $this->profileSystemName);
 		}
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see kMatchCondition::getFieldValue()
 	 */
@@ -64,17 +64,17 @@ class kMatchMetadataCondition extends kMatchCondition
 				KalturaLog::err("No metadata profile id and system-name supplied");
 				return null;
 			}
-
+				
 			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName);
 			if(!$profile)
 			{
 				KalturaLog::notice("Metadata profile with system-name [$this->profileSystemName] not found");
 				return null;
 			}
-
+				
 			$profileId = $profile->getId();
 		}
-
+		
 		$metadata = null;
 		if($scope instanceof accessControlScope || $scope instanceof kStorageProfileScope)
 		{
@@ -106,18 +106,18 @@ class kMatchMetadataCondition extends kMatchCondition
 				$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $object->getEntryId());
 			}
 		}
-
+			
 		if($metadata)
 			return kMetadataManager::parseMetadataValues($metadata, $this->xPath);
-
+			
 		KalturaLog::notice("Metadata object not found for scope [" . get_class($scope) . "]");
 		return null;
 	}
-
+	
 	/**
 	 * @return string $xPath
 	 */
-	public function getXPath()
+	public function getXPath() 
 	{
 		return $this->xPath;
 	}
@@ -133,7 +133,7 @@ class kMatchMetadataCondition extends kMatchCondition
 	/**
 	 * @param string $xPath
 	 */
-	public function setXPath($xPath)
+	public function setXPath($xPath) 
 	{
 		$this->xPath = $xPath;
 	}
@@ -141,7 +141,7 @@ class kMatchMetadataCondition extends kMatchCondition
 	/**
 	 * @param int $profileId
 	 */
-	public function setProfileId($profileId)
+	public function setProfileId($profileId) 
 	{
 		$this->profileId = $profileId;
 	}
@@ -149,7 +149,7 @@ class kMatchMetadataCondition extends kMatchCondition
 	/**
 	 * @return string
 	 */
-	public function getProfileSystemName()
+	public function getProfileSystemName() 
 	{
 		return $this->profileSystemName;
 	}
@@ -157,7 +157,7 @@ class kMatchMetadataCondition extends kMatchCondition
 	/**
 	 * @param string $profileSystemName
 	 */
-	public function setProfileSystemName($profileSystemName)
+	public function setProfileSystemName($profileSystemName) 
 	{
 		$this->profileSystemName = $profileSystemName;
 	}
@@ -168,5 +168,5 @@ class kMatchMetadataCondition extends kMatchCondition
 	public function shouldFieldDisableCache($scope)
 	{
 		return false;
-	}
+	}	
 }
