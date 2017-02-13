@@ -148,7 +148,7 @@ class kPlaybackContextDataHelper
 	private function getFlavorsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
-		$flavorsIds = null;
+		$flavorsParamsIds = null;
 		$flavorsParamsNotIn = false;
 
 		foreach ($actions as $action)
@@ -157,11 +157,11 @@ class kPlaybackContextDataHelper
 			if ($action->getType() == RuleActionType::LIMIT_FLAVORS)
 			{
 				/* @var $action kAccessControlLimitFlavorsAction */
-				$flavorsIds = explode(',', $action->getFlavorParamsIds());
+				$flavorsParamsIds = explode(',', $action->getFlavorParamsIds());
 				$flavorsParamsNotIn = $action->getIsBlockedList();
 			}
 		}
-		return array($flavorsIds, $flavorsParamsNotIn);
+		return array($flavorsParamsIds, $flavorsParamsNotIn);
 	}
 
 
@@ -172,10 +172,10 @@ class kPlaybackContextDataHelper
 	private function getRelevantFlavorAssets(kContextDataHelper $contextDataHelper)
 	{
 		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
-		list($flavorsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorsToFilter($contextDataHelper);
+		list($flavorsParamsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorsToFilter($contextDataHelper);
 
-		if(count($flavorsIdsToFilter) || $flavorsParamsNotIn)
-			self::filterFlavorAssets($flavorAssets, $flavorsIdsToFilter, $flavorsParamsNotIn);
+		if(count($flavorsParamsIdsToFilter) || $flavorsParamsNotIn)
+			self::filterFlavorAssets($flavorAssets, $flavorsParamsIdsToFilter, $flavorsParamsNotIn);
 
 		$this->flavorAssets = $flavorAssets;
 	}
@@ -394,14 +394,17 @@ class kPlaybackContextDataHelper
 
 	/**
 	 * @param $flavorAssets
-	 * @param $flavorAssetsIdsToFilter
+	 * @param $flavorParamsAssetsIdsToFilter
 	 * @param $flavorAssetsParamsNotIn
 	 */
-	private static function filterFlavorAssets(&$flavorAssets, $flavorAssetsIdsToFilter, $flavorAssetsParamsNotIn)
+	private static function filterFlavorAssets(&$flavorAssets, $flavorParamsAssetsIdsToFilter, $flavorAssetsParamsNotIn)
 	{
 		foreach ($flavorAssets as $key => $flavorAsset)
 		{
-			if (in_array($flavorAsset->getId(), $flavorAssetsIdsToFilter))
+			/**
+			 * @var asset $flavorAsset
+			 */
+			if (in_array($flavorAsset->getFlavorParamsId(), $flavorParamsAssetsIdsToFilter))
 			{
 				if ($flavorAssetsParamsNotIn)
 					unset($flavorAssets[$key]);
