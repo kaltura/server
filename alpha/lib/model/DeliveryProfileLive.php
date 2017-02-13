@@ -289,10 +289,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		/* @var $serverNode WowzaMediaServerNode */
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
+		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
 		
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
-		$livePackagerUrl = str_replace("{DC}", "dc-".$serverNode->getDc(), $livePackagerUrl);
-		$livePackagerUrl = rtrim($livePackagerUrl, "/");
+		$livePackagerUrl = rtrim(str_replace("{DC}", "dc-".$serverNode->getDc(), $livePackagerUrl), "/");
 		
 		if(strpos($livePackagerUrl, "{m}") !== false)
 		{
@@ -317,7 +317,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$entryId = $this->getDynamicAttributes()->getEntryId();
 		}
 		
-		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
+		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/sd/$segmentDuration/";
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
 		$livePackagerUrl .= "t/$secureToken/"; 
 		

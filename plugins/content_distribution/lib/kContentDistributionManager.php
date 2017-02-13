@@ -158,6 +158,10 @@ class kContentDistributionManager
 		
 		// create all needed import jobs
 		$destinationDc = $distributionProfile->getRecommendedDcForDownload();
+		//if there is no recommended dc to import choose the distribution job dc
+		if(!$destinationDc)
+			$destinationDc = $dc;
+
 		$dcExistingFiles = $dcs[$destinationDc];
 		foreach($assetObjects as $assetId => $assetObject)
 		{

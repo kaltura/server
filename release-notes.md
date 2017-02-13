@@ -1,4 +1,73 @@
+# Lynx 12.10.0 #
+
+## Add user list permissions for capture device role ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6898
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_02_01_user_list_for_capture_role_permissions.php
+
+## Added dynamic segment duration feature ## 
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6593 (part of epic PLAT-5602)
+ 
+### Configuration ###
+
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.liveStreamSegmentDuration.enabled = true
+		moduls.liveStreamSegmentDuration.permissionType = 2
+		moduls.liveStreamSegmentDuration.label = Kaltura Live Dynamic Segment Duration
+		moduls.liveStreamSegmentDuration.permissionName = FEATURE_DYNAMIC_SEGMENT_DURATION
+		moduls.liveStreamSegmentDuration.basePermissionType = 2
+		moduls.liveStreamSegmentDuration.basePermissionName = FEATURE_LIVE_STREAM
+		moduls.liveStreamSegmentDuration.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Fix FFmpeg 3.2 decryption issue ##
+
+ - Issue Type: Bug fix
+ - Issue ID: PLAT-6718
+
+### Configuration ###
+Binaries: Provided in the PLAT-6718
+
+Following bins/scripts should be switched -
+- ffmpeg.sh
+- ffprobe.sh
+- ismindex.sh
+- qt-faststart
+
 # Lynx 12.9.0 #
+
+## Add new permissions for capture device role ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6877
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_01_30_expend_capture_role_permissions.php
+	
+#### Known Issues & Limitations ####
+
+None.
 
 ## Update notification templates ##
 

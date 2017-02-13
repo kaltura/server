@@ -280,6 +280,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			return;
 		
 		$offset = 0;
+		$contributedDataSize = 0;
 		$searchDataBytType = array();
 		$entryId = $entry->getId();
 		$partnerId = $entry->getPartnerId();
@@ -306,12 +307,14 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 					$searchDataBytType[$cuePointType] = '';
 				
 				$searchDataBytType[$cuePointType] .= $contributedData . ' ';
+				$contributedDataSize += strlen($contributedData) + 1; // +1 for the ' '
 			}
 			
 			$handledObjectsCount = count($cuePointObjects);
 			$offset += $handledObjectsCount;
 		} 
-		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT); //In case cue point was deleted during index execution than offset will not reach count so break when count is 0
+		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT && //In case cue point was deleted during index execution than offset will not reach count so break when count is 0
+					$contributedDataSize < kSphinxSearchManager::MAX_SIZE_FOR_PLUGIN_SEARCH_DATA);
 		
 		
 		$dataField  = CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);

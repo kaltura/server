@@ -2537,7 +2537,7 @@ CREATE TABLE `business_process_case`
 	`partner_id` INTEGER  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`case_id` INTEGER,
+	`case_id` VARCHAR(64),
 	`process_id` VARCHAR(255),
 	`template_id` INTEGER,
 	`server_id` INTEGER,

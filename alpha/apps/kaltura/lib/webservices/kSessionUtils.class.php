@@ -443,7 +443,30 @@ class ks extends kSessionBase
 		{
 			return true;
 		}
-		
+
+		if ( $required_priv_name == ks::PRIVILEGE_VIEW &&
+			$this->verifyRedirectEntryId(ks::PRIVILEGE_VIEW, $required_priv_value))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public function verifyRedirectEntryId($privilegeName, $entryId)
+	{
+		$allPrivileges = explode(',', $this->privileges);
+		foreach($allPrivileges as $privilege)
+		{
+			$exPrivilege = explode(':', $privilege);
+			if ($exPrivilege[0] == $privilegeName && isset($exPrivilege[1]))
+			{
+				$privilegeObjectId = $exPrivilege[1];
+				$entry = entryPeer::retrieveByPK($privilegeObjectId);
+				if($entry && $entry->getRedirectEntryId() == $entryId)
+					return true;
+			}
+		}
 		return false;
 	}
 	
@@ -460,7 +483,7 @@ class ks extends kSessionBase
 			if($exPrivileges[0] == $required_priv_name)
 			{
 				// if found in playlist - return true
-				if(myPlaylistUtils::isEntryInPlaylist($entryId, $exPrivileges[1], $partnerId))
+				if(myPlaylistUtils::isEntryReferredByPlaylist($entryId, $exPrivileges[1], $partnerId))
 				{
 					return true;
 				}
@@ -554,6 +577,20 @@ class ks extends kSessionBase
 		}
 		
 		return $entries;
+	}
+	
+	public function getPrivilegeByName($privilegeName)
+	{
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $privilege)
+		{
+			if ($privilege == $privilegeName)
+				return true;
+		}
+		
+		return false;
 	}
 	
 	public function getPrivacyContext()

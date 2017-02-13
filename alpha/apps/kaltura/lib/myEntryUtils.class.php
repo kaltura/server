@@ -655,7 +655,14 @@ class myEntryUtils
 		if($stripProfiles)
 			$thumbName .= "_stp_{$stripProfiles}";
 				
-		$entryThumbFilename = ($entry->getThumbnail() ? $entry->getThumbnail() : "0.jpg");
+		$entryThumbFilename = $entry->getThumbnail();
+		if(!$entryThumbFilename)
+		{
+			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+				$entryThumbFilename = $entry->getVersion().".jpg";
+			else
+				$entryThumbFilename = "0.jpg";
+		}
 		if ($entry->getStatus() != entryStatus::READY || @$entryThumbFilename[0] == '&')
 			$thumbName .= "_NOCACHE_";
 		
@@ -879,7 +886,7 @@ class myEntryUtils
 				$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
 			}
 		}
-		
+
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
@@ -950,7 +957,7 @@ class myEntryUtils
 		{
 			// look for the highest bitrate flavor the packager can parse
 			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
-			if (is_null($flavorAsset))
+			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
 			{
 				//retrieve original ready
 				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
@@ -963,7 +970,11 @@ class myEntryUtils
 
 	public static function isFlavorSupportedByPackager($flavorAsset)
 	{
-		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM, assetParams::CONTAINER_FORMAT_F4V);
+		//filter audio flavors and encrypted flavors
+		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0) || $flavorAsset->getEncryptionKey())
+			return false;
+
+		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM);
 		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
 			return true;
 		return false;
@@ -1294,6 +1305,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$copyUsers = true;
 		$copyCategories = true;
 	    $copyChildren = false;
+	    $copyAccessControl = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1314,6 +1326,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$copyChildren = true;
 			}
+			if ($currentOption == BaseEntryCloneOptions::ACCESS_CONTROL && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyAccessControl = false;
+			}
 		}
 
  		$newEntry = $entry->copy();
@@ -1326,7 +1342,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		{
  			$newEntry->setPartnerId($toPartner->getId());
  			$newEntry->setSubpId($toPartner->getId() * 100);
-			$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());		
+		    if ($toPartner->getId() != $entry->getPartnerId() || !$copyAccessControl)
+				$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
  		}
  		
  		$newKuser = null;

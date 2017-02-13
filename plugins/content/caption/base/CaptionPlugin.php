@@ -186,15 +186,15 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		return $map;
 	}
 
-    /* (non-PHPdoc)
-     * @see IKalturaEventConsumers::getEventConsumers()
-      */
-      public static function getEventConsumers()
-      {
-        return array(
-            self::MULTI_CAPTION_FLOW_MANAGER_CLASS,
-        );
-      }
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::MULTI_CAPTION_FLOW_MANAGER_CLASS,
+		);
+	}
 
 	/* (non-PHPdoc)
 	 * @see IKalturaEnumerator::getEnums()

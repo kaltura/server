@@ -78,6 +78,9 @@ class LiveEntryServerNode extends EntryServerNode
 	 */
 	public function postDelete(PropelPDO $con = null)
 	{
+		// First call parent to clear query cache
+		parent::postDelete($con);
+		
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":dc=".$this->getDc());
 		
 		$liveEntry = $this->getLiveEntry();
@@ -93,8 +96,6 @@ class LiveEntryServerNode extends EntryServerNode
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
 		}
-		
-		parent::postDelete($con);
 	}
 
 	public function setStreams(array $v) 

@@ -48,11 +48,13 @@ class PartnerService extends KalturaBaseService
 			
 			
 			$parentPartnerId = null;
+			$isAdminOrVarConsole = false;
 			if ( $this->getKs() && $this->getKs()->isAdmin() )
 			{
 				$parentPartnerId = $this->getKs()->partner_id;
 				if ($parentPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) {
 		                    $parentPartnerId = null;
+		                    $isAdminOrVarConsole = true;
 				}
                 else
                 {
@@ -63,7 +65,7 @@ class PartnerService extends KalturaBaseService
 					{
 						throw new KalturaAPIException( KalturaErrors::NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD , $parentPartnerId );
 					}
-					
+					$isAdminOrVarConsole = true;
 					if ($templatePartnerId)
 					{
 					    $templatePartner = PartnerPeer::retrieveByPK($templatePartnerId);
@@ -76,15 +78,14 @@ class PartnerService extends KalturaBaseService
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			
 			$ignorePassword = false;
-			if ($existingUser && ($this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID || $this->getKs()->partner_id == $parentPartnerId)){
+			if ($existingUser && $isAdminOrVarConsole){
 				kuserPeer::setUseCriteriaFilter(false);
 				$kuserOfLoginData = kuserPeer::getKuserByEmail($partner->adminEmail, $existingUser->getConfigPartnerId());
 				kuserPeer::setUseCriteriaFilter(true);
-				if ($kuserOfLoginData){
+				if ($kuserOfLoginData && ($parentPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || ($parentPartnerId == $existingUser->getConfigPartnerId())))
 					$ignorePassword = true;
-				}
 			}
-			
+
 			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName() , $dbPartner->getAdminName() , $dbPartner->getAdminEmail() ,
 				$dbPartner->getCommercialUse() , "yes" , $dbPartner->getDescription() , $dbPartner->getUrl1() , $cmsPassword , $dbPartner, $ignorePassword, $templatePartnerId );
 

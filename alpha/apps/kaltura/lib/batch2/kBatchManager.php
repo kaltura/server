@@ -301,11 +301,11 @@ class kBatchManager
 		return kBatchExclusiveLock::freeExclusive($id, $lockKey, $resetExecutionAttempts);
 	}
 	
-	public static function getQueueSize($schedulerId, $workerId, $jobType, $filter)
+	public static function getQueueSize($workerId, $jobType, $filter)
 	{
 		$c = new Criteria();
 		$filter->attachToCriteria($c);
-		return kBatchExclusiveLock::getQueueSize($c, $schedulerId, $workerId, $jobType);
+		return kBatchExclusiveLock::getQueueSize($c, $workerId, $jobType);
 	}
 	
 	public static function cleanExclusiveJobs()

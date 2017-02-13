@@ -3,7 +3,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 {
 	private $baseEndpointUrl = null;
 	const DEFAULT_ACCURACY = 0.6;
-	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
+	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.{ext}";
 	
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -30,31 +30,37 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$partnerId = $dbBatchJob->getPartnerId();
 		$spokenLanguage = $providerData->getSpokenLanguage();
 
-		$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
+		$transcripts = kTranscriptHelper::getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage);
 		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
 		{
-			if($transcript)
+			if(count ($transcripts))
 			{
-				$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$transcript->save();
+				foreach ($transcripts as $transcript)
+				{
+					$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+					$transcript->save();
+				}
 			}
 		}
 
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_DONT_PROCESS)
 		{
-			if(!$transcript)
+			foreach (array (AttachmentType::JSON, AttachmentType::TEXT) as $containerFormat)
 			{
-				$transcript = new TranscriptAsset();
-				$transcript->setType(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
-				$transcript->setEntryId($entryId);
-				$transcript->setPartnerId($partnerId);
-				$transcript->setLanguage($spokenLanguage);
-				$transcript->setContainerFormat(AttachmentType::TEXT);
+				if (!isset ($transcripts[$containerFormat]))
+				{
+					$transcript = kTranscriptHelper::createTranscript($entryId, $partnerId, $spokenLanguage, $containerFormat);
+				}
+				else {
+					$transcript = $transcripts[$containerFormat];
+				}
+				
+				$transcript->setProviderType (VoicebasePlugin::getTranscriptProviderTypeCoreValue(VoicebaseTranscriptProviderType::VOICEBASE));
+				$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
+				$transcript->save();
 			}
-			$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
-			$transcript->save();
-	
+
 			return true;
 		}
 	
@@ -67,22 +73,39 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$externalEntryExists = $clientHelper->checkExistingExternalContent($entryId);
 			if (!$externalEntryExists)
 			{
-				KalturaLog::err('remote content does not exist');
+				KalturaLog::err("Remote content for entry ID [$entryId] does not exist");
 				return true;     	
 			}
+			
 			$formatsArray = explode(',',$formatsString);
 			$formatsArray[] = "TXT";
+			$formatsArray[] = "JSON";
+			
 			$contentsArray = $clientHelper->getRemoteTranscripts($entryId, $formatsArray);
 			KalturaLog::debug('contents are - ' . print_r($contentsArray, true));
-			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
+			
 			$accuracy = $clientHelper->calculateAccuracy($entryId);
 			if($accuracy)
 				$accuracy = floor($accuracy * 100) / 100;
 
-			if($transcript)
-				$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+			if(count ($transcripts))
+			{
+				foreach ($transcripts as $transcript)
+				{
+					/* @var $transcript TranscriptAsset */
+					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
+						$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
+					{
+						$tokenizedTranscript = $this->normalizeJson ($contentsArray["JSON"]);
+						$this->setObjectContent($transcript, $tokenizedTranscript, $accuracy, "JSON", true);
+					}
+				}
+			}
 			unset($contentsArray["TXT"]);
+			unset($contentsArray["JSON"]); 
 	
+			$captions = kTranscriptHelper::getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
 			foreach ($contentsArray as $format => $content)
 			{        
 				$captionFormatConst = constant("KalturaCaptionType::" . $format);
@@ -124,6 +147,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				$objects[$object->getContainerFormat()] = $object;
 			}
 		}	
+		
 		return $objects;
 	}
 	
@@ -137,6 +161,8 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				$ext = "xml";
 			if ($format == "SRT")
 				$ext = "srt";
+			if ($format == "JSON")
+				$ext = 'json';
 		}
 	
 		$assetObject->setFileExt($ext);
@@ -154,8 +180,8 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		{
 			$language = str_replace(" ", "", $assetObject->getLanguage());
 			
-			$patterns = array("{entryId}","{language}");
-			$replacements = array($assetObject->getEntryId(), $language);
+			$patterns = array("{entryId}","{language}","{ext}");
+			$replacements = array($assetObject->getEntryId(), $language, $ext);
 			$fileName = str_replace($patterns, $replacements, self::FILE_NAME_PATTERN);
 			$assetObject->setFileName($fileName);
 		}
@@ -255,5 +281,36 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$stringTime = kXml::integerToTime($int - $milliseconds);
 		$stringTime .= '.' . str_pad($milliseconds, 3, 0, STR_PAD_LEFT);
 		return $stringTime;
+	}
+	
+	/*
+	 * 
+	 */
+	private function normalizeJson ($transcript)
+	{
+		$tokens = json_decode($transcript, true);
+		
+		$normalizedTokens = array ();
+		foreach ($tokens as $token)
+		{
+			if (!isset ($token['m']) || $token['m'] == 'punc')
+			{
+				$normalizedToken = array ();
+				$normalizedToken['i'] = $token['p'];
+				$normalizedToken['s'] = $token['s'];
+				$normalizedToken['e'] = $token['e'];
+				
+				$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_WORD;
+				if (isset ($token['m']) && $token['m'] == 'punc')
+				{
+					$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_PUNC;
+				}
+				$normalizedToken['w'] = $token['w'];
+			
+				$normalizedTokens[] = $normalizedToken;
+			}
+		}
+		
+		return json_encode($normalizedTokens);
 	}
 }

@@ -14,6 +14,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 	//amount of time for holding kLock
 	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 3;
+	
+	//Max time from recording created time before creating new recorded entry
+	const SEVEN_DAYS_IN_SECONDS = 604800;
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -235,21 +238,31 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 					$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
 					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbLiveEntry->getCurrentBroadcastStartTime();
+					$maxAppendTimeReached = ($recordedEntryCreationTime + self::SEVEN_DAYS_IN_SECONDS) < time();
 
 					KalturaLog::debug("isNewSession [$isNewSession] getLastBroadcastEndTime [{$dbLiveEntry->getLastBroadcastEndTime()}] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
-					KalturaLog::debug("recordedEntryCreationTime [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]"); 
-					if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
-						if ($isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
-						{
-							KalturaLog::info("Creating a recorded entry for $entryId ");
-							$createRecordedEntry = true;
-						}
+					KalturaLog::debug("recordedEntryCreationTime [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
+					KalturaLog::debug("maxAppendTimeReached [$maxAppendTimeReached] recordedEntryCreationTime [$recordedEntryCreationTime]");
+					
+					if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION && $isNewSession && $recordedEntryNotYetCreatedForCurrentSession) 
+					{
+						$createRecordedEntry = true;
+					}
+					
+					if($dbLiveEntry->getRecordStatus() == RecordStatus::APPENDED && $dbRecordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $maxAppendTimeReached)
+					{
+						$createRecordedEntry = true;
+						$dbLiveEntry->setRecordedEntryId(null);
+						$dbLiveEntry->save();
 					}
 				}
 			}
 
 			if($createRecordedEntry)
+			{
+				KalturaLog::info("Creating a recorded entry for $entryId ");
 				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
+			}
 		}
 
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
@@ -295,7 +308,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 			
 		// If while we were waiting for the lock, someone has updated the recorded entry id - we should use it.
 		$dbEntry->reload();
-		if(($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId())) {
+		if(($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId())) 
+		{
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if($recordedEntry)
 			{
