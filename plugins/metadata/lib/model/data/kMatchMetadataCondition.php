@@ -90,6 +90,11 @@ class kMatchMetadataCondition extends kMatchCondition
 			}
 			else if ($object instanceof Metadata)
 			{
+				if($profileId != $object->getMetadataProfileId())
+				{
+					KalturaLog::debug("METADATA CONDITION CHECK - partner id " . $object->getPartnerId() . " configured MP id $profileId current context MP " . $object->getMetadataProfileId() . " xpath " . $this->xPath . " scope - " . print_r($scope,true));
+				}
+				
 				$metadata = $object;
 			}
 			elseif ($scope->getEvent()->getObject() instanceof categoryEntry)
