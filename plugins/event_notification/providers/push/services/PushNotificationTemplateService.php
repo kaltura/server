@@ -88,7 +88,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * Clear queue messages 
 	 *
 	 * @action sendCommand
-	 * @actionAlias eventNotification_eventNotificationTemplate.sendComman
+	 * @actionAlias eventNotification_eventNotificationTemplate.sendCommand
 	 * @param string $notificationTemplateSystemName Existing push notification template system name
 	 * @param KalturaPushNotificationParams $pushNotificationParams
 	 * @param KalturaPushNotificationCommandType $command Command to be sent to push server

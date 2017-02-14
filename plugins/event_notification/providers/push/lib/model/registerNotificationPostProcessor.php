@@ -38,9 +38,18 @@ class registerNotificationPostProcessor
 	
 	public function processResponse(&$response)
 	{
-		$requestParams = infraRequestUtils::getRequestParams();
-		$this->updateResponseQueueKey($response, $requestParams);
-		$this->updateResponseUrl($response, $requestParams);
+		try
+		{
+			$requestParams = infraRequestUtils::getRequestParams();
+			$this->updateResponseQueueKey($response, $requestParams);
+			$this->updateResponseUrl($response, $requestParams);
+		}
+		catch(Exception $e)
+		{
+			return false;
+		}
+		
+		return true;
 	}
 	
 	public function updateResponseQueueKey(&$response, $requestParams)
@@ -69,6 +78,8 @@ class registerNotificationPostProcessor
 	public function updateResponseUrl(&$response, $requestParams)
 	{		
 		$ksObject = $this->getKsObject($requestParams);
+		if(!$ksObject)
+			throw new Exception('Failed to get KS object');
 		
 		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData($ksObject)));
 		

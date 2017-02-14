@@ -199,14 +199,19 @@ class KalturaResponseCacher extends kApiCache
 			}
 		}
 
-		if ($responseMetadata['responsePostProcessor'])
+		if (isset($responseMetadata['responsePostProcessor']))
 		{
 			$responsePostProcessor = $responseMetadata['responsePostProcessor'];
 			foreach ($responsePostProcessor as $filePath => $postProcessor)
 			{
 				require_once $filePath;
 				$postProcessor = unserialize($postProcessor);
-				$postProcessor->processResponse($response);
+				$postProcessorSuccess = $postProcessor->processResponse($response);
+				if(!$postProcessorSuccess)
+				{
+					$this->sendCachingHeaders(false);
+					return;
+				}
 			}
 		}
 		
