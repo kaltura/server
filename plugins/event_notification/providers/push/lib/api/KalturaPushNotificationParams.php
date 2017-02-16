@@ -8,7 +8,7 @@ class KalturaPushNotificationParams extends KalturaObject
 {	
 	/**
 	 * User params
-	 * @var KalturaEventNotificationParameterArray
+	 * @var KalturaPushEventNotificationParameterArray
 	 */
 	public $userParams;
 

@@ -5,6 +5,11 @@
  */
 class registerNotificationPostProcessor
 {
+	const QUEUE_NAME_PREFIX = "qns_";
+	const QUEUE_NAME_POSTFIX = "_qne";
+	const QUEUE_KEY_PREFIX = "qks_";
+	const QUEUE_KEY_POSTFIX = "_qke";
+	
 	/*
 	 * @var array 
 	 * search by key if exists in the request params and replace the toekn value with the request parsms value 
@@ -16,6 +21,49 @@ class registerNotificationPostProcessor
 	 * Hash to sign queue key with
 	 */
 	public $hash;
+	
+	/*
+	 * @var string
+	 * key contnet params prefix
+	 */
+	public $contentParamsPrefix;
+	
+	/*
+	 * @var string
+	 * key contnet params postfix
+	 */
+	public $contentParamsPostfix;
+	
+	/*
+	 * @var string
+	 * queue key prefix
+	 */
+	public $queueKeyPrefix;
+	
+	public function addToken($key, $token)
+	{
+		$this->tokensToReplace[$key] = $token;
+	}
+	
+	public function setHash($hash)
+	{
+		$this->hash = $hash;
+	}
+	
+	public function setContentParamsPrefix($contentParamsPrefix)
+	{
+		$this->contentParamsPrefix = $contentParamsPrefix;
+	}
+	
+	public function setContentParamsPostfix($contentParamsPostfix)
+	{
+		$this->contentParamsPostfix = $contentParamsPostfix;
+	}
+	
+	public function setQueueKeyPrefix($queueKeyPrefix)
+	{
+		$this->queueKeyPrefix = $queueKeyPrefix;
+	}
 	
 	private function encode($data)
 	{
@@ -41,8 +89,14 @@ class registerNotificationPostProcessor
 		try
 		{
 			$requestParams = infraRequestUtils::getRequestParams();
+			$ksObject = $this->getKsObject($requestParams);
+			if(!$ksObject)
+				throw new Exception('Failed to get KS object');
+			
+			$this->setHash($ksObject->getHash());
+			$this->updateResponseQueueName($response);
 			$this->updateResponseQueueKey($response, $requestParams);
-			$this->updateResponseUrl($response, $requestParams);
+			$this->updateResponseUrl($response, $requestParams, $ksObject);
 		}
 		catch(Exception $e)
 		{
@@ -64,7 +118,8 @@ class registerNotificationPostProcessor
 			}
 		}
 		
-		if(preg_match('/(pn_.*?)md5s_(.*?)_md5e/', $response, $matches))
+		$matchString = '/(' . $this->queueKeyPrefix . '.*)' . $this->contentParamsPrefix . '(.*?)' . $this->contentParamsPostfix . '/';
+		if(preg_match($matchString, $response, $matches))
 		{
 			$queueKeyToReplace = $matches[0];
 			$queuKeyPrefix = $matches[1];
@@ -75,16 +130,23 @@ class registerNotificationPostProcessor
 		}
 	}
 	
-	public function updateResponseUrl(&$response, $requestParams)
-	{		
-		$ksObject = $this->getKsObject($requestParams);
-		if(!$ksObject)
-			throw new Exception('Failed to get KS object');
-		
+	public function updateResponseQueueName(&$response)
+	{
+		$matchString = '/' . self::QUEUE_NAME_PREFIX . '(.*)' . self::QUEUE_NAME_POSTFIX .'/';
+		if(preg_match($matchString, $response, $matches))
+		{
+			$queueNameToReplace = $matches[0];
+			$queueName = $matches[1];
+				
+			$encodedQueueName = $this->encode($queueName . ":" . $this->hash);
+			$response = str_replace($queueNameToReplace, $encodedQueueKey, $response);
+		}
+	}
+	
+	public function updateResponseUrl(&$response, $requestParams, kSessionBase $ksObject)
+	{
 		$urlData = json_encode(array_merge($this->getBasicUrlData(), $this->getKsUrlData($ksObject)));
-		
-		$urlData = urlencode(base64_encode($ksObject->getPartnerId() . ":" . $this->encode($urlData)));
-		
+		$urlData = urlencode(base64_encode($ksObject->getPartnerId() . ":" . $this->encode($urlData)));		
 		$response = str_replace("{urlData}", $urlData, $response);
 	}
 	
@@ -121,16 +183,6 @@ class registerNotificationPostProcessor
 		return null;
 	}
 	
-	public function addToken($key, $token)
-	{
-		$this->tokensToReplace[$key] = $token;
-	}
-	
-	public function setHash($hash)
-	{
-		$this->hash = $hash;
-	}
-	
 	private function getBasicUrlData()
 	{
 		return array(
@@ -156,8 +208,8 @@ class registerNotificationPostProcessor
 	private function buildCachableResponse($partnerId, $queueName, $queueKey)
 	{
 		$result = new KalturaPushNotificationData();
-		$result->queueName = $this->encode($queueName . ":" . $this->hash);
-		$result->queueKey = $queueKey;
+		$result->queueName = self::QUEUE_NAME_PREFIX . $queueName . self::QUEUE_NAME_POSTFIX;
+		$result->queueKey = self::QUEUE_KEY_PREFIX . $queueKey . self::QUEUE_KEY_POSTFIX;
 		$result->url = infraRequestUtils::getProtocol() . "://" . kConf::get("push_server_host") . "/?p=" . $partnerId . "&x={urlData}";;
 		
 		return $result;
@@ -179,6 +231,9 @@ class registerNotificationPostProcessor
 	public function buildResponse($partnerId, $queueName, $queueKey)
 	{
 		$this->setHash(kCurrentContext::$ks_object->getHash());
+		$this->setContentParamsPrefix(PushNotificationTemplate::CONTENT_PARAMS_PERFIX);
+		$this->setContentParamsPostfix(PushNotificationTemplate::CONTENT_PARAMS_POSTFIX);
+		$this->setQueueKeyPrefix(PushNotificationTemplate::QUEUE_PREFIX);
 		
 		if(kApiCache::getEnableResponsePostProcessor())
 			return $this->buildCachableResponse($partnerId, $queueName, $queueKey);

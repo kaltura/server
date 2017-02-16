@@ -36,26 +36,17 @@ class PushNotificationTemplateService extends KalturaBaseService
 			kApiCache::setResponsePostProcessor($postProcessor);
 
 		$missingParams = array();
-		$userContentParams = array();
 		$userQueueKeyParams = array();
 		$userParamsArrayKeys = array();
 		$userParamsArray = $pushNotificationParams->toObject()->getUserParams();
 		
 		// get template configured params
-		$contentParams = $dbEventNotificationTemplate->getContentParametersKeyValueArray();
 		$queueKeyParams = $dbEventNotificationTemplate->getQueueKeyParametersKeyValueArray();
-		$templateParams = array_merge($contentParams, $queueKeyParams);
 		
 		foreach ($userParamsArray as $userParam)
 		{
 			$userParamKey = $userParam->getKey();
 			array_push($userParamsArrayKeys, $userParamKey);
-			
-			if(isset($contentParams[$userParamKey]))
-			{
-				$userContentParams[] = $userParam;
-				continue;
-			}
 			
 			if(isset($queueKeyParams[$userParamKey]))
 			{
@@ -63,23 +54,24 @@ class PushNotificationTemplateService extends KalturaBaseService
 				if($valueToken && kApiCache::getEnableResponsePostProcessor())
 				{
 					$userParam->setValue(new kStringValue($valueToken));
+					$userParam->setQueueKeyToken($valueToken);
 					$postProcessor->addToken($userParamKey, $valueToken);
 				}
 				$userQueueKeyParams[] = $userParam;
 			}
 		}
 		
-		foreach ($templateParams as $templateParamKey => $templateParamValue)
+		foreach ($queueKeyParams as $keyParam => $keyValue)
 		{
-			if (!in_array($templateParamKey, $userParamsArrayKeys))
-				array_push($missingParams, $templateParamKey);
+			if (!in_array($keyParam, $userParamsArrayKeys))
+				array_push($missingParams, $keyParam);
 		}
 		
 		if (!empty($missingParams))
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
 		
-		$queueName = $dbEventNotificationTemplate->getQueueName($userContentParams, $partnerId, null);
-		$queueKey = $dbEventNotificationTemplate->getQueueKey(array_merge($userContentParams, $userQueueKeyParams), $partnerId, null, kApiCache::getEnableResponsePostProcessor());
+		$queueName = $dbEventNotificationTemplate->getQueueName($userQueueKeyParams, $partnerId, null);
+		$queueKey = $dbEventNotificationTemplate->getQueueKey($userQueueKeyParams, $partnerId, null, kApiCache::getEnableResponsePostProcessor());
 		
 		return $postProcessor->buildResponse($partnerId, $queueName, $queueKey);
 	}

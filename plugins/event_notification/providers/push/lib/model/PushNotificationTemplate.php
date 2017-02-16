@@ -9,6 +9,9 @@ class PushNotificationTemplate extends EventNotificationTemplate
     const CUSTOM_DATA_OBJECT_FORMAT = 'objectFormat';
     const CUSTOM_DATA_RESPONSE_PROFILE_ID = 'responseProfileId';
     const CUSTOM_DATA_QUEUE_KEY_PARAMETERS = 'queueKeyParameters';
+    const CONTENT_PARAMS_PERFIX = "s_cp_";
+    const CONTENT_PARAMS_POSTFIX = "_e_cp";
+    const QUEUE_PREFIX = "pn_";
     
     public function __construct()
     {
@@ -106,15 +109,26 @@ class PushNotificationTemplate extends EventNotificationTemplate
         ksort($contentParametersValues);
         
         $queueContentParams = $partnerId . '_' . implode( '_' , array_values($contentParametersValues));
+        $queueKey = self::QUEUE_PREFIX . $templateId . "_";
         if($returnRaw)
-        	return 'pn_' . $templateId . '_md5s_' . $queueContentParams . "_md5e";
+        	return $queueKey . self::CONTENT_PARAMS_PERFIX . $queueContentParams . self::CONTENT_PARAMS_POSTFIX;
         else
-        	return 'pn_' . $templateId . '_' . md5($queueContentParams);
+        	return $queueKey . md5($queueContentParams);
     }
     
     public function getQueueName($contentParameters, $partnerId = null, kScope $scope = null)
     {
-    	return $this->getQueueKey($contentParameters, $partnerId, $scope);
+    	$queueNameParams = array();
+    	foreach ($contentParameters as $contentParameter)
+    	{
+    		/* @var $contentParameter kPushEventNotificationParameter */
+    		if ($contentParameter->getQueueKeyToken())
+    			continue;
+    	 	
+			$queueNameParams[] = $contentParameter;
+    	}
+    	 
+		return $this->getQueueKey($queueNameParams, $partnerId, $scope);
     }
     
     protected function getMessage(kScope $scope)
@@ -147,9 +161,8 @@ class PushNotificationTemplate extends EventNotificationTemplate
         }
         
         $queueParameters = $this->getQueueKeyParameters();
-        $contentParameters = $this->getContentParameters();
-        $queueKey = $this->getQueueKey(array_merge($contentParameters, $queueParameters), null, $scope);
-        $queueName = $this->getQueueName($contentParameters, null, $scope);
+        $queueKey = $this->getQueueKey($queueParameters, null, $scope);
+        $queueName = $this->getQueueName($queueParameters, null, $scope);
         $message = $this->getMessage($scope);
         $time = time();
 

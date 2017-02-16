@@ -7,7 +7,7 @@ class KalturaPushNotificationTemplate extends KalturaEventNotificationTemplate
 {
 	/**
 	 * Define the content dynamic parameters
-	 * @var KalturaEventNotificationParameterArray
+	 * @var KalturaPushEventNotificationParameterArray
 	 * @requiresPermission update
 	 */
 	public $queueKeyParameters;

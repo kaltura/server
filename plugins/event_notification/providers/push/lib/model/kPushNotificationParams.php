@@ -6,12 +6,12 @@
 class kPushNotificationParams extends KalturaObject
 {
 	/**
-	 * @var array<kEventNotificationParameter>
+	 * @var array<kPushEventNotificationParameter>
 	 */
 	public $userParams;
 
 	/**
-	 * @return array<kEventNotificationParameter>
+	 * @return array<kPushEventNotificationParameter>
 	 */
 	public function getUserParams()
 	{
@@ -19,7 +19,7 @@ class kPushNotificationParams extends KalturaObject
 	}
 
 	/**
-	 * @param array <kEventNotificationParameter> $userParams
+	 * @param array <kPushEventNotificationParameter> $userParams
 	 */
 	public function setUserParams($userParams)
 	{
