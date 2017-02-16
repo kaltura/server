@@ -152,8 +152,8 @@ class LiveConversionProfileService extends KalturaBaseService
 					$defaultFrameRate = $liveParamsItem->getFrameRate();
 				}
 			}
-			$flavorExist = $this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $streamParametersArray);
-			if ($flavorExist) {
+			$shouldAddFlavor = $this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $streamParametersArray);
+			if ($shouldAddFlavor) {
 				$tags = array("all");
 				foreach ($tags as $tag) {
 					if (!isset($groups[$tag]))
