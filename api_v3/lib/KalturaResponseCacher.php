@@ -353,6 +353,7 @@ class KalturaResponseCacher extends kApiCache
 		$processingTime = microtime(true) - $startTime;
 		$cacheKey = md5("{$partnerId}_{$userId}_{$type}_{$expiry}_{$privileges}");
 		header("X-Kaltura:cached-dispatcher,$cacheKey,$processingTime", false);
+		$this->sendCachingHeaders(false);
 		
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
