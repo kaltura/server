@@ -10,6 +10,13 @@ class KalturaPushNotificationTemplate extends KalturaEventNotificationTemplate
 	 * @var KalturaPushEventNotificationParameterArray
 	 * @requiresPermission update
 	 */
+	public $queueNameParameters;
+	
+	/**
+	 * Define the content dynamic parameters
+	 * @var KalturaPushEventNotificationParameterArray
+	 * @requiresPermission update
+	 */
 	public $queueKeyParameters;
 	
     /**
@@ -31,7 +38,7 @@ class KalturaPushNotificationTemplate extends KalturaEventNotificationTemplate
     public $responseProfileId;
     
 
-    private static $map_between_objects = array('apiObjectType', 'objectFormat', 'responseProfileId', 'queueKeyParameters');
+    private static $map_between_objects = array('apiObjectType', 'objectFormat', 'responseProfileId', 'queueNameParameters', 'queueKeyParameters');
     
     public function __construct()
     {

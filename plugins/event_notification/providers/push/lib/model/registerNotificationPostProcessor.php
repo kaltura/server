@@ -9,6 +9,9 @@ class registerNotificationPostProcessor
 	const QUEUE_NAME_POSTFIX = "_qne";
 	const QUEUE_KEY_PREFIX = "qks_";
 	const QUEUE_KEY_POSTFIX = "_qke";
+	const CONTENT_PARAMS_PREFIX = "s_cp_";
+	const CONTENT_PARAMS_POSTFIX = "_e_cp";
+	const QUEUE_PREFIX = "pn_";
 	
 	/*
 	 * @var array 
@@ -22,24 +25,6 @@ class registerNotificationPostProcessor
 	 */
 	public $hash;
 	
-	/*
-	 * @var string
-	 * key contnet params prefix
-	 */
-	public $contentParamsPrefix;
-	
-	/*
-	 * @var string
-	 * key contnet params postfix
-	 */
-	public $contentParamsPostfix;
-	
-	/*
-	 * @var string
-	 * queue key prefix
-	 */
-	public $queueKeyPrefix;
-	
 	public function addToken($key, $token)
 	{
 		$this->tokensToReplace[$key] = $token;
@@ -48,21 +33,6 @@ class registerNotificationPostProcessor
 	public function setHash($hash)
 	{
 		$this->hash = $hash;
-	}
-	
-	public function setContentParamsPrefix($contentParamsPrefix)
-	{
-		$this->contentParamsPrefix = $contentParamsPrefix;
-	}
-	
-	public function setContentParamsPostfix($contentParamsPostfix)
-	{
-		$this->contentParamsPostfix = $contentParamsPostfix;
-	}
-	
-	public function setQueueKeyPrefix($queueKeyPrefix)
-	{
-		$this->queueKeyPrefix = $queueKeyPrefix;
 	}
 	
 	private function encode($data)
@@ -118,7 +88,8 @@ class registerNotificationPostProcessor
 			}
 		}
 		
-		$matchString = '/(' . $this->queueKeyPrefix . '.*)' . $this->contentParamsPrefix . '(.*?)' . $this->contentParamsPostfix . '/';
+		$matchString = '/' . self::QUEUE_KEY_PREFIX . '(' . self::QUEUE_PREFIX . '.*)' .
+					 self::CONTENT_PARAMS_PREFIX . '(.*?)' . self::CONTENT_PARAMS_POSTFIX . self::QUEUE_KEY_POSTFIX . '/';
 		if(preg_match($matchString, $response, $matches))
 		{
 			$queueKeyToReplace = $matches[0];
@@ -139,7 +110,7 @@ class registerNotificationPostProcessor
 			$queueName = $matches[1];
 				
 			$encodedQueueName = $this->encode($queueName . ":" . $this->hash);
-			$response = str_replace($queueNameToReplace, $encodedQueueKey, $response);
+			$response = str_replace($queueNameToReplace, $encodedQueueName, $response);
 		}
 	}
 	
@@ -231,9 +202,6 @@ class registerNotificationPostProcessor
 	public function buildResponse($partnerId, $queueName, $queueKey)
 	{
 		$this->setHash(kCurrentContext::$ks_object->getHash());
-		$this->setContentParamsPrefix(PushNotificationTemplate::CONTENT_PARAMS_PERFIX);
-		$this->setContentParamsPostfix(PushNotificationTemplate::CONTENT_PARAMS_POSTFIX);
-		$this->setQueueKeyPrefix(PushNotificationTemplate::QUEUE_PREFIX);
 		
 		if(kApiCache::getEnableResponsePostProcessor())
 			return $this->buildCachableResponse($partnerId, $queueName, $queueKey);

@@ -9,6 +9,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
     const CUSTOM_DATA_OBJECT_FORMAT = 'objectFormat';
     const CUSTOM_DATA_RESPONSE_PROFILE_ID = 'responseProfileId';
     const CUSTOM_DATA_QUEUE_KEY_PARAMETERS = 'queueKeyParameters';
+    const CUSTOM_DATA_QUEUE_NAME_PARAMETERS = 'queueNameParameters';
     const CONTENT_PARAMS_PERFIX = "s_cp_";
     const CONTENT_PARAMS_POSTFIX = "_e_cp";
     const QUEUE_PREFIX = "pn_";
@@ -65,27 +66,41 @@ class PushNotificationTemplate extends EventNotificationTemplate
     	return $this->putInCustomData(self::CUSTOM_DATA_QUEUE_KEY_PARAMETERS, $v);
 	}
 	
-	public function getQueueKeyParameters()
+	public function getQueueKeyParameters($returnAsKeyValue = false)
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_QUEUE_KEY_PARAMETERS, null, array());
+		$queueNameParams = $this->getQueueNameParameters();
+		$queueKeyParams = array_merge($queueNameParams, $this->getFromCustomData(self::CUSTOM_DATA_QUEUE_KEY_PARAMETERS, null, array()));
+		
+		if(!$returnAsKeyValue || !count($queueKeyParams))
+			return $queueKeyParams;
+		
+		return $this->getAsKeyValueArray($queueKeyParams);
 	}
 	
-	public function getQueueKeyParametersKeyValueArray()
+	public function setQueueNameParameters(array $v)
 	{
-		$queueKeyParametersKeyValueArray = array();
+		return $this->putInCustomData(self::CUSTOM_DATA_QUEUE_NAME_PARAMETERS, $v);
+	}
+	
+	public function getQueueNameParameters($returnAsKeyValue = false)
+	{
+		$queueNameParams = $this->getFromCustomData(self::CUSTOM_DATA_QUEUE_NAME_PARAMETERS, null, array());
+		if(!$returnAsKeyValue || !count($queueNameParams))
+			return $queueNameParams;
 		
-		$queueParams = $this->getQueueKeyParameters();
-		foreach ($queueParams as $queueParam)
+		return $this->getAsKeyValueArray($queueNameParams);
+	}
+	
+	private function getAsKeyValueArray($params)
+	{
+		$keyValueArray = array();
+		
+		foreach ($params as $param)
 		{
-			$queueKeyParametersKeyValueArray[$queueParam->getKey()] = $queueParam;
+			$keyValueArray[$param->getKey()] = $param;
 		}
 		
-		return $queueKeyParametersKeyValueArray;
-	}
-	
-	public function getNotificationParameters()
-	{
-		return array_merge($this->getQueueKeyParameters(), parent::getNotificationParameters());
+		return $keyValueArray;
 	}
     
     public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null, $returnRaw = false)
@@ -109,25 +124,15 @@ class PushNotificationTemplate extends EventNotificationTemplate
         ksort($contentParametersValues);
         
         $queueContentParams = $partnerId . '_' . implode( '_' , array_values($contentParametersValues));
-        $queueKey = self::QUEUE_PREFIX . $templateId . "_";
+        $queueKey = registerNotificationPostProcessor::QUEUE_PREFIX . $templateId . "_";
         if($returnRaw)
-        	return $queueKey . self::CONTENT_PARAMS_PERFIX . $queueContentParams . self::CONTENT_PARAMS_POSTFIX;
+        	return $queueKey . registerNotificationPostProcessor::CONTENT_PARAMS_PREFIX . $queueContentParams . registerNotificationPostProcessor::CONTENT_PARAMS_POSTFIX;
         else
         	return $queueKey . md5($queueContentParams);
     }
     
-    public function getQueueName($contentParameters, $partnerId = null, kScope $scope = null)
+    public function getQueueName($queueNameParams, $partnerId = null, kScope $scope = null)
     {
-    	$queueNameParams = array();
-    	foreach ($contentParameters as $contentParameter)
-    	{
-    		/* @var $contentParameter kPushEventNotificationParameter */
-    		if ($contentParameter->getQueueKeyToken())
-    			continue;
-    	 	
-			$queueNameParams[] = $contentParameter;
-    	}
-    	 
 		return $this->getQueueKey($queueNameParams, $partnerId, $scope);
     }
     
@@ -160,9 +165,10 @@ class PushNotificationTemplate extends EventNotificationTemplate
             return;
         }
         
-        $queueParameters = $this->getQueueKeyParameters();
-        $queueKey = $this->getQueueKey($queueParameters, null, $scope);
-        $queueName = $this->getQueueName($queueParameters, null, $scope);
+        $queueNameParameters = $this->getQueueNameParameters();
+        $queueKeyParameters = $this->getQueueKeyParameters();
+        $queueName = $this->getQueueName($queueNameParameters, null, $scope);
+        $queueKey = $this->getQueueKey($queueKeyParameters, null, $scope);
         $message = $this->getMessage($scope);
         $time = time();
 
@@ -192,5 +198,18 @@ class PushNotificationTemplate extends EventNotificationTemplate
         // get instance of activated queue proivder and check whether given queue exists
         $queueProvider = QueueProvider::getInstance();
         return $queueProvider->exists($queueKey);
-    }    
+    }
+    
+    public function applyDynamicValues(&$scope)
+    {
+    	parent::applyDynamicValues($scope);
+    	
+    	$notificationParameters = $this->getQueueKeyParameters();
+    	foreach($notificationParameters as $notificationParameter)
+    	{
+    		/* @var $notificationParameter kEventNotificationParameter */
+    		if(!is_null($notificationParameter->getValue()))
+    			$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+    	}
+    }
 }

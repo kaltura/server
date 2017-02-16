@@ -107,9 +107,23 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 	    return true;
 	}
 	
-	public function getNotificationParameters()
+	public function applyDynamicValues(&$scope)
 	{
-		return array_merge($this->getContentParameters(), $this->getUserParameters());
+		$notificationParameters = $this->getContentParameters();
+		foreach($notificationParameters as $notificationParameter)
+		{
+			/* @var $notificationParameter kEventNotificationParameter */
+			if(!is_null($notificationParameter->getValue()))
+				$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+		}
+			
+		$notificationParameters = $this->getUserParameters();
+		foreach($notificationParameters as $notificationParameter)
+		{
+			/* @var $notificationParameter kEventNotificationParameter */
+			if(!is_null($notificationParameter->getValue()))
+				$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+		}
 	}
 	
 } // EventNotificationTemplate

@@ -9,6 +9,19 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
 	{
 		if(!($object instanceof Kaltura_Client_PushNotification_Type_PushNotificationTemplate))
 			return;
+		
+		if($object->queueNameParameters && count($object->queueNameParameters))
+		{
+			$queueNameParameters = array();
+			foreach($object->queueNameParameters as $index => $parameter)
+				$queueNameParameters[] = $this->getParameterDescription($parameter);
+		
+			$queueNameParametersList = new Infra_Form_HtmlList('queueNameParameters', array(
+					'legend'		=> 'queue Name Parameters',
+					'list'			=> $queueNameParameters,
+			));
+			$this->addElements(array($queueNameParametersList));
+		}
 
 		if($object->queueKeyParameters && count($object->queueKeyParameters))
 		{
@@ -17,7 +30,7 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
 				$queueKeyParameters[] = $this->getParameterDescription($parameter);
 		
 			$queueKeyParametersList = new Infra_Form_HtmlList('queueKeyParameters', array(
-					'legend'		=> 'queue Parameters',
+					'legend'		=> 'queue Key Parameters',
 					'list'			=> $queueKeyParameters,
 			));
 			$this->addElements(array($queueKeyParametersList));

@@ -611,4 +611,9 @@ class kSessionBase
 		}
 		return null;
 	}
+	
+	public function getHash()
+	{
+		return $this->hash;
+	}
 }

@@ -14,10 +14,10 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @action register
 	 * @actionAlias eventNotification_eventNotificationTemplate.register
 	 * @param string $notificationTemplateSystemName Existing push notification template system name
-	 * @param KalturaPushNotificationParams $pushNotificationParams
+	  * @param KalturaPushEventNotificationParameterArray $pushNotificationParams User params
 	 * @return KalturaPushNotificationData
 	 */
-	function registerAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams)
+	function registerAction($notificationTemplateSystemName, $pushNotificationParams)
 	{		
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
@@ -35,18 +35,25 @@ class PushNotificationTemplateService extends KalturaBaseService
 		if(kApiCache::getEnableResponsePostProcessor())
 			kApiCache::setResponsePostProcessor($postProcessor);
 
-		$missingParams = array();
+		$missingParams = array();		
+		$userQueueNameParams = array();
 		$userQueueKeyParams = array();
 		$userParamsArrayKeys = array();
-		$userParamsArray = $pushNotificationParams->toObject()->getUserParams();
+		$userParamsArray = $pushNotificationParams->toObjectsArray();
 		
 		// get template configured params
-		$queueKeyParams = $dbEventNotificationTemplate->getQueueKeyParametersKeyValueArray();
+		$queueNameParams = $dbEventNotificationTemplate->getQueueNameParameters(true);
+		$queueKeyParams = $dbEventNotificationTemplate->getQueueKeyParameters(true);
 		
 		foreach ($userParamsArray as $userParam)
 		{
 			$userParamKey = $userParam->getKey();
 			array_push($userParamsArrayKeys, $userParamKey);
+			
+			if(isset($queueNameParams[$userParamKey]))
+			{
+				$userQueueNameParams[] = $userParam;
+			}
 			
 			if(isset($queueKeyParams[$userParamKey]))
 			{
@@ -54,7 +61,6 @@ class PushNotificationTemplateService extends KalturaBaseService
 				if($valueToken && kApiCache::getEnableResponsePostProcessor())
 				{
 					$userParam->setValue(new kStringValue($valueToken));
-					$userParam->setQueueKeyToken($valueToken);
 					$postProcessor->addToken($userParamKey, $valueToken);
 				}
 				$userQueueKeyParams[] = $userParam;
@@ -70,7 +76,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		if (!empty($missingParams))
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
 		
-		$queueName = $dbEventNotificationTemplate->getQueueName($userQueueKeyParams, $partnerId, null);
+		$queueName = $dbEventNotificationTemplate->getQueueName($userQueueNameParams, $partnerId, null);
 		$queueKey = $dbEventNotificationTemplate->getQueueKey($userQueueKeyParams, $partnerId, null, kApiCache::getEnableResponsePostProcessor());
 		
 		return $postProcessor->buildResponse($partnerId, $queueName, $queueKey);
