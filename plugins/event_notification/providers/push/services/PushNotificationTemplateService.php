@@ -14,10 +14,10 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @action register
 	 * @actionAlias eventNotification_eventNotificationTemplate.register
 	 * @param string $notificationTemplateSystemName Existing push notification template system name
-	  * @param KalturaPushEventNotificationParameterArray $pushNotificationParams User params
+	 * @param KalturaPushNotificationParams $pushNotificationParams
 	 * @return KalturaPushNotificationData
 	 */
-	function registerAction($notificationTemplateSystemName, $pushNotificationParams)
+	function registerAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams)
 	{		
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
@@ -39,7 +39,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		$userQueueNameParams = array();
 		$userQueueKeyParams = array();
 		$userParamsArrayKeys = array();
-		$userParamsArray = $pushNotificationParams->toObjectsArray();
+		$userParamsArray = $pushNotificationParams->toObject()->getUserParams();
 		
 		// get template configured params
 		$queueNameParams = $dbEventNotificationTemplate->getQueueNameParameters(true);
