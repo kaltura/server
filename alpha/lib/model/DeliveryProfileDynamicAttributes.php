@@ -604,6 +604,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->edgeServerIds = $newObj->getEdgeServerIds();
 		$this->serveVodFromLive = $newObj->getServeVodFromLive();
 		$this->serveLiveAsVodEntryId = $newObj->getServeLiveAsVodEntryId();
+		$this->urlParams = $newObj->getUrlParams();
 		$this->deliveryProfileId = $newObj->getDeliveryProfileId();
 	}
 }
