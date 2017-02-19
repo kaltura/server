@@ -314,7 +314,7 @@ abstract class KalturaBaseService
 		$maxAge = null;
 		if ($this->ks)
 		{
-			$maxAge = max($this->ks->valid_until - time(), 1);
+			$maxAge = min(max($this->ks->valid_until - time(), 1), 8640000);
 		}
 
 		return kFileUtils::getDumpFileRenderer($filePath, $mimeType, $maxAge);
