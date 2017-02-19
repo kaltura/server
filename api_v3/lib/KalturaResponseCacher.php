@@ -352,11 +352,11 @@ class KalturaResponseCacher extends kApiCache
 		
 		$processingTime = microtime(true) - $startTime;
 		$cacheKey = md5("{$partnerId}_{$userId}_{$type}_{$expiry}_{$privileges}");
-                header("X-Kaltura:cached-dispatcher,$cacheKey,$processingTime", false);
-                header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
-                header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
-                header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
-                header("Pragma: no-cache", true);
+		header("X-Kaltura:cached-dispatcher,$cacheKey,$processingTime", false);
+		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
+		header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
+		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
+		header("Pragma: no-cache", true);
 		
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
