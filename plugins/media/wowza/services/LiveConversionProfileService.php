@@ -13,6 +13,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	const HEIGHT = 'height';
 	const MATCH_SOURCE = 'match-source';
 	const KILO = 1000;
+	const DEFAULT_NAME_GROUP = 'all';
 	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
@@ -154,7 +155,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			}
 			$shouldAddFlavor = $this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $streamParametersArray);
 			if ($shouldAddFlavor) {
-				$tags = array("all");
+				$tags = array(self::DEFAULT_NAME_GROUP);
 				foreach ($tags as $tag) {
 					if (!isset($groups[$tag]))
 						$groups[$tag] = array();
