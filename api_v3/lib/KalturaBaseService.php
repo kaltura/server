@@ -311,7 +311,13 @@ abstract class KalturaBaseService
 	 */
 	protected function dumpFile($filePath, $mimeType)
 	{
-		return kFileUtils::getDumpFileRenderer($filePath, $mimeType);
+		$maxAge = null;
+		if ($this->ks)
+		{
+			$maxAge = max($this->ks->valid_until - time(), 1);
+		}
+
+		return kFileUtils::getDumpFileRenderer($filePath, $mimeType, $maxAge);
 	}
 	
 	/**
