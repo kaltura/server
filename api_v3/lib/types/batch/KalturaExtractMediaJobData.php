@@ -25,13 +25,19 @@ class KalturaExtractMediaJobData extends KalturaConvartableJobData
 	 * @var string
 	 */
 	public $destDataFilePath;
-	
+
+	/**
+	 * @var int
+	 */
+	public $detectGOP;
+
 	private static $map_between_objects = array
 	(
 		"flavorAssetId",
 		"calculateComplexity",
 		"extractId3Tags",
-		"destDataFilePath"
+		"destDataFilePath",
+		"detectGOP",
 	);
 
 	public function getMapBetweenObjects ( )
