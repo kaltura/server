@@ -1538,6 +1538,9 @@ class kJobsManager
 		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
 		$extractMediaData->setCalculateComplexity($shouldCalculateComplexity);
 		
+        	$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
+		$extractMediaData->setDetectGOP($shouldDetectGOP);
+
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$entry = $flavorAsset->getentry();
 		if($entry && $entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
