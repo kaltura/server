@@ -4,7 +4,7 @@
  * @subpackage api.objects
  */
 
-class KalturaPushNotificationCommandType extends KalturaEnum implements PushNotificationCommandType
+class KalturaPushNotificationCommandType extends KalturaStringEnum implements PushNotificationCommandType
 {
 	public static function getEnumClass()
 	{

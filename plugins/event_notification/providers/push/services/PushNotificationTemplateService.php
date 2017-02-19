@@ -91,7 +91,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @param KalturaPushNotificationParams $pushNotificationParams
 	 * @param KalturaPushNotificationCommandType $command Command to be sent to push server
 	 */
-	function sendCommandAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams, KalturaPushNotificationCommandType $command)
+	function sendCommandAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams, $command)
 	{
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
@@ -106,17 +106,17 @@ class PushNotificationTemplateService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $notificationTemplateSystemName, get_class($dbEventNotificationTemplate));
 		
 		$missingParams = array();
-		$queuNameParams = array();
+		$queueNameParams = array();
 		$userParamsArray = $pushNotificationParams->toObject()->getUserParams();
-		$templateContentParams = $dbEventNotificationTemplate->getContentParametersKeyValueArray();
+		$templateQueueNameParams = $dbEventNotificationTemplate->getQueueNameParameters(true);
 		
 		foreach ($userParamsArray as $userParam)
 		{
 			$userParamKey = $userParam->getKey();
 			array_push($userParamsArrayKeys, $userParam->getKey());
 			
-			if(isset($templateContentParams[$userParamKey]))
-				$queuNameParams[] = $userParam;
+			if(isset($templateQueueNameParams[$userParamKey]))
+				$queueNameParams[$userParamKey] = $userParam;
 		}
 		
 		foreach ($templateParams as $templateParamKey => $templateParamValue)
@@ -128,7 +128,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		if (!empty($missingParams))
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
 		
-		$queueName = $dbEventNotificationTemplate->getQueueName($queuNameParams, $partnerId, null);
+		$queueName = $dbEventNotificationTemplate->getQueueName($queueNameParams, $partnerId, null);
 		
 		$time = time();
 		$msg = json_encode(array(
