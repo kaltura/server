@@ -32,7 +32,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $notificationTemplateSystemName, get_class($dbEventNotificationTemplate));
 		
 		$postProcessor = new registerNotificationPostProcessor();
-		if(kApiCache::getEnableResponsePostProcessor())
+		if(kApiCache::getEnableResponsePostProcessor() && !kApiCache::getResponsePostProcessor())
 			kApiCache::setResponsePostProcessor($postProcessor);
 
 		$missingParams = array();		
@@ -93,6 +93,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 */
 	function sendCommandAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams, $command)
 	{
+		kApiCache::disableCache();
 		// find the template, according to its system name, on both current partner and partner 0
 		$partnerId = $this->getPartnerId();
 		$partnersIds = array(PartnerPeer::GLOBAL_PARTNER, $partnerId);
@@ -107,6 +108,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 		
 		$missingParams = array();
 		$queueNameParams = array();
+		$userParamsArrayKeys = array();
 		$userParamsArray = $pushNotificationParams->toObject()->getUserParams();
 		$templateQueueNameParams = $dbEventNotificationTemplate->getQueueNameParameters(true);
 		
@@ -119,7 +121,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 				$queueNameParams[$userParamKey] = $userParam;
 		}
 		
-		foreach ($templateParams as $templateParamKey => $templateParamValue)
+		foreach ($templateQueueNameParams as $templateParamKey => $templateParamValue)
 		{
 			if (!in_array($templateParamKey, $userParamsArrayKeys))
 				array_push($missingParams, $templateParamKey);

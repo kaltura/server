@@ -88,29 +88,38 @@ class registerNotificationPostProcessor
 			}
 		}
 		
-		$matchString = '/' . self::QUEUE_KEY_PREFIX . '(' . self::QUEUE_PREFIX . '.*)' .
+		$matchString = '/' . self::QUEUE_KEY_PREFIX . '(' . self::QUEUE_PREFIX . '.*?)' .
 					 self::CONTENT_PARAMS_PREFIX . '(.*?)' . self::CONTENT_PARAMS_POSTFIX . self::QUEUE_KEY_POSTFIX . '/';
-		if(preg_match($matchString, $response, $matches))
+		if(preg_match_all($matchString, $response, $matches))
 		{
-			$queueKeyToReplace = $matches[0];
-			$queuKeyPrefix = $matches[1];
-			$md5String = md5($matches[2]);
+			$queueKeysToReplace = $matches[0];
+			$queuKeysPrefixes = $matches[1];
+			$md5Strings = $matches[2];
+			
+			foreach ($queueKeysToReplace as $key => $queueKeyToReplace)
+			{
+				$queuKeyPrefix = $queuKeysPrefixes[$key];
+				$md5String = md5($md5Strings[$key]);
 				
-			$encodedQueueKey = $this->encode($queuKeyPrefix.$md5String . ":" . $this->hash);
-			$response = str_replace($queueKeyToReplace, $encodedQueueKey, $response);
+				$encodedQueueKey = $this->encode($queuKeyPrefix.$md5String . ":" . $this->hash);
+				$response = str_replace($queueKeyToReplace, $encodedQueueKey, $response);
+			}
 		}
 	}
 	
 	public function updateResponseQueueName(&$response)
 	{
-		$matchString = '/' . self::QUEUE_NAME_PREFIX . '(.*)' . self::QUEUE_NAME_POSTFIX .'/';
-		if(preg_match($matchString, $response, $matches))
+		$matchString = '/' . self::QUEUE_NAME_PREFIX . '(.*?)' . self::QUEUE_NAME_POSTFIX .'/';
+		if(preg_match_all($matchString, $response, $matches))
 		{
-			$queueNameToReplace = $matches[0];
-			$queueName = $matches[1];
-				
-			$encodedQueueName = $this->encode($queueName . ":" . $this->hash);
-			$response = str_replace($queueNameToReplace, $encodedQueueName, $response);
+			$queueNameToReplaceMatches = $matches[0];
+			$queueNames = $matches[1];
+			
+			foreach ($queueNameToReplaceMatches as $key => $value)
+			{
+				$encodedQueueName = $this->encode($queueNames[$key] . ":" . $this->hash);
+				$response = str_replace($value, $encodedQueueName, $response);
+			}
 		}
 	}
 	
@@ -127,7 +136,7 @@ class registerNotificationPostProcessor
 		
 		foreach ($requestParams as $key => $value)
 		{
-			preg_match('/(pushNotificationParams:userParams:item\\d:).*key/', $key, $matches);
+			preg_match('/(\\d?:?pushNotificationParams:userParams:item\\d:).*key/', $key, $matches);
 			if(count($matches))
 			{
 				$resKey = $matches[1];
@@ -150,6 +159,15 @@ class registerNotificationPostProcessor
 			if($parseResult && $ksStatus == kSessionBase::OK)
 				return $ksObj;
 		}
+		
+		if(isset($requestParams['service']) && $requestParams['service'] === "multirequest" && isset($requestParams['1:ks']))
+		{
+			$ksObj = new kSessionBase();
+			$parseResult = $ksObj->parseKS($requestParams['1:ks']);
+			$ksStatus = $ksObj->tryToValidateKS();
+			if($parseResult && $ksStatus == kSessionBase::OK)
+				return $ksObj;
+		}	
 		
 		return null;
 	}

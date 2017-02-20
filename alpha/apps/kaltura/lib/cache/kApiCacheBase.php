@@ -67,7 +67,6 @@ class kApiCacheBase
 	protected $_extraFields = array();
 	protected static $_usesHttpReferrer = false;	// enabled if the request is dependent on the http referrer field (opposed to an API parameter referrer)
 	protected static $_hasExtraFields = false;		// set to true if the response depends on http headers and should not return caching headers to the user / cdn
-	protected static $_ignoreKsKuserId = false;		// Remove ks kuser_id from cache when registering to push notifications
 
 	// debug
 	protected static $_debugMode = false;
@@ -156,11 +155,6 @@ class kApiCacheBase
 	public static function enableLock()
 	{
 		self::$_lockEnabled = true;
-	}
-	
-	public static function enableIgnoreKsKuserId()
-	{
-		self::$_ignoreKsKuserId = true;
 	}
 	
 	public static function setResponsePostProcessor($postProcessor)

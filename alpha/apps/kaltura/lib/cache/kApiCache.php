@@ -193,10 +193,7 @@ class kApiCache extends kApiCacheBase
 		$this->_params["___cache___partnerId"] =  $this->_ksPartnerId;
 		$this->_params["___cache___ksStatus"] =   $this->_ksStatus;
 		$this->_params["___cache___ksType"] = 	  ($this->_ksObj ? $this->_ksObj->type		 : null);
-		
-		if(!self::$_ignoreKsKuserId)
-			$this->_params["___cache___userId"] =     ($this->_ksObj ? $this->_ksObj->user		 : null);
-		
+		$this->_params["___cache___userId"] =     ($this->_ksObj ? $this->_ksObj->user		 : null);
 		$this->_params["___cache___privileges"] = ($this->_ksObj ? $this->_ksObj->privileges : null);
 	}
 
@@ -729,6 +726,15 @@ class kApiCache extends kApiCacheBase
 			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
 		}
 		
+		if (isset($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
+		{
+			$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
+			$filePath = key($responsePostProcessor);
+			require_once $filePath;
+			$postProcessor = unserialize($responsePostProcessor[$filePath]);
+			self::$_responsePostProcessor = $postProcessor;
+		}
+		
 		return $result;
 	}
 
@@ -764,6 +770,8 @@ class kApiCache extends kApiCacheBase
 		}
 
 		$this->_responseMetadata = $responseMetadata;
+		if($responseMetadata)
+			$this->_responseMetadata = unserialize($responseMetadata);
 
 		if ($this->_cacheRulesDirty)
 		{
@@ -936,6 +944,20 @@ class kApiCache extends kApiCacheBase
 
 		if (!$foundHeader)
 			header("X-Kaltura: cache-key,".$this->_cacheKey);
+		
+		if(self::$_responsePostProcessor)
+		{
+			if(!$responseMetadata)
+				$responseMetadata = array();
+			
+			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
+			$fileName = $postProcessorClass->getFileName();
+			$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
+			$responseMetadata['responsePostProcessor'] = $responsePostProcessor;
+		}
+		
+		if($responseMetadata)
+			$responseMetadata = serialize($responseMetadata);
 
 		$this->_responseMetadata = $responseMetadata;
 		$this->_cacheId = microtime(true) . '_' . getmypid();
