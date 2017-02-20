@@ -98,6 +98,7 @@ class RabbitMQProvider extends QueueProvider
 		$channel->basic_publish($msg, $this->exchangeName, $queueName);
 
 		KalturaLog::info("Message [$data] was sent to [$queueName].");
+		$channel->close();
 		$connection->close();
 	}
 }

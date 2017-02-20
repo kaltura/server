@@ -8,6 +8,11 @@ class PushNotificationTemplate extends EventNotificationTemplate
     const CUSTOM_DATA_API_OBJECT_TYPE = 'apiObjectType';
     const CUSTOM_DATA_OBJECT_FORMAT = 'objectFormat';
     const CUSTOM_DATA_RESPONSE_PROFILE_ID = 'responseProfileId';
+    const CUSTOM_DATA_QUEUE_KEY_PARAMETERS = 'queueKeyParameters';
+    const CUSTOM_DATA_QUEUE_NAME_PARAMETERS = 'queueNameParameters';
+    const CONTENT_PARAMS_PERFIX = "s_cp_";
+    const CONTENT_PARAMS_POSTFIX = "_e_cp";
+    const QUEUE_PREFIX = "pn_";
     
     public function __construct()
     {
@@ -23,15 +28,6 @@ class PushNotificationTemplate extends EventNotificationTemplate
         if(!parent::fulfilled($scope))
             return false;
         
-        // check if queue exists
-        $contentParameters = $this->getContentParameters();
-        $queueKey = $this->getQueueKey($contentParameters, null, $scope);
-        $queueProvider = QueueProvider::getInstance();
-        if (!$queueProvider->exists($queueKey))
-        {
-            KalturaLog::info("Queue [$queueKey] doesn't exist.");
-            return false;
-        }
         return true;
     }
     
@@ -63,9 +59,51 @@ class PushNotificationTemplate extends EventNotificationTemplate
     public function getResponseProfileId()
     {
         return $this->getFromCustomData(self::CUSTOM_DATA_RESPONSE_PROFILE_ID);
-    }    
+    }
+
+    public function setQueueKeyParameters(array $v)
+	{
+    	return $this->putInCustomData(self::CUSTOM_DATA_QUEUE_KEY_PARAMETERS, $v);
+	}
+	
+	public function getQueueKeyParameters($returnAsKeyValue = false)
+	{
+		$queueNameParams = $this->getQueueNameParameters();
+		$queueKeyParams = array_merge($queueNameParams, $this->getFromCustomData(self::CUSTOM_DATA_QUEUE_KEY_PARAMETERS, null, array()));
+		
+		if(!$returnAsKeyValue || !count($queueKeyParams))
+			return $queueKeyParams;
+		
+		return $this->getAsKeyValueArray($queueKeyParams);
+	}
+	
+	public function setQueueNameParameters(array $v)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_QUEUE_NAME_PARAMETERS, $v);
+	}
+	
+	public function getQueueNameParameters($returnAsKeyValue = false)
+	{
+		$queueNameParams = $this->getFromCustomData(self::CUSTOM_DATA_QUEUE_NAME_PARAMETERS, null, array());
+		if(!$returnAsKeyValue || !count($queueNameParams))
+			return $queueNameParams;
+		
+		return $this->getAsKeyValueArray($queueNameParams);
+	}
+	
+	private function getAsKeyValueArray($params)
+	{
+		$keyValueArray = array();
+		
+		foreach ($params as $param)
+		{
+			$keyValueArray[$param->getKey()] = $param;
+		}
+		
+		return $keyValueArray;
+	}
     
-    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null)
+    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null, $returnRaw = false)
     {
         $templateId = $this->getId();
         if ($scope)
@@ -73,7 +111,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
         
         // currently contentParams contains only one param (entryId), but for further support
         foreach ($contentParameters as $contentParameter)
-        {
+        {        	
             /* @var $contentParameter kEventNotificationParameter */
             $value = $contentParameter->getValue();
             if (($value instanceof kStringField) && ($scope) )
@@ -85,9 +123,17 @@ class PushNotificationTemplate extends EventNotificationTemplate
         // sort array according to created keys
         ksort($contentParametersValues);
         
-        $contentParamsHash = md5($partnerId . '_' . implode( '_' , array_values($contentParametersValues) ) );
-        // prepare queue key to return
-        return 'pn_' . $templateId . '_' . $contentParamsHash;
+        $queueContentParams = $partnerId . '_' . implode( '_' , array_values($contentParametersValues));
+        $queueKey = registerNotificationPostProcessor::QUEUE_PREFIX . $templateId . "_";
+        if($returnRaw)
+        	return $queueKey . registerNotificationPostProcessor::CONTENT_PARAMS_PREFIX . $queueContentParams . registerNotificationPostProcessor::CONTENT_PARAMS_POSTFIX;
+        else
+        	return $queueKey . md5($queueContentParams);
+    }
+    
+    public function getQueueName($queueNameParams, $partnerId = null, kScope $scope = null)
+    {
+		return $this->getQueueKey($queueNameParams, $partnerId, $scope);
     }
     
     protected function getMessage(kScope $scope)
@@ -112,18 +158,32 @@ class PushNotificationTemplate extends EventNotificationTemplate
     
     public function dispatch(kScope $scope) 
     {
+    	KalturaLog::debug("Dispatching event notification with name [{$this->getName()}] systemName [{$this->getSystemName()}]");
         if (!$scope || !($scope instanceof kEventScope))
         {
             KalturaLog::err('Failed to dispatch due to incorrect scope [' .$scope . ']');
             return;
         }
         
-        $contentParameters = $this->getContentParameters();
-        $queueKey = $this->getQueueKey($contentParameters, null, $scope);
-        
+        $queueNameParameters = $this->getQueueNameParameters();
+        $queueKeyParameters = $this->getQueueKeyParameters();
+        $queueName = $this->getQueueName($queueNameParameters, null, $scope);
+        $queueKey = $this->getQueueKey($queueKeyParameters, null, $scope);
+        $message = $this->getMessage($scope);
+        $time = time();
+
+        $msg = json_encode(array(
+        		"data" 		=> $message, 
+        		"queueKey" 	=> $queueKey, 
+        		"queueName"	=> $queueName,
+        		"msgId"		=> md5("$message $time"), 
+        		"msgTime"	=> $time,
+        		"command"	=> null 
+        ));
         // get instance of activated queue proivder and send message
         $queueProvider = QueueProvider::getInstance();
-        $queueProvider->send($queueKey, $this->getMessage($scope));
+
+        $queueProvider->send('', $msg);
     }
     
     public function create($queueKey)
@@ -138,5 +198,18 @@ class PushNotificationTemplate extends EventNotificationTemplate
         // get instance of activated queue proivder and check whether given queue exists
         $queueProvider = QueueProvider::getInstance();
         return $queueProvider->exists($queueKey);
-    }    
+    }
+    
+    public function applyDynamicValues(&$scope)
+    {
+    	parent::applyDynamicValues($scope);
+    	
+    	$notificationParameters = $this->getQueueKeyParameters();
+    	foreach($notificationParameters as $notificationParameter)
+    	{
+    		/* @var $notificationParameter kEventNotificationParameter */
+    		if(!is_null($notificationParameter->getValue()))
+    			$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+    	}
+    }
 }
