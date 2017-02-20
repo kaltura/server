@@ -13,19 +13,9 @@ class KalturaPushEventNotificationParameterArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-			$parameterType = get_class($obj);
-			switch ($parameterType)
-			{
-				case 'kPushEventNotificationParameter':
-    				$nObj = new KalturaPushEventNotificationParameter();
-					break;
-			}
-			
-			if($nObj)
-			{
-				$nObj->fromObject($obj, $responseProfile);
-				$newArr[] = $nObj;
-			}
+    		$nObj = new KalturaPushEventNotificationParameter();
+			$nObj->fromObject($obj, $responseProfile);
+			$newArr[] = $nObj;
 		}
 		
 		return $newArr;
