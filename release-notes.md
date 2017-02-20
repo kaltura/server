@@ -1,5 +1,19 @@
 # Lynx 12.11.0 #
 
+## Drop folder Optimization ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6944
+
+### Configuration ###
+reduce dropfolder watcher to single for each type
+
+### Known Issues & Limitations ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_02_08_add_actions_drop_folder_permissions.php
+
 ## Conditional conversion porfiles ##
 
  - Issue Type: New Feature
