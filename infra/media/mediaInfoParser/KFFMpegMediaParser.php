@@ -594,6 +594,88 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		}
 		return $outputArr;
 	}
+
+	/**
+	 * 
+	 * @param unknown_type $ffprobeBin
+	 * @param unknown_type $srcFileName
+	 * @return array with detcted GOP values (min, max, dectected)
+	 */
+	public static function detectGOP($ffprobeBin, $srcFileName, $start=null, $duration=null)
+	{
+		$kFrames = KFFMpegMediaParser::retrieveKeyFrames($ffprobeBin, $srcFileName, $start, $duration);
+		if(!isset($kFrames) || count($kFrames)<2){
+			return null;
+		}
+			/*
+			 * Turn the KF timings into integers representing 10th seconds
+			 */
+		foreach($kFrames as $k=>$kF){
+			$kFrames[$k] = (int)round($kF*100);
+		}
+KalturaLog::log("KFrames:".serialize($kFrames));
+			/*
+			 * Calculate GOP minimum, maximum and histogram counters
+			 */
+		$gopMin = $gopMax = $kFrames[1]-$kFrames[0];
+//		$gopHist = array();		//  GOP Histogram array - counts number occurences of each GOP
+//		$gopHist[$gopMin] = 1;
+
+			 // If there are more than 1 gop (2 KF's), then For more than With only 2 KF's - no reason to continue
+		for($i=2;$i<count($kFrames); $i++){
+			$gop = $kFrames[$i]-$kFrames[$i-1];
+			$gopMin = min($gopMin,$gop);
+			$gopMax = max($gopMax,$gop);
+			
+/*			if(key_exists($gop, $gopHist)){
+				$gopHist[$gop] = $gopHist[$gop]+1;
+			}
+			else{
+				$gopHist[$gop] = 1;
+			}*/
+		}
+		
+			/*
+			 * Detect 0.5-4sec gops
+			 *  Create GOP hustogram
+			 *  Calculte the appeared to expected number of GOPs
+			 *  The GOP with hihest ratio considered to be the 'detected' GOP
+			 */
+		$kf2gopHist = array(50=>0, 100=>0, 150=>0, 200=>0, 250=>0, 300=>0, 350=>0, 400=>0);
+		$kf2gopHist = array(200=>0, 400=>0);
+		$delta=6;
+		for($tm=$kFrames[0]; $tm<=$kFrames[count($kFrames)-1];$tm+=50){
+			for($t=$tm-$delta; $t<=$tm+$delta; $t++){
+				if(array_search($t, $kFrames)!==false){
+					break;
+				}
+			}
+			if($t>$tm+$delta){
+				continue;
+			}
+			foreach($kf2gopHist as $gop=>$cnt) {
+				if(($tm % $gop)<5){
+					$kf2gopHist[$gop]++;
+				}
+			}
+		}
+KalturaLog::log("kf2gopHist raw:".serialize($kf2gopHist));
+			/*
+			 * Calculate the appeared-to-expected-number-of-GOPs ratio.
+			 */ 
+		foreach($kf2gopHist as $gop=>$cnt) {
+			$kf2gopHist[$gop] = $cnt/(round(($kFrames[count($kFrames)-1]-$kFrames[0])/$gop-0.5)+1);
+		}
+			// Sort the histogram array and get the GOP value that had the higest ratio
+		asort($kf2gopHist);
+KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
+		end($kf2gopHist);
+		$gopDetected = key($kf2gopHist);
+		
+			// Turn back the timing values from 10th's of sec to seconds
+		$rv = array(($gopMin/100), ($gopMax/100), ($gopDetected/100));
+		return $rv;
+	}
 	
 	/**
 	 * 

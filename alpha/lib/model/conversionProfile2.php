@@ -319,4 +319,20 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	 */
 	public function getCollectionTags() { return $this->getFromCustomData('collectionTags', null, 'mbr,ism'); }
 	public function setCollectionTags($v) {	$this->putInCustomData('collectionTags', $v); }
+
+	/*
+	 * JSON string with array of "condition,profile-id" pairs. For example - 
+	 * 	'[{"profileId":"11","condition":"containerFormat==wmv"}]'
+	 *	For all WMV sources the conv-prof 11 will be applied (overriding the original conv.prof)"
+	 */
+	public function getConditionalProfiles() { return $this->getFromCustomData('conditionalProfiles', null, null); }
+	public function setConditionalProfiles($v) { $this->putInCustomData('conditionalProfiles', $v); }
+	
+	/*
+	 * When set, the ExtractMedia job should attempt to detect the source file GOP interval 
+	 * using the 'detectGOP' value as the max calculated period
+	 */
+	public function getDetectGOP() { return $this->getFromCustomData('detectGOP', null, 0); }
+	public function setDetectGOP($v) { $this->putInCustomData('detectGOP', $v); }
+
 }

@@ -162,6 +162,20 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	 * @var string
 	 */
 	public $collectionTags;
+
+	/**
+	 * JSON string with array of "condition,profile-id" pairs.
+	 *
+	 * @var string
+	 */
+	public $conditionalProfiles;
+	
+	/**
+	 * When set, the ExtractMedia job should detect the source file GOP using this value as the max calculated period
+	 *
+	 * @var int
+	 */
+	public $detectGOP;
 	
 	private static $map_between_objects = array
 	(
@@ -183,6 +197,8 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		"mediaParserType",
 		"calculateComplexity",
 		"collectionTags",
+		"conditionalProfiles",
+		"detectGOP",
 	);
 	
 	public function getMapBetweenObjects ( )

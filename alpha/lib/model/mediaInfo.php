@@ -26,4 +26,7 @@ class mediaInfo extends BasemediaInfo
 	
 	public function setComplexityValue($v)	{$this->putInCustomData('ComplexityValue', $v);}
 	public function getComplexityValue()	{return $this->getFromCustomData('ComplexityValue', null, null);}
+	
+	public function setMaxGOP($v)	{$this->putInCustomData('MaxGOP', $v);}
+	public function getMaxGOP()	{return $this->getFromCustomData('MaxGOP', null, null);}
 }

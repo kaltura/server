@@ -153,8 +153,8 @@ $fltStr = null;
 	 */
     protected function calcForcedKeyFrames($vidObj, KDLFlavor $target)
     {
-    	if($vidObj->_isForcedKeyFrames!=true
-    	|| !(isset($vidObj->_gop) && isset($vidObj->_frameRate) && $vidObj->_frameRate>0)){
+    	if($vidObj->_forcedKeyFramesMode==0
+    	|| !($vidObj->_forcedKeyFramesMode==1 && isset($vidObj->_gop) && isset($vidObj->_frameRate) && $vidObj->_frameRate>0)){
     		return null;
     	}
 
