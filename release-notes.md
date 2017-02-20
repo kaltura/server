@@ -7,6 +7,7 @@
 
 Add ability to switch the conv.prof according to source params and pre-defined conditions stored in JSON string on flavorParamsConversionProfile.
 Add GOP detection
+
 Example - JSON condition string: 
 	'[{"profileId":"11","condition":"videoGop<4 && containerFormat==mp4 && videoHeight<1080 && videoWidth<1920 && videoDar<16/9"}]'
 
