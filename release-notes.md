@@ -1,5 +1,21 @@
 # Lynx 12.11.0 #
 
+## Push notification redesig + caching optiization ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6888
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_02_06_add_send_command_permissons_to_push_notification_tempalte.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
 ## Drop folder Optimization ##
 
  - Issue Type: New Feature
