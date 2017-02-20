@@ -14,7 +14,7 @@ class KalturaPushNotificationCommandType extends KalturaStringEnum implements Pu
 	public static function getAdditionalDescriptions()
 	{
 		return array(
-				PushNotificationCommandType::CLEAR_QUEUE => 'Clear messgae queue.',
+				PushNotificationCommandType::CLEAR_QUEUE => 'Clear message queue.',
 		);
 	}
 }
