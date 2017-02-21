@@ -127,6 +127,7 @@ class TvinciDistributionFeedHelper
 		$this->_doc->encoding = "UTF-8";
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
+		self::addEmptyValueInMetadataObjects($feedAsXml);
 
 		if ( $action != self::ACTION_DELETE )
 		{
@@ -181,6 +182,38 @@ class TvinciDistributionFeedHelper
 
 		return $this->getXml();
 	}
+	
+	private static function addEmptyValueInMetadataObjects($feedAsXmlForEntry)
+	{
+		$metadataObjects = $feedAsXmlForEntry->customData;
+		if ($metadataObjects)
+		{
+			foreach($metadataObjects as $metadataObject)
+				self::addEmptyValueInMetadataObject($metadataObject);
+		}
+	}
+
+	private static function addEmptyValueInMetadataObject($metadataObject)
+	{
+		$metadataProfileId = kXml::getXmlAttributeAsInt($metadataObject, 'metadataProfileId');
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+		if (!$metadataProfile)
+			return;
+
+		$metadataFieldsKeys = $metadataProfile->getMetadataFieldsKeys();
+		$metadataFieldsKeys = array_flip($metadataFieldsKeys); //because we only need the names of the fields
+		$entryKeys = (array)$metadataObject->metadata;
+		$diffKeys = array_diff_key($metadataFieldsKeys, $entryKeys);
+
+		if (count($diffKeys) > 0)
+		{
+			KalturaLog::debug("Adding fields to metadata with profileID [$metadataProfileId] with the keys: " .print_r($diffKeys, true));
+			foreach($diffKeys as $key => $val)
+				$metadataObject->metadata->addChild($key, '');
+		}
+	}
+
+	
 
 	private function setAttribute($node, $attribName, $attribValue)
 	{
