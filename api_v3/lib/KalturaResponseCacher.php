@@ -403,5 +403,39 @@ class KalturaResponseCacher extends kApiCache
 			$curInstance->_cacheHeadersExpiry = $expiry;
 		}
 	}
-
+	
+	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
+	{
+		$result = parent::checkCache($cacheHeaderName, $cacheHeader);
+		
+		if($result)
+		{
+			if (is_array($this->_responseMetadata) && isset($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
+			{
+				$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
+				$filePath = key($responsePostProcessor);
+				require_once $filePath;
+				$postProcessor = unserialize($responsePostProcessor[$filePath]);
+				self::$_responsePostProcessor = $postProcessor;
+			}
+		}
+		
+		return $result;
+	}
+	
+	public function storeCache($response, $responseMetadata = "", $serializeResponse = false)
+	{		
+		if(!$responseMetadata && self::$_responsePostProcessor)
+			$responseMetadata = array();
+		
+		if(self::$_responsePostProcessor)
+		{
+			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
+			$fileName = $postProcessorClass->getFileName();
+			$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
+			$responseMetadata['responsePostProcessor'] = $responsePostProcessor;
+		}
+		
+		parent::storeCache($response, $responseMetadata, $serializeResponse);
+	}
 }
