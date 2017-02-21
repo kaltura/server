@@ -726,15 +726,6 @@ class kApiCache extends kApiCacheBase
 			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
 		}
 		
-		if (isset($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
-		{
-			$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
-			$filePath = key($responsePostProcessor);
-			require_once $filePath;
-			$postProcessor = unserialize($responsePostProcessor[$filePath]);
-			self::$_responsePostProcessor = $postProcessor;
-		}
-		
 		return $result;
 	}
 
@@ -944,17 +935,6 @@ class kApiCache extends kApiCacheBase
 
 		if (!$foundHeader)
 			header("X-Kaltura: cache-key,".$this->_cacheKey);
-		
-		if(self::$_responsePostProcessor)
-		{
-			if(!$responseMetadata)
-				$responseMetadata = array();
-			
-			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
-			$fileName = $postProcessorClass->getFileName();
-			$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
-			$responseMetadata['responsePostProcessor'] = $responsePostProcessor;
-		}
 		
 		if($responseMetadata)
 			$responseMetadata = serialize($responseMetadata);
