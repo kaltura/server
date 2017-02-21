@@ -216,7 +216,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	private function checkFlavorsDataRate($ingestDataRate, $flavorDataRate)
 	{
 		$percentageFactor = 1 + (kConf::get('transcoding_profile_bitrate_percentage_gap_between_flavors') / 100);
-		return ($ingestDataRate !== 0) && (($ingestDataRate * self::KILO) < ($flavorDataRate * $percentageFactor));
+		return ($ingestDataRate != 0) && (($ingestDataRate * self::KILO) < ($flavorDataRate * $percentageFactor));
 	}
 	
 	private function checkFlavorsHeight($ingestHeight, $flavorHeight)
