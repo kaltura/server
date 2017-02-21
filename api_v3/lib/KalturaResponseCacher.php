@@ -425,9 +425,6 @@ class KalturaResponseCacher extends kApiCache
 	
 	public function storeCache($response, $responseMetadata = "", $serializeResponse = false)
 	{		
-		if(!$responseMetadata && self::$_responsePostProcessor)
-			$responseMetadata = array();
-		
 		if(self::$_responsePostProcessor)
 		{
 			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
