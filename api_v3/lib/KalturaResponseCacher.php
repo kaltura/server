@@ -410,7 +410,7 @@ class KalturaResponseCacher extends kApiCache
 		if(!$result)
 			return $result;
 		
-		if (is_array($this->_responseMetadata) && isset($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
+		if (isset($this->_responseMetadata['responsePostProcessor']) && is_array($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
 		{
 			$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
 			$filePath = key($responsePostProcessor);
