@@ -3,7 +3,6 @@
 <form id="frmSystemHelper" enctype="application/x-www-form-urlencoded" method="post" class="inline-form" action=""><fieldset id="fieldset-frmSystemHelper" class="form"><dl>
 	<dt id="Algorithm-label">Algorithm</dt>
 	<dd id="Algorithm-element">
-		<label><input type="radio" name="Algorithm" id="Algorithm-wikidecode" value="wiki_decode" <?php echo $this->algo == "wiki_decode" ? "checked='checked'" : "" ; ?> />Wiki Decode</label>
 		<label><input type="radio" name="Algorithm" id="Algorithm-wikidecodenoserialize" value="wiki_decode_no_serialize" <?php echo $this->algo == "wiki_decode_no_serialize" ? "checked='checked'" : "" ; ?>/>Wiki Decode (No unserialize)</label>
 		<label><input type="radio" name="Algorithm" id="Algorithm-base64encode" value="base64_encode" <?php echo $this->algo == "base64_encode" ? "checked='checked'" : "" ; ?>/>Base64 Encode</label>
 		<label><input type="radio" name="Algorithm" id="Algorithm-base64decode" value="base64_decode" <?php echo $this->algo == "base64_decode" ? "checked='checked'" : "" ; ?>/>Base64 Decode</label>
