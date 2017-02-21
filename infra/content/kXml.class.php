@@ -216,7 +216,7 @@ class kXml
 	public static function getXmlAttributeAsInt($object, $attribute)
 	{
 	    if(isset($object[$attribute]))
-	        return (string) $object[$attribute];
+	        return (int) $object[$attribute];
 	}
 
 	/**
