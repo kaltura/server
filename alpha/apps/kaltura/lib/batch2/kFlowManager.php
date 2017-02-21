@@ -529,7 +529,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		if(
 			$object instanceof entry
 			&&	in_array(entryPeer::STATUS, $modifiedColumns)
-			&&	$object->getStatus() == entryStatus::READY
+			&&	($object->getStatus() == entryStatus::READY || $object->getStatus() == entryStatus::ERROR_CONVERTING)
 			&&	$object->getReplacedEntryId()
 		)
 			return true;
@@ -580,7 +580,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		if(
 			$object instanceof entry
 			&&	in_array(entryPeer::STATUS, $modifiedColumns)
-			&&	$object->getStatus() == entryStatus::READY
+			&&	($object->getStatus() == entryStatus::READY || $object->getStatus() == entryStatus::ERROR_CONVERTING)
 			&&	$object->getReplacedEntryId()
 		)
 		{
