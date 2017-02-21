@@ -407,17 +407,16 @@ class KalturaResponseCacher extends kApiCache
 	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
 	{
 		$result = parent::checkCache($cacheHeaderName, $cacheHeader);
+		if(!$result)
+			return $result;
 		
-		if($result)
+		if (is_array($this->_responseMetadata) && isset($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
 		{
-			if (is_array($this->_responseMetadata) && isset($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
-			{
-				$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
-				$filePath = key($responsePostProcessor);
-				require_once $filePath;
-				$postProcessor = unserialize($responsePostProcessor[$filePath]);
-				self::$_responsePostProcessor = $postProcessor;
-			}
+			$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
+			$filePath = key($responsePostProcessor);
+			require_once $filePath;
+			$postProcessor = unserialize($responsePostProcessor[$filePath]);
+			self::$_responsePostProcessor = $postProcessor;
 		}
 		
 		return $result;
