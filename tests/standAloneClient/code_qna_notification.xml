@@ -11,7 +11,7 @@
 		<!-- script will ask for username / password interactively -->
 	</session>
         <multirequest>
-			<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="8006">
+			<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 				<template objectType="KalturaPushNotificationTemplate">
 					<name>CODE_QNA_NOTIFICATIONS</name>
 					<systemName>CODE_QNA_NOTIFICATIONS</systemName>
@@ -67,7 +67,7 @@
 					</userParameters>
 				</template>
 			</request>
-			<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="8006">
+			<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
 				<id>{1:result:id}</id>
 				<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 			</request>
