@@ -199,7 +199,7 @@ class registerNotificationPostProcessor
 		$result = new KalturaPushNotificationData();
 		$result->queueName = self::QUEUE_NAME_PREFIX . $queueName . self::QUEUE_NAME_POSTFIX;
 		$result->queueKey = self::QUEUE_KEY_PREFIX . $queueKey . self::QUEUE_KEY_POSTFIX;
-		$result->url = infraRequestUtils::getProtocol() . "://" . kConf::get("push_server_host") . "/?p=" . $partnerId . "&x={urlData}";;
+		$result->url = infraRequestUtils::getProtocol() . "://" . kConf::get("push_server_host") . "/?p=" . $partnerId . "&x={urlData}";
 		
 		return $result;
 	}
