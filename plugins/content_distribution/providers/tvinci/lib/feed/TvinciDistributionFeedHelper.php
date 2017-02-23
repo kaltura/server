@@ -9,6 +9,7 @@ class TvinciDistributionFeedHelper
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
+	const EMPTY_PLACE_HOLDER = '@EMPTY_PLACE_HOLDER@';
 	const DELETE_XML = "<feed><export><media co_guid=\"COGUID\" entry_id=\"ENTRYID\" action=\"delete\" is_active=\"true\" erase=\"true\"/></export></feed>";
 
 	/**
@@ -149,6 +150,7 @@ class TvinciDistributionFeedHelper
 			$feedAsString = str_replace("ENTRYID", $this->entry->getId(), $feedAsString);
 		}
 
+		$feedAsString = str_replace(self::EMPTY_PLACE_HOLDER, '', $feedAsString);
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsString));
 
@@ -209,7 +211,7 @@ class TvinciDistributionFeedHelper
 		{
 			KalturaLog::debug("Adding fields to metadata with profileID [$metadataProfileId] with the keys: " .print_r($diffKeys, true));
 			foreach($diffKeys as $key => $val)
-				$metadataObject->metadata->addChild($key, '');
+				$metadataObject->metadata->addChild($key, self::EMPTY_PLACE_HOLDER);
 		}
 	}
 
