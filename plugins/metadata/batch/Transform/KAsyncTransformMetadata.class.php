@@ -35,9 +35,9 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	 */
 	protected function getJobs()
 	{
-		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
+		$maxJobToPull = KBatchBase::$taskConfig->maxJobToPullToCache;
 		return self::$kClient->metadataBatch->getExclusiveTransformMetadataJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 1, 
-				$this->getFilter(), $maxOffset);
+				$this->getFilter(), $maxJobToPull);
 	}
 	
 	/* (non-PHPdoc)
