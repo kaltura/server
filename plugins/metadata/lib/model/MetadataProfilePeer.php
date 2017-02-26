@@ -33,12 +33,17 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 	 * @param      PropelPDO $con the connection to use
 	 * @return     MetadataProfile
 	 */
-	public static function retrieveBySystemName($systemName, $partnerId = null, PropelPDO $con = null)
+	public static function retrieveBySystemName($systemName, $partnerIds = null, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(MetadataProfilePeer::SYSTEM_NAME, $systemName);
-		if($partnerId)
-			$criteria->add(MetadataProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		if($partnerIds)
+		{
+			$partnerIds = !is_array($partnerIds) ? array($partnerIds) : $partnerIds;
+			$partnerIds = array_map ('intval', $partnerIds);
+			$criteria->add(MetadataProfilePeer::PARTNER_ID, $partnerIds, Criteria::IN);
+		
+		}
 		return MetadataProfilePeer::doSelectOne($criteria, $con);
 	}
 	
