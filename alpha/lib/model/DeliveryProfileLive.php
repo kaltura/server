@@ -342,6 +342,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				KalturaLog::debug("Failed to parse domain from original url, signed domain will not be modified");
 			}
 		}
+
+		//Remove schema from the signed token to avoid validation errors in case manifest is in http and urls are rtunined in https
+		$url = preg_replace('#^https?://#', '', $url);
 		
 		$token = md5("$livePackagerToken $url", true);
 		$token = rtrim(strtr(base64_encode($token), '+/', '-_'), '=');

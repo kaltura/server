@@ -9,6 +9,7 @@ class TvinciDistributionFeedHelper
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
+	const EMPTY_PLACE_HOLDER = '@EMPTY_PLACE_HOLDER@';
 	const DELETE_XML = "<feed><export><media co_guid=\"COGUID\" entry_id=\"ENTRYID\" action=\"delete\" is_active=\"true\" erase=\"true\"/></export></feed>";
 
 	/**
@@ -127,6 +128,7 @@ class TvinciDistributionFeedHelper
 		$this->_doc->encoding = "UTF-8";
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
+		self::addEmptyValueInMetadataObjects($feedAsXml);
 
 		if ( $action != self::ACTION_DELETE )
 		{
@@ -148,6 +150,7 @@ class TvinciDistributionFeedHelper
 			$feedAsString = str_replace("ENTRYID", $this->entry->getId(), $feedAsString);
 		}
 
+		$feedAsString = str_replace(self::EMPTY_PLACE_HOLDER, '', $feedAsString);
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsString));
 
@@ -181,6 +184,38 @@ class TvinciDistributionFeedHelper
 
 		return $this->getXml();
 	}
+	
+	private static function addEmptyValueInMetadataObjects($feedAsXmlForEntry)
+	{
+		$metadataObjects = $feedAsXmlForEntry->customData;
+		if ($metadataObjects)
+		{
+			foreach($metadataObjects as $metadataObject)
+				self::addEmptyValueInMetadataObject($metadataObject);
+		}
+	}
+
+	private static function addEmptyValueInMetadataObject($metadataObject)
+	{
+		$metadataProfileId = kXml::getXmlAttributeAsInt($metadataObject, 'metadataProfileId');
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+		if (!$metadataProfile)
+			return;
+
+		$metadataFieldsKeys = $metadataProfile->getMetadataFieldsKeys();
+		$metadataFieldsKeys = array_flip($metadataFieldsKeys); //because we only need the names of the fields
+		$entryKeys = (array)$metadataObject->metadata;
+		$diffKeys = array_diff_key($metadataFieldsKeys, $entryKeys);
+
+		if (count($diffKeys) > 0)
+		{
+			KalturaLog::debug("Adding fields to metadata with profileID [$metadataProfileId] with the keys: " .print_r($diffKeys, true));
+			foreach($diffKeys as $key => $val)
+				$metadataObject->metadata->addChild($key, self::EMPTY_PLACE_HOLDER);
+		}
+	}
+
+	
 
 	private function setAttribute($node, $attribName, $attribValue)
 	{

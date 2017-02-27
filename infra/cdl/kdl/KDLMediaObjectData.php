@@ -220,7 +220,7 @@
 		public $_isShrinkBitrateToSource=1;		// - frame rate
 		public $_isFrameRateForLowBrAppleHls=0; // for default fr (keep source fr),adjust for Apple HLS recommendations. Relevant only for <200 kbps;
 		public $_anamorphic=0;					// null,0,1 - regular/square pixs, otherwise - anamorphic
-		public $_isForcedKeyFrames=1;			// ForcedKF not needed for mezz files. default=1
+		public $_forcedKeyFramesMode=1;			// ForcedKF not needed for mezz files, 0:no forced KF, 1:use GOP value (default), 2: follow source KF's
 		public $_isCropIMX = false;				// For IMX sources, apply cropping of the top 32 pixs
 		public $_maxFrameRate=0;
 		public $_watermarkData;

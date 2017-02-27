@@ -7,6 +7,7 @@ class playManifestAction extends kalturaAction
 {
 	
 	const URL = 'url';
+	const DOWNLOAD = 'download';
 	
 	const HDNETWORKSMIL = 'hdnetworksmil';
 	
@@ -221,8 +222,10 @@ class playManifestAction extends kalturaAction
 		$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer));
 		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data
-			
-		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, ContextType::PLAY, $keyValueHashes);
+
+		$context = $this->deliveryAttributes->getFormat() == self::DOWNLOAD ? ContextType::DOWNLOAD : ContextType::PLAY;
+		
+		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, $context, $keyValueHashes);
 		
 		if ($this->secureEntryHelper->shouldPreview())
 		{
@@ -577,8 +580,11 @@ class playManifestAction extends kalturaAction
 			return;
 		
 		$oneOnly = false;
-		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP || $this->deliveryAttributes->getFormat() == "url" || $this->deliveryAttributes->getFormat() == "rtsp")
+		if(in_array($this->deliveryAttributes->getFormat(), 
+			array(PlaybackProtocol::HTTP, PlaybackProtocol::RTSP, self::URL, self::DOWNLOAD)))
+		{
 			$oneOnly = true;
+		}
 
 		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
 		$flavorByTags = false;
@@ -789,6 +795,21 @@ class playManifestAction extends kalturaAction
 		}
 	}
 
+	protected function getDownloadFileName()
+	{
+		$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
+		$flavorAsset = reset($flavorAssets);
+		list($fileName, $extension) = kAssetUtils::getFileName($this->entry, $flavorAsset);
+
+		$fileName = str_replace("\n", ' ', $fileName);
+		$fileName = kString::keepOnlyValidUrlChars($fileName);
+
+		if ($extension)
+			$fileName .= ".$extension";
+
+		return $fileName;
+	}
+
 ///////////////////////////////////////////////////////////////////////////////////
 	//	Main functions
 
@@ -824,22 +845,39 @@ class playManifestAction extends kalturaAction
 		
 		// Fixing ALL kinds of historical bugs.
 		
-		if($this->deliveryAttributes->getFormat() == self::URL) {
+		switch ($this->deliveryAttributes->getFormat())
+		{
+		case self::URL:
 			if(is_null($this->deliveryAttributes->getResponseFormat()))
 				$this->deliveryAttributes->setResponseFormat('redirect');
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
-		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HD) {
+			break;
+
+		case self::DOWNLOAD:
+			if(is_null($this->deliveryAttributes->getResponseFormat()))
+				$this->deliveryAttributes->setResponseFormat('redirect');
+			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
+			$this->deliveryAttributes->setUrlParams('/fileName/' . $this->getDownloadFileName());
+			break;
+
+		case PlaybackProtocol::AKAMAI_HD:
 			// This is a hack to return an f4m that has a URL of a smil
 			return $this->serveHDNetwork();
-		} else if($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL) {
+
+		case self::HDNETWORKSMIL:
 			// Translate to playback protocol format 	
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::AKAMAI_HD);
-		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::RTMP) {
+			break;
+
+		case PlaybackProtocol::RTMP:
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0) 
 				$this->deliveryAttributes->setMediaProtocol("rtmp");
-		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP) {
+			break;
+
+		case PlaybackProtocol::HTTP:
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
 				$this->deliveryAttributes->setMediaProtocol("http");
+			break;
 		}
 
 		// <-- 

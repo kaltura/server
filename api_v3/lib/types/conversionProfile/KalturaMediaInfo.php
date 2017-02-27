@@ -249,6 +249,12 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 */
 	public $complexityValue;
 	
+	/**
+	 * @var float
+	 * @requiresPermission read
+	 */
+	public $maxGOP;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -285,6 +291,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 		"isFastStart",
 		"contentStreams",
 		"complexityValue",
+		"maxGOP",
 	);
 	
 	public function getMapBetweenObjects ( )

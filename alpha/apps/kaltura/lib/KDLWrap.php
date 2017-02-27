@@ -479,7 +479,17 @@ class KDLWrap
 				$kdlFlavor->_video->_isFrameRateForLowBrAppleHls = $cdlFlavor->getIsVideoFrameRateForLowBrAppleHls();
 				$kdlFlavor->_video->_anamorphic = $cdlFlavor->getAnamorphicPixels();
 				$kdlFlavor->_video->_maxFrameRate = $cdlFlavor->getMaxFrameRate();
-				$kdlFlavor->_video->_isForcedKeyFrames = !$cdlFlavor->getIsAvoidForcedKeyFrames();
+//				$kdlFlavor->_video->_isForcedKeyFrames = !$cdlFlavor->getIsAvoidForcedKeyFrames();
+					/*
+					 * 'getForcedKeyFramesMode' should be used instead of obsolete 'getIsAvoidForcedKeyFrames' is obsolete.
+					 * But for backward compatibility (till switching of existing non-default settings to new 'getForcedKeyFramesMode'),
+					 * check both fields
+					 */
+				if($cdlFlavor->getIsAvoidForcedKeyFrames()!=0)
+					$kdlFlavor->_video->_forcedKeyFramesMode = 0;
+				else
+					$kdlFlavor->_video->_forcedKeyFramesMode = $cdlFlavor->getForcedKeyFramesMode();
+
 				$kdlFlavor->_video->_isCropIMX = $cdlFlavor->getIsCropIMX();
 				$kdlFlavor->_video->_contentAwareness = $cdlFlavor->getContentAwareness();
 					/*
@@ -656,6 +666,7 @@ class KDLWrap
 		$medSet->_video->_rotation = $cdlMediaInfo->getVideoRotation();
 		$medSet->_video->_scanType = $cdlMediaInfo->getScanType();
 		$medSet->_video->_complexityValue = $cdlMediaInfo->getComplexityValue();
+		$medSet->_video->_gop = $cdlMediaInfo->getMaxGOP();
 /*		{
 				$medLoader = new KDLMediaInfoLoader($cdlMediaInfo->getRawData());
 				$md = new KDLMediadataset();

@@ -50,6 +50,17 @@ class DropFolderPeer extends BaseDropFolderPeer
 		DropFolderPeer::setUseCriteriaFilter(true);
 		return $dropFolder;
 	}
+
+	public static function retrieveByTag($tag, $currentDC = false)
+	{
+		$c = new Criteria();
+		$c->addAnd( self::STATUS, array(DropFolderStatus::ENABLED, DropFolderStatus::ERROR), Criteria::IN);
+		$c->addAnd(DropFolderPeer::TAGS, $tag, Criteria::EQUAL);
+		if ($currentDC)
+			$c->addAnd(DropFolderPeer::DC, kDataCenterMgr::getCurrentDcId(), Criteria::EQUAL);
+		$dropFolders = DropFolderPeer::doSelect($c);
+		return $dropFolders;
+	}
 	
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::getOMClass()

@@ -160,7 +160,7 @@ class KalturaResponseCacher extends kApiCache
 			return;
 		}
 		
-		$responseMetadata = unserialize($this->_responseMetadata);
+		$responseMetadata = $this->_responseMetadata;
 		
 		if ($responseMetadata['class'])
 		{
@@ -199,6 +199,9 @@ class KalturaResponseCacher extends kApiCache
 			}
 		}
 
+		if(self::$_responsePostProcessor)
+			self::$_responsePostProcessor->processResponse($response);
+		
 		echo $response;
 		die;
 	}
@@ -239,7 +242,7 @@ class KalturaResponseCacher extends kApiCache
 				'class' => $responseClass
 			);
 						
-			$this->storeCache($response, serialize($responseMetadata), $serializeResponse);
+			$this->storeCache($response, $responseMetadata, $serializeResponse);
 		}
 		
 		if ($response instanceof kRendererBase)
@@ -249,6 +252,9 @@ class KalturaResponseCacher extends kApiCache
 		}
 		else
 		{
+			if(self::$_responsePostProcessor)
+				self::$_responsePostProcessor->processResponse($response);
+			
 			echo $response;
 			die;
 		}
@@ -353,6 +359,10 @@ class KalturaResponseCacher extends kApiCache
 		$processingTime = microtime(true) - $startTime;
 		$cacheKey = md5("{$partnerId}_{$userId}_{$type}_{$expiry}_{$privileges}");
 		header("X-Kaltura:cached-dispatcher,$cacheKey,$processingTime", false);
+		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
+		header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
+		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
+		header("Pragma: no-cache", true);
 		
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
@@ -393,5 +403,35 @@ class KalturaResponseCacher extends kApiCache
 			$curInstance->_cacheHeadersExpiry = $expiry;
 		}
 	}
-
+	
+	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
+	{
+		$result = parent::checkCache($cacheHeaderName, $cacheHeader);
+		if(!$result)
+			return $result;
+		
+		if (isset($this->_responseMetadata['responsePostProcessor']) && is_array($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
+		{
+			$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
+			$filePath = key($responsePostProcessor);
+			require_once $filePath;
+			$postProcessor = unserialize($responsePostProcessor[$filePath]);
+			self::$_responsePostProcessor = $postProcessor;
+		}
+		
+		return $result;
+	}
+	
+	public function storeCache($response, $responseMetadata = "", $serializeResponse = false)
+	{		
+		if(self::$_responsePostProcessor)
+		{
+			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
+			$fileName = $postProcessorClass->getFileName();
+			$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
+			$responseMetadata['responsePostProcessor'] = $responsePostProcessor;
+		}
+		
+		parent::storeCache($response, $responseMetadata, $serializeResponse);
+	}
 }

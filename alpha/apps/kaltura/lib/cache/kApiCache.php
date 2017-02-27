@@ -24,7 +24,7 @@ class kApiCache extends kApiCacheBase
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
 
-	const CACHE_VERSION = '11';
+	const CACHE_VERSION = '14';
 
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
@@ -760,7 +760,10 @@ class kApiCache extends kApiCacheBase
 			return false;
 		}
 
-		$this->_responseMetadata = $responseMetadata;
+		if($responseMetadata)
+			$this->_responseMetadata = unserialize($responseMetadata);
+		else
+			$this->_responseMetadata = array();
 
 		if ($this->_cacheRulesDirty)
 		{
@@ -933,7 +936,7 @@ class kApiCache extends kApiCacheBase
 
 		if (!$foundHeader)
 			header("X-Kaltura: cache-key,".$this->_cacheKey);
-
+		
 		$this->_responseMetadata = $responseMetadata;
 		$this->_cacheId = microtime(true) . '_' . getmypid();
 
@@ -951,7 +954,8 @@ class kApiCache extends kApiCacheBase
 			if (self::$_debugMode)
 				$curCacheStore->set($this->_cacheKey . self::SUFFIX_LOG, print_r($this->_params, true), $maxExpiry + self::EXPIRY_MARGIN);
 			$curCacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($this->_cacheRules), $maxExpiry + self::EXPIRY_MARGIN);
-			$curCacheStore->set($this->_cacheKey . self::SUFFIX_DATA, implode(self::CACHE_DELIMITER, array($this->_cacheId, $this->_responseMetadata, $response)), $maxExpiry);
+			$responseMetadata = $this->_responseMetadata ? serialize($this->_responseMetadata) : '';
+			$curCacheStore->set($this->_cacheKey . self::SUFFIX_DATA, implode(self::CACHE_DELIMITER, array($this->_cacheId, $responseMetadata, $response)), $maxExpiry);
 		}
 	}
 

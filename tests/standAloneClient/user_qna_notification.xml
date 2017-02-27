@@ -8,12 +8,7 @@
 		<userAgent>Stand alone php 1.0.0</userAgent>
 	</config>
 	<session>
-		<partnerId>-2</partnerId>
-		<secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
-		<userId></userId>
-		<sessionType>2</sessionType>
-		<expiry>86400</expiry>
-		<privileges></privileges>
+		<!-- script will ask for username / password interactively -->
 	</session>
 	<multirequest>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
@@ -64,24 +59,52 @@
 							</item>
 						</values>
 					</item>
-				</eventConditions>
-				<contentParameters objectType="array">
-					<item objectType="KalturaEventNotificationParameter">
-						<key>entryId</key>
-						<description></description>
-						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getEntryId()</code>
-						</value>
+					<item objectType="KalturaOrCondition">
+                       	<conditions objectType="array">
+                    		<item objectType="KalturaMatchMetadataCondition">
+                            	<description>User_qna_added</description>
+                                <xPath>/*[local-name()='metadata']/*[local-name()='Type']</xPath>
+                                <profileSystemName>Kaltura-QnA</profileSystemName>
+                                <values objectType="array">
+                                	<item objectType="KalturaStringValue">
+                                    	<value>Question</value>
+									</item>
+								</values>
+							</item>
+							<item objectType="KalturaMatchMetadataCondition">
+                            	<description>AnswerOnAir_added</description>
+                                <xPath>/*[local-name()='metadata']/*[local-name()='Type']</xPath>
+                                <profileSystemName>Kaltura-QnA</profileSystemName>
+							<values objectType="array">
+                                	<item objectType="KalturaStringValue">
+                                		<value>Answer</value>
+                                	</item>
+								</values>
+							</item>
+						</conditions>
 					</item>
-					<item objectType="KalturaEventNotificationParameter">
+				</eventConditions>
+				<queueNameParameters objectType="array">
+					<item objectType="KalturaPushEventNotificationParameter">
+						<key>entryId</key>
+                        <queueKeyToken></queueKeyToken>
+                        <description></description>
+                        <value objectType="KalturaEvalStringField">
+                        	<code>$scope->getObject()->getEntryId()</code>
+                        </value>
+					</item>
+				</queueNameParameters>
+				<queueKeyParameters objectType="array">
+					<item objectType="KalturaPushEventNotificationParameter">
 						<key>userId</key>
 						<description></description>
+						<queueKeyToken>{userId}</queueKeyToken>
 						<value objectType="KalturaMetadataField">
 							<xPath>/*[local-name()='metadata']/*[local-name()='ThreadCreatorId']</xPath>
 							<profileSystemName>Kaltura-QnA</profileSystemName>
 						</value>
 					</item>
-				</contentParameters>
+				</queueKeyParameters>
 				<userParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>cue_point_type</key>
@@ -99,3 +122,4 @@
 		</request>
 	</multirequest>
 </xml>
+

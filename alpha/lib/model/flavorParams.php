@@ -168,4 +168,6 @@ class flavorParams extends assetParams
 	public function setContentAwareness($v){ $this->putInCustomData('ContentAwareness', $v);}
 	public function getContentAwareness(){return $this->getFromCustomData('ContentAwareness', null, 0.5);}
 
+	public function setForcedKeyFramesMode($v){ $this->putInCustomData('ForcedKeyFramesMode', $v);}
+	public function getForcedKeyFramesMode(){return $this->getFromCustomData('ForcedKeyFramesMode', null, 1);}
 }

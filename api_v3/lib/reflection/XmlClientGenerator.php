@@ -89,6 +89,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			{
 				$serviceElement->setAttribute("plugin", $plugin);
 			}
+			ksort($serviceActionItem->actionMap);
 			foreach($serviceActionItem->actionMap as $actionId => $actionReflector)
 			{
 				/* @var $actionReflector KalturaActionReflector */
