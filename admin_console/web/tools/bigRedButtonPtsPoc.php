@@ -5,9 +5,9 @@ if(!isset($_GET['partnerId']))
 if(!isset($_GET['playerVersion']))
 	die('html5 lib version must be supplied in query string');
 
-$partnerId = $_GET['partnerId'];
+$partnerId = strip_tags($_GET['partnerId']);
 
-$html5Version = $_GET['playerVersion'];
+$html5Version = strip_tags($_GET['playerVersion']);
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -210,19 +210,19 @@ $html5Version = $_GET['playerVersion'];
 	  	<table>
 		<tr style="display: none; ">
 			<td>Admin Secret:</td>
-			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? $_GET['secret'] : ''; ?>" />
+			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? strip_tags($_GET['secret']) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
 			<td>Entry Id:</td>
-			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? $_GET['entryId'] : ''; ?>" />
+			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? strip_tags($_GET['entryId']) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
         	<td>Admin uiConf Id:</td>
-            <td><input type="text" id="txtAdminUiConfId" value="<?php echo isset($_GET['adminUiConfId']) ? $_GET['adminUiConfId'] : ''; ?>" />
+            <td><input type="text" id="txtAdminUiConfId" value="<?php echo isset($_GET['adminUiConfId']) ? strip_tags($_GET['adminUiConfId']) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
         	<td>User uiConf Id:</td>
-            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? $_GET['uiConfId'] : ''; ?>" />
+            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? strip_tags($_GET['uiConfId']) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
 			<td colspan="2">
