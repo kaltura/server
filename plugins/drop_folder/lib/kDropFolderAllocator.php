@@ -147,7 +147,8 @@ class kDropFolderAllocator
 		$numOfFolderFromDB = count($dropFoldersFromDB);
 		KalturaLog::info("Got $numOfFolderFromDB drop folder to insert to cache with tag [$tag] for [$ttlForList] seconds");
 
-		$cache->set($indexKey, 0, $ttlForList);
+		$indexKeyTtl = 86400 * 14; // day in secods * 14 days
+		$cache->set($indexKey, 0, $indexKeyTtl);
 		$cache->set($tagKey, $dropFoldersFromDB, $ttlForList);
 
 		$cache->delete($tagLockKey);
