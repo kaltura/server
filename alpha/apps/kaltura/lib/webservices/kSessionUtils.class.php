@@ -291,11 +291,6 @@ class ks extends kSessionBase
 		return $this->partner_id . $this->rand;
 	}
 	
-	public function getHash()
-	{
-		return $this->hash;
-	}
-	
 	public function toSecureString()
 	{
 		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);

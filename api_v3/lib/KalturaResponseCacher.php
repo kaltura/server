@@ -160,7 +160,7 @@ class KalturaResponseCacher extends kApiCache
 			return;
 		}
 		
-		$responseMetadata = unserialize($this->_responseMetadata);
+		$responseMetadata = $this->_responseMetadata;
 		
 		if ($responseMetadata['class'])
 		{
@@ -199,6 +199,9 @@ class KalturaResponseCacher extends kApiCache
 			}
 		}
 
+		if(self::$_responsePostProcessor)
+			self::$_responsePostProcessor->processResponse($response);
+		
 		echo $response;
 		die;
 	}
@@ -239,7 +242,7 @@ class KalturaResponseCacher extends kApiCache
 				'class' => $responseClass
 			);
 						
-			$this->storeCache($response, serialize($responseMetadata), $serializeResponse);
+			$this->storeCache($response, $responseMetadata, $serializeResponse);
 		}
 		
 		if ($response instanceof kRendererBase)
@@ -249,6 +252,9 @@ class KalturaResponseCacher extends kApiCache
 		}
 		else
 		{
+			if(self::$_responsePostProcessor)
+				self::$_responsePostProcessor->processResponse($response);
+			
 			echo $response;
 			die;
 		}

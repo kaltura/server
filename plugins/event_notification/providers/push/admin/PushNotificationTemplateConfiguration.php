@@ -5,6 +5,40 @@
 */
 class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationTemplateConfiguration
 {
+	public function populateFromObject($object, $add_underscore = true)
+	{
+		if(!($object instanceof Kaltura_Client_PushNotification_Type_PushNotificationTemplate))
+			return;
+		
+		if($object->queueNameParameters && count($object->queueNameParameters))
+		{
+			$queueNameParameters = array();
+			foreach($object->queueNameParameters as $index => $parameter)
+				$queueNameParameters[] = $this->getParameterDescription($parameter);
+		
+			$queueNameParametersList = new Infra_Form_HtmlList('queueNameParameters', array(
+					'legend'		=> 'queue Name Parameters',
+					'list'			=> $queueNameParameters,
+			));
+			$this->addElements(array($queueNameParametersList));
+		}
+
+		if($object->queueKeyParameters && count($object->queueKeyParameters))
+		{
+			$queueKeyParameters = array();
+			foreach($object->queueKeyParameters as $index => $parameter)
+				$queueKeyParameters[] = $this->getParameterDescription($parameter);
+		
+			$queueKeyParametersList = new Infra_Form_HtmlList('queueKeyParameters', array(
+					'legend'		=> 'queue Key Parameters',
+					'list'			=> $queueKeyParameters,
+			));
+			$this->addElements(array($queueKeyParametersList));
+		}
+		
+		parent::populateFromObject($object, $add_underscore);
+	}
+	
     protected function addTypeElements(Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate)
     {
         $element = new Infra_Form_Html('http_title', array(
