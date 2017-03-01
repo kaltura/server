@@ -1597,13 +1597,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/*
 	 * Check if recorded entry should be served from live
 	 */
-	public static function shouldServeVodFromLive(entry $entry)
+	public static function shouldServeVodFromLive(entry $entry, $validateStatus = true)
 	{
-		$typeMatch = $entry->getType() == entryType::MEDIA_CLIP;
-		$sourceMatch = $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
-		$statusMatch = $entry->getStatus() == entryStatus::READY;
-		
-		if($typeMatch && $sourceMatch && $statusMatch)
+		$shouldServeVodFromLive = $entry->getType() == entryType::MEDIA_CLIP && $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
+		if($validateStatus)
+			$shouldServeVodFromLive = $shouldServeVodFromLive && $entry->getStatus() == entryStatus::READY;
+				
+		if($shouldServeVodFromLive)
 		{
 			$readyAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusIn($entry->getId(), array(asset::ASSET_STATUS_READY));
 			if(!count($readyAssets))

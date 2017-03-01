@@ -734,10 +734,13 @@ class BaseEntryService extends KalturaEntryService
 		
 		if ($dbEntry->getStatus() != entryStatus::READY)
 		{
+			$cacheExpirationTime = 60;
+			if($dbEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+				$cacheExpirationTime = 10;
 			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
 			// and the request becomes cached for a long time, preventing playback even after the entry
 			// becomes ready
-			kApiCache::setExpiry(60);
+			kApiCache::setExpiry($cacheExpirationTime);
 		}
 		
 		$asset = null;
