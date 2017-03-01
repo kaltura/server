@@ -85,7 +85,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		$folderTag = self::$taskConfig->params->tags;
 		$maxTimeForFolder = self::$taskConfig->params->maxTimeForFolder;
-		if (strlen($folderTag) == 0 || $folderTag == '*')
+		if (strlen($folderTag) == 0)
 			throw new KalturaException('Tags must be specify in configuration - cannot continue');
 
 		$dropFolders = $this->dropFolderPlugin->dropFolder->getExclusiveDropFolder($folderTag, $maxTimeForFolder);
