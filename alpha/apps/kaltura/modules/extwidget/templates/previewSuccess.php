@@ -9,8 +9,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<?php if( $entry_id ) { ?>
 	<meta property="og:url" content="<?php echo $pageURL; ?>" />
-	<meta property="og:title" content="<?php echo strip_tags(html_entity_decode($entry_name)); ?>" />
-	<meta property="og:description" content="<?php echo strip_tags(html_entity_decode($entry_description)); ?>" />
+	<meta property="og:title" content="<?php echo addslashes(strip_tags(html_entity_decode($entry_name))); ?>" />
+	<meta property="og:description" content="<?php echo addslashes(strip_tags(html_entity_decode($entry_description))); ?>" />
 	<meta property="og:type" content="video.other" />
 	<meta property="og:image" content="<?php echo $entry_thumbnail_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:image:secure_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
