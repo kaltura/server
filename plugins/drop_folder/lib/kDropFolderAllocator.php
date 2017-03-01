@@ -142,7 +142,6 @@ class kDropFolderAllocator
 		$tagKey = self::getCacheKeyForDropFolderTag($tag);
 		$indexKey = self::getCacheKeyForIndex($tag);
 		$ttlForList = kConf::get("DropFolderListTTL");
-		
 		$dropFoldersFromDB = DropFolderPeer::retrieveByTag($tag, true);
 		$numOfFolderFromDB = count($dropFoldersFromDB);
 		KalturaLog::info("Got $numOfFolderFromDB drop folder to insert to cache with tag [$tag] for [$ttlForList] seconds");
