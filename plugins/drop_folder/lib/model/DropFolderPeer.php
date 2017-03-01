@@ -55,7 +55,8 @@ class DropFolderPeer extends BaseDropFolderPeer
 	{
 		$c = new Criteria();
 		$c->addAnd( self::STATUS, array(DropFolderStatus::ENABLED, DropFolderStatus::ERROR), Criteria::IN);
-		$c->addAnd(DropFolderPeer::TAGS, $tag, Criteria::EQUAL);
+		if ($tag)
+			$c->addAnd(DropFolderPeer::TAGS, $tag, Criteria::EQUAL);
 		if ($currentDC)
 			$c->addAnd(DropFolderPeer::DC, kDataCenterMgr::getCurrentDcId(), Criteria::EQUAL);
 		$dropFolders = DropFolderPeer::doSelect($c);
