@@ -6,6 +6,8 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 {
 	const INTEGRATION_PLUGIN_NAME = 'integration';
 	
+	abstract function getProvider();
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPending::dependsOn()
 	 */
