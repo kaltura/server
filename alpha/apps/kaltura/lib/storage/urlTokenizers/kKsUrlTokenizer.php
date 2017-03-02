@@ -8,6 +8,11 @@ class kKsUrlTokenizer extends kUrlTokenizer
 	protected $usePath;
 	
 	/**
+	 * @var string
+	 */
+	protected $additionalUris;
+
+	/**
 	 * @return $usePath
 	 */
 	public function getUsePath() 
@@ -24,6 +29,22 @@ class kKsUrlTokenizer extends kUrlTokenizer
 	}
 	
 	/**
+	 * @return $additionalUris
+	 */
+	public function getAdditionalUris()
+	{
+		return $this->additionalUris;
+	}
+
+	/**
+	 * @param string $additionalUris
+	 */
+	public function setAdditionalUris($additionalUris)
+	{
+		$this->additionalUris = $additionalUris;
+	}
+
+	/**
 	 * @param string $url
 	 * @param string $urlPrefix
 	 * @return string
@@ -38,11 +59,16 @@ class kKsUrlTokenizer extends kUrlTokenizer
 		}
 		
 		$uriRestrict = explode(',', $url);		// cannot contain commas, since it's used as the privileges delimiter
-		$uriRestrict = $uriRestrict[0];
+		$uriRestrict = $uriRestrict[0] . '*';
+
+		if ($this->additionalUris)
+		{
+			$uriRestrict .= '|' . $this->additionalUris;
+		}
 		
 		$privileges = kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $this->entryId;
 		$privileges .= ',' . kSessionBase::PRIVILEGE_VIEW . ':' . $this->entryId;
-		$privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . $uriRestrict . '*';
+		$privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . $uriRestrict;
 		if ($this->limitIpAddress)
 		{
 			$privileges .= ',' . kSessionBase::PRIVILEGE_IP_RESTRICTION . ':' . infraRequestUtils::getRemoteAddress();
