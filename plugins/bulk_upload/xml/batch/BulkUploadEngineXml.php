@@ -472,8 +472,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$thumbResources = array();
 		$resource = new KalturaAssetsParamsResourceContainers(); // holds all teh needed resources for the conversion
 		$resource->resources = array();
-		
-		
+
+		//default action to perfom for assets and thumbnails is replace
+		$contentAssetsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
+		$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
 		if(isset($item->contentAssets->action) && (isset($item->thumbnails->action)))
 		{
 			$contentAssetsAction = strtolower($item->contentAssets->action);
@@ -489,15 +491,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$contentAssetsAction = strtolower($item->thumbnails->action);
 			$thumbnailsAction = strtolower($item->thumbnails->action);
 		}
-		else
-		{
-			//default action to perfom for assets and thumbnails is replace
-			$contentAssetsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
-			$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
-		}
-		
-		
-		
+
 		if (isset($item->contentAssets->action) && isset($item->thumbnails->action) && ($contentAssetsAction != $thumbnailsAction))
 			throw new KalturaBatchException("ContentAsset->action: {$contentAssetsAction} must be the same as thumbnails->action: {$thumbnailsAction}", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		
@@ -609,8 +603,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 
+
+		$this->handlePluginAddedData($item, $existingEntry);
 		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
-		
+
 		switch($contentAssetsAction)
 		{
 			case self::$actionsMap[KalturaBulkUploadAction::UPDATE]:
@@ -629,26 +625,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult, true);
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
-				
-		//Handles the plugin added data
-		$pluginsErrorResults = array();
-		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
-		foreach($pluginsInstances as $pluginsInstance)
-		{
-			/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
-			try {
-				$pluginsInstance->configureBulkUploadXmlHandler($this);
-				$pluginsInstance->handleItemUpdated($entry, $item);
-			}catch (Exception $e)
-			{
-				KalturaLog::err($pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage());
-				$pluginsErrorResults[] = $pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage();
-			}
-		}
-		
-		if(count($pluginsErrorResults))
-			throw new Exception(implode(', ', $pluginsErrorResults));
-	
+
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$updatedEntryBulkUploadResult->errorDescription = $nonCriticalErrors;
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
@@ -2399,5 +2376,33 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	public function getObjectTypeTitle()
 	{
 		return self::OBJECT_TYPE_TITLE;
+	}
+
+	/**
+	 * @param SimpleXMLElement $item
+	 * @param $entry
+	 * @throws Exception
+	 */
+	protected function handlePluginAddedData(SimpleXMLElement $item, $entry)
+	{
+		//Handles the plugin added data
+		$pluginsErrorResults = array();
+		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
+		foreach ($pluginsInstances as $pluginsInstance)
+		{
+			/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
+			try
+			{
+				$pluginsInstance->configureBulkUploadXmlHandler($this);
+				$pluginsInstance->handleItemUpdated($entry, $item);
+			} catch (Exception $e)
+			{
+				KalturaLog::err($pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage());
+				$pluginsErrorResults[] = $pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage();
+			}
+		}
+
+		if (count($pluginsErrorResults))
+			throw new Exception(implode(', ', $pluginsErrorResults));
 	}
 }
