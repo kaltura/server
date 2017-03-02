@@ -350,6 +350,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $htmlPurifierBaseListUsage;
 	
+	/**
+	 * @var int
+	 */
+	public $defaultLiveStreamSegmentDuration;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -418,6 +423,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	    "timeAlignedRenditions",
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
+		"defaultLiveStreamSegmentDuration",
 	);
 
 	public function getMapBetweenObjects()
