@@ -485,6 +485,17 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			if (!$liveThumbEntry || $liveThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
 				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_LIVE_THUMB_ENTRY_ID_ERROR, $liveThumbEntryId);
 		}
+		
+		$defaultLiveStreamSegmentDuration = $this->defaultLiveStreamSegmentDuration;
+		if(!is_null($defaultLiveStreamSegmentDuration))
+		{
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
+				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName($this->defaultLiveStreamSegmentDuration));
+			}
+			
+			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
+			$this->validatePropertyMinMaxValue('defaultLiveStreamSegmentDuration', KalturaLiveEntry::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, KalturaLiveEntry::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
+		}
 	
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
 	}
