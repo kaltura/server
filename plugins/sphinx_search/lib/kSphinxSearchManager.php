@@ -504,9 +504,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if ($cache)
 		{
+			$cache->add($cacheKey, 0, 60);
 			$saveCounter = $cache->increment($cacheKey);
-			if (!$saveCounter)
-				$saveCounter = $cache->add($cacheKey, 1, 60);
 		}
 		
 		KalturaLog::debug('Updating sphinx for object [' . get_class($object) . '] [' . $object->getId() . '] count [ '. $saveCounter . ' ] ' . kCurrentContext::$service . ' ' . kCurrentContext::$action);
