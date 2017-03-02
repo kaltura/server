@@ -11,9 +11,15 @@ abstract class KalturaMatchCondition extends KalturaCondition
 	 */
 	public $values;
 	
+	/**
+	 * @var bool
+	 */
+	public $restrictEmptyFieldValues;
+	
 	private static $mapBetweenObjects = array
 	(
 		'values',
+		'restrictEmptyFieldValues'
 	);
 	
 	public function getMapBetweenObjects()
