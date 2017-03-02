@@ -391,6 +391,22 @@ class kSessionBase
 		return $this->partner_id;
 	}
 	
+	protected function isValidUriRestrict()
+	{
+		$value = implode(self::PRIVILEGES_DELIMITER, $this->parsedPrivileges[self::PRIVILEGE_URI_RESTRICTION]);
+		$uris = explode('|', $value);
+		foreach ($uris as $uri)
+		{
+			if ($_SERVER["REQUEST_URI"] == $uri ||		// exact match
+				(substr($uri, -1) == '*' && 			// prefix match
+				substr($_SERVER["REQUEST_URI"], 0, strlen($uri) - 1) == substr($uri, 0, -1)))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public function isValidBase()
 	{
 		if (!$this->real_str || !$this->hash)
@@ -407,10 +423,7 @@ class kSessionBase
 		
 		if (array_key_exists(self::PRIVILEGE_URI_RESTRICTION, $this->parsedPrivileges))
 		{
-			$value = implode(self::PRIVILEGES_DELIMITER, $this->parsedPrivileges[self::PRIVILEGE_URI_RESTRICTION]);
-			if ($_SERVER["REQUEST_URI"] != $value &&		// exact match
-				(substr($value, -1) != '*' || 				// prefix match
-				substr($_SERVER["REQUEST_URI"], 0, strlen($value) - 1) != substr($value, 0, -1)))
+			if (!$this->isValidUriRestrict())
 			{
 				return self::EXCEEDED_RESTRICTED_URI;
 			}
