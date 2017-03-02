@@ -1806,11 +1806,11 @@ class Partner extends BasePartner
 	
 	public function getDefaultLiveStreamSegmentDuration()
 	{
-		return $this->getFromCustomData( "defualt_live_stream_segment_duration", null , null );
+		return $this->getFromCustomData( "default_live_stream_segment_duration", null , null );
 	}
 	
 	public function setDefaultLiveStreamSegmentDuration($v)
 	{
-		$this->putInCustomData( "defualt_live_stream_segment_duration", $v );
+		$this->putInCustomData( "default_live_stream_segment_duration", $v );
 	}
 }
