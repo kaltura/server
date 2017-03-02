@@ -486,11 +486,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_LIVE_THUMB_ENTRY_ID_ERROR, $liveThumbEntryId);
 		}
 		
-		$defaultLiveStreamSegmentDuration = $this->defaultLiveStreamSegmentDuration;
-		if(!is_null($defaultLiveStreamSegmentDuration))
+		if (!$this->isNull('defaultLiveStreamSegmentDuration'))
 		{
-			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
-				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName($this->defaultLiveStreamSegmentDuration));
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->id)) {
+				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName('defaultLiveStreamSegmentDuration'));
 			}
 			
 			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
