@@ -499,7 +499,17 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function saveToSphinx(IIndexable $object, $isInsert = false, $force = false)
 	{
-		KalturaLog::debug('Updating sphinx for object [' . get_class($object) . '] [' . $object->getId() . ']');
+		$saveCounter = 0;
+		$cacheKey = "SPHSave:".get_class($object).":".$object->getId();
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if ($cache)
+		{
+			$saveCounter = $cache->increment($cacheKey);
+			if (!$saveCounter)
+				$saveCounter = $cache->add($cacheKey, 1, 60);
+		}
+		
+		KalturaLog::debug('Updating sphinx for object [' . get_class($object) . '] [' . $object->getId() . '] count [ '. $saveCounter . ' ] ' . kCurrentContext::$service . ' ' . kCurrentContext::$action);
 		$sql = $this->getSphinxSaveSql($object, $isInsert, $force);
 		if(!$sql)
 			return true;
