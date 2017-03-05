@@ -854,7 +854,8 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 				array_push($auxArr, "-loop", 1, "-t", $loopTime);
 			array_push($auxArr, "-i",KDLCmdlinePlaceholders::WaterMarkFileName);
 		}
-		$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
+		$tmpArr=array_keys($cmdValsArr, '-i');
+		$insertHere = end($tmpArr)+2;
 		array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
 	}
 	
