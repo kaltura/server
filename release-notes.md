@@ -1,3 +1,21 @@
+# Lynx 12.12.0 #
+
+## User KS allow specific permission to approveReplace ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6663
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_01_add_kms_user_permission_and_role.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.11.0 #
 
 ## Push notification redesig + caching optiization ##
