@@ -12,9 +12,6 @@ None.
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_05_add_batch_thumbasset_delete_permission.php
 
-#### Known Issues & Limitations ####
-
-None.
 
 ## User KS allow specific permission to approveReplace ##
 
