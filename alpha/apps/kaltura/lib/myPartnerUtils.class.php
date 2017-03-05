@@ -344,7 +344,7 @@ class myPartnerUtils
 	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null )
 	{
 		// in case the request came through https, force https url
-		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+		if (infraRequestUtils::getProtocol() == 'https')
 			$protocol = 'https';
 
 		// temporary default is http since the system is not aligned to use https in all of its components (e.g. kmc)
