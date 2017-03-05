@@ -421,7 +421,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('text', 'default_live_stream_segment_duration', array(
-				'label'			=> 'Defualt segment duration (Kaltura Live):',
+				'label'			=> 'Default segment duration (Kaltura Live):',
 				'filters'		=> array('StringTrim'),
 		));
 		
