@@ -1,5 +1,21 @@
 # Lynx 12.12.0 #
 
+## Add batch thumbasset delete permission ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6916
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_05_add_batch_thumbasset_delete_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## User KS allow specific permission to approveReplace ##
 
  - Issue Type: New Feature
