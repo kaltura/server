@@ -1326,7 +1326,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 
 		$ks = $this->getKs();
-		if ((!$ks || !$this->getKs()->isAdmin()) && !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_USER, $entry->userId))
+		if (!$ks ||(!$this->getKs()->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_USER, $entry->userId)))
 		{
 			$entryPuserId = $dbEntry->getPuserId();
 			
