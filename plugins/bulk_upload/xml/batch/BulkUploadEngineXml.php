@@ -753,7 +753,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
 
 		$nonCriticalErrors = '';
-		$addedThumbAssetsIds = array();
+		$newThumbAssetsIds = array();
 		foreach($requestResults as $requestResult)
 		{
 			if (is_array($requestResult) && isset($requestResult['code']))
@@ -761,33 +761,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if ($requestResult instanceof Exception)
 				$nonCriticalErrors .= $requestResult->getMessage()."\n";
 			if ($requestResult instanceof KalturaThumbAsset)
-				$addedThumbAssetsIds[] = $requestResult->id;
+				$newThumbAssetsIds[] = $requestResult->id;
 		}
 
 		//delete old thumbnails if necessary
-		if(!$resource && !$keepManualThumbnails  && count($addedThumbAssetsIds) > 0)
-		{
-			$filter = new KalturaAssetFilter();
-			$filter->entryIdEqual = $updatedEntryId;
-			$thumbList = KBatchBase::$kClient->thumbAsset->listAction($filter);
-
-			KBatchBase::$kClient->startMultiRequest();
-			foreach($thumbList->objects as $thumbAsset)
-			{
-				if(!in_array($thumbAsset->id, $addedThumbAssetsIds))
-					KBatchBase::$kClient->thumbAsset->delete($thumbAsset->id);
-			}
-			$requestResults = KBatchBase::$kClient->doMultiRequest();
-
-			$nonCriticalErrors = '';
-			foreach($requestResults as $requestResult)
-			{
-				if (is_array($requestResult) && isset($requestResult['code']))
-					$nonCriticalErrors .= $requestResult['message']."\n";
-				if ($requestResult instanceof Exception)
-					$nonCriticalErrors .= $requestResult->getMessage()."\n";
-			}
-		}
+		if(!$resource && !$keepManualThumbnails  && count($newThumbAssetsIds) > 0)
+			$nonCriticalErrors .= $this->removeOldThumbnails($updatedEntryId, $newThumbAssetsIds);
 
 
 		//update is after add content since in case entry replacement we want the duration to be set on the new entry.
@@ -796,6 +775,31 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::unimpersonate();
 		
 		return array($updatedEntry, $nonCriticalErrors);
+	}
+
+	protected function removeOldThumbnails($updatedEntryId, $newThumbAssetsIds)
+	{
+		$filter = new KalturaAssetFilter();
+		$filter->entryIdEqual = $updatedEntryId;
+		$thumbList = KBatchBase::$kClient->thumbAsset->listAction($filter);
+
+		KBatchBase::$kClient->startMultiRequest();
+		foreach($thumbList->objects as $thumbAsset)
+		{
+			if(!in_array($thumbAsset->id, $newThumbAssetsIds))
+				KBatchBase::$kClient->thumbAsset->delete($thumbAsset->id);
+		}
+		$requestResults = KBatchBase::$kClient->doMultiRequest();
+
+		$nonCriticalErrors = '';
+		foreach($requestResults as $requestResult)
+		{
+			if (is_array($requestResult) && isset($requestResult['code']))
+				$nonCriticalErrors .= $requestResult['message']."\n";
+			if ($requestResult instanceof Exception)
+				$nonCriticalErrors .= $requestResult->getMessage()."\n";
+		}
+		return $nonCriticalErrors;
 	}
 
 	/**
