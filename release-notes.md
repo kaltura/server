@@ -1,5 +1,29 @@
 # Lynx 12.12.0 #
 
+## Support source playback in LC uploaded contnet ## 
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6899
+ 
+### Configuration ###
+
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.lectureCapture.enabled = true
+		moduls.lectureCapture.permissionType = 2
+		moduls.lectureCapture.label = Lecture Capture
+		moduls.lectureCapture.permissionName = LECTURE_CAPTURE_USAGE
+		moduls.lectureCapture.basePermissionType = 
+		moduls.lectureCapture.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
+
 ## Add batch thumbasset delete permission ##
 
  - Issue Type: Bug
