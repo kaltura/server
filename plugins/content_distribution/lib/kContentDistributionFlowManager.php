@@ -968,17 +968,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionSubmitJobAborted(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
 	{
-		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
-		if(!$entryDistribution)
-		{
-			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
-			return $dbBatchJob;
-		}
-
-		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_SUBMITTING);
-		$entryDistribution->setDirtyStatus(null);
-		$entryDistribution->save();
-
+		self::updateDistributionStatus($data, EntryDistributionStatus::ERROR_SUBMITTING);
 		return $dbBatchJob;
 	}
 
@@ -989,18 +979,26 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionUpdateJobAborted(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
 	{
+		self::updateDistributionStatus($data, EntryDistributionStatus::ERROR_UPDATING);
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param kDistributionSubmitJobData $data
+	 * @param $status
+	 */
+	private static function updateDistributionStatus(kDistributionSubmitJobData $data, $status)
+	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
 		{
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
-			return $dbBatchJob;
+			return;
 		}
 
-		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
+		$entryDistribution->setStatus($status);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
-
-		return $dbBatchJob;
 	}
 
 	/**
