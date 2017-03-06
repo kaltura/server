@@ -48,6 +48,7 @@ class kSessionBase
 	const PRIVILEGE_APP_TOKEN = "apptoken";
 	const PRIVILEGES_DELIMITER = "/";
 	const PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT = "disablechangeaccount";
+	const PRIVILEGE_EDIT_USER = "edituser";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
