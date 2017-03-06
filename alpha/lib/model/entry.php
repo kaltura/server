@@ -3282,7 +3282,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	
 	public function setSource($v)
 	{
-		if($this->getSource() != EntrySourceType::KALTURA_RECORDED_LIVE || $v == EntrySourceType::RECORDED_LIVE)
+		if(!in_array($this->getSource(), array(EntrySourceType::KALTURA_RECORDED_LIVE, EntrySourceType::LECTURE_CAPTURE)) || $v == EntrySourceType::RECORDED_LIVE)
 			parent::setSource($v);
 	}
 	
