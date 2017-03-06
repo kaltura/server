@@ -228,6 +228,7 @@ return array(
 	'Kaltura_Client_Enum_SourceType::RECORDED_LIVE' => 'Recorded Live',
 	'Kaltura_Client_Enum_SourceType::CLIP' => 'Clip',
 	'Kaltura_Client_Enum_SourceType::KALTURA_RECORDED_LIVE' => 'Kaltura recorded Live',
+	'Kaltura_Client_Enum_SourceType::LECTURE_CAPTURE' => 'Lecture Capture',
 	
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA_EDIT' => 'Data Edit',

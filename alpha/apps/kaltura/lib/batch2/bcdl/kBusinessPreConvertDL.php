@@ -8,6 +8,10 @@ class kBusinessPreConvertDL
 	const TAG_VARIANT_A = 'watermark_a';
 	const TAG_VARIANT_B = 'watermark_b';
 	const TAG_VARIANT_PAIR_ID = 'watermark_pair_';
+	
+	public static $conditionalMapBySourceType = array (
+			EntrySourceType::LECTURE_CAPTURE => "LECTURE_CAPTURE_PROFILE",
+	);
 
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
@@ -1127,7 +1131,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 /* Conditional Conv prof */
 		if(isset($mediaInfo)){
-			self::checkConditionalProfiles($entry, $mediaInfo);
+			$isConditionMet = self::checkConditionalProfiles($entry, $mediaInfo);
 		}
 		
 		$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
@@ -1144,6 +1148,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$errDescription = 'Original flavor asset not found';
 			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
 			return false;
+		}
+		
+		if($isConditionMet)
+		{
+			$originalFlavorAsset->addTags(array("web","mbr"));
 		}
 
 		// gets the list of flavor params of the conversion profile
@@ -2056,41 +2065,56 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 */
 	private static function checkConditionalProfiles($entry, $mediaInfo)
 	{
-		$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
-		if(!$profile) {
-			KalturaLog::log("No profile for entry(".($entry->getId())."), cannot check conditional ");
-			return;
+		if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
+		{
+			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
 		}
-
+		else 
+		{
+			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+		}
+		
+		if(!$profile) 
+		{
+			KalturaLog::log("No profile for entry(".($entry->getId())."), cannot check profile conditions ");
+			return false;
+		}
+		
 		$jsonStr = $profile->getConditionalProfiles();
-		if(!isset($jsonStr)){
+		if(!isset($jsonStr))
+		{
 			KalturaLog::log("No conditionalProfiles for profile(".($profile->getId())."), entry(".($entry->getId()).")");
-			return;
+			return false;
 		}
+		
 		KalturaLog::log("Conditional profiles:$jsonStr");
-/*
-$jsonStr = '[{"profileId":"11","condition":"containerFormat==mp4 && videoHeight<1080 && videoWidth<1920 && videoDar<(16/9+0.1) && isMbr==1"},
-{"profileId":"12","condition":"ZZZZZZ12"}
-]';
-*/
-KalturaLog::log("mediaInfo::maxGOP(".$mediaInfo->getMaxGOP().")");
+		KalturaLog::log("mediaInfo::maxGOP(".$mediaInfo->getMaxGOP().")");
+		
 		$medSet = new KDLMediaDataSet();
 		KDLWrap::ConvertMediainfoCdl2Mediadataset($mediaInfo,$medSet);
-KalturaLog::log("medSet::GOP(".$medSet->_video->_gop.")");
+		KalturaLog::log("medSet::GOP(".$medSet->_video->_gop.")");
 		$conditionalProfiles = json_decode($jsonStr);
-		foreach($conditionalProfiles as $conditionalProfile){
+		
+		foreach($conditionalProfiles as $conditionalProfile)
+		{
 			KalturaLog::log("Checking condition($conditionalProfile->condition)");
 			$rv = $medSet->IsCondition($conditionalProfile->condition);
-			if($rv==true) {
-				$entry->setConversionProfileId($conditionalProfile->profileId);
-				$entry->setConversionQuality($conditionalProfile->profileId);
+			if($rv==true) 
+			{
+				if(isset($conditionalProfile->profileId))
+					$profId = $conditionalProfile->profileId;
+				else
+					$profId = $profile->getId();
+				
+				$entry->setConversionProfileId($profId);
+				$entry->setConversionQuality($profId);
 				$entry->save();
-				KalturaLog::log("Condition is met! Switching to profile($conditionalProfile->profileId)");
-				return;
+				KalturaLog::log("Condition is met! Switching to profile($profId)");
+				return true;
 			}
 		}
 		
 		KalturaLog::log("None of the conditions are met.");
-		return;
+		return false;
 	}
 }
