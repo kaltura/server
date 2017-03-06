@@ -1130,6 +1130,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 		
 /* Conditional Conv prof */
+		$isConditionMet = false;
 		if(isset($mediaInfo)){
 			$isConditionMet = self::checkConditionalProfiles($entry, $mediaInfo);
 		}
@@ -1152,7 +1153,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		if($isConditionMet)
 		{
-			$originalFlavorAsset->addTags(array("web","mbr"));
+			$tagsMap = $profile->getInputTagsMap();
+			if($tagsMap)
+			{
+				$tagsMapArray = explode(",", $tagsMap);
+				$tagsMapArray = KDLWrap::CDLMediaInfo2Tags($mediaInfo, $tagsMapArray);
+				$originalFlavorAsset->addTags($tagsMapArray);
+				$originalFlavorAsset->save();
+			}
 		}
 
 		// gets the list of flavor params of the conversion profile
