@@ -832,6 +832,7 @@ class MediaService extends KalturaEntryService
 	 * @return KalturaMediaEntry The canceled media entry
 	 *
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @validateUser entry entryId edit
 	 */
 	function cancelReplaceAction($entryId)
 	{
