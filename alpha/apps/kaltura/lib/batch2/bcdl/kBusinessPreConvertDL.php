@@ -1129,12 +1129,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if($mediaInfoId)
 			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 		
-/* Conditional Conv prof */
-		$isConditionMet = false;
-		if(isset($mediaInfo)){
-			$isConditionMet = self::checkConditionalProfiles($entry, $mediaInfo);
-		}
-		
 		$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
 		if(! $profile)
 		{
@@ -1149,18 +1143,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$errDescription = 'Original flavor asset not found';
 			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
 			return false;
-		}
-		
-		if($isConditionMet)
-		{
-			$tagsMap = $profile->getInputTagsMap();
-			if($tagsMap)
-			{
-				$tagsMapArray = explode(",", $tagsMap);
-				$tagsMapArray = KDLWrap::CDLMediaInfo2Tags($mediaInfo, $tagsMapArray);
-				$originalFlavorAsset->addTags($tagsMapArray);
-				$originalFlavorAsset->save();
-			}
 		}
 
 		// gets the list of flavor params of the conversion profile
@@ -2071,7 +2053,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	/*
 	 *
 	 */
-	private static function checkConditionalProfiles($entry, $mediaInfo)
+	public static function checkConditionalProfiles($entry, $mediaInfo)
 	{
 		if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
 		{
@@ -2085,14 +2067,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if(!$profile) 
 		{
 			KalturaLog::log("No profile for entry(".($entry->getId())."), cannot check profile conditions ");
-			return false;
+			return;
 		}
 		
 		$jsonStr = $profile->getConditionalProfiles();
 		if(!isset($jsonStr))
 		{
 			KalturaLog::log("No conditionalProfiles for profile(".($profile->getId())."), entry(".($entry->getId()).")");
-			return false;
+			return;
 		}
 		
 		KalturaLog::log("Conditional profiles:$jsonStr");
@@ -2118,11 +2100,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$entry->setConversionQuality($profId);
 				$entry->save();
 				KalturaLog::log("Condition is met! Switching to profile($profId)");
-				return true;
+				return;
 			}
 		}
 		
 		KalturaLog::log("None of the conditions are met.");
-		return false;
+		return;
 	}
 }
