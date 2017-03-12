@@ -1162,7 +1162,10 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             
             if ($copyProperty) {
                 $propertyName = $prop->name;
-                $newObject->{$propertyName} = $sourceObject->{$propertyName};
+                if($propertyName == "displayInSearch")
+                    continue;
+                else
+                    $newObject->{$propertyName} = $sourceObject->{$propertyName};
             }
         }
         return $newObject;
