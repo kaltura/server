@@ -1158,14 +1158,11 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             $propReadOnly = preg_match("/\\@readonly/i", $docComment);
             $deprecated = preg_match("/\\DEPRECATED/i", $docComment);
             
-            $copyProperty = !$deprecated && !$propReadOnly;
+            $copyProperty = !$deprecated && !$propReadOnly && $prop->name!="displayInSearch";
             
             if ($copyProperty) {
                 $propertyName = $prop->name;
-                if($propertyName == "displayInSearch")
-                    continue;
-                else
-                    $newObject->{$propertyName} = $sourceObject->{$propertyName};
+                $newObject->{$propertyName} = $sourceObject->{$propertyName};
             }
         }
         return $newObject;
