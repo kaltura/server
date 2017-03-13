@@ -1324,8 +1324,9 @@ class KalturaEntryService extends KalturaBaseService
 			KalturaLog::log("entry->userId is null, not changing user");
 			return;
 		}
-		
-		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
+
+		$ks = $this->getKs();
+		if (!$ks ||(!$this->getKs()->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_USER, $entry->userId)))
 		{
 			$entryPuserId = $dbEntry->getPuserId();
 			

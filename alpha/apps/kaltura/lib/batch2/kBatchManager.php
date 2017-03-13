@@ -191,6 +191,8 @@ class kBatchManager
 
 		if($flavorAsset->getIsOriginal())
 		{
+			kBusinessPreConvertDL::checkConditionalProfiles($flavorAsset->getentry(), $mediaInfoDb);
+		
 			KalturaLog::log("Media info is for the original flavor asset");
 			$tags = null;
 			

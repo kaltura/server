@@ -65,5 +65,5 @@ class CaptionAsset extends asset
 		$this->setLabel($dbAssetParams->getLabel());
 	}
 	
-	public function shouldCopyOnReplacement($v) {return false;}
+	public function shouldCopyOnReplacement() {return false;}
 }

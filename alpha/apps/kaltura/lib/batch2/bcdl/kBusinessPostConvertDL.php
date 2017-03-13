@@ -64,7 +64,7 @@ class kBusinessPostConvertDL
 			$productMediaInfo = $sourceMediaInfo;
 			
 			$entry = $dbBatchJob->getEntry();
-			if (!entry)
+			if (!$entry)
 			{
 				KalturaLog::err("Entry not found [" . $dbBatchJob->getEntryId() . "]");
 				throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $dbBatchJob->getEntryId());

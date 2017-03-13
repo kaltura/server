@@ -15,4 +15,4 @@ if (strlen($responseBuffer) > 300)
 
 if ($responseBuffer == '<xml>' || 
 	(substr($responseBuffer, 0, 13) == '<xml><result>' && substr($responseBuffer, -15) == '</result></xml>'))
-	echo $responseBuffer;
+	echo htmlspecialchars($responseBuffer);

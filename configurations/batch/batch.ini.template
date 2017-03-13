@@ -552,6 +552,8 @@ type												= KAsyncDropFolderWatcher
 maximumExecutionTime								= 3000
 scriptPath											= ../plugins/drop_folder/batch/DropFolderWatcher/KAsyncDropFolderWatcherExe.php
 params.tags											= *
+params.maxTimeForFolder                             = 3000
+numberOfFoldersEachRun                              = 20
 params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles
 params.mrss.limitProcessEachRun						= 20
 

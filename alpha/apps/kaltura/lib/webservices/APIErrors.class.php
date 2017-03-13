@@ -423,4 +423,6 @@ class APIErrors
 	const UNSAFE_HTML_TAGS = "UNSAFE_HTML_TAGS;CLASS_NAME,PROPERTY_NAME;Potential Unsafe HTML tags found in [@CLASS_NAME@]::[@PROPERTY_NAME@]";
 	
 	const RECORDED_NOT_READY = "RECORDED_NOT_READY;ENTRY_ID;Live entry [@ENTRY_ID@] cannot be deleted, recorded entry not in ready status yet";
+	
+	const RECORDED_ENTRY_LIVE_MISMATCH = "RECORDED_ENTRY_LIVE_MISMATCH;LIVE_ENTRY_ID,RECORDE_ERNTRY_ID;Recorded entry [@RECORDE_ERNTRY_ID@] was not created while streaming to the given live entry [@LIVE_ENTRY_ID@]";
 }

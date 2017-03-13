@@ -12,11 +12,11 @@
 <script language="javascript">
 
 	
-	var flashVars = 'cpcode=<?php echo $_GET['streamUsername']; ?>';
-	flashVars += '&passwd=<?php echo $_GET['streamPassword']; ?>';
-	flashVars += '&streamname=<?php echo $_GET['entryId']; ?>@<?php echo $_GET['streamRemoteId']; ?>';
-	flashVars += '&primaryep=p.ep<?php echo $_GET['streamRemoteId']; ?>.i.akamaientrypoint.net';
-	flashVars += '&backupep=b.ep<?php echo $_GET['streamRemoteBackupId']; ?>.i.akamaientrypoint.net';
+	var flashVars = 'cpcode=<?php echo strip_tags($_GET['streamUsername']); ?>';
+	flashVars += '&passwd=<?php echo strip_tags($_GET['streamPassword']); ?>';
+	flashVars += '&streamname=<?php echo strip_tags($_GET['entryId']); ?>@<?php echo strip_tags($_GET['streamRemoteId']); ?>';
+	flashVars += '&primaryep=p.ep<?php echo strip_tags($_GET['streamRemoteId']); ?>.i.akamaientrypoint.net';
+	flashVars += '&backupep=b.ep<?php echo strip_tags($_GET['streamRemoteBackupId']); ?>.i.akamaientrypoint.net';
 	
 
 	if (AC_FL_RunContent == 0) {

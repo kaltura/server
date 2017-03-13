@@ -1,3 +1,58 @@
+# Lynx 12.12.0 #
+
+## Support source playback in LC uploaded contnet ## 
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6899
+ 
+### Configuration ###
+
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.lectureCapture.enabled = true
+		moduls.lectureCapture.permissionType = 2
+		moduls.lectureCapture.label = Lecture Capture
+		moduls.lectureCapture.permissionName = LECTURE_CAPTURE_USAGE
+		moduls.lectureCapture.basePermissionType = 
+		moduls.lectureCapture.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Add batch thumbasset delete permission ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6916
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_05_add_batch_thumbasset_delete_permission.php
+
+
+## User KS allow specific permission to approveReplace ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6663
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_01_add_kms_user_permission_and_role.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.11.0 #
 
 ## Push notification redesig + caching optiization ##

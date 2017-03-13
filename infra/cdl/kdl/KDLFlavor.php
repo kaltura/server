@@ -1420,10 +1420,16 @@ $plannedDur = 0;
 		}
 		// For 'portrait' sources (rotation -90,90,270) - switch the source dims
 		if(isset($rotation) && in_array($rotation, array(-90,90,270))){
-			$aux = $adjustedHgt;
-			$adjustedHgt = $adjustedWid;
-			$adjustedWid = $aux;
-			KalturaLog::log("Adjust frame dims to rotation($rotation): width($adjustedWid),height($adjustedHgt)");
+				// For fixed-frame-size flavors, call the same func recursively 
+			if(isset($fixImageDar) && $fixImageDar!=0 && $dar!=0){
+				list($adjustedWid,$adjustedHgt,$fixImageDar) = self::adjustFrameSizeToDarAndRotation($height, $width, 1/$dar, 0);
+			}
+			else {
+				$aux = $adjustedHgt;
+				$adjustedHgt = $adjustedWid;
+				$adjustedWid = $aux;
+				KalturaLog::log("Adjust frame dims to rotation($rotation): width($adjustedWid),height($adjustedHgt)");
+			}
 		}
 		KalturaLog::log("Final: width($adjustedWid),height($adjustedHgt),fixImageDar($fixImageDar)");
 		return array($adjustedWid,$adjustedHgt,$fixImageDar);

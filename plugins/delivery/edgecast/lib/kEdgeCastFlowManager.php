@@ -116,7 +116,7 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
 			$c->add(DeliveryProfilePeer::PARTNER_ID, $partnerId);
 			$c->add(DeliveryProfilePeer::ID, $deliveryProfileIds, Criteria::IN);
             $c->addSelectColumn(DeliveryProfilePeer::HOST_NAME);
-			$stmt = PermissionPeer::doSelectStmt($c);
+			$stmt = DeliveryProfilePeer::doSelectStmt($c);
 			$hosts = $stmt->fetchAll(PDO::FETCH_COLUMN);
             
             foreach ($hosts as $host)

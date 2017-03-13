@@ -444,6 +444,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @return KalturaLiveEntry The updated live entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::RECORDED_ENTRY_LIVE_MISMATCH
 	 */
 	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $recordedEntryId = null)
 	{
@@ -463,20 +464,29 @@ class KalturaLiveEntryService extends KalturaEntryService
 			return $entry;
 		}
 		
+		$recordedEntry = null;
+		$createRecordedEntry = false;
 		if($recordedEntryId)
 		{
 			$recordedEntry = entryPeer::retrieveByPK($recordedEntryId);
 			if($recordedEntry && $recordedEntry->getRootEntryId() != $entryId)
-				$recordedEntry = null;
-		}
-		else
-		{
-			if(!$dbLiveEntry->getRecordedEntryId())
-				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
+				throw new KalturaAPIException(KalturaErrors::RECORDED_ENTRY_LIVE_MISMATCH, $entryId, $recordedEntryId);
 			
-			$recordedEntryId = $dbLiveEntry->getRecordedEntryId();
-			$recordedEntry = entryPeer::retrieveByPK($recordedEntryId);
+			if($recordedEntry && $recordedEntry->getSourceType() != EntrySourceType::KALTURA_RECORDED_LIVE)
+			{
+				$recordedEntry = null;
+				$createRecordedEntry = true;
+				$dbLiveEntry->setRecordedEntryId(null);
+				$dbLiveEntry->save();
+			}
 		}
+		else if(!$dbLiveEntry->getRecordedEntryId())
+		{
+				$createRecordedEntry = true;
+		}
+		
+		if($createRecordedEntry)
+			$recordedEntry = $this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
 		
 		if(!$recordedEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $recordedEntryId);

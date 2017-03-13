@@ -21,6 +21,7 @@ interface EntrySourceType extends BaseEnum
 	const RECORDED_LIVE = 34;
 	const CLIP = 35;
 	const KALTURA_RECORDED_LIVE = 36;
+	const LECTURE_CAPTURE = 37;
 	
 	const LIVE_STREAM_ONTEXTDATA_CAPTIONS = 42;
 }

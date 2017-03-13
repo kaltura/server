@@ -17,15 +17,15 @@ current_module = 'reports';
 var flashVars = {	
 		'host' : "<?php echo $host ?>" , 
 		'cdnhost' : "<?php echo $cdn_host ?>" ,
-		'uid' : "<?php echo $uid ?>" ,
-		'partner_id' : "<?php echo $partner_id ?>",
+		'uid' : "<?php echo htmlspecialchars($uid) ?>" ,
+		'partner_id' : "<?php echo htmlspecialchars($partner_id) ?>",
 		'srvurl' : 'api_v3/index.php',
 		'innerKdpVersion' : 'v2.5.2.30876',
 		'kdpUrl' : "<?php echo $flash_dir ?>/kdp/v2.5.2.30792/kdp.swf",
 	    'uiconfId' : '48500' ,
-		'subp_id' : '<?php echo $subp_id ?>' ,
-		'ks' : '<?php echo $ks ?>' ,
-		'widget_id' : '_<?php echo $partner_id ?>' ,
+		'subp_id' : "<?php echo htmlspecialchars($subp_id) ?>" ,
+		'ks' : "<?php echo htmlspecialchars($ks) ?>" ,
+		'widget_id' : "_<?php echo htmlspecialchars($partner_id) ?>" ,
 		'devFlag' : 'false' ,
 		'serverPath' : "<?php echo $service_url; ?>"
 		};

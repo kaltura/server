@@ -307,6 +307,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				return self::onDistributionSubmitJobPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return self::onDistributionSubmitJobFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_ABORTED:
+				return self::onDistributionSubmitJobAborted($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
 				return self::onDistributionSubmitJobFailed($dbBatchJob, $data);
@@ -365,6 +367,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				return self::onDistributionUpdateJobPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return self::onDistributionUpdateJobFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_ABORTED:
+				return self::onDistributionUpdateJobAborted($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
 				return self::onDistributionUpdateJobFailed($dbBatchJob, $data);
@@ -955,6 +959,46 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->save();
 		
 		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionSubmitJobData $data
+	 * @return BatchJob
+	 */
+	public static function onDistributionSubmitJobAborted(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
+	{
+		self::updateDistributionStatus($data, EntryDistributionStatus::ERROR_SUBMITTING);
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionSubmitJobData $data
+	 * @return BatchJob
+	 */
+	public static function onDistributionUpdateJobAborted(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
+	{
+		self::updateDistributionStatus($data, EntryDistributionStatus::ERROR_UPDATING);
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param kDistributionSubmitJobData $data
+	 * @param $status
+	 */
+	private static function updateDistributionStatus(kDistributionSubmitJobData $data, $status)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return;
+		}
+
+		$entryDistribution->setStatus($status);
+		$entryDistribution->setDirtyStatus(null);
+		$entryDistribution->save();
 	}
 
 	/**

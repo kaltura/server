@@ -761,6 +761,6 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		return assetParamsPeer::retrieveByPk($this->flavor_params_id);
 	}
 	
-	public function shouldCopyOnReplacement($v) {return true;}
+	public function shouldCopyOnReplacement() {return true;}
 		
 }
