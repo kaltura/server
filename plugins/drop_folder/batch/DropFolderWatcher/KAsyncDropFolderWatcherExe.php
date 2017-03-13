@@ -10,6 +10,7 @@ function sigint()
 	$instance->preKill();
 	exit;
 }
+declare(ticks = 1);
 pcntl_signal(SIGINT, 'sigint');
 pcntl_signal(SIGTERM, 'sigint');
 
