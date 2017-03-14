@@ -9,7 +9,7 @@ function gracefullyKill()
 {
 	global $instance; //as the KAsyncDropFolderWatcher
 	$instance->preKill();
-	exit;
+	exit();
 }
 declare(ticks = 1);
 pcntl_signal(SIGINT, 'gracefullyKill');
