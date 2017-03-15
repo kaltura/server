@@ -479,7 +479,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doGet()
 	 */
-	protected function doGet($key)
+	protected function doGet($key, $retries = 1)
 	{
 		try
 		{
@@ -494,8 +494,19 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		{
 			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
 				return false;
-				
-			throw $e;
+
+			else
+			{
+				if ($retries > 0 )
+				{
+					KalturaLog::debug("Retrying Couchbase get operation.");
+					return $this->doGet($key, $retries - 1);
+				}
+				else{
+					KalturaLog::debug("No retries left for Couchbase get operation.");
+					throw $e;
+				}
+			}
 		}
 	}
 	
@@ -548,16 +559,33 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doSet()
 	 */
-	protected function doSet($key, $var, $expiry = 0)
+	protected function doSet($key, $var, $expiry = 0, $retries = 1)
 	{
 		if($this->debug)
 			KalturaLog::debug("Bucket name [$this->name] key [$key] var [" . print_r($var, true) . "]");
 			
-		$meta = $this->bucket->upsert($key, $var, array(
-			'expiry' => $expiry
-		));
-		
-		return is_null($meta->error);
+		try
+		{
+			$meta = $this->bucket->upsert($key, $var, array(
+				'expiry' => $expiry
+			));
+
+			return is_null($meta->error);
+		}
+		catch (CouchbaseException $e)
+		{
+			KalturaLog::err($e);
+			if ($retries > 0 )
+			{
+				KalturaLog::debug("Retrying Couchbase upsert operation.");
+				return $this->doSet($key, $var, $expiry = 0, $retries -1 );
+			}
+			else
+			{
+				KalturaLog::debug("Couchbase upsert operation error - No retries left .");
+				return false;
+			}
+		}
 	}
 
 	/* (non-PHPdoc)
