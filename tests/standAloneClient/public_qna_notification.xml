@@ -42,7 +42,7 @@
 								</item>
 							</values>
 						</item>
-							<item objectType="KalturaOrCondition">
+						<item objectType="KalturaOrCondition">
 							<conditions objectType="array">
 								<item objectType="KalturaEventFieldCondition">
 									<description>tags_field_modified</description>
