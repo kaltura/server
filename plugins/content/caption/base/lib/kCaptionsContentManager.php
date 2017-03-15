@@ -38,6 +38,9 @@ abstract class kCaptionsContentManager
 
 			case CaptionType::WEBVTT:
 				return webVttCaptionsContentManager::get();
+				
+			case CaptionType::CAP:
+				return capCaptionsContentManager::get();
 
 			default:
 				return KalturaPluginManager::loadObject('kCaptionsContentManager', $type);
