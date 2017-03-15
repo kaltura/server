@@ -689,17 +689,17 @@ class myReportsMgr
 			$link = self::getConnection();
 			$add_search_text = false;
 			
-			$has_object_ids = false;
+                        $str_object_ids = $object_ids;
 			if ($input_filter instanceof endUserReportsInputFilter) 
-				$has_object_ids = $input_filter->categories;
-			$has_object_ids = $has_object_ids || $object_ids;	
+                                $str_object_ids .=  $input_filter->categories;
+   	                
 			if ( is_numeric( $report_type ))
 			{
 				$file_path = myReportsSqlFileMgr::getSqlFilePath( 
 					self::$type_map[$report_type] ,  
 					self::$flavor_map[$report_flavor] , 
 					$add_search_text , 
-					$has_object_ids ? true : false ,
+					$str_object_ids ,
 					$input_filter);
 			}
 			else
