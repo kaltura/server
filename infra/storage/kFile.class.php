@@ -392,6 +392,8 @@ class kFile
 			// In case of move, first try to move the file before copy & unlink.
 			if(rename($src, $dest)) 
 				return true;
+			
+			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
 		}
 		
 		if (!copy($src,$dest)) {
