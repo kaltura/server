@@ -314,7 +314,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 
 	public function getMetadataFieldsKeys()
 	{
-		$metadataFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($this->id);
+		$metadataFields = MetadataProfileFieldPeer::retrieveAllActiveByMetadataProfileId($this->id);
 		$keys = array();
 		foreach ($metadataFields as $metadataField)
 			$keys[] = $metadataField->getKey();
