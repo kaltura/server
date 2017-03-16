@@ -1297,14 +1297,11 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 
-		if (!preg_match(kuser::PUSER_ID_REGEXP, $entry->userId))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
-		}
-		
+
 		// need to create kuser if this is an admin creating the entry on a different user
-		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
-		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->creatorId);  
+		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), trim($entry->userId));
+		$creatorId = is_null($entry->creatorId) ? $entry->creatorId : trim($entry->creatorId);
+		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $creatorId);
 
 		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 		$dbEntry->setKuserId($kuser->getId());
