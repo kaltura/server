@@ -18,6 +18,20 @@ class KalturaGenericSyndicationFeed extends KalturaBaseSyndicationFeed
 	* @var string
 	*/
 	public $feedLandingPage;
+	
+	/**
+	 * entry filter
+	 *
+	 * @var KalturaBaseEntryFilter
+	 */
+	public $entryFilter;
+
+	/**
+	 * page size
+	 *
+	 * @var int
+	 */
+	public $pageSize;
         
     function __construct()
 	{
@@ -28,6 +42,8 @@ class KalturaGenericSyndicationFeed extends KalturaBaseSyndicationFeed
 	(
 		"feedDescription",
 		"feedLandingPage",
+		"entryFilter",
+		"pageSize",
 	);
 	
 	public function getMapBetweenObjects()

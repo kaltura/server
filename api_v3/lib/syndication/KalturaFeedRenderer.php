@@ -3,13 +3,15 @@
 class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	
 	const ITEMS_PLACEHOLDER = 'ITEMS_PLACEHOLDER';
-	
+
 	protected $kalturaXslt = null;
 	protected $kalturaXsltItem = null;
+
+	private $state;
 	
 	public function init($syndicationFeed, $syndicationFeedDB, $mimeType) {
 		parent::init($syndicationFeed, $syndicationFeedDB, $mimeType);
-		
+	
 		$xslt = $syndicationFeedDB->getXslt();
 		if (($syndicationFeedDB->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null($xslt))) {
 			$this->kalturaXslt = $this->createKalturaMrssXslt($xslt);
@@ -49,7 +51,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 			KalturaLog::err("No MRSS returned for entry [".$entry->getId()."]");
 			return null;
 		}
-		
+	
 		return $entryMrss;
 	}
 	
@@ -65,28 +67,44 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 			$entryMrss = $this->removeNamespaces($entryMrss);
 		}
 		$entryMrss = $this->removeXmlHeader($entryMrss);
+
 		return $entryMrss;
 	}
 	
 	public function handleFooter() {
-		$mrss = $this->getKalturaMrssXml($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription);
+		$mrss = $this->getKalturaMrssXml($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, true);
 	
 		if($this->kalturaXslt)
 			$mrss = kXml::transformXmlUsingXslt($mrss, $this->kalturaXslt);
 	
 		$divideHeaderFromFooter = strpos($mrss, self::ITEMS_PLACEHOLDER) + strlen(self::ITEMS_PLACEHOLDER);
 		$mrss = substr($mrss,$divideHeaderFromFooter);
-	
+
 		return $mrss;
 	}
 
-	private function getKalturaMrssXml($title, $link = null, $description = null)
+	private function getKalturaMrssXml($title, $link = null, $description = null, $addNextLink = false)
 	{
 		$mrss = kMrssManager::getMrssXml($title, $link, $description);
 	
 		foreach ($mrss->children() as $second_gen) {
 			if ($second_gen->getName() == 'channel')
 				$second_gen->addChild('items', self::ITEMS_PLACEHOLDER);
+		}
+
+		if($this->state && $addNextLink)
+		{
+			$id = $this->syndicationFeed->id;
+			$partnerId = $this->syndicationFeed->partnerId;
+
+			$hrefLink = kConf::get('www_host') . "/api_v3/getFeed.php?partnerId=$partnerId&feedId=$id";
+			if(kCurrentContext::$ks)
+				$hrefLink .= "&ks=" . kCurrentContext::$ks;
+			$hrefLink .= "&state=" . $this->state;
+
+			$nextLink = $mrss->addChild('link');
+			$nextLink->addAttribute("rel", "next");
+			$nextLink->addAttribute("href", $hrefLink);
 		}
 	
 		return $mrss->asXML();
@@ -211,6 +229,11 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		//	return preg_replace("/<.*(xmlns *= *[\"'].[^\"']*[\"']).[^>]*>/i", "", $xmlStr);
 		//return preg_replace("/ xmlns:[a-zA-Z0-9_]{1,}=[\"'].[^\"']*[\"']/", "", $xmlStr);
 		return preg_replace("/ xmlns:[^= ]{1,}=[\"][^\"]*[\"]/i", "", $xmlStr);
+	}
+
+	public function setState($state)
+	{
+		$this->state = $state;
 	}
 }
 

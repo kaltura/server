@@ -12,7 +12,9 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	const FILE_SYNC_SYNDICATION_FEED_XSLT = 1;
 	
 	const CUSTOM_DATA_FIELD_ADD_XML_HEADER = 'addXmlHeader';
-	
+	const CUSTOM_DATA_FIELD_ENTRY_FILTER = 'entryFilter';
+	const CUSTOM_DATA_FIELD_PAGE_SIZE = 'pageSize';
+
 	private $xslt;
 		
 	/* (non-PHPdoc)
@@ -28,7 +30,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * @var FileSync
 	 */
 	private $m_file_sync;
-	
+
 	/* (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#getFileSync()
 	 */
@@ -144,6 +146,24 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	public function setAddXmlHeader($addXmlHeader){
 		parent::putInCustomData(self::CUSTOM_DATA_FIELD_ADD_XML_HEADER, $addXmlHeader);
 	}
-	
-	
+
+	public function getEntryFilter()
+	{
+		return parent::getFromCustomData(self::CUSTOM_DATA_FIELD_ENTRY_FILTER);
+	}
+
+	public function setEntryFilter($entryFilter)
+	{
+		parent::putInCustomData(self::CUSTOM_DATA_FIELD_ENTRY_FILTER, $entryFilter);
+	}
+
+	public function getPageSize()
+	{
+		return parent::getFromCustomData(self::CUSTOM_DATA_FIELD_PAGE_SIZE);
+	}
+
+	public function setPageSize($pageSize)
+	{
+		parent::putInCustomData(self::CUSTOM_DATA_FIELD_PAGE_SIZE, $pageSize);
+	}
 }
