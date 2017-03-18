@@ -88,7 +88,7 @@ try
 {
 	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId, $feedProcessingKey, $ks, $state);
 	$syndicationFeedRenderer->addFlavorParamsAttachedFilter();
-
+	
 	kCurrentContext::$partner_id = $syndicationFeedRenderer->syndicationFeed->partnerId;
 	
 	if (isset($entryId))

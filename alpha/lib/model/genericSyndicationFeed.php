@@ -30,7 +30,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * @var FileSync
 	 */
 	private $m_file_sync;
-
+	
 	/* (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#getFileSync()
 	 */

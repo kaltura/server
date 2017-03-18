@@ -3,7 +3,7 @@
 class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	
 	const ITEMS_PLACEHOLDER = 'ITEMS_PLACEHOLDER';
-
+	
 	protected $kalturaXslt = null;
 	protected $kalturaXsltItem = null;
 
@@ -11,7 +11,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	
 	public function init($syndicationFeed, $syndicationFeedDB, $mimeType) {
 		parent::init($syndicationFeed, $syndicationFeedDB, $mimeType);
-	
+		
 		$xslt = $syndicationFeedDB->getXslt();
 		if (($syndicationFeedDB->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null($xslt))) {
 			$this->kalturaXslt = $this->createKalturaMrssXslt($xslt);
@@ -51,7 +51,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 			KalturaLog::err("No MRSS returned for entry [".$entry->getId()."]");
 			return null;
 		}
-	
+		
 		return $entryMrss;
 	}
 	
@@ -79,7 +79,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	
 		$divideHeaderFromFooter = strpos($mrss, self::ITEMS_PLACEHOLDER) + strlen(self::ITEMS_PLACEHOLDER);
 		$mrss = substr($mrss,$divideHeaderFromFooter);
-
+	
 		return $mrss;
 	}
 
