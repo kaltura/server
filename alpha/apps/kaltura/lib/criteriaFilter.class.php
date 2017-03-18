@@ -11,6 +11,15 @@ class criteriaFilter
 	private $criteria;
 	private $enable = true;
 
+	/*
+	 * mapping opposite criterion comparison operators
+	 */
+	private static $opposite_operators = array 
+	(
+		Criteria::NOT_EQUAL => Criteria::EQUAL,
+		Criteria::NOT_EQUAL => Criteria::IN,
+	);
+
 	public function isEnabled()
 	{
 		return $this->enable;
@@ -60,7 +69,7 @@ class criteriaFilter
 	private function copyCriteriaConstraints($fromCriteria, $toCriteria)
 	{
 		$columns = $fromCriteria->keys();
-		
+	
 		foreach ( $columns as $column )
 		{
 			$filterCriterion = $fromCriteria->getCriterion ( $column );
@@ -74,14 +83,13 @@ class criteriaFilter
 			$existingCriterion = $toCriteria->getCriterion ( $column );
 
 			// don't add duplicates !!
-			if ( $existingCriterion && ( $existingCriterion->getValue() == $filterCriterion->getValue() &&  $existingCriterion->getComparison() == $filterCriterion->getComparison() ) )
+			if ( $existingCriterion && ( $existingCriterion->getValue() == $filterCriterion->getValue() &&  ($existingCriterion->getComparison() == $filterCriterion->getComparison() || $this->checkOppositeOperators($filterCriterion->getComparison(), $filterCriterion->getValue(), $existingCriterion->getComparison(), $existingCriterion->getValue()))))
 				continue;
-			
+
 				// go one step deeper to copy the inner clauses
 			$this->addClauses( $fromCriteria , $filterCriterion , $newCriterion );
 			$toCriteria->addAnd ( $newCriterion );
 		}
-		
 
 		// TODO - adda more robust way to copy the orderBy from this->criteria
 		$orderBy = $fromCriteria->getOrderByColumns();
@@ -129,6 +137,27 @@ class criteriaFilter
 			elseif ( $conj == Criterion::ODER ) $criterion->addOr ( $newCriterion );
 			$i++;
 		}
+	}
+
+	/**
+	 * checks for opposite comparison conditions
+	 *
+	 */
+	private function checkOppositeConditions($fromOperator, $fromValue, $toOperator, $toValue)
+	{
+		if(self::$opposite_operators[$fromOperator] == $toOperator)
+		{
+			if(is_array($toValue))
+			{
+				if(is_array($fromValue))
+				{
+					return $toValue == $fromValue;
+				}
+				return in_array($fromValue, $toValue);
+			}
+		}
+
+		return false;
 	}
 	
 }

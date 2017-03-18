@@ -118,7 +118,8 @@ class KalturaSyndicationFeedRenderer
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
 		if(!is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
-			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
+			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext(), true);
+//			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
 		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		$tmpSyndicationFeed->fromObject($syndicationFeedDB);
