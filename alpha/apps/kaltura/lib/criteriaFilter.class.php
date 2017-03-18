@@ -69,7 +69,7 @@ class criteriaFilter
 	private function copyCriteriaConstraints($fromCriteria, $toCriteria)
 	{
 		$columns = $fromCriteria->keys();
-	
+		
 		foreach ( $columns as $column )
 		{
 			$filterCriterion = $fromCriteria->getCriterion ( $column );
@@ -85,7 +85,7 @@ class criteriaFilter
 			// don't add duplicates !!
 			if ( $existingCriterion && ( $existingCriterion->getValue() == $filterCriterion->getValue() &&  ($existingCriterion->getComparison() == $filterCriterion->getComparison() || $this->checkOppositeOperators($filterCriterion->getComparison(), $filterCriterion->getValue(), $existingCriterion->getComparison(), $existingCriterion->getValue()))))
 				continue;
-
+			
 				// go one step deeper to copy the inner clauses
 			$this->addClauses( $fromCriteria , $filterCriterion , $newCriterion );
 			$toCriteria->addAnd ( $newCriterion );
