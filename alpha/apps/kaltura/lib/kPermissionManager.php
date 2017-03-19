@@ -815,7 +815,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		$objectName = strtolower($objectName);
 		$paramName = strtolower($paramName);
-		if (!isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName]))
+		if ( !isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName]) && !isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][ApiParameterPermissionItemAction::USAGE][$objectName]) )
 		{
 			return false;
 		}
