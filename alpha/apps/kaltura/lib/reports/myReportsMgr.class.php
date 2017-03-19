@@ -693,6 +693,7 @@ class myReportsMgr
 			if ($input_filter instanceof endUserReportsInputFilter) 
                                 $str_object_ids .=  $input_filter->categories;
    	                
+   	        $use_index = "USE INDEX (PRIMARY)";        
 			if ( is_numeric( $report_type ))
 			{
 				$file_path = myReportsSqlFileMgr::getSqlFilePath( 
@@ -840,6 +841,7 @@ class myReportsMgr
 				{
 					$entryIds = "'" . implode("','", array_merge($escapedobjectIds, $entryIdsFromDB)) . "'";
 					$obj_ids_clause = "ev.entry_id in ( $entryIds )";
+					
 				}
 			}
 			elseif (count($entryIdsFromDB))
@@ -847,6 +849,10 @@ class myReportsMgr
 				$entryIds = "'" . implode("','", $entryIdsFromDB) . "'";
 				$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 			}
+
+			if ($entryIds && substr_count($entryIds, ",") < 10) 
+				$use_index = " ";
+
 			
 			if ($input_filter instanceof endUserReportsInputFilter && ($input_filter->userIds != null) && ($report_type == self::REPORT_TYPE_USER_USAGE || $report_type == self::REPORT_TYPE_SPECIFIC_USER_USAGE) ) {
 					$userFilter = new kuserFilter();
@@ -868,7 +874,7 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
+			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset, $use_index);
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
 			else 
@@ -1202,7 +1208,7 @@ class myReportsMgr
 	}
 	
 	private static function getReplacedSql ( $link, $sql_content , $partner_id , reportsInputFilter $input_filter , 
-		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null , $offset = null)
+		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null , $offset = null, $use_index = null)
 	{
 		// TODO - format the search_text according to the the $input_filter
 		$search_text_match_clause = "1=1"; //self::setSearchFieldsAndText ( $input_filter );
@@ -1265,6 +1271,7 @@ class myReportsMgr
 				"{TIME_SHIFT}" , 
 				"{CAT_ID_CLAUSE}" ,
 				"{GROUP_COLUMN}" ,
+				"{USE_INDEX}"
 			);
 			
 		$values = 
@@ -1285,6 +1292,7 @@ class myReportsMgr
 				$time_shift,
 				$cat_ids_str,
 				($input_filter->interval == reportInterval::MONTHS ? "month_id" : "date_id"),
+				$use_index
 			);
 				
 		if ( $input_filter->extra_map )
