@@ -7,7 +7,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	protected $kalturaXslt = null;
 	protected $kalturaXsltItem = null;
 
-	private $state;
+	private $state = null;
 	
 	public function init($syndicationFeed, $syndicationFeedDB, $mimeType) {
 		parent::init($syndicationFeed, $syndicationFeedDB, $mimeType);
@@ -96,6 +96,12 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		{
 			$id = $this->syndicationFeed->id;
 			$partnerId = $this->syndicationFeed->partnerId;
+
+			$host = kConf::get('www_host');
+			if(is_null(parse_url($host ,PHP_URL_SCHEME)))
+			{
+				$host = infraRequestUtils::getProtocol() . $host;
+			}
 
 			$hrefLink = kConf::get('www_host') . "/api_v3/getFeed.php?partnerId=$partnerId&feedId=$id";
 			if(kCurrentContext::$ks)

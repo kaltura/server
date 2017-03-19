@@ -14,7 +14,6 @@ class KalturaSyndicationFeedRenderer
 	const CACHE_VERSION = 1;
 	const CACHE_EXPIRY = 2592000;		// 30 days
 
-	const PAGE_SIZE_MIN_VALUE = 100;
 	const PAGE_SIZE_MAX_VALUE = 500;
 	
 	/**
@@ -161,15 +160,15 @@ class KalturaSyndicationFeedRenderer
 			if($state)
 			{
 				list($lastCreatedAt, $excludedEntryIds) = $this->extractStateParams($state);
-
-				$this->baseCriteria->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
-				$this->baseCriteria->addAnd(entryPeer::ID, $excludedEntryIds, Criteria::NOT_IN);
+				if($lastCreatedAt)
+					$this->baseCriteria->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
+				if($excludedEntryIds)
+					$this->baseCriteria->addAnd(entryPeer::ID, $excludedEntryIds, Criteria::NOT_IN);
 			}
 			entryPeer::allowDeletedInCriteriaFilter();
 		}
 		else
 		{
-			$this->baseCriteria->addAnd(entryPeer::STATUS, entryStatus::READY);
 			$this->baseCriteria->addAnd(entryPeer::TYPE, array(entryType::MEDIA_CLIP, entryType::MIX), Criteria::IN);
 		}
 		$this->baseCriteria->addAnd(entryPeer::MODERATION_STATUS, array(
@@ -206,10 +205,14 @@ class KalturaSyndicationFeedRenderer
 	private function extractStateParams($state)
 	{
 		$decodedState = base64_decode($state);
-		list($lastCreatedAt, $excludedEntryIdsStr) = explode(",", $decodedState);
-		$excludedEntryIdsArr = explode(":", $excludedEntryIdsStr);
 
-		return array($lastCreatedAt,$excludedEntryIdsArr);
+		if($decodedState !== false && strpos($decodedState, ","))
+		{
+			list($lastCreatedAt, $excludedEntryIdsStr) = explode(",", $decodedState);
+			$excludedEntryIdsArr = explode(":", $excludedEntryIdsStr);
+			return array($lastCreatedAt,$excludedEntryIdsArr);
+		}
+		return array(null, null);
 	}
 
 	private function encodeStateParams($lastCreateVal, array $entryIds)
@@ -220,7 +223,7 @@ class KalturaSyndicationFeedRenderer
 
 	private function shouldAddNextLink()
 	{
-		if(($this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT) && (!$this->syndicationFeed->playlistId && $this->syndicationFeed->pageSize > self::PAGE_SIZE_MIN_VALUE && $this->syndicationFeed->pageSize < self::PAGE_SIZE_MAX_VALUE))
+		if(($this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT) && (!$this->syndicationFeed->playlistId && $this->syndicationFeed->pageSize && $this->syndicationFeed->pageSize < self::PAGE_SIZE_MAX_VALUE))
 		{
 			return true;
 		}
@@ -524,14 +527,14 @@ class KalturaSyndicationFeedRenderer
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
 		$nextEntry = $this->getNextEntry();
 	
-		$tempLastCreatedAtVal = null;
+		$currentLastCreatedAtVal = null;
 		$excludedEntryIds = array();	
 
 		while($nextEntry)
 		{
 			if($this->addLinkForNextIteration)
 			{
-				$currentLastCreatedAtVal = strtotime($nextEntry->getCreatedAt());
+				$currentLastCreatedAtVal = $nextEntry->getCreatedAt(null);
 				$excludedEntryId = $nextEntry->getId();
 				if($currentLastCreatedAtVal == $tempLastCreatedAtVal)
 					$excludedEntryIds[] = $excludedEntryId;
