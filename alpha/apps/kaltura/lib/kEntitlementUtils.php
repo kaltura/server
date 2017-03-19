@@ -377,9 +377,16 @@ class kEntitlementUtils
 		return self::$privacyContextSearch;
 	}
 
-	public static function setPrivacyContextSearch($privacyContextSearch)
+	public static function setPrivacyContextSearch($privacyContextSearch, $addPrefix = false)
 	{
-		self::$privacyContextSearch = array($privacyContextSearch . self::TYPE_SEPERATOR . PrivacyType::ALL);
+		$privacyContextSearchArr = array($privacyContextSearch . self::TYPE_SEPERATOR . PrivacyType::ALL);
+		if($addPrefix)
+		{
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$privacyContextSearchArr = self::addPrivacyContextsPrefix($privacyContextSearchArr, $partnerId);
+		}
+
+		self::$privacyContextSearch =  $privacyContextSearchArr;
 	}
 
 	public static function getPrivacyContextForEntry(entry $entry)
