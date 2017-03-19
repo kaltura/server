@@ -293,7 +293,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * @readonly
+	 * @insertonly
 	 */
 	public $partnerParentId;
 	
