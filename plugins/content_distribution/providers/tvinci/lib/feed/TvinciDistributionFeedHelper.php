@@ -128,7 +128,7 @@ class TvinciDistributionFeedHelper
 		$this->_doc->encoding = "UTF-8";
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
-		self::addEmptyValueInMetadataObjects($feedAsXml);
+		//self::addEmptyValueInMetadataObjects($feedAsXml);
 
 		if ( $action != self::ACTION_DELETE )
 		{
