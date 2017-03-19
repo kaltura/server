@@ -109,7 +109,7 @@ class KalturaSyndicationFeedRenderer
  	 *
 	 * @var bool
 	 */
-	private $addLinkForNextIteration;
+	private $addLinkForNextIteration = false;
 	
 	public function __construct($feedId, $feedProcessingKey = null, $ks = null, $state = null)
 	{
@@ -223,7 +223,7 @@ class KalturaSyndicationFeedRenderer
 
 	private function shouldAddNextLink()
 	{
-		if(($this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT) && (!$this->syndicationFeed->playlistId && $this->syndicationFeed->pageSize && $this->syndicationFeed->pageSize < self::PAGE_SIZE_MAX_VALUE))
+		if(($this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT) && (!$this->syndicationFeed->playlistId && $this->syndicationFeed->pageSize && $this->syndicationFeed->pageSize <= self::PAGE_SIZE_MAX_VALUE))
 		{
 			return true;
 		}
@@ -250,8 +250,7 @@ class KalturaSyndicationFeedRenderer
 
 		$coreFilter = new entryFilter();
 		$entryFilter->toObject($coreFilter);
-		$entryFilter = $coreFilter;
-		$this->addFilter($entryFilter);
+		$this->addFilter($coreFilter);
 	}
 
 	public function addEntryAttachedFilter($entryId)
