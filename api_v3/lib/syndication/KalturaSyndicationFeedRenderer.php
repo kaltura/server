@@ -142,7 +142,7 @@ class KalturaSyndicationFeedRenderer
 		myPartnerUtils::resetPartnerFilter('entry');
 
 		$this->baseCriteria = clone entryPeer::getDefaultCriteriaFilter();
-		
+	
 		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
 		$startDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::START_DATE, null));
 		$this->baseCriteria->addAnd($startDateCriterion);
@@ -165,6 +165,7 @@ class KalturaSyndicationFeedRenderer
 				$this->baseCriteria->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
 				$this->baseCriteria->addAnd(entryPeer::ID, $excludedEntryIds, Criteria::NOT_IN);
 			}
+			entryPeer::allowDeletedInCriteriaFilter();
 		}
 		else
 		{
@@ -174,7 +175,7 @@ class KalturaSyndicationFeedRenderer
 		$this->baseCriteria->addAnd(entryPeer::MODERATION_STATUS, array(
 			entry::ENTRY_MODERATION_STATUS_REJECTED, 
 			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION), Criteria::NOT_IN);
-			
+
 		if($this->syndicationFeed->playlistId)
 		{
 			$this->entryFilters = myPlaylistUtils::getPlaylistFiltersById($this->syndicationFeed->playlistId);
@@ -404,7 +405,7 @@ class KalturaSyndicationFeedRenderer
 			if(!$this->currentCriteria)
 				return;
 		}
-			
+
 		$nextPage = entryPeer::doSelect($this->currentCriteria);
 		if(!count($nextPage)) // move to the next criteria
 		{
@@ -506,7 +507,6 @@ class KalturaSyndicationFeedRenderer
 		$microTimeStart = microtime(true);
 		
 		$renderer = KalturaSyndicationFeedFactory::getRendererByType($this->syndicationFeed->type);
-
 		$renderer->init($this->syndicationFeed, $this->syndicationFeedDb, $this->mimeType);
 		
 		header($renderer->handleHttpHeader());
@@ -575,16 +575,13 @@ class KalturaSyndicationFeedRenderer
 				} else {
 					$xml = $renderer->handleBody($entry, $e, $flavorAssetUrl);
 				}
-				
+
 				if ($cacheStore)
 				{
 					$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
 					$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
 				}
 			} 
-
-			
-			
 			echo $renderer->finalize($xml, $nextEntry !== false);
 		}
 		
