@@ -145,7 +145,7 @@ class criteriaFilter
 	 */
 	private function checkOppositeConditions($fromOperator, $fromValue, $toOperator, $toValue)
 	{
-		if(self::$opposite_operators[$fromOperator] == $toOperator)
+		if(isset(self::$opposite_operators[$fromOperator]) && self::$opposite_operators[$fromOperator] == $toOperator)
 		{
 			if(is_array($toValue))
 			{
