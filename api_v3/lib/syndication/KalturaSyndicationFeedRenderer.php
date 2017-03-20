@@ -126,8 +126,9 @@ class KalturaSyndicationFeedRenderer
 		kPermissionManager::init();
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
-		// in case ks exists, it's privacy context will be added in entryPeer::setDefaultCriteriaFilter 
+		// in case ks exists, it's privacy context will be added in entryPeer::setDefaultCriteriaFilter
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		
 		if((!$ks || !$ks->getPrivacyContext()) && !is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
 			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
@@ -529,6 +530,7 @@ class KalturaSyndicationFeedRenderer
 		$nextEntry = $this->getNextEntry();
 	
 		$currenCreatedAtVal = null;
+		$tempCreatedAtVal = null;
 		$excludedEntryIds = array();	
 
 		while($nextEntry)
@@ -537,7 +539,7 @@ class KalturaSyndicationFeedRenderer
 			{
 				$currenCreatedAtVal = $nextEntry->getCreatedAt(null);
 				$excludedEntryId = $nextEntry->getId();
-				if(isset($tempCreatedAtVal) &&  $currenCreatedAtVal == $tempCreatedAtVal)
+				if($currenCreatedAtVal == $tempCreatedAtVal)
 					$excludedEntryIds[] = $excludedEntryId;
 				else
 					$excludedEntryIds = array($excludedEntryId);
