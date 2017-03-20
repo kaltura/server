@@ -126,7 +126,9 @@ class KalturaSyndicationFeedRenderer
 		kPermissionManager::init();
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
-		if(!is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
+		// in case ks exists, it's privacy context will be added in entryPeer::setDefaultCriteriaFilter 
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		if((!$ks || !$ks->getPrivacyContext()) && !is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
 			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
 		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
@@ -526,21 +528,21 @@ class KalturaSyndicationFeedRenderer
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
 		$nextEntry = $this->getNextEntry();
 	
-		$currentLastCreatedAtVal = null;
+		$currenCreatedAtVal = null;
 		$excludedEntryIds = array();	
 
 		while($nextEntry)
 		{
 			if($this->addLinkForNextIteration)
 			{
-				$currentLastCreatedAtVal = $nextEntry->getCreatedAt(null);
+				$currenCreatedAtVal = $nextEntry->getCreatedAt(null);
 				$excludedEntryId = $nextEntry->getId();
-				if($currentLastCreatedAtVal == $tempLastCreatedAtVal)
+				if(isset($tempCreatedAtVal) &&  $currenCreatedAtVal == $tempCreatedAtVal)
 					$excludedEntryIds[] = $excludedEntryId;
 				else
 					$excludedEntryIds = array($excludedEntryId);
 
-				$tempLastCreatedAtVal = $currentLastCreatedAtVal; 
+				$tempCreatedAtVal = $currenCreatedAtVal; 
 			}
 			$this->enableApcProcessingFlag();
 			$entry = $nextEntry;
@@ -589,7 +591,7 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->addLinkForNextIteration)
 		{
-			$currState = $this->encodeStateParams($currentLastCreatedAtVal, $excludedEntryIds);
+			$currState = $this->encodeStateParams($currenCreatedAtVal, $excludedEntryIds);
 			$renderer->setState($currState);
 		}
 

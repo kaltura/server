@@ -435,7 +435,15 @@ class kMrssManager
 			else
 				$mrss = new SimpleXMLElement('<item/>');
 		}
-		
+	
+		if($entry->getStatus() == entryStatus::DELETED)
+		{
+			$mrss->addChild('status', self::stringToSafeXml($entry->getStatus()));
+			self::addInstanceToPool($instanceKey, $mrss);
+			return $mrss;
+		}
+
+	
 		$mrss->addChild('entryId', $entry->getId());
 		if($entry->getReferenceID())
 			$mrss->addChild('referenceID', self::stringToSafeXml($entry->getReferenceID()));
