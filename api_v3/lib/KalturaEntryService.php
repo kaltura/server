@@ -1296,6 +1296,11 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
 		}
+
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $entry->userId))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
+		}
 		
 		// need to create kuser if this is an admin creating the entry on a different user
 		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
