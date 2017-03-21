@@ -1,6 +1,6 @@
 # Lynx 12.13.0 #
 
-## Add batch thumbasset delete permission ##
+## Add media-server permission get permission ##
 
  - Issue Type: Bug
  - Issue ID: PLAT-7163
