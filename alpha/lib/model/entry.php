@@ -2609,7 +2609,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			
 		if(is_string($v) && !is_numeric($v)) // not numeric
 			return;
-			
+
+		if ($this->getIsRecordedEntry())
+			$this->setRecordedLengthInMsecs(0);
+
 		return parent::setLengthInMsecs($v);
 	}
 	
@@ -3574,5 +3577,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function getInClone()
 	{
 		return $this->getFromCustomData("in_clone");
+	}
+
+	public function setRecordedLengthInMsecs($v)
+	{
+		$this->putInCustomData("recorded_entry_length_in_msecs", $v);
+	}
+
+	public function getRecordedLengthInMsecs()
+	{
+		return $this->getFromCustomData("recorded_entry_length_in_msecs",null, 0);
 	}
 }
