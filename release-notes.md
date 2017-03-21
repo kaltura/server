@@ -1,3 +1,21 @@
+# Lynx 12.13.0 #
+
+## Add media-server permission get permission ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7163
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_20_add_media_server_permission_get_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.12.0 #
 
 ## Support source playback in LC uploaded contnet ## 
