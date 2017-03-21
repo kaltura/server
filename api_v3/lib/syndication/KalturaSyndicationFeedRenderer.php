@@ -127,9 +127,9 @@ class KalturaSyndicationFeedRenderer
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
 		// in case ks exists, it's privacy context will be added in entryPeer::setDefaultCriteriaFilter
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		$ksObj = kCurrentContext::$ks_object;
 		
-		if((!$ks || !$ks->getPrivacyContext()) && !is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
+		if((!$ksObj || !$ksObj->getPrivacyContext()) && !is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
 			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
 		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
