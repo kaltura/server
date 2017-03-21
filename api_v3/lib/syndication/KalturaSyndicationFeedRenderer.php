@@ -126,7 +126,10 @@ class KalturaSyndicationFeedRenderer
 		kPermissionManager::init();
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
-		if(!is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
+		// in case ks exists, it's privacy context will be added in entryPeer::setDefaultCriteriaFilter
+		$ksObj = kCurrentContext::$ks_object;
+		
+		if((!$ksObj || !$ksObj->getPrivacyContext()) && !is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
 			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
 		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
@@ -526,21 +529,22 @@ class KalturaSyndicationFeedRenderer
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
 		$nextEntry = $this->getNextEntry();
 	
-		$currentLastCreatedAtVal = null;
+		$lastCreatedAtVal = null;
+		$tempCreatedAtVal = null;
 		$excludedEntryIds = array();	
 
 		while($nextEntry)
 		{
 			if($this->addLinkForNextIteration)
 			{
-				$currentLastCreatedAtVal = $nextEntry->getCreatedAt(null);
+				$lastCreatedAtVal = $nextEntry->getCreatedAt(null);
 				$excludedEntryId = $nextEntry->getId();
-				if($currentLastCreatedAtVal == $tempLastCreatedAtVal)
+				if($lastCreatedAtVal == $tempCreatedAtVal)
 					$excludedEntryIds[] = $excludedEntryId;
 				else
 					$excludedEntryIds = array($excludedEntryId);
 
-				$tempLastCreatedAtVal = $currentLastCreatedAtVal; 
+				$tempCreatedAtVal = $lastCreatedAtVal; 
 			}
 			$this->enableApcProcessingFlag();
 			$entry = $nextEntry;
@@ -589,7 +593,7 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->addLinkForNextIteration)
 		{
-			$currState = $this->encodeStateParams($currentLastCreatedAtVal, $excludedEntryIds);
+			$currState = $this->encodeStateParams($lastCreatedAtVal, $excludedEntryIds);
 			$renderer->setState($currState);
 		}
 
