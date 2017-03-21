@@ -529,7 +529,7 @@ class KalturaSyndicationFeedRenderer
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
 		$nextEntry = $this->getNextEntry();
 	
-		$currenCreatedAtVal = null;
+		$lastCreatedAtVal = null;
 		$tempCreatedAtVal = null;
 		$excludedEntryIds = array();	
 
@@ -537,14 +537,14 @@ class KalturaSyndicationFeedRenderer
 		{
 			if($this->addLinkForNextIteration)
 			{
-				$currenCreatedAtVal = $nextEntry->getCreatedAt(null);
+				$lastCreatedAtVal = $nextEntry->getCreatedAt(null);
 				$excludedEntryId = $nextEntry->getId();
-				if($currenCreatedAtVal == $tempCreatedAtVal)
+				if($lastCreatedAtVal == $tempCreatedAtVal)
 					$excludedEntryIds[] = $excludedEntryId;
 				else
 					$excludedEntryIds = array($excludedEntryId);
 
-				$tempCreatedAtVal = $currenCreatedAtVal; 
+				$tempCreatedAtVal = $lastCreatedAtVal; 
 			}
 			$this->enableApcProcessingFlag();
 			$entry = $nextEntry;
@@ -593,7 +593,7 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->addLinkForNextIteration)
 		{
-			$currState = $this->encodeStateParams($currenCreatedAtVal, $excludedEntryIds);
+			$currState = $this->encodeStateParams($lastCreatedAtVal, $excludedEntryIds);
 			$renderer->setState($currState);
 		}
 
