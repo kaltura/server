@@ -591,7 +591,7 @@ class KalturaSyndicationFeedRenderer
 			echo $renderer->finalize($xml, $nextEntry !== false);
 		}
 		
-		if($this->addLinkForNextIteration)
+		if($this->addLinkForNextIteration && $lastCreatedAtVal)
 		{
 			$currState = $this->encodeStateParams($lastCreatedAtVal, $excludedEntryIds);
 			$renderer->setState($currState);
