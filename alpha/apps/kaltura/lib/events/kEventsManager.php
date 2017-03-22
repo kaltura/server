@@ -233,10 +233,15 @@ class kEventsManager
 		{
 			if (!class_exists($consumerClass))
 				continue;
-			
-			if($event->consume(new $consumerClass()) || !($event instanceof IKalturaCancelableEvent))
-				continue;
-				
+
+			try{
+				if($event->consume(new $consumerClass()) || !($event instanceof IKalturaCancelableEvent))
+					continue;
+			}
+			catch (CouchbaseException $e){
+				KalturaLog::err($e);
+			}
+
 			KalturaLog::notice("Event [" . get_class($event) . "] paused by consumer [$consumerClass]");
 			break;
 		}
