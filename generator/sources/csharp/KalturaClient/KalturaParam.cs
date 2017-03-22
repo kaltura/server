@@ -96,7 +96,7 @@ namespace Kaltura
                 case PARAM_TYPE_LONG:
                     return _LongValue.ToString();
                 case PARAM_TYPE_FLOAT:
-                    return String.Format("{0:F20}", _FloatValue);
+                    return _FloatValue.ToString();
                 case PARAM_TYPE_STRING:
                 default:
                     return "\"" + _Value.Replace("\"", "\\\"").Replace("\r", "").Replace("\t", "\\t").Replace("\n", "\\n") + "\"";
