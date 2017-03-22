@@ -1,10 +1,4 @@
 <!DOCTYPE html>
-<?php
-include_once(__DIR__ . '/../alpha/config/kConf.php');
-?>
-
-<!-- This landing page is based on a template taken from https://github.com/BlackrockDigital/startbootstrap-landing-page, license: MIT -->
-
 <html lang="en">
 
 <head>
@@ -15,7 +9,7 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Kaltura Platform Start Page - Getting Started</title>
+    <title>Kaltura Platform Start Page - Getting Start</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -25,7 +19,7 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="css/google_font.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -46,7 +40,7 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
             <div class="row">
                 <div class="col-lg-12">
                     <div class="intro-message">
-                        <h1>Kaltura Video Platform (<?php echo kConf::get('kaltura_version');?>)</h1>
+                        <h1>Kaltura Video Platform</h1>
                         <h3>Getting Started With Your Deployment</h3>
                         <hr class="intro-divider">
                         <ul class="intro-links-list">
@@ -77,7 +71,7 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
                 <div class="col-lg-5 col-sm-6">
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
-                    <h2 class="section-heading">The Admin Console<br /><a href="//<?php echo kConf::get('cdn_api_host_https')?>/admin_console" target="_blank">Admin Your Platform Backend</a></h2>
+                    <h2 class="section-heading">The Admin Console<br /><a href="/admin_console" target="_blank">Admin Your Platform Backend</a></h2>
                     <p class="lead">The Admin Console makes it easy to manage your Kaltura backend and administer Kaltura accounts. View and access all accounts, manage permissions, register new accounts using templates, view usage reports for each account or the entire group, manage backend services and investigate jobs, and more. <a href="https://knowledge.kaltura.com/kaltura-admin-console-user-manual" target="_blank">Learn more about the Admin Console</a>.</p>
                     <p>NOTE: Before you can begin to manage content using the KMC, login to the Admin Console using the credentials provided during the installation, and create a new Kaltura account.</p>
                 </div>
@@ -101,8 +95,8 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
                 <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
-                    <h2 class="section-heading">KMC: Management Console<br /><a href="//<?php echo kConf::get('cdn_api_host_https')?>/kmc" target="_blank">Manage Specific Accounts</a></h2>
-                    <p class="lead">The KMC is the media management application. Perform bulk ingestion/upload, create transcoding profiles, manage metadata and categories, design and configure players, create playlists, view analytics, configure live streaming, distribute content across the web, configure ad campaigns, control access to media, manage your account, users, entitlements and permissions, and much more. <a href="https://knowledge.kaltura.com/node/1606/attachment/field_media" target="_blank">Learn more about the KMC application</a>.</p>
+                    <h2 class="section-heading">KMC: Management Console<br /><a href="/kmc" target="_blank">Manage Specific Accounts</a></h2>
+                    <p class="lead">The KMC is the media management application. Perform bulk ingestion/upload, create transcoding profiles, manage metadata and categories, design and configure players, create playlists, view analytics, configure live streaming, distribute content across the web, configure ad campaigns, control access to media, manage your account, users, entitlements and permissions, and much more. <a href="http://knowledge.kaltura.com/node/1606/attachment/field_media" target="_blank">Learn more about the KMC application</a>.</p>
                 </div>
                 <div class="col-lg-5 col-sm-pull-6  col-sm-6">
                     <img class="img-responsive" src="img/dog.png" alt="">
