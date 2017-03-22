@@ -267,8 +267,12 @@ class KCurlWrapper
 		}
 		
 		$curlWrapper = new KCurlWrapper();
+		$curlHeaderResponse = $curlWrapper->getHeader($url, true);
 		$res = $curlWrapper->exec($url, $destFilePath);
 		$curlWrapper->close();
+
+		if(!$curlHeaderResponse->isGoodCode())
+			throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
 		
 		return $res;
 	}
