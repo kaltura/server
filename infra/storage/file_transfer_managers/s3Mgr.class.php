@@ -163,12 +163,14 @@ class s3Mgr extends kFileTransferMgr
 				$params['ServerSideEncryption'] = "AES256";
 			}
 
+			$fp = fopen($local_file, 'r');
             $res = $this->s3->upload($bucket,
                 $remote_file,
-                $local_file,
+                $fp,
                 $this->filesAcl,
                 array('params' => $params)
             );
+            fclose($fp);
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
 			return array(true, null);
