@@ -6,7 +6,7 @@
 class KalturaTranscriptAsset extends KalturaAttachmentAsset 
 {
 	/**
-	 * The accuracy of the transcript
+	 * The accuracy of the transcript - values between 0 and 1
 	 * @var float
 	 */
 	public $accuracy;

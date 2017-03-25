@@ -50,7 +50,13 @@ class IntegrationService extends KalturaBaseService
 		$batchJob = BatchJobPeer::retrieveByPK($id);
 		$invalidJobId = false;
 		$invalidKs = false;
-		if(!$batchJob)
+		
+		if(!self::validateKs($batchJob))
+		{
+			$invalidKs = true;
+			KalturaLog::err("ks not valid for notifying job [$id]");
+		}
+		elseif(!$batchJob)
 		{
 			$invalidJobId = true;
 			KalturaLog::err("Job [$id] not found");
@@ -70,12 +76,7 @@ class IntegrationService extends KalturaBaseService
 			$invalidKs = true;
 			KalturaLog::err("Job [$id] of wrong partner [" . $batchJob->getPartnerId() . "] expected [" . kCurrentContext::getCurrentPartnerId() . "]");
 		}
-		elseif(!self::validateKs($batchJob))
-		{
-			$invalidKs = true;
-			KalturaLog::err("ks not valid for notifying job [$id]");
-		}
-	
+
 		if($invalidJobId)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $id);
@@ -87,7 +88,7 @@ class IntegrationService extends KalturaBaseService
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
 	}
-	
+
 	public static function validateKs($job)
 	{	
 		$dcParams = kDataCenterMgr::getCurrentDc();
