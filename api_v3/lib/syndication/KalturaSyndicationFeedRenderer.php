@@ -143,6 +143,16 @@ class KalturaSyndicationFeedRenderer
 		
 		myPartnerUtils::resetPartnerFilter('entry');
 
+		if($this->shouldAddNextLink())
+		{
+			$this->addLinkForNextIteration = true;
+
+			if($this->syndicationFeed->entryFilter && ($this->syndicationFeed->entryFilter->statusEqual || $this->syndicationFeed->entryFilter->statusIn))
+			{
+				entryPeer::allowDeletedInCriteriaFilter();
+			}
+		}
+
 		$this->baseCriteria = clone entryPeer::getDefaultCriteriaFilter();
 		
 		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
@@ -154,8 +164,8 @@ class KalturaSyndicationFeedRenderer
 		$this->baseCriteria->addAnd($endDateCriterion);
 		
 		$this->baseCriteria->addAnd(entryPeer::PARTNER_ID, $this->syndicationFeed->partnerId);
-	
-		if($this->shouldAddNextLink())
+
+		if($this->addLinkForNextIteration)
 		{
 			$this->addLinkForNextIteration = true;
 			$this->addExternalAttachedFilter();
@@ -168,7 +178,6 @@ class KalturaSyndicationFeedRenderer
 				if($excludedEntryIds)
 					$this->baseCriteria->addAnd(entryPeer::ID, $excludedEntryIds, Criteria::NOT_IN);
 			}
-			entryPeer::allowDeletedInCriteriaFilter();
 		}
 		else
 		{
@@ -410,7 +419,7 @@ class KalturaSyndicationFeedRenderer
 			if(!$this->currentCriteria)
 				return;
 		}
-			
+	
 		$nextPage = entryPeer::doSelect($this->currentCriteria);
 		if(!count($nextPage)) // move to the next criteria
 		{
