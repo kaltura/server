@@ -73,6 +73,7 @@ $feedId = getRequestParameter('feedId');
 $entryId = getRequestParameter('entryId');
 $limit = getRequestParameter('limit');
 $ks = getRequestParameter('ks');
+$state = getRequestParameter('state');
 
 $feedProcessingKey = "feedProcessing_{$feedId}_{$entryId}_{$limit}";
 if (function_exists('apc_fetch'))
@@ -85,7 +86,7 @@ if (function_exists('apc_fetch'))
 
 try
 {
-	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId, $feedProcessingKey, $ks);
+	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId, $feedProcessingKey, $ks, $state);
 	$syndicationFeedRenderer->addFlavorParamsAttachedFilter();
 	
 	kCurrentContext::$partner_id = $syndicationFeedRenderer->syndicationFeed->partnerId;

@@ -13,6 +13,8 @@ class KalturaSyndicationFeedRenderer
 	
 	const CACHE_VERSION = 1;
 	const CACHE_EXPIRY = 2592000;		// 30 days
+
+	const PAGE_SIZE_MAX_VALUE = 500;
 	
 	/**
 	 * Maximum number of items to list
@@ -101,8 +103,15 @@ class KalturaSyndicationFeedRenderer
 	 * @var int
 	 */
 	private $nextProcessingSetTime = null;
+
+	/**
+	 * flag for adding xml-level link for next iteration
+ 	 *
+	 * @var bool
+	 */
+	private $addLinkForNextIteration = false;
 	
-	public function __construct($feedId, $feedProcessingKey = null, $ks = null)
+	public function __construct($feedId, $feedProcessingKey = null, $ks = null, $state = null)
 	{
 		$this->feedProcessingKey = $feedProcessingKey;
 		
@@ -117,7 +126,10 @@ class KalturaSyndicationFeedRenderer
 		kPermissionManager::init();
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
-		if(!is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
+		// in case ks exists, it's privacy context will be added in entryPeer::setDefaultCriteriaFilter
+		$ksObj = kCurrentContext::$ks_object;
+		
+		if((!$ksObj || !$ksObj->getPrivacyContext()) && !is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
 			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
 		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
@@ -142,8 +154,26 @@ class KalturaSyndicationFeedRenderer
 		$this->baseCriteria->addAnd($endDateCriterion);
 		
 		$this->baseCriteria->addAnd(entryPeer::PARTNER_ID, $this->syndicationFeed->partnerId);
-		$this->baseCriteria->addAnd(entryPeer::STATUS, entryStatus::READY);
-		$this->baseCriteria->addAnd(entryPeer::TYPE, array(entryType::MEDIA_CLIP, entryType::MIX), Criteria::IN);
+	
+		if($this->shouldAddNextLink())
+		{
+			$this->addLinkForNextIteration = true;
+			$this->addExternalAttachedFilter();
+
+			if($state)
+			{
+				list($lastCreatedAt, $excludedEntryIds) = $this->extractStateParams($state);
+				if($lastCreatedAt)
+					$this->baseCriteria->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
+				if($excludedEntryIds)
+					$this->baseCriteria->addAnd(entryPeer::ID, $excludedEntryIds, Criteria::NOT_IN);
+			}
+			entryPeer::allowDeletedInCriteriaFilter();
+		}
+		else
+		{
+			$this->baseCriteria->addAnd(entryPeer::TYPE, array(entryType::MEDIA_CLIP, entryType::MIX), Criteria::IN);
+		}
 		$this->baseCriteria->addAnd(entryPeer::MODERATION_STATUS, array(
 			entry::ENTRY_MODERATION_STATUS_REJECTED, 
 			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION), Criteria::NOT_IN);
@@ -175,6 +205,34 @@ class KalturaSyndicationFeedRenderer
 		KalturaLog::info("syndicationFeedRenderer- initialization done [".($microTimeEnd - $microTimeStart)."]");		
 	}
 	
+	private function extractStateParams($state)
+	{
+		$decodedState = base64_decode($state);
+
+		if($decodedState !== false && strpos($decodedState, ","))
+		{
+			list($lastCreatedAt, $excludedEntryIdsStr) = explode(",", $decodedState);
+			$excludedEntryIdsArr = explode(":", $excludedEntryIdsStr);
+			return array($lastCreatedAt,$excludedEntryIdsArr);
+		}
+		return array(null, null);
+	}
+
+	private function encodeStateParams($lastCreateVal, array $entryIds)
+	{
+		$str = $lastCreateVal . "," . implode(":", $entryIds);
+		return base64_encode($str);
+	}
+
+	private function shouldAddNextLink()
+	{
+		if(($this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT) && (!$this->syndicationFeed->playlistId && $this->syndicationFeed->pageSize && $this->syndicationFeed->pageSize <= self::PAGE_SIZE_MAX_VALUE))
+		{
+			return true;
+		}
+		return false;
+	}
+
 	public function addFlavorParamsAttachedFilter()
 	{
 		if($this->executed)
@@ -189,6 +247,15 @@ class KalturaSyndicationFeedRenderer
 		$entryFilter->attachToCriteria($this->baseCriteria);
 	}
 	
+	public function addExternalAttachedFilter()
+	{
+		$entryFilter = $this->syndicationFeed->entryFilter;
+
+		$coreFilter = new entryFilter();
+		$entryFilter->toObject($coreFilter);
+		$this->addFilter($coreFilter);
+	}
+
 	public function addEntryAttachedFilter($entryId)
 	{
 		if($this->executed)
@@ -394,6 +461,10 @@ class KalturaSyndicationFeedRenderer
 		{
 			$c->setLimit(self::STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY);
 		}
+		elseif($this->addLinkForNextIteration)
+		{
+			$c->setLimit($this->syndicationFeed->pageSize);
+		}
 		else 
 		{
 			$c->setLimit(min(self::ENTRY_PEER_LIMIT_QUERY, $this->limit));
@@ -433,7 +504,9 @@ class KalturaSyndicationFeedRenderer
 		if($this->executed)
 			return;
 
-		if ($limit)
+		if($this->addLinkForNextIteration)
+			$this->limit = $this->syndicationFeed->pageSize; 
+		elseif ($limit)
 			$this->limit = $limit;
 			
 		$microTimeStart = microtime(true);
@@ -455,9 +528,24 @@ class KalturaSyndicationFeedRenderer
 		$e = null;
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
 		$nextEntry = $this->getNextEntry();
-		
+	
+		$lastCreatedAtVal = null;
+		$tempCreatedAtVal = null;
+		$excludedEntryIds = array();	
+
 		while($nextEntry)
 		{
+			if($this->addLinkForNextIteration)
+			{
+				$lastCreatedAtVal = $nextEntry->getCreatedAt(null);
+				$excludedEntryId = $nextEntry->getId();
+				if($lastCreatedAtVal == $tempCreatedAtVal)
+					$excludedEntryIds[] = $excludedEntryId;
+				else
+					$excludedEntryIds = array($excludedEntryId);
+
+				$tempCreatedAtVal = $lastCreatedAtVal; 
+			}
 			$this->enableApcProcessingFlag();
 			$entry = $nextEntry;
 			$nextEntry = $this->getNextEntry();
@@ -499,11 +587,16 @@ class KalturaSyndicationFeedRenderer
 					$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
 					$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
 				}
-			}
-			
+			} 
 			echo $renderer->finalize($xml, $nextEntry !== false);
 		}
 		
+		if($this->addLinkForNextIteration && $lastCreatedAtVal)
+		{
+			$currState = $this->encodeStateParams($lastCreatedAtVal, $excludedEntryIds);
+			$renderer->setState($currState);
+		}
+
 		echo $renderer->handleFooter();
 		
 		if ($this->feedProcessingKey && function_exists('apc_delete'))
@@ -643,5 +736,4 @@ class KalturaSyndicationFeedRenderer
 	{
 		return $this->returnedEntriesCount;
 	}
-
 }

@@ -390,8 +390,14 @@ class kFile
 	private static function copySingleFile($src, $dest, $deleteSrc) {
 		if($deleteSrc) {
 			// In case of move, first try to move the file before copy & unlink.
-			if(rename($src, $dest)) 
+			$startTime = microtime(true);
+			if(rename($src, $dest))
+			{
+				KalturaLog::log("rename took : ".(microtime(true) - $startTime)." [$src] to [$dest] size: ".filesize($dest));
 				return true;
+			}
+			
+			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
 		}
 		
 		if (!copy($src,$dest)) {

@@ -1296,10 +1296,12 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
 		}
-		
+
+
 		// need to create kuser if this is an admin creating the entry on a different user
-		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
-		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->creatorId);  
+		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), trim($entry->userId));
+		$creatorId = is_null($entry->creatorId) ? $entry->creatorId : trim($entry->creatorId);
+		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $creatorId);
 
 		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 		$dbEntry->setKuserId($kuser->getId());

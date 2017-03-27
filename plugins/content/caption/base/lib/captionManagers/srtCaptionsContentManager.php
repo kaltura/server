@@ -61,6 +61,11 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	 */
 	public function getContent($content)
 	{
+		if (kString::beginsWith($content, "\xff\xfe"))
+		{
+			$content = iconv('utf-16', 'utf-8', substr($content, 2));
+		}
+		
 		$replace = array(
 			'/^[\d]+\s*[\r\n]+/' => '',
 			'/[\r\n]+\s*[\d]+\s*[\r\n]+/' => '',

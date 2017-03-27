@@ -20,7 +20,7 @@ FROM
 		( SUM(count_plays) / SUM(count_loads) ) load_play_ratio,
 		(SUM(IFNULL(count_plays_25,0)) + SUM(IFNULL(count_plays_50,0)) + SUM(IFNULL(count_plays_75,0)) + SUM(IFNULL(count_plays_100,0)))/4/SUM(count_plays) avg_view_drop_off
 	FROM 
-		dwh_hourly_events_entry ev USE INDEX (PRIMARY)
+		dwh_hourly_events_entry ev {USE_INDEX} 
 	WHERE 	{OBJ_ID_CLAUSE}
 		AND partner_id =  {PARTNER_ID} # PARTNER_ID
         AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  

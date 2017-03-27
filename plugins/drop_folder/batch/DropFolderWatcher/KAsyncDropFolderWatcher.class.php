@@ -11,6 +11,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	 * @var KalturaDropFolderClientPlugin
 	 */
 	protected $dropFolderPlugin = null;
+
+	private $currentDropFolderId;
 	
 			
 	/* (non-PHPdoc)
@@ -89,6 +91,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			throw new KalturaException('Tags must be specify in configuration - cannot continue');
 
 		$dropFolders = $this->dropFolderPlugin->dropFolder->getExclusiveDropFolder($folderTag, $maxTimeForFolder);
+		$this->currentDropFolderId = $dropFolders->id;
 		return $dropFolders;
 	}
 	
@@ -112,5 +115,11 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		if(!strstr($message, 'KalturaDropFolderListResponse') && !strstr($message, 'KalturaDropFolderFileListResponse'))
 			KalturaLog::info($message);
-	}	
+	}
+
+	public function preKill()
+	{
+		if ($this->currentDropFolderId)
+			$this->freeExclusiveDropFolder($this->currentDropFolderId);
+	}
 }

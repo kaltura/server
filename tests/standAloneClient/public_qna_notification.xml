@@ -42,11 +42,21 @@
 								</item>
 							</values>
 						</item>
-						<item objectType="KalturaEventFieldCondition">
-							<description>tags_field_modified</description>
-                            <field objectType="KalturaEvalBooleanField">
-                            	<code>in_array(CuePointPeer::TAGS, $scope->getEvent()->getModifiedColumns())</code>
-							</field>
+						<item objectType="KalturaOrCondition">
+							<conditions objectType="array">
+								<item objectType="KalturaEventFieldCondition">
+									<description>tags_field_modified</description>
+                            		<field objectType="KalturaEvalBooleanField">
+                            			<code>in_array(CuePointPeer::TAGS, $scope->getEvent()->getModifiedColumns())</code>
+									</field>
+								</item>
+								<item objectType="KalturaEventFieldCondition">
+									<description>tags_field_modified</description>
+                            		<field objectType="KalturaEvalBooleanField">
+                            			<code>in_array(CuePointPeer::END_TIME, $scope->getEvent()->getModifiedColumns())</code>
+									</field>
+								</item>
+							</conditions>
 						</item>
 						<item objectType="KalturaFieldMatchCondition">
 							<description>tags_match_qna</description>

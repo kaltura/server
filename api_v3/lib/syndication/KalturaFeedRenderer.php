@@ -6,6 +6,8 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	
 	protected $kalturaXslt = null;
 	protected $kalturaXsltItem = null;
+
+	private $state = null;
 	
 	public function init($syndicationFeed, $syndicationFeedDB, $mimeType) {
 		parent::init($syndicationFeed, $syndicationFeedDB, $mimeType);
@@ -65,11 +67,12 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 			$entryMrss = $this->removeNamespaces($entryMrss);
 		}
 		$entryMrss = $this->removeXmlHeader($entryMrss);
+
 		return $entryMrss;
 	}
 	
 	public function handleFooter() {
-		$mrss = $this->getKalturaMrssXml($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription);
+		$mrss = $this->getKalturaMrssXml($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, true);
 	
 		if($this->kalturaXslt)
 			$mrss = kXml::transformXmlUsingXslt($mrss, $this->kalturaXslt);
@@ -80,13 +83,34 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		return $mrss;
 	}
 
-	private function getKalturaMrssXml($title, $link = null, $description = null)
+	private function getKalturaMrssXml($title, $link = null, $description = null, $addNextLink = false)
 	{
 		$mrss = kMrssManager::getMrssXml($title, $link, $description);
 	
 		foreach ($mrss->children() as $second_gen) {
 			if ($second_gen->getName() == 'channel')
 				$second_gen->addChild('items', self::ITEMS_PLACEHOLDER);
+		}
+
+		if($this->state && $addNextLink)
+		{
+			$id = $this->syndicationFeed->id;
+			$partnerId = $this->syndicationFeed->partnerId;
+
+			$host = kConf::get('www_host');
+			if(is_null(parse_url($host ,PHP_URL_SCHEME)))
+			{
+				$host = infraRequestUtils::getProtocol() . "://" . $host;
+			}
+
+			$hrefLink = $host . "/api_v3/getFeed.php?partnerId=$partnerId&amp;feedId=$id";
+			if(kCurrentContext::$ks)
+				$hrefLink .= "&amp;ks=" . kCurrentContext::$ks;
+			$hrefLink .= "&amp;state=" . $this->state;
+
+			$nextLink = $mrss->addChild('link');
+			$nextLink->addAttribute("rel", "next");
+			$nextLink->addAttribute("href", $hrefLink);
 		}
 	
 		return $mrss->asXML();
@@ -211,6 +235,11 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		//	return preg_replace("/<.*(xmlns *= *[\"'].[^\"']*[\"']).[^>]*>/i", "", $xmlStr);
 		//return preg_replace("/ xmlns:[a-zA-Z0-9_]{1,}=[\"'].[^\"']*[\"']/", "", $xmlStr);
 		return preg_replace("/ xmlns:[^= ]{1,}=[\"][^\"]*[\"]/i", "", $xmlStr);
+	}
+
+	public function setState($state)
+	{
+		$this->state = $state;
 	}
 }
 
