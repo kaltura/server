@@ -503,25 +503,22 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$objectId = $object->getId();
 
 		// track repetitive udpates of the same object (e.g. adding many annotations which cause updates of the entry)
-		// once hitting a threshold, we will avoid more than one update per xx seconds
+		// once hitting a threshold, we will avoid more than one update per minute
+		// threshold is defined by kConf parameter skip_sphinx_repetitive_updates using lowercase of {className}_{service}_{action}={threshold}
 		$saveCounter = 0;
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if ($cache)
 		{
 			$cacheKey = "SPHSave:$className:$objectId";
-			$cacheKeyLastSaveTime = "$cacheKey:lastSaveTime";
 			$cache->add($cacheKey, 0, 60);
 			$saveCounter = $cache->increment($cacheKey);
 		}
 
+		$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		$skipSphinxRepetitiveUpdates = kConf::get('skip_sphinx_repetitive_updates', 'local', array());
+		$skipSave = isset($skipSphinxRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipSphinxRepetitiveUpdates[$updatesKey];
 		$skipSave = $saveCounter > 10 && $className == 'entry' && kCurrentContext::$service == "annotation" && kCurrentContext::$action == "add";
-		if ($skipSave)
-		{
-			// if we got here cache must have been valid
-			$lastSaveTime = $cache->get($cacheKeyLastSaveTime);
-			$skipSave = time() - $lastSaveTime < 60;
-		}
-
+		
 		KalturaLog::debug("Updating sphinx for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
 
 		if ($skipSave)
@@ -530,9 +527,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$sql = $this->getSphinxSaveSql($object, $isInsert, $force);
 		if(!$sql)
 			return true;
-
-		if ($cache)
-			$cache->add($cacheKeyLastSaveTime, time(), 60);
 
 		return $this->execSphinx($sql, $object);
 	}
