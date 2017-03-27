@@ -586,7 +586,7 @@ class playManifestAction extends kalturaAction
 			$oneOnly = true;
 		}
 
-		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+		$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId);
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
@@ -903,7 +903,7 @@ class playManifestAction extends kalturaAction
 					$assets);
 			$this->deliveryAttributes->setFlavorAssets($assets);
 		}
-
+		
 		$this->enforceAudioVideoEntry();
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
@@ -1151,7 +1151,7 @@ class playManifestAction extends kalturaAction
 				
 		if (!$renderer)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'This format is unsupported');
-		
+
 		$renderer->contributors = array();
 		$config = new kManifestContributorConfig();
 		$config->format = $this->deliveryAttributes->getFormat();
