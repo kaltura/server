@@ -53,7 +53,8 @@ class SyndicationFeedService extends KalturaBaseService
 		$syndicationFeed->validateStorageId($this->getPartnerId());
 		
 		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
-			$syndicationFeed->validatePropertyNotNull('xslt');				
+			if (!$syndicationFeed instanceof KalturaConstantXsltSyndicationFeed)
+				$syndicationFeed->validatePropertyNotNull('xslt');
 			$syndicationFeedDB = new genericSyndicationFeed();
 			$syndicationFeedDB->incrementVersion();	
 		}else
