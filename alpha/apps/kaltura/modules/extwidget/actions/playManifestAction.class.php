@@ -586,7 +586,16 @@ class playManifestAction extends kalturaAction
 			$oneOnly = true;
 		}
 
-		$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId);
+		//in case asset id specified, allow url and download regardless of asset type
+		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
+		{
+			$flavorId = $this->flavorIds[0];
+			$flavorAssets = array(assetPeer::retrieveById($flavorId));
+		}
+		else
+		{
+			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+		}
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
