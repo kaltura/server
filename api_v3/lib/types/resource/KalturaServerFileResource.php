@@ -49,7 +49,7 @@ class KalturaServerFileResource extends KalturaDataCenterContentResource
 			$object_to_fill = new kLocalFileResource();
 		
 		$keepOriginalFile = true;
-		if($this->keepOriginalFile && $this->keepOriginalFile === false)
+		if(isset($this->keepOriginalFile) && $this->keepOriginalFile === false)
 			$keepOriginalFile = false;
 		
 		$object_to_fill->setKeepOriginalFile($keepOriginalFile);
