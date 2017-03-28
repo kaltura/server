@@ -22,7 +22,7 @@ class KalturaFairplayDrmProfile extends KalturaDrmProfile
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
-			$dbObject = new PlayReadyProfile();
+			$dbObject = new FairplayDrmProfile();
 			
 		parent::toObject($dbObject, $skip);
 					
