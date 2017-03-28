@@ -119,14 +119,26 @@ if readOnly and inputFileExt == '.pdf':
 else:
     commandParams.append('/PF"%s"' % inputFile)
 
-command = ' '.join(commandParams)
 
+printer = win32print.OpenPrinter('PDFCreator')
+
+#make sure print queue is empty, if not delete existing jobs.
+while len(win32print.EnumJobs(printer, 0, 1, 2)) > 0:
+    for currentJob in win32print.EnumJobs(printer, 0, 100, 2):
+        print '\nDeleting print job with id [' + str(currentJob['JobId']) + ']'
+        win32print.SetJob(printer, currentJob['JobId'], 0, None, win32print.JOB_CONTROL_DELETE)
+    win32print.ClosePrinter(printer)
+    printer = win32print.OpenPrinter('PDFCreator')
+    time.sleep(.5)
+
+command = ' '.join(commandParams)    
+    
 # execute the command
 print '\ncommand: %s' % command
 os.system(command)
 
 # wait until the printer queue becomes empty
-printer = win32print.OpenPrinter('PDFCreator')
+
 
 while True:
     if len(win32print.EnumJobs(printer, 0, 1, 2)) == 0:
