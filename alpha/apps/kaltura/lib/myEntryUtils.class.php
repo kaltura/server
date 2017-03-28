@@ -330,15 +330,24 @@ class myEntryUtils
 			}
 		}
 		
-		if($entry->getType() === entryType::LIVE_STREAM && $entry->getRecordedEntryId())
+		if($entry->getType() === entryType::LIVE_STREAM)
 		{
-			$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
-			if($recordedEntry && in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+			$connectedEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entry->getId(), EntryServerNodePeer::$connectedServerNodeStatuses);
+			if(count($connectedEntryServerNodes))
 			{
-				KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");  
-				throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getRecordedEntryId());
+				KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, while streaming");
+				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING, $entry->getId());
 			}
-				
+			
+			if($entry->getRecordedEntryId())
+			{
+				$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
+				if($recordedEntry && in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+				{
+					KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
+					throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getRecordedEntryId());
+				}	
+			}
 		}
 
 		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
