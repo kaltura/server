@@ -46,8 +46,11 @@ class AttachmentAsset extends asset
 		return $finalPath;
 	}
 	
-	public function getName()
+	public function getName($prefix = '')
 	{
-		return $this->getFilename();
+		$name = $this->getFilename();
+		if($prefix != '')
+			$name = $prefix . "-Attachment-" . $name;
+		return $name;
 	}
 }
