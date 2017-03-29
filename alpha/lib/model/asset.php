@@ -727,7 +727,10 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 
 	public function getName($prefix = '')
 	{
-		return $prefix . "_" . $this->getId();
+		$name = $this->getId();
+		if($prefix != '')
+			$name = $prefix . "_" . $name;
+		return $name;
 	}
 	
     /**
