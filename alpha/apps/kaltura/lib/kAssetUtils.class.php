@@ -51,17 +51,7 @@ class kAssetUtils
 		$fileBaseName = $entry->getName();
 		if ($asset)
 		{
-			if($asset instanceof flavorAsset)
-			{
-				$flavorParams = $asset->getFlavorParams();
-				if ($flavorParams)
-					$fileBaseName = ($fileBaseName . " (" . $flavorParams->getName() . ")");
-			}
-			else
-			{
-				$fileBaseName = $asset->getName();
-
-			}
+			$fileBaseName = $asset->getName($fileBaseName);
 			$fileExt = $asset->getFileExt();
 		}
 		else
