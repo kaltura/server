@@ -51,18 +51,14 @@ class SyndicationFeedService extends KalturaBaseService
 	{
 		$syndicationFeed->validatePlaylistId();
 		$syndicationFeed->validateStorageId($this->getPartnerId());
-		
-		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
-			if (!$syndicationFeed instanceof KalturaConstantXsltSyndicationFeed)
-				$syndicationFeed->validatePropertyNotNull('xslt');
-			$syndicationFeedDB = new genericSyndicationFeed();
-			$syndicationFeedDB->incrementVersion();	
-		}else
+
+		$propertiesToValidate = $syndicationFeed->getPropertiesToValidate();
+		foreach ($propertiesToValidate as $propName => $propValue)
 		{
-			$syndicationFeedDB = new syndicationFeed();
+			$syndicationFeed->validatePropertyNotNull($propName);
 		}
 			
-		$syndicationFeed->toInsertableObject($syndicationFeedDB);
+		$syndicationFeedDB = $syndicationFeed->toInsertableObject();
 		$syndicationFeedDB->setPartnerId($this->getPartnerId());
 		$syndicationFeedDB->setStatus(KalturaSyndicationFeedStatus::ACTIVE);
 		$syndicationFeedDB->save();

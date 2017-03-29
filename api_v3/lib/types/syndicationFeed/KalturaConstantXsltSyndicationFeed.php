@@ -55,4 +55,13 @@ abstract class KalturaConstantXsltSyndicationFeed extends KalturaGenericXsltSynd
 
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip );
 	}
+
+	public function getPropertiesToValidate()
+	{
+		$propsToValidate = parent::getPropertiesToValidate();
+		unset($propsToValidate['xslt']);
+		return $propsToValidate;
+	}
+
+
 }
