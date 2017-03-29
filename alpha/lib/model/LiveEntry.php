@@ -157,9 +157,11 @@ abstract class LiveEntry extends entry
 		if($this->isColumnModified(entryPeer::LENGTH_IN_MSECS) && $this->getLengthInMsecs() > 0 && $this->getRecordStatus() !== RecordStatus::DISABLED && $this->getRecordedEntryId())
 		{
 			$recordedEntry = entryPeer::retrieveByPK($this->getRecordedEntryId());
-			if($recordedEntry && $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $recordedEntry->getStatus() != entryStatus::READY)
+			if($recordedEntry && $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			{
-				$recordedEntry->setStatus(entryStatus::READY);
+				if($recordedEntry->getStatus() != entryStatus::READY)
+					$recordedEntry->setStatus(entryStatus::READY);
+				$recordedEntry->setRecordedLengthInMsecs($this->getLengthInMsecs());
 				$recordedEntry->save();
 			}
 		}
