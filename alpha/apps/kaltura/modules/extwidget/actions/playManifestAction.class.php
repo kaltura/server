@@ -379,23 +379,23 @@ class playManifestAction extends kalturaAction
 		return false;
 	}
 	
-	protected function getFlavorKeyByTag($assets, $tag, $syncKeyType) {
-		if($assets)
+	protected function getFlavorKeyByTag($flavorAssets, $tag, $syncKeyType) {
+		if($flavorAssets)
 		{
-			foreach ($assets as $asset)
+			foreach ($flavorAssets as $flavorAsset)
 			{
-				if($asset->hasTag($tag))
+				if($flavorAsset->hasTag($tag))
 				{
-					return $asset->getSyncKey($syncKeyType);
+					return $flavorAsset->getSyncKey($syncKeyType);
 				}
 			}
 		}
 		return null;
 	}
 	
-	protected function initSilverLightManifest($assets)
+	protected function initSilverLightManifest($flavorAssets)
 	{
-		$key = $this->getFlavorKeyByTag($assets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				
 		if(!$key)
 			$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
@@ -406,7 +406,7 @@ class playManifestAction extends kalturaAction
 		//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats
 		if(!$localFileSync && !$remoteFileSync)
 		{
-			$key = $this->getFlavorKeyByTag($assets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
 			if (!$key)
 			{
 				return false;
@@ -433,9 +433,9 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
-	protected function initSmilManifest($assets)
+	protected function initSmilManifest($flavorAssets)
 	{
-		$key = $this->getFlavorKeyByTag($assets, assetParams::TAG_SMIL_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		if (!$key)
 			return false;
 
@@ -456,18 +456,18 @@ class playManifestAction extends kalturaAction
 		return (!is_null($this->deliveryAttributes->getManifestFileSync()));
 	}
 
-	private function removeNotAllowedFlavors($assets)
+	private function removeNotAllowedFlavors($flavorAssets)
 	{
 		if(!$this->secureEntryHelper)
-			return $assets;
+			return $flavorAssets;
 
 		$returnedFlavors = array();
 
-		foreach ($assets as $asset)
+		foreach ($flavorAssets as $flavorAsset)
 		{
-			if ($this->secureEntryHelper->isAssetAllowed($asset))
+			if ($this->secureEntryHelper->isAssetAllowed($flavorAsset))
 			{
-				$returnedFlavors[] = $asset;
+				$returnedFlavors[] = $flavorAsset;
 			}
 		}
 	
@@ -475,16 +475,16 @@ class playManifestAction extends kalturaAction
 	}
 	
 	/**
-	 * @param array $assets
+	 * @param array $flavorAssets
 	 * @return array
 	 */
-	private function removeMaxBitrateFlavors($assets)
+	private function removeMaxBitrateFlavors($flavorAssets)
 	{
 		if (!$this->maxBitrate)			
-			return $assets;
+			return $flavorAssets;
 			
 		$returnedFlavors = array();		
-		foreach ($assets as $flavor)
+		foreach ($flavorAssets as $flavor)
 		{
 			if ($flavor->getBitrate() <= $this->maxBitrate)
 			{
@@ -520,55 +520,55 @@ class playManifestAction extends kalturaAction
 		
 		$this->duration = array_sum($durations) / 1000;
 
-		$assets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
-		$assets = $this->removeNotAllowedFlavors($assets);
-		$assets = $this->removeMaxBitrateFlavors($assets);
-		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($assets);
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
+		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 		{
-			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($assets);
+			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-				$this->addAltAudioFlavors($filteredFlavorAssets, $assets);
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
 		$this->deliveryAttributes->setStorageId(null);
 		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
 	}
 
-	private function filterFlavorsByAssetIdOrParamsIds($assets)
+	private function filterFlavorsByAssetIdOrParamsIds($flavorAssets)
 	{
 		$filteredFlavorAssets = Array();
 
-		foreach ($assets as $asset)
+		foreach ($flavorAssets as $flavorAsset)
 		{
 			/**
-			 * @var asset $asset
+			 * @var asset $flavorAsset
 			 */
-			if ($this->shouldIncludeFlavor($asset))
-				$filteredFlavorAssets[] = $asset;
+			if ($this->shouldIncludeFlavor($flavorAsset))
+				$filteredFlavorAssets[] = $flavorAsset;
 		}
 
 		if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-			$this->addAltAudioFlavors($filteredFlavorAssets, $assets);
+			$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		return $filteredFlavorAssets;
 	}
 
 	private function addAltAudioFlavors(&$filteredFlavorAssets, $originalFlavorAssets)
 	{
-		foreach ($originalFlavorAssets as $asset)
+		foreach ($originalFlavorAssets as $flavorAsset)
 		{
 			/**
-			 * @var asset $asset
+			 * @var asset $flavorAsset
 			 */
-			if ($asset->hasTag(assetParams::TAG_ALT_AUDIO) && !in_array($asset, $filteredFlavorAssets))
-				$filteredFlavorAssets[] = $asset;
+			if ($flavorAsset->hasTag(assetParams::TAG_ALT_AUDIO) && !in_array($flavorAsset, $filteredFlavorAssets))
+				$filteredFlavorAssets[] = $flavorAsset;
 		}
 	}
 
-	private function shouldIncludeFlavor($asset)
+	private function shouldIncludeFlavor($flavorAsset)
 	{
-		if(($this->flavorIds && in_array($asset->getId(), $this->flavorIds)) || ($this->flavorParamsIds && in_array($asset->getFlavorParamsId(), $this->flavorParamsIds)))
+		if(($this->flavorIds && in_array($flavorAsset->getId(), $this->flavorIds)) || ($this->flavorParamsIds && in_array($flavorAsset->getFlavorParamsId(), $this->flavorParamsIds)))
 			return true;
 
 		return false;
@@ -601,19 +601,19 @@ class playManifestAction extends kalturaAction
 			$oneOnly = true;
 		}
 
-		$assets = $this->retrieveAssets();		
+		$flavorAssets = $this->retrieveAssets();		
 		$flavorByTags = false;
-		$assets = $this->removeNotAllowedFlavors($assets);
-		$assets = $this->removeMaxBitrateFlavors($assets);
+		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 
-		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($assets);
+		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 			$flavorByTags = true;
 
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::SILVER_LIGHT)
 		{
-			if ($this->initSilverLightManifest($assets))
+			if ($this->initSilverLightManifest($flavorAssets))
 			{
 				return;
 			}
@@ -627,17 +627,17 @@ class playManifestAction extends kalturaAction
 
 		if ($flavorByTags)
 		{
-			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($assets);
+			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-				$this->addAltAudioFlavors($filteredFlavorAssets, $assets);
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
-		$assets = $filteredFlavorAssets;
+		$flavorAssets = $filteredFlavorAssets;
 
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HDS || $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
 		{
 			// try to look for a smil manifest, if it was found, we will use it for hds and hls
-			if ($this->initSmilManifest($assets))
+			if ($this->initSmilManifest($flavorAssets))
 				return;
 		}
 
@@ -648,10 +648,10 @@ class playManifestAction extends kalturaAction
 		$remoteFlavorsByDc = array();
 		$remoteFileSyncs = array();
 		
-		foreach($assets as $asset)
+		foreach($flavorAssets as $flavorAsset)
 		{
-			$flavorId = $asset->getId();
-			$key = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$flavorId = $flavorAsset->getId();
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
 			$c = new Criteria();
 			$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
@@ -677,12 +677,12 @@ class playManifestAction extends kalturaAction
 				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 				{
 					$dc = $fileSync->getDc();
-					$remoteFlavorsByDc[$dc][$flavorId] = $asset;
+					$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
 					$remoteFileSyncs[$dc][$flavorId] = $fileSync;
 				}
 				else
 				{
-					$localFlavors[$flavorId] = $asset;
+					$localFlavors[$flavorId] = $flavorAsset;
 				}
 			}
 		}
@@ -743,8 +743,8 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 	
 		if ($oneOnly) {
-			$assets = $this->deliveryAttributes->getFlavorAssets();
-			$this->deliveryAttributes->setFlavorAssets(array(reset($assets)));
+			$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
+			$this->deliveryAttributes->setFlavorAssets(array(reset($flavorAssets)));
 		}
 	}
 
@@ -766,11 +766,11 @@ class playManifestAction extends kalturaAction
 	{
 		$this->duration = $this->entry->getDurationInt();
 		$flavors = $this->deliveryAttributes->getFlavorAssets();
-		foreach($flavors as $asset)
+		foreach($flavors as $flavorAsset)
 		{
-			/* @var $asset flavorAsset */
+			/* @var $flavorAsset flavorAsset */
 			
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
 			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 			{
 				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 
@@ -812,9 +812,9 @@ class playManifestAction extends kalturaAction
 
 	protected function getDownloadFileName()
 	{
-		$assets = $this->deliveryAttributes->getFlavorAssets();
-		$asset = reset($assets);
-		list($fileName, $extension) = kAssetUtils::getFileName($this->entry, $asset);
+		$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
+		$flavorAsset = reset($flavorAssets);
+		list($fileName, $extension) = kAssetUtils::getFileName($this->entry, $flavorAsset);
 
 		$fileName = str_replace("\n", ' ', $fileName);
 		$fileName = kString::keepOnlyValidUrlChars($fileName);
@@ -851,9 +851,9 @@ class playManifestAction extends kalturaAction
 		{
 			// videos shorter than 10 seconds cannot be played with HDS, fall back to HTTP
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
-			$assets = $this->deliveryAttributes->getFlavorAssets();
-			$asset = reset($assets);
-			$this->deliveryAttributes->setFlavorAssets(array($asset));
+			$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
+			$flavorAsset = reset($flavorAssets);
+			$this->deliveryAttributes->setFlavorAssets(array($flavorAsset));
 		}
 		
 		$this->initStorageProfile();
