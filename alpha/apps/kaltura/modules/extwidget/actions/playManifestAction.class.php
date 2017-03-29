@@ -574,6 +574,21 @@ class playManifestAction extends kalturaAction
 		return false;
 	}
 
+	protected function retrieveAssets()
+	{
+		//in case asset id specified, allow url and download regardless of asset type
+		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
+		{
+			$flavorId = $this->flavorIds[0];
+			$assets = array(assetPeer::retrieveById($flavorId));
+		}
+		else
+		{
+			$assets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+		}
+		return $assets;
+	}
+	
 	protected function initFlavorAssetArray()
 	{
 		if(!$this->shouldInitFlavorAssetsArray())
@@ -586,7 +601,7 @@ class playManifestAction extends kalturaAction
 			$oneOnly = true;
 		}
 
-		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+		$flavorAssets = $this->retrieveAssets();
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
