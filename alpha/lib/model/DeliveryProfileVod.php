@@ -24,8 +24,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$prefix = '';
 		if($this->getDynamicAttributes()->getUiConfId())
 			$prefix .= '/uiConfId/'.$this->getDynamicAttributes()->getUiConfId();
-
-		$prefix .= '/sessionId/{sessionId}';
+		$sessionId = $this->getDynamicAttributes()->getSessionId();
+		if($sessionId)
+			$prefix .= '/sessionId/'.$sessionId;
+		else
+			$prefix .= '/sessionId/{sessionId}';
 
 		return $prefix;
 	}
