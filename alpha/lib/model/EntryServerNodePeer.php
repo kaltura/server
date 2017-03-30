@@ -22,9 +22,9 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	);
 	
 	public static $connectedServerNodeStatuses = array(
-			KalturaEntryServerNodeStatus::AUTHENTICATED,
-			KalturaEntryServerNodeStatus::BROADCASTING,
-			KalturaEntryServerNodeStatus::PLAYABLE
+		EntryServerNodeStatus::AUTHENTICATED,
+		EntryServerNodeStatus::BROADCASTING,
+		EntryServerNodeStatus::PLAYABLE
 	);
 
 	public static function getOMClass($row, $column)
