@@ -139,7 +139,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @filter eq,gte,lte,in
-	 * @readonly
+	 * @requiresPermission insert,update
 	 */
 	public $partnerPackage;
 	
@@ -293,7 +293,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * @insertonly
+	 * @requiresPermission insert,update
 	 */
 	public $partnerParentId;
 	
