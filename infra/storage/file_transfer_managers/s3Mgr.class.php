@@ -163,7 +163,7 @@ class s3Mgr extends kFileTransferMgr
 				$params['ServerSideEncryption'] = "AES256";
 			}
 
-			$fp = fopen($local_file, 'r');
+            $fp = fopen($local_file, 'r');
             $res = $this->s3->upload($bucket,
                 $remote_file,
                 $fp,
