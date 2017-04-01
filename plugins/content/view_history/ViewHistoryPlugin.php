@@ -58,11 +58,21 @@
 	
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		
+		if ( ($baseClass == "KalturaUserEntry") && ($enumValue == getViewHistoryUserEntryTypeCoreValue(ViewHistoryUserEntryType::VIEW_HISTORY)))
+		{
+			return new KalturaViewHistoryUserEntry();
+		}
+		if ( ($baseClass=="UserEntry") && ($enumValue == getViewHistoryUserEntryTypeCoreValue(ViewHistoryUserEntryType::VIEW_HISTORY)))
+		{
+			return new ViewHistoryUserEntry();
+		}
 	}
 	
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		
+		if ($baseClass == 'UserEntry' && $enumValue == getViewHistoryUserEntryTypeCoreValue(ViewHistoryUserEntryType::VIEW_HISTORY))
+		{
+			return 'ViewHistoryUserEntry';
+		}
 	}
  }

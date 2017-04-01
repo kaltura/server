@@ -189,7 +189,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			return;
 		}
 		
-		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
+		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
 	}
 	
 	/**
