@@ -7,7 +7,7 @@ class KalturaUserEntryExtendedStatus extends KalturaDynamicEnum implements UserE
 {
 	public static function getEnumClass()
 	{
-		return 'UserEntryStatus';
+		return 'UserEntryExtendedStatus';
 	}
 }
 
