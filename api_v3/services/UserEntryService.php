@@ -128,7 +128,7 @@ class UserEntryService extends KalturaBaseService {
 		
 		$ueFilter = $filter->toObject();
 		
-		return kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
+		return kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
 	}
 
 }
