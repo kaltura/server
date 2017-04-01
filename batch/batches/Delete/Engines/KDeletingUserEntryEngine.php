@@ -10,14 +10,14 @@ class KDeletingUserEntryEngine extends KDeletingEngine
 	 */
 	protected function delete(KalturaFilter $filter)
 	{
-		return $this->deleteCategoryEntries($filter);
+		return $this->deleteUserEntries($filter);
 	}
 	
 	/**
-	 * @param KalturaCategoryEntryFilter $filter The filter should return the list of category entries that need to be deleted
+	 * @param KalturaUserEntryFilter $filter The filter should return the list of user entries that need to be deleted
 	 * @return int the number of deleted category entries
 	 */
-	protected function deleteCategoryEntries(KalturaUserEntryFilter $filter)
+	protected function deleteUserEntries(KalturaUserEntryFilter $filter)
 	{
 		$filter->orderBy = KalturaUserEntryOrderBy::CREATED_AT_ASC;
 		
