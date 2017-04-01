@@ -144,7 +144,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $entry->getId());
-		if(!userEntryPeer::doSelectOne($c)) {
+		if(!UserEntryPeer::doSelectOne($c)) {
 			return;
 		}
 		
