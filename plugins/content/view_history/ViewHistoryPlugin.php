@@ -42,7 +42,7 @@
 		return array();
 	}
 	
-	public function getViewHistoryUserEntryTypeCoreValue ($valueName)
+	public static function getViewHistoryUserEntryTypeCoreValue ($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('UserEntryType', $value);
@@ -54,5 +54,15 @@
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		
+	}
+	
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		
 	}
  }
