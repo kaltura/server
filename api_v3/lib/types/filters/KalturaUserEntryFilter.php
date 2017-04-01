@@ -79,7 +79,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	{
 		if ($this->userIdEqual !== null)
 		{
+			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get userEntry objects of deleted users.
+				kuserPeer::setUseCriteriaFilter(false);
+
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
+			kuserPeer::setUseCriteriaFilter(true);
 			if ($kuser)
 				$this->userIdEqual = $kuser->getId();
 			else
