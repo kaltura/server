@@ -646,7 +646,7 @@ class KalturaErrors extends APIErrors
 	const USER_ENTRY_NOT_FOUND = 'USER_ENTRY_NOT_FOUND;USER_ENTRY_ID; User-Entry id [@USER_ENTRY_ID@] not found';
 	const USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID = 'USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID;USER_ENTRY_ID;The entry id in the user-entry [@USER_ENTRY_ID@] does not match the entry-id given';
 	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE,USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
-	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER,Must filter on entry ID or user ID';
+	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER;;Must filter on entry ID or user ID';
 	
 	/*
 	 * serverNode service
@@ -655,7 +655,7 @@ class KalturaErrors extends APIErrors
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
 
 	/*
-	 * EntryServerNode service
+	 * EntryServerNode servicet
 	 */
 	const ENTRY_SERVER_NODE_NOT_FOUND = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;Entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@] not found";
 	const ENTRY_SERVER_NODE_MULTI_RESULT = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;There were several results for entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@]";
