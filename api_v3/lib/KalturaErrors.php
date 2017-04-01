@@ -655,7 +655,7 @@ class KalturaErrors extends APIErrors
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
 
 	/*
-	 * EntryServerNode servicet
+	 * EntryServerNode service
 	 */
 	const ENTRY_SERVER_NODE_NOT_FOUND = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;Entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@] not found";
 	const ENTRY_SERVER_NODE_MULTI_RESULT = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;There were several results for entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@]";
