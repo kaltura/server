@@ -173,6 +173,17 @@
 				$this->scanType = $sourceData->scanType;
 
 				/*
+				 * Limit the complexity evaluation FPS to 'reasonable' values,
+				 * in order to avoid processing overloading in cases with huge/invalid FPS values.
+				 */
+			if(!isset($sourceData->videoFrameRate) || $sourceData->videoFrameRate>KDLSanityLimits::MaxFramerate){
+				$this->fps = KDLSanityLimits::MaxFramerate;
+			}
+			else if($sourceData->videoFrameRate==0){
+				$this->fps = KDLConstants::MaxFramerate;
+			}
+			
+				/*
 				 * Determine the sampling paramters
 				 * - number of sumpling points
 				 * - step interval (between the points)
