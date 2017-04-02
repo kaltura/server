@@ -37,9 +37,7 @@ abstract class KalturaConstantXsltSyndicationFeed extends KalturaGenericXsltSynd
 	 */
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		if($this->xslt)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, 'xslt');
-		
+		$this->xslt = null;
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 	
@@ -50,9 +48,7 @@ abstract class KalturaConstantXsltSyndicationFeed extends KalturaGenericXsltSynd
 	 */
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
-		if($this->xslt)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, 'xslt');
-
+		$this->xslt = null;
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip );
 	}
 
