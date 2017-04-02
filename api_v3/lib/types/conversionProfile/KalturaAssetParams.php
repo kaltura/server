@@ -9,6 +9,7 @@ class KalturaAssetParams extends KalturaObject implements IRelatedFilterable
 	 * The id of the Flavor Params
 	 * 
 	 * @var int
+	 * @filter eq,in
 	 * @readonly
 	 */
 	public $id;
