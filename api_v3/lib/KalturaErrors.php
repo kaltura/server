@@ -574,6 +574,8 @@ class KalturaErrors extends APIErrors
 	
 	const KALTURA_RECORDING_DISABLED = "KALTURA_RECORDING_DISABLED;PARTNER_ID;Kaltura recording is disabled for partner [@PARTNER_ID@] use liveStream->appendRecording to set the live recorded content";
 	
+	const RECORDING_DISABLED = "RECORDING_DISABLED;;Record status attribute cannot be set, account has recording feature disabled";
+	
 	/*
 	 * BaseEntry Service
 	 */
