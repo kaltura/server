@@ -1,0 +1,232 @@
+<p><?php echo $this->translate('Media Repurposing list intro text'); ?></p>
+<?php echo $this->filterForm; ?>
+<?php echo $this->newMediaRepurposingForm; ?>
+
+<div id="media_repurposing_list_div" class="clear">
+	<table>
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Status'); ?></th>
+
+				<th><?php echo $this->translate('Filter'); ?></th>
+				<th><?php echo $this->translate('Task Type'); ?></th>
+				<th><?php echo $this->translate('Schedule Task IDs'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="10">
+			<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as $mediaRepurposing): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next();
+			?>">
+				<td><?php echo $mediaRepurposing->name; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus', $mediaRepurposing->status); ?></td>
+				<td><?php echo get_class($mediaRepurposing->objectFilter); ?></td>
+				<td><?php echo MediaRepurposingUtils::getDescriptionForType($mediaRepurposing->taskType); ?></td>
+				<td><?php echo $mediaRepurposing->scheduleTasksIds; ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, `<?php echo $mediaRepurposing->name; ?>`)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="configureMediaRepurposing" ><?php echo $this->translate('Configure'); ?></option>
+						<?php if ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED): ?>
+							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
+						<?php elseif ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE): ?>
+							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
+						<?php endif; ?>
+						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
+					</select>
+				</td>				
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	addSubTitle('Media Repurposing Profiles');
+});
+
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+	}
+});
+
+jQuery('#filter_type').change();
+
+partnerId = <?php echo $this->filterForm->partnerId ?>;
+function doAction(action, mediaRepurposingName) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+
+function enable(mediaRepurposingName)
+{
+	changeStatus(
+		mediaRepurposingName,
+		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE; ?>,
+		function() {
+			alert('<?php echo $this->translate('Media Repurposing active');?>');
+		}
+	);
+}
+
+function disable(mediaRepurposingName)
+{
+	changeStatus(
+		mediaRepurposingName,
+		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED; ?>,
+		function() {
+			alert('<?php echo $this->translate('Media Repurposing disabled');?>');
+		}
+	);
+}
+
+function remove(mediaRepurposingName)
+{
+	var ok = confirm('<?php echo $this->translate('Are you sure you want to remove media Repurposing ?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+			mediaRepurposingName,
+			<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DELETED; ?>,
+			function() {
+				alert('<?php echo $this->translate('Media Repurposing removed');?>');
+			}
+		);
+	}
+}
+
+function changeStatus(mediaRepurposingName, status, callback)
+{
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingSetStatusAction', 'mediaRepurposingName' => 'MEDIAREPURPOSINGID', 'mediaRepurposingStatus' => 'STATUS', 'partnerId' => 'PARTNERID')); ?>';
+	url = url.replace('STATUS', status);
+	url = url.replace('MEDIAREPURPOSINGID', mediaRepurposingName);
+	url = url.replace('PARTNERID', partnerId);
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(result) {
+			if (result != 'ok')
+				this.error();
+			
+			if (callback && (typeof callback == 'function'))
+			{
+				callback.apply(this);
+			}			
+			jQuery('#frmPaginator1').submit();
+		},
+		error: function() {
+			alert('<?php echo $this->translate('an error occured'); ?>');
+		}
+	});
+}
+
+
+function newMediaRepurposing(partnerId, mediaRepurposingType, filterType)
+{
+	if(!partnerId.length || isNaN(partnerId)){
+		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
+		return;
+	}
+	
+	if(!mediaRepurposingType.length){
+		alert('<?php echo $this->translate('Media Repurposing type not supplied'); ?>');
+		return;
+	}
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_media_repurposing_type/' + mediaRepurposingType + '/new_media_repurposing_filter_type/' + filterType;
+
+	loadMediaRepurposing(paramsStr);
+}
+
+function configureMediaRepurposing(mediaRepurposingName)
+{
+	if(typeof mediaRepurposingName == 'undefined'){
+		alert('<?php echo $this->translate('Media Repurposing ID not supplied'); ?>');
+		return;
+	}
+
+
+	mediaRepurposingIdStr = '/new_partner_id/' + partnerId + '/media_repurposing_name/' + mediaRepurposingName;
+	loadMediaRepurposing(mediaRepurposingIdStr);
+}
+
+
+function loadMediaRepurposing(paramStr)
+{	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingConfigureAction')); ?>' + paramStr;
+	
+	jQuery('#media-repurposing-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="media-repurposing-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 600,
+		height: 600,
+		title: '<?php echo $this->translate('Media Repurposing Profile'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmMediaRepurposingConfigure').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		}
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmMediaRepurposingConfigure').ajaxForm({
+				success: loadMediaRepurposingSuccess,
+				iframe: true
+			});
+		}
+	);
+}
+
+
+function loadMediaRepurposingSuccess(html) {
+	if (jQuery(html).filter('#frmMediaRepurposingConfigure').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+		if (jQuery('#frmPaginator1').length){
+			jQuery('#frmPaginator1').submit();
+		}
+		else {
+			jQuery('#frmPartnerIdFilter').submit();
+		}
+	}
+	jQuery('#frmMediaRepurposingConfigure').replaceWith(html);
+	jQuery('#frmMediaRepurposingConfigure').ajaxForm({
+		success: loadMediaRepurposingSuccess,
+		iframe: true
+	});
+}
+
+
+
+
+</script>

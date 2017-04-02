@@ -671,6 +671,9 @@ class Partner extends BasePartner
 	
 	private function getDisabledDeliveryTypes() { return $this->getFromCustomData("disabledDeliveryTypes", array()); }
 	private function setDisabledDeliveryTypes(array $v ) { $this->putInCustomData("disabledDeliveryTypes", $v); }
+
+	public function getMrProfiles() { return $this->getFromCustomData("mrProfiles", array()); }
+	public function setMrProfiles(array $v ) { $this->putInCustomData("mrProfiles", $v); }
 	
 	public function getCustomDeliveryTypes()
 	{

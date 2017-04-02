@@ -351,9 +351,14 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $htmlPurifierBaseListUsage;
 	
 	/**
-	 * @var int
-	 */
+ * @var int
+ */
 	public $defaultLiveStreamSegmentDuration;
+
+	/**
+	 * @var KalturaMediaRepurposingProfileArray
+	 */
+	public $mrProfiles;
 	
 	
 	private static $map_between_objects = array
@@ -424,6 +429,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
 		"defaultLiveStreamSegmentDuration",
+		"mrProfiles"
 	);
 
 	public function getMapBetweenObjects()

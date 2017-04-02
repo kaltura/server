@@ -1,0 +1,45 @@
+<?php
+/**
+ * @package plugins.schedule_task
+ * @subpackage Admin
+ */
+class MediaRepurposingSetStatusAction extends KalturaApplicationPlugin
+{
+	
+	/**
+	 * @return string - absolute file path of the phtml template
+	 */
+	public function getTemplatePath()
+	{
+		return realpath(dirname(__FILE__));
+	}
+	
+	
+	public function doAction(Zend_Controller_Action $action)
+	{
+		$action->getHelper('layout')->disableLayout();
+		$mediaRepurposingName = $this->_getParam('mediaRepurposingName');
+		$newStatus = $this->_getParam('mediaRepurposingStatus');
+		$partnerId = $this->_getParam('partnerId');
+
+
+		$mediaRepurposingProfiles = MediaRepurposingUtils::getMrs($partnerId);
+		foreach ($mediaRepurposingProfiles as $key => $mr)
+			if ($mr->name == $mediaRepurposingName)
+				$mediaRepurposingProfiles[$key] = MediaRepurposingUtils::changeMrStatus($mr, $newStatus);
+			
+
+		
+		try
+		{
+			MediaRepurposingUtils::updateMrs($partnerId, $mediaRepurposingProfiles);
+			echo $action->getHelper('json')->sendJson('ok', false);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
+			echo $action->getHelper('json')->sendJson($e->getMessage(), false);
+		}
+	}
+}
+

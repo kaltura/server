@@ -2,7 +2,7 @@
 /**
  * @package plugins.scheduledTask
  */
-class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers
+class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaAdminConsolePages
 {
 	const PLUGIN_NAME = 'scheduledTask';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -138,5 +138,17 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BatchJobObjectType', $value);
+	}
+
+	/* (non-PHPdoc)
+ * @see IKalturaAdminConsolePages::getApplicationPages()
+ */
+	public static function getApplicationPages()
+	{
+		$pages = array();
+		$pages[] = new MediaRepurposingListAction();
+		$pages[] = new MediaRepurposingConfigureAction();
+		$pages[] = new MediaRepurposingSetStatusAction();
+		return $pages;
 	}
 }
