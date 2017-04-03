@@ -577,10 +577,9 @@ class playManifestAction extends kalturaAction
 	protected function retrieveAssets()
 	{
 		//in case asset id specified, allow url and download regardless of asset type
-		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
+		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)) && $asset = assetPeer::retrieveById($this->flavorIds[0]))
 		{
-			$flavorId = $this->flavorIds[0];
-			$assets = array(assetPeer::retrieveById($flavorId));
+			$assets = array($asset);
 		}
 		else
 		{
