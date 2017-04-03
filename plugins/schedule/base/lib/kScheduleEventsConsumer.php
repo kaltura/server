@@ -122,13 +122,16 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 
     protected function scheduleEventChanged(ScheduleEvent $scheduleEvent, $modifiedColumns)
     {
-        $scheduleEvents = ScheduleEventResourcePeer::retrieveByEventId($scheduleEvent->getId());
-        foreach ($scheduleEvents as $currScheduleEvent)
+        if (in_array($scheduleEvent->getStatus(), ScheduleEventStatus::DELETED, ScheduleEventStatus::CANCELLED))
         {
-            /**
-             * @var ScheduleEventResource $currScheduleEvent
-             */
-            $currScheduleEvent->delete();
+            $scheduleEvents = ScheduleEventResourcePeer::retrieveByEventId($scheduleEvent->getId());
+            foreach ($scheduleEvents as $currScheduleEvent)
+            {
+                /**
+                 * @var ScheduleEventResource $currScheduleEvent
+                 */
+                $currScheduleEvent->delete();
+            }
         }
     }
 
