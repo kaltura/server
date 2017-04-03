@@ -128,7 +128,6 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
             /**
              * @var ScheduleEventResource $currScheduleEvent
              */
-            $currScheduleEvent->setEventId(null);
             $currScheduleEvent->delete();
         }
     }
