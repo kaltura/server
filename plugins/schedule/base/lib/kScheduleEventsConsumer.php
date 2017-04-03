@@ -24,7 +24,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
         if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
             return true;
 
-        if ($object instanceof ScheduleEvent && in_array(ScheduleEventPeer::STATUS, $modifiedColumns) && $object->getStatus() == ScheduleEventStatus::DELETED)
+        if ($object instanceof ScheduleEvent && in_array(ScheduleEventPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), ScheduleEventStatus::DELETED, ScheduleEventStatus::CANCELLED))
             return true;
 
         return false;
@@ -129,7 +129,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
              * @var ScheduleEventResource $currScheduleEvent
              */
             $currScheduleEvent->setEventId(null);
-            $currScheduleEvent->save();
+            $currScheduleEvent->delete();
         }
     }
 
