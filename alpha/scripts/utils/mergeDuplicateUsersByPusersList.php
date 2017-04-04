@@ -19,24 +19,24 @@ foreach ($pusers as $puserId) {
         KalturaLog::debug('ERROR: couldn\'t find kusers with puser id ['.$puserId.']');
         continue;
     }
-    $baseKuser = findKuserWithMaxEntries($kusersArray);
-    mergeUsersToBaseUser($kusersArray, $baseKuser, $partnerId, $puserId);
+    $baseKuser = findKuserWithMaxEntries($kusersArray, $partnerId);
+    mergeUsersToBaseUser($kusersArray, $baseKuser, $partnerId);
+    KalturaLog::debug('finished handling puserId ['.$puserId.']');
 }
 
-function mergeUsersToBaseUser($kusersArray, $baseKuser, $partnerId, $puserId){
+function mergeUsersToBaseUser($kusersArray, $baseKuser, $partnerId){
     foreach ($kusersArray as $kuser){
         if($kuser->getId() != $baseKuser->getId()){
             changeKuserForEntries($kuser, $baseKuser, $partnerId);
             changeKuserForCuePoints($kuser, $baseKuser, $partnerId);
-            changeKuserForCategoryKusers($kuser, $baseKuser);
-            changeKuserForUserEntries($kuser, $partnerId, $baseKuser);
-            changeKuserForKuserKgroup($kuser, $partnerId, $baseKuser);
-            changeKuserForKvote($kuser, $baseKuser);
+            changeKuserForCategoryKusers($kuser, $baseKuser, $partnerId);
+            changeKuserForUserEntries($kuser, $baseKuser, $partnerId);
+            changeKuserForKuserKgroup($kuser, $baseKuser, $partnerId);
+            changeKuserForKvote($kuser, $baseKuser, $partnerId);
             deleteKuser($kuser);
             KalturaLog::debug('finished handling kuserId ['.$kuser->getId().']');
         }
     }
-    KalturaLog::debug('finished handling puserId ['.$puserId.']');
 }
 
 function getAllDuplicatedKusersForPuser ($puserId, $partnerId){
@@ -47,13 +47,15 @@ function getAllDuplicatedKusersForPuser ($puserId, $partnerId){
     return kuserPeer::doSelect($Critiria);
 }
 
-function findKuserWithMaxEntries ($kusersArray){
+function findKuserWithMaxEntries ($kusersArray, $partnerId){
     $baseKuser=null;
     $maxEntriesNum=0;
     foreach ($kusersArray as $kuser){
         $Critiria = KalturaCriteria::create(entryPeer::OM_CLASS);
         $Critiria->add(entryPeer::KUSER_ID, $kuser->getId());
-        $entriesNum = count(entryPeer::doSelect($Critiria));
+        $Critiria->add(entryPeer::PARTNER_ID, $partnerId);
+        $entries = entryPeer::doSelect($Critiria);
+        $entriesNum = $Critiria->getRecordsCount();
         KalturaLog::debug('kuserId: ['.$kuser->getId().'] entries num: ['.$entriesNum.']');
         if($entriesNum >= $maxEntriesNum){
             $baseKuser = $kuser;
@@ -89,8 +91,11 @@ function changeKuserForCuePoints ($kuser, $baseKuser, $partnerId)
     }
 }
 
-function changeKuserForCategoryKusers ($kuser, $baseKuser) {
-    $categoryUserArray = categoryKuserPeer::retrieveByKuserId($kuser->getId());
+function changeKuserForCategoryKusers ($kuser, $baseKuser, $partnerId) {
+    $Critiria = new Criteria();
+    $Critiria->add(categoryKuserPeer::KUSER_ID, $kuser->getId());
+    $Critiria->add(categoryKuserPeer::PARTNER_ID, $partnerId);
+    $categoryUserArray = categoryKuserPeer::doSelect($Critiria);
     foreach ($categoryUserArray as $categoryUser) {
         KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$categoryUser->getKuser()->getId().'] for categoryUserId ['.$categoryUser->getId().']');
         $categoryUser->setkuserId($baseKuser->getId());
@@ -98,10 +103,11 @@ function changeKuserForCategoryKusers ($kuser, $baseKuser) {
     }
 }
 
-function changeKuserForUserEntries($kuser, $partnerId, $baseKuser){
+function changeKuserForUserEntries($kuser, $baseKuser, $partnerId){
     $Critiria = new Criteria();
     $Critiria->add(UserEntryPeer::KUSER_ID, $kuser->getId());
     $Critiria->add(UserEntryPeer::PARTNER_ID, $partnerId);
+    $Critiria->add(UserEntryPeer::STATUS, UserEntryStatus::ACTIVE);
     $userEntryArray = UserEntryPeer::doSelect($Critiria);
     foreach ($userEntryArray as $userEntry) {
         KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$userEntry->getKuser()->getId().'] for userEntry ['.$userEntry->getId().']');
@@ -110,9 +116,10 @@ function changeKuserForUserEntries($kuser, $partnerId, $baseKuser){
     }
 }
 
-function changeKuserForKvote($kuser, $baseKuser){
+function changeKuserForKvote($kuser, $baseKuser, $partnerId){
     $Critiria = new Criteria();
     $Critiria->add(kvotePeer::KUSER_ID, $kuser->getId());
+    $Critiria->add(kvotePeer::PARTNER_ID, $partnerId);
     $kvotesArray = kvotePeer::doSelect($Critiria);
     foreach ($kvotesArray as $kvote) {
         KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$kvote->getKuserId().'] for kvote ['.$kvote->getId().']');
@@ -121,12 +128,11 @@ function changeKuserForKvote($kuser, $baseKuser){
     }
 }
 
-function changeKuserForKuserKgroup($kuser, $partnerId, $baseKuser){
+function changeKuserForKuserKgroup($kuser, $baseKuser, $partnerId){
+    kCurrentContext::$partner_id = $partnerId;
     $Critiria = new Criteria();
     $Critiria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
     $Critiria->add(KuserKgroupPeer::PARTNER_ID, $partnerId);
-    $Critiria->add(KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
-    KuserKgroupPeer::setUseCriteriaFilter(false);
     $kuserKgroups = KuserKgroupPeer::doSelect($Critiria);
 
     //if we have a row for the kuser_kgroup for the base puser we are deleting the row for the deleted kuser, else we are changing the kuser in the relevant row
@@ -147,7 +153,6 @@ function changeKuserForKuserKgroup($kuser, $partnerId, $baseKuser){
         }
         $kuserKgroup->save();
     }
-    KuserKgroupPeer::setUseCriteriaFilter(true);
 }
 
 function deleteKuser ($kuser){
