@@ -222,22 +222,16 @@ class s3Mgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
+		$this->s3->registerStreamWrapper();
+
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		if($this->isdirectory($remote_file)) 
-		{
-			return true;
-		}
-		KalturaLog::debug("remote_file: ".$remote_file);
+		$s3path = "s3://" . $bucket . '/' . $remote_file;
 
-		$exists = $this->s3->doesObjectExist($bucket, $remote_file);
-		return $exists;
+		KalturaLog::debug("remote_file: ".$s3path);
+
+		return is_dir($s3path) || file_exists($s3path);
 	}
 
-	private function isdirectory($file_name) {
-		if(strpos($file_name,'.') === false) return TRUE;
-		return false;
-	}
-	
 	// return the current working directory
 	protected function doPwd ()
 	{
