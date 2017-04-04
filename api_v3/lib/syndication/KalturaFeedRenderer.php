@@ -8,12 +8,14 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	protected $kalturaXsltItem = null;
 
 	private $state = null;
-	
+
 	public function init($syndicationFeed, $syndicationFeedDB, $mimeType) {
 		parent::init($syndicationFeed, $syndicationFeedDB, $mimeType);
-		
-		$xslt = $syndicationFeedDB->getXslt();
-		if (($syndicationFeedDB->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null($xslt))) {
+
+		$allXSLTSyndicationFeeds = array(syndicationFeedType::KALTURA_XSLT, syndicationFeedType::ROKU_DIRECT_PUBLISHER, syndicationFeedType::OPERA_TV_SNAP);
+
+		$xslt = $syndicationFeed->xslt;
+		if (in_array($syndicationFeedDB->getType(), $allXSLTSyndicationFeeds) && !is_null($xslt)) {
 			$this->kalturaXslt = $this->createKalturaMrssXslt($xslt);
 			$this->kalturaXsltItem = $this->createKalturaItemXslt($xslt);
 		}
