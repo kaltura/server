@@ -13,4 +13,6 @@ interface syndicationFeedType extends BaseEnum
 	const KALTURA_XSLT = 6;
 	const ROKU_DIRECT_PUBLISHER = 7;
 	const OPERA_TV_SNAP = 8;
+
+	const ALL_XSLT_TYPES = array(self::KALTURA_XSLT, self::ROKU_DIRECT_PUBLISHER, self::OPERA_TV_SNAP);
 }

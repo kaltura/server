@@ -526,7 +526,7 @@ class KalturaSyndicationFeedRenderer
 		$feedUpdatedAt = $this->syndicationFeedDb->getUpdatedAt(null);
 
 		$e = null;
-		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
+		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || in_array($this->syndicationFeed->type, KalturaSyndicationFeedType::ALL_XSLT_TYPES);
 		$nextEntry = $this->getNextEntry();
 	
 		$lastCreatedAtVal = null;
