@@ -235,8 +235,8 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 		if($cuePoint->getEndTime())
 			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 	
-		$scene->addChild('title', $cuePoint->getName());
-		$scene->addChild('description', $cuePoint->getText());
+		$scene->addChild('title', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		$scene->addChild('description', kMrssManager::stringToSafeXml($cuePoint->getText()));
 		$scene->addChild('subType', $cuePoint->getSubType());
 		$scene->addChild('thumbAssetId', $cuePoint->getAssetId());
 		
@@ -257,8 +257,8 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 		if($cuePoint->getEndTime())
 			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 	
-		$scene->addChild('title', $cuePoint->getName());
-		$scene->addChild('description', $cuePoint->getText());
+		$scene->addChild('title', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		$scene->addChild('description', kMrssManager::stringToSafeXml($cuePoint->getText()));
 		$scene->addChild('subType', $cuePoint->getSubType());
 		$scene->addChild('thumbAssetId', $cuePoint->getAssetId());
 			
