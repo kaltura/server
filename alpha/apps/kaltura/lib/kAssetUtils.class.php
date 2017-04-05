@@ -51,7 +51,9 @@ class kAssetUtils
 		$fileBaseName = $entry->getName();
 		if ($asset)
 		{
-			$fileBaseName = $fileBaseName . " (" . $asset->getName() . ")";
+			$assetName = $asset->getName();
+			if ($assetName)
+				$fileBaseName .= " ($assetName)";
 			$fileExt = $asset->getFileExt();
 		}
 		else
