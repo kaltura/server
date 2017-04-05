@@ -829,6 +829,7 @@ class playManifestAction extends kalturaAction
 	private function serveVodEntry()
 	{
 		$this->initFlavorIds();
+		
 		if($this->entry->getPartner()->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 		
@@ -1068,6 +1069,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 			if(!$this->deliveryAttributes->getUiConfId())
 				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
+			if($this->getRequestParameter("sessionId"))
+				$this->deliveryAttributes->setSessionId($this->getRequestParameter("sessionId"));
 		}
 	}
 
@@ -1090,6 +1093,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setMediaProtocol($this->getRequestParameter ( "protocol", null ));
 		if(!$this->deliveryAttributes->getMediaProtocol() || $this->deliveryAttributes->getMediaProtocol() === "null")
 			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
+		
 		$this->deliveryAttributes->setFormat($this->getRequestParameter ( "format" ));
 		if(!$this->deliveryAttributes->getFormat())
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
@@ -1097,7 +1101,7 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS || $this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL)  
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
 			    $this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
-		
+
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
 		{
@@ -1114,6 +1118,7 @@ class playManifestAction extends kalturaAction
 			
 			$this->deliveryAttributes->setTags($tags);
 		}
+
 		$this->deliveryAttributes->setpreferredBitrate($this->getRequestParameter ( "preferredBitrate", null ));
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
@@ -1121,6 +1126,7 @@ class playManifestAction extends kalturaAction
 
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
+
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 
 		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
