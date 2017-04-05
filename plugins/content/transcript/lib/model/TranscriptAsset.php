@@ -30,12 +30,9 @@ class TranscriptAsset extends AttachmentAsset
 	public function setLanguage($v)     {$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);}
 	public function setProviderType($v)     {$this->putInCustomData(self::CUSTOM_DATA_FIELD_PROVIDER_TYPE, $v);}
 	
-	public function getName($prefix = '')
+	public function getName()
 	{
-		$name = $this->getFilename();
-		if($prefix != '')
-			$name = $prefix . "-Transcript-" . $name;
-		return $name;
+		return $this->getFilename();
 	}
 
 }
