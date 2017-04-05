@@ -29,5 +29,10 @@ class TranscriptAsset extends AttachmentAsset
 	public function setHumanVerified($v) {$this->putInCustomData(self::CUSTOM_DATA_FIELD_HUMAN_VERIFIED, $v);}
 	public function setLanguage($v)     {$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);}
 	public function setProviderType($v)     {$this->putInCustomData(self::CUSTOM_DATA_FIELD_PROVIDER_TYPE, $v);}
+	
+	public function getName()
+	{
+		return $this->getFilename();
+	}
 
 }
