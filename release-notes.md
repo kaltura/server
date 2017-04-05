@@ -10,11 +10,29 @@ None.
 
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_20_add_media_server_permission_get_permission.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_30_partner_parent_partner_packager_permission.php
 
 #### Known Issues & Limitations ####
 
 None.
+
+## Add permission for capture device for scheduleEvent and scheduleResource ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7216
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_05_add_schedule_and_schedule_resource_permissions_for_capture_device.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 
 # Lynx 12.13.0 #
 
