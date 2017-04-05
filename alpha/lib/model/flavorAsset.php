@@ -298,7 +298,7 @@ class flavorAsset extends exportableAsset
 	{
 		$flavorParams = $this->getFlavorParams();
 		if ($flavorParams)
-			return " (" . $flavorParams->getName() . ")";
-		return parent::getName();
+			return $flavorParams->getName();
+		return "";
 	}
 }
