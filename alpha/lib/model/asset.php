@@ -724,6 +724,14 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	    	
 	    return false;
 	}
+
+	public function getName($prefix = '')
+	{
+		$name = $this->getId();
+		if($prefix != '')
+			$name = $prefix . "_" . $name;
+		return $name;
+	}
 	
     /**
      * Set the asset status to a locally ready status (READY, EXPORTING) according to the required jobs to perform on the asset
