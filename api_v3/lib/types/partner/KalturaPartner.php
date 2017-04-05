@@ -390,6 +390,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validatePropertyNotNull("description");
 		$this->validatePropertyMaxLength("country", 2, true);
 		$this->validatePropertyMaxLength("state", 2, true);
+		$this->validateForInsert();
 
 		$partner = new Partner();
 		$partner = parent::toObject( $partner );
