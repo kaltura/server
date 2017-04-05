@@ -294,12 +294,11 @@ class flavorAsset extends exportableAsset
 		return false;
 	}
 	
-	public function getName($prefix = '')
+	public function getName()
 	{
-		$name = $prefix;
 		$flavorParams = $this->getFlavorParams();
 		if ($flavorParams)
-			$name .= " (" . $flavorParams->getName() . ")";
-		return $name;
+			return $flavorParams->getName();
+		return "";
 	}
 }

@@ -577,11 +577,11 @@ class playManifestAction extends kalturaAction
 	protected function retrieveAssets()
 	{
 		//in case asset id specified, allow url and download regardless of asset type
-		//ignoring flavor-asset due to backward compat.
+		//ignoring flavor-assets due to backward compat.
 		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
 		{
 			$asset = assetPeer::retrieveById($this->flavorIds[0]);
-			if($asset && $asset->getType() != assetType::FLAVOR && $asset->getType() != assetType::LIVE)
+			if($asset && $asset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && !in_array($asset->getType(), assetPeer::retrieveAllFlavorsTypes()))
 				return array($asset);
 		}
 		return assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
@@ -1084,7 +1084,6 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setSeekFromTime($this->getRequestParameter ( "seekFrom" , -1));
 		if ($this->deliveryAttributes->getSeekFromTime() <= 0)
 			$this->deliveryAttributes->setSeekFromTime(-1);
-
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
 
 		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
@@ -1102,7 +1101,7 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS || $this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL)  
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
 			    $this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
-			
+
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
 		{
@@ -1119,7 +1118,7 @@ class playManifestAction extends kalturaAction
 			
 			$this->deliveryAttributes->setTags($tags);
 		}
-				
+
 		$this->deliveryAttributes->setpreferredBitrate($this->getRequestParameter ( "preferredBitrate", null ));
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
@@ -1145,7 +1144,7 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$renderer = null;
-		
+
 		switch($this->entry->getType())
 		{
 			case entryType::PLAYLIST:
@@ -1180,7 +1179,7 @@ class playManifestAction extends kalturaAction
 			/* @var $contributor IKalturaPlayManifestContributor */
 			$renderer->contributors = array_merge($renderer->contributors, $contributor->getManifestEditors($config));
 		}
-			
+
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
