@@ -5,7 +5,7 @@ if($argc != 3)
    echo "Usage: php updateEventNotificationTemplates.php {systemName} {dryRun}\n";
    exit;
 }
-$systemName = argv[1];
+$systemName = $argv[1];
 $dryRun = $argv[2];
 
 require_once(__DIR__ . '/../bootstrap.php');
