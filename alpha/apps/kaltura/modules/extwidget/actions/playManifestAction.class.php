@@ -577,11 +577,11 @@ class playManifestAction extends kalturaAction
 	protected function retrieveAssets()
 	{
 		//in case asset id specified, allow url and download regardless of asset type
-		//ignoring flavor-asset due to backward compat.
+		//ignoring flavor-assets due to backward compat.
 		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
 		{
 			$asset = assetPeer::retrieveById($this->flavorIds[0]);
-			if($asset && $asset->getType() != assetType::FLAVOR && $asset->getType() != assetType::LIVE)
+			if($asset && $asset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && !in_array($asset->getType(), assetPeer::retrieveAllFlavorsTypes()))
 				return array($asset);
 		}
 		return assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
@@ -828,8 +828,9 @@ class playManifestAction extends kalturaAction
 
 	private function serveVodEntry()
 	{
+		KalturaLog::debug("XXXXX - 1");
 		$this->initFlavorIds();
-		
+		KalturaLog::debug("XXXXX - 2");
 		if($this->entry->getPartner()->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 		
@@ -840,7 +841,9 @@ class playManifestAction extends kalturaAction
 			break;
 		
 		case entryType::MEDIA_CLIP:
+			KalturaLog::debug("XXXXX - 3");
 			$this->initFlavorAssetArray();
+			KalturaLog::debug("XXXXX - 4");
 			$this->initEntryDuration();
 			break;
 		}
@@ -1069,13 +1072,12 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 			if(!$this->deliveryAttributes->getUiConfId())
 				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
-			if($this->getRequestParameter("sessionId"))
-				$this->deliveryAttributes->setSessionId($this->getRequestParameter("sessionId"));
 		}
 	}
 
 	public function execute()
 	{
+		KalturaLog::debug("YYYYYY new - 1");
 		if($this->getRequestParameter("format", "Empty") !== PlaybackProtocol::APPLE_HTTP_TO_MC)
 			KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 		
@@ -1084,7 +1086,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setSeekFromTime($this->getRequestParameter ( "seekFrom" , -1));
 		if ($this->deliveryAttributes->getSeekFromTime() <= 0)
 			$this->deliveryAttributes->setSeekFromTime(-1);
-
+		KalturaLog::debug("YYYYYY - 2");
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
 
 		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
@@ -1094,7 +1096,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setMediaProtocol($this->getRequestParameter ( "protocol", null ));
 		if(!$this->deliveryAttributes->getMediaProtocol() || $this->deliveryAttributes->getMediaProtocol() === "null")
 			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
-		
+		KalturaLog::debug("YYYYYY - 3");
 		$this->deliveryAttributes->setFormat($this->getRequestParameter ( "format" ));
 		if(!$this->deliveryAttributes->getFormat())
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
@@ -1102,7 +1104,8 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS || $this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL)  
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
 			    $this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
-			
+		
+		KalturaLog::debug("YYYYYY - 4");
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
 		{
@@ -1119,7 +1122,7 @@ class playManifestAction extends kalturaAction
 			
 			$this->deliveryAttributes->setTags($tags);
 		}
-				
+		KalturaLog::debug("YYYYYY - 5");
 		$this->deliveryAttributes->setpreferredBitrate($this->getRequestParameter ( "preferredBitrate", null ));
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
@@ -1127,12 +1130,12 @@ class playManifestAction extends kalturaAction
 
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
-
+		KalturaLog::debug("YYYYYY - 6");
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 
 		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
 		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
-
+		KalturaLog::debug("YYYYYY - 7");
 		// Initialize
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
@@ -1145,7 +1148,7 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$renderer = null;
-		
+		KalturaLog::debug("YYYYYY - 1");
 		switch($this->entry->getType())
 		{
 			case entryType::PLAYLIST:
@@ -1167,6 +1170,8 @@ class playManifestAction extends kalturaAction
 		if (!$renderer)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'This format is unsupported');
 		
+		KalturaLog::debug("XXXXX - 5");
+
 		$renderer->contributors = array();
 		$config = new kManifestContributorConfig();
 		$config->format = $this->deliveryAttributes->getFormat();
@@ -1181,6 +1186,8 @@ class playManifestAction extends kalturaAction
 			$renderer->contributors = array_merge($renderer->contributors, $contributor->getManifestEditors($config));
 		}
 			
+		KalturaLog::debug("XXXXX - 6");
+
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
@@ -1194,6 +1201,8 @@ class playManifestAction extends kalturaAction
 		}
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		$renderer->lastModified = time();
+
+		KalturaLog::debug("XXXXX - 6");
 
 		// Handle caching
 		$canCacheAccessControl = false;

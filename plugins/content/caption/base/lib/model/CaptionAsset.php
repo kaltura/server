@@ -65,12 +65,9 @@ class CaptionAsset extends asset
 		$this->setLabel($dbAssetParams->getLabel());
 	}
 	
-	public function getName($prefix = '')
+	public function getName()
 	{
-		$name = $this->getLanguage();
-		if($prefix != '')
-			$name = $prefix . "_" . $name;
-		return $name;
+		return $this->getLanguage();
 	}
 	
 	public function shouldCopyOnReplacement() {return false;}
