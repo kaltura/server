@@ -66,14 +66,14 @@ function updateTemplatesCode($templates, $dryRun)
          echo "Checking template id".$templateId." eventConditions\n";
          foreach ($eventConditions as $eventCondition)
          {
-            $filed = $eventCondition->getField();
+            $field = $eventCondition->getField();
             $eventCondDescription = $eventCondition->getDescription();
-            if($filed && isset($map[$filed->getCode()]))
+            if($field && isset($map[$field->getCode()]))
             {
                $templateChanged = true;
-               echo "old code value for ". $eventCondDescription." is [".print_r($filed,true)."]\n";
-               $filed->setCode($map[$filed->getCode()]);
-               echo "new code value for ". $eventCondDescription." is [".print_r($filed,true)."]\n";
+               echo "old code value for ". $eventCondDescription." is [".print_r($field,true)."]\n";
+               $field->setCode($map[$field->getCode()]);
+               echo "new code value for ". $eventCondDescription." is [".print_r($field,true)."]\n";
             }
          }
          if($templateChanged && !$dryRun)
