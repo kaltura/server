@@ -1071,6 +1071,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 			if(!$this->deliveryAttributes->getUiConfId())
 				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
+			if($this->getRequestParameter("sessionId"))
+				$this->deliveryAttributes->setSessionId($this->getRequestParameter("sessionId"));
 		}
 	}
 
