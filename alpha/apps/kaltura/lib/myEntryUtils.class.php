@@ -342,10 +342,19 @@ class myEntryUtils
 			if($entry->getRecordedEntryId())
 			{
 				$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
-				if($recordedEntry && in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+				if($recordedEntry)
 				{
-					KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
-					throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getRecordedEntryId());
+					if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+					{
+						KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
+						throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getId());
+					}
+					
+					if(myEntryUtils::shouldServeVodFromLive($recordedEntry))
+					{
+						KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, entry still beeing handled by recordign engien");
+						throw new KalturaAPIException(KalturaErrors::RECORDEDING_FLOW_NOT_COMPLETE, $entry->getId());
+					}
 				}	
 			}
 		}
