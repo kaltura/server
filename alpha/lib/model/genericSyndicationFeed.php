@@ -17,13 +17,6 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 
 	private $xslt;
 
-	public function __construct()
-	{
-		parent::__construct();
-		$this->incrementVersion();
-	}
-
-
 	/* (non-PHPdoc)
 	 * @see BasesyndicationFeed::applyDefaultValues()
 	 */
@@ -173,4 +166,12 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	{
 		parent::putInCustomData(self::CUSTOM_DATA_FIELD_PAGE_SIZE, $pageSize);
 	}
+
+	public function init()
+	{
+		parent::init();
+		$this->incrementVersion();
+	}
+
+
 }

@@ -232,6 +232,7 @@ abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilt
 	{
 		if(is_null($object_to_fill))
 			$object_to_fill = new syndicationFeed();
+		$object_to_fill->init();
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 
