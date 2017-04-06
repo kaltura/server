@@ -424,7 +424,7 @@ class APIErrors
 	
 	const RECORDED_NOT_READY = "RECORDED_NOT_READY;ENTRY_ID;Live entry [@ENTRY_ID@] cannot be deleted, recorded entry not in ready status yet";
 	
-	const RECORDEDING_FLOW_NOT_COMPLETE = "RECORDEDING_FLOW_NOT_COMPLETE;ENTRY_ID;Live entry [@ENTRY_ID@] cannot be deleted, recording engien still proccesing live event";
+	const RECORDEDING_FLOW_NOT_COMPLETE = "RECORDEDING_FLOW_NOT_COMPLETE;ENTRY_ID;Live entry [@ENTRY_ID@] cannot be deleted, recording engine still proccesing live event";
 	
 	const RECORDED_ENTRY_LIVE_MISMATCH = "RECORDED_ENTRY_LIVE_MISMATCH;LIVE_ENTRY_ID,RECORDE_ERNTRY_ID;Recorded entry [@RECORDE_ERNTRY_ID@] was not created while streaming to the given live entry [@LIVE_ENTRY_ID@]";
 	
