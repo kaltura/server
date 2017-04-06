@@ -86,7 +86,7 @@
 
 			<media:description>
 
-				<xsl:value-of select="string(description)" disable-output-escaping="yes" />
+				<xsl:value-of select="string(description)" disable-output-escaping="no" />
 
 			</media:description>
 

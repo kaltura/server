@@ -42,7 +42,7 @@
                 <xsl:value-of select="$title" />
             </title>
             <description>
-                <xsl:value-of select="string(description)" disable-output-escaping="yes" />
+                <xsl:value-of select="string(description)" disable-output-escaping="no" />
             </description>
             <pubdate>
                 <xsl:value-of select="php:function('date', 'D, d M Y \ H:i:s e', sum($stamp))" />
