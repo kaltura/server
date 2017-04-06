@@ -448,7 +448,9 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			if($this->debug)
 				KalturaLog::debug("Bucket name [$this->name]");
 				
+			$connStart = microtime(true);
 			$this->bucket = $cluster->openBucket($this->name);
+			self::safeLog("connect took - {$connTook} seconds to {$config['dsn']} bucket {$this->name}");
 		}
 		catch(CouchbaseException $e)
 		{
