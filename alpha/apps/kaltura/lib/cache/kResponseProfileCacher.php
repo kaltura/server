@@ -130,7 +130,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$value[self::CACHE_VALUE_VERSION] = self::getCacheVersion();
 		
 		$key = self::addCacheVersion($key);
-		KalturaLog::debug("Key [$key]");
+		//KalturaLog::debug("Key [$key]");
 		
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
@@ -145,7 +145,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	protected static function delete($key)
 	{
 		$key = self::addCacheVersion($key);
-		KalturaLog::debug("Key [$key]");
+		//KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
