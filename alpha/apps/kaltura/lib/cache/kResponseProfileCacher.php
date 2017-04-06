@@ -118,7 +118,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			/* @var $cacheStore kBaseCacheWrapper */
 			$queryStart = microtime(true);
 			$cacheStore->set($invalidationKey, $value);
-			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds");
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds key=$invalidationKey");
 		}
 	}
 	
@@ -138,7 +138,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			/* @var $cacheStore kBaseCacheWrapper */
 			$queryStart = microtime(true);
 			$cacheStore->set($key, $value);
-			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds");
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds key=$key");
 		}
 	}
 	
@@ -151,7 +151,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			$queryStart = microtime(true);
 			$cacheStore->delete($key);
-			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds");
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds key=$key");
 		}
 	}
 	
@@ -171,7 +171,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				$value = is_array($keys) ? $cacheStore->multiGet($keys) : $cacheStore->get($keys);
 			}
-			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds");
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds $key=".print_r($keys, true));
 
 			if($value)
 			{
