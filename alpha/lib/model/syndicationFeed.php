@@ -221,4 +221,8 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FEED_CONTENT_TYPE_HEADER, null, 'text/xml; charset=utf-8');
 	}
+
+	public function init()
+	{
+	}
 }
