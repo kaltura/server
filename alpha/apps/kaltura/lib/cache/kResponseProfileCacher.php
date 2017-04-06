@@ -171,7 +171,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				$value = is_array($keys) ? $cacheStore->multiGet($keys) : $cacheStore->get($keys);
 			}
-			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds $key=".print_r($keys, true));
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds $keys=".print_r($keys, true));
 
 			if($value)
 			{
