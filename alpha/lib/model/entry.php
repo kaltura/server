@@ -757,11 +757,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 		if ($media_type == self::ENTRY_MEDIA_TYPE_VIDEO || $media_type == self::ENTRY_MEDIA_TYPE_AUDIO)
 		{
-			$protocolStr = infraRequestUtils::getProtocol();
-
-			$url = requestUtils::getApiCdnHost();
-			$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
-			$url .= "/playManifest/entryId/$entryId/format/url/protocol/$protocolStr";
+			$url = $this->createPlayManifestUrlByFormat("url");
 		}
 		else if ($media_type == self::ENTRY_MEDIA_TYPE_IMAGE  )
 		{
@@ -862,7 +858,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	}
 	
 	public function getDownloadUrl( $version = NULL )
-	{
+	{		
+		if(in_array($this->getMediaType(), array(self::ENTRY_MEDIA_TYPE_VIDEO, self::ENTRY_MEDIA_TYPE_AUDIO )))
+		{
+			//Request the soruce flavor to be compaitble to raw action default behavior
+			return $this->createPlayManifestUrlByFormat("download") . "/flavorParamIds/0"; 
+		}
+		
 		// always return the URL for the download - there is enough logic there to fix problems return the correct version/flavor
 		return myPartnerUtils::getCdnHost($this->getPartnerId()). myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/raw/entry_id/" . $this->getId() . "/version/" . $this->getVersion();
 	}
@@ -3587,5 +3589,17 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function getRecordedLengthInMsecs()
 	{
 		return $this->getFromCustomData("recorded_entry_length_in_msecs",null, 0);
+	}
+	
+	private function createPlayManifestUrlByFormat($format)
+	{
+		$entryId = $this->getId();
+		$protocolStr = infraRequestUtils::getProtocol();
+		
+		$url = requestUtils::getApiCdnHost();
+		$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
+		$url .= "/playManifest/entryId/$entryId/format/$format/protocol/$protocolStr";
+		
+		return $url;
 	}
 }
