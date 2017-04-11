@@ -39,16 +39,8 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			return $response;
 		}
 
-
 		$c = new Criteria();
-		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
-		{
-			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
-		}
-		else
-		{
-			$this->fixFilterUserId();
-		}
+		
 		$userEntryFilter = $this->toObject();
 		$userEntryFilter->attachToCriteria($c);
 
@@ -69,6 +61,21 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$response->totalCount = $totalCount;
 		$response->objects = KalturaUserEntryArray::fromDbArray($list, $responseProfile);
 		return $response;
+	}
+	
+
+	public function toObject ($object_to_fill = null, $props_to_skip = array())
+	{
+		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
+		{
+			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
+		}
+		else
+		{
+			$this->fixFilterUserId();
+		}
+		
+		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
 

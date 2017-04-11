@@ -65,6 +65,7 @@ class KalturaViewHistoryUserEntryAdvancedFilter extends KalturaSearchItem
 		}
 		
 		$userEntryFilter->typeEqual = ViewHistoryPlugin::getApiValue(ViewHistoryUserEntryType::VIEW_HISTORY);
+		$userEntryFilter->orderBy = KalturaUserEntryOrderBy::UPDATED_AT_ASC;
 		
 		return $userEntryFilter->toObject();
 	}
