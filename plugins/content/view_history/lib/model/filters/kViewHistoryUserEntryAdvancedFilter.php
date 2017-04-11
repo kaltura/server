@@ -90,7 +90,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		if (!count($entryIds))
 		{
 			KalturaLog::err("No user entries found - returning empty result");
-			$this->add
+			$entryIds = array (-1);
 		}
 		
 		$query->addColumnWhere(entryPeer::ID, $entryIds, KalturaCriteria::IN);
