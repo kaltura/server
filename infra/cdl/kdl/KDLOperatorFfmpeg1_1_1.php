@@ -63,11 +63,18 @@ $con = $target->_container;
 		}
 	
 		$aud = $target->_audio;
-		if($aud->_id==KDLAudioTarget::AACHE) {
-		
-			$cmdStr = " -acodec libfdk_aac -profile:a aac_he_v2";
+		switch($aud->_id){
+		case KDLAudioTarget::AACHE:
+			$cmdStr = " -c:a libfdk_aac -profile:a aac_he_v2";
+			break;
+		case KDLAudioTarget::AC3:
+		case KDLAudioTarget::EAC3:
+			$cmdStr = " -c:a ".$aud->_id;
+			break;
+		}
+		if(isset($cmdStr)){
 			if($aud->_bitRate!==null && $aud->_bitRate>0){
-				$cmdStr.= " -a:b ".$aud->_bitRate."k";
+				$cmdStr.= " -b:a ".$aud->_bitRate."k";
 			}
 			if($aud->_sampleRate!==null && $aud->_sampleRate>0){
 				$cmdStr.= " -ar ".$aud->_sampleRate;
@@ -75,9 +82,9 @@ $con = $target->_container;
 			if($aud->_channels!==null && $aud->_channels>0){
 				$cmdStr.= " -ac ".$aud->_channels;
 			}
-		
 			return $cmdStr;
 		}
+		
 		$cmdStr = parent::generateAudioParams($design, $target);
 		
 			/*
