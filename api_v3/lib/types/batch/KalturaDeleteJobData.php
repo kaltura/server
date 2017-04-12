@@ -44,6 +44,10 @@ class KalturaDeleteJobData extends KalturaJobData
 			case 'categoryFilter':
 				$this->filter = new KalturaCategoryFilter();
  				break;
+				
+			case 'UserEntryFilter':
+				$this->filter = new KalturaUserEntryFilter();
+ 				break;
 			
 			default:
 				$this->filter = KalturaPluginManager::loadObject('KalturaFilter', $filterType);
