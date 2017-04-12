@@ -6,5 +6,5 @@
 
 $addPermissionsAndItemsScript = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
 
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.object.KalturaPartner.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaPartner.ini';
 passthru("php $addPermissionsAndItemsScript $config");
