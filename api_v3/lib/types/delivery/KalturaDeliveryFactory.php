@@ -73,7 +73,9 @@ class KalturaDeliveryProfileFactory {
 			case 'kVnptUrlTokenizer':
 				return new KalturaUrlTokenizerVnpt();
 			case 'kChtHttpUrlTokenizer':
-				return new KalturaUrlTokenizerCht();	
+				return new KalturaUrlTokenizerCht();
+			case 'kChinaCacheUrlTokenizer':
+				return new KalturaUrlTokenizerChinaCache();	
 			case 'kKsUrlTokenizer':
 				return new KalturaUrlTokenizerKs();
 
