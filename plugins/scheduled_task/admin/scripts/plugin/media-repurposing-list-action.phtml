@@ -6,11 +6,11 @@
 	<table>
 		<thead>
 			<tr>
+				<th><?php echo $this->translate('ID'); ?></th>
 				<th><?php echo $this->translate('Name'); ?></th>
 				<th><?php echo $this->translate('Status'); ?></th>
 
 				<th><?php echo $this->translate('Filter'); ?></th>
-				<th><?php echo $this->translate('Task Type'); ?></th>
 				<th><?php echo $this->translate('Schedule Task IDs'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
 			</tr>
@@ -26,13 +26,13 @@
 			<?php foreach($this->paginator as $mediaRepurposing): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next();
 			?>">
+				<td><?php echo $mediaRepurposing->id; ?></td>
 				<td><?php echo $mediaRepurposing->name; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus', $mediaRepurposing->status); ?></td>
 				<td><?php echo get_class($mediaRepurposing->objectFilter); ?></td>
-				<td><?php echo MediaRepurposingUtils::getDescriptionForType($mediaRepurposing->taskType); ?></td>
-				<td><?php echo $mediaRepurposing->scheduleTasksIds; ?></td>
+				<td><?php echo $mediaRepurposing->description; ?></td>
 				<td>
-					<select class="options" onchange="doAction(this.value, `<?php echo $mediaRepurposing->name; ?>`)">
+					<select class="options" onchange="doAction(this.value, '<?php echo $mediaRepurposing->id; ?>')">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configureMediaRepurposing" ><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED): ?>
@@ -78,10 +78,10 @@ function doAction(action, mediaRepurposingName) {
 }
 
 
-function enable(mediaRepurposingName)
+function enable(mediaRepurposingId)
 {
 	changeStatus(
-		mediaRepurposingName,
+		mediaRepurposingId,
 		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE; ?>,
 		function() {
 			alert('<?php echo $this->translate('Media Repurposing active');?>');
@@ -89,10 +89,10 @@ function enable(mediaRepurposingName)
 	);
 }
 
-function disable(mediaRepurposingName)
+function disable(mediaRepurposingId)
 {
 	changeStatus(
-		mediaRepurposingName,
+		mediaRepurposingId,
 		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED; ?>,
 		function() {
 			alert('<?php echo $this->translate('Media Repurposing disabled');?>');
@@ -100,13 +100,13 @@ function disable(mediaRepurposingName)
 	);
 }
 
-function remove(mediaRepurposingName)
+function remove(mediaRepurposingId)
 {
 	var ok = confirm('<?php echo $this->translate('Are you sure you want to remove media Repurposing ?'); ?>');
 	if (ok)
 	{
 		changeStatus(
-			mediaRepurposingName,
+			mediaRepurposingId,
 			<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DELETED; ?>,
 			function() {
 				alert('<?php echo $this->translate('Media Repurposing removed');?>');
@@ -115,11 +115,11 @@ function remove(mediaRepurposingName)
 	}
 }
 
-function changeStatus(mediaRepurposingName, status, callback)
+function changeStatus(mediaRepurposingId, status, callback)
 {
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingSetStatusAction', 'mediaRepurposingName' => 'MEDIAREPURPOSINGID', 'mediaRepurposingStatus' => 'STATUS', 'partnerId' => 'PARTNERID')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingSetStatusAction', 'mediaRepurposingId' => 'MEDIAREPURPOSINGID', 'mediaRepurposingStatus' => 'STATUS', 'partnerId' => 'PARTNERID')); ?>';
 	url = url.replace('STATUS', status);
-	url = url.replace('MEDIAREPURPOSINGID', mediaRepurposingName);
+	url = url.replace('MEDIAREPURPOSINGID', mediaRepurposingId);
 	url = url.replace('PARTNERID', partnerId);
 	jQuery.ajax({
 		url: url,
@@ -141,33 +141,32 @@ function changeStatus(mediaRepurposingName, status, callback)
 }
 
 
-function newMediaRepurposing(partnerId, mediaRepurposingType, filterType)
+function newMediaRepurposing(partnerId, filterType)
 {
 	if(!partnerId.length || isNaN(partnerId)){
 		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
 		return;
 	}
-	
-	if(!mediaRepurposingType.length){
-		alert('<?php echo $this->translate('Media Repurposing type not supplied'); ?>');
+	if(!filterType.length){
+		alert('<?php echo $this->translate('Media Repurposing Filter Type not supplied'); ?>');
 		return;
 	}
-
-	paramsStr = '/new_partner_id/' + partnerId + '/new_media_repurposing_type/' + mediaRepurposingType + '/new_media_repurposing_filter_type/' + filterType;
-
+	paramsStr = '/new_partner_id/' + partnerId + '/new_media_repurposing_filter_type/' + filterType;
+	
 	loadMediaRepurposing(paramsStr);
 }
 
-function configureMediaRepurposing(mediaRepurposingName)
+function configureMediaRepurposing(mediaRepurposingId)
 {
-	if(typeof mediaRepurposingName == 'undefined'){
+	if(typeof mediaRepurposingId == 'undefined'){
 		alert('<?php echo $this->translate('Media Repurposing ID not supplied'); ?>');
 		return;
 	}
 
 
-	mediaRepurposingIdStr = '/new_partner_id/' + partnerId + '/media_repurposing_name/' + mediaRepurposingName;
+	mediaRepurposingIdStr = '/new_partner_id/' + partnerId + '/media_repurposing_id/' + mediaRepurposingId;
 	loadMediaRepurposing(mediaRepurposingIdStr);
+	
 }
 
 
@@ -187,6 +186,7 @@ function loadMediaRepurposing(paramStr)
 		title: '<?php echo $this->translate('Media Repurposing Profile'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
+				rearrangeData();
 				jQuery(this).find('#frmMediaRepurposingConfigure').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
@@ -205,6 +205,57 @@ function loadMediaRepurposing(paramStr)
 			});
 		}
 	);
+}
+
+function rearrangeData() {
+	//remove all template field
+	$('dd[id^="MR_tasksDataTemplate_"]').remove();
+
+
+	var tasks = [];
+	var currentIndex = 0;
+	while (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0) {
+		tasks.push(buildTaskParams(currentIndex.toString()));
+		currentIndex++;
+		if (currentIndex > 9)
+			break;
+	}
+
+	//alert(JSON.stringify(tasks));
+	jQuery('#TasksData').val(JSON.stringify(tasks));
+	return true;
+}
+
+function buildTaskParams(index) {
+
+	var taskTypeElement = jQuery('#mr_task_' + index + '-TaskType');
+	var taskType = taskTypeElement.val();
+	taskTypeElement.remove();
+
+	var taskIdElement = jQuery('#mr_task_' + index + '-TaskId');
+	var taskId = taskIdElement.val();
+	taskIdElement.remove();
+
+	var taskTimeToNextElement = jQuery('#mr_task_' + index + '-taskTime');
+	var taskTimeToNext = taskTimeToNextElement.val();
+	taskTimeToNextElement.remove();
+
+	var taskData = {};
+	jQuery('#mr_task_data_' + index).find('input,select').each(function(idx) {
+		var type = $( this ).attr("type");
+		var name = $( this ).attr("name");
+		var val = $( this ).val();
+
+		if (type == 'checkbox') {
+			val = $(this).attr("checked");
+			if (val == 'checked')
+				val = "1";
+		}
+		taskData[name] = val;
+
+		$(this).remove();
+	});
+	return {taskId, taskType, taskTimeToNext, taskData};
 }
 
 

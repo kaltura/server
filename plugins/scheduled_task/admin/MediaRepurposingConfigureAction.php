@@ -14,54 +14,45 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 	}
 
 
-	
-	
+
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('layout')->disableLayout();
 		$request = $action->getRequest();
-		$mediaRepurposingName = $this->_getParam('media_repurposing_name');
+		$mediaRepurposingId = $this->_getParam('media_repurposing_id');
 		$partnerId = $this->_getParam('new_partner_id');
-		$mediaRepurposingType = $this->_getParam('new_media_repurposing_type');
-
-		$filterType = $this->_getParam('new_media_repurposing_filter_type');
-		$filterType = MediaRepurposingUtils::filterFactory($filterType);
-
-
+		$filterTypeEngine = $this->_getParam('new_media_repurposing_filter_type');
+		$filterType = MediaRepurposingUtils::filterFactory($filterTypeEngine);
 		
 		$action->view->formValid = false;
 
+
 		try
 		{
+			
 			if ($request->isPost())
 			{
 				$formData = $request->getPost();
-				$mediaRepurposingTypeStr = $formData['type'];
-				$mediaRepurposingType = constant("Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::$mediaRepurposingTypeStr");
 				$filterType = $formData['filterTypeStr'];
-				$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $mediaRepurposingType, $filterType);
-
-				$action->view->formValid = $this->processForm($mediaRepurposingForm, $formData, $mediaRepurposingType, $filterType);
+				$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterType);
+				$action->view->formValid = $this->processForm($mediaRepurposingForm, $formData, $filterTypeEngine, $mediaRepurposingId);
 			}
 			else
 			{
-				if (!is_null($mediaRepurposingName))
+				if (!is_null($mediaRepurposingId))
 				{
-					$mediaRepurposingProfiles = MediaRepurposingUtils::getMrs($partnerId);
-					$mr = null;
-					foreach ($mediaRepurposingProfiles as $m)
-						if ($m->name == $mediaRepurposingName)
-							$mr = $m;
-					$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $mr->taskType, $mr->objectFilter);
+
+					$mr = $this->getMrById($partnerId, $mediaRepurposingId);
+					$filterEngineType = $mr->objectFilterEngineType;
+					$filterType = MediaRepurposingUtils::filterFactory($filterEngineType);
+
+					$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterType, $mediaRepurposingId);
 					$mediaRepurposingForm->populateFromObject($mr, false);
 				}
 				else
 				{
-					$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $mediaRepurposingType, $filterType);
-
+					$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterType, null);
 					$mediaRepurposingForm->getElement('partnerId')->setValue($partnerId);
-					$typeDescription = MediaRepurposingUtils::getDescriptionForType($mediaRepurposingType);
-					$mediaRepurposingForm->getElement('type')->setValue($typeDescription);
 					$mediaRepurposingForm->getElement('filterTypeStr')->setValue($filterType);
 				}
 			}
@@ -76,7 +67,16 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$action->view->form = $mediaRepurposingForm;
 	}
 
-	private static function getSubArrayByPrefix($array, $prefix) {
+	private function getMrById($partnerId, $MrId)
+	{
+		$mediaRepurposingProfiles = MediaRepurposingUtils::getMrs($partnerId);
+		foreach ($mediaRepurposingProfiles as $m)
+			if ($m->id == $MrId)
+				return $m;
+	}
+
+	private static function getSubArrayByPrefix($array, $prefix)
+	{
 		$prefixLen = strlen($prefix);
 		$subArray = array();
 		foreach ($array as $key => $value)
@@ -84,26 +84,42 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 				$subArray[substr($key, $prefixLen)] = $value;
 		return $subArray;
 	}
+
+	private function buildTasksArray($tasksData)
+	{
+		$taskArray = array();
+		$tasksData = json_decode($tasksData);
+
+		foreach ($tasksData as $task) {
+			$taskArray[] = $this->buildTask($task);
+			$taskArray[] = $task->taskTimeToNext;
+		}
+		return $taskArray;
+	}
+
+	private function buildTask($taskObj)
+	{
+		$typeInt = constant("Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::". $taskObj->taskType);
+		$objectTask = MediaRepurposingUtils::objectTaskFactory($typeInt);
+		$objectTask->relatedObjects = $taskObj->taskId; //as the scheduleTask Id of this task
+		$objectTask->stopProcessingOnError = 0; //as default value
+		MediaRepurposingUtils::addParamToObjectTask($objectTask, $taskObj->taskData);
+		return $objectTask;
+	}
+
+
 	
-	private function processForm($form, $formData, $mediaRepurposingType, $filterType)
+	private function processForm(Form_MediaRepurposingConfigure $form, $formData, $filterTypeEngine, $mediaRepurposingId = null)
 	{
 		$name = $formData['media_repurposing_name'];
 
-		$time1 = $formData['first_status_change'];
-		$notify1 = $formData['first_notification'];
-		$time2 = $formData['second_status_change'];
-		$notify2 = $formData['second_notification'];
-
-		KalturaLog::info('asdf - 6');
-		//KalturaLog::info(print_r($formData,true));
-		
-		$statusChanges = $time1. ',' .$notify1. ','.$time2. ','.$notify2;
-		$statusChangesArray = explode(',', $statusChanges);
-		KalturaLog::info(print_r($statusChangesArray,true));
+		$filterType = $formData['filterTypeStr'];
+		if (!$filterType)
+			$filterType = MediaRepurposingUtils::filterFactory($filterTypeEngine);
 
 
-		$prefix = Form_MediaRepurposingConfigure::TASK_OBJECT__PREFIX;
-		$extraParamForType = $this->getSubArrayByPrefix($formData, $prefix);
+
+
 
 		$filter = new $filterType();
 		$prefix = Form_MediaRepurposingConfigure::FILTER_PREFIX;
@@ -112,26 +128,25 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		foreach ($filterFields as $key => $value) {
 			$filter->$key = $value;
 		}
+		
+		$taskArray = $this->buildTasksArray($formData['TasksData']);
 
-//		KalturaLog::info('qwer');
-//		KalturaLog::info("type is : $mediaRepurposingType");
-//		KalturaLog::info("filter type  is : $filterType");
-//		KalturaLog::info(print_r($filter, true));
-//		KalturaLog::info(print_r($extraParamForType, true));
-//		return true;
+		KalturaLog::info("asdf - 3");
+		KalturaLog::info(print_r($formData, true));
+		KalturaLog::info(print_r($taskArray, true));
+
+
 
 
 		if ($form->isValid($formData))
 		{
 			$partnerId = $formData['partnerId'];
-			$mr = MediaRepurposingUtils::createNewMr($name, $mediaRepurposingType, $filter, $statusChanges, $extraParamForType, $partnerId);
+			
+			if (!$mediaRepurposingId)
+				MediaRepurposingUtils::createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId);
+			else
+				MediaRepurposingUtils::UpdateMr($mediaRepurposingId, $name, $filterTypeEngine, $filter, $taskArray, $partnerId);
 
-
-			$mediaRepurposingProfiles = MediaRepurposingUtils::getMrs($partnerId);
-			$mediaRepurposingProfiles[] = $mr;
-
-
-			MediaRepurposingUtils::updateMrs($partnerId, $mediaRepurposingProfiles);
 			return true;
 		}
 		else

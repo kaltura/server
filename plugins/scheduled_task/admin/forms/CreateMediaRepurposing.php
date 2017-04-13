@@ -3,7 +3,7 @@
  * @package plugins.schedule_task
  * @subpackage Admin
  */
-class Form_CreateMediaRepurposing extends ConfigureForm
+class Form_CreateMediaRepurposing extends ConfigureSubForm
 {
 	public function init()
 	{
@@ -18,18 +18,7 @@ class Form_CreateMediaRepurposing extends ConfigureForm
 			'label'			=> 'Publisher ID:',
 			'onkeypress'	=> "return supressFormSubmit(event)",
 			'filters'		=> array('StringTrim'),
-		));	
-
-		$newMediaRepurposingType = new Kaltura_Form_Element_EnumSelect('newMediaRepurposingType', array(
-			'enum' => 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType',
-			'excludes' => array(
-			)
 		));
-
-		$newMediaRepurposingType->setLabel('Type:');
-		$newMediaRepurposingType->setRequired(true);
-		$this->addElement($newMediaRepurposingType);
-
 
 
 		$this->addEnumElement('Filter','newMR','Kaltura_Client_ScheduledTask_Enum_ObjectFilterEngineType');
@@ -38,7 +27,7 @@ class Form_CreateMediaRepurposing extends ConfigureForm
 		$this->addElement('button', 'submit', array(
 			'ignore'	=> true,
 			'label'		=> 'Create New',
-			'onclick'		=> "newMediaRepurposing($('#newPartnerId').val(), $('#newMediaRepurposingType').val(), $('#newMRFilter').val())",
+			'onclick'		=> "newMediaRepurposing($('#newPartnerId').val(), $('#newMRFilter').val())",
 			'decorators' => array('ViewHelper')
 		));
 	}

@@ -18,21 +18,18 @@ class MediaRepurposingSetStatusAction extends KalturaApplicationPlugin
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('layout')->disableLayout();
-		$mediaRepurposingName = $this->_getParam('mediaRepurposingName');
+		$mediaRepurposingId = $this->_getParam('mediaRepurposingId');
 		$newStatus = $this->_getParam('mediaRepurposingStatus');
 		$partnerId = $this->_getParam('partnerId');
 
 
 		$mediaRepurposingProfiles = MediaRepurposingUtils::getMrs($partnerId);
 		foreach ($mediaRepurposingProfiles as $key => $mr)
-			if ($mr->name == $mediaRepurposingName)
-				$mediaRepurposingProfiles[$key] = MediaRepurposingUtils::changeMrStatus($mr, $newStatus);
-			
+			if ($mr->id == $mediaRepurposingId)
+				MediaRepurposingUtils::changeMrStatus($mr, $newStatus);
 
-		
 		try
 		{
-			MediaRepurposingUtils::updateMrs($partnerId, $mediaRepurposingProfiles);
 			echo $action->getHelper('json')->sendJson('ok', false);
 		}
 		catch(Exception $e)
@@ -40,6 +37,7 @@ class MediaRepurposingSetStatusAction extends KalturaApplicationPlugin
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			echo $action->getHelper('json')->sendJson($e->getMessage(), false);
 		}
+
 	}
 }
 

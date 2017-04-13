@@ -38,13 +38,14 @@ class Kaltura_FilterPaginatorForMediaRepurposing implements Zend_Paginator_Adapt
 			$this->count = count($mediaRepurposingProfiles);
 			return $mediaRepurposingProfiles;
 		}
-
+		
 		foreach ($mediaRepurposingProfiles as $mr)
-			if ($mr->id == $this->mrId) {
+			if ($mr->name == $this->mrId) {
 				$this->count = 1;
 				return array($mr);
-			}
-		
+		}
+
+
 		return array();
 	}
 

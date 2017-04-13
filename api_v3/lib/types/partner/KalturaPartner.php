@@ -248,11 +248,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $deliveryTypes;
-
-	/**
-	 * @var KalturaMediaRepurposingProfileArray
-	 */
-	public $mrProfiles;
 	
 	/**
 	 * @var KalturaPlayerEmbedCodeTypesArray
@@ -326,7 +321,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'adultContent' , 'defConversionProfileType' , 'notify' , 'status' , 'allowQuickEdit' , 'mergeEntryLists' , 'notificationsConfig' ,
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
-		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'mrProfiles', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
+		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions',
 	);
 	

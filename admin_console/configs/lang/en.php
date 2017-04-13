@@ -1086,18 +1086,6 @@ return array(
 	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED' => 'Suspended',
 	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY' => 'Dry run only',
 
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::DISTRIBUTE' => 'Distribute',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::DISPATCH_EVENT_NOTIFICATION' => 'Dispatch Event Notification',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::EXECUTE_METADATA_XSLT' => 'Execute Metadata XSLT',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::DELETE_ENTRY' => 'Delete Entry',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::MODIFY_CATEGORIES' => 'Modify Categories',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::DELETE_ENTRY_FLAVORS' => 'Delete Entry Flavors',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::CONVERT_ENTRY_FLAVORS' => 'Convert Entry Flavors',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::DELETE_LOCAL_CONTENT' => 'Delete Local Content',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::STORAGE_EXPORT' => 'Storage Export',
-	'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::MODIFY_ENTRY' => 'Modify Entry',
-
-
 	// Drop Folder
 	'drop folder list intro text' => 'Here you can manage the Drop Folder profiles on your Kaltura video platform deployment',
 

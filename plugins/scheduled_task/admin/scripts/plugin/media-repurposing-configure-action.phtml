@@ -2,16 +2,36 @@
 <div class="error"><?php echo $this->errMessage ?></div><br/>
 <?php endif; ?>
 
+
 <?php
 	$this->form->setAction($this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingConfigureAction')));
 	echo $this->form;
 ?>
 
+
 <script type="text/javascript">
+	
+	hideTemplate();
+	populateTasks();
+	function hideTemplate() {
+		$('dd[id^="MR_tasksDataTemplate_"]').hide();
+	}
+
+	function populateTasks() {
+		var id = jQuery('#mrId').val();
+		if (!id)
+			return;
+		var data = jQuery('#MR_tasksDataTemplate_TaskData').val();
+		//alert(data);
+		var arr = JSON.parse(data);
+		var ts = $( ".add-task" );
+		
+		for (var i = 0, len = arr.length; i < len; i++)
+			addTaskFromObject(ts, arr[i]);
+	}
 
 
 jQuery(function() {
-	
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPaginator1').submit();
