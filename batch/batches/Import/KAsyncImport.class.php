@@ -66,7 +66,6 @@ class KAsyncImport extends KJobHandlerWorker
 
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;
-			$resumeOffset = 0;
 			$contentType = null;
 
 			$curlHeaderResponse = $this->getCurlHeaders($job, $sourceUrl);
@@ -318,11 +317,11 @@ class KAsyncImport extends KJobHandlerWorker
 		return $destFile;
 	}
 
-	protected function handleTextHtml($job, $curlHeaderResponse, $sourceUrl, $fileSize, KalturaImportJobData $data, $resumeOffset)
+	protected function handleTextHtml($job, $curlHeaderResponse, $sourceUrl, $fileSize, KalturaImportJobData $data)
 	{
 		if (!$data->destFileLocalPath)
 			$this->setTempDestFile($job, $data, $sourceUrl, $fileSize);
-		$res = $this->downloadFile($sourceUrl, $job, $data, $resumeOffset, $fileSize);
+		$res = $this->downloadFile($sourceUrl, $job, $data, 0, $fileSize);
 		if (!$res)
 			return $job;
 		KalturaLog::info("headers " . print_r($curlHeaderResponse, true));
@@ -422,6 +421,7 @@ class KAsyncImport extends KJobHandlerWorker
 
 	protected function handleBinaryImport($job, $data, $fileSize,$sourceUrl)
 	{
+		$resumeOffset = 0;
 		if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
 		{
 			if ($fileSize)
