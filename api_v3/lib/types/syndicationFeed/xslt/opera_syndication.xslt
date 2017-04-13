@@ -66,8 +66,6 @@
 
 		<xsl:variable name="tags" select="tags" />
 
-		<xsl:variable name="partnerId" select="2162191" />
-
 		<xsl:variable name="entryId" select="string(entryId)" />
 
 		<item>
@@ -96,25 +94,25 @@
 
 			</pubdate>
 
-			<!--<xsl:for-each select="$var1_content">-->
+			<xsl:for-each select="$var1_content">
 
-			<media:content>
+				<media:content>
 
-				<xsl:attribute name="url">
+					<xsl:attribute name="url">
 
-					<xsl:value-of select="concat ('http://cdnapi.kaltura.com/p/', $partnerId, '/sp/', $partnerId, '00/playManifest/entryId/', $entryId, '/format/url/protocol/http')" />
+						<xsl:value-of select="@url" />
 
-				</xsl:attribute>
+					</xsl:attribute>
 
-				<xsl:attribute name="duration">
+					<xsl:attribute name="duration">
 
-					<xsl:value-of select="string($var1_media/duration) div 1000" />
+						<xsl:value-of select="string($var1_media/duration) div 1000" />
 
-				</xsl:attribute>
+					</xsl:attribute>
 
-			</media:content>
+				</media:content>
 
-			<!--</xsl:for-each>-->
+			</xsl:for-each>
 
 			<xsl:element name="media:thumbnail">
 

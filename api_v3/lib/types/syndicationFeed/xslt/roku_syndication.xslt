@@ -32,7 +32,6 @@
         <xsl:variable name="var2_updatedAt" select="updatedAt" />
         <xsl:variable name="stamp" select="createdAt" />
         <xsl:variable name="tags" select="tags" />
-        <xsl:variable name="partnerId" select="2162191" />
         <xsl:variable name="entryId" select="string(entryId)" />
         <item>
             <guid isPermalink="false">
@@ -47,16 +46,16 @@
             <pubdate>
                 <xsl:value-of select="php:function('date', 'D, d M Y \ H:i:s e', sum($stamp))" />
             </pubdate>
-            <!--<xsl:for-each select="$var1_content">-->
-            <media:content>
-                <xsl:attribute name="url">
-                    <xsl:value-of select="concat ('http://cdnapi.kaltura.com/p/', $partnerId, '/sp/', $partnerId, '00/playManifest/entryId/', $entryId, '/format/applehttp/protocol/http/a/a.m3u8')" />
-                </xsl:attribute>
-                <xsl:attribute name="duration">
-                    <xsl:value-of select="string($var1_media/duration) div 1000" />
-                </xsl:attribute>
-            </media:content>
-            <!--</xsl:for-each>-->
+            <xsl:for-each select="$var1_content">
+                <media:content>
+                    <xsl:attribute name="url">
+                        <xsl:value-of select="@url" />
+                    </xsl:attribute>
+                    <xsl:attribute name="duration">
+                        <xsl:value-of select="string($var1_media/duration) div 1000" />
+                    </xsl:attribute>
+                </media:content>
+            </xsl:for-each>
             <xsl:element name="media:thumbnail">
                 <xsl:attribute name="url">
                     <xsl:value-of select="concat(thumbnailUrl/@url, '/width/800/height/450')" />
