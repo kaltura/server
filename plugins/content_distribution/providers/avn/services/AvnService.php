@@ -14,6 +14,7 @@ class AvnService extends ContentDistributionServiceBase
 	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
 	 * @param int $distributionProfileId
 	 * @param string $hash
+	 * @ksOptional
 	 */
 	public function getFeedAction($distributionProfileId, $hash)
 	{

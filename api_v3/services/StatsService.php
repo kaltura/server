@@ -56,6 +56,7 @@ referrer
 	 * 
 	 * @action collect
 	 * @return bool
+	 * @ksIgnored
 	 */
 	
 	// TODO - should move to a lighter php script that is not part of the API - it is unnecessarily  heavy	
@@ -114,6 +115,7 @@ referrer
 	 * @action kmcCollect
 	 * 
 	 * @param KalturaStatsKmcEvent $kmcEvent
+	 * @ksIgnored
 	 */
 	public function kmcCollectAction( KalturaStatsKmcEvent $kmcEvent )
 	{
@@ -143,6 +145,7 @@ referrer
 	 * @action reportKceError
 	 * @param KalturaCEError $kalturaCEError 
 	 * @return KalturaCEError
+	 * @ksIgnored
 	 */
 	function reportKceErrorAction( KalturaCEError $kalturaCEError )
 	{
@@ -166,6 +169,7 @@ referrer
 	 * @action reportError
 	 * @param string $errorCode 
 	 * @param string $errorMessage 
+	 * @ksIgnored
 	 */
 	function reportError($errorCode, $errorMessage)
 	{

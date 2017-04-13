@@ -32,6 +32,7 @@ class SessionService extends KalturaBaseService
 	 * @param int $expiry KS expiry time in seconds
 	 * @param string $privileges 
 	 * @return string
+	 * @ksIgnored
 	 *
 	 * @throws APIErrors::START_SESSION_ERROR
 	 */
@@ -57,6 +58,7 @@ class SessionService extends KalturaBaseService
 	 * End a session with the Kaltura server, making the current KS invalid.
 	 * 
 	 * @action end
+	 * @ksOptional
 	 */
 	function endAction()
 	{
@@ -80,6 +82,7 @@ class SessionService extends KalturaBaseService
 	 * @param int $expiry KS expiry time in seconds
 	 * @param string $privileges 
 	 * @return string
+	 * @ksIgnored
 	 *
 	 * @throws APIErrors::START_SESSION_ERROR
 	 */
@@ -264,12 +267,13 @@ class SessionService extends KalturaBaseService
 	 * @action startWidgetSession
 	 * @param string $widgetId
 	 * @param int $expiry
+	 * @return KalturaStartWidgetSessionResponse
+	 * @ksIgnored
 	 * 
 	 * @throws APIErrors::INVALID_WIDGET_ID
 	 * @throws APIErrors::MISSING_KS
 	 * @throws APIErrors::INVALID_KS
 	 * @throws APIErrors::START_WIDGET_SESSION_ERROR
-	 * @return KalturaStartWidgetSessionResponse
 	 */	
 	function startWidgetSession ( $widgetId , $expiry = 86400 )
 	{

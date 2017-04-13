@@ -1023,6 +1023,7 @@ class MediaService extends KalturaEntryService
 	 * @action flag
 	 * @param string $entryId
 	 * @param KalturaModerationFlag $moderationFlag
+	 * @ksOptional
 	 *
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */

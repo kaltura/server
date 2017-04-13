@@ -17,6 +17,7 @@ class SearchService extends KalturaBaseService
 	 * @param KalturaSearch $search A KalturaSearch object contains the search keywords, media provider and media type
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaSearchResultResponse
+	 * @ksOptional
 	 *
 	 * @throws APIErrors::SEARCH_UNSUPPORTED_MEDIA_SOURCE
 	 * @throws APIErrors::SEARCH_UNSUPPORTED_MEDIA_TYPE
@@ -70,6 +71,7 @@ class SearchService extends KalturaBaseService
 	 * @action getMediaInfo
 	 * @param KalturaSearchResult $searchResult KalturaSearchResult object extends KalturaSearch and has all fields required for media:add
 	 * @return KalturaSearchResult
+	 * @ksOptional
 	 *
 	 * @throws APIErrors::SEARCH_UNSUPPORTED_MEDIA_SOURCE
 	 * @throws APIErrors::SEARCH_UNSUPPORTED_MEDIA_TYPE
@@ -105,6 +107,7 @@ class SearchService extends KalturaBaseService
 	 * @param KalturaMediaType $mediaType
 	 * @param string $url
 	 * @return KalturaSearchResult
+	 * @ksOptional
 	 *
 	 * @throws APIErrors::SEARCH_UNSUPPORTED_MEDIA_SOURCE_FOR_URL
 	 */
@@ -129,6 +132,7 @@ class SearchService extends KalturaBaseService
 	 * @param string $userName
 	 * @param string $password
 	 * @return KalturaSearchAuthData 
+	 * @ksOptional
 	 */
 	public function externalLoginAction($searchSource, $userName, $password)
 	{
