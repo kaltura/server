@@ -420,7 +420,7 @@ class KAsyncImport extends KJobHandlerWorker
 		return $res;
 	}
 
-	protected function handleBinaryImport($job, $data, $fileSize,$sourceUrl, $res)
+	protected function handleBinaryImport($job, $data, $fileSize,$sourceUrl)
 	{
 		if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
 		{
