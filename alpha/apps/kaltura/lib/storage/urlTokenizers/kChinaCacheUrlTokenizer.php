@@ -34,13 +34,17 @@ class kChinaCacheUrlTokenizer extends kUrlTokenizer
 		$hashit = dirname($url) . "/";
 		$hashData = $hashit . $expiryTime;
 		
-		if($this->algorithmId == 1)
+		if($this->algorithmId == ChinaCacheAlgorithmType::SHA1)
 		{
-			$token = urlencode(base64_encode(hash_hmac("sha1", $hashData, $this->key)));
+			$token = urlencode(base64_encode(hash_hmac("sha1", $hashData, $this->key, true)));
 		}
-		elseif ($this->algorithmId == 2)
+		elseif ($this->algorithmId == ChinaCacheAlgorithmType::SHA256)
 		{
-			$token = urlencode(base64_encode(hash_hmac("sha256", $hashData, $this->key)));
+			$token = urlencode(base64_encode(hash_hmac("sha256", $hashData, $this->key, true)));
+		}
+		else {
+			KalturaLog::info("Illegal algorithm ID value!");
+			return;
 		}
 		
 		if (strpos($url, '?') !== false)
@@ -48,7 +52,7 @@ class kChinaCacheUrlTokenizer extends kUrlTokenizer
 		else
 			$s = '?';
 		
-		return $url.$s.'P1='.$expiryTime.'&P2='.$this->keyId . "&P3=" . $this->algorithmId . "&P4=" . $token;
+		return $url.$s.'ACL=' . urlencode($hashit) . '&P1='.$expiryTime.'&P2='.$this->keyId . "&P3=" . $this->algorithmId . "&P4=" . $token;
 	}
 	
 	/**

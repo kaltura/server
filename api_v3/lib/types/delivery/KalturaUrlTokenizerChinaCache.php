@@ -6,7 +6,7 @@
 class KalturaUrlTokenizerChinaCache extends KalturaUrlTokenizer {
 
 	/**
-	 * @var int
+	 * @var KalturaChinaCacheAlgorithmType
 	 */
 	public $algorithmId;
 	
