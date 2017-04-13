@@ -77,7 +77,7 @@ class KAsyncImport extends KJobHandlerWorker
 
 			if ( $contentType == 'text/html')
 			{
-				return $this->handleTextHtml($job, $curlHeaderResponse, $sourceUrl, $fileSize, $data, $resumeOffset);
+				return $this->handleTextHtml($job, $curlHeaderResponse, $sourceUrl, $fileSize, $data);
 			}
 			return $this->handleBinaryImport($job, $data, $fileSize,$sourceUrl);
 		}
