@@ -76,91 +76,11 @@ class KAsyncImport extends KJobHandlerWorker
 			if(isset($curlHeaderResponse->headers['content-length']))
 				$fileSize = $curlHeaderResponse->headers['content-length'];
 
-			$res = null;
 			if ( $contentType == 'text/html')
 			{
-
-				if (!$data->destFileLocalPath)
-					$this->setTempDestFile($job, $data, $sourceUrl, $fileSize);
-				$res = $this->downloadFile($sourceUrl, $job, $data, $resumeOffset, $fileSize);
-				if (!$res)
-					return $job;
-				$data = $this->handleNonBinaryFile($curlHeaderResponse, $data);
-				$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-				$job = $this->moveFile($job, $data->destFileLocalPath);
-				return $job;
+				return $this->handleTextHtml($job, $curlHeaderResponse, $sourceUrl, $fileSize, $data, $resumeOffset);
 			}
-			else if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
-			{
-				if ($fileSize)
-				{
-					clearstatcache();
-					$actualFileSize = kFile::fileSize($data->destFileLocalPath);
-					if ($actualFileSize >= $fileSize)
-					{
-						return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
-					} else
-					{
-						$resumeOffset = $actualFileSize;
-					}
-				}
-			}
-
-			$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-
-			if(is_null($fileSize)) {
-				// Read file size
-				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
-				$contentType = $curlHeaderResponse->headers['content-type'];
-				if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
-					$fileSize = $curlHeaderResponse->headers['content-length'];
-				
-				//Close the curl used to fetch the header and create a new one. 
-				//When fetching headers we set curl options that than are not reset once header is fetched. 
-				//Not all servers support all the options so we need to remove them from our headers.
-				$curlWrapper->close();
-				$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-			}
-
-			if($resumeOffset)
-			{
-				$curlWrapper->setResumeOffset($resumeOffset);
-			}
-			else
-			{
-				$this->setTempDestFile($job, $data, $sourceUrl, $fileSize);
-
-			}
-
-			$res = $this->downloadFile($sourceUrl, $job, $data, $resumeOffset, $fileSize);
-			if (!$res)
-				return $job;
-			if(!file_exists($data->destFileLocalPath))
-			{
-				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: output file doesn't exist", KalturaBatchJobStatus::RETRY);
-				return $job;
-			}
-
-			// check the file size only if its first or second retry
-			// in case it failed few times, taks the file as is
-			if($fileSize)
-			{
-				clearstatcache();
-				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
-
-				//Ignore file size check based on content.
-				if($actualFileSize < $fileSize)
-				{
-					$percent = floor($actualFileSize * 100 / $fileSize);
-					$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
-					self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-//					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Expected file size[$fileSize] actual file size[$actualFileSize]", KalturaBatchJobStatus::RETRY);
-					return $job;
-				}
-			}
-
-			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-			$job = $this->moveFile($job, $data->destFileLocalPath);
+			return $this->handleBinaryImport($job, $data, $fileSize,$sourceUrl);
 		}
 		catch(kTemporaryException $tex)
 		{
@@ -398,8 +318,13 @@ class KAsyncImport extends KJobHandlerWorker
 		return $destFile;
 	}
 
-	protected function handleNonBinaryFile($curlHeaderResponse, KalturaImportJobData $data)
+	protected function handleTextHtml($job, $curlHeaderResponse, $sourceUrl, $fileSize, KalturaImportJobData $data, $resumeOffset)
 	{
+		if (!$data->destFileLocalPath)
+			$this->setTempDestFile($job, $data, $sourceUrl, $fileSize);
+		$res = $this->downloadFile($sourceUrl, $job, $data, $resumeOffset, $fileSize);
+		if (!$res)
+			return $job;
 		KalturaLog::info("headers " . print_r($curlHeaderResponse, true));
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaImportHandler');
 		foreach ($pluginInstances as $pluginInstance)
@@ -407,7 +332,9 @@ class KAsyncImport extends KJobHandlerWorker
 			/* @var $pluginInstance IKalturaImportHandler */
 			$data = $pluginInstance->handleImportContent($curlHeaderResponse, $data, KBatchBase::$taskConfig->params);
 		}
-		return $data;
+		$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
+		$job = $this->moveFile($job, $data->destFileLocalPath);
+		return $job;
 	}
 
 	protected function getCurlHeaders($job, $sourceUrl)
@@ -491,5 +418,81 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		$curlWrapper->close();
 		return $res;
+	}
+
+	protected function handleBinaryImport($job, $data, $fileSize,$sourceUrl, $res)
+	{
+		if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
+		{
+			if ($fileSize)
+			{
+				clearstatcache();
+				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
+				if ($actualFileSize >= $fileSize)
+				{
+					return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+				} else
+				{
+					$resumeOffset = $actualFileSize;
+				}
+			}
+		}
+
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+
+		if(is_null($fileSize)) {
+			// Read file size
+			$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
+			$contentType = $curlHeaderResponse->headers['content-type'];
+			if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
+				$fileSize = $curlHeaderResponse->headers['content-length'];
+
+			//Close the curl used to fetch the header and create a new one.
+			//When fetching headers we set curl options that than are not reset once header is fetched.
+			//Not all servers support all the options so we need to remove them from our headers.
+			$curlWrapper->close();
+			$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+		}
+
+		if($resumeOffset)
+		{
+			$curlWrapper->setResumeOffset($resumeOffset);
+		}
+		else
+		{
+			$this->setTempDestFile($job, $data, $sourceUrl, $fileSize);
+
+		}
+
+		$res = $this->downloadFile($sourceUrl, $job, $data, $resumeOffset, $fileSize);
+		if (!$res)
+			return $job;
+		if(!file_exists($data->destFileLocalPath))
+		{
+			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: output file doesn't exist", KalturaBatchJobStatus::RETRY);
+			return $job;
+		}
+
+		// check the file size only if its first or second retry
+		// in case it failed few times, taks the file as is
+		if($fileSize)
+		{
+			clearstatcache();
+			$actualFileSize = kFile::fileSize($data->destFileLocalPath);
+
+			//Ignore file size check based on content.
+			if($actualFileSize < $fileSize)
+			{
+				$percent = floor($actualFileSize * 100 / $fileSize);
+				$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
+				self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+//					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Expected file size[$fileSize] actual file size[$actualFileSize]", KalturaBatchJobStatus::RETRY);
+				return $job;
+			}
+		}
+
+		$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
+		$job = $this->moveFile($job, $data->destFileLocalPath);
+		return $job;
 	}
 }
