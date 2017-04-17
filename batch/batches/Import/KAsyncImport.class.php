@@ -67,6 +67,7 @@ class KAsyncImport extends KJobHandlerWorker
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;
 			$resumeOffset = 0;
+			$contentType = null;
 			if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
 			{
     			$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
@@ -93,7 +94,7 @@ class KAsyncImport extends KJobHandlerWorker
     				$curlWrapper->close();
     				return $job;
     			}
-
+    			$contentType = $curlHeaderResponse->headers['content-type'];
     			if(isset($curlHeaderResponse->headers['content-length']))
     				$fileSize = $curlHeaderResponse->headers['content-length'];
     			$curlWrapper->close();
@@ -118,6 +119,7 @@ class KAsyncImport extends KJobHandlerWorker
 			if(is_null($fileSize)) {
 				// Read file size
 				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
+    			$contentType = $curlHeaderResponse->headers['content-type'];
 				if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
 					$fileSize = $curlHeaderResponse->headers['content-length'];
 				
@@ -186,7 +188,10 @@ class KAsyncImport extends KJobHandlerWorker
 			{
 				clearstatcache();
 				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
-				if($actualFileSize < $fileSize)
+				//Ignore file size check based on content.
+				$shouldCheckFileSize = ($contentType!='text/html');
+				KalturaLog::debug("shouldCheckFileSize:{$shouldCheckFileSize} actualFileSize:{$actualFileSize} fileSize:{$fileSize}");
+				if($actualFileSize < $fileSize && $shouldCheckFileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
 					$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
