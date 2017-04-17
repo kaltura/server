@@ -119,7 +119,7 @@ class KAsyncImport extends KJobHandlerWorker
 			if(is_null($fileSize)) {
 				// Read file size
 				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
-    			$contentType = $curlHeaderResponse->headers['content-type'];
+				$contentType = $curlHeaderResponse->headers['content-type'];
 				if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
 					$fileSize = $curlHeaderResponse->headers['content-length'];
 				
