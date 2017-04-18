@@ -1,6 +1,9 @@
 <?php
 class kChinaCacheUrlTokenizer extends kUrlTokenizer
 {
+	const SHA1 = 1;
+	
+	const SHA256 = 2;
 	/**
 	 * @var int
 	 */
@@ -34,11 +37,11 @@ class kChinaCacheUrlTokenizer extends kUrlTokenizer
 		$hashit = dirname($url) . "/";
 		$hashData = $hashit . $expiryTime;
 		
-		if($this->algorithmId == ChinaCacheAlgorithmType::SHA1)
+		if($this->algorithmId == self::SHA1)
 		{
 			$token = urlencode(base64_encode(hash_hmac("sha1", $hashData, $this->key, true)));
 		}
-		elseif ($this->algorithmId == ChinaCacheAlgorithmType::SHA256)
+		elseif ($this->algorithmId == self::SHA256)
 		{
 			$token = urlencode(base64_encode(hash_hmac("sha256", $hashData, $this->key, true)));
 		}
