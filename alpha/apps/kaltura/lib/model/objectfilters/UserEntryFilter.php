@@ -25,9 +25,6 @@ class UserEntryFilter extends baseObjectFilter
 			"_eq_status",
 			"_in_status",
 			"_eq_type",
-			"_eq_extended_status",
-			"_in_extended_status",
-			"_notin_extended_status",
 		) , NULL );
 
 		$this->allowed_order_fields = array (

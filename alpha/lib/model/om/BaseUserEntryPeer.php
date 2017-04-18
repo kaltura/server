@@ -26,7 +26,7 @@ abstract class BaseUserEntryPeer {
 	const TM_CLASS = 'UserEntryTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 9;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -55,9 +55,6 @@ abstract class BaseUserEntryPeer {
 	/** the column name for the TYPE field */
 	const TYPE = 'user_entry.TYPE';
 
-	/** the column name for the EXTENDED_STATUS field */
-	const EXTENDED_STATUS = 'user_entry.EXTENDED_STATUS';
-
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'user_entry.CUSTOM_DATA';
 
@@ -77,11 +74,11 @@ abstract class BaseUserEntryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'EntryId', 'KuserId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Status', 'Type', 'ExtendedStatus', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'entryId', 'kuserId', 'partnerId', 'createdAt', 'updatedAt', 'status', 'type', 'extendedStatus', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::ENTRY_ID, self::KUSER_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::STATUS, self::TYPE, self::EXTENDED_STATUS, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'entry_id', 'kuser_id', 'partner_id', 'created_at', 'updated_at', 'status', 'type', 'extended_status', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'EntryId', 'KuserId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Status', 'Type', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'entryId', 'kuserId', 'partnerId', 'createdAt', 'updatedAt', 'status', 'type', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::ENTRY_ID, self::KUSER_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::STATUS, self::TYPE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'entry_id', 'kuser_id', 'partner_id', 'created_at', 'updated_at', 'status', 'type', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -91,11 +88,11 @@ abstract class BaseUserEntryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EntryId' => 1, 'KuserId' => 2, 'PartnerId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Status' => 6, 'Type' => 7, 'ExtendedStatus' => 8, 'CustomData' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'entryId' => 1, 'kuserId' => 2, 'partnerId' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'status' => 6, 'type' => 7, 'extendedStatus' => 8, 'customData' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENTRY_ID => 1, self::KUSER_ID => 2, self::PARTNER_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::STATUS => 6, self::TYPE => 7, self::EXTENDED_STATUS => 8, self::CUSTOM_DATA => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'entry_id' => 1, 'kuser_id' => 2, 'partner_id' => 3, 'created_at' => 4, 'updated_at' => 5, 'status' => 6, 'type' => 7, 'extended_status' => 8, 'custom_data' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EntryId' => 1, 'KuserId' => 2, 'PartnerId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Status' => 6, 'Type' => 7, 'CustomData' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'entryId' => 1, 'kuserId' => 2, 'partnerId' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'status' => 6, 'type' => 7, 'customData' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENTRY_ID => 1, self::KUSER_ID => 2, self::PARTNER_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::STATUS => 6, self::TYPE => 7, self::CUSTOM_DATA => 8, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'entry_id' => 1, 'kuser_id' => 2, 'partner_id' => 3, 'created_at' => 4, 'updated_at' => 5, 'status' => 6, 'type' => 7, 'custom_data' => 8, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -173,7 +170,6 @@ abstract class BaseUserEntryPeer {
 		$criteria->addSelectColumn(UserEntryPeer::UPDATED_AT);
 		$criteria->addSelectColumn(UserEntryPeer::STATUS);
 		$criteria->addSelectColumn(UserEntryPeer::TYPE);
-		$criteria->addSelectColumn(UserEntryPeer::EXTENDED_STATUS);
 		$criteria->addSelectColumn(UserEntryPeer::CUSTOM_DATA);
 	}
 
