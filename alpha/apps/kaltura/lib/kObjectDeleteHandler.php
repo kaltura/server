@@ -136,19 +136,10 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		$c = new Criteria();
 		$c->add(categoryEntryPeer::ENTRY_ID, $entry->getId());
 		if(categoryEntryPeer::doSelectOne($c)) {
-			kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
-		}
-		
-		$userEntryFilter = new UserEntryFilter();
-		$userEntryFilter->set("_eq_entry_id", $entry->getId());
-		
-		$c = new Criteria();
-		$c->add(UserEntryPeer::ENTRY_ID, $entry->getId());
-		if(!UserEntryPeer::doSelectOne($c)) {
 			return;
 		}
 		
-		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::USER_ENTRY, $userEntryFilter);
+		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}
 	
 	protected function kuserDelete(kuser $kuser)
@@ -177,17 +168,6 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 				kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::GROUP_USER, $filter);
 			}
 		}
-		
-		$userEntryFilter = new UserEntryFilter();
-		$userEntryFilter->set("_eq_user_id", $kuser->getPuserId());
-		
-		$c = new Criteria();
-		$c->add(UserEntryPeer::KUSER_ID, $kuser->getId());
-		if(!UserEntryPeer::doSelectOne($c)) {
-			return;
-		}
-		
-		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::USER_ENTRY, $userEntryFilter);
 	}
 	
 	/**
