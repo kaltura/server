@@ -63,12 +63,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	 */
 	public $type;
 	
-	/**
-	 * @var KalturaUserEntryExtendedStatus
-	 * @filter eq,in,notin
-	 */
-	public $extendedStatus;
-
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -80,7 +75,6 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		"createdAt",
 		"updatedAt",
 		"type",
-		"extendedStatus",
 	);
 
 	public function getMapBetweenObjects ( )
