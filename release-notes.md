@@ -32,7 +32,7 @@ None.
 
 None.
 
-## Add permission for capture device for appToken->get ##
+## Add permission for capture device for uploadToken->get ##
 
  - Issue Type: Bug
  - Issue ID: PLAT-7253
@@ -42,7 +42,7 @@ None.
 
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_18_add_apptoken_get_permission_for_capture_device.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_18_add_uploadtoken_get_permission_for_capture_device.php
 
 #### Known Issues & Limitations ####
 
