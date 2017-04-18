@@ -32,6 +32,22 @@ None.
 
 None.
 
+## Add permission for capture device for appToken->get ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7253
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_18_add_apptoken_get_permission_for_capture_device.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 
 
 # Lynx 12.13.0 #
