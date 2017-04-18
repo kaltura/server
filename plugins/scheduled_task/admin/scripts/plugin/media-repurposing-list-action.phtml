@@ -102,7 +102,7 @@ function disable(mediaRepurposingId)
 
 function remove(mediaRepurposingId)
 {
-	var ok = confirm('<?php echo $this->translate('Are you sure you want to remove media Repurposing ?'); ?>');
+	var ok = confirm('<?php echo $this->translate("Are you sure you want to remove media Repurposing? 	NOTICE: delete will not stop currently running process"); ?>');
 	if (ok)
 	{
 		changeStatus(
@@ -147,10 +147,11 @@ function newMediaRepurposing(partnerId, filterType)
 		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
 		return;
 	}
-	if(!filterType.length){
+	if(!filterType.length || (filterType == 'N/A')) {
 		alert('<?php echo $this->translate('Media Repurposing Filter Type not supplied'); ?>');
 		return;
 	}
+	
 	paramsStr = '/new_partner_id/' + partnerId + '/new_media_repurposing_filter_type/' + filterType;
 	
 	loadMediaRepurposing(paramsStr);
@@ -210,30 +211,25 @@ function loadMediaRepurposing(paramStr)
 function rearrangeData() {
 	//remove all template field
 	$('dd[id^="MR_tasksDataTemplate_"]').remove();
-
-
 	var tasks = [];
 	var currentIndex = 0;
 	while (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0) {
 		tasks.push(buildTaskParams(currentIndex.toString()));
 		currentIndex++;
-		if (currentIndex > 9)
-			break;
 	}
-
-	//alert(JSON.stringify(tasks));
 	jQuery('#TasksData').val(JSON.stringify(tasks));
+	
 	return true;
 }
 
 function buildTaskParams(index) {
 
 	var taskTypeElement = jQuery('#mr_task_' + index + '-TaskType');
-	var taskType = taskTypeElement.val();
+	var type = taskTypeElement.val();
 	taskTypeElement.remove();
 
 	var taskIdElement = jQuery('#mr_task_' + index + '-TaskId');
-	var taskId = taskIdElement.val();
+	var id = taskIdElement.val();
 	taskIdElement.remove();
 
 	var taskTimeToNextElement = jQuery('#mr_task_' + index + '-taskTime');
@@ -255,7 +251,7 @@ function buildTaskParams(index) {
 
 		$(this).remove();
 	});
-	return {taskId, taskType, taskTimeToNext, taskData};
+	return {id, type, taskTimeToNext, taskData};
 }
 
 

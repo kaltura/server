@@ -57,6 +57,7 @@ class ConfigureForm extends Infra_Form
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'string':
+			case 'int':
 				return $this->addStringElement($name, $prefix);
 
 			case 'bool':
@@ -88,8 +89,11 @@ class ConfigureForm extends Infra_Form
 	protected function addEnumElement($name, $prefix, $enumClass) {
 		$elem = new Kaltura_Form_Element_EnumSelect("$prefix$name", array(
 			'enum' => $enumClass,
-			'excludes' => array()
+			'excludes' => array(),
+			'value' => 'default'
 		));
+		$elem->addMultiOption("N/A", "NONE");
+
 		$elem->setLabel("$name:");
 		$elem->setRequired(true);
 		$this->addElement($elem);

@@ -10,22 +10,75 @@
 
 
 <script type="text/javascript">
+
+	var filterStatus = 0;
+	var alwaysDisplay = ['mediaDateLessThanOrEqual', 'lastPlayedAtLessThanOrEqual'];
+	init();
+
 	
-	hideTemplate();
-	populateTasks();
-	function hideTemplate() {
+	function init() {
+		//hide template
 		$('dd[id^="MR_tasksDataTemplate_"]').hide();
+		
+		//set select as default
+		$('select').val("N/A");
+
+		hideEmptyFilterFields();
+		populateTasks();
+		checkIfError();
 	}
+
+
+	function changeFilterStatus() {
+		let button = jQuery('#expandFilter');
+		if (filterStatus) {
+			hideEmptyFilterFields();
+			button.text("Expand");
+		} else {
+			hideEmptyFilterFields(false);
+			button.text("Hide un-used");
+		}
+		filterStatus = !filterStatus;
+	}
+	
+	function hideEmptyFilterFields(hide = true) {
+		let f = jQuery('#frmMediaRepurposingConfigure');
+		f.find( "input[id^=FilterParams_],select[id^=FilterParams_]").each(function(idx) {
+			var val = $(this).val();
+			var name = $( this ).attr("name");
+			if (alwaysDisplay.includes(name.replace("FilterParams_", "")))
+				return;
+			if (!val.length || val == 'N/A' || (val == '0')) {
+				if (hide) {
+					$( this ).hide();
+					jQuery('#' + name + '-label').hide();
+				} else {
+					$( this ).show();
+					jQuery('#' + name + '-label').show();
+				}
+			}
+		});
+	}
+
+	function checkIfError() {
+		var x = jQuery('#generalTitle').val();
+		if (x) {
+			alert('Form was invalid, didn\'t saved');
+			x.attr('value',0);
+		}
+	}
+
+
 
 	function populateTasks() {
 		var id = jQuery('#mrId').val();
 		if (!id)
 			return;
-		var data = jQuery('#MR_tasksDataTemplate_TaskData').val();
+		var data = jQuery('#TasksData').val();
 		//alert(data);
 		var arr = JSON.parse(data);
 		var ts = $( ".add-task" );
-		
+
 		for (var i = 0, len = arr.length; i < len; i++)
 			addTaskFromObject(ts, arr[i]);
 	}

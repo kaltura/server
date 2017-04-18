@@ -29,6 +29,9 @@
 		var type = chooseElem.options[chooseElem.selectedIndex].value;
 		var showType = chooseElem.options[chooseElem.selectedIndex].text;
 
+		if (showType == 'NONE')
+			return alert("Please choose task");
+
 		var taskTag = 'mr_task_data_'+index;
 		var taskSubForm = createSubForm(showType);
 		var newData = createDataByType(type, taskTag);
@@ -89,68 +92,35 @@
 	}
 
 	function populateTaskFromObject(object) {
-
 		// because we increase the index before when adding the form
 		let currentIndex = index-1;
 
-		//set the task Id and time to next in the previous task
-		let str = object.id;
-		var time=str.substring(str.lastIndexOf("[")+1,str.lastIndexOf("]"));
-		var id=str.substring(0, str.lastIndexOf("["));
-		jQuery('#mr_task_' + currentIndex + "-TaskId").val(id);
-		jQuery('#mr_task_' + (currentIndex-1) + "-taskTime").val(time);
-
-
-		let ignore = ['type', 'relatedObjects'];
-		let fields = Object.keys(object).filter(function(item){
-			return ignore.indexOf(item) === -1;
-		});
-
-		//alert(JSON.stringify(object));
+		//set the task Id and time to next
+		jQuery('#mr_task_' + currentIndex + "-TaskId").val(object.id);
+		jQuery('#mr_task_' + currentIndex + "-taskTime").val(object.taskTimeToNext);
 
 		var taskTag = 'mr_task_data_'+currentIndex;
 		let parent = jQuery('#' + taskTag);
 
+		let fields = Object.keys(object.taskData);
 		fields.forEach(function(currentValue, index, arr) {
-			insertDataVal(parent, currentValue, object[currentValue]);
+			insertDataVal(parent, currentValue, object.taskData[currentValue]);
 		});
 
 	}
 
 	function addEmptyTaskFromObject(target, object) {
-		var type = object.type;
-		var showType = jQuery('#TaskTypeChoose option[value="' + type + '"]').text();
+		let chooseElement = jQuery('#TaskTypeChoose option[label="' + object.type + '"]');
+		var type = chooseElement.val();
 
 		var taskTag = 'mr_task_data_'+index;
-		var taskSubForm = createSubForm(showType);
+		var taskSubForm = createSubForm(object.type);
 		var newData = createDataByType(type,taskTag );
 
 		addSubFormToView(target, taskSubForm, newData, taskTag);
-
 	}
 
 
-
-
-	//		type = type.replace('.','');
-	//		var dataTemplate = jQuery('#MR_tasksDataTemplate_' + type + "-element");
-	//		dataTemplate.attr("name", "Template");
-	//		var newData = dataTemplate.clone(true);
-	//		newData.attr("id", taskTag).attr("name", taskTag);
-	//		newData.find( "input").each(function(idx) {
-	//			var name = $( this ).attr("name");
-	//			var paramName =name.substring(name.lastIndexOf("[")+1,name.lastIndexOf("]"));
-	//			var tag = 'TaskData_' + index + "::" + paramName;
-	//			$( this ).attr("name", paramName).attr("id", tag)
-	//		});
-	//		alert(JSON.stringify(a));
-	//jQuery(dataTemplate).before(newData.show());
-	//newData.find('[id="TASK_DATA_distributionProfileId-element"]').attr('name', taskTag);
-	<!--		--><?php //$subForm = new Form_MediaRepurposingTasksSubForm("REPLACE_TYPE"); ?>
-	<!--		--><?php //$subForm->setElementsBelongTo('mr_task_REPLACE_INDEX'); ?>
-	//		var template = '<?php //echo str_replace(array("\n", "\r"), '', $subForm->__toString()); ?>//';
-	//		template = template.replace(/REPLACE_INDEX/g, index++);
-	//		template = template.replace(/REPLACE_TYPE/g, showType);
 
 	function insertDataVal(parent, tag, val) {
 		let x = parent.find("[name^=" + tag + "]");

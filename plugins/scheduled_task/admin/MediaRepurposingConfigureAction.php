@@ -23,26 +23,24 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$partnerId = $this->_getParam('new_partner_id');
 		$filterTypeEngine = $this->_getParam('new_media_repurposing_filter_type');
 		$filterType = MediaRepurposingUtils::filterFactory($filterTypeEngine);
-		
 		$action->view->formValid = false;
-
 
 		try
 		{
-			
 			if ($request->isPost())
 			{
 				$formData = $request->getPost();
 				$filterType = $formData['filterTypeStr'];
 				$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterType);
-				$action->view->formValid = $this->processForm($mediaRepurposingForm, $formData, $filterTypeEngine, $mediaRepurposingId);
+				$valid = $this->processForm($mediaRepurposingForm, $formData, $filterTypeEngine, $mediaRepurposingId);
+				$action->view->formValid = $valid;
+
 			}
 			else
 			{
 				if (!is_null($mediaRepurposingId))
 				{
-
-					$mr = $this->getMrById($partnerId, $mediaRepurposingId);
+					$mr = MediaRepurposingUtils::getMrById($partnerId, $mediaRepurposingId);
 					$filterEngineType = $mr->objectFilterEngineType;
 					$filterType = MediaRepurposingUtils::filterFactory($filterEngineType);
 
@@ -67,23 +65,7 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$action->view->form = $mediaRepurposingForm;
 	}
 
-	private function getMrById($partnerId, $MrId)
-	{
-		$mediaRepurposingProfiles = MediaRepurposingUtils::getMrs($partnerId);
-		foreach ($mediaRepurposingProfiles as $m)
-			if ($m->id == $MrId)
-				return $m;
-	}
 
-	private static function getSubArrayByPrefix($array, $prefix)
-	{
-		$prefixLen = strlen($prefix);
-		$subArray = array();
-		foreach ($array as $key => $value)
-			if (strpos($key, $prefix) === 0)
-				$subArray[substr($key, $prefixLen)] = $value;
-		return $subArray;
-	}
 
 	private function buildTasksArray($tasksData)
 	{
@@ -99,59 +81,42 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 
 	private function buildTask($taskObj)
 	{
-		$typeInt = constant("Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::". $taskObj->taskType);
+		$typeInt = constant("Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::". $taskObj->type);
 		$objectTask = MediaRepurposingUtils::objectTaskFactory($typeInt);
-		$objectTask->relatedObjects = $taskObj->taskId; //as the scheduleTask Id of this task
+		$objectTask->relatedObjects = $taskObj->id; //as the scheduleTask Id of this task
 		$objectTask->stopProcessingOnError = 0; //as default value
 		MediaRepurposingUtils::addParamToObjectTask($objectTask, $taskObj->taskData);
 		return $objectTask;
 	}
 
 
+
 	
 	private function processForm(Form_MediaRepurposingConfigure $form, $formData, $filterTypeEngine, $mediaRepurposingId = null)
 	{
 		$name = $formData['media_repurposing_name'];
-
-		$filterType = $formData['filterTypeStr'];
-		if (!$filterType)
-			$filterType = MediaRepurposingUtils::filterFactory($filterTypeEngine);
-
-
-
-
-
-		$filter = new $filterType();
-		$prefix = Form_MediaRepurposingConfigure::FILTER_PREFIX;
-		$filterFields = $this->getSubArrayByPrefix($formData, $prefix);
-
-		foreach ($filterFields as $key => $value) {
-			$filter->$key = $value;
-		}
+		$maxEntriesAllowed = $formData['max_entries_allowed'];
 		
+
+		$filter = $form->getFilterFromData($formData);
 		$taskArray = $this->buildTasksArray($formData['TasksData']);
 
-		KalturaLog::info("asdf - 3");
-		KalturaLog::info(print_r($formData, true));
-		KalturaLog::info(print_r($taskArray, true));
-
-
-
+		KalturaLog::debug("Got the following Data from the Configure Form:");
+		KalturaLog::debug(print_r($formData, true));
 
 		if ($form->isValid($formData))
 		{
 			$partnerId = $formData['partnerId'];
-			
 			if (!$mediaRepurposingId)
-				MediaRepurposingUtils::createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId);
+				MediaRepurposingUtils::createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed);
 			else
-				MediaRepurposingUtils::UpdateMr($mediaRepurposingId, $name, $filterTypeEngine, $filter, $taskArray, $partnerId);
-
+				MediaRepurposingUtils::UpdateMr($mediaRepurposingId, $name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed);
 			return true;
 		}
 		else
 		{
 			KalturaLog::info('Form was not valid - keep the form open for changing');
+			$formData['generalTitle'] = 1; // mark as return from error
 			$form->populate($formData);
 			return false;
 		}

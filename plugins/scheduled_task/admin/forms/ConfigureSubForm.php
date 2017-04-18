@@ -57,6 +57,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'string':
+			case 'int':
 				return $this->addStringElement($name, $prefix);
 
 			case 'bool':
@@ -91,6 +92,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'enum' => $enumClass,
 			'excludes' => array()
 		));
+		$elem->addMultiOption("N/A", "NONE");
 		$elem->setLabel("$name:");
 		$elem->setRequired(true);
 		$this->addElement($elem);

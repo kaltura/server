@@ -10,9 +10,9 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	protected $mediaRepurposingId;
 
 	const FILTER_PREFIX = 'FilterParams_';
-	const TASK_OBJECT__PREFIX = 'TaskObjectParams_';
-
-	const EXTENSION_SUBFORM_NAME = 'extensionSubForm';
+	const DEFAULT_MAX_TOTAL_COUNT_ALLOWED = 500;
+	const MAX_TASKS_ON_MR = 10;
+	const MAX_MR_ON_PARTNER = 10;
 
 	public function __construct($partnerId, $filterType, $mediaRepurposingId = null)
 	{
@@ -50,13 +50,6 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			'readonly'		=> true,
 		));
 
-		$this->addElement('text', 'MR_tasksDataTemplate_TaskData', array(
-			//'label' 		=> 'TaskData:',
-			'required'		=> true,
-			'filters' 		=> array('StringTrim'),
-			'placement' => 'prepend',
-			'readonly'		=> true,
-		));
 
 		$this->addElement('text', 'filterTypeStr', array(
 			'label' 		=> 'Filter Type:',
@@ -73,32 +66,31 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			'placement' => 'prepend',
 		));
 
-
-		if ($this->filterType)
-			$this->addFilterElementElement();
-
+		$this->addElement('text', 'max_entries_allowed', array(
+			'label' 		=> 'Max Entries Allowed in MR:',
+			'required'		=> true,
+			'filters'		=> array('StringTrim'),
+			'placement' => 'prepend',
+		));
+		$this->getElement('max_entries_allowed')->setValue(self::DEFAULT_MAX_TOTAL_COUNT_ALLOWED); //as default
+		
+		$this->addFilterElement();
 
 		//add tasks section
 		$this->addTaskSection();
 
-
-
 		// template who will not be shown on form
 		$this->addTaskDataTemplate();
-
 	}
 
 
-
-	private function addTaskDataTemplate() {
-
+	private function addTaskDataTemplate()
+	{
 		$options = $this->getElement('TaskTypeChoose')->options;
-
 		foreach ($options as $key => $val) {
 			$TasksSubForm = new Form_MediaRepurposingTaskDataSubForm($key);
 			$this->addSubForm($TasksSubForm, "MR_tasksDataTemplate_$key");
 		}
-
 	}
 
 	private function addTaskSection() {
@@ -112,18 +104,17 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElement($titleElement);
 
-		
 
 		$elem = new Kaltura_Form_Element_EnumSelect("TaskTypeChoose", array(
 			'enum' => 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType',
 			'excludes' => array(),
 		));
+		$elem->addMultiOption("N/A", "NONE");
 		$elem->setLabel("Task Type:");
 		$elem->setRequired(true);
 		$this->addElement($elem);
 		$this->removeClassName("TaskTypeChoose");
-
-
+		
 		$TasksSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$TasksSubForm->addDecorator('ViewScript', array(
 			'viewScript' => 'tasks-data-sub-form.phtml',
@@ -132,14 +123,21 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	}
 
-	private function addFilterElementElement()
+	private function addFilterElement()
 	{
 		$filter = new $this->filterType;
 		//TODO add all field that we want to block the user to filter by in MR
 		$ignore = array('relatedObjects');
 		$this->addObjectSection('Filter', $filter , $ignore, self::FILTER_PREFIX);
-	}
 
+		$this->addElement('button', 'expandFilter', array(
+			'ignore'	=> true,
+			'label'		=> 'Expand Filter',
+			'onclick'		=> "changeFilterStatus()",
+			'decorators' => array('ViewHelper')
+		));
+	}
+	
 
 	public function populateFromObject($object, $add_underscore = true)
 	{
@@ -149,28 +147,19 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->setDefault('partnerId', $this->newPartnerId);
 		$this->setDefault('mrId', $this->mediaRepurposingId);
 
-
+		$this->setDefault('max_entries_allowed', $object->maxTotalCountAllowed);
 		$this->setDefault('media_repurposing_name', $object->name);
 		$this->setDefault('filterTypeStr', get_class($object->objectFilter));
 
 		foreach ($object->objectFilter as $key => $value)
 			$this->setDefault(self::FILTER_PREFIX.$key, $value);
 
-
 		$this->populateTasks($object);
-
-
-		//$result = MediaRepurposingUtils::getScheduleTaskById($ids[0]);
-		//$objectTask = $result->objectTasks[0]; // for the first ST which is the first in the array
-		//foreach ($objectTask as $key => $value)
-		//	$this->setDefault(self::TASK_OBJECT__PREFIX.$key, $value);
-
 	}
 
 	private function populateTasks($object)
 	{
-		$tasks = $object->objectTasks;
-		$tasks[0]->id = $object->id . '[]'; //in first task no time to last task
+		$tasks = $this->populateTask($object);
 
 		$scheduledtaskPlugin = MediaRepurposingUtils::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $this->newPartnerId);
 		$ids = explode(',', $object->description);
@@ -179,16 +168,64 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 				continue;
 			$arr = explode("[", $stId, 2); // get only the ID without the time
 			$result = $scheduledtaskPlugin->scheduledTaskProfile->get($arr[0]);
-			$taskArr = $result->objectTasks;
-			$taskArr[0]->id = $stId;
-			$tasks = array_merge($tasks, $taskArr);
-		}
+			$newTaskArr = $this->populateTask($result);
 
-		KalturaLog::info(print_r($tasks,true));
-		$this->setDefault('MR_tasksDataTemplate_TaskData',  json_encode($tasks));
+			$taskTimeToNext = substr($arr[1], 0, -1); // set the time in las task
+			$tasks[count($tasks) - 1]['taskTimeToNext'] = strval($taskTimeToNext);
+			$tasks = array_merge($tasks, $newTaskArr);
+		}
+		$this->setDefault('TasksData',  json_encode($tasks));
 
 	}
 
+	private function populateTask($object)
+	{
+		$currentTask = $object->objectTasks[0];
+		$newTask = array();
+		$newTask['id'] = strval($object->id);
+		$newTask['type'] = MediaRepurposingUtils::getDescriptionForType($currentTask->type);
+		$newTask['taskTimeToNext'] = 0;
+		$ignore = array('id', 'type', 'taskTimeToNext', 'relatedObjects');
+
+		$params = array();
+		foreach ($currentTask as $key => $value)
+			if (!in_array($key, $ignore))
+				$params[$key] = $value;
+		$newTask['taskData'] = $params;
+		return array($newTask);
+	}
+
+	private static function getSubArrayByPrefix($array, $prefix)
+	{
+		$prefixLen = strlen($prefix);
+		$subArray = array();
+		foreach ($array as $key => $value)
+			if (strpos($key, $prefix) === 0)
+				$subArray[substr($key, $prefixLen)] = $value;
+		return $subArray;
+	}
+
+	public function getFilterFromData($formData)
+	{
+		$filterType = $formData['filterTypeStr'];
+		if (!$filterType)
+			return null;
+		$filter = new $filterType();
+		$filterFields = self::getSubArrayByPrefix($formData, Form_MediaRepurposingConfigure::FILTER_PREFIX);
+		foreach ($filterFields as $key => $value)
+			if ($value != 'N/A')
+				$filter->$key = $value;
+		return $filter;
+	}
+
+	private function isFilterValid($filter)
+	{
+		// check if filter not empty
+		foreach($filter as $prop)
+			if ($prop)
+				return true;
+		return false;
+	}
 
 
 	/**
@@ -199,9 +236,16 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	 */
 	public function isValid($data)
 	{
+		$partnerId = $data['partnerId'];
+		if (count(MediaRepurposingUtils::getMrs($partnerId)) > self::MAX_MR_ON_PARTNER)
+			return false;
 		
 		$tasksData = json_decode($data['TasksData']);
-		if (count($tasksData) < 1)
+		if (count($tasksData) < 1 || count($tasksData) > self::MAX_TASKS_ON_MR)
+			return false;
+		
+		$filter = $this->getFilterFromData($data);
+		if (!$this->isFilterValid($filter))
 			return false;
 
 		$name = $data['media_repurposing_name'];
