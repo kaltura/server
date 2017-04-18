@@ -6,5 +6,5 @@
 
 $addPermissionsAndItemsScript = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
 
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.appToken.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.uploadtoken.ini';
 passthru("php $addPermissionsAndItemsScript $config");
