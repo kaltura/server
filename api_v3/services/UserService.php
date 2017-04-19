@@ -330,6 +330,7 @@ class UserService extends KalturaBaseUserService
 	 * @param int $expiry The requested time (in seconds) before the generated KS expires (By default, a KS expires after 24 hours).
 	 * @param string $privileges Special privileges
 	 * @return string A session KS for the user
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -357,6 +358,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $privileges Special privileges
 	 * @param string $otp the user's one-time password
 	 * @return string A session KS for the user
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -384,6 +386,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $newPassword Optional, The user's new password
 	 * @param string $newFirstName Optional, The user's new first name
 	 * @param string $newLastName Optional, The user's new last name
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -403,6 +406,7 @@ class UserService extends KalturaBaseUserService
 	 * @action resetPassword
 	 * 
 	 * @param string $email The user's email address (login email)
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -422,6 +426,7 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @param string $hashKey The hash key used to identify the user (retrieved by email)
 	 * @param string $newPassword The new password to set for the user
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID

@@ -39,6 +39,7 @@ class FileAssetService extends KalturaBaseService
 	 * @action get
 	 * @param int $id
 	 * @return KalturaFileAsset
+	 * @ksIgnored
 	 * 
 	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
 	 */
@@ -101,6 +102,7 @@ class FileAssetService extends KalturaBaseService
 	 * @action serve
 	 * @param int $id
 	 * @return file
+	 * @ksIgnored
 	 *  
 	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::FILE_DOESNT_EXIST
@@ -246,6 +248,7 @@ class FileAssetService extends KalturaBaseService
 	 * @param KalturaFilterPager $filter
 	 * @param KalturaFileAssetFilter $pager
 	 * @return KalturaFileAssetListResponse
+	 * @ksIgnored
 	 */
 	function listAction(KalturaFileAssetFilter $filter, KalturaFilterPager $pager = null)
 	{
