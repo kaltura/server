@@ -63,7 +63,11 @@ class kCaptureSpaceVersionManager{
 			return null;
 		$cacheKey = "capture-space-file-hash-key-os".$os."-version-".$version."-hash-algo-".$hashAlgorithm;
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
-		$hash = $cache->get($cacheKey);
+		$hash = null;
+		if (!$cache)
+			$hash = hash_file($hashAlgorithm, $actualPath);
+		else
+			$hash = $cache->get($cacheKey);
 		if (!$hash)
 		{
 			$hash = hash_file($hashAlgorithm, $actualPath);
