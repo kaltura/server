@@ -295,9 +295,10 @@ class kPlaybackContextDataHelper
 		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($liveDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
 
+		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
 		foreach ($liveDeliveryProfiles as $deliveryProfile)
 		{
-			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, array(), $deliveryProfile, $contextDataHelper);
+			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $flavorAssets, $deliveryProfile, $contextDataHelper);
 			$protocols = $this->constructProtocol($deliveryProfile);
 			$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
 			$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
