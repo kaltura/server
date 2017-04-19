@@ -583,7 +583,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$actionElement->appendChild($throws);
 		}
 
-		$actionElement->setAttribute('sessionRequired', ($actionInfo->ksNeeded ? 'always' : (is_null($actionInfo->ksNeeded) ? 'optioanl' : 'none')));
+		$actionElement->setAttribute('sessionRequired', ($actionInfo->ksNeeded ? 'always' : (is_null($actionInfo->ksNeeded) ? 'optional' : 'none')));
 		
 		return $actionElement;
 	}
