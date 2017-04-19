@@ -51,10 +51,10 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
                         <hr class="intro-divider">
                         <ul class="intro-links-list">
                             <li>
-                                <a href="#adminconsole" class="intro-link"><span class="network-name">Server Admin &amp; Create Accounts</span></a>
+                                <a href="//<?php echo kConf::get('cdn_api_host_https')?>/admin_console" target="_blank" class="intro-link"><span class="network-name">Server Admin &amp; Create Accounts</span></a>
                             </li>
                             <li>
-                                <a href="#kmc" class="intro-link"><span class="network-name">Manage a Content Account</span></a>
+                                <a href="//<?php echo kConf::get('cdn_api_host_https')?>/kmc" target="_blank" class="intro-link"><span class="network-name">Manage a Content Account</span></a>
                             </li>
                         </ul>
                     </div>
