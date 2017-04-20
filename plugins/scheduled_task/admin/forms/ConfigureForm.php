@@ -56,10 +56,10 @@ class ConfigureForm extends Infra_Form
 
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
-			case 'string':
 			case 'int':
+				return $this->addIntegerElement($name, $prefix);
+			case 'string':
 				return $this->addStringElement($name, $prefix);
-
 			case 'bool':
 			case 'boolean':
 				return $this->addBooleanElement($name, $prefix);
@@ -77,6 +77,16 @@ class ConfigureForm extends Infra_Form
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
+		$this->getElement("$prefix$name")->setValue("N/A");
+	}
+
+	protected function addIntegerElement($name, $prefix) {
+		$this->addElement('text', "$prefix$name", array(
+			'label' 		=> $name,
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+		));
+		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
 	protected function addBooleanElement($name, $prefix) {
@@ -93,7 +103,7 @@ class ConfigureForm extends Infra_Form
 			'value' => 'default'
 		));
 		$elem->addMultiOption("N/A", "NONE");
-
+		$elem->setValue("N/A");
 		$elem->setLabel("$name:");
 		$elem->setRequired(true);
 		$this->addElement($elem);

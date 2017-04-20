@@ -56,8 +56,9 @@ class ConfigureSubForm extends Zend_Form_SubForm
 
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
-			case 'string':
 			case 'int':
+				return $this->addIntegerElement($name, $prefix);
+			case 'string':
 				return $this->addStringElement($name, $prefix);
 
 			case 'bool':
@@ -79,6 +80,15 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		));
 	}
 
+	protected function addIntegerElement($name, $prefix) {
+		$this->addElement('text', "$prefix$name", array(
+			'label' 		=> $name,
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+		));
+		$this->getElement("$prefix$name")->setValue("N/A");
+	}
+
 	protected function addBooleanElement($name, $prefix) {
 		$this->addElement('checkbox', "$prefix$name", array(
 			'label'	  => $name,
@@ -93,6 +103,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'excludes' => array()
 		));
 		$elem->addMultiOption("N/A", "NONE");
+		$elem->setValue("N/A");
 		$elem->setLabel("$name:");
 		$elem->setRequired(true);
 		$this->addElement($elem);

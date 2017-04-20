@@ -8,6 +8,12 @@
 class MediaRepurposingUtils
 {
 
+	const MR_METADATA_PROFILE = 9;
+	const STATUS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'Status\']';
+	const MPRS_DATA_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
+	const MPRS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPsOnEntry\']';
+	const EXCLUDE = 0;
+
 	const MEDIA_REPURPOSING_SYSTEM_NAME = 'MRP';
 	/**
 	 * get all Media Repurposing of the partner
@@ -71,7 +77,7 @@ class MediaRepurposingUtils
 
 		$mrId = $result->id;
 		$mr = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
-		$mr->description = self::handleSts($scheduledTaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleSts($mrId, $scheduledTaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
 		return $scheduledTaskPlugin->scheduledTaskProfile->update($mrId, $mr);
 	}
 
@@ -82,13 +88,14 @@ class MediaRepurposingUtils
 		$taskArray[0]->relatedObjects = null;
 		$mr = self::createST($name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
+		$mr->objectFilter->advancedSearch->items[] = self::createMrConditionFilter($id);
 
-		$mr->description = self::handleSts($scheduledtaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleSts($id, $scheduledtaskPlugin, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
 		return $scheduledtaskPlugin->scheduledTaskProfile->update($id, $mr);
 
 	}
 
-	private static function handleSts($scheduledtaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
+	private static function handleSts($mrId, $scheduledtaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
 	{
 		$ids = '';
 		for ($i = 2; $i < count($taskArray); $i += 2) {
@@ -98,12 +105,12 @@ class MediaRepurposingUtils
 			$timeAfterLast = $taskArray[$i-1];
 			//TODO change filter according to $timeAfterLast
 			//$filter->LastViewed += $timeAfterLast;
-			//$filter->MR[$mrId] == ($i/2)
-			//TODO add on the entryEngine: $filter->status on entry is not disable
 
 			$stName = self::getSubScheduleTaskName($name, $i);
 
 			$scheduledTaskProfile = self::createST($stName, $filterTypeEngine, $filter, $taskArray[$i], $maxEntriesAllowed);
+			$scheduledTaskProfile->description = $timeAfterLast;
+			$scheduledTaskProfile->objectFilter->advancedSearch->items[] = self::createMrStateConditionFilter($mrId, ($i/2));
 
 			KalturaLog::info("Handle Schedule Task [$sdId] who should run [$timeAfterLast] days after last ST:");
 			KalturaLog::info(print_r($scheduledTaskProfile, true));
@@ -127,11 +134,46 @@ class MediaRepurposingUtils
 		$st = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
 		$st->name = $name;
 		$st->status = ScheduledTaskProfileStatus::DISABLED;
+
+		$filter->advancedSearch = self::createMRFilterForState();
 		$st->objectFilter = $filter;
 		$st->objectFilterEngineType = $filterTypeEngine;
 		$st->maxTotalCountAllowed = $maxEntriesAllowed;
 		$st->objectTasks = array($task);
 		return $st;
+	}
+
+	private static function createMRFilterForState()
+	{
+		$searchItem = new Kaltura_Client_Metadata_Type_MetadataSearchItem();
+		$searchItem->type = Kaltura_Client_Enum_SearchOperatorType::SEARCH_AND;
+		$searchItem->metadataProfileId = 13;
+		$conditions = array();
+		$condition = new Kaltura_Client_Type_SearchMatchCondition();
+		$condition->field = self::STATUS_XPATH_NAME;
+		$condition->value = self::EXCLUDE;
+		$condition->not = 1;
+		$conditions[] = $condition;
+
+		$searchItem->items = $conditions;
+		return $searchItem;
+	}
+
+	private static function createMrStateConditionFilter($mrId, $statusLevel)
+	{
+		$condition = new Kaltura_Client_Type_SearchMatchCondition();
+		$condition->field = self::MPRS_DATA_XPATH_NAME;
+		$condition->value = "$mrId,$statusLevel";
+		return $condition;
+	}
+
+	private static function createMrConditionFilter($mrId)
+	{
+		$condition = new Kaltura_Client_Type_SearchMatchCondition();
+		$condition->field = self::MPRS_XPATH_NAME;
+		$condition->value = "MR_$mrId";
+		$condition->not = true;
+		return $condition;
 	}
 
 
@@ -177,7 +219,6 @@ class MediaRepurposingUtils
 		switch($type)
 		{
 			case Kaltura_Client_ScheduledTask_Enum_ObjectFilterEngineType::ENTRY:
-				//return 'Kaltura_Client_Type_BaseEntryFilter';
 				return 'Kaltura_Client_Type_MediaEntryFilter';
 
 			default:

@@ -110,6 +110,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			'excludes' => array(),
 		));
 		$elem->addMultiOption("N/A", "NONE");
+		$elem->setValue("N/A");
 		$elem->setLabel("Task Type:");
 		$elem->setRequired(true);
 		$this->addElement($elem);
@@ -127,7 +128,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		$filter = new $this->filterType;
 		//TODO add all field that we want to block the user to filter by in MR
-		$ignore = array('relatedObjects');
+		$ignore = array('relatedObjects', 'orderBy');
 		$this->addObjectSection('Filter', $filter , $ignore, self::FILTER_PREFIX);
 
 		$this->addElement('button', 'expandFilter', array(
@@ -152,7 +153,8 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->setDefault('filterTypeStr', get_class($object->objectFilter));
 
 		foreach ($object->objectFilter as $key => $value)
-			$this->setDefault(self::FILTER_PREFIX.$key, $value);
+			if ($value)
+				$this->setDefault(self::FILTER_PREFIX.$key, $value);
 
 		$this->populateTasks($object);
 	}
@@ -217,6 +219,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 				$filter->$key = $value;
 		return $filter;
 	}
+
 
 	private function isFilterValid($filter)
 	{

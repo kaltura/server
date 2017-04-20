@@ -12,16 +12,13 @@
 <script type="text/javascript">
 
 	var filterStatus = 0;
-	var alwaysDisplay = ['mediaDateLessThanOrEqual', 'lastPlayedAtLessThanOrEqual'];
+	var alwaysDisplay = ['createdAtGreaterThanOrEqual', 'lastPlayedAtGreaterThanOrEqual'];
 	init();
 
 	
 	function init() {
 		//hide template
 		$('dd[id^="MR_tasksDataTemplate_"]').hide();
-		
-		//set select as default
-		$('select').val("N/A");
 
 		hideEmptyFilterFields();
 		populateTasks();
@@ -48,7 +45,7 @@
 			var name = $( this ).attr("name");
 			if (alwaysDisplay.includes(name.replace("FilterParams_", "")))
 				return;
-			if (!val.length || val == 'N/A' || (val == '0')) {
+			if (!val.length || val == 'N/A') {
 				if (hide) {
 					$( this ).hide();
 					jQuery('#' + name + '-label').hide();
@@ -67,8 +64,7 @@
 			x.attr('value',0);
 		}
 	}
-
-
+	
 
 	function populateTasks() {
 		var id = jQuery('#mrId').val();
