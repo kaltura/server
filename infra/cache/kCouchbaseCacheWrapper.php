@@ -450,6 +450,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 				
 			$connStart = microtime(true);
 			$this->bucket = $cluster->openBucket($this->name);
+			$connTook = microtime(true) - $connStart;
 			self::safeLog("connect took - {$connTook} seconds to {$config['dsn']} bucket {$this->name}");
 		}
 		catch(CouchbaseException $e)
