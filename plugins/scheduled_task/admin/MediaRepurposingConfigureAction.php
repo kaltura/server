@@ -30,14 +30,15 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 			if ($request->isPost())
 			{
 				$formData = $request->getPost();
-				$filterType = $formData['filterTypeStr'];
-				$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterType);
-				$valid = $this->processForm($mediaRepurposingForm, $formData, $filterTypeEngine, $mediaRepurposingId);
+				$arr = explode(":", $formData['filterTypeStr']);
+				$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $arr[1]);
+				$valid = $this->processForm($mediaRepurposingForm, $formData, $arr[0], $mediaRepurposingId);
 				$action->view->formValid = $valid;
 
 			}
 			else
 			{
+
 				if (!is_null($mediaRepurposingId))
 				{
 					$mr = MediaRepurposingUtils::getMrById($partnerId, $mediaRepurposingId);
@@ -51,7 +52,7 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 				{
 					$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterType, null);
 					$mediaRepurposingForm->getElement('partnerId')->setValue($partnerId);
-					$mediaRepurposingForm->getElement('filterTypeStr')->setValue($filterType);
+					$mediaRepurposingForm->getElement('filterTypeStr')->setValue("$filterTypeEngine:$filterType");
 				}
 			}
 		}

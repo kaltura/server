@@ -150,7 +150,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 		$this->setDefault('max_entries_allowed', $object->maxTotalCountAllowed);
 		$this->setDefault('media_repurposing_name', $object->name);
-		$this->setDefault('filterTypeStr', get_class($object->objectFilter));
+		$this->setDefault('filterTypeStr', $object->objectFilterEngineType . ":" .get_class($object->objectFilter));
 
 		foreach ($object->objectFilter as $key => $value)
 			if ($value)
@@ -209,7 +209,8 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	public function getFilterFromData($formData)
 	{
-		$filterType = $formData['filterTypeStr'];
+		$arr = explode(":", $formData['filterTypeStr']);
+		$filterType = $arr[1];
 		if (!$filterType)
 			return null;
 		$filter = new $filterType();

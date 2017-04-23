@@ -9,7 +9,7 @@
 				<th><?php echo $this->translate('ID'); ?></th>
 				<th><?php echo $this->translate('Name'); ?></th>
 				<th><?php echo $this->translate('Status'); ?></th>
-
+				<th><?php echo $this->translate('Engine Type'); ?></th>
 				<th><?php echo $this->translate('Filter'); ?></th>
 				<th><?php echo $this->translate('Schedule Task IDs'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
@@ -29,6 +29,7 @@
 				<td><?php echo $mediaRepurposing->id; ?></td>
 				<td><?php echo $mediaRepurposing->name; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus', $mediaRepurposing->status); ?></td>
+				<td><?php echo $mediaRepurposing->objectFilterEngineType; ?></td>
 				<td><?php echo get_class($mediaRepurposing->objectFilter); ?></td>
 				<td><?php echo $mediaRepurposing->description; ?></td>
 				<td>

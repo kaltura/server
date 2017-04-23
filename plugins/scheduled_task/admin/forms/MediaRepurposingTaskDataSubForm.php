@@ -28,22 +28,8 @@ class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 
 		$obj = MediaRepurposingUtils::objectTaskFactory($this->type);
 
-
-
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
 	}
-
-
-
-/*
-
-	public function addTaskData($type) {
-
-		$task = MediaRepurposingUtils::objectTaskFactory($type);
-		$ignore = array('relatedObjects');
-		$this->addObjectSection('Task', $task , $ignore, self::TASK_OBJECT__PREFIX);
-	}
-*/
 
 	
 	public function populateFromObject($object, $add_underscore = true)
@@ -70,10 +56,10 @@ class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 	 * @param  array $data
 	 * @return boolean
 	 */
-	public function isValid($data)
-	{
-		return true;
-	}
+//	public function isValid($data)
+//	{
+//		return true;
+//	}
 
 
 }

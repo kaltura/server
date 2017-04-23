@@ -8,7 +8,7 @@
 class MediaRepurposingUtils
 {
 
-	const MR_METADATA_PROFILE = 9;
+
 	const STATUS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'Status\']';
 	const MPRS_DATA_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const MPRS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPsOnEntry\']';
@@ -28,7 +28,6 @@ class MediaRepurposingUtils
 		$filter->partnerIdEqual = 104;
 		$filter->systemNameEqual = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$result = $scheduledtaskPlugin->scheduledTaskProfile->listAction($filter, null);
-
 		return $result->objects;
 	}
 
@@ -41,10 +40,14 @@ class MediaRepurposingUtils
 		return null;
 	}
 
+
+
 	public static function getPluginByName($name, $partnerId = null) {
 		$client = Infra_ClientHelper::getClient();
 		if ($partnerId)
 			$client->setPartnerId($partnerId);
+		else
+			$client->setPartnerId(-2);
 		$plugin = $name::get($client);
 		return $plugin;
 	}
@@ -71,13 +74,13 @@ class MediaRepurposingUtils
 	public static function createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed) {
 		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 
-		$mr = self::createST($name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
+		$mr = self::createST($partnerId, $name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$result = $scheduledTaskPlugin->scheduledTaskProfile->add($mr);
 
 		$mrId = $result->id;
 		$mr = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
-		$mr->description = self::handleSts($mrId, $scheduledTaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleSts($mrId, $partnerId, $scheduledTaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
 		return $scheduledTaskPlugin->scheduledTaskProfile->update($mrId, $mr);
 	}
 
@@ -86,16 +89,16 @@ class MediaRepurposingUtils
 		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 
 		$taskArray[0]->relatedObjects = null;
-		$mr = self::createST($name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
+		$mr = self::createST($partnerId, $name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$mr->objectFilter->advancedSearch->items[] = self::createMrConditionFilter($id);
 
-		$mr->description = self::handleSts($id, $scheduledtaskPlugin, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleSts($id, $partnerId, $scheduledtaskPlugin, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
 		return $scheduledtaskPlugin->scheduledTaskProfile->update($id, $mr);
 
 	}
 
-	private static function handleSts($mrId, $scheduledtaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
+	private static function handleSts($mrId, $partnerId, $scheduledtaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
 	{
 		$ids = '';
 		for ($i = 2; $i < count($taskArray); $i += 2) {
@@ -108,7 +111,7 @@ class MediaRepurposingUtils
 
 			$stName = self::getSubScheduleTaskName($name, $i);
 
-			$scheduledTaskProfile = self::createST($stName, $filterTypeEngine, $filter, $taskArray[$i], $maxEntriesAllowed);
+			$scheduledTaskProfile = self::createST($partnerId, $stName, $filterTypeEngine, $filter, $taskArray[$i], $maxEntriesAllowed);
 			$scheduledTaskProfile->description = $timeAfterLast;
 			$scheduledTaskProfile->objectFilter->advancedSearch->items[] = self::createMrStateConditionFilter($mrId, ($i/2));
 
@@ -129,25 +132,70 @@ class MediaRepurposingUtils
 	}
 
 
-	private static function createST($name, $filterTypeEngine, $filter, $task, $maxEntriesAllowed)
+	private static function createST($partnerId, $name, $filterTypeEngine, $filter, $task, $maxEntriesAllowed)
 	{
 		$st = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
 		$st->name = $name;
 		$st->status = ScheduledTaskProfileStatus::DISABLED;
 
-		$filter->advancedSearch = self::createMRFilterForState();
+		$filter->advancedSearch = self::createMRFilterForState($partnerId);
 		$st->objectFilter = $filter;
 		$st->objectFilterEngineType = $filterTypeEngine;
+		if (!$filterTypeEngine)
+			$st->objectFilterEngineType = ObjectFilterEngineType::ENTRY;
 		$st->maxTotalCountAllowed = $maxEntriesAllowed;
 		$st->objectTasks = array($task);
 		return $st;
 	}
 
-	private static function createMRFilterForState()
+
+	private static function getMrMetadataProfileId($partnerId = null)
+	{
+		$result = self::getMrMetadataProfile($partnerId);
+
+		if (count($result->objects) > 0)
+			return $result->objects[0]->id;
+	}
+
+	private static function getMrMetadataProfile($partnerId = null)
+	{
+		$filter = new Kaltura_Client_Metadata_Type_MetadataProfileFilter();
+		$filter->nameEqual = 'MRP';
+		if ($partnerId)
+			$filter->partnerIdEqual = $partnerId;
+
+		$metadataPlugin = self::getPluginByName('Kaltura_Client_Metadata_Plugin');
+		return $metadataPlugin->metadataProfile->listAction($filter, null);
+	}
+
+//	private static function copyFromPartner0($partnerId = null)
+//	{
+//		$result = self::getMrMetadataProfile(0);
+//
+//		KalturaLog::info("asdf");
+//		KalturaLog::info(print_r($result, true));
+//		if (count($result->objects) > 0) {
+//			KalturaLog::info("more than 0");
+//		}
+//
+//
+//		$metadataProfile = new Kaltura_Client_Metadata_Type_MetadataProfile();
+//		$metadataProfile->name = 'MRP';
+//		$metadataProfile->metadataObjectType = $result->objects[0]->metadataObjectType;
+//		$xsdData = $result->objects[0]->xsd;
+//
+//		$metadataPlugin = self::getPluginByName('Kaltura_Client_Metadata_Plugin', $partnerId);
+//		$result = $metadataPlugin->metadataProfile->add($metadataProfile, $xsdData, null);
+//		return $result->id;
+//
+//	}
+
+	private static function createMRFilterForState($partnerId)
 	{
 		$searchItem = new Kaltura_Client_Metadata_Type_MetadataSearchItem();
 		$searchItem->type = Kaltura_Client_Enum_SearchOperatorType::SEARCH_AND;
-		$searchItem->metadataProfileId = 13;
+		$searchItem->metadataProfileId = self::getMrMetadataProfileId($partnerId);
+
 		$conditions = array();
 		$condition = new Kaltura_Client_Type_SearchMatchCondition();
 		$condition->field = self::STATUS_XPATH_NAME;
@@ -210,6 +258,9 @@ class MediaRepurposingUtils
 			case Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::DISTRIBUTE:
 				return new Kaltura_Client_ScheduledTaskContentDistribution_Type_DistributeObjectTask();
 
+			case Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::MAIL_NOTIFICATION:
+				return new Kaltura_Client_ScheduledTask_Type_MailNotificationObjectTask();
+
 			default:
 				return null;
 		}
@@ -238,6 +289,7 @@ class MediaRepurposingUtils
 		"5" => 'DELETE_LOCAL_CONTENT',
 		"6" => 'STORAGE_EXPORT',
 		"7" => 'MODIFY_ENTRY',
+		"8" => 'MAIL_NOTIFICATION',
 		"scheduledTaskContentDistribution.Distribute" => 'DISTRIBUTE',
 		"scheduledTaskEventNotification.DispatchEventNotification" => 'DISPATCH_EVENT_NOTIFICATION',
 		"scheduledTaskMetadata.ExecuteMetadataXslt" => 'EXECUTE_METADATA_XSLT');

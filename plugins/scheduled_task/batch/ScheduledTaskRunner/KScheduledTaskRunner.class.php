@@ -78,7 +78,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		else
 			$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
 
-		$this->addDateToFilter($profile);
+		$objectsIds = array();
+		$isMrProfile = $this->isMrProfile($profile);
+		if ($isMrProfile)
+			$this->addDateToFilter($profile);
 
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
@@ -108,11 +111,28 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 			foreach($result->objects as $object)
 			{
-				$this->processObject($profile, $object);
-			}
 
-			$pager->pageIndex++;
+				$this->processObject($profile, $object);
+
+				$objectsIds[] = $object->id;
+				if ($isMrProfile)
+					$this->updateMetadataStatusForMR($profile, $object);
+			}
+			if (!$isMrProfile)
+				$pager->pageIndex++;
 		}
+
+//		KalturaLog::info("qwer");
+//		KalturaLog::info(print_r($objectsIds,true));
+//		KalturaLog::info($profile->objectTasks[0]->type);
+
+		// check only objectTasks[0] because it made by MR mechanize and will be the first and only task
+		if ($profile->objectTasks[0]->type == ObjectTaskType::MAIL_NOTIFICATION && count($objectsIds)) {
+			$mrId = $this->getMrProfileId($profile);
+			$this->sendMailNotification($profile->objectTasks[0], $objectsIds, $mrId);
+		}
+
+
 	}
 
 	/**
@@ -123,13 +143,15 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	{
 		foreach($profile->objectTasks as $objectTask)
 		{
+
+			if ($objectTask->type == ObjectTaskType::MAIL_NOTIFICATION)
+				return; //no execute on object
 			/** @var KalturaObjectTask $objectTask */
 			$objectTaskEngine = $this->getObjectTaskEngineByType($objectTask->type);
 			$objectTaskEngine->setObjectTask($objectTask);
 			try
 			{
 				$objectTaskEngine->execute($object);
-				$this->updateMetadataStatus($profile, $object);
 			}
 			catch(Exception $ex)
 			{
@@ -266,29 +288,59 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$xml->addChild('Status', '1');
 		$xml->addChild('MRPsOnEntry', "MR_$mrId");
 		$xml->addChild('MRPData', "$mrId,1," .self::getUpdateDay());
-
 		return $xml;
 	}
 
-	private function updateMetadataStatus(KalturaScheduledTaskProfile $profile, $object) {
-		$metadataProfileId = 13;
-		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
+	private function isMrProfile(KalturaScheduledTaskProfile $profile)
+	{
+		if (($profile->systemName == "MRP") || (self::startsWith($profile->name, 'MR_')))
+			return true;
+		return false;
+	}
 
-		if ($profile->systemName == "MRP") {
-			//as the first schedule task running in this MRP
-			$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
-			$xml = $this->addMetadataXmlField($profile->id, $metadata->xml);
-
-			$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
-		} elseif (self::startsWith($profile->name, 'MR_')) {
-			//sub task of MRP
+	private function getMrProfileId(KalturaScheduledTaskProfile $profile)
+	{
+		if ($profile->systemName == "MRP")
+			return $profile->id;
+		if (self::startsWith($profile->name, 'MR_')) {
 			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
-			$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
-			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml);
-
-			$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
-
+			return $arr[0];
 		}
+		return null;
+	}
+
+
+
+	private function sendMailNotification($mailTask, $objectsIds, $mrId)
+	{
+		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
+		$body .= "\nExecute for entries: \n" .print_r($objectsIds,true);
+		KalturaLog::info("sending mail to $mailTask->mailAddress with body: $body");
+
+		$mailer = new PHPMailer();
+		$mailer->CharSet = 'utf-8';
+		$mailer->AddAddress($mailTask->mailAddress);
+		$mailer->Subject = "Media Repurposing Notification";
+		$mailer->Body = $body;
+
+		$success = $mailer->Send();
+		if (!$success)
+			KalturaLog::alert("Mail for MRP [$mrId] did not send successfully");
+	}
+
+	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object) {
+		$metadataProfileId = $profile->objectFilter->advancedSearch->metadataProfileId;
+		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
+		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
+
+		$xml = $metadata->xml;
+		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
+			$xml = $this->addMetadataXmlField($profile->id, $metadata->xml);
+		elseif (self::startsWith($profile->name, 'MR_')) { //sub task of MRP
+			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
+			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml);
+		}
+		$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
 	}
 
 }
