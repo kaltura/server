@@ -520,10 +520,10 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	        {
 	            throw new Exception('Cannot map metadata profile ID ['.$sourceMetadata->metadataProfileId.']');
 	        }
-			if($this->mapMetadataProfileIds[$sourceMetadata->metadataProfileId] == 0)
-			{
-				continue;
-			}
+	        if($this->mapMetadataProfileIds[$sourceMetadata->metadataProfileId] == 0)
+	        {
+	            continue;
+	        }
 	        
 	        $targetMetadata = new KalturaMetadata();
 	        $targetMetadata->metadataProfileId = $this->mapMetadataProfileIds[$sourceMetadata->metadataProfileId];
