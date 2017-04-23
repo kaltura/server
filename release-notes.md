@@ -48,7 +48,38 @@ None.
 
 None.
 
+## Extract media & conversions failures when source with very high frame rate ##
 
+ - Issue Type: Bug
+ - Issue ID: PLAT-7120
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Support generation of Dolby Digital Plus/EAC3 audio ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-7178
+Requires custom flavor params
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
 
 # Lynx 12.13.0 #
 
