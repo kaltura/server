@@ -68,6 +68,7 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		}
 		
 		$dbObject->setMrssParameters($mrssParams);
+		return $dbObject;
 	}
 	
 	/**
@@ -101,4 +102,11 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip );
 	}
+
+	public function getPropertiesToValidate()
+	{
+		return array_merge(parent::getPropertiesToValidate(), array('xslt' => true));
+	}
+
+
 }

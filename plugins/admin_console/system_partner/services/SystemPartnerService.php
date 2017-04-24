@@ -229,7 +229,7 @@ class SystemPartnerService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $pId);
 		$configuration->toUpdatableObject($dbPartner);
 		$dbPartner->save();
-		PartnerPeer::removePartnerFromCache($partnerId);
+		PartnerPeer::removePartnerFromCache($pId);
 	}
 	
 	/**

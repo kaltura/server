@@ -144,6 +144,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $serveLiveAsVodEntryId;
 
 	/**
+	 * @var string
+	 */
+	protected $sessionId;
+
+	/**
 	 * request a specific delivery profile id
 	 * @var int
 	 */
@@ -531,7 +536,21 @@ class DeliveryProfileDynamicAttributes {
 	{
 		return $this->serveLiveAsVodEntryId;
 	}
-	
+
+	/**
+	 * @return the $sessionId
+	 */
+	public function getSessionId() {
+		return $this->sessionId;
+	}
+
+	/**
+	 * @param $sessionId
+	 */
+	public function setSessionId($sessionId) {
+		$this->sessionId = $sessionId;
+	}
+
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
@@ -606,6 +625,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->serveLiveAsVodEntryId = $newObj->getServeLiveAsVodEntryId();
 		$this->urlParams = $newObj->getUrlParams();
 		$this->deliveryProfileId = $newObj->getDeliveryProfileId();
+		$this->sessionId = $newObj->getSessionId();
 	}
 }
 

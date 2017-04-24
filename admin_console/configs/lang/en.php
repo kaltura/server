@@ -1317,6 +1317,7 @@ return array(
 	'Kaltura_Client_Type_UrlTokenizerCloudFront'	=> 'CloudFront Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerVnpt'        => 'Vnpt Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerCht'		=> 'CHT Tokenizer',
+	'Kaltura_Client_Type_UrlTokenizerChinaCache'		=> 'ChinaCache Tokenizer',
 	
 	'Kaltura_Client_Type_UrlRecognizer' => "default recognizer",
     

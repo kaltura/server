@@ -20,6 +20,12 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		EntryServerNodeType::LIVE_PRIMARY => LiveEntryServerNode::OM_CLASS,
 		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
 	);
+	
+	public static $connectedServerNodeStatuses = array(
+		EntryServerNodeStatus::AUTHENTICATED,
+		EntryServerNodeStatus::BROADCASTING,
+		EntryServerNodeStatus::PLAYABLE
+	);
 
 	public static function getOMClass($row, $column)
 	{
@@ -118,17 +124,11 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	}
 	
 	public static function retrieveConnectedEntryServerNodesByPartner($partnerId, $excludeEntryId)
-	{
-		$connectedLiveEntryStatuses = array(
-			KalturaEntryServerNodeStatus::AUTHENTICATED,
-			KalturaEntryServerNodeStatus::BROADCASTING,
-			KalturaEntryServerNodeStatus::PLAYABLE
-		);
-		
+	{		
 		$c = KalturaCriteria::create(EntryServerNodePeer::OM_CLASS);
 		$c->add(EntryServerNodePeer::PARTNER_ID, $partnerId);
 		$c->add(EntryServerNodePeer::ENTRY_ID, $excludeEntryId, Criteria::NOT_EQUAL);
-		$c->add(EntryServerNodePeer::STATUS, $connectedLiveEntryStatuses, Criteria::IN);
+		$c->add(EntryServerNodePeer::STATUS, self::$connectedServerNodeStatuses, Criteria::IN);
 		$c->addGroupByColumn(EntryServerNodePeer::ENTRY_ID);
 		
 		return EntryServerNodePeer::doSelect($c);

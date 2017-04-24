@@ -18,6 +18,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param string $state
 	 * @param bool $ignoreScheduling
 	 * @return file
+	 * @ksOptional
 	 */
 	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false)
 	{
@@ -129,6 +130,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param string $hash
 	 * @param string $entryId
 	 * @return file
+	 * @ksOptional
 	 */
 	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId)
 	{

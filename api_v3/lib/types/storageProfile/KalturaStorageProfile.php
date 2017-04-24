@@ -318,10 +318,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		
 		$deliveryProfiles = array();
 		if($deliveryProfileIds)
-			foreach($deliveryProfileIds->toArray() as $keyValue) 
+		{
+			foreach ($deliveryProfileIds->toArray() as $keyValue)
 				$this->insertObject($deliveryProfiles, $keyValue->key, $keyValue->value);
-			
-		$object_to_fill->setDeliveryProfileIds($deliveryProfiles);
+			$object_to_fill->setDeliveryProfileIds($deliveryProfiles);
+		}
 		
 		return $object_to_fill;
 	}

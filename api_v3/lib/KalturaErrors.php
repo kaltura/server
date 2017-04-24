@@ -574,6 +574,8 @@ class KalturaErrors extends APIErrors
 	
 	const KALTURA_RECORDING_DISABLED = "KALTURA_RECORDING_DISABLED;PARTNER_ID;Kaltura recording is disabled for partner [@PARTNER_ID@] use liveStream->appendRecording to set the live recorded content";
 	
+	const RECORDING_DISABLED = "RECORDING_DISABLED;;Record status attribute cannot be set, account has recording feature disabled";
+	
 	/*
 	 * BaseEntry Service
 	 */
@@ -646,7 +648,7 @@ class KalturaErrors extends APIErrors
 	const USER_ENTRY_NOT_FOUND = 'USER_ENTRY_NOT_FOUND;USER_ENTRY_ID; User-Entry id [@USER_ENTRY_ID@] not found';
 	const USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID = 'USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID;USER_ENTRY_ID;The entry id in the user-entry [@USER_ENTRY_ID@] does not match the entry-id given';
 	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE,USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
-
+	
 	/*
 	 * serverNode service
 	 */

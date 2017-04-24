@@ -53,6 +53,11 @@ class KalturaDocCommentParser
     const DOCCOMMENT_VALIDATE_CONSTRAINT = "/\\@CONSTRAINT\\s+([\\w.]+\\s+)?(\\d+)/";
 
     const DOCCOMMENT_DISABLE_RELATIVE_TIME = "/\\@disableRelativeTime \\$(\\w*)/";
+    
+    const DOCCOMMENT_KS_OPTIONAL = "/\\@ksOptional/i";
+    
+    const DOCCOMMENT_KS_IGNORED = "/\\@ksIgnored/i";
+    
 
     const MIN_LENGTH_CONSTRAINT = "minLength";
     const MAX_LENGTH_CONSTRAINT = "maxLength";
@@ -214,6 +219,14 @@ class KalturaDocCommentParser
      * @var array
      */
     public $disableTags = null;
+
+    /**
+     * True - required
+     * False - ignored
+     * Null - optional
+     * @var bool
+     */
+    public $ksNeeded = true;
     
     /**
      * Parse a docComment
@@ -231,6 +244,15 @@ class KalturaDocCommentParser
         $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);
+
+        if(preg_match( self::DOCCOMMENT_KS_IGNORED, $comment))
+        {
+        	$this->ksNeeded = false;
+        }
+        elseif(preg_match( self::DOCCOMMENT_KS_OPTIONAL, $comment))
+        {
+        	$this->ksNeeded = null;
+        }
         
         $result = null;
         if (is_array($replacements) && key_exists(self::DOCCOMMENT_REPLACENET_PARAM_NAME, $replacements))

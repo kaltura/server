@@ -218,6 +218,7 @@ class PermissionService extends KalturaBaseService
 	 * @action getCurrentPermissions
 	 * 
 	 * @return string A comma-separated list of current permission names
+	 * @ksOptional
 	 * 
 	 */	
 	public function getCurrentPermissions()

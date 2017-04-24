@@ -499,11 +499,34 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function saveToSphinx(IIndexable $object, $isInsert = false, $force = false)
 	{
-		KalturaLog::debug('Updating sphinx for object [' . get_class($object) . '] [' . $object->getId() . ']');
+		$className = get_class($object);
+		$objectId = $object->getId();
+
+		// track repetitive udpates of the same object (e.g. adding many annotations which cause updates of the entry)
+		// once hitting a threshold, we will avoid more than one update per minute
+		// threshold is defined by kConf parameter skip_sphinx_repetitive_updates using lowercase of {className}_{service}_{action}={threshold}
+		$saveCounter = 0;
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if ($cache)
+		{
+			$cacheKey = "SPHSave:$className:$objectId";
+			$cache->add($cacheKey, 0, 60);
+			$saveCounter = $cache->increment($cacheKey);
+		}
+
+		$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		$skipSphinxRepetitiveUpdates = kConf::get('skip_sphinx_repetitive_updates', 'local', array());
+		$skipSave = isset($skipSphinxRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipSphinxRepetitiveUpdates[$updatesKey];
+		
+		KalturaLog::debug("Updating sphinx for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
+
+		if ($skipSave)
+			return true;
+
 		$sql = $this->getSphinxSaveSql($object, $isInsert, $force);
 		if(!$sql)
 			return true;
-		
+
 		return $this->execSphinx($sql, $object);
 	}
     /* (non-PHPdoc)

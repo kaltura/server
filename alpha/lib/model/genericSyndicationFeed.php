@@ -16,7 +16,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	const CUSTOM_DATA_FIELD_PAGE_SIZE = 'pageSize';
 
 	private $xslt;
-		
+
 	/* (non-PHPdoc)
 	 * @see BasesyndicationFeed::applyDefaultValues()
 	 */
@@ -166,4 +166,12 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	{
 		parent::putInCustomData(self::CUSTOM_DATA_FIELD_PAGE_SIZE, $pageSize);
 	}
+
+	public function init()
+	{
+		parent::init();
+		$this->incrementVersion();
+	}
+
+
 }

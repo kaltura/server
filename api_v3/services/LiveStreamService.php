@@ -336,6 +336,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @param string $id ID of the live stream
 	 * @param KalturaPlaybackProtocol $protocol protocol of the stream to test.
 	 * @return bool
+	 * @ksOptional
 	 * 
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID

@@ -26,6 +26,7 @@ class PartnerService extends KalturaBaseService
 	 * @param int $templatePartnerId
 	 * @param bool $silent
 	 * @return KalturaPartner
+	 * @ksOptional
 	 *
 	 * @throws APIErrors::PARTNER_REGISTRATION_ERROR
 	 */
@@ -205,7 +206,7 @@ class PartnerService extends KalturaBaseService
 	 * @param string $adminEmail
 	 * @param string $cmsPassword
 	 * @return KalturaPartner
-	 * 
+	 * @ksIgnored
 	 *
 	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
 	 */

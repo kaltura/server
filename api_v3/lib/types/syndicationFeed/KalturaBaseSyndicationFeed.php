@@ -227,4 +227,18 @@ abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilt
 			$this->feedUrl .= 'feedId=' . $this->id;
 		}
 	}
+
+	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
+	{
+		if(is_null($object_to_fill))
+			$object_to_fill = new syndicationFeed();
+		$object_to_fill->init();
+		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	}
+
+
+	public function getPropertiesToValidate()
+	{
+		return array();
+	}
 }

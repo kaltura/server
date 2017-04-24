@@ -293,4 +293,12 @@ class flavorAsset extends exportableAsset
 	
 		return false;
 	}
+	
+	public function getName()
+	{
+		$flavorParams = $this->getFlavorParams();
+		if ($flavorParams)
+			return $flavorParams->getName();
+		return "";
+	}
 }

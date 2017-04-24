@@ -201,7 +201,8 @@ class ReportService extends KalturaBaseService
 	 * @action serve
 	 * 
 	 * @param string $id - the requested id
-	 * @return string 
+	 * @return string
+	 * @ksOptional 
 	 */
 	public function serveAction($id) {
 		
