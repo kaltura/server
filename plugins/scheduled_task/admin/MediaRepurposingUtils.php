@@ -40,6 +40,18 @@ class MediaRepurposingUtils
 		return null;
 	}
 
+	public static function isAllowMrToPartner($partnerId)
+	{
+		$client = Infra_ClientHelper::getClient();
+		$client->setPartnerId($partnerId);
+		$filter = new Kaltura_Client_Type_PermissionFilter();
+		$filter->nameEqual = Kaltura_Client_Enum_PermissionName::FEATURE_MEDIA_REPURPOSING_PERMISSION;
+		$filter->partnerIdEqual = $partnerId;
+		$result = $client->permission->listAction($filter, null);
+		$client->setPartnerId(-2);
+
+		return ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
+	}
 
 
 	public static function getPluginByName($name, $partnerId = null) {

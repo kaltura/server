@@ -8,6 +8,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	protected $newPartnerId;
 	protected $filterType;
 	protected $mediaRepurposingId;
+	protected $allowed;
 
 	const FILTER_PREFIX = 'FilterParams_';
 	const DEFAULT_MAX_TOTAL_COUNT_ALLOWED = 500;
@@ -19,6 +20,8 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->newPartnerId = $partnerId;
 		$this->filterType = $filterType;
 		$this->mediaRepurposingId = $mediaRepurposingId;
+
+		$this->allowed = MediaRepurposingUtils::isAllowMrToPartner($partnerId);
 		parent::__construct();
 	}
 
@@ -28,10 +31,17 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->setAttrib('id', 'frmMediaRepurposingConfigure');
 		$this->setMethod('post');
 
+
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
 		$titleElement->setLabel('General');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElement($titleElement);
+
+
+		if (!$this->allowed) {
+			$this->getElement('generalTitle')->setLabel('NOT ALLOWED TO PARTNER');
+			return;
+		}
 		
 
 		$this->addElement('text', 'partnerId', array(
