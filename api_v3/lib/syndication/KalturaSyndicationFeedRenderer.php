@@ -111,6 +111,8 @@ class KalturaSyndicationFeedRenderer
 	 */
 	private $addLinkForNextIteration = false;
 	
+	private static $relativeTimeFieldNames = array("createdAtGreaterThanOrEqual", "createdAtLessThanOrEqual", "updatedAtGreaterThanOrEqual", "updatedAtLessThanOrEqual");
+	
 	public function __construct($feedId, $feedProcessingKey = null, $ks = null, $state = null)
 	{
 		$this->feedProcessingKey = $feedProcessingKey;
@@ -167,6 +169,16 @@ class KalturaSyndicationFeedRenderer
 	
 		if($this->addLinkForNextIteration)
 		{
+			$entryFilter = $this->syndicationFeed->entryFilter;
+			foreach(self::$relativeTimeFieldNames as $relativeTimeFieldName)
+			{
+				if($entryFilter->$relativeTimeFieldName && $entryFilter->$relativeTimeFieldName != 0)
+				{
+					$entryFilter->$relativeTimeFieldName = kTime::getRelativeTime($entryFilter->$relativeTimeFieldName);
+				}
+			}
+
+			
 			$this->addExternalAttachedFilter();
 
 			if($state)
