@@ -50,13 +50,8 @@ class Form_MediaRepurposingTasksSubForm extends ConfigureSubForm
 			'readonly'		=> true,
 		));
 
-
 		$this->getElement('TaskType')->setValue($this->type);
 
-		
-
-		
-		
 		$this->addElement('text', "taskTime", array(
 			'label' 		=> 'Time to next',
 			'required'		=> false,
@@ -69,8 +64,6 @@ class Form_MediaRepurposingTasksSubForm extends ConfigureSubForm
 	public function populateFromDataObject($object, $time)
 	{
 		$this->setDefault('taskTime', $time);
-
-
 		$newFormData = new Form_MediaRepurposingTaskDataSubForm($object->type);
 		$newFormData->populateFromObject($object);
 		return $newFormData;

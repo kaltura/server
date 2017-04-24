@@ -23,21 +23,18 @@ class MediaRepurposingUtils
 	public static function getMrs($partnerId) {
 		if (!$partnerId)
 			return array();
-		$scheduledtaskPlugin = $scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
+		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
 		$filter = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfileFilter();
-		$filter->partnerIdEqual = 104;
+		$filter->partnerIdEqual = $partnerId;
 		$filter->systemNameEqual = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$result = $scheduledtaskPlugin->scheduledTaskProfile->listAction($filter, null);
 		return $result->objects;
 	}
 
-	public static function getMrById($partnerId, $MrId)
+	public static function getMrById($MrId)
 	{
-		$mediaRepurposingProfiles = self::getMrs($partnerId);
-		foreach ($mediaRepurposingProfiles as $m)
-			if ($m->id == $MrId)
-				return $m;
-		return null;
+		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
+		return $scheduledtaskPlugin->scheduledTaskProfile->get($MrId);
 	}
 
 	public static function isAllowMrToPartner($partnerId)
@@ -147,7 +144,7 @@ class MediaRepurposingUtils
 		$st->name = $name;
 		$st->status = ScheduledTaskProfileStatus::DISABLED;
 
-		$filter->advancedSearch = self::createMRFilterForState();
+		$filter->advancedSearch = self::createMRFilterForStatus();
 		$st->objectFilter = $filter;
 		$st->objectFilterEngineType = $filterTypeEngine;
 		if (!$filterTypeEngine)
@@ -167,7 +164,7 @@ class MediaRepurposingUtils
 	}
 
 
-	private static function createMRFilterForState()
+	private static function createMRFilterForStatus()
 	{
 		$searchItem = new Kaltura_Client_Metadata_Type_MetadataSearchItem();
 		$searchItem->type = Kaltura_Client_Enum_SearchOperatorType::SEARCH_AND;

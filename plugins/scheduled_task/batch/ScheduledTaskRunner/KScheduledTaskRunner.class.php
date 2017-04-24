@@ -123,7 +123,8 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		}
 
 		// check only objectTasks[0] because it made by MR mechanize and will be the first and only task
-		if ($profile->objectTasks[0]->type == ObjectTaskType::MAIL_NOTIFICATION && count($objectsIds)) {
+		if ($profile->objectTasks[0]->type == ObjectTaskType::MAIL_NOTIFICATION && count($objectsIds))
+		{
 			$mrId = $this->getMrProfileId($profile);
 			$this->sendMailNotification($profile->objectTasks[0], $objectsIds, $mrId);
 		}
@@ -312,8 +313,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 	private function sendMailNotification($mailTask, $objectsIds, $mrId)
 	{
-		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
-		$body .= "\nExecute for entries: \n" .print_r($objectsIds,true);
+		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n\nExecute for entries: \n";
+		foreach($objectsIds as $id)
+			$body .= "$id\n";
+
 		KalturaLog::info("sending mail to $mailTask->mailAddress with body: $body");
 
 		$mailer = new PHPMailer();

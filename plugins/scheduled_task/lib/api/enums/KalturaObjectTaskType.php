@@ -20,7 +20,7 @@ class KalturaObjectTaskType extends KalturaDynamicEnum implements ObjectTaskType
 			self::CONVERT_ENTRY_FLAVORS => 'Convert entry flavors by the given flavor params.',
 			self::DELETE_LOCAL_CONTENT => 'Delete the local file syncs of an entry.',
 			self::MODIFY_ENTRY => 'Modifies entries',
-			self::MAIL_NOTIFICATION => 'Send mail notification'
+			self::MAIL_NOTIFICATION => 'Send mail notification',
 		);
 		
 		return self::mergeDescriptions(self::getEnumClass(), $descriptions);

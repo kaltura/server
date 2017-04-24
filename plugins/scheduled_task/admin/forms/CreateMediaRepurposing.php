@@ -20,6 +20,14 @@ class Form_CreateMediaRepurposing extends ConfigureSubForm
 			'filters'		=> array('StringTrim'),
 		));
 
+		$options = array('Kaltura_Client_Type_MediaEntryFilter' => 'media filter', "N/A" => "NONE");
+		$this->addElement('select', 'filterType', array(
+			'label'			=> 'Filter Type:',
+			'filters'		=> array('StringTrim'),
+			'multiOptions'	=> $options,
+		));
+		$this->getElement("filterType")->setValue("N/A");
+
 
 		$this->addEnumElement('Filter','newMR','Kaltura_Client_ScheduledTask_Enum_ObjectFilterEngineType');
 		
@@ -27,7 +35,7 @@ class Form_CreateMediaRepurposing extends ConfigureSubForm
 		$this->addElement('button', 'submit', array(
 			'ignore'	=> true,
 			'label'		=> 'Create New',
-			'onclick'		=> "newMediaRepurposing($('#newPartnerId').val(), $('#newMRFilter').val())",
+			'onclick'		=> "newMediaRepurposing($('#newPartnerId').val(), $('#newMRFilter').val(), $('#filterType').val())",
 			'decorators' => array('ViewHelper')
 		));
 	}

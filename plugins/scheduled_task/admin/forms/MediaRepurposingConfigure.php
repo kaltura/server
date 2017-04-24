@@ -60,6 +60,13 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			'readonly'		=> true,
 		));
 
+		$this->addElement('text', 'engineType', array(
+			'label' 		=> 'Engine Type:',
+			'required'		=> true,
+			'filters' 		=> array('StringTrim'),
+			'placement' => 'prepend',
+			'readonly'		=> true,
+		));
 
 		$this->addElement('text', 'filterTypeStr', array(
 			'label' 		=> 'Filter Type:',
@@ -160,7 +167,8 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 		$this->setDefault('max_entries_allowed', $object->maxTotalCountAllowed);
 		$this->setDefault('media_repurposing_name', $object->name);
-		$this->setDefault('filterTypeStr', $object->objectFilterEngineType . ":" .get_class($object->objectFilter));
+		$this->setDefault('engineType', $object->objectFilterEngineType);
+		$this->setDefault('filterTypeStr', get_class($object->objectFilter));
 
 		foreach ($object->objectFilter as $key => $value)
 			if ($value)
@@ -219,8 +227,9 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	public function getFilterFromData($formData)
 	{
-		$arr = explode(":", $formData['filterTypeStr']);
-		$filterType = $arr[1];
+		//$arr = explode(":", $formData['filterTypeStr']);
+		//$filterType = $arr[1];
+		$filterType = $formData['filterTypeStr'];
 		if (!$filterType)
 			return null;
 		$filter = new $filterType();

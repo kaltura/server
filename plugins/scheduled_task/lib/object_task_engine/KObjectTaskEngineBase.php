@@ -39,8 +39,7 @@ abstract class KObjectTaskEngineBase
 		if (!$this->isObjectSupported($object))
 			throw new Exception('Object '.get_class($object).' is not support by '.get_class($this).' engine');
 
-		KalturaLog::info('zxcv ------- got the entry before process: ' . $object->id);
-		//$this->processObject($object);
+		$this->processObject($object);
 		
 	}
 	

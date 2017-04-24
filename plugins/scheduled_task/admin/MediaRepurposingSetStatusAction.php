@@ -20,13 +20,9 @@ class MediaRepurposingSetStatusAction extends KalturaApplicationPlugin
 		$action->getHelper('layout')->disableLayout();
 		$mediaRepurposingId = $this->_getParam('mediaRepurposingId');
 		$newStatus = $this->_getParam('mediaRepurposingStatus');
-		$partnerId = $this->_getParam('partnerId');
 
-
-		$mediaRepurposingProfiles = MediaRepurposingUtils::getMrs($partnerId);
-		foreach ($mediaRepurposingProfiles as $key => $mr)
-			if ($mr->id == $mediaRepurposingId)
-				MediaRepurposingUtils::changeMrStatus($mr, $newStatus);
+		$mr = MediaRepurposingUtils::getMrById($mediaRepurposingId);
+		MediaRepurposingUtils::changeMrStatus($mr, $newStatus);
 
 		try
 		{

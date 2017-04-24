@@ -142,18 +142,18 @@ function changeStatus(mediaRepurposingId, status, callback)
 }
 
 
-function newMediaRepurposing(partnerId, filterType)
+function newMediaRepurposing(partnerId, filterEngineType, filterType)
 {
 	if(!partnerId.length || isNaN(partnerId)){
 		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
 		return;
 	}
-	if(!filterType.length || (filterType == 'N/A')) {
+	if(!filterEngineType.length || (filterEngineType == 'N/A')) {
 		alert('<?php echo $this->translate('Media Repurposing Filter Type not supplied'); ?>');
 		return;
 	}
-	
-	paramsStr = '/new_partner_id/' + partnerId + '/new_media_repurposing_filter_type/' + filterType;
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_filter_engine_type/' + filterEngineType + '/new_mr_filter_type/' + filterType;
 	
 	loadMediaRepurposing(paramsStr);
 }

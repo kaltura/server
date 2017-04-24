@@ -49,17 +49,5 @@ class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 		}
 
 	}
-
-	/**
-	 * Validate the form
-	 *
-	 * @param  array $data
-	 * @return boolean
-	 */
-//	public function isValid($data)
-//	{
-//		return true;
-//	}
-
-
+	
 }

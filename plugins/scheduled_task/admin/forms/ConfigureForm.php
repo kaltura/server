@@ -42,22 +42,18 @@ class ConfigureForm extends Infra_Form
 	}
 
 	protected function getTypeFromDoc($docComment) {
-		$prefix = '* @var';
+		$exp =  "/\\@var (\\w*)/";
+		$result = null;
 		$lines = explode("\n", $docComment);
-		foreach ($lines as $line) {
-			$pos = strpos ($line , $prefix );
-			if ($pos > -1) {
-				$type =  substr($line, $pos+ strlen($prefix), strlen($line));
-				return str_replace(' ', '', $type);
-			}
-		}
-		return 'string';
+		foreach ($lines as $line)
+			if (preg_match( $exp, $line, $result ))
+				return $result[1];
+		return 'string'; //as default
 	}
 
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'int':
-				return $this->addIntegerElement($name, $prefix);
 			case 'string':
 				return $this->addStringElement($name, $prefix);
 			case 'bool':
@@ -80,14 +76,6 @@ class ConfigureForm extends Infra_Form
 		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
-	protected function addIntegerElement($name, $prefix) {
-		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> $name,
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-		));
-		$this->getElement("$prefix$name")->setValue("N/A");
-	}
 
 	protected function addBooleanElement($name, $prefix) {
 		$this->addElement('checkbox', "$prefix$name", array(
