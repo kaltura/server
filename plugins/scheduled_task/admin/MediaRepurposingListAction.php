@@ -12,6 +12,7 @@ class MediaRepurposingListAction extends KalturaApplicationPlugin implements IKa
 		$this->label = null;
 		$this->rootLabel = null;
 	}
+	
 
 	/**
 	 * @return string - absolute file path of the phtml template

@@ -122,10 +122,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$pager->pageIndex++;
 		}
 
-//		KalturaLog::info("qwer");
-//		KalturaLog::info(print_r($objectsIds,true));
-//		KalturaLog::info($profile->objectTasks[0]->type);
-
 		// check only objectTasks[0] because it made by MR mechanize and will be the first and only task
 		if ($profile->objectTasks[0]->type == ObjectTaskType::MAIL_NOTIFICATION && count($objectsIds)) {
 			$mrId = $this->getMrProfileId($profile);
@@ -273,8 +269,9 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private function addMetadataXmlField($mrId, $xml_string)
 	{
 		$xml = simplexml_load_string($xml_string);
-		if (!$xml->MRPData)
+		if (!$xml || !$xml->MRPData)
 			return $this->createFirstMr($mrId, $xml);
+
 
 		$xml->MRPData[] = "$mrId,1," .self::getUpdateDay();
 		$target_dom = dom_import_simplexml(current($xml->xpath('//MRPsOnEntry[last()]')));
@@ -283,8 +280,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $xml;
 	}
 
-	private function createFirstMr($mrId, SimpleXMLElement $xml)
+	private function createFirstMr($mrId, $xml = null)
 	{
+		if (!$xml)
+			$xml = new SimpleXMLElement("<metadata/>");
 		$xml->addChild('Status', '1');
 		$xml->addChild('MRPsOnEntry', "MR_$mrId");
 		$xml->addChild('MRPData', "$mrId,1," .self::getUpdateDay());
@@ -330,7 +329,9 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object) {
 		$metadataProfileId = $profile->objectFilter->advancedSearch->metadataProfileId;
-		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
+
+		self::impersonate($object->partnerId);
+		$metadataPlugin = KalturaMetadataClientPlugin::get(self::$kClient);
 		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
 
 		$xml = $metadata->xml;
@@ -340,7 +341,14 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml);
 		}
-		$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
+
+		if ($metadata->id)
+			$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
+		else
+			$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml->asXML());
+
+		self::unimpersonate();
+		return $result->id;
 	}
 
 }
