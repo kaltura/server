@@ -12,16 +12,15 @@ class CaptureSpaceService extends KalturaBaseService
 	 * @action clientUpdates
 	 * @param string $os
 	 * @param string $version
-	 * @param KalturaCaptureSpaceHashAlgorithm $hashAlgorithm
 	 * @return KalturaCaptureSpaceUpdateResponse
 	 * @ksIgnored
 	 * 
 	 * @throws CaptureSpaceErrors::ALREADY_LATEST_VERSION
 	 * @throws CaptureSpaceErrors::NO_UPDATE_IS_AVAILABLE
 	 */
-	function clientUpdatesAction ($os, $version, $hashAlgorithm = KalturaCaptureSpaceHashAlgorithm::MD5)
+	function clientUpdatesAction ($os, $version)
 	{
-		$hashValue = kCaptureSpaceVersionManager::getUpdateHash($os, $version, $hashAlgorithm);
+		$hashValue = kCaptureSpaceVersionManager::getUpdateHash($os, $version);
 		if (!$hashValue) {
 			throw new KalturaAPIException(CaptureSpaceErrors::NO_UPDATE_IS_AVAILABLE, $version, $os);
 		}
@@ -32,7 +31,7 @@ class CaptureSpaceService extends KalturaBaseService
 		$info = new KalturaCaptureSpaceUpdateResponseInfo();
 		$info->url = $downloadUrl;
 		$info->hash = new KalturaCaptureSpaceUpdateResponseInfoHash();
-		$info->hash->algorithm = $hashAlgorithm;
+		$info->hash->algorithm = KalturaCaptureSpaceHashAlgorithm::MD5;
 		$info->hash->value = $hashValue;
 		
 		$response = new KalturaCaptureSpaceUpdateResponse();
@@ -57,10 +56,12 @@ class CaptureSpaceService extends KalturaBaseService
 		if (!$filename) {
 			throw new KalturaAPIException(CaptureSpaceErrors::NO_INSTALL_IS_AVAILABLE, $os);
 		}
-		$actualFilePath = kCaptureSpaceVersionManager::getActualFilePath($filename);
-		if (!$actualFilePath)
+		
+		$actualFilePath = myContentStorage::getFSContentRootPath() . "/content/third_party/capturespace/$filename";
+		if (!file_exists($actualFilePath)) {
 			throw new KalturaAPIException(CaptureSpaceErrors::NO_INSTALL_IS_AVAILABLE, $os);
-
+		}
+		
 		$mimeType = kFile::mimeType($actualFilePath);
 		header("Content-Disposition: attachment; filename=\"$filename\"");
 		return $this->dumpFile($actualFilePath, $mimeType);

@@ -46,34 +46,20 @@ class kCaptureSpaceVersionManager{
 		
 		foreach($sections as $section){
 			if(isset($section[$osFileType])){		
-				return $section[$osFileType];
+				return explode(',', $section[$osFileType]);
 			}
 		}
 		
 		return null;
 	}
 	
-	public static function getUpdateHash($os, $version, $hashAlgorithm){
-		$filename = self::getConfig($os, self::$osUpdateTypes, $version);
-		if(!$filename){
+	public static function getUpdateHash($os, $version){
+		$config = self::getConfig($os, self::$osUpdateTypes, $version);
+		if(!$config){
 			return null;
 		}
-		$actualPath = self::getActualFilePath($filename);
-		if (!$actualPath)
-			return null;
-		$cacheKey = "capture-space-file-hash-key-os".$os."-version-".$version."-hash-algo-".$hashAlgorithm;
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
-		$hash = null;
-		if (!$cache)
-			$hash = hash_file($hashAlgorithm, $actualPath);
-		else
-			$hash = $cache->get($cacheKey);
-		if (!$hash)
-		{
-			$hash = hash_file($hashAlgorithm, $actualPath);
-			$cache->set($cacheKey, $hash);
-		}
-
+		
+		list($filename, $hash) = $config;
 		return $hash;
 	}
 	
@@ -95,14 +81,5 @@ class kCaptureSpaceVersionManager{
 		
 		list($filename, $hash) = $config;
 		return $filename;
-	}
-
-	public static function getActualFilePath($filename)
-	{
-		$actualFilePath = myContentStorage::getFSContentRootPath() . "/content/third_party/capturespace/$filename";
-		if (!file_exists($actualFilePath)) {
-			return false;
-		}
-		return $actualFilePath;
 	}
 }
