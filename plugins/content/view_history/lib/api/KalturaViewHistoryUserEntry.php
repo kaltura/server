@@ -16,11 +16,6 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 	 * @var int
 	 */
 	public $lastTimeReached;
-	
-	public function __construct()
-	{
-		$this->type = ViewHistoryPlugin::getApiValue(ViewHistoryUserEntryType::VIEW_HISTORY);
-	}
 
 	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  

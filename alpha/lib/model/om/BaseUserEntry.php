@@ -74,6 +74,12 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	protected $extended_status;
 
 	/**
+	 * The value for the privacy_context field.
+	 * @var        string
+	 */
+	protected $privacy_context;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -282,6 +288,16 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	public function getExtendedStatus()
 	{
 		return $this->extended_status;
+	}
+
+	/**
+	 * Get the [privacy_context] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPrivacyContext()
+	{
+		return $this->privacy_context;
 	}
 
 	/**
@@ -562,6 +578,29 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	} // setExtendedStatus()
 
 	/**
+	 * Set the value of [privacy_context] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     UserEntry The current object (for fluent API support)
+	 */
+	public function setPrivacyContext($v)
+	{
+		if(!isset($this->oldColumnsValues[UserEntryPeer::PRIVACY_CONTEXT]))
+			$this->oldColumnsValues[UserEntryPeer::PRIVACY_CONTEXT] = $this->privacy_context;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->privacy_context !== $v) {
+			$this->privacy_context = $v;
+			$this->modifiedColumns[] = UserEntryPeer::PRIVACY_CONTEXT;
+		}
+
+		return $this;
+	} // setPrivacyContext()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -625,7 +664,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->extended_status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->privacy_context = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -635,7 +675,7 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = UserEntryPeer::NUM_COLUMNS - UserEntryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = UserEntryPeer::NUM_COLUMNS - UserEntryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UserEntry object", $e);
@@ -1228,6 +1268,9 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 				return $this->getExtendedStatus();
 				break;
 			case 9:
+				return $this->getPrivacyContext();
+				break;
+			case 10:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1260,7 +1303,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			$keys[6] => $this->getStatus(),
 			$keys[7] => $this->getType(),
 			$keys[8] => $this->getExtendedStatus(),
-			$keys[9] => $this->getCustomData(),
+			$keys[9] => $this->getPrivacyContext(),
+			$keys[10] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1320,6 +1364,9 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 				$this->setExtendedStatus($value);
 				break;
 			case 9:
+				$this->setPrivacyContext($value);
+				break;
+			case 10:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1355,7 +1402,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setType($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setExtendedStatus($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
+		if (array_key_exists($keys[9], $arr)) $this->setPrivacyContext($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
 	}
 
 	/**
@@ -1376,6 +1424,7 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserEntryPeer::STATUS)) $criteria->add(UserEntryPeer::STATUS, $this->status);
 		if ($this->isColumnModified(UserEntryPeer::TYPE)) $criteria->add(UserEntryPeer::TYPE, $this->type);
 		if ($this->isColumnModified(UserEntryPeer::EXTENDED_STATUS)) $criteria->add(UserEntryPeer::EXTENDED_STATUS, $this->extended_status);
+		if ($this->isColumnModified(UserEntryPeer::PRIVACY_CONTEXT)) $criteria->add(UserEntryPeer::PRIVACY_CONTEXT, $this->privacy_context);
 		if ($this->isColumnModified(UserEntryPeer::CUSTOM_DATA)) $criteria->add(UserEntryPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1470,6 +1519,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		$copyObj->setType($this->type);
 
 		$copyObj->setExtendedStatus($this->extended_status);
+
+		$copyObj->setPrivacyContext($this->privacy_context);
 
 		$copyObj->setCustomData($this->custom_data);
 

@@ -26,6 +26,12 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
 
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
+		if (kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
+			$dbUserEntry->setPrivacyContext($privacyContexts[0]);
+		}
+		
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -48,6 +54,10 @@ class UserEntryService extends KalturaBaseService {
 
 		$dbUserEntry = $userEntry->toUpdatableObject($dbUserEntry);
 		$dbUserEntry->save();
+		
+		$userEntry->fromObject($dbUserEntry);
+		
+		return $userEntry;
 	}
 
 	/**

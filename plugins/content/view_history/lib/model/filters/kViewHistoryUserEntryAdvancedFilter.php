@@ -26,6 +26,13 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 	public function getEntryIds($entryIds = array())
 	{
 		$ueCrit = new Criteria();
+		
+		if (kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
+			$ueCrit->addAnd(self::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
+		}
+		
 		$ueCrit->addSelectColumn(UserEntryPeer::ENTRY_ID);
 		$this->filter->attachToCriteria($ueCrit);
 		
@@ -83,8 +90,13 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 					KalturaLog::info("Not all objects will return from the search - consider narrowing the search criteria");
 					$entryIds = array_slice($entryIds, 0, $query->getLimit());
 				}
-				
 			}
+			else
+			{
+				KalturaLog::err("Consider narrowing search");
+				throw new kCoreException(kCoreException::SEARCH_TOO_GENERAL);
+			}
+					
 		}
 		
 		if (!count($entryIds))
