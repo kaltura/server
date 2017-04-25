@@ -51,7 +51,17 @@ class kPlaybackContextDataHelper
 		if ($this->hasBlockAction($contextDataHelper))
 			return;
 
-		if ($dbEntry->getType() == entryType::LIVE_STREAM)
+		if (myEntryUtils::shouldServeVodFromLive($dbEntry))
+		{
+			$rootEntryId = $dbEntry->getRootEntryId();
+			$rootEntry = entryPeer::retrieveByPK($rootEntryId);
+			if (!$rootEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $rootEntryId);
+
+			$this->constructLivePlaybackSources($rootEntry, $contextDataHelper, $dbEntry);
+			$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
+		}
+		elseif ($dbEntry->getType() == entryType::LIVE_STREAM)
 		{
 			$this->constructLivePlaybackSources($dbEntry, $contextDataHelper);
 			$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
@@ -271,7 +281,7 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	private function constructLivePlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper)
+	private function constructLivePlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper, $replacementEntry = null)
 	{
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 
@@ -304,9 +314,12 @@ class kPlaybackContextDataHelper
 				/* @var $playbackFlavor flavorAsset*/
 				$playbackFlavorParamsIds []= $playbackFlavor->getFlavorParamsId();
 			}
-			
+
 			$protocols = $this->constructProtocol($deliveryProfile);
-			$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+			if ($replacementEntry)
+				$manifestUrl = myEntryUtils::buildManifestUrl($replacementEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+			else
+				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
 			$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", $playbackFlavorParamsIds), $manifestUrl, $drmData);
 		}
 	}
