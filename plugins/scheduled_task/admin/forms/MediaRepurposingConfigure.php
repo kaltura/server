@@ -181,7 +181,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		$tasks = $this->populateTask($object);
 
-		$scheduledtaskPlugin = MediaRepurposingUtils::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $this->newPartnerId);
+		$scheduledtaskPlugin = MediaRepurposingUtils::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
 		$ids = explode(',', $object->description);
 		foreach($ids as $stId) {
 			if (strlen($stId) == 0)
