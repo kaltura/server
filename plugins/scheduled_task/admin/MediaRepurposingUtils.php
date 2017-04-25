@@ -81,33 +81,33 @@ class MediaRepurposingUtils
 
 	
 	public static function createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed) {
-		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
-
 		$mr = self::createST($name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
+		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		$result = $scheduledTaskPlugin->scheduledTaskProfile->add($mr);
 
 		$mrId = $result->id;
 		$mr = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
-		$mr->description = self::handleSts($mrId, $scheduledTaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleSts($mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
+		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		return $scheduledTaskPlugin->scheduledTaskProfile->update($mrId, $mr);
 	}
 
 	
-	public static function UpdateMr($id, $name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed) {
-		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
-
+	public static function UpdateMr($id, $name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed)
+	{
 		$taskArray[0]->relatedObjects = null;
 		$mr = self::createST($name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$mr->objectFilter->advancedSearch->items[] = self::createMrConditionFilter($id);
+		$mr->description = self::handleSts($id, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
 
-		$mr->description = self::handleSts($id, $scheduledtaskPlugin, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
+		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		return $scheduledtaskPlugin->scheduledTaskProfile->update($id, $mr);
 
 	}
 
-	private static function handleSts($mrId, $scheduledtaskPlugin, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
+	private static function handleSts($mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
 	{
 		$ids = '';
 		for ($i = 2; $i < count($taskArray); $i += 2) {
@@ -125,10 +125,11 @@ class MediaRepurposingUtils
 			KalturaLog::info(print_r($scheduledTaskProfile, true));
 
 			//add task to API
+			$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 			if ($sdId)
-				$result = $scheduledtaskPlugin->scheduledTaskProfile->update($sdId, $scheduledTaskProfile);
+				$result = $scheduledTaskPlugin->scheduledTaskProfile->update($sdId, $scheduledTaskProfile);
 			else
-				$result = $scheduledtaskPlugin->scheduledTaskProfile->add($scheduledTaskProfile);
+				$result = $scheduledTaskPlugin->scheduledTaskProfile->add($scheduledTaskProfile);
 
 			if (strlen($ids))
 				$ids.= ",";

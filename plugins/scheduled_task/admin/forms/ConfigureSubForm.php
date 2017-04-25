@@ -54,7 +54,6 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'int':
-				return $this->addIntegerElement($name, $prefix);
 			case 'string':
 				return $this->addStringElement($name, $prefix);
 
@@ -65,6 +64,8 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			default:
 				if (strpos($type ,'Enum') > -1)
 					return $this->addEnumElement($name, $prefix, $type);
+				if (strpos($type ,'array') > -1)
+					return $this->addArrayElement($name, $prefix);
 		}
 		return null;
 	}
@@ -75,11 +76,12 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
+		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
-	protected function addIntegerElement($name, $prefix) {
+	protected function addArrayElement($name, $prefix) {
 		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> $name,
+			'label' 		=> "$name (Array: enter item comma separated)",
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
