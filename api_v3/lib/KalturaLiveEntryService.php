@@ -441,12 +441,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
 	 * @param string $recordedEntryId Recorded entry Id
+	 * @param int $flavorParamsId Recorded entry Id
 	 * @return KalturaLiveEntry The updated live entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::RECORDED_ENTRY_LIVE_MISMATCH
 	 */
-	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $recordedEntryId = null)
+	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $recordedEntryId = null, $flavorParamsId = null)
 	{
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_KALTURA_RECORDING, kCurrentContext::getCurrentPartnerId()))
 		{
@@ -484,6 +485,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 				$createRecordedEntry = true;
 		}
+		else
+		{
+			$recordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
+		}
 		
 		if($createRecordedEntry)
 			$recordedEntry = $this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
@@ -495,12 +500,35 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbLiveEntry->setLengthInMsecs($totalDuration);
 		$dbLiveEntry->save();
 		
-		$service = new MediaService();
-		$service->initService('media', 'media', 'updateContent');
-		$service->updateContentAction($recordedEntry->getId(), $resource);
+		$this->handleRecording($dbLiveEntry, $recordedEntry, $resource, $flavorParamsId);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
 		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
 		return $entry;
+	}
+	
+	private function handleRecording(LiveEntry $dbLiveEntry, entry $recordedEntry, KalturaDataCenterContentResource $resource, $flavorParamsId = null)
+	{
+		if(!$flavorParamsId)
+		{
+			$service = new MediaService();
+			$service->initService('media', 'media', 'updateContent');
+			$service->updateContentAction($recordedEntry->getId(), $resource);
+			return;
+		}
+		
+		if(!$recordedEntry->getConversionProfileId())
+		{
+			$recordedEntry->setConversionProfileId($dbLiveEntry->getConversionProfileId());
+			$recordedEntry->save();
+		}
+		
+		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbLiveEntry->getId(), $flavorParamsId);
+		$kResource = $resource->toObject();
+		$filename = $kResource->getLocalFilePath();
+		
+		$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
+		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
+		$this->ingestAsset($replacingEntry, $dbAsset, $filename);
 	}
 }
