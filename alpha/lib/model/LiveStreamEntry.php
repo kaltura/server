@@ -34,16 +34,52 @@ class LiveStreamEntry extends LiveEntry
 	public function getStreamUrl (  )		{	return $this->getFromCustomData( "streamUrl" );	}
 	
 	public function setPrimaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryBroadcastingUrl" , $v );	}
-	public function getPrimaryBroadcastingUrl (  )		{	return $this->getFromCustomData( "primaryBroadcastingUrl" );	}
+	public function getPrimaryBroadcastingUrl (  )
+	{
+		$url = $this->getFromCustomData( "primaryBroadcastingUrl" );
+		if($url)
+			return $url;
+
+		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
+		$url = $manager->getPrimaryBroadcastUrl($this, kBroadcastUrlManager::PROTOCOL_RTMP, 'domain', 'port');
+		return $url;
+	}
 	
 	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
-	public function getSecondaryBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryBroadcastingUrl", null, '' );	}
+	public function getSecondaryBroadcastingUrl (  )
+	{
+		$url = $this->getFromCustomData( "secondaryBroadcastingUrl" );
+		if($url)
+			return $url;
+
+		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
+		$url = $manager->getSecondaryBroadcastUrl($this, kBroadcastUrlManager::PROTOCOL_RTMP, 'domain', 'port');
+		return $url;
+	}
 	
 	public function setPrimaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtspBroadcastingUrl" , $v );	}
-	public function getPrimaryRtspBroadcastingUrl (  )		{	return $this->getFromCustomData( "primaryRtspBroadcastingUrl" );	}
+	public function getPrimaryRtspBroadcastingUrl (  )
+	{
+		$url = $this->getFromCustomData( "primaryRtspBroadcastingUrl" );
+		if($url)
+			return $url;
+
+		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
+		$url = $manager->getPrimaryBroadcastUrl($this, kBroadcastUrlManager::PROTOCOL_RTSP, 'rtsp_domain', 'rtsp_port', true);
+		return $url;
+	}
 	
 	public function setSecondaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryRtspBroadcastingUrl" , $v );	}
-	public function getSecondaryRtspBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryRtspBroadcastingUrl", null, '' );	}
+	public function getSecondaryRtspBroadcastingUrl (  )
+	{
+		$url = $this->getFromCustomData( "secondaryRtspBroadcastingUrl" );
+		if($url)
+			return $url;
+
+		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
+		$url = $manager->getSecondaryBroadcastUrl($this, kBroadcastUrlManager::PROTOCOL_RTSP, 'rtsp_domain', 'rtsp_port', true);
+		return $url;
+	}
 	
 	public function setPrimaryServerNodeId ( $v )	{	$this->putInCustomData ( "primaryServerNodeId" , $v );	}
 	public function getPrimaryServerNodeId (  )	{	return $this->getFromCustomData( "primaryServerNodeId", null, null );	}

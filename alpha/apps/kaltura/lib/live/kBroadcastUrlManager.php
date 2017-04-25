@@ -38,27 +38,6 @@ class kBroadcastUrlManager
 		return new kBroadcastUrlManager($partnerId);
 	}
 
-	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
-	{
-		$currentDc = kDataCenterMgr::getCurrentDcId();
-		$hostname = $this->getHostname($currentDc, true, $dbEntry);
-		
-		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));		
-		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, true));
-			
-		$configuration = $this->getConfiguration();
-		foreach($configuration as $dc => $config)
-		{
-			if(!is_numeric($dc) || $dc == $currentDc)
-				continue;
-				
-			$hostname = $this->getHostname($dc, false, $dbEntry);
-			
-			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
-			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, true));
-		}
-	}
-	
 	protected function getPostfixValue ($sourceType)
 	{
 		//We want the behavior to be as before.
@@ -77,14 +56,14 @@ class kBroadcastUrlManager
 		return $partner->getLiveStreamBroadcastUrlConfigurations($dc);
 	}
 	
-	protected function getHostname ($dc, $primary, $entry)
+	protected function getHostname ($dc, $primary, $entry, $domainParam, $portParam)
 	{
 		$sourceType = $entry->getSource();
 		$applicationSuffix = $this->getPostfixValue($sourceType);
 		$mediaServerConfig = $this->getConfiguration($dc);
-		$url = $mediaServerConfig['domain'];
+		$url = $mediaServerConfig[$domainParam];
 		$url = str_replace(array("{entryId}", "{primary}"), array($entry->getId(), $primary ? "p" : "b"), $url);
-		$port = $this->getPort($dc);
+		$port = $this->getPort($dc, $portParam);
 		
 		if (isset ($mediaServerConfig['application'][$applicationSuffix]))
 			$app = $mediaServerConfig['application'][$applicationSuffix];
@@ -97,19 +76,19 @@ class kBroadcastUrlManager
 		return "$url:$port/$app";
 	}
 	
-	protected function getPort ($dc)
+	protected function getPort($dc, $portParam)
 	{
 		$port = kBroadcastUrlManager::DEFAULT_PORT;
 	
 		$broadcastConfig = $this->getConfiguration();	
-		if(isset($broadcastConfig['port']))
+		if(isset($broadcastConfig[$portParam]))
 		{
-			$port = $broadcastConfig['port'];
+			$port = $broadcastConfig[$portParam];
 		}
 		
-		if (isset($broadcastConfig[$dc]) && isset($broadcastConfig[$dc]['port']))
+		if (isset($broadcastConfig[$dc]) && isset($broadcastConfig[$dc][$portParam]))
 		{
-			$port = $broadcastConfig[$dc]['port'];
+			$port = $broadcastConfig[$dc][$portParam];
 		}
 		
 		return $port;
@@ -176,5 +155,25 @@ class kBroadcastUrlManager
 		
 		return "$url" . ($this->useOldUrlPattern ? "/" : "") . "?$paramsStr";
 	}
-	
+
+	public function getPrimaryBroadcastUrl(LiveStreamEntry $entry, $protocol, $domainParam, $portParam, $concatStreamName = false)
+	{
+		$currentDc = kDataCenterMgr::getCurrentDcId();
+		$hostname = $this->getHostName($currentDc, true, $entry, $domainParam, $portParam);
+		return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, $concatStreamName);
+	}
+
+	public function getSecondaryBroadcastUrl(LiveStreamEntry $entry, $protocol, $domainParam, $portParam, $concatStreamName = false)
+	{
+		$currentDc = kDataCenterMgr::getCurrentDcId();
+		$configuration = $this->getConfiguration();
+		foreach($configuration as $dc => $config)
+		{
+			if(!is_numeric($dc) || $dc == $currentDc)
+				continue;
+
+			$hostname = $this->getHostName($dc, false, $entry, $domainParam, $portParam);
+			return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $concatStreamName);
+		}
+	}
 }
