@@ -22,9 +22,7 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$mediaRepurposingId = $this->_getParam('media_repurposing_id');
 		$partnerId = $this->_getParam('new_partner_id');
 		$filterTypeEngine = $this->_getParam('new_mr_filter_engine_type');
-		
 		$filterType = $this->_getParam('new_mr_filter_type');
-		//$filterType = MediaRepurposingUtils::filterFactory($filterTypeEngine);
 		
 		$action->view->formValid = false;
 

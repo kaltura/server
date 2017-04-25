@@ -316,6 +316,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n\nExecute for entries: \n";
 		foreach($objectsIds as $id)
 			$body .= "$id\n";
+		$body .= "Total count of affected object: " . count($objectsIds);
 
 		KalturaLog::info("sending mail to $mailTask->mailAddress with body: $body");
 
