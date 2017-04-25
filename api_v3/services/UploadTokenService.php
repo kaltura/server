@@ -184,7 +184,7 @@ class UploadTokenService extends KalturaBaseService
 
                 // in case a filename filter was passed enforce a statusIn filter in order to limit slow db queries
                 if ($filter->fileNameEqual && $filter->statusEqual == null && $filter->statusIn == null)
-                        $filter->statusIn = implode(array(KalturaUploadTokenStatus::PENDING, KalturaUploadTokenStatus::PARTIAL_UPLOAD, KalturaUploadTokenStatus::FULL_UPLOAD), ",");
+                        $filter->statusIn = implode(",", array(KalturaUploadTokenStatus::PENDING, KalturaUploadTokenStatus::PARTIAL_UPLOAD, KalturaUploadTokenStatus::FULL_UPLOAD));
  
 		// create the filter
 		$uploadTokenFilter = new UploadTokenFilter();
