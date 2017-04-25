@@ -1076,6 +1076,15 @@ return array(
     'distribution-profile was removed' => 'Distribution profile was removed.' ,
     'distribution-profile was disabled' => 'Distribution profile disabled.',
     'distribution-profile was enabled' => 'Distribution profile enabled.',
+	
+	//Media Repurposing
+	'Media Repurposing list intro text' => 'Here you can manage the Media Repurposing profiles on your Kaltura video platform deployment',
+
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE' => 'Active',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DELETED' => 'Delete',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED' => 'Suspended',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY' => 'Dry run only',
 
 	// Drop Folder
 	'drop folder list intro text' => 'Here you can manage the Drop Folder profiles on your Kaltura video platform deployment',

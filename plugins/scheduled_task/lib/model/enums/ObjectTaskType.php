@@ -18,4 +18,6 @@ interface ObjectTaskType extends BaseEnum
 	const STORAGE_EXPORT = 6;
 
 	const MODIFY_ENTRY = 7;
+
+	const MAIL_NOTIFICATION = 8;
 }
