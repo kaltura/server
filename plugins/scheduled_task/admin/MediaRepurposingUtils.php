@@ -161,9 +161,12 @@ class MediaRepurposingUtils
 	{
 		$filter = new Kaltura_Client_Metadata_Type_MetadataProfileFilter();
 		$filter->systemNameEqual = 'MRP';
+		$filter->partnerIdEqual = 0;
 		$metadataPlugin = self::getPluginByName('Kaltura_Client_Metadata_Plugin');
-		$profiles = $metadataPlugin->metadataProfile->listAction($filter, null);
-		return $profiles->objects[0];
+		$res = $metadataPlugin->metadataProfile->listAction($filter, null);
+		if ($res->totalCount != 1)
+			return null;
+		return $res->objects[0];
 	}
 
 
@@ -173,8 +176,10 @@ class MediaRepurposingUtils
 		$searchItem->type = Kaltura_Client_Enum_SearchOperatorType::SEARCH_AND;
 
 		$profile = self::getMrMetadataProfile();
+		if (!$profile)
+			return null;
 		$searchItem->metadataProfileId = $profile->id;
-		
+
 		$conditions = array();
 		$condition = new Kaltura_Client_Type_SearchMatchCondition();
 		$condition->field = self::STATUS_XPATH_NAME;
