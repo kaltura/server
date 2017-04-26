@@ -148,6 +148,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$ignore = array('relatedObjects', 'orderBy');
 		$this->addObjectSection('Filter', $filter , $ignore, self::FILTER_PREFIX);
 
+		$this->addComment('relativeTimes', 'For relative times insert -/+ and seconds');
 		$this->addElement('button', 'expandFilter', array(
 			'ignore'	=> true,
 			'label'		=> 'Expand Filter',
