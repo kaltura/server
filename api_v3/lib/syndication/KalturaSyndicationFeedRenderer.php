@@ -262,6 +262,7 @@ class KalturaSyndicationFeedRenderer
 
 		$coreFilter = new entryFilter();
 		$entryFilter->toObject($coreFilter);
+		$coreFilter->transformFieldsToRelative();
 		$this->addFilter($coreFilter);
 	}
 

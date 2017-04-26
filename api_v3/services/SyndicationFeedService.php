@@ -45,7 +45,9 @@ class SyndicationFeedService extends KalturaBaseService
 	 * 
 	 * @action add
 	 * @param KalturaBaseSyndicationFeed $syndicationFeed
-	 * @return KalturaBaseSyndicationFeed 
+	 * @return KalturaBaseSyndicationFeed
+	 *
+	 * @disableRelativeTime $syndicationFeed
 	 */
 	public function addAction(KalturaBaseSyndicationFeed $syndicationFeed)
 	{
@@ -134,6 +136,8 @@ class SyndicationFeedService extends KalturaBaseService
 	 * @param KalturaBaseSyndicationFeed $syndicationFeed
 	 * @return KalturaBaseSyndicationFeed
 	 * @throws KalturaErrors::INVALID_FEED_ID
+	 *
+	 * @disableRelativeTime $syndicationFeed
 	 */
 	public function updateAction($id, KalturaBaseSyndicationFeed $syndicationFeed)
 	{
