@@ -88,7 +88,7 @@ class MediaRepurposingUtils
 
 		$mrId = $result->id;
 		$mr = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
-		$mr->description = self::handleSts($mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleSts($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
 		$mr->objectFilter->advancedSearch->items[] = self::createMrConditionFilter($mrId);
 		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		return $scheduledTaskPlugin->scheduledTaskProfile->update($mrId, $mr);
@@ -101,14 +101,14 @@ class MediaRepurposingUtils
 		$mr = self::createST($name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$mr->objectFilter->advancedSearch->items[] = self::createMrConditionFilter($id);
-		$mr->description = self::handleSts($id, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleSts($partnerId, $id, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
 
 		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		return $scheduledtaskPlugin->scheduledTaskProfile->update($id, $mr);
 
 	}
 
-	private static function handleSts($mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
+	private static function handleSts($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
 	{
 		$ids = '';
 		for ($i = 2; $i < count($taskArray); $i += 2) {
