@@ -60,16 +60,8 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			return $response;
 		}
 
-
 		$c = new Criteria();
-		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
-		{
-			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
-		}
-		else
-		{
-			$this->fixFilterUserId();
-		}
+		
 		$userEntryFilter = $this->toObject();
 		$userEntryFilter->attachToCriteria($c);
 
@@ -94,6 +86,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$response->objects = KalturaUserEntryArray::fromDbArray($list, $responseProfile);
 		return $response;
 	}
+	
 
 	public function toObject ($object_to_fill = null, $props_to_skip = array())
 	{
@@ -125,7 +118,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	{
 		if ($this->userIdEqual !== null)
 		{
+			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get userEntry objects of deleted users.
+				kuserPeer::setUseCriteriaFilter(false);
+
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
+			kuserPeer::setUseCriteriaFilter(true);
 			if ($kuser)
 				$this->userIdEqual = $kuser->getId();
 			else
