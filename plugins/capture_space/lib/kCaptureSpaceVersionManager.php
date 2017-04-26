@@ -78,22 +78,18 @@ class kCaptureSpaceVersionManager{
 	}
 	
 	public static function getUpdateFile($os, $version){
-		$config = self::getConfig($os, self::$osUpdateTypes, $version);
-		if(!$config){
+		$filename = self::getConfig($os, self::$osUpdateTypes, $version);
+		if(!$filename){
 			return null;
 		}
-		
-		list($filename, $hash) = $config;
 		return $filename;
 	}
 	
 	public static function getInstallFile($os){
-		$config = self::getConfig($os, self::$osInstallTypes);
-		if(!$config){
+		$filename = self::getConfig($os, self::$osInstallTypes);
+		if(!$filename){
 			return null;
 		}
-		
-		list($filename, $hash) = $config;
 		return $filename;
 	}
 
