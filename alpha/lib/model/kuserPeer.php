@@ -45,6 +45,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 */
 	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
 	{
+		if(strlen($puserId) > 100)
+			$puserId = substr($puserId, 0, 100);
+
 		if(!$ignorePuserKuser && !kCurrentContext::isApiV3Context())
 		{
 			$puserKuser = PuserKuserPeer::retrieveByPartnerAndUid($partnerId, 0, $puserId, true);
@@ -89,6 +92,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	
 	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
+		if(strlen($puser_id) > 100)
+			$puser_id = substr($puser_id, 0, 100);
 		$lockKey = "user_add_" . $partner_id . $puser_id;
 		return kLock::runLocked($lockKey, array('kuserPeer','createUniqueKuserForPartner'), array($partner_id, $puser_id, $is_admin));
 	}
