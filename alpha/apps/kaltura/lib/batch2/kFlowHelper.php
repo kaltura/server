@@ -366,7 +366,7 @@ class kFlowHelper
 		return $fileIndex;
 	}
 
-	private static function createReplacigEntry($recordedEntry, $liveSegmentCount)
+	private static function createReplacigEntry($recordedEntry, $liveSegmentCount, $replacementStatus = entryReplacementStatus::APPROVED_BUT_NOT_READY)
 	{
 		$advancedOptions = new kEntryReplacementOptions();
 		$advancedOptions->setKeepManualThumbnails(true);
@@ -389,12 +389,12 @@ class kFlowHelper
 		$replacingEntry->save();
 
 		$recordedEntry->setReplacingEntryId($replacingEntry->getId());
-		$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+		$recordedEntry->setReplacementStatus($replacementStatus);
 		$affectedRows = $recordedEntry->save();
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount)
+	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount, $replacementStatus = entryReplacementStatus::APPROVED_BUT_NOT_READY)
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -427,7 +427,7 @@ class kFlowHelper
 		
 		if(is_null($replacingEntry))
 		{
-			$replacingEntry = self::createReplacigEntry($recordedEntry, $liveSegmentCount);
+			$replacingEntry = self::createReplacigEntry($recordedEntry, $liveSegmentCount, $replacementStatus);
 		}
 		return $replacingEntry;
 	}	

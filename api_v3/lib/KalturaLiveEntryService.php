@@ -481,13 +481,15 @@ class KalturaLiveEntryService extends KalturaEntryService
 				$dbLiveEntry->save();
 			}
 		}
-		else if(!$dbLiveEntry->getRecordedEntryId())
+		else if($dbLiveEntry->getRecordedEntryId())
 		{
+			$recordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
+			if(!$recordedEntry)
 				$createRecordedEntry = true;
 		}
 		else
 		{
-			$recordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
+			$createRecordedEntry = true;
 		}
 		
 		if($createRecordedEntry)
@@ -528,7 +530,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$filename = $kResource->getLocalFilePath();
 		
 		$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
-		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
+		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0, entryReplacementStatus::NOT_READY_AND_NOT_APPROVED));
 		$this->ingestAsset($replacingEntry, $dbAsset, $filename);
 	}
 }
