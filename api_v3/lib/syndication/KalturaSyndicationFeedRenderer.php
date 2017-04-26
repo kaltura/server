@@ -260,6 +260,9 @@ class KalturaSyndicationFeedRenderer
 	{
 		$entryFilter = $this->syndicationFeed->entryFilter;
 
+		if(!$entryFilter)
+			return;
+		
 		$coreFilter = new entryFilter();
 		$entryFilter->toObject($coreFilter);
 		$coreFilter->transformFieldsToRelative();
