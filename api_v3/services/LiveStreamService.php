@@ -536,6 +536,9 @@ class LiveStreamService extends KalturaLiveEntryService
 		$password = substr($password, rand(0, strlen($password) - 8), 8);
 		$liveEntry->setStreamPassword($password);
 
+		$broadcastUrlManager = kBroadcastUrlManager::getInstance($liveEntry->getPartnerId());
+		$broadcastUrlManager->setEntryBroadcastingUrls($liveEntry);
+
 		$liveEntry->save();
 
 		$entry = KalturaEntryFactory::getInstanceByType($liveEntry->getType());

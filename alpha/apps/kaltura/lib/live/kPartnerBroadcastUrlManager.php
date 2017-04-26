@@ -1,7 +1,7 @@
 <?php
 class kPartnerBroadcastUrlManager extends kBroadcastUrlManager
 {
-	protected function getHostName($dc, $primary, $entry, $domainParam, $portParam)
+	protected function getHostName($dc, $primary, $entry, $protocol)
 	{
 		$partner  = PartnerPeer::retrieveByPK($this->partnerId);
 		if (!$partner)
