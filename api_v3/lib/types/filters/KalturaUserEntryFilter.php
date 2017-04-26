@@ -17,6 +17,27 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	public $isAnonymous;
 	
 	/**
+	 * @var string
+	 */
+	public $privacyContextEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $privacyContextIn;
+	
+	static private $map_between_objects = array
+	(
+		"privacyContextEqual" => "_eq_privacy_context",
+		"privacyContextIn" => "_in_privacy_context",
+	);
+	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
+	/**
 	 * @return baseObjectFilter
 	 */
 	protected function getCoreFilter()
@@ -45,6 +66,9 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$userEntryFilter->attachToCriteria($c);
 
 		$pager->attachToCriteria($c);
+		
+		$this->modifyCriteria($c);
+		
 		$list = UserEntryPeer::doSelect($c);
 
 		$resultCount = count($list);
@@ -66,6 +90,14 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 
 	public function toObject ($object_to_fill = null, $props_to_skip = array())
 	{
+		if (kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
+		{
+			if (!is_null($this->privacyContextEqual) || !is_null($this->privacyContextIn))
+			{
+				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED);
+			}
+		}
+		
 		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
 		{
 			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
@@ -124,5 +156,10 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			$anonKuserIds .= ",".$anonKuser->getKuserId();
 		}
 		return $anonKuserIds;
+	}
+	
+	protected function modifyCriteria ($c)
+	{
+		//to be overridden by child classes
 	}
 }

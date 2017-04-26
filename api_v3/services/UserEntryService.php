@@ -136,7 +136,23 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
 		}
 		
-		$ueFilter = $filter->toObject();
+		$ueFilter = new UserEntryFilter();
+		if ($filter->userIdEqual)
+		{
+			$ueFilter->set("_eq_user_id", $filter->userIdEqual);
+			$filter->userIdEqual = null;
+		}
+		if($filter->userIdIn)
+		{
+			$ueFilter->set("_in_user_id", $filter->userIdIn);
+			$filter->userIdIn = null;
+		}
+		$ueFilter = $filter->toObject($ueFilter);
+		if (kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
+			$ueFilter->set("_eq_privacy_context", $privacyContexts[0]);
+		}
 		
 		return kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
 	}

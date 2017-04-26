@@ -30,7 +30,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
-			$ueCrit->addAnd(self::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
+			$ueCrit->addAnd(UserEntryPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
 		}
 		
 		$ueCrit->addSelectColumn(UserEntryPeer::ENTRY_ID);
