@@ -451,7 +451,7 @@ class kMrssManager
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
 		if($mrssParams && !is_null($mrssParams->getLink()))
 			$mrss->addChild('link', $mrssParams->getLink() . $entry->getId());
-		$mrss->addChild('type', $entry->getType());
+		$mrss->addChild('type', kPluginableEnumsManager::coreToApi('entryType', $entry->getType()));
 		$mrss->addChild('licenseType', $entry->getLicenseType());
 		$mrss->addChild('userId', $entry->getPuserId());
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
