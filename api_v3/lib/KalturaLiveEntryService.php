@@ -178,6 +178,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			$recordedAsset->setFileExt($ext);
 		}
+		
+		if($flavorParams->conversionEnginesExtraParams())
+		{
+			$extraParamsJson = json_decode($flavorParams->conversionEnginesExtraParams(), true);
+			KalturaLog::debug("ingestAsset = extraParamsJson = " . print_r($extraParamsJson, true));
+			if(isset($extraParamsJson["language"]))
+				$recordedAsset->setLanguage($extraParamsJson["language"]);
+		}
 
 		$recordedAsset->save();
 
