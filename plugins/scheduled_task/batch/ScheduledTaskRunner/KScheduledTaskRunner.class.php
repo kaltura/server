@@ -111,12 +111,12 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 			foreach($result->objects as $object)
 			{
+				$error = $this->processObject($profile, $object);
 
-				$this->processObject($profile, $object);
-
-				$objectsIds[] = $object->id;
+				if (!$error)
+					$objectsIds[] = $object->id;
 				if ($isMrProfile)
-					$this->updateMetadataStatusForMR($profile, $object);
+					$this->updateMetadataStatusForMR($profile, $object, $error);
 			}
 			if (!$isMrProfile)
 				$pager->pageIndex++;
@@ -137,17 +137,18 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	 */
 	protected function processObject(KalturaScheduledTaskProfile $profile, $object)
 	{
+		$error = false;
 		foreach($profile->objectTasks as $objectTask)
 		{
-
 			if ($objectTask->type == ObjectTaskType::MAIL_NOTIFICATION)
-				return; //no execute on object
+				continue; //no execute on object
 			/** @var KalturaObjectTask $objectTask */
 			$objectTaskEngine = $this->getObjectTaskEngineByType($objectTask->type);
 			$objectTaskEngine->setObjectTask($objectTask);
 			try
 			{
 				$objectTaskEngine->execute($object);
+
 			}
 			catch(Exception $ex)
 			{
@@ -157,6 +158,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 					$id = $object->id;
 				KalturaLog::err(sprintf('An error occurred while executing %s on object %s (id %s)', get_class($objectTaskEngine), get_class($object), $id));
 				KalturaLog::err($ex);
+				$error = true;
 
 				if ($objectTask->stopProcessingOnError)
 				{
@@ -165,6 +167,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				}
 			}
 		}
+		return $error;
 	}
 
 	/**
@@ -253,10 +256,13 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $result->objects[0];
 	}
 
-	private function updateMetadataXmlField($mrId, $newStatus, $xml_string)
+	private function updateMetadataXmlField($mrId, $newStatus, $xml_string, $error)
 	{
 		$day = self::getUpdateDay();
-		$newVal = "$mrId,$newStatus,$day";
+		if ($error)
+			$newVal = "$mrId,Error,$newStatus,$day";
+		else
+			$newVal = "$mrId,$newStatus,$day";
 
 		$xml = simplexml_load_string($xml_string);
 		$mprsData = $xml->xpath('/metadata/MRPData');
@@ -266,27 +272,33 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $xml;
 	}
 
-	private function addMetadataXmlField($mrId, $xml_string)
+	private function addMetadataXmlField($mrId, $xml_string, $error)
 	{
 		$xml = simplexml_load_string($xml_string);
 		if (!$xml || !$xml->MRPData)
-			return $this->createFirstMr($mrId, $xml);
+			return $this->createFirstMr($mrId, $xml, $error);
 
+		$newVal = "$mrId,1," .self::getUpdateDay();
+		if ($error)
+			$newVal = "$mrId,Error,1," .self::getUpdateDay();
 
-		$xml->MRPData[] = "$mrId,1," .self::getUpdateDay();
+		$xml->MRPData[] = $newVal;
 		$target_dom = dom_import_simplexml(current($xml->xpath('//MRPsOnEntry[last()]')));
 		$insert_dom = $target_dom->ownerDocument->createElement("MRPsOnEntry", "MR_$mrId");
 		$target_dom->parentNode->insertBefore($insert_dom, $target_dom->nextSibling);
 		return $xml;
 	}
 
-	private function createFirstMr($mrId, $xml = null)
+	private function createFirstMr($mrId, $xml = null, $error)
 	{
 		if (!$xml)
 			$xml = new SimpleXMLElement("<metadata/>");
 		$xml->addChild('Status', '1');
 		$xml->addChild('MRPsOnEntry', "MR_$mrId");
-		$xml->addChild('MRPData', "$mrId,1," .self::getUpdateDay());
+		if ($error)
+			$xml->addChild('MRPData', "$mrId,Error,1," .self::getUpdateDay());
+		else
+			$xml->addChild('MRPData', "$mrId,1," .self::getUpdateDay());
 		return $xml;
 	}
 
@@ -313,8 +325,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $profile->objectTasks[0]->type;
 	}
 
-
-
 	private function sendMailNotification($mailTask, $objectsIds, $mrId)
 	{
 		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n\nExecute for entries: \n";
@@ -340,7 +350,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $mailer->Send();
 	}
 
-	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object) {
+	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object, $error) {
 		$metadataProfileId = $profile->objectFilter->advancedSearch->metadataProfileId;
 
 		self::impersonate($object->partnerId);
@@ -349,10 +359,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 		$xml = $metadata->xml;
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
-			$xml = $this->addMetadataXmlField($profile->id, $metadata->xml);
+			$xml = $this->addMetadataXmlField($profile->id, $metadata->xml, $error);
 		elseif (self::startsWith($profile->name, 'MR_')) { //sub task of MRP
 			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
-			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml);
+			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml, $error);
 		}
 
 		try {
@@ -363,7 +373,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 		} catch (Exception $e) {
 			if (self::getMrProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
-				return null; //delete entry should get exception when update metadata
+				return null; //delete entry should get exception when update metadata for deleted entry
 			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage());
 		}
 		
