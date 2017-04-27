@@ -563,6 +563,9 @@ class KalturaSyndicationFeedRenderer
 			$entry = $nextEntry;
 			$nextEntry = $this->getNextEntry();
 
+			if(is_null($this->lastEntryCreatedAt))
+				$lastCreatedAtVal = null;
+
 			// in case no video player is requested by user and the entry is mix, skip it	
 			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) 
 				continue;
