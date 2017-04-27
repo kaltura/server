@@ -115,15 +115,14 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$this->processObject($profile, $object);
 
 				$objectsIds[] = $object->id;
-				if ($isMrProfile && self::getMrProfileTaskType($profile) != ObjectTaskType::DELETE_ENTRY)
+				if ($isMrProfile)
 					$this->updateMetadataStatusForMR($profile, $object);
 			}
 			if (!$isMrProfile)
 				$pager->pageIndex++;
 		}
 
-		// check only objectTasks[0] because it made by MR mechanize and will be the first and only task
-		if ($profile->objectTasks[0]->type == ObjectTaskType::MAIL_NOTIFICATION && count($objectsIds))
+		if ($isMrProfile && (self::getMrProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
 		{
 			$mrId = $this->getMrProfileId($profile);
 			$this->sendMailNotification($profile->objectTasks[0], $objectsIds, $mrId);
@@ -324,18 +323,21 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$body .= "Total count of affected object: " . count($objectsIds);
 
 		KalturaLog::info("sending mail to $mailTask->mailAddress with body: $body");
-
-		$mailer = new PHPMailer();
-		$mailer->CharSet = 'utf-8';
 		$toArr = explode(",", $mailTask->mailAddress);
-		foreach ($toArr as $to)
-			$mailer->AddAddress($to);
-		$mailer->Subject = "Media Repurposing Notification";
-		$mailer->Body = $body;
-
-		$success = $mailer->Send();
+		$success = $this->sendMail($toArr, "Media Repurposing Notification" , $body);
 		if (!$success)
 			KalturaLog::alert("Mail for MRP [$mrId] did not send successfully");
+	}
+
+	private function sendMail($toArray, $subject, $body)
+	{
+		$mailer = new PHPMailer();
+		$mailer->CharSet = 'utf-8';
+		foreach ($toArray as $to)
+			$mailer->AddAddress($to);
+		$mailer->Subject = $subject;
+		$mailer->Body = $body;
+		return $mailer->Send();
 	}
 
 	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object) {
@@ -353,11 +355,18 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml);
 		}
 
-		if ($metadata->id)
-			$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
-		else
-			$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml->asXML());
+		try {
+			if ($metadata->id)
+				$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
+			else
+				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml->asXML());
 
+		} catch (Exception $e) {
+			if (self::getMrProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
+				return null; //delete entry should get exception when update metadata
+			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage());
+		}
+		
 		self::unimpersonate();
 		return $result->id;
 	}
