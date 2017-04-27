@@ -87,7 +87,6 @@ class MediaRepurposingUtils
 		$result = $scheduledTaskPlugin->scheduledTaskProfile->add($mr);
 
 		$mrId = $result->id;
-		$mr = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
 		$mr->description = self::handleSts($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
 		$mr->objectFilter->advancedSearch->items[] = self::createMrConditionFilter($mrId);
 		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
