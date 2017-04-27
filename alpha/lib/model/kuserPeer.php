@@ -15,7 +15,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL = 123;
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL_TO_ADMINS = 125;
-	
+	const MAX_PUSER_LENGTH = 100;
+
 	private static $s_default_count_limit = 301;
 
 	public static function setDefaultCriteriaFilter ()
@@ -45,8 +46,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 */
 	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
 	{
-		if(strlen($puserId) > 100)
-			$puserId = substr($puserId, 0, 100);
+		$puserId = self::getValidPuserStr($puserId);
 
 		if(!$ignorePuserKuser && !kCurrentContext::isApiV3Context())
 		{
@@ -63,6 +63,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
 
 		return self::doSelectOne($c);
+	}
+
+	private static function getValidPuserStr($puserId){
+		return substr($puserId, 0, self::MAX_PUSER_LENGTH);
 	}
 	
 	/**
@@ -92,8 +96,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	
 	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
-		if(strlen($puser_id) > 100)
-			$puser_id = substr($puser_id, 0, 100);
+		$puser_id = self::getValidPuserStr($puser_id);
 		$lockKey = "user_add_" . $partner_id . $puser_id;
 		return kLock::runLocked($lockKey, array('kuserPeer','createUniqueKuserForPartner'), array($partner_id, $puser_id, $is_admin));
 	}
