@@ -327,7 +327,9 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 		$mailer = new PHPMailer();
 		$mailer->CharSet = 'utf-8';
-		$mailer->AddAddress($mailTask->mailAddress);
+		$toArr = explode(",", $mailTask->mailAddress);
+		foreach ($toArr as $to)
+			$mailer->AddAddress($to);
 		$mailer->Subject = "Media Repurposing Notification";
 		$mailer->Body = $body;
 
