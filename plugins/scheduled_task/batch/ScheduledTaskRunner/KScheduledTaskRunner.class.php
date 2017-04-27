@@ -115,7 +115,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$this->processObject($profile, $object);
 
 				$objectsIds[] = $object->id;
-				if ($isMrProfile)
+				if ($isMrProfile && self::getMrProfileTaskType($profile) != ObjectTaskType::DELETE_ENTRY)
 					$this->updateMetadataStatusForMR($profile, $object);
 			}
 			if (!$isMrProfile)
@@ -307,6 +307,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			return $arr[0];
 		}
 		return null;
+	}
+
+	private static function getMrProfileTaskType(KalturaScheduledTaskProfile $profile)
+	{
+		return $profile->objectTasks[0]->type;
 	}
 
 
