@@ -12,6 +12,7 @@
 				<th><?php echo $this->translate('Engine Type'); ?></th>
 				<th><?php echo $this->translate('Filter'); ?></th>
 				<th><?php echo $this->translate('Schedule Task IDs'); ?></th>
+				<th><?php echo $this->translate('Last Run:'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
 			</tr>
 		</thead>
@@ -32,6 +33,7 @@
 				<td><?php echo $mediaRepurposing->objectFilterEngineType; ?></td>
 				<td><?php echo get_class($mediaRepurposing->objectFilter); ?></td>
 				<td><?php echo $mediaRepurposing->description; ?></td>
+				<td><?php echo date('r', $mediaRepurposing->lastExecutionStartedAt); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, '<?php echo $mediaRepurposing->id; ?>')">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
