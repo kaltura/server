@@ -228,8 +228,6 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	public function getFilterFromData($formData)
 	{
-		//$arr = explode(":", $formData['filterTypeStr']);
-		//$filterType = $arr[1];
 		$filterType = $formData['filterTypeStr'];
 		if (!$filterType)
 			return null;

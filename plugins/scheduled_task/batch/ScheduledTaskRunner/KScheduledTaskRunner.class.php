@@ -115,7 +115,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$this->processObject($profile, $object);
 
 				$objectsIds[] = $object->id;
-				if ($isMrProfile)
+				if ($isMrProfile && self::getMrProfileTaskType($profile) != ObjectTaskType::DELETE_ENTRY)
 					$this->updateMetadataStatusForMR($profile, $object);
 			}
 			if (!$isMrProfile)
@@ -309,6 +309,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return null;
 	}
 
+	private static function getMrProfileTaskType(KalturaScheduledTaskProfile $profile)
+	{
+		return $profile->objectTasks[0]->type;
+	}
+
 
 
 	private function sendMailNotification($mailTask, $objectsIds, $mrId)
@@ -322,7 +327,9 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 		$mailer = new PHPMailer();
 		$mailer->CharSet = 'utf-8';
-		$mailer->AddAddress($mailTask->mailAddress);
+		$toArr = explode(",", $mailTask->mailAddress);
+		foreach ($toArr as $to)
+			$mailer->AddAddress($to);
 		$mailer->Subject = "Media Repurposing Notification";
 		$mailer->Body = $body;
 
