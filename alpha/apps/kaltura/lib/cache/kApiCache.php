@@ -83,6 +83,7 @@ class kApiCache extends kApiCacheBase
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
 	protected static $_coordinates = null;			// caches the latitude and longitude of the user issuing this request
+	protected static $_anonymousIP = null;			// caches the anonymous IP info of the user issuing this request
 	protected $minCacheTTL = null;
 	
 	protected $clientTag = null;
@@ -268,6 +269,18 @@ class kApiCache extends kApiCacheBase
 		return self::$_coordinates;
 	}
 	
+	static protected function getAnonymousIP()
+	{
+		if (is_null(self::$_anonymousIP))
+		{
+			// TODO 
+			//require_once(dirname(__FILE__) . '/../request/kIP2Location.php');
+			//$ipAddress = infraRequestUtils::getRemoteAddress();
+			//self::$_anonymousIP = kIP2Location::ipToCoordinates($ipAddress);
+		}
+		return self::$_anonymousIP;
+	}
+	
 	static protected function getExtraFieldType($extraField)
 	{
 		return is_array($extraField) ? $extraField["type"] : $extraField;
@@ -296,8 +309,11 @@ class kApiCache extends kApiCacheBase
 
 		case self::ECF_COORDINATES:
 			return array(self::getCoordinates());
+			
+		case self::ECF_ANONYMOUS_IP:
+			return array(self::getAnonymousIP());
 
-			case self::ECF_IP:
+		case self::ECF_IP:
 			if (is_array($extraField))
 				return array(infraRequestUtils::getIpFromHttpHeader($extraField[self::ECFD_IP_HTTP_HEADER], $extraField[self::ECFD_IP_ACCEPT_INTERNAL_IPS], true));
 
@@ -358,6 +374,11 @@ class kApiCache extends kApiCacheBase
 					return true;
 			}
 			return false;
+			
+		case self::COND_ANONYMOUS_IP:
+			//TODO check ip
+			return false;
+
 		}
 		return $strippedFieldValue;
 	}

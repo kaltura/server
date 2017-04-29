@@ -12,6 +12,7 @@ class kApiCacheBase
 	const ECF_COUNTRY = 'country';
 	const ECF_IP = 'ip';
 	const ECF_COORDINATES = 'coordinates';
+	const ECF_ANONYMOUS_IP = 'anonymousIp';
 	
 	// extra cache fields data
 	const ECFD_IP_HTTP_HEADER = 'httpHeader';
@@ -28,6 +29,7 @@ class kApiCacheBase
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
 	const COND_GEO_DISTANCE = 'geoDistance';	// used by kGeoDistanceCondition
+	const COND_ANONYMOUS_IP = 'anonymousIP';	// used by kAnonymousIPCondition
 	
 	// cache statuses
 	const CACHE_STATUS_ACTIVE = 0;				// cache was not explicitly disabled

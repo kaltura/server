@@ -20,6 +20,11 @@ class myIPGeocoder extends kGeoCoder
 		return kIP2Location::ipToCoordinates($ip);
 	}
 
+	public function getAnonymousInfo($ip)
+	{
+		return array();
+	}
+
 	function iptocountry($ip) 
 	{   
 		return kIP2Location::ipToCountry($ip);
