@@ -1,6 +1,6 @@
-/*! KMC - v6.0.11 - 2016-11-21
+/*! KMC - v6.0.11 - 2017-04-30
 * https://github.com/kaltura/KMC_V2
-* Copyright (c) 2016 Amir Chervinsky; Licensed GNU */
+* Copyright (c) 2017 Amir Chervinsky; Licensed GNU */
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
@@ -4029,10 +4029,12 @@ kmc.functions = {
 	},
 	getVersionFromPath: function( path ) {
 		var version = false;
-		if (path.indexOf("{latest}") !== -1){
+		if (typeof path == 'string' && path.indexOf("{latest}") !== -1){
 			version = "latest";
 		}else{
-			version = (typeof path == 'string') ? path.split("/v")[1].split("/")[0] : false;
+			if (typeof path == 'string' && path.indexOf("/v") !== -1) {
+				version = path.split("/v")[1].split("/")[0];
+			}
 		}
 		return version;
 	}
