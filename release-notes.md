@@ -1,5 +1,26 @@
 # Lynx 12.15.0 #
 
+## Add permission and Enabling for Admin console and Batch to Schedule task ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-6960
+
+### Configuration ###
+add to admin.ini:
+	moduls.MediaRepurposing.enabled = true
+	moduls.MediaRepurposing.permissionType = 2
+	moduls.MediaRepurposing.label = "Enable Media Repurposing"
+	moduls.MediaRepurposing.permissionName = FEATURE_MEDIA_REPURPOSING_PERMISSION
+	moduls.MediaRepurposing.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Add permission for capture device to do scheduleResource->get ##
 
  - Issue Type: Feature
