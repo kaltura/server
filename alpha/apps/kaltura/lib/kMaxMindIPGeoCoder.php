@@ -27,7 +27,7 @@ require("$baseDir/GeoIP2/Record/Continent.php");
 
 use GeoIp2\Database\Reader;
 
-class myMaxMindIPGeocoder extends kGeoCoder
+class kMaxMindIPGeocoder extends kGeoCoder
 {
 	/* (non-PHPdoc)
 	 * @see kGeoCoder::getCountry()

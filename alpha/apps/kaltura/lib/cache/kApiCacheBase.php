@@ -17,7 +17,8 @@ class kApiCacheBase
 	// extra cache fields data
 	const ECFD_IP_HTTP_HEADER = 'httpHeader';
 	const ECFD_IP_ACCEPT_INTERNAL_IPS = 'acceptInternalIps';
-
+	const ECFD_GEO_CODER_TYPE = 'geoCoderType';
+	
 	// extra cache fields conditions
 	// 	the conditions will be applied on the extra fields when generating the cache key
 	//	for example, when using country restriction of US allowed, we can take country==US
@@ -29,6 +30,8 @@ class kApiCacheBase
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
 	const COND_GEO_DISTANCE = 'geoDistance';	// used by kGeoDistanceCondition
+	const COND_COUNTRY = 'country';				// used by kGeoCountryCondition
+	const COND_ANONYMOUS_IP = 'anonymousIP';	// used by kGeoAnonymousIPCondition
 	
 	// cache statuses
 	const CACHE_STATUS_ACTIVE = 0;				// cache was not explicitly disabled

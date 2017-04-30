@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
+require_once(KALTURA_ROOT_PATH ."/alpha/apps/kaltura/lib/request/kIP2Location.php");
 
 class myIPGeocoder extends kGeoCoder
 {
@@ -22,7 +23,7 @@ class myIPGeocoder extends kGeoCoder
 
 	public function getAnonymousInfo($ip)
 	{
-		return array();
+		return "undefined";
 	}
 
 	function iptocountry($ip) 
