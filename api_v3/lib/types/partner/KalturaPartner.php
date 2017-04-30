@@ -139,7 +139,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @filter eq,gte,lte,in
-	 * @requiresPermission insert,update
+	 * @requiresPermission update
 	 */
 	public $partnerPackage;
 	
@@ -390,6 +390,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validatePropertyNotNull("description");
 		$this->validatePropertyMaxLength("country", 2, true);
 		$this->validatePropertyMaxLength("state", 2, true);
+		$this->validatePartnerPackageForInsert();
 		$this->validateForInsert();
 
 		$partner = new Partner();
@@ -419,6 +420,17 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public function getFilterDocs()
 	{
 		return array();
+	}
+
+	public function validatePartnerPackageForInsert()
+	{
+		if (!$this->partnerPackage)
+			return true;
+		if (kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			return true;
+		if (in_array($this->partnerPackage,kConf::get('allowed_partner_packages_for_all','local', array())))
+			return true;
+		throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, 'partnerPackage');
 	}
 	
 }
