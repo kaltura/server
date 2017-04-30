@@ -207,12 +207,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$newTask['type'] = MediaRepurposingUtils::getDescriptionForType($currentTask->type);
 		$newTask['taskTimeToNext'] = 0;
 		$ignore = array('id', 'type', 'taskTimeToNext', 'relatedObjects');
-
-		$params = array();
-		foreach ($currentTask as $key => $value)
-			if (!in_array($key, $ignore))
-				$params[$key] = $value;
-		$newTask['taskData'] = $params;
+		$newTask['taskData'] = MediaRepurposingUtils::getParamToTask($currentTask, $ignore);
 		return array($newTask);
 	}
 

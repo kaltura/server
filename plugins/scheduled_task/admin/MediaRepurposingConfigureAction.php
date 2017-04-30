@@ -100,7 +100,6 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$name = $formData['media_repurposing_name'];
 		$maxEntriesAllowed = $formData['max_entries_allowed'];
 		
-
 		$filter = $form->getFilterFromData($formData);
 		$taskArray = $this->buildTasksArray($formData['TasksData']);
 

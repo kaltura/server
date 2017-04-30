@@ -287,8 +287,42 @@ class MediaRepurposingUtils
 
 	public static function addParamToObjectTask($objectTask, $params, $ignore = array()) {
 		foreach ($params as $key => $value) {
-			$objectTask->$key = $value;
+			$objectTask->$key = self::getValueFromString($key, $value);
 		}
+	}
+
+	public static function getParamToTask($task, $ignore = array()) {
+		$params = array();
+		foreach ($task as $key => $value)
+			if (!in_array($key, $ignore))
+				$params[$key] = self::setValueToString($key, $value);
+		return $params;
+	}
+
+	private static function getValueFromString($key, $value) {
+		if ($key == 'categoryIds') 
+		{
+			$arr = array();
+			$strArray = explode(",", $value);
+			foreach($strArray as $str) {
+				$elem = new Kaltura_Client_Type_IntegerValue();
+				$elem->value = intval($str);
+				$arr[] = $elem;
+			}
+			return $arr;
+		}
+		return $value;
+	}
+
+	private static function setValueToString($key, $value) {
+		if ($key == 'categoryIds') 
+		{
+			$values = '';
+			foreach($value as $val)
+				$values .= $val->value . ",";
+			return $values;
+		}
+		return $value;
 	}
 
 }
