@@ -43,11 +43,11 @@ class kAnonymousIPCondition extends kCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		kApiCache::addExtraField(kApiCache::ECF_ANONYMOUS_IP, kApiCache::COND_ANONYMOUS_IP, $this->getStringValues($scope));
+		kApiCache::addExtraField(kApiCache::ECF_ANONYMOUS_IP, kApiCache::COND_MATCH, $this->getStringValues($scope));
 
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
-		return array($ipGeo->getAnonymousInfo($ip)); // wrap in an array since otherwise the result will be perceived as a list of values
+		return $ipGeo->getAnonymousInfo($ip);
 	}
 	
 	/* (non-PHPdoc)
@@ -55,7 +55,7 @@ class kAnonymousIPCondition extends kCondition
 	 */
 	protected function matches($field, $value)
 	{
-		return in_array($value, $field);
+		return parent::matches(trim(strtolower($field), " \n\r\t"), trim(strtolower($value), " \n\r\t"));		
 	}
 
 	/* (non-PHPdoc)

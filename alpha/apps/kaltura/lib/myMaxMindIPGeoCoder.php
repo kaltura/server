@@ -59,18 +59,19 @@ class myMaxMindIPGeocoder extends kGeoCoder
 
 			$record = $reader->anonymousIp($ip);
 
-			if ($record->isAnonymous) $attr[] = "anonymous";
-			if ($record->isAnonymousVpn) $attr[] = "anonymousVpn";
-			if ($record->isHostingProvider) $attr[] = "hostingProvider";
-			if ($record->isPublicProxy) $attr[] = "publicProxy";
-			if ($record->isTorExitNode) $attr[] = "torExitNode";
+			if (!$record->isAnonymous) return "";
+			if ($record->isAnonymousVpn) return "anonymousVpn";
+			if ($record->isHostingProvider) return "hostingProvider";
+			if ($record->isPublicProxy) return "publicProxy";
+			if ($record->isTorExitNode) return "torExitNode";
+			return "anonymous";
 		}
 		catch(Exception $e)
 		{
 		}
 		
-		return implode(",", $attr);
-}
+		return "undefined";
+	}
 
 	function iptocountry($ip) 
 	{   

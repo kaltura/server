@@ -374,11 +374,6 @@ class kApiCache extends kApiCacheBase
 					return true;
 			}
 			return false;
-			
-		case self::COND_ANONYMOUS_IP:
-			//TODO check ip
-			return false;
-
 		}
 		return $strippedFieldValue;
 	}

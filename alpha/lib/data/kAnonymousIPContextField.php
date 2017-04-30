@@ -26,8 +26,8 @@ class kAnonymousIPContextField extends kStringField
 			
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
-		$anonymousIPInfo = $ipGeo->getAnonymousIPInfo($ip);
-		return implode(",", $anonymousIPInfo);
+		$anonymousIPInfo = $ipGeo->getAnonymousInfo($ip);
+		return $anonymousIPInfo;
 	}
 	
 	/**
