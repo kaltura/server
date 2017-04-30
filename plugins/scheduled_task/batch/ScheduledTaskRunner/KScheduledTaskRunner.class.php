@@ -228,10 +228,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private function addDateToFilter($profile)
 	{
 		if (self::startsWith($profile->name, 'MR_')) { //as sub task of MR profile
-			// first item is for entry status, second is for MR status
-			$value = $profile->objectFilter->advancedSearch->items[1]->value;
+			//first item on advancedSearch is for the MRP
+			//in the MRP filter: first item is for entry status, second is for MR status
+			$value = self::getMrAdvancedSearchFilter($profile)->items[1]->value;
 			$updatedDay = self::getUpdateDay($profile->description);
-			$profile->objectFilter->advancedSearch->items[1]->value = $value. "," . $updatedDay;
+			$profile->objectFilter->advancedSearch->items[0]->items[1]->value = $value. "," . $updatedDay;
 		}
 	}
 
@@ -314,7 +315,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		if ($profile->systemName == "MRP")
 			return $profile->id;
 		if (self::startsWith($profile->name, 'MR_')) {
-			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
+			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
 			return $arr[0];
 		}
 		return null;
@@ -323,6 +324,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private static function getMrProfileTaskType(KalturaScheduledTaskProfile $profile)
 	{
 		return $profile->objectTasks[0]->type;
+	}
+
+	private static function getMrAdvancedSearchFilter(KalturaScheduledTaskProfile $profile)
+	{
+		return $profile->objectFilter->advancedSearch->items[0];
 	}
 
 	private function sendMailNotification($mailTask, $objectsIds, $mrId)
@@ -351,7 +357,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	}
 
 	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object, $error) {
-		$metadataProfileId = $profile->objectFilter->advancedSearch->metadataProfileId;
+		$metadataProfileId = self::getMrAdvancedSearchFilter($profile)->metadataProfileId;
 
 		self::impersonate($object->partnerId);
 		$metadataPlugin = KalturaMetadataClientPlugin::get(self::$kClient);
@@ -361,7 +367,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
 			$xml = $this->addMetadataXmlField($profile->id, $metadata->xml, $error);
 		elseif (self::startsWith($profile->name, 'MR_')) { //sub task of MRP
-			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
+			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml, $error);
 		}
 
