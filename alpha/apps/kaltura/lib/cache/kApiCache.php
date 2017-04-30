@@ -7,6 +7,7 @@ require_once(dirname(__FILE__) . '/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
 require_once(dirname(__FILE__) . '/../request/kIpAddressUtils.php');
 require_once(dirname(__FILE__) . '/../request/kGeoUtils.php');
+require_once(dirname(__FILE__) . '/../kGeoCoderManager.php');
 require_once(dirname(__FILE__) . '/../monitor/KalturaMonitorClient.php');
 
 /**
@@ -250,7 +251,7 @@ class kApiCache extends kApiCacheBase
 	
 	static protected function getGeoCoderFieldValue($extraField, $fieldName, $method)
 	{
-		if (is_null($self::$$fieldName))
+		if (is_null(self::$$fieldName))
 		{
 			$geoCoder = kGeoCoderManager::getGeoCoder(is_array($extraField) ? $extraField[self::ECFD_GEO_CODER_TYPE] : null);
 			if ($geoCoder)

@@ -1,4 +1,6 @@
 <?php
+
+require_once(dirname(__FILE__) . '/../../../lib/enums/geoCoderType.php');
 /**
  * @package Core
  * @subpackage AccessControl
@@ -20,12 +22,12 @@ class kGeoCoderManager
 		{
 		case geoCoderType::KALTURA:
 			// require direct path as the call may arrive for the caching layer
-			require_once(dirname(__FILE__) . '/alpha/apps/kaltura/lib/myIPGeoCoder.class.php');
+			require_once(dirname(__FILE__) . '/myIPGeoCoder.class.php');
 			return new myIPGeocoder();
 			
 		case geoCoderType::MAX_MIND:
 			// require direct path as the call may arrive for the caching layer			
-			require_once(dirname(__FILE__) . '/alpha/apps/kaltura/lib/kMaxMindGeoCoder.class.php');
+			require_once(dirname(__FILE__) . '/kMaxMindIPGeocoder.php');
 			return new kMaxMindIPGeocoder();
 		}
 			
