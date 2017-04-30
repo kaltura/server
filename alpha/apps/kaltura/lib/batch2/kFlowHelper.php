@@ -366,7 +366,7 @@ class kFlowHelper
 		return $fileIndex;
 	}
 
-	private static function createReplacigEntry($recordedEntry, $liveSegmentCount, $replacementStatus = entryReplacementStatus::APPROVED_BUT_NOT_READY)
+	private static function createReplacigEntry($recordedEntry, $liveSegmentCount)
 	{
 		$advancedOptions = new kEntryReplacementOptions();
 		$advancedOptions->setKeepManualThumbnails(true);
@@ -376,6 +376,7 @@ class kFlowHelper
 		$replacingEntry = new entry();
 		$replacingEntry->setType(entryType::MEDIA_CLIP);
 		$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+		$replacingEntry->setSourceType($recordedEntry->getSourceType());
 		$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
 		$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
 		$replacingEntry->setKuserId($recordedEntry->getKuserId());
@@ -389,12 +390,12 @@ class kFlowHelper
 		$replacingEntry->save();
 
 		$recordedEntry->setReplacingEntryId($replacingEntry->getId());
-		$recordedEntry->setReplacementStatus($replacementStatus);
+		$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 		$affectedRows = $recordedEntry->save();
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount, $replacementStatus = entryReplacementStatus::APPROVED_BUT_NOT_READY)
+	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount)
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -427,7 +428,7 @@ class kFlowHelper
 		
 		if(is_null($replacingEntry))
 		{
-			$replacingEntry = self::createReplacigEntry($recordedEntry, $liveSegmentCount, $replacementStatus);
+			$replacingEntry = self::createReplacigEntry($recordedEntry, $liveSegmentCount);
 		}
 		return $replacingEntry;
 	}	

@@ -538,7 +538,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$filename = $kResource->getLocalFilePath();
 		
 		$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
-		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0, entryReplacementStatus::NOT_READY_AND_NOT_APPROVED));
+		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
 		$this->ingestAsset($replacingEntry, $dbAsset, $filename);
+		
+		
 	}
 }
