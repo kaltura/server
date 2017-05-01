@@ -54,7 +54,7 @@ class kMaxMindIPGeocoder extends kGeoCoder
 			if (!$reader)
 			{
 				$dbFilePath = __DIR__ . '/../../../../../../data'."/MaxMind/Anonymous/GeoIP2-Anonymous-IP.mmdb";
-				$reader = new Reader('$dbFilePath');
+				$reader = new Reader($dbFilePath);
 			}
 
 			$record = $reader->anonymousIp($ip);
@@ -81,7 +81,7 @@ class kMaxMindIPGeocoder extends kGeoCoder
 			if (!$reader)
 			{
 				$dbFilePath = __DIR__ . '/../../../../../../data'."/MaxMind/Country/GeoIP2-Country.mmdb";
-				$reader = new Reader('$dbFilePath');
+				$reader = new Reader($dbFilePath);
 			}
 
 			$country = $reader->country($ip);
