@@ -30,8 +30,6 @@ class kApiCacheBase
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
 	const COND_GEO_DISTANCE = 'geoDistance';	// used by kGeoDistanceCondition
-	const COND_COUNTRY = 'country';				// used by kGeoCountryCondition
-	const COND_ANONYMOUS_IP = 'anonymousIP';	// used by kGeoAnonymousIPCondition
 	
 	// cache statuses
 	const CACHE_STATUS_ACTIVE = 0;				// cache was not explicitly disabled

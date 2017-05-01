@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
 
-$baseDir = dirname(__FILE__) . '/../../../../vendor/MaxMind';
+$baseDir = KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor/MaxMind';
 
 require("$baseDir/MaxMind/Db/Reader.php");
 require("$baseDir/MaxMind/Db/Reader/Decoder.php");
@@ -53,24 +53,24 @@ class kMaxMindIPGeocoder extends kGeoCoder
 		try {
 			if (!$reader)
 			{
-				$dbFilePath = __DIR__ . '/../../../../../data/MaxMind/Anonymous/GeoIP2-Anonymous-IP.mmdb';
-				$reader = new Reader($dbFilePath);
+				$dbFilePath = __DIR__ . '/../../../../../../data'."/MaxMind/Anonymous/GeoIP2-Anonymous-IP.mmdb";
+				$reader = new Reader('$dbFilePath');
 			}
 
 			$record = $reader->anonymousIp($ip);
-
-			if (!$record->isAnonymous) return "";
-			if ($record->isAnonymousVpn) return "anonymousVpn";
-			if ($record->isHostingProvider) return "hostingProvider";
-			if ($record->isPublicProxy) return "publicProxy";
-			if ($record->isTorExitNode) return "torExitNode";
-			return "anonymous";
+			
+			if ($record->isAnonymous) $attr[] = "anonymous";
+			if ($record->isAnonymousVpn) $attr[] = "anonymousVpn";
+			if ($record->isHostingProvider) $attr[] = "hostingProvider";
+			if ($record->isPublicProxy) $attr[] = "publicProxy";
+			if ($record->isTorExitNode) $attr[] = "torExitNode";
+			return $attr;
 		}
 		catch(Exception $e)
 		{
 		}
 		
-		return "undefined";
+		return array("undefined");
 	}
 
 	function iptocountry($ip) 
@@ -80,8 +80,8 @@ class kMaxMindIPGeocoder extends kGeoCoder
 		try {
 			if (!$reader)
 			{
-				$dbFilePath = __DIR__ . '/../../../../../data/MaxMind/Anonymous/GeoIP2-Anonymous-IP.mmdb';
-				$reader = new Reader($dbFilePath);
+				$dbFilePath = __DIR__ . '/../../../../../../data'."/MaxMind/Country/GeoIP2-Country.mmdb";
+				$reader = new Reader('$dbFilePath');
 			}
 
 			$country = $reader->country($ip);

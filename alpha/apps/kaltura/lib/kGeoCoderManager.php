@@ -23,7 +23,7 @@ class kGeoCoderManager
 		{
 		case geoCoderType::KALTURA:
 			// require direct path as the call may arrive for the caching layer
-			require_once(dirname(__FILE__) . '/myIPGeoCoder.class.php');
+			require_once(dirname(__FILE__) . '/myIPGeocoder.class.php');
 			return new myIPGeocoder();
 			
 		case geoCoderType::MAX_MIND:

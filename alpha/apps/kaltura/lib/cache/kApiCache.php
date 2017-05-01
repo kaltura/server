@@ -314,6 +314,20 @@ class kApiCache extends kApiCacheBase
 		case self::COND_MATCH:
 			if (!count($refValue))
 				return null;
+				
+			if (!is_array($fieldValue))
+				return in_array($fieldValue, $refValue);
+			
+			foreach($fieldValue as $value)
+			{
+				if (in_array($value, $refValue))
+					return true;
+			}
+			return false;
+						
+		case self::COND_MATCH:
+			if (!count($refValue))
+				return null;
 			return in_array($fieldValue, $refValue);
 
 		case self::COND_REGEX:
@@ -358,12 +372,6 @@ class kApiCache extends kApiCacheBase
 					return true;
 			}
 			return false;
-			
-		case self::COND_ANONYMOUS_IP:
-			if (!count($refValue))
-				return null;
-			return in_array($fieldValue, $refValue);
-					
 		}
 		return $strippedFieldValue;
 	}
