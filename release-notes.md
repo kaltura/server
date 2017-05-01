@@ -1,5 +1,19 @@
 # Lynx 12.15.0 #
 
+## Support dynamic broadcast urls ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7251
+
+### Configuration ###
+- update broadcast.ini add for each dc config:
+
+		- port, rtsp_domain, rtsp_port
+
+#### Deployment Scripts ####
+
+php /opt/kaltura/app/deployment/updates/scripts/2017_04_27_clear_rtsp_broadcast_url_from_custom_data.php
+
 ## Add permission for capture device to do scheduleResource->get ##
 
  - Issue Type: Feature
