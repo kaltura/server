@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
-require_once(KALTURA_ROOT_PATH ."/alpha/apps/kaltura/lib/request/kIP2Location.php");
+require_once(dirname(__FILE__) . '/kGeoCoder.php');
+require_once(dirname(__FILE__) . '/request/kIP2Location.php');
 
 class myIPGeocoder extends kGeoCoder
 {

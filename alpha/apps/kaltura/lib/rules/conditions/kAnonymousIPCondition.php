@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kAnonymousIPCondition extends kCondition
+class kAnonymousIPCondition extends kMatchCondition
 {
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
@@ -43,7 +43,7 @@ class kAnonymousIPCondition extends kCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		kApiCache::addExtraField(array("type" => kApiCache::ECF_COORDINATES,
+		kApiCache::addExtraField(array("type" => kApiCache::ECF_ANONYMOUS_IP,
 			kApiCache::ECFD_GEO_CODER_TYPE => $this->getGeoCoderType()),
 			kApiCache::COND_ANONYMOUS_IP, $this->getStringValues($scope));
 		

@@ -295,7 +295,7 @@ class kApiCache extends kApiCacheBase
 			return array(self::getGeoCoderFieldValue($extraField, "_coordinates", "getCoordinates"));
 			
 		case self::ECF_ANONYMOUS_IP:
-			return array(self::getGeoCoderFieldValue($extraField, "_anonymousIPInfo", "getAnonymousIPInfo"));
+			return array(self::getGeoCoderFieldValue($extraField, "_anonymousIPInfo", "getAnonymousInfo"));
 
 		case self::ECF_IP:
 			if (is_array($extraField))

@@ -36,7 +36,7 @@ class KalturaAnonymousIPCondition extends KalturaMatchCondition
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kGeoDistanceCondition();
+			$dbObject = new kAnonymousIPCondition();
 			
 		return parent::toObject($dbObject, $skip);
 	}

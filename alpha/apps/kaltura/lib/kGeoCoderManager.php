@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__) . '/../../../../infra/general/BaseEnum.php');
 require_once(dirname(__FILE__) . '/../../../lib/enums/geoCoderType.php');
 /**
  * @package Core
