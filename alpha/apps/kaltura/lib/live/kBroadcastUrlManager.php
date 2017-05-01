@@ -48,6 +48,7 @@ class kBroadcastUrlManager
 
 	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
 	{
+		//if we have broadcast urls on the custom data and we regenerate token - need to save the new url
 		if($dbEntry->getFromCustomData('primaryBroadcastingUrl'))
 			$dbEntry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP));
 		if($dbEntry->getFromCustomData('primaryRtspBroadcastingUrl'))
