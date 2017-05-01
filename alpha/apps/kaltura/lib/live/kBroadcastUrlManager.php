@@ -91,8 +91,9 @@ class kBroadcastUrlManager
 			$app = $broadcastConfig['application'][$applicationSuffix];
 		else
 		{
-			KalturaLog::err("The value for $applicationSuffix does not exist in the broadcast map.");
-			throw new kCoreException("The value for $applicationSuffix does not exist in the broadcast map.");
+			//return empty url
+			KalturaLog::log("The value for $applicationSuffix does not exist in the broadcast map.");
+			return null;
 		}
 		
 		return "$url:$port/$app";
