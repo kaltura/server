@@ -28,7 +28,7 @@ class kGeoCoderManager
 			
 		case geoCoderType::MAX_MIND:
 			// require direct path as the call may arrive for the caching layer			
-			require_once(dirname(__FILE__) . '/kMaxMindIPGeocoder.php');
+			require_once(dirname(__FILE__) . '/kMaxMindIPGeoCoder.php');
 			return new kMaxMindIPGeocoder();
 		}
 			
