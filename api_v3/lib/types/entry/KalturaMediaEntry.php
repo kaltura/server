@@ -116,12 +116,12 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	/* (non-PHPdoc)
 	 * @see KalturaBaseEntry::toObject()
 	 */
-	public function toObject($entry = null, $a = array()) {
+	public function toObject($entry = null, $props_to_skip = array()) {
 		if (is_null ( $entry )) {
 			$entry = new entry ();
 		}
 		
-		$entry = parent::toObject ( $entry );
+		$entry = parent::toObject($entry, $props_to_skip);
 		
 		/* @var $entry entry */
 		if ($this->msDuration && ($entry->getMediaType () == KalturaMediaType::IMAGE || $this->mediaType == KalturaMediaType::IMAGE && $this->msDuration)) {
