@@ -77,6 +77,22 @@ $nullDev ="/dev/null";
 		return $cmdStr;
 	}
 	
+	/* ---------------------------
+	 * generateAudioParams
+	 */
+	protected function generateAudioParams(KDLFlavor $design, KDLFlavor $target)
+	{
+		$cmdStr = parent::generateAudioParams($design, $target);
+		if(isset($target->_audio)) {
+			$cmdValsArr = explode(' ', $cmdStr);
+			if(($key=array_search('-channel_layout', $cmdValsArr))!==false){
+				$cmdValsArr[$key+1].= "c";
+				$cmdStr = implode(" ", $cmdValsArr);
+			}
+		}
+		return $cmdStr;
+	}
+	
 	/**
 	 * generateVideoFilters
 	 * @param $vid

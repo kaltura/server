@@ -586,9 +586,23 @@ class entryFilter extends baseObjectFilter
 	}
 
 	protected function getRelativeTimeFields()
-        {
-                return array_merge(parent::getRelativeTimeFields(), self::$relative_time_fields);
-        }
+	{
+		return array_merge(parent::getRelativeTimeFields(), self::$relative_time_fields);
+	}
+	
+	public function transformFieldsToRelative()
+	{
+		foreach($this->getRelativeTimeFields() as $relativeFieldName)
+		{
+			$relativeFieldName = "_" . $relativeFieldName;
+			if($this->is_set($relativeFieldName))
+			{
+				$value = $this->getByName($relativeFieldName);
+				$value = kTime::getRelativeTime($value);
+				$this->setByName($relativeFieldName, $value);
+			}
+		}
+	}
 	
 	public function setIdEquel($v)
 	{

@@ -1,3 +1,21 @@
+# Lynx 12.15.0 #
+
+## Add permission for capture device to do scheduleResource->get ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7300
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_27_add_capture_device_permission_to_schedule_resource_get.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.14.0 #
 
 ## Change permissions for admin_console and KalturaPartner ##

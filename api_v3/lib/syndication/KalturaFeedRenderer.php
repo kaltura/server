@@ -105,10 +105,10 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 				$host = infraRequestUtils::getProtocol() . "://" . $host;
 			}
 
-			$hrefLink = $host . "/api_v3/getFeed.php?partnerId=$partnerId&amp;feedId=$id";
+			$hrefLink = $host . "/api_v3/getFeed.php?partnerId=$partnerId&feedId=$id";
 			if(kCurrentContext::$ks)
-				$hrefLink .= "&amp;ks=" . kCurrentContext::$ks;
-			$hrefLink .= "&amp;state=" . $this->state;
+				$hrefLink .= "&ks=" . kCurrentContext::$ks;
+			$hrefLink .= "&state=" . $this->state;
 
 			$nextLink = $mrss->addChild('link');
 			$nextLink->addAttribute("rel", "next");

@@ -260,8 +260,12 @@ class KalturaSyndicationFeedRenderer
 	{
 		$entryFilter = $this->syndicationFeed->entryFilter;
 
+		if(!$entryFilter)
+			return;
+		
 		$coreFilter = new entryFilter();
 		$entryFilter->toObject($coreFilter);
+		$coreFilter->transformFieldsToRelative();
 		$this->addFilter($coreFilter);
 	}
 
@@ -558,6 +562,9 @@ class KalturaSyndicationFeedRenderer
 			$this->enableApcProcessingFlag();
 			$entry = $nextEntry;
 			$nextEntry = $this->getNextEntry();
+
+			if(is_null($this->lastEntryCreatedAt))
+				$lastCreatedAtVal = null;
 
 			// in case no video player is requested by user and the entry is mix, skip it	
 			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) 
