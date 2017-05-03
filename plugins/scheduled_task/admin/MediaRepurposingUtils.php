@@ -253,17 +253,6 @@ class MediaRepurposingUtils
 		}
 	}
 
-	public static function filterFactory($type) {
-		switch($type)
-		{
-			case Kaltura_Client_ScheduledTask_Enum_ObjectFilterEngineType::ENTRY:
-				return 'Kaltura_Client_Type_MediaEntryFilter';
-
-			default:
-				return null;
-		}
-	}
-
 	public static function getSubScheduleTaskName($name, $index)
 	{
 		return 'MR_' .$name .'_'. ($index/2);
@@ -324,5 +313,6 @@ class MediaRepurposingUtils
 		}
 		return $value;
 	}
+	
 
 }

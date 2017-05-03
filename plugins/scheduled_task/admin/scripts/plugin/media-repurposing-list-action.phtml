@@ -1,6 +1,7 @@
 <p><?php echo $this->translate('Media Repurposing list intro text'); ?></p>
 <?php echo $this->filterForm; ?>
 <?php echo $this->newMediaRepurposingForm; ?>
+<?php echo $this->newMediaRepurposingFormFromTemplate; ?>
 
 <div id="media_repurposing_list_div" class="clear">
 	<table>
@@ -155,21 +156,41 @@ function changeStatus(mediaRepurposingId, status, callback)
 	});
 }
 
+function newMediaRepurposingFromTemplate(partnerId, templateType)
+{
+	if (!isValidParam(partnerId, 'Publisher ID', true))
+		return;
+	if (!isValidParam(templateType, 'Media Repurposing Template', false))
+		return;
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_template_type/' + templateType;
+	loadMediaRepurposing(paramsStr);
+}
 
 function newMediaRepurposing(partnerId, filterEngineType, filterType)
 {
-	if(!partnerId.length || isNaN(partnerId)){
-		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
+	if (!isValidParam(partnerId, 'Publisher ID', true))
 		return;
-	}
-	if(!filterEngineType.length || (filterEngineType == 'N/A')) {
-		alert('<?php echo $this->translate('Media Repurposing Filter Type not supplied'); ?>');
+	if (!isValidParam(filterEngineType, 'Media Repurposing Engine Type', true))
 		return;
-	}
+	if (!isValidParam(filterType, 'Media Repurposing Filter Type', false))
+		return;
 
 	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_filter_engine_type/' + filterEngineType + '/new_mr_filter_type/' + filterType;
-	
 	loadMediaRepurposing(paramsStr);
+}
+
+function isValidParam(param, name, number)
+{
+	if (!param.length || (param == 'N/A')) {
+		alert(name + " not supplied");
+		return false;
+	}
+	if (number && isNaN(param)) {
+		alert(name + " is not a number");
+		return false;
+	}
+	return true;
 }
 
 function configureMediaRepurposing(mediaRepurposingId)

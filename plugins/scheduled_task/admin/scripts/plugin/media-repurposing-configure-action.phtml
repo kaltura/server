@@ -12,7 +12,8 @@
 <script type="text/javascript">
 
 	var filterStatus = 0;
-	var alwaysDisplay = ['createdAtGreaterThanOrEqual', 'lastPlayedAtGreaterThanOrEqual'];
+	//var alwaysDisplay = ['createdAtGreaterThanOrEqual', 'lastPlayedAtGreaterThanOrEqual'];
+	var alwaysDisplay = [];
 	init();
 
 	
@@ -67,11 +68,9 @@
 	
 
 	function populateTasks() {
-		var id = jQuery('#mrId').val();
-		if (!id)
-			return;
 		var data = jQuery('#TasksData').val();
-		//alert(data);
+		if (!data)
+			return;
 		var arr = JSON.parse(data);
 		var ts = $( ".add-task" );
 

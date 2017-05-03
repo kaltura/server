@@ -174,7 +174,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		foreach ($object->objectFilter as $key => $value)
 			if ($value)
 				$this->setDefault(self::FILTER_PREFIX.$key, $value);
-
+		
 		$this->populateTasks($object);
 	}
 
@@ -203,7 +203,8 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		$currentTask = $object->objectTasks[0];
 		$newTask = array();
-		$newTask['id'] = strval($object->id);
+		if ($object->partnerId != -2)
+			$newTask['id'] = strval($object->id);
 		$newTask['type'] = MediaRepurposingUtils::getDescriptionForType($currentTask->type);
 		$newTask['taskTimeToNext'] = 0;
 		$ignore = array('id', 'type', 'taskTimeToNext', 'relatedObjects');

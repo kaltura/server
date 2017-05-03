@@ -13,6 +13,8 @@ class Form_CreateMediaRepurposing extends ConfigureSubForm
 			array('HtmlTag', array('tag' => 'fieldset')),
 			array('Form', array('class' => 'simple')),
 		));
+
+		$this->addComment("customFormExplain", "Create custom MR here:");
 		
 		$this->addElement('text', 'newPartnerId', array(
 			'label'			=> 'Publisher ID:',
