@@ -36,25 +36,25 @@ class LiveStreamEntry extends LiveEntry
 	public function setPrimaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryBroadcastingUrl" , $v );	}
 	public function getPrimaryBroadcastingUrl (  )
 	{
-		return $this->getDynamicBrodcastUrl('primaryBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
+		return $this->getDynamicBroadcastUrl('primaryBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
 	}
 	
 	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
 	public function getSecondaryBroadcastingUrl (  )
 	{
-		return $this->getDynamicBrodcastUrl('secondaryBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
+		return $this->getDynamicBroadcastUrl('secondaryBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
 	}
 	
 	public function setPrimaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtspBroadcastingUrl" , $v );	}
 	public function getPrimaryRtspBroadcastingUrl (  )
 	{
-		return $this->getDynamicBrodcastUrl('primaryRtspBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
+		return $this->getDynamicBroadcastUrl('primaryRtspBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
 	}
 	
 	public function setSecondaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryRtspBroadcastingUrl" , $v );	}
 	public function getSecondaryRtspBroadcastingUrl (  )
 	{
-		return $this->getDynamicBrodcastUrl('secondaryRtspBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
+		return $this->getDynamicBroadcastUrl('secondaryRtspBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
 	}
 	
 	public function setPrimaryServerNodeId ( $v )	{	$this->putInCustomData ( "primaryServerNodeId" , $v );	}
@@ -80,7 +80,7 @@ class LiveStreamEntry extends LiveEntry
 	    $this->putInCustomData("hls_stream_url", $v);
 	}
 
-	private function getDynamicBrodcastUrl($customDataParam, $functionName, $protocol)
+	private function getDynamicBroadcastUrl($customDataParam, $functionName, $protocol)
 	{
 		$url = $this->getFromCustomData($customDataParam);
 		if($url)
