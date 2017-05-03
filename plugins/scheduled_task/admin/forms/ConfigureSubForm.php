@@ -18,12 +18,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		$this->addElement('hidden', "crossLine_$tag", array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
-
-		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
-		$titleElement->setLabel($name);
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElement($titleElement);
-
+		$this->addTitle($name);
 		$this->addObjectProperties($obj, $ignore, $prefix);
 		return;
 
@@ -124,6 +119,15 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		$element->setLabel($msg);
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partnerConfigurationDescription'))));
 		$this->addElements(array($element));
+	}
+
+	protected function addTitle($name)
+	{
+		$tag = str_replace(' ', '', $name);
+		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
+		$titleElement->setLabel($name);
+		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+		$this->addElement($titleElement);
 	}
 
 }
