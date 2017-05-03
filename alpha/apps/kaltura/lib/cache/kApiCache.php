@@ -312,11 +312,22 @@ class kApiCache extends kApiCacheBase
 		switch ($condition)
 		{
 		case self::COND_MATCH:
+		case self::COND_MATCH_ALL:
 			if (!count($refValue))
 				return null;
 				
 			if (!is_array($fieldValue))
 				return in_array($fieldValue, $refValue);
+			
+			if ($condition == self::COND_MATCH_ALL) // compare all field values
+			{
+				foreach($fieldValue as $value)
+				{
+					if (!in_array($value, $refValue))
+						return false;
+				}
+				return true;
+			}
 			
 			foreach($fieldValue as $value)
 			{
@@ -324,12 +335,7 @@ class kApiCache extends kApiCacheBase
 					return true;
 			}
 			return false;
-						
-		case self::COND_MATCH:
-			if (!count($refValue))
-				return null;
-			return in_array($fieldValue, $refValue);
-
+				
 		case self::COND_REGEX:
 			if (!count($refValue))
 				return null;
@@ -382,6 +388,7 @@ class kApiCache extends kApiCacheBase
 		{
 		case self::COND_REGEX:
 		case self::COND_MATCH:
+		case self::COND_MATCH_ALL:
 		case self::COND_SITE_MATCH:
 		case self::COND_GEO_DISTANCE:
 			return "_{$condition}_" . implode(',', $refValue);

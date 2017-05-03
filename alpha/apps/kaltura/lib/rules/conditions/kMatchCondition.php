@@ -12,6 +12,11 @@ abstract class kMatchCondition extends kCondition
 	protected $values;
 	
 	/**
+	 * @var bool - in case the field has multiple values, enfroce matching all of them 
+	 */
+	protected $matchAll = true;
+	
+	/**
 	 * @var array
 	 */
 	protected $dynamicValues;
@@ -36,6 +41,24 @@ abstract class kMatchCondition extends kCondition
 	{
 		return $this->values;
 	}
+	
+	/**
+	 * @return bool
+	 */
+	public function getMatchAll()
+	{
+		return $this->matchAll;
+	}
+	
+	/**
+	 * @param bool $not
+	 */
+	public function setMatchAll($matchAll)
+	{
+		$this->matchAll = $matchAll;
+	}
+	
+	
 
 	/* (non-PHPdoc)
 	 * @see kCondition::applyDynamicValues()
@@ -149,16 +172,30 @@ abstract class kMatchCondition extends kCondition
 
 		if(is_array($field))
 		{
+			if ($matchAll)
+			{
+				foreach($field as $fieldItem)
+				{
+					if(!$this->fieldFulfilled($fieldItem, $values))
+					{
+						KalturaLog::debug("[$this->description] Field item [$fieldItem] does not fulfill, condition is false");
+						return false;
+					}
+				}
+				KalturaLog::debug("[$this->description] All field items fulfilled, condition is true");
+				return true;
+			}
+			
 			foreach($field as $fieldItem)
 			{
-				if(!$this->fieldFulfilled($fieldItem, $values))
+				if($this->fieldFulfilled($fieldItem, $values))
 				{
-					KalturaLog::debug("[$this->description] Field item [$fieldItem] does not fulfill, condition is false");
-					return false;
+					KalturaLog::debug("[$this->description] Field item [$fieldItem] fulfill, condition is true");
+					return true;
 				}
 			}
-			KalturaLog::debug("[$this->description] All field items fulfilled, condition is true");
-			return true;
+			KalturaLog::debug("[$this->description] None of the field items fulfilled, condition is false");
+			return false;
 		}
 		
 		return $this->fieldFulfilled($field, $values);

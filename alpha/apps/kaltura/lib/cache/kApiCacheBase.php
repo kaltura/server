@@ -26,6 +26,7 @@ class kApiCacheBase
 	//	the entry, instead of 200)
 	const COND_NONE = '';
 	const COND_MATCH = 'match';					// used by kCountryCondition
+	const COND_MATCH_ALL = 'matchAll';
 	const COND_REGEX = 'regex';					// used by kUserAgentCondition
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
