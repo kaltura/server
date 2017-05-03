@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
 
-$baseDir = KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor/MaxMind';
+$baseDir = dirname(__FILE__) . '/../../../../vendor/MaxMind';
 
 require("$baseDir/MaxMind/Db/Reader.php");
 require("$baseDir/MaxMind/Db/Reader/Decoder.php");
