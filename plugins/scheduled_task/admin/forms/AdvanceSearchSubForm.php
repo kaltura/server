@@ -18,8 +18,6 @@ class Form_AdvanceSearchSubForm extends ConfigureSubForm
 		parent::__construct();
 	}
 
-
-
 	public function init()
 	{
 		$this->setAttrib('id', 'frmAdvanceSearchSubForm');
@@ -33,25 +31,6 @@ class Form_AdvanceSearchSubForm extends ConfigureSubForm
 		$this->addStringElement("conditionType", $this->prefix);
 		$this->addStringElement("MetadataProfileId", $this->prefix);
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
-	}
-
-	
-	public function populateFromObject($object, $add_underscore = true)
-	{
-		/* @var $object Kaltura_Client_Type_SearchCondition */
-		KalturaLog::info(print_r($object,true));
-
-		$reflectClass = new ReflectionClass(get_class($object));
-		$properties = $reflectClass	->getProperties(ReflectionProperty::IS_PUBLIC);
-
-		foreach($properties as $property) {
-			$propertyName = $property->name;
-			if (!in_array($propertyName, $this->ignore)) {
-				$tag = $this->prefix. $propertyName;
-				$this->setDefault($tag, $object->$propertyName);
-			}
-		}
-
 	}
 	
 }

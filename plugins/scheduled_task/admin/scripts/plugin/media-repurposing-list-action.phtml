@@ -248,9 +248,9 @@ function rearrangeData() {
 	//remove all template field
 	$('dd[id^="MR_tasksDataTemplate_"]').remove();
 	$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
+
 	setConditionData();
 	setTaskData();
-	return true;
 }
 
 function setConditionData() {
@@ -258,7 +258,6 @@ function setConditionData() {
 	var currentIndex = 0;
 	while (jQuery('#Cond_' + currentIndex.toString()).length > 0) {
 		conditions.push(buildCondParams(currentIndex));
-		alert(JSON.stringify(conditions));
 		currentIndex++;
 	}
 	jQuery('#AdvanceSearch').val(JSON.stringify(conditions));
