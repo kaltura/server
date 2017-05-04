@@ -13,7 +13,7 @@ class KalturaMatchConditionType extends KalturaDynamicEnum implements MatchCondi
 	public static function getDescriptions()
 	{
 		$descriptions = array(
-			MatchConditionType::MATCH => 'Match at least one field value',
+			MatchConditionType::MATCH_ANY => 'Match at least one field value',
 			MatchConditionType::MATCH_ALL => 'Match all field values.',
 			);
 		
