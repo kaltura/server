@@ -342,13 +342,15 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$toArr = explode(",", $mailTask->mailAddress);
 		$success = $this->sendMail($toArr, "Media Repurposing Notification" , $body);
 		if (!$success)
-			KalturaLog::alert("Mail for MRP [$mrId] did not send successfully");
+			KalturaLog::info("Mail for MRP [$mrId] did not send successfully");
 	}
 
 	private function sendMail($toArray, $subject, $body)
 	{
 		$mailer = new PHPMailer();
 		$mailer->CharSet = 'utf-8';
+		if (!$toArray || count($toArray) < 1 || strlen($toArray[0]) == 0)
+			return false;
 		foreach ($toArray as $to)
 			$mailer->AddAddress($to);
 		$mailer->Subject = $subject;

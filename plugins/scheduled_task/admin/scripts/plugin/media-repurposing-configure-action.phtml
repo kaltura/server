@@ -21,8 +21,11 @@
 		//hide template
 		$('dd[id^="MR_tasksDataTemplate_"]').hide();
 
+		$('fieldset[id^="MR_SearchConditionTemplate"]').hide();
+
 		hideEmptyFilterFields();
 		populateTasks();
+		populateConditions();
 		checkIfError();
 	}
 
@@ -76,6 +79,16 @@
 
 		for (var i = 0, len = arr.length; i < len; i++)
 			addTaskFromObject(ts, arr[i]);
+	}
+
+	function populateConditions() {
+		var data = jQuery('#AdvanceSearch').val();
+		if (!data)
+			return;
+		var arr = JSON.parse(data);
+		var ts = $( ".add-cond" );
+		for (var i = 0, len = arr.length; i < len; i++)
+			addCondFromObject(ts, arr[i]);
 	}
 
 

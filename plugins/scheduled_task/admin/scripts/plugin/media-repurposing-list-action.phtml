@@ -247,6 +247,42 @@ function loadMediaRepurposing(paramStr)
 function rearrangeData() {
 	//remove all template field
 	$('dd[id^="MR_tasksDataTemplate_"]').remove();
+	$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
+	setConditionData();
+	setTaskData();
+	return true;
+}
+
+function setConditionData() {
+	var conditions = [];
+	var currentIndex = 0;
+	while (jQuery('#Cond_' + currentIndex.toString()).length > 0) {
+		conditions.push(buildCondParams(currentIndex));
+		alert(JSON.stringify(conditions));
+		currentIndex++;
+	}
+	jQuery('#AdvanceSearch').val(JSON.stringify(conditions));
+}
+
+function buildCondParams(index) {
+	var cond = {};
+	jQuery('#Cond_' + index).find('input,select').each(function(idx) {
+		var type = $( this ).attr("type");
+		var name = $( this ).attr("name");
+		var val = $( this ).val();
+		if (type == 'hidden')
+			return;
+
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
+
+		cond[name] = val;
+		$(this).remove();
+	});
+	return cond;
+}
+
+function setTaskData() {
 	var tasks = [];
 	var currentIndex = 0;
 	while (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0) {
@@ -254,8 +290,6 @@ function rearrangeData() {
 		currentIndex++;
 	}
 	jQuery('#TasksData').val(JSON.stringify(tasks));
-	
-	return true;
 }
 
 function buildTaskParams(index) {
@@ -278,16 +312,19 @@ function buildTaskParams(index) {
 		var name = $( this ).attr("name");
 		var val = $( this ).val();
 
-		if (type == 'checkbox') {
-			val = $(this).attr("checked");
-			if (val == 'checked')
-				val = "1";
-		}
-		taskData[name] = val;
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
 
+		taskData[name] = val;
 		$(this).remove();
 	});
 	return {id, type, taskTimeToNext, taskData};
+}
+
+function getCheckboxVal(element) {
+	if ($(element).attr("checked") == 'checked')
+		return "1";
+	return "0";
 }
 
 

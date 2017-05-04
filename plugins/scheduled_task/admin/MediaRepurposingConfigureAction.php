@@ -67,8 +67,6 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$action->view->form = $mediaRepurposingForm;
 	}
 
-
-
 	private function buildTasksArray($tasksData)
 	{
 		$taskArray = array();
@@ -92,8 +90,6 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 	}
 
 
-
-	
 	private function processForm(Form_MediaRepurposingConfigure $form, $formData, $filterTypeEngine, $mediaRepurposingId = null)
 	{
 		$name = $formData['media_repurposing_name'];

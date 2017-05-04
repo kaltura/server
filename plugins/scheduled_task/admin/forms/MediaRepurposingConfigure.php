@@ -91,7 +91,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		));
 		$this->getElement('max_entries_allowed')->setValue(self::DEFAULT_MAX_TOTAL_COUNT_ALLOWED); //as default
 		
-		$this->addFilterElement();
+		$this->addFilterSection();
 
 		//add tasks section
 		$this->addTaskSection();
@@ -110,21 +110,14 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		}
 	}
 
-	private function addTaskSection() {
-
-		$this->addElement('hidden', 'crossLine2', array(
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
-		));
-
-		$titleElement = new Zend_Form_Element_Hidden('TasksData');
-		$titleElement->setLabel('Tasks Data');
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElement($titleElement);
-
+	private function addTaskSection()
+	{
+		$this->addLine("2");
+		$this->addTitle('Tasks Data');
 
 		$elem = new Kaltura_Form_Element_EnumSelect("TaskTypeChoose", array(
 			'enum' => 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType',
-			'excludes' => array(),
+			'excludes' => array(Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::MODIFY_ENTRY),
 		));
 		$elem->addMultiOption("N/A", "NONE");
 		$elem->setValue("N/A");
@@ -141,7 +134,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	}
 
-	private function addFilterElement()
+	private function addFilterSection()
 	{
 		$filter = new $this->filterType;
 		//TODO add all field that we want to block the user to filter by in MR
@@ -155,6 +148,36 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			'onclick'		=> "changeFilterStatus()",
 			'decorators' => array('ViewHelper')
 		));
+
+		$this->addAdvanceSearchSection();
+		$this->addAdvanceSearchTemplate();
+	}
+
+	private function addAdvanceSearchSection()
+	{
+		$this->addLine("3");
+		$this->addTitle('Advance Search:');
+
+		$options = self::$advanceSearchMap;
+		$this->addSelectElement("conditionType", $options);
+
+		
+		$TasksSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+		$TasksSubForm->addDecorator('ViewScript', array(
+			'viewScript' => 'conditions-sub-form.phtml',
+		));
+		$this->addSubForm($TasksSubForm, 'AdvanceSearch_');
+	}
+	
+	public static $advanceSearchMap = array("Kaltura_Client_Type_SearchMatchCondition" => "match",
+												"Kaltura_Client_Type_SearchComparableCondition" => "compare");
+	
+	private function addAdvanceSearchTemplate()
+	{
+		foreach(self::$advanceSearchMap as $name => $class) {
+			$advanceSearchSubForm = new Form_AdvanceSearchSubForm($name);
+			$this->addSubForm($advanceSearchSubForm, "MR_SearchConditionTemplate_" . $class);
+		}
 	}
 	
 
@@ -174,8 +197,35 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		foreach ($object->objectFilter as $key => $value)
 			if ($value)
 				$this->setDefault(self::FILTER_PREFIX.$key, $value);
-		
+
+		$this->populateAdvanceSearch($object->objectFilter);
 		$this->populateTasks($object);
+	}
+
+	private function populateAdvanceSearch($filter) {
+		$metadataItems = array();
+		if (!$filter->advancedSearch)
+			return;
+		
+		$items = $filter->advancedSearch->items;
+		array_shift($items); // first element is the MR mechanism
+		foreach($items as $item)
+			$metadataItems = array_merge($metadataItems, $this->populateMetadataItem($item));
+
+		$this->setDefault('AdvanceSearch',  json_encode($metadataItems));
+	}
+
+	private function populateMetadataItem($item)
+	{
+		$metadataSearch = array();
+		$condition = $item->items[0];
+		$metadataSearch['conditionType'] = self::$advanceSearchMap[get_class($condition)];
+		$metadataSearch['MetadataProfileId'] = $item->metadataProfileId;
+		foreach ($condition as $key => $value)
+			if ($value)
+				$metadataSearch[$key] = $value;
+
+		return array($metadataSearch);
 	}
 
 	private function populateTasks($object)
@@ -222,6 +272,34 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		return $subArray;
 	}
 
+	private function buildMetadataSearchArray($advanceSearchData)
+	{
+		$metadataSearchArray = array();
+		foreach (json_decode($advanceSearchData) as $advanceSearch)
+			$metadataSearchArray[] = $this->buildMetadataSearchItem($advanceSearch);
+		return $metadataSearchArray;
+	}
+
+	private function buildMetadataSearchItem($advanceSearch)
+	{
+		$searchItem = new Kaltura_Client_Metadata_Type_MetadataSearchItem();
+		$searchItem->type = Kaltura_Client_Enum_SearchOperatorType::SEARCH_AND;
+		$searchItem->metadataProfileId = $advanceSearch->MetadataProfileId;
+		$type = $advanceSearch->conditionType;
+
+		unset($advanceSearch->conditionType);
+		unset($advanceSearch->MetadataProfileId);
+
+		$class = array_search($type, Form_MediaRepurposingConfigure::$advanceSearchMap);
+		/* @var $condition Kaltura_Client_Type_SearchCondition  */
+		$condition = new $class();
+		foreach($advanceSearch as $key => $value)
+			$condition->$key = $value;
+
+		$searchItem->items = array($condition);
+		return $searchItem;
+	}
+
 	public function getFilterFromData($formData)
 	{
 		$filterType = $formData['filterTypeStr'];
@@ -232,6 +310,10 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		foreach ($filterFields as $key => $value)
 			if ($value != 'N/A')
 				$filter->$key = $value;
+
+		$metadataSearchArray = $this->buildMetadataSearchArray($formData['AdvanceSearch']);
+		$filter->advancedSearch = MediaRepurposingUtils::createSearchOperator($metadataSearchArray);
+
 		return $filter;
 	}
 

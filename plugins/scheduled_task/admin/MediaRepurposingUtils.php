@@ -145,10 +145,9 @@ class MediaRepurposingUtils
 		$st->name = $name;
 		$st->status = ScheduledTaskProfileStatus::DISABLED;
 
-		$filter->advancedSearch = new Kaltura_Client_Type_SearchOperator();
-		$filter->advancedSearch->type = Kaltura_Client_Enum_SearchOperatorType::SEARCH_AND;
-		$filter->advancedSearch->items = array();
-		$filter->advancedSearch->items[0] = self::createMRFilterForStatus($partnerId);
+		if (!$filter->advancedSearch)
+			$filter->advancedSearch = self::createSearchOperator();
+		array_unshift($filter->advancedSearch->items, self::createMRFilterForStatus($partnerId));
 
 		$st->objectFilter = $filter;
 		$st->objectFilterEngineType = $filterTypeEngine;
@@ -209,6 +208,13 @@ class MediaRepurposingUtils
 		$condition->value = "MR_$mrId";
 		$condition->not = true;
 		return $condition;
+	}
+	
+	public static function createSearchOperator($metadataSearchArray = array()) {
+		$searchOperator = new Kaltura_Client_Type_SearchOperator();
+		$searchOperator->type = Kaltura_Client_Enum_SearchOperatorType::SEARCH_AND;
+		$searchOperator->items = $metadataSearchArray;
+		return $searchOperator;
 	}
 
 

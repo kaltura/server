@@ -13,15 +13,11 @@ class ConfigureForm extends Infra_Form
 		parent::__construct();
 	}
 
-	protected function addObjectSection($name, $obj, $ignore, $prefix) {
-		$tag = str_replace(' ', '', $name);
-		$this->addElement('hidden', "crossLine_$tag", array(
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
-		));
+	protected function addObjectSection($name, $obj, $ignore, $prefix)
+	{
+		$this->addLine($name);
 		$this->addTitle($name);
 		$this->addObjectProperties($obj, $ignore, $prefix);
-		return;
-
 	}
 
 	protected function addObjectProperties($obj, $ignore, $prefix) {
@@ -78,6 +74,17 @@ class ConfigureForm extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
 		));
 	}
+	
+	protected function addSelectElement($name, $options, $prefix = '') 
+	{
+		$options['N/A'] = 'None';
+		$this->addElement('select', "$prefix$name", array(
+			'label'			=> "$name:",
+			'filters'		=> array('StringTrim'),
+			'multiOptions'	=> $options,
+		));
+		$this->getElement("$prefix$name")->setValue("N/A");
+	}
 
 	protected function addEnumElement($name, $prefix, $enumClass) {
 		$elem = new Kaltura_Form_Element_EnumSelect("$prefix$name", array(
@@ -113,10 +120,18 @@ class ConfigureForm extends Infra_Form
 	protected function addTitle($name)
 	{
 		$tag = str_replace(' ', '', $name);
-		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
+		$titleElement = new Zend_Form_Element_Hidden($tag);
 		$titleElement->setLabel($name);
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElement($titleElement);
+	}
+
+	protected function addLine($name)
+	{
+		$tag = str_replace(' ', '', $name);
+		$this->addElement('hidden', "crossLine_$tag", array(
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		));
 	}
 
 }
