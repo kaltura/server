@@ -12,9 +12,9 @@ abstract class kMatchCondition extends kCondition
 	protected $values;
 	
 	/**
-	 * @var bool - in case the field has multiple values, enfroce matching all of them 
+	 * @var MatchConditionType - default is MATCH_ALL in case the field has multiple values, enforce matching all of them 
 	 */
-	protected $matchAll = true;
+	protected $matchType = MatchConditionType::MATCH_ALL;
 	
 	/**
 	 * @var array
@@ -43,19 +43,19 @@ abstract class kMatchCondition extends kCondition
 	}
 	
 	/**
-	 * @return bool
+	 * @return MatchConditionType
 	 */
-	public function getMatchAll()
+	public function getMatchType()
 	{
-		return $this->matchAll;
+		return $this->matchType;
 	}
 	
 	/**
-	 * @param bool $not
+	 * @param MatchConditionType $matchType
 	 */
-	public function setMatchAll($matchAll)
+	public function setMatchType($matchType)
 	{
-		$this->matchAll = $matchAll;
+		$this->matchType = $matchType;
 	}
 	
 	
@@ -172,7 +172,7 @@ abstract class kMatchCondition extends kCondition
 
 		if(is_array($field))
 		{
-			if ($this->matchAll)
+			if ($this->matchType)
 			{
 				foreach($field as $fieldItem)
 				{

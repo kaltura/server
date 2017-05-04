@@ -4,31 +4,35 @@ require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
 
 $baseDir = dirname(__FILE__) . '/../../../../vendor/MaxMind';
 
-require("$baseDir/MaxMind/Db/Reader.php");
-require("$baseDir/MaxMind/Db/Reader/Decoder.php");
-require("$baseDir/MaxMind/Db/Reader/Util.php");
-require("$baseDir/MaxMind/Db/Reader/Metadata.php");
+require_once("$baseDir/MaxMind/Db/Reader.php");
+require_once("$baseDir/MaxMind/Db/Reader/Decoder.php");
+require_once("$baseDir/MaxMind/Db/Reader/Util.php");
+require_once("$baseDir/MaxMind/Db/Reader/Metadata.php");
 
-require("$baseDir/GeoIP2/Exception/GeoIp2Exception.php");
-require("$baseDir/GeoIP2/Exception/AddressNotFoundException.php");
-require("$baseDir/GeoIP2/ProviderInterface.php");
-require("$baseDir/GeoIP2/Database/Reader.php");
-require("$baseDir/GeoIP2/Compat/JsonSerializable.php");
-require("$baseDir/GeoIP2/Model/AbstractModel.php");
-require("$baseDir/GeoIP2/Model/AnonymousIp.php");
-require("$baseDir/GeoIP2/Model/Country.php");
-require("$baseDir/GeoIP2/Record/AbstractRecord.php");
-require("$baseDir/GeoIP2/Record/AbstractPlaceRecord.php");
-require("$baseDir/GeoIP2/Record/Traits.php");
-require("$baseDir/GeoIP2/Record/Country.php");
-require("$baseDir/GeoIP2/Record/RepresentedCountry.php");
-require("$baseDir/GeoIP2/Record/MaxMind.php");
-require("$baseDir/GeoIP2/Record/Continent.php");
+require_once("$baseDir/GeoIP2/Exception/GeoIp2Exception.php");
+require_once("$baseDir/GeoIP2/Exception/AddressNotFoundException.php");
+require_once("$baseDir/GeoIP2/ProviderInterface.php");
+require_once("$baseDir/GeoIP2/Database/Reader.php");
+require_once("$baseDir/GeoIP2/Compat/JsonSerializable.php");
+require_once("$baseDir/GeoIP2/Model/AbstractModel.php");
+require_once("$baseDir/GeoIP2/Model/AnonymousIp.php");
+require_once("$baseDir/GeoIP2/Model/Country.php");
+require_once("$baseDir/GeoIP2/Record/AbstractRecord.php");
+require_once("$baseDir/GeoIP2/Record/AbstractPlaceRecord.php");
+require_once("$baseDir/GeoIP2/Record/Traits.php");
+require_once("$baseDir/GeoIP2/Record/Country.php");
+require_once("$baseDir/GeoIP2/Record/RepresentedCountry.php");
+require_once("$baseDir/GeoIP2/Record/MaxMind.php");
+require_once("$baseDir/GeoIP2/Record/Continent.php");
 
 use GeoIp2\Database\Reader;
 
 class kMaxMindIPGeocoder extends kGeoCoder
 {
+	
+	static $readerAnonymous = null;
+	static $readerCountry = null;
+	
 	/* (non-PHPdoc)
 	 * @see kGeoCoder::getCountry()
 	 */
@@ -47,17 +51,16 @@ class kMaxMindIPGeocoder extends kGeoCoder
 
 	public function getAnonymousInfo($ip)
 	{
-		static $reader = null;
 		$attr = array();
 		
 		try {
-			if (!$reader)
+			if (!self::$readerAnonymous)
 			{
-				$dbFilePath = __DIR__ . '/../../../../../data'."/MaxMind/Anonymous/GeoIP2-Anonymous-IP.mmdb";
-				$reader = new Reader($dbFilePath);
+				$dbFilePath = __DIR__ . '/../../../../../data/MaxMind/Anonymous/GeoIP2-Anonymous-IP.mmdb';
+				self::$readerAnonymous = new Reader($dbFilePath);
 			}
 
-			$record = $reader->anonymousIp($ip);
+			$record = $readerAnonymous->anonymousIp($ip);
 			
 			if ($record->isAnonymous) $attr[] = "anonymous";
 			if ($record->isAnonymousVpn) $attr[] = "anonymousVpn";
@@ -75,16 +78,14 @@ class kMaxMindIPGeocoder extends kGeoCoder
 
 	function iptocountry($ip) 
 	{   
-		static $reader = null;
-
 		try {
-			if (!$reader)
+			if (!self::$readerCountry)
 			{
-				$dbFilePath = __DIR__ . '/../../../../../data'."/MaxMind/Country/GeoIP2-Country.mmdb";
-				$reader = new Reader($dbFilePath);
+				$dbFilePath = __DIR__ . '/../../../../../data/MaxMind/Country/GeoIP2-Country.mmdb';
+				self::$readerCountry = new Reader($dbFilePath);
 			}
 
-			$country = $reader->country($ip);
+			$country = self::$readerCountry->country($ip);
 			return $country->country->isoCode;
 		}
 		catch(Exception $e)

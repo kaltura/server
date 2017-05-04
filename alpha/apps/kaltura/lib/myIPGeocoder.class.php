@@ -23,7 +23,7 @@ class myIPGeocoder extends kGeoCoder
 
 	public function getAnonymousInfo($ip)
 	{
-		return "undefined";
+		return array("undefined");
 	}
 
 	function iptocountry($ip) 

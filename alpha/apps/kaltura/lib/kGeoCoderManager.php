@@ -32,6 +32,8 @@ class kGeoCoderManager
 			return new kMaxMindIPGeocoder();
 		}
 			
-		return KalturaPluginManager::loadObject('kGeoCoder', $type);
+		//currently there aren't any GeoCoder plugins and the caching layer won't support auto loading them anyway
+		//return KalturaPluginManager::loadObject('kGeoCoder', $type);
+		return new myIPGeocoder();
 	}
 }
