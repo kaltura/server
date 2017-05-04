@@ -14,7 +14,7 @@ abstract class KalturaMatchCondition extends KalturaCondition
 	/**
 	 * @var KalturaMatchConditionType
 	 */
-	public $matchAll;
+	public $matchType;
 	
 	private static $mapBetweenObjects = array
 	(
