@@ -172,7 +172,7 @@ abstract class kMatchCondition extends kCondition
 
 		if(is_array($field))
 		{
-			if ($this->matchType)
+			if ($this->matchType == MatchConditionType::MATCH_ALL)
 			{
 				foreach($field as $fieldItem)
 				{

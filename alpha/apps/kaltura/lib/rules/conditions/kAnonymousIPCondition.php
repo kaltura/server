@@ -45,7 +45,7 @@ class kAnonymousIPCondition extends kMatchCondition
 	{
 		kApiCache::addExtraField(array("type" => kApiCache::ECF_ANONYMOUS_IP,
 			kApiCache::ECFD_GEO_CODER_TYPE => $this->getGeoCoderType()),
-			$this->getMatchAll() ? kApiCache::COND_MATCH_ALL : kApiCache::COND_MATCH, $this->getStringValues($scope));
+			$this->getMatchType() == MatchConditionType::MATCH_ALL ? kApiCache::COND_MATCH_ALL : kApiCache::COND_MATCH, $this->getStringValues($scope));
 		
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
