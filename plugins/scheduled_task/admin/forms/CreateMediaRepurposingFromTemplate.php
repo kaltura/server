@@ -42,7 +42,7 @@ class Form_CreateMediaRepurposingFromTemplate extends ConfigureSubForm
 	private function getTemplateOption()
 	{
 		$options = array("N/A" => "NONE");
-		$templates = MediaRepurposingUtils::getMrs(-2);
+		$templates = MediaRepurposingUtils::getMrs(MediaRepurposingUtils::ADMIN_CONSOLE_PARTNER);
 		foreach ($templates as $template)
 			$options[$template->id] = $template->name;
 		return $options;

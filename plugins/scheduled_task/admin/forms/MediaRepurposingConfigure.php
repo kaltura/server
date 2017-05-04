@@ -151,11 +151,11 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->addSelectElement("conditionType", $options);
 
 		
-		$TasksSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
-		$TasksSubForm->addDecorator('ViewScript', array(
+		$conditionsSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+		$conditionsSubForm->addDecorator('ViewScript', array(
 			'viewScript' => 'conditions-sub-form.phtml',
 		));
-		$this->addSubForm($TasksSubForm, 'AdvanceSearch_');
+		$this->addSubForm($conditionsSubForm, 'AdvanceSearch_');
 	}
 	
 	public static $advanceSearchMap = array("Kaltura_Client_Type_SearchMatchCondition" => "match",
@@ -244,7 +244,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		foreach ($object->objectTasks as $currentTask)
 		{
 			$newTask = array();
-			if ($object->partnerId != -2)
+			if ($object->partnerId != MediaRepurposingUtils::ADMIN_CONSOLE_PARTNER)
 				$newTask['id'] = strval($object->id);
 			$newTask['type'] = MediaRepurposingUtils::getDescriptionForType($currentTask->type);
 			$newTask['taskTimeToNext'] = 0;

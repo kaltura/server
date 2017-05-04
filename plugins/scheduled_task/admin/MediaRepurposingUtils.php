@@ -15,6 +15,7 @@ class MediaRepurposingUtils
 	const EXCLUDE = 0;
 
 	const MEDIA_REPURPOSING_SYSTEM_NAME = 'MRP';
+	const ADMIN_CONSOLE_PARTNER = "-2";
 	/**
 	 * get all Media Repurposing of the partner
 	 * @param int $partnerId
@@ -45,7 +46,7 @@ class MediaRepurposingUtils
 		$filter->nameEqual = Kaltura_Client_Enum_PermissionName::FEATURE_MEDIA_REPURPOSING_PERMISSION;
 		$filter->partnerIdEqual = $partnerId;
 		$result = $client->permission->listAction($filter, null);
-		$client->setPartnerId(-2);
+		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
 
 		return ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
 	}
@@ -56,7 +57,7 @@ class MediaRepurposingUtils
 		if ($partnerId)
 			$client->setPartnerId($partnerId);
 		else
-			$client->setPartnerId(-2);
+			$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
 		$plugin = $name::get($client);
 		return $plugin;
 	}
@@ -70,7 +71,7 @@ class MediaRepurposingUtils
 		$scheduledTaskProfile->status = $newStatus;
 
 		$scheduleTaskIds = explode(',', $mr->description);
-		KalturaLog::info("starting changing status of media repurpesing and its ST [$mr->description] to $newStatus");
+		KalturaLog::info("starting changing status of media repurpesing and its schedule tasks [$mr->description] to $newStatus");
 		foreach ($scheduleTaskIds as $scheduleTaskId)
 			if ($scheduleTaskId)
 				$result = $scheduledtaskPlugin->scheduledTaskProfile->update($scheduleTaskId, $scheduledTaskProfile);
@@ -81,13 +82,13 @@ class MediaRepurposingUtils
 
 	
 	public static function createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed) {
-		$mr = self::createST($partnerId, $name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
+		$mr = self::createScheduleTask($partnerId, $name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		$result = $scheduledTaskPlugin->scheduledTaskProfile->add($mr);
 
 		$mrId = $result->id;
-		$mr->description = self::handleSts($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleScheduleTasks($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed);
 		$mr->objectFilter->advancedSearch->items[0]->items[] = self::createMrConditionFilter($mrId);
 		$scheduledTaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		return $scheduledTaskPlugin->scheduledTaskProfile->update($mrId, $mr);
@@ -97,17 +98,17 @@ class MediaRepurposingUtils
 	public static function UpdateMr($id, $name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed)
 	{
 		$taskArray[0]->relatedObjects = null;
-		$mr = self::createST($partnerId, $name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
+		$mr = self::createScheduleTask($partnerId, $name, $filterTypeEngine, $filter, $taskArray[0], $maxEntriesAllowed);
 		$mr->systemName = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$mr->objectFilter->advancedSearch->items[0]->items[] = self::createMrConditionFilter($id);
-		$mr->description = self::handleSts($partnerId, $id, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
+		$mr->description = self::handleScheduleTasks($partnerId, $id, $name, $filterTypeEngine, clone($filter), $taskArray, $maxEntriesAllowed);
 
 		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin', $partnerId);
 		return $scheduledtaskPlugin->scheduledTaskProfile->update($id, $mr);
 
 	}
 
-	private static function handleSts($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
+	private static function handleScheduleTasks($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
 	{
 		$ids = '';
 		for ($i = 2; $i < count($taskArray); $i += 2) {
@@ -117,11 +118,11 @@ class MediaRepurposingUtils
 			$timeAfterLast = $taskArray[$i-1];
 			$stName = self::getSubScheduleTaskName($name, $i);
 
-			$scheduledTaskProfile = self::createST($partnerId, $stName, $filterTypeEngine, $filter, $taskArray[$i], $maxEntriesAllowed);
+			$scheduledTaskProfile = self::createScheduleTask($partnerId, $stName, $filterTypeEngine, $filter, $taskArray[$i], $maxEntriesAllowed);
 			$scheduledTaskProfile->description = $timeAfterLast;
 			$scheduledTaskProfile->objectFilter->advancedSearch->items[0]->items[] = self::createMrStateConditionFilter($mrId, ($i/2));
 
-			KalturaLog::info("Handle Schedule Task [$sdId] who should run [$timeAfterLast] days after last ST:");
+			KalturaLog::info("Handle Schedule Task [$sdId] who should run [$timeAfterLast] days after last Schedule Task:");
 			KalturaLog::info(print_r($scheduledTaskProfile, true));
 
 			//add task to API
@@ -139,23 +140,23 @@ class MediaRepurposingUtils
 	}
 
 
-	private static function createST($partnerId, $name, $filterTypeEngine, $filter, $task, $maxEntriesAllowed)
+	private static function createScheduleTask($partnerId, $name, $filterTypeEngine, $filter, $task, $maxEntriesAllowed)
 	{
-		$st = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
-		$st->name = $name;
-		$st->status = ScheduledTaskProfileStatus::DISABLED;
+		$scheduleTask = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
+		$scheduleTask->name = $name;
+		$scheduleTask->status = ScheduledTaskProfileStatus::DISABLED;
 
 		if (!$filter->advancedSearch)
 			$filter->advancedSearch = self::createSearchOperator();
 		array_unshift($filter->advancedSearch->items, self::createMRFilterForStatus($partnerId));
 
-		$st->objectFilter = $filter;
-		$st->objectFilterEngineType = $filterTypeEngine;
+		$scheduleTask->objectFilter = $filter;
+		$scheduleTask->objectFilterEngineType = $filterTypeEngine;
 		if (!$filterTypeEngine)
-			$st->objectFilterEngineType = ObjectFilterEngineType::ENTRY;
-		$st->maxTotalCountAllowed = $maxEntriesAllowed;
-		$st->objectTasks = array($task);
-		return $st;
+			$scheduleTask->objectFilterEngineType = ObjectFilterEngineType::ENTRY;
+		$scheduleTask->maxTotalCountAllowed = $maxEntriesAllowed;
+		$scheduleTask->objectTasks = array($task);
+		return $scheduleTask;
 	}
 
 
