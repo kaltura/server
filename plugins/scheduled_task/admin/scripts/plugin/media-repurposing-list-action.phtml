@@ -1,4 +1,6 @@
 <p><?php echo $this->translate('Media Repurposing list intro text'); ?></p>
+
+<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to Media Repurposing Admin'); return;} ?>
 <?php echo $this->filterForm; ?>
 <?php echo $this->newMediaRepurposingForm; ?>
 <?php echo $this->newMediaRepurposingFormFromTemplate; ?>

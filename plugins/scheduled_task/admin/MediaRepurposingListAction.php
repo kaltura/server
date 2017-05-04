@@ -40,8 +40,8 @@ class MediaRepurposingListAction extends KalturaApplicationPlugin implements IKa
 		if (!$partnerId)
 			$partnerId = 0;
 
-
-
+		$action->view->allowed = MediaRepurposingUtils::isAllowMrToPartner($partnerId);
+		
 		$paginatorAdapter = new Kaltura_FilterPaginatorForMediaRepurposing($partnerId, $mrId);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);

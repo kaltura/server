@@ -20,8 +20,6 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->newPartnerId = $partnerId;
 		$this->filterType = $filterType;
 		$this->mediaRepurposingId = $mediaRepurposingId;
-
-		$this->allowed = MediaRepurposingUtils::isAllowMrToPartner($partnerId);
 		parent::__construct();
 	}
 
@@ -30,19 +28,11 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		$this->setAttrib('id', 'frmMediaRepurposingConfigure');
 		$this->setMethod('post');
-
-
+		
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
 		$titleElement->setLabel('General');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElement($titleElement);
-
-
-		if (!$this->allowed) {
-			$this->getElement('generalTitle')->setLabel('NOT ALLOWED TO PARTNER');
-			return;
-		}
-		
 
 		$this->addElement('text', 'partnerId', array(
 			'label' 		=> 'Related Publisher ID:',
@@ -99,7 +89,6 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		// template who will not be shown on form
 		$this->addTaskDataTemplate();
 	}
-
 
 	private function addTaskDataTemplate()
 	{
@@ -241,7 +230,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			$result = $scheduledtaskPlugin->scheduledTaskProfile->get($arr[0]);
 			$newTaskArr = $this->populateTask($result);
 
-			$taskTimeToNext = substr($arr[1], 0, -1); // set the time in las task
+			$taskTimeToNext = substr($arr[1], 0, -1); // set the time in last task
 			$tasks[count($tasks) - 1]['taskTimeToNext'] = strval($taskTimeToNext);
 			$tasks = array_merge($tasks, $newTaskArr);
 		}
@@ -251,15 +240,19 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	private function populateTask($object)
 	{
-		$currentTask = $object->objectTasks[0];
-		$newTask = array();
-		if ($object->partnerId != -2)
-			$newTask['id'] = strval($object->id);
-		$newTask['type'] = MediaRepurposingUtils::getDescriptionForType($currentTask->type);
-		$newTask['taskTimeToNext'] = 0;
-		$ignore = array('id', 'type', 'taskTimeToNext', 'relatedObjects');
-		$newTask['taskData'] = MediaRepurposingUtils::getParamToTask($currentTask, $ignore);
-		return array($newTask);
+		$tasks = array();
+		foreach ($object->objectTasks as $currentTask)
+		{
+			$newTask = array();
+			if ($object->partnerId != -2)
+				$newTask['id'] = strval($object->id);
+			$newTask['type'] = MediaRepurposingUtils::getDescriptionForType($currentTask->type);
+			$newTask['taskTimeToNext'] = 0;
+			$ignore = array('id', 'type', 'taskTimeToNext', 'relatedObjects');
+			$newTask['taskData'] = MediaRepurposingUtils::getParamToTask($currentTask, $ignore);
+			$tasks[] = $newTask;
+		}
+		return $tasks;
 	}
 
 	private static function getSubArrayByPrefix($array, $prefix)
