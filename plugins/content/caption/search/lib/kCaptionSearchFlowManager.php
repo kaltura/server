@@ -131,7 +131,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 			/* @var $captionAssetItem CaptionAssetItem */
 			$captionAssetItem->delete();
 		}
-		
+		$object->indexToElasticIndex();//we don't delete the caption asset from elastic only the items
 		// updates entry on order to trigger reindexing
 		$entry = $object->getentry();
 		$entry->setUpdatedAt(time());

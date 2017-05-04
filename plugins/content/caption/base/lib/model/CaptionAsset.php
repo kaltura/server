@@ -5,7 +5,7 @@
  * @package plugins.caption
  * @subpackage model
  */ 
-class CaptionAsset extends asset
+class CaptionAsset extends asset implements IElasticIndexable
 {
 	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
 	const CUSTOM_DATA_FIELD_DEFAULT = "default";
@@ -71,4 +71,68 @@ class CaptionAsset extends asset
 	}
 	
 	public function shouldCopyOnReplacement() {return false;}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return IElasticIndexable::ELASTIC_INDEX_PREFIX.'_entry';
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return 'caption';
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return $this->getEntryId();
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$obj = array(
+			'language' => $this->getLanguage(),
+			'lines' => array()
+		);
+
+		if($params && $params instanceof CaptionAssetItemContainer)
+			$obj['lines'] = $params->getLines();
+
+		return $obj;
+	}
+
+	/**
+	 * return true if we index the doc using update to elasticsearch
+	 */
+	public function shouldIndexWithUpdate()
+	{
+		return false;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElasticIndex($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexContainerEvent($this, $params));
+	}
 }

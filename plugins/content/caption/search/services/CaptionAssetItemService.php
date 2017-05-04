@@ -55,6 +55,8 @@ class CaptionAssetItemService extends KalturaBaseService
 			/* @var $captionAssetItem CaptionAssetItem */
 			$captionAssetItem->delete();
 		}
+
+		$captionAsset->indexToElasticIndex(); //delete the old asset items - without a container we delete the lines array
 		
 		// make sure that all old items are deleted from the sphinx before creating the new ones
 		kEventsManager::flushEvents();
@@ -69,6 +71,8 @@ class CaptionAssetItemService extends KalturaBaseService
     		return;
     		
     	$itemsData = $captionsContentManager->parse($content);
+		$container = new CaptionAssetItemContainer();
+		$container->language = $captionAsset->getLanguage();
     	foreach($itemsData as $itemData)
     	{
     		$item = new CaptionAssetItem();
@@ -87,7 +91,10 @@ class CaptionAssetItemService extends KalturaBaseService
     		
     		$item->setContent($content);
     		$item->save();
+			$container->addItem($item);
     	}
+		//index new content to elastic
+		$captionAsset->indexToElasticIndex($container);
     }
 	
 	/**

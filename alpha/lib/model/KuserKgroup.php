@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
+class KuserKgroup extends BaseKuserKgroup implements IRelatedObject, IElasticIndexable
 {
 	const MAX_NUMBER_OF_GROUPS_PER_USER = 100;
 
@@ -55,5 +55,64 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 	public function getCacheInvalidationKeys()
 	{
 		return array("kuserKgroup:kuserId=".strtolower($this->getKuserId()));
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return IElasticIndexable::ELASTIC_INDEX_PREFIX.'_kuser_kgroup';
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return 'Kuser';
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getKuserId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId()) //maximum 100
+		);
+		return $body;
+	}
+
+	/**
+	 * return true if we index the doc using update to elasticsearch
+	 */
+	public function shouldIndexWithUpdate()
+	{
+		return false;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElasticIndex($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 } // KuserKgroup

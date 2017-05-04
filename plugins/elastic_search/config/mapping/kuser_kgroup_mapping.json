@@ -1,0 +1,18 @@
+{
+  "settings" : {
+	"number_of_shards" : 5,
+	"number_of_replicas" : 0
+  },
+  "mappings" : {
+	"KuserKgroup" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "properties" : {
+		"group_ids" : {
+		  "type" : "text"
+		}
+	  }
+	}
+  }
+}
