@@ -60,7 +60,7 @@ class kMaxMindIPGeocoder extends kGeoCoder
 				self::$readerAnonymous = new Reader($dbFilePath);
 			}
 
-			$record = $readerAnonymous->anonymousIp($ip);
+			$record = self::$readerAnonymous->anonymousIp($ip);
 			
 			if ($record->isAnonymous) $attr[] = "anonymous";
 			if ($record->isAnonymousVpn) $attr[] = "anonymousVpn";
