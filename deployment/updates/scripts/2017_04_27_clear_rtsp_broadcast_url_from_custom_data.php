@@ -39,8 +39,13 @@ function clearCustomDataByEntryIds(array $entryIds, $dryRun)
 
         if($dryRun == 'realRun' && $shouldSave)
         {
-            $entry->save();
-            echo 'updated entry id ['.$entry->getId()."] custom data\n";
+            try{
+                $entry->save();
+                echo 'updated entry id ['.$entry->getId()."] custom data\n";
+            }
+            catch(Exception $e){
+                echo 'could not save entry['.$entry->getId().'] exception: ',  $e->getMessage(), "\n";
+            }
         }
     }
     entryPeer::clearInstancePool();
