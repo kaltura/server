@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaConditionType extends KalturaDynamicEnum implements MatchConditionType
+class KalturaMatchConditionType extends KalturaDynamicEnum implements MatchConditionType
 {
 	public static function getEnumClass()
 	{

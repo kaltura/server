@@ -12,14 +12,14 @@ abstract class KalturaMatchCondition extends KalturaCondition
 	public $values;
 	
 	/**
-	 * @var bool
+	 * @var KalturaMatchConditionType
 	 */
 	public $matchAll;
 	
 	private static $mapBetweenObjects = array
 	(
 		'values',
-		'matchAll',
+		'matchType',
 	);
 	
 	public function getMapBetweenObjects()
