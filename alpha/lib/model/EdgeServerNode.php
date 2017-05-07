@@ -64,7 +64,7 @@ class EdgeServerNode extends DeliveryServerNode {
 		
 		$edgeSpecificDeliveryProfileByType = $this->getEdgeSpecificDeliveryProfileByType($format, $deliveryType);
 		if(!$edgeSpecificDeliveryProfileByType)
-			return $edgePath . "/" . $this->getCacheLocation($deliveryType, $assetType);
+			return $edgePath . "/" . $this->getCacheLocation($format, $deliveryType, $assetType);
 	
 		/* @var $deliveryProfile DeliveryProfile */
 		$deliveryUrl = $edgeSpecificDeliveryProfileByType->getUrl();
@@ -92,7 +92,7 @@ class EdgeServerNode extends DeliveryServerNode {
 		return reset($deliveryProfiles);
 	}
 	
-	private function getCacheLocation($deliveryType = null, $assetType = null)
+	private function getCacheLocation($format, $deliveryType = null, $assetType = null)
 	{
 		if($assetType && $assetType == assetType::THUMBNAIL)
 			return self::EDGE_SERVER_DEFAULT_THUMBNAIL_CACHE_APPLICATION_NAME;
@@ -103,6 +103,9 @@ class EdgeServerNode extends DeliveryServerNode {
 		$liveDeliveryTypes = DeliveryProfilePeer::getAllLiveDeliveryProfileTypes();
 		if(!in_array($deliveryType, $liveDeliveryTypes))
 			return self::EDGE_SERVER_DEFAULT_VOD_CACHE_APPLICATION_NAME;
+		
+		if($format == PlaybackProtocol::APPLE_HTTP_TO_MC)
+			return self::EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME;
 	
 		return self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME;
 	}
