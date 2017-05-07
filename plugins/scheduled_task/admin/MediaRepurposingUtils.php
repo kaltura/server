@@ -281,28 +281,49 @@ class MediaRepurposingUtils
 		return self::$typeDescription[$type];
 	}
 
-	public static function addParamToObjectTask($objectTask, $params, $ignore = array()) {
+	private static function getTypeOfVar($obj, $name)
+	{
+		$reflectClass = new ReflectionClass(get_class($obj));
+		$property = $reflectClass->getProperty($name);
+		return ConfigureForm::getTypeFromDoc($property->getDocComment());
+	}
+	
+	public static function addParamToObjectTask($objectTask, $params, $ignore = array())
+	{
 		foreach ($params as $key => $value) {
-			$objectTask->$key = self::getValueFromString($key, $value);
+			$type = self::getTypeOfVar($objectTask, $key);
+			$objectTask->$key = self::getValueFromString($value, $type);
 		}
 	}
 
 	public static function getParamToTask($task, $ignore = array()) {
 		$params = array();
-		foreach ($task as $key => $value)
+		foreach ($task as $key => $value) {
+			$type = self::getTypeOfVar($task, $key);
 			if (!in_array($key, $ignore))
-				$params[$key] = self::setValueToString($key, $value);
+				$params[$key] = self::setValueToString($value, $type);
+		}
 		return $params;
 	}
 
-	private static function getValueFromString($key, $value) {
-		if ($key == 'categoryIds') 
+	private static function elementTypeFactory($type)
+	{
+		switch ($type) {
+			case 'KalturaIntegerValue':
+				return new Kaltura_Client_Type_IntegerValue();
+			default:
+				return null;
+		}
+	}
+
+	private static function getValueFromString($value, $type) {
+		if (strpos($type ,'array') > -1)
 		{
 			$arr = array();
-			$strArray = explode(",", $value);
-			foreach($strArray as $str) {
-				$elem = new Kaltura_Client_Type_IntegerValue();
-				$elem->value = intval($str);
+			$elemType = explode(" ", $type); // template is 'array of XXX';
+			foreach(explode(",", $value) as $val) {
+				$elem = self::elementTypeFactory($elemType[2]);
+				$elem->value = intval($val);
 				$arr[] = $elem;
 			}
 			return $arr;
@@ -310,13 +331,13 @@ class MediaRepurposingUtils
 		return $value;
 	}
 
-	private static function setValueToString($key, $value) {
-		if ($key == 'categoryIds') 
+	private static function setValueToString($value, $type) {
+		if (strpos($type ,'array') > -1)
 		{
 			$values = '';
 			foreach($value as $val)
 				$values .= $val->value . ",";
-			return $values;
+			return rtrim($values, ',');
 		}
 		return $value;
 	}

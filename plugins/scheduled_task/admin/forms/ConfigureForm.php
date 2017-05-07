@@ -26,14 +26,14 @@ class ConfigureForm extends Infra_Form
 
 		foreach($properties as $property) {
 			if (!in_array($property->name, $ignore)) {
-				$type = $this->getTypeFromDoc($property->getDocComment());
+				$type = self::getTypeFromDoc($property->getDocComment());
 				$this->addElementByType($type, $property->name, $prefix);
 			}
 		}
 	}
 
-	protected function getTypeFromDoc($docComment) {
-		$exp =  "/\\@var (\\w*)/";
+	public static function getTypeFromDoc($docComment) {
+		$exp = "/\\@var (.*)/";
 		$result = null;
 		$lines = explode("\n", $docComment);
 		foreach ($lines as $line)

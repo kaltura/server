@@ -37,7 +37,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function getTypeFromDoc($docComment) {
-		$exp =  "/\\@var (\\w*)/";
+		$exp = "/\\@var (.*)/";
 		$result = null;
 		$lines = explode("\n", $docComment);
 		foreach ($lines as $line)
@@ -66,7 +66,19 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function addStringElement($name, $prefix) {
+		if ($name == 'message')
+			return $this->addStringAreaElement($name, $prefix);
+
 		$this->addElement('text', "$prefix$name", array(
+			'label' 		=> $name,
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+		));
+		$this->getElement("$prefix$name")->setValue("N/A");
+	}
+
+	protected function addStringAreaElement($name, $prefix) {
+		$this->addElement('textarea', "$prefix$name", array(
 			'label' 		=> $name,
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),

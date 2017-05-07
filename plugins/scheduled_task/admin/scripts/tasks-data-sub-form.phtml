@@ -65,7 +65,7 @@
 		newData.attr("id", taskTag).attr("name", taskTag);
 
 
-		newData.find( "input,select").each(function(idx) {
+		newData.find( "input,select,textarea").each(function(idx) {
 			var name = $( this ).attr("name");
 			var paramName =name.substring(name.lastIndexOf("[")+1,name.lastIndexOf("]"));
 			var tag = 'TaskData_' + index + "::" + paramName;

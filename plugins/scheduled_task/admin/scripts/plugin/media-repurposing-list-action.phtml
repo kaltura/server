@@ -308,7 +308,7 @@ function buildTaskParams(index) {
 	taskTimeToNextElement.remove();
 
 	var taskData = {};
-	jQuery('#mr_task_data_' + index).find('input,select').each(function(idx) {
+	jQuery('#mr_task_data_' + index).find('input,select,textarea').each(function(idx) {
 		var type = $( this ).attr("type");
 		var name = $( this ).attr("name");
 		var val = $( this ).val();
