@@ -351,8 +351,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $htmlPurifierBaseListUsage;
 	
 	/**
-	 * @var int
-	 */
+ * @var int
+ */
 	public $defaultLiveStreamSegmentDuration;
 	
 	
@@ -423,7 +423,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	    "timeAlignedRenditions",
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
-		"defaultLiveStreamSegmentDuration",
+		"defaultLiveStreamSegmentDuration"
 	);
 
 	public function getMapBetweenObjects()

@@ -34,16 +34,28 @@ class LiveStreamEntry extends LiveEntry
 	public function getStreamUrl (  )		{	return $this->getFromCustomData( "streamUrl" );	}
 	
 	public function setPrimaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryBroadcastingUrl" , $v );	}
-	public function getPrimaryBroadcastingUrl (  )		{	return $this->getFromCustomData( "primaryBroadcastingUrl" );	}
+	public function getPrimaryBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl('primaryBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
+	}
 	
 	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
-	public function getSecondaryBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryBroadcastingUrl", null, '' );	}
+	public function getSecondaryBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl('secondaryBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
+	}
 	
 	public function setPrimaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtspBroadcastingUrl" , $v );	}
-	public function getPrimaryRtspBroadcastingUrl (  )		{	return $this->getFromCustomData( "primaryRtspBroadcastingUrl" );	}
+	public function getPrimaryRtspBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl('primaryRtspBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
+	}
 	
 	public function setSecondaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryRtspBroadcastingUrl" , $v );	}
-	public function getSecondaryRtspBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryRtspBroadcastingUrl", null, '' );	}
+	public function getSecondaryRtspBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl('secondaryRtspBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
+	}
 	
 	public function setPrimaryServerNodeId ( $v )	{	$this->putInCustomData ( "primaryServerNodeId" , $v );	}
 	public function getPrimaryServerNodeId (  )	{	return $this->getFromCustomData( "primaryServerNodeId", null, null );	}
@@ -66,5 +78,16 @@ class LiveStreamEntry extends LiveEntry
 	public function setHlsStreamUrl ($v)
 	{
 	    $this->putInCustomData("hls_stream_url", $v);
+	}
+
+	private function getDynamicBroadcastUrl($customDataParam, $functionName, $protocol)
+	{
+		$url = $this->getFromCustomData($customDataParam);
+		if($url)
+			return $url;
+
+		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
+		$url = $manager->$functionName($this, $protocol);
+		return $url;
 	}
 }

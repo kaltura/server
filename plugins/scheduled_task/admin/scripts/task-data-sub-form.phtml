@@ -1,0 +1,14 @@
+<fieldset >
+	<legend>Task</legend>
+	<?php echo $this->element->getElement('TaskType'); ?></br>
+	<?php echo $this->element->getElement('TaskId'); ?><br/>
+	<?php echo $this->element->getElement('taskTime'); ?><br/>
+
+
+	<input type="hidden" name="belongs" value="<?php echo $this->element->getElementsBelongTo(); ?>" />
+	<a class="remove-condition" href="javascript:;" onclick="removeTask(this);">Remove</a>
+
+
+</fieldset>
+
+

@@ -66,6 +66,8 @@ abstract class KalturaObjectTask extends KalturaObject
 				return new KalturaStorageExportObjectTask();
 			case ObjectTaskType::MODIFY_ENTRY:
 				return new KalturaModifyEntryObjectTask();
+			case ObjectTaskType::MAIL_NOTIFICATION:
+				return new KalturaMailNotificationObjectTask();
 			default:
 				return KalturaPluginManager::loadObject('KalturaObjectTask', $dbObject->getType());
 		}

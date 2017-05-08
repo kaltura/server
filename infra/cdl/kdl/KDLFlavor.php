@@ -1326,8 +1326,12 @@ $plannedDur = 0;
 				 * On 'fixed/forced-frame-size' mode (flavorVid::_width/flavorVid::_height != 0),
 				 * use the calculated 'forced-dar', rather than source::dar.
 				 */
-			if(isset($flavorVid->_width) && $flavorVid->_width>0 && isset($flavorVid->_height) && $flavorVid->_height>0)
+			if(isset($flavorVid->_width) && $flavorVid->_width>0 && isset($flavorVid->_height) && $flavorVid->_height>0){
 				$dar = $flavorVid->_width/$flavorVid->_height;
+				// Handles 'truely' rotated/portrait sources - wid<hgt
+				if($sourceVid->_width<$sourceVid->_height)
+					$dar = 1/$dar;
+			}
 			else if(isset($sourceVid->_dar))
 				$dar = $sourceVid->_dar;
 			else $dar = null;

@@ -331,6 +331,12 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			}
 
 			$widevineProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(WidevinePlugin::getWidevineProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
+			if (!$widevineProfile)
+			{
+				$widevineProfile = new WidevineProfile();
+				$widevineProfile->setName('default');
+			}
+
 			if ($widevineProfile)
 			{
 				/* @var WidevineProfile $widevineProfile */
