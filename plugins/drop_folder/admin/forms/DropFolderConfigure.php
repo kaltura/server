@@ -306,6 +306,7 @@ class Form_DropFolderConfigure extends Infra_Form
 			try
 			{
 				$conversionProfileFilter = new Kaltura_Client_Type_ConversionProfileFilter();
+				$conversionProfileFilter->typeEqual = Kaltura_Client_Enum_ConversionProfileType::MEDIA;
 
 				$client = Infra_ClientHelper::getClient();
 				Infra_ClientHelper::impersonate($this->newPartnerId);
@@ -320,7 +321,7 @@ class Form_DropFolderConfigure extends Infra_Form
 			}
 		}
 
-		if(!is_null($conversionProfiles) && count($conversionProfiles))
+		if(!is_null($conversionProfiles) && count($conversionProfiles) && (count($conversionProfiles) == $conversionProfileList->totalCount))
 		{
 			$this->addElement('select', 'conversionProfileId', array(
 				'label' 		=> 'Conversion Profile ID:',
