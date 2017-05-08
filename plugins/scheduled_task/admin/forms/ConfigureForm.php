@@ -63,8 +63,8 @@ class ConfigureForm extends Infra_Form
 			'label' 		=> $name,
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
+			'value'	=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
 
@@ -82,8 +82,8 @@ class ConfigureForm extends Infra_Form
 			'label'			=> "$name:",
 			'filters'		=> array('StringTrim'),
 			'multiOptions'	=> $options,
+			'value'	=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
 	protected function addEnumElement($name, $prefix, $enumClass) {

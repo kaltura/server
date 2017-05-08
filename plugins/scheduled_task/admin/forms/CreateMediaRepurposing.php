@@ -27,8 +27,8 @@ class Form_CreateMediaRepurposing extends ConfigureSubForm
 			'label'			=> 'Filter Type:',
 			'filters'		=> array('StringTrim'),
 			'multiOptions'	=> $options,
+			'value'			=> 'N/A',
 		));
-		$this->getElement("filterType")->setValue("N/A");
 
 
 		$this->addEnumElement('Filter','newMR','Kaltura_Client_ScheduledTask_Enum_ObjectFilterEngineType');

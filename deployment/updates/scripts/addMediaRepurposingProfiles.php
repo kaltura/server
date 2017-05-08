@@ -12,7 +12,7 @@ require_once(__DIR__ . '/../../bootstrap.php');
 if ($override == 'renew')
 	deleteAllMRTemplate();
 
-
+$defaultFilterValue = 1167609601; // 01/01/2007
 
 $md = MetadataProfilePeer::retrieveBySystemName('MRP', '-2');
 if (!$md)
@@ -65,9 +65,9 @@ function createMDPTemplateForMR($xsd) {
 
 function deleteAllMRTemplate()
 {
+	echo 'DELETE ALL TEMPLATE....';
 	$criteria = new Criteria();
 	$criteria->add(ScheduledTaskProfilePeer::PARTNER_ID, -2);
-	$criteria->add(ScheduledTaskProfilePeer::SYSTEM_NAME, 'MRP');
 	ScheduledTaskProfilePeer::doDelete($criteria);
 }
 
@@ -97,12 +97,20 @@ function addTask($type, $name, $filter, $description, $isFirst = false)
 	return $scheduleTask->getId();
 }
 
+function getFilter($names)
+{
+	global $defaultFilterValue;
+	$filter = new entryFilter();
+	foreach ($names as $name)
+		$filter->fields[$name] = $defaultFilterValue;
+	return $filter;
+}
+
 function addDeleteAfterXTemplate()
 {
 	echo "Add Template of MR for Delete with notification\n";
 	$name = 'Delete with Notification';
-	$filter = new entryFilter();
-	$filter->fields['_lte_created_at'] = -1;
+	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
 	$timeToNext = "30";
@@ -116,8 +124,7 @@ function addDeleteAfterXWithExportTemplate()
 {
 	echo "Add Template of MR for Delete after Export with notification\n";
 	$name = 'Export and Delete';
-	$filter = new entryFilter();
-	$filter->fields['_lte_created_at'] = -1;
+	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
 	$timeToNext2 = "7";
@@ -133,8 +140,7 @@ function addArchiveAndDeleteTemplate()
 {
 	echo "Add Template of MR for Archive and Delete with notification\n";
 	$name = 'Archive and Delete';
-	$filter = new entryFilter();
-	$filter->fields['_lte_created_at'] = -1;
+	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
 	$timeToNext2 = "7";
@@ -150,8 +156,7 @@ function addArchiveExportAndDeleteTemplate()
 {
 	echo "Add Template of MR for Archive, Export and Delete with notification\n";
 	$name = 'Archive, Export and Delete';
-	$filter = new entryFilter();
-	$filter->fields['_lte_created_at'] = -1;
+	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
 	$timeToNext3 = "7";
@@ -169,9 +174,7 @@ function addDeletePrivateContentTemplate()
 {
 	echo "Add Template of MR for Delete Private content with notification\n";
 	$name = 'Delete Private Content';
-	$filter = new entryFilter();
-	$filter->fields['_lte_created_at'] = -1;
-	$filter->fields['_lte_last_played_at'] = -1;
+	$filter = getFilter(array('_lte_created_at', '_lte_last_played_at'));
 	$filter->fields['_empty_categories_ids'] = 1;
 
 	//create the sub-task
@@ -186,9 +189,7 @@ function addDeleteFlavorTemplate()
 {
 	echo "Add Template of MR for Delete Flavor with notification\n";
 	$name = 'Delete Flavors';
-	$filter = new entryFilter();
-	$filter->fields['_lte_created_at'] = -1;
-	$filter->fields['_lte_last_played_at'] = -1;
+	$filter = getFilter(array('_lte_created_at', '_lte_last_played_at'));
 
 	//create the sub-task
 	$timeToNext = "30";
@@ -202,8 +203,7 @@ function addExportTemplate()
 {
 	echo "Add Template of MR for Export with notification\n";
 	$name = 'Export';
-	$filter = new entryFilter();
-	$filter->fields['_lte_last_played_at'] = -1;
+	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
 	$timeToNext = "30";
@@ -217,10 +217,7 @@ function addExportAndDeleteLocalContentTemplate()
 {
 	echo "Add Template of MR for Export and Delete Local Content with notification\n";
 	$name = 'Export and Delete Local Content';
-
-	$filter = new entryFilter();
-	$filter->fields['_lte_created_at'] = -1;
-	$filter->fields['_lte_last_played_at'] = -1;
+	$filter = getFilter(array('_lte_created_at', '_lte_last_played_at'));
 
 	//create the sub-task
 	$timeToNext2 = "7";

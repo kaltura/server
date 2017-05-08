@@ -73,8 +73,9 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'label' 		=> $name,
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
+
 	}
 
 	protected function addStringAreaElement($name, $prefix) {
@@ -82,8 +83,8 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'label' 		=> $name,
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
 	protected function addArrayElement($name, $prefix) {
@@ -91,8 +92,8 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'label' 		=> "$name (Array: enter item comma separated)",
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
 	protected function addBooleanElement($name, $prefix) {

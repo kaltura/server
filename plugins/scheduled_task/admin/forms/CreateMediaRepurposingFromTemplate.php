@@ -7,7 +7,7 @@ class Form_CreateMediaRepurposingFromTemplate extends ConfigureSubForm
 {
 	public function init()
 	{
-		$this->setAttrib('id', 'frmCreateMediaRepurposing');
+		$this->setAttrib('id', 'frmCreateMediaRepurposingFromTemplate');
 		$this->setDecorators(array(
 			'FormElements', 
 			array('HtmlTag', array('tag' => 'fieldset')),

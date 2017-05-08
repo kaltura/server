@@ -72,7 +72,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			'filters'		=> array('StringTrim'),
 			'placement' => 'prepend',
 		));
-
+		
 		$this->addElement('text', 'max_entries_allowed', array(
 			'label' 		=> 'Max Entries Allowed in MR:',
 			'required'		=> true,
