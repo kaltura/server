@@ -131,6 +131,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->addObjectSection('Filter', $filter , $ignore, self::FILTER_PREFIX);
 
 		$this->addComment('relativeTimes', 'For relative times insert -/+ and seconds');
+		$this->addComment('NAExplain', 'In order to disable field insert: "N/A" ');
 		$this->addElement('button', 'expandFilter', array(
 			'ignore'	=> true,
 			'label'		=> 'Expand Filter',
