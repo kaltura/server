@@ -15,9 +15,16 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 	/**
 	 * The message to send in the notification mail
 	 *
-	 * @var string
+	 * @var string area
 	 */
 	public $message;
+
+	/**
+	 * Send the mail to each user
+	 *
+	 * @var bool
+	 */
+	public $sendToUsers;
 
 	public function __construct()
 	{
@@ -30,6 +37,7 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 		$dbObject = parent::toObject($dbObject, $skip);
 		$dbObject->setDataValue('mailAddress', $this->mailAddress);
 		$dbObject->setDataValue('message', $this->message);
+		$dbObject->setDataValue('sendToUsers', $this->sendToUsers);
 		return $dbObject;
 	}
 	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
@@ -38,6 +46,7 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 		/** @var kObjectTask $srcObj */
 		$this->mailAddress = $srcObj->getDataValue('mailAddress');
 		$this->message = $srcObj->getDataValue('message');
+		$this->sendToUsers = $srcObj->getDataValue('sendToUsers');
 	}
 
 }

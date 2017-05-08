@@ -1,6 +1,10 @@
 <p><?php echo $this->translate('Media Repurposing list intro text'); ?></p>
+
+<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to Media Repurposing Admin'); return;} ?>
 <?php echo $this->filterForm; ?>
+<br><br><br><br><br><br><br>
 <?php echo $this->newMediaRepurposingForm; ?>
+<?php echo $this->newMediaRepurposingFormFromTemplate; ?>
 
 <div id="media_repurposing_list_div" class="clear">
 	<table>
@@ -155,21 +159,41 @@ function changeStatus(mediaRepurposingId, status, callback)
 	});
 }
 
+function newMediaRepurposingFromTemplate(partnerId, templateType)
+{
+	if (!isValidParam(partnerId, 'Publisher ID', true))
+		return;
+	if (!isValidParam(templateType, 'Media Repurposing Template', false))
+		return;
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_template_type/' + templateType;
+	loadMediaRepurposing(paramsStr);
+}
 
 function newMediaRepurposing(partnerId, filterEngineType, filterType)
 {
-	if(!partnerId.length || isNaN(partnerId)){
-		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
+	if (!isValidParam(partnerId, 'Publisher ID', true))
 		return;
-	}
-	if(!filterEngineType.length || (filterEngineType == 'N/A')) {
-		alert('<?php echo $this->translate('Media Repurposing Filter Type not supplied'); ?>');
+	if (!isValidParam(filterEngineType, 'Media Repurposing Engine Type', true))
 		return;
-	}
+	if (!isValidParam(filterType, 'Media Repurposing Filter Type', false))
+		return;
 
 	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_filter_engine_type/' + filterEngineType + '/new_mr_filter_type/' + filterType;
-	
 	loadMediaRepurposing(paramsStr);
+}
+
+function isValidParam(param, name, number)
+{
+	if (!param.length || (param == 'N/A')) {
+		alert(name + " not supplied");
+		return false;
+	}
+	if (number && isNaN(param)) {
+		alert(name + " is not a number");
+		return false;
+	}
+	return true;
 }
 
 function configureMediaRepurposing(mediaRepurposingId)
@@ -226,6 +250,41 @@ function loadMediaRepurposing(paramStr)
 function rearrangeData() {
 	//remove all template field
 	$('dd[id^="MR_tasksDataTemplate_"]').remove();
+	$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
+
+	setConditionData();
+	setTaskData();
+}
+
+function setConditionData() {
+	var conditions = [];
+	var currentIndex = 0;
+	while (jQuery('#Cond_' + currentIndex.toString()).length > 0) {
+		conditions.push(buildCondParams(currentIndex));
+		currentIndex++;
+	}
+	jQuery('#AdvanceSearch').val(JSON.stringify(conditions));
+}
+
+function buildCondParams(index) {
+	var cond = {};
+	jQuery('#Cond_' + index).find('input,select').each(function(idx) {
+		var type = $( this ).attr("type");
+		var name = $( this ).attr("name");
+		var val = $( this ).val();
+		if (type == 'hidden')
+			return;
+
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
+
+		cond[name] = val;
+		$(this).remove();
+	});
+	return cond;
+}
+
+function setTaskData() {
 	var tasks = [];
 	var currentIndex = 0;
 	while (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0) {
@@ -233,8 +292,6 @@ function rearrangeData() {
 		currentIndex++;
 	}
 	jQuery('#TasksData').val(JSON.stringify(tasks));
-	
-	return true;
 }
 
 function buildTaskParams(index) {
@@ -252,21 +309,24 @@ function buildTaskParams(index) {
 	taskTimeToNextElement.remove();
 
 	var taskData = {};
-	jQuery('#mr_task_data_' + index).find('input,select').each(function(idx) {
+	jQuery('#mr_task_data_' + index).find('input,select,textarea').each(function(idx) {
 		var type = $( this ).attr("type");
 		var name = $( this ).attr("name");
 		var val = $( this ).val();
 
-		if (type == 'checkbox') {
-			val = $(this).attr("checked");
-			if (val == 'checked')
-				val = "1";
-		}
-		taskData[name] = val;
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
 
+		taskData[name] = val;
 		$(this).remove();
 	});
 	return {id, type, taskTimeToNext, taskData};
+}
+
+function getCheckboxVal(element) {
+	if ($(element).attr("checked") == 'checked')
+		return "1";
+	return "0";
 }
 
 
