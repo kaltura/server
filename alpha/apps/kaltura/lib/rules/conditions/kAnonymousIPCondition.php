@@ -3,14 +3,14 @@
  * @package Core
  * @subpackage model.data
  */
-class kCountryCondition extends kMatchCondition
+class kAnonymousIPCondition extends kMatchCondition
 {
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
 	public function __construct($not = false)
 	{
-		$this->setType(ConditionType::COUNTRY);
+		$this->setType(ConditionType::ANONYMOUS_IP);
 		parent::__construct($not);
 	}
 	
@@ -43,13 +43,13 @@ class kCountryCondition extends kMatchCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		kApiCache::addExtraField(array("type" => kApiCache::ECF_COUNTRY,
+		kApiCache::addExtraField(array("type" => kApiCache::ECF_ANONYMOUS_IP,
 			kApiCache::ECFD_GEO_CODER_TYPE => $this->getGeoCoderType()),
-			kApiCache::COND_MATCH, $this->getStringValues($scope));
+			$this->getMatchType() == MatchConditionType::MATCH_ALL ? kApiCache::COND_MATCH_ALL : kApiCache::COND_MATCH, $this->getStringValues($scope));
 		
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
-		return $ipGeo->getCountry($ip);
+		return $ipGeo->getAnonymousInfo($ip);
 	}
 	
 	/* (non-PHPdoc)
@@ -57,7 +57,7 @@ class kCountryCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		return parent::matches(trim(strtolower($field), " \n\r\t"), trim(strtolower($value), " \n\r\t"));
+		return parent::matches(trim(strtolower($field), " \n\r\t"), trim(strtolower($value), " \n\r\t"));		
 	}
 
 	/* (non-PHPdoc)

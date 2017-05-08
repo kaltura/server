@@ -12,11 +12,13 @@ class kApiCacheBase
 	const ECF_COUNTRY = 'country';
 	const ECF_IP = 'ip';
 	const ECF_COORDINATES = 'coordinates';
+	const ECF_ANONYMOUS_IP = 'anonymousIp';
 	
 	// extra cache fields data
 	const ECFD_IP_HTTP_HEADER = 'httpHeader';
 	const ECFD_IP_ACCEPT_INTERNAL_IPS = 'acceptInternalIps';
-
+	const ECFD_GEO_CODER_TYPE = 'geoCoderType';
+	
 	// extra cache fields conditions
 	// 	the conditions will be applied on the extra fields when generating the cache key
 	//	for example, when using country restriction of US allowed, we can take country==US
@@ -24,6 +26,7 @@ class kApiCacheBase
 	//	the entry, instead of 200)
 	const COND_NONE = '';
 	const COND_MATCH = 'match';					// used by kCountryCondition
+	const COND_MATCH_ALL = 'matchAll';
 	const COND_REGEX = 'regex';					// used by kUserAgentCondition
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
