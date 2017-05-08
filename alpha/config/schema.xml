@@ -2108,6 +2108,25 @@
 		<column name="status" type="integer"/>
 		<column name="type" type="integer" inheritance="single"/>
 		<column name="custom_data" type="longvarchar"/>
+		<column name="extended_status" type="integer" />
+		<column name="privacy_context" type="varchar" size="255" />
+		<column name="custom_data" type="longvarchar"/>
+		<index name="kuser_id_entry_id">
+            <index-column name="kuser_id" />
+            <index-column name="entry_id" />
+            <index-column name="privacy_context" />
+        </index>
+        <index name="kuser_id_updated_at">
+            <index-column name="kuser_id" />
+            <index-column name="updated_at" />
+            <index-column name="privacy_context" />
+        </index>
+        <index name="kuser_id_extended_status_updated_at">
+            <index-column name="kuser_id" />
+            <index-column name="extended_status" />
+            <index-column name="updated_at" />
+            <index-column name="privacy_context" />
+        </index>
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
 			<reference local="entry_id" foreign="id" />
 		</foreign-key>
