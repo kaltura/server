@@ -345,7 +345,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		$snippet = $video['snippet'];
 		$snippet['title'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE);
-		$snippet['description'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION);
+		$snippet['description'] = self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION));
 		$snippet['tags'] = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS));
  		$snippet['category'] = $this->translateCategory($youtube, $distributionProfile, $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY));
 		
