@@ -47,8 +47,9 @@ class MediaRepurposingUtils
 		$filter->partnerIdEqual = $partnerId;
 		$result = $client->permission->listAction($filter, null);
 		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
-
-		return ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
+		
+		$isAllow = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
+		return $isAllow;
 	}
 
 
@@ -346,8 +347,9 @@ class MediaRepurposingUtils
 		if (strpos($type ,'array') > -1)
 		{
 			$values = '';
-			foreach($value as $val)
-				$values .= $val->value . ",";
+			if ($value && is_array($value))
+				foreach($value as $val)
+					$values .= $val->value . ",";
 			return rtrim($values, ',');
 		}
 		return $value;
