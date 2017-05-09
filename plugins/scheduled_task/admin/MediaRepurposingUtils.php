@@ -146,13 +146,11 @@ class MediaRepurposingUtils
 		$scheduleTask->name = $name;
 		$scheduleTask->status = ScheduledTaskProfileStatus::DISABLED;
 
+		if (!$originalFilter->advancedSearch)
+			$originalFilter->advancedSearch = self::createSearchOperator();
+
 		// clone the advance search field and add the status-not-exclude filter
-		$filter = clone $originalFilter;
-		if (!$filter->advancedSearch)
-			$filter->advancedSearch = self::createSearchOperator();
-		$advanceSearch = clone $filter->advancedSearch;
-		array_unshift($advanceSearch->items, self::createMRFilterForStatus($partnerId));
-		$filter->advancedSearch = $advanceSearch;
+		$filter = self::appendMRStatusfilter($originalFilter, $partnerId);
 
 		$scheduleTask->objectFilter = $filter;
 		$scheduleTask->objectFilterEngineType = $filterTypeEngine;
@@ -174,6 +172,15 @@ class MediaRepurposingUtils
 		if ($res->totalCount != 1)
 			return null;
 		return $res->objects[0];
+	}
+
+	private static function appendMRStatusfilter($originalFilter, $partnerId)
+	{
+		$filter = clone $originalFilter;
+		$advanceSearch = clone $filter->advancedSearch;
+		array_unshift($advanceSearch->items, self::createMRFilterForStatus($partnerId));
+		$filter->advancedSearch = $advanceSearch;
+		return $filter;
 	}
 
 
