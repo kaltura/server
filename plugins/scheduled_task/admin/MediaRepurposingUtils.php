@@ -346,8 +346,9 @@ class MediaRepurposingUtils
 		if (strpos($type ,'array') > -1)
 		{
 			$values = '';
-			foreach($value as $val)
-				$values .= $val->value . ",";
+			if ($value && is_array($value))
+				foreach($value as $val)
+					$values .= $val->value . ",";
 			return rtrim($values, ',');
 		}
 		return $value;
