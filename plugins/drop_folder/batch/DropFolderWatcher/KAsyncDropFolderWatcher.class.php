@@ -75,8 +75,9 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			catch (Exception $e) 
 			{
 				$this->unimpersonate();
-				$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR, 
-					KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::DROP_FOLDER_APP_ERROR_MESSAGE.$e->getMessage());
+				if ($folder)
+					$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR,
+						KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::DROP_FOLDER_APP_ERROR_MESSAGE.$e->getMessage());
 			}
 		}
 		
