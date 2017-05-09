@@ -140,15 +140,19 @@ class MediaRepurposingUtils
 	}
 
 
-	private static function createScheduleTask($partnerId, $name, $filterTypeEngine, $filter, $task, $maxEntriesAllowed)
+	private static function createScheduleTask($partnerId, $name, $filterTypeEngine, $originalFilter, $task, $maxEntriesAllowed)
 	{
 		$scheduleTask = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfile();
 		$scheduleTask->name = $name;
 		$scheduleTask->status = ScheduledTaskProfileStatus::DISABLED;
 
+		// clone the advance search field and add the status-not-exclude filter
+		$filter = clone $originalFilter;
 		if (!$filter->advancedSearch)
 			$filter->advancedSearch = self::createSearchOperator();
-		array_unshift($filter->advancedSearch->items, self::createMRFilterForStatus($partnerId));
+		$advanceSearch = clone $filter->advancedSearch;
+		array_unshift($advanceSearch->items, self::createMRFilterForStatus($partnerId));
+		$filter->advancedSearch = $advanceSearch;
 
 		$scheduleTask->objectFilter = $filter;
 		$scheduleTask->objectFilterEngineType = $filterTypeEngine;
