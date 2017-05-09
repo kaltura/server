@@ -137,9 +137,34 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
+			
+			$this->addLanguageInfo($flavor, $kLiveStreamParams);
 				
 			$flavors[] = $flavor;
 		}
+	}
+	
+	protected function addLanguageInfo(&$flavor, $kLiveStreamParams)
+	{
+		$audioLanguageData = $this->getLanguageInfo($kLiveStreamParams);
+		if($audioLanguageData)
+		{
+			list($audioLanguage, $audioLanguageName) = $audioLanguageData;
+			$flavor['audioLanguage'] = $audioLanguage;
+			$flavor['audioLanguageName'] =  $audioLanguageName;
+		}
+	}
+	
+	protected function getLanguageInfo($kLiveStreamParams)
+	{
+		$language = $kLiveStreamParams->getLanguage();
+		if(!$language)
+			return null;
+		
+		$languageObj = languageCodeManager::getObjectFromThreeCode(strtolower($language));
+		$audioLanguageName = $this->getAudioLanguageName($languageObj, $language);
+			
+		return array($language, $audioLanguageName);
 	}
 
 	protected function getPlayServerUrl($manifestUrl)

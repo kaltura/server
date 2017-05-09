@@ -376,6 +376,7 @@ class kFlowHelper
 		$replacingEntry = new entry();
 		$replacingEntry->setType(entryType::MEDIA_CLIP);
 		$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+		$replacingEntry->setSourceType($recordedEntry->getSourceType());
 		$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
 		$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
 		$replacingEntry->setKuserId($recordedEntry->getKuserId());
