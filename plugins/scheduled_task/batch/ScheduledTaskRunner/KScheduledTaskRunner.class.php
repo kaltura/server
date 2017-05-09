@@ -338,13 +338,16 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private function getAdminObjectsBody($objectsIds)
 	{
 		$body = "\nExecute for entries: (users aggregate)\n";
+		$cnt = 0;
 		foreach($objectsIds as $userId => $entriesId) {
 			$body .= "[$userId]\n";
-			foreach($entriesId as $id)
+			foreach($entriesId as $id) {
 				$body .= "\t$id\n";
+				$cnt++;
+			}
 		}
-
-		$body .= "Total count of affected object: " . count($objectsIds);
+		
+		$body .= "Total count of affected object: $cnt";
 		$body .= "\nSend Notification for the following users: ";
 		foreach($objectsIds as $userId => $entriesId)
 			$body .= "$userId\n";
