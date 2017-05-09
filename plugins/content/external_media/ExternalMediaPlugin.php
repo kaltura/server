@@ -128,7 +128,7 @@ class ExternalMediaPlugin extends KalturaPlugin implements IKalturaServices, IKa
 		return null;
 	}
 	
-	        /* (non-PHPdoc)
+		/* (non-PHPdoc)
          * @see IKalturaMrssContributor::contribute()
          */
         public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
