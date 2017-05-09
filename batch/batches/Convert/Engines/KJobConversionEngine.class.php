@@ -126,7 +126,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 	
 			$start = microtime(true);
 			// TODO add BatchEvent - before conversion + conversion engine 
-			$output = system( $execution_command_str , $return_value );
+			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value );
 			// TODO add BatchEvent - after conversion + conversion engine		
 			$end = microtime(true);
 	
@@ -145,7 +145,16 @@ abstract class KJobConversionEngine extends KConversionEngine
 		
 		
 		return array ( true , $error_message );// indicate all was converted properly
-	}	
+	}
+	
+	/**
+	 *
+	 */
+	protected function execute_conversion_cmdline($command, &$return_var)
+	{
+		$output = system($command, $return_var);
+		return $output;
+	}
 }
 
 
