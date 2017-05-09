@@ -37,7 +37,7 @@
 				<td><?php echo $mediaRepurposing->objectFilterEngineType; ?></td>
 				<td><?php echo get_class($mediaRepurposing->objectFilter); ?></td>
 				<td><?php echo $mediaRepurposing->description; ?></td>
-				<td><?php echo date('r', $mediaRepurposing->lastExecutionStartedAt); ?></td>
+				<td><?php if ($mediaRepurposing->lastExecutionStartedAt) echo date('r', $mediaRepurposing->lastExecutionStartedAt); else echo "NEVER"?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, '<?php echo $mediaRepurposing->id; ?>')">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
@@ -61,6 +61,8 @@
 $(function(){
 	addSubTitle('Media Repurposing Profiles');
 });
+
+
 
 jQuery('#filter_type').change(function() {
 	if(this.value == "none") {
@@ -228,6 +230,7 @@ function loadMediaRepurposing(paramStr)
 			'<?php echo $this->translate('Save'); ?>': function() {
 				rearrangeData();
 				jQuery(this).find('#frmMediaRepurposingConfigure').submit();
+				setTimeout(function () { window.location.reload(); }, 10);
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
@@ -246,6 +249,7 @@ function loadMediaRepurposing(paramStr)
 		}
 	);
 }
+
 
 function rearrangeData() {
 	//remove all template field

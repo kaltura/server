@@ -47,7 +47,8 @@ class MediaRepurposingUtils
 		$filter->partnerIdEqual = $partnerId;
 		$result = $client->permission->listAction($filter, null);
 		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
-
+		if ($result->totalCount < 1)
+			return false;
 		return ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
 	}
 
