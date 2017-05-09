@@ -35,6 +35,8 @@ class DeliveryProfileLivePackagerHls extends DeliveryProfileLiveAppleHttp {
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
 			
+			$this->addLanguageInfo($flavor, $kLiveStreamParams);
+			
 			$flavors[] = $flavor;
 		}
 	}
