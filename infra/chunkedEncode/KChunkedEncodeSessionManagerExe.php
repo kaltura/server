@@ -8,8 +8,8 @@
  */
 ini_set("memory_limit","512M");
 
-//require_once(__DIR__ . "/../../batch/bootstrap.php");
-require_once "/opt/kaltura/app/alpha/scripts/bootstrap.php";
+require_once(__DIR__ . "/../../batch/bootstrap.php");
+//require_once "/opt/kaltura/app/alpha/scripts/bootstrap.php";
 
 if (!class_exists('KChunkedEncodeSessionManager')) {
 require_once "/opt/kaltura/app/batch/client/KalturaTypes.php";
