@@ -14,7 +14,7 @@
 
 		const	DefaultChunkDuration = 60;  // secs
 		const	DefaultChunkOverlap =  0.5; // secs
-		const	DefaultConcurrentChunks = 5;// secs
+		const	DefaultConcurrentChunks = 1;// secs
 		
 		public $ffmpegBin = "ffmpeg";
 		public $ffprobeBin = "ffprobe";
