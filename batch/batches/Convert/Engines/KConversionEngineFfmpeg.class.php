@@ -177,15 +177,18 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 			$setup->ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
 			$setup->cmd = $cmdLineAdjusted;
 
-			$chunkedEncodeScriptParams = " -cleanUp 0";//null; //
 			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent)){
 				$setup->concurrent = KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent;
-				$chunkedEncodeScriptParams.= " -concurrent $setup->concurrent";
+			}
+			else {
+				$setup->concurrent = KBatchBase::$taskConfig->maxInstances;
 			}
 			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent)) {
 				$setup->concurrentMin = KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent;
-				$chunkedEncodeScriptParams.= " -concurrentMin $setup->concurrentMin";
 			}
+			$chunkedEncodeScriptParams = " -cleanUp 0";//null; //
+			$chunkedEncodeScriptParams.= " -concurrent $setup->concurrent";
+			$chunkedEncodeScriptParams.= " -concurrentMin $setup->concurrentMin";
 		}
 
 			/*
