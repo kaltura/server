@@ -238,13 +238,15 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	
 	public function setFlavorAssetIds($v)
 	{
-		if(is_array($v))
+		if (!is_array($v))
 		{
-			$v = array_unique($v);
-			sort($v); // the sort is importanet to idetify changes, when the list is changed the update required flag is raised
-			$v = implode(',', $v);
+			$v = $v = explode(',', $v);
 		}
-			
+		$v = $this->filterFlavorAssets($v);
+		$v = array_unique($v);
+		sort($v); // the sort is importanet to idetify changes, when the list is changed the update required flag is raised
+		$v = implode(',', $v);
+
 		return parent::setFlavorAssetIds($v);
 	}
 	
@@ -435,5 +437,47 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	{
 		return array("entryDistribution:entryId=".strtolower($this->getEntryId()));
 	}
-	
+
+	protected function filterFlavorAssets(array $flavorIds)
+	{
+		$conversionProfile = null;
+		if (count($flavorIds))
+		{
+			$asset = assetPeer::retrieveById($flavorIds[0]);
+			$entryId = $asset->getEntryId();
+			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		}
+		if (!$conversionProfile)
+			return array();
+		$criteria = new Criteria();
+		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfile->getId());
+		$criteria->add(flavorParamsConversionProfilePeer::DELETE_POLICY, AssetParamsDeletePolicy::DELETE);
+		$tempFlavorsParams = flavorParamsConversionProfilePeer::doSelect($criteria);
+		$tempFlavorsParamsIds = array();
+		foreach ($tempFlavorsParams as $flavorParams)
+		{
+			/**
+			 * @var flavorParams $flavorParams
+			 */
+			$tempFlavorsParamsIds[] = $flavorParams->getId();
+		}
+
+		$flavorAssets = assetPeer::retrieveByIds($flavorIds);
+
+		$outFlavors = array();
+		foreach ($flavorAssets as $asset)
+		{
+			/**
+			 * @var flavorAsset $asset
+			 */
+			if ($asset && $asset->getIsOriginal() && $asset->getStatus() == flavorAsset::ASSET_STATUS_TEMP)
+				continue;
+			if (in_array($asset->getFlavorParamsId(), $tempFlavorsParamsIds))
+				continue;
+
+			$outFlavors[] = $asset->getId();
+		}
+		return $outFlavors;
+	}
+
 } // EntryDistribution
