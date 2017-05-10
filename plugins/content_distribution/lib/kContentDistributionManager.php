@@ -1163,7 +1163,7 @@ class kContentDistributionManager
 			/**
 			 * @var flavorAsset $asset
 			 */
-			if ($asset && $asset->getIsOriginal() && $asset->getStatus() == flavorAsset::ASSET_STATUS_TEMP)
+			if ($asset->getIsOriginal() && $asset->getStatus() == flavorAsset::ASSET_STATUS_TEMP)
 				continue;
 			if (in_array($asset->getFlavorParamsId(), $tempFlavorsParamsIds))
 				continue;
