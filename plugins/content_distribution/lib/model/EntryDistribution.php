@@ -244,7 +244,6 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			sort($v); // the sort is importanet to idetify changes, when the list is changed the update required flag is raised
 			$v = implode(',', $v);
 		}
-		$v = $this->filterFlavorAssets($v);
 		return parent::setFlavorAssetIds($v);
 	}
 
@@ -434,52 +433,6 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function getCacheInvalidationKeys()
 	{
 		return array("entryDistribution:entryId=".strtolower($this->getEntryId()));
-	}
-
-	/**
-	 * @param $flavorIds - string of comma seperated flavor ids
-	 * @return string
-	 * @throws Exception
-	 */
-	protected function filterFlavorAssets($flavorIds)
-	{
-		$flavorIdsArr = explode(',', $flavorIds);
-
-		$entryId = null;
-		if (count($flavorIdsArr) && !empty($flavorIdsArr[0]))
-		{
-			$asset = assetPeer::retrieveById($flavorIdsArr[0]);
-			$entryId = $asset->getEntryId();
-		}
-		if (!$entryId)
-			return array();
-		$tempFlavorsParams = kFlowHelper::getTempFlavorsParams($entryId);
-
-		$tempFlavorsParamsIds = array();
-		foreach ($tempFlavorsParams as $flavorParams)
-		{
-			/**
-			 * @var flavorParams $flavorParams
-			 */
-			$tempFlavorsParamsIds[] = $flavorParams->getId();
-		}
-
-		$flavorAssets = assetPeer::retrieveByIds($flavorIdsArr);
-
-		$outFlavors = array();
-		foreach ($flavorAssets as $asset)
-		{
-			/**
-			 * @var flavorAsset $asset
-			 */
-			if ($asset && $asset->getIsOriginal() && $asset->getStatus() == flavorAsset::ASSET_STATUS_TEMP)
-				continue;
-			if (in_array($asset->getFlavorParamsId(), $tempFlavorsParamsIds))
-				continue;
-
-			$outFlavors[] = $asset->getId();
-		}
-		return implode(',', $outFlavors);
 	}
 
 } // EntryDistribution

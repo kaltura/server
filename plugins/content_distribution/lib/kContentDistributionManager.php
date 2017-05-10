@@ -783,9 +783,8 @@ class kContentDistributionManager
 		
 		// adds added flavor assets
 		$newFlavorAssetIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entry->getId(), $flavorParamsIds);
-		foreach($newFlavorAssetIds as $newFlavorAssetId)
-			$flavorAssetIds[] = $newFlavorAssetId;
-			
+		$flavorAssetIds = self::getFilteredFlavorAssets($newFlavorAssetIds, $entry->getEntryId());
+
 		$entryDistribution->setFlavorAssetIds($flavorAssetIds);
 		return ($originalList != $entryDistribution->getFlavorAssetIds());
 	}
@@ -1134,5 +1133,41 @@ class kContentDistributionManager
 		if (self::shouldWaitForSunrise($entryDistribution, $distributionProfile))
 			return false;
 		return true;
+	}
+
+	/**
+	 * @param $flavorIds - array of flavor ids
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function getFilteredFlavorAssets($flavorAssetsIds, $entryId)
+	{
+		$tempFlavorsParams = flavorParamsConversionProfilePeer::getTempFlavorsParams($entryId);
+
+		$tempFlavorsParamsIds = array();
+		foreach ($tempFlavorsParams as $flavorParams)
+		{
+			/**
+			 * @var flavorParams $flavorParams
+			 */
+			$tempFlavorsParamsIds[] = $flavorParams->getId();
+		}
+
+		$flavorAssets = assetPeer::retrieveByIds($flavorAssetsIds);
+
+		$outFlavors = array();
+		foreach ($flavorAssets as $asset)
+		{
+			/**
+			 * @var flavorAsset $asset
+			 */
+			if ($asset && $asset->getIsOriginal() && $asset->getStatus() == flavorAsset::ASSET_STATUS_TEMP)
+				continue;
+			if (in_array($asset->getFlavorParamsId(), $tempFlavorsParamsIds))
+				continue;
+
+			$outFlavors[] = $asset->getId();
+		}
+		return $outFlavors;
 	}
 }
