@@ -121,9 +121,8 @@
 	}
 
 
-
 	function insertDataVal(parent, tag, val) {
-		let x = parent.find("[name^=" + tag + "]");
+		let x = parent.find("[name=" + tag + "]");
 		x.val(val).attr('checked', val);
 	}
 

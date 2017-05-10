@@ -109,6 +109,11 @@ class MediaRepurposingUtils
 
 	}
 
+	public static function executeDryRun($mr) {
+		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
+		return $scheduledtaskPlugin->scheduledTaskProfile->requestDryRun($mr->id);
+	}
+
 	private static function handleScheduleTasks($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
 	{
 		$ids = '';
@@ -318,11 +323,30 @@ class MediaRepurposingUtils
 		return $params;
 	}
 
-	private static function elementTypeFactory($type)
+	private static function elementTypeCreator($type, $params)
 	{
 		switch ($type) {
 			case 'KalturaIntegerValue':
-				return new Kaltura_Client_Type_IntegerValue();
+				$elem = new Kaltura_Client_Type_IntegerValue();
+				$elem->value = intval($params[0]);
+				return $elem;
+			case 'KalturaKeyValue':
+				$elem = new Kaltura_Client_Type_KeyValue();
+				$elem->key = $params[0];
+				$elem->value = $params[1];
+				return $elem;
+			default:
+				return null;
+		}
+	}
+
+	private static function getValueFromElement($type, $elem)
+	{
+		switch ($type) {
+			case 'KalturaIntegerValue':
+				return $elem->value;
+			case 'KalturaKeyValue':
+				return $elem->key . ":" . $elem->value;
 			default:
 				return null;
 		}
@@ -334,9 +358,7 @@ class MediaRepurposingUtils
 			$arr = array();
 			$elemType = explode(" ", $type); // template is 'array of XXX';
 			foreach(explode(",", $value) as $val) {
-				$elem = self::elementTypeFactory($elemType[2]);
-				$elem->value = intval($val);
-				$arr[] = $elem;
+				$arr[] = self::elementTypeCreator($elemType[2], explode(":", $val));
 			}
 			return $arr;
 		}
@@ -347,9 +369,10 @@ class MediaRepurposingUtils
 		if (strpos($type ,'array') > -1)
 		{
 			$values = '';
+			$elemType = explode(" ", $type); // template is 'array of XXX';
 			if ($value && is_array($value))
-				foreach($value as $val)
-					$values .= $val->value . ",";
+				foreach($value as $elem)
+					$values .= self::getValueFromElement($elemType[2], $elem) . ",";
 			return rtrim($values, ',');
 		}
 		return $value;
