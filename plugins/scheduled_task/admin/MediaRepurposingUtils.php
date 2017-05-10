@@ -109,6 +109,11 @@ class MediaRepurposingUtils
 
 	}
 
+	public static function executeDryRun($mr) {
+		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
+		return $scheduledtaskPlugin->scheduledTaskProfile->requestDryRun($mr->id);
+	}
+
 	private static function handleScheduleTasks($partnerId, $mrId, $name, $filterTypeEngine, $filter, $taskArray, $maxEntriesAllowed)
 	{
 		$ids = '';

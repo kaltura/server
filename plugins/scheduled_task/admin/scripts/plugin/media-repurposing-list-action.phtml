@@ -44,10 +44,10 @@
 						<option value="configureMediaRepurposing" ><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED): ?>
 							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
-							<option value="dryRun" ><?php echo $this->translate('Dry-Run'); ?></option>
 						<?php elseif ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY): ?>
 							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
 						<?php endif; ?>
+						<option value="dryRun" ><?php echo $this->translate('Execute Dry-Run'); ?></option>
 						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
 					</select>
 				</td>				
@@ -116,7 +116,7 @@ function dryRun(mediaRepurposingId)
 		mediaRepurposingId,
 		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY; ?>,
 		function() {
-			alert('<?php echo $this->translate('Media Repurposing set to Dry-Run');?>');
+			alert("Dry run for MR profile id [" + mediaRepurposingId + "] has been Assign. This could take couple of minutes./");
 		}
 	);
 }
