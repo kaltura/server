@@ -340,6 +340,18 @@ class MediaRepurposingUtils
 		}
 	}
 
+	private static function getValueFromElement($type, $elem)
+	{
+		switch ($type) {
+			case 'KalturaIntegerValue':
+				return $elem->value;
+			case 'KalturaKeyValue':
+				return $elem->key . ":" . $elem->value;
+			default:
+				return null;
+		}
+	}
+
 	private static function getValueFromString($value, $type) {
 		if (strpos($type ,'array') > -1)
 		{
@@ -357,9 +369,10 @@ class MediaRepurposingUtils
 		if (strpos($type ,'array') > -1)
 		{
 			$values = '';
+			$elemType = explode(" ", $type); // template is 'array of XXX';
 			if ($value && is_array($value))
-				foreach($value as $val)
-					$values .= $val->value . ",";
+				foreach($value as $elem)
+					$values .= self::getValueFromElement($elemType[2], $elem) . ",";
 			return rtrim($values, ',');
 		}
 		return $value;
