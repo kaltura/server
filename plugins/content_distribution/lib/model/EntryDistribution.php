@@ -238,18 +238,16 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	
 	public function setFlavorAssetIds($v)
 	{
-		if (!is_array($v))
+		if(is_array($v))
 		{
-			$v = $v = explode(',', $v);
+			$v = array_unique($v);
+			sort($v); // the sort is importanet to idetify changes, when the list is changed the update required flag is raised
+			$v = implode(',', $v);
 		}
 		$v = $this->filterFlavorAssets($v);
-		$v = array_unique($v);
-		sort($v); // the sort is importanet to idetify changes, when the list is changed the update required flag is raised
-		$v = implode(',', $v);
-
 		return parent::setFlavorAssetIds($v);
 	}
-	
+
 	public function setThumbAssetIds($v)
 	{
 		if(is_array($v))
@@ -438,21 +436,25 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		return array("entryDistribution:entryId=".strtolower($this->getEntryId()));
 	}
 
-	protected function filterFlavorAssets(array $flavorIds)
+	/**
+	 * @param $flavorIds - string of comma seperated flavor ids
+	 * @return string
+	 * @throws Exception
+	 */
+	protected function filterFlavorAssets($flavorIds)
 	{
-		$conversionProfile = null;
-		if (count($flavorIds))
+		$flavorIdsArr = explode(',', $flavorIds);
+
+		$entryId = null;
+		if (count($flavorIdsArr) && !empty($flavorIdsArr[0]))
 		{
-			$asset = assetPeer::retrieveById($flavorIds[0]);
+			$asset = assetPeer::retrieveById($flavorIdsArr[0]);
 			$entryId = $asset->getEntryId();
-			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
 		}
-		if (!$conversionProfile)
+		if (!$entryId)
 			return array();
-		$criteria = new Criteria();
-		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfile->getId());
-		$criteria->add(flavorParamsConversionProfilePeer::DELETE_POLICY, AssetParamsDeletePolicy::DELETE);
-		$tempFlavorsParams = flavorParamsConversionProfilePeer::doSelect($criteria);
+		$tempFlavorsParams = kFlowHelper::getTempFlavorsParams($entryId);
+
 		$tempFlavorsParamsIds = array();
 		foreach ($tempFlavorsParams as $flavorParams)
 		{
@@ -462,7 +464,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			$tempFlavorsParamsIds[] = $flavorParams->getId();
 		}
 
-		$flavorAssets = assetPeer::retrieveByIds($flavorIds);
+		$flavorAssets = assetPeer::retrieveByIds($flavorIdsArr);
 
 		$outFlavors = array();
 		foreach ($flavorAssets as $asset)
