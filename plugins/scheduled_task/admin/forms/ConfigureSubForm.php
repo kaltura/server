@@ -49,6 +49,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'int':
+				return $this->addIntegerElement($name, $prefix);
 			case 'string':
 				return $this->addStringElement($name, $prefix);
 
@@ -75,7 +76,15 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'filters'		=> array('StringTrim'),
 			'value'			=>	'N/A',
 		));
+	}
 
+	protected function addIntegerElement($name, $prefix) {
+		$this->addElement('text', "$prefix$name", array(
+			'label' 		=> $name,
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+			'value'			=>	-1,
+		));
 	}
 
 	protected function addStringAreaElement($name, $prefix) {

@@ -106,7 +106,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 		$elem = new Kaltura_Form_Element_EnumSelect("TaskTypeChoose", array(
 			'enum' => 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType',
-			'excludes' => array(Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::MODIFY_ENTRY),
+			//'excludes' => array(Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::MODIFY_ENTRY),
 		));
 		$elem->addMultiOption("N/A", "NONE");
 		$elem->setValue("N/A");
