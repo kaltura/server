@@ -98,7 +98,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 
 	protected function addArrayElement($name, $prefix) {
 		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> "$name (Array: enter item comma separated)",
+			'label' 		=> "$name (Array: enter item comma separated. for key-value insert: key:value)",
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 			'value'			=>	'N/A',
