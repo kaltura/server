@@ -1,6 +1,6 @@
 # Lynx 12.16.0 #
 
-## Support dynamic broadcast urls ##
+## ViewHistory Feature ##
 
 - Issue Type: Story
 - Issue ID: PLAT-7281
@@ -10,11 +10,11 @@
 
 		- ViewHistory  
 - update admin.ini by adding the following permission switch:  
-		moduls.viewHistory.enabled = true  
-		moduls.viewHistory.permissionType = 2  
-		moduls.viewHistory.label = "View History"  
-		moduls.viewHistory.permissionName = VIEWHISTORY_PLUGIN_PERMISSION  
-		moduls.viewHistory.group = GROUP_ENABLE_DISABLE_FEATURES  
+				moduls.viewHistory.enabled = true  
+				moduls.viewHistory.permissionType = 2  
+				moduls.viewHistory.label = "View History"  
+				moduls.viewHistory.permissionName = VIEWHISTORY_PLUGIN_PERMISSION  
+				moduls.viewHistory.group = GROUP_ENABLE_DISABLE_FEATURES  
 		
 
 #### Deployment Scripts ####
