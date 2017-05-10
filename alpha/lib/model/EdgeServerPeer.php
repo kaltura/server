@@ -35,5 +35,22 @@ class EdgeServerPeer extends BaseEdgeServerPeer {
 		
 		return EdgeServerPeer::doSelectOne($c);
 	}
+	
+	public static function retrieveOrderedEdgeServersArrayByPKs($pks, PropelPDO $con = null)
+	{
+		if (empty($pks)) {
+			$objs = array();
+		} 
+		else {
+			$criteria = new Criteria(EdgeServerPeer::DATABASE_NAME);
+			$criteria->add(EdgeServerPeer::ID, $pks, Criteria::IN);
+			$criteria->add(EdgeServerPeer::STATUS, EdgeServerStatus::ACTIVE);
+			$orderBy = "FIELD (" . self::ID . "," . implode(",", $pks) . ")";  // first take the pattner_id and then the rest
+			$criteria->addAscendingOrderByColumn($orderBy);
+			$objs = EdgeServerPeer::doSelect($criteria, $con);
+		}
+		
+		return $objs;
+	}
 
 } // EdgeServerPeer
