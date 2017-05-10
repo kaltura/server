@@ -244,10 +244,9 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			sort($v); // the sort is importanet to idetify changes, when the list is changed the update required flag is raised
 			$v = implode(',', $v);
 		}
-			
 		return parent::setFlavorAssetIds($v);
 	}
-	
+
 	public function setThumbAssetIds($v)
 	{
 		if(is_array($v))
@@ -435,5 +434,5 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	{
 		return array("entryDistribution:entryId=".strtolower($this->getEntryId()));
 	}
-	
+
 } // EntryDistribution
