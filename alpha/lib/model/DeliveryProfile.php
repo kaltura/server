@@ -253,6 +253,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					'smil' => 	'kSmilManifestRenderer',
 					'm3u8' => 	'kM3U8ManifestRenderer',
 					'jsonp' => 	'kJSONPManifestRenderer',
+					'json' => 	'kJSONManifestRenderer',
 					'redirect' => 'kRedirectManifestRenderer',
 			);
 	
