@@ -1,3 +1,29 @@
+# Lynx 12.16.0 #
+
+## Support dynamic broadcast urls ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7281
+
+### Configuration ###
+- update plugins.ini:
+
+		- ViewHistory  
+- update admin.ini by adding the following permission switch:  
+		moduls.viewHistory.enabled = true  
+		moduls.viewHistory.permissionType = 2  
+		moduls.viewHistory.label = "View History"  
+		moduls.viewHistory.permissionName = VIEWHISTORY_PLUGIN_PERMISSION  
+		moduls.viewHistory.group = GROUP_ENABLE_DISABLE_FEATURES  
+		
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2017_03_21_alter_user_entry_table_extended_status_add_keys.sql
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2017_04_24_alter_user_entry_table_privacy_context_add_keys.sql
+		php /deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
+		php /deployment/base/scripts/installPlugins.php
+
 # Lynx 12.15.0 #
 
 ## Support dynamic broadcast urls ##
