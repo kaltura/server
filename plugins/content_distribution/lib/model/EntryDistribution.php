@@ -479,7 +479,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 
 			$outFlavors[] = $asset->getId();
 		}
-		return $outFlavors;
+		return implode(',', $outFlavors);
 	}
 
 } // EntryDistribution
