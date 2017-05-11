@@ -81,6 +81,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addIntegerElement($name, $prefix) {
 		$this->addElement('text', "$prefix$name", array(
 			'label' 		=> $name,
+			'innerType' 	=> 'integer',
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 			'value'			=>	-1,

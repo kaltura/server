@@ -256,8 +256,20 @@ function rearrangeData() {
 	$('dd[id^="MR_tasksDataTemplate_"]').remove();
 	$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
 
+	convertDates();
 	setConditionData();
 	setTaskData();
+}
+
+
+function convertDates()
+{
+	let f = jQuery('#frmMediaRepurposingConfigure');
+	f.find( "input[innertype=integer]").each(function(idx) {
+		var val = $(this).val();
+		if (val.split(".").length == 3)
+			$(this).val(new Date(val).getTime() / 1000);
+	});
 }
 
 function setConditionData() {

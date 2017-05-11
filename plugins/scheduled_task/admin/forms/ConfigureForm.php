@@ -45,6 +45,7 @@ class ConfigureForm extends Infra_Form
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'int':
+				return $this->addIntegerElement($name, $prefix);
 			case 'string':
 				return $this->addStringElement($name, $prefix);
 			case 'bool':
@@ -67,6 +68,15 @@ class ConfigureForm extends Infra_Form
 		));
 	}
 
+	protected function addIntegerElement($name, $prefix) {
+		$this->addElement('text', "$prefix$name", array(
+			'label' 		=> $name,
+			'innerType' 	=> 'integer',
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
+		));
+	}
 
 	protected function addBooleanElement($name, $prefix) {
 		$this->addElement('checkbox', "$prefix$name", array(
