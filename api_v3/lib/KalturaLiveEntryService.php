@@ -526,6 +526,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 		
 		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbLiveEntry->getId(), $flavorParamsId);
+		if(!$dbAsset)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+		
 		$kResource = $resource->toObject();
 		$filename = $kResource->getLocalFilePath();
 		
