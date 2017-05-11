@@ -66,7 +66,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	}
 
 	private static function getValidPuserStr($puserId){
-		return substr($puserId, 0, self::MAX_PUSER_LENGTH);
+		if (!is_null($puserId))
+			$puserId = substr($puserId, 0, self::MAX_PUSER_LENGTH);
+		return $puserId;
 	}
 	
 	/**
