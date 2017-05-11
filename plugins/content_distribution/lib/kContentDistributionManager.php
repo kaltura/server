@@ -1150,11 +1150,12 @@ class kContentDistributionManager
 		foreach ($tempFlavorsParams as $flavorParams)
 		{
 			/**
-			 * @var flavorParams $flavorParams
+			 * @var flavorParamsConversionProfile $flavorParams
 			 */
-			$tempFlavorsParamsIds[] = $flavorParams->getId();
+			$tempFlavorsParamsIds[] = $flavorParams->getFlavorParamsId();
 		}
 
+		assetPeer::setUseCriteriaFilter(false);
 		$flavorAssets = assetPeer::retrieveByIds($flavorAssetsIds);
 
 		$outFlavors = array();
