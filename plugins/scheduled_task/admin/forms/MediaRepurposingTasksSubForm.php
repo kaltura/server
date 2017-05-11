@@ -49,7 +49,7 @@ class Form_MediaRepurposingTasksSubForm extends ConfigureSubForm
 		$this->getElement('TaskType')->setValue($this->type);
 
 		$this->addElement('text', "taskTime", array(
-			'label' 		=> 'Time to next',
+			'label' 		=> 'Time to next (in days)',
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
