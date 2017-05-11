@@ -27,7 +27,7 @@ class Form_MediaRepurposingTasksSubForm extends ConfigureSubForm
 
 		$this->addTextElement('Task Type:', 'TaskType', array('required', 'readonly'));
 		$this->addTextElement('Task ID:', 'TaskId', array('required', 'readonly'));
-		$this->addTextElement('Time to next (in days):', 'taskTime');
+		$this->addTextElement('Time to next Task (in days):', 'taskTime');
 
 		$this->getElement('TaskType')->setValue($this->type);
 	}
