@@ -78,6 +78,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$ignore = array('relatedObjects', 'orderBy');
 		$this->addObjectSection('Filter', $filter , $ignore, self::FILTER_PREFIX);
 
+		$this->addTitle('Instruction Note:', 'instructionNote');
 		$this->addComment('relativeTimes', 'For relative times insert -/+ and seconds');
 		$this->addComment('absoluteTimes', 'For absolute times YYYY.MM.DD');
 		$this->addComment('NAExplain', 'In order to disable field insert: "N/A" ');
