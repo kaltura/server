@@ -1,3 +1,21 @@
+# Lynx 12.16.0 #
+
+## Add scheduleEvent->list optimization ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7230
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create create <myql-server> <mysql-user> <mysql-pass> realrun
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.15.0 #
 
 ## Add permission for capture device to do scheduleResource->get ##

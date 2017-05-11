@@ -269,5 +269,10 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		return false;
 	}
+
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("scheduleEvent:id%s", self::ID));
+	}
 	
 } // ScheduleEventPeer
