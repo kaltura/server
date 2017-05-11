@@ -144,9 +144,10 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		$this->addElements(array($element));
 	}
 
-	protected function addTitle($name)
+	protected function addTitle($name, $tag = null)
 	{
-		$tag = str_replace(' ', '', $name);
+		if (!$tag)
+			$tag = str_replace(' ', '', $name);
 		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
 		$titleElement->setLabel($name);
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));

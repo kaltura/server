@@ -28,57 +28,14 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		$this->setAttrib('id', 'frmMediaRepurposingConfigure');
 		$this->setMethod('post');
-		
-		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
-		$titleElement->setLabel('General');
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElement($titleElement);
 
-		$this->addElement('text', 'partnerId', array(
-			'label' 		=> 'Related Publisher ID:',
-			'required'		=> true,
-			'filters' 		=> array('StringTrim'),
-			'placement' => 'prepend',
-			'readonly'		=> true,
-		));
-
-		$this->addElement('text', 'mrId', array(
-			'label' 		=> 'MR ID:',
-			'required'		=> true,
-			'filters' 		=> array('StringTrim'),
-			'placement' => 'prepend',
-			'readonly'		=> true,
-		));
-
-		$this->addElement('text', 'engineType', array(
-			'label' 		=> 'Engine Type:',
-			'required'		=> true,
-			'filters' 		=> array('StringTrim'),
-			'placement' => 'prepend',
-			'readonly'		=> true,
-		));
-
-		$this->addElement('text', 'filterTypeStr', array(
-			'label' 		=> 'Filter Type:',
-			'required'		=> true,
-			'filters' 		=> array('StringTrim'),
-			'placement' => 'prepend',
-			'readonly'		=> true,
-		));
-
-		$this->addElement('text', 'media_repurposing_name', array(
-			'label' 		=> 'Media Repurposing Name:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-			'placement' => 'prepend',
-		));
-		
-		$this->addElement('text', 'max_entries_allowed', array(
-			'label' 		=> 'Max Entries Allowed in MR:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-			'placement' => 'prepend',
-		));
+		$this->addTitle('General', 'generalTitle');
+		$this->addTextElement('Publisher ID:', 'partnerId', array('required', 'readonly'));
+		$this->addTextElement('MR profile ID:', 'mrId', array('required', 'readonly'));
+		$this->addTextElement('Engine Type:', 'engineType', array('required', 'readonly'));
+		$this->addTextElement('Filter Type:', 'filterTypeStr', array('required', 'readonly'));
+		$this->addTextElement('Media Repurposing Name:', 'media_repurposing_name', array('required'));
+		$this->addTextElement('Max Entries Allowed in MR:', 'max_entries_allowed', array('required'));
 		$this->getElement('max_entries_allowed')->setValue(self::DEFAULT_MAX_TOTAL_COUNT_ALLOWED); //as default
 		
 		$this->addFilterSection();
@@ -104,16 +61,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->addLine("2");
 		$this->addTitle('Tasks Data');
 
-		$elem = new Kaltura_Form_Element_EnumSelect("TaskTypeChoose", array(
-			'enum' => 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType',
-			//'excludes' => array(Kaltura_Client_ScheduledTask_Enum_ObjectTaskType::MODIFY_ENTRY),
-		));
-		$elem->addMultiOption("N/A", "NONE");
-		$elem->setValue("N/A");
-		$elem->setLabel("Task Type:");
-		$elem->setRequired(true);
-		$this->addElement($elem);
-		$this->removeClassName("TaskTypeChoose");
+		$this->addEnumElement('TaskTypeChoose', '', 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType');
 		
 		$TasksSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$TasksSubForm->addDecorator('ViewScript', array(

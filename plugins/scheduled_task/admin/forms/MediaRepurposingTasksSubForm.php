@@ -23,11 +23,7 @@ class Form_MediaRepurposingTasksSubForm extends ConfigureSubForm
 		$this->setAttrib('id', 'frmMediaRepurposingTaskSubForm');
 		$this->setMethod('post');
 
-
-		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
-		$titleElement->setLabel('Task:');
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElement($titleElement);
+		$this->addTitle('Task:', 'taskTitle');
 
 		$this->addDecorator('ViewScript', array(
 			'viewScript' => 'task-data-sub-form.phtml',
