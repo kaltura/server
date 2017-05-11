@@ -81,6 +81,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addIntegerElement($name, $prefix) {
 		$this->addElement('text', "$prefix$name", array(
 			'label' 		=> $name,
+			'innerType' 	=> 'integer',
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 			'value'			=>	-1,
@@ -143,13 +144,26 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		$this->addElements(array($element));
 	}
 
-	protected function addTitle($name)
+	protected function addTitle($name, $tag = null)
 	{
-		$tag = str_replace(' ', '', $name);
+		if (!$tag)
+			$tag = str_replace(' ', '', $name);
 		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
 		$titleElement->setLabel($name);
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElement($titleElement);
+	}
+
+	protected function addTextElement($label, $tag, $params = array()) {
+		$options = array(
+			'label' 		=> $label,
+			'filters' 		=> array('StringTrim'),
+			'placement'		=> 'prepend',
+		);
+		foreach($params as $param)
+			$options[$param] = true;
+
+		$this->addElement('text', $tag, $options);
 	}
 
 }

@@ -256,9 +256,34 @@ function rearrangeData() {
 	$('dd[id^="MR_tasksDataTemplate_"]').remove();
 	$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
 
+	convertDates();
 	setConditionData();
 	setTaskData();
 }
+
+
+function convertDates()
+{
+	let f = jQuery('#frmMediaRepurposingConfigure');
+	f.find( "input[innertype=integer]").each(function(idx) {
+		var val = $(this).val();
+		if (isDatesFormat(val))
+			$(this).val(getEpocTime(val));
+	});
+}
+
+function isDatesFormat(val) {
+	return (val.split(".").length == 3 || val.split("/").length == 3);
+}
+
+function getEpocTime(val) {
+	let epoc = new Date(val).getTime() / 1000 + 3600*4; // + 4 hour for not slide a day backward in for time zones
+	if (epoc)
+		return epoc;
+	alert("Date is not valid. insert time 0 instead");
+	return 0;
+}
+
 
 function setConditionData() {
 	var conditions = [];

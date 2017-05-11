@@ -28,6 +28,7 @@
 		populateTasks();
 		populateConditions();
 		checkIfError();
+		populateDates();
 	}
 
 
@@ -90,6 +91,19 @@
 		var ts = $( ".add-cond" );
 		for (var i = 0, len = arr.length; i < len; i++)
 			addCondFromObject(ts, arr[i]);
+	}
+	
+	function populateDates() {
+		var d = new Date(0);
+		
+		let f = jQuery('#frmMediaRepurposingConfigure');
+		f.find( "input[innertype=integer]").each(function(idx) {
+			var val = parseInt($(this).val());
+			if (isNaN(val) || val < 315360000) // 10 Year (max relative time)	315360000
+				return;
+			d.setUTCSeconds(val);
+			$(this).val(d.toISOString().slice(0,10).replace(/-/g,"."));
+		});
 	}
 
 

@@ -45,6 +45,7 @@ class ConfigureForm extends Infra_Form
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'int':
+				return $this->addIntegerElement($name, $prefix);
 			case 'string':
 				return $this->addStringElement($name, $prefix);
 			case 'bool':
@@ -67,6 +68,15 @@ class ConfigureForm extends Infra_Form
 		));
 	}
 
+	protected function addIntegerElement($name, $prefix) {
+		$this->addElement('text', "$prefix$name", array(
+			'label' 		=> $name,
+			'innerType' 	=> 'integer',
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
+		));
+	}
 
 	protected function addBooleanElement($name, $prefix) {
 		$this->addElement('checkbox', "$prefix$name", array(
@@ -117,9 +127,10 @@ class ConfigureForm extends Infra_Form
 		$this->addElements(array($element));
 	}
 
-	protected function addTitle($name)
+	protected function addTitle($name, $tag = null)
 	{
-		$tag = str_replace(' ', '', $name);
+		if (!$tag)
+			$tag = str_replace(' ', '', $name);
 		$titleElement = new Zend_Form_Element_Hidden($tag);
 		$titleElement->setLabel($name);
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
@@ -132,6 +143,18 @@ class ConfigureForm extends Infra_Form
 		$this->addElement('hidden', "crossLine_$tag", array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
+	}
+
+	protected function addTextElement($label, $tag, $params) {
+		$options = array(
+			'label' 		=> $label,
+			'filters' 		=> array('StringTrim'),
+			'placement'		=> 'prepend',
+		);
+		foreach($params as $param)
+			$options[$param] = true;
+		
+		$this->addElement('text', $tag, $options);
 	}
 
 }
