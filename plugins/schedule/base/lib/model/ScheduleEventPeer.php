@@ -234,7 +234,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
 		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
 		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
-		$c->addAnd(ScheduleEventPeer::TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
+		$c->addAnd(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
 
 		$filter = new ScheduleEventFilter();
 		$filter->setResourceIdsIn($resourceIds);
