@@ -154,4 +154,16 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		$this->addElement($titleElement);
 	}
 
+	protected function addTextElement($label, $tag, $params = array()) {
+		$options = array(
+			'label' 		=> $label,
+			'filters' 		=> array('StringTrim'),
+			'placement'		=> 'prepend',
+		);
+		foreach($params as $param)
+			$options[$param] = true;
+
+		$this->addElement('text', $tag, $options);
+	}
+
 }
