@@ -2837,16 +2837,11 @@ class kFlowHelper
 			$originalflavorAsset->setDeletedAt(time());
 			$originalflavorAsset->save();
 		}
-		
-		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
-		if(!$conversionProfile)
+
+		$tempFlavorsParams = flavorParamsConversionProfilePeer::getTempFlavorsParams($entryId);
+		if (!$tempFlavorsParams)
 			return;
-		
-		$criteria = new Criteria();
-		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfile->getId());
-		$criteria->add(flavorParamsConversionProfilePeer::DELETE_POLICY, AssetParamsDeletePolicy::DELETE);
-		$tempFlavorsParams = flavorParamsConversionProfilePeer::doSelect($criteria);
-		
+
 		foreach ($tempFlavorsParams as $tempFlavorsParam) 
 		{
 			$tempFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $tempFlavorsParam->getFlavorParamsId());
@@ -2887,4 +2882,5 @@ class kFlowHelper
 		else 
 			return false;
 	}
+
 }
