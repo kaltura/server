@@ -53,7 +53,7 @@ function help() {
 function createMDPTemplateForMR($xsd) {
 	echo "Creating new MDP template for MR in partner -2\n";
 	$newMDP = new MetadataProfile();
-	$newMDP->setName('MRP');
+	$newMDP->setName('Media Repurposing Profiles');
 	$newMDP->setSystemName('MRP');
 	$newMDP->setStatus(1);
 	$newMDP->setCreateMode(1);
@@ -106,6 +106,11 @@ function getFilter($names)
 	return $filter;
 }
 
+function buildSubTaskName($name, $index)
+{
+	return "MR_$name" . "_$index";
+}
+
 function addDeleteAfterXTemplate()
 {
 	echo "Add Template of MR for Delete with notification\n";
@@ -114,7 +119,7 @@ function addDeleteAfterXTemplate()
 
 	//create the sub-task
 	$timeToNext = "30";
-	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY, "MR-" . $name . "-1", $filter, $timeToNext );
+	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
@@ -128,9 +133,9 @@ function addDeleteAfterXWithExportTemplate()
 
 	//create the sub-task
 	$timeToNext2 = "7";
-	$task2Id = addTask(ObjectTaskType::DELETE_ENTRY, "MR-" . $name . "-2", $filter, $timeToNext2 );
+	$task2Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
 	$timeToNext1 = "30";
-	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, "MR-" . $name . "-1", $filter, $timeToNext1 );
+	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
@@ -144,9 +149,9 @@ function addArchiveAndDeleteTemplate()
 
 	//create the sub-task
 	$timeToNext2 = "7";
-	$task2Id = addTask(ObjectTaskType::DELETE_ENTRY, "MR-" . $name . "-2", $filter, $timeToNext2 );
+	$task2Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
 	$timeToNext1 = "30";
-	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, "MR-" . $name . "-1", $filter, $timeToNext1 );
+	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
@@ -160,11 +165,11 @@ function addArchiveExportAndDeleteTemplate()
 
 	//create the sub-task
 	$timeToNext3 = "7";
-	$task3Id = addTask(ObjectTaskType::DELETE_ENTRY, "MR-" . $name . "-3", $filter, $timeToNext3 );
+	$task3Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "3"), $filter, $timeToNext3 );
 	$timeToNext2 = "7";
-	$task2Id = addTask(ObjectTaskType::STORAGE_EXPORT, "MR-" . $name . "-2", $filter, $timeToNext2 );
+	$task2Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
 	$timeToNext1 = "30";
-	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, "MR-" . $name . "-1", $filter, $timeToNext1 );
+	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]," . $task3Id . "[$timeToNext3]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
@@ -179,7 +184,7 @@ function addDeletePrivateContentTemplate()
 
 	//create the sub-task
 	$timeToNext = "30";
-	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY, "MR-" . $name . "-1", $filter, $timeToNext );
+	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
@@ -193,7 +198,7 @@ function addDeleteFlavorTemplate()
 
 	//create the sub-task
 	$timeToNext = "30";
-	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY_FLAVORS, "MR-" . $name . "-1", $filter, $timeToNext );
+	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY_FLAVORS, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
@@ -207,7 +212,7 @@ function addExportTemplate()
 
 	//create the sub-task
 	$timeToNext = "30";
-	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, "MR-" . $name . "-1", $filter, $timeToNext );
+	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
@@ -221,9 +226,9 @@ function addExportAndDeleteLocalContentTemplate()
 
 	//create the sub-task
 	$timeToNext2 = "7";
-	$task2Id = addTask(ObjectTaskType::DELETE_LOCAL_CONTENT, "MR-" . $name . "-2", $filter, $timeToNext2 );
+	$task2Id = addTask(ObjectTaskType::DELETE_LOCAL_CONTENT, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
 	$timeToNext1 = "30";
-	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, "MR-" . $name . "-1", $filter, $timeToNext1 );
+	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]";
 	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);

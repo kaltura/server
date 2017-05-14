@@ -79,8 +79,8 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
 
 		$objectsIds = array();
-		$isMrProfile = $this->isMrProfile($profile);
-		if ($isMrProfile)
+		$isMediaRepurposingProfile = $this->isMediaRepurposingProfile($profile);
+		if ($isMediaRepurposingProfile)
 			$this->addDateToFilter($profile);
 
 		$pager = new KalturaFilterPager();
@@ -119,17 +119,17 @@ class KScheduledTaskRunner extends KPeriodicWorker
 					else
 						$objectsIds[$object->userId] = array($object->id);
 				}
-				if ($isMrProfile)
-					$this->updateMetadataStatusForMR($profile, $object, $error);
+				if ($isMediaRepurposingProfile)
+					$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
 			}
-			if (!$isMrProfile)
+			if (!$isMediaRepurposingProfile)
 				$pager->pageIndex++;
 		}
 		
-		if ($isMrProfile && (self::getMrProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
+		if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
 		{
-			$mrId = $this->getMrProfileId($profile);
-			$this->sendMailNotification($profile->objectTasks[0], $objectsIds, $mrId);
+			$mediaRepurposingName = $this->getMediaRepurposingProfileName($profile);
+			$this->sendMailNotification($profile->objectTasks[0], $objectsIds, $mediaRepurposingName);
 		}
 
 
@@ -227,6 +227,12 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$this->impersonate($profile->partnerId);
 		$scheduledTaskClient->scheduledTaskProfile->update($profile->id, $profileForUpdate);
 		$this->unimpersonate();
+		KalturaLog::alert("Media Repurposing profile [$profile->id] has been suspended");
+		if (self::isMediaRepurposingProfile($profile))
+		{
+			$address = $this->getPartnerMail($profile->partnerId);
+			$this->sendMail(array($address), "Media Repurposing Suspended", "MR profile with id [$profile->name] has been suspended");
+		}
 	}
 
 	private function addDateToFilter($profile)
@@ -307,7 +313,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $xml;
 	}
 
-	private function isMrProfile(KalturaScheduledTaskProfile $profile)
+	private function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
 	{
 		if (($profile->systemName == "MRP") || (self::startsWith($profile->name, 'MR_')))
 			return true;
@@ -325,7 +331,18 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return null;
 	}
 
-	private static function getMrProfileTaskType(KalturaScheduledTaskProfile $profile)
+	private function getMediaRepurposingProfileName(KalturaScheduledTaskProfile $profile)
+	{
+		if ($profile->systemName == "MRP")
+			return $profile->name;
+		if (self::startsWith($profile->name, 'MR_')) {
+			$arr = explode("_", $profile->name);
+			return $arr[1];
+		}
+		return null;
+	}
+
+	private static function getMediaRepurposingProfileTaskType(KalturaScheduledTaskProfile $profile)
 	{
 		return $profile->objectTasks[0]->type;
 	}
@@ -364,25 +381,23 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $body;
 	}
 
-	private function sendMailNotification($mailTask, $objectsIds, $mrId)
+	private function sendMailNotification($mailTask, $objectsIds, $mediaRepurposingName)
 	{
-		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
-		$body .= $this->getAdminObjectsBody($objectsIds);
+		$subject = "Media Repurposing Notification";
+		$bodyPrefix = "Notification from Media Repurposing [$mediaRepurposingName]: \n$mailTask->message " . PHP_EOL;
+		$body = $bodyPrefix . $this->getAdminObjectsBody($objectsIds);
 
-		KalturaLog::info("sending mail to $mailTask->mailAddress with body: $body");
 		$toArr = explode(",", $mailTask->mailAddress);
-		$success = $this->sendMail($toArr, "Media Repurposing Notification" , $body);
+		$success = $this->sendMail($toArr, $subject, $body);
 		if (!$success)
-			KalturaLog::info("Mail for MRP [$mrId] did not send successfully");
+			KalturaLog::info("Mail for MRP [$mediaRepurposingName] did not send successfully");
 
 		if ($mailTask->sendToUsers)
 			foreach ($objectsIds as $user => $objects) {
-				$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
-				$body .= $this->getUserObjectsBody($objects);
-				KalturaLog::info("sending mail to $user with body: $body");
-				$success = $this->sendMail(array($user), "Media Repurposing Notification" , $body);
+				$body = $bodyPrefix . $this->getUserObjectsBody($objects);
+				$success = $this->sendMail(array($user), $subject, $body);
 				if (!$success)
-					KalturaLog::info("Mail for MRP [$mrId] did not send successfully");
+					KalturaLog::info("Mail for MRP [$mediaRepurposingName] did not send successfully");
 			}
 	}
 
@@ -396,10 +411,20 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$mailer->AddAddress($to);
 		$mailer->Subject = $subject;
 		$mailer->Body = $body;
+		KalturaLog::info("sending mail to " . implode(",",$toArray) . " with body: $body");
 		return $mailer->Send();
 	}
 
-	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object, $error) {
+	private function getPartnerMail($partnerId)
+	{
+		$client = $this->getClient();
+		self::impersonate($partnerId);
+		$res = $client->partner->get($partnerId);
+		self::unimpersonate();
+		return $res->adminEmail;
+	}
+
+	private function updateMetadataStatusForMediaRepurposing(KalturaScheduledTaskProfile $profile, $object, $error) {
 		$metadataProfileId = self::getMrAdvancedSearchFilter($profile)->metadataProfileId;
 
 		self::impersonate($object->partnerId);
@@ -421,7 +446,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml->asXML());
 
 		} catch (Exception $e) {
-			if (self::getMrProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
+			if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
 				return null; //delete entry should get exception when update metadata for deleted entry
 			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage());
 		}
