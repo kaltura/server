@@ -1,22 +1,20 @@
 <fieldset class="mediaRepurposing-task">
 	<legend>Tasks:</legend>
+	<a class="add-task" href="javascript:;" onclick="addTask(this);" >+ Add Task</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
 		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
 		<?php echo $subForm; ?>
 	<?php endforeach; ?>
-	<a class="add-task" href="javascript:;" onclick="addTask(this);" >+ Add Task</a>
+
 </fieldset>
 
 <style type="text/css">
 	#frmMediaRepurposingConfigure .mediaRepurposing-task { padding: 10px; }
 	#frmMediaRepurposingConfigure .mediaRepurposing-task span.rule { font-size: 14px; font-weight: bold; }
-	#frmMediaRepurposingConfigure .mediaRepurposing-task label { display: block; padding: 4px 0; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-task label { display: block; padding: 4px 2px; }
 	#frmMediaRepurposingConfigure .mediaRepurposing-task fieldset { height: auto; margin: 6px 0; padding: 10px; border: 1px solid #CCCCCC; }
-	#frmMediaRepurposingConfigure .mediaRepurposing-task .add-condition,
-	#frmMediaRepurposingConfigure .mediaRepurposing-task .remove-condition { margin: 4px 0; }
-	#frmMediaRepurposingConfigure .mediaRepurposing-task .add-condition { float: left; }
-	#frmMediaRepurposingConfigure .mediaRepurposing-task .remove-condition { float: right; }
-	#frmMediaRepurposingConfigure .mediaRepurposing-task .remove-property { float: right; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-task .add-task { float: left; padding: 10px; }
+
 
 </style>
 
