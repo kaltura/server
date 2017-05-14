@@ -8,21 +8,27 @@
 	echo $this->form;
 ?>
 
+<style type="text/css">
+	#frmMediaRepurposingConfigure textarea {  height: 5em;  width: 25em;  }
+</style>
+
 
 <script type="text/javascript">
-
+	
 	var filterStatus = 0;
-	var alwaysDisplay = ['createdAtGreaterThanOrEqual', 'lastPlayedAtGreaterThanOrEqual'];
+	var alwaysDisplay = [];
 	init();
 
-	
 	function init() {
 		//hide template
 		$('dd[id^="MR_tasksDataTemplate_"]').hide();
+		$('fieldset[id^="MR_SearchConditionTemplate"]').hide();
 
 		hideEmptyFilterFields();
 		populateTasks();
+		populateConditions();
 		checkIfError();
+		populateDates();
 	}
 
 
@@ -67,16 +73,37 @@
 	
 
 	function populateTasks() {
-		var id = jQuery('#mrId').val();
-		if (!id)
-			return;
 		var data = jQuery('#TasksData').val();
-		//alert(data);
+		if (!data)
+			return;
 		var arr = JSON.parse(data);
 		var ts = $( ".add-task" );
 
 		for (var i = 0, len = arr.length; i < len; i++)
 			addTaskFromObject(ts, arr[i]);
+	}
+
+	function populateConditions() {
+		var data = jQuery('#AdvanceSearch').val();
+		if (!data)
+			return;
+		var arr = JSON.parse(data);
+		var ts = $( ".add-cond" );
+		for (var i = 0, len = arr.length; i < len; i++)
+			addCondFromObject(ts, arr[i]);
+	}
+	
+	function populateDates() {
+		var d = new Date(0);
+		
+		let f = jQuery('#frmMediaRepurposingConfigure');
+		f.find( "input[innertype=integer]").each(function(idx) {
+			var val = parseInt($(this).val());
+			if (isNaN(val) || val < 315360000) // 10 Year (max relative time)	315360000
+				return;
+			d.setUTCSeconds(val);
+			$(this).val(d.toISOString().slice(0,10).replace(/-/g,"."));
+		});
 	}
 
 

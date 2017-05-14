@@ -16,4 +16,9 @@ abstract class kGeoCoder
 	 * @return array (latitude, longitude)
 	 */
 	abstract public function getCoordinates($ip);
+	/**
+	 * @param string $ip
+	 * @return array the anonymous info of the IP such as proxy, hosting provider 
+	 */
+	abstract public function getAnonymousInfo($ip);
 }

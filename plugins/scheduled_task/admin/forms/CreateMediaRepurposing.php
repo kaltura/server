@@ -13,6 +13,8 @@ class Form_CreateMediaRepurposing extends ConfigureSubForm
 			array('HtmlTag', array('tag' => 'fieldset')),
 			array('Form', array('class' => 'simple')),
 		));
+
+		$this->addComment("customFormExplain", "Create custom MR here:");
 		
 		$this->addElement('text', 'newPartnerId', array(
 			'label'			=> 'Publisher ID:',
@@ -25,8 +27,8 @@ class Form_CreateMediaRepurposing extends ConfigureSubForm
 			'label'			=> 'Filter Type:',
 			'filters'		=> array('StringTrim'),
 			'multiOptions'	=> $options,
+			'value'			=> 'N/A',
 		));
-		$this->getElement("filterType")->setValue("N/A");
 
 
 		$this->addEnumElement('Filter','newMR','Kaltura_Client_ScheduledTask_Enum_ObjectFilterEngineType');
