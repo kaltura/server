@@ -227,6 +227,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$this->impersonate($profile->partnerId);
 		$scheduledTaskClient->scheduledTaskProfile->update($profile->id, $profileForUpdate);
 		$this->unimpersonate();
+		if (self::isMrProfile($profile)) 
+		{
+			$address = $this->getPartnerMail($profile->partnerId);
+			$this->sendMail(array($address), "Media Repurposing Suspended", "MR profile with id [$profile->id] has been suspended");
+		}
 	}
 
 	private function addDateToFilter($profile)
@@ -366,12 +371,12 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 	private function sendMailNotification($mailTask, $objectsIds, $mrId)
 	{
+		$subject = "Media Repurposing Notification";
 		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
 		$body .= $this->getAdminObjectsBody($objectsIds);
 
-		KalturaLog::info("sending mail to $mailTask->mailAddress with body: $body");
 		$toArr = explode(",", $mailTask->mailAddress);
-		$success = $this->sendMail($toArr, "Media Repurposing Notification" , $body);
+		$success = $this->sendMail($toArr, $subject, $body);
 		if (!$success)
 			KalturaLog::info("Mail for MRP [$mrId] did not send successfully");
 
@@ -379,8 +384,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			foreach ($objectsIds as $user => $objects) {
 				$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
 				$body .= $this->getUserObjectsBody($objects);
-				KalturaLog::info("sending mail to $user with body: $body");
-				$success = $this->sendMail(array($user), "Media Repurposing Notification" , $body);
+				$success = $this->sendMail(array($user), $subject, $body);
 				if (!$success)
 					KalturaLog::info("Mail for MRP [$mrId] did not send successfully");
 			}
@@ -396,7 +400,17 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$mailer->AddAddress($to);
 		$mailer->Subject = $subject;
 		$mailer->Body = $body;
+		KalturaLog::info("sending mail to " . implode(",",$toArray) . " with body: $body");
 		return $mailer->Send();
+	}
+
+	private function getPartnerMail($partnerId)
+	{
+		$client = $this->getClient();
+		self::impersonate($partnerId);
+		$res = $client->partner->get($partnerId);
+		self::unimpersonate();
+		return $res->adminEmail;
 	}
 
 	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object, $error) {

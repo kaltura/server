@@ -53,7 +53,7 @@ function help() {
 function createMDPTemplateForMR($xsd) {
 	echo "Creating new MDP template for MR in partner -2\n";
 	$newMDP = new MetadataProfile();
-	$newMDP->setName('MRP');
+	$newMDP->setName('Media Repurposing Profiles');
 	$newMDP->setSystemName('MRP');
 	$newMDP->setStatus(1);
 	$newMDP->setCreateMode(1);
