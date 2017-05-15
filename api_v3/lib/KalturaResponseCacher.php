@@ -34,8 +34,9 @@ class KalturaResponseCacher extends kApiCache
 	{
 		if (!parent::init())
 			return false;
-			
-		self::handleSessionStart($this->_params);
+
+		//self::handleSessionStart($this->_params);
+		self::handleCacheBasedServiceActions($this->_params);
 		
 		// remove parameters that do not affect the api result
 		foreach(kConf::get('v3cache_ignore_params') as $name)
@@ -305,6 +306,50 @@ class KalturaResponseCacher extends kApiCache
 		
 		return false;
 	}
+
+	private static function handleCacheBasedServiceActions(&$params)
+	{
+		if (isset($params['service']) && isset($params['action']))
+		{
+			$service = $params['service'];
+			$action = $params['action'];
+			if ($service === 'session' && $action === 'start')
+				return self::handleSessionStart($params);
+			else
+			{
+				$confActions = $path = kConf::get('cache_based_service_actions');;
+				if (is_array($confActions))
+				{
+					$actionKey = $service . '_' . $action;
+					if (array_key_exists($actionKey, $confActions))
+					{
+						$xxx = dirname(__FILE__).$confActions[$actionKey];
+						require_once($xxx);
+						// TODO set logic to be generic using dynamic mode load
+						if ($action === 'setVote')
+						{
+							$pollId = $params['pollId'];
+							$userId = $params['userId'];
+							$ansIds = $params['ansIds'];
+							PollActions::setVote($pollId, $userId, $ansIds);
+							die('Successfully voted for '.$pollId.'_'.$userId);
+						} /*else if ($action === 'add' ){
+							die (PollActions::generatePollId());
+
+						} else if ($action === 'getVotes')
+						{
+							$pollId = $params['pollId'];
+							$ansIds = $params['ansIds'];
+							die (PollActions::getVotes($pollId, $ansIds));
+						}*/
+
+					}
+				}
+			}
+		}
+	}
+
+
 
 	private static function handleSessionStart(&$params)
 	{
