@@ -18,12 +18,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		$this->addElement('hidden', "crossLine_$tag", array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
-
-		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
-		$titleElement->setLabel($name);
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElement($titleElement);
-
+		$this->addTitle($name);
 		$this->addObjectProperties($obj, $ignore, $prefix);
 		return;
 
@@ -42,7 +37,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function getTypeFromDoc($docComment) {
-		$exp =  "/\\@var (\\w*)/";
+		$exp = "/\\@var (.*)/";
 		$result = null;
 		$lines = explode("\n", $docComment);
 		foreach ($lines as $line)
@@ -71,12 +66,25 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function addStringElement($name, $prefix) {
+		if ($name == 'message')
+			return $this->addStringAreaElement($name, $prefix);
+
 		$this->addElement('text', "$prefix$name", array(
 			'label' 		=> $name,
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
+
+	}
+
+	protected function addStringAreaElement($name, $prefix) {
+		$this->addElement('textarea', "$prefix$name", array(
+			'label' 		=> $name,
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
+		));
 	}
 
 	protected function addArrayElement($name, $prefix) {
@@ -84,8 +92,8 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			'label' 		=> "$name (Array: enter item comma separated)",
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
 	protected function addBooleanElement($name, $prefix) {
@@ -117,6 +125,22 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			if (count($newOpArr) > 1)
 				$option = $newOpArr[1];
 		}
+	}
+
+	protected function addComment($name, $msg) {
+		$element = new Zend_Form_Element_Hidden($name);
+		$element->setLabel($msg);
+		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partnerConfigurationDescription'))));
+		$this->addElements(array($element));
+	}
+
+	protected function addTitle($name)
+	{
+		$tag = str_replace(' ', '', $name);
+		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
+		$titleElement->setLabel($name);
+		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+		$this->addElement($titleElement);
 	}
 
 }

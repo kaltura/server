@@ -113,15 +113,19 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			{
 				$error = $this->processObject($profile, $object);
 
-				if (!$error)
-					$objectsIds[] = $object->id;
+				if (!$error) {
+					if (array_key_exists($object->userId, $objectsIds))
+						$objectsIds[$object->userId][] = $object->id;
+					else
+						$objectsIds[$object->userId] = array($object->id);
+				}
 				if ($isMrProfile)
 					$this->updateMetadataStatusForMR($profile, $object, $error);
 			}
 			if (!$isMrProfile)
 				$pager->pageIndex++;
 		}
-
+		
 		if ($isMrProfile && (self::getMrProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
 		{
 			$mrId = $this->getMrProfileId($profile);
@@ -228,10 +232,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private function addDateToFilter($profile)
 	{
 		if (self::startsWith($profile->name, 'MR_')) { //as sub task of MR profile
-			// first item is for entry status, second is for MR status
-			$value = $profile->objectFilter->advancedSearch->items[1]->value;
+			//first item on advancedSearch is for the MRP
+			//in the MRP filter: first item is for entry status, second is for MR status
+			$value = self::getMrAdvancedSearchFilter($profile)->items[1]->value;
 			$updatedDay = self::getUpdateDay($profile->description);
-			$profile->objectFilter->advancedSearch->items[1]->value = $value. "," . $updatedDay;
+			$profile->objectFilter->advancedSearch->items[0]->items[1]->value = $value. "," . $updatedDay;
 		}
 	}
 
@@ -314,7 +319,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		if ($profile->systemName == "MRP")
 			return $profile->id;
 		if (self::startsWith($profile->name, 'MR_')) {
-			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
+			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
 			return $arr[0];
 		}
 		return null;
@@ -325,24 +330,65 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $profile->objectTasks[0]->type;
 	}
 
-	private function sendMailNotification($mailTask, $objectsIds, $mrId)
+	private static function getMrAdvancedSearchFilter(KalturaScheduledTaskProfile $profile)
 	{
-		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n\nExecute for entries: \n";
+		return $profile->objectFilter->advancedSearch->items[0];
+	}
+
+	private function getAdminObjectsBody($objectsIds)
+	{
+		$body = "\nExecute for entries: (users aggregate)\n";
+		foreach($objectsIds as $userId => $entriesId) {
+			$body .= "[$userId]\n";
+			foreach($entriesId as $id)
+				$body .= "\t$id\n";
+		}
+
+		$body .= "Total count of affected object: " . count($objectsIds);
+		$body .= "\nSend Notification for the following users: ";
+		foreach($objectsIds as $userId => $entriesId)
+			$body .= "$userId\n";
+		return $body;
+	}
+
+	private function getUserObjectsBody($objectsIds)
+	{
+		$body = "\nExecute for entries:\n";
 		foreach($objectsIds as $id)
 			$body .= "$id\n";
+
 		$body .= "Total count of affected object: " . count($objectsIds);
+		return $body;
+	}
+
+	private function sendMailNotification($mailTask, $objectsIds, $mrId)
+	{
+		$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
+		$body .= $this->getAdminObjectsBody($objectsIds);
 
 		KalturaLog::info("sending mail to $mailTask->mailAddress with body: $body");
 		$toArr = explode(",", $mailTask->mailAddress);
 		$success = $this->sendMail($toArr, "Media Repurposing Notification" , $body);
 		if (!$success)
-			KalturaLog::alert("Mail for MRP [$mrId] did not send successfully");
+			KalturaLog::info("Mail for MRP [$mrId] did not send successfully");
+
+		if ($mailTask->sendToUsers)
+			foreach ($objectsIds as $user => $objects) {
+				$body = "Notification from MR id [$mrId]: \n$mailTask->message \n";
+				$body .= $this->getUserObjectsBody($objects);
+				KalturaLog::info("sending mail to $user with body: $body");
+				$success = $this->sendMail(array($user), "Media Repurposing Notification" , $body);
+				if (!$success)
+					KalturaLog::info("Mail for MRP [$mrId] did not send successfully");
+			}
 	}
 
 	private function sendMail($toArray, $subject, $body)
 	{
 		$mailer = new PHPMailer();
 		$mailer->CharSet = 'utf-8';
+		if (!$toArray || count($toArray) < 1 || strlen($toArray[0]) == 0)
+			return true;
 		foreach ($toArray as $to)
 			$mailer->AddAddress($to);
 		$mailer->Subject = $subject;
@@ -351,7 +397,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	}
 
 	private function updateMetadataStatusForMR(KalturaScheduledTaskProfile $profile, $object, $error) {
-		$metadataProfileId = $profile->objectFilter->advancedSearch->metadataProfileId;
+		$metadataProfileId = self::getMrAdvancedSearchFilter($profile)->metadataProfileId;
 
 		self::impersonate($object->partnerId);
 		$metadataPlugin = KalturaMetadataClientPlugin::get(self::$kClient);
@@ -361,7 +407,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
 			$xml = $this->addMetadataXmlField($profile->id, $metadata->xml, $error);
 		elseif (self::startsWith($profile->name, 'MR_')) { //sub task of MRP
-			$arr = explode(",", $profile->objectFilter->advancedSearch->items[1]->value);
+			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml, $error);
 		}
 
