@@ -3,6 +3,7 @@
 <xsl:stylesheet version="1.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:php="http://php.net/xsl" exclude-result-prefixes="xs">
 
 	<xsl:output method="xml" media-type="application/rss+xml" />
+	<xsl:param name="partnerId" select="'partnerId'" />
 
 	<xsl:template match="*">
 
@@ -66,8 +67,6 @@
 
 		<xsl:variable name="tags" select="tags" />
 
-		<xsl:variable name="partnerId" select="2162191" />
-
 		<xsl:variable name="entryId" select="string(entryId)" />
 
 		<item>
@@ -80,7 +79,7 @@
 
 			<media:title>
 
-				<xsl:value-of select="$title" />
+				<xsl:value-of select="$title" disable-output-escaping="no" />
 
 			</media:title>
 
@@ -174,7 +173,7 @@
 
 			</xsl:if>
 
-			<xsl:value-of select="." />
+			<xsl:value-of select="." disable-output-escaping="no"/>
 
 		</xsl:for-each>
 
