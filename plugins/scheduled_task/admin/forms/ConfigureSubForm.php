@@ -140,7 +140,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addComment($name, $msg) {
 		$element = new Zend_Form_Element_Hidden($name);
 		$element->setLabel($msg);
-		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partnerConfigurationDescription'))));
+		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dd', 'class' => 'comment'))));
 		$this->addElements(array($element));
 	}
 

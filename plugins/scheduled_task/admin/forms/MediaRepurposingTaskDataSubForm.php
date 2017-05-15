@@ -26,6 +26,7 @@ class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 
 		$obj = MediaRepurposingUtils::objectTaskFactory($this->type);
 
+		$this->addComment("specificParamSubForm", "Those are specific param for task:");
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
 	}
 
