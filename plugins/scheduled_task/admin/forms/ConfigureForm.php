@@ -60,22 +60,13 @@ class ConfigureForm extends Infra_Form
 	}
 
 	protected function addStringElement($name, $prefix) {
-		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> $name,
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-			'value'	=>	'N/A',
-		));
+		$params = array('required' => false, 'value'=>	'N/A',);
+		$this->addElementByStrType('text', $name, "$prefix$name", $params);
 	}
 
 	protected function addIntegerElement($name, $prefix) {
-		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> $name,
-			'innerType' 	=> 'integer',
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-			'value'			=>	'N/A',
-		));
+		$params = array('required' => false, 'value'=>	'N/A', 'innerType' => 'integer', 'onkeypress' => 'validNum(this.id)');
+		$this->addElementByStrType('text', $name, "$prefix$name", $params);
 	}
 
 	protected function addBooleanElement($name, $prefix) {
@@ -88,12 +79,8 @@ class ConfigureForm extends Infra_Form
 	protected function addSelectElement($name, $options, $prefix = '') 
 	{
 		$options['N/A'] = 'None';
-		$this->addElement('select', "$prefix$name", array(
-			'label'			=> "$name:",
-			'filters'		=> array('StringTrim'),
-			'multiOptions'	=> $options,
-			'value'	=>	'N/A',
-		));
+		$params = array('value'=>'N/A', 'multiOptions'=> $options);
+		$this->addElementByStrType('select', $name, "$prefix$name", $params);
 	}
 
 	protected function addEnumElement($name, $prefix, $enumClass) {
@@ -145,16 +132,20 @@ class ConfigureForm extends Infra_Form
 		));
 	}
 
-	protected function addTextElement($label, $tag, $params) {
+	protected function addTextElement($label, $tag, $params = array()) {
+		$this->addElementByStrType('text', $label, $tag, $params);
+	}
+
+	protected function addElementByStrType($type, $label, $tag, $params) {
 		$options = array(
 			'label' 		=> $label,
 			'filters' 		=> array('StringTrim'),
 			'placement'		=> 'prepend',
 		);
-		foreach($params as $param)
-			$options[$param] = true;
-		
-		$this->addElement('text', $tag, $options);
+		foreach($params as $key => $val)
+			$options[$key] = $val;
+
+		$this->addElement($type, $tag, $options);
 	}
 
 }
