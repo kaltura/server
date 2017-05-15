@@ -67,8 +67,6 @@
 
 		<xsl:variable name="tags" select="tags" />
 
-		<xsl:variable name="partnerId" select="2162191" />
-
 		<xsl:variable name="entryId" select="string(entryId)" />
 
 		<item>
