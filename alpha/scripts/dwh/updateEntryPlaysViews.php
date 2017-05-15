@@ -49,6 +49,7 @@ while($s = trim(fgets($f))){
 			$sphinxLog->setEntryId($entryId);
 			$sphinxLog->setPartnerId($entry->getPartnerId());
 			$sphinxLog->setSql($sql);
+			$sphinxLog->setType(SphinxLogType::SPHINX);
 			$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
 		} catch (Exception $e) {

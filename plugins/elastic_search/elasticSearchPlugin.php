@@ -2,7 +2,7 @@
 /**
  * @package plugins.elasticSearch
  */
-class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers
+class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending
 {
     const PLUGIN_NAME = 'elasticSearch';
     const ELASTIC_SEARCH_MANAGER = 'kElasticSearchManager';
@@ -20,5 +20,16 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
         return array(
             self::ELASTIC_SEARCH_MANAGER,
         );
+    }
+
+    /**
+     * Returns a Kaltura dependency object that defines the relationship between two plugins.
+     *
+     * @return array<KalturaDependency> The Kaltura dependency object
+     */
+    public static function dependsOn()
+    {
+        $elasticSearchDependency = new KalturaDependency(SphinxSearchPlugin::getPluginName());
+        return array($elasticSearchDependency);
     }
 }

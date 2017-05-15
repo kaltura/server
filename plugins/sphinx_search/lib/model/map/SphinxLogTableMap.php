@@ -46,6 +46,7 @@ class SphinxLogTableMap extends TableMap {
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
 		$this->addColumn('SQL', 'Sql', 'CLOB', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

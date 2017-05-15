@@ -10,6 +10,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />			
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="sql" type="clob" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="integer" />
 		<index name="entry_id">
 			<index-column name="entry_id" />
 		</index>

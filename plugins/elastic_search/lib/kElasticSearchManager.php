@@ -5,6 +5,10 @@
  */
 class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjectReadyForIndexContainerEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
 {
+
+    const CACHE_PREFIX = 'executed_elastic_server_';
+
+
     /**
      * @param BaseObject $object
      * @param BatchJob $raisedJob
@@ -30,7 +34,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function saveToElastic(IElasticIndexable $object ,$params = null)
     {
-        KalturaLog::debug('@nadav@ saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
+        KalturaLog::debug('Saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
         //$cmd = $this->getElasticSaveParams($object, $params);
         $cmd['body'] = $object->getObjectParams($params);
         if(!$cmd)
@@ -51,9 +55,28 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
 
-        KalturaLog::DEBUG("@nadav@ ".print_r($params,true));
-        KalturaLog::DEBUG("@nadav@ op ".print_r($op,true));
-        $client->$op($params);
+        $params['action'] = $op;
+        $elasticLog = new SphinxLog();
+        $command = serialize($params);
+        $elasticLog->setSql($command);
+        $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
+        $elasticLog->setObjectId($object->getId());
+        $elasticLog->setObjectType($object->getElasticObjectType());
+        //$sphinxLog->setEntryId($object->getEntryId());
+        $elasticLog->setPartnerId($object->getPartnerId());
+        $elasticLog->setType(SphinxLogType::ELASTIC);
+        $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+
+        if(!kConf::get('exec_elastic', 'local', 0))
+            return true;
+        
+        $ret = $client->$op($params);
+        if(!$ret)
+        {
+            //todo log here
+            return false;
+        }
+
         return true;
     }
 
@@ -68,6 +91,31 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $client->delete($object->getElasticIndexName(),$object->getElasticObjectType(),$object->getElasticId());
         KalturaLog::debug("deleted object [".$object->getElasticId()."] from elasticsearch index .[".$object->getElasticIndexName()."] type [".$object->getElasticObjectType()."]");
     }
+    
+    private function retrieveElasticServerId()
+    {
+        $elasticServerId = null;
+        if(kConf::hasParam('exec_elastic') && kConf::get('exec_elastic'))
+        {
+            $elasticHostName = kConf::get('elasticHost', 'local');
+            $elasticServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_SERVER);
+            if ($elasticServerCacheStore)
+            {
+                $elasticServerId = $elasticServerCacheStore->get(self::CACHE_PREFIX . $elasticHostName);
+                if ($elasticServerId)
+                    return $elasticServerId;
+            }
+            $elasticServer = SphinxLogServerPeer::retrieveByLocalServer($elasticHostName);
+            if($elasticServer)
+            {
+                $elasticServerId = $elasticServer->getId();
+                if ($elasticServerCacheStore)
+                    $elasticServerCacheStore->set(self::CACHE_PREFIX . $elasticHostName, $elasticServerId);
+            }
+        }
+
+        return $elasticServerId;
+    }
 
     /**
      * @param $object
@@ -76,7 +124,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function objectReadyForIndexContainer($object, $params = null)
     {
-        KalturaLog::debug("@nadav@ acc ".print_r($params,true));
         $this->saveToElastic($object, $params);
         return true;
     }

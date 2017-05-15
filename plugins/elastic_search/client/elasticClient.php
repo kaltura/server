@@ -55,9 +55,21 @@ class elasticClient
         return curl_setopt($this->ch, CURLOPT_TIMEOUT, $seconds);
     }
 
-    public function setResponseFiltering()
+    protected function getQueryParams($params)
     {
+        $val = '';
+        $queryParams = array();
+        if(isset($params['parent']))
+            $queryParams['parent'] = $params['parent'];
+        if(isset($params['retry_on_conflict']))
+            $queryParams['retry_on_conflict'] = $params['retry_on_conflict'];
 
+        if(count($queryParams) >0)
+        {
+            $val .= '?';
+            $val .= http_build_query($queryParams);
+        }
+        return $val;
     }
 
     /**
@@ -80,13 +92,14 @@ class elasticClient
         {
             $code = $this->getErrorNumber();
             $message = $this->getError();
-            KalturaLog::debug("@nadav@ elastic client curl error code[".$code."] message[".$message."]");
+            KalturaLog::debug("Elastic client curl error code[".$code."] message[".$message."]");
+            //todo - decide how to handle the error here or throw exception
         }
         else
         {
             //return the response as associative array
             $response = json_decode($response, true);
-            KalturaLog::debug("@nadav@ elastic client response ".print_r($response,true));
+            KalturaLog::debug("Elastic client response ".print_r($response,true));
         }
 
         return $response;
@@ -123,12 +136,11 @@ class elasticClient
         $cmd .='/'.$params['index']; //index name
         if(isset($params['type']))
             $cmd .= '/'.$params['type'];
-        if(isset($params['size'])) //todo maybe overkill
+        if(isset($params['size']))
             $params['body']['size'] = $params['size'];
 
         $cmd .= "/_search";
-        //if($pretty)
-        //    $cmd .= '?pretty';
+
         $val =  $this->sendRequest($cmd, 'POST', $params['body']);
         return $val;
     }
@@ -144,10 +156,10 @@ class elasticClient
         $cmd .='/'.$params['index'].'/'.$params['type'];
         if(isset($params['id']))
             $cmd .= '/'.$params['id'];
-        if(isset($params['parent']))
-            $cmd .= '?parent='.$params['parent'];
-        KalturaLog::DEBUG("@nadav@ client index cmd".print_r($cmd,true));
-        KalturaLog::DEBUG("@nadav@ client index params".print_r($params['body'],true));
+
+        $queryParams = $this->getQueryParams($params);
+        $cmd .= $queryParams;
+
         $response = $this->sendRequest($cmd, 'PUT', $params['body']);
         return $response;
     }
@@ -162,10 +174,10 @@ class elasticClient
         $cmd = $this->elasticHost;
         $cmd .='/'.$params['index'].'/'.$params['type'].'/'.$params['id'];
         $cmd .= "/_update";
-        if(isset($params['parent']))
-            $cmd .= '?parent='.$params['parent'];
-        if(isset($params['retry_on_conflict']))
-            $cmd .= '?retry_on_conflict='.$params['retry_on_conflict'];
+
+        $queryParams = $this->getQueryParams($params);
+        $cmd .= $queryParams;
+
         $response = $this->sendRequest($cmd, 'POST' ,$params['body']);
         return $response;
     }
@@ -179,8 +191,10 @@ class elasticClient
     {
         $cmd = $this->elasticHost;
         $cmd .='/'.$params['index'].'/'.$params['type'].'/'.$params['id'];
-        if(isset($params['parent']))
-            $cmd .= '?parent='.$params['parent'];
+
+        $queryParams = $this->getQueryParams($params);
+        $cmd .= $queryParams;
+
         $response = $this->sendRequest($cmd, 'DELETE');
         return $response;
     }

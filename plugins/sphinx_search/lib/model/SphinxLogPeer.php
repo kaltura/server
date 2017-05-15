@@ -25,13 +25,14 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 	 * Retrieve all records larger than the id
 	 *
 	 * @param      array $servers<SphinxLogServer>
+	 * @param	   int $type
 	 * @param	   int $gap
 	 * @param      int $limit
 	 * @param	   array $handledEntries	
 	 * @param      PropelPDO $con the connection to use
 	 * @return     SphinxLog
 	 */
-	public static function retrieveByLastId(array $servers, $gap = 0, $limit = 1000, array $handledEntries = null, PropelPDO $con = null)
+	public static function retrieveByLastId(array $servers, $type, $gap = 0, $limit = 1000, array $handledEntries = null, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criterions = null;
@@ -57,6 +58,8 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 		{
 			$criteria->add(SphinxLogPeer::PARTNER_ID, $disabledPartnerIds, Criteria::NOT_IN);
 		}
+
+		$criteria->add(SphinxLogPeer::TYPE, $type, Criteria::IN);
 		
 		$criteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
 		$criteria->setLimit($limit);

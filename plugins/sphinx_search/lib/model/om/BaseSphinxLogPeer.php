@@ -26,7 +26,7 @@ abstract class BaseSphinxLogPeer {
 	const TM_CLASS = 'SphinxLogTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 9;
+	const NUM_COLUMNS = 10;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -58,6 +58,9 @@ abstract class BaseSphinxLogPeer {
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'sphinx_log.CREATED_AT';
 
+	/** the column name for the TYPE field */
+	const TYPE = 'sphinx_log.TYPE';
+
 	/**
 	 * An identiy map to hold any loaded instances of SphinxLog objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -74,11 +77,11 @@ abstract class BaseSphinxLogPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'ExecutedServerId', 'ObjectType', 'ObjectId', 'EntryId', 'PartnerId', 'Dc', 'Sql', 'CreatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'executedServerId', 'objectType', 'objectId', 'entryId', 'partnerId', 'dc', 'sql', 'createdAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::EXECUTED_SERVER_ID, self::OBJECT_TYPE, self::OBJECT_ID, self::ENTRY_ID, self::PARTNER_ID, self::DC, self::SQL, self::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'executed_server_id', 'object_type', 'object_id', 'entry_id', 'partner_id', 'dc', 'sql', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ExecutedServerId', 'ObjectType', 'ObjectId', 'EntryId', 'PartnerId', 'Dc', 'Sql', 'CreatedAt', 'Type', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'executedServerId', 'objectType', 'objectId', 'entryId', 'partnerId', 'dc', 'sql', 'createdAt', 'type', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::EXECUTED_SERVER_ID, self::OBJECT_TYPE, self::OBJECT_ID, self::ENTRY_ID, self::PARTNER_ID, self::DC, self::SQL, self::CREATED_AT, self::TYPE, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'executed_server_id', 'object_type', 'object_id', 'entry_id', 'partner_id', 'dc', 'sql', 'created_at', 'type', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -88,11 +91,11 @@ abstract class BaseSphinxLogPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ExecutedServerId' => 1, 'ObjectType' => 2, 'ObjectId' => 3, 'EntryId' => 4, 'PartnerId' => 5, 'Dc' => 6, 'Sql' => 7, 'CreatedAt' => 8, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'executedServerId' => 1, 'objectType' => 2, 'objectId' => 3, 'entryId' => 4, 'partnerId' => 5, 'dc' => 6, 'sql' => 7, 'createdAt' => 8, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::EXECUTED_SERVER_ID => 1, self::OBJECT_TYPE => 2, self::OBJECT_ID => 3, self::ENTRY_ID => 4, self::PARTNER_ID => 5, self::DC => 6, self::SQL => 7, self::CREATED_AT => 8, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'executed_server_id' => 1, 'object_type' => 2, 'object_id' => 3, 'entry_id' => 4, 'partner_id' => 5, 'dc' => 6, 'sql' => 7, 'created_at' => 8, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ExecutedServerId' => 1, 'ObjectType' => 2, 'ObjectId' => 3, 'EntryId' => 4, 'PartnerId' => 5, 'Dc' => 6, 'Sql' => 7, 'CreatedAt' => 8, 'Type' => 9, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'executedServerId' => 1, 'objectType' => 2, 'objectId' => 3, 'entryId' => 4, 'partnerId' => 5, 'dc' => 6, 'sql' => 7, 'createdAt' => 8, 'type' => 9, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::EXECUTED_SERVER_ID => 1, self::OBJECT_TYPE => 2, self::OBJECT_ID => 3, self::ENTRY_ID => 4, self::PARTNER_ID => 5, self::DC => 6, self::SQL => 7, self::CREATED_AT => 8, self::TYPE => 9, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'executed_server_id' => 1, 'object_type' => 2, 'object_id' => 3, 'entry_id' => 4, 'partner_id' => 5, 'dc' => 6, 'sql' => 7, 'created_at' => 8, 'type' => 9, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -171,6 +174,7 @@ abstract class BaseSphinxLogPeer {
 		$criteria->addSelectColumn(SphinxLogPeer::DC);
 		$criteria->addSelectColumn(SphinxLogPeer::SQL);
 		$criteria->addSelectColumn(SphinxLogPeer::CREATED_AT);
+		$criteria->addSelectColumn(SphinxLogPeer::TYPE);
 	}
 
 	/**
@@ -485,7 +489,7 @@ abstract class BaseSphinxLogPeer {
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
 			}
-			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
 			{
 				// all is allowed - don't add anything to the criteria
 			}
@@ -859,6 +863,15 @@ abstract class BaseSphinxLogPeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}

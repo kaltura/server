@@ -75,6 +75,12 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
+	 * The value for the type field.
+	 * @var        int
+	 */
+	protected $type;
+
+	/**
 	 * @var        array SphinxLogServer[] Collection to store aggregation of SphinxLogServer objects.
 	 */
 	protected $collSphinxLogServers;
@@ -268,6 +274,16 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getType()
+	{
+		return $this->type;
 	}
 
 	/**
@@ -504,6 +520,29 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
+	 * Set the value of [type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     SphinxLog The current object (for fluent API support)
+	 */
+	public function setType($v)
+	{
+		if(!isset($this->oldColumnsValues[SphinxLogPeer::TYPE]))
+			$this->oldColumnsValues[SphinxLogPeer::TYPE] = $this->type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->type !== $v) {
+			$this->type = $v;
+			$this->modifiedColumns[] = SphinxLogPeer::TYPE;
+		}
+
+		return $this;
+	} // setType()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -548,6 +587,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			$this->dc = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->sql = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->type = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -557,7 +597,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 9; // 9 = SphinxLogPeer::NUM_COLUMNS - SphinxLogPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 10; // 10 = SphinxLogPeer::NUM_COLUMNS - SphinxLogPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating SphinxLog object", $e);
@@ -610,7 +650,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		SphinxLogPeer::setUseCriteriaFilter(false);
-		$stmt = SphinxLogPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		SphinxLogPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		SphinxLogPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -796,7 +838,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -821,8 +863,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		return parent::preInsert($con);
 	}
 	
@@ -985,6 +1026,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			case 8:
 				return $this->getCreatedAt();
 				break;
+			case 9:
+				return $this->getType();
+				break;
 			default:
 				return null;
 				break;
@@ -1015,6 +1059,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			$keys[6] => $this->getDc(),
 			$keys[7] => $this->getSql(),
 			$keys[8] => $this->getCreatedAt(),
+			$keys[9] => $this->getType(),
 		);
 		return $result;
 	}
@@ -1073,6 +1118,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			case 8:
 				$this->setCreatedAt($value);
 				break;
+			case 9:
+				$this->setType($value);
+				break;
 		} // switch()
 	}
 
@@ -1106,6 +1154,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[6], $arr)) $this->setDc($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setSql($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setType($arr[$keys[9]]);
 	}
 
 	/**
@@ -1126,6 +1175,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(SphinxLogPeer::DC)) $criteria->add(SphinxLogPeer::DC, $this->dc);
 		if ($this->isColumnModified(SphinxLogPeer::SQL)) $criteria->add(SphinxLogPeer::SQL, $this->sql);
 		if ($this->isColumnModified(SphinxLogPeer::CREATED_AT)) $criteria->add(SphinxLogPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(SphinxLogPeer::TYPE)) $criteria->add(SphinxLogPeer::TYPE, $this->type);
 
 		return $criteria;
 	}
@@ -1195,6 +1245,8 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		$copyObj->setSql($this->sql);
 
 		$copyObj->setCreatedAt($this->created_at);
+
+		$copyObj->setType($this->type);
 
 
 		if ($deepCopy) {
