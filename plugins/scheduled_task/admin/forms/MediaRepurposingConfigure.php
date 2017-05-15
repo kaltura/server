@@ -35,9 +35,9 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->addTextElement('Engine Type:', 'engineType', array('required', 'readonly'));
 		$this->addTextElement('Filter Type:', 'filterTypeStr', array('required', 'readonly'));
 		$this->addTextElement('Media Repurposing Name:', 'media_repurposing_name', array('required'));
-		$this->addTextElement('Max Entries Allowed in MR:', 'max_entries_allowed', array('required'));
-		$this->getElement('max_entries_allowed')->setValue(self::DEFAULT_MAX_TOTAL_COUNT_ALLOWED); //as default
-		
+
+		$this->addSafetyMechanismSection();
+
 		$this->addFilterSection();
 
 		//add tasks section
@@ -45,6 +45,15 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 		// template who will not be shown on form
 		$this->addTaskDataTemplate();
+
+	}
+
+	private function addSafetyMechanismSection()
+	{
+		$this->addLine("2");
+		$this->addTitle('Safety Mechanism');
+		$this->addTextElement('Max Entries Allowed in MR:', 'max_entries_allowed', array('required'));
+		$this->getElement('max_entries_allowed')->setValue(self::DEFAULT_MAX_TOTAL_COUNT_ALLOWED); //as default
 	}
 
 	private function addTaskDataTemplate()
@@ -58,17 +67,21 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	private function addTaskSection()
 	{
-		$this->addLine("2");
+		$this->addLine("taskLine");
 		$this->addTitle('Tasks Data');
 
-		$this->addEnumElement('TaskTypeChoose', '', 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType');
-		
+
 		$TasksSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$TasksSubForm->addDecorator('ViewScript', array(
 			'viewScript' => 'tasks-data-sub-form.phtml',
 		));
 		$this->addSubForm($TasksSubForm, 'MR_tasks');
 
+		$this->addLine("taskLine2");
+		$this->addEnumElement('TaskTypeChoose', '', 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType');
+
+		// template who will not be shown on form
+		$this->addTaskDataTemplate();
 	}
 
 	private function addFilterSection()
