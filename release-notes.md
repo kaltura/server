@@ -10,7 +10,7 @@ None.
 
 ### Deployment scripts ###
 
-    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create create <myql-server> <mysql-user> <mysql-pass> realrun
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
 
 #### Known Issues & Limitations ####
 
