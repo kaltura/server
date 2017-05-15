@@ -70,31 +70,18 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		if ($name == 'message')
 			return $this->addStringAreaElement($name, $prefix);
 
-		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> $name,
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-			'value'			=>	'N/A',
-		));
+		$params = array('required' => false, 'value'=>	'N/A',);
+		$this->addElementByStrType('text', $name, "$prefix$name", $params);
 	}
 
 	protected function addIntegerElement($name, $prefix) {
-		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> $name,
-			'innerType' 	=> 'integer',
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-			'value'			=>	-1,
-		));
+		$params = array('required' => false, 'value'=>	-1, 'innerType' => 'integer', 'oninput'	=> 'checkNumValid(this.value)');
+		$this->addElementByStrType('textarea', $name, "$prefix$name", $params);
 	}
 
 	protected function addStringAreaElement($name, $prefix) {
-		$this->addElement('textarea', "$prefix$name", array(
-			'label' 		=> $name,
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-			'value'			=>	'N/A',
-		));
+		$params = array('required' => false, 'value'=>	'N/A',);
+		$this->addElementByStrType('textarea', $name, "$prefix$name", $params);
 	}
 
 	protected function addArrayElement($name, $prefix) {
@@ -155,15 +142,19 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function addTextElement($label, $tag, $params = array()) {
+		$this->addElementByStrType('text', $label, $tag, $params);
+	}
+
+	protected function addElementByStrType($type, $label, $tag, $params) {
 		$options = array(
 			'label' 		=> $label,
 			'filters' 		=> array('StringTrim'),
 			'placement'		=> 'prepend',
 		);
-		foreach($params as $param)
-			$options[$param] = true;
+		foreach($params as $key => $val)
+			$options[$key] = $val;
 
-		$this->addElement('text', $tag, $options);
+		$this->addElement($type, $tag, $options);
 	}
 
 }

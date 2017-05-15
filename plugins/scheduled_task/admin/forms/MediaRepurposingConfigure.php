@@ -30,11 +30,11 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->setMethod('post');
 
 		$this->addTitle('General', 'generalTitle');
-		$this->addTextElement('Publisher ID:', 'partnerId', array('required', 'readonly'));
-		$this->addTextElement('MR profile ID:', 'mrId', array('required', 'readonly'));
-		$this->addTextElement('Engine Type:', 'engineType', array('required', 'readonly'));
-		$this->addTextElement('Filter Type:', 'filterTypeStr', array('required', 'readonly'));
-		$this->addTextElement('Media Repurposing Name:', 'media_repurposing_name', array('required'));
+		$this->addTextElement('Publisher ID:', 'partnerId', array('required'=> true, 'readonly'=> true));
+		$this->addTextElement('MR profile ID:', 'mrId', array('required'=> true, 'readonly'=> true));
+		$this->addTextElement('Engine Type:', 'engineType', array('required'=> true, 'readonly'=> true));
+		$this->addTextElement('Filter Type:', 'filterTypeStr', array('required'=> true, 'readonly'=> true));
+		$this->addTextElement('Media Repurposing Name:', 'media_repurposing_name', array('required' => true));
 
 		$this->addSafetyMechanismSection();
 
@@ -52,7 +52,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		$this->addLine("SafetyMechanismLine");
 		$this->addTitle('Safety Mechanism');
-		$this->addTextElement('Max Entries Allowed in MR:', 'max_entries_allowed', array('required'));
+		$this->addTextElement('Max Entries Allowed in MR:', 'max_entries_allowed', array('required'=>true));
 		$this->getElement('max_entries_allowed')->setValue(self::DEFAULT_MAX_TOTAL_COUNT_ALLOWED); //as default
 	}
 

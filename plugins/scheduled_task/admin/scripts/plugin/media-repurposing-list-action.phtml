@@ -284,6 +284,16 @@ function getEpocTime(val) {
 	return 0;
 }
 
+function checkNumValid(val) {
+	if (isDatesFormat(val)) {
+		if(isNaN(new Date(val).getTime()))
+			alert("Not a valid Date!");
+		return;
+	}
+	if (isNaN(val))
+		alert("You need to enter number!");
+}
+
 
 function setConditionData() {
 	var conditions = [];

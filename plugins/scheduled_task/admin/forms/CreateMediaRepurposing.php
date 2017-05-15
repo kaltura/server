@@ -19,6 +19,7 @@ class Form_CreateMediaRepurposing extends ConfigureSubForm
 		$this->addElement('text', 'newPartnerId', array(
 			'label'			=> 'Publisher ID:',
 			'filters'		=> array('StringTrim'),
+			'oninput'	=> 'checkNumValid(this.value)',
 		));
 
 		$options = array('Kaltura_Client_Type_MediaEntryFilter' => 'media filter', "N/A" => "NONE");

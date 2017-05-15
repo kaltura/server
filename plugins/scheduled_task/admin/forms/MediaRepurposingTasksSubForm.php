@@ -25,10 +25,10 @@ class Form_MediaRepurposingTasksSubForm extends ConfigureSubForm
 			'viewScript' => 'task-data-sub-form.phtml',
 		));
 
-		$this->addTextElement('Task Type:', 'TaskType', array('required', 'readonly'));
-		$this->addTextElement('Task ID:', 'TaskId', array('required', 'readonly'));
-		$this->addTextElement('Time to next Task (in days):', 'taskTime');
-
+		$this->addTextElement('Task Type:', 'TaskType', array('required'=> true, 'readonly'=> true));
+		$this->addTextElement('Task ID:', 'TaskId', array('required'=> true, 'readonly'=> true));
+		$this->addTextElement('Time to next Task (in days):', 'taskTime', array('oninput'	=> 'checkNumValid(this.value)'));
+		
 		$this->getElement('TaskType')->setValue($this->type);
 	}
 
