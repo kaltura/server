@@ -1,5 +1,21 @@
 # Lynx 12.16.0 #
 
+## Add scheduleEvent->list optimization ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7230
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create create <myql-server> <mysql-user> <mysql-pass> realrun
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## ViewHistory Feature ##
 
 - Issue Type: Story
@@ -23,6 +39,7 @@
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2017_04_24_alter_user_entry_table_privacy_context_add_keys.sql
 		php /deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
 		php /deployment/base/scripts/installPlugins.php
+
 
 # Lynx 12.15.0 #
 
