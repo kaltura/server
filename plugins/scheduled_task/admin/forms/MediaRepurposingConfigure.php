@@ -50,7 +50,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 	private function addSafetyMechanismSection()
 	{
-		$this->addLine("2");
+		$this->addLine("SafetyMechanismLine");
 		$this->addTitle('Safety Mechanism');
 		$this->addTextElement('Max Entries Allowed in MR:', 'max_entries_allowed', array('required'));
 		$this->getElement('max_entries_allowed')->setValue(self::DEFAULT_MAX_TOTAL_COUNT_ALLOWED); //as default
