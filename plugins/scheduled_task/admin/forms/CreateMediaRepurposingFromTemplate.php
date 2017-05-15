@@ -19,6 +19,7 @@ class Form_CreateMediaRepurposingFromTemplate extends ConfigureSubForm
 		$this->addElement('text', 'newPartnerIdTemplate', array(
 			'label'			=> 'Publisher ID:',
 			'filters'		=> array('StringTrim'),
+			'onkeypress'	=> 'validNum(this.id);',
 		));
 
 		$options = $this->getTemplateOption();
