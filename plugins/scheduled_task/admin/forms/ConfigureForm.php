@@ -65,7 +65,7 @@ class ConfigureForm extends Infra_Form
 	}
 
 	protected function addIntegerElement($name, $prefix) {
-		$params = array('required' => false, 'value'=>	'N/A', 'innerType' => 'integer', 'onkeypress' => 'validNum(this.id)');
+		$params = array('required' => false, 'value'=>	'N/A', 'innerType' => 'integer', 'oninput'	=> 'checkNumValid(this.value)');
 		$this->addElementByStrType('text', $name, "$prefix$name", $params);
 	}
 

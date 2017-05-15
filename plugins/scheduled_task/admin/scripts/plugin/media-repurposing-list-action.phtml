@@ -284,12 +284,7 @@ function getEpocTime(val) {
 	return 0;
 }
 
-function validNum(id) {
-	setTimeout(function () { checkNum(id); }, 10);
-}
-
-function checkNum(id) {
-	let val = jQuery("#" + id).val();
+function checkNumValid(val) {
 	if (isDatesFormat(val)) {
 		if(isNaN(new Date(val).getTime()))
 			alert("Not a valid Date!");
