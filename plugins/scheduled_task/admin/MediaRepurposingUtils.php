@@ -12,7 +12,7 @@ class MediaRepurposingUtils
 	const STATUS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'Status\']';
 	const MPRS_DATA_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const MPRS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPsOnEntry\']';
-	const EXCLUDE = 0;
+	const EXCLUDE = 'Exclude';
 
 	const MEDIA_REPURPOSING_SYSTEM_NAME = 'MRP';
 	const ADMIN_CONSOLE_PARTNER = "-2";
