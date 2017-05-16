@@ -230,7 +230,7 @@ function loadMediaRepurposing(paramStr)
 			'<?php echo $this->translate('Save'); ?>': function() {
 				rearrangeData();
 				jQuery(this).find('#frmMediaRepurposingConfigure').submit();
-				setTimeout(function () { window.location.reload(); }, 10);
+				setTimeout(function () { window.location.reload(); }, 100);
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
