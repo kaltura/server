@@ -40,13 +40,25 @@ class PollService extends KalturaBaseService
 	 * @action getVotes
 	 * @param string $pollId
 	 * @param string $answerIds comma separated string
+	 * @param string $previousDataJson
 	 * @return string
 	 **/
-	public function getVotesAction($pollId, $answerIds)
+	public function getVotesAction($pollId, $answerIds, $previousDataJson = null)
 	{
-		$votes = PollActions::getVotes($pollId, $answerIds);
-		KalturaLog::info("Votes from Poll id : ".$pollId.", Are :".print_r($votes, true));
-		return $votes;
+		$localDcVotes = PollActions::getVotes($pollId, $answerIds);
+		if (!$previousDataJson)
+		{
+			$_POST['previousDataJson'] = json_encode($localDcVotes);
+			$currentDcId = kDataCenterMgr::getCurrentDcId();
+			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - $currentDcId ) );
+		}
+		else
+		{
+			$prevData = json_decode($previousDataJson);
+			$localDcVotes->merge($prevData);
+			return json_encode($localDcVotes);
+		}
+
 	}
 
 	/**

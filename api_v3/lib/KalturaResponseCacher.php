@@ -323,26 +323,16 @@ class KalturaResponseCacher extends kApiCache
 					$actionKey = $service . '_' . $action;
 					if (array_key_exists($actionKey, $confActions))
 					{
-						$xxx = dirname(__FILE__).$confActions[$actionKey];
-						require_once($xxx);
-						// TODO set logic to be generic using dynamic mode load
-						if ($action === 'setVote')
+						$classPath = dirname(__FILE__).$confActions[$actionKey];
+						$lastSlash = strrpos($classPath, '/');
+						$lastDot = strrpos($classPath, '.');
+						if ($classPath && $lastSlash && $lastDot && file_exists($classPath))
 						{
-							$pollId = $params['pollId'];
-							$userId = $params['userId'];
-							$ansIds = $params['ansIds'];
-							PollActions::setVote($pollId, $userId, $ansIds);
-							die('Successfully voted for '.$pollId.'_'.$userId);
-						} /*else if ($action === 'add' ){
-							die (PollActions::generatePollId());
-
-						} else if ($action === 'getVotes')
-						{
-							$pollId = $params['pollId'];
-							$ansIds = $params['ansIds'];
-							die (PollActions::getVotes($pollId, $ansIds));
-						}*/
-
+							require_once($classPath);
+							$className = substr($classPath,  $lastSlash + 1, $lastDot - $lastSlash - 1);
+							die($className::$action($params));
+						}
+						die('Failed to parse '.$actionKey.' as a valid class configuration');
 					}
 				}
 			}

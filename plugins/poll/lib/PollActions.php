@@ -3,32 +3,44 @@
  * Class PollActions
  *
  * Package and location is not indicated
- *
+ * Should not include any kaltura dependency in this class - to enable it to run in cache only mode
  */
-
-
 class PollActions
 {
-
-	/**
-	 * @var PollCacheHandler
-	 */
-	private static $pollsCacheHandler;
 
 	const ID_SEPARATOR_CHAR = '-';
 	const ANSWER_SEPARATOR_CHAR = ';';
 	const ID_NUM_ELEMENTS = 3;
-	private static $pollTypes = null;
 
+	/**
+	 * @var PollCacheHandler
+	 */
+	private static $pollsCacheHandler = null;
+	/**
+	 * @var array of const strings representing poll types
+	 */
+	private static $pollTypes = null;
+	/**
+	 * @var string
+	 */
 	private static $kalturaSecret = null;
 
 	/* Configuration */
-
+	/**
+	 *
+	 * @throws Exception
+	 */
 	private static function init()
 	{
 		self::$kalturaSecret = kConf::get("polls_secret");
+		if (!self::$kalturaSecret)
+			throw new Exception("Could not find polls_secret in the configuration");
 		self::$pollsCacheHandler = new PollCacheHandler();
-		self::$pollTypes = array( 'SINGLE_ANONYMOUS', 'SINGLE_RESTRICT' , 'MULTI_ANONYMOUS' , 'MULTI_RESTRICT'	);
+		self::$pollTypes = array(
+			'SINGLE_ANONYMOUS',
+			'SINGLE_RESTRICT',
+			'MULTI_ANONYMOUS',
+			'MULTI_RESTRICT');
 	}
 
 	/* Poll Id Action */
@@ -36,9 +48,8 @@ class PollActions
 	{
 		self::init();
 		if (!self::isValidPollType($type))
-			die('Poll type provided is invalid');
+			throw new Exception("Poll type provided is invalid");
 		$randKey = rand();
-		$randKey=strval($randKey);
 		$hash = hash_hmac('SHA256', self::$kalturaSecret, $randKey);
 		return $type.self::ID_SEPARATOR_CHAR.$hash.self::ID_SEPARATOR_CHAR.$randKey;
 	}
@@ -58,7 +69,7 @@ class PollActions
 			$key = $idElements[2];
 			$simulatedHash = hash_hmac('SHA256', self::$kalturaSecret, $key);
 			$isHashOk = strcmp($hash, $simulatedHash) === 0;
-			$validPollType=self::isValidPollType($pollType);
+			$validPollType = self::isValidPollType($pollType);
 			return $isHashOk && $validPollType;
 
 		}
@@ -66,15 +77,23 @@ class PollActions
 	}
 
 	/* Poll Vote Actions */
+	public static function vote($params)
+	{
+		$pollId = $params['pollId'];
+		$userId = $params['userId'];
+		$ansIds = $params['answerIds'];
+		return self::setVote($pollId, $userId, $ansIds);
+	}
 
 	public static function setVote($pollId, $userId, $ansIds)
 	{
-		$answers = expolde(self::ANSWER_SEPARATOR_CHAR, $ansIds);
+		if (!$pollId || !$userId || !$ansIds)
+			throw new Exception('Missing parameter for vote action');
+		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
 		if (self::isValidPollIdStructure($pollId)) {
 			// check early user vote
-			$result = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
-			if ($result) {
-				$previousAnswers = expolde(self::ANSWER_SEPARATOR_CHAR, $result);
+			$previousAnswers = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
+			if ($previousAnswers) {
 				self::$pollsCacheHandler->decrementAnsCounter($pollId, $previousAnswers);
 			} else {
 				self::$pollsCacheHandler->incrementPollVotersCount($pollId);
@@ -83,7 +102,7 @@ class PollActions
 			return;
 		}
 		return "Failed to vote due to bad poll id structure";
-		// TODO here we want to return 200 with Exception within
+
 	}
 
 	/* Poll Get Votes Actions */
@@ -99,7 +118,8 @@ class PollActions
 			$answerCount = self::$pollsCacheHandler->getAnswerCounter($pollId, $ansId);
 			$pollVotes->addAnswerCounter($ansId, $answerCount);
 		}
-		return $pollVotes->toJSONString();
+		return $pollVotes;
+
 	}
 
 }
@@ -113,7 +133,7 @@ class PollCacheHandler
 
 	public function __construct()
 	{
-		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
+		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
 	}
 
 	public function setCacheVote($userId, $pollId, $ansIds)
@@ -189,9 +209,9 @@ class PollCacheHandler
 }
 
 class PollVotes {
-	private $pollId = "";
-	private $numVoters = 0 ;
-	private $answerCounters = array();
+	public $pollId = "";
+	public $numVoters = 0 ;
+	public $answerCounters = array();
 
 	public function __construct($pollId)
 	{
@@ -208,19 +228,21 @@ class PollVotes {
 		else
 			$this->numVoters = $voters;
 	}
-	public function toJSONString()
-	{
-		$pollIdText = '"PollId":' . $this->pollId;
-		$numberOfVotersText = '"NumberOfVoters":' . $this->numVoters;
-		$answersText = '"AnswersCounters":[';
-		foreach ($this->answerCounters as $ans => $counter) {
-			$answersText = $answersText.'"'.$ans.'":'.$counter.',';
-		}
-		if (count($this->answerCounters) > 0)
-			$answersText = substr($answersText, 0, -1);
-		$answersText = $answersText.']';
-		return '{'.$pollIdText.','.$numberOfVotersText.','.$answersText.'}';
 
+	/**
+	 * @param PollVotes $other
+	 */
+	public function merge($other)
+	{
+		$this->numVoters += $other->numVoters;
+		foreach ($other->answerCounters as $ans => $counter)
+		{
+			$currentCounter = $this->answerCounters[$ans];
+			if (isset($currentCounter))
+				$this->answerCounters[$ans] = $currentCounter + $counter;
+			else
+				$this->answerCounters[$ans] = $counter;
+		}
 	}
 
 }
