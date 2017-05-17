@@ -96,10 +96,9 @@
 	}
 	
 	function populateDates() {
-		var d = new Date(0);
-		
 		let f = jQuery('#frmMediaRepurposingConfigure');
 		f.find( "input[innertype=integer]").each(function(idx) {
+			var d = new Date(0);
 			var val = parseInt($(this).val());
 			if (isNaN(val) || val < 315360000) // 10 Year (max relative time)	315360000
 				return;
