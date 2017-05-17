@@ -29,4 +29,33 @@ class mediaInfo extends BasemediaInfo
 	
 	public function setMaxGOP($v)	{$this->putInCustomData('MaxGOP', $v);}
 	public function getMaxGOP()	{return $this->getFromCustomData('MaxGOP', null, null);}
+	
+	public function getRawDataXml()
+	{
+		$rawData = $this->getRawData();
+		$rawDataLinesArray = explode(PHP_EOL, $rawData);
+	
+		$rawDataXml = new DOMDocument();
+		$rootNode = $rawDataXml->createElement("RawData");
+		$root = $rawDataXml->appendChild($rootNode);
+		foreach ($rawDataLinesArray as $rawDataLine)
+		{
+			list($key, $value) = explode(":", $rawDataLine);
+			if (!$value)
+				continue;
+			
+			$key = str_replace(" ", "",$key);
+			$value = trim($value);
+			try{
+				$node = $rawDataXml->createElement($key);
+				$value = $rawDataXml->createTextNode ($value);
+				$node->appendChild($value);
+				$root->appendChild($node);
+			} catch (Exception $e) {
+				KalturaLog::debug("Illegal node name: $key");
+			}	
+		}
+		
+		return $rawDataXml->saveXML();
+	}
 }
