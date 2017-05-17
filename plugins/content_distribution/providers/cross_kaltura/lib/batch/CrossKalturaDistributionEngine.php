@@ -264,6 +264,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    
 	    // get entry's thumbnail assets chosen for distribution
 	    $thumbAssets = array();
+		$timedThumbAssets = array();
 	    if (!empty($data->entryDistribution->thumbAssetIds))
 	    {
     	    $thumbAssetFilter = new KalturaThumbAssetFilter();
@@ -273,7 +274,14 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
                 $thumbAssetsList = $client->thumbAsset->listAction($thumbAssetFilter);
     	        foreach ($thumbAssetsList->objects as $asset)
                 {
-                    $thumbAssets[$asset->id] = $asset;
+	                if (isset($asset->cuePointId))
+	                {
+		                $timedThumbAssets[$asset->cuePointId] = $asset;
+	                }
+	                else
+	                {
+		                $thumbAssets[$asset->id] = $asset;
+	                }
                 }
             }
             catch (Exception $e) {
@@ -291,10 +299,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    foreach ($thumbAssets as $thumbAsset)
 	    {
 	        $thumbAssetsContent[$thumbAsset->id] = $this->getAssetContentResource($thumbAsset->id, $client->thumbAsset, $remoteThumbAssetContent);
-	    } 
-	    
-	    
-	    // get entry's custom metadata objects
+	    }
+		foreach ($timedThumbAssets as $thumbAsset)
+		{
+			$thumbAssetsContent[$thumbAsset->id] = $this->getAssetContentResource($thumbAsset->id, $client->thumbAsset, $remoteThumbAssetContent);
+		}
+
+		// get entry's custom metadata objects
 	    $metadataObjects = array();
     	$metadataFilter = new KalturaMetadataFilter();
         $metadataFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
@@ -343,16 +354,23 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         
         // get entry's cue points
         $cuePoints = array();
+		$thumbCuePoints = array();
         if ($this->distributeCuePoints == true)
         {
             $cuePointFilter = new KalturaCuePointFilter();
             $cuePointFilter->entryIdEqual = $entryId;        
     	    try {
-                $cuePointClient = KalturaCuePointClientPlugin::get($client);            
+                $cuePointClient = KalturaCuePointClientPlugin::get($client);
                 $cuePointsList = $cuePointClient->cuePoint->listAction($cuePointFilter);
     	        foreach ($cuePointsList->objects as $cuePoint)
                 {
-                    $cuePoints[$cuePoint->id] = $cuePoint;
+	                /**
+	                 * @var $cuePoint KalturaCuePoint
+	                 */
+	                if ($cuePoint->cuePointType != KalturaCuePointType::THUMB)
+                        $cuePoints[$cuePoint->id] = $cuePoint;
+	                else
+		                $thumbCuePoints[$cuePoint->id] = $cuePoint;
                 }
             }
             catch (Exception $e) {
@@ -367,10 +385,12 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         $entryObjects->flavorAssets = $flavorAssets;
         $entryObjects->flavorAssetsContent = $flavorAssetsContent;
         $entryObjects->thumbAssets = $thumbAssets;
+		$entryObjects->timedThumbAssets = $timedThumbAssets;
         $entryObjects->thumbAssetsContent = $thumbAssetsContent;
         $entryObjects->captionAssets = $captionAssets;
         $entryObjects->captionAssetsContent = $captionAssetsContent;
         $entryObjects->cuePoints = $cuePoints;
+		$entryObjects->thumbCuePoints = $thumbCuePoints;
         
         return $entryObjects;
 	}
@@ -660,6 +680,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		$targetObjects->flavorAssets = $this->transformFlavorAssets($sourceObjects->flavorAssets); // flavor assets
 		$targetObjects->flavorAssetsContent = $sourceObjects->flavorAssetsContent; // flavor assets content - already transformed
 		$targetObjects->thumbAssets = $this->transformThumbAssets($sourceObjects->thumbAssets); // thumb assets
+		$targetObjects->timedThumbAssets = $this->transformThumbAssets($sourceObjects->timedThumbAssets); // timed thumb assets
 		$targetObjects->thumbAssetsContent = $sourceObjects->thumbAssetsContent; // thumb assets content - already transformed
 		if ($this->distributeCaptions)
 		{
@@ -668,7 +689,8 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		}
         if ($this->distributeCuePoints)
         {
-		    $targetObjects->cuePoints = $this->transformCuePoints($sourceObjects->cuePoints); // cue points
+	        $targetObjects->cuePoints = $this->transformCuePoints($sourceObjects->cuePoints); // cue points
+	        $targetObjects->thumbCuePoints  = $this->transformCuePoints($sourceObjects->thumbCuePoints); // thumb cue points
         }
 		return $targetObjects;
 	}
@@ -730,11 +752,18 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
     protected function getDistributedMap(KalturaDistributionJobData $data, CrossKalturaEntryObjectsContainer $syncedObjects)
     {
         $data->providerData->distributedFlavorAssets = $this->getDistributedMapForObjects($this->sourceObjects->flavorAssets, $syncedObjects->flavorAssets);
-		$data->providerData->distributedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->thumbAssets, $syncedObjects->thumbAssets);
+
+	    $distributedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->thumbAssets, $syncedObjects->thumbAssets, false);
+	    $distributedTimedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->timedThumbAssets, $syncedObjects->timedThumbAssets, false);
+	    $data->providerData->distributedThumbAssets = serialize(array_merge($distributedThumbAssets, $distributedTimedThumbAssets));
+
 		$data->providerData->distributedMetadata = $this->getDistributedMapForObjects($this->sourceObjects->metadataObjects, $syncedObjects->metadataObjects);
 		$data->providerData->distributedCaptionAssets = $this->getDistributedMapForObjects($this->sourceObjects->captionAssets, $syncedObjects->captionAssets);
-		$data->providerData->distributedCuePoints = $this->getDistributedMapForObjects($this->sourceObjects->cuePoints, $syncedObjects->cuePoints);
-		
+
+	    $distributedCuePoints = $this->getDistributedMapForObjects($this->sourceObjects->cuePoints, $syncedObjects->cuePoints, false);
+	    $distributedThumbCuePoints = $this->getDistributedMapForObjects($this->sourceObjects->thumbCuePoints, $syncedObjects->thumbCuePoints, false);
+		$data->providerData->distributedCuePoints = serialize(array_merge($distributedCuePoints, $distributedThumbCuePoints));
+
 		return $data;
     }
     
@@ -744,7 +773,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
      * @param unknown_type $sourceObjects
      * @param unknown_type $syncedObjects
      */
-    protected function getDistributedMapForObjects($sourceObjects, $syncedObjects)
+    protected function getDistributedMapForObjects($sourceObjects, $syncedObjects, $serialized=true)
     {
         $info = array();
         foreach ($syncedObjects as $sourceId => $targetObj)
@@ -758,7 +787,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
             $info[$sourceId] = $objInfo;
         }
-        return serialize($info);
+	    if ($serialized)
+            return serialize($info);
+	    return $info;
     }
 	
 	
@@ -980,15 +1011,6 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	        $targetEntryId
         );
         
-        // sync thumbnail content
-        $this->syncAssetsContent(
-            $this->targetClient->thumbAsset,
-            $targetObjects->thumbAssetsContent,
-            $syncedObjects->thumbAssets,
-            $jobData->providerData->distributedThumbAssets,
-            $this->sourceObjects->thumbAssets
-        );
-        
         // sync caption assets
         if ($this->distributeCaptions)
         {
@@ -1030,7 +1052,46 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
     	        $targetEntryId,
     	        'getCuePointAddArgs'
             );
+
+	        foreach ($targetObjects->thumbCuePoints as $thumbCuePoint)
+	        {
+		        /* @var $cuePoint KalturaThumbCuePoint */
+		        $thumbCuePoint->entryId = $targetEntryId;
+		        $thumbCuePoint->assetId = null;
+	        }
+	        $targetCuePointClient = KalturaCuePointClientPlugin::get($this->targetClient);
+	        $syncedObjects->thumbCuePoints = $this->syncTargetEntryObjects(
+		        $targetCuePointClient->cuePoint,
+		        $targetObjects->thumbCuePoints,
+		        $this->sourceObjects->thumbCuePoints,
+		        $jobData->providerData->distributedCuePoints,
+		        $targetEntryId,
+		        'getCuePointAddArgs'
+	        );
+
+	        foreach ($targetObjects->timedThumbAssets as $timedThumbAsset)
+	        {
+		        $timedThumbAsset->cuePointId = $syncedObjects->thumbCuePoints[$timedThumbAsset->cuePointId]->id;
+	        }
+
+	        // sync Timed thumbnail assets
+	        $syncedObjects->timedThumbAssets = $this->syncTargetEntryObjects(
+		        $this->targetClient->thumbAsset,
+		        $targetObjects->timedThumbAssets,
+		        $this->sourceObjects->timedThumbAssets,
+		        $jobData->providerData->distributedThumbAssets,
+		        $targetEntryId
+	        );
         }
+
+		// sync thumbnail content
+		$this->syncAssetsContent(
+			$this->targetClient->thumbAsset,
+			$targetObjects->thumbAssetsContent,
+			array_merge($syncedObjects->thumbAssets,$syncedObjects->timedThumbAssets),
+			$jobData->providerData->distributedThumbAssets,
+			$this->sourceObjects->thumbAssets
+		);
         
         return $syncedObjects;
 	}
