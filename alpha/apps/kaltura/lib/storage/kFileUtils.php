@@ -82,7 +82,8 @@ class kFileUtils extends kFile
 		
 		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
 		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
-			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
+			die("STOPPING loopback");
+//		KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
 			
 		$get_params = $post_params = array();
 		

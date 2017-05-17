@@ -9,7 +9,7 @@ class PollActions
 {
 
 	const ID_SEPARATOR_CHAR = '-';
-	const ANSWER_SEPARATOR_CHAR = ';';
+	const ANSWER_SEPARATOR_CHAR = ',';
 	const ID_NUM_ELEMENTS = 3;
 
 	/**
@@ -89,20 +89,20 @@ class PollActions
 	{
 		if (!$pollId || !$userId || !$ansIds)
 			throw new Exception('Missing parameter for vote action');
-		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
-		if (self::isValidPollIdStructure($pollId)) {
-			// check early user vote
-			$previousAnswers = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
-			if ($previousAnswers) {
-				self::$pollsCacheHandler->decrementAnsCounter($pollId, $previousAnswers);
-			} else {
-				self::$pollsCacheHandler->incrementPollVotersCount($pollId);
-			}
-			self::$pollsCacheHandler->increaseAnsCounter($pollId, $answers);
-			return;
-		}
-		return "Failed to vote due to bad poll id structure";
+		if (!self::isValidPollIdStructure($pollId))
+			throw new Exception("Failed to vote due to bad poll id structure");
 
+		// check early user vote
+		$previousAnswers = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $ansIds);
+		if (!is_null($previousAnswers))
+		{
+			self::$pollsCacheHandler->decrementAnsCounter($pollId, $previousAnswers);
+		} else
+			self::$pollsCacheHandler->incrementPollVotersCount($pollId);
+
+		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
+		self::$pollsCacheHandler->increaseAnsCounter($pollId, $answers);
+		return;
 	}
 
 	/* Poll Get Votes Actions */
@@ -112,14 +112,12 @@ class PollActions
 		self::init();
 		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
 		$pollVotes = new PollVotes($pollId);
-
 		$pollVotes->setNumVoters(self::$pollsCacheHandler->getPollVotersCount($pollId));
 		foreach($answers as $ansId) {
 			$answerCount = self::$pollsCacheHandler->getAnswerCounter($pollId, $ansId);
 			$pollVotes->addAnswerCounter($ansId, $answerCount);
 		}
 		return $pollVotes;
-
 	}
 
 }
@@ -138,13 +136,14 @@ class PollCacheHandler
 
 	public function setCacheVote($userId, $pollId, $ansIds)
 	{
+		$res = null;
 		$userVoteKey = self::getPollUserVoteCacheKey($pollId, $userId);
-		if ($this->cache->add($userVoteKey, $ansIds) === false) {
+		if ($this->cache->get($userVoteKey, $ansIds)) {
 			$earlyVoteAnsIds = $this->cache->get($userVoteKey);
-			$this->cache->set($userVoteKey, $ansIds);
-			return $earlyVoteAnsIds;
+			$res = explode(PollActions::ANSWER_SEPARATOR_CHAR, $earlyVoteAnsIds);
 		}
-		return null;
+		$this->cache->set($userVoteKey, $ansIds);
+		return $res;
 	}
 
 	public function getAnswerCounter($pollId, $ansId)
@@ -164,7 +163,8 @@ class PollCacheHandler
 		{
 			$ansCounterId = self::getPollAnswerCounterCacheKey($pollId, $ansId);
 			// in case it does not exist it is set to the default init value (1 in this case)
-			$this->cache->add($ansCounterId, 0);
+			if (!$this->cache->get($ansCounterId))
+				$this->cache->set($ansCounterId, 0);
 			$this->cache->increment($ansCounterId);
 		}
 	}
@@ -176,18 +176,22 @@ class PollCacheHandler
 			$ansCounterId = self::getPollAnswerCounterCacheKey($pollId, $ansId);
 			$this->cache->decrement($ansCounterId);
 		}
-
 	}
 
 	public function incrementPollVotersCount($pollId)
 	{
-		$this->cache->add($this->getPollVotersCacheKey($pollId), 0);
-		$this->cache->increment($this->getPollVotersCacheKey($pollId));
+		$cacheKey = self::getPollVotersCacheKey($pollId);
+		if (!$this->cache->get($cacheKey))
+			$this->cache->set($cacheKey , 0);
+		$this->cache->increment($cacheKey );
 	}
 
 	public function getPollVotersCount($pollId)
 	{
-		return $this->cache->get($this->getPollVotersCacheKey($pollId));
+		$counter = $this->cache->get($this->getPollVotersCacheKey($pollId));
+		if (!$counter)
+			return 0;
+		return $counter;
 	}
 
 	/* Cache keys functions */

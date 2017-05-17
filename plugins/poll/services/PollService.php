@@ -48,14 +48,15 @@ class PollService extends KalturaBaseService
 		$localDcVotes = PollActions::getVotes($pollId, $answerIds);
 		if (!$previousDataJson)
 		{
-			$_POST['previousDataJson'] = json_encode($localDcVotes);
-			$currentDcId = kDataCenterMgr::getCurrentDcId();
-			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - $currentDcId ) );
+//			$_POST['previousDataJson'] = json_encode($localDcVotes);
+//			$currentDcId = kDataCenterMgr::getCurrentDcId();
+//			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - $currentDcId ) );
+			return json_encode($localDcVotes);
 		}
 		else
 		{
 			$prevData = json_decode($previousDataJson);
-			$localDcVotes->merge($prevData);
+//			$localDcVotes->merge($prevData);
 			return json_encode($localDcVotes);
 		}
 
