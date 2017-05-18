@@ -13,7 +13,7 @@ class KalturaViewHistoryUserEntryFilter extends KalturaUserEntryFilter
 		return $response;
 	}
 	
-	protected function modifyCriteria (Criteria $c)
+	protected function modifyCriteria ($c)
 	{
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
