@@ -167,31 +167,6 @@ class DeliveryProfileDynamicAttributes {
 	protected $isAclFlavorParamsIdsBlockedList = null;
 	
 	/**
-	 * @param array $aclFlavorParamsIds
-	 * @param bool $isAclFlavorParamsIdsBlockedList
-	 */
-	public function setAclFlavorParamsIds($aclFlavorParamsIds, $isAclFlavorParamsIdsBlockedList)
-	{
-		$this->aclFlavorParamsIds = $aclFlavorParamsIds;
-		$this->isAclFlavorParamsIdsBlockedList = $isAclFlavorParamsIdsBlockedList;
-		
-	}
-	
-	/**
-	 * @return the $aclFlavorParamsIds
-	 */
-	public function getAclFlavorParamsIds() {
-		return $this->aclFlavorParamsIds;
-	}
-	
-	/**
-	 * @return the $isAclFlavorParamsIdsBlockedList
-	 */
-	public function getIsAclFlavorParamsIdsBlockedList() {
-		return $this->isAclFlavorParamsIdsBlockedList;
-	}
-
-	/**
 	 * @return the $addThumbnailExtension
 	 */
 	public function getAddThumbnailExtension() {
@@ -586,6 +561,31 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function setSessionId($sessionId) {
 		$this->sessionId = $sessionId;
+	}
+	
+	/**
+	 * @param array $aclFlavorParamsIds
+	 * @param bool $isAclFlavorParamsIdsBlockedList
+	 */
+	public function setAclFlavorParamsIds($aclFlavorParamsIds, $isAclFlavorParamsIdsBlockedList)
+	{
+		$this->aclFlavorParamsIds = $aclFlavorParamsIds;
+		$this->isAclFlavorParamsIdsBlockedList = $isAclFlavorParamsIdsBlockedList;
+	
+	}
+	
+	/**
+	 * @return the $aclFlavorParamsIds
+	 */
+	public function getAclFlavorParamsIds() {
+		return $this->aclFlavorParamsIds;
+	}
+	
+	/**
+	 * @return the $isAclFlavorParamsIdsBlockedList
+	 */
+	public function getIsAclFlavorParamsIdsBlockedList() {
+		return $this->isAclFlavorParamsIdsBlockedList;
 	}
 
 	/**
