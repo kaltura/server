@@ -33,8 +33,6 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err("XML structure is incorrect - must contain tag entry ID");
 			return true;
 		}
-		
-		$xml->getElementsByTagName("entryId")->item(0)->nodeValue = $dbBatchJob->getEntryId();
 		$transformedXml = $xml->saveXML();
 		
 		//Save the file to a temporary location
