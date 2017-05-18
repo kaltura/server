@@ -40,20 +40,27 @@ class mediaInfo extends BasemediaInfo
 		$root = $rawDataXml->appendChild($rootNode);
 		foreach ($rawDataLinesArray as $rawDataLine)
 		{
-			list($key, $value) = explode(":", $rawDataLine);
-			if (!$value)
+			$rawDataLine = trim($rawDataLine);
+			if(!$rawDataLine)
 				continue;
-			
+								
+			list($key, $value) = explode(":", $rawDataLine);
 			$key = str_replace(" ", "",$key);
-			$value = trim($value);
-			try{
+			$key = str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']',' ','%', '(', ')'), "_", $key);
+			
+			if (!$value)
+			{
+				$parentNode = $rawDataXml->createElement($key);
+				$root->appendChild($parentNode);
+			}
+			else
+			{
+				$value = trim($value);
 				$node = $rawDataXml->createElement($key);
-				$value = $rawDataXml->createTextNode ($value);
+				$value = $rawDataXml->createTextNode (htmlspecialchars($value));
 				$node->appendChild($value);
-				$root->appendChild($node);
-			} catch (Exception $e) {
-				KalturaLog::debug("Illegal node name: $key");
-			}	
+				$parentNode->appendChild($node);
+			}
 		}
 		
 		return $rawDataXml->saveXML();

@@ -8,15 +8,9 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		if ($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED && $dbBatchJob->getJobType() != BatchJobType::EXTRACT_MEDIA)
-		{
-			return true;
-		}
-		
 		KalturaLog::debug("Handling finished ExtractMedia job!");
 		
-		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
-		$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+		$profile = myPartnerUtils::getConversionProfile2ForEntry($dbBatchJob->getEntryId());
 		$mediaInfoXslt = $profile->getMediaInfoXslTransformation();
 		if (!$mediaInfoXslt)
 		{
@@ -26,7 +20,7 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 		$mediaInfo = mediaInfoPeer::retrieveByPk($dbBatchJob->getData()->getMediaInfoId());
 		$mediaInfoRawData = $mediaInfo->getRawDataXml();
 		
-		$transformedXml = kXml::transformXmlUsingXslt($mediaInfoRawData, $mediaInfoXslt);
+		$transformedXml = kXml::transformXmlUsingXslt($mediaInfoRawData, $mediaInfoXslt, array("entryId" => $dbBatchJob->getEntryId()));
 		$xml = new KDOMDocument();
 		if(!$xml->loadXML($transformedXml))
 		{
@@ -40,12 +34,12 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 			return true;
 		}
 		
-		$xml->getElementsByTagName("entryId")->item(0)->nodeValue = $entry->getId();
+		$xml->getElementsByTagName("entryId")->item(0)->nodeValue = $dbBatchJob->getEntryId();
 		$transformedXml = $xml->saveXML();
 		
 		//Save the file to a temporary location
 		$tmpFolder = kConf::get("temp_folder");
-		$fileName = $entry->getId() . '_update_' . time() . ".xml";
+		$fileName = $dbBatchJob->getEntryId() . '_update_' . time() . ".xml";
 		$filePath = $tmpFolder . DIRECTORY_SEPARATOR. $fileName;
 		$res = file_put_contents($filePath, $transformedXml);
 		chmod($filePath, 0640);
@@ -57,7 +51,7 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 		$jobData->setObjectData(new kBulkUploadEntryData());
 		$bulkUploadCoreType = BulkUploadXmlPlugin::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML);
 		
-		kJobsManager::addBulkUploadJob($entry->getPartner(), $jobData, $bulkUploadCoreType);
+		kJobsManager::addBulkUploadJob($dbBatchJob->getPartner(), $jobData, $bulkUploadCoreType);
 		
 		return true;
 	}

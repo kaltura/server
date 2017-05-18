@@ -116,7 +116,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function incrementMediaInfoXslVersion()
 	{
-		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::CONVERSION_PROFILE, self::FILE_SYNC_MEDIAINFO_XSL);
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getMediaInfoXslVersion(), FileSyncObjectType::CONVERSION_PROFILE, self::FILE_SYNC_MEDIAINFO_XSL);
 		
 		$this->putInCustomData("mediaInfoXslVersion", $newVersion);
 	}

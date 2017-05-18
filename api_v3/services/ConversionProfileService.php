@@ -126,6 +126,7 @@ class ConversionProfileService extends KalturaBaseService
 		{
 			$xsl = html_entity_decode($conversionProfile->mediaInfoXslTransformation);
 			$key = $conversionProfileDb->getSyncKey(conversionProfile2::FILE_SYNC_MEDIAINFO_XSL);
+			kFileSyncUtils::file_put_contents($key, $xsl);
 		}
 		
 		$conversionProfile->fromObject($conversionProfileDb, $this->getResponseProfile());
