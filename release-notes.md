@@ -40,6 +40,24 @@ None.
 		php /deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
 		php /deployment/base/scripts/installPlugins.php
 
+## Chunked Encoding ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7365
+ 
+Beta version, activated for the internal Kino account.
+
+### Configuration ###
+/opt/kaltura/app/configurations/batch/workers.ini
+/opt/kaltura/app/configurations/batch/encoder.ini
+
+### Deployment scripts ###
+
+None
+
+#### Known Issues & Limitations ####
+
+None
 
 # Lynx 12.15.0 #
 
