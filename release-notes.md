@@ -48,8 +48,8 @@ None.
 Beta version, activated for the internal Kino account.
 
 ### Configuration ###
-/opt/kaltura/app/configurations/batch/workers.ini
-/opt/kaltura/app/configurations/batch/encoder.ini
+- /opt/kaltura/app/configurations/batch/workers.ini
+- /opt/kaltura/app/configurations/batch/encoder.ini
 
 ### Deployment scripts ###
 
