@@ -279,8 +279,14 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		// check if filter not empty
 		foreach($filter as $prop)
-			if ($prop)
+		{
+			if ($prop instanceof Kaltura_Client_Type_SearchOperator)
+			{
+				if (count($prop->items))
+					return true;
+			} elseif ($prop)
 				return true;
+		}
 		return false;
 	}
 
