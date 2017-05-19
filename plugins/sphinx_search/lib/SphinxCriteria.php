@@ -87,6 +87,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	protected $sphinxSkipped = false;
 	
+	/**
+	 * List of entry IDs in a foreign order that must be maintained by the returned result
+	 * @var array
+	 */
+	public $foreignOrderIds;
+	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
@@ -549,6 +555,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if(count($this->numericalOrderConditions))
 				$conditions .= "," . implode(",", $this->numericalOrderConditions);
 		}
+		elseif (count($this->foreignOrderIds))
+		{
+			$this->applySortRequired = true;
+		}
 		else
 		{
 			$this->applySortRequired = false;
@@ -852,11 +862,20 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		foreach ($objects as $object)
 			$sortedResult[$object->getId()] = $object; 
 		
+		$orderedIds = $this->fetchedIds;
+		if ($this->foreignOrderIds && count($this->foreignOrderIds))
+		{
+			KalturaLog::debug("Foreign order imposed");
+			$orderedIds = array_intersect($this->foreignOrderIds, $this->fetchedIds);
+		}
+			
+		
 		$objects = array();
-		foreach ($this->fetchedIds as $fetchedId)
+		foreach ($orderedIds as $fetchedId)
 			if(isset($sortedResult[$fetchedId]))
 				$objects[] = $sortedResult[$fetchedId];
 	}
+	
 	
 	/* (non-PHPdoc)
 	 * @see Criteria::getNewCriterion()
@@ -1066,6 +1085,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$objectClass = $this->getIndexObjectName();
 		$sphinxColumnName = $objectClass::getIndexFieldName($name);
 		$this->groupByColumn = $sphinxColumnName;
+	}
+	
+	public function setApplyForeignResultSortRequired()
+	{
+		$this->applyForeignResultSortRequired = true;
 	}
 	
 	public function addFreeTextToMatchClauseByMatchFields($freeTexts, $matchFields, $additionalConditions = null, $isLikeExpr = false)
