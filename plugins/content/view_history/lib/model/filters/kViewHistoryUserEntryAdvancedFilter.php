@@ -107,7 +107,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		
 		if($query instanceof SphinxCriteria)
 		{
-			$query->foreignOrderIds = $entryIds;
+			$query->forcedOrderIds = $entryIds;
 		}
 		
 		$query->addColumnWhere(entryPeer::ID, $entryIds, KalturaCriteria::IN);
