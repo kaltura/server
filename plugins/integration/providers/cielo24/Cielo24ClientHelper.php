@@ -21,7 +21,12 @@ class Cielo24ClientHelper
 	private static $getCaptionWhitelistedParams = array (
 															"disallow_dangling",
 															"remove_disfluencies",
-															);
+															"display_speaker_id",
+															"emit_speaker_change_tokens_as",
+															"mask_profanity",
+															"replace_slang",
+															"remove_sound_references",
+														);
 	 
 	
 	public function __construct($username, $password, $baseUrl = null, $additionalParams = array())
