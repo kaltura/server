@@ -88,10 +88,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected $sphinxSkipped = false;
 	
 	/**
-	 * List of entry IDs in a foreign order that must be maintained by the returned result
+	 * List of entry IDs in a forced order that must be maintained by the returned result
 	 * @var array
 	 */
-	public $foreignOrderIds;
+	public $forcedOrderIds;
 	
 	protected function applyIds(array $ids)
 	{
@@ -555,7 +555,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if(count($this->numericalOrderConditions))
 				$conditions .= "," . implode(",", $this->numericalOrderConditions);
 		}
-		elseif (count($this->foreignOrderIds))
+		elseif (count($this->forcedOrderIds))
 		{
 			$this->applySortRequired = true;
 		}
@@ -863,10 +863,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$sortedResult[$object->getId()] = $object; 
 		
 		$orderedIds = $this->fetchedIds;
-		if ($this->foreignOrderIds && count($this->foreignOrderIds))
+		if ($this->forcedOrderIds && count($this->forcedOrderIds))
 		{
-			KalturaLog::debug("Foreign order imposed");
-			$orderedIds = array_intersect($this->foreignOrderIds, $this->fetchedIds);
+			KalturaLog::debug("Forced order imposed");
+			$orderedIds = array_intersect($this->forcedOrderIds, $this->fetchedIds);
 		}
 			
 		
@@ -1085,11 +1085,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$objectClass = $this->getIndexObjectName();
 		$sphinxColumnName = $objectClass::getIndexFieldName($name);
 		$this->groupByColumn = $sphinxColumnName;
-	}
-	
-	public function setApplyForeignResultSortRequired()
-	{
-		$this->applyForeignResultSortRequired = true;
 	}
 	
 	public function addFreeTextToMatchClauseByMatchFields($freeTexts, $matchFields, $additionalConditions = null, $isLikeExpr = false)
