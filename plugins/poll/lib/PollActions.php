@@ -170,7 +170,7 @@ class PollCacheHandler
 		foreach($ansIds as $ansId)
 		{
 			$ansCounterId = self::getPollAnswerCounterCacheKey($pollId, $ansId);
-			// in case it already exists the add function will not do anything 
+			// in case it already exists the add function will not do anything
 			$this->cache->add($ansCounterId, 0, $this->cacheTTL);
 			$this->cache->increment($ansCounterId);
 		}
@@ -253,5 +253,4 @@ class PollVotes {
 				$this->answerCounters[$ans] = $counter;
 		}
 	}
-
 }
