@@ -116,6 +116,8 @@ class PollActions
 
 	public static function getVotes($pollId, $ansIds)
 	{
+		if (!$pollId || !$ansIds)
+			throw new Exception('Missing parameter for getVotes action');
 		self::init();
 		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
 		$pollVotes = new PollVotes($pollId);
@@ -131,8 +133,6 @@ class PollActions
 
 class PollCacheHandler
 {
-
-	// TODo - add initialization validations to class
 
 	private $cache;
 
@@ -167,11 +167,10 @@ class PollCacheHandler
 
 	public function increaseAnsCounter($pollId, $ansIds)
 	{
-		//TODO add expiry to the poll counters keys
 		foreach($ansIds as $ansId)
 		{
 			$ansCounterId = self::getPollAnswerCounterCacheKey($pollId, $ansId);
-			// in case it does not exist it is set to the default init value (1 in this case)
+			// in case it already exists the add function will not do anything 
 			$this->cache->add($ansCounterId, 0, $this->cacheTTL);
 			$this->cache->increment($ansCounterId);
 		}
