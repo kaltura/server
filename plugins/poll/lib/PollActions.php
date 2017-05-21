@@ -110,7 +110,6 @@ class PollActions
 			return "Successfully voted";
 		}
 		return "Failed to vote due to bad poll id structure";
-
 	}
 
 	/* Poll Get Votes Actions */
@@ -120,14 +119,12 @@ class PollActions
 		self::init();
 		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
 		$pollVotes = new PollVotes($pollId);
-
 		$pollVotes->setNumVoters(self::$pollsCacheHandler->getPollVotersCount($pollId));
 		foreach($answers as $ansId) {
 			$answerCount = self::$pollsCacheHandler->getAnswerCounter($pollId, $ansId);
 			$pollVotes->addAnswerCounter($ansId, $answerCount);
 		}
 		return $pollVotes;
-
 	}
 
 }
@@ -187,7 +184,6 @@ class PollCacheHandler
 			$ansCounterId = self::getPollAnswerCounterCacheKey($pollId, $ansId);
 			$this->cache->decrement($ansCounterId);
 		}
-
 	}
 
 	public function incrementPollVotersCount($pollId)
@@ -198,7 +194,10 @@ class PollCacheHandler
 
 	public function getPollVotersCount($pollId)
 	{
-		return $this->cache->get($this->getPollVotersCacheKey($pollId));
+		$counter = $this->cache->get($this->getPollVotersCacheKey($pollId));
+		if (!$counter)
+			return 0;
+		return $counter;
 	}
 
 	/* Cache keys functions */
