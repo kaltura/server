@@ -9,7 +9,7 @@ class PollActions
 {
 
 	const ID_SEPARATOR_CHAR = '-';
-	const ANSWER_SEPARATOR_CHAR = ';';
+	const ANSWER_SEPARATOR_CHAR = ',';
 	const ID_NUM_ELEMENTS = 3;
 
 	/**
@@ -24,6 +24,10 @@ class PollActions
 	 * @var string
 	 */
 	private static $kalturaSecret = null;
+	/**
+	 * @var int
+	 */
+	private static $pollCacheTTL = 0;
 
 	/* Configuration */
 	/**
@@ -32,10 +36,14 @@ class PollActions
 	 */
 	private static function init()
 	{
-		self::$kalturaSecret = kConf::get("polls_secret");
+		$pollConf = kConf::get("poll");
+		if (array_key_exists('secret' ,$pollConf))
+			self::$kalturaSecret = $pollConf['secret'];
 		if (!self::$kalturaSecret)
 			throw new Exception("Could not find polls_secret in the configuration");
-		self::$pollsCacheHandler = new PollCacheHandler();
+		if (array_key_exists('cache_ttl', $pollConf))
+			self::$pollCacheTTL = $pollConf['cache_ttl'];
+		self::$pollsCacheHandler = new PollCacheHandler(self::$pollCacheTTL);
 		self::$pollTypes = array(
 			'SINGLE_ANONYMOUS',
 			'SINGLE_RESTRICT',
@@ -99,7 +107,7 @@ class PollActions
 				self::$pollsCacheHandler->incrementPollVotersCount($pollId);
 			}
 			self::$pollsCacheHandler->increaseAnsCounter($pollId, $answers);
-			return;
+			return "Successfully voted";
 		}
 		return "Failed to vote due to bad poll id structure";
 
@@ -131,15 +139,18 @@ class PollCacheHandler
 
 	private $cache;
 
-	public function __construct()
+	private $cacheTTL;
+
+	public function __construct($cacheTTL)
 	{
-		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
+		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_CACHE_ONLY_ACTIONS);
+		$this->cacheTTL = $cacheTTL;
 	}
 
 	public function setCacheVote($userId, $pollId, $ansIds)
 	{
 		$userVoteKey = self::getPollUserVoteCacheKey($pollId, $userId);
-		if ($this->cache->add($userVoteKey, $ansIds) === false) {
+		if (!$this->cache->add($userVoteKey, $ansIds, $this->cacheTTL)) {
 			$earlyVoteAnsIds = $this->cache->get($userVoteKey);
 			$this->cache->set($userVoteKey, $ansIds);
 			return $earlyVoteAnsIds;
@@ -164,7 +175,7 @@ class PollCacheHandler
 		{
 			$ansCounterId = self::getPollAnswerCounterCacheKey($pollId, $ansId);
 			// in case it does not exist it is set to the default init value (1 in this case)
-			$this->cache->add($ansCounterId, 0);
+			$this->cache->add($ansCounterId, 0, $this->cacheTTL);
 			$this->cache->increment($ansCounterId);
 		}
 	}
@@ -181,7 +192,7 @@ class PollCacheHandler
 
 	public function incrementPollVotersCount($pollId)
 	{
-		$this->cache->add($this->getPollVotersCacheKey($pollId), 0);
+		$this->cache->add($this->getPollVotersCacheKey($pollId), 0, $this->cacheTTL);
 		$this->cache->increment($this->getPollVotersCacheKey($pollId));
 	}
 

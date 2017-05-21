@@ -317,12 +317,16 @@ class KalturaResponseCacher extends kApiCache
 				return self::handleSessionStart($params);
 			else
 			{
+				$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
+				if ($format != self::RESPONSE_TYPE_XML && $format != self::RESPONSE_TYPE_PHP)
+					return;			// the format is unsupported at this level
 				$confActions = $path = kConf::get('cache_based_service_actions');;
 				if (is_array($confActions))
 				{
 					$actionKey = $service . '_' . $action;
 					if (array_key_exists($actionKey, $confActions))
 					{
+						$startTime = microtime(true);
 						$classPath = dirname(__FILE__).$confActions[$actionKey];
 						$lastSlash = strrpos($classPath, '/');
 						$lastDot = strrpos($classPath, '.');
@@ -330,9 +334,12 @@ class KalturaResponseCacher extends kApiCache
 						{
 							require_once($classPath);
 							$className = substr($classPath,  $lastSlash + 1, $lastDot - $lastSlash - 1);
-							die($className::$action($params));
+							$result =  $className::$action($params);
 						}
-						die('Failed to parse '.$actionKey.' as a valid class configuration');
+						else
+						    $result = "Failed to parse $actionKey as a valid class configuration";
+						$processingTime = microtime(true) - $startTime;
+						self::returnCacheResponseStructure($processingTime, $format, $result);
 					}
 				}
 			}
@@ -393,12 +400,17 @@ class KalturaResponseCacher extends kApiCache
 		
 		$processingTime = microtime(true) - $startTime;
 		$cacheKey = md5("{$partnerId}_{$userId}_{$type}_{$expiry}_{$privileges}");
+		self::returnCacheResponseStructure($processingTime, $format, $result, $cacheKey);
+	}
+
+	private static function returnCacheResponseStructure($processingTime, $format, $result ,$cacheKey='noCacheKey')
+	{
 		header("X-Kaltura:cached-dispatcher,$cacheKey,$processingTime", false);
 		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 		header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
 		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
 		header("Pragma: no-cache", true);
-		
+
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
 			header("Content-Type: text/xml");
