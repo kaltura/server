@@ -26,6 +26,12 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
 
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
+		if (kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
+			$dbUserEntry->setPrivacyContext($privacyContexts[0]);
+		}
+		
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -48,6 +54,10 @@ class UserEntryService extends KalturaBaseService {
 
 		$dbUserEntry = $userEntry->toUpdatableObject($dbUserEntry);
 		$dbUserEntry->save();
+		
+		$userEntry->fromObject($dbUserEntry);
+		
+		return $userEntry;
 	}
 
 	/**
@@ -111,6 +121,41 @@ class UserEntryService extends KalturaBaseService {
 			return null;
 		$userEntry->fromObject($dbUserEntry);
 		return $userEntry;
+	}
+
+	
+	/**
+	 * @action bulkDelete
+	 * @param string $id
+	 * @return int
+	 * @throws KalturaAPIException
+	 */
+	public function bulkDeleteAction(KalturaUserEntryFilter $filter)
+	{
+		if (!$filter->userIdEqual && !$filter->userIdIn && !$filter->entryIdEqual && !$filter->entryIdIn)
+		{
+			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
+		}
+		
+		$ueFilter = new UserEntryFilter();
+		if ($filter->userIdEqual)
+		{
+			$ueFilter->set("_eq_user_id", $filter->userIdEqual);
+			$filter->userIdEqual = null;
+		}
+		if($filter->userIdIn)
+		{
+			$ueFilter->set("_in_user_id", $filter->userIdIn);
+			$filter->userIdIn = null;
+		}
+		$ueFilter = $filter->toObject($ueFilter);
+		if (kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
+			$ueFilter->set("_eq_privacy_context", $privacyContexts[0]);
+		}
+		
+		return kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
 	}
 
 }

@@ -2425,9 +2425,13 @@ CREATE TABLE `user_entry`
 	`updated_at` DATETIME,
 	`status` INTEGER,
 	`type` INTEGER,
+	`extended_status` INTEGER,
+	`privacy_context` VARCHAR(255),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY (`entry_id`, `kuser_id`)
+	KEY (`entry_id`, `kuser_id`,`privacy_context`),
+	KEY `kuser_id_updated_at`(`kuser_id`, `updated_at`),
+	KEY `kuser_id_extended_status_updated_at`(`kuser_id`, `extended_status`, `updated_at`, `privacy_context`)
 )ENGINE=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
 
 

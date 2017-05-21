@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.quiz
+ * @subpackage api.filters
  */
 class KalturaQuizUserEntryFilter extends KalturaQuizUserEntryBaseFilter
 {

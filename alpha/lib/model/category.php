@@ -1488,9 +1488,11 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			$filter->setIdNotIn($entryIds);
 		$filter->setLimit(1);
 		$filter->attachToCriteria($baseCriteria);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		$baseCriteria->applyFilters();
 		
 		$count = $baseCriteria->getRecordsCount();
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		
 		// Save the result within the cache		
 		if($count >= category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY) {

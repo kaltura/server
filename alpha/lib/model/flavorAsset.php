@@ -301,4 +301,15 @@ class flavorAsset extends exportableAsset
 			return $flavorParams->getName();
 		return "";
 	}
+	
+	/* (non-PHPdoc)
+ 	 * @see Baseasset::copyInto()
+ 	 */
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		/* @var $copyObj flavorasset */
+		parent::copyInto($copyObj, $deepCopy);
+		$copyObj->setLanguage($this->getLanguage());
+		$copyObj->setLabel($this->getLabel());
+	}
 }

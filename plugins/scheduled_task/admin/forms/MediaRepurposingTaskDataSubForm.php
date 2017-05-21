@@ -4,11 +4,9 @@
  * @subpackage Admin
  */
 class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
-
-{	const TASK_OBJECT__PREFIX = 'TaskObjectParams_';
-	const EXTENSION_SUBFORM_NAME = 'extensionSubForm';
-
-	private $ignore = array('relatedObjects', 'type');
+{	
+	
+	private $ignore = array('relatedObjects', 'type', 'stopProcessingOnError');
 	private $prefix = "";
 
 	private $type;
@@ -27,7 +25,6 @@ class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 		$this->setMethod('post');
 
 		$obj = MediaRepurposingUtils::objectTaskFactory($this->type);
-
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
 	}
 

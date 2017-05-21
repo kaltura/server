@@ -64,4 +64,17 @@ class flavorParamsConversionProfilePeer extends BaseflavorParamsConversionProfil
 	{
 		return array(array("flavorParamsConversionProfile:flavorParamsId=%s,conversionProfileId=%s", self::FLAVOR_PARAMS_ID, self::CONVERSION_PROFILE_ID), array("flavorParamsConversionProfile:conversionProfileId=%s", self::CONVERSION_PROFILE_ID));		
 	}
+
+	public static function getTempFlavorsParams($entryId)
+	{
+		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		if(!$conversionProfile)
+			return null;
+
+		$criteria = new Criteria();
+		$criteria->add(self::CONVERSION_PROFILE_ID, $conversionProfile->getId());
+		$criteria->add(self::DELETE_POLICY, AssetParamsDeletePolicy::DELETE);
+		$tempFlavorsParams = self::doSelect($criteria);
+		return $tempFlavorsParams;
+	}
 }

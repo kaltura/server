@@ -1,6 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
+require_once(dirname(__FILE__) . '/kGeoCoder.php');
+require_once(dirname(__FILE__) . '/request/kIP2Location.php');
 
 class myIPGeocoder extends kGeoCoder
 {
@@ -18,6 +19,11 @@ class myIPGeocoder extends kGeoCoder
 	public function getCoordinates($ip)
 	{
 		return kIP2Location::ipToCoordinates($ip);
+	}
+
+	public function getAnonymousInfo($ip)
+	{
+		return array("undefined");
 	}
 
 	function iptocountry($ip) 

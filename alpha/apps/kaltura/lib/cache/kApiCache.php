@@ -7,6 +7,7 @@ require_once(dirname(__FILE__) . '/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
 require_once(dirname(__FILE__) . '/../request/kIpAddressUtils.php');
 require_once(dirname(__FILE__) . '/../request/kGeoUtils.php');
+require_once(dirname(__FILE__) . '/../kGeoCoderManager.php');
 require_once(dirname(__FILE__) . '/../monitor/KalturaMonitorClient.php');
 
 /**
@@ -83,6 +84,7 @@ class kApiCache extends kApiCacheBase
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
 	protected static $_coordinates = null;			// caches the latitude and longitude of the user issuing this request
+	protected static $_anonymousIPInfo = null;		// caches the anonymous IP info of the user issuing this request
 	protected $minCacheTTL = null;
 	
 	protected $clientTag = null;
@@ -246,26 +248,21 @@ class kApiCache extends kApiCacheBase
 	}
 
 	// extra fields
-	static protected function getCountry()
+	
+	static protected function getGeoCoderFieldValue($extraField, $fieldName, $method)
 	{
-		if (is_null(self::$_country))
+		if (is_null(self::$$fieldName))
 		{
-			require_once(dirname(__FILE__) . '/../request/kIP2Location.php');
-			$ipAddress = infraRequestUtils::getRemoteAddress();
-			self::$_country = kIP2Location::ipToCountry($ipAddress);
+			$geoCoder = kGeoCoderManager::getGeoCoder(is_array($extraField) ? $extraField[self::ECFD_GEO_CODER_TYPE] : null);
+			if ($geoCoder)
+			{
+				$ipAddress = infraRequestUtils::getRemoteAddress();
+			
+				self::$$fieldName = $geoCoder->$method($ipAddress); 
+			}
 		}
-		return self::$_country;
-	}
-
-	static protected function getCoordinates()
-	{
-		if (is_null(self::$_coordinates))
-		{
-			require_once(dirname(__FILE__) . '/../request/kIP2Location.php');
-			$ipAddress = infraRequestUtils::getRemoteAddress();
-			self::$_coordinates = kIP2Location::ipToCoordinates($ipAddress);
-		}
-		return self::$_coordinates;
+		
+		return self::$$fieldName;
 	}
 	
 	static protected function getExtraFieldType($extraField)
@@ -292,12 +289,15 @@ class kApiCache extends kApiCacheBase
 			break;
 
 		case self::ECF_COUNTRY:
-			return array(self::getCountry());
+			return array(self::getGeoCoderFieldValue($extraField, "_country", "getCountry"));
 
 		case self::ECF_COORDINATES:
-			return array(self::getCoordinates());
+			return array(self::getGeoCoderFieldValue($extraField, "_coordinates", "getCoordinates"));
+			
+		case self::ECF_ANONYMOUS_IP:
+			return array(self::getGeoCoderFieldValue($extraField, "_anonymousIPInfo", "getAnonymousInfo"));
 
-			case self::ECF_IP:
+		case self::ECF_IP:
 			if (is_array($extraField))
 				return array(infraRequestUtils::getIpFromHttpHeader($extraField[self::ECFD_IP_HTTP_HEADER], $extraField[self::ECFD_IP_ACCEPT_INTERNAL_IPS], true));
 
@@ -312,10 +312,30 @@ class kApiCache extends kApiCacheBase
 		switch ($condition)
 		{
 		case self::COND_MATCH:
+		case self::COND_MATCH_ALL:
 			if (!count($refValue))
 				return null;
-			return in_array($fieldValue, $refValue);
-
+				
+			if (!is_array($fieldValue))
+				return in_array($fieldValue, $refValue);
+			
+			if ($condition == self::COND_MATCH_ALL) // compare all field values
+			{
+				foreach($fieldValue as $value)
+				{
+					if (!in_array($value, $refValue))
+						return false;
+				}
+				return true;
+			}
+			
+			foreach($fieldValue as $value)
+			{
+				if (in_array($value, $refValue))
+					return true;
+			}
+			return false;
+				
 		case self::COND_REGEX:
 			if (!count($refValue))
 				return null;
@@ -368,6 +388,7 @@ class kApiCache extends kApiCacheBase
 		{
 		case self::COND_REGEX:
 		case self::COND_MATCH:
+		case self::COND_MATCH_ALL:
 		case self::COND_SITE_MATCH:
 		case self::COND_GEO_DISTANCE:
 			return "_{$condition}_" . implode(',', $refValue);
