@@ -35,7 +35,7 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 		}
 		$transformedXml = $xml->saveXML();
 		
-		//Save the file to a shatred temporary location
+		//Save the file to a shared temporary location
 		$tmpSharedFolder = myContentStorage::getFSContentRootPath() . "/tmp/bulkupload/";
 		$fileName = $dbBatchJob->getEntryId() . '_update_' . time() . ".xml";
 		$filePath = $tmpSharedFolder . DIRECTORY_SEPARATOR. $fileName;
