@@ -44,9 +44,17 @@ class mediaInfo extends BasemediaInfo
 			if(!$rawDataLine)
 				continue;
 								
-			list($key, $value) = explode(":", $rawDataLine);
+			if(strpos($rawDataLine, ":") === false)
+			{
+				$key = $rawDataLine;
+				$value = "";
+			}
+			else
+			{
+				list($key, $value) = explode(":", $rawDataLine);
+			}
 			$key = str_replace(" ", "",$key);
-			$key = str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']',' ','%', '(', ')'), "_", $key);
+			$key = preg_replace('/[^A-Za-z0-9]/', '_', $key);
 			
 			if (!$value)
 			{
