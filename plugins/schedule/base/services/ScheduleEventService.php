@@ -320,7 +320,7 @@ class ScheduleEventService extends KalturaBaseService
 	 * @action getConflicts
 	 * @param string $resourceIds comma separated
 	 * @param KalturaScheduleEvent $scheduleEvent
-	 * @return KalturaScheduleEventArray
+	 * @return KalturaScheduleEventListResponse
 	 */
 	public function getConflictsAction($resourceIds, KalturaScheduleEvent $scheduleEvent)
 	{
@@ -347,7 +347,10 @@ class ScheduleEventService extends KalturaBaseService
 		if (!count($events))
 			$this->reserveResources($resourceIds);
 
-		return KalturaScheduleEventArray::fromDbArray($events);
+		$response = new KalturaScheduleEventListResponse();
+		$response->objects = KalturaScheduleEventArray::fromDbArray($events, $this->getResponseProfile());
+		$response->totalCount = count($events);
+		return $response;
 	}
 
 	private function reserveResources($resourceIds)

@@ -231,9 +231,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	//		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
 			
 			$snippet = new Google_Service_YouTube_VideoSnippet();
-			$snippet->setTitle($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE));
+			$snippet->setTitle(self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE)));
 			$snippet->setDescription(self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION)));
-			$snippet->setTags(explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS)));
+			$snippet->setTags(explode(',', self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS))));
 			$snippet->setCategoryId($this->translateCategory($youtube, $distributionProfile, $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY)));
 
 			$status = new Google_Service_YouTube_VideoStatus();
@@ -344,9 +344,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 //		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
 		
 		$snippet = $video['snippet'];
-		$snippet['title'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE);
-		$snippet['description'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION);
-		$snippet['tags'] = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS));
+		$snippet['title'] = self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE));
+		$snippet['description'] = self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION));
+		$snippet['tags'] = explode(',', self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS)));
  		$snippet['category'] = $this->translateCategory($youtube, $distributionProfile, $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY));
 		
 		$status = $video['status'];

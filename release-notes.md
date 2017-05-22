@@ -1,3 +1,64 @@
+# Lynx 12.16.0 #
+
+## Add scheduleEvent->list optimization ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7230
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
+#### Known Issues & Limitations ####
+
+None.
+
+## ViewHistory Feature ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7281
+
+### Configuration ###
+- update plugins.ini:
+
+		- ViewHistory  
+- update admin.ini by adding the following permission switch:  
+				moduls.viewHistory.enabled = true  
+				moduls.viewHistory.permissionType = 2  
+				moduls.viewHistory.label = "View History"  
+				moduls.viewHistory.permissionName = VIEWHISTORY_PLUGIN_PERMISSION  
+				moduls.viewHistory.group = GROUP_ENABLE_DISABLE_FEATURES  
+		
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2017_03_21_alter_user_entry_table_extended_status_add_keys.sql
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2017_04_24_alter_user_entry_table_privacy_context_add_keys.sql
+		php /deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
+		php /deployment/base/scripts/installPlugins.php
+
+## Chunked Encoding ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7365
+ 
+Beta version, activated for the internal Kino account.
+
+### Configuration ###
+- /opt/kaltura/app/configurations/batch/workers.ini
+- /opt/kaltura/app/configurations/batch/encoder.ini
+
+### Deployment scripts ###
+
+None
+
+#### Known Issues & Limitations ####
+
+None
+
 # Lynx 12.15.0 #
 
 ## Support dynamic broadcast urls ##

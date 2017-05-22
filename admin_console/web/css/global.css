@@ -1883,13 +1883,15 @@ form#frmCreateDropFolder dd,form#frmCreateDropFolder dt {
 	float: left;
 }
 
-
-form#frmCreateMediaRepurposing {
-	margin-left: 20px;
-}
-
 form#frmCreateMediaRepurposing dd,form#frmCreateMediaRepurposing dt {
 	float: left;
+	right: 0px;
+}
+
+form#frmCreateMediaRepurposingFromTemplate dd,form#frmCreateMediaRepurposingFromTemplate dt {
+	right: 0px;
+	float: left;
+
 }
 
 

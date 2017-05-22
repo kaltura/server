@@ -41,6 +41,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "response_profile", 				'keys' => array(array("'responseProfile:systemName='", '@OBJ@.system_name'))),
 	array('table' => "entry_server_node", 				'keys' => array(array("'entryServerNode:entryId'", '@OBJ@.entry_id'))),
 	array('table' => "server_node", 					'keys' => array(array("'serverNode:id'", '@OBJ@.id'))),
+	array('table' => "schedule_event",                  'keys' => array(array("'scheduleEvent:id'", '@OBJ@.id')),                                                                               'plugin' => 'schedule/base'),
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');

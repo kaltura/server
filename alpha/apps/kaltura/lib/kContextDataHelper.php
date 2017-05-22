@@ -137,11 +137,19 @@ class kContextDataHelper
 		return $this->streamerType;
 	}
 
+	public function setStreamerType($streamerType) {
+		$this->streamerType = $streamerType;
+	}
+
 	/**
 	 * @return string $mediaProtocol
 	 */
 	public function getMediaProtocol() {
 		return $this->mediaProtocol;
+	}
+
+	public function setMediaProtocol($protocol) {
+		 $this->mediaProtocol = $protocol;
 	}
 
 	public function buildContextDataResult(accessControlScope $scope, $flavorTags, $streamerType, $mediaProtocol, $shouldHandleRuleCodes = false)

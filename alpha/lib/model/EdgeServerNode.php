@@ -41,7 +41,13 @@ class EdgeServerNode extends DeliveryServerNode {
 	
 	public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null)
 	{
-		return $this->buildEdgeFullPath($protocol, $format, $deliveryType);
+		$playbackHost = $this->buildEdgeFullPath($protocol, $format, $deliveryType);
+		
+		if($playbackHost && $format && $format == PlaybackProtocol::APPLE_HTTP_TO_MC)
+			$playbackHost = preg_replace('/' . EdgeServerNode::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . '/',
+					EdgeServerNode::EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME , $playbackHost, 1);
+		
+		return $playbackHost;
 	}
 	
 	public function buildEdgeFullPath($protocol = 'http', $format = null, $deliveryType = null, $assetType = null)

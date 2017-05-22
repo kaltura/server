@@ -23,6 +23,9 @@ abstract class KalturaUserEntryBaseFilter extends KalturaRelatedFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"typeEqual" => "_eq_type",
+		"extendedStatusEqual" => "_eq_extended_status",
+		"extendedStatusIn" => "_in_extended_status",
+		"extendedStatusNotIn" => "_notin_extended_status",
 	);
 
 	static private $order_by_map = array
@@ -117,4 +120,21 @@ abstract class KalturaUserEntryBaseFilter extends KalturaRelatedFilter
 	 * @var KalturaUserEntryType
 	 */
 	public $typeEqual;
+
+	/**
+	 * @var KalturaUserEntryExtendedStatus
+	 */
+	public $extendedStatusEqual;
+
+	/**
+	 * @dynamicType KalturaUserEntryExtendedStatus
+	 * @var string
+	 */
+	public $extendedStatusIn;
+
+	/**
+	 * @dynamicType KalturaUserEntryExtendedStatus
+	 * @var string
+	 */
+	public $extendedStatusNotIn;
 }

@@ -1,6 +1,10 @@
 <p><?php echo $this->translate('Media Repurposing list intro text'); ?></p>
+
+<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to Media Repurposing Admin'); return;} ?>
 <?php echo $this->filterForm; ?>
+<br><br><br><br><br><br><br>
 <?php echo $this->newMediaRepurposingForm; ?>
+<?php echo $this->newMediaRepurposingFormFromTemplate; ?>
 
 <div id="media_repurposing_list_div" class="clear">
 	<table>
@@ -33,17 +37,17 @@
 				<td><?php echo $mediaRepurposing->objectFilterEngineType; ?></td>
 				<td><?php echo get_class($mediaRepurposing->objectFilter); ?></td>
 				<td><?php echo $mediaRepurposing->description; ?></td>
-				<td><?php echo date('r', $mediaRepurposing->lastExecutionStartedAt); ?></td>
+				<td><?php if ($mediaRepurposing->lastExecutionStartedAt) echo date('r', $mediaRepurposing->lastExecutionStartedAt); else echo "NEVER"?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, '<?php echo $mediaRepurposing->id; ?>')">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configureMediaRepurposing" ><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED): ?>
 							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
-							<option value="dryRun" ><?php echo $this->translate('Dry-Run'); ?></option>
 						<?php elseif ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY): ?>
 							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
 						<?php endif; ?>
+						<option value="dryRun" ><?php echo $this->translate('Execute Dry-Run'); ?></option>
 						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
 					</select>
 				</td>				
@@ -57,6 +61,8 @@
 $(function(){
 	addSubTitle('Media Repurposing Profiles');
 });
+
+
 
 jQuery('#filter_type').change(function() {
 	if(this.value == "none") {
@@ -110,7 +116,7 @@ function dryRun(mediaRepurposingId)
 		mediaRepurposingId,
 		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY; ?>,
 		function() {
-			alert('<?php echo $this->translate('Media Repurposing set to Dry-Run');?>');
+			alert("Dry run for MR profile id [" + mediaRepurposingId + "] has been Assign. This could take couple of minutes.");
 		}
 	);
 }
@@ -155,21 +161,41 @@ function changeStatus(mediaRepurposingId, status, callback)
 	});
 }
 
+function newMediaRepurposingFromTemplate(partnerId, templateType)
+{
+	if (!isValidParam(partnerId, 'Publisher ID', true))
+		return;
+	if (!isValidParam(templateType, 'Media Repurposing Template', false))
+		return;
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_template_type/' + templateType;
+	loadMediaRepurposing(paramsStr);
+}
 
 function newMediaRepurposing(partnerId, filterEngineType, filterType)
 {
-	if(!partnerId.length || isNaN(partnerId)){
-		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
+	if (!isValidParam(partnerId, 'Publisher ID', true))
 		return;
-	}
-	if(!filterEngineType.length || (filterEngineType == 'N/A')) {
-		alert('<?php echo $this->translate('Media Repurposing Filter Type not supplied'); ?>');
+	if (!isValidParam(filterEngineType, 'Media Repurposing Engine Type', true))
 		return;
-	}
+	if (!isValidParam(filterType, 'Media Repurposing Filter Type', false))
+		return;
 
 	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_filter_engine_type/' + filterEngineType + '/new_mr_filter_type/' + filterType;
-	
 	loadMediaRepurposing(paramsStr);
+}
+
+function isValidParam(param, name, number)
+{
+	if (!param.length || (param == 'N/A')) {
+		alert(name + " not supplied");
+		return false;
+	}
+	if (number && isNaN(param)) {
+		alert(name + " is not a number");
+		return false;
+	}
+	return true;
 }
 
 function configureMediaRepurposing(mediaRepurposingId)
@@ -204,6 +230,7 @@ function loadMediaRepurposing(paramStr)
 			'<?php echo $this->translate('Save'); ?>': function() {
 				rearrangeData();
 				jQuery(this).find('#frmMediaRepurposingConfigure').submit();
+				setTimeout(function () { window.location.reload(); }, 100);
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
@@ -223,9 +250,80 @@ function loadMediaRepurposing(paramStr)
 	);
 }
 
+
 function rearrangeData() {
 	//remove all template field
 	$('dd[id^="MR_tasksDataTemplate_"]').remove();
+	$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
+
+	convertDates();
+	setConditionData();
+	setTaskData();
+}
+
+
+function convertDates()
+{
+	let f = jQuery('#frmMediaRepurposingConfigure');
+	f.find( "input[innertype=integer]").each(function(idx) {
+		var val = $(this).val();
+		if (isDatesFormat(val))
+			$(this).val(getEpocTime(val));
+	});
+}
+
+function isDatesFormat(val) {
+	return (val.split(".").length == 3 || val.split("/").length == 3);
+}
+
+function getEpocTime(val) {
+	let epoc = new Date(val).getTime() / 1000 + 3600*4; // + 4 hour for not slide a day backward in for time zones
+	if (epoc)
+		return epoc;
+	alert("Date is not valid. insert time 0 instead");
+	return 0;
+}
+
+function checkNumValid(val) {
+	if (isDatesFormat(val)) {
+		if(isNaN(new Date(val).getTime()))
+			alert("Not a valid Date!");
+		return;
+	}
+	if (isNaN(val))
+		alert("You need to enter number!");
+}
+
+
+function setConditionData() {
+	var conditions = [];
+	var currentIndex = 0;
+	while (jQuery('#Cond_' + currentIndex.toString()).length > 0) {
+		conditions.push(buildCondParams(currentIndex));
+		currentIndex++;
+	}
+	jQuery('#AdvanceSearch').val(JSON.stringify(conditions));
+}
+
+function buildCondParams(index) {
+	var cond = {};
+	jQuery('#Cond_' + index).find('input,select').each(function(idx) {
+		var type = $( this ).attr("type");
+		var name = $( this ).attr("name");
+		var val = $( this ).val();
+		if (type == 'hidden')
+			return;
+
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
+
+		cond[name] = val;
+		$(this).remove();
+	});
+	return cond;
+}
+
+function setTaskData() {
 	var tasks = [];
 	var currentIndex = 0;
 	while (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0) {
@@ -233,8 +331,6 @@ function rearrangeData() {
 		currentIndex++;
 	}
 	jQuery('#TasksData').val(JSON.stringify(tasks));
-	
-	return true;
 }
 
 function buildTaskParams(index) {
@@ -252,21 +348,24 @@ function buildTaskParams(index) {
 	taskTimeToNextElement.remove();
 
 	var taskData = {};
-	jQuery('#mr_task_data_' + index).find('input,select').each(function(idx) {
+	jQuery('#mr_task_data_' + index).find('input,select,textarea').each(function(idx) {
 		var type = $( this ).attr("type");
 		var name = $( this ).attr("name");
 		var val = $( this ).val();
 
-		if (type == 'checkbox') {
-			val = $(this).attr("checked");
-			if (val == 'checked')
-				val = "1";
-		}
-		taskData[name] = val;
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
 
+		taskData[name] = val;
 		$(this).remove();
 	});
 	return {id, type, taskTimeToNext, taskData};
+}
+
+function getCheckboxVal(element) {
+	if ($(element).attr("checked") == 'checked')
+		return "1";
+	return "0";
 }
 
 
