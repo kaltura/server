@@ -1,59 +1,71 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'sphinx_log_server' table.
+ * Base static class for performing query and update operations on the 'sphinx_log' table.
  *
  * 
  *
- * @package plugins.sphinxSearch
+ * @package plugins.search
  * @subpackage model.om
  */
-abstract class BaseSphinxLogServerPeer {
+abstract class BaseSphinxLogPeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'sphinx_log_server';
+	const TABLE_NAME = 'sphinx_log';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'SphinxLogServer';
+	const OM_CLASS = 'SphinxLog';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'plugins.sphinxSearch.SphinxLogServer';
+	const CLASS_DEFAULT = 'plugins.search.SphinxLog';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'SphinxLogServerTableMap';
+	const TM_CLASS = 'SphinxLogTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 10;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'sphinx_log_server.ID';
+	const ID = 'sphinx_log.ID';
 
-	/** the column name for the SERVER field */
-	const SERVER = 'sphinx_log_server.SERVER';
+	/** the column name for the EXECUTED_SERVER_ID field */
+	const EXECUTED_SERVER_ID = 'sphinx_log.EXECUTED_SERVER_ID';
+
+	/** the column name for the OBJECT_TYPE field */
+	const OBJECT_TYPE = 'sphinx_log.OBJECT_TYPE';
+
+	/** the column name for the OBJECT_ID field */
+	const OBJECT_ID = 'sphinx_log.OBJECT_ID';
+
+	/** the column name for the ENTRY_ID field */
+	const ENTRY_ID = 'sphinx_log.ENTRY_ID';
+
+	/** the column name for the PARTNER_ID field */
+	const PARTNER_ID = 'sphinx_log.PARTNER_ID';
 
 	/** the column name for the DC field */
-	const DC = 'sphinx_log_server.DC';
+	const DC = 'sphinx_log.DC';
 
-	/** the column name for the LAST_LOG_ID field */
-	const LAST_LOG_ID = 'sphinx_log_server.LAST_LOG_ID';
+	/** the column name for the SQL field */
+	const SQL = 'sphinx_log.SQL';
 
 	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'sphinx_log_server.CREATED_AT';
+	const CREATED_AT = 'sphinx_log.CREATED_AT';
 
-	/** the column name for the UPDATED_AT field */
-	const UPDATED_AT = 'sphinx_log_server.UPDATED_AT';
+	/** the column name for the TYPE field */
+	const TYPE = 'sphinx_log.TYPE';
 
 	/**
-	 * An identiy map to hold any loaded instances of SphinxLogServer objects.
+	 * An identiy map to hold any loaded instances of SphinxLog objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array SphinxLogServer[]
+	 * @var        array SphinxLog[]
 	 */
 	public static $instances = array();
 
@@ -65,11 +77,11 @@ abstract class BaseSphinxLogServerPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Server', 'Dc', 'LastLogId', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'server', 'dc', 'lastLogId', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::SERVER, self::DC, self::LAST_LOG_ID, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'server', 'dc', 'last_log_id', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ExecutedServerId', 'ObjectType', 'ObjectId', 'EntryId', 'PartnerId', 'Dc', 'Sql', 'CreatedAt', 'Type', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'executedServerId', 'objectType', 'objectId', 'entryId', 'partnerId', 'dc', 'sql', 'createdAt', 'type', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::EXECUTED_SERVER_ID, self::OBJECT_TYPE, self::OBJECT_ID, self::ENTRY_ID, self::PARTNER_ID, self::DC, self::SQL, self::CREATED_AT, self::TYPE, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'executed_server_id', 'object_type', 'object_id', 'entry_id', 'partner_id', 'dc', 'sql', 'created_at', 'type', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -79,11 +91,11 @@ abstract class BaseSphinxLogServerPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Server' => 1, 'Dc' => 2, 'LastLogId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'server' => 1, 'dc' => 2, 'lastLogId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SERVER => 1, self::DC => 2, self::LAST_LOG_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'server' => 1, 'dc' => 2, 'last_log_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ExecutedServerId' => 1, 'ObjectType' => 2, 'ObjectId' => 3, 'EntryId' => 4, 'PartnerId' => 5, 'Dc' => 6, 'Sql' => 7, 'CreatedAt' => 8, 'Type' => 9, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'executedServerId' => 1, 'objectType' => 2, 'objectId' => 3, 'entryId' => 4, 'partnerId' => 5, 'dc' => 6, 'sql' => 7, 'createdAt' => 8, 'type' => 9, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::EXECUTED_SERVER_ID => 1, self::OBJECT_TYPE => 2, self::OBJECT_ID => 3, self::ENTRY_ID => 4, self::PARTNER_ID => 5, self::DC => 6, self::SQL => 7, self::CREATED_AT => 8, self::TYPE => 9, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'executed_server_id' => 1, 'object_type' => 2, 'object_id' => 3, 'entry_id' => 4, 'partner_id' => 5, 'dc' => 6, 'sql' => 7, 'created_at' => 8, 'type' => 9, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -132,12 +144,12 @@ abstract class BaseSphinxLogServerPeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. SphinxLogServerPeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. SphinxLogPeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(SphinxLogServerPeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(SphinxLogPeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -153,12 +165,16 @@ abstract class BaseSphinxLogServerPeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(SphinxLogServerPeer::ID);
-		$criteria->addSelectColumn(SphinxLogServerPeer::SERVER);
-		$criteria->addSelectColumn(SphinxLogServerPeer::DC);
-		$criteria->addSelectColumn(SphinxLogServerPeer::LAST_LOG_ID);
-		$criteria->addSelectColumn(SphinxLogServerPeer::CREATED_AT);
-		$criteria->addSelectColumn(SphinxLogServerPeer::UPDATED_AT);
+		$criteria->addSelectColumn(SphinxLogPeer::ID);
+		$criteria->addSelectColumn(SphinxLogPeer::EXECUTED_SERVER_ID);
+		$criteria->addSelectColumn(SphinxLogPeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(SphinxLogPeer::OBJECT_ID);
+		$criteria->addSelectColumn(SphinxLogPeer::ENTRY_ID);
+		$criteria->addSelectColumn(SphinxLogPeer::PARTNER_ID);
+		$criteria->addSelectColumn(SphinxLogPeer::DC);
+		$criteria->addSelectColumn(SphinxLogPeer::SQL);
+		$criteria->addSelectColumn(SphinxLogPeer::CREATED_AT);
+		$criteria->addSelectColumn(SphinxLogPeer::TYPE);
 	}
 
 	/**
@@ -177,27 +193,27 @@ abstract class BaseSphinxLogServerPeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(SphinxLogServerPeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(SphinxLogPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			SphinxLogServerPeer::addSelectColumns($criteria);
+			SphinxLogPeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		SphinxLogServerPeer::attachCriteriaFilter($criteria);
+		SphinxLogPeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'SphinxLogServerPeer', 
+			'SphinxLogPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
@@ -206,7 +222,7 @@ abstract class BaseSphinxLogServerPeer {
 		}
 		
 		// select the connection for the query
-		$con = SphinxLogServerPeer::alternativeCon ($con, $queryDB);
+		$con = SphinxLogPeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -230,7 +246,7 @@ abstract class BaseSphinxLogServerPeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     SphinxLogServer
+	 * @return     SphinxLog
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -238,7 +254,7 @@ abstract class BaseSphinxLogServerPeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = SphinxLogServerPeer::doSelect($critcopy, $con);
+		$objects = SphinxLogPeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -280,10 +296,10 @@ abstract class BaseSphinxLogServerPeer {
 	{
 		foreach ($queryResult as $curIndex => $curObject)
 		{
-			$objFromPool = SphinxLogServerPeer::getInstanceFromPool($curObject->getPrimaryKey());
+			$objFromPool = SphinxLogPeer::getInstanceFromPool($curObject->getPrimaryKey());
 			if ($objFromPool === null)
 			{
-				SphinxLogServerPeer::addInstanceToPool($curObject);
+				SphinxLogPeer::addInstanceToPool($curObject);
 			}
 			else
 			{
@@ -305,7 +321,7 @@ abstract class BaseSphinxLogServerPeer {
 			{  
 				foreach ($queryResult as $curResult)
 				{
-					SphinxLogServerPeer::addInstanceToPool($curResult);
+					SphinxLogPeer::addInstanceToPool($curResult);
 				}
 			}
 		}
@@ -322,27 +338,27 @@ abstract class BaseSphinxLogServerPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = SphinxLogServerPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = SphinxLogPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'SphinxLogServerPeer', 
+			'SphinxLogPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			$cacheKey = null;
-			SphinxLogServerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			SphinxLogServerPeer::updateInstancePool($cachedResult);
+			SphinxLogPeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			SphinxLogPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
-		$con = SphinxLogServerPeer::alternativeCon($con, $queryDB);
+		$con = SphinxLogPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = SphinxLogServerPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = SphinxLogPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
@@ -353,9 +369,9 @@ abstract class BaseSphinxLogServerPeer {
 			$cacheKey = null;
 		}
 		
-		SphinxLogServerPeer::filterSelectResults($queryResult, $criteria);
+		SphinxLogPeer::filterSelectResults($queryResult, $criteria);
 		
-		SphinxLogServerPeer::addInstancesToPool($queryResult);
+		SphinxLogPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
 
@@ -379,7 +395,7 @@ abstract class BaseSphinxLogServerPeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -391,7 +407,7 @@ abstract class BaseSphinxLogServerPeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = SphinxLogServerPeer::getCriteriaFilter();
+		$criteria_filter = SphinxLogPeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -405,12 +421,12 @@ abstract class BaseSphinxLogServerPeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			SphinxLogServerPeer::setDefaultCriteriaFilter();
+			SphinxLogPeer::setDefaultCriteriaFilter();
 		
-		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('SphinxLogServer');
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('SphinxLog');
 		if ($partnerCriteria)
 		{
-			call_user_func_array(array('SphinxLogServerPeer','addPartnerToCriteria'), $partnerCriteria);
+			call_user_func_array(array('SphinxLogPeer','addPartnerToCriteria'), $partnerCriteria);
 		}
 		
 		return self::$s_criteria_filter;
@@ -437,11 +453,70 @@ abstract class BaseSphinxLogServerPeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		SphinxLogServerPeer::getCriteriaFilter()->applyFilter($criteria);
+		SphinxLogPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		
+		if(!$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff
+				if($partnerId)
+				{
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			// private data is allowed
+			if(!strlen(strval($partnerGroup)))
+			{
+				// the default case
+				$criteria->addAnd(self::PARTNER_ID, $partnerId);
+			}
+			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+				$partners = explode(',', trim($partnerGroup));
+				foreach($partners as &$p)
+					trim($p); // make sure there are not leading or trailing spaces
+
+				// add the partner_id to the partner_group
+				if (!in_array(strval($partnerId), $partners))
+					$partners[] = strval($partnerId);
+				
+				if(count($partners) == 1 && reset($partners) == $partnerId)
+				{
+					$criteria->addAnd(self::PARTNER_ID, $partnerId);
+				}
+				else 
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+					$criteria->addAnd($criterion);
+				}
+			}
+		}
+			
+		$criteriaFilter->enable();
 	}
 	
 	/**
@@ -460,10 +535,10 @@ abstract class BaseSphinxLogServerPeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		SphinxLogServerPeer::attachCriteriaFilter($criteria);
+		SphinxLogPeer::attachCriteriaFilter($criteria);
 		
 		// select the connection for the query
-		$con = SphinxLogServerPeer::alternativeCon ( $con );
+		$con = SphinxLogPeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -477,20 +552,20 @@ abstract class BaseSphinxLogServerPeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				SphinxLogServerPeer::addSelectColumns($criteria);
+				SphinxLogPeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			SphinxLogServerPeer::addSelectColumns($criteria);
+			SphinxLogPeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		SphinxLogServerPeer::attachCriteriaFilter($criteria);
+		SphinxLogPeer::attachCriteriaFilter($criteria);
 
 		return $criteria;
 	}
@@ -510,9 +585,9 @@ abstract class BaseSphinxLogServerPeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = SphinxLogServerPeer::alternativeCon($con);
+		$con = SphinxLogPeer::alternativeCon($con);
 		
-		$criteria = SphinxLogServerPeer::prepareCriteriaForSelect($criteria);
+		$criteria = SphinxLogPeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -526,10 +601,10 @@ abstract class BaseSphinxLogServerPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      SphinxLogServer $value A SphinxLogServer object.
+	 * @param      SphinxLog $value A SphinxLog object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(SphinxLogServer $obj, $key = null)
+	public static function addInstanceToPool(SphinxLog $obj, $key = null)
 	{
 		if ( Propel::isInstancePoolingEnabled() )
 		{
@@ -543,7 +618,7 @@ abstract class BaseSphinxLogServerPeer {
 				)
 			{
 				self::$instances[$key] = $obj;
-				kMemoryManager::registerPeer('SphinxLogServerPeer');
+				kMemoryManager::registerPeer('SphinxLogPeer');
 			}
 		}
 	}
@@ -556,18 +631,18 @@ abstract class BaseSphinxLogServerPeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A SphinxLogServer object or a primary key value.
+	 * @param      mixed $value A SphinxLog object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof SphinxLogServer) {
+			if (is_object($value) && $value instanceof SphinxLog) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or SphinxLogServer object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or SphinxLog object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -582,7 +657,7 @@ abstract class BaseSphinxLogServerPeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     SphinxLogServer Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     SphinxLog Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -610,7 +685,7 @@ abstract class BaseSphinxLogServerPeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to sphinx_log_server
+	 * Method to invalidate the instance pool of all tables related to sphinx_log
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -648,11 +723,11 @@ abstract class BaseSphinxLogServerPeer {
 		$results = array();
 	
 		// set the class once to avoid overhead in the loop
-		$cls = SphinxLogServerPeer::getOMClass(false);
+		$cls = SphinxLogPeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = SphinxLogServerPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = SphinxLogServerPeer::getInstanceFromPool($key))) {
+			$key = SphinxLogPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = SphinxLogPeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
@@ -666,238 +741,6 @@ abstract class BaseSphinxLogServerPeer {
 		$stmt->closeCursor();
 		return $results;
 	}
-
-	/**
-	 * Returns the number of rows matching criteria, joining the related SphinxLog table
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinSphinxLog(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(SphinxLogServerPeer::TABLE_NAME);
-
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			SphinxLogServerPeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-		
-		
-		$criteria->addJoin(SphinxLogServerPeer::LAST_LOG_ID, SphinxLogPeer::ID, $join_behavior);
-
-		$stmt = SphinxLogServerPeer::doCountStmt($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
-	}
-
-
-	/**
-	 * Selects a collection of SphinxLogServer objects pre-filled with their SphinxLog objects.
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of SphinxLogServer objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinSphinxLog(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		SphinxLogServerPeer::addSelectColumns($criteria);
-		$startcol = (SphinxLogServerPeer::NUM_COLUMNS - SphinxLogServerPeer::NUM_LAZY_LOAD_COLUMNS);
-		SphinxLogPeer::addSelectColumns($criteria);
-
-		$criteria->addJoin(SphinxLogServerPeer::LAST_LOG_ID, SphinxLogPeer::ID, $join_behavior);
-
-		$stmt = SphinxLogServerPeer::doSelectStmt($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = SphinxLogServerPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = SphinxLogServerPeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://propel.phpdb.org/trac/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-
-				$cls = SphinxLogServerPeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				SphinxLogServerPeer::addInstanceToPool($obj1, $key1);
-			} // if $obj1 already loaded
-
-			$key2 = SphinxLogPeer::getPrimaryKeyHashFromRow($row, $startcol);
-			if ($key2 !== null) {
-				$obj2 = SphinxLogPeer::getInstanceFromPool($key2);
-				if (!$obj2) {
-
-					$cls = SphinxLogPeer::getOMClass(false);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol);
-					SphinxLogPeer::addInstanceToPool($obj2, $key2);
-				} // if obj2 already loaded
-				
-				// Add the $obj1 (SphinxLogServer) to $obj2 (SphinxLog)
-				$obj2->addSphinxLogServer($obj1);
-
-			} // if joined row was not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($results);
-		
-		return $results;
-	}
-
-
-	/**
-	 * Returns the number of rows matching criteria, joining all related tables
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(SphinxLogServerPeer::TABLE_NAME);
-
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			SphinxLogServerPeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-		
-		
-		$criteria->addJoin(SphinxLogServerPeer::LAST_LOG_ID, SphinxLogPeer::ID, $join_behavior);
-
-		$stmt = SphinxLogServerPeer::doCountStmt($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
-	}
-
-	/**
-	 * Selects a collection of SphinxLogServer objects pre-filled with all related objects.
-	 *
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of SphinxLogServer objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		SphinxLogServerPeer::addSelectColumns($criteria);
-		$startcol2 = (SphinxLogServerPeer::NUM_COLUMNS - SphinxLogServerPeer::NUM_LAZY_LOAD_COLUMNS);
-
-		SphinxLogPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SphinxLogPeer::NUM_COLUMNS - SphinxLogPeer::NUM_LAZY_LOAD_COLUMNS);
-
-		$criteria->addJoin(SphinxLogServerPeer::LAST_LOG_ID, SphinxLogPeer::ID, $join_behavior);
-
-		$stmt = SphinxLogServerPeer::doSelectStmt($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = SphinxLogServerPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = SphinxLogServerPeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://propel.phpdb.org/trac/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-				$cls = SphinxLogServerPeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				SphinxLogServerPeer::addInstanceToPool($obj1, $key1);
-			} // if obj1 already loaded
-
-			// Add objects for joined SphinxLog rows
-
-			$key2 = SphinxLogPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-			if ($key2 !== null) {
-				$obj2 = SphinxLogPeer::getInstanceFromPool($key2);
-				if (!$obj2) {
-
-					$cls = SphinxLogPeer::getOMClass(false);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol2);
-					SphinxLogPeer::addInstanceToPool($obj2, $key2);
-				} // if obj2 loaded
-
-				// Add the $obj1 (SphinxLogServer) to the collection in $obj2 (SphinxLog)
-				$obj2->addSphinxLogServer($obj1);
-			} // if joined row not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		return $results;
-	}
-
 	/**
 	 * Returns the TableMap related to this peer.
 	 * This method is not needed for general use but a specific application could have a need.
@@ -915,10 +758,10 @@ abstract class BaseSphinxLogServerPeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseSphinxLogServerPeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseSphinxLogServerPeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BaseSphinxLogPeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BaseSphinxLogPeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new SphinxLogServerTableMap());
+	    $dbMap->addTableObject(new SphinxLogTableMap());
 	  }
 	}
 
@@ -935,13 +778,13 @@ abstract class BaseSphinxLogServerPeer {
 	 */
 	public static function getOMClass($withPrefix = true)
 	{
-		return $withPrefix ? SphinxLogServerPeer::CLASS_DEFAULT : SphinxLogServerPeer::OM_CLASS;
+		return $withPrefix ? SphinxLogPeer::CLASS_DEFAULT : SphinxLogPeer::OM_CLASS;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a SphinxLogServer or Criteria object.
+	 * Method perform an INSERT on the database, given a SphinxLog or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or SphinxLogServer object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or SphinxLog object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -950,17 +793,17 @@ abstract class BaseSphinxLogServerPeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from SphinxLogServer object
+			$criteria = $values->buildCriteria(); // build Criteria from SphinxLog object
 		}
 
-		if ($criteria->containsKey(SphinxLogServerPeer::ID) && $criteria->keyContainsValue(SphinxLogServerPeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.SphinxLogServerPeer::ID.')');
+		if ($criteria->containsKey(SphinxLogPeer::ID) && $criteria->keyContainsValue(SphinxLogPeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.SphinxLogPeer::ID.')');
 		}
 
 
@@ -982,9 +825,9 @@ abstract class BaseSphinxLogServerPeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a SphinxLogServer or Criteria object.
+	 * Method perform an UPDATE on the database, given a SphinxLog or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or SphinxLogServer object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or SphinxLog object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -993,7 +836,7 @@ abstract class BaseSphinxLogServerPeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -1001,10 +844,10 @@ abstract class BaseSphinxLogServerPeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(SphinxLogServerPeer::ID);
-			$selectCriteria->add(SphinxLogServerPeer::ID, $criteria->remove(SphinxLogServerPeer::ID), $comparison);
+			$comparison = $criteria->getComparison(SphinxLogPeer::ID);
+			$selectCriteria->add(SphinxLogPeer::ID, $criteria->remove(SphinxLogPeer::ID), $comparison);
 
-		} else { // $values is SphinxLogServer object
+		} else { // $values is SphinxLog object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -1034,26 +877,26 @@ abstract class BaseSphinxLogServerPeer {
 	}
 
 	/**
-	 * Method to DELETE all rows from the sphinx_log_server table.
+	 * Method to DELETE all rows from the sphinx_log table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(SphinxLogServerPeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(SphinxLogPeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			SphinxLogServerPeer::clearInstancePool();
-			SphinxLogServerPeer::clearRelatedInstancePool();
+			SphinxLogPeer::clearInstancePool();
+			SphinxLogPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1063,9 +906,9 @@ abstract class BaseSphinxLogServerPeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a SphinxLogServer or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a SphinxLog or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or SphinxLogServer object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or SphinxLog object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -1076,27 +919,27 @@ abstract class BaseSphinxLogServerPeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			SphinxLogServerPeer::clearInstancePool();
+			SphinxLogPeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof SphinxLogServer) { // it's a model object
+		} elseif ($values instanceof SphinxLog) { // it's a model object
 			// invalidate the cache for this single object
-			SphinxLogServerPeer::removeInstanceFromPool($values);
+			SphinxLogPeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(SphinxLogServerPeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(SphinxLogPeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				SphinxLogServerPeer::removeInstanceFromPool($singleval);
+				SphinxLogPeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -1111,7 +954,7 @@ abstract class BaseSphinxLogServerPeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			SphinxLogServerPeer::clearRelatedInstancePool();
+			SphinxLogPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1121,24 +964,24 @@ abstract class BaseSphinxLogServerPeer {
 	}
 
 	/**
-	 * Validates all modified columns of given SphinxLogServer object.
+	 * Validates all modified columns of given SphinxLog object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      SphinxLogServer $obj The object to validate.
+	 * @param      SphinxLog $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(SphinxLogServer $obj, $cols = null)
+	public static function doValidate(SphinxLog $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(SphinxLogServerPeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(SphinxLogServerPeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(SphinxLogPeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(SphinxLogPeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -1154,7 +997,7 @@ abstract class BaseSphinxLogServerPeer {
 
 		}
 
-		return BasePeer::doValidate(SphinxLogServerPeer::DATABASE_NAME, SphinxLogServerPeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(SphinxLogPeer::DATABASE_NAME, SphinxLogPeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -1162,19 +1005,19 @@ abstract class BaseSphinxLogServerPeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     SphinxLogServer
+	 * @return     SphinxLog
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = SphinxLogServerPeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = SphinxLogPeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(SphinxLogServerPeer::DATABASE_NAME);
-		$criteria->add(SphinxLogServerPeer::ID, $pk);
+		$criteria = new Criteria(SphinxLogPeer::DATABASE_NAME);
+		$criteria->add(SphinxLogPeer::ID, $pk);
 
-		$v = SphinxLogServerPeer::doSelect($criteria, $con);
+		$v = SphinxLogPeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -1193,16 +1036,16 @@ abstract class BaseSphinxLogServerPeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(SphinxLogServerPeer::DATABASE_NAME);
-			$criteria->add(SphinxLogServerPeer::ID, $pks, Criteria::IN);
-			$objs = SphinxLogServerPeer::doSelect($criteria, $con);
+			$criteria = new Criteria(SphinxLogPeer::DATABASE_NAME);
+			$criteria->add(SphinxLogPeer::ID, $pks, Criteria::IN);
+			$objs = SphinxLogPeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BaseSphinxLogServerPeer
+} // BaseSphinxLogPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseSphinxLogServerPeer::buildTableMap();
+BaseSphinxLogPeer::buildTableMap();
 

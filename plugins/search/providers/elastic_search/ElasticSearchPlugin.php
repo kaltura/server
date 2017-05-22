@@ -29,7 +29,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
      */
     public static function dependsOn()
     {
-        $elasticSearchDependency = new KalturaDependency(SphinxSearchPlugin::getPluginName());
-        return array($elasticSearchDependency);
+        $searchDependency = new KalturaDependency(SearchPlugin::getPluginName());
+        return array($searchDependency);
     }
 }

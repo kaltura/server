@@ -2,7 +2,7 @@
 /**
  * @package plugins.sphinxSearch
  */
-class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
+class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory, IKalturaPending
 {
 	const PLUGIN_NAME = 'sphinxSearch';
 	const SPHINX_SEARCH_MANAGER = 'kSphinxSearchManager';
@@ -43,5 +43,16 @@ class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers
 			return new SphinxCategoryKuserCriteria();
 			
 		return null;
+	}
+
+	/**
+	 * Returns a Kaltura dependency object that defines the relationship between two plugins.
+	 *
+	 * @return array<KalturaDependency> The Kaltura dependency object
+	 */
+	public static function dependsOn()
+	{
+		$searchDependency = new KalturaDependency(SearchPlugin::getPluginName());
+		return array($searchDependency);
 	}
 }

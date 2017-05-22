@@ -24,9 +24,9 @@ echo `date`
 #. /etc/rc.d/init.d/functions
 
 # Directory containing the populate php files
-SCRIPTDIR=$APP_DIR/plugins/elastic_search/scripts
+SCRIPTDIR=$APP_DIR/plugins/search/providers/elastic_search/scripts
 
-SCRIPTEXE=populateFromLog.php
+SCRIPTEXE=populateElasticFromLog.php
 
 if [ $# -ne 1 ]; then
 	echo "Usage: $0 [start|stop|restart|status|forcestart]"

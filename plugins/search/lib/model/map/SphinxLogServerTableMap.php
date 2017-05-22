@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'sphinx_log' table.
+ * This class defines the structure of the 'sphinx_log_server' table.
  *
  *
  *
@@ -11,15 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package plugins.sphinxSearch
+ * @package plugins.search
  * @subpackage model.map
  */
-class SphinxLogTableMap extends TableMap {
+class SphinxLogServerTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'plugins.sphinxSearch.SphinxLogTableMap';
+	const CLASS_NAME = 'plugins.search.SphinxLogServerTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -31,22 +31,18 @@ class SphinxLogTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('sphinx_log');
-		$this->setPhpName('SphinxLog');
-		$this->setClassname('SphinxLog');
-		$this->setPackage('plugins.sphinxSearch');
+		$this->setName('sphinx_log_server');
+		$this->setPhpName('SphinxLogServer');
+		$this->setClassname('SphinxLogServer');
+		$this->setPackage('plugins.search');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addColumn('EXECUTED_SERVER_ID', 'ExecutedServerId', 'INTEGER', false, null, null);
-		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'VARCHAR', false, 255, null);
-		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 20, null);
-		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, null);
-		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, 0);
+		$this->addColumn('SERVER', 'Server', 'VARCHAR', false, 63, null);
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
-		$this->addColumn('SQL', 'Sql', 'CLOB', false, null, null);
+		$this->addForeignKey('LAST_LOG_ID', 'LastLogId', 'INTEGER', 'sphinx_log', 'ID', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
+		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		// validators
 	} // initialize()
 
@@ -55,7 +51,7 @@ class SphinxLogTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('SphinxLogServer', 'SphinxLogServer', RelationMap::ONE_TO_MANY, array('id' => 'last_log_id', ), null, null);
+    $this->addRelation('SphinxLog', 'SphinxLog', RelationMap::MANY_TO_ONE, array('last_log_id' => 'id', ), null, null);
 	} // buildRelations()
 
-} // SphinxLogTableMap
+} // SphinxLogServerTableMap

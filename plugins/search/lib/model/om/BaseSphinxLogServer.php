@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Base class that represents a row from the 'sphinx_log' table.
+ * Base class that represents a row from the 'sphinx_log_server' table.
  *
  * 
  *
- * @package plugins.sphinxSearch
+ * @package plugins.search
  * @subpackage model.om
  */
-abstract class BaseSphinxLog extends BaseObject  implements Persistent {
+abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        SphinxLogPeer
+	 * @var        SphinxLogServerPeer
 	 */
 	protected static $peer;
 
@@ -26,35 +26,10 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
-	 * The value for the executed_server_id field.
-	 * @var        int
-	 */
-	protected $executed_server_id;
-
-	/**
-	 * The value for the object_type field.
+	 * The value for the server field.
 	 * @var        string
 	 */
-	protected $object_type;
-
-	/**
-	 * The value for the object_id field.
-	 * @var        string
-	 */
-	protected $object_id;
-
-	/**
-	 * The value for the entry_id field.
-	 * @var        string
-	 */
-	protected $entry_id;
-
-	/**
-	 * The value for the partner_id field.
-	 * Note: this column has a database default value of: 0
-	 * @var        int
-	 */
-	protected $partner_id;
+	protected $server;
 
 	/**
 	 * The value for the dc field.
@@ -63,10 +38,10 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	protected $dc;
 
 	/**
-	 * The value for the sql field.
-	 * @var        string
+	 * The value for the last_log_id field.
+	 * @var        int
 	 */
-	protected $sql;
+	protected $last_log_id;
 
 	/**
 	 * The value for the created_at field.
@@ -75,20 +50,15 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
-	 * The value for the type field.
-	 * @var        int
+	 * The value for the updated_at field.
+	 * @var        string
 	 */
-	protected $type;
+	protected $updated_at;
 
 	/**
-	 * @var        array SphinxLogServer[] Collection to store aggregation of SphinxLogServer objects.
+	 * @var        SphinxLog
 	 */
-	protected $collSphinxLogServers;
-
-	/**
-	 * @var        Criteria The criteria used to select the current contents of collSphinxLogServers.
-	 */
-	private $lastSphinxLogServerCriteria = null;
+	protected $aSphinxLog;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -136,27 +106,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Applies default values to this object.
-	 * This method should be called from the object's constructor (or
-	 * equivalent initialization method).
-	 * @see        __construct()
-	 */
-	public function applyDefaultValues()
-	{
-		$this->partner_id = 0;
-	}
-
-	/**
-	 * Initializes internal state of BaseSphinxLog object.
-	 * @see        applyDefaults()
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-		$this->applyDefaultValues();
-	}
-
-	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -167,53 +116,13 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [executed_server_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getExecutedServerId()
-	{
-		return $this->executed_server_id;
-	}
-
-	/**
-	 * Get the [object_type] column value.
+	 * Get the [server] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getObjectType()
+	public function getServer()
 	{
-		return $this->object_type;
-	}
-
-	/**
-	 * Get the [object_id] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getObjectId()
-	{
-		return $this->object_id;
-	}
-
-	/**
-	 * Get the [entry_id] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getEntryId()
-	{
-		return $this->entry_id;
-	}
-
-	/**
-	 * Get the [partner_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getPartnerId()
-	{
-		return $this->partner_id;
+		return $this->server;
 	}
 
 	/**
@@ -227,13 +136,13 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [sql] column value.
+	 * Get the [last_log_id] column value.
 	 * 
-	 * @return     string
+	 * @return     int
 	 */
-	public function getSql()
+	public function getLastLogId()
 	{
-		return $this->sql;
+		return $this->last_log_id;
 	}
 
 	/**
@@ -277,25 +186,55 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [type] column value.
+	 * Get the [optionally formatted] temporal [updated_at] column value.
 	 * 
-	 * @return     int
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
 	 */
-	public function getType()
+	public function getUpdatedAt($format = 'Y-m-d H:i:s')
 	{
-		return $this->type;
+		if ($this->updated_at === null) {
+			return null;
+		}
+
+
+		if ($this->updated_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->updated_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
 	}
 
 	/**
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
+	 * @return     SphinxLogServer The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::ID]))
-			$this->oldColumnsValues[SphinxLogPeer::ID] = $this->id;
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::ID]))
+			$this->oldColumnsValues[SphinxLogServerPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -303,137 +242,45 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::ID;
+			$this->modifiedColumns[] = SphinxLogServerPeer::ID;
 		}
 
 		return $this;
 	} // setId()
 
 	/**
-	 * Set the value of [executed_server_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
-	 */
-	public function setExecutedServerId($v)
-	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::EXECUTED_SERVER_ID]))
-			$this->oldColumnsValues[SphinxLogPeer::EXECUTED_SERVER_ID] = $this->executed_server_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->executed_server_id !== $v) {
-			$this->executed_server_id = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::EXECUTED_SERVER_ID;
-		}
-
-		return $this;
-	} // setExecutedServerId()
-
-	/**
-	 * Set the value of [object_type] column.
+	 * Set the value of [server] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
+	 * @return     SphinxLogServer The current object (for fluent API support)
 	 */
-	public function setObjectType($v)
+	public function setServer($v)
 	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[SphinxLogPeer::OBJECT_TYPE] = $this->object_type;
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::SERVER]))
+			$this->oldColumnsValues[SphinxLogServerPeer::SERVER] = $this->server;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->object_type !== $v) {
-			$this->object_type = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::OBJECT_TYPE;
+		if ($this->server !== $v) {
+			$this->server = $v;
+			$this->modifiedColumns[] = SphinxLogServerPeer::SERVER;
 		}
 
 		return $this;
-	} // setObjectType()
-
-	/**
-	 * Set the value of [object_id] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
-	 */
-	public function setObjectId($v)
-	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::OBJECT_ID]))
-			$this->oldColumnsValues[SphinxLogPeer::OBJECT_ID] = $this->object_id;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->object_id !== $v) {
-			$this->object_id = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::OBJECT_ID;
-		}
-
-		return $this;
-	} // setObjectId()
-
-	/**
-	 * Set the value of [entry_id] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
-	 */
-	public function setEntryId($v)
-	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::ENTRY_ID]))
-			$this->oldColumnsValues[SphinxLogPeer::ENTRY_ID] = $this->entry_id;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->entry_id !== $v) {
-			$this->entry_id = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::ENTRY_ID;
-		}
-
-		return $this;
-	} // setEntryId()
-
-	/**
-	 * Set the value of [partner_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
-	 */
-	public function setPartnerId($v)
-	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::PARTNER_ID]))
-			$this->oldColumnsValues[SphinxLogPeer::PARTNER_ID] = $this->partner_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->partner_id !== $v || $this->isNew()) {
-			$this->partner_id = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::PARTNER_ID;
-		}
-
-		return $this;
-	} // setPartnerId()
+	} // setServer()
 
 	/**
 	 * Set the value of [dc] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
+	 * @return     SphinxLogServer The current object (for fluent API support)
 	 */
 	public function setDc($v)
 	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::DC]))
-			$this->oldColumnsValues[SphinxLogPeer::DC] = $this->dc;
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::DC]))
+			$this->oldColumnsValues[SphinxLogServerPeer::DC] = $this->dc;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -441,41 +288,45 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 
 		if ($this->dc !== $v) {
 			$this->dc = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::DC;
+			$this->modifiedColumns[] = SphinxLogServerPeer::DC;
 		}
 
 		return $this;
 	} // setDc()
 
 	/**
-	 * Set the value of [sql] column.
+	 * Set the value of [last_log_id] column.
 	 * 
-	 * @param      string $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
+	 * @param      int $v new value
+	 * @return     SphinxLogServer The current object (for fluent API support)
 	 */
-	public function setSql($v)
+	public function setLastLogId($v)
 	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::SQL]))
-			$this->oldColumnsValues[SphinxLogPeer::SQL] = $this->sql;
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::LAST_LOG_ID]))
+			$this->oldColumnsValues[SphinxLogServerPeer::LAST_LOG_ID] = $this->last_log_id;
 
 		if ($v !== null) {
-			$v = (string) $v;
+			$v = (int) $v;
 		}
 
-		if ($this->sql !== $v) {
-			$this->sql = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::SQL;
+		if ($this->last_log_id !== $v) {
+			$this->last_log_id = $v;
+			$this->modifiedColumns[] = SphinxLogServerPeer::LAST_LOG_ID;
+		}
+
+		if ($this->aSphinxLog !== null && $this->aSphinxLog->getId() !== $v) {
+			$this->aSphinxLog = null;
 		}
 
 		return $this;
-	} // setSql()
+	} // setLastLogId()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     SphinxLog The current object (for fluent API support)
+	 * @return     SphinxLogServer The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -512,7 +363,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = SphinxLogPeer::CREATED_AT;
+				$this->modifiedColumns[] = SphinxLogServerPeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -520,27 +371,53 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
-	 * Set the value of [type] column.
+	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
 	 * 
-	 * @param      int $v new value
-	 * @return     SphinxLog The current object (for fluent API support)
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     SphinxLogServer The current object (for fluent API support)
 	 */
-	public function setType($v)
+	public function setUpdatedAt($v)
 	{
-		if(!isset($this->oldColumnsValues[SphinxLogPeer::TYPE]))
-			$this->oldColumnsValues[SphinxLogPeer::TYPE] = $this->type;
-
-		if ($v !== null) {
-			$v = (int) $v;
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
 		}
 
-		if ($this->type !== $v) {
-			$this->type = $v;
-			$this->modifiedColumns[] = SphinxLogPeer::TYPE;
-		}
+		if ( $this->updated_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = SphinxLogServerPeer::UPDATED_AT;
+			}
+		} // if either are not null
 
 		return $this;
-	} // setType()
+	} // setUpdatedAt()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -552,10 +429,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->partner_id !== 0) {
-				return false;
-			}
-
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -579,15 +452,11 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->executed_server_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->object_type = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->object_id = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->entry_id = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->dc = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->sql = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->type = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->server = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->dc = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->last_log_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -597,10 +466,10 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = SphinxLogPeer::NUM_COLUMNS - SphinxLogPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 6; // 6 = SphinxLogServerPeer::NUM_COLUMNS - SphinxLogServerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating SphinxLog object", $e);
+			throw new PropelException("Error populating SphinxLogServer object", $e);
 		}
 	}
 
@@ -620,6 +489,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
+		if ($this->aSphinxLog !== null && $this->last_log_id !== $this->aSphinxLog->getId()) {
+			$this->aSphinxLog = null;
+		}
 	} // ensureConsistency
 
 	/**
@@ -643,17 +515,17 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		SphinxLogPeer::setUseCriteriaFilter(false);
+		SphinxLogServerPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		SphinxLogPeer::addSelectColumns($criteria);
+		SphinxLogServerPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
-		SphinxLogPeer::setUseCriteriaFilter(true);
+		SphinxLogServerPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -663,9 +535,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
-			$this->collSphinxLogServers = null;
-			$this->lastSphinxLogServerCriteria = null;
-
+			$this->aSphinxLog = null;
 		} // if (deep)
 	}
 
@@ -685,14 +555,14 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			if ($ret) {
-				SphinxLogPeer::doDelete($this, $con);
+				SphinxLogServerPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				$this->setDeleted(true);
 				$con->commit();
@@ -725,7 +595,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(SphinxLogPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SphinxLogServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -745,7 +615,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 					$this->postUpdate($con);
 				}
 				$this->postSave($con);
-				SphinxLogPeer::addInstanceToPool($this);
+				SphinxLogServerPeer::addInstanceToPool($this);
 			} else {
 				$affectedRows = 0;
 			}
@@ -779,15 +649,27 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
 
+			// We call the save method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aSphinxLog !== null) {
+				if ($this->aSphinxLog->isModified() || $this->aSphinxLog->isNew()) {
+					$affectedRows += $this->aSphinxLog->save($con);
+				}
+				$this->setSphinxLog($this->aSphinxLog);
+			}
+
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = SphinxLogPeer::ID;
+				$this->modifiedColumns[] = SphinxLogServerPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = SphinxLogPeer::doInsert($this, $con);
+					$pk = SphinxLogServerPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -797,7 +679,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
-					$affectedObjects = SphinxLogPeer::doUpdate($this, $con);
+					$affectedObjects = SphinxLogServerPeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
 						
@@ -805,14 +687,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
-			}
-
-			if ($this->collSphinxLogServers !== null) {
-				foreach ($this->collSphinxLogServers as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
 			}
 
 			$this->alreadyInSave = false;
@@ -864,6 +738,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function preInsert(PropelPDO $con = null)
 	{
 		$this->setCreatedAt(time());
+		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
 	
@@ -953,18 +828,22 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = SphinxLogPeer::doValidate($this, $columns)) !== true) {
-				$failureMap = array_merge($failureMap, $retval);
+			// We call the validate method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aSphinxLog !== null) {
+				if (!$this->aSphinxLog->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->aSphinxLog->getValidationFailures());
+				}
 			}
 
 
-				if ($this->collSphinxLogServers !== null) {
-					foreach ($this->collSphinxLogServers as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
+			if (($retval = SphinxLogServerPeer::doValidate($this, $columns)) !== true) {
+				$failureMap = array_merge($failureMap, $retval);
+			}
+
 
 
 			$this->alreadyInValidation = false;
@@ -984,7 +863,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = SphinxLogPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = SphinxLogServerPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -1003,31 +882,19 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getExecutedServerId();
+				return $this->getServer();
 				break;
 			case 2:
-				return $this->getObjectType();
-				break;
-			case 3:
-				return $this->getObjectId();
-				break;
-			case 4:
-				return $this->getEntryId();
-				break;
-			case 5:
-				return $this->getPartnerId();
-				break;
-			case 6:
 				return $this->getDc();
 				break;
-			case 7:
-				return $this->getSql();
+			case 3:
+				return $this->getLastLogId();
 				break;
-			case 8:
+			case 4:
 				return $this->getCreatedAt();
 				break;
-			case 9:
-				return $this->getType();
+			case 5:
+				return $this->getUpdatedAt();
 				break;
 			default:
 				return null;
@@ -1048,18 +915,14 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = SphinxLogPeer::getFieldNames($keyType);
+		$keys = SphinxLogServerPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getExecutedServerId(),
-			$keys[2] => $this->getObjectType(),
-			$keys[3] => $this->getObjectId(),
-			$keys[4] => $this->getEntryId(),
-			$keys[5] => $this->getPartnerId(),
-			$keys[6] => $this->getDc(),
-			$keys[7] => $this->getSql(),
-			$keys[8] => $this->getCreatedAt(),
-			$keys[9] => $this->getType(),
+			$keys[1] => $this->getServer(),
+			$keys[2] => $this->getDc(),
+			$keys[3] => $this->getLastLogId(),
+			$keys[4] => $this->getCreatedAt(),
+			$keys[5] => $this->getUpdatedAt(),
 		);
 		return $result;
 	}
@@ -1076,7 +939,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = SphinxLogPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = SphinxLogServerPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -1095,31 +958,19 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setExecutedServerId($value);
+				$this->setServer($value);
 				break;
 			case 2:
-				$this->setObjectType($value);
-				break;
-			case 3:
-				$this->setObjectId($value);
-				break;
-			case 4:
-				$this->setEntryId($value);
-				break;
-			case 5:
-				$this->setPartnerId($value);
-				break;
-			case 6:
 				$this->setDc($value);
 				break;
-			case 7:
-				$this->setSql($value);
+			case 3:
+				$this->setLastLogId($value);
 				break;
-			case 8:
+			case 4:
 				$this->setCreatedAt($value);
 				break;
-			case 9:
-				$this->setType($value);
+			case 5:
+				$this->setUpdatedAt($value);
 				break;
 		} // switch()
 	}
@@ -1143,18 +994,14 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = SphinxLogPeer::getFieldNames($keyType);
+		$keys = SphinxLogServerPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setExecutedServerId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setObjectType($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setObjectId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setEntryId($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setPartnerId($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setDc($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setSql($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setType($arr[$keys[9]]);
+		if (array_key_exists($keys[1], $arr)) $this->setServer($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setDc($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setLastLogId($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
 	}
 
 	/**
@@ -1164,18 +1011,14 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(SphinxLogPeer::DATABASE_NAME);
+		$criteria = new Criteria(SphinxLogServerPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(SphinxLogPeer::ID)) $criteria->add(SphinxLogPeer::ID, $this->id);
-		if ($this->isColumnModified(SphinxLogPeer::EXECUTED_SERVER_ID)) $criteria->add(SphinxLogPeer::EXECUTED_SERVER_ID, $this->executed_server_id);
-		if ($this->isColumnModified(SphinxLogPeer::OBJECT_TYPE)) $criteria->add(SphinxLogPeer::OBJECT_TYPE, $this->object_type);
-		if ($this->isColumnModified(SphinxLogPeer::OBJECT_ID)) $criteria->add(SphinxLogPeer::OBJECT_ID, $this->object_id);
-		if ($this->isColumnModified(SphinxLogPeer::ENTRY_ID)) $criteria->add(SphinxLogPeer::ENTRY_ID, $this->entry_id);
-		if ($this->isColumnModified(SphinxLogPeer::PARTNER_ID)) $criteria->add(SphinxLogPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(SphinxLogPeer::DC)) $criteria->add(SphinxLogPeer::DC, $this->dc);
-		if ($this->isColumnModified(SphinxLogPeer::SQL)) $criteria->add(SphinxLogPeer::SQL, $this->sql);
-		if ($this->isColumnModified(SphinxLogPeer::CREATED_AT)) $criteria->add(SphinxLogPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(SphinxLogPeer::TYPE)) $criteria->add(SphinxLogPeer::TYPE, $this->type);
+		if ($this->isColumnModified(SphinxLogServerPeer::ID)) $criteria->add(SphinxLogServerPeer::ID, $this->id);
+		if ($this->isColumnModified(SphinxLogServerPeer::SERVER)) $criteria->add(SphinxLogServerPeer::SERVER, $this->server);
+		if ($this->isColumnModified(SphinxLogServerPeer::DC)) $criteria->add(SphinxLogServerPeer::DC, $this->dc);
+		if ($this->isColumnModified(SphinxLogServerPeer::LAST_LOG_ID)) $criteria->add(SphinxLogServerPeer::LAST_LOG_ID, $this->last_log_id);
+		if ($this->isColumnModified(SphinxLogServerPeer::CREATED_AT)) $criteria->add(SphinxLogServerPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(SphinxLogServerPeer::UPDATED_AT)) $criteria->add(SphinxLogServerPeer::UPDATED_AT, $this->updated_at);
 
 		return $criteria;
 	}
@@ -1190,9 +1033,24 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(SphinxLogPeer::DATABASE_NAME);
+		$criteria = new Criteria(SphinxLogServerPeer::DATABASE_NAME);
 
-		$criteria->add(SphinxLogPeer::ID, $this->id);
+		$criteria->add(SphinxLogServerPeer::ID, $this->id);
+		
+		if($this->alreadyInSave)
+		{
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(SphinxLogServerPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != SphinxLogServerPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = SphinxLogServerPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -1223,44 +1081,22 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of SphinxLog (or compatible) type.
+	 * @param      object $copyObj An object of SphinxLogServer (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
-		$copyObj->setExecutedServerId($this->executed_server_id);
-
-		$copyObj->setObjectType($this->object_type);
-
-		$copyObj->setObjectId($this->object_id);
-
-		$copyObj->setEntryId($this->entry_id);
-
-		$copyObj->setPartnerId($this->partner_id);
+		$copyObj->setServer($this->server);
 
 		$copyObj->setDc($this->dc);
 
-		$copyObj->setSql($this->sql);
+		$copyObj->setLastLogId($this->last_log_id);
 
 		$copyObj->setCreatedAt($this->created_at);
 
-		$copyObj->setType($this->type);
-
-
-		if ($deepCopy) {
-			// important: temporarily setNew(false) because this affects the behavior of
-			// the getter/setter methods for fkey referrer objects.
-			$copyObj->setNew(false);
-
-			foreach ($this->getSphinxLogServers() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addSphinxLogServer($relObj->copy($deepCopy));
-				}
-			}
-
-		} // if ($deepCopy)
+		$copyObj->setUpdatedAt($this->updated_at);
 
 
 		$copyObj->setNew(true);
@@ -1278,7 +1114,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     SphinxLog Clone of current object.
+	 * @return     SphinxLogServer Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1294,16 +1130,16 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     SphinxLog Clone of current object.
+	 * @var     SphinxLogServer Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      SphinxLog $copiedFrom Clone of current object.
+	 * @param      SphinxLogServer $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(SphinxLog $copiedFrom)
+	public function setCopiedFrom(SphinxLogServer $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}
@@ -1315,168 +1151,63 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     SphinxLogPeer
+	 * @return     SphinxLogServerPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new SphinxLogPeer();
+			self::$peer = new SphinxLogServerPeer();
 		}
 		return self::$peer;
 	}
 
 	/**
-	 * Clears out the collSphinxLogServers collection (array).
+	 * Declares an association between this object and a SphinxLog object.
 	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addSphinxLogServers()
-	 */
-	public function clearSphinxLogServers()
-	{
-		$this->collSphinxLogServers = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collSphinxLogServers collection (array).
-	 *
-	 * By default this just sets the collSphinxLogServers collection to an empty array (like clearcollSphinxLogServers());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initSphinxLogServers()
-	{
-		$this->collSphinxLogServers = array();
-	}
-
-	/**
-	 * Gets an array of SphinxLogServer objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this SphinxLog has previously been saved, it will retrieve
-	 * related SphinxLogServers from storage. If this SphinxLog is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array SphinxLogServer[]
+	 * @param      SphinxLog $v
+	 * @return     SphinxLogServer The current object (for fluent API support)
 	 * @throws     PropelException
 	 */
-	public function getSphinxLogServers($criteria = null, PropelPDO $con = null)
+	public function setSphinxLog(SphinxLog $v = null)
 	{
-		if ($criteria === null) {
-			$criteria = new Criteria(SphinxLogPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collSphinxLogServers === null) {
-			if ($this->isNew()) {
-			   $this->collSphinxLogServers = array();
-			} else {
-
-				$criteria->add(SphinxLogServerPeer::LAST_LOG_ID, $this->id);
-
-				SphinxLogServerPeer::addSelectColumns($criteria);
-				$this->collSphinxLogServers = SphinxLogServerPeer::doSelect($criteria, $con);
-			}
+		if ($v === null) {
+			$this->setLastLogId(NULL);
 		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(SphinxLogServerPeer::LAST_LOG_ID, $this->id);
-
-				SphinxLogServerPeer::addSelectColumns($criteria);
-				if (!isset($this->lastSphinxLogServerCriteria) || !$this->lastSphinxLogServerCriteria->equals($criteria)) {
-					$this->collSphinxLogServers = SphinxLogServerPeer::doSelect($criteria, $con);
-				}
-			}
+			$this->setLastLogId($v->getId());
 		}
-		$this->lastSphinxLogServerCriteria = $criteria;
-		return $this->collSphinxLogServers;
+
+		$this->aSphinxLog = $v;
+
+		// Add binding for other direction of this n:n relationship.
+		// If this object has already been added to the SphinxLog object, it will not be re-added.
+		if ($v !== null) {
+			$v->addSphinxLogServer($this);
+		}
+
+		return $this;
 	}
 
-	/**
-	 * Returns the number of related SphinxLogServer objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related SphinxLogServer objects.
-	 * @throws     PropelException
-	 */
-	public function countSphinxLogServers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(SphinxLogPeer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->collSphinxLogServers === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(SphinxLogServerPeer::LAST_LOG_ID, $this->id);
-
-				$count = SphinxLogServerPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(SphinxLogServerPeer::LAST_LOG_ID, $this->id);
-
-				if (!isset($this->lastSphinxLogServerCriteria) || !$this->lastSphinxLogServerCriteria->equals($criteria)) {
-					$count = SphinxLogServerPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->collSphinxLogServers);
-				}
-			} else {
-				$count = count($this->collSphinxLogServers);
-			}
-		}
-		return $count;
-	}
 
 	/**
-	 * Method called to associate a SphinxLogServer object to this object
-	 * through the SphinxLogServer foreign key attribute.
+	 * Get the associated SphinxLog object
 	 *
-	 * @param      SphinxLogServer $l SphinxLogServer
-	 * @return     void
+	 * @param      PropelPDO Optional Connection object.
+	 * @return     SphinxLog The associated SphinxLog object.
 	 * @throws     PropelException
 	 */
-	public function addSphinxLogServer(SphinxLogServer $l)
+	public function getSphinxLog(PropelPDO $con = null)
 	{
-		if ($this->collSphinxLogServers === null) {
-			$this->initSphinxLogServers();
+		if ($this->aSphinxLog === null && ($this->last_log_id !== null)) {
+			$this->aSphinxLog = SphinxLogPeer::retrieveByPk($this->last_log_id);
+			/* The following can be used additionally to
+			   guarantee the related object contains a reference
+			   to this object.  This level of coupling may, however, be
+			   undesirable since it could result in an only partially populated collection
+			   in the referenced object.
+			   $this->aSphinxLog->addSphinxLogServers($this);
+			 */
 		}
-		if (!in_array($l, $this->collSphinxLogServers, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collSphinxLogServers, $l);
-			$l->setSphinxLog($this);
-		}
+		return $this->aSphinxLog;
 	}
 
 	/**
@@ -1491,14 +1222,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
-			if ($this->collSphinxLogServers) {
-				foreach ((array) $this->collSphinxLogServers as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 		} // if ($deep)
 
-		$this->collSphinxLogServers = null;
+			$this->aSphinxLog = null;
 	}
 
-} // BaseSphinxLog
+} // BaseSphinxLogServer

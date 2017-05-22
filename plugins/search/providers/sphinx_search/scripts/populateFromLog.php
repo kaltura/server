@@ -3,7 +3,7 @@ set_time_limit(0);
 ini_set("memory_limit","700M");
 chdir(dirname(__FILE__));
 
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
+define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../../../'));
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 require_once(ROOT_DIR . '/alpha/config/kConf.php');
 
