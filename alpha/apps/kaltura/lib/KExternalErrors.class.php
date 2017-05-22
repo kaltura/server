@@ -55,6 +55,7 @@ class KExternalErrors
 	const INTERNAL_SERVER_ERROR = 44;
 	const LIVE_STREAM_CONFIG_NOT_FOUND = 45;
 	const TOO_MANY_PROCESSES = 46;
+    const BUNDLE_CREATION_FAILED = 47;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -109,6 +110,7 @@ class KExternalErrors
 			self::INTERNAL_SERVER_ERROR => "Internal server error",
 			self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
 			self::TOO_MANY_PROCESSES => "Too many executed processes",
+            self::BUNDEL_CREATION_FAILED => "Failed to build bundel for [%s]"
 	);
 	
 	public static function dieError($errorCode, $message = null)
