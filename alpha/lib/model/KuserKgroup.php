@@ -70,7 +70,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject, IElasticInd
 	 */
 	public function getElasticObjectType()
 	{
-		return 'Kuser';
+		return 'kuser';
 	}
 
 	/**

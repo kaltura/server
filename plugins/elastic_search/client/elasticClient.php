@@ -29,10 +29,10 @@ class elasticClient
         $this->ch = curl_init();
 
         curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true); //TRUE to force the connection to explicitly close when it has finished processing, and not be pooled for reuse.
-        curl_setopt($this->ch, CURLOPT_PORT, $this->elasticPort); //port
+        curl_setopt($this->ch, CURLOPT_PORT, $this->elasticPort);
 
         if(!$curlTimeout)
-            $curlTimeout = kConf::get('elasticClientTimeout', 'local', 5);//default curl 5 seconds
+            $curlTimeout = kConf::get('elasticClientTimeout', 'local', 10);//default curl 10 seconds
         $this->setTimeout($curlTimeout);
     }
 
@@ -208,6 +208,8 @@ class elasticClient
     {
         $cmd = $this->elasticHost;
         $cmd .='/'.$params['index'].'/'.$params['type'].'/'.$params['id'];
+        $queryParams = $this->getQueryParams($params);
+        $cmd .= $queryParams;
         $response = $this->sendRequest($cmd, 'GET');
         return $response;
     }

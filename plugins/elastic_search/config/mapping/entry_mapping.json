@@ -37,6 +37,9 @@
 		"partner_id" : {
 		  "type" : "text"
 		},
+		"partner_status" : {
+		  "type" : "text"
+		},
 		"parent_id" : {
 		  "type" : "text"
 		},
@@ -56,6 +59,9 @@
 		  "type" : "text"
 		},
 		"category_ids" : {
+		  "type" : "text"
+		},
+		"tags" : {
 		  "type" : "text"
 		}
 	  }
@@ -214,10 +220,10 @@
 			  "analyzer" : "trigrams"
 			},
 			"start_time"  : {
-			  "type" : "long"//change to integer
+			  "type" : "long"
 			},
 			"end_time"  : {
-			  "type" : "long"//change to integer
+			  "type" : "long"
 			}
 		  }
 		}

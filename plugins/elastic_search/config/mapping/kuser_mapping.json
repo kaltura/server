@@ -4,7 +4,7 @@
 	"number_of_replicas" : 0
   },
   "mappings" : {
-	"KuserKgroup" : {
+	"kuser" : {
 	  "_source" : {
 		"enabled" : true
 	  },

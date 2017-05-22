@@ -105,12 +105,21 @@ class CaptionAsset extends asset implements IElasticIndexable
 	}
 
 	/**
+	 * return true if we index the doc using update to elasticsearch
+	 */
+	public function shouldIndexWithUpdate()
+	{
+		return false;
+	}
+
+	/**
 	 * get the params we index to elasticsearch for this object
 	 */
 	public function getObjectParams($params = null)
 	{
 		$obj = array(
 			'language' => $this->getLanguage(),
+			'status' => $this->getStatus(),
 			'lines' => array()
 		);
 
@@ -118,14 +127,6 @@ class CaptionAsset extends asset implements IElasticIndexable
 			$obj['lines'] = $params->getLines();
 
 		return $obj;
-	}
-
-	/**
-	 * return true if we index the doc using update to elasticsearch
-	 */
-	public function shouldIndexWithUpdate()
-	{
-		return false;
 	}
 
 	/**

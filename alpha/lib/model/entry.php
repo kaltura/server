@@ -1328,6 +1328,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return null;
 		return parent::getCategoriesIds();
 	}
+
+	public function getCategoriesIdsArray()
+	{
+		$categoryIds = $this->getCategoriesIds();
+		if(!$categoryIds)
+			return null;
+		$categoryIds = explode(',', $categoryIds);
+		return $categoryIds;
+	}
 		
 	/*public function renameCategory($oldFullName, $newFullName)
 	{
@@ -3651,7 +3660,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'description' => $this->getDescription(),
 			'tags' => $this->getTags(),
 			'partner_id' => $this->getPartnerId(),
-			'category_ids' => $this->getCategoriesIds()
+			'category_ids' => $this->getCategoriesIdsArray()
 		);
 		return $body;
 	}
