@@ -33,14 +33,14 @@ class mediaInfo extends BasemediaInfo
 	public function getRawDataXml()
 	{
 		$rawData = $this->getRawData();
-		$rawDataLinesArray = explode(PHP_EOL, $rawData);
+		$tokenizer = new KStringTokenizer ( $rawData, "\t\n" );
 	
 		$rawDataXml = new DOMDocument();
 		$rootNode = $rawDataXml->createElement("RawData");
 		$root = $rawDataXml->appendChild($rootNode);
-		foreach ($rawDataLinesArray as $rawDataLine)
+		while($tokenizer->hasMoreTokens())
 		{
-			$rawDataLine = trim($rawDataLine);
+			$rawDataLine = trim($tokenizer->nextToken());
 			if(!$rawDataLine)
 				continue;
 								
