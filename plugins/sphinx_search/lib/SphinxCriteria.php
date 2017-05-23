@@ -87,6 +87,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	protected $sphinxSkipped = false;
 	
+	/**
+	 * List of entry IDs in a forced order that must be maintained by the returned result
+	 * @var array
+	 */
+	public $forcedOrderIds;
+	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
@@ -549,6 +555,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if(count($this->numericalOrderConditions))
 				$conditions .= "," . implode(",", $this->numericalOrderConditions);
 		}
+		elseif (count($this->forcedOrderIds))
+		{
+			$this->applySortRequired = true;
+		}
 		else
 		{
 			$this->applySortRequired = false;
@@ -852,11 +862,20 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		foreach ($objects as $object)
 			$sortedResult[$object->getId()] = $object; 
 		
+		$orderedIds = $this->fetchedIds;
+		if ($this->forcedOrderIds && count($this->forcedOrderIds))
+		{
+			KalturaLog::debug("Forced order imposed");
+			$orderedIds = array_intersect($this->forcedOrderIds, $this->fetchedIds);
+		}
+			
+		
 		$objects = array();
-		foreach ($this->fetchedIds as $fetchedId)
+		foreach ($orderedIds as $fetchedId)
 			if(isset($sortedResult[$fetchedId]))
 				$objects[] = $sortedResult[$fetchedId];
 	}
+	
 	
 	/* (non-PHPdoc)
 	 * @see Criteria::getNewCriterion()
