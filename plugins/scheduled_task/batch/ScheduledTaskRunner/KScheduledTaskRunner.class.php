@@ -352,30 +352,32 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $profile->objectFilter->advancedSearch->items[0];
 	}
 
-	private function getAdminObjectsBody($objectsIds)
+	private function getAdminObjectsBody($objectsIds, $sendToUsers)
 	{
 		$body = "\nExecute for entries: (users aggregate)\n";
 		$cnt = 0;
-		foreach($objectsIds as $userId => $entriesId) {
-			$body .= "[$userId]\n";
-			foreach($entriesId as $id) {
-				$body .= "\t$id\n";
+		foreach($objectsIds as $userId => $entriesIds) {
+			$body .= "[$userId]" . PHP_EOL;
+			foreach($entriesIds as $id) {
+				$body .= "\t$id" . PHP_EOL;
 				$cnt++;
 			}
 		}
-		
 		$body .= "Total count of affected object: $cnt";
-		$body .= "\nSend Notification for the following users: ";
-		foreach($objectsIds as $userId => $entriesId)
-			$body .= "$userId\n";
+		
+		if ($sendToUsers) {
+			$body .= PHP_EOL . "Send Notification for the following users: ";
+			foreach($objectsIds as $userId => $entriesIds)
+				$body .= "$userId" . PHP_EOL;
+		}
 		return $body;
 	}
 
 	private function getUserObjectsBody($objectsIds)
 	{
-		$body = "\nExecute for entries:\n";
+		$body = PHP_EOL ."Execute for entries:" . PHP_EOL;
 		foreach($objectsIds as $id)
-			$body .= "$id\n";
+			$body .= "$id" . PHP_EOL;
 
 		$body .= "Total count of affected object: " . count($objectsIds);
 		return $body;
@@ -385,7 +387,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	{
 		$subject = "Media Repurposing Notification";
 		$bodyPrefix = "Notification from Media Repurposing [$mediaRepurposingName]: \n$mailTask->message " . PHP_EOL;
-		$body = $bodyPrefix . $this->getAdminObjectsBody($objectsIds);
+		$body = $bodyPrefix . $this->getAdminObjectsBody($objectsIds, $mailTask->sendToUsers);
 
 		$toArr = explode(",", $mailTask->mailAddress);
 		$success = $this->sendMail($toArr, $subject, $body);

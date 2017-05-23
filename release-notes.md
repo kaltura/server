@@ -24,6 +24,23 @@
 
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
 
+## ViewHistory Feature Add missing permission item ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7281
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Lynx 12.16.0 #
 
 ## Add scheduleEvent->list optimization ##
