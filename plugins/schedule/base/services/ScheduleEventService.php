@@ -322,7 +322,7 @@ class ScheduleEventService extends KalturaBaseService
 	 * @param KalturaScheduleEvent $scheduleEvent
 	 * @return KalturaScheduleEventListResponse
 	 */
-	public function getConflictsAction($resourceIds, KalturaScheduleEvent $scheduleEvent)
+	public function getConflictsAction($resourceIds, KalturaScheduleEvent $scheduleEvent,$scheduleEventIdToIgnore=null)
 	{
 		if (!$resourceIds)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'resourceIds');
@@ -339,10 +339,10 @@ class ScheduleEventService extends KalturaBaseService
 			$dates = $datesGenerator->getDates($dbScheduleEvent->getStartDate(null));
 
 			foreach($dates as $date)
-				$events = array_merge($events, ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $date, ($date + $dbScheduleEvent->getDuration())));
+				$events = array_merge($events, ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $date, ($date + $dbScheduleEvent->getDuration()),$scheduleEventIdToIgnore));
 		}
 		else {
-			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null));
+			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null),$scheduleEventIdToIgnore);
 		}
 		if (!count($events))
 			$this->reserveResources($resourceIds);
