@@ -15,14 +15,6 @@
 - In base.ini add the following parameters:
  - [cache_based_service_actions]
    poll_poll_vote = "/../../plugins/poll/lib/PollActions.php"
-- In admin.ini add the following parameters:
-  - moduls.poll.enabled = true
-    moduls.poll.permissionType = 2
-    moduls.poll.label = "Polls"
-    moduls.poll.permissionName = FEATURE_POLL
-    moduls.poll.basePermissionType =
-    moduls.poll.basePermissionName =
-    moduls.poll.group = GROUP_ENABLE_DISABLE_FEATURES
 - In cache.ini add the following parameters:
   - [memcacheKeys:memcacheBase]
      host = 127.0.0.1

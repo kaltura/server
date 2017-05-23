@@ -12,18 +12,24 @@ class PollActions
 	const ANSWER_SEPARATOR_CHAR = ',';
 	const ID_NUM_ELEMENTS = 3;
 
+	const POLL_ID_ARG = 'pollId';
+	const ANSWER_IDS_ARG = 'answerIds';
+	const USER_ID_ARG = 'userId';
+
+	const HASH_TYPE = 'SHA256';
+
+	const CONF_SECRET_REF = 'secret';
+	const CONF_CACHE_TTL_REF = 'cache_ttl';
+	const CONF_POLL_REF = 'poll';
+
 	/**
 	 * @var PollCacheHandler
 	 */
 	private static $pollsCacheHandler = null;
 	/**
-	 * @var array of const strings representing poll types
-	 */
-	private static $pollTypes = null;
-	/**
 	 * @var string
 	 */
-	private static $kalturaSecret = null;
+	private static $kalturaPollSecret = null;
 	/**
 	 * @var int
 	 */
@@ -36,35 +42,26 @@ class PollActions
 	 */
 	private static function init()
 	{
-		$pollConf = kConf::get("poll");
-		if (array_key_exists('secret' ,$pollConf))
-			self::$kalturaSecret = $pollConf['secret'];
-		if (!self::$kalturaSecret)
+		$pollConf = kConf::get(PollActions::CONF_POLL_REF);
+		if (array_key_exists(PollActions::CONF_SECRET_REF ,$pollConf))
+			self::$kalturaPollSecret = $pollConf[PollActions::CONF_SECRET_REF];
+		if (!self::$kalturaPollSecret)
 			throw new Exception("Could not find polls_secret in the configuration");
-		if (array_key_exists('cache_ttl', $pollConf))
-			self::$pollCacheTTL = $pollConf['cache_ttl'];
+		if (array_key_exists(PollActions::CONF_CACHE_TTL_REF, $pollConf))
+			self::$pollCacheTTL = $pollConf[PollActions::CONF_CACHE_TTL_REF];
 		self::$pollsCacheHandler = new PollCacheHandler(self::$pollCacheTTL);
-		self::$pollTypes = array(
-			'SINGLE_ANONYMOUS',
-			'SINGLE_RESTRICT',
-			'MULTI_ANONYMOUS',
-			'MULTI_RESTRICT');
+
 	}
 
 	/* Poll Id Action */
-	public static function generatePollId($type = 'SINGLE_ANONYMOUS')
+	public static function generatePollId($type = PollType::SINGLE_ANONYMOUS)
 	{
 		self::init();
-		if (!self::isValidPollType($type))
+		if (!PollType::isValidPollType($type))
 			throw new Exception("Poll type provided is invalid");
 		$randKey = rand();
-		$hash = hash_hmac('SHA256', self::$kalturaSecret, $randKey);
+		$hash = hash_hmac(PollActions::HASH_TYPE, self::$kalturaPollSecret, $randKey);
 		return $type.self::ID_SEPARATOR_CHAR.$hash.self::ID_SEPARATOR_CHAR.$randKey;
-	}
-
-	private static function  isValidPollType($type)
-	{
-		return in_array($type, self::$pollTypes);
 	}
 
 	private static function isValidPollIdStructure($id)
@@ -75,9 +72,9 @@ class PollActions
 			$pollType = $idElements[0];
 			$hash = $idElements[1];
 			$key = $idElements[2];
-			$simulatedHash = hash_hmac('SHA256', self::$kalturaSecret, $key);
+			$simulatedHash = hash_hmac(PollActions::HASH_TYPE, self::$kalturaPollSecret, $key);
 			$isHashOk = strcmp($hash, $simulatedHash) === 0;
-			$validPollType = self::isValidPollType($pollType);
+			$validPollType = PollType::isValidPollType($pollType);
 			return $isHashOk && $validPollType;
 
 		}
@@ -87,9 +84,9 @@ class PollActions
 	/* Poll Vote Actions */
 	public static function vote($params)
 	{
-		$pollId = $params['pollId'];
-		$userId = $params['userId'];
-		$ansIds = $params['answerIds'];
+		$pollId = $params[PollActions::POLL_ID_ARG];
+		$userId = $params[PollActions::USER_ID_ARG];
+		$ansIds = $params[PollActions::ANSWER_IDS_ARG];
 		return self::setVote($pollId, $userId, $ansIds);
 	}
 
@@ -102,11 +99,11 @@ class PollActions
 			// check early user vote
 			$previousAnswers = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
 			if ($previousAnswers) {
-				self::$pollsCacheHandler->decrementAnsCounter($pollId, $previousAnswers);
+				self::$pollsCacheHandler->decrementAnswersCounter($pollId, $previousAnswers);
 			} else {
 				self::$pollsCacheHandler->incrementPollVotersCount($pollId);
 			}
-			self::$pollsCacheHandler->increaseAnsCounter($pollId, $answers);
+			self::$pollsCacheHandler->incrementAnswersCounter($pollId, $answers);
 			return "Successfully voted";
 		}
 		return "Failed to vote due to bad poll id structure";
@@ -133,6 +130,9 @@ class PollActions
 
 class PollCacheHandler
 {
+
+	const CACHE_KEY_SEPARATOR = '_';
+	const VOTERS_SUFFIX = 'voters';
 
 	private $cache;
 
@@ -165,7 +165,7 @@ class PollCacheHandler
 	}
 
 
-	public function increaseAnsCounter($pollId, $ansIds)
+	public function incrementAnswersCounter($pollId, $ansIds)
 	{
 		foreach($ansIds as $ansId)
 		{
@@ -176,7 +176,7 @@ class PollCacheHandler
 		}
 	}
 
-	public function decrementAnsCounter($pollId, $ansIds)
+	public function decrementAnswersCounter($pollId, $ansIds)
 	{
 		foreach($ansIds as $ansId)
 		{
@@ -202,29 +202,32 @@ class PollCacheHandler
 	/* Cache keys functions */
 	private function getPollVotersCacheKey($pollId)
 	{
-		return $pollId . "_voters";
+		return $pollId .PollCacheHandler::CACHE_KEY_SEPARATOR. PollCacheHandler::VOTERS_SUFFIX;
 	}
 
 	private function getPollUserVoteCacheKey($pollId, $userId)
 	{
-		return $pollId.'_'.$userId;
+		return $pollId. PollCacheHandler::CACHE_KEY_SEPARATOR. $userId;
 	}
 
 	private function getPollAnswerCounterCacheKey($pollId, $ansId)
 	{
-		return $pollId.'_'.$ansId;
+		return $pollId. PollCacheHandler::CACHE_KEY_SEPARATOR. $ansId;
 	}
 
 }
 
 class PollVotes {
-	public $pollId = "";
-	public $numVoters = 0 ;
-	public $answerCounters = array();
+	public $pollId;
+	public $numVoters;
+	public $answerCounters;
 
 	public function __construct($pollId)
 	{
 		$this->pollId = $pollId;
+		$this->numVoters = 0;
+		$this->answerCounters = array();
+
 	}
 	public function addAnswerCounter($ansId, $counter)
 	{
@@ -254,3 +257,25 @@ class PollVotes {
 		}
 	}
 }
+class PollType {
+
+	const SINGLE_ANONYMOUS = "SINGLE_ANONYMOUS";
+	const SINGLE_RESTRICT = "SINGLE_RESTRICT";
+	const MULTI_ANONYMOUS = "MULTI_ANONYMOUS";
+	const MULTI_RESTRICT = "MULTI_RESTRICT";
+
+	public static function isValidPollType($type)
+	{
+		switch ($type)
+		{
+			case SINGLE_ANONYMOUS:
+			case SINGLE_RESTRICT:
+			case MULTI_ANONYMOUS:
+			case MULTI_RESTRICT:
+				return true;
+			default:
+				return false;
+		}
+	}
+}
+

@@ -12,6 +12,7 @@ require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/cache/kApiCache.
 class KalturaResponseCacher extends kApiCache
 {
 	// copied from KalturaResponseType
+	const RESPONSE_TYPE_JSON = 1;
 	const RESPONSE_TYPE_XML = 2;
 	const RESPONSE_TYPE_PHP = 3;
 		
@@ -35,7 +36,6 @@ class KalturaResponseCacher extends kApiCache
 		if (!parent::init())
 			return false;
 
-		//self::handleSessionStart($this->_params);
 		self::handleCacheBasedServiceActions($this->_params);
 		
 		// remove parameters that do not affect the api result
@@ -307,6 +307,13 @@ class KalturaResponseCacher extends kApiCache
 		return false;
 	}
 
+	private static function isSupportedFormat($format)
+	{
+		return $format == self::RESPONSE_TYPE_XML ||
+			$format == self::RESPONSE_TYPE_PHP ||
+			$format == self::RESPONSE_TYPE_JSON ;
+	}
+
 	private static function handleCacheBasedServiceActions(&$params)
 	{
 		if (isset($params['service']) && isset($params['action']))
@@ -318,7 +325,7 @@ class KalturaResponseCacher extends kApiCache
 			else
 			{
 				$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
-				if ($format != self::RESPONSE_TYPE_XML && $format != self::RESPONSE_TYPE_PHP)
+				if (!self::isSupportedFormat($format))
 					return;			// the format is unsupported at this level
 				$confActions = $path = kConf::get('cache_based_service_actions');;
 				if (is_array($confActions))
@@ -327,14 +334,16 @@ class KalturaResponseCacher extends kApiCache
 					if (array_key_exists($actionKey, $confActions))
 					{
 						$startTime = microtime(true);
-						$classPath = dirname(__FILE__).$confActions[$actionKey];
-						$lastSlash = strrpos($classPath, '/');
-						$lastDot = strrpos($classPath, '.');
-						if ($classPath && $lastSlash && $lastDot && file_exists($classPath))
+						$filePath = dirname(__FILE__).$confActions[$actionKey];
+						if ($filePath != dirname(__FILE__) &&
+							file_exists($filePath))
 						{
-							require_once($classPath);
-							$className = substr($classPath,  $lastSlash + 1, $lastDot - $lastSlash - 1);
-							$result =  $className::$action($params);
+							require_once($filePath);
+							$className = basename($filePath, ".php");
+							if (class_exists($className) && method_exists($className, $action))
+								$result =  $className::$action($params);
+							else
+								$result = "Could not run $className::$action since it does not exist";
 						}
 						else
 						    $result = "Failed to parse $actionKey as a valid class configuration";
@@ -364,7 +373,7 @@ class KalturaResponseCacher extends kApiCache
 		}
 					
 		$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
-		if ($format != self::RESPONSE_TYPE_XML && $format != self::RESPONSE_TYPE_PHP)
+		if (!self::isSupportedFormat($format))
 		{
 			return;			// the format is unsupported at this level
 		}
@@ -415,6 +424,12 @@ class KalturaResponseCacher extends kApiCache
 		{
 			header("Content-Type: text/xml");
 			echo "<xml><result>{$result}</result><executionTime>{$processingTime}</executionTime></xml>";
+			die;
+		}
+		if ($format == self::RESPONSE_TYPE_JSON)
+		{
+			header("Content-Type: application/json");
+			echo json_encode($result);
 			die;
 		}
 		else if ($format == self::RESPONSE_TYPE_PHP)

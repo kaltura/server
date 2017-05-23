@@ -13,17 +13,6 @@
 class PollService extends KalturaBaseService
 {
 
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-
-		if(!PollPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PollPlugin::PLUGIN_NAME);
-
-		$this->applyPartnerFilterForClass('poll');
-
-	}
-
 	/**
 	 * Add Action
 	 * @action add
