@@ -36,13 +36,13 @@ interface IElasticIndexable extends IBaseObject
     public function getObjectParams($params = null);
 
     /**
-     * return true if we index the doc using update to elasticsearch
+     * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
      */
-    public function shouldIndexWithUpdate();
+    public function getElasticSaveMethod();
 
     /**
      * Index the object into elasticsearch
      */
-    public function indexToElasticIndex($params = null);
+    public function indexToElastic($params = null);
 
 }

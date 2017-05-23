@@ -28,7 +28,7 @@ class elasticClient
 
         $this->ch = curl_init();
 
-        curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true); //TRUE to force the connection to explicitly close when it has finished processing, and not be pooled for reuse.
+        curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
         curl_setopt($this->ch, CURLOPT_PORT, $this->elasticPort);
 
         if(!$curlTimeout)
@@ -92,8 +92,7 @@ class elasticClient
         {
             $code = $this->getErrorNumber();
             $message = $this->getError();
-            KalturaLog::debug("Elastic client curl error code[".$code."] message[".$message."]");
-            //todo - decide how to handle the error here or throw exception
+            KalturaLog::err("Elastic client curl error code[".$code."] message[".$message."]");
         }
         else
         {

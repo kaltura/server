@@ -6,9 +6,14 @@
  */
 class CaptionAssetItemContainer
 {
-    private $items = array();
+    private $items;
     public $assetId;
     public $language;
+
+    public function __construct()
+    {
+        $this->items = array();
+    }
 
     public function addItem(CaptionAssetItem $item)
     {
@@ -32,33 +37,5 @@ class CaptionAssetItemContainer
     public function getLanguage()
     {
         return $this->language;
-    }
-
-    public function getLines()
-    {
-        $lines = array();
-        foreach ($this->getItems() as $item)
-        {
-            $line = $this->getLine($item);
-            $lines[] = $line;
-        }
-        return $lines;
-    }
-
-    private function getLine($item)
-    {
-        $line = array(
-            'start_time' => $item['startTime'],
-            'end_time' => $item['endTime'],
-            'content' => $item['content']//this should be the non analyzed field
-        );
-        $lang = $this->getLanguage();
-        $analyzedFieldName = elasticSearchUtils::getAnalyzedFieldName($lang, 'content');
-
-        if($analyzedFieldName)
-            $line[$analyzedFieldName] = $item['content'];
-        //general for all lang
-        $line['content_trigrams'] = $item['content'];
-        return $line;
     }
 }

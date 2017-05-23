@@ -8,7 +8,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     const CACHE_PREFIX = 'executed_elastic_server_';
 
-
     /**
      * @param BaseObject $object
      * @param BatchJob $raisedJob
@@ -50,7 +49,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
-        $op = $object->shouldIndexWithUpdate() ? 'update' : 'index';
+        $op = $object->getElasticSaveMethod();
         $params['index'] = $object->getElasticIndexName();
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
@@ -73,25 +72,13 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $ret = $client->$op($params);
         if(!$ret)
         {
-            //todo log here
+            KalturaLog::err('Failed to Execute elasticSearch query: '.print_r($params,true));
             return false;
         }
 
         return true;
     }
 
-    public function deleteFromElastic(IElasticIndexable $object)
-    {
-        $client = new elasticClient();
-        if(!$object->getElasticId())
-        {
-            KalturaLog::debug("cannot delete an object without an elasticsearch id");
-            return;
-        }
-        $client->delete($object->getElasticIndexName(),$object->getElasticObjectType(),$object->getElasticId());
-        KalturaLog::debug("deleted object [".$object->getElasticId()."] from elasticsearch index .[".$object->getElasticIndexName()."] type [".$object->getElasticObjectType()."]");
-    }
-    
     private function retrieveElasticServerId()
     {
         $elasticServerId = null;
@@ -149,7 +136,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
     {
         /** @var IElasticIndexable $object */
-        $object->indexToElasticIndex();
+        $object->indexToElastic();
         return true;
     }
 
@@ -176,7 +163,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
     {
         /** @var IElasticIndexable $object */
-        $object->indexToElasticIndex();
+        $object->indexToElastic();
         return true;
     }
 

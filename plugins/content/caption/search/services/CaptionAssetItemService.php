@@ -56,8 +56,6 @@ class CaptionAssetItemService extends KalturaBaseService
 			$captionAssetItem->delete();
 		}
 
-		$captionAsset->indexToElasticIndex(); //delete the old asset items - without a container we delete the lines array
-		
 		// make sure that all old items are deleted from the sphinx before creating the new ones
 		kEventsManager::flushEvents();
 		
@@ -65,7 +63,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
 		if(!$content)
 			return;
-			
+
     	$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
     	if(!$captionsContentManager)
     		return;
@@ -84,7 +82,7 @@ class CaptionAssetItemService extends KalturaBaseService
     		$content = '';
     		foreach ($itemData['content'] as $curChunk)
     			$content .= $curChunk['text'];
-    			
+
     		//Make sure there are no invalid chars in the caption asset items to avoid braking the search request by providing invalid XML
     		$content = kString::stripUtf8InvalidChars($content);
     		$content = kXml::stripXMLInvalidChars($content);
@@ -94,7 +92,7 @@ class CaptionAssetItemService extends KalturaBaseService
 			$container->addItem($item);
     	}
 		//index new content to elastic
-		$captionAsset->indexToElasticIndex($container);
+		$captionAsset->indexToElastic($container);
     }
 	
 	/**

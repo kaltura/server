@@ -3666,17 +3666,17 @@ public function copyTemplate($copyPartnerId = false, $template)
 	}
 
 	/**
-	 * return true if we index the doc using update to elasticsearch
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
 	 */
-	public function shouldIndexWithUpdate()
+	public function getElasticSaveMethod()
 	{
-		return false;
+		return ElasticMethodType::INDEX;
 	}
 
 	/**
 	 * Index the object into elasticsearch
 	 */
-	public function indexToElasticIndex($params = null)
+	public function indexToElastic($params = null)
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}

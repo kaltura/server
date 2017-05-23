@@ -105,11 +105,11 @@ class CaptionAsset extends asset implements IElasticIndexable
 	}
 
 	/**
-	 * return true if we index the doc using update to elasticsearch
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
 	 */
-	public function shouldIndexWithUpdate()
+	public function getElasticSaveMethod()
 	{
-		return false;
+		return ElasticMethodType::INDEX;
 	}
 
 	/**
@@ -120,11 +120,8 @@ class CaptionAsset extends asset implements IElasticIndexable
 		$obj = array(
 			'language' => $this->getLanguage(),
 			'status' => $this->getStatus(),
-			'lines' => array()
+			'lines' => $this->getElasticLines($params)
 		);
-
-		if($params && $params instanceof CaptionAssetItemContainer)
-			$obj['lines'] = $params->getLines();
 
 		return $obj;
 	}
@@ -132,8 +129,33 @@ class CaptionAsset extends asset implements IElasticIndexable
 	/**
 	 * Index the object into elasticsearch
 	 */
-	public function indexToElasticIndex($params = null)
+	public function indexToElastic($params = null)
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexContainerEvent($this, $params));
+	}
+
+	private function getElasticLines(CaptionAssetItemContainer $container = null)
+	{
+		$lines = array();
+		if($container)
+		{
+			foreach ($container->getItems() as $item)
+			{
+				$line = array(
+					'start_time' => $item['startTime'],
+					'end_time' => $item['endTime'],
+					'content' => $item['content']
+				);
+				$lang = $this->getLanguage();
+				$analyzedFieldName = elasticSearchUtils::getAnalyzedFieldName($lang, 'content');
+
+				if($analyzedFieldName)
+					$line[$analyzedFieldName] = $item['content'];
+				//general for all languages
+				$line['content_trigrams'] = $item['content'];
+				$lines[] = $line;
+			}
+		}
+		return $lines;
 	}
 }

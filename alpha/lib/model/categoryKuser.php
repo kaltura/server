@@ -447,7 +447,6 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 				'lang' => 'painless',
 				'params' => array(
 					'kuser_id' => $this->getKuserId(),
-					'shouldRemove' => $this->getStatus() == CategoryKuserStatus::DELETED
 				)
 			),
 			'retry_on_conflict' => 10
@@ -457,24 +456,31 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 
 	private function getInlineScript()
 	{
-		$script = 'if(params.shouldRemove == true) {ctx._source.kuser_ids.remove(ctx._source.kuser_ids.indexOf(params.kuser_id));}';
-		$script .= 'else if(ctx._source.kuser_ids == null) {ctx._source.kuser_ids = new ArrayList(); ctx._source.kuser_ids.add(params.kuser_id);}';
-		$script .= 'else { if(!ctx._source.kuser_ids.contains(params.kuser_id)) {ctx._source.kuser_ids.add(params.kuser_id);} }';
+		if($this->getStatus() == CategoryKuserStatus::DELETED)
+		{
+			$script = 'ctx._source.kuser_ids.remove(ctx._source.kuser_ids.indexOf(params.kuser_id));';
+		}
+		else
+		{
+			$script = 'if(ctx._source.kuser_ids == null) {ctx._source.kuser_ids = new ArrayList(); ctx._source.kuser_ids.add(params.kuser_id);}';
+			$script .= 'else if(!ctx._source.kuser_ids.contains(params.kuser_id)) {ctx._source.kuser_ids.add(params.kuser_id);}';
+		}
+
 		return $script;
 	}
 
 	/**
-	 * return true if we index the doc using update to elasticsearch
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
 	 */
-	public function shouldIndexWithUpdate()
+	public function getElasticSaveMethod()
 	{
-		return true;
+		return ElasticMethodType::UPADTE;
 	}
 
 	/**
 	 * Index the object into elasticsearch
 	 */
-	public function indexToElasticIndex($params = null)
+	public function indexToElastic($params = null)
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
