@@ -14,4 +14,5 @@ class KalturaAuditTrailAction extends KalturaStringEnum
 	const FILE_SYNC_CREATED = 'FILE_SYNC_CREATED';
 	const RELATION_ADDED = 'RELATION_ADDED';
 	const RELATION_REMOVED = 'RELATION_REMOVED';
+	const EXECUTED = 'EXECUTED';
 }

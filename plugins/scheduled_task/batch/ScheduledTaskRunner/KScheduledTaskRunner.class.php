@@ -79,6 +79,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
 
 		$objectsIds = array();
+		$errorIds = array();
 		$isMediaRepurposingProfile = $this->isMediaRepurposingProfile($profile);
 		if ($isMediaRepurposingProfile)
 			$this->addDateToFilter($profile);
@@ -118,14 +119,17 @@ class KScheduledTaskRunner extends KPeriodicWorker
 						$objectsIds[$object->userId][] = $object->id;
 					else
 						$objectsIds[$object->userId] = array($object->id);
-				}
+				} else
+					$errorIds[] = $object->id;
 				if ($isMediaRepurposingProfile)
 					$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
 			}
 			if (!$isMediaRepurposingProfile)
 				$pager->pageIndex++;
 		}
-		
+		if ($isMediaRepurposingProfile && (count($objectsIds) || count($errorIds)))
+			$this->sendAudit($profile, $objectsIds, $errorIds);
+
 		if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
 		{
 			$mediaRepurposingName = $this->getMediaRepurposingProfileName($profile);
@@ -455,6 +459,43 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		
 		self::unimpersonate();
 		return $result->id;
+	}
+
+	private function sendAudit($profile, $objectsIds, $errorIds)
+	{
+		$mrId = $this->getMrProfileId($profile);
+		$auditTrail = new KalturaAuditTrail();
+		$auditTrail->auditObjectType = AuditTrailObjectType::SCHEDULE_TASK;
+		$auditTrail->objectId = $mrId;
+		$auditTrail->description = self::getMediaRepurposingProfileTaskType($profile);
+		$auditTrail->action = KalturaAuditTrailAction::EXECUTED;
+
+		$ids = '';
+		foreach($objectsIds as $userEntries)
+			foreach($userEntries as $entryId)
+				$ids .= "$entryId,";
+
+		$data = new KalturaAuditTrailTextInfo();
+		$data->info = rtrim($ids, ',');
+		$auditTrail->data = $data;
+
+		$errorIdsStr = '';
+		foreach($errorIds as $id)
+			$errorIdsStr .= "$id,";
+		if ($errorIdsStr)
+			$auditTrail->errorDescription = rtrim($errorIdsStr, ',');
+
+		KalturaLog::info("Add Audit to log:");
+		KalturaLog::info(print_r($auditTrail, true));
+
+		self::impersonate($profile->partnerId);
+		$auditPlugin = KalturaAuditClientPlugin::get($this->getClient());
+		try {
+			$result = $auditPlugin->auditTrail->add($auditTrail);
+		} catch (Exception $e) {
+			KalturaLog::info("Fail in add audit trail - partner may be unauthorized");
+		}
+		self::unimpersonate();
 	}
 
 }
