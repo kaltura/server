@@ -116,7 +116,7 @@ class KSyncPointsMediaInfoParser
 				$streamId3tagTimeStamp = $this->getTimestampFromStreamInfo($streamSyncPointInfo->data);
 				$streamPtsTime = (int)($streamSyncPointInfo->pts_time * 1000); //convert for seconds to milliseconds
 				
-				if(!$firstPtsTime)
+				if(is_null($firstPtsTime))
 					$firstPtsTime = $streamPtsTime;
 				
 				$streamPtsTime = $streamPtsTime - $firstPtsTime;
