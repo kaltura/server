@@ -68,7 +68,8 @@ class PollActions
 	{
 		self::init();
 		$idElements = explode(self::ID_SEPARATOR_CHAR, $id);
-		if (count($idElements) === self::ID_NUM_ELEMENTS ) {
+		if (count($idElements) === self::ID_NUM_ELEMENTS )
+		{
 			$pollType = $idElements[0];
 			$hash = $idElements[1];
 			$key = $idElements[2];
@@ -84,6 +85,11 @@ class PollActions
 	/* Poll Vote Actions */
 	public static function vote($params)
 	{
+		if ( is_null($params) ||
+			!array_key_exists(PollActions::POLL_ID_ARG, $params) ||
+			!array_key_exists(PollActions::USER_ID_ARG, $params) ||
+			!array_key_exists(PollActions::ANSWER_IDS_ARG, $params))
+			return 'Missing parameter for vote action';
 		$pollId = $params[PollActions::POLL_ID_ARG];
 		$userId = $params[PollActions::USER_ID_ARG];
 		$ansIds = $params[PollActions::ANSWER_IDS_ARG];
@@ -92,17 +98,15 @@ class PollActions
 
 	public static function setVote($pollId, $userId, $ansIds)
 	{
-		if (!$pollId || !$userId || !$ansIds)
-			throw new Exception('Missing parameter for vote action');
 		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
-		if (self::isValidPollIdStructure($pollId)) {
+		if (self::isValidPollIdStructure($pollId))
+		{
 			// check early user vote
 			$previousAnswers = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
-			if ($previousAnswers) {
+			if ($previousAnswers)
 				self::$pollsCacheHandler->decrementAnswersCounter($pollId, $previousAnswers);
-			} else {
+			else
 				self::$pollsCacheHandler->incrementPollVotersCount($pollId);
-			}
 			self::$pollsCacheHandler->incrementAnswersCounter($pollId, $answers);
 			return "Successfully voted";
 		}
@@ -119,7 +123,8 @@ class PollActions
 		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
 		$pollVotes = new PollVotes($pollId);
 		$pollVotes->setNumVoters(self::$pollsCacheHandler->getPollVotersCount($pollId));
-		foreach($answers as $ansId) {
+		foreach($answers as $ansId)
+		{
 			$answerCount = self::$pollsCacheHandler->getAnswerCounter($pollId, $ansId);
 			$pollVotes->addAnswerCounter($ansId, $answerCount);
 		}
@@ -147,7 +152,8 @@ class PollCacheHandler
 	public function setCacheVote($userId, $pollId, $ansIds)
 	{
 		$userVoteKey = self::getPollUserVoteCacheKey($pollId, $userId);
-		if (!$this->cache->add($userVoteKey, $ansIds, $this->cacheTTL)) {
+		if (!$this->cache->add($userVoteKey, $ansIds, $this->cacheTTL))
+		{
 			$earlyVoteAnsIds = $this->cache->get($userVoteKey);
 			$this->cache->set($userVoteKey, $ansIds);
 			return $earlyVoteAnsIds;

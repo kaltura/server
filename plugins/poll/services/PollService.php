@@ -18,28 +18,45 @@ class PollService extends KalturaBaseService
 	 * @action add
 	 * @param string $pollType
 	 * @return string
-	 **/
+	 * @throws KalturaAPIException
+	 */
 	public function addAction($pollType = 'SINGLE_ANONYMOUS')
 	{
-		return PollActions::generatePollId($pollType);
+		try {
+			return PollActions::generatePollId($pollType);
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException($e->getMessage());
+		}
+
 	}
 
 	/**
 	 * Get Votes Action
 	 * @action getVotes
-	 * @param string $pollId
-	 * @param string $answerIds comma separated string
-	 * @param string $previousDataJson
-	 * @return string
-	 **/
-	public function getVotesAction($pollId, $answerIds, $previousDataJson = null)
+	 * @param $pollId
+	 * @param $answerIds
+	 * @param null $otherDCVotes
+	 * @return mixed|string|void
+	 * @throws KalturaAPIException
+	 */
+	public function getVotesAction($pollId, $answerIds, $otherDCVotes = null)
 	{
-		$localDcVotes = PollActions::getVotes($pollId, $answerIds);
-		if (!$previousDataJson)
+		try {
+			$localDcVotes = PollActions::getVotes($pollId, $answerIds);
+		}
+		catch (Exception $e)
 		{
-			$_POST['previousDataJson'] = json_encode($localDcVotes);
-			$remoteDcIds = kDataCenterMgr::getAllDcs();
-			if($remoteDcIds && count($remoteDcIds) > 0) {
+			throw new KalturaAPIException($e->getMessage());
+		}
+
+		if (!$otherDCVotes)
+		{
+			$_POST['otherDCVotes'] = json_encode($localDcVotes);
+			$remoteDCIds = kDataCenterMgr::getAllDcs();
+			if($remoteDCIds && count($remoteDCIds) > 0)
+			{
 				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
 				if ($remoteDCHost)
 					return kFileUtils::dumpApiRequest($remoteDCHost);
@@ -47,7 +64,7 @@ class PollService extends KalturaBaseService
 		}
 		else
 		{
-			$prevData = json_decode($previousDataJson);
+			$prevData = json_decode($otherDCVotes);
 			$localDcVotes->merge($prevData);
 		}
 		return json_encode($localDcVotes);
@@ -56,14 +73,21 @@ class PollService extends KalturaBaseService
 	/**
 	 * Vote Action
 	 * @action vote
-	 * @param string $pollId
-	 * @param string $userId
-	 * @param string $answerIds comma separated string
+	 * @param $pollId
+	 * @param $userId
+	 * @param $answerIds
 	 * @return string
-	 **/
+	 * @throws KalturaAPIException
+	 */
 	public function voteAction($pollId, $userId, $answerIds)
 	{
-		return PollActions::setVote($pollId, $userId, $answerIds);
+		try {
+			return PollActions::setVote($pollId, $userId, $answerIds);
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException($e->getMessage());
+		}
 	}
 
 	/**

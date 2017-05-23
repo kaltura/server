@@ -426,7 +426,7 @@ class KalturaResponseCacher extends kApiCache
 			echo "<xml><result>{$result}</result><executionTime>{$processingTime}</executionTime></xml>";
 			die;
 		}
-		if ($format == self::RESPONSE_TYPE_JSON)
+		else if ($format == self::RESPONSE_TYPE_JSON)
 		{
 			header("Content-Type: application/json");
 			echo json_encode($result);
