@@ -16,7 +16,6 @@ class embedPlaykitJsAction extends sfAction
     {
         //Get uiConf ID from QS
         $this->uiconf_id = $this->getRequestParameter('uiconf_id');
-        KalturaLog::log("uiconf_id is [{$this->uiconf_id}]");
         if (!$this->uiconf_id)
             KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'uiconf_id');
 
@@ -30,8 +29,8 @@ class embedPlaykitJsAction extends sfAction
         if (!$this->partner_id)
             KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
 
-        $bundleWebDirPath = kConf::get('playkit_js_bundels_path');
-        $bundleBuilderPath = kConf::get('bundel_builder_cli_path');
+        $bundleWebDirPath = kConf::get('playkit_js_bundles_path');
+        $bundleBuilderPath = kConf::get('bundle_builder_cli_path');
         $this->sourcesPath = kConf::get('playkit_js_sources_path');
 
         //Get bundle configuration stored in conf_vars
@@ -40,10 +39,11 @@ class embedPlaykitJsAction extends sfAction
         //convert string to json
         $bundleConfig_json = json_decode($bundleConfig, true);
 
-        //if latest version required set version number in config obj
+        //if latest/beta version required set version number in config obj
         $isLatestVersionRequired = strpos($bundleConfig, "{latest}");
-        if ($isLatestVersionRequired) {
-            $bundleConfig_json = $this->setLatestVersionNumber($bundleConfig_json);
+        $isBetaVersionRequired = strpos($bundleConfig, "{beta}");
+        if ($isLatestVersionRequired || $isBetaVersionRequired) {
+            $bundleConfig_json = $this->setLatestOrBetaVersionNumber($bundleConfig_json);
         }
 
         //sort bundle config by key
@@ -61,12 +61,10 @@ class embedPlaykitJsAction extends sfAction
             //build bundle and save in web dir
             $config = str_replace("\"", "'", $config_str);
             $command = $bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . $config . '" --dest ' . $bundleWebDirPath . " --source " . $this->sourcesPath . " 2>&1";
-            //KalturaLog::log("command is " . print_r($command, true));
             exec($command, $output, $return_var);
 
             //bundle build failed
             if ($return_var != 0) {
-                //KalturaLog::log("output = " . print_r($output, true));
                 KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 
             } else {
@@ -104,14 +102,11 @@ class embedPlaykitJsAction extends sfAction
             $bundleContent = $this->getIfarmEmbedCode($bundleContent);
         }
 
-        //for debugging add append source map to served content
-        $debug = $this->getRequestParameter('debug');
-        if ($debug) {
-            $sourceMapContent = base64_encode(file_get_contents($path . ".map"));
-            $bundleContent = str_replace("$this->bundle_name.min.js.map", "data:application/json;charset=utf8;base64,$sourceMapContent", $bundleContent);
-        } else {
-            $bundleContent = str_replace("//# sourceMappingURL=$this->bundle_name.min.js.map", "", $bundleContent);
-        }
+        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+        $host = myPartnerUtils::getCdnHost($this->partner_id, $protocol, 'api');
+        $loader = kConf::get('playkit_js_source_map_loader');
+        $sourceMapLoaderURL = "$host/$loader/path/$this->bundle_name.min.js.map";
+        $bundleContent = str_replace("//# sourceMappingURL=$this->bundle_name.min.js.map", "//# sourceMappingURL=$sourceMapLoaderURL", $bundleContent);
 
         return $bundleContent;
     }
@@ -158,7 +153,6 @@ class embedPlaykitJsAction extends sfAction
         $entry_id = $this->getRequestParameter('entry_id');
         $autoEmbedCode = "\n var player; var ovpProvider = new Providers.OvpProvider($this->partner_id,\"\",$config);\n" .
             "\t    ovpProvider.getConfig(\"" . $entry_id . "\",$this->uiconf_id).then(config => {\n" .
-            "\t    data.plugins = {};\n" .
             "\t    player = Playkit.playkit(config);\n" .
             "\t }, \n" .
             "\t err => {\n" .
@@ -185,18 +179,24 @@ class embedPlaykitJsAction extends sfAction
         return $htmlDoc;
     }
 
-    private function setLatestVersionNumber($bundleConfig_json)
+    private function setLatestOrBetaVersionNumber($bundleConfig_json)
     {
         $latestVersionsMapPath = $this->sourcesPath . "/latest.json";
-        $latestVersionMap = json_decode(file_get_contents($latestVersionsMapPath), true);
+        $latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
 
-        $configLatestVersionMap = array();
+        $betaVersionsMapPath = $this->sourcesPath . "/beta.json";
+        $betatVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
+
         foreach ($bundleConfig_json as $key => $val) {
-            if ($val == "{latest}") {
-                $configLatestVersionMap[$key] = $val;
+            if ($val == "{latest}" && $latestVersionMap != null) {
                 $bundleConfig_json[$key] = $latestVersionMap[$key];
+            }
+
+            if ($val == "{beta}" && $betatVersionMap != null) {
+                $bundleConfig_json[$key] = $betatVersionMap[$key];
             }
         }
         return $bundleConfig_json;
     }
+
 }
