@@ -104,9 +104,6 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 				
 			$dbEntry->save();
-			
-			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$broadcastUrlManager->setEntryBroadcastingUrls($dbEntry);
 		}
 		
 		return $dbEntry;
@@ -538,12 +535,12 @@ class LiveStreamService extends KalturaLiveEntryService
 		$password = sha1(md5(uniqid(rand(), true)));
 		$password = substr($password, rand(0, strlen($password) - 8), 8);
 		$liveEntry->setStreamPassword($password);
-		
+
 		$broadcastUrlManager = kBroadcastUrlManager::getInstance($liveEntry->getPartnerId());
 		$broadcastUrlManager->setEntryBroadcastingUrls($liveEntry);
-		
+
 		$liveEntry->save();
-	
+
 		$entry = KalturaEntryFactory::getInstanceByType($liveEntry->getType());
 		$entry->fromObject($liveEntry, $this->getResponseProfile());
 		return $entry;

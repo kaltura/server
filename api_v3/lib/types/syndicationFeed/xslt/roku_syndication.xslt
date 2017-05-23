@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:php="http://php.net/xsl" exclude-result-prefixes="xs">
     <xsl:output method="xml" media-type="application/rss+xml" />
+    <xsl:param name="partnerId" select="'partnerId'" />
+
     <xsl:template match="*">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates />
@@ -32,14 +34,13 @@
         <xsl:variable name="var2_updatedAt" select="updatedAt" />
         <xsl:variable name="stamp" select="createdAt" />
         <xsl:variable name="tags" select="tags" />
-        <xsl:variable name="partnerId" select="2162191" />
         <xsl:variable name="entryId" select="string(entryId)" />
         <item>
             <guid isPermalink="false">
                 <xsl:value-of select="string(entryId)" />
             </guid>
             <title>
-                <xsl:value-of select="$title" />
+                <xsl:value-of select="$title" disable-output-escaping="no"/>
             </title>
             <description>
                 <xsl:value-of select="string(description)" disable-output-escaping="no" />
@@ -63,9 +64,9 @@
                 </xsl:attribute>
             </xsl:element>
             <xsl:element name="media:keywords">
-                <xsl:call-template name="implode">
+                <xsl:call-template name="implodeTags">
                     <xsl:with-param name="items" select="tags/tag" />
-                </xsl:call-template>, <xsl:call-template name="implode"><xsl:with-param name="items" select="category/@name" /></xsl:call-template></xsl:element>
+                </xsl:call-template>, <xsl:call-template name="implode"><xsl:with-param name="items" select="category/@name"  /></xsl:call-template></xsl:element>
         </item>
     </xsl:template>
     <xsl:template name="implode">
@@ -79,6 +80,19 @@
                 <xsl:value-of select="' '" />
             </xsl:if>
             <xsl:value-of select="." />
+        </xsl:for-each>
+    </xsl:template>
+    <xsl:template name="implodeTags">
+        <xsl:param name="items" />
+        <xsl:param name="separator" select="','" />
+        <xsl:for-each select="$items">
+            <xsl:if test="position() &gt; 1">
+                <xsl:value-of select="$separator" />
+            </xsl:if>
+            <xsl:if test="not (starts-with(., ' ')) and position() &gt; 1">
+                <xsl:value-of select="' '" />
+            </xsl:if>
+            <xsl:value-of select="." disable-output-escaping="no"/>
         </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>

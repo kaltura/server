@@ -294,4 +294,9 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		}
 		return $fieldVals;
 	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("scheduleEvent:id".strtolower($this->getId()));
+	}
 } // ScheduleEvent

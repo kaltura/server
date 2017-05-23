@@ -11,31 +11,8 @@ class DeliveryProfileLivePackagerHls extends DeliveryProfileLiveAppleHttp {
 		return $httpUrl;
 	}
 	
-	/**
-	 * Build all streaming flavors array
-	 * @param string $url
-	 */
-	protected function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
+	protected function getUrlPrefix($url, $kLiveStreamParams)
 	{
-		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
-		
-		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
-		{
-			/* @var $kLiveStreamParams kLiveStreamParams */
-			/* @var $stream kLiveStreamParams */
-			$flavor = array(
-				'url' => '',
-				'urlPrefix' => requestUtils::resolve("index-s" . $kLiveStreamParams->getFlavorId() . ".m3u8" , $url),
-				'domainPrefix' => $domainPrefix,
-				'ext' => 'm3u8',
-			);
-			
-			$flavor['bitrate'] = isset($flavorBitrateInfo[$kLiveStreamParams->getFlavorId()]) ? $flavorBitrateInfo[$kLiveStreamParams->getFlavorId()] : $kLiveStreamParams->getBitrate();
-			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
-			$flavor['width'] = $kLiveStreamParams->getWidth();
-			$flavor['height'] = $kLiveStreamParams->getHeight();
-			
-			$flavors[] = $flavor;
-		}
+		return requestUtils::resolve("index-s" . $kLiveStreamParams->getFlavorId() . ".m3u8" , $url);
 	}
 }

@@ -153,7 +153,19 @@ class DeliveryProfileDynamicAttributes {
 	 * @var int
 	 */
 	protected $deliveryProfileId = null;
-
+	
+	/**
+	 * List of flavor params ids swhich should be enfroced due to an access control action
+	 * @var array
+	 */
+	protected $aclFlavorParamsIds = null;
+	
+	/**
+	 * Defines whether the list of flavor params ids should be whitelist or blacklisted 
+	 * @var bool
+	 */
+	protected $isAclFlavorParamsIdsBlockedList = null;
+	
 	/**
 	 * @return the $addThumbnailExtension
 	 */
@@ -550,6 +562,31 @@ class DeliveryProfileDynamicAttributes {
 	public function setSessionId($sessionId) {
 		$this->sessionId = $sessionId;
 	}
+	
+	/**
+	 * @param array $aclFlavorParamsIds
+	 * @param bool $isAclFlavorParamsIdsBlockedList
+	 */
+	public function setAclFlavorParamsIds($aclFlavorParamsIds, $isAclFlavorParamsIdsBlockedList)
+	{
+		$this->aclFlavorParamsIds = $aclFlavorParamsIds;
+		$this->isAclFlavorParamsIdsBlockedList = $isAclFlavorParamsIdsBlockedList;
+	
+	}
+	
+	/**
+	 * @return the $aclFlavorParamsIds
+	 */
+	public function getAclFlavorParamsIds() {
+		return $this->aclFlavorParamsIds;
+	}
+	
+	/**
+	 * @return the $isAclFlavorParamsIdsBlockedList
+	 */
+	public function getIsAclFlavorParamsIdsBlockedList() {
+		return $this->isAclFlavorParamsIdsBlockedList;
+	}
 
 	/**
 	 * @param array<asset|assetParams> $flavors
@@ -626,6 +663,8 @@ class DeliveryProfileDynamicAttributes {
 		$this->urlParams = $newObj->getUrlParams();
 		$this->deliveryProfileId = $newObj->getDeliveryProfileId();
 		$this->sessionId = $newObj->getSessionId();
+		$this->aclFlavorParamsIds = $newObj->getAclFlavorParamsIds();
+		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
 	}
 }
 

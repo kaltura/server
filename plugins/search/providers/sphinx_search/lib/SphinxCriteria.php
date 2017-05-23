@@ -6,7 +6,7 @@
 abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQuery
 {
 	const RANKER_NONE = 'none';
-	const RANKER_BM25 = 'BM25';
+	const RANKER_BM25 = "expr('1000*bm25f(2.0,0.75,{privacy_by_contexts=0,categories=0,kuser_id=0,entitled_kusers=0,sphinx_match_optimizations=0})')";
 	const WEIGHT = '@weight';
 	const MAX_MATCHES = 10000;
 	
@@ -464,7 +464,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$matches = reset($this->matchClause);
 			if(count($this->matchClause) > 1)
 				$matches = '( ' . implode(' ) ( ', $this->matchClause) . ' )';
-				
+
 			$this->addWhere("MATCH('$matches')");
 		}
 		

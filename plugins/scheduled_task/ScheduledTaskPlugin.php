@@ -2,8 +2,9 @@
 /**
  * @package plugins.scheduledTask
  */
-class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaAdminConsolePages
+class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaAdminConsolePages, IKalturaPermissionsEnabler
 {
+
 	const PLUGIN_NAME = 'scheduledTask';
 	const PLUGIN_VERSION_MAJOR = 1;
 	const PLUGIN_VERSION_MINOR = 0;
@@ -150,5 +151,16 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 		$pages[] = new MediaRepurposingConfigureAction();
 		$pages[] = new MediaRepurposingSetStatusAction();
 		return $pages;
+	}
+
+	/* (non-PHPdoc)
+	* @see IKalturaPermissionsEnabler::permissionEnabled()
+	*/
+	public static function permissionEnabled($partnerId, $permissionName)
+	{
+		if ($permissionName == 'SCHEDULEDTASK_PLUGIN_PERMISSION')
+		{
+			MediaRepurposingHandler::enableMrPermission($partnerId);
+		}
 	}
 }

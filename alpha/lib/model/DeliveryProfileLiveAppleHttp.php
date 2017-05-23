@@ -124,11 +124,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
 		{
+			if(!$this->isFlavorAllowed($kLiveStreamParams->getFlavorId()))
+				continue;
+			
 			/* @var $kLiveStreamParams kLiveStreamParams */
 			/* @var $stream kLiveStreamParams */
 			$flavor = array(
 					'url' => '',
-					'urlPrefix' => requestUtils::resolve($kLiveStreamParams->getFlavorId() . "/chunklist.m3u8" , $url),
+					'urlPrefix' => $this->getUrlPrefix($url, $kLiveStreamParams),
 					'domainPrefix' => $domainPrefix,
 					'ext' => 'm3u8',
 			);
@@ -137,9 +140,39 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
+			
+			$this->addLanguageInfo($flavor, $kLiveStreamParams);
 				
 			$flavors[] = $flavor;
 		}
+	}
+	
+	protected function getUrlPrefix($url, $kLiveStreamParams)
+	{
+		return requestUtils::resolve($kLiveStreamParams->getFlavorId() . "/chunklist.m3u8" , $url);
+	}
+	
+	protected function addLanguageInfo(&$flavor, $kLiveStreamParams)
+	{
+		$audioLanguageData = $this->getLanguageInfo($kLiveStreamParams);
+		if($audioLanguageData)
+		{
+			list($audioLanguage, $audioLanguageName) = $audioLanguageData;
+			$flavor['audioLanguage'] = $audioLanguage;
+			$flavor['audioLanguageName'] =  $audioLanguageName;
+		}
+	}
+	
+	protected function getLanguageInfo($kLiveStreamParams)
+	{
+		$language = $kLiveStreamParams->getLanguage();
+		if(!$language)
+			return null;
+		
+		$languageObj = languageCodeManager::getObjectFromThreeCode(strtolower($language));
+		$audioLanguageName = $this->getAudioLanguageName($languageObj, $language);
+			
+		return array($language, $audioLanguageName);
 	}
 
 	protected function getPlayServerUrl($manifestUrl)
@@ -245,6 +278,18 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavorBitrateInfo[$stream->getFlavorId()] = $stream->getBitrate();
 		}
 		return $flavorBitrateInfo;
+	}
+	
+	protected function isFlavorAllowed($flavorParamId)
+	{
+		$aclFlavorParamsIds = $this->getDynamicAttributes()->getAclFlavorParamsIds();
+		if(!$aclFlavorParamsIds)
+			return true;
+		
+		$isBlockedList = $this->getDynamicAttributes()->getIsAclFlavorParamsIdsBlockedList();
+		$exists = in_array($flavorParamId, $aclFlavorParamsIds);
+		
+		return $isBlockedList ? !$exists : $exists;
 	}
 }
 

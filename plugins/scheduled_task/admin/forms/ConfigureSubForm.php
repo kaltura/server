@@ -18,12 +18,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		$this->addElement('hidden', "crossLine_$tag", array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
-
-		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
-		$titleElement->setLabel($name);
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElement($titleElement);
-
+		$this->addTitle($name);
 		$this->addObjectProperties($obj, $ignore, $prefix);
 		return;
 
@@ -42,7 +37,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function getTypeFromDoc($docComment) {
-		$exp =  "/\\@var (\\w*)/";
+		$exp = "/\\@var (.*)/";
 		$result = null;
 		$lines = explode("\n", $docComment);
 		foreach ($lines as $line)
@@ -54,6 +49,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addElementByType($type, $name, $prefix) {
 		switch($type) {
 			case 'int':
+				return $this->addIntegerElement($name, $prefix);
 			case 'string':
 				return $this->addStringElement($name, $prefix);
 
@@ -71,21 +67,30 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function addStringElement($name, $prefix) {
-		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> $name,
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-		));
-		$this->getElement("$prefix$name")->setValue("N/A");
+		if ($name == 'message')
+			return $this->addStringAreaElement($name, $prefix);
+
+		$params = array('required' => false, 'value'=>	'N/A',);
+		$this->addElementByStrType('text', $name, "$prefix$name", $params);
+	}
+
+	protected function addIntegerElement($name, $prefix) {
+		$params = array('required' => false, 'value'=>	-1, 'innerType' => 'integer', 'oninput'	=> 'checkNumValid(this.value)');
+		$this->addElementByStrType('textarea', $name, "$prefix$name", $params);
+	}
+
+	protected function addStringAreaElement($name, $prefix) {
+		$params = array('required' => false, 'value'=>	'N/A',);
+		$this->addElementByStrType('textarea', $name, "$prefix$name", $params);
 	}
 
 	protected function addArrayElement($name, $prefix) {
 		$this->addElement('text', "$prefix$name", array(
-			'label' 		=> "$name (Array: enter item comma separated)",
+			'label' 		=> "$name (Array: enter item comma separated. for key-value insert: key:value)",
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
 		));
-		$this->getElement("$prefix$name")->setValue("N/A");
 	}
 
 	protected function addBooleanElement($name, $prefix) {
@@ -117,6 +122,39 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			if (count($newOpArr) > 1)
 				$option = $newOpArr[1];
 		}
+	}
+
+	protected function addComment($name, $msg) {
+		$element = new Zend_Form_Element_Hidden($name);
+		$element->setLabel($msg);
+		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dd', 'class' => 'comment'))));
+		$this->addElements(array($element));
+	}
+
+	protected function addTitle($name, $tag = null)
+	{
+		if (!$tag)
+			$tag = str_replace(' ', '', $name);
+		$titleElement = new Zend_Form_Element_Hidden("Title_$tag");
+		$titleElement->setLabel($name);
+		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+		$this->addElement($titleElement);
+	}
+
+	protected function addTextElement($label, $tag, $params = array()) {
+		$this->addElementByStrType('text', $label, $tag, $params);
+	}
+
+	protected function addElementByStrType($type, $label, $tag, $params) {
+		$options = array(
+			'label' 		=> $label,
+			'filters' 		=> array('StringTrim'),
+			'placement'		=> 'prepend',
+		);
+		foreach($params as $key => $val)
+			$options[$key] = $val;
+
+		$this->addElement($type, $tag, $options);
 	}
 
 }

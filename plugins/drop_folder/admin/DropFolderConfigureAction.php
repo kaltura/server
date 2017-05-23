@@ -35,7 +35,7 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 				$partnerId = $this->_getParam('partnerId');
 				$dropFolderType = $this->_getParam('type');
 				$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
-				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
+				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $partnerId, $dropFolderId);
 				if(!is_null($dropFolderId))
 				{
 					$dropFolder = $dropFolderForm->getObject("Kaltura_Client_DropFolder_Type_DropFolder", $request->getPost(), false, true);
@@ -83,7 +83,7 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 		$action->view->form = $dropFolderForm;
 	}
 	
-	private function processForm(Form_DropFolderConfigure $form, $formData, $dropFolderId = null)
+	private function processForm(Form_DropFolderConfigure $form, $formData, $partnerId, $dropFolderId = null)
 	{
 		if ($form->isValid($formData))
 		{
@@ -91,6 +91,8 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 			$dropFolderPluginClient = Kaltura_Client_DropFolder_Plugin::get($client);
 			
 			$dropFolder = $form->getObject("Kaltura_Client_DropFolder_Type_DropFolder", $formData, false, true);
+			$this->validateConversionProfileId($dropFolder->conversionProfileId, $partnerId);
+			
 			unset($dropFolder->id);
 			
 			if($dropFolder->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT)
@@ -121,6 +123,22 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 		$fileHandlerTypeForView->setLabel('Ingestion Workflow:');
 		$fileHandlerTypeForView->setAttrib('style', 'display:inline');
 		$fileHandlerTypeForView->setValue($fileHandlerTypeValue);
+	}
+	
+	protected function validateConversionProfileId ($conversionProfileId, $partnerId)
+	{
+		$client = Infra_ClientHelper::getClient();
+		
+		$filter = new Kaltura_Client_Type_ConversionProfileFilter();
+		$filter->idEqual = $conversionProfileId;
+		Infra_ClientHelper::impersonate($partnerId);
+		$conversionProfiles = $client->conversionProfile->listAction($filter);
+		Infra_ClientHelper::unimpersonate();
+		
+		if (!$conversionProfiles->totalCount)
+		{
+			throw new Exception("Conversion profile ID [$conversionProfileId] not found.");
+		}
 	}
 }
 

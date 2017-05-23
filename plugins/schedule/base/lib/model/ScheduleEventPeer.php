@@ -233,6 +233,8 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
 		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
+		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
 
 		$filter = new ScheduleEventFilter();
 		$filter->setResourceIdsIn($resourceIds);
@@ -268,6 +270,11 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
+	}
+
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("scheduleEvent:id%s", self::ID));
 	}
 	
 } // ScheduleEventPeer

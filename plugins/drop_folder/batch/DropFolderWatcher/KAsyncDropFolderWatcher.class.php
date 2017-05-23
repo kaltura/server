@@ -75,8 +75,9 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			catch (Exception $e) 
 			{
 				$this->unimpersonate();
-				$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR, 
-					KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::DROP_FOLDER_APP_ERROR_MESSAGE.$e->getMessage());
+				if ($folder)
+					$this->freeExclusiveDropFolder($folder->id, KalturaDropFolderStatus::ERROR,
+						KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::DROP_FOLDER_APP_ERROR_MESSAGE.$e->getMessage());
 			}
 		}
 		
@@ -90,9 +91,10 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		if (strlen($folderTag) == 0)
 			throw new KalturaException('Tags must be specify in configuration - cannot continue');
 
-		$dropFolders = $this->dropFolderPlugin->dropFolder->getExclusiveDropFolder($folderTag, $maxTimeForFolder);
-		$this->currentDropFolderId = $dropFolders->id;
-		return $dropFolders;
+		$dropFolder = $this->dropFolderPlugin->dropFolder->getExclusiveDropFolder($folderTag, $maxTimeForFolder);
+		if (!is_null($dropFolder))
+			$this->currentDropFolderId = $dropFolder->id;
+		return $dropFolder;
 	}
 	
 	private function freeExclusiveDropFolder($dropFolderId, $status = KalturaDropFolderStatus::ENABLED , $errorCode = null, $errorDescription = null)

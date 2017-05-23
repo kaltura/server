@@ -64,7 +64,8 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 			$xslParams = array();
 			$xslParams[XsltParameterName::KALTURA_HAS_NEXT_ITEM] = $moreItems;
 			$xslParams[XsltParameterName::KALTURA_SYNDICATION_FEED_FLAVOR_PARAM_ID] = $this->syndicationFeedDB->getFlavorParamId();
-				
+			$xslParams[XsltParameterName::KALTURA_SYNDICATION_FEED_PARTNER_ID] = $this->syndicationFeed->partnerId;
+
 			$entryMrss = kXml::transformXmlUsingXslt($entryMrss, $this->kalturaXsltItem, $xslParams);
 			$entryMrss = $this->removeNamespaces($entryMrss);
 		}

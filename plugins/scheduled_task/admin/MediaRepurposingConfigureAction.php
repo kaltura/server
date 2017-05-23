@@ -22,10 +22,10 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$mediaRepurposingId = $this->_getParam('media_repurposing_id');
 		$partnerId = $this->_getParam('new_partner_id');
 		$filterTypeEngine = $this->_getParam('new_mr_filter_engine_type');
+		$templateType = $this->_getParam('new_mr_template_type');
 		$filterType = $this->_getParam('new_mr_filter_type');
 		
 		$action->view->formValid = false;
-
 		try
 		{
 			if ($request->isPost())
@@ -34,18 +34,17 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 				$filterTypeStr = $formData['filterTypeStr'];
 				$filterTypeEngine = $formData['engineType'];
 				$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterTypeStr);
-				$valid = $this->processForm($mediaRepurposingForm, $formData, $filterTypeEngine, $mediaRepurposingId);
-				$action->view->formValid = $valid;
-
+				$action->view->formValid = $this->processForm($mediaRepurposingForm, $formData, $filterTypeEngine, $mediaRepurposingId);
 			}
 			else
 			{
 
-				if (!is_null($mediaRepurposingId))
+				if (!is_null($mediaRepurposingId) || !is_null($templateType))
 				{
-					$mr = MediaRepurposingUtils::getMrById($mediaRepurposingId);
-					$filterType = get_class($mr->objectFilter);
+					$mrId = $mediaRepurposingId ? $mediaRepurposingId : $templateType;
+					$mr = MediaRepurposingUtils::getMrById($mrId);
 
+					$filterType = get_class($mr->objectFilter);
 					$mediaRepurposingForm = new Form_MediaRepurposingConfigure($partnerId, $filterType, $mediaRepurposingId);
 					$mediaRepurposingForm->populateFromObject($mr, false);
 				}
@@ -67,8 +66,6 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		
 		$action->view->form = $mediaRepurposingForm;
 	}
-
-
 
 	private function buildTasksArray($tasksData)
 	{
@@ -93,14 +90,11 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 	}
 
 
-
-	
 	private function processForm(Form_MediaRepurposingConfigure $form, $formData, $filterTypeEngine, $mediaRepurposingId = null)
 	{
 		$name = $formData['media_repurposing_name'];
 		$maxEntriesAllowed = $formData['max_entries_allowed'];
 		
-
 		$filter = $form->getFilterFromData($formData);
 		$taskArray = $this->buildTasksArray($formData['TasksData']);
 

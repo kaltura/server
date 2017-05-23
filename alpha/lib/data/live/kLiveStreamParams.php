@@ -43,6 +43,11 @@ class kLiveStreamParams
 	 * @var float
 	 */
 	protected $keyFrameInterval;
+	
+	/**
+	 * @var string
+	 */
+	protected $language;
 
 	/**
 	 * @return the $bitrate
@@ -112,4 +117,13 @@ class kLiveStreamParams
 	 * @param float $keyFrameInterval
 	 */
 	public function setKeyFrameInterval($keyFrameInterval) { $this->keyFrameInterval = $keyFrameInterval; }
+	
+	/**
+	 * @return the $language
+	 */
+	public function getLanguage() { return $this->language; }
+	/**
+	 * @param string $language
+	 */
+	public function setLanguage($language) { $this->language = $language; }
 }
