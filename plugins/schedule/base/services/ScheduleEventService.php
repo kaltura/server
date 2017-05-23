@@ -320,6 +320,7 @@ class ScheduleEventService extends KalturaBaseService
 	 * @action getConflicts
 	 * @param string $resourceIds comma separated
 	 * @param KalturaScheduleEvent $scheduleEvent
+	 * @param string $scheduleEventIdToIgnore
 	 * @return KalturaScheduleEventListResponse
 	 */
 	public function getConflictsAction($resourceIds, KalturaScheduleEvent $scheduleEvent,$scheduleEventIdToIgnore=null)
