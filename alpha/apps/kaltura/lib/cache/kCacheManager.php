@@ -29,7 +29,8 @@ class kCacheManager
 	const CACHE_TYPE_BATCH_JOBS = 'batchJobs';
 	const CACHE_TYPE_RESOURCE_RESERVATION = 'resourceReservation';
 	const CACHE_TYPE_ELASTIC_EXECUTED_SERVER = 'elasticExecutedServer';
-	
+	const CACHE_TYPE_CACHE_ONLY_ACTIONS = 'cacheOnlyActions';
+
 	protected static $caches = array();
 	
 	/**
