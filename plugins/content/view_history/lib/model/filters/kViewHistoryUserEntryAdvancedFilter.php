@@ -34,7 +34,8 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		}
 		
 		$ueCrit->addSelectColumn(UserEntryPeer::ENTRY_ID);
-		$this->filter->attachToCriteria($ueCrit);
+		if($this->filter)
+			$this->filter->attachToCriteria($ueCrit);
 		
 		if(count ($entryIds))
 		{
@@ -56,9 +57,10 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		
 		//get all userEntries
 		$entryIds = $this->getEntryIds();
+		$limit = $this->getLimit();
 		
 		/* @var $query KalturaCriteria */
-		if (count($entryIds) <= $query->getLimit())
+		if (count($entryIds) <= $limit || !$limit)
 		{
 			KalturaLog::info("Few user entries found - merge with query");
 		}
@@ -69,7 +71,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 			$entries = entryPeer::doSelect($query);
 			
 			//if few entry IDS - search userEntry table w/ entry IDs
-			if (count ($entries) <= $query->getLimit())
+			if (count ($entries) <= $limit)
 			{
 				KalturaLog::info("Few criteria entries found - cross with userEntries");
 				
@@ -81,14 +83,14 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 				
 				$entryIds = $this->getEntryIds($ids);
 				
-				if (count($entryIds) <= $query->getLimit())
+				if (count($entryIds) <= $limit)
 				{
 					KalturaLog::info("Few user entries found - merge with query");
 				}
 				else 
 				{
 					KalturaLog::info("Not all objects will return from the search - consider narrowing the search criteria");
-					$entryIds = array_slice($entryIds, 0, $query->getLimit());
+					$entryIds = array_slice($entryIds, 0, $limit);
 				}
 			}
 			else
