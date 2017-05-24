@@ -110,7 +110,7 @@ class KExternalErrors
 			self::INTERNAL_SERVER_ERROR => "Internal server error",
 			self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
 			self::TOO_MANY_PROCESSES => "Too many executed processes",
-            self::BUNDEL_CREATION_FAILED => "Failed to build bundel for [%s]"
+            self::BUNDLE_CREATION_FAILED => "Failed to build bundel for [%s]"
 	);
 	
 	public static function dieError($errorCode, $message = null)

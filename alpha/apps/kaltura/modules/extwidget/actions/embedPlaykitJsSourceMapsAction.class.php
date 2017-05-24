@@ -14,8 +14,19 @@ class embedPlaykitJsSourceMapsAction extends sfAction
         $fileName = $this->getRequestParameter('path');
         if (!$fileName)
             KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'path');
-        $bundleWebDirPath = kConf::get('playkit_js_bundles_path');
-        $sourceMapFilePath = $bundleWebDirPath .$fileName ;
+        //file name should be base64 encoded string which ends with min.js.map
+        if (!preg_match('`^[a-zA-Z0-9+/]+={0,2}.min.js.map$`', $fileName)) {
+            KExternalErrors::dieGracefully("Wrong source map name pattern");
+        }
+
+        //Get config params
+        try {
+            $bundleWebDirPath = kConf::get('playkit_js_bundles_path');
+        } catch (Exception $ex) {
+            KExternalErrors::dieGracefully($ex->getMessage());
+        }
+
+        $sourceMapFilePath = $bundleWebDirPath . $fileName;
         $sourceMap = file_get_contents($sourceMapFilePath);
         header("Content-Type: application/octet-stream");
 
