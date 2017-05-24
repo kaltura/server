@@ -139,6 +139,11 @@ class SphinxScheduleEventCriteria extends SphinxCriteria
 		return parent::applyFilterFields($filter);
 	}
 
+	public function getTranslateIndexId($id)
+	{
+		return $id;
+	}
+
 	private function buildMd5String($str)
 	{
 		return mySearchUtils::getMd5EncodedString($str);
