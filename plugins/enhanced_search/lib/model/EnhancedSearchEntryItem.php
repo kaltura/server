@@ -26,6 +26,15 @@ class EnhancedSearchEntryItem extends EnhancedSearchItem
 	 */
 	public function setFieldName($fieldName)
 	{
+		switch ($fieldName)
+		{
+			case EnhancedSearchEntryFieldName::ENTRY_DESCRIPTION:
+				$fieldName = 'ENTRY_DESCRIPTION';
+				break;
+			case EnhancedSearchEntryFieldName::ENTRY_NAME:
+				$fieldName = 'ENTRY_NAME';
+				break;
+		}
 		$this->fieldName = $fieldName;
 	}
 
@@ -43,6 +52,13 @@ class EnhancedSearchEntryItem extends EnhancedSearchItem
 	public function setSearchTerm($searchTerm)
 	{
 		$this->searchTerm = $searchTerm;
+	}
+
+	public function getSearchQuery()
+	{
+		$queryVerb = $this->getQueryVerb();
+		$queryVal = array($this->getFieldName() => strtolower($this->getSearchTerm()));
+		return array($queryVerb => $queryVal);
 	}
 
 

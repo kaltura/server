@@ -30,8 +30,11 @@ class EnhancedSearchService extends KalturaBaseService
 	function searchAction (KalturaEnhancedSearchOperator $searchOperator)
 	{
 		$coreSearchOperator = $searchOperator->toObject();
+		/**
+		 * @var EnhancedSearchOperator $coreSearchOperator
+		 */
 		// CALL NADAVS class here with coreSearchOperator
-
+		KalturaLog::debug("@@NA for debug [".print_r($coreSearchOperator->getSearchQuery(),true)."]");
 		$results = new KalturaEnhancedSearchResultArray();
 //		$results = KalturaEnhancedSearchResultArray::fromDbArray(array());
 		return $results;

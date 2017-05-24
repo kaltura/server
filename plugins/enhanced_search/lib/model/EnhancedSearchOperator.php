@@ -68,29 +68,39 @@ class EnhancedSearchOperator extends EnhancedSearchItem
 
 	public function getSearchQuery()
 	{
-		
-		$captionQuery = array(
-			'has_child' => array(
-				'type' => self::ELASTIC_CAPTION_TYPE,
-				'query' => array(
-					'nested' => array(
-						'path' => 'lines',
-						'query' => array(
-							'bool' => array(
-								//here you enter the query on the fields
-							)
-						),
-						'inner_hits' => array( //to see the lines that contributed to the answer
-							'size' => self::INNER_HITS_SIZE
-						)
-					)
-				),
-				'inner_hits' => array( //to see the caption asset id
-					'size' => self::INNER_HITS_SIZE,
-					'_source' => false,
-				)
-			)
-		);
+		if (!count($this->getSearchItems()))
+		{
+			return array();
+		}
+		$boolOpeartor = null;
+		$additionalParams = array();
+		switch ($this->getOperator())
+		{
+			case EnhancedSearchOperatorType::AND_OP:
+				$boolOpeartor = 'must';
+				break;
+			case EnhancedSearchOperatorType::OR_OP:
+				$boolOpeartor = 'should';
+				$additionalParams['minimum_should_match'] = 1;
+				break;
+			default:
+				KalturaLog::crit('unknown operator type');
+				return null;
+		}
+		$outQuery = array();
+		foreach ($this->getSearchItems() as $searchItem)
+		{
+			/**
+			 * @var EnhancedSearchItem $searchItem
+			 */
+			$outQuery[$boolOpeartor] = $searchItem->getSearchQuery();
+			foreach ($additionalParams as $addParamKey => $addParamVal)
+			{
+				$outQuery[$addParamKey] = $addParamVal;
+			}
+		}
+
+		return $outQuery;
 	}
 
 

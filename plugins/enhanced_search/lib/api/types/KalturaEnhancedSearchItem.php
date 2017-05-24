@@ -7,11 +7,11 @@ abstract class KalturaEnhancedSearchItem extends KalturaEnhancedSearchBaseItem {
 	/**
 	 * @var KalturaEnhancedSearchItemType
 	 */
-	public $searchType;
+	public $itemType;
 
 
 	private static $map_between_objects = array(
-		'searchType',
+		'itemType',
 	);
 
 	protected function getMapBetweenObjects()
