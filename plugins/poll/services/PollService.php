@@ -37,7 +37,7 @@ class PollService extends KalturaBaseService
 	 * @action getVotes
 	 * @param string $pollId
 	 * @param string $answerIds
-	 * @param string|null $otherDCVotes
+	 * @param string $otherDCVotes
 	 * @return mixed|string|void
 	 * @throws KalturaAPIException
 	 */
