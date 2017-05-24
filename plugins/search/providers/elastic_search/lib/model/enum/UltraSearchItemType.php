@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.enhancedSearch
+ * @package plugins.elasticSearch
  * @subpackage model.enum
  */ 
-interface EnhancedSearchItemType extends BaseEnum
+interface UltraSearchItemType extends BaseEnum
 {
 	const EXACT_MATCH = 1;
 	const PARTIAL = 2;

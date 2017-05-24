@@ -1,10 +1,10 @@
 <?php
 
-class EnhancedSearchOperator extends EnhancedSearchItem
+class UltraSearchOperator extends UltraSearchItem
 {
 
 	/**
-	 * @var EnhancedSearchOperatorType
+	 * @var UltraSearchOperatorType
 	 */
 	protected $operator;
 
@@ -19,7 +19,7 @@ class EnhancedSearchOperator extends EnhancedSearchItem
 	protected $searchItems;
 
 	/**
-	 * @return EnhancedSearchOperatorType
+	 * @return UltraSearchOperatorType
 	 */
 	public function getOperator()
 	{
@@ -27,7 +27,7 @@ class EnhancedSearchOperator extends EnhancedSearchItem
 	}
 
 	/**
-	 * @param EnhancedSearchOperatorType $operator
+	 * @param UltraSearchOperatorType $operator
 	 */
 	public function setOperator($operator)
 	{
@@ -76,10 +76,10 @@ class EnhancedSearchOperator extends EnhancedSearchItem
 		$additionalParams = array();
 		switch ($this->getOperator())
 		{
-			case EnhancedSearchOperatorType::AND_OP:
+			case UltraSearchOperatorType::AND_OP:
 				$boolOpeartor = 'must';
 				break;
-			case EnhancedSearchOperatorType::OR_OP:
+			case UltraSearchOperatorType::OR_OP:
 				$boolOpeartor = 'should';
 				$additionalParams['minimum_should_match'] = 1;
 				break;
@@ -91,7 +91,7 @@ class EnhancedSearchOperator extends EnhancedSearchItem
 		foreach ($this->getSearchItems() as $searchItem)
 		{
 			/**
-			 * @var EnhancedSearchItem $searchItem
+			 * @var UltraSearchItem $searchItem
 			 */
 			$outQuery[$boolOpeartor] = $searchItem->getSearchQuery();
 			foreach ($additionalParams as $addParamKey => $addParamVal)

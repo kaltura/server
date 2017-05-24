@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.enhancedSearch
+ * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaEnhancedSearchResult extends KalturaObject {
+class KalturaUltraSearchResult extends KalturaObject {
 
     /**
      * @var KalturaBaseEntry

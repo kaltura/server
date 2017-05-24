@@ -1,10 +1,10 @@
 <?php
 
-class EnhancedSearchEntryItem extends EnhancedSearchItem
+class UltraSearchEntryItem extends UltraSearchItem
 {
 
 	/**
-	 * @var EnhancedSearchEntryFieldName
+	 * @var UltraSearchEntryFieldName
 	 */
 	protected $fieldName;
 
@@ -14,7 +14,7 @@ class EnhancedSearchEntryItem extends EnhancedSearchItem
 	protected $searchTerm;
 
 	/**
-	 * @return EnhancedSearchEntryFieldName
+	 * @return UltraSearchEntryFieldName
 	 */
 	public function getFieldName()
 	{
@@ -22,16 +22,16 @@ class EnhancedSearchEntryItem extends EnhancedSearchItem
 	}
 
 	/**
-	 * @param EnhancedSearchEntryFieldName $fieldName
+	 * @param UltraSearchEntryFieldName $fieldName
 	 */
 	public function setFieldName($fieldName)
 	{
 		switch ($fieldName)
 		{
-			case EnhancedSearchEntryFieldName::ENTRY_DESCRIPTION:
+			case UltraSearchEntryFieldName::ENTRY_DESCRIPTION:
 				$fieldName = 'ENTRY_DESCRIPTION';
 				break;
-			case EnhancedSearchEntryFieldName::ENTRY_NAME:
+			case UltraSearchEntryFieldName::ENTRY_NAME:
 				$fieldName = 'ENTRY_NAME';
 				break;
 		}

@@ -1,11 +1,11 @@
 <?php
 /**
- * @package plugins.enhancedSearch
+ * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-abstract class KalturaEnhancedSearchItem extends KalturaEnhancedSearchBaseItem {
+abstract class KalturaUltraSearchItem extends KalturaUltraSearchBaseItem {
 	/**
-	 * @var KalturaEnhancedSearchItemType
+	 * @var KalturaUltraSearchItemType
 	 */
 	public $itemType;
 

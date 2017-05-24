@@ -1,13 +1,13 @@
 <?php
 /**
- * @package plugins.enhancedSearch
+ * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaEnhancedSearchOperator extends KalturaEnhancedSearchBaseItem {
+class KalturaUltraSearchOperator extends KalturaUltraSearchBaseItem {
 
 
     /**
-     * @var KalturaEnhancedSearchOperatorType
+     * @var KalturaUltraSearchOperatorType
      */
     public $operator;
 
@@ -17,7 +17,7 @@ class KalturaEnhancedSearchOperator extends KalturaEnhancedSearchBaseItem {
     public $not;
 
     /**
-     *  @var KalturaEnhancedSearchBaseItemArray
+     *  @var KalturaUltraSearchBaseItemArray
      */
     public $searchItems;
 
@@ -35,7 +35,7 @@ class KalturaEnhancedSearchOperator extends KalturaEnhancedSearchBaseItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new EnhancedSearchOperator();
+			$object_to_fill = new UltraSearchOperator();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 

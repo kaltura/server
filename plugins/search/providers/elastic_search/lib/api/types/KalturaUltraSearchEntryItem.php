@@ -1,9 +1,14 @@
 <?php
 /**
- * @package plugins.enhancedSearch
+ * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaEnhancedSearchCaptionItem extends KalturaEnhancedSearchItem {
+class KalturaUltraSearchEntryItem extends KalturaUltraSearchItem {
+
+	/**
+	 * @var KalturaUltraSearchEntryFieldName
+	 */
+	public $fieldName;
 
 	/**
 	 * @var string
@@ -11,6 +16,7 @@ class KalturaEnhancedSearchCaptionItem extends KalturaEnhancedSearchItem {
 	public $searchTerm;
 
 	private static $map_between_objects = array(
+		'fieldName',
 		'searchTerm',
 	);
 
@@ -22,7 +28,7 @@ class KalturaEnhancedSearchCaptionItem extends KalturaEnhancedSearchItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new EnhancedSearchCaptionItem();
+			$object_to_fill = new UltraSearchEntryItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 

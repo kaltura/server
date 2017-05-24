@@ -1,6 +1,6 @@
 <?php
 
-class EnhancedSearchCaptionItem extends EnhancedSearchItem
+class UltraSearchCaptionItem extends UltraSearchItem
 {
 
 	/**
@@ -29,14 +29,14 @@ class EnhancedSearchCaptionItem extends EnhancedSearchItem
 		$captionQuery = null;
 		switch ($this->getItemType())
 		{
-			case EnhancedSearchItemType::EXACT_MATCH:
+			case UltraSearchItemType::EXACT_MATCH:
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must'][] = array(
 					'term' => array(
 						'lines.content' => strtolower($this->getSearchTerm())
 					)
 				);
 				break;
-			case EnhancedSearchItemType::PARTIAL:
+			case UltraSearchItemType::PARTIAL:
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must'][] = array(
 					'multi_match'=> array(
 						'query'=> strtolower($this->getSearchTerm()),
@@ -48,14 +48,14 @@ class EnhancedSearchCaptionItem extends EnhancedSearchItem
 					)
 				);
 				break;
-			case EnhancedSearchItemType::STARTS_WITH:
+			case UltraSearchItemType::STARTS_WITH:
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must'][] = array(
 					'prefix' => array(
 						'lines.content' => strtolower($this->getSearchTerm())
 					)
 				);
 				break;
-			case EnhancedSearchItemType::DOESNT_CONTAIN:
+			case UltraSearchItemType::DOESNT_CONTAIN:
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must_not'][] = array(
 					'term' => array(
 						'lines.content' => strtolower($this->getSearchTerm())
