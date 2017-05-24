@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */
-class category extends Basecategory implements IIndexable, IRelatedObject
+class category extends Basecategory implements IIndexable, IRelatedObject, IElasticIndexable
 {
 	protected $childs_for_save = array();
 	
@@ -1853,5 +1853,71 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$c->applyFilters();
 		$categoryIds = $c->getFetchedIds();
 		return $categoryIds;
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return IElasticIndexable::ELASTIC_INDEX_PREFIX.'_category';
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return 'category';
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'doc' => array(
+				'partner_id' => $this->getPartnerId(),
+				'privacy' => $this->getPrivacy(),
+				'privacy_context' => $this->getPrivacyContext(),
+				'privacy_contexts' => $this->getPrivacyContexts(),
+				'status' => $this->getStatus(),
+			),
+			'doc_as_upsert' => true
+		);
+		return $body;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::UPADTE;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 }
