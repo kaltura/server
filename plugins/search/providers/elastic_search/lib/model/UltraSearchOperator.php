@@ -66,42 +66,9 @@ class UltraSearchOperator extends UltraSearchItem
 		$this->searchItems = $searchItems;
 	}
 
-	public function getSearchQuery()
+	public function createSearchQuery()
 	{
-		if (!count($this->getSearchItems()))
-		{
-			return array();
-		}
-		$boolOpeartor = null;
-		$additionalParams = array();
-		switch ($this->getOperator())
-		{
-			case UltraSearchOperatorType::AND_OP:
-				$boolOpeartor = 'must';
-				break;
-			case UltraSearchOperatorType::OR_OP:
-				$boolOpeartor = 'should';
-				$additionalParams['minimum_should_match'] = 1;
-				break;
-			default:
-				KalturaLog::crit('unknown operator type');
-				return null;
-		}
-		$outQuery = array();
-		foreach ($this->getSearchItems() as $searchItem)
-		{
-			/**
-			 * @var UltraSearchItem $searchItem
-			 */
-			$outQuery[$boolOpeartor] = $searchItem->getSearchQuery();
-			foreach ($additionalParams as $addParamKey => $addParamVal)
-			{
-				$outQuery[$addParamKey] = $addParamVal;
-			}
-		}
-
-		return $outQuery;
+		return kUltraQueryManager::createOperatorSearchQuery($this);
 	}
-
 
 }

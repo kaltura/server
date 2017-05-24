@@ -18,14 +18,16 @@ class UltraSearchService extends KalturaBaseService
 		/**
 		 * @var UltraSearchOperator $coreSearchOperator
 		 */
-		// CALL NADAVS class here with coreSearchOperator
-		KalturaLog::debug("@@NA for debug [".print_r($coreSearchOperator->getSearchQuery(),true)."]");
-//		$results = new KalturaUltraSearchResultArray();
-		$results = KalturaUltraSearchResultArray::fromDbArray(array());
-		return $results;
+		$subSearchQuery = kUltraQueryManager::createSearchQuery($coreSearchOperator);
+		KalturaLog::debug("@@NA for debug [".print_r($subSearchQuery,true)."]");
+		$results = kUltraSearch::doSearch($subSearchQuery);
+		return KalturaUltraSearchResultArray::fromDbArray($results);
 	}
 
 
 }
+
+
+?>
 
 

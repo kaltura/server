@@ -27,7 +27,7 @@ abstract class UltraSearchItem extends BaseObject
 	/**
 	 * @return null|string
 	 */
-	protected function getQueryVerb()
+	public function getQueryVerb()
 	{
 		$queryVerb = null;
 		switch ($this->getItemType())
@@ -48,6 +48,9 @@ abstract class UltraSearchItem extends BaseObject
 		return $queryVerb;
 	}
 
-	abstract public function getSearchQuery();
+	/**
+	 * In order to implement visitor/visited design pattern.
+	 */
+	abstract public function createSearchQuery();
 
 }

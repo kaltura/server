@@ -54,11 +54,9 @@ class UltraSearchEntryItem extends UltraSearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function getSearchQuery()
+	public function createSearchQuery()
 	{
-		$queryVerb = $this->getQueryVerb();
-		$queryVal = array($this->getFieldName() => strtolower($this->getSearchTerm()));
-		return array($queryVerb => $queryVal);
+		return kUltraQueryManager::createEntrySearchQuery($this);
 	}
 
 
