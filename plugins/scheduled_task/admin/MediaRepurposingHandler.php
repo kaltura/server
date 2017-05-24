@@ -19,15 +19,11 @@ class MediaRepurposingHandler
 		}
 		if (!AuditTrailConfigPeer::retrieveByObjectType(AuditTrailObjectType::SCHEDULE_TASK,$partnerId)) {
 			KalturaLog::info("NO Audit trail config on partner [$partnerId] - creating new one");
-
-			KalturaLog::info("qwer");
-			
 			$auditTrailConfig = new AuditTrailConfig();
 			$auditTrailConfig->setPartnerId($partnerId);
 			$auditTrailConfig->setObjectType(AuditTrailObjectType::SCHEDULE_TASK);
 			$auditTrailConfig->setActions(KalturaAuditTrailAction::EXECUTED);
 			$auditTrailConfig->save();
-			
 		}
 	}
 }
