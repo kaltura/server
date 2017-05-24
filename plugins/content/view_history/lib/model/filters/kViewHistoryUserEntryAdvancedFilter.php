@@ -42,7 +42,8 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 			$ueCrit->add(UserEntryPeer::ENTRY_ID, $entryIds, Criteria::IN);
 		}
 		$ueCrit->add(UserEntryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
-		$ueCrit->add(UserEntryPeer::KUSER_ID, kCurrentContext::$ks_kuser_id);
+		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
+		$ueCrit->add(UserEntryPeer::KUSER_ID, $currentKsKuserId);
 		
 		$stmt = UserEntryPeer::doSelectStmt($ueCrit);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
