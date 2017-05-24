@@ -35,9 +35,9 @@ class PollService extends KalturaBaseService
 	/**
 	 * Get Votes Action
 	 * @action getVotes
-	 * @param $pollId
-	 * @param $answerIds
-	 * @param null $otherDCVotes
+	 * @param string $pollId
+	 * @param string $answerIds
+	 * @param null|string $otherDCVotes
 	 * @return mixed|string|void
 	 * @throws KalturaAPIException
 	 */
@@ -73,9 +73,9 @@ class PollService extends KalturaBaseService
 	/**
 	 * Vote Action
 	 * @action vote
-	 * @param $pollId
-	 * @param $userId
-	 * @param $answerIds
+	 * @param string $pollId
+	 * @param string $userId
+	 * @param string $answerIds
 	 * @return string
 	 * @throws KalturaAPIException
 	 */
