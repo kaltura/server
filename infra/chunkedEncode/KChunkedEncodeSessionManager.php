@@ -165,7 +165,7 @@
 		public function GenerateVideo()
 		{
 			while(1)	{
-				if($this->IsFinished()) {
+				if($this->chunker->PendingChunksCount()==0) {
 					break;
 				}
 				if($this->GenerateVideoChunk()!=true) {
@@ -177,14 +177,6 @@
 				return $rv;
 			$this->SerializeSession();
 			return true;
-		}
-		
-		/********************
-		 *
-		 */
-		public function IsFinished()
-		{
-			return ($this->chunker->chunkDataIdx>=count($this->chunker->chunkDataArr));
 		}
 		
 		/********************
@@ -454,16 +446,32 @@
 				$lineArr = explode(' ', $line);
 				if(count($lineArr)==0)
 					continue;
+				
+				/*
+				 * Retrieve the ouput filename from the ffmpeg cmd-line 
+				 */
 				if(($key=array_search('-pass', $lineArr))!==false && $lineArr[$key+1]==1) {
 					if(($key=array_search('-passlogfile', $lineArr))!==false) {
-						$fileName = basename($lineArr[$key+1]);
+						$outputFileName = basename($lineArr[$key+1]);
 					}
 				}
 				else
-					$fileName = basename(end($lineArr));
-				if(($sessionName=strstr($fileName,"_".$this->chunker->chunkEncodeToken, true))===false)
+					$outputFileName = basename(end($lineArr));
+				
+				/*
+				 * Skip cases/cmd-lines that does not contain the 'chunkEncodeToken'
+				 * Only cmd-lines with this token participate in chunked encode flow
+				 */
+				if(($sessionName=strstr($outputFileName,"_".$this->chunker->chunkEncodeToken, true))===false)
 					continue;
-				if(strstr($fileName,"_fallback")===false){
+				
+				/*
+				 * Gather into separete arrays - 
+				 * - 'normal' chunked encodes (chunkedSesssionsArr)
+				 * - the 'fallback' cases (fallbackSesssionsArr)
+				 * - Sum up jobs that belong to that specific session (this) 
+				 */
+				if(strstr($outputFileName,"_fallback")===false){
 					if(key_exists($sessionName,$chunkedSesssionsArr))
 						$chunkedSesssionsArr[$sessionName] = $chunkedSesssionsArr[$sessionName]+1;
 					else 
@@ -478,19 +486,50 @@
 						$fallbackSesssionsArr[$sessionName] = 1;
 				}
 			}
+			
+				/*
+				 * Sum up 
+				 * - all currently processing chunks
+				 * - all currenly processed sessions
+				 * - all fallback sessions
+				 */
 			$allChunks = array_sum($chunkedSesssionsArr);
 			$chunkedSesssionsCnt = count($chunkedSesssionsArr);
-			$fallbackSesssionsCnt = count($fallbackSesssionsArr);
 			if($thisChunks==0)
 				$chunkedSesssionsCnt+= 1;
-			$toSet = round(($setup->concurrent-$fallbackSesssionsCnt)/$chunkedSesssionsCnt);
-			if(($allChunks-$thisChunks)+$toSet>$setup->concurrent)
-				$toSet = $setup->concurrent - ($allChunks-$thisChunks);
-			if($toSet<$setup->concurrentMin)
-				$toSet = $setup->concurrentMin;
-			KalturaLog::log("maxConcurrent($toSet),sessions($chunkedSesssionsCnt),chunks($allChunks),this($thisChunks),fallbacks($fallbackSesssionsCnt),".serialize($chunkedSesssionsArr));
-
-			return $toSet;
+			$fallbackSesssionsCnt = count($fallbackSesssionsArr);
+			
+				/*
+				 * Concurrency evaluation rules - 
+				 * - Every active session should ALWAYS run at least ONE chunk
+				 * - All sessions should get the same concurrency level (number of concurrently running chunks)
+				 * -- An exception to the above are fallback sessions (they are not chunked)
+				 * Therefore the calculation is bellow - 
+				 */
+			$newConcurrency = round(($setup->concurrent-$fallbackSesssionsCnt)/$chunkedSesssionsCnt);
+				/*
+				 * If for some reason the total sum of all concurrently executed chunks 
+				 * is going to be higher than the allowed limit (setup::concurrent) => trim it to the limit val
+				 */
+			if($setup->concurrent<($allChunks-$thisChunks)+$newConcurrency)
+				$newConcurrency = $setup->concurrent - ($allChunks-$thisChunks);
+				/*
+				 * If on the other hand there are remaining free execution slots - 
+				 * randomly assign it to th ecurrent session
+				 */
+			else if($setup->concurrent>($allChunks-$thisChunks)+$newConcurrency) {
+				$additional = rand(1,$chunkedSesssionsCnt);
+				if($additional==1){
+					$newConcurrency++;
+				}
+			}
+			if($newConcurrency<$setup->concurrentMin)
+				$newConcurrency = $setup->concurrentMin;
+			$msgStr = "maxConcurrent($newConcurrency),sessions($chunkedSesssionsCnt),chunks($allChunks),this($thisChunks),fallbacks($fallbackSesssionsCnt),".serialize($chunkedSesssionsArr);
+			if(isset($additional))
+				$msgStr.=",added";
+			KalturaLog::log($msgStr);
+			return $newConcurrency;
 		}
 
 		/********************
@@ -543,11 +582,11 @@
 					KalturaLog::log("Finished - No running processes!!");
 					break;
 				}
-				KalturaLog::log("Running($runningCnt):".implode(',',$runningArr));
+				KalturaLog::log("Running($runningCnt=>".implode(',',$runningArr)."),Pending(".$this->chunker->PendingChunksCount().")");
 				if($this->getChunkArrFileStatData()==0)
 					sleep($sleepTime);
 			}
-			KalturaLog::log("Running($runningCnt):".implode(',',$runningArr));
+			KalturaLog::log("Running($runningCnt=>".implode(',',$runningArr)."),Pending(".$this->chunker->PendingChunksCount().")");
 			$this->processArr = $runningArr;
 			return true;
 		}
