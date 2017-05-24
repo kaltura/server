@@ -124,11 +124,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
 		{
+			if(!$this->isFlavorAllowed($kLiveStreamParams->getFlavorId()))
+				continue;
+			
 			/* @var $kLiveStreamParams kLiveStreamParams */
 			/* @var $stream kLiveStreamParams */
 			$flavor = array(
 					'url' => '',
-					'urlPrefix' => requestUtils::resolve($kLiveStreamParams->getFlavorId() . "/chunklist.m3u8" , $url),
+					'urlPrefix' => $this->getUrlPrefix($url, $kLiveStreamParams),
 					'domainPrefix' => $domainPrefix,
 					'ext' => 'm3u8',
 			);
@@ -142,6 +145,11 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 				
 			$flavors[] = $flavor;
 		}
+	}
+	
+	protected function getUrlPrefix($url, $kLiveStreamParams)
+	{
+		return requestUtils::resolve($kLiveStreamParams->getFlavorId() . "/chunklist.m3u8" , $url);
 	}
 	
 	protected function addLanguageInfo(&$flavor, $kLiveStreamParams)
@@ -270,6 +278,18 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavorBitrateInfo[$stream->getFlavorId()] = $stream->getBitrate();
 		}
 		return $flavorBitrateInfo;
+	}
+	
+	protected function isFlavorAllowed($flavorParamId)
+	{
+		$aclFlavorParamsIds = $this->getDynamicAttributes()->getAclFlavorParamsIds();
+		if(!$aclFlavorParamsIds)
+			return true;
+		
+		$isBlockedList = $this->getDynamicAttributes()->getIsAclFlavorParamsIdsBlockedList();
+		$exists = in_array($flavorParamId, $aclFlavorParamsIds);
+		
+		return $isBlockedList ? !$exists : $exists;
 	}
 }
 

@@ -1,3 +1,46 @@
+# Lynx 12.17.0 #
+
+## Add polls support ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7333
+
+### Configuration ###
+
+- Add service.poll.poll.ini
+- In local.ini add the following parameters:
+ - [poll]
+   secret = <select a secret>
+   cache_ttl = 86400
+- In base.ini add the following parameters:
+ - [cache_based_service_actions]
+   poll_poll_vote = "/../../plugins/poll/lib/PollActions.php"
+- In cache.ini add the following parameters:
+  - [memcacheKeys:memcacheBase]
+     host = 127.0.0.1
+  - cacheOnlyActions = memcacheKeys
+  
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+## ViewHistory Feature Add missing permission item ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7281
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Lynx 12.16.0 #
 
 ## Add scheduleEvent->list optimization ##

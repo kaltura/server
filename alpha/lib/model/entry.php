@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject
+class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject, IElasticIndexable
 {
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
@@ -1327,6 +1327,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return null;
 		return parent::getCategoriesIds();
+	}
+
+	public function getCategoriesIdsArray()
+	{
+		$categoryIds = $this->getCategoriesIds();
+		if(!$categoryIds)
+			return null;
+		$categoryIds = explode(',', $categoryIds);
+		return $categoryIds;
 	}
 		
 	/*public function renameCategory($oldFullName, $newFullName)
@@ -3601,5 +3610,74 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$url .= "/playManifest/entryId/$entryId/format/$format/protocol/$protocolStr";
 		
 		return $url;
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return IElasticIndexable::ELASTIC_INDEX_PREFIX."_entry";
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return 'entry';
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'parent_id' => $this->getParentEntryId(),
+			'status' => $this->getStatus(),
+			'entitled_kusers_edit' => $this->getEntitledKusersEdit(),
+			'entitled_kusers_publish' => $this->getEntitledKusersPublish(),
+			'kuser_id' => $this->getKuserId(),
+			'creator_kuser_id' => $this->getCreatorKuserId(),
+			'name' => $this->getName(),
+			'description' => $this->getDescription(),
+			'tags' => $this->getTags(),
+			'partner_id' => $this->getPartnerId(),
+			'category_ids' => $this->getCategoriesIdsArray()
+		);
+		return $body;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::INDEX;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 }

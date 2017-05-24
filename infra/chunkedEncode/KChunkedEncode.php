@@ -226,6 +226,14 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 		}
 		
 		/********************
+		 * Returns count of yet-to-be-processed chunks
+		 */
+		public function PendingChunksCount()
+		{
+			return (count($this->chunkDataArr)-$this->chunkDataIdx);
+		}
+		
+		/********************
 		 * Check for supported codecs/formats, conditions
 		 */
 		protected function verifySupport(&$msgStr)
