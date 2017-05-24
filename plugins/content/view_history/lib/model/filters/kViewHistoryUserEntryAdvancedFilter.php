@@ -57,7 +57,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		
 		//get all userEntries
 		$entryIds = $this->getEntryIds();
-		$limit = $this->getLimit();
+		$limit = $query->getLimit();
 		
 		/* @var $query KalturaCriteria */
 		if (count($entryIds) <= $limit || !$limit)
