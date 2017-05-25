@@ -48,6 +48,36 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		return $ids;
 	}
 	
+	public function addToXml(SimpleXMLElement &$xmlElement)
+	{
+		parent::addToXml($xmlElement);
+		
+		if(!is_null($this->filter))
+		{
+			foreach($this->filter->getFields() as $name => $value)
+			{
+				if(!is_null($value))
+					$xmlElement->addAttribute($name, $value);
+			}
+		}
+	}
+	
+	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
+	{
+		parent::fillObjectFromXml($xmlElement);
+	
+		$attr = $xmlElement->attributes();
+		if(is_null($this->filter))
+			$this->filter = new UserEntryFilter();
+		foreach($attr as $name => $value)
+		{
+			if(!is_null($value))
+			{
+				$this->filter->set($name,(string)$value);
+			}
+		}
+	}
+	
 	public function applyCondition(IKalturaDbQuery $query)
 	{
 		if ($this->disable)
