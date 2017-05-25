@@ -22,14 +22,17 @@ class kEntrySearch
     /**
      * todo - before the call need to call kElasticEntitlement::init()
      */
-    public function doSearch($elasticSearchConditions = null, $entriesStatus = array(entryStatus::READY))
+    public function doSearch(UltraSearchOperator $ultraSearchOperator, $entriesStatus = array(entryStatus::READY))
     {
+	    kElasticEntitlement::init();
         $this->initQuery($entriesStatus);
         $this->initEntitlement();
-        $this->applyElasticSearchConditions($elasticSearchConditions);
-        echo print_r($this->query, true); //todo - remove after debug
+        $subQuery = kUltraQueryManager::createSearchQuery($ultraSearchOperator);
+	    KalturaLog::debug("@@NA for debug [".print_r($subQuery,true)."]");
+        $this->applyElasticSearchConditions($subQuery);
+        KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
         $result = $this->elasticClient->search($this->query);
-        echo print_r($result, true); //todo - remove after debug
+        KalturaLog::debug("@@NH results [".print_r($result, true)."]"); //todo - remove after debug
         return $result;
     }
     

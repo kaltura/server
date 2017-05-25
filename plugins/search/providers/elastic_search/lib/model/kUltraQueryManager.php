@@ -14,13 +14,12 @@ class kUltraQueryManager
 		return $ultraSearchItem->createSearchQuery();
 	}
 
-	public static function createOperatorSearchQuery(UltraSearchOperator $ultraSearchOperator)
+	public static function createOperatorSearchQuery(UltraSearchOperator $ultraSearchOperator, $boolOperator = UltraSearchOperatorType::AND_OP)
 	{
 		if (!count($ultraSearchOperator->getSearchItems()))
 		{
 			return array();
 		}
-		$boolOpeartor = null;
 		$additionalParams = array();
 		switch ($ultraSearchOperator->getOperator())
 		{
@@ -41,29 +40,33 @@ class kUltraQueryManager
 			/**
 			 * @var UltraSearchItem $searchItem
 			 */
-			$outQuery[$boolOpeartor] = self::createSearchQuery($searchItem);
+			$outQuery['bool'][$boolOpeartor] = self::createSearchQuery($searchItem);
 			foreach ($additionalParams as $addParamKey => $addParamVal)
 			{
-				$outQuery[$addParamKey] = $addParamVal;
+				$outQuery['bool'][$addParamKey] = $addParamVal;
 			}
 		}
 
 		return $outQuery;
 	}
 
-	public static function createEntrySearchQuery(UltraSearchEntryItem $ultraEntrySearchItem)
+	public static function createEntrySearchQuery(UltraSearchEntryItem $ultraEntrySearchItem, $boolOperator)
 	{
 		$queryVerb = $ultraEntrySearchItem->getQueryVerb();
 		$queryVal = array($ultraEntrySearchItem->getFieldName() => strtolower($ultraEntrySearchItem->getSearchTerm()));
 		return array($queryVerb => $queryVal);
 	}
 
-	public static function createCaptionSearchQuery(UltraSearchCaptionItem $ultraSearchCaptionItem)
+	public static function createCaptionSearchQuery(UltraSearchCaptionItem $ultraSearchCaptionItem, $boolOperator)
 	{
-		$captionQuery = null;
+		$captionQuery['has_child']['type'] = ElasticIndexMap::ELASTIC_CAPTION_TYPE;
+		$captionQuery['has_child']['query']['nested']['path'] = 'lines';
+		$captionQuery['has_child']['query']['nested']['inner_hits'] = array('size' => 10); //TODO: get this parameter from config
+		$captionQuery['has_child']['inner_hits'] = array('size' => 10, '_source' => false);
 		switch ($ultraSearchCaptionItem->getItemType())
 		{
 			case UltraSearchItemType::EXACT_MATCH:
+
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must'][] = array(
 					'term' => array(
 						'lines.content' => strtolower($ultraSearchCaptionItem->getSearchTerm())

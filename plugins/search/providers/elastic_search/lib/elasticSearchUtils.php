@@ -57,5 +57,33 @@ class elasticSearchUtils
 
         return null;
     }
+
+    public static function transformElasticToObject($elasticResults)
+    {
+		$coreObjs = array();
+	    $entriesData = array();
+	    foreach ($elasticResults['hits']['hits'] as $elasticEntry)
+	    {
+		    $itemData = '';
+		    foreach ($elasticEntry['inner_hits']['caption']['hits']['hits'] as $captionAssetResult)
+		    {
+			    foreach ($captionAssetResult['inner_hits']['lines']['hits']['hits'] as $captionAssetItemResult)
+			    {
+				    $itemData .= $captionAssetItemResult['_source']['content'];
+			    }
+		    }
+		    $entriesData[$elasticEntry['_id']] = $itemData;
+	    }
+	    $entries = entryPeer::retrieveByPKs(array_keys($entriesData));
+	    foreach ($entries as $baseEntry)
+	    {
+		    $resultObj = new UltraSearchResult();
+		    $resultObj->setEntry($baseEntry);
+		    $resultObj->setItemData($entriesData[$baseEntry->getId()]);
+		    $coreObjs[] = $resultObj;
+	    }
+	    return $coreObjs;
+    }
+
     
 }
