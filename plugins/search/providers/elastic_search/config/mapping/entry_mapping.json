@@ -63,6 +63,31 @@
 		},
 		"tags" : {
 		  "type" : "text"
+		},
+		"parent_entry" : {
+		  "properties" : {
+			"entry_id" : {
+			  "type" : "keyword"
+			},
+			"status" : {
+			  "type" : "short"
+			},
+			"entitled_kusers_edit" : {
+			  "type" : "text"
+			},
+			"entitled_kusers_publish" : {
+			  "type" : "text"
+			},
+			"kuser_id" : {
+			  "type" : "text"
+			},
+			"creator_kuser_id" : {
+			  "type" : "text"
+			},
+			"category_ids" : {
+			  "type" : "text"
+			}
+		  }
 		}
 	  }
 	},

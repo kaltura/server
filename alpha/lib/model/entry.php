@@ -1329,15 +1329,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return parent::getCategoriesIds();
 	}
 
-	public function getCategoriesIdsArray()
-	{
-		$categoryIds = $this->getCategoriesIds();
-		if(!$categoryIds)
-			return null;
-		$categoryIds = explode(',', $categoryIds);
-		return $categoryIds;
-	}
-		
 	/*public function renameCategory($oldFullName, $newFullName)
 	{
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
@@ -1950,6 +1941,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return implode(',', array_keys($this->getEntitledUserPuserEditArray()));
 	}
+
+	public function getEntitledKusersEditArray()
+	{
+		return array_keys($this->getEntitledUserPuserEditArray());
+	}
 	
 	public function getEntitledPusersEdit()
 	{
@@ -2029,6 +2025,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return '';
 
 		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
+	}
+
+	public function getEntitledKusersPublishArray()
+	{
+		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
+		if(!$entitledUserPuserPublish)
+			return array();
+
+		return array_keys(unserialize($entitledUserPuserPublish));
 	}
 	
 	public function getEntitledPusersPublish()
@@ -3617,7 +3622,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	public function getElasticIndexName()
 	{
-		return IElasticIndexable::ELASTIC_INDEX_PREFIX."_entry";
+		return ElasticIndexMap::ELASTIC_ENTRY_INDEX;
 	}
 
 	/**
@@ -3625,7 +3630,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	public function getElasticObjectType()
 	{
-		return 'entry';
+		return ElasticIndexMap::ELASTIC_ENTRY_TYPE;
 	}
 
 	/**
@@ -3652,16 +3657,20 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$body = array(
 			'parent_id' => $this->getParentEntryId(),
 			'status' => $this->getStatus(),
-			'entitled_kusers_edit' => $this->getEntitledKusersEdit(),
-			'entitled_kusers_publish' => $this->getEntitledKusersPublish(),
+			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
+			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
 			'kuser_id' => $this->getKuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
 			'name' => $this->getName(),
 			'description' => $this->getDescription(),
 			'tags' => $this->getTags(),
 			'partner_id' => $this->getPartnerId(),
-			'category_ids' => $this->getCategoriesIdsArray()
+			'category_ids' => $this->getAllCategoriesIds(true)
 		);
+		
+		if($this->getParentEntryId())
+			$this->addParentEntryToObjectParams($body);
+		
 		return $body;
 	}
 
@@ -3679,5 +3688,22 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function indexToElastic($params = null)
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	protected function addParentEntryToObjectParams(&$body)
+	{
+		$parentEntry = $this->getParentEntry();
+		if($parentEntry->getId() == $this->getId())
+			return;
+		
+		$body['parent_entry'] = array(
+			'partner_id' => $parentEntry->getPartnerId(),
+			'status' => $parentEntry->getStatus(),
+			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),
+			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
+			'kuser_id' => $parentEntry->getKuserId(),
+			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
+			'category_ids' => $parentEntry->getAllCategoriesIds(true)
+		);
 	}
 }

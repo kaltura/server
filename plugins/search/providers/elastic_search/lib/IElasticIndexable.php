@@ -5,11 +5,7 @@
  */
 interface IElasticIndexable extends IBaseObject
 {
-    /**
-     * elastic index prefix
-     */
-    const ELASTIC_INDEX_PREFIX = 'kaltura';
-
+ 
     /**
      * return the name of the elasticsearch index for this object
      */

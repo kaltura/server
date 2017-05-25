@@ -62,7 +62,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject, IElasticInd
 	 */
 	public function getElasticIndexName()
 	{
-		return IElasticIndexable::ELASTIC_INDEX_PREFIX.'_kuser';
+		return ElasticIndexMap::ELASTIC_KUSER_INDEX;
 	}
 
 	/**
@@ -70,7 +70,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject, IElasticInd
 	 */
 	public function getElasticObjectType()
 	{
-		return 'kuser';
+		return ElasticIndexMap::ELASTIC_KUSER_TYPE;
 	}
 
 	/**

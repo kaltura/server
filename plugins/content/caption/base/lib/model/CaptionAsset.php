@@ -77,7 +77,7 @@ class CaptionAsset extends asset implements IElasticIndexable
 	 */
 	public function getElasticIndexName()
 	{
-		return IElasticIndexable::ELASTIC_INDEX_PREFIX.'_entry';
+		return ElasticIndexMap::ELASTIC_ENTRY_INDEX;
 	}
 
 	/**
@@ -85,7 +85,7 @@ class CaptionAsset extends asset implements IElasticIndexable
 	 */
 	public function getElasticObjectType()
 	{
-		return 'caption';
+		return ElasticIndexMap::ELASTIC_CAPTION_TYPE;
 	}
 
 	/**

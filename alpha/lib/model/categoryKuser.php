@@ -409,7 +409,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	 */
 	public function getElasticIndexName()
 	{
-		return IElasticIndexable::ELASTIC_INDEX_PREFIX.'_category';
+		return ElasticIndexMap::ELASTIC_CATEGORY_INDEX;
 	}
 
 	/**
@@ -417,7 +417,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	 */
 	public function getElasticObjectType()
 	{
-		return 'category';
+		return ElasticIndexMap::ELASTIC_CATEGORY_TYPE;
 	}
 
 	/**
