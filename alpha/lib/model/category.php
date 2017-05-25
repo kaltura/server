@@ -1860,7 +1860,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	 */
 	public function getElasticIndexName()
 	{
-		return IElasticIndexable::ELASTIC_INDEX_PREFIX.'_category';
+		return ElasticIndexMap::ELASTIC_CATEGORY_INDEX;
 	}
 
 	/**
@@ -1868,7 +1868,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	 */
 	public function getElasticObjectType()
 	{
-		return 'category';
+		return ElasticIndexMap::ELASTIC_CATEGORY_TYPE;
 	}
 
 	/**
