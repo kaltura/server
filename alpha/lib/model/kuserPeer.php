@@ -46,7 +46,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 */
 	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
 	{
-		$puserId = self::getValidPuserStr($puserId);
+		if (!is_null($puserId))
+			$puserId = self::getValidPuserStr($puserId);
 
 		if(!$ignorePuserKuser && !kCurrentContext::isApiV3Context())
 		{
