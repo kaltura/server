@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:php="http://php.net/xsl" exclude-result-prefixes="xs">
-    <xsl:output method="xml" media-type="application/rss+xml" />
+    <xsl:output method="xml" media-type="application/rss+xml" cdata-section-elements="title description media:keywords"/>
     <xsl:param name="partnerId" select="'partnerId'" />
 
     <xsl:template match="*">
