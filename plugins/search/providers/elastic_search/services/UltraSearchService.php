@@ -14,14 +14,16 @@ class UltraSearchService extends KalturaBaseService
 	 */
 	function searchAction (KalturaUltraSearchOperator $searchOperator)
 	{
+		//TODO: should we allow doesnt contain without a specific contains
 		$coreSearchOperator = $searchOperator->toObject();
 		/**
 		 * @var UltraSearchOperator $coreSearchOperator
 		 */
-		$subSearchQuery = kUltraQueryManager::createSearchQuery($coreSearchOperator);
-		KalturaLog::debug("@@NA for debug [".print_r($subSearchQuery,true)."]");
-		$results = kUltraSearch::doSearch($subSearchQuery);
-		return KalturaUltraSearchResultArray::fromDbArray($results);
+		$entrySearch = new kEntrySearch();
+		$elasticResults = $entrySearch->doSearch($coreSearchOperator);//TODO: handle error flow
+		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
+
+		return KalturaUltraSearchResultArray::fromDbArray($coreResults);
 	}
 
 

@@ -12,9 +12,17 @@ class KalturaUltraSearchResultArray extends KalturaTypedArray {
         return parent::__construct("KalturaUltraSearchResult");
     }
 
-	public static function fromDbArray(array $strings = null)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		return array(new KalturaUltraSearchResult(), new KalturaUltraSearchResult());
+		$newArr = new KalturaUltraSearchResultArray();
+		foreach ( $arr as $obj )
+		{
+			$nObj = new KalturaUltraSearchResult();
+			$nObj->fromObject($obj, $responseProfile);
+			$newArr[] = $nObj;
+		}
+
+		return $newArr;
 	}
 
 }
