@@ -8,7 +8,7 @@ class KExternalErrors
 	private static $responseCode = null;
 
 	const CACHE_EXPIRY = 60;
-	
+
 	const ENTRY_NOT_FOUND = 1;
 	const NOT_SCHEDULED_NOW = 2;
 	const ACCESS_CONTROL_RESTRICTED = 3;
@@ -55,14 +55,14 @@ class KExternalErrors
 	const INTERNAL_SERVER_ERROR = 44;
 	const LIVE_STREAM_CONFIG_NOT_FOUND = 45;
 	const TOO_MANY_PROCESSES = 46;
-    const BUNDLE_CREATION_FAILED = 47;
-	
+	const BUNDLE_CREATION_FAILED = 47;
+
 	const HTTP_STATUS_NOT_FOUND = 404;
-	
+
 	private static $errorCodeMap = array(
 			self::HTTP_STATUS_NOT_FOUND => "HTTP/1.0 404 Not Found",
 	);
-	
+
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
 			self::NOT_SCHEDULED_NOW => "entry restricted due to scheduling",
@@ -79,7 +79,7 @@ class KExternalErrors
 			self::ENTRY_MODERATION_ERROR => "entry is restricted due to invalid moderation status",
 			self::PARTNER_NOT_FOUND => "requested partner not found",
 			self::PARTNER_NOT_ACTIVE => "requested partner not active",
-			self::IP_COUNTRY_BLOCKED => "", // we rather not explain this error code 
+			self::IP_COUNTRY_BLOCKED => "", // we rather not explain this error code
 			self::IMAGE_RESIZE_FAILED => "image resize failed",
 			self::DELIVERY_METHOD_NOT_ALLOWED => "Delivery method not allowed",
 			self::INVALID_MAX_BITRATE => "max bitrate is not valid",
@@ -110,9 +110,9 @@ class KExternalErrors
 			self::INTERNAL_SERVER_ERROR => "Internal server error",
 			self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
 			self::TOO_MANY_PROCESSES => "Too many executed processes",
-            self::BUNDLE_CREATION_FAILED => "Failed to build bundle for [%s]"
+			self::BUNDLE_CREATION_FAILED => "Failed to build bundle for [%s]"
 	);
-	
+
 	public static function dieError($errorCode, $message = null)
 	{
 		$description = self::$errorDescriptionMap[$errorCode];
@@ -122,35 +122,35 @@ class KExternalErrors
 			array_shift($args);
 			$description = @call_user_func_array('sprintf', array_merge(array($description), $args));
 		}
-		
+
 		if($message)
 			$description .= ", $message";
-			
+
 		if (class_exists('KalturaLog'))
 			KalturaLog::err("exiting on error $errorCode - $description");
-		
+
 		$headers = array();
 		if(self::$responseCode)
 			$headers[] = self::$errorCodeMap[self::$responseCode];
-		
+
 		$headers[] = "X-Kaltura-App: exiting on error $errorCode - $description";
-		
+
 		foreach ($headers as $header)
 		{
 			header($header);
 		}
 		header("X-Kaltura:error-$errorCode");
-		
+
 		$headers[] = "X-Kaltura:cached-error-$errorCode";
-		
+
 		self::terminateDispatch();
-		
-		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED && 
-			$errorCode != self::IP_COUNTRY_BLOCKED && 
+
+		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED &&
+			$errorCode != self::IP_COUNTRY_BLOCKED &&
 			$_SERVER["REQUEST_METHOD"] == "GET")
 		{
 			infraRequestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
-			
+
 			if (function_exists('apc_store'))
 			{
 				$protocol = infraRequestUtils::getProtocol();
@@ -163,27 +163,27 @@ class KExternalErrors
 				apc_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
 			}
 		}
-		
+
 		die();
 	}
-	
+
 	public static function dieGracefully($message = null)
 	{
-		if (class_exists('KalturaLog') && !is_null($message)) 
+		if (class_exists('KalturaLog') && !is_null($message))
 			KalturaLog::err($message);
-		
+
 		self::terminateDispatch();
 		die();
 	}
-	
-	public static function terminateDispatch() 
+
+	public static function terminateDispatch()
 	{
-		if (class_exists('KalturaLog') && isset($GLOBALS["start"])) 
+		if (class_exists('KalturaLog') && isset($GLOBALS["start"]))
 			KalturaLog::debug("Dispatch took - " . (microtime(true) - $GLOBALS["start"]) . " seconds, memory: ".memory_get_peak_usage(true));
 	}
-	
+
 	public static function setResponseErrorCode($errorCode)
 	{
 		self::$responseCode = $errorCode;
 	}
-}	
+}
