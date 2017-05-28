@@ -433,8 +433,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	}
 
 	private function updateMetadataStatusForMediaRepurposing(KalturaScheduledTaskProfile $profile, $object, $error) {
-		if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
-			return null; //can not update metadata for deleted entry
 		$metadataProfileId = self::getMrAdvancedSearchFilter($profile)->metadataProfileId;
 
 		self::impersonate($object->partnerId);
@@ -450,12 +448,15 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		}
 
 		try {
+			$xml = $xml ? $xml->asXML(): null;
 			if ($metadata && $metadata->id)
-				$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
+				$result = $metadataPlugin->metadata->update($metadata->id, $xml);
 			else
-				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml->asXML());
+				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml);
 
 		} catch (Exception $e) {
+			if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
+				return null; //delete entry should get exception when update metadata for deleted entry
 			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage());
 		}
 		
