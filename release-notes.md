@@ -1,5 +1,33 @@
 # Lynx 12.17.0 #
 
+## Add-on for ExtractMedia logic ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7436
+
+### Configuration ###
+	make sure @WEB_DIR@/tmp/bulkupload exists (if not - create it)
+	point 'shared_temp_folder' var (in configurations/local.ini) to that folder
+
+### Deployment scripts ###
+None.
+
+## Q&A/Polls Response profiles and push notifications tempaltes ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-6940
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Add polls support ##
 
  - Issue Type: Feature
@@ -7,18 +35,24 @@
 
 ### Configuration ###
 
-- Add service.poll.poll.ini
+
 - In local.ini add the following parameters:
- - [poll]
-   secret = <select a secret>
-   cache_ttl = 86400
-- In base.ini add the following parameters:
- - [cache_based_service_actions]
-   poll_poll_vote = "/../../plugins/poll/lib/PollActions.php"
+
+		[poll]
+		secret = <select a secret>
+		cache_ttl = 86400
+		
+- In base.ini add the following parameters::
+
+		[cache_based_service_actions]
+		poll_poll_vote = "/../../plugins/poll/lib/PollActions.php"
+
 - In cache.ini add the following parameters:
-  - [memcacheKeys:memcacheBase]
-     host = 127.0.0.1
-  - cacheOnlyActions = memcacheKeys
+		
+		* [memcacheKeys:memcacheBase]
+		  host = 127.0.0.1
+		
+		* cacheOnlyActions = memcacheKeys
   
 ### Deployment scripts ###
 

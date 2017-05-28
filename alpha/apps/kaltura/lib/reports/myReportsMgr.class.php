@@ -1276,11 +1276,11 @@ class myReportsMgr
 			
 		$values = 
 			array (
-				$partner_id ,
+				intval($partner_id) ,
 				self::intToDateTime($input_filter->from_date), 
 				self::intToDateTime($input_filter->to_date ),
-				$input_filter->from_day,
-				$input_filter->to_day,
+				intval($input_filter->from_day),
+				intval($input_filter->to_day),
 				self::intToDateId($input_filter->to_date , -7 ),
 				self::intToDateId($input_filter->to_date , -30 ),
 				self::intToDateId($input_filter->to_date , -180 ),
