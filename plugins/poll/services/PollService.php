@@ -22,7 +22,8 @@ class PollService extends KalturaBaseService
 	 */
 	public function addAction($pollType = 'SINGLE_ANONYMOUS')
 	{
-		try {
+		try
+		{
 			return PollActions::generatePollId($pollType);
 		}
 		catch (Exception $e)
@@ -35,15 +36,16 @@ class PollService extends KalturaBaseService
 	/**
 	 * Get Votes Action
 	 * @action getVotes
-	 * @param $pollId
-	 * @param $answerIds
-	 * @param null $otherDCVotes
-	 * @return mixed|string|void
+	 * @param string $pollId
+	 * @param string $answerIds
+	 * @param string $otherDCVotes json
+	 * @return string
 	 * @throws KalturaAPIException
 	 */
 	public function getVotesAction($pollId, $answerIds, $otherDCVotes = null)
 	{
-		try {
+		try
+		{
 			$localDcVotes = PollActions::getVotes($pollId, $answerIds);
 		}
 		catch (Exception $e)
@@ -65,7 +67,15 @@ class PollService extends KalturaBaseService
 		else
 		{
 			$prevData = json_decode($otherDCVotes);
-			$localDcVotes->merge($prevData);
+			try
+			{
+				$localDcVotes->merge($prevData);
+			}
+			catch (Exception $e)
+			{
+				throw new KalturaAPIException($e->getMessage());
+			}
+
 		}
 		return json_encode($localDcVotes);
 	}
@@ -73,15 +83,16 @@ class PollService extends KalturaBaseService
 	/**
 	 * Vote Action
 	 * @action vote
-	 * @param $pollId
-	 * @param $userId
-	 * @param $answerIds
+	 * @param string $pollId
+	 * @param string $userId
+	 * @param string $answerIds
 	 * @return string
 	 * @throws KalturaAPIException
 	 */
 	public function voteAction($pollId, $userId, $answerIds)
 	{
-		try {
+		try
+		{
 			return PollActions::setVote($pollId, $userId, $answerIds);
 		}
 		catch (Exception $e)

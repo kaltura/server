@@ -49,7 +49,10 @@ class PollActions
 			throw new Exception("Could not find polls_secret in the configuration");
 		if (array_key_exists(PollActions::CONF_CACHE_TTL_REF, $pollConf))
 			self::$pollCacheTTL = $pollConf[PollActions::CONF_CACHE_TTL_REF];
-		self::$pollsCacheHandler = new PollCacheHandler(self::$pollCacheTTL);
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_CACHE_ONLY_ACTIONS);
+		if (!$cache)
+			throw new Exception("Could not initiate cache instance (needed for polls)");
+		self::$pollsCacheHandler = new PollCacheHandler(self::$pollCacheTTL, $cache);
 
 	}
 
@@ -143,9 +146,9 @@ class PollCacheHandler
 
 	private $cacheTTL;
 
-	public function __construct($cacheTTL)
+	public function __construct($cacheTTL, $cache)
 	{
-		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_CACHE_ONLY_ACTIONS);
+		$this->cache = $cache;
 		$this->cacheTTL = $cacheTTL;
 	}
 
@@ -249,9 +252,12 @@ class PollVotes {
 
 	/**
 	 * @param PollVotes $other
+	 * @throws Exception
 	 */
 	public function merge($other)
 	{
+		if (!$other)
+			throw new Exception("Can not merge Poll Votes with null object");
 		$this->numVoters += $other->numVoters;
 		foreach ($other->answerCounters as $ans => $counter)
 		{
@@ -274,10 +280,10 @@ class PollType {
 	{
 		switch ($type)
 		{
-			case SINGLE_ANONYMOUS:
-			case SINGLE_RESTRICT:
-			case MULTI_ANONYMOUS:
-			case MULTI_RESTRICT:
+			case self::SINGLE_ANONYMOUS:
+			case self::SINGLE_RESTRICT:
+			case self::MULTI_ANONYMOUS:
+			case self::MULTI_RESTRICT:
 				return true;
 			default:
 				return false;
