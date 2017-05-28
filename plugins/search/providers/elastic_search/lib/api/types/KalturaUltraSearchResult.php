@@ -11,7 +11,7 @@ class KalturaUltraSearchResult extends KalturaObject {
     public $entry;
 
     /**
-     * @var string
+     * @var KalturaESearchItemDataArray
      */
     public $itemData;
 

@@ -64,12 +64,16 @@ class elasticSearchUtils
 	    $entriesData = array();
 	    foreach ($elasticResults['hits']['hits'] as $elasticEntry)
 	    {
-		    $itemData = '';
+		    $itemData = array();
 		    foreach ($elasticEntry['inner_hits']['caption']['hits']['hits'] as $captionAssetResult)
 		    {
 			    foreach ($captionAssetResult['inner_hits']['lines']['hits']['hits'] as $captionAssetItemResult)
 			    {
-				    $itemData .= $captionAssetItemResult['_source']['content'];
+				    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', $captionAssetResult['_type']);
+				    $currItemData->setLine($captionAssetItemResult['_source']['content']);
+				    $currItemData->setStartsAt($captionAssetItemResult['_source']['start_time']);
+				    $currItemData->setEndsAt($captionAssetItemResult['_source']['end_time']);
+				    $itemData[] = $currItemData;
 			    }
 		    }
 		    $entriesData[$elasticEntry['_id']] = $itemData;
