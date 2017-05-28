@@ -79,6 +79,11 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 		$this->addLine("taskLine2");
 		$this->addEnumElement('TaskTypeChoose', '', 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType');
+		$this->addElement('button', 'addTaskButton', array(
+			'ignore'	=> true,
+			'label'		=> 'Add Task',
+			'onclick'		=> "addTaskButtonExe()",
+		));
 
 		// template who will not be shown on form
 		$this->addTaskDataTemplate();
