@@ -1,29 +1,29 @@
 <?php
 /**
- * @service ultraSearch
+ * @service eSearch
  * @package plugins.elasticSearch
  * @subpackage api.services
  */
-class UltraSearchService extends KalturaBaseService
+class ESearchService extends KalturaBaseService
 {
 	/**
 	 *
 	 * @action search
-	 * @param KalturaUltraSearchOperator $searchOperator
-	 * @return KalturaUltraSearchResultArray
+	 * @param KalturaESearchOperator $searchOperator
+	 * @return KalturaESearchResultArray
 	 */
-	function searchAction (KalturaUltraSearchOperator $searchOperator)
+	function searchAction (KalturaESearchOperator $searchOperator)
 	{
 		//TODO: should we allow doesnt contain without a specific contains
 		$coreSearchOperator = $searchOperator->toObject();
 		/**
-		 * @var UltraSearchOperator $coreSearchOperator
+		 * @var ESearchOperator $coreSearchOperator
 		 */
 		$entrySearch = new kEntrySearch();
 		$elasticResults = $entrySearch->doSearch($coreSearchOperator);//TODO: handle error flow
 		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
 
-		return KalturaUltraSearchResultArray::fromDbArray($coreResults);
+		return KalturaESearchResultArray::fromDbArray($coreResults);
 	}
 
 

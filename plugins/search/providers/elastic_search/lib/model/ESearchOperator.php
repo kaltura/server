@@ -1,10 +1,10 @@
 <?php
 
-class UltraSearchOperator extends UltraSearchItem
+class ESearchOperator extends ESearchItem
 {
 
 	/**
-	 * @var UltraSearchOperatorType
+	 * @var ESearchOperatorType
 	 */
 	protected $operator;
 
@@ -19,7 +19,7 @@ class UltraSearchOperator extends UltraSearchItem
 	protected $searchItems;
 
 	/**
-	 * @return UltraSearchOperatorType
+	 * @return ESearchOperatorType
 	 */
 	public function getOperator()
 	{
@@ -27,7 +27,7 @@ class UltraSearchOperator extends UltraSearchItem
 	}
 
 	/**
-	 * @param UltraSearchOperatorType $operator
+	 * @param ESearchOperatorType $operator
 	 */
 	public function setOperator($operator)
 	{
@@ -68,7 +68,7 @@ class UltraSearchOperator extends UltraSearchItem
 
 	public function createSearchQuery()
 	{
-		return kUltraQueryManager::createOperatorSearchQuery($this);
+		return kEQueryManager::createOperatorSearchQuery($this);
 	}
 
 }

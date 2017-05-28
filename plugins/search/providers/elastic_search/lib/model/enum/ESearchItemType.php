@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage model.enum
  */ 
-interface UltraSearchItemType extends BaseEnum
+interface ESearchItemType extends BaseEnum
 {
 	const EXACT_MATCH = 1;
 	const PARTIAL = 2;

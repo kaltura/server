@@ -1,32 +1,32 @@
 <?php
 
 
-class kUltraQueryManager
+class kEQueryManager
 {
 	/**
 	 * Uses visitor/visited design pattern in order to create a search query
 
-	 * @param UltraSearchItem $ultraSearchItem
+	 * @param ESearchItem $eSearchItem
 	 * @return array - represents a sub elastic query.
 	 */
-	public static function createSearchQuery(UltraSearchItem $ultraSearchItem)
+	public static function createSearchQuery(ESearchItem $eSearchItem)
 	{
-		return $ultraSearchItem->createSearchQuery();
+		return $eSearchItem->createSearchQuery();
 	}
 
-	public static function createOperatorSearchQuery(UltraSearchOperator $ultraSearchOperator, $boolOperator = UltraSearchOperatorType::AND_OP)
+	public static function createOperatorSearchQuery(ESearchOperator $eSearchOperator, $boolOperator = ESearchOperatorType::AND_OP)
 	{
-		if (!count($ultraSearchOperator->getSearchItems()))
+		if (!count($eSearchOperator->getSearchItems()))
 		{
 			return array();
 		}
 		$additionalParams = array();
-		switch ($ultraSearchOperator->getOperator())
+		switch ($eSearchOperator->getOperator())
 		{
-			case UltraSearchOperatorType::AND_OP:
+			case ESearchOperatorType::AND_OP:
 				$boolOpeartor = 'must';
 				break;
-			case UltraSearchOperatorType::OR_OP:
+			case ESearchOperatorType::OR_OP:
 				$boolOpeartor = 'should';
 				$additionalParams['minimum_should_match'] = 1;
 				break;
@@ -35,10 +35,10 @@ class kUltraQueryManager
 				return null;
 		}
 		$outQuery = array();
-		foreach ($ultraSearchOperator->getSearchItems() as $searchItem)
+		foreach ($eSearchOperator->getSearchItems() as $searchItem)
 		{
 			/**
-			 * @var UltraSearchItem $searchItem
+			 * @var ESearchItem $searchItem
 			 */
 			$outQuery['bool'][$boolOpeartor] = self::createSearchQuery($searchItem);
 			foreach ($additionalParams as $addParamKey => $addParamVal)
@@ -50,33 +50,33 @@ class kUltraQueryManager
 		return $outQuery;
 	}
 
-	public static function createEntrySearchQuery(UltraSearchEntryItem $ultraEntrySearchItem, $boolOperator)
+	public static function createEntrySearchQuery(ESearchEntryItem $eEntrySearchItem, $boolOperator)
 	{
-		$queryVerb = $ultraEntrySearchItem->getQueryVerb();
-		$queryVal = array($ultraEntrySearchItem->getFieldName() => strtolower($ultraEntrySearchItem->getSearchTerm()));
+		$queryVerb = $eEntrySearchItem->getQueryVerb();
+		$queryVal = array($eEntrySearchItem->getFieldName() => strtolower($eEntrySearchItem->getSearchTerm()));
 		return array($queryVerb => $queryVal);
 	}
 
-	public static function createCaptionSearchQuery(UltraSearchCaptionItem $ultraSearchCaptionItem, $boolOperator)
+	public static function createCaptionSearchQuery(ESearchCaptionItem $eSearchCaptionItem, $boolOperator)
 	{
 		$captionQuery['has_child']['type'] = ElasticIndexMap::ELASTIC_CAPTION_TYPE;
 		$captionQuery['has_child']['query']['nested']['path'] = 'lines';
 		$captionQuery['has_child']['query']['nested']['inner_hits'] = array('size' => 10); //TODO: get this parameter from config
 		$captionQuery['has_child']['inner_hits'] = array('size' => 10, '_source' => false);
-		switch ($ultraSearchCaptionItem->getItemType())
+		switch ($eSearchCaptionItem->getItemType())
 		{
-			case UltraSearchItemType::EXACT_MATCH:
+			case ESearchItemType::EXACT_MATCH:
 
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must'][] = array(
 					'term' => array(
-						'lines.content' => strtolower($ultraSearchCaptionItem->getSearchTerm())
+						'lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
 					)
 				);
 				break;
-			case UltraSearchItemType::PARTIAL:
+			case ESearchItemType::PARTIAL:
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must'][] = array(
 					'multi_match'=> array(
-						'query'=> strtolower($ultraSearchCaptionItem->getSearchTerm()),
+						'query'=> strtolower($eSearchCaptionItem->getSearchTerm()),
 						'fields'=> array(
 							'lines.content',
 							'lines.content_*' //todo change here if we want to choose the language to search
@@ -85,17 +85,17 @@ class kUltraQueryManager
 					)
 				);
 				break;
-			case UltraSearchItemType::STARTS_WITH:
+			case ESearchItemType::STARTS_WITH:
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must'][] = array(
 					'prefix' => array(
-						'lines.content' => strtolower($ultraSearchCaptionItem->getSearchTerm())
+						'lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
 					)
 				);
 				break;
-			case UltraSearchItemType::DOESNT_CONTAIN:
+			case ESearchItemType::DOESNT_CONTAIN:
 				$captionQuery['has_child']['query']['nested']['query']['bool']['must_not'][] = array(
 					'term' => array(
-						'lines.content' => strtolower($ultraSearchCaptionItem->getSearchTerm())
+						'lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
 					)
 				);
 				break;

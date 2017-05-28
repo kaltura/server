@@ -3,10 +3,10 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaUltraSearchEntryItem extends KalturaUltraSearchItem {
+class KalturaESearchEntryItem extends KalturaESearchItem {
 
 	/**
-	 * @var KalturaUltraSearchEntryFieldName
+	 * @var KalturaESearchEntryFieldName
 	 */
 	public $fieldName;
 
@@ -28,7 +28,7 @@ class KalturaUltraSearchEntryItem extends KalturaUltraSearchItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new UltraSearchEntryItem();
+			$object_to_fill = new ESearchEntryItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 

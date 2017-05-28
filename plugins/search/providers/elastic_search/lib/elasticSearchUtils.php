@@ -81,7 +81,7 @@ class elasticSearchUtils
 	    $entries = entryPeer::retrieveByPKs(array_keys($entriesData));
 	    foreach ($entries as $baseEntry)
 	    {
-		    $resultObj = new UltraSearchResult();
+		    $resultObj = new ESearchResult();
 		    $resultObj->setEntry($baseEntry);
 		    $resultObj->setItemData($entriesData[$baseEntry->getId()]);
 		    $coreObjs[] = $resultObj;

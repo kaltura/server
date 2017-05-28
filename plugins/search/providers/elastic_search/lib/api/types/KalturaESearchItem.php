@@ -3,9 +3,9 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-abstract class KalturaUltraSearchItem extends KalturaUltraSearchBaseItem {
+abstract class KalturaESearchItem extends KalturaESearchBaseItem {
 	/**
-	 * @var KalturaUltraSearchItemType
+	 * @var KalturaESearchItemType
 	 */
 	public $itemType;
 

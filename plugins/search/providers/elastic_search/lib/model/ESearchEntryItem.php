@@ -1,10 +1,10 @@
 <?php
 
-class UltraSearchEntryItem extends UltraSearchItem
+class ESearchEntryItem extends ESearchItem
 {
 
 	/**
-	 * @var UltraSearchEntryFieldName
+	 * @var ESearchEntryFieldName
 	 */
 	protected $fieldName;
 
@@ -14,7 +14,7 @@ class UltraSearchEntryItem extends UltraSearchItem
 	protected $searchTerm;
 
 	/**
-	 * @return UltraSearchEntryFieldName
+	 * @return ESearchEntryFieldName
 	 */
 	public function getFieldName()
 	{
@@ -22,16 +22,16 @@ class UltraSearchEntryItem extends UltraSearchItem
 	}
 
 	/**
-	 * @param UltraSearchEntryFieldName $fieldName
+	 * @param ESearchEntryFieldName $fieldName
 	 */
 	public function setFieldName($fieldName)
 	{
 		switch ($fieldName)
 		{
-			case UltraSearchEntryFieldName::ENTRY_DESCRIPTION:
+			case ESearchEntryFieldName::ENTRY_DESCRIPTION:
 				$fieldName = 'ENTRY_DESCRIPTION';
 				break;
-			case UltraSearchEntryFieldName::ENTRY_NAME:
+			case ESearchEntryFieldName::ENTRY_NAME:
 				$fieldName = 'ENTRY_NAME';
 				break;
 		}
@@ -56,7 +56,7 @@ class UltraSearchEntryItem extends UltraSearchItem
 
 	public function createSearchQuery()
 	{
-		return kUltraQueryManager::createEntrySearchQuery($this);
+		return kEQueryManager::createEntrySearchQuery($this);
 	}
 
 

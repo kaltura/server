@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaUltraSearchCaptionItem extends KalturaUltraSearchItem {
+class KalturaESearchCaptionItem extends KalturaESearchItem {
 
 	/**
 	 * @var string
@@ -22,7 +22,7 @@ class KalturaUltraSearchCaptionItem extends KalturaUltraSearchItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new UltraSearchCaptionItem();
+			$object_to_fill = new ESearchCaptionItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 

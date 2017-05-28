@@ -1,15 +1,15 @@
 <?php
 
-abstract class UltraSearchItem extends BaseObject
+abstract class ESearchItem extends BaseObject
 {
 
 	/**
-	 * @var UltraSearchItemType
+	 * @var ESearchItemType
 	 */
 	protected $itemType;
 
 	/**
-	 * @return UltraSearchItemType
+	 * @return ESearchItemType
 	 */
 	public function getItemType()
 	{
@@ -17,7 +17,7 @@ abstract class UltraSearchItem extends BaseObject
 	}
 
 	/**
-	 * @param UltraSearchItemType $itemType
+	 * @param ESearchItemType $itemType
 	 */
 	public function setItemType($itemType)
 	{
@@ -32,16 +32,16 @@ abstract class UltraSearchItem extends BaseObject
 		$queryVerb = null;
 		switch ($this->getItemType())
 		{
-			case UltraSearchItemType::EXACT_MATCH:
+			case ESearchItemType::EXACT_MATCH:
 				$queryVerb = 'must';
 				break;
-			case UltraSearchItemType::PARTIAL:
+			case ESearchItemType::PARTIAL:
 				$queryVerb = 'query';
 				break;
-			case UltraSearchItemType::STARTS_WITH:
+			case ESearchItemType::STARTS_WITH:
 				$queryVerb = 'prefix';
 				break;
-			case UltraSearchItemType::DOESNT_CONTAIN:
+			case ESearchItemType::DOESNT_CONTAIN:
 				$queryVerb = 'must_not';
 				break;
 		}

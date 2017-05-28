@@ -1,6 +1,6 @@
 <?php
 
-class UltraSearchCaptionItem extends UltraSearchItem
+class ESearchCaptionItem extends ESearchItem
 {
 
 	/**
@@ -26,6 +26,6 @@ class UltraSearchCaptionItem extends UltraSearchItem
 
 	public function createSearchQuery()
 	{
-		return kUltraQueryManager::createCaptionSearchQuery($this);
+		return kEQueryManager::createCaptionSearchQuery($this);
 	}
 }

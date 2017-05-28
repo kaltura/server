@@ -3,10 +3,10 @@
  * @package plugins.elasticSearch
  * @subpackage api.enum
  */
-class KalturaUltraSearchItemType extends KalturaEnum implements UltraSearchItemType
+class KalturaESearchOperatorType extends KalturaEnum implements ESearchOperatorType
 {
 	public static function getEnumClass()
 	{
-		return 'UltraSearchItemType';
+		return 'ESearchOperatorType';
 	}
 }
