@@ -18,18 +18,16 @@ class kEntrySearch
     {
         $this->elasticClient = new elasticClient();
     }
-
-    /**
-     * todo - before the call need to call kElasticEntitlement::init()
-     */
+    
     public function doSearch($elasticSearchConditions = null, $entriesStatus = array(entryStatus::READY))
     {
+        kElasticEntitlement::init();
         $this->initQuery($entriesStatus);
         $this->initEntitlement();
-        $this->applyElasticSearchConditions($elasticSearchConditions);
-        echo print_r($this->query, true); //todo - remove after debug
+        //$this->applyElasticSearchConditions($elasticSearchConditions);
+        print_r($this->query); //todo - remove after debug
         $result = $this->elasticClient->search($this->query);
-        echo print_r($result, true); //todo - remove after debug
+        print_r($result); //todo - remove after debug
         return $result;
     }
     
@@ -66,12 +64,12 @@ class kEntrySearch
         $parentEntryQuery = null;
         
         //entry query - assign by reference to create name alias
-        $entryQuery = &$this->query['body']['query']['bool'];
+        $entryQuery = &$this->query['body']['query']['bool']['filter'][2]['bool'];
 
         if(kElasticEntitlement::$parentEntitlement)
         {
             //create parent entry part
-            $this->query['body']['query']['bool']['should'][0]['bool']['filter'] = array(
+            $this->query['body']['query']['bool']['filter'][2]['bool']['should'][0]['bool']['filter'] = array(
                 array(
                     'exists' => array(
                         'field'=> 'parent_id'
@@ -80,10 +78,10 @@ class kEntrySearch
             );
 
             //assign by reference to create name alias
-            $parentEntryQuery = &$this->query['body']['query']['bool']['should'][0]['bool'];
+            $parentEntryQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][0]['bool'];
 
             //create entry part
-            $this->query['body']['query']['bool']['should'][1]['bool']['must_not'] = array(
+            $this->query['body']['query']['bool']['filter'][2]['bool']['should'][1]['bool']['must_not'] = array(
                 array(
                     'exists' => array(
                         'field'=> 'parent_id'
@@ -91,8 +89,8 @@ class kEntrySearch
                 )
             );
             //assign by reference to create name alias
-            $entryQuery = &$this->query['body']['query']['bool']['should'][1]['bool'];
-            $this->query['body']['query']['bool']['minimum_should_match'] = 1;
+            $entryQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][1]['bool'];
+            $this->query['body']['query']['bool']['filter'][2]['bool']['minimum_should_match'] = 1;
         }
 
         foreach (self::$entitlementContributors as $contributor)
