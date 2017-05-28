@@ -448,10 +448,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		}
 
 		try {
+			$xml = $xml ? $xml->asXML(): null;
 			if ($metadata && $metadata->id)
-				$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
+				$result = $metadataPlugin->metadata->update($metadata->id, $xml);
 			else
-				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml->asXML());
+				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml);
 
 		} catch (Exception $e) {
 			if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
