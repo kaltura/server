@@ -35,8 +35,19 @@ class kCrossKalturaDistributionJobProviderData extends kDistributionJobProviderD
      * @var string
      */
     protected $distributedCuePoints;
-    
-    
+
+    /**
+     * array of information about distributed thumb cue points
+     * @var string
+     */
+    protected $distributedThumbCuePoints;
+
+    /**
+     * array of information about distributed timed thumb assets
+     * @var string
+     */
+    protected $distributedTimedThumbAssets;
+
 	/**
      * @return the $distributedFlavorAssets
      */
@@ -115,6 +126,38 @@ class kCrossKalturaDistributionJobProviderData extends kDistributionJobProviderD
     public function setDistributedCuePoints ($distributedCuePoints)
     {
         $this->distributedCuePoints = $distributedCuePoints;
-    }    
-    
+    }
+
+    /**
+     * @return the $distributedCuePoints
+     */
+    public function getDistributedThumbCuePoints ()
+    {
+        return $this->distributedThumbCuePoints;
+    }
+
+    /**
+     * @param string $distributedCuePoints
+     */
+    public function setDistributedThumbCuePoints ($distributedThumbCuePoints)
+    {
+        $this->distributedThumbCuePoints = $distributedThumbCuePoints;
+    }
+
+    /**
+     * @return the $distributedThumbAssets
+     */
+    public function getDistributedTimedThumbAssets ()
+    {
+        return $this->distributedTimedThumbAssets;
+    }
+
+    /**
+     * @param string $distributedThumbAssets
+     */
+    public function setDistributedTimedThumbAssets ($distributedTimedThumbAssets)
+    {
+        $this->distributedTimedThumbAssets = $distributedTimedThumbAssets;
+    }
+
 }

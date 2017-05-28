@@ -276,7 +276,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 				{
 					if (isset($asset->cuePointId))
 					{
-						$timedThumbAssets[$asset->cuePointId] = $asset;
+						$timedThumbAssets[$asset->id] = $asset;
 					}
 					else
 					{
@@ -753,16 +753,14 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	{
 		$data->providerData->distributedFlavorAssets = $this->getDistributedMapForObjects($this->sourceObjects->flavorAssets, $syncedObjects->flavorAssets);
 
-		$distributedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->thumbAssets, $syncedObjects->thumbAssets, false);
-		$distributedTimedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->timedThumbAssets, $syncedObjects->timedThumbAssets, false);
-		$data->providerData->distributedThumbAssets = serialize(array_merge($distributedThumbAssets, $distributedTimedThumbAssets));
+		$data->providerData->distributedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->thumbAssets, $syncedObjects->thumbAssets);
+		$data->providerData->distributedTimedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->timedThumbAssets, $syncedObjects->timedThumbAssets);
 
 		$data->providerData->distributedMetadata = $this->getDistributedMapForObjects($this->sourceObjects->metadataObjects, $syncedObjects->metadataObjects);
 		$data->providerData->distributedCaptionAssets = $this->getDistributedMapForObjects($this->sourceObjects->captionAssets, $syncedObjects->captionAssets);
 
-		$distributedCuePoints = $this->getDistributedMapForObjects($this->sourceObjects->cuePoints, $syncedObjects->cuePoints, false);
-		$distributedThumbCuePoints = $this->getDistributedMapForObjects($this->sourceObjects->thumbCuePoints, $syncedObjects->thumbCuePoints, false);
-		$data->providerData->distributedCuePoints = serialize(array_merge($distributedCuePoints, $distributedThumbCuePoints));
+		$data->providerData->distributedCuePoints = $this->getDistributedMapForObjects($this->sourceObjects->cuePoints, $syncedObjects->cuePoints);
+		$data->providerData->distributedThumbCuePoints = $this->getDistributedMapForObjects($this->sourceObjects->thumbCuePoints, $syncedObjects->thumbCuePoints);
 
 		return $data;
 	}
@@ -773,7 +771,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 * @param unknown_type $sourceObjects
 	 * @param unknown_type $syncedObjects
 	 */
-	protected function getDistributedMapForObjects($sourceObjects, $syncedObjects, $serialized=true)
+	protected function getDistributedMapForObjects($sourceObjects, $syncedObjects)
 	{
 		$info = array();
 		foreach ($syncedObjects as $sourceId => $targetObj)
@@ -787,9 +785,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
 			$info[$sourceId] = $objInfo;
 		}
-		if ($serialized)
-			return serialize($info);
-		return $info;
+		return serialize($info);
 	}
 
 
@@ -1064,7 +1060,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 				$targetCuePointClient->cuePoint,
 				$targetObjects->thumbCuePoints,
 				$this->sourceObjects->thumbCuePoints,
-				$jobData->providerData->distributedCuePoints,
+				$jobData->providerData->distributedThumbCuePoints,
 				$targetEntryId,
 				'getCuePointAddArgs'
 			);
@@ -1079,7 +1075,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 				$this->targetClient->thumbAsset,
 				$targetObjects->timedThumbAssets,
 				$this->sourceObjects->timedThumbAssets,
-				$jobData->providerData->distributedThumbAssets,
+				$jobData->providerData->distributedTimedThumbAssets,
 				$targetEntryId
 			);
 		}
