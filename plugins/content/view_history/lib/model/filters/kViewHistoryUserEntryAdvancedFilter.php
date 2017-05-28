@@ -11,6 +11,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 	public $filter;
 	
 	protected $disable;
+	const ENTRIES_COUNT = 100;
 	
 	/**
 	 * Function to retrieve
@@ -40,6 +41,9 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		{
 			$ueCrit->add(UserEntryPeer::ENTRY_ID, $entryIds, Criteria::IN);
 		}
+		$ueCrit->add(UserEntryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
+		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
+		$ueCrit->add(UserEntryPeer::KUSER_ID, $currentKsKuserId);
 		
 		$stmt = UserEntryPeer::doSelectStmt($ueCrit);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -66,37 +70,28 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		{
 			KalturaLog::info("Too many user entries found");
 			$this->disable = true;
+			$limit = $query->getLimit();
+			$query->setLimit(self::ENTRIES_COUNT);
 			$entries = entryPeer::doSelect($query);
+			$query->setLimit($limit);
 			
-			//if few entry IDS - search userEntry table w/ entry IDs
-			if (count ($entries) <= $query->getLimit())
+			$ids = array();
+			foreach ($entries as $entry)
 			{
-				KalturaLog::info("Few criteria entries found - cross with userEntries");
-				
-				$ids = array();
-				foreach ($entries as $entry)
-				{
-					$ids[] = $entry->getId();
-				}
-				
-				$entryIds = $this->getEntryIds($ids);
-				
-				if (count($entryIds) <= $query->getLimit())
-				{
-					KalturaLog::info("Few user entries found - merge with query");
-				}
-				else 
-				{
-					KalturaLog::info("Not all objects will return from the search - consider narrowing the search criteria");
-					$entryIds = array_slice($entryIds, 0, $query->getLimit());
-				}
+				$ids[] = $entry->getId();
 			}
-			else
+			
+			$entryIds = $this->getEntryIds($ids);
+		
+			if (count($entryIds) <= $limit)
 			{
-				KalturaLog::err("Consider narrowing search");
-				throw new kCoreException(kCoreException::SEARCH_TOO_GENERAL);
+				KalturaLog::info("Few user entries found - merge with query");
 			}
-					
+			else 
+			{
+				KalturaLog::info("Not all objects will return from the search - consider narrowing the search criteria");
+				$entryIds = array_slice($entryIds, 0, $limit);
+			}
 		}
 		
 		if (!count($entryIds))
