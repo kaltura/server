@@ -62,25 +62,46 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		return parent::setKuserId($v);
 	}
 
-
 	/** (non-PHPdoc)
-    * @see BaseCuePoint::preInsert()
-    */
+	* @see BaseCuePoint::preInsert()
+	*/
 	public function preInsert(PropelPDO $con = null)
 	{
 		$dbParentCuePoint = CuePointPeer::retrieveByPK($this->getParentId());
 		$optionalAnswers =  $dbParentCuePoint->getOptionalAnswers();
 		$correctKeys = array();
-		foreach ($optionalAnswers as $answer)
+
+		$kQuiz = $this->getQuiz();
+
+		if($kQuiz->getShowCorrectKey())
 		{
-			if ( $answer->getIsCorrect() )
-				$correctKeys[] = $answer->getKey();
+
+			foreach ($optionalAnswers as $answer) {
+				if ($answer->getIsCorrect())
+					$correctKeys[] = $answer->getKey();
+			}
+			$this->setCorrectAnswerKeys($correctKeys);
+			$this->setExplanation($dbParentCuePoint->getExplanation());
 		}
-		$this->setCorrectAnswerKeys( $correctKeys );
-		$this->setExplanation( $dbParentCuePoint->getExplanation() );
-		$this->setIsCorrect( in_array( $this->getAnswerKey(), $correctKeys ) );
+		if($kQuiz->getShowCorrect())
+		{
+			$this->setIsCorrect(in_array($this->getAnswerKey(), $correctKeys));
+		}
 		$this->setCustomDataObj();
 		return parent::preInsert($con);
+	}
+
+	private function getQuiz()
+	{
+		$dbEntry = entryPeer::retrieveByPK($this->entry_id);
+		if (!$dbEntry)
+			throw new KalturaException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entry_id);
+
+		$kQuiz = QuizPlugin::getQuizData($dbEntry);
+		if ( is_null( $kQuiz ) )
+			throw new KalturaException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $this->entry_id);
+
+		return $kQuiz;
 	}
 
 	/**
