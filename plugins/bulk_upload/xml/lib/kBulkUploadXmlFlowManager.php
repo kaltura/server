@@ -11,6 +11,11 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 		KalturaLog::debug("Handling finished ExtractMedia job!");
 		
 		$profile = myPartnerUtils::getConversionProfile2ForEntry($dbBatchJob->getEntryId());
+		if(is_null($profile))
+		{
+			KalturaLog::err("no profile found for entry " . $dbBatchJob->getEntryId());
+			return true;
+		}
 		$mediaInfoXslt = $profile->getMediaInfoXslTransformation();
 		if (!$mediaInfoXslt)
 		{
