@@ -22,9 +22,10 @@ class PollService extends KalturaBaseService
 	 */
 	public function addAction($pollType = 'SINGLE_ANONYMOUS')
 	{
+
+		KalturaResponseCacher::disableCache();
 		try
 		{
-			kApiCache::disableConditionalCache();
 			return PollActions::generatePollId($pollType);
 		}
 		catch (Exception $e)
@@ -45,6 +46,8 @@ class PollService extends KalturaBaseService
 	 */
 	public function getVotesAction($pollId, $answerIds, $otherDCVotes = null)
 	{
+
+		KalturaResponseCacher::disableCache();
 		try
 		{
 			$localDcVotes = PollActions::getVotes($pollId, $answerIds);
@@ -92,6 +95,7 @@ class PollService extends KalturaBaseService
 	 */
 	public function voteAction($pollId, $userId, $answerIds)
 	{
+		KalturaResponseCacher::disableCache();
 		try
 		{
 			return PollActions::setVote($pollId, $userId, $answerIds);
