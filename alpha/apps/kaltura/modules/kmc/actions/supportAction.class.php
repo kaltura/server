@@ -28,6 +28,33 @@ class supportAction extends kalturaAction
             $this->bodyBgColor = 'F8F8F8';
         }
 
+        /** check parameters and verify user is logged-in **/
+        $this->ks = $this->getP ( "kmcks" );
+        if(!$this->ks)
+        {
+            // if kmcks from cookie doesn't exist, try ks from REQUEST
+            $this->ks = $this->getP('ks');
+        }
+        if (isset($this->ks))
+        {
+            $ksObj = kSessionUtils::crackKs($this->ks);
+            // Set partnerId from KS
+            $this->partner_id = $ksObj->partner_id;
+        } else if (isset($_POST['partner_id']))
+        {
+            $this->partner_id = $_POST['partner_id'];
+        }
+
+        if (isset($this->partner_id))
+        {
+            // Check for forced HTTPS
+            $force_ssl = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $this->partner_id);
+            if( $force_ssl && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ) {
+                header( "Location: " . infraRequestUtils::PROTOCOL_HTTPS . "://" . $_SERVER['SERVER_NAME'] . $_SERVER["REQUEST_URI"] );
+                die();
+            }
+        }
+
         if(isset($_POST['partner_id']))
         {
             // do mail
