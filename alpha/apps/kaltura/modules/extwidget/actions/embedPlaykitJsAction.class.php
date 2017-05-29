@@ -7,118 +7,124 @@
 class embedPlaykitJsAction extends sfAction
 {
 
-    const UI_CONF_ID_PARAM_NAME = "uiconf_id";
-    const PARTNER_ID_PARAM_NAME = "partner_id";
+	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
+	const PARTNER_ID_PARAM_NAME = "partner_id";
 
-    public function execute()
-    {
-        $this->initMembers();
+	private $eTagHash = null;
+	private $uiconfId = null;
+	private $partnerId = null;
+	private $bundleWebDirPath = null;
+	private $bundleBuilderPath = null;
+	private $sourcesPath = null;
+	private $bundleConfig = null;
+	private $bundlePath = null;
 
-        //if bundle not exists build it
-        if (!file_exists($this->bundle_path)) {
-            //build bundle and save in web dir
-            $config = str_replace("\"", "'", json_encode($this->bundleConfig));
-            $command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . $config . '" --dest ' . $this->bundleWebDirPath . " --source " . $this->sourcesPath . " 2>&1";
-            exec($command, $output, $return_var);
 
-            //bundle build failed
-            if ($return_var != 0 || !in_array("Bundle created: $this->bundle_name.min.js", $output)) {
-                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
-            }
-        }
+	public function execute()
+	{
+		$this->initMembers();
 
-        $bundleContent = $this->getbundleContent($this->bundle_path);
+		//if bundle not exists build it
+		if (!file_exists($this->bundlePath)) {
+			//build bundle and save in web dir
+			$config = str_replace("\"", "'", json_encode($this->bundleConfig));
+			$command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . $config . '" --dest ' . $this->bundleWebDirPath . " --source " . $this->sourcesPath . " 2>&1";
+			exec($command, $output, $return_var);
 
-        // send cache headers
-        $this->sendHeaders($bundleContent);
+			//bundle build failed
+			if ($return_var != 0 || !in_array("Bundle created: $this->bundle_name.min.js", $output)) {
+				KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			}
+		}
 
-        // start gzip handler if possible:
-        if (!ob_start("ob_gzhandler")) ob_start();
+		$bundleContent = $this->getbundleContent($this->bundlePath);
 
-        echo($bundleContent);
+		// send cache headers
+		$this->sendHeaders($bundleContent);
 
-        KExternalErrors::dieGracefully();
-    }
+		echo($bundleContent);
 
-    private function getBundleContent($path)
-    {
-        $bundleContent = file_get_contents($path);
-        $autoEmbed = $this->getRequestParameter('autoembed');
-        $iframeEmbed = $this->getRequestParameter('iframeembed');
+		KExternalErrors::dieGracefully();
+	}
 
-        //if auto embed selected add embed script to bundle content
-        if ($autoEmbed) {
-            $bundleContent .= $this->getAutoEmbedCode();
-        }
+	private function getBundleContent($path)
+	{
+		$bundleContent = file_get_contents($path);
+		$autoEmbed = $this->getRequestParameter('autoembed');
+		$iframeEmbed = $this->getRequestParameter('iframeembed');
 
-        if ($iframeEmbed) {
-            $bundleContent = $this->getIfarmEmbedCode($bundleContent);
-        }
+		//if auto embed selected add embed script to bundle content
+		if ($autoEmbed) {
+			$bundleContent .= $this->getAutoEmbedCode();
+		} elseif ($iframeEmbed) {
+			$bundleContent = $this->getIfarmEmbedCode($bundleContent);
+		}
 
-        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-        $host = myPartnerUtils::getCdnHost($this->partner_id, $protocol, 'api');
-        $loader = kConf::get('playkit_js_source_map_loader');
-        $sourceMapLoaderURL = "$host/$loader/path/$this->bundle_name.min.js.map";
-        $bundleContent = str_replace("//# sourceMappingURL=$this->bundle_name.min.js.map", "//# sourceMappingURL=$sourceMapLoaderURL", $bundleContent);
+		$protocol = infraRequestUtils::getProtocol();
+		$host = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'api');
+		$loader = kConf::get('playkit_js_source_map_loader');
+		$sourceMapLoaderURL = "$host/$loader/path/$this->bundle_name.min.js.map";
+		$bundleContent = str_replace("//# sourceMappingURL=$this->bundle_name.min.js.map", "//# sourceMappingURL=$sourceMapLoaderURL", $bundleContent);
 
-        return $bundleContent;
-    }
+		return $bundleContent;
+	}
 
-    private function sendHeaders($content)
-    {
-        // Support Etag and 304
-        if (@strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= gmdate('D, d M Y H:i:s', time()) ||
-            @trim($_SERVER['HTTP_IF_NONE_MATCH']) == $this->getOutputHash($content)
-        ) {
-            header('HTTP/1.1 304 Not Modified');
-            exit();
-        }
+	private function sendHeaders($content)
+	{
+		$max_age = 60 * 10;
+		$lastModified = filemtime($this->bundlePath);
+		// Support Etag and 304
+		if (
+			(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
+				$_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($lastModified)) ||
+			(isset($_SERVER['HTTP_IF_NONE_MATCH']) && @trim($_SERVER['HTTP_IF_NONE_MATCH']) == $this->getOutputHash($content))
+		) {
+			infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
+			header("HTTP/1.1 304 Not Modified");
+			return;
+		}
 
-        $iframeEmbed = $this->getRequestParameter('iframeembed');
-        if ($iframeEmbed) {
-            header("Content-Type: text/html");
-        } else {
-            header("Content-Type: text/javascript");
-        }
+		$iframeEmbed = $this->getRequestParameter('iframeembed');
+		if ($iframeEmbed) {
+			header("Content-Type: text/html");
+		} else {
+			header("Content-Type: text/javascript");
+		}
 
-        header("Etag: " . $this->getOutputHash($content));
+		header("Etag: " . $this->getOutputHash($content));
+		// alwayse set cross orgin headers:
+		header("Access-Control-Allow-Origin: *");
+		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 
-        // alwayse set cross orgin headers:
-        header("Access-Control-Allow-Origin: *");
-        // Default expire time for the loader to 10 min ( we support 304 not modified so no need for long expire )
-        $max_age = 60 * 10;
-        header("Cache-Control: public, max-age=$max_age max-stale=0");
-        header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
-    }
+	}
 
-    private function getOutputHash($o)
-    {
-        if (!$this->eTagHash) {
-            $this->eTagHash = md5($o);
-        }
-        return $this->eTagHash;
-    }
+	private function getOutputHash($o)
+	{
+		if (!$this->eTagHash) {
+			$this->eTagHash = md5($o);
+		}
+		return $this->eTagHash;
+	}
 
-    private function getAutoEmbedCode()
-    {
-        $config = json_encode($this->getRequestParameter("config"));
-        $entry_id = $this->getRequestParameter('entry_id');
-        $autoEmbedCode = "\n var player; var ovpProvider = new Providers.OvpProvider($this->partner_id,\"\",$config);\n" .
-            "\t    ovpProvider.getConfig(\"" . $entry_id . "\",$this->uiconf_id).then(config => {\n" .
-            "\t    player = Playkit.playkit(config);\n" .
-            "\t }, \n" .
-            "\t err => {\n" .
-            "\t    console.log(err)\n" .
-            "\t})\n";
+	private function getAutoEmbedCode()
+	{
+		$config = json_encode($this->getRequestParameter("config"));
+		$entry_id = $this->getRequestParameter('entry_id');
+		$autoEmbedCode = "\n var player; var ovpProvider = new Providers.OvpProvider($this->partnerId,\"\",$config);\n" .
+			"\t    ovpProvider.getConfig(\"" . $entry_id . "\",$this->uiconfId).then(config => {\n" .
+			"\t    player = Playkit.playkit(config);\n" .
+			"\t }, \n" .
+			"\t err => {\n" .
+			"\t    console.log(err)\n" .
+			"\t})\n";
 
-        return $autoEmbedCode;
-    }
+		return $autoEmbedCode;
+	}
 
-    private function getIfarmEmbedCode($bundleContent)
-    {
-        $bundleContent .= $this->getAutoEmbedCode();
-        $htmlDoc = '<!DOCTYPE html PUBLIC " -//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	private function getIfarmEmbedCode($bundleContent)
+	{
+		$bundleContent .= $this->getAutoEmbedCode();
+		$htmlDoc = '<!DOCTYPE html PUBLIC " -//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
                     <html xmlns = "http://www.w3.org/1999/xhtml" >
                         <head >
                             <meta http - equiv = "Content-Type" content = "text/html; charset=iso-8859-1" />
@@ -127,81 +133,81 @@ class embedPlaykitJsAction extends sfAction
                             <script type = "text/javascript" > ' . $bundleContent . '</script >
                         </body >
                     </html >';
-        return $htmlDoc;
-    }
+		return $htmlDoc;
+	}
 
-    private function setLatestOrBetaVersionNumber($confVars)
-    {
-        //if latest/beta version required set version number in config obj
-        $isLatestVersionRequired = strpos($confVars, "{latest}");
-        $isBetaVersionRequired = strpos($confVars, "{beta}");
+	private function setLatestOrBetaVersionNumber($confVars)
+	{
+		//if latest/beta version required set version number in config obj
+		$isLatestVersionRequired = strpos($confVars, "{latest}") !== false;
+		$isBetaVersionRequired = strpos($confVars, "{beta}") !== false;
 
-        if ($isLatestVersionRequired || $isBetaVersionRequired) {
-            $latestVersionsMapPath = $this->sourcesPath . "/latest.json";
-            $latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
+		if ($isLatestVersionRequired || $isBetaVersionRequired) {
+			$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
+			$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
 
-            $betaVersionsMapPath = $this->sourcesPath . "/beta.json";
-            $betatVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
+			$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
+			$betatVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
 
-            foreach ($this->bundleConfig as $key => $val) {
-                if ($val == "{latest}" && $latestVersionMap != null) {
-                    $this->bundleConfig[$key] = $latestVersionMap[$key];
-                }
+			foreach ($this->bundleConfig as $key => $val) {
+				if ($val == "{latest}" && $latestVersionMap != null) {
+					$this->bundleConfig[$key] = $latestVersionMap[$key];
+				}
 
-                if ($val == "{beta}" && $betatVersionMap != null) {
-                    $this->bundleConfig[$key] = $betatVersionMap[$key];
-                }
-            }
-        }
-    }
+				if ($val == "{beta}" && $betatVersionMap != null) {
+					$this->bundleConfig[$key] = $betatVersionMap[$key];
+				}
+			}
+		}
+	}
 
-    private function initMembers()
-    {
-        $this->eTagHash = null;
+	private function initMembers()
+	{
+		$this->eTagHash = null;
 
-        //Get uiConf ID from QS
-        $this->uiconf_id = $this->getRequestParameter(self::UI_CONF_ID_PARAM_NAME);
-        if (!$this->uiconf_id)
-            KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, self::UI_CONF_ID_PARAM_NAME);
+		//Get uiConf ID from QS
+		$this->uiconfId = $this->getRequestParameter(self::UI_CONF_ID_PARAM_NAME);
+		if (!$this->uiconfId)
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, self::UI_CONF_ID_PARAM_NAME);
 
-        // retrieve uiCong Obj
-        $uiConf = uiConfPeer::retrieveByPK($this->uiconf_id);
-        if (!$uiConf)
-            KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
+		// retrieve uiCong Obj
+		$uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
+		if (!$uiConf)
+			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 
-        //Get bundle configuration stored in conf_vars
-        $confVars = $uiConf->getConfVars();
-        if (!$confVars) {
-            KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconf_id");
-        }
+		//Get bundle configuration stored in conf_vars
+		$confVars = $uiConf->getConfVars();
+		if (!$confVars) {
+			KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
+		}
 
-        //Get partner ID from QS or from UI conf
-        $this->partner_id = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $uiConf->getPartnerId());
+		//Get partner ID from QS or from UI conf
+		$this->partnerId = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $uiConf->getPartnerId());
 
-        //Get config params
-        try {
-            $this->bundleWebDirPath = kConf::get('playkit_js_bundles_path');
-            $this->bundleBuilderPath = kConf::get('bundle_builder_cli_path');
-            $this->sourcesPath = kConf::get('playkit_js_sources_path');
-        } catch (Exception $ex) {
-            KExternalErrors::dieGracefully($ex->getMessage());
-        }
+		//Get config params
+		try {
+			$this->bundleWebDirPath = kConf::get('playkit_js_bundles_path');
+			$this->bundleBuilderPath = kConf::get('bundle_builder_cli_path');
+			$this->sourcesPath = kConf::get('playkit_js_sources_path');
+		} catch (Exception $ex) {
+			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
+		}
 
-        $this->bundleConfig = json_decode($confVars, true);
-        $this->setLatestOrBetaVersionNumber($confVars);
-        $this->setBundleName();
-        $this->bundle_path = $this->bundleWebDirPath . $this->bundle_name . ".min.js";
-    }
+		$this->bundleConfig = json_decode($confVars, true);
+		$this->setLatestOrBetaVersionNumber($confVars);
+		$this->setBundleName();
+		$this->bundlePath = $this->bundleWebDirPath . $this->bundle_name . ".min.js";
+	}
 
-    private function setBundleName()
-    {
-        //sort bundle config by key
-        ksort($this->bundleConfig);
+	private function setBundleName()
+	{
+		//sort bundle config by key
+		ksort($this->bundleConfig);
 
-        //create base64 bundle name from json config
-        $config_str = json_encode($this->bundleConfig);
-        $this->bundle_name = base64_encode($config_str);
-    }
+		//create base64 bundle name from json config
+		$config_str = json_encode($this->bundleConfig);
+		$this->bundle_name = base64_encode($config_str);
+	}
 
 
 }
