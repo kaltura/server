@@ -24,6 +24,7 @@ class PollService extends KalturaBaseService
 	{
 		try
 		{
+			kApiCache::disableConditionalCache();
 			return PollActions::generatePollId($pollType);
 		}
 		catch (Exception $e)
