@@ -562,7 +562,18 @@ class kMrssManager
 			if($asset instanceof thumbAsset)
 				self::appendThumbAssetMrss($asset, $mrss);
 		}
-			
+
+		$capabilities = $entry->getCapabilities();
+		if($capabilities)
+		{
+			$capabilitiesNode = $mrss->addChild('capabilities');
+			$capabilitiesArr = explode(",", $capabilities);
+			foreach($capabilitiesArr as $capability)
+			{
+				$capabilitiesNode->addChild('capability', kPluginableEnumsManager::coreToApi('EntryCapability', $capability));
+			}
+		}
+
 		$mrssContributors = self::getMrssContributors();
 		if(count($mrssContributors))
 		{
