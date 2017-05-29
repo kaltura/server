@@ -54,8 +54,8 @@ class KalturaQuiz extends KalturaObject
 	(
 		"version",
 		"uiAttributes",
-		"showResultOnAnswer",
-		"showCorrectKeyOnAnswer",
+		"showResultOnAnswer" => "showCorrect",
+		"showCorrectKeyOnAnswer" => "showCorrectKey",
 		"allowAnswerUpdate",
 		"showCorrectAfterSubmission",
 		"allowDownload",
