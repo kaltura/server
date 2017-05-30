@@ -13,6 +13,16 @@ class ESearchEntryItem extends ESearchItem
 	 */
 	protected $searchTerm;
 
+	private static $exact_match_only_fields = array(
+		'category_ids',
+		'kuser_id',
+		'reference_id',
+		'redirect_entry_id',
+		'templated_entry_id',
+		'parent_id',
+		'recorded_entry_id',
+	);
+
 	/**
 	 * @return ESearchEntryFieldName
 	 */
@@ -26,15 +36,6 @@ class ESearchEntryItem extends ESearchItem
 	 */
 	public function setFieldName($fieldName)
 	{
-//		switch ($fieldName)
-//		{
-//			case ESearchEntryFieldName::ENTRY_DESCRIPTION:
-//				$fieldName = 'ENTRY_DESCRIPTION';
-//				break;
-//			case ESearchEntryFieldName::ENTRY_NAME:
-//				$fieldName = 'ENTRY_NAME';
-//				break;
-//		}
 		$this->fieldName = $fieldName;
 	}
 
@@ -57,12 +58,19 @@ class ESearchEntryItem extends ESearchItem
 	public function createSubQuery()
 	{
 		return $this->getSearchTerm();
-//		return kEQueryManager::createEntrySearchQuery($this);
+//		return kESearchQueryManager::createEntrySearchQuery($this);
 	}
 
 	public function getType()
 	{
 		return 'entry';
+	}
+
+	public function getQueryVerbs()
+	{
+		if (in_array($this->getFieldName(), self::$exact_match_only_fields))
+			return array('must','term');
+		return parent::getQueryVerbs();
 	}
 
 
