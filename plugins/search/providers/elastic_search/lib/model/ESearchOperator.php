@@ -71,4 +71,15 @@ class ESearchOperator extends ESearchItem
 		return kEQueryManager::createOperatorSearchQuery($this);
 	}
 
+	public function createSubQuery()
+	{
+		return $this;
+	}
+
+	public function getType()
+	{
+		return 'operator';
+	}
+
+
 }

@@ -26,15 +26,15 @@ class ESearchEntryItem extends ESearchItem
 	 */
 	public function setFieldName($fieldName)
 	{
-		switch ($fieldName)
-		{
-			case ESearchEntryFieldName::ENTRY_DESCRIPTION:
-				$fieldName = 'ENTRY_DESCRIPTION';
-				break;
-			case ESearchEntryFieldName::ENTRY_NAME:
-				$fieldName = 'ENTRY_NAME';
-				break;
-		}
+//		switch ($fieldName)
+//		{
+//			case ESearchEntryFieldName::ENTRY_DESCRIPTION:
+//				$fieldName = 'ENTRY_DESCRIPTION';
+//				break;
+//			case ESearchEntryFieldName::ENTRY_NAME:
+//				$fieldName = 'ENTRY_NAME';
+//				break;
+//		}
 		$this->fieldName = $fieldName;
 	}
 
@@ -54,9 +54,15 @@ class ESearchEntryItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function createSearchQuery()
+	public function createSubQuery()
 	{
-		return kEQueryManager::createEntrySearchQuery($this);
+		return $this->getSearchTerm();
+//		return kEQueryManager::createEntrySearchQuery($this);
+	}
+
+	public function getType()
+	{
+		return 'entry';
 	}
 
 

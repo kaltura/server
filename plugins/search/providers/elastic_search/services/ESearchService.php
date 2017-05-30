@@ -14,6 +14,8 @@ class ESearchService extends KalturaBaseService
 	 */
 	function searchAction (KalturaESearchOperator $searchOperator)
 	{
+		if (!$searchOperator->operator)
+			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
 		//TODO: should we allow doesnt contain without a specific contains
 		$coreSearchOperator = $searchOperator->toObject();
 		/**

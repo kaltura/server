@@ -27,22 +27,22 @@ abstract class ESearchItem extends BaseObject
 	/**
 	 * @return null|string
 	 */
-	public function getQueryVerb()
+	public function getQueryVerbs()
 	{
 		$queryVerb = null;
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$queryVerb = 'must';
+				$queryVerb = array('must','term');
 				break;
 			case ESearchItemType::PARTIAL:
-				$queryVerb = 'query';
+				$queryVerb = array('must','match');
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$queryVerb = 'prefix';
+				$queryVerb = array('must','prefix');
 				break;
 			case ESearchItemType::DOESNT_CONTAIN:
-				$queryVerb = 'must_not';
+				$queryVerb = array('must_not','term');
 				break;
 		}
 		return $queryVerb;
@@ -51,6 +51,8 @@ abstract class ESearchItem extends BaseObject
 	/**
 	 * In order to implement visitor/visited design pattern.
 	 */
-	abstract public function createSearchQuery();
+	abstract public function createSubQuery();
+
+	abstract public function getType();
 
 }
