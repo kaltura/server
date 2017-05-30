@@ -1,6 +1,6 @@
 <?php
 
-class UltraSearchResult extends BaseObject
+class ESearchResult extends BaseObject
 {
 
 	/**

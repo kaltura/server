@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaUltraSearchResult extends KalturaObject {
+class KalturaESearchResult extends KalturaObject {
 
     /**
      * @var KalturaBaseEntry
@@ -11,7 +11,7 @@ class KalturaUltraSearchResult extends KalturaObject {
     public $entry;
 
     /**
-     * @var string
+     * @var KalturaESearchItemDataArray
      */
     public $itemData;
 

@@ -3,21 +3,28 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaUltraSearchEntryItem extends KalturaUltraSearchItem {
-
-	/**
-	 * @var KalturaUltraSearchEntryFieldName
-	 */
-	public $fieldName;
+//TODO: should class be moved to caption plugin?
+class KalturaESearchCaptionItemData extends KalturaESearchItemData {
 
 	/**
 	 * @var string
 	 */
-	public $searchTerm;
+	public $line;
+
+	/**
+	 * @var int
+	 */
+	public $startsAt;
+
+	/**
+	 * @var int
+	 */
+	public $endsAt;
 
 	private static $map_between_objects = array(
-		'fieldName',
-		'searchTerm',
+		'line',
+		'startsAt',
+		'endsAt',
 	);
 
 	protected function getMapBetweenObjects()
@@ -28,7 +35,7 @@ class KalturaUltraSearchEntryItem extends KalturaUltraSearchItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new UltraSearchEntryItem();
+			$object_to_fill = new ESearchCaptionItemData();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 

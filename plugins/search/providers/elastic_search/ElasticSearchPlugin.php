@@ -36,7 +36,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
     public static function getServicesMap()
     {
         $map = array(
-            'UltraSearch' => 'UltraSearchService',
+            'ESearch' => 'ESearchService',
         );
         return $map;
     }

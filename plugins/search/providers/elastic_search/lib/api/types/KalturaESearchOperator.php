@@ -3,11 +3,11 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaUltraSearchOperator extends KalturaUltraSearchBaseItem {
+class KalturaESearchOperator extends KalturaESearchBaseItem {
 
 
     /**
-     * @var KalturaUltraSearchOperatorType
+     * @var KalturaESearchOperatorType
      */
     public $operator;
 
@@ -17,7 +17,7 @@ class KalturaUltraSearchOperator extends KalturaUltraSearchBaseItem {
     public $not;
 
     /**
-     *  @var KalturaUltraSearchBaseItemArray
+     *  @var KalturaESearchBaseItemArray
      */
     public $searchItems;
 
@@ -35,7 +35,7 @@ class KalturaUltraSearchOperator extends KalturaUltraSearchBaseItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new UltraSearchOperator();
+			$object_to_fill = new ESearchOperator();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
