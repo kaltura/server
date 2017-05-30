@@ -64,6 +64,33 @@
 		"tags" : {
 		  "type" : "text"
 		},
+		"reference_id": {
+		  "type" : "text"
+		},
+		"conversion_profile_id": {
+		  "type" : "text"
+		},
+		"template_entry_id": {
+		  "type" : "text"
+		},
+		"display_in_search": {
+		  "type" : "boolean"
+		},
+		"media_type": {
+		  "type" : "short"
+		},
+		"source_type": {
+		  "type" : "text"
+		},
+		"duration": {
+		  "type" : "long"
+		},
+		"recorded_entry_id": {
+		  "type" : "text"
+		},
+		"push_publish": {
+		  "type" : "boolean"
+		},
 		"parent_entry" : {
 		  "properties" : {
 			"entry_id" : {

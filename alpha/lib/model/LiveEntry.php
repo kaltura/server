@@ -901,4 +901,15 @@ abstract class LiveEntry extends entry
 		
 		return $currentDuration;
 	}
+
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'recorded_entry_id' => $this->getRecordedEntryId(),
+			'push_publish' => $this->getPushPublishEnabled(),
+		);
+		return array_merge(parent::getObjectParams($params), $body);
+	}
+
+
 }
