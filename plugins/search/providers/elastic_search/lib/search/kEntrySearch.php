@@ -27,7 +27,7 @@ class kEntrySearch
 	    kElasticEntitlement::init();
         $this->initQuery($entriesStatus);
         $this->initEntitlement();
-        $subQuery = kEQueryManager::createSearchQuery($eSearchOperator);
+        $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
 	    KalturaLog::debug("@@NA for debug [".print_r($subQuery,true)."]");
         $this->applyElasticSearchConditions($subQuery);
         KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug

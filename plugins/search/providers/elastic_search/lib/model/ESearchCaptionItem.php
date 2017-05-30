@@ -27,7 +27,6 @@ class ESearchCaptionItem extends ESearchItem
 	public function createSubQuery()
 	{
 		return $this->getSearchTerm();
-//		return kEQueryManager::createCaptionSearchQuery($this);
 	}
 
 	public function getType()

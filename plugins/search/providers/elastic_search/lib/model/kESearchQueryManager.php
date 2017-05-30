@@ -1,7 +1,7 @@
 <?php
 
 
-class kEQueryManager
+class kESearchQueryManager
 {
 	/**
 	 * Uses visitor/visited design pattern in order to create a search query
@@ -53,7 +53,7 @@ class kEQueryManager
 		if (isset($categorizedSearchItems['entrySearchItems']))
 		{
 			//TODO: partial won't work on most of these since they are not indexed as ngram
-			 $entrySubQuery = self::createEntrySearchQuery($categorizedSearchItems['entrySearchItems'], $boolOperator);
+			$entrySubQuery = self::createEntrySearchQuery($categorizedSearchItems['entrySearchItems'], $boolOperator);
 			foreach($entrySubQuery as $queryVerb => $queryVal)
 				$outQuery['bool'][$queryVerb][] = $queryVal;
 		}
