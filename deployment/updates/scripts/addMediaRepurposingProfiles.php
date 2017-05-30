@@ -128,7 +128,7 @@ function buildSubTaskName($name, $index)
 function addDeleteAfterXTemplate()
 {
 	echo "Add Template of MR for Delete with notification\n";
-	$name = 'Delete with Notification';
+	$name = 'Delete';
 	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
