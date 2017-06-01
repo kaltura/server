@@ -51,7 +51,7 @@ class mediaInfo extends BasemediaInfo
 			}
 			else
 			{
-				list($key, $value) = explode(":", $rawDataLine);
+				list($key, $value) = explode(":", $rawDataLine, 2);
 			}
 			$key = str_replace(" ", "",$key);
 			$key = preg_replace('/[^A-Za-z0-9]/', '_', $key);
