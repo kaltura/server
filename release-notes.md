@@ -97,6 +97,20 @@ None.
 
 None.
 
+## Fix FFmpeg 3.2 source aligned KF's and segfault on encryption issues ##
+
+ - Issue Type: Bug fix
+ - Issue ID: PRODIT-4352
+
+### Configuration ###
+Binaries: Provided in the PRODIT-4352
+
+Following bins/scripts should be switched -
+- ffmpeg.sh
+- ffprobe.sh
+- ismindex.sh
+- qt-faststart
+
 
 # Lynx 12.16.0 #
 
