@@ -1,5 +1,28 @@
 # Lynx 12.17.0 #
 
+## Media Repurposing ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-6960
+
+### Configuration ###
+Add to admin.ini:
+
+	moduls.MediaRepurposing.enabled = true
+	moduls.MediaRepurposing.permissionType = 2
+	moduls.MediaRepurposing.label = "Enable Media Repurposing"
+	moduls.MediaRepurposing.permissionName = FEATURE_MEDIA_REPURPOSING_PERMISSION
+	moduls.MediaRepurposing.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission.php
+	  php /opt/kaltura/app/deployment/updates/scripts/addMediaRepurposingProfiles.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Add-on for ExtractMedia logic ##
 
 - Issue Type: Feature
