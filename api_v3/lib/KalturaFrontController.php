@@ -169,7 +169,7 @@ class KalturaFrontController
 						
 						$valueFromObject = $this->getValueFromObject($result, $attributePath);
 						if(!$valueFromObject)
-							throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $path);
+							throw new KalturaAPIException(KalturaErrors::FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE, $path);
 							
 						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
 					}
