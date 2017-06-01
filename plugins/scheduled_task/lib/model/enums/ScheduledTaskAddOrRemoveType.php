@@ -8,4 +8,5 @@ interface ScheduledTaskAddOrRemoveType extends BaseEnum
 {
 	const ADD = 1;
 	const REMOVE = 2;
+	const MOVE = 3;
 }
