@@ -24,7 +24,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		return UserEntryPeer::doCount($c);
 	}
 	
-	public function getEntryIdsByCurrentKuser($entryIds = array())
+	public function getEntryIds($entryIds = array())
 	{
 		$userEntryCriteria = new Criteria();
 		
@@ -42,9 +42,15 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		{
 			$userEntryCriteria->add(UserEntryPeer::ENTRY_ID, $entryIds, Criteria::IN);
 		}
+		
 		$userEntryCriteria->add(UserEntryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
-		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
-		$userEntryCriteria->add(UserEntryPeer::KUSER_ID, $currentKsKuserId);
+		
+		if (!$this->filter || (!$this->filter->get('_eq_user_id') && !$this->filter->get('_in_user_id')))
+		{
+			
+			$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
+			$userEntryCriteria->add(UserEntryPeer::KUSER_ID, $currentKsKuserId);
+		}
 		
 		$stmt = UserEntryPeer::doSelectStmt($userEntryCriteria);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -112,7 +118,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 				$ids[] = $entry->getId();
 			}
 			
-			$entryIds = $this->getEntryIdsByCurrentKuser($ids);
+			$entryIds = $this->getEntryIds($ids);
 		
 			if (count($entryIds) <= $limit)
 			{
