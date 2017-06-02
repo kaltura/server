@@ -47,7 +47,6 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		
 		if (!$this->filter || (!$this->filter->get('_eq_user_id') && !$this->filter->get('_in_user_id')))
 		{
-			
 			$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
 			$userEntryCriteria->add(UserEntryPeer::KUSER_ID, $currentKsKuserId);
 		}
