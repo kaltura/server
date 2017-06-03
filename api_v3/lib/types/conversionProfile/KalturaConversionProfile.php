@@ -177,6 +177,13 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	 */
 	public $detectGOP;
 	
+	/**
+	 * XSL to transform ingestion Media Info XML
+	 * 
+	 * @var string
+	 */
+	public $mediaInfoXslTransformation;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -217,6 +224,11 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		{
 			$this->cropDimensions = new KalturaCropDimensions();
 			$this->cropDimensions->fromObject($sourceObject);
+		}
+		
+		if($this->shouldGet('mediaInfoXslTransformation', $responseProfile))
+		{
+			$this->mediaInfoXslTransformation = $sourceObject->getMediaInfoXslTransformation();
 		}
 	}
 	
