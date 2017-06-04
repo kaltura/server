@@ -267,12 +267,13 @@ function convertDates()
 	let f = jQuery('#frmMediaRepurposingConfigure');
 	f.find( "input[innertype=integer]").each(function(idx) {
 		var val = $(this).val();
-		var id = this.id; 
-		if (epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
-			$(this).val(val * 2592000); // 60*60*24*30 - set relative in seconds from relative months
-
-		if (isDatesFormat(val))
+		if (isDatesFormat(val)) {
 			$(this).val(getEpocTime(val));
+			return;
+		}
+		var id = this.id;
+		if (val != 'N/A' && epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
+			$(this).val(val * 2592000); // 60*60*24*30 - set relative in seconds from relative months
 	});
 }
 
