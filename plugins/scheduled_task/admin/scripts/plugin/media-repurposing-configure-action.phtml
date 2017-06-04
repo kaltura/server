@@ -19,8 +19,7 @@
 	
 	var filterStatus = 0;
 	var alwaysDisplay = [];
-	var epocToMonthsField = ['createdAtGreaterThanOrEqual', 'createdAtLessThanOrEqual', 'lastPlayedAtGreaterThanOrEqual', 'lastPlayedAtLessThanOrEqual',
-								'mediaDateGreaterThanOrEqual', 'mediaDateLessThanOrEqual', 'updatedAtGreaterThanOrEqual', 'updatedAtLessThanOrEqual'];
+	var epocToMonthsField= ['createdAt', 'lastPlayedAt', 'mediaDate', 'updatedAt'];
 	init();
 
 	function init() {
@@ -104,8 +103,7 @@
 			if (isNaN(val))
 				return;
 
-			if ( val > 315360000) // 10 Year (max relative time)
-			{
+			if ( val > 315360000) {// 10 Year (max relative time)
 				var d = new Date(0);
 				d.setUTCSeconds(val);
 				$(this).val(d.toISOString().slice(0,10).replace(/-/g,"."));
@@ -116,10 +114,9 @@
 			if (epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
 				$(this).val(val / 2592000); // 60*60*24*30
 		});
-	}
 
-	function convertMonths() {
-
+		var l = f.find( "label[for=relativeTimes]");
+		l.html(l.html() + " [for field " + epocToMonthsField.toString() + " insert in months]")
 	}
 
 	function addTaskButtonExe() {
