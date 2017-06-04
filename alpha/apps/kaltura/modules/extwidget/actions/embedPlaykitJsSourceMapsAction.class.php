@@ -27,8 +27,7 @@ class embedPlaykitJsSourceMapsAction extends sfAction
 		}
 
 		$sourceMapFilePath = $bundleWebDirPath . $fileName;
-		header("Content-Type: application/octet-stream");
-		$sourceMap = kFileUtils::getDumpFileRenderer($sourceMapFilePath, null);
+		$sourceMap = kFileUtils::getDumpFileRenderer($sourceMapFilePath, "application/octet-stream");
 
 		echo($sourceMap->output());
 
