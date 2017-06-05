@@ -2,7 +2,7 @@
 <xml>
 	<config>
 		<serviceUrl>@SERVICE_URL@</serviceUrl>
-		<partnerId>-4</partnerId>
+		<partnerId>-2</partnerId>
 		<clientTag>Stand alone php 1.0.0</clientTag>
 		<curlTimeout>120</curlTimeout>
 		<userAgent>Stand alone php 1.0.0</userAgent>
