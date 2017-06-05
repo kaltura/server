@@ -1891,7 +1891,11 @@ form#frmCreateMediaRepurposing dd,form#frmCreateMediaRepurposing dt {
 form#frmCreateMediaRepurposingFromTemplate dd,form#frmCreateMediaRepurposingFromTemplate dt {
 	right: 0px;
 	float: left;
+}
 
+form#frmGetLogMediaRepurposing dd,form#frmGetLogMediaRepurposing dt {
+	right: 0px;
+	float: left;
 }
 
 

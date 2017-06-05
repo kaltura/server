@@ -4,7 +4,7 @@
 <?php echo $this->filterForm; ?>
 <br><br><br><br><br><br><br>
 <?php echo $this->newMediaRepurposingForm; ?>
-<?php echo $this->newMediaRepurposingFormFromTemplate; ?>
+<?php //echo $this->newMediaRepurposingFormFromTemplate; ?>
 
 <div id="media_repurposing_list_div" class="clear">
 	<table>
@@ -56,7 +56,7 @@
 		</tbody>
 	</table>
 </div>
-
+<?php echo $this->getLogMediaRepurposingForm; ?>
 <script type="text/javascript">
 $(function(){
 	addSubTitle('Media Repurposing Profiles');
@@ -204,8 +204,7 @@ function configureMediaRepurposing(mediaRepurposingId)
 		alert('<?php echo $this->translate('Media Repurposing ID not supplied'); ?>');
 		return;
 	}
-
-
+	
 	mediaRepurposingIdStr = '/new_partner_id/' + partnerId + '/media_repurposing_id/' + mediaRepurposingId;
 	loadMediaRepurposing(mediaRepurposingIdStr);
 	
@@ -248,6 +247,26 @@ function loadMediaRepurposing(paramStr)
 			});
 		}
 	);
+}
+
+function getLog(partnerId, mrId, startDate, endDate) {
+	if (!isValidParam(partnerId, 'Publisher ID', true))
+		return;
+	if (isDatesFormat(startDate))
+		startDate = getEpocTime(startDate);
+	if (isDatesFormat(endDate))
+		endDate = getEpocTime(endDate);
+	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingLogsAction')); ?>' +
+		'/partner_id/' + partnerId + '/mr_Id/' + mrId + '/start_date/' + startDate + '/end_date/' + endDate;
+	jQuery('#media-repurposing-logs-dialog').remove();
+	dialogDiv = jQuery('<div id="media-repurposing-logs-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	dialogDiv.dialog({
+		bgiframe: true, modal: true, resizable: true, width: 800, height: 600,
+		title: '<?php echo $this->translate('Media Repurposing Logs'); ?>',
+		buttons: {'<?php echo $this->translate('Close'); ?>': function () {jQuery(this).dialog('close');}}
+	});
+	dialogDiv.load(url);
 }
 
 

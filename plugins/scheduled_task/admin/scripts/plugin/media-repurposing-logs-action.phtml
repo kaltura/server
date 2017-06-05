@@ -1,0 +1,52 @@
+<?php if($this->errMessage): ?>
+<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+
+
+<?php
+	$this->form->setAction($this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingLogsAction')));
+	echo $this->form;
+?>
+<div id="media_repurposing_list_div" class="clear">
+	<table>
+		<thead>
+		<tr>
+			<th><?php echo $this->translate('ID'); ?></th>
+			<th><?php echo $this->translate('Media Reporposing ID'); ?></th>
+			<th><?php echo $this->translate('ST action'); ?></th>
+			<th><?php echo $this->translate('Entry Effected Data'); ?></th>
+			<th><?php echo $this->translate('Error'); ?></th>
+		</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="10">
+				<?php echo $this->auditTrails; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+		<?php foreach($this->auditTrails as $auditTrail): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next();
+			?>">
+				<td><?php echo $auditTrail->id; ?></td>
+				<td><?php echo $auditTrail->status; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_ScheduledTask_Enum_ObjectTaskType', $auditTrail->description); ?></td>
+				<td><?php echo $auditTrail->data->info; ?></td>
+				<td><?php echo $auditTrail->errorDescription; ?></td>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+
+<style type="text/css">
+
+</style>
+
+
+<script type="text/javascript">
+
+</script>
+
