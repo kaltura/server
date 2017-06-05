@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package Core
+ * @package plugins.quiz
  * @subpackage model
  */
 class QuizUserEntry extends UserEntry{
