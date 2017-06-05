@@ -45,12 +45,6 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		
 		$userEntryCriteria->add(UserEntryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
 		
-		if (!$this->filter || (!$this->filter->get('_eq_user_id') && !$this->filter->get('_in_user_id')))
-		{
-			$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
-			$userEntryCriteria->add(UserEntryPeer::KUSER_ID, $currentKsKuserId);
-		}
-		
 		$stmt = UserEntryPeer::doSelectStmt($userEntryCriteria);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
@@ -95,7 +89,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		}
 		
 		//get all userEntries
-		$entryIds = $this->getEntryIdsByCurrentKuser();
+		$entryIds = $this->getEntryIds();
 		$limit = $query->getLimit();
 		
 		/* @var $query KalturaCriteria */
