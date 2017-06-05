@@ -41,15 +41,18 @@ class Form_MediaRepurposingLogs extends ConfigureForm
 
 
 
-	public function populateLogData($runsLogs)
+	public function populateLogData($auditLogs)
 	{
 		KalturaLog::info("asdf - in populateLogData");
 		$this->setDefault('logsPartnerId', $this->partnerId);
 		$this->setDefault('logsMrId', $this->mediaRepurposingId);
-		KalturaLog::info(print_r($runsLogs, true));
+		$this->setDefault('logsRunNum', count($auditLogs));
 
-		//$this->auditTrails = $runsLogs;
+		$entryArr = array();
+		foreach($auditLogs as $log)
+			$entryArr = array_merge($entryArr, array_flip(explode(',', $log->data->info)));
 
+		$this->setDefault('logsEntryNum', count($entryArr));
 
 	}
 

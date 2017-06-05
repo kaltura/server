@@ -30,7 +30,7 @@
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next();
 			?>">
 				<td><?php echo $auditTrail->id; ?></td>
-				<td><?php echo $auditTrail->status; ?></td>
+				<td><?php echo $auditTrail->objectId; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_ScheduledTask_Enum_ObjectTaskType', $auditTrail->description); ?></td>
 				<td><?php echo $auditTrail->data->info; ?></td>
 				<td><?php echo $auditTrail->errorDescription; ?></td>
