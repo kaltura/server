@@ -200,7 +200,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 			 */
 		$runChunkedEncode = new KChunkedEncodeSessionManager($setup);
 		if($runChunkedEncode->Initialize()!=true){
-			$output = $runChunkedEncode->ExecuteFallback($cmdLine, &$returnVar);
+			$output = $runChunkedEncode->ExecuteFallback($cmdLine, $returnVar);
 			return $output;
 		}
 		$sessionFilename = $runChunkedEncode->chunker->getSessionName("session");

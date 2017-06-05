@@ -1,3 +1,117 @@
+# Lynx 12.17.0 #
+
+## Media Repurposing ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-6960
+
+### Configuration ###
+Add to admin.ini:
+
+	moduls.MediaRepurposing.enabled = true
+	moduls.MediaRepurposing.permissionType = 2
+	moduls.MediaRepurposing.label = "Enable Media Repurposing"
+	moduls.MediaRepurposing.permissionName = FEATURE_MEDIA_REPURPOSING_PERMISSION
+	moduls.MediaRepurposing.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission.php
+	  php /opt/kaltura/app/deployment/updates/scripts/addMediaRepurposingProfiles.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add-on for ExtractMedia logic ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7436
+
+### Configuration ###
+	make sure @WEB_DIR@/tmp/bulkupload exists (if not - create it)
+	point 'shared_temp_folder' var (in configurations/local.ini) to that folder
+
+### Deployment scripts ###
+None.
+
+## Q&A/Polls Response profiles and push notifications tempaltes ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-6940
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add polls support ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7333
+
+### Configuration ###
+
+
+- In local.ini add the following parameters:
+
+		[poll]
+		secret = <select a secret>
+		cache_ttl = 86400
+		
+- In base.ini add the following parameters::
+
+		[cache_based_service_actions]
+		poll_poll_vote = "/../../plugins/poll/lib/PollActions.php"
+
+- In cache.ini add the following parameters:
+		
+		* [memcacheKeys:memcacheBase]
+		  host = 127.0.0.1
+		
+		* cacheOnlyActions = memcacheKeys
+  
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+## ViewHistory Feature Add missing permission item ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7281
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Fix FFmpeg 3.2 source aligned KF's and segfault on encryption issues ##
+
+ - Issue Type: Bug fix
+ - Issue ID: PRODIT-4352
+
+### Configuration ###
+Binaries: Provided in the PRODIT-4352
+
+Following bins/scripts should be switched -
+- ffmpeg.sh
+- ffprobe.sh
+- ismindex.sh
+- qt-faststart
+
+
 # Lynx 12.16.0 #
 
 ## Add scheduleEvent->list optimization ##

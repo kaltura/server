@@ -105,7 +105,7 @@ function disable(mediaRepurposingId)
 		mediaRepurposingId,
 		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED; ?>,
 		function() {
-			alert('<?php echo $this->translate('Media Repurposing disabled');?>');
+			alert('<?php echo $this->translate('Media Repurposing disabled. NOTICE: disabling will not stop currently running process');?>');
 		}
 	);
 }

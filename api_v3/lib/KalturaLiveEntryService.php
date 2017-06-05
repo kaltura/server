@@ -142,7 +142,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return $entry;
 	}
 
-	private function ingestAsset(entry $entry, $dbAsset, $filename)
+	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true)
 	{
 		$flavorParamsId = $dbAsset->getFlavorParamsId();
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
@@ -183,7 +183,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		// create file sync
 		$recordedAssetKey = $recordedAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::moveFromFile($filename, $recordedAssetKey, true, true);
+		kFileSyncUtils::moveFromFile($filename, $recordedAssetKey, true, $shouldCopy);
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($recordedAsset));
 	}
@@ -530,10 +530,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
 		
 		$kResource = $resource->toObject();
+		/* @var $kResource kLocalFileResource */
 		$filename = $kResource->getLocalFilePath();
+		$keepOriginalFile = $kResource->getKeepOriginalFile();
 		
 		$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
 		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
-		$this->ingestAsset($replacingEntry, $dbAsset, $filename);
+		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile);
 	}
 }
