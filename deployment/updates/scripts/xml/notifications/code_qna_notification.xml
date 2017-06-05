@@ -8,8 +8,10 @@
 		<userAgent>Stand alone php 1.0.0</userAgent>
 	</config>
 	<session>
-		<!-- script will ask for username / password interactively -->
-	</session>
+        <partnerId>-2</partnerId>
+        <secret>{prompt:Partner -2 admin_secret:}</secret>
+        <sessionType>2</sessionType>
+    </session>
         <multirequest>
 			<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 				<template objectType="KalturaPushNotificationTemplate">

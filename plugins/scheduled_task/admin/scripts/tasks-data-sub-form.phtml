@@ -1,10 +1,10 @@
-<fieldset class="mediaRepurposing-task">
+<fieldset class="mediaRepurposing-task" id="tasksDisplay">
 	<legend>Tasks:</legend>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
 		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
 		<?php echo $subForm; ?>
 	<?php endforeach; ?>
-	<a class="add-task" href="javascript:;" onclick="addTask(this);" >+ Add Task</a>
+	<a class="add-task" style="display:none" href="javascript:;" onclick="addTask(this);" >+ Add Task</a>
 </fieldset>
 
 <style type="text/css">
@@ -19,7 +19,6 @@
 
 	var index = 0;
 	function addTask(target) {
-
 		var chooseElem = document.getElementById("TaskTypeChoose");
 		var type = chooseElem.options[chooseElem.selectedIndex].value;
 		var showType = chooseElem.options[chooseElem.selectedIndex].text;

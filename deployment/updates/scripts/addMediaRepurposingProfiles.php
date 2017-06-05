@@ -97,6 +97,20 @@ function addTask($type, $name, $filter, $description, $isFirst = false)
 	return $scheduleTask->getId();
 }
 
+function addMailTask($name, $filter, $description, $isFirst = true)
+{
+	$task = new kObjectTask();
+	$task->setType(ObjectTaskType::MAIL_NOTIFICATION);
+	$task->setDataValue('message', "You have been identified as the owner of Media which is approaching its media retention deadline. 
+		Unless you take action in the next [notification interval] days, this entry will be [Action].  ");
+	$scheduleTask = createST($name, $filter, $task);
+	$scheduleTask->setDescription($description);
+	if ($isFirst)
+		$scheduleTask->setSystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME);
+	$scheduleTask->save();
+	return $scheduleTask->getId();
+}
+
 function getFilter($names)
 {
 	global $defaultFilterValue;
@@ -114,7 +128,7 @@ function buildSubTaskName($name, $index)
 function addDeleteAfterXTemplate()
 {
 	echo "Add Template of MR for Delete with notification\n";
-	$name = 'Delete with Notification';
+	$name = 'Delete';
 	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
@@ -122,7 +136,7 @@ function addDeleteAfterXTemplate()
 	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
+	addMailTask($name, $filter, $description);
 }
 
 function addDeleteAfterXWithExportTemplate()
@@ -138,7 +152,7 @@ function addDeleteAfterXWithExportTemplate()
 	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
+	addMailTask($name, $filter, $description);
 }
 
 function addArchiveAndDeleteTemplate()
@@ -154,8 +168,7 @@ function addArchiveAndDeleteTemplate()
 	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
-}
+	addMailTask($name, $filter, $description);}
 
 function addArchiveExportAndDeleteTemplate()
 {
@@ -172,8 +185,7 @@ function addArchiveExportAndDeleteTemplate()
 	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]," . $task3Id . "[$timeToNext3]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
-}
+	addMailTask($name, $filter, $description);}
 
 function addDeletePrivateContentTemplate()
 {
@@ -187,8 +199,7 @@ function addDeletePrivateContentTemplate()
 	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
-}
+	addMailTask($name, $filter, $description);}
 
 function addDeleteFlavorTemplate()
 {
@@ -201,8 +212,7 @@ function addDeleteFlavorTemplate()
 	$task1Id = addTask(ObjectTaskType::DELETE_ENTRY_FLAVORS, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
-}
+	addMailTask($name, $filter, $description);}
 
 function addExportTemplate()
 {
@@ -215,8 +225,7 @@ function addExportTemplate()
 	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "1"), $filter, $timeToNext );
 
 	$description = $task1Id . "[$timeToNext]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
-}
+	addMailTask($name, $filter, $description);}
 
 function addExportAndDeleteLocalContentTemplate()
 {
@@ -231,8 +240,7 @@ function addExportAndDeleteLocalContentTemplate()
 	$task1Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
 	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]";
-	addTask(ObjectTaskType::MAIL_NOTIFICATION, $name, $filter, $description, true);
-}
+	addMailTask($name, $filter, $description);}
 
 
 function getXsd() {

@@ -79,6 +79,11 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 		$this->addLine("taskLine2");
 		$this->addEnumElement('TaskTypeChoose', '', 'Kaltura_Client_ScheduledTask_Enum_ObjectTaskType');
+		$this->addElement('button', 'addTaskButton', array(
+			'ignore'	=> true,
+			'label'		=> 'Add Task',
+			'onclick'		=> "addTaskButtonExe()",
+		));
 
 		// template who will not be shown on form
 		$this->addTaskDataTemplate();
@@ -279,8 +284,14 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		// check if filter not empty
 		foreach($filter as $prop)
-			if ($prop)
+		{
+			if ($prop instanceof Kaltura_Client_Type_SearchOperator)
+			{
+				if (count($prop->items))
+					return true;
+			} elseif ($prop)
 				return true;
+		}
 		return false;
 	}
 

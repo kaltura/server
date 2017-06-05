@@ -117,6 +117,7 @@ class ScheduleEventResourceService extends KalturaBaseService
 		}
 		
 		$dbScheduleEventResource->delete();
+		kEventsManager::raiseEvent(new kObjectErasedEvent($dbScheduleEventResource));
 	}
 	
 	/**

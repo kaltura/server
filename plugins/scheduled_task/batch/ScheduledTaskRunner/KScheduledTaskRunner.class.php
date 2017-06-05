@@ -264,7 +264,9 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$filter->objectIdEqual = $objectId;
 		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
 		$result =  $metadataPlugin->metadata->listAction($filter, null);
-		return $result->objects[0];
+		if ($result->totalCount > 0)
+			return $result->objects[0];
+		return null;
 	}
 
 	private function updateMetadataXmlField($mrId, $newStatus, $xml_string, $error)
@@ -276,10 +278,14 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$newVal = "$mrId,$newStatus,$day";
 
 		$xml = simplexml_load_string($xml_string);
-		$mprsData = $xml->xpath('/metadata/MRPData');
-		for ($i = 0; $i < count($mprsData); $i++)
-			if (self::startsWith($mprsData[$i], $mrId.","))
-				$mprsData[$i][0] = $newVal;
+		if ($xml)
+		{
+			$mprsData = $xml->xpath('/metadata/MRPData');
+			for ($i = 0; $i < count($mprsData); $i++)
+				if (self::startsWith($mprsData[$i], $mrId.","))
+					$mprsData[$i][0] = $newVal;
+		}
+
 		return $xml;
 	}
 
@@ -352,30 +358,32 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $profile->objectFilter->advancedSearch->items[0];
 	}
 
-	private function getAdminObjectsBody($objectsIds)
+	private function getAdminObjectsBody($objectsIds, $sendToUsers)
 	{
 		$body = "\nExecute for entries: (users aggregate)\n";
 		$cnt = 0;
-		foreach($objectsIds as $userId => $entriesId) {
-			$body .= "[$userId]\n";
-			foreach($entriesId as $id) {
-				$body .= "\t$id\n";
+		foreach($objectsIds as $userId => $entriesIds) {
+			$body .= "[$userId]" . PHP_EOL;
+			foreach($entriesIds as $id) {
+				$body .= "\t$id" . PHP_EOL;
 				$cnt++;
 			}
 		}
-		
 		$body .= "Total count of affected object: $cnt";
-		$body .= "\nSend Notification for the following users: ";
-		foreach($objectsIds as $userId => $entriesId)
-			$body .= "$userId\n";
+		
+		if ($sendToUsers) {
+			$body .= PHP_EOL . "Send Notification for the following users: ";
+			foreach($objectsIds as $userId => $entriesIds)
+				$body .= "$userId" . PHP_EOL;
+		}
 		return $body;
 	}
 
 	private function getUserObjectsBody($objectsIds)
 	{
-		$body = "\nExecute for entries:\n";
+		$body = PHP_EOL ."Execute for entries:" . PHP_EOL;
 		foreach($objectsIds as $id)
-			$body .= "$id\n";
+			$body .= "$id" . PHP_EOL;
 
 		$body .= "Total count of affected object: " . count($objectsIds);
 		return $body;
@@ -385,7 +393,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	{
 		$subject = "Media Repurposing Notification";
 		$bodyPrefix = "Notification from Media Repurposing [$mediaRepurposingName]: \n$mailTask->message " . PHP_EOL;
-		$body = $bodyPrefix . $this->getAdminObjectsBody($objectsIds);
+		$body = $bodyPrefix . $this->getAdminObjectsBody($objectsIds, $mailTask->sendToUsers);
 
 		$toArr = explode(",", $mailTask->mailAddress);
 		$success = $this->sendMail($toArr, $subject, $body);
@@ -431,19 +439,20 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$metadataPlugin = KalturaMetadataClientPlugin::get(self::$kClient);
 		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
 
-		$xml = $metadata->xml;
+		$xml = ($metadata && $metadata->xml) ? $metadata->xml : null;
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
-			$xml = $this->addMetadataXmlField($profile->id, $metadata->xml, $error);
+			$xml = $this->addMetadataXmlField($profile->id, $xml, $error);
 		elseif (self::startsWith($profile->name, 'MR_')) { //sub task of MRP
 			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
-			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $metadata->xml, $error);
+			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $xml, $error);
 		}
 
 		try {
-			if ($metadata->id)
-				$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
+			$xml = $xml ? $xml->asXML(): null;
+			if ($metadata && $metadata->id)
+				$result = $metadataPlugin->metadata->update($metadata->id, $xml);
 			else
-				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml->asXML());
+				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml);
 
 		} catch (Exception $e) {
 			if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)

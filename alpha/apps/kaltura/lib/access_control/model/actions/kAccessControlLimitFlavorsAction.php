@@ -60,7 +60,13 @@ class kAccessControlLimitFlavorsAction extends kRuleAction
 	{
 		$this->isBlockedList = $isBlockedList;
 	}
-
 	
-	
+	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
+		if(!count($this->flavorParamsIds))
+			return false;
+		
+		$deliveryAttributes->setAclFlavorParamsIds($this->flavorParamsIds, $this->isBlockedList);
+		return true;
+	}
 }
