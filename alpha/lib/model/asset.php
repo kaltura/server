@@ -601,11 +601,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 			$partner = PartnerPeer::retrieveByPK($partnerId);
 			$secret = $partner->getSecret();
 			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
-			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
-			
-			if($this->getentry() && $this->getentry()->getParentEntryId())
-				$privilege .= "/" . $this->getentry()->getParentEntryId();
-			
+			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();			
 			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();       
 			$privilege .= "," . kSessionBase::PRIVILEGE_DOWNLOAD_ASSET . ":" . $this->getId();
 			
