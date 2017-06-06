@@ -568,7 +568,15 @@ class ks extends kSessionBase
 		{
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
+			{
 				$entries[] =  $exPrivileges[1];
+				
+				$entry = entryPeer::retrieveByPKNoFilter($exPrivileges[1], null, false);
+				if($entry && $entry->getParentEntryId())
+				{
+					$entries[] = $entry->getParentEntryId();
+				}
+			}
 		}
 		
 		return $entries;
