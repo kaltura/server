@@ -557,19 +557,11 @@ class ks extends kSessionBase
 	
 	public function getDisableEntitlementForEntry()
 	{
-		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
-		// edit privilege (edit:XX,edit:YYY,...)
-		$allPrivileges = explode(',', $this->privileges);
-		
 		$entries = array();
 		
-		// foreach pair - check privileges on playlist
-		foreach($allPrivileges as $priv)
-		{
-			$exPrivileges = explode(':', $priv);
-			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
-				$entries[] =  $exPrivileges[1];
-		}
+		$parsedPrivileges = $this->getParsedPrivileges();
+		if($parsedPrivileges && isset($parsedPrivileges[self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY]))
+			$entries = $parsedPrivileges[self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY];
 		
 		return $entries;
 	}
