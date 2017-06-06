@@ -78,6 +78,8 @@ class kCrossKalturaDistributionEventsConsumer implements kBatchJobStatusEventCon
 		$entryDistribution->putInCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_METADATA, $providerData->getDistributedMetadata());
 		$entryDistribution->putInCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_CAPTION_ASSETS, $providerData->getDistributedCaptionAssets());
 		$entryDistribution->putInCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_CUE_POINTS, $providerData->getDistributedCuePoints());
+		$entryDistribution->putInCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_THUMB_CUE_POINTS, $providerData->getDistributedThumbCuePoints());
+		$entryDistribution->putInCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_TIMED_THUMB_ASSETS, $providerData->getDistributedTimedThumbAssets());
 		$entryDistribution->save();
 		
 		return $dbBatchJob;
