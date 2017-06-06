@@ -99,11 +99,35 @@ class PollActions
 		return self::setVote($pollId, $userId, $ansIds);
 	}
 
-	public static function setVote($pollId, $userId, $ansIds)
+	/* get Vote Actions */
+	public static function getVote($params)
 	{
-		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
+		if ( is_null($params) ||
+			!array_key_exists(PollActions::POLL_ID_ARG, $params) ||
+			!array_key_exists(PollActions::USER_ID_ARG, $params))
+			return 'Missing parameter for get vote action';
+		$pollId = $params[PollActions::POLL_ID_ARG];
+		$userId = $params[PollActions::USER_ID_ARG];
 		if (self::isValidPollIdStructure($pollId))
 		{
+			$vote = self::$pollsCacheHandler->getCacheVote($userId, $pollId);
+			if ($vote)
+				return json_encode($vote);
+			else
+				return "Could not find vote for user id : $userId in poll id $pollId";
+		}
+		else
+			return "Failed to vote due to bad poll id structure";
+
+
+	}
+
+	public static function setVote($pollId, $userId, $ansIds)
+	{
+		if (self::isValidPollIdStructure($pollId))
+		{
+			$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
+			$answers = array_unique($answers);
 			// check early user vote
 			$previousAnswers = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
 			if ($previousAnswers)
@@ -162,6 +186,12 @@ class PollCacheHandler
 			return $earlyVoteAnsIds;
 		}
 		return null;
+	}
+
+	public function getCacheVote($userId, $pollId)
+	{
+		$userVoteKey = self::getPollUserVoteCacheKey($pollId, $userId);
+		return  $this->cache->get($userVoteKey);
 	}
 
 	public function getAnswerCounter($pollId, $ansId)
