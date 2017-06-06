@@ -1,0 +1,33 @@
+{
+  "settings" : {
+	"number_of_shards" : 5,
+	"number_of_replicas" : 0
+  },
+  "mappings" : {
+	"category" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "properties" : {
+		"partner_id" : {
+		  "type" : "text"
+		},
+		"status" : {
+		  "type" : "short"
+		},
+		"privacy" : {
+		  "type" : "text"
+		},
+		"privacy_context" : {
+		  "type" : "text"
+		},
+		"privacy_contexts" : {
+		  "type" : "text"
+		},
+		"kuser_ids" : {
+		  "type" : "text"
+		}
+	  }
+	}
+  }
+}

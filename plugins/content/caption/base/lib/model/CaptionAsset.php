@@ -5,7 +5,7 @@
  * @package plugins.caption
  * @subpackage model
  */ 
-class CaptionAsset extends asset
+class CaptionAsset extends asset implements IElasticIndexable
 {
 	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
 	const CUSTOM_DATA_FIELD_DEFAULT = "default";
@@ -71,4 +71,91 @@ class CaptionAsset extends asset
 	}
 	
 	public function shouldCopyOnReplacement() {return false;}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return ElasticIndexMap::ELASTIC_ENTRY_INDEX;
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return ElasticIndexMap::ELASTIC_CAPTION_TYPE;
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return $this->getEntryId();
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::INDEX;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$obj = array(
+			'language' => $this->getLanguage(),
+			'status' => $this->getStatus(),
+			'lines' => $this->getElasticLines($params)
+		);
+
+		return $obj;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexContainerEvent($this, $params));
+	}
+
+	private function getElasticLines(CaptionAssetItemContainer $container = null)
+	{
+		$lines = array();
+		if($container)
+		{
+			foreach ($container->getItems() as $item)
+			{
+				$line = array(
+					'start_time' => $item['startTime'],
+					'end_time' => $item['endTime'],
+					'content' => $item['content']
+				);
+				$lang = $this->getLanguage();
+				$analyzedFieldName = elasticSearchUtils::getAnalyzedFieldName($lang, 'content');
+
+				if($analyzedFieldName)
+					$line[$analyzedFieldName] = $item['content'];
+				//general for all languages
+				$line['content_trigrams'] = $item['content'];
+				$lines[] = $line;
+			}
+		}
+		return $lines;
+	}
 }

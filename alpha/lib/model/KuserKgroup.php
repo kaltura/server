@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
+class KuserKgroup extends BaseKuserKgroup implements IRelatedObject, IElasticIndexable
 {
 	const MAX_NUMBER_OF_GROUPS_PER_USER = 100;
 
@@ -55,5 +55,64 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 	public function getCacheInvalidationKeys()
 	{
 		return array("kuserKgroup:kuserId=".strtolower($this->getKuserId()));
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return ElasticIndexMap::ELASTIC_KUSER_INDEX;
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return ElasticIndexMap::ELASTIC_KUSER_TYPE;
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getKuserId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId()) //maximum 100
+		);
+		return $body;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::INDEX;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 } // KuserKgroup

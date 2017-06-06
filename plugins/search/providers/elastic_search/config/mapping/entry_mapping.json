@@ -1,0 +1,258 @@
+{
+  "settings" : {
+	"number_of_shards" : 5,
+	"number_of_replicas" : 0,
+	"analysis": {
+	  "filter": {
+		"trigrams_filter": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3
+		}
+	  },
+	  "analyzer": {
+		"trigrams": {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "filter": [
+			"lowercase",
+			"trigrams_filter"
+		  ]
+		}
+	  }
+	}
+  },
+  "mappings" : {
+	"entry" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "properties" : {
+		"name" : {
+		  "type" : "text"
+		},
+		"description" : {
+		  "type" : "text"
+		},
+		"partner_id" : {
+		  "type" : "text"
+		},
+		"partner_status" : {
+		  "type" : "text"
+		},
+		"parent_id" : {
+		  "type" : "text"
+		},
+		"status" : {
+		  "type" : "short"
+		},
+		"entitled_kusers_edit" : {
+		  "type" : "text"
+		},
+		"entitled_kusers_publish" : {
+		  "type" : "text"
+		},
+		"kuser_id" : {
+		  "type" : "text"
+		},
+		"creator_kuser_id" : {
+		  "type" : "text"
+		},
+		"category_ids" : {
+		  "type" : "text"
+		},
+		"tags" : {
+		  "type" : "text"
+		},
+		"parent_entry" : {
+		  "properties" : {
+			"entry_id" : {
+			  "type" : "keyword"
+			},
+			"status" : {
+			  "type" : "short"
+			},
+			"entitled_kusers_edit" : {
+			  "type" : "text"
+			},
+			"entitled_kusers_publish" : {
+			  "type" : "text"
+			},
+			"kuser_id" : {
+			  "type" : "text"
+			},
+			"creator_kuser_id" : {
+			  "type" : "text"
+			},
+			"category_ids" : {
+			  "type" : "text"
+			}
+		  }
+		}
+	  }
+	},
+	"caption"  : {
+	  "_parent"  : {
+		"type"  : "entry"
+	  },
+	  "properties" : {
+		"language" : {
+		  "type"  : "text"
+		},
+		"status" : {
+		  "type": "short"
+		},
+		"lines"  : {
+		  "type"  : "nested",
+		  "properties"  : {
+			"content" : {
+			  "type" : "text"
+			},
+			"content_english" : {
+			  "type" : "text",
+			  "analyzer": "english"
+			},
+			"content_arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"content_armenian" : {
+			  "type" : "text",
+			  "analyzer" : "armenian"
+			},
+			"content_basque" : {
+			  "type" : "text",
+			  "analyzer" : "basque"
+			},
+			"content_brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"content_bulgarian" : {
+			  "type" : "text",
+			  "analyzer" : "bulgarian"
+			},
+			"content_catalan" : {
+			  "type" : "text",
+			  "analyzer" : "catalan"
+			},
+			"content_cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"content_czech" : {
+			  "type" : "text",
+			  "analyzer" : "czech"
+			},
+			"content_danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"content_dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"content_finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"content_french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"content_galician" : {
+			  "type" : "text",
+			  "analyzer" : "galician"
+			},
+			"content_german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"content_greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"content_hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"content_hungarian" : {
+			  "type" : "text",
+			  "analyzer" : "hungarian"
+			},
+			"content_indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"content_irish" : {
+			  "type" : "text",
+			  "analyzer" : "irish"
+			},
+			"content_italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"content_latvian" : {
+			  "type" : "text",
+			  "analyzer" : "latvian"
+			},
+			"content_lithuanian" : {
+			  "type" : "text",
+			  "analyzer" : "lithuanian"
+			},
+			"content_norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"content_persian" : {
+			  "type" : "text",
+			  "analyzer" : "persian"
+			},
+			"content_portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"content_romanian" : {
+			  "type" : "text",
+			  "analyzer" : "romanian"
+			},
+			"content_russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"content_sorani" : {
+			  "type" : "text",
+			  "analyzer" : "sorani"
+			},
+			"content_spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"content_swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"content_turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"content_thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
+			},
+			"content_trigrams" : {
+			  "type" : "text",
+			  "analyzer" : "trigrams"
+			},
+			"start_time"  : {
+			  "type" : "long"
+			},
+			"end_time"  : {
+			  "type" : "long"
+			}
+		  }
+		}
+	  }
+	}
+  }
+}

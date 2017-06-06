@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject
+class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject, IElasticIndexable
 {
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
@@ -1328,7 +1328,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return null;
 		return parent::getCategoriesIds();
 	}
-		
+
 	/*public function renameCategory($oldFullName, $newFullName)
 	{
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
@@ -1941,6 +1941,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return implode(',', array_keys($this->getEntitledUserPuserEditArray()));
 	}
+
+	public function getEntitledKusersEditArray()
+	{
+		return array_keys($this->getEntitledUserPuserEditArray());
+	}
 	
 	public function getEntitledPusersEdit()
 	{
@@ -2020,6 +2025,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return '';
 
 		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
+	}
+
+	public function getEntitledKusersPublishArray()
+	{
+		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
+		if(!$entitledUserPuserPublish)
+			return array();
+
+		return array_keys(unserialize($entitledUserPuserPublish));
 	}
 	
 	public function getEntitledPusersPublish()
@@ -3601,5 +3615,95 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$url .= "/playManifest/entryId/$entryId/format/$format/protocol/$protocolStr";
 		
 		return $url;
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return ElasticIndexMap::ELASTIC_ENTRY_INDEX;
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return ElasticIndexMap::ELASTIC_ENTRY_TYPE;
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'parent_id' => $this->getParentEntryId(),
+			'status' => $this->getStatus(),
+			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
+			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
+			'kuser_id' => $this->getKuserId(),
+			'creator_kuser_id' => $this->getCreatorKuserId(),
+			'name' => $this->getName(),
+			'description' => $this->getDescription(),
+			'tags' => $this->getTags(),
+			'partner_id' => $this->getPartnerId(),
+			'category_ids' => $this->getAllCategoriesIds(true)
+		);
+		
+		if($this->getParentEntryId())
+			$this->addParentEntryToObjectParams($body);
+		
+		return $body;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::INDEX;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	protected function addParentEntryToObjectParams(&$body)
+	{
+		$parentEntry = $this->getParentEntry();
+		if($parentEntry->getId() == $this->getId())
+			return;
+		
+		$body['parent_entry'] = array(
+			'partner_id' => $parentEntry->getPartnerId(),
+			'status' => $parentEntry->getStatus(),
+			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),
+			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
+			'kuser_id' => $parentEntry->getKuserId(),
+			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
+			'category_ids' => $parentEntry->getAllCategoriesIds(true)
+		);
 	}
 }
