@@ -19,10 +19,19 @@ class KalturaEdgeServerNode extends KalturaDeliveryServerNode
 	 */
 	public $config;
 	
+	/**
+	 * fallback Ids of the parent serverNodes
+	 *
+	 * @var string
+	 * @filter like
+	 */
+	public $parentIds;
+	
 	private static $map_between_objects = array
 	(
 		"playbackDomain" => "playbackHostName",
 		"config",
+		"parentIds",
 	);
 	
 	/* (non-PHPdoc)
