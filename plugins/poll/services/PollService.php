@@ -112,18 +112,11 @@ class PollService extends KalturaBaseService
 	 * @param string $pollId
 	 * @param string $userId
 	 * @return string
-	 * @throws KalturaAPIException
 	 */
 	public function getVoteAction($pollId, $userId)
 	{
 		KalturaResponseCacher::disableCache();
-		try {
-			return PollActions::getVote($pollId, $userId);
-		}
-		catch (Exception $e)
-		{
-			throw new KalturaAPIException($e->getMessage());
-		}
+		return PollActions::getVote($pollId, $userId);
 	}
 
 	/**

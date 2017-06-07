@@ -117,7 +117,7 @@ class PollActions
 				return "Could not find vote for user id : $userId in poll id $pollId";
 		}
 		else
-			return "Failed to vote due to bad poll id structure";
+			return "Failed to get vote due to bad poll id structure";
 
 
 	}
