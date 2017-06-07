@@ -457,7 +457,7 @@ class sfRouting
 
     $params = array_merge($defaults, $params);
 
-    $real_url = preg_replace('/\:([^\/]+)/e', 'urlencode($params["\\1"])', $url);
+    $real_url=preg_replace_callback('/\:([^\/]+)/',function ($matches) use ($params){return urlencode($params[$matches[1]]);},$url);
 
     // we add all other params if *
     if (strpos($real_url, '*'))
