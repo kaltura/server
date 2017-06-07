@@ -107,6 +107,19 @@ class PollService extends KalturaBaseService
 	}
 
 	/**
+	 * Vote Action
+	 * @action getVote
+	 * @param string $pollId
+	 * @param string $userId
+	 * @return string
+	 */
+	public function getVoteAction($pollId, $userId)
+	{
+		KalturaResponseCacher::disableCache();
+		return PollActions::getVote($pollId, $userId);
+	}
+
+	/**
 	 * Should return true or false for allowing/disallowing kaltura network filter for the given action.
 	 * Can be extended to partner specific checks etc...
 	 * @return true if "kaltura network" is enabled for the given action or false otherwise
