@@ -1,3 +1,23 @@
+# Lynx 12.18.0 #
+
+## eCDN parent redundency ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7371
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/appdeployment/updates/sql/2017_06_07_alter_server_node_table_parent_id.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Lynx 12.17.0 #
 
 ## Media Repurposing ##
