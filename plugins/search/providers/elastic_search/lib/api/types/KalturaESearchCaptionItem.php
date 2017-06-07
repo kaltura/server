@@ -10,8 +10,20 @@ class KalturaESearchCaptionItem extends KalturaESearchItem {
 	 */
 	public $searchTerm;
 
+	/**
+	 * @var int
+	 */
+	public $startTimeInVideo;
+
+	/**
+	 * @var int
+	 */
+	public $endTimeInVideo;
+
 	private static $map_between_objects = array(
 		'searchTerm',
+		'startTimeInVideo',
+		'endTimeInVideo',
 	);
 
 	protected function getMapBetweenObjects()

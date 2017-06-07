@@ -91,6 +91,7 @@ class kESearchQueryManager
 		$captionQuery['has_child']['inner_hits'] = array('size' => 10, '_source' => false);
 		foreach ($eSearchCaptionItemsArr as $eSearchCaptionItem)
 		{
+			/* @var ESearchCaptionItem $eSearchCaptionItem */
 			switch ($eSearchCaptionItem->getItemType())
 			{
 				case ESearchItemType::EXACT_MATCH:
@@ -127,6 +128,16 @@ class kESearchQueryManager
 					);
 					break;
 			}
+
+			if (!is_null($eSearchCaptionItem->getStartTimeInVideo()))
+			{
+				$captionQuery['has_child']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('lines.start_time' => array('gte' => $eSearchCaptionItem->getStartTimeInVideo())));
+			}
+			if (!is_null($eSearchCaptionItem->getEndTimeInVideo()))
+			{
+				$captionQuery['has_child']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('lines.end_time' => array('gte' => $eSearchCaptionItem->getEndTimeInVideo())));
+			}
+
 		}
 		foreach ($additionalParams as $addParamKey => $addParamVal)
 		{
