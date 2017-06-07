@@ -64,7 +64,11 @@ class kWebVTTGenerator
 		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
 
 		$result = "WEBVTT\n";
-		$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+		if ($localTimestamp != 10000)
+		{
+			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n";
+		}
+		$result .= "\n";
 
 		foreach ($parsedCaption as $curCaption)
 		{
@@ -140,8 +144,9 @@ class kWebVTTGenerator
 		$result = implode('', $headerInfo);
 		if ($localTimestamp != 10000)
 		{
-			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n";
 		}
+		$result .= "\n";
 
 		foreach ($parsedCaption as $curCaption)
 		{
