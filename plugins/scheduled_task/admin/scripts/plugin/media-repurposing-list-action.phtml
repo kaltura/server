@@ -115,8 +115,8 @@ function dryRun(mediaRepurposingId)
 	changeStatus(
 		mediaRepurposingId,
 		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY; ?>,
-		function() {
-			alert("Dry run for MR profile id [" + mediaRepurposingId + "] has been Assign. This could take couple of minutes. Results will be save to file");
+		function(batchJobId) {
+			alert("Dry run for MR profile id [" + mediaRepurposingId + "] has been Assign. This could take couple of minutes. Results will be save to file. The batch JobId is " + batchJobId);
 		}
 	);
 }
@@ -146,12 +146,12 @@ function changeStatus(mediaRepurposingId, status, callback)
 		url: url,
 		dataType: 'json',
 		success: function(result) {
-			if (result != 'ok')
+			if (result[0] != 'ok')
 				this.error();
 			
 			if (callback && (typeof callback == 'function'))
 			{
-				callback.apply(this);
+				callback.apply(this, [result[1]]);
 			}			
 			jQuery('#frmPaginator1').submit();
 		},

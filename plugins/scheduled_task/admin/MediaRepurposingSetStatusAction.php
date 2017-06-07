@@ -24,17 +24,17 @@ class MediaRepurposingSetStatusAction extends KalturaApplicationPlugin
 		$mr = MediaRepurposingUtils::getMrById($mediaRepurposingId);
 		MediaRepurposingUtils::changeMrStatus($mr, $newStatus);
 
+		$batchJobId = null;
 		if ($newStatus == Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY)
 		{
 			$batchJobId = MediaRepurposingUtils::executeDryRun($mr);
 			KalturaLog::info("Add job for Schedule Task Dry Run with ID $batchJobId. Data will save in configured path [default: {WEB_DIR_PATH}/content/batchfiles/{PARTNER_ID}/bulk_$batchJobId");
 			MediaRepurposingUtils::changeMrStatus($mr, Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED);
 		}
-
-
+		
 		try
 		{
-			echo $action->getHelper('json')->sendJson('ok', false);
+			echo $action->getHelper('json')->sendJson(array('ok',$batchJobId), false);
 		}
 		catch(Exception $e)
 		{
