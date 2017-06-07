@@ -11,7 +11,7 @@
 
 ### Deployment scripts ###
 
-	  mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/appdeployment/updates/sql/2017_06_07_alter_server_node_table_parent_id.sql
+	  mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_06_07_alter_server_node_table_parent_id.sql
 
 #### Known Issues & Limitations ####
 
