@@ -30,12 +30,17 @@ class embedPlaykitJsAction extends sfAction
 		if (!file_exists($this->bundlePath) || $regenerate) {
 			//build bundle and save in web dir
 			$config = str_replace("\"", "'", json_encode($this->bundleConfig));
-			$command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . $config . '" --dest ' . $this->bundleWebDirPath . " --source " . $this->sourcesPath . " 2>&1";
-			exec($command, $output, $return_var);
+			if($config){
+                $command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . $config . '" --dest ' . $this->bundleWebDirPath . " --source " . $this->sourcesPath . " 2>&1";
+                exec($command, $output, $return_var);
 
-			//bundle build failed
-			if ($return_var != 0 || !in_array("Bundle created: $this->bundle_name.min.js", $output)) {
-				KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+                //bundle build failed
+                if ($return_var != 0 || !in_array("Bundle created: $this->bundle_name.min.js", $output)) {
+                    KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+                }
+			}
+			else{
+			    KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 			}
 		}
 
@@ -199,7 +204,7 @@ class embedPlaykitJsAction extends sfAction
 		$this->setLatestOrBetaVersionNumber($confVars);
 		$this->setBundleName();
 		$namePrefix = substr($this->bundle_name, 0, 2);
-		$this->bundleWebDirPath = $this->bundleWebDirPath . "/" . $namePrefix . "/";
+		$this->bundleWebDirPath = $this->bundleWebDirPath . $namePrefix . "/";
 		$this->bundlePath = $this->bundleWebDirPath . $this->bundle_name . ".min.js";
 	}
 
