@@ -105,11 +105,10 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	protected $playback_host_name;
 
 	/**
-	 * The value for the parent_id field.
-	 * Note: this column has a database default value of: 0
-	 * @var        int
+	 * The value for the parent_ids field.
+	 * @var        string
 	 */
-	protected $parent_id;
+	protected $parent_ids;
 
 	/**
 	 * The value for the custom_data field.
@@ -171,7 +170,6 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	public function applyDefaultValues()
 	{
 		$this->type = 0;
-		$this->parent_id = 0;
 	}
 
 	/**
@@ -415,13 +413,13 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [parent_id] column value.
+	 * Get the [parent_ids] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
-	public function getParentId()
+	public function getParentIds()
 	{
-		return $this->parent_id;
+		return $this->parent_ids;
 	}
 
 	/**
@@ -838,27 +836,27 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	} // setPlaybackHostName()
 
 	/**
-	 * Set the value of [parent_id] column.
+	 * Set the value of [parent_ids] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     ServerNode The current object (for fluent API support)
 	 */
-	public function setParentId($v)
+	public function setParentIds($v)
 	{
-		if(!isset($this->oldColumnsValues[ServerNodePeer::PARENT_ID]))
-			$this->oldColumnsValues[ServerNodePeer::PARENT_ID] = $this->parent_id;
+		if(!isset($this->oldColumnsValues[ServerNodePeer::PARENT_IDS]))
+			$this->oldColumnsValues[ServerNodePeer::PARENT_IDS] = $this->parent_ids;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
-		if ($this->parent_id !== $v || $this->isNew()) {
-			$this->parent_id = $v;
-			$this->modifiedColumns[] = ServerNodePeer::PARENT_ID;
+		if ($this->parent_ids !== $v) {
+			$this->parent_ids = $v;
+			$this->modifiedColumns[] = ServerNodePeer::PARENT_IDS;
 		}
 
 		return $this;
-	} // setParentId()
+	} // setParentIds()
 
 	/**
 	 * Set the value of [custom_data] column.
@@ -891,10 +889,6 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	public function hasOnlyDefaultValues()
 	{
 			if ($this->type !== 0) {
-				return false;
-			}
-
-			if ($this->parent_id !== 0) {
 				return false;
 			}
 
@@ -937,7 +931,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 			$this->tags = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->host_name = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->playback_host_name = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->parent_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->parent_ids = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
 			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->resetModified();
 
@@ -1511,7 +1505,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 				return $this->getPlaybackHostName();
 				break;
 			case 14:
-				return $this->getParentId();
+				return $this->getParentIds();
 				break;
 			case 15:
 				return $this->getCustomData();
@@ -1551,7 +1545,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 			$keys[11] => $this->getTags(),
 			$keys[12] => $this->getHostName(),
 			$keys[13] => $this->getPlaybackHostName(),
-			$keys[14] => $this->getParentId(),
+			$keys[14] => $this->getParentIds(),
 			$keys[15] => $this->getCustomData(),
 		);
 		return $result;
@@ -1627,7 +1621,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 				$this->setPlaybackHostName($value);
 				break;
 			case 14:
-				$this->setParentId($value);
+				$this->setParentIds($value);
 				break;
 			case 15:
 				$this->setCustomData($value);
@@ -1670,7 +1664,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[11], $arr)) $this->setTags($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setHostName($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setPlaybackHostName($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setParentId($arr[$keys[14]]);
+		if (array_key_exists($keys[14], $arr)) $this->setParentIds($arr[$keys[14]]);
 		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
 	}
 
@@ -1697,7 +1691,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ServerNodePeer::TAGS)) $criteria->add(ServerNodePeer::TAGS, $this->tags);
 		if ($this->isColumnModified(ServerNodePeer::HOST_NAME)) $criteria->add(ServerNodePeer::HOST_NAME, $this->host_name);
 		if ($this->isColumnModified(ServerNodePeer::PLAYBACK_HOST_NAME)) $criteria->add(ServerNodePeer::PLAYBACK_HOST_NAME, $this->playback_host_name);
-		if ($this->isColumnModified(ServerNodePeer::PARENT_ID)) $criteria->add(ServerNodePeer::PARENT_ID, $this->parent_id);
+		if ($this->isColumnModified(ServerNodePeer::PARENT_IDS)) $criteria->add(ServerNodePeer::PARENT_IDS, $this->parent_ids);
 		if ($this->isColumnModified(ServerNodePeer::CUSTOM_DATA)) $criteria->add(ServerNodePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1803,7 +1797,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 
 		$copyObj->setPlaybackHostName($this->playback_host_name);
 
-		$copyObj->setParentId($this->parent_id);
+		$copyObj->setParentIds($this->parent_ids);
 
 		$copyObj->setCustomData($this->custom_data);
 
@@ -1923,6 +1917,10 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	{
 		$customData = $this->getCustomDataObj( );
 		
+		$customDataOldValue = $customData->get($name, $namespace);
+		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
+			return;
+				
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
@@ -1930,7 +1928,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
 		
 		$customData->put ( $name , $value , $namespace );
 	}

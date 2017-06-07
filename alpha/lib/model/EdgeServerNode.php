@@ -7,7 +7,36 @@ class EdgeServerNode extends DeliveryServerNode {
 	const EDGE_SERVER_DEFAULT_VOD_CACHE_APPLICATION_NAME = "kVOD";
 	const EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME = "kMulticast";
 	const EDGE_SERVER_DEFAULT_KAPI_APPLICATION_NAME = "kAPI";
+	
 	const CUSTOM_DATA_KES_CONFIG = "config";
+	const CUSTOM_DATA_PARENT_ID= 'parent_id';
+	
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return boolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->setParentIds($this->getJoinedParentIds());
+		
+		return parent::preSave($con);
+	}
+	
+	private function getJoinedParentIds()
+	{
+		if(!$this->getParentId() && !$this->getParentIds())
+			return null;
+		
+		$res = array();
+		if($this->getParentId())
+			$res[] = $this->getParentId();
+		
+		if($this->getParentIds())
+			$res = array_merge($res, explode(",", $this->getParentIds()));
+		
+		return implode(",", array_unique($res));
+	}
 	
 	/* Config Settings */
 	public function setConfig($config)
@@ -18,6 +47,16 @@ class EdgeServerNode extends DeliveryServerNode {
 	public function getConfig()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_KES_CONFIG, null, null);
+	}
+	
+	public function setParentId($parentId)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PARENT_ID, $parentId);
+	}
+	
+	public function getParentId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PARENT_ID, null, null);
 	}
 	
 	/**
@@ -52,19 +91,19 @@ class EdgeServerNode extends DeliveryServerNode {
 	
 	public function buildEdgeFullPath($protocol = 'http', $format = null, $deliveryType = null, $assetType = null)
 	{
-		$edgeFullPath = rtrim($this->getedgePath($format, $deliveryType, $assetType), "/") . "/";
+		$edgeFullPath = rtrim($this->getEdgePath($format, $deliveryType, $assetType), "/") . "/";
 		
-		if($this->parent_id)
-		{
-			$parentEdge = ServerNodePeer::retrieveByPK($this->parent_id);
-			if($parentEdge)
-				$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType, $assetType);
-		}
+		$parentIds = $this->getParentIdsArray();
+		if(!count($parentIds))
+			return $edgeFullPath;
+		
+		$parentEdge = $this->getActiveParent($parentIds);
+		$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType, $assetType);
 		
 		return $edgeFullPath;
 	}
 	
-	public function getedgePath($format, $deliveryType = null, $assetType = null)
+	public function getEdgePath($format, $deliveryType = null, $assetType = null)
 	{
 		$edgePath = $this->getPlaybackDomain();
 		
@@ -113,22 +152,32 @@ class EdgeServerNode extends DeliveryServerNode {
 		return self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME;
 	}
 	
+	public function getParentIdsArray()
+	{
+		if(!$this->getParentIds())
+			return array();
+		
+		return explode(",", $this->getParentIds());
+	}
+	
+	public function getActiveParent($parentIds)
+	{
+		$activeParents = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($parentIds);
+		$activeParentEdge = reset($activeParents);
+		return $activeParentEdge;
+	}
+	
 	public function validateEdgeTreeRegistered()
 	{
 		/* @var $edgeServer EdgeServerNode */
-		$parentId = $this->getParentId();
-		if($parentId)
-		{
-			$parentEdge = ServerNodePeer::retrieveRegisteredServerNodeByPk($parentId);
-	
-			if(!$parentEdge)
-			{
-				return false;
-			}
-	
-			return $parentEdge->validateEdgeTreeRegistered();
-		}
-	
-		return true;
+		$parentIds = $this->getParentIdsArray();
+		if(!count($parentIds))
+			return true;
+		
+		$parentEdge = $this->getActiveParent($parentIds);
+		if(!$parentEdge)
+			return false;
+			
+		return $parentEdge->validateEdgeTreeRegistered();
 	}
 } // EdgeServer

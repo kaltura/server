@@ -1,0 +1,1 @@
+ALTER TABLE server_node CHANGE parent_id parent_ids varchar(256);
