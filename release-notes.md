@@ -1,5 +1,22 @@
 # Lynx 12.18.0 #
 
+## eCDN parent redundency ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7371
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/appdeployment/updates/sql/2017_06_07_alter_server_node_table_parent_id.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Polls getVote action ##
   
 - Issue Type: Bug fix
@@ -13,7 +30,6 @@
 ### Deployment scripts ###
 
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
-
 
 # Lynx 12.17.0 #
 
