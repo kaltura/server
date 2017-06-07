@@ -34,9 +34,17 @@ class kWebVTTGenerator
 		$result .= "#EXT-X-MEDIA-SEQUENCE:1\r\n";
 		$result .= "#EXT-X-PLAYLIST-TYPE:VOD\r\n";
 		$segmentCount = ceil($entryDuration / $segmentDuration);
+		$lastSegmentDuration = $entryDuration - ($segmentCount - 1) * $segmentDuration;
 		for ($curIndex = 1; $curIndex <= $segmentCount; $curIndex++)
 		{
-			$result .= "#EXTINF:{$segmentDuration}.0,\r\n";
+			if ($curIndex == $segmentCount)
+			{
+				$result .= "#EXTINF:{$lastSegmentDuration}.0,\r\n";
+			}
+			else
+			{
+				$result .= "#EXTINF:{$segmentDuration}.0,\r\n";
+			}
 			$result .= "segmentIndex/{$curIndex}.vtt\r\n";
 		}
 		$result .= "#EXT-X-ENDLIST\r\n";
@@ -130,7 +138,10 @@ class kWebVTTGenerator
 		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
 
 		$result = implode('', $headerInfo);
-		$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+		if ($localTimestamp != 10000)
+		{
+			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+		}
 
 		foreach ($parsedCaption as $curCaption)
 		{
