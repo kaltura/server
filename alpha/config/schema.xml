@@ -1714,7 +1714,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="host_name" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="playback_host_name" type="varchar" size="256" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="partner_id_status_system_name">
 			<index-column name="partner_id" />

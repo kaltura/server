@@ -103,8 +103,8 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	/**
 	 * Id of the parent serverNode
 	 *
-	 * @var int
-	 * @filter eq,in
+	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $parentId;
 	
