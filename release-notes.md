@@ -17,6 +17,19 @@
 
 None.
 
+## Polls getVote action ##
+  
+- Issue Type: Bug fix
+- Issue Id: PLAT-7502
+
+### Configuration ###
+- In base.ini add the following parameters to [cache_based_service_actions]:
+	poll_poll_getVote = "/../../plugins/poll/lib/PollActions.php"
+
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
 
 # Lynx 12.17.0 #
 
