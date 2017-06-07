@@ -24,8 +24,10 @@ class embedPlaykitJsAction extends sfAction
 	{
 		$this->initMembers();
 
-		//if bundle not exists build it
-		if (!file_exists($this->bundlePath)) {
+	    $regenerate = $this->getRequestParameter('regenerate');
+
+		//if bundle not exists or explicitly should be regenerated build it
+		if (!file_exists($this->bundlePath) || $regenerate) {
 			//build bundle and save in web dir
 			$config = str_replace("\"", "'", json_encode($this->bundleConfig));
 			$command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . $config . '" --dest ' . $this->bundleWebDirPath . " --source " . $this->sourcesPath . " 2>&1";
@@ -196,6 +198,8 @@ class embedPlaykitJsAction extends sfAction
 		$this->bundleConfig = json_decode($confVars, true);
 		$this->setLatestOrBetaVersionNumber($confVars);
 		$this->setBundleName();
+		$namePrefix = substr($this->bundle_name, 0, 2);
+		$this->bundleWebDirPath = $this->bundleWebDirPath . "/" . $namePrefix . "/";
 		$this->bundlePath = $this->bundleWebDirPath . $this->bundle_name . ".min.js";
 	}
 
