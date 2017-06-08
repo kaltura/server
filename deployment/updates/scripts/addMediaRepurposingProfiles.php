@@ -31,14 +31,14 @@ if ($firstArg == 'setNewXsd')
 	$md->setXsdData(getXsd());
 $md->save();
 
-addDeleteAfterXTemplate();
-addDeleteAfterXWithExportTemplate();
+//addDeleteAfterXTemplate();
+//addDeleteAfterXWithExportTemplate();
 addArchiveAndDeleteTemplate();
 addArchiveExportAndDeleteTemplate();
-addDeletePrivateContentTemplate();
-addDeleteFlavorTemplate();
-addExportAndDeleteLocalContentTemplate();
-addExportTemplate();
+//addDeletePrivateContentTemplate();
+//addDeleteFlavorTemplate();
+//addExportAndDeleteLocalContentTemplate();
+//addExportTemplate();
 
 
 printInGreen("DONE" . PHP_EOL);
@@ -177,12 +177,14 @@ function addArchiveAndDeleteTemplate()
 	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
-	$timeToNext2 = "7";
-	$task2Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
+	$timeToNext3 = "7";
+	$task3Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "3"), $filter, $timeToNext3 );
+	$timeToNext2 = "0";
+	$task2Id = addTask(ObjectTaskType::MODIFY_ENTRY, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
 	$timeToNext1 = "30";
 	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
-	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]";
+	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]," . $task3Id . "[$timeToNext3]";
 	addMailTask($name, $filter, $description);}
 
 function addArchiveExportAndDeleteTemplate()
@@ -192,14 +194,16 @@ function addArchiveExportAndDeleteTemplate()
 	$filter = getFilter(array('_lte_created_at'));
 
 	//create the sub-task
+	$timeToNext4 = "7";
+	$task4Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "3"), $filter, $timeToNext4 );
 	$timeToNext3 = "7";
-	$task3Id = addTask(ObjectTaskType::DELETE_ENTRY, buildSubTaskName($name, "3"), $filter, $timeToNext3 );
-	$timeToNext2 = "7";
-	$task2Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
+	$task3Id = addTask(ObjectTaskType::STORAGE_EXPORT, buildSubTaskName($name, "2"), $filter, $timeToNext3 );
+	$timeToNext2 = "0";
+	$task2Id = addTask(ObjectTaskType::MODIFY_ENTRY, buildSubTaskName($name, "2"), $filter, $timeToNext2 );
 	$timeToNext1 = "30";
 	$task1Id = addTask(ObjectTaskType::MODIFY_CATEGORIES, buildSubTaskName($name, "1"), $filter, $timeToNext1 );
 
-	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]," . $task3Id . "[$timeToNext3]";
+	$description = $task1Id . "[$timeToNext1]," . $task2Id . "[$timeToNext2]," . $task3Id . "[$timeToNext3]," . $task4Id . "[$timeToNext4]";
 	addMailTask($name, $filter, $description);}
 
 function addDeletePrivateContentTemplate()
