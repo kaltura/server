@@ -193,7 +193,7 @@ class embedPlaykitJsAction extends sfAction
 
 		//Get config params
 		try {
-			$this->bundleWebDirPath = kConf::get('playkit_js_bundles_path');
+			$this->bundleWebDirPath = "/" . trim(kConf::get('playkit_js_bundles_path'),"/");
 			$this->bundleBuilderPath = kConf::get('bundle_builder_cli_path');
 			$this->sourcesPath = kConf::get('playkit_js_sources_path');
 		} catch (Exception $ex) {
@@ -204,7 +204,8 @@ class embedPlaykitJsAction extends sfAction
 		$this->setLatestOrBetaVersionNumber($confVars);
 		$this->setBundleName();
 		$namePrefix = substr($this->bundle_name, 0, 2);
-		$this->bundleWebDirPath = $this->bundleWebDirPath . $namePrefix . "/";
+		$subNamePrefix = substr($this->bundle_name, 2, 2);
+		$this->bundleWebDirPath = $this->bundleWebDirPath . "/" . $namePrefix . "/" . $subNamePrefix . "/";
 		$this->bundlePath = $this->bundleWebDirPath . $this->bundle_name . ".min.js";
 	}
 
