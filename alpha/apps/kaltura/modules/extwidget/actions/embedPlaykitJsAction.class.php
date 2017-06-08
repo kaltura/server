@@ -18,31 +18,13 @@ class embedPlaykitJsAction extends sfAction
 	private $sourcesPath = null;
 	private $bundleConfig = null;
 	private $bundlePath = null;
-
+	private $regenerate = false;
 
 	public function execute()
 	{
 		$this->initMembers();
 
-	    $regenerate = $this->getRequestParameter('regenerate');
-
-		//if bundle not exists or explicitly should be regenerated build it
-		if (!file_exists($this->bundlePath) || $regenerate) {
-			//build bundle and save in web dir
-			$config = str_replace("\"", "'", json_encode($this->bundleConfig));
-			if($config){
-                $command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . base64_encode($config) . '" --dest ' . base64_encode($this->bundleWebDirPath) . " --source " . base64_encode($this->sourcesPath) . " 2>&1";
-                exec($command, $output, $return_var);
-                
-                //bundle build failed
-                if ($return_var != 0 || !in_array("Bundle created: $this->bundle_name.min.js", $output)) {
-                    KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
-                }
-			}
-			else{
-			    KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
-			}
-		}
+		kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundelLocked"), array($this));
 
 		$bundleContent = $this->getbundleContent($this->bundlePath);
 
@@ -52,6 +34,31 @@ class embedPlaykitJsAction extends sfAction
 		echo($bundleContent);
 
 		KExternalErrors::dieGracefully();
+	}
+
+	public static function buildBundelLocked($context)
+	{
+		//if bundle not exists or explicitly should be regenerated build it
+		if (!file_exists($context->bundlePath) || $regenerate)
+		{
+			//build bundle and save in web dir
+			$config = str_replace("\"", "'", json_encode($context->bundleConfig));
+			if($config)
+			{
+				$command = $context->bundleBuilderPath . ' --name ' . $context->bundle_name . ' --config "' . base64_encode($config) . '" --dest ' . base64_encode($context->bundleWebDirPath) . " --source " . base64_encode($context->sourcesPath) . " 2>&1";
+				exec($command, $output, $return_var);
+
+				//bundle build failed
+				if ($return_var != 0 || !in_array("Bundle created: $context->bundle_name.min.js", $output))
+				{
+					KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+				}
+			}
+			else
+			{
+				KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			}
+		}
 	}
 
 	private function getBundleContent($path)
@@ -191,9 +198,12 @@ class embedPlaykitJsAction extends sfAction
 		//Get partner ID from QS or from UI conf
 		$this->partnerId = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $uiConf->getPartnerId());
 
+		//Get should force regenration
+		$this->regenerate = $this->getRequestParameter('regenerate');
+
 		//Get config params
 		try {
-			$this->bundleWebDirPath = "/" . trim(kConf::get('playkit_js_bundles_path'),"/");
+			$this->bundleWebDirPath = rtrim(kConf::get('playkit_js_bundles_path'),"/");
 			$this->bundleBuilderPath = kConf::get('bundle_builder_cli_path');
 			$this->sourcesPath = kConf::get('playkit_js_sources_path');
 		} catch (Exception $ex) {
