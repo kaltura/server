@@ -137,13 +137,16 @@ class serveFlavorAction extends kalturaAction
 		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry);
 	}
 
-	protected function serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorAssets = null)
+	protected function serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds = null)
 	{
 		// get request parameters
-		$flavorParamIds = $this->getRequestParameter("flavorParamIds");
-		if ($flavorParamIds)
+		if (!$flavorParamIds)
 		{
-			$flavorParamIds = explode(',', $flavorParamIds);
+			$flavorParamIds = $this->getRequestParameter("flavorParamIds");
+			if ($flavorParamIds)
+			{
+				$flavorParamIds = explode(',', $flavorParamIds);
+			}
 		}
 		$isLive = $this->getRequestParameter("live");
 
@@ -155,15 +158,13 @@ class serveFlavorAction extends kalturaAction
 		// load the flavor assets
 		// Note: not filtering by $flavorParamIds here, so that in case some flavor is missing
 		//		we can fill in the gap using some other flavor params
-		if (!$flavorAssets)
-		{
-			$c = new Criteria();
-			$c->add(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
-			$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-			$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
-			$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
-			$flavorAssets = assetPeer::doSelect($c);
-		}
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		$flavorAssets = assetPeer::doSelect($c);
+
 		// group the flavors by entry and flavor params
 		$groupedFlavors = array();
 		foreach ($flavorAssets as $flavor)
@@ -297,15 +298,17 @@ class serveFlavorAction extends kalturaAction
 	}
 
 
-	protected function serverEntryWithBumper($entry, $bumper, $flavorId)
+	protected function serverEntryWithBumper($entry, $bumperEntries, $flavorId)
 	{
 		$flavorAsset = assetPeer::retrieveById($flavorId);
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		/* @var asset $flavorAsset */
+		$allEntris = $bumperEntries;
+		$allEntris[] = $entry;
 		list($entryIds, $durations, $referenceEntry ) =
-			myPlaylistUtils::getPlaylistDataFromEntries(array($bumper, $entry), array($flavorAsset->getFlavorParamsId()));
-		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, array($flavorAsset));
+			myPlaylistUtils::getPlaylistDataFromEntries($allEntris, array($flavorAsset->getFlavorParamsId()));
+		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, array($flavorAsset->getFlavorParamsId()));
 	}
 
 	public function execute()
@@ -317,7 +320,7 @@ class serveFlavorAction extends kalturaAction
 
 		$flavorId = $this->getRequestParameter("flavorId");
 		$entryId = $this->getRequestParameter("entryId");
-		$bumperId = $this->getRequestParameter('bumperId');
+		$bumperIds = $this->getRequestParameter('bumperIds');
 		
 		if ($entryId)
 		{
@@ -332,14 +335,15 @@ class serveFlavorAction extends kalturaAction
 			{
 				$this->servePlaylist($entry);
 			}
-			if ($bumperId)
+			if ($bumperIds)
 			{
-				$bumperEntry = entryPeer::retrieveByPK($bumperId);
-				if (!$bumperEntry)
+				$bumperIdsArr = explode(',', $bumperIds);
+				$bumperEntries = entryPeer::retrieveByPKs($bumperIdsArr);
+				if (!count($bumperEntries))
 				{
 					KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);//TODO: should we just continue without bumper in this case???
 				}
-				$this->serverEntryWithBumper($bumperEntry, $entry,$flavorId);
+				$this->serverEntryWithBumper($entry,$bumperEntries, $flavorId);
 			}
 		}
 		
