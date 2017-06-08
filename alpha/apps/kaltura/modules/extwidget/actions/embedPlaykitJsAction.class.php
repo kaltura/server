@@ -31,9 +31,9 @@ class embedPlaykitJsAction extends sfAction
 			//build bundle and save in web dir
 			$config = str_replace("\"", "'", json_encode($this->bundleConfig));
 			if($config){
-                $command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . $config . '" --dest ' . $this->bundleWebDirPath . " --source " . $this->sourcesPath . " 2>&1";
+                $command = $this->bundleBuilderPath . ' --name ' . $this->bundle_name . ' --config "' . base64_encode($config) . '" --dest ' . base64_encode($this->bundleWebDirPath) . " --source " . base64_encode($this->sourcesPath) . " 2>&1";
                 exec($command, $output, $return_var);
-
+                
                 //bundle build failed
                 if ($return_var != 0 || !in_array("Bundle created: $this->bundle_name.min.js", $output)) {
                     KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
