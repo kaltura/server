@@ -1052,7 +1052,16 @@ HTML;
 				null,
 				false, 
 				$pager);
-		
+
+		return self::getPlaylistDataFromEntries($entries);
+	}
+
+	/**
+	 * @param $entries
+	 * @return array
+	 */
+	public static function getPlaylistDataFromEntries($entries, $flavorParamsIds = null)
+	{
 		$entryIds = array();
 		$durations = array();
 		$mediaEntry = null;
@@ -1064,8 +1073,11 @@ HTML;
 
 			// Note: choosing a reference entry that has max(flavor count) and min(int id)
 			//	the reason for the int id condition is to avoid frequent changes to the 
-			//	reference entry in case the playlist content changes 
-			$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
+			//	reference entry in case the playlist content changes
+			if ($flavorParamsIds)
+				$flavorCount = count($flavorParamsIds);
+			else
+				$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
 			if (!$mediaEntry ||
 				$flavorCount > $maxFlavorCount ||
 				($flavorCount == $maxFlavorCount && $entry->getIntId() < $mediaEntry->getIntId()))

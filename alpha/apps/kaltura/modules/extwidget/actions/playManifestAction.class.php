@@ -1137,6 +1137,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
 		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
+		$this->deliveryAttributes->setBumperId($this->getRequestParameter("bumperId"));
 
 		if($this->secureEntryHelper)
 			$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);

@@ -165,6 +165,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var bool
 	 */
 	protected $isAclFlavorParamsIdsBlockedList = null;
+
+	/**
+	 * @var string
+	 */
+	protected $bumperId = null;
 	
 	/**
 	 * @return the $addThumbnailExtension
@@ -615,6 +620,22 @@ class DeliveryProfileDynamicAttributes {
 		return array();
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getBumperId()
+	{
+		return $this->bumperId;
+	}
+
+	/**
+	 * @param string $bumperId
+	 */
+	public function setBumperId($bumperId)
+	{
+		$this->bumperId = $bumperId;
+	}
+
 
 	/**
 	 * 
@@ -665,6 +686,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->sessionId = $newObj->getSessionId();
 		$this->aclFlavorParamsIds = $newObj->getAclFlavorParamsIds();
 		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
+		$this->bumperId = $newObj->getBumperId();
 	}
 }
 
