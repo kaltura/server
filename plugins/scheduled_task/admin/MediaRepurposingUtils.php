@@ -353,7 +353,7 @@ class MediaRepurposingUtils
 	}
 
 	private static function getValueFromString($value, $type) {
-		if (strpos($type ,'array') > -1)
+		if ($value && $value != 'N/A' && strpos($type ,'array') > -1)
 		{
 			$arr = array();
 			$elemType = explode(" ", $type); // template is 'array of XXX';
