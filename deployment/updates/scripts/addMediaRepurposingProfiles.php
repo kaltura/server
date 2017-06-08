@@ -31,14 +31,14 @@ if ($firstArg == 'setNewXsd')
 	$md->setXsdData(getXsd());
 $md->save();
 
-//addDeleteAfterXTemplate();
-//addDeleteAfterXWithExportTemplate();
+addDeleteAfterXTemplate();
+addDeleteAfterXWithExportTemplate();
 addArchiveAndDeleteTemplate();
 addArchiveExportAndDeleteTemplate();
-//addDeletePrivateContentTemplate();
-//addDeleteFlavorTemplate();
-//addExportAndDeleteLocalContentTemplate();
-//addExportTemplate();
+addDeletePrivateContentTemplate();
+addDeleteFlavorTemplate();
+addExportAndDeleteLocalContentTemplate();
+addExportTemplate();
 
 
 printInGreen("DONE" . PHP_EOL);
