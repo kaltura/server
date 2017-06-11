@@ -298,26 +298,26 @@ class serveFlavorAction extends kalturaAction
 	}
 
 
-	protected function serverEntryWithBumper($entry, $bumperEntries, $flavorId)
+	protected function serverEntryWithSequence($entry, $sequenceEntries, $flavorId)
 	{
 		$flavorAsset = assetPeer::retrieveById($flavorId);
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		/* @var asset $flavorAsset */
-		$allEntris = $bumperEntries;
+		$allEntris = $sequenceEntries;
 		$allEntris[] = $entry;
 		list($entryIds, $durations, $referenceEntry ) =
 			myPlaylistUtils::getPlaylistDataFromEntries($allEntris, array($flavorAsset->getFlavorParamsId()));
 		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, array($flavorAsset->getFlavorParamsId()));
 	}
 
-	protected function verifyBumperEntries($bumperEntries)
+	protected function verifySequenceEntries($sequenceEntries)
 	{
-		foreach ($bumperEntries as $bumper)
+		foreach ($sequenceEntries as $sequence)
 		{
-			/* @var entry $bumper */
-			if (!in_array('sequence_entry',$bumper->getTagsArr()))
-				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_BUMPER);
+			/* @var entry $sequence */
+			if (!in_array('sequence_entry',$sequence->getTagsArr()))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_SEQUENCE);
 		}
 		return true;
 
@@ -332,7 +332,7 @@ class serveFlavorAction extends kalturaAction
 
 		$flavorId = $this->getRequestParameter("flavorId");
 		$entryId = $this->getRequestParameter("entryId");
-		$bumperIds = $this->getRequestParameter('bumperIds');
+		$sequenceIds = $this->getRequestParameter('sequenceIds');
 		
 		if ($entryId)
 		{
@@ -347,16 +347,16 @@ class serveFlavorAction extends kalturaAction
 			{
 				$this->servePlaylist($entry);
 			}
-			if ($bumperIds)
+			if ($sequenceIds)
 			{
-				$bumperIdsArr = explode(',', $bumperIds);
-				$bumperEntries = entryPeer::retrieveByPKs($bumperIdsArr);
-				if (!count($bumperEntries))
+				$bumperIdsArr = explode(',', $sequenceIds);
+				$sequenceEntries = entryPeer::retrieveByPKs($bumperIdsArr);
+				if (!count($sequenceEntries))
 				{
 					KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);//TODO: should we just continue without bumper in this case???
 				}
-				$this->verifyBumperEntries($bumperEntries);
-				$this->serverEntryWithBumper($entry,$bumperEntries, $flavorId);
+				$this->verifySequenceEntries($sequenceEntries);
+				$this->serverEntryWithSequence($entry,$sequenceEntries, $flavorId);
 			}
 		}
 		
