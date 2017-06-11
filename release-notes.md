@@ -31,6 +31,23 @@ None.
 
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
 
+## missing enum in quiz plugin ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.17.0 #
 
 ## Media Repurposing ##
