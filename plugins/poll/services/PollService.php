@@ -25,7 +25,7 @@ class PollService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		try
 		{
-            $pollActions = new PollActions();
+			$pollActions = new PollActions();
 			return $pollActions->generatePollId($pollType);
 		}
 		catch (Exception $e)
@@ -49,7 +49,7 @@ class PollService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		try
 		{
-            $pollActions = new PollActions();
+			$pollActions = new PollActions();
 			$localDcVotes = $pollActions->getVotes($pollId, $answerIds);
 		}
 		catch (Exception $e)
@@ -98,8 +98,8 @@ class PollService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		try
 		{
-            $pollActions = new PollActions();
-            $ksUserId = kCurrentContext::getCurrentKsKuserId();
+			$pollActions = new PollActions();
+			$ksUserId = kCurrentContext::getCurrentKsKuserId();
 			$pollActions->setVote($pollId, $userId,$ksUserId ,$answerIds);
 		}
 		catch (Exception $e)
@@ -118,7 +118,7 @@ class PollService extends KalturaBaseService
 	public function getVoteAction($pollId, $userId)
 	{
 		KalturaResponseCacher::disableCache();
-        $pollActions = new PollActions();
+		$pollActions = new PollActions();
 		return $pollActions->doGetVote($pollId, $userId);
 	}
 
