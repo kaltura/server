@@ -429,4 +429,6 @@ class APIErrors
 	const RECORDED_ENTRY_LIVE_MISMATCH = "RECORDED_ENTRY_LIVE_MISMATCH;LIVE_ENTRY_ID,RECORDE_ERNTRY_ID;Recorded entry [@RECORDE_ERNTRY_ID@] was not created while streaming to the given live entry [@LIVE_ENTRY_ID@]";
 	
 	const CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING = "CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING;LIVE_ENTRY_ID;Live entry [@LIVE_ENTRY_ID@] cannot be deleted while streaming";
+	
+	const RECORDING_CONTENT_NOT_YET_SET = "RECORDING_CONTENT_NOT_YET_SET;ENTRY_ID;Entry [@ENTRY_ID@] cannot be deleted, waiting for recording engine to finish handling";
 }

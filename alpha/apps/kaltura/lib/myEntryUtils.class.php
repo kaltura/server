@@ -358,6 +358,15 @@ class myEntryUtils
 				}	
 			}
 		}
+		
+		if($entry->getSourceType() === EntrySourceType::KALTURA_RECORDED_LIVE)
+		{
+			if(myEntryUtils::shouldServeVodFromLive($entry, false))
+			{
+				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded contnet is set");
+				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
+			}
+		}
 
 		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
 		
