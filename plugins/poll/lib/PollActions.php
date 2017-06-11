@@ -7,7 +7,6 @@
  */
 class PollActions
 {
-
 	const ID_SEPARATOR_CHAR = '-';
 	const ANSWER_SEPARATOR_CHAR = ',';
 	const ID_NUM_ELEMENTS = 3;
@@ -25,92 +24,176 @@ class PollActions
 	/**
 	 * @var PollCacheHandler
 	 */
-	private static $pollsCacheHandler = null;
+	private $pollsCacheHandler;
 	/**
 	 * @var string
 	 */
-	private static $kalturaPollSecret = null;
+	private $kalturaPollSecret;
 	/**
 	 * @var int
 	 */
-	private static $pollCacheTTL = 0;
+	private $pollCacheTTL;
+    /**
+     *
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        $this->pollsCacheHandler = null;
+        $this->kalturaPollSecret = null;
+        $this->pollCacheTTL      = 0;
 
-	/* Configuration */
-	/**
-	 *
-	 * @throws Exception
-	 */
-	private static function init()
-	{
-		$pollConf = kConf::get(PollActions::CONF_POLL_REF);
-		if (array_key_exists(PollActions::CONF_SECRET_REF ,$pollConf))
-			self::$kalturaPollSecret = $pollConf[PollActions::CONF_SECRET_REF];
-		if (!self::$kalturaPollSecret)
-			throw new Exception("Could not find polls_secret in the configuration");
-		if (array_key_exists(PollActions::CONF_CACHE_TTL_REF, $pollConf))
-			self::$pollCacheTTL = $pollConf[PollActions::CONF_CACHE_TTL_REF];
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_CACHE_ONLY_ACTIONS);
-		if (!$cache)
-			throw new Exception("Could not initiate cache instance (needed for polls)");
-		self::$pollsCacheHandler = new PollCacheHandler(self::$pollCacheTTL, $cache);
+        $pollConf = kConf::get(PollActions::CONF_POLL_REF);
+        if (array_key_exists(PollActions::CONF_SECRET_REF ,$pollConf))
+            $this->kalturaPollSecret = $pollConf[PollActions::CONF_SECRET_REF];
+        if (!$this->kalturaPollSecret)
+            throw new Exception("Could not find polls_secret in the configuration");
 
-	}
+        if (array_key_exists(PollActions::CONF_CACHE_TTL_REF, $pollConf))
+            $this->pollCacheTTL = $pollConf[PollActions::CONF_CACHE_TTL_REF];
+        $cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_CACHE_ONLY_ACTIONS);
+        if (!$cache)
+            throw new Exception("Could not initiate cache instance (needed for polls)");
+
+        $this->pollsCacheHandler = new PollCacheHandler($this->pollCacheTTL, $cache);
+    }
 
 	/* Poll Id Action */
-	public static function generatePollId($type = PollType::SINGLE_ANONYMOUS)
+	public function generatePollId($type = PollType::SINGLE_ANONYMOUS)
 	{
-		self::init();
-		if (!PollType::isValidPollType($type))
-			throw new Exception("Poll type provided is invalid");
+	/*	if (!PollType::isValidPollType($type))
+			throw new Exception("Poll type provided is invalid");*/
 		$randKey = rand();
-		$hash = hash_hmac(PollActions::HASH_TYPE, self::$kalturaPollSecret, $randKey);
+		$hash = hash_hmac(PollActions::HASH_TYPE, $this->kalturaPollSecret, $randKey);
 		return $type.self::ID_SEPARATOR_CHAR.$hash.self::ID_SEPARATOR_CHAR.$randKey;
 	}
 
-	private static function isValidPollIdStructure($id)
+	private function isValidPollIdStructure($id)
 	{
-		self::init();
 		$idElements = explode(self::ID_SEPARATOR_CHAR, $id);
 		if (count($idElements) === self::ID_NUM_ELEMENTS )
 		{
 			$pollType = $idElements[0];
 			$hash = $idElements[1];
 			$key = $idElements[2];
-			$simulatedHash = hash_hmac(PollActions::HASH_TYPE, self::$kalturaPollSecret, $key);
+			$simulatedHash = hash_hmac(PollActions::HASH_TYPE, $this->kalturaPollSecret, $key);
 			$isHashOk = strcmp($hash, $simulatedHash) === 0;
 			$validPollType = PollType::isValidPollType($pollType);
 			return $isHashOk && $validPollType;
-
 		}
 		return false;
 	}
 
-	/* Poll Vote Actions */
-	public static function vote($params)
-	{
-		if ( is_null($params) ||
-			!array_key_exists(PollActions::POLL_ID_ARG, $params) ||
-			!array_key_exists(PollActions::USER_ID_ARG, $params) ||
-			!array_key_exists(PollActions::ANSWER_IDS_ARG, $params))
-			return 'Missing parameter for vote action';
-		$pollId = $params[PollActions::POLL_ID_ARG];
-		$userId = $params[PollActions::USER_ID_ARG];
-		$ansIds = $params[PollActions::ANSWER_IDS_ARG];
-		return self::setVote($pollId, $userId, $ansIds);
-	}
+    /* Poll Vote Actions to be called from cache */
+    public static function vote($params)
+    {
+        if ( is_null($params) ||
+            !array_key_exists(PollActions::POLL_ID_ARG, $params) ||
+            !array_key_exists(PollActions::USER_ID_ARG, $params) ||
+            !array_key_exists(PollActions::ANSWER_IDS_ARG, $params))
+            return 'Missing parameter for vote action';
 
-	/* get Vote Actions */
-	public static function getVote($params)
+
+        $pollId = $params[PollActions::POLL_ID_ARG];
+        $ansIds = $params[PollActions::ANSWER_IDS_ARG];
+        $userId = $params[PollActions::USER_ID_ARG];
+        $ksUserId = self::getUserIdFromKs($params);
+        $ksUserId = $params['ksUserId'];
+        $instance = new PollActions();
+        $ret = $instance->setVote($pollId, $userId, $ksUserId ,$ansIds);
+        return $ret;
+    }
+
+    private static function getValidUserId($pollType,$userId,$ksUserId)
+    {
+        $validUserId = $ksUserId;
+
+        if(PollType::isAnonymous($pollType) and !$ksUserId)
+                $validUserId = $userId;
+
+        return $validUserId;
+    }
+
+    public function setVote($pollId, $userId, $ksUserId, $ansIds)
+    {
+        if ($this->isValidPollIdStructure($pollId))
+        {
+            $pollType = $this->getPollType($pollId);
+            //validate User ID
+            $str = $userId." ".$ksUserId;
+            $userId = self::getValidUserId($pollType,$userId,$ksUserId);
+            if(is_null($userId))
+            {
+                return "User ID is invalid ksUserId - $str";
+            }
+
+            //validate answers
+            $answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
+            if(count($answers) > 1 and !PollType::isMultipleAnswer($pollType))
+            {
+                return "Only one answer is allowed";
+            }
+            $answers = array_unique($answers);
+
+            // check early user vote
+            $previousAnswers =$this->pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
+            if ($previousAnswers)
+                $this->pollsCacheHandler->decrementAnswersCounter($pollId, $previousAnswers);
+            else
+                $this->pollsCacheHandler->incrementPollVotersCount($pollId);
+            $this->pollsCacheHandler->incrementAnswersCounter($pollId, $answers);
+            return "Successfully voted";
+        }
+        return "Failed to vote due to bad poll id structure";
+    }
+
+
+
+    private static function getUserIdFromKs($params)
+    {
+        $userId = null;
+        $ks = isset($params['ks']) ? $params['ks'] : '';
+        if($ks)
+        {
+            $ksObj = new kSessionBase();
+            $parseResult = $ksObj->parseKS($ks);
+            $ksStatus = $ksObj->tryToValidateKS();
+            if($parseResult && $ksStatus == kSessionBase::OK)
+                $userId = $ksObj->user;
+        }
+        return $userId;
+    }
+
+    private function getPollType($pollId)
+    {
+        $pollType = null;
+        $idElements = explode(self::ID_SEPARATOR_CHAR, $pollId);
+        if (count($idElements) === self::ID_NUM_ELEMENTS )
+        {
+            $pollType = isset($idElements[0]) ? $idElements[0] : null;
+        }
+        return $pollType;
+    }
+
+    public static function getVote($params)
+    {
+        $instance = new PollActions();
+        return $instance->doGetVote($params);
+    }
+
+    /* get Vote Actions */
+	public function doGetVote($params)
 	{
 		if ( is_null($params) ||
 			!array_key_exists(PollActions::POLL_ID_ARG, $params) ||
 			!array_key_exists(PollActions::USER_ID_ARG, $params))
 			return 'Missing parameter for get vote action';
+
 		$pollId = $params[PollActions::POLL_ID_ARG];
 		$userId = $params[PollActions::USER_ID_ARG];
-		if (self::isValidPollIdStructure($pollId))
+		if ($this->isValidPollIdStructure($pollId))
 		{
-			$vote = self::$pollsCacheHandler->getCacheVote($userId, $pollId);
+			$vote = $this->pollsCacheHandler->getCacheVote($userId, $pollId);
 			if ($vote)
 				return json_encode($vote);
 			else
@@ -118,41 +201,21 @@ class PollActions
 		}
 		else
 			return "Failed to get vote due to bad poll id structure";
-
-
 	}
 
-	public static function setVote($pollId, $userId, $ansIds)
-	{
-		if (self::isValidPollIdStructure($pollId))
-		{
-			$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
-			$answers = array_unique($answers);
-			// check early user vote
-			$previousAnswers = self::$pollsCacheHandler->setCacheVote($userId, $pollId, $answers);
-			if ($previousAnswers)
-				self::$pollsCacheHandler->decrementAnswersCounter($pollId, $previousAnswers);
-			else
-				self::$pollsCacheHandler->incrementPollVotersCount($pollId);
-			self::$pollsCacheHandler->incrementAnswersCounter($pollId, $answers);
-			return "Successfully voted";
-		}
-		return "Failed to vote due to bad poll id structure";
-	}
 
 	/* Poll Get Votes Actions */
 
-	public static function getVotes($pollId, $ansIds)
+	public function getVotes($pollId, $ansIds)
 	{
 		if (!$pollId || !$ansIds)
 			throw new Exception('Missing parameter for getVotes action');
-		self::init();
 		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
 		$pollVotes = new PollVotes($pollId);
-		$pollVotes->setNumVoters(self::$pollsCacheHandler->getPollVotersCount($pollId));
+		$pollVotes->setNumVoters($this->pollsCacheHandler->getPollVotersCount($pollId));
 		foreach($answers as $ansId)
 		{
-			$answerCount = self::$pollsCacheHandler->getAnswerCounter($pollId, $ansId);
+			$answerCount = $this->pollsCacheHandler->getAnswerCounter($pollId, $ansId);
 			$pollVotes->addAnswerCounter($ansId, $answerCount);
 		}
 		return $pollVotes;
@@ -178,7 +241,7 @@ class PollCacheHandler
 
 	public function setCacheVote($userId, $pollId, $ansIds)
 	{
-		$userVoteKey = self::getPollUserVoteCacheKey($pollId, $userId);
+		$userVoteKey = $this->getPollUserVoteCacheKey($pollId, $userId);
 		if (!$this->cache->add($userVoteKey, $ansIds, $this->cacheTTL))
 		{
 			$earlyVoteAnsIds = $this->cache->get($userVoteKey);
@@ -190,7 +253,7 @@ class PollCacheHandler
 
 	public function getCacheVote($userId, $pollId)
 	{
-		$userVoteKey = self::getPollUserVoteCacheKey($pollId, $userId);
+		$userVoteKey = $this->getPollUserVoteCacheKey($pollId, $userId);
 		return  $this->cache->get($userVoteKey);
 	}
 
@@ -319,5 +382,29 @@ class PollType {
 				return false;
 		}
 	}
+
+    public static function isAnonymous($type)
+    {
+        switch ($type)
+        {
+            case self::SINGLE_ANONYMOUS:
+            case self::MULTI_ANONYMOUS:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static function isMultipleAnswer($type)
+    {
+        switch ($type)
+        {
+            case self::MULTI_ANONYMOUS:
+            case self::MULTI_RESTRICT:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
 
