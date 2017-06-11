@@ -3602,4 +3602,18 @@ public function copyTemplate($copyPartnerId = false, $template)
 		
 		return $url;
 	}
+
+	public function getTagsArr()
+	{
+		$tags = explode(",", $this->getTags());
+		$tagsToReturn = array();
+		foreach($tags as $tag)
+		{
+			$tag = trim($tag);
+			if ($tag){
+				$tagsToReturn[] = $tag;
+			}
+		}
+		return array_unique($tagsToReturn);
+	}
 }

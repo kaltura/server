@@ -311,6 +311,18 @@ class serveFlavorAction extends kalturaAction
 		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, array($flavorAsset->getFlavorParamsId()));
 	}
 
+	protected function verifyBumperEntries($bumperEntries)
+	{
+		foreach ($bumperEntries as $bumper)
+		{
+			/* @var entry $bumper */
+			if (!in_array('sequence_entry',$bumper->getTagsArr()))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_BUMPER);
+		}
+		return true;
+
+	}
+
 	public function execute()
 	{
 		//entitlement should be disabled to serveFlavor action as we do not get ks on this action.
@@ -343,6 +355,7 @@ class serveFlavorAction extends kalturaAction
 				{
 					KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);//TODO: should we just continue without bumper in this case???
 				}
+				$this->verifyBumperEntries($bumperEntries);
 				$this->serverEntryWithBumper($entry,$bumperEntries, $flavorId);
 			}
 		}
