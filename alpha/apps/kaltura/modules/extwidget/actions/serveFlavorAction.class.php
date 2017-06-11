@@ -300,15 +300,22 @@ class serveFlavorAction extends kalturaAction
 
 	protected function serverEntryWithSequence($entry, $sequenceEntries, $flavorId)
 	{
-		$flavorAsset = assetPeer::retrieveById($flavorId);
-		if (is_null($flavorAsset))
-			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		$flavorParamsIdsArr = array();
+		if ($flavorId)
+		{
+			$flavorAsset = assetPeer::retrieveById($flavorId);
+			if (is_null($flavorAsset))
+			{
+				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			}
+			$flavorParamsIdsArr = array($flavorAsset->getFlavorParamsId());
+		}
 		/* @var asset $flavorAsset */
 		$allEntris = $sequenceEntries;
 		$allEntris[] = $entry;
 		list($entryIds, $durations, $referenceEntry ) =
-			myPlaylistUtils::getPlaylistDataFromEntries($allEntris, array($flavorAsset->getFlavorParamsId()));
-		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, array($flavorAsset->getFlavorParamsId()));
+			myPlaylistUtils::getPlaylistDataFromEntries($allEntris, $flavorParamsIdsArr);
+		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr);
 	}
 
 	protected function verifySequenceEntries($sequenceEntries)
@@ -349,8 +356,8 @@ class serveFlavorAction extends kalturaAction
 			}
 			if ($sequenceIds)
 			{
-				$bumperIdsArr = explode(',', $sequenceIds);
-				$sequenceEntries = entryPeer::retrieveByPKs($bumperIdsArr);
+				$sequenceIdsArr = explode(',', $sequenceIds);
+				$sequenceEntries = entryPeer::retrieveByPKs($sequenceIdsArr);
 				if (!count($sequenceEntries))
 				{
 					KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);//TODO: should we just continue without bumper in this case???

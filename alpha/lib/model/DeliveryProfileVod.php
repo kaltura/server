@@ -47,7 +47,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$url .= $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrl() : '';
 		$url .= $this->getDynamicAttributes()->getSequenceIds() ? '/sequenceIds/'.$this->getDynamicAttributes()->getSequenceIds() : '';
 
-		if ($entry->getType() == entryType::PLAYLIST)
+		if ($entry->getType() == entryType::PLAYLIST || $this->getDynamicAttributes()->getSequenceIds())
 		{
 			$partner = $entry->getPartner();
 			$entryVersion = $entry->getVersion();

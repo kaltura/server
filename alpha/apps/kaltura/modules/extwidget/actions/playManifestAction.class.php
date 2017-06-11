@@ -840,8 +840,36 @@ class playManifestAction extends kalturaAction
 			break;
 		
 		case entryType::MEDIA_CLIP:
-			$this->initFlavorAssetArray();
-			$this->initEntryDuration();
+			if ($this->deliveryAttributes->getSequenceIds())
+			{
+				$sequenceIdsArr = explode(',',$this->deliveryAttributes->getSequenceIds());
+				$sequenceEntries = entryPeer::retrieveByPKs($sequenceIdsArr);
+				if (count($sequenceEntries) <= 0)
+				{
+					KalturaLog::err("@@NA should die here");
+				}
+				list($entryIds, $durations, $mediaEntry) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries);
+				$this->duration = array_sum($durations) / 1000;
+
+				$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entry->getId());
+				$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+				$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+				$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
+
+				if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
+				{
+					$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+					if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+						$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
+				}
+				$this->deliveryAttributes->setStorageId(null);
+				$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
+			}
+			else
+			{
+				$this->initFlavorAssetArray();
+				$this->initEntryDuration();
+			}
 			break;
 		}
 		
