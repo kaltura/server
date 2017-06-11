@@ -98,7 +98,7 @@ class PollActions
 		$ansIds = $params[PollActions::ANSWER_IDS_ARG];
 		$userId = $params[PollActions::USER_ID_ARG];
 		$ksUserId=empty($params['___cache___userId']) ?  null : $params['___cache___userId'];
-	$instance = new PollActions();
+		$instance = new PollActions();
 		$ret = $instance->setVote($pollId, $userId, $ksUserId ,$ansIds);
 		return $ret;
 	}
