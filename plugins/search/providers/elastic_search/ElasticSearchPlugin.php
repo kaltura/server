@@ -2,7 +2,7 @@
 /**
  * @package plugins.elasticSearch
  */
-class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending
+class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending, IKalturaServices
 {
     const PLUGIN_NAME = 'elasticSearch';
     const ELASTIC_SEARCH_MANAGER = 'kElasticSearchManager';
@@ -31,5 +31,13 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
     {
         $searchDependency = new KalturaDependency(SearchPlugin::getPluginName());
         return array($searchDependency);
+    }
+
+    public static function getServicesMap()
+    {
+        $map = array(
+            'ESearch' => 'ESearchService',
+        );
+        return $map;
     }
 }

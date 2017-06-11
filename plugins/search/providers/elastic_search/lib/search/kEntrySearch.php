@@ -18,16 +18,22 @@ class kEntrySearch
     {
         $this->elasticClient = new elasticClient();
     }
-    
-    public function doSearch($elasticSearchConditions = null, $entriesStatus = array(entryStatus::READY))
+
+
+    /**
+     * todo - before the call need to call kElasticEntitlement::init()
+     */
+    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(entryStatus::READY))
     {
-        kElasticEntitlement::init();
+	    kElasticEntitlement::init();
         $this->initQuery($entriesStatus);
         $this->initEntitlement();
-        //$this->applyElasticSearchConditions($elasticSearchConditions);
-        print_r($this->query); //todo - remove after debug
+        $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
+	    KalturaLog::debug("@@NA for debug [".print_r($subQuery,true)."]");
+        $this->applyElasticSearchConditions($subQuery);
+        KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
         $result = $this->elasticClient->search($this->query);
-        print_r($result); //todo - remove after debug
+        KalturaLog::debug("@@NH results [".print_r($result, true)."]"); //todo - remove after debug
         return $result;
     }
     
