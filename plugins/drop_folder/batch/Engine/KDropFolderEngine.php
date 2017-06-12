@@ -34,41 +34,21 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	abstract public function watchFolder (KalturaDropFolder $dropFolder);
 	
 	abstract public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data);
-	
+
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
-	 * @param KalturaDropFolder $folder
+	 * @param KalturaFilterPager $pager
 	 */
-	protected function loadDropFolderFiles()
+	protected function loadDropFolderFiles($pager)
 	{
-		$dropFolderFilesMap = array();
 		$dropFolderFiles =null;
-		
+
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
-		
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
-		if(KBatchBase::$taskConfig->params->pageSize)
-			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;	
-		$totalCount = 0;
-		do
-		{
-			$pager->pageIndex++;
-			$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
-			if (!$totalCount)
-				$totalCount = $dropFolderFiles->totalCount;
-			$dropFolderFiles = $dropFolderFiles->objects;
-			foreach ($dropFolderFiles as $dropFolderFile) 
-			{
-				$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
-			}
-		}while (count($dropFolderFiles) >= $pager->pageSize);
 
-		$mapCount = count($dropFolderFilesMap);
-		KalturaLog::debug("Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list and [$mapCount] files in map");
-		return $dropFolderFilesMap;
+		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
+		return $dropFolderFiles->objects;
 	}
 
 	/**
