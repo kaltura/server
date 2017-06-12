@@ -353,7 +353,7 @@ class myEntryUtils
 					if(myEntryUtils::shouldServeVodFromLive($recordedEntry))
 					{
 						KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, entry still beeing handled by recordign engien");
-						throw new KalturaAPIException(KalturaErrors::RECORDEDING_FLOW_NOT_COMPLETE, $entry->getId());
+						throw new KalturaAPIException(KalturaErrors::RECORDING_FLOW_NOT_COMPLETE, $entry->getId());
 					}
 				}	
 			}
