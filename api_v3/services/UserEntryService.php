@@ -131,18 +131,23 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
 		}
 		
-		$ueFilter = new UserEntryFilter();
+		//The Delete job will need the users translated to puser IDs
+		$ueFilter = $filter->toObject($ueFilter);
 		if ($filter->userIdEqual)
 		{
-			$ueFilter->set("_eq_user_id", $filter->userIdEqual);
-			$filter->userIdEqual = null;
+			$ueFilter->set("_eq_user_id", kuserPeer::retrieveByPK($filter->userIdEqual)->getPuserId());
 		}
 		if($filter->userIdIn)
 		{
-			$ueFilter->set("_in_user_id", $filter->userIdIn);
-			$filter->userIdIn = null;
+			$kusers = explode(',', $filter->userIdIn);
+			$pusers = array();
+			foreach ($kusers as $kuser)
+			{
+				$pusers[] = kuserPeer::retrieveByPK($kuser)->getPuserId();
+			}	
+		
+			$ueFilter->set("_in_user_id", implode (',', $pusers));
 		}
-		$ueFilter = $filter->toObject($ueFilter);
 		
 		return kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
 	}
