@@ -22,17 +22,16 @@ class PollService extends KalturaBaseService
 	 */
 	public function addAction($pollType = 'SINGLE_ANONYMOUS')
 	{
-
 		KalturaResponseCacher::disableCache();
 		try
 		{
-			return PollActions::generatePollId($pollType);
+			$pollActions = new PollActions();
+			return $pollActions->generatePollId($pollType);
 		}
 		catch (Exception $e)
 		{
 			throw new KalturaAPIException($e->getMessage());
 		}
-
 	}
 
 	/**
@@ -50,7 +49,8 @@ class PollService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		try
 		{
-			$localDcVotes = PollActions::getVotes($pollId, $answerIds);
+			$pollActions = new PollActions();
+			$localDcVotes = $pollActions->getVotes($pollId, $answerIds);
 		}
 		catch (Exception $e)
 		{
@@ -98,7 +98,9 @@ class PollService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		try
 		{
-			return PollActions::setVote($pollId, $userId, $answerIds);
+			$pollActions = new PollActions();
+			$ksUserId = kCurrentContext::$uid;
+			$pollActions->setVote($pollId, $userId,$ksUserId ,$answerIds);
 		}
 		catch (Exception $e)
 		{
@@ -116,7 +118,9 @@ class PollService extends KalturaBaseService
 	public function getVoteAction($pollId, $userId)
 	{
 		KalturaResponseCacher::disableCache();
-		return PollActions::getVote($pollId, $userId);
+		$ksUserId = kCurrentContext::$uid;
+		$pollActions = new PollActions();
+		return $pollActions->doGetVote($pollId, $userId, $ksUserId);
 	}
 
 	/**
