@@ -1,4 +1,4 @@
-;<?php
+<?php
 /**
  * @package plugins.viewHistory
  * @subpackage model.filters
