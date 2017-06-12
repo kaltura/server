@@ -361,10 +361,24 @@ class myEntryUtils
 		
 		if($entry->getSourceType() === EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
+			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
 			if(myEntryUtils::shouldServeVodFromLive($entry, false))
 			{
-				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded contnet is set");
+				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
+			}
+			
+			//Check if the recorded entry is the current recorded entry of the live, in that case validate there are not any active server nodes
+			$liveEntryId = $entry->getRootEntryId();
+			$liveEntry = $liveEntryId ? entryPeer::retrieveByPK($liveEntryId) : null;
+			if($liveEntry && $liveEntry->getRecordedEntryId() &&  $liveEntry->getRecordedEntryId() == $entry->getId())
+			{
+				$connectedEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($liveEntry->getId(), EntryServerNodePeer::$connectedServerNodeStatuses);
+				if(count($connectedEntryServerNodes))
+				{
+					KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted, active server nodes detected");
+					throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
+				} 
 			}
 		}
 
