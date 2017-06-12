@@ -19,10 +19,6 @@ class kEntrySearch
         $this->elasticClient = new elasticClient();
     }
 
-
-    /**
-     * todo - before the call need to call kElasticEntitlement::init()
-     */
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(entryStatus::READY))
     {
 	    kElasticEntitlement::init();
@@ -52,7 +48,7 @@ class kEntrySearch
         $this->query['body'] = array(
             'query' => array(
                 'bool' => array(
-                    'filter' => array(
+                    'filter' => array( //todo - change to partner_status
                         array(
                             'term' => array('partner_id' => $partnerId)
                         ),

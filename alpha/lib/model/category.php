@@ -1707,7 +1707,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 
 		return implode(' ',$privacyContexts);
 	}
-	
+
 	public function getSearchIndexPrivacyContexts()
 	{
 		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
@@ -1895,10 +1895,32 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$body = array(
 			'doc' => array(
 				'partner_id' => $this->getPartnerId(),
-				'privacy' => $this->getPrivacy(),
-				'privacy_context' => $this->getPrivacyContext(),
-				'privacy_contexts' => $this->getPrivacyContexts(),
+				'partner_status' => "p{$this->getPartnerId()}s{$this->getStatus()}",
+				'privacy' => "{$this->getPrivacy()}p{$this->getPartnerId()}",
+				'privacy_context' => explode(',',$this->getPrivacyContext()),
+				'privacy_contexts' => explode(',',$this->getPrivacyContexts()),
 				'status' => $this->getStatus(),
+				'parent_id' => $this->getParentId(),
+				'depth' => $this->getDepth(),
+				'name' => $this->getName(),
+				'full_name' => $this->getFullName(),
+				'full_ids' => explode(',',$this->getFullIds()),
+				'entries_count' => $this->getEntriesCount(),
+				'created_at' => $this->getCreatedAt(null),
+				'updated_at' => $this->getUpdatedAt(null),
+				'direct_entries_count' => $this->getDirectEntriesCount(),
+				'direct_sub_categories_count' => $this->getDirectSubCategoriesCount(),
+				'members_count' => $this->getMembersCount(),
+				'pending_members_count' => $this->getPendingMembersCount(),
+				'pending_entries_count' => $this->getPendingEntriesCount(),
+				'description' => $this->getDescription(),
+				'tags' => explode(',', $this->getTags()),
+				'display_in_search' => $this->getDisplayInSearch(),
+				'inheritance_type' => $this->getInheritanceType(),
+				'kuser_id' => $this->getKuserId(),
+				'reference_id' => $this->getReferenceId(),
+				'inherited_parent_id' => $this->getInheritedParentId(),
+				'moderation' => $this->getModeration(),
 			),
 			'doc_as_upsert' => true
 		);
@@ -1918,6 +1940,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	 */
 	public function indexToElastic($params = null)
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
 	}
 }

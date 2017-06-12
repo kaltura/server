@@ -414,7 +414,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		//This case handles adding/deleting an existing cue point
 		if(!count($modifiedColumns))
 			return true;
-		
+
 		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
 		if(!count($indexOnEntryTypes))
 			return false;
@@ -428,6 +428,28 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
 			return true;
 		
+		return false;
+	}
+
+	public function shouldReIndexEntryToElastic(array $modifiedColumns = array())
+	{
+		//This case handles adding/deleting an existing cue point
+		if(!count($modifiedColumns))
+			return true;
+
+		$elasticIndexOnEntryTypes = CuePointPlugin::getElasticIndexOnEntryTypes();
+		if(!count($elasticIndexOnEntryTypes))
+			return false;
+
+		if(!in_array($this->getType(), $elasticIndexOnEntryTypes))
+			return false;
+
+		//If modified columns has values we need to check that the fileds updated are the once that should trigger re-in
+		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME, CuePointPeer::PARTNER_DATA, CuePointPeer::UPDATED_AT); //todo -add custom data
+
+		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
+			return true;
+
 		return false;
 	}
 
@@ -495,5 +517,10 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		}
 
 		return false;
+	}
+
+	public function contributeElasticData()
+	{
+		return null;
 	}
 } // CuePoint

@@ -7,7 +7,6 @@ interface ElasticIndexMap extends BaseEnum
 {
     const ELASTIC_ENTRY_INDEX = 'kaltura_entry';
     const ELASTIC_ENTRY_TYPE = 'entry';
-    const ELASTIC_CAPTION_TYPE = 'caption';
     const ELASTIC_CATEGORY_INDEX = 'kaltura_category';
     const ELASTIC_CATEGORY_TYPE = 'category';
     const ELASTIC_KUSER_INDEX = 'kaltura_kuser';

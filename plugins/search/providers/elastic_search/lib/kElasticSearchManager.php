@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage lib
  */
-class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjectReadyForIndexContainerEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
+class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjectReadyForElasticIndexEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
 {
 
     const CACHE_PREFIX = 'executed_elastic_server_';
@@ -15,7 +15,14 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function objectReadyForIndex(BaseObject $object, BatchJob $raisedJob = null)
     {
-        $this->saveToElastic($object);
+        if($object instanceof CuePoint && in_array($object->getType(),CuePointPlugin::getElasticIndexOnEntryTypes()))
+        {
+            kCuePointManager::reIndexCuePointEntry($object, false, true);//reindex the entry only on elastic
+        }
+
+        if($object instanceof IElasticIndexable)
+            $this->saveToElastic($object);
+
         return true;
     }
 
@@ -25,6 +32,9 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeReadyForIndexEvent(BaseObject $object)
     {
+        if($object instanceof CuePoint && in_array($object->getType(),CuePointPlugin::getElasticIndexOnEntryTypes()))
+            return true;
+
         if($object instanceof IElasticIndexable)
             return true;
 
@@ -34,12 +44,51 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     public function saveToElastic(IElasticIndexable $object ,$params = null)
     {
         KalturaLog::debug('Saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
-        //$cmd = $this->getElasticSaveParams($object, $params);
-        $cmd['body'] = $object->getObjectParams($params);
+        $cmd = $this->getElasticSaveParams($object, $params);
+        //$cmd['body'] = $object->getObjectParams($params);
         if(!$cmd)
             return true;
 
         return $this->execElastic($cmd, $object);
+    }
+
+    public function getElasticSaveParams($object, $params)
+    {
+        $cmd['body'] = $object->getObjectParams($params);
+
+        $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaElasticSearchDataContributor');
+        $dataContributionPath = null;
+
+        if(isset($cmd['body']['doc']))
+            $dataContributionPath = &$cmd['body']['doc'];
+        else
+            $dataContributionPath = &$cmd['body'];
+
+        foreach($pluginInstances as $pluginName => $pluginInstance)
+        {
+            KalturaLog::debug("Loading $pluginName elastic data contribution");
+            $elasticPluginData = null;
+            try
+            {
+                $elasticPluginData = $pluginInstance::getElasticSearchData($object);
+            }
+            catch(Exception $e)
+            {
+                KalturaLog::err($e->getMessage());
+                continue;
+            }
+
+            if($elasticPluginData)
+            {
+                KalturaLog::debug("Elastic data for $pluginName [" . print_r($elasticPluginData,true) . "]");
+                foreach ($elasticPluginData as $fieldName => $fieldValue)
+                {
+                    $dataContributionPath[$fieldName] = $fieldValue;
+                }
+            }
+        }
+        
+        return $cmd;
     }
 
     //exe the curl
@@ -109,7 +158,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      * @param $params
      * @return bool true if should continue to the next consumer
      */
-    public function objectReadyForIndexContainer($object, $params = null)
+    public function objectReadyForElasticIndex($object, $params = null)
     {
         $this->saveToElastic($object, $params);
         return true;
@@ -120,9 +169,9 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      * @param  $params
      * @return bool true if the consumer should handle the event
      */
-    public function shouldConsumeReadyForIndexContainerEvent($object, $params = null)
+    public function shouldConsumeReadyForElasticIndexEvent($object, $params = null)
     {
-        if($object instanceof CaptionAsset)
+        if($object instanceof IElasticIndexable)
             return true;
 
         return false;
@@ -146,9 +195,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeAddedEvent(BaseObject $object)
     {
-        if($object instanceof CaptionAsset)
-            return false;
-
         if($object instanceof IElasticIndexable)
             return true;
 
@@ -173,12 +219,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeUpdatedEvent(BaseObject $object)
     {
-        if($object instanceof CaptionAsset)
-            return false;
-
         if($object instanceof IElasticIndexable)
             return true;
 
         return false;
     }
+    
 }

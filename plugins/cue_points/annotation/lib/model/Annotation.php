@@ -55,6 +55,14 @@ class Annotation extends CuePoint implements IMetadataObject
 		return parent::shouldReIndexEntry($modifiedColumns);
 	}
 
+	public function shouldReIndexEntryToElastic(array $modifiedColumns = array())
+	{
+		if(!$this->getSearchableOnEntry())
+			return false;
+
+		return parent::shouldReIndexEntryToElastic($modifiedColumns);
+	}
+
 	/**
 	 * @param entry $entry
 	 * @return bool true if cuepoints should be copied to given entry
@@ -103,4 +111,20 @@ class Annotation extends CuePoint implements IMetadataObject
 	
 	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, null, false);}
 	public function setSearchableOnEntry($v)        	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, (bool)$v);}
+
+	public function contributeElasticData()
+	{
+		$data = null;
+
+		if($this->getSearchableOnEntry())
+		{
+			if($this->getText())
+				$data['cue_point_text'] = $this->getText();
+
+			if($this->getTags())
+				$data['cue_point_tags'] = explode(',', $this->getTags());
+		}
+
+		return $data;
+	}
 }

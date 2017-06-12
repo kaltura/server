@@ -116,4 +116,9 @@ class EventCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	{
 		return false;
 	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array();
+	}
 }

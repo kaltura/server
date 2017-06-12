@@ -122,5 +122,10 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		return false;
 	}
 
+	public function shouldReIndexEntryToElastic(array $modifiedColumns = array())
+	{
+		return false;
+	}
+
 
 }
