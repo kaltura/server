@@ -134,10 +134,10 @@ class serveFlavorAction extends kalturaAction
 		
 		list($entryIds, $durations, $referenceEntry) =
 			myPlaylistUtils::executeStitchedPlaylist($entry);
-		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry);
 	}
 
-	protected function serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds = null)
+	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds = null)
 	{
 		// get request parameters
 		if (!$flavorParamIds)
@@ -298,7 +298,7 @@ class serveFlavorAction extends kalturaAction
 	}
 
 
-	protected function serverEntryWithSequence($entry, $sequenceEntries, $flavorId)
+	protected function serveEntryWithSequence($entry, $sequenceEntries, $flavorId)
 	{
 		$flavorParamsIdsArr = array();
 		if ($flavorId)
@@ -315,7 +315,7 @@ class serveFlavorAction extends kalturaAction
 		$allEntris[] = $entry;
 		list($entryIds, $durations, $referenceEntry ) =
 			myPlaylistUtils::getPlaylistDataFromEntries($allEntris, $flavorParamsIdsArr);
-		$this->serverEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr);
 	}
 
 	protected function verifySequenceEntries($sequenceEntries)
@@ -339,7 +339,7 @@ class serveFlavorAction extends kalturaAction
 
 		$flavorId = $this->getRequestParameter("flavorId");
 		$entryId = $this->getRequestParameter("entryId");
-		$sequenceIds = $this->getRequestParameter('sequenceIds');
+		$sequences = $this->getRequestParameter('sequences');
 		
 		if ($entryId)
 		{
@@ -354,16 +354,15 @@ class serveFlavorAction extends kalturaAction
 			{
 				$this->servePlaylist($entry);
 			}
-			if ($sequenceIds)
+			if ($sequences)
 			{
-				$sequenceIdsArr = explode(',', $sequenceIds);
-				$sequenceEntries = entryPeer::retrieveByPKs($sequenceIdsArr);
-				if (!count($sequenceEntries))
+				$sequencesArr = explode(',', $sequences);
+				$sequenceEntries = entryPeer::retrieveByPKs($sequencesArr);
+				if (count($sequenceEntries))
 				{
-					KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);//TODO: should we just continue without bumper in this case???
+					$this->verifySequenceEntries($sequenceEntries);
+					$this->serveEntryWithSequence($entry, $sequenceEntries, $flavorId);
 				}
-				$this->verifySequenceEntries($sequenceEntries);
-				$this->serverEntryWithSequence($entry,$sequenceEntries, $flavorId);
 			}
 		}
 		
