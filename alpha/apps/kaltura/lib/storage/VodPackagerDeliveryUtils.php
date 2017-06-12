@@ -42,7 +42,7 @@ class VodPackagerDeliveryUtils
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
 		
-		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false) || ($params->getSequences()))
+		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false) || ($params->getHasValidSequences()))
 		{
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
 			$result = $prefix . $middlePart . $postfix;
