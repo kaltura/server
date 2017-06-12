@@ -94,10 +94,10 @@ class PollActions
 			return 'Missing parameter for vote action';
 
 
-		$pollId = $params[PollActions::POLL_ID_ARG];
-		$ansIds = $params[PollActions::ANSWER_IDS_ARG];
-		$userId = $params[PollActions::USER_ID_ARG];
-		$ksUserId=empty($params['___cache___userId']) ?  null : $params['___cache___userId'];
+		$pollId     = $params[PollActions::POLL_ID_ARG];
+		$ansIds     = $params[PollActions::ANSWER_IDS_ARG];
+		$userId     = $params[PollActions::USER_ID_ARG];
+		$ksUserId   = empty($params['___cache___userId']) ?  null : $params['___cache___userId'];
 		$instance = new PollActions();
 		$ret = $instance->setVote($pollId, $userId, $ksUserId ,$ansIds);
 		return $ret;
@@ -119,12 +119,9 @@ class PollActions
 		{
 			$pollType = $this->getPollType($pollId);
 			//validate User ID
-			$str = $userId." ".$ksUserId;
 			$userId = self::getValidUserId($pollType,$userId,$ksUserId);
-			if(is_null($userId))
-			{
-				return "User ID is invalid ksUserId - $str";
-			}
+			if (is_null($userId))
+				return "User ID is invalid";
 
 			//validate answers
 			$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
@@ -146,23 +143,6 @@ class PollActions
 		return "Failed to vote due to bad poll id structure";
 	}
 
-
-
-	private static function getUserIdFromKs($params)
-	{
-		$userId = null;
-		$ks = isset($params['ks']) ? $params['ks'] : '';
-		if($ks)
-		{
-			$ksObj = new kSessionBase();
-			$parseResult = $ksObj->parseKS($ks);
-			$ksStatus = $ksObj->tryToValidateKS();
-			if($parseResult && $ksStatus == kSessionBase::OK)
-				$userId = $ksObj->user;
-		}
-		return $userId;
-	}
-
 	private function getPollType($pollId)
 	{
 		$pollType = null;
@@ -176,22 +156,26 @@ class PollActions
 
 	public static function getVote($params)
 	{
-		$instance = new PollActions();
-		return $instance->doGetVote($params);
-	}
-
-	/* get Vote Actions */
-	public function doGetVote($params)
-	{
 		if ( is_null($params) ||
 			!array_key_exists(PollActions::POLL_ID_ARG, $params) ||
 			!array_key_exists(PollActions::USER_ID_ARG, $params))
 			return 'Missing parameter for get vote action';
 
-		$pollId = $params[PollActions::POLL_ID_ARG];
-		$userId = $params[PollActions::USER_ID_ARG];
+		$pollId     = $params[PollActions::POLL_ID_ARG];
+		$userId     = $params[PollActions::USER_ID_ARG];
+		$ksUserId   = empty($params['___cache___userId']) ?  null : $params['___cache___userId'];
+
+		$instance   = new PollActions();
+		return $instance->doGetVote($pollId,$userId,$ksUserId);
+	}
+
+	/* get Vote Actions */
+	public function doGetVote($pollId,$userId,$ksUserId)
+	{
 		if ($this->isValidPollIdStructure($pollId))
 		{
+			$pollType = $this->getPollType($pollId);
+			$userId = self::getValidUserId($pollType,$userId,$ksUserId);
 			$vote = $this->pollsCacheHandler->getCacheVote($userId, $pollId);
 			if ($vote)
 				return json_encode($vote);
