@@ -1,9 +1,11 @@
 <?php
-
-class kObjectReadyForIndexContainerEvent extends kApplicativeEvent
+/**
+ * Applicative event that raised by the developer when indexed object is ready for indexing to elasticsearch
+ */
+class kObjectReadyForElasticIndexEvent extends kApplicativeEvent
 {
 
-    const EVENT_CONSUMER = 'kObjectReadyForIndexContainerEventConsumer';
+    const EVENT_CONSUMER = 'kObjectReadyForElasticIndexEventConsumer';
 
     protected $params;
 
@@ -36,7 +38,7 @@ class kObjectReadyForIndexContainerEvent extends kApplicativeEvent
      */
     protected function doConsume(KalturaEventConsumer $consumer)
     {
-        if(!$consumer->shouldConsumeReadyForIndexContainerEvent($this->object, $this->params))
+        if(!$consumer->shouldConsumeReadyForElasticIndexEvent($this->object, $this->params))
             return true;
 
         $additionalLog = '';
@@ -46,7 +48,7 @@ class kObjectReadyForIndexContainerEvent extends kApplicativeEvent
             $additionalLog .= ' with params [' . print_r($this->params, true) . ']';
 
         KalturaLog::debug('consumer [' . get_class($consumer) . '] started handling [' . get_class($this) . '] object type [' . get_class($this->object) . '] ' . $additionalLog);
-        $result = $consumer->objectReadyForIndexContainer($this->object, $this->params);
+        $result = $consumer->objectReadyForElasticIndex($this->object, $this->params);
         KalturaLog::debug('consumer [' . get_class($consumer) . '] finished handling [' . get_class($this) . '] object type [' . get_class($this->object) . '] ' . $additionalLog);
         return $result;
     }

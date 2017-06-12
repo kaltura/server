@@ -249,4 +249,9 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKal
 	{
 		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryCodeCuePointCloneOptions::CODE_CUE_POINTS), false);
 	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(CodeCuePointType::CODE));
+	}
 }

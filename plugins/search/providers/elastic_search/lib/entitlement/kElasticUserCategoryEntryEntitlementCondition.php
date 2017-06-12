@@ -100,7 +100,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
 
         if($privacyContext)
         {
-            $body['query']['bool']['filter'][] = array('term' => array('privacy_context' => $privacyContext)); //todo add partner prefix
+            $body['query']['bool']['filter'][] = array('term' => array('privacy_context' => $privacyContext)); //todo add partner prefix , search in privacy contexts
         }
         else
         {

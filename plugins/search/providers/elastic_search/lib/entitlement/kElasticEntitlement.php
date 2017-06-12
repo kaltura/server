@@ -15,8 +15,15 @@ class kElasticEntitlement
     public static $entriesDisabledEntitlement = array();
     public static $publicEntries = false;
     public static $parentEntitlement = false;
+    public static $isInitialized = false;
 
     public static function init()
+    {
+        if(!self::$isInitialized)
+            self::initialize();
+    }
+
+    protected static function initialize()
     {
         $ks = ks::fromSecureString(kCurrentContext::$ks);
         self::$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;

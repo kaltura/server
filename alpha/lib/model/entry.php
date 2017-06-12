@@ -3660,12 +3660,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
 			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
 			'kuser_id' => $this->getKuserId(),
+			'puser_id' => $this->getPuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
 			'name' => $this->getName(),
 			'description' => $this->getDescription(),
-			'tags' => $this->getTags(),
+			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
 			'category_ids' => $this->getAllCategoriesIds(true),
+			'partner_status' => "p{$this->getPartnerId()}s{$this->getStatus()}",
+			'parent_id' => $this->getParentEntryId(),
 			'reference_id' => $this->getReferenceID(),
 			'conversion_profile_id' => $this->getConversionProfileId(),
 			'template_entry_id' => $this->getTemplateEntryId(),
@@ -3673,6 +3676,12 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'media_type' => $this->getMediaType(),
 			'source_type' => $this->getSourceType(),
 			'duration' => $this->getLengthInMsecs(),
+			'admin_tags' => explode(',',$this->getAdminTags()),
+			'credit' => $this->getCredit(),
+			'site_url' => $this->getSiteUrl(),
+			'start_date' => $this->getStartDate(null),
+			'end_date' => $this->getEndDate(null),
+			//'recorded_entry_id' => $this->getRecorded
 		);
 		
 		if($this->getParentEntryId())
@@ -3694,7 +3703,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	public function indexToElastic($params = null)
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
 	}
 	
 	protected function addParentEntryToObjectParams(&$body)
@@ -3704,8 +3713,10 @@ public function copyTemplate($copyPartnerId = false, $template)
 			return;
 		
 		$body['parent_entry'] = array(
+			'entry_id' => $parentEntry->getId(),
 			'partner_id' => $parentEntry->getPartnerId(),
 			'status' => $parentEntry->getStatus(),
+			'partner_status' => "p{$parentEntry->getPartnerId()}s{$parentEntry->getStatus()}",
 			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),
 			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
 			'kuser_id' => $parentEntry->getKuserId(),

@@ -482,6 +482,6 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	 */
 	public function indexToElastic($params = null)
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
 	}
 } // categoryKuser

@@ -50,4 +50,39 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	{
 		return false;
 	}
+
+	public function shouldReIndexEntryToElastic(array $modifiedColumns = array())
+	{
+		return true;
+	}
+
+	public function contributeElasticData()
+	{
+		$data = null;
+		if($this->getName())
+			$data['cue_point_name'] = $this->getName();
+
+		if($this->getOptionalAnswers())
+			$data['cue_point_answers'] = $this->getElasticAnswersData();
+
+		if($this->getHint())
+			$data['cue_point_hint'] = $this->getHint();
+
+		if($this->getExplanation())
+			$data['cue_point_explanation'] = $this->getExplanation();
+
+		return $data;
+	}
+
+	private function getElasticAnswersData()
+	{
+		$answers = $this->getOptionalAnswers();
+		$data = null;
+		foreach ($answers as $answer)
+		{
+			/* @var kOptionalAnswer $answer */
+			$data[] = $answer->getText();
+		}
+		return $data;
+	}
 }
