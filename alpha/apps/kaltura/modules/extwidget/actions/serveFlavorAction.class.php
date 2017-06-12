@@ -348,13 +348,12 @@ class serveFlavorAction extends kalturaAction
 			{
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
-			
-			if ($entry->getType() == entryType::PLAYLIST &&
-				kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+			$isInternalIp = kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']);
+			if ($entry->getType() == entryType::PLAYLIST && $isInternalIp)
 			{
 				$this->servePlaylist($entry);
 			}
-			if ($sequence)
+			if ($sequence  && $isInternalIp)
 			{
 				$sequenceArr = explode(',', $sequence);
 				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
