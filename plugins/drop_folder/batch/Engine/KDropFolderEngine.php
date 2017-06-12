@@ -65,8 +65,9 @@ abstract class KDropFolderEngine implements IKalturaLogger
 				$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
 			}
 		}while (count($dropFolderFiles) >= $pager->pageSize);
-		
-		KalturaLog::debug("Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list and [". count($dropFolderFiles ."] file in map"));
+
+		$mapCount = count($dropFolderFilesMap);
+		KalturaLog::debug("Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list and [$mapCount] files in map");
 		return $dropFolderFilesMap;
 	}
 
