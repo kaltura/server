@@ -61,8 +61,8 @@ class PollActions
 	/* Poll Id Action */
 	public function generatePollId($type = PollType::SINGLE_ANONYMOUS)
 	{
-	/*	if (!PollType::isValidPollType($type))
-			throw new Exception("Poll type provided is invalid");*/
+		if (!PollType::isValidPollType($type))
+			throw new Exception("Poll type provided is invalid");
 		$randKey = rand();
 		$hash = hash_hmac(PollActions::HASH_TYPE, $this->kalturaPollSecret, $randKey);
 		return $type.self::ID_SEPARATOR_CHAR.$hash.self::ID_SEPARATOR_CHAR.$randKey;
