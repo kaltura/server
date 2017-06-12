@@ -1,5 +1,37 @@
 # Lynx 12.18.0 #
 
+## support new live packages + LC flow + webcast on update or fresh install ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7535
+
+### Configuration ###
+
+	1. Update configurations/rabbit_mq.ini placeholders with the rabbit information.
+	2. Follow instrunctions of pub-sub-server config update required as mentioend in: https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md
+	
+
+### Deployment scripts ###
+
+	Before runing deployimend screipts you need to replace all teh tokens with the proper values in the followign file list: 
+	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
+	2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
+	3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
+	4. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/public_qna_notification.template.xml
+	5. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/polls_response_profile.template.xml
+	6. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/qna_response_profiles.template.xml
+
+	php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_latest_live_params.php
+	php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
+	php /opt/kaltura/app/deployment/updates/scripts/2017_05_24_deploy_webcast_related_profiles.php
+	php /opt/kaltura/app/deployment/base/scripts/installWebcast.php
+	
+#### Known Issues & Limitations ####
+
+	Please note that for webcast to work you will need to have rabbit and pub-sub-server installed and correctly configured. For refernce view:
+	1. https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md
+	2. https://www.rabbitmq.com/download.html
+
 ## eCDN parent redundency ##
 
 - Issue Type: Feature
@@ -66,22 +98,6 @@ None.
 	point 'shared_temp_folder' var (in configurations/local.ini) to that folder
 
 ### Deployment scripts ###
-None.
-
-## Q&A/Polls Response profiles and push notifications tempaltes ##
-
-- Issue Type: Feature
-- Issue ID: PLAT-6940
-
-### Configuration ###
-None.
-
-### Deployment scripts ###
-
-	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
-
-#### Known Issues & Limitations ####
-
 None.
 
 ## Add polls support ##
