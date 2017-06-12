@@ -339,7 +339,7 @@ class serveFlavorAction extends kalturaAction
 
 		$flavorId = $this->getRequestParameter("flavorId");
 		$entryId = $this->getRequestParameter("entryId");
-		$sequences = $this->getRequestParameter('sequences');
+		$sequence = $this->getRequestParameter('sequence');
 		
 		if ($entryId)
 		{
@@ -354,10 +354,10 @@ class serveFlavorAction extends kalturaAction
 			{
 				$this->servePlaylist($entry);
 			}
-			if ($sequences)
+			if ($sequence)
 			{
-				$sequencesArr = explode(',', $sequences);
-				$sequenceEntries = entryPeer::retrieveByPKs($sequencesArr);
+				$sequenceArr = explode(',', $sequence);
+				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
 				if (count($sequenceEntries))
 				{
 					$this->verifySequenceEntries($sequenceEntries);

@@ -825,18 +825,18 @@ class playManifestAction extends kalturaAction
 			break;
 		
 		case entryType::MEDIA_CLIP:
-			if ($this->deliveryAttributes->getSequences())
+			if ($this->deliveryAttributes->getSequence())
 			{
-				$sequenceArr = explode(',',$this->deliveryAttributes->getSequences());
+				$sequenceArr = explode(',',$this->deliveryAttributes->getSequence());
 				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
 				if (count($sequenceEntries))
 				{
-					$this->deliveryAttributes->setHasValidSequences(true);
+					$this->deliveryAttributes->setHasValidSequence(true);
 					list($entryIds, $durations, $mediaEntry) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries);
 					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
 				}
 			}
-			if (!$this->deliveryAttributes->getHasValidSequences())
+			if (!$this->deliveryAttributes->getHasValidSequence())
 			{
 				$this->initFlavorAssetArray();
 				$this->initEntryDuration();
@@ -1136,7 +1136,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
 		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
-		$this->deliveryAttributes->setSequences($this->getRequestParameter("sequences"));
+		$this->deliveryAttributes->setSequence($this->getRequestParameter("sequence"));
 
 		if($this->secureEntryHelper)
 			$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
