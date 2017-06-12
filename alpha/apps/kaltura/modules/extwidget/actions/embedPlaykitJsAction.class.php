@@ -9,6 +9,8 @@ class embedPlaykitJsAction extends sfAction
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
 	const REGENERATE_PARAM_NAME = "regenerate";
+	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
+	const AUTO_EMBED_PARAM_NAME = "autoembed";
 	
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -19,81 +21,89 @@ class embedPlaykitJsAction extends sfAction
 	private $bundlerUrl = null;
 	private $sourcesPath = null;
 	private $bundleConfig = null;
-	private $cacheVersion = null;
 	private $sourceMapLoader = null;
+	private $cacheVersion = null;
+	private $playKitVersion = null;
 	private $regenerate = false;
 	
 	public function execute()
 	{
 		$this->initMembers();
 		
-		if (!$this->bundleCache->get($this->cacheVersion . "_" . $this->bundle_name)) {
-			$bundleContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundelLocked"), array($this));
-			$bundleContent = $this->formatBundleContent($bundleContent);
-		} else {
-			$bundleContent = $this->getBundleContent(null);
+		$bundleContent = $this->bundleCache->get($this->bundle_name);
+		if (!$bundleContent || $this->regenerate) 
+		{
+			$bundleContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
 		
 		// send cache headers
 		$this->sendHeaders($bundleContent);
+		
+		//Format bundle contnet
+		$bundleContent = $this->formatBundleContent($bundleContent);
 		
 		echo($bundleContent);
 		
 		KExternalErrors::dieGracefully();
 	}
 	
-	public static function buildBundelLocked($context)
+	public static function buildBundleLocked($context)
 	{
 		//if bundle not exists or explicitly should be regenerated build it
-		if (!$context->bundleCache->get($context->bundle_name) || $context->regenerate) {
+		if (!$context->bundleCache->get($context->bundle_name) || $context->regenerate) 
+		{
 			//build bundle and save in memcache
 			$config = str_replace("\"", "'", json_encode($context->bundleConfig));
-			if ($config) {
+			if ($config) 
+			{
 				$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
-				$contnet = KCurlWrapper::getContent($url, array('Content-Type: application/json'));
+				$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'));
 				
-				if ($contnet) {
-					try {
-						$contnet = json_decode($contnet, true);
-						$sourceMapContent = base64_decode($contnet['sourceMap']);
-						$bundleContent = base64_decode($contnet['bundle']);
-						$context->bundleCache->set($context->cacheVersion . "_" . $context->bundle_name, time() . "," . $bundleContent);
-						$context->sourceMapsCache->set($context->cacheVersion . "_" . $context->bundle_name, $sourceMapContent);
-					} catch (Exception $ex) {
+				if ($content) 
+				{
+					try 
+					{
+						$content = json_decode($content, true);
+						$sourceMapContent = base64_decode($content['sourceMap']);
+						$bundleContent = time() . "," . base64_decode($content['bundle']);
+						$context->bundleCache->set($context->bundle_name, $bundleContent);
+						$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
+					} 
+					catch (Exception $ex) 
+					{
 						KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 					}
 					
-				} else {
+				} 
+				else 
+				{
 					KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 				}
 				
 				return $bundleContent;
-			} else {
+			} 
+			else 
+			{
 				KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 			}
 		}
 	}
 	
-	private function getBundleContent()
-	{
-		$bundleContent = $this->bundleCache->get($this->cacheVersion . "_" . $this->bundle_name);
-		if (!$bundleContent)
-			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
-		$lastModified = explode(",", $bundleContent, 2);
-		$bundleContent = str_replace($lastModified[0] . ",", "", $bundleContent);
-		return $this->formatBundleContent($bundleContent);
-		
-	}
-	
 	private function formatBundleContent($bundleContent)
 	{
-		$autoEmbed = $this->getRequestParameter('autoembed');
-		$iframeEmbed = $this->getRequestParameter('iframeembed');
+		$bundleContentParts = explode(",", $bundleContent, 2);
+		$bundleContent = $bundleContentParts[1];
+		
+		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
+		$iframeEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		
 		//if auto embed selected add embed script to bundle content
-		if ($autoEmbed) {
+		if ($autoEmbed) 
+		{
 			$bundleContent .= $this->getAutoEmbedCode();
-		} elseif ($iframeEmbed) {
+		} 
+		elseif ($iframeEmbed) 
+		{
 			$bundleContent = $this->getIfarmEmbedCode($bundleContent);
 		}
 		
@@ -108,35 +118,39 @@ class embedPlaykitJsAction extends sfAction
 	private function sendHeaders($content)
 	{
 		$max_age = 60 * 10;
-		$lastModified = explode(",", $content, 2);
+		$contentParts = explode(",", $content, 2);
+		$lastModified = $contentParts[0];
 		// Support Etag and 304
 		if (
 			(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
-				$_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($lastModified[0])) ||
+				$_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($lastModified)) ||
 			(isset($_SERVER['HTTP_IF_NONE_MATCH']) && @trim($_SERVER['HTTP_IF_NONE_MATCH']) == $this->getOutputHash($content))
 		) {
-			infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified[0]);
+			infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 			header("HTTP/1.1 304 Not Modified");
 			return;
 		}
 		
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
-		if ($iframeEmbed) {
+		if ($iframeEmbed) 
+		{
 			header("Content-Type: text/html");
-		} else {
+		} 
+		else 
+		{
 			header("Content-Type: text/javascript");
 		}
 		
 		header("Etag: " . $this->getOutputHash($content));
-		// alwayse set cross orgin headers:
+		// always set cross orgin headers:
 		header("Access-Control-Allow-Origin: *");
 		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified[0]);
-		
 	}
 	
 	private function getOutputHash($o)
 	{
-		if (!$this->eTagHash) {
+		if (!$this->eTagHash) 
+		{
 			$this->eTagHash = md5($o);
 		}
 		return $this->eTagHash;
@@ -185,12 +199,15 @@ class embedPlaykitJsAction extends sfAction
 			$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
 			$betatVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
 			
-			foreach ($this->bundleConfig as $key => $val) {
-				if ($val == "{latest}" && $latestVersionMap != null) {
+			foreach ($this->bundleConfig as $key => $val) 
+			{
+				if ($val == "{latest}" && $latestVersionMap != null) 
+				{
 					$this->bundleConfig[$key] = $latestVersionMap[$key];
 				}
 				
-				if ($val == "{beta}" && $betatVersionMap != null) {
+				if ($val == "{beta}" && $betatVersionMap != null) 
+				{
 					$this->bundleConfig[$key] = $betatVersionMap[$key];
 				}
 			}
@@ -232,7 +249,8 @@ class embedPlaykitJsAction extends sfAction
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 		
 		//Get config params
-		try {
+		try 
+		{
 			$playkitConfig = kConf::get('playkit-js');
 			if (array_key_exists('internal_bundler_url', $playkitConfig))
 				$this->bundlerUrl = rtrim($playkitConfig['internal_bundler_url']);
@@ -247,7 +265,9 @@ class embedPlaykitJsAction extends sfAction
 				$this->sourceMapLoader = rtrim($playkitConfig['playkit_js_source_map_loader']);
 			
 			
-		} catch (Exception $ex) {
+		} 
+		catch (Exception $ex) 
+		{
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
 		
@@ -265,6 +285,8 @@ class embedPlaykitJsAction extends sfAction
 		//create base64 bundle name from json config
 		$config_str = json_encode($this->bundleConfig);
 		$this->bundle_name = base64_encode($config_str);
+		if($this->cacheVersion)
+			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
 	}
 	
 	
