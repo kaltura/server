@@ -26,12 +26,6 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
 
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		if (kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
-			$dbUserEntry->setPrivacyContext($privacyContexts[0]);
-		}
-		
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -149,11 +143,6 @@ class UserEntryService extends KalturaBaseService {
 			$filter->userIdIn = null;
 		}
 		$ueFilter = $filter->toObject($ueFilter);
-		if (kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
-			$ueFilter->set("_eq_privacy_context", $privacyContexts[0]);
-		}
 		
 		return kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
 	}

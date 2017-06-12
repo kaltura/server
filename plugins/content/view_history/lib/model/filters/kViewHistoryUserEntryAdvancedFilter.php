@@ -1,4 +1,4 @@
-<?php
+;<?php
 /**
  * @package plugins.viewHistory
  * @subpackage model.filters
@@ -11,7 +11,8 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 	public $filter;
 	
 	protected $disable;
-	const ENTRIES_COUNT = 100;
+	const ENTRIES_COUNT = 200;
+	const USER_ENTRIES_LIMIT = 2000;
 	
 	/**
 	 * Function to retrieve
@@ -24,15 +25,9 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		return UserEntryPeer::doCount($c);
 	}
 	
-	public function getEntryIds($entryIds = array())
+	public function getEntryIds($limit, $offset = 0, $entryIds = array())
 	{
 		$userEntryCriteria = new Criteria();
-		
-		if (kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
-			$userEntryCriteria->addAnd(UserEntryPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
-		}
 		
 		$userEntryCriteria->addSelectColumn(UserEntryPeer::ENTRY_ID);
 		if($this->filter)
@@ -44,6 +39,8 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		}
 		
 		$userEntryCriteria->add(UserEntryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
+		$userEntryCriteria->setLimit($limit);
+		$userEntryCriteria->setOffset($offset);
 		
 		$stmt = UserEntryPeer::doSelectStmt($userEntryCriteria);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -83,45 +80,67 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 	
 	public function applyCondition(IKalturaDbQuery $query)
 	{
+		/* @var $query KalturaCriteria */
 		if ($this->disable)
 		{
 			return;
 		}
-		
-		//get all userEntries
-		$entryIds = $this->getEntryIds();
+		$entryIds = array();
 		$limit = $query->getLimit();
 		
-		/* @var $query KalturaCriteria */
-		if (count($entryIds) <= $limit || !$limit)
+		$query->setLimit(self::ENTRIES_COUNT);
+		$this->disable = true;
+		
+		$entries = entryPeer::doSelect($query);
+		$totalCountEntries = $query->getRecordsCount();
+		$query->setLimit($limit);
+		
+		if ($totalCountEntries <= self::ENTRIES_COUNT)
 		{
-			KalturaLog::info("Few user entries found - merge with query");
-		}
-		else 
-		{
-			KalturaLog::info("Too many user entries found");
-			$this->disable = true;
-			$query->setLimit(self::ENTRIES_COUNT);
-			$entries = entryPeer::doSelect($query);
-			$query->setLimit($limit);
-			
+			KalturaLog::info("Few entries found - merge with query");
 			$ids = array();
 			foreach ($entries as $entry)
 			{
 				$ids[] = $entry->getId();
 			}
 			
-			$entryIds = $this->getEntryIds($ids);
-		
-			if (count($entryIds) <= $limit)
+			$entryIds = $this->getEntryIds($limit, 0, $ids);
+		}	
+	
+		else 
+		{
+			KalturaLog::info("Not all objects will return from the search - consider narrowing the search criteria");
+			$userEntriesCount = 0;
+			while (true)
 			{
-				KalturaLog::info("Few user entries found - merge with query");
+				if (count($entryIds) >= $limit)
+				{
+					KalturaLog::info("Enough entry IDs retrieved");
+					break;
+				}
+				if ($userEntriesCount > self::USER_ENTRIES_LIMIT)
+				{
+					KalturaLog::info("User entry search limit reached!");
+					break;
+				}
+				
+				$currEntryIds = $this->getEntryIds($limit,$userEntriesCount);
+				$query->addColumnWhere(entryPeer::ID, $currEntryIds, KalturaCriteria::IN);
+				$query->forcedOrderIds = $currEntryIds;
+				$entries = entryPeer::doSelect($query);
+				foreach($entries as $entry)
+				{
+					if(count($entryIds) >= $limit)
+					{
+						break;
+					}
+					$entryIds[] = $entry->getId();
+				}
+				
+				$userEntriesCount += $limit;
+				kMemoryManager::clearMemory();
 			}
-			else 
-			{
-				KalturaLog::info("Not all objects will return from the search - consider narrowing the search criteria");
-				$entryIds = array_slice($entryIds, 0, $limit);
-			}
+			
 		}
 		
 		if (!count($entryIds))

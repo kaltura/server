@@ -67,8 +67,6 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 
 		$pager->attachToCriteria($c);
 		
-		$this->modifyCriteria($c);
-		
 		$list = UserEntryPeer::doSelect($c);
 
 		$resultCount = count($list);
@@ -158,8 +156,4 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		return $anonKuserIds;
 	}
 	
-	protected function modifyCriteria ($c)
-	{
-		//to be overridden by child classes
-	}
 }
