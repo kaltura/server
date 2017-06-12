@@ -517,23 +517,8 @@ class playManifestAction extends kalturaAction
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
-		
-		$this->duration = array_sum($durations) / 1000;
 
-		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
-		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
-
-		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
-		{
-			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
-			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
-		}
-
-		$this->deliveryAttributes->setStorageId(null);
-		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
+		$this->setPlaylistFlavorAssets($durations, $mediaEntry->getId());
 	}
 
 	private function filterFlavorsByAssetIdOrParamsIds($flavorAssets)
@@ -848,21 +833,7 @@ class playManifestAction extends kalturaAction
 				{
 					$this->deliveryAttributes->setHasValidSequences(true);
 					list($entryIds, $durations, $mediaEntry) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries);
-					$this->duration = array_sum($durations) / 1000;
-
-					$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entry->getId());
-					$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-					$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-					$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
-
-					if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
-					{
-						$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
-						if (count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-							$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
-					}
-					$this->deliveryAttributes->setStorageId(null);
-					$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
+					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
 				}
 			}
 			if (!$this->deliveryAttributes->getHasValidSequences())
@@ -1263,5 +1234,29 @@ class playManifestAction extends kalturaAction
 		$renderer->setDeliveryCode($deliveryCode);
 		
 		$renderer->output();
+	}
+
+	/**
+	 * @param $durations
+	 * @param $mediaEntry
+	 */
+	protected function setPlaylistFlavorAssets($durations, $mediaEntryId)
+	{
+		$this->duration = array_sum($durations) / 1000;
+
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntryId);
+		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
+
+		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
+		{
+			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+			if (count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
+		}
+
+		$this->deliveryAttributes->setStorageId(null);
+		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
 	}
 }
