@@ -359,7 +359,7 @@ class myEntryUtils
 			}
 		}
 		
-		if($entry->getSourceType() === EntrySourceType::KALTURA_RECORDED_LIVE)
+		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
 			if(myEntryUtils::shouldServeVodFromLive($entry, false))
