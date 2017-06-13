@@ -278,7 +278,7 @@ class kCurrentContext
 
 	public static function getCurrentPartnerId()
 	{
-		if(self::$partner_id)
+		if(isset(self::$partner_id))
 			return self::$partner_id;
 			
 		return self::$ks_partner_id;
