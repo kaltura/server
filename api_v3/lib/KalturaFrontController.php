@@ -166,7 +166,12 @@ class KalturaFrontController
 					if(intval($matches[1]) == $index)
 					{
 						$attributePath = explode(':', $matches[2]);
-						$params[$key] = str_replace($path, $this->getValueFromObject($result, $attributePath), $params[$key]);
+						
+						$valueFromObject = $this->getValueFromObject($result, $attributePath);
+						if(!$valueFromObject)
+							throw new KalturaAPIException(KalturaErrors::FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE, $path);
+							
+						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
 					}
 				}
 			}
@@ -295,6 +300,9 @@ class KalturaFrontController
 							
 				try
 				{
+					if($listOfRequests[$i]['error'])
+						throw $listOfRequests[$i]['error'];
+					
 					$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
 				}
 				catch(Exception $ex)
@@ -311,7 +319,14 @@ class KalturaFrontController
 			{
 				if(isset($multiRequestResultsPaths[$nextMultiRequestIndex]))
 				{
-					$listOfRequests[$nextMultiRequestIndex] = $this->replaceMultiRequestResults(kCurrentContext::$multiRequest_index, $multiRequestResultsPaths[$nextMultiRequestIndex], $listOfRequests[$nextMultiRequestIndex], $currentResult);
+					try 
+					{
+						$listOfRequests[$nextMultiRequestIndex] = $this->replaceMultiRequestResults(kCurrentContext::$multiRequest_index, $multiRequestResultsPaths[$nextMultiRequestIndex], $listOfRequests[$nextMultiRequestIndex], $currentResult);
+					}
+					catch(Exception $ex)
+					{
+						$listOfRequests[$nextMultiRequestIndex]['error'] = $ex;
+					}
 				}
 			}
 			
