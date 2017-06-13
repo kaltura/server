@@ -27,10 +27,10 @@ function deployWebcastPushNotifications()
 		return;
 	}
 	
-	passthru("php $script $config");	
-	passthru("php $script $config");
-	passthru("php $script $config");
-	passthru("php $script $config");
+	passthru("php $script $codeQnaConfig");	
+	passthru("php $script $publicQnaConfig");
+	passthru("php $script $userQnaConfig");
+	passthru("php $script $pollsConfig");
 }
 
 function generateClients()
@@ -62,7 +62,6 @@ function installRequirePlugins()
 	KalturaLog::debug("Loading Plugins config from [$pluginsFilePath]");
 	
 	$pluginsData = file_get_contents($pluginsFilePath);
-	echo "pluginsData = " . print_r($pluginsData, true) . "\n"; 
 	foreach ($requiredPlugins as $requiredPlugin)
 	{
 		//check if plugin exists in file but is disabled
