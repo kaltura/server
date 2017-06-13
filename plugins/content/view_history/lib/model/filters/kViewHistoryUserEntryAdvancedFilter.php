@@ -104,9 +104,10 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 					break;
 				}
 				
-				$currEntryIds = UserEntryPeer::getEntryIdsByFilter($chunkSize, $userEntriesCount, $this->filter);
+				$currEntryIds = UserEntryPeer::getEntryIdsByFilter($chunkSize, $userEntryOffset, $this->filter);
 				$query->addColumnWhere(entryPeer::ID, $currEntryIds, KalturaCriteria::IN);
 				$query->forcedOrderIds = $currEntryIds;
+				$query->setLimit($chunkSize);
 				$entries = entryPeer::doSelect($query);
 				foreach($entries as $entry)
 				{
@@ -125,6 +126,8 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 				$userEntryOffset += $chunkSize;
 				kMemoryManager::clearMemory();
 			}
+			
+			$query->setLimit($limit);
 			
 		}
 		
