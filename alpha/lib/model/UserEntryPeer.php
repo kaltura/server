@@ -55,5 +55,28 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		}
 		return parent::OM_CLASS;
 	}
+	
+	public static function getEntryIdsByFilter($limit, $offset = 0, $filter = null, $entryIds = array())
+	{
+		$userEntryCriteria = new Criteria();
+		
+		$userEntryCriteria->addSelectColumn(self::ENTRY_ID);
+		if($filter)
+			$filter->attachToCriteria($userEntryCriteria);
+		
+		if(count ($entryIds))
+		{
+			$userEntryCriteria->add(self::ENTRY_ID, $entryIds, Criteria::IN);
+		}
+		
+		$userEntryCriteria->add(self::PARTNER_ID, kCurrentContext::$ks_partner_id);
+		$userEntryCriteria->setLimit($limit);
+		$userEntryCriteria->setOffset($offset);
+		
+		$stmt = self::doSelectStmt($userEntryCriteria);
+		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		
+		return $ids;
+	}
 
 } // UserEntryPeer
