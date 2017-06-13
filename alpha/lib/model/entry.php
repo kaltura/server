@@ -3709,7 +3709,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	protected function addParentEntryToObjectParams(&$body)
 	{
 		$parentEntry = $this->getParentEntry();
-		if($parentEntry->getId() == $this->getId())
+		if(!$parentEntry || $parentEntry->getId() == $this->getId())
 			return;
 		
 		$body['parent_entry'] = array(
