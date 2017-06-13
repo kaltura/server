@@ -7,13 +7,14 @@
 
 ### Configuration ###
 
-	1. Update configurations/rabbit_mq.ini placeholders with the rabbit information.
-	2. Follow instrunctions of pub-sub-server config update required as mentioend in: https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md
-	
+	Please note that for webcast to work you will need to have rabbit and pub-sub-server installed and correctly configured. For refernce view:
+	1. Install rabbit_mq (for reference view, https://www.rabbitmq.com/download.html)
+	2. Update configurations/rabbit_mq.ini placeholders with the rabbit information.
+	3. Install pub-sub-server (for reference view: https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md)
 
 ### Deployment scripts ###
 
-	Before runing deployimend screipts you need to replace all teh tokens with the proper values in the followign file list: 
+	Before runing deployimend screipts you need to replace all the tokens with the proper values in the following file list (Remove "template" from the file names):
 	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
 	2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
 	3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
@@ -28,9 +29,7 @@
 	
 #### Known Issues & Limitations ####
 
-	Please note that for webcast to work you will need to have rabbit and pub-sub-server installed and correctly configured. For refernce view:
-	1. https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md
-	2. https://www.rabbitmq.com/download.html
+	None.
 
 ## eCDN parent redundency ##
 
