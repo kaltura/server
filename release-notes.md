@@ -11,6 +11,7 @@
 	1. Install rabbit_mq (for reference view, https://www.rabbitmq.com/download.html)
 	2. Update configurations/rabbit_mq.ini placeholders with the rabbit information.
 	3. Install pub-sub-server (for reference view: https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md)
+	4. Add the following to you plugins.ini file: "PushNotification", "Queue", "RabbitMQ"
 
 ### Deployment scripts ###
 
@@ -25,6 +26,8 @@
 	php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_latest_live_params.php
 	php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
 	php /opt/kaltura/app/deployment/updates/scripts/2017_05_24_deploy_webcast_related_profiles.php
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/generator/generate.php
 	php /opt/kaltura/app/deployment/base/scripts/installWebcast.php
 	
 #### Known Issues & Limitations ####
