@@ -57,6 +57,8 @@
 	</table>
 </div>
 
+<?php echo $this->getDryRunLogForm; ?>
+
 <script type="text/javascript">
 $(function(){
 	addSubTitle('Media Repurposing Profiles');
@@ -205,7 +207,6 @@ function configureMediaRepurposing(mediaRepurposingId)
 		return;
 	}
 
-
 	mediaRepurposingIdStr = '/new_partner_id/' + partnerId + '/media_repurposing_id/' + mediaRepurposingId;
 	loadMediaRepurposing(mediaRepurposingIdStr);
 	
@@ -249,6 +250,38 @@ function loadMediaRepurposing(paramStr)
 		}
 	);
 }
+
+function getDryRunLog(dryRunId) {
+	if (!isValidParam(dryRunId, 'Dry Run id', true))
+		return;
+	
+	let mediaRepurposingIdStr = '/dryRunId/' + dryRunId;
+	loadMediaRepurposingLogs(mediaRepurposingIdStr);
+}
+
+function loadMediaRepurposingLogs(paramStr) {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingLogsAction')); ?>' + paramStr;
+
+	jQuery('#media-repurposing-logs-dialog').remove();
+	dialogDiv = jQuery('<div id="media-repurposing-logs-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+
+	dialogDiv.dialog({bgiframe: true, modal: true, resizable: false, width: 700, height: 700,
+		title: '<?php echo $this->translate('Media Repurposing Profile Logs'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Close'); ?>': function() {jQuery(this).dialog('close');}
+		}
+	});
+
+	dialogDiv.load(url, null, function() {
+			jQuery(this).find('#frmMediaRepurposingLogs').ajaxForm({
+				success: function(html) {jQuery('#frmMediaRepurposingLogs').replaceWith(html);},
+				iframe: true
+			});
+		}
+	);
+
+}
+
 
 
 function rearrangeData() {
