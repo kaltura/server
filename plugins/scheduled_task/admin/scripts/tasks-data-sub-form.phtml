@@ -4,7 +4,7 @@
 		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
 		<?php echo $subForm; ?>
 	<?php endforeach; ?>
-	<a class="add-task" style="display:none" href="javascript:;" onclick="addTask(this);" >+ Add Task</a>
+	<a id="addTaskButtonInForm" class="add-task" style="display:none" href="javascript:;" onclick="addTask(this);" >+ Add Task</a>
 </fieldset>
 
 <style type="text/css">
@@ -88,9 +88,12 @@
 	function populateTaskFromObject(object) {
 		// because we increase the index before when adding the form
 		let currentIndex = index-1;
+		let idElem = jQuery('#mr_task_' + currentIndex + "-TaskId");
 
 		//set the task Id and time to next
-		jQuery('#mr_task_' + currentIndex + "-TaskId").val(object.id);
+		idElem.val(object.id);
+		if (object.id)
+			idElem.closest("fieldset").find('[id=removeTaskButton]').hide();
 		jQuery('#mr_task_' + currentIndex + "-taskTime").val(object.taskTimeToNext);
 
 		var taskTag = 'mr_task_data_'+currentIndex;
