@@ -33,14 +33,6 @@ function deployWebcastPushNotifications()
 	passthru("php $script $config");
 }
 
-function generateFilters()
-{
-	debug("Generating updated filters");
-	$script = realpath(dirname(__FILE__) . "/../../../api_v3/generator/generate_filters.php");
-	passthru("php $script");
-	KalturaLog::debug("Done Generating updated filters");
-}
-
 function generateClients()
 {
 	KalturaLog::debug("Generating updated clientLibs");
