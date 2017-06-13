@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
 	<config>
-		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
 		<partnerId>-2</partnerId>
 		<clientTag>Stand alone php 1.0.0</clientTag>
 		<curlTimeout>30</curlTimeout>
@@ -9,7 +9,7 @@
 	</config>
 	<session>
         <partnerId>-2</partnerId>
-        <secret>{prompt:Partner -2 admin_secret:}</secret>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
         <sessionType>2</sessionType>
     </session>
     
