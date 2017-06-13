@@ -19,7 +19,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder();
-		array_filter($physicalFiles, "validatePhysicalFile");
+		$physicalFiles = array_filter($physicalFiles, array($this, 'validatePhysicalFile'));
 		if (count($physicalFiles) <= 0)
 			return;
 
@@ -32,7 +32,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		do
 		{
 			$pager->pageIndex++;
-			$dropFolderFiles = $this->loadDropFolderFiles($pager);
+			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager);
 
 			foreach ($dropFolderFiles as $dropFolderFile)
 			{
@@ -42,7 +42,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 					unset($physicalFiles[$dropFolderFile->fileName]);
 
 					$maxModificationTime = ($physicalFile->modificationTime > $maxModificationTime) ? $physicalFile->modificationTime : $maxModificationTime;
-					KalturaLog::info('Watch file [' . $physicalFile->fileName . ']');
+					KalturaLog::info('Watch file [' . $physicalFile->filename . ']');
 					$this->handleExistingDropFolderFile($dropFolderFile);
 				} else
 				{
