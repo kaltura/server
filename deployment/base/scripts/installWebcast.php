@@ -8,7 +8,6 @@ if($pluginsUpdated)
 {
 	installPlugins();
 	generateClients();
-	generateFilters();
 }
 
 deployWebcastPushNotifications();
