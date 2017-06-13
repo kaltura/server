@@ -135,16 +135,28 @@ class UserEntryService extends KalturaBaseService {
 		$ueFilter = $filter->toObject($ueFilter);
 		if ($filter->userIdEqual)
 		{
+			if(!kuserPeer::retrieveByPK($filter->userIdEqual))
+			{
+				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
+			}
+			
 			$ueFilter->set("_eq_user_id", kuserPeer::retrieveByPK($filter->userIdEqual)->getPuserId());
 		}
 		if($filter->userIdIn)
 		{
-			$kusers = explode(',', $filter->userIdIn);
+			$kusersIds = explode(',', $filter->userIdIn);
+			$kusers = kuserPeer::retrieveByPKs($kusersIds);
+			
 			$pusers = array();
 			foreach ($kusers as $kuser)
 			{
-				$pusers[] = kuserPeer::retrieveByPK($kuser)->getPuserId();
+				$pusers[] = $kuser->getPuserId();
 			}	
+			
+			if(!count($pusers))
+			{
+				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
+			}
 		
 			$ueFilter->set("_in_user_id", implode (',', $pusers));
 		}
