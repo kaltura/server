@@ -612,7 +612,7 @@ class serveFlavorAction extends kalturaAction
 				if ($captionFileSync)
 					$captionFullPath = $captionFileSync->getFullPath();
 			}
-//			$captionClips[] = array('type' => 'source', 'path' => $captionFullPath);
+			$captionClips[] = array('type' => 'source', 'path' => $captionFullPath);
 		}
 		return $captionClips;
 	}
