@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . "/../../../alpha/scripts/bootstrap.php");
+
 checkMandatoryPluginsEnabled();
 deployWebcastPushNotifications();
 
@@ -32,7 +34,7 @@ function checkMandatoryPluginsEnabled()
 {
 	$requiredPlugins = array("PushNotification", "Queue", "RabbitMQ");
 	$pluginsFilePath = realpath(dirname(__FILE__) . "/../../../configurations/plugins.ini");
-	echo ("Loading Plugins config from [$pluginsFilePath]" . PHP_EOL);
+	KalturaLog::debug("Loading Plugins config from [$pluginsFilePath]");
 	
 	$pluginsData = file_get_contents($pluginsFilePath);
 	foreach ($requiredPlugins as $requiredPlugin)
@@ -40,13 +42,13 @@ function checkMandatoryPluginsEnabled()
 		//check if plugin exists in file but is disabled
 		if(strpos($pluginsData, ";".$requiredPlugin) !== false)
 		{
-			echo ("[$requiredPlugin] is disabled, aborting execution" . PHP_EOL);
+			KalturaLog::debug("[$requiredPlugin] is disabled, aborting execution");
 			exit(-2);
 		}
 		
 		if(strpos($pluginsData, $requiredPlugin) === false)
 		{
-			echo ("[$requiredPlugin] not found in plugins data, aborting execution" . PHP_EOL);
+			KalturaLog::debug("[$requiredPlugin] not found in plugins data, aborting execution");
 			exit(-2);
 		}
 	}
