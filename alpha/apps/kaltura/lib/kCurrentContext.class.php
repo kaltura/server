@@ -228,10 +228,6 @@ class kCurrentContext
 			kCurrentContext::$ks_uid = $ksObj->user;
 			kCurrentContext::$master_partner_id = $ksObj->master_partner_id ? $ksObj->master_partner_id : kCurrentContext::$ks_partner_id;
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
-			
-			if($requestedPartnerId == PartnerPeer::GLOBAL_PARTNER && self::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER)
-				$requestedPartnerId = null;
-			
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 		}
@@ -278,7 +274,7 @@ class kCurrentContext
 
 	public static function getCurrentPartnerId()
 	{
-		if(isset(self::$partner_id))
+		if(self::$partner_id)
 			return self::$partner_id;
 			
 		return self::$ks_partner_id;
