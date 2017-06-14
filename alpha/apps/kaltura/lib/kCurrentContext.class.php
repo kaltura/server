@@ -276,9 +276,9 @@ class kCurrentContext
 		return kSessionBase::SESSION_TYPE_USER;
 	}
 
-	public static function getCurrentPartnerId()
+	public static function getCurrentPartnerId($allowGlobalPartner = false)
 	{
-		if(isset(self::$partner_id))
+		if(($allowGlobalPartner && isset(self::$partner_id)) || self::$partner_id)
 			return self::$partner_id;
 			
 		return self::$ks_partner_id;
