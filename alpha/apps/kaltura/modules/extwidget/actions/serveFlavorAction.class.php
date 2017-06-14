@@ -275,6 +275,10 @@ class serveFlavorAction extends kalturaAction
 			$sequences[] = array('clips' => $clips);
 		}
 
+		$captionClips = $this->getCaptionClips($entryIds);
+		if (count($captionClips))
+			$sequences[] = array('clips' => $captionClips);
+
 		// build the media set
 		if ($isLive)
 		{
@@ -582,5 +586,34 @@ class serveFlavorAction extends kalturaAction
 
 		$flvWrapper->dump(self::CHUNK_SIZE, $fromByte, $toByte, $audioOnly, $seekFromBytes, $rangeFrom, $rangeTo, $cuepointTime, $cuepointPos);
 		KExternalErrors::dieGracefully();
+	}
+
+	/**
+	 * @param $entryIds
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function getCaptionClips($entryIds)
+	{
+		$captionClips = array();
+		foreach ($entryIds as $entryId)
+		{
+			$c = new Criteria();
+			$c->addAnd(assetPeer::ENTRY_ID, $entryId);
+			$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+			$captionAssets = assetPeer::doSelect($c);
+			$captionFullPath = null;
+			foreach ($captionAssets as $captionAsset)
+			{
+				/* @var CaptionAsset $captionAsset */
+				$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+
+				list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
+				if ($captionFileSync)
+					$captionFullPath = $captionFileSync->getFullPath();
+			}
+//			$captionClips[] = array('type' => 'source', 'path' => $captionFullPath);
+		}
+		return $captionClips;
 	}
 }
