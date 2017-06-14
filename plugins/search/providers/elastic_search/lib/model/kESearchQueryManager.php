@@ -62,6 +62,9 @@ class kESearchQueryManager
 		if (isset($categorizedSearchItems['metadataSearchItems']))
 			$outQuery['bool']['must'][] = self::createMetadataSearchQuery($categorizedSearchItems['metadataSearchItems'], $boolOperator, $additionalParams);
 
+		if (isset($categorizedSearchItems['cuepointSearchItems']))
+			$outQuery['bool']['must'][] = self::createCuePointSearchQuery($categorizedSearchItems['cuepointSearchItems'], $boolOperator, $additionalParams);
+
 		if (isset($categorizedSearchItems['operatorSearchItems']))
 		{
 			foreach ($categorizedSearchItems['operatorSearchItems'] as $operatorSearchItem)
@@ -185,6 +188,21 @@ class kESearchQueryManager
 			}
 		}
 		return $metadataQuery;
+	}
+
+	public static function createCuePointSearchQuery(array $eSearchCuePointItemsArr, $boolOperator, $additionalParams = null)
+	{
+		$cuePointQuery['nested']['path'] = 'cue_points';
+		$cuePointQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
+		foreach ($eSearchCuePointItemsArr as $cuePointSearchItem)
+		{
+			/**
+			 * @var ESearchEntryItem $cuePointSearchItem
+			 */
+			$queryVerbs = $cuePointSearchItem->getQueryVerbs();
+			$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]][$queryVerbs[1]] = array($cuePointSearchItem->getFieldName() => strtolower($cuePointSearchItem->getSearchTerm()));
+		}
+		return $cuePointQuery;
 	}
 }
 

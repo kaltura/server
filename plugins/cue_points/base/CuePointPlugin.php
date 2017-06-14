@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -449,4 +449,18 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 
 		return $indexOnEntryTypes;
 	}
+
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if ($baseClass == 'KalturaESearchItemData' && $enumValue == 'cue_points')
+			return new KalturaESearchCuePointItemData();
+		if ($baseClass == 'ESearchItemData' && $enumValue == 'cue_points')
+			return new ESearchCuePointItemData();
+	}
+
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+	}
+
+
 }

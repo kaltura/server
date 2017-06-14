@@ -71,6 +71,13 @@ class ESearchCaptionItemData extends ESearchItemData
 		$this->endsAt = $endsAt;
 	}
 
+	public function loadFromElasticHits($objectResult)
+	{
+		$this->setLine($objectResult['_source']['content']);
+		$this->setStartsAt($objectResult['_source']['start_time']);
+		$this->setEndsAt($objectResult['_source']['end_time']);
+
+	}
 
 
 }
