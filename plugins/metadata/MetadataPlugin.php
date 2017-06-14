@@ -255,7 +255,12 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			if ($enumValue == 'kMetadataResponseProfileMapping')
 				return new KalturaMetadataResponseProfileMapping();
 		}
-		
+
+		if ($baseClass == 'KalturaESearchItemData' && $enumValue == 'metadata')
+			return new KalturaESearchMetadataItemData();
+		if ($baseClass == 'ESearchItemData' && $enumValue == 'metadata')
+			return new ESearchMetadataItemData();
+
 		return null;
 	}
 	

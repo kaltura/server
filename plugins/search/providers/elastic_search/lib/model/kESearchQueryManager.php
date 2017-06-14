@@ -58,6 +58,10 @@ class kESearchQueryManager
 				$outQuery['bool'][$queryVerb][] = $queryVal;
 		}
 
+
+		if (isset($categorizedSearchItems['metadataSearchItems']))
+			$outQuery['bool']['must'][] = self::createMetadataSearchQuery($categorizedSearchItems['metadataSearchItems'], $boolOperator, $additionalParams);
+
 		if (isset($categorizedSearchItems['operatorSearchItems']))
 		{
 			foreach ($categorizedSearchItems['operatorSearchItems'] as $operatorSearchItem)
@@ -144,6 +148,43 @@ class kESearchQueryManager
 			$captionQuery['has_child']['query']['nested']['query']['bool'][$addParamKey] = $addParamVal;
 		}
 		return $captionQuery;
+	}
+
+	public static function createMetadataSearchQuery(array $eSearchMetadataItemsArr, $boolOperator, $additionalParams = null)
+	{
+		$metadataQuery['nested']['path'] = 'metadata';
+		$metadataQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
+		foreach ($eSearchMetadataItemsArr as $metadataESearchItem)
+		{
+			/* @var ESearchMetadataItem $metadataESearchItem */
+			switch ($metadataESearchItem->getItemType())
+			{
+				case ESearchItemType::EXACT_MATCH:
+					$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+						'term' => array(
+							'metadata.value_text' => strtolower($metadataESearchItem->getSearchTerm())
+						)
+					);
+					break;
+			}
+			if ($metadataESearchItem->getXpath())
+			{
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'term' => array(
+						'metadata.xpath' => strtolower($metadataESearchItem->getXpath())
+					)
+				);
+			}
+			if ($metadataESearchItem->getMetadataProfileId())
+			{
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'term' => array(
+						'metadata.metadata_profile_id' => strtolower($metadataESearchItem->getMetadataProfileId())
+					)
+				);
+			}
+		}
+		return $metadataQuery;
 	}
 }
 

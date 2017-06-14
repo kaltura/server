@@ -79,6 +79,17 @@ class elasticSearchUtils
                     }
 			    }
 		    }
+		    foreach ($elasticEntry['inner_hits']['metadata']['hits']['hits'] as $metadataResult)
+		    {
+			    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', 'metadata');
+			    if ($currItemData)
+			    {
+				    $currItemData->setXpath($metadataResult['_source']['xpath']);
+				    $currItemData->setMetadataProfileId($metadataResult['_source']['metadata_profile_id']);
+				    $currItemData->setValueText(implode(',',$metadataResult['_source']['value_text']));
+				    $itemData[] = $currItemData;
+			    }
+		    }
 		    $entriesData[$elasticEntry['_id']] = $itemData;
 	    }
 	    $entries = entryPeer::retrieveByPKs(array_keys($entriesData));
