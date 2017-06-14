@@ -48,11 +48,6 @@ abstract class ESearchItem extends BaseObject
 		return $queryVerb;
 	}
 
-	/**
-	 * In order to implement visitor/visited design pattern.
-	 */
-	abstract public function createSubQuery();
-
 	abstract public function getType();
 
 }

@@ -55,12 +55,6 @@ class ESearchEntryItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function createSubQuery()
-	{
-		return $this->getSearchTerm();
-//		return kESearchQueryManager::createEntrySearchQuery($this);
-	}
-
 	public function getType()
 	{
 		return 'entry';

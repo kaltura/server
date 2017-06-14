@@ -12,11 +12,6 @@ class KalturaESearchOperator extends KalturaESearchBaseItem {
     public $operator;
 
     /**
-     * @var bool
-     */
-    public $not;
-
-    /**
      *  @var KalturaESearchBaseItemArray
      */
     public $searchItems;
