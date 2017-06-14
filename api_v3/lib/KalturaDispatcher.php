@@ -36,9 +36,11 @@ class KalturaDispatcher
 		$userId = "";
 		$ksStr = isset($params["ks"]) ? $params["ks"] : null ;
 		
-		$p = isset($params["p"]) && $ksStr ? $params["p"] : null;
+		//If trying to impersonate to partner zero validate that a ksString is provided,
+		//In case an invalid partner tries to do the impersonation it will be prevented when building the current context.
+		$p = isset($params["p"]) && ($params["p"] || $ksStr) ? $params["p"] : null;
 		if (!$p)
-			$p = isset($params["partnerId"]) && $ksStr ? $params["partnerId"] : null;
+			$p = isset($params["partnerId"]) && ($params["partnerId"] || $ksStr) ? $params["partnerId"] : null;
 		
 		$GLOBALS["partnerId"] = $p; // set for logger
 		 
