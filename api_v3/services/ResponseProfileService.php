@@ -46,7 +46,7 @@ class ResponseProfileService extends KalturaBaseService
 	{
 		$dbResponseProfile = $addResponseProfile->toInsertableObject();
 		/* @var $dbResponseProfile ResponseProfile */
-		$dbResponseProfile->setPartnerId(kCurrentContext::getCurrentPartnerId(true));
+		$dbResponseProfile->setPartnerId($this->getPartnerId());
 		$dbResponseProfile->setStatus(ResponseProfileStatus::ENABLED);
 		$dbResponseProfile->save();
 		
