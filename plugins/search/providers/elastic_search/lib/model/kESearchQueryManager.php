@@ -58,6 +58,10 @@ class kESearchQueryManager
 				$outQuery['bool'][$queryVerb][] = $queryVal;
 		}
 
+
+		if (isset($categorizedSearchItems['metadataSearchItems']))
+			$outQuery['bool']['must'][] = self::createMetadataSearchQuery($categorizedSearchItems['metadataSearchItems'], $boolOperator, $additionalParams);
+
 		if (isset($categorizedSearchItems['operatorSearchItems']))
 		{
 			foreach ($categorizedSearchItems['operatorSearchItems'] as $operatorSearchItem)
@@ -85,45 +89,45 @@ class kESearchQueryManager
 
 	public static function createCaptionSearchQuery(array $eSearchCaptionItemsArr, $boolOperator, $additionalParams = null)
 	{
-		$captionQuery['has_child']['type'] = ElasticIndexMap::ELASTIC_CAPTION_TYPE;
-		$captionQuery['has_child']['query']['nested']['path'] = 'lines';
-		$captionQuery['has_child']['query']['nested']['inner_hits'] = array('size' => 10); //TODO: get this parameter from config
-		$captionQuery['has_child']['inner_hits'] = array('size' => 10, '_source' => false);
+		$captionQuery['nested']['path'] = 'caption_assets';
+		$captionQuery['nested']['query']['nested']['inner_hits'] = array('size' => 10); //TODO: get this parameter from config
+		$captionQuery['nested']['inner_hits'] = array('size' => 10, '_source' => false);
+		$captionQuery['nested']['query']['nested']['path'] = "caption_assets.lines";
 		foreach ($eSearchCaptionItemsArr as $eSearchCaptionItem)
 		{
 			/* @var ESearchCaptionItem $eSearchCaptionItem */
 			switch ($eSearchCaptionItem->getItemType())
 			{
 				case ESearchItemType::EXACT_MATCH:
-					$captionQuery['has_child']['query']['nested']['query']['bool'][$boolOperator][] = array(
+					$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
 							'term' => array(
-								'lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
+								'caption_assets.lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
 							)
 						);
 					break;
 				case ESearchItemType::PARTIAL:
-					$captionQuery['has_child']['query']['nested']['query']['bool'][$boolOperator][] = array(
+					$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
 						'multi_match' => array(
 							'query' => strtolower($eSearchCaptionItem->getSearchTerm()),
 							'fields' => array(
-								'lines.content',
-								'lines.content_*' //todo change here if we want to choose the language to search
+								'caption_assets.lines.content',
+								'caption_assets.lines.content_*' //todo change here if we want to choose the language to search
 							),
 							'type' => 'most_fields'
 						)
 					);
 					break;
 				case ESearchItemType::STARTS_WITH:
-					$captionQuery['has_child']['query']['nested']['query']['bool'][$boolOperator][] = array(
+					$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
 						'prefix' => array(
-							'lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
+							'caption_assets.lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
 						)
 					);
 					break;
 				case ESearchItemType::DOESNT_CONTAIN:
 					$captionQuery['has_child']['query']['nested']['query']['bool']['must_not'][] = array(
 						'term' => array(
-							'lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
+							'caption_assets.lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
 						)
 					);
 					break;
@@ -144,6 +148,43 @@ class kESearchQueryManager
 			$captionQuery['has_child']['query']['nested']['query']['bool'][$addParamKey] = $addParamVal;
 		}
 		return $captionQuery;
+	}
+
+	public static function createMetadataSearchQuery(array $eSearchMetadataItemsArr, $boolOperator, $additionalParams = null)
+	{
+		$metadataQuery['nested']['path'] = 'metadata';
+		$metadataQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
+		foreach ($eSearchMetadataItemsArr as $metadataESearchItem)
+		{
+			/* @var ESearchMetadataItem $metadataESearchItem */
+			switch ($metadataESearchItem->getItemType())
+			{
+				case ESearchItemType::EXACT_MATCH:
+					$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+						'term' => array(
+							'metadata.value_text' => strtolower($metadataESearchItem->getSearchTerm())
+						)
+					);
+					break;
+			}
+			if ($metadataESearchItem->getXpath())
+			{
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'term' => array(
+						'metadata.xpath' => strtolower($metadataESearchItem->getXpath())
+					)
+				);
+			}
+			if ($metadataESearchItem->getMetadataProfileId())
+			{
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'term' => array(
+						'metadata.metadata_profile_id' => strtolower($metadataESearchItem->getMetadataProfileId())
+					)
+				);
+			}
+		}
+		return $metadataQuery;
 	}
 }
 

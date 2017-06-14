@@ -65,14 +65,28 @@ class elasticSearchUtils
 	    foreach ($elasticResults['hits']['hits'] as $elasticEntry)
 	    {
 		    $itemData = array();
-		    foreach ($elasticEntry['inner_hits']['caption']['hits']['hits'] as $captionAssetResult)
+		    foreach ($elasticEntry['inner_hits']['caption_assets']['hits']['hits'] as $captionAssetResult)
 		    {
-			    foreach ($captionAssetResult['inner_hits']['lines']['hits']['hits'] as $captionAssetItemResult)
+			    foreach ($captionAssetResult['inner_hits']['caption_assets.lines']['hits']['hits'] as $captionAssetItemResult)
 			    {
-				    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', $captionAssetResult['_type']);
-				    $currItemData->setLine($captionAssetItemResult['_source']['content']);
-				    $currItemData->setStartsAt($captionAssetItemResult['_source']['start_time']);
-				    $currItemData->setEndsAt($captionAssetItemResult['_source']['end_time']);
+				    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', 'caption');
+                    if ($currItemData)
+                    {
+                        $currItemData->setLine($captionAssetItemResult['_source']['content']);
+                        $currItemData->setStartsAt($captionAssetItemResult['_source']['start_time']);
+                        $currItemData->setEndsAt($captionAssetItemResult['_source']['end_time']);
+                        $itemData[] = $currItemData;
+                    }
+			    }
+		    }
+		    foreach ($elasticEntry['inner_hits']['metadata']['hits']['hits'] as $metadataResult)
+		    {
+			    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', 'metadata');
+			    if ($currItemData)
+			    {
+				    $currItemData->setXpath($metadataResult['_source']['xpath']);
+				    $currItemData->setMetadataProfileId($metadataResult['_source']['metadata_profile_id']);
+				    $currItemData->setValueText(implode(',',$metadataResult['_source']['value_text']));
 				    $itemData[] = $currItemData;
 			    }
 		    }
