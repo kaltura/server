@@ -6,7 +6,6 @@
 - Issue ID: PLAT-7535
 
 ### Configuration ###
-
 	1. Add the following to you plugins.ini file: "PushNotification", "Queue", "RabbitMQ". 
 	   (This will require execution of install plugins and new clients tp be genrated. Instrunctions can be found in the deploymnet script part).
 
@@ -21,17 +20,18 @@
 	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_latest_live_params.php
 	
 	Deploy Lecture_Capture conversion profile & flavors:
-	1. 	php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
+	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
 
 	Deploy Webcast Push notification and response profiles:
 	1. Response profiles:
 	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
 	   1. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/polls_response_profile.template.xml
 	   2. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/qna_response_profiles.template.xml
+	   
 	   Run deployment script:
 	   1. 	php /opt/kaltura/app/deployment/updates/scripts/2017_05_24_deploy_webcast_related_response_profiles.php
 
-	2. Push notitificationsL
+	2. Push notitifications:
 	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
 	   	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
 		2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
