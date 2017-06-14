@@ -38,7 +38,7 @@
 		3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
 		4. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/public_qna_notification.template.xml
 	
-		Run deployment script:
+	   Run deployment script:
 		1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 		2. php /opt/kaltura/app/generator/generate.php
 		3. php /opt/kaltura/app/deployment/updates/scripts/2017_06_14_deploy_webcast_push_notifications.php
