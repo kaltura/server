@@ -71,7 +71,12 @@ class ESearchMetadataItemData extends ESearchItemData
 		$this->valueText = $valueText;
 	}
 
-
+	public function loadFromElasticHits($objectResult)
+	{
+		$this->setXpath($objectResult['_source']['xpath']);
+		$this->setMetadataProfileId($objectResult['_source']['metadata_profile_id']);
+		$this->setValueText(implode(',',$objectResult['_source']['value_text']));
+	}
 
 
 }

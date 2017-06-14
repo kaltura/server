@@ -9,11 +9,6 @@ class ESearchOperator extends ESearchItem
 	protected $operator;
 
 	/**
-	 * @var boolean
-	 */
-	protected $not;
-
-	/**
 	 * @var array
 	 */
 	protected $searchItems;
@@ -35,22 +30,6 @@ class ESearchOperator extends ESearchItem
 	}
 
 	/**
-	 * @return boolean
-	 */
-	public function isNot()
-	{
-		return $this->not;
-	}
-
-	/**
-	 * @param boolean $not
-	 */
-	public function setNot($not)
-	{
-		$this->not = $not;
-	}
-
-	/**
 	 * @return array
 	 */
 	public function getSearchItems()
@@ -69,11 +48,6 @@ class ESearchOperator extends ESearchItem
 	public function createSearchQuery()
 	{
 		return kESearchQueryManager::createOperatorSearchQuery($this);
-	}
-
-	public function createSubQuery()
-	{
-		return $this;
 	}
 
 	public function getType()

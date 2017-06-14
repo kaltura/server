@@ -35,11 +35,6 @@ class ESearchCaptionItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function createSubQuery()
-	{
-		return $this->getSearchTerm();
-	}
-
 	public function getType()
 	{
 		return 'caption';

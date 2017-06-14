@@ -235,7 +235,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		if ($baseClass == 'KalturaESearchItemData' && $enumValue == 'caption')
 			return new KalturaESearchCaptionItemData();
-		if ($baseClass == 'ESearchItemData' && $enumValue == 'caption')
+		if ($baseClass == 'ESearchItemData' && $enumValue == 'caption_assets')
 			return new ESearchCaptionItemData();
 
 

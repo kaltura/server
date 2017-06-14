@@ -1,10 +1,10 @@
 <?php
 
-class ESearchEntryItem extends ESearchItem
+class ESearchCuePointItem extends ESearchItem
 {
 
 	/**
-	 * @var ESearchEntryFieldName
+	 * @var ESearchCuePointFieldName
 	 */
 	protected $fieldName;
 
@@ -14,13 +14,6 @@ class ESearchEntryItem extends ESearchItem
 	protected $searchTerm;
 
 	private static $exact_match_only_fields = array(
-		'category_ids',
-		'kuser_id',
-		'reference_id',
-		'redirect_entry_id',
-		'templated_entry_id',
-		'parent_id',
-		'recorded_entry_id',
 	);
 
 	/**
@@ -57,7 +50,7 @@ class ESearchEntryItem extends ESearchItem
 
 	public function getType()
 	{
-		return 'entry';
+		return 'cuepoint';
 	}
 
 	public function getQueryVerbs()
