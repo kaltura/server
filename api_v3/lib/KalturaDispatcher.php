@@ -32,16 +32,17 @@ class KalturaDispatcher
 	public function dispatch($service, $action, $params = array()) 
 	{
 		$start = microtime( true );
-	
-		// prevent impersonate to partner zero
-		$p = isset($params["p"]) && $params["p"] ? $params["p"] : null;
-		if (!$p) 
-			$p = isset($params["partnerId"]) && $params["partnerId"] ? $params["partnerId"] : null;
-			
-		$GLOBALS["partnerId"] = $p; // set for logger
 		
 		$userId = "";
 		$ksStr = isset($params["ks"]) ? $params["ks"] : null ;
+		
+		//If trying to impersonate to partner zero validate that a ksString is provided,
+		//In case an invalid partner tries to do the impersonation it will be prevented when building the current context.
+		$p = isset($params["p"]) && ($params["p"] || $ksStr) ? $params["p"] : null;
+		if (!$p)
+			$p = isset($params["partnerId"]) && ($params["partnerId"] || $ksStr) ? $params["partnerId"] : null;
+		
+		$GLOBALS["partnerId"] = $p; // set for logger
 		 
 		if (!$service)
 			throw new KalturaAPIException(KalturaErrors::SERVICE_NOT_SPECIFIED);
