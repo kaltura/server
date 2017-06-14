@@ -6,6 +6,8 @@
 - Issue ID: PLAT-7535
 
 ### Configuration ###
+	1. Add the following to you plugins.ini file: "PushNotification", "Queue", "RabbitMQ". 
+	   (This will require execution of install plugins and new clients tp be genrated. Instrunctions can be found in the deploymnet script part).
 
 	Please note that for webcast to work you will need to have rabbit and pub-sub-server installed and correctly configured. For refernce view:
 	1. Install rabbit_mq (for reference view, https://www.rabbitmq.com/download.html)
@@ -14,18 +16,32 @@
 
 ### Deployment scripts ###
 
-	Before runing deployimend screipts you need to replace all the tokens with the proper values in the following file list (Remove "template" from the file names):
-	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
-	2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
-	3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
-	4. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/public_qna_notification.template.xml
-	5. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/polls_response_profile.template.xml
-	6. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/qna_response_profiles.template.xml
+	Deploy new live HD flavors + Live Language package:
+	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_latest_live_params.php
+	
+	Deploy Lecture_Capture conversion profile & flavors:
+	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
 
-	php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_latest_live_params.php
-	php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
-	php /opt/kaltura/app/deployment/updates/scripts/2017_05_24_deploy_webcast_related_profiles.php
-	php /opt/kaltura/app/deployment/base/scripts/installWebcast.php
+	Deploy Webcast Push notification and response profiles:
+	1. Response profiles:
+	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	   1. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/polls_response_profile.template.xml
+	   2. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/qna_response_profiles.template.xml
+	   
+	   Run deployment script:
+	   1. 	php /opt/kaltura/app/deployment/updates/scripts/2017_05_24_deploy_webcast_related_response_profiles.php
+
+	2. Push notitifications:
+	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	   	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
+		2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
+		3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
+		4. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/public_qna_notification.template.xml
+	
+	   Run deployment script:
+		1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+		2. php /opt/kaltura/app/generator/generate.php
+		3. php /opt/kaltura/app/deployment/updates/scripts/2017_06_14_deploy_webcast_push_notifications.php
 	
 #### Known Issues & Limitations ####
 
