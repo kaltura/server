@@ -603,6 +603,7 @@ class serveFlavorAction extends kalturaAction
 			$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 			$captionAssets = assetPeer::doSelect($c);
 			$captionFullPath = null;
+			$captionExists = false;
 			foreach ($captionAssets as $captionAsset)
 			{
 				/* @var CaptionAsset $captionAsset */
@@ -610,9 +611,16 @@ class serveFlavorAction extends kalturaAction
 
 				list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
 				if ($captionFileSync)
+				{
+					$captionExists = true;
 					$captionFullPath = $captionFileSync->getFullPath();
+					$captionClips[] = array('type' => 'source', 'path' => $captionFullPath);
+				}
 			}
-//			$captionClips[] = array('type' => 'source', 'path' => $captionFullPath);
+			if (!$captionExists)
+			{
+				$captionClips[] = array('type' => 'source', 'path' => '/tmp/empty.srt');
+			}
 		}
 		return $captionClips;
 	}
