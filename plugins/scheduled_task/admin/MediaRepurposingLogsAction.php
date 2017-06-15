@@ -16,7 +16,6 @@ class MediaRepurposingLogsAction extends KalturaApplicationPlugin
 	
 	public function doAction(Zend_Controller_Action $action)
 	{
-		//$action->getHelper('layout')->disableLayout();
 		$action->getHelper('layout')->setLayout('layout_empty');
 		$request = $action->getRequest();
 		$dryRunId = $this->_getParam('dryRunId');
@@ -26,9 +25,7 @@ class MediaRepurposingLogsAction extends KalturaApplicationPlugin
 		try
 		{
 			if ($dryRunId) {
-
 				$adapter = new Kaltura_FilterPaginatorForDryRunResult($dryRunId);
-
 				$action->view->paginator = new Infra_Paginator($adapter, $request);
 				$action->view->scheme = array("id", "name", "userId", "views", "createdAt", "lastPlayedAt");
 				$form->populateDryRun($dryRunId, $adapter->count());
