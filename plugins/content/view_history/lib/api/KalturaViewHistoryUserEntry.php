@@ -43,4 +43,16 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 			
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toUpdatableObject()
+	 */
+	public function toUpdatableObject($dbObject = null, $propertiesToSkip = array())
+	{
+		if(is_null($dbObject))
+			$dbObject = new ViewHistoryUserEntry();
+		
+		$dbObject->setUpdatedAt(time());	
+		return parent::toUpdatableObject($dbObject, $propertiesToSkip);
+	}
 }
