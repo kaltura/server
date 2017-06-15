@@ -254,8 +254,7 @@ function loadMediaRepurposing(paramStr)
 function getDryRunLog(dryRunId) {
 	if (!isValidParam(dryRunId, 'Dry Run id', true))
 		return;
-	let mediaRepurposingIdStr = '/dryRunId/' + dryRunId;
-	loadMediaRepurposingLogs(mediaRepurposingIdStr);
+	loadMediaRepurposingLogs('/dryRunId/' + dryRunId);
 }
 
 function loadMediaRepurposingLogs(paramStr) {
