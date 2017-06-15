@@ -9,7 +9,7 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_DESCRIPTION = 'description';
 	const ENTRY_TAGS = 'tags';
 	const ENTRY_CATEGORY_IDS = 'category_ids';
-	const ENTRY_USER_ID = 'kuser_id';
+	const ENTRY_USER_ID = 'puser_id';
 	const ENTRY_CREATOR_ID = 'creator_kuser_id';
 	const ENTRY_START_DATE = 'start_time';
 	const ENTRY_END_DATE = 'end_time';
