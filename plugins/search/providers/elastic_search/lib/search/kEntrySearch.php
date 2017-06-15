@@ -19,9 +19,11 @@ class kEntrySearch
         $this->elasticClient = new elasticClient();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(entryStatus::READY))
+    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array())
     {
 	    kElasticEntitlement::init();
+        if (!count($entriesStatus))
+            $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus);
 //        $this->initEntitlement();
         $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
