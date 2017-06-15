@@ -621,6 +621,7 @@ class serveFlavorAction extends kalturaAction
 			{
 				$captionClips[] = array('type' => 'source', 'path' => '/tmp/empty.srt');
 			}
+			$captionClips[] = array('type' => 'source', 'path' => $captionFullPath);
 		}
 		return $captionClips;
 	}
