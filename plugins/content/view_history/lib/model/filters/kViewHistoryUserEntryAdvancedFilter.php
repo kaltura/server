@@ -105,6 +105,11 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 				}
 				
 				$currEntryIds = UserEntryPeer::getEntryIdsByFilter($chunkSize, $userEntryOffset, $this->filter);
+				if(!count($currEntryIds))
+	            {
+	                    break;
+	            }
+				
 				$query->addColumnWhere(entryPeer::ID, $currEntryIds, KalturaCriteria::IN);
 				$query->forcedOrderIds = $currEntryIds;
 				$query->setLimit($chunkSize);
