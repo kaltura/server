@@ -254,34 +254,18 @@ function loadMediaRepurposing(paramStr)
 function getDryRunLog(dryRunId) {
 	if (!isValidParam(dryRunId, 'Dry Run id', true))
 		return;
-	
 	let mediaRepurposingIdStr = '/dryRunId/' + dryRunId;
 	loadMediaRepurposingLogs(mediaRepurposingIdStr);
 }
 
 function loadMediaRepurposingLogs(paramStr) {
 	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingLogsAction')); ?>' + paramStr;
-
-	jQuery('#media-repurposing-logs-dialog').remove();
-	dialogDiv = jQuery('<div id="media-repurposing-logs-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
-
-	dialogDiv.dialog({bgiframe: true, modal: true, resizable: false, width: 700, height: 700,
+	dialogDiv = jQuery('<div id="media-repurposing-logs-dialog"><iframe width="100%" height="100%" src="' + url + '"></iframe></div>').appendTo('body');
+	dialogDiv.dialog({bgiframe: true, modal: true, resizable: true, width: 600, height: 600,
 		title: '<?php echo $this->translate('Media Repurposing Profile Logs'); ?>',
-		buttons: {
-			'<?php echo $this->translate('Close'); ?>': function() {jQuery(this).dialog('close');}
-		}
+		buttons: {'<?php echo $this->translate('Close'); ?>': function() {jQuery(this).dialog('close');}}
 	});
-
-	dialogDiv.load(url, null, function() {
-			jQuery(this).find('#frmMediaRepurposingLogs').ajaxForm({
-				success: function(html) {jQuery('#frmMediaRepurposingLogs').replaceWith(html);},
-				iframe: true
-			});
-		}
-	);
-
 }
-
 
 
 function rearrangeData() {
@@ -363,10 +347,9 @@ function buildCondParams(index) {
 
 function setTaskData() {
 	var tasks = [];
-	var currentIndex = 0;
-	while (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0) {
-		tasks.push(buildTaskParams(currentIndex.toString()));
-		currentIndex++;
+	for (let currentIndex = 0; currentIndex < 10 ; currentIndex++) {
+		if (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0)
+			tasks.push(buildTaskParams(currentIndex.toString()));
 	}
 	jQuery('#TasksData').val(JSON.stringify(tasks));
 }
