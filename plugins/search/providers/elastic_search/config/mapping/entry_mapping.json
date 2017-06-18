@@ -76,10 +76,16 @@
 		"puser_id" : {
 		  "type" : "keyword"
 		},
+		"creator_puser_id" : {
+		  "type" : "keyword"
+		},
 		"creator_kuser_id" : {
 		  "type" : "keyword"
 		},
 		"category_ids" : {
+		  "type" : "keyword"
+		},
+		"active_category_ids" : {
 		  "type" : "keyword"
 		},
 		"tags" : {
@@ -127,6 +133,9 @@
 		"push_publish": {
 		  "type" : "keyword"
 		},
+		"entry_type": {
+		  "type" : "keyword"
+		},
 		"parent_entry" : {
 		  "properties" : {
 			"entry_id" : {
@@ -154,6 +163,9 @@
 			  "type" : "keyword"
 			},
 			"category_ids" : {
+			  "type" : "keyword"
+			},
+			"active_category_ids" : {
 			  "type" : "keyword"
 			}
 		  }

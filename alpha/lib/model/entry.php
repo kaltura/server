@@ -3661,12 +3661,14 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
 			'kuser_id' => $this->getKuserId(),
 			'puser_id' => $this->getPuserId(),
+			'creator_puser_id' => $this->getCreatorPuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
 			'name' => $this->getName(),
 			'description' => $this->getDescription(),
 			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
 			'category_ids' => $this->getAllCategoriesIds(true),
+			'active_category_ids' => $this->getAllCategoriesIds(false),
 			'partner_status' => "p{$this->getPartnerId()}s{$this->getStatus()}",
 			'parent_id' => $this->getParentEntryId(),
 			'reference_id' => $this->getReferenceID(),
@@ -3681,7 +3683,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'site_url' => $this->getSiteUrl(),
 			'start_date' => $this->getStartDate(null),
 			'end_date' => $this->getEndDate(null),
-			//'recorded_entry_id' => $this->getRecorded
+			'entry_type' => $this->getType(),
 		);
 		
 		if($this->getParentEntryId())
@@ -3721,7 +3723,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
 			'kuser_id' => $parentEntry->getKuserId(),
 			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
-			'category_ids' => $parentEntry->getAllCategoriesIds(true)
+			'category_ids' => $parentEntry->getAllCategoriesIds(true),
+			'active_category_ids' => $parentEntry->getAllCategoriesIds(false),
 		);
 	}
 }

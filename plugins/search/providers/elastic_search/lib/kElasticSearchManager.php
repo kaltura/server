@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage lib
  */
-class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjectReadyForElasticIndexEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
+class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjectReadyForElasticIndexEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer
 {
 
     const CACHE_PREFIX = 'executed_elastic_server_';
@@ -195,7 +195,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeAddedEvent(BaseObject $object)
     {
-        if($object instanceof IElasticIndexable)
+        //prevent indexing 2 times- if object is IIndexable we raise the event in kSphinxSearchManager
+        if($object instanceof IElasticIndexable && !($object instanceof IIndexable))
             return true;
 
         return false;
@@ -219,10 +220,56 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeUpdatedEvent(BaseObject $object)
     {
-        if($object instanceof IElasticIndexable)
+        //prevent indexing 2 times- if object is IIndexable we raise the event in kSphinxSearchManager
+        if($object instanceof IElasticIndexable && !($object instanceof IIndexable))
             return true;
 
         return false;
     }
-    
+
+    /**
+     * @param BaseObject $object
+     * @param array $modifiedColumns
+     * @return bool true if should continue to the next consumer
+     */
+    public function objectChanged(BaseObject $object, array $modifiedColumns)
+    {
+        $childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($object->getId(), $object->getPartnerId());
+        foreach ($childEntries as $childEntry)
+        {
+            /**
+             * @var entry $childEntry
+             */
+            $childEntry->indexToElastic();
+        }
+    }
+
+    /**
+     * @param BaseObject $object
+     * @param array $modifiedColumns
+     * @return bool true if the consumer should handle the event
+     */
+    public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+    {
+        //fields we save on parent entry
+        $fieldsToMonitor = array(entryPeer::STATUS, entryPeer::KUSER_ID, entryPeer::CATEGORIES_IDS);
+        // custom data for entitled kusers edit/publish
+        $customDataFieldsToMonitor = array('entitledUserPuserEdit', 'entitledUserPuserPublish', 'creatorKuserId');
+        $namespace = '';
+
+        if($object instanceof entry)
+        {
+            if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
+                return true;
+
+            if(in_array(entryPeer::CUSTOM_DATA, $modifiedColumns))
+            {
+                $oldCustomData = $object->getCustomDataOldValues();
+                $oldCustomDataKeys = array_keys($oldCustomData[$namespace]);
+                if(count(array_intersect($customDataFieldsToMonitor, $oldCustomDataKeys)) > 0)
+                    return true;
+            }
+        }
+        return false;
+    }
 }

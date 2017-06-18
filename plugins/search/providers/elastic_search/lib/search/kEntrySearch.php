@@ -7,6 +7,9 @@ class kEntrySearch
 {
     protected $elasticClient;
     protected $query;
+    protected $isInitialized;
+    private $entryEntitlementQuery;
+    private $parentEntryEntitlementQuery;
     protected static $entitlementContributors = array(
         'kElasticEntryDisableEntitlementCondition',
         'kElasticPublicEntriesEntitlementCondition',
@@ -17,6 +20,7 @@ class kEntrySearch
     public function __construct()
     {
         $this->elasticClient = new elasticClient();
+        $this->isInitialized = false;
     }
 
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array())
@@ -45,15 +49,18 @@ class kEntrySearch
 
     protected function initBasePartnerFilter($partnerId, array $entriesStatus)
     {
+        $partnerStatus = array();
+        foreach ($entriesStatus as $entryStatus)
+        {
+            $partnerStatus[] = "p{$partnerId}s{$entryStatus}";
+        }
+
         $this->query['body'] = array(
             'query' => array(
                 'bool' => array(
-                    'filter' => array( //todo - change to partner_status
+                    'filter' => array(
                         array(
-                            'term' => array('partner_id' => $partnerId)
-                        ),
-                        array(
-                            'terms' => array('status' => $entriesStatus)
+                            'terms' => array('partner_status' => $partnerStatus)
                         )
                     )
                 )
@@ -63,10 +70,20 @@ class kEntrySearch
 
     protected function initEntitlement()
     {
-        $parentEntryQuery = null;
-        
-        //entry query - assign by reference to create name alias
-        $entryQuery = &$this->query['body']['query']['bool']['filter'][2]['bool'];
+        foreach (self::$entitlementContributors as $contributor)
+        {
+            if($contributor::shouldContribute())
+            {
+                if(!$this->isInitialized)
+                    $this->initEntryEntitlementQueries();
+                $contributor::applyCondition($this->entryEntitlementQuery, $this->parentEntryEntitlementQuery);
+            }
+        }
+    }
+
+    protected function initEntryEntitlementQueries()
+    {
+        $this->parentEntryEntitlementQuery = null;
 
         if(kElasticEntitlement::$parentEntitlement)
         {
@@ -80,7 +97,7 @@ class kEntrySearch
             );
 
             //assign by reference to create name alias
-            $parentEntryQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][0]['bool'];
+            $this->parentEntryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][0]['bool'];
 
             //create entry part
             $this->query['body']['query']['bool']['filter'][2]['bool']['should'][1]['bool']['must_not'] = array(
@@ -91,18 +108,15 @@ class kEntrySearch
                 )
             );
             //assign by reference to create name alias
-            $entryQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][1]['bool'];
+            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][1]['bool'];
             $this->query['body']['query']['bool']['filter'][2]['bool']['minimum_should_match'] = 1;
         }
-
-        foreach (self::$entitlementContributors as $contributor)
+        else
         {
-            if($contributor::shouldContribute())
-            {
-                $contributor::applyCondition($entryQuery, $parentEntryQuery);
-            }
+            //entry query - assign by reference to create name alias
+            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][2]['bool'];
         }
-
+        $this->isInitialized = true;
     }
 
     protected function applyElasticSearchConditions($conditions)

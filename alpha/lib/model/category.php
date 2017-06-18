@@ -1695,6 +1695,28 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$this->setDirectSubCategoriesCount($c->getRecordsCount());
 	}
+
+	protected function getElasticSearchIndexPrivacyContext()
+	{
+		if(is_null($this->getPrivacyContext()) || trim($this->getPrivacyContext()) == '')
+			return null;
+
+		$privacyContexts = explode(',', $this->getPrivacyContext());
+		$privacyContexts[] = kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+		$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, $this->getPartnerId() );
+		return $privacyContexts;
+	}
+
+	protected function getElasticSearchIndexPrivacyContexts()
+	{
+		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
+			return kEntitlementUtils::getDefaultContextString( $this->getPartnerId() );
+
+		$privacyContexts = explode(',', $this->getPrivacyContexts());
+		$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, $this->getPartnerId() );
+
+		return $privacyContexts;
+	}
 	
 	public function getSearchIndexPrivacyContext()
 	{
@@ -1897,8 +1919,8 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 				'partner_id' => $this->getPartnerId(),
 				'partner_status' => "p{$this->getPartnerId()}s{$this->getStatus()}",
 				'privacy' => "{$this->getPrivacy()}p{$this->getPartnerId()}",
-				'privacy_context' => explode(',',$this->getPrivacyContext()),
-				'privacy_contexts' => explode(',',$this->getPrivacyContexts()),
+				'privacy_context' => $this->getElasticSearchIndexPrivacyContext(),
+				'privacy_contexts' => $this->getElasticSearchIndexPrivacyContexts(),
 				'status' => $this->getStatus(),
 				'parent_id' => $this->getParentId(),
 				'depth' => $this->getDepth(),
