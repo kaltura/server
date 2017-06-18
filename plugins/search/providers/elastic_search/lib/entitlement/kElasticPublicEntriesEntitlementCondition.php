@@ -24,20 +24,36 @@ class kElasticPublicEntriesEntitlementCondition extends kElasticBaseEntitlementC
 
     public static function applyCondition(&$entryQuery, &$parentEntryQuery)
     {
-        if($parentEntryQuery)
+        if(kElasticEntitlement::$publicEntries)
         {
-            $conditions = self::getEntitlementCondition(array(), 'parent_entry.');
-            self::attachToQuery($parentEntryQuery, 'should', $conditions);
-            $parentEntryQuery['minimum_should_match'] = 1;
+            if($parentEntryQuery)
+            {
+                $conditions = self::getEntitlementCondition(array(), 'parent_entry.');
+                self::attachToQuery($parentEntryQuery, 'should', $conditions);
+                $parentEntryQuery['minimum_should_match'] = 1;
+            }
+            $conditions = self::getEntitlementCondition();
+            self::attachToQuery($entryQuery, 'should', $conditions);
+            $entryQuery['minimum_should_match'] = 1;
         }
-        $conditions = self::getEntitlementCondition();
-        self::attachToQuery($entryQuery, 'should', $conditions);
-        $entryQuery['minimum_should_match'] = 1;
+
+        if(kElasticEntitlement::$publicActiveEntries)
+        {
+            if($parentEntryQuery)
+            {
+                $conditions = self::getEntitlementCondition(array(), 'parent_entry.active_');
+                self::attachToQuery($parentEntryQuery, 'should', $conditions);
+                $parentEntryQuery['minimum_should_match'] = 1;
+            }
+            $conditions = self::getEntitlementCondition(array(), 'active_');
+            self::attachToQuery($entryQuery, 'should', $conditions);
+            $entryQuery['minimum_should_match'] = 1;
+        }
     }
 
     public static function shouldContribute()
     {
-       if(kElasticEntitlement::$publicEntries)
+       if(kElasticEntitlement::$publicEntries || kElasticEntitlement::$publicActiveEntries)
            return true;
         
         return false;

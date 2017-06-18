@@ -48,7 +48,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
 
     public static function shouldContribute()
     {
-        if(kElasticEntitlement::$userCategoryToEntryEntitlement)
+        if(kElasticEntitlement::$userCategoryToEntryEntitlement || kElasticEntitlement::$entryInSomeCategoryNoPC)
             return true;
         
         return false;
@@ -67,8 +67,8 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
                 'bool' => array(
                     'filter' => array(
                         array(
-                            'term' => array( //todo partner_status
-                                'status' => CategoryStatus::ACTIVE
+                            'term' => array(
+                                'partner_status' => 'p'.kElasticEntitlement::$partnerId.'s'.CategoryStatus::ACTIVE
                             )
                         ),
                         array(
@@ -98,15 +98,28 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
             )
         );
 
-        if($privacyContext)
+        if(kElasticEntitlement::$entryInSomeCategoryNoPC)
         {
-            $body['query']['bool']['filter'][] = array('term' => array('privacy_context' => $privacyContext)); //todo add partner prefix , search in privacy contexts
+            $body['query']['bool']['filter'][1]['bool']['should'][] = array(
+                'bool' => array(
+                    'must_not' => array(
+                        'exists' => array(
+                            'field' => 'privacy_context'
+                        )
+                    )
+                )
+            );
         }
+
+        $privacyContexts = null;
+        if (!$privacyContext || trim($privacyContext) == '')
+            $privacyContexts = array(kEntitlementUtils::getDefaultContextString(kElasticEntitlement::$partnerId));
         else
         {
-            //add privacy context doesnt exist
-            $body['query']['bool']['must_not'][] = array('exists' => array('field' => 'privacy_context'));
+            $privacyContexts = explode(',', $privacyContext);
+            $privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, kElasticEntitlement::$partnerId );
         }
+        $body['query']['bool']['filter'][] = array('terms' => array('privacy_contexts' => $privacyContexts)); //todo add partner prefix , search in privacy contexts
 
         //todo add privacy on category
         if($privacy) //privacy is an array
@@ -116,8 +129,9 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
 
         $params['body'] = $body;
         $elasticClient = new elasticClient();
+        //print_r($params);
         $results = $elasticClient->search($params);
-
+        //print_r($results);
         $categories = $results['hits']['hits'];
         $categoryIds = array();
 
