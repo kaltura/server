@@ -33,6 +33,35 @@ class ESearchService extends KalturaBaseService
 	}
 
 
+	/**
+	 *
+	 * @action getAllowedSearchTypes
+	 * @param KalturaESearchItem $searchItem
+	 * @param string $fieldName
+	 * @return KalturaKeyValueArray
+	 * @throws KalturaAPIException
+	 */
+	function getAllowedSearchTypesAction (KalturaESearchItem $searchItem)
+	{
+		$coreSearchItem = $searchItem->toObject();
+		$coreSearchItemClass = get_class($coreSearchItem);
+		$allowedSearchMap = $coreSearchItemClass::getAallowedSearchTypesForField();
+
+		$result = new KalturaKeyValueArray();
+		if (isset($searchItem->fieldName))
+		{
+			foreach ($allowedSearchMap[$coreSearchItem->getFieldName()] as $searchTypeName => $searchTypeVal)
+			{
+				$currVal = new KalturaKeyValue();
+				$currVal->key = $searchTypeName;
+				$currVal->value = $searchTypeVal;
+				$result[] = $currVal;
+			}
+		}
+		return $result;
+	}
+
+
 }
 
 
