@@ -85,7 +85,14 @@ class kESearchQueryManager
 			 * @var ESearchEntryItem $entrySearchItem
 			 */
 			$queryVerbs = $entrySearchItem->getQueryVerbs();
-			$queryOut[$queryVerbs[0]][$queryVerbs[1]] = array($entrySearchItem->getFieldName() => strtolower($entrySearchItem->getSearchTerm()));
+			if ($entrySearchItem->getItemType() == ESearchItemType::PARTIAL)
+			{
+				$queryOut[$queryVerbs[0]]['multi_match']['query'] = strtolower($entrySearchItem->getSearchTerm());
+				$queryOut[$queryVerbs[0]]['multi_match']['fields'] = array($eEntrySearchItemsArr->getFieldName()."^2", $entrySearchItem->getFieldName() . ".raw^2", $entrySearchItem->getFieldName() . ".trigrams");
+				$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
+			}
+			else
+				$queryOut[$queryVerbs[0]][$queryVerbs[1]] = array($entrySearchItem->getFieldName() => strtolower($entrySearchItem->getSearchTerm()));
 		}
 		return $queryOut;
 	}
@@ -113,8 +120,10 @@ class kESearchQueryManager
 						'multi_match' => array(
 							'query' => strtolower($eSearchCaptionItem->getSearchTerm()),
 							'fields' => array(
-								'caption_assets.lines.content',
-								'caption_assets.lines.content_*' //todo change here if we want to choose the language to search
+								'caption_assets.lines.content.trigrams',
+								'caption_assets.lines.content.raw^3',
+								'caption_assets.lines.content^2',
+								'caption_assets.lines.content_*^2',
 							),
 							'type' => 'most_fields'
 						)
@@ -225,7 +234,14 @@ class kESearchQueryManager
 			 * @var ESearchEntryItem $cuePointSearchItem
 			 */
 			$queryVerbs = $cuePointSearchItem->getQueryVerbs();
-			$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]][$queryVerbs[1]] = array($cuePointSearchItem->getFieldName() => strtolower($cuePointSearchItem->getSearchTerm()));
+			if ($eSearchCuePointItemsArr->getItemType() == ESearchItemType::PARTIAL)
+			{
+				$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['query'] = strtolower($cuePointSearchItem->getSearchTerm());
+				$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['fields'] = array($cuePointSearchItem->getFieldName()."^2", $cuePointSearchItem->getFieldName() . "raw^2", $cuePointSearchItem->getFieldName() . "trigrams");
+				$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
+			}
+			else
+				$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]][$queryVerbs[1]] = array($cuePointSearchItem->getFieldName() => strtolower($cuePointSearchItem->getSearchTerm()));
 		}
 		return $cuePointQuery;
 	}
