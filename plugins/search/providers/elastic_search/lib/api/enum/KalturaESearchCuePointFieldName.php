@@ -5,8 +5,4 @@
  */
 class KalturaESearchCuePointFieldName extends KalturaStringEnum implements ESearchCuePointFieldName
 {
-	public static function getEnumClass()
-	{
-		return 'ESearchCuePointFieldName';
-	}
 }

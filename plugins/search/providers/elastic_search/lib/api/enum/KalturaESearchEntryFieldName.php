@@ -5,8 +5,4 @@
  */
 class KalturaESearchEntryFieldName extends KalturaStringEnum implements ESearchEntryFieldName
 {
-	public static function getEnumClass()
-	{
-		return 'ESearchEntryFieldName';
-	}
 }

@@ -5,8 +5,4 @@
  */
 class KalturaESearchItemType extends KalturaEnum implements ESearchItemType
 {
-	public static function getEnumClass()
-	{
-		return 'ESearchItemType';
-	}
 }
