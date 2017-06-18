@@ -8,7 +8,6 @@
 class MediaRepurposingUtils
 {
 
-
 	const STATUS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'Status\']';
 	const MPRS_DATA_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const MPRS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPsOnEntry\']';
@@ -21,12 +20,11 @@ class MediaRepurposingUtils
 	 * @param int $partnerId
 	 * @return array of KalturaScheduledTaskProfile
 	 */
-	public static function getMrs($partnerId) {
-		if (!$partnerId)
-			return array();
+	public static function getMrs($partnerId = null) {
 		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
 		$filter = new Kaltura_Client_ScheduledTask_Type_ScheduledTaskProfileFilter();
-		$filter->partnerIdEqual = $partnerId;
+		if ($partnerId)
+			$filter->partnerIdEqual = $partnerId;
 		$filter->systemNameEqual = self::MEDIA_REPURPOSING_SYSTEM_NAME;
 		$result = $scheduledtaskPlugin->scheduledTaskProfile->listAction($filter, null);
 		return $result->objects;
@@ -280,6 +278,11 @@ class MediaRepurposingUtils
 			default:
 				return null;
 		}
+	}
+
+	public static function getMediaRepurposingProfileTaskType($profile)
+	{
+		return $profile->objectTasks[0]->type;
 	}
 
 	public static function getSubScheduleTaskName($name, $index)
