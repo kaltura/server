@@ -25,4 +25,16 @@ class KalturaESearchResult extends KalturaObject {
         return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
     }
 
+    protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+    {
+	    $isAdmin = kCurrentContext::$ks_object->isAdmin();
+	    $entry = KalturaEntryFactory::getInstanceByType($srcObj->getEntry()->getType(), $isAdmin);
+
+	    $entry->fromObject($srcObj->getEntry());
+	    $this->entry = $entry;
+
+	    return parent::doFromObject($srcObj, $responseProfile);
+    }
+
+
 }
