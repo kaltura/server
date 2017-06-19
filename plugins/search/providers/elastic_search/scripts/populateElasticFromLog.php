@@ -129,8 +129,6 @@ while(true)
                 $command = unserialize($command);
                 $action = $command['action'];
 
-                echo print_r($command,true)."\n";
-
                 $response = $elasticClient->$action($command);
                 //todo - choose what to do with an error from elastic
             }

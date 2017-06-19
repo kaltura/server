@@ -129,9 +129,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
 
         $params['body'] = $body;
         $elasticClient = new elasticClient();
-        //print_r($params);
         $results = $elasticClient->search($params);
-        //print_r($results);
         $categories = $results['hits']['hits'];
         $categoryIds = array();
 
