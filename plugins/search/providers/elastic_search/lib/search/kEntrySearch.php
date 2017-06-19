@@ -29,7 +29,7 @@ class kEntrySearch
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus);
-//        $this->initEntitlement();
+        $this->initEntitlement();
         $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
         $this->applyElasticSearchConditions($subQuery);
         KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
