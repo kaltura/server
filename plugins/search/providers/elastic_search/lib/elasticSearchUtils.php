@@ -4,6 +4,13 @@
  * @subpackage lib
  */
 
+
+function build_sorter($entriesScores) {
+	return function ($a, $b) use ($entriesScores) {
+		return ($entriesScores[$a->getId()] > $entriesScores[$b->getId()]) ? -1 : 1;
+	};
+}
+
 class elasticSearchUtils
 {
     /**
@@ -62,28 +69,34 @@ class elasticSearchUtils
     {
 		$coreObjs = array();
 	    $entriesData = array();
+	    $entriesScore = array();
 	    foreach ($elasticResults['hits']['hits'] as $elasticEntry)
 	    {
 		    $itemData = array();
-		    foreach ($elasticEntry['inner_hits'] as $objectType => $hits)
+		    if (isset($elasticEntry['inner_hits']))
 		    {
-			    foreach ($hits['hits']['hits'] as $objectResult)
+			    foreach ($elasticEntry['inner_hits'] as $objectType => $hits)
 			    {
-				    $itemResults = self::getItemResults($objectResult, $objectType);
-				    foreach ($itemResults as $itemResult)
+				    foreach ($hits['hits']['hits'] as $objectResult)
 				    {
-					    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
-					    if ($currItemData)
+					    $itemResults = self::getItemResults($objectResult, $objectType);
+					    foreach ($itemResults as $itemResult)
 					    {
-						    $currItemData->loadFromElasticHits($itemResult);
-						    $itemData[] = $currItemData;
+						    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
+						    if ($currItemData)
+						    {
+							    $currItemData->loadFromElasticHits($itemResult);
+							    $itemData[] = $currItemData;
+						    }
 					    }
 				    }
 			    }
 		    }
 		    $entriesData[$elasticEntry['_id']] = $itemData;
+		    $entriesScore[$elasticEntry['_id']] = $elasticEntry['_score'];
 	    }
 	    $entries = entryPeer::retrieveByPKs(array_keys($entriesData));
+        usort($entries, build_sorter($entriesScore));
 	    foreach ($entries as $baseEntry)
 	    {
 		    $resultObj = new ESearchResult();
@@ -106,5 +119,6 @@ class elasticSearchUtils
 		}
 	}
 
-    
+
+
 }
