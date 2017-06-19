@@ -88,7 +88,7 @@ class kESearchQueryManager
 			if ($entrySearchItem->getItemType() == ESearchItemType::PARTIAL)
 			{
 				$queryOut[$queryVerbs[0]]['multi_match']['query'] = strtolower($entrySearchItem->getSearchTerm());
-				$queryOut[$queryVerbs[0]]['multi_match']['fields'] = array($eEntrySearchItemsArr->getFieldName()."^2", $entrySearchItem->getFieldName() . ".raw^2", $entrySearchItem->getFieldName() . ".trigrams");
+				$queryOut[$queryVerbs[0]]['multi_match']['fields'] = array($entrySearchItem->getFieldName()."^2", $entrySearchItem->getFieldName() . ".raw^2", $entrySearchItem->getFieldName() . ".trigrams");
 				$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
 			}
 			else
