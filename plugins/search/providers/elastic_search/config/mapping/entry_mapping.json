@@ -109,7 +109,7 @@
 		"source_type": {
 		  "type" : "keyword"
 		},
-		"duration": {
+		"length_in_msecs": {
 		  "type" : "long"
 		},
 		"recorded_entry_id": {
