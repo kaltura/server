@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage paginator
  */
-class Kaltura_FilterPaginatorForDryRunResult implements Zend_Paginator_Adapter_Interface
+class Kaltura_FilterPaginatorList implements Zend_Paginator_Adapter_Interface
 {
 	/**
 	 * @var array
@@ -17,11 +17,10 @@ class Kaltura_FilterPaginatorForDryRunResult implements Zend_Paginator_Adapter_I
 	protected $count;
 
 	
-	public function __construct($dryRunId)
+	public function __construct($objects)
 	{
-		$results = MediaRepurposingUtils::getDryRunResult($dryRunId);
-		$this->count = $results->totalCount;
-		$this->objects = $results->objects;
+		$this->count = count($objects);
+		$this->objects = $objects;
 	}
 
 

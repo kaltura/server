@@ -25,7 +25,8 @@ class MediaRepurposingLogsAction extends KalturaApplicationPlugin
 		try
 		{
 			if ($dryRunId) {
-				$adapter = new Kaltura_FilterPaginatorForDryRunResult($dryRunId);
+				$results = MediaRepurposingUtils::getDryRunResult($dryRunId);
+				$adapter = new Kaltura_FilterPaginatorList($results->objects);
 				$action->view->paginator = new Infra_Paginator($adapter, $request);
 				$action->view->scheme = array("id", "name", "userId", "views", "createdAt", "lastPlayedAt");
 				$form->populateDryRun($dryRunId, $adapter->count());
