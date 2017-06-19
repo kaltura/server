@@ -25,6 +25,6 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_SOURCE_TYPE = 'source_type';
 	const ENTRY_RECORDED_ENTRY_ID = 'recorded_entry_id';
 	const ENTRY_PUSH_PUBLISH = 'push_publish';
-	const ENTRY_DURATION = 'duration';
+	const ENTRY_LENGTH_IN_MSECS = 'length_in_msecs';
 
 }
