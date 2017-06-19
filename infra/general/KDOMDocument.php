@@ -21,7 +21,7 @@ class KDOMDocument extends DOMDocument
 
 	public function loadXML ( $source, $options = null)
 	{
-		$regex = '&(?!amp;)';
+		$regex = '/&(?!amp;)/';
 		$source =  preg_replace($regex,' &amp; ',$source);
 
 		return parent::loadXML($source, $options);
