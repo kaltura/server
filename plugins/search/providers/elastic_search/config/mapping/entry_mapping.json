@@ -1,0 +1,513 @@
+{
+  "settings" : {
+	"number_of_shards" : 5,
+	"number_of_replicas" : 0,
+	"analysis": { //todo - we can move the analyzer to config file because he is common for all indices
+	  "filter": {
+		"trigrams_filter": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3
+		}
+	  },
+	  "analyzer": {
+		"trigrams": {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "filter": [
+			"lowercase",
+			"trigrams_filter"
+		  ]
+		}
+	  }
+	}
+  },
+  "mappings" : {
+	"entry" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "properties" : {
+		"name" : {
+		  "type" : "text",
+		  "fields": {
+			"trigrams" : {
+			  "type" : "text",
+			  "analyzer" : "trigrams"
+			},
+			"raw" : {
+			  "type" : "keyword"
+			}
+		  }
+		},
+		"description" : {
+		  "type" : "text",
+		  "fields": {
+			"trigrams" : {
+			  "type" : "text",
+			  "analyzer" : "trigrams"
+			},
+			"raw" : {
+			  "type" : "keyword"
+			}
+		  }
+		},
+		"partner_id" : {
+		  "type" : "keyword"
+		},
+		"partner_status" : {
+		  "type" : "keyword"
+		},
+		"parent_id" : {
+		  "type" : "keyword"
+		},
+		"status" : {
+		  "type" : "keyword"
+		},
+		"entitled_kusers_edit" : {
+		  "type" : "keyword"
+		},
+		"entitled_kusers_publish" : {
+		  "type" : "keyword"
+		},
+		"kuser_id" : {
+		  "type" : "keyword"
+		},
+		"puser_id" : {
+		  "type" : "keyword"
+		},
+		"creator_puser_id" : {
+		  "type" : "keyword"
+		},
+		"creator_kuser_id" : {
+		  "type" : "keyword"
+		},
+		"category_ids" : {
+		  "type" : "keyword"
+		},
+		"active_category_ids" : {
+		  "type" : "keyword"
+		},
+		"tags" : {
+		  "type" : "keyword"
+		},
+		"reference_id": {
+		  "type" : "keyword"
+		},
+		"conversion_profile_id": {
+		  "type" : "keyword"
+		},
+		"template_entry_id": {
+		  "type" : "keyword"
+		},
+		"display_in_search": {
+		  "type" : "keyword"
+		},
+		"media_type": {
+		  "type" : "keyword"
+		},
+		"source_type": {
+		  "type" : "keyword"
+		},
+		"duration": {
+		  "type" : "long"
+		},
+		"recorded_entry_id": {
+		  "type" : "keyword"
+		},
+		"credit": {
+		  "type" : "keyword"
+		},
+		"start_date": {
+		  "type" : "keyword"
+		},
+		"end_date": {
+		  "type" : "keyword"
+		},
+		"site_url": {
+		  "type" : "keyword"
+		},
+		"admin_tags": {
+		  "type" : "keyword"
+		},
+		"push_publish": {
+		  "type" : "keyword"
+		},
+		"entry_type": {
+		  "type" : "keyword"
+		},
+		"parent_entry" : {
+		  "properties" : {
+			"entry_id" : {
+			  "type" : "keyword"
+			},
+			"status" : {
+			  "type" : "keyword"
+			},
+			"partner_id" :{
+			  "type" : "keyword"
+			},
+			"partner_status" :{
+			  "type" : "keyword"
+			},
+			"entitled_kusers_edit" : {
+			  "type" : "keyword"
+			},
+			"entitled_kusers_publish" : {
+			  "type" : "keyword"
+			},
+			"kuser_id" : {
+			  "type" : "keyword"
+			},
+			"creator_kuser_id" : {
+			  "type" : "keyword"
+			},
+			"category_ids" : {
+			  "type" : "keyword"
+			},
+			"active_category_ids" : {
+			  "type" : "keyword"
+			}
+		  }
+		},
+		"caption_assets": {
+		  "type"  : "nested",
+		  "properties"  : {
+			"id": {
+			  "type"  : "keyword"
+			},
+			"language" : {
+			  "type"  : "keyword"
+			},
+			"lines"  : {
+			  "type"  : "nested",
+			  "properties"  : {
+				"content" : {
+				  "type" : "text",
+				  "fields": {
+					"trigrams" : {
+					  "type" : "text",
+					  "analyzer" : "trigrams"
+					},
+					"raw" : {
+					  "type" : "keyword"
+					}
+				  }
+				},
+				"content_english" : {
+				  "type" : "text",
+				  "analyzer": "english"
+				},
+				"content_arabic" : {
+				  "type" : "text",
+				  "analyzer": "arabic"
+				},
+				"content_armenian" : {
+				  "type" : "text",
+				  "analyzer" : "armenian"
+				},
+				"content_basque" : {
+				  "type" : "text",
+				  "analyzer" : "basque"
+				},
+				"content_brazilian" : {
+				  "type" : "text",
+				  "analyzer" : "brazilian"
+				},
+				"content_bulgarian" : {
+				  "type" : "text",
+				  "analyzer" : "bulgarian"
+				},
+				"content_catalan" : {
+				  "type" : "text",
+				  "analyzer" : "catalan"
+				},
+				"content_cjk" : {
+				  "type" : "text",
+				  "analyzer" : "cjk"
+				},
+				"content_czech" : {
+				  "type" : "text",
+				  "analyzer" : "czech"
+				},
+				"content_danish" : {
+				  "type" : "text",
+				  "analyzer" : "danish"
+				},
+				"content_dutch" : {
+				  "type" : "text",
+				  "analyzer" : "dutch"
+				},
+				"content_finnish" : {
+				  "type" : "text",
+				  "analyzer" : "finnish"
+				},
+				"content_french" : {
+				  "type" : "text",
+				  "analyzer" : "french"
+				},
+				"content_galician" : {
+				  "type" : "text",
+				  "analyzer" : "galician"
+				},
+				"content_german" : {
+				  "type" : "text",
+				  "analyzer" : "german"
+				},
+				"content_greek" : {
+				  "type" : "text",
+				  "analyzer" : "greek"
+				},
+				"content_hindi" : {
+				  "type" : "text",
+				  "analyzer" : "hindi"
+				},
+				"content_hungarian" : {
+				  "type" : "text",
+				  "analyzer" : "hungarian"
+				},
+				"content_indonesian" : {
+				  "type" : "text",
+				  "analyzer" : "indonesian"
+				},
+				"content_irish" : {
+				  "type" : "text",
+				  "analyzer" : "irish"
+				},
+				"content_italian" : {
+				  "type" : "text",
+				  "analyzer" : "italian"
+				},
+				"content_latvian" : {
+				  "type" : "text",
+				  "analyzer" : "latvian"
+				},
+				"content_lithuanian" : {
+				  "type" : "text",
+				  "analyzer" : "lithuanian"
+				},
+				"content_norwegian" : {
+				  "type" : "text",
+				  "analyzer" : "norwegian"
+				},
+				"content_persian" : {
+				  "type" : "text",
+				  "analyzer" : "persian"
+				},
+				"content_portuguese" : {
+				  "type" : "text",
+				  "analyzer" : "portuguese"
+				},
+				"content_romanian" : {
+				  "type" : "text",
+				  "analyzer" : "romanian"
+				},
+				"content_russian" : {
+				  "type" : "text",
+				  "analyzer" : "russian"
+				},
+				"content_sorani" : {
+				  "type" : "text",
+				  "analyzer" : "sorani"
+				},
+				"content_spanish" : {
+				  "type" : "text",
+				  "analyzer" : "spanish"
+				},
+				"content_swedish" : {
+				  "type" : "text",
+				  "analyzer" : "swedish"
+				},
+				"content_turkish" : {
+				  "type" : "text",
+				  "analyzer" : "turkish"
+				},
+				"content_thai" : {
+				  "type" : "text",
+				  "analyzer" : "thai"
+				},
+				"start_time"  : {
+				  "type" : "long"
+				},
+				"end_time"  : {
+				  "type" : "long"
+				}
+			  }
+			}
+		  }
+		},
+		"metadata" :{
+		  "type"  : "nested",
+		  "properties"  : {
+			"metadata_id" : {
+			  "type" : "keyword"
+			},
+			"system_name" : {
+			  "type" : "keyword"
+			},
+			"xpath" : {
+			  "type" : "keyword"
+			},
+			"metadata_profile_id" : {
+			  "type" : "keyword"
+			},
+			"systemname_xpath_metadataprofileid" : {
+			  "type" : "keyword"
+			},
+			"metadata_field_id" : {
+			  "type" : "keyword"
+			},
+			"value_int": {
+			  "type": "long"
+			},
+			"value_text": {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			}
+		  }
+		},
+		"cue_points" : {
+		  "type" : "nested",
+		  "properties"  : {
+			"cue_point_type" : {
+			  "type" : "keyword"
+			},
+			"cue_point_id": {
+			  "type" : "keyword"
+			},
+			"cue_point_name" : {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			},
+			"cue_point_text" : {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			},
+			"cue_point_tags" : {
+			  "type" : "keyword"
+			},
+			"cue_point_start_time" : {
+			  "type" : "long"
+			},
+			"cue_point_end_time" : {
+			  "type" : "long"
+			},
+			"cue_point_sub_type" : {
+			  "type" : "keyword"
+			},
+			"cue_point_question" : { //for polls
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			},
+			"cue_point_answers" : {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			},
+			"cue_point_hint" : {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			},
+			"cue_point_explanation" : {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			},
+			"cue_point_metadata" :{
+			  "type"  : "nested",
+			  "properties"  : {
+				"metadata_id" : {
+				  "type" : "keyword"
+				},
+				"system_name" : {
+				  "type" : "keyword"
+				},
+				"xpath" : {
+				  "type" : "keyword"
+				},
+				"metadata_profile_id" : {
+				  "type" : "keyword"
+				},
+				"systemname_xpath_metadataprofileid" : {
+				  "type" : "keyword"
+				},
+				"metadata_field_id" : {
+				  "type" : "keyword"
+				},
+				"value_int": {
+				  "type": "long"
+				},
+				"value_text": {
+				  "type" : "text",
+				  "fields": {
+					"trigrams" : {
+					  "type" : "text",
+					  "analyzer" : "trigrams"
+					},
+					"raw" : {
+					  "type" : "keyword"
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+}

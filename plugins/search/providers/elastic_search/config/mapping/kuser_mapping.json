@@ -1,0 +1,120 @@
+{
+  "settings" : {
+	"number_of_shards" : 5,
+	"number_of_replicas" : 0,
+	"analysis": { //todo - we can move the analyzer to config filebecause he is common for all indices
+	  "filter": {
+		"trigrams_filter": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3
+		}
+	  },
+	  "analyzer": {
+		"trigrams": {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "filter": [
+			"lowercase",
+			"trigrams_filter"
+		  ]
+		}
+	  }
+	}
+  },
+  "mappings" : {
+	"kuser" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "properties" : {
+		"group_ids" : {
+		  "type" : "keyword"
+		},
+		"screen_name" : {
+		  "type" : "text",
+		  "fields": {
+			"trigrams" : {
+			  "type" : "text",
+			  "analyzer" : "trigrams"
+			},
+			"raw" : {
+			  "type" : "keyword"
+			}
+		  }
+		},
+		"kuser_type" : {
+		  "type" : "keyword"
+		},
+		"email" : {
+		  "type" : "keyword"
+		},
+		"tags" : {
+		  "type" : "keyword"
+		},
+		"status" : {
+		  "type" : "keyword"
+		},
+		"partner_status":{
+		  "type" : "keyword"
+		},
+		"created_at" : {
+		  "type" : "date"
+		},
+		"updated_at" : {
+		  "type" : "date"
+		},
+		"first_name" : {
+		  "type" : "keyword"
+		},
+		"last_name" : {
+		  "type" : "keyword"
+		},
+		"role_ids" : {
+		  "type" : "keyword"
+		},
+		"permission_names" : {
+		  "type" : "keyword"
+		},
+		"metadata" :{
+		  "type"  : "nested",
+		  "properties"  : {
+			"metadata_id" : {
+			  "type" : "keyword"
+			},
+			"system_name" : {
+			  "type" : "keyword"
+			},
+			"xpath" : {
+			  "type" : "keyword"
+			},
+			"metadata_profile_id" : {
+			  "type" : "keyword"
+			},
+			"systemname_xpath_metadataprofileid" : {
+			  "type" : "keyword"
+			},
+			"metadata_field_id" : {
+			  "type" : "keyword"
+			},
+			"value_int": {
+			  "type": "long"
+			},
+			"value_text": {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "keyword"
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+}
