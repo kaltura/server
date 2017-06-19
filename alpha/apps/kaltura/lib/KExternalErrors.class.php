@@ -57,6 +57,7 @@ class KExternalErrors
 	const LIVE_STREAM_CONFIG_NOT_FOUND = 45;
 	const TOO_MANY_PROCESSES = 46;
 	const BUNDLE_CREATION_FAILED = 47;
+	const ENTRY_NOT_SEQUENCE = 48;
 
 	const HTTP_STATUS_NOT_FOUND = 404;
 
@@ -111,7 +112,8 @@ class KExternalErrors
 		self::INTERNAL_SERVER_ERROR => "Internal server error",
 		self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
 		self::TOO_MANY_PROCESSES => "Too many executed processes",
-		self::BUNDLE_CREATION_FAILED => "Failed to build bundle for [%s]"
+		self::BUNDLE_CREATION_FAILED => "Failed to build bundle for [%s]",
+		self::ENTRY_NOT_SEQUENCE => "One or more of the sequence entry ids given is not a sequence entry",
 	);
 
 	public static function dieError($errorCode, $message = null)
