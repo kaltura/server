@@ -165,9 +165,6 @@ class KalturaFrontController
 				{
 					if(intval($matches[1]) == $index)
 					{
-						if($result instanceof KalturaAPIException)
-							throw new KalturaAPIException(KalturaErrors::FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE, $path);
-						
 						$attributePath = explode(':', $matches[2]);
 						$valueFromObject = $this->getValueFromObject($result, $attributePath);
 						if(!$valueFromObject)
