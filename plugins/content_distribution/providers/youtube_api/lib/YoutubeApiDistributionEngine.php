@@ -327,7 +327,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	private static function sanitizeFromHtmlTags($filed)
 	{
-		return strip_tags(html_entity_decode(preg_replace('/\<br(\s*)?\/?\>/i', "\n", $filed)));
+		/* In php 7 this should be tested to make sure that it works properly since default value for html_entity_decode is not null */
+		return strip_tags(html_entity_decode(preg_replace('/\<br(\s*)?\/?\>/i', "\n", $filed),null, 'UTF-8'));
 	}
 
 	protected function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enable = true)

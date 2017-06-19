@@ -2,7 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:php="http://php.net/xsl" exclude-result-prefixes="xs">
 
-	<xsl:output method="xml" media-type="application/rss+xml" cdata-section-elements="title media:title media:description media:keywords media:category"/>
+	<xsl:output method="xml" media-type="application/rss+xml" cdata-section-elements="title media:title media:description media:keywords"/>
 	<xsl:param name="partnerId" select="'partnerId'" />
 
 	<xsl:template match="*">
@@ -201,7 +201,7 @@
 
 				</xsl:if>
 
-				<xsl:value-of select="." disable-output-escaping="no"/>
+				<xsl:value-of select="." disable-output-escaping="yes"/>
 
 			</media:category>
 

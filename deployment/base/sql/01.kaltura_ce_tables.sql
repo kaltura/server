@@ -2408,7 +2408,7 @@ CREATE TABLE `server_node`
 	`tags` TEXT,
 	`host_name` VARCHAR(256) NOT NULL,
 	`playback_host_name` VARCHAR(256),
-	`parent_id` INTEGER default 0,
+	`parent_id` VARCHAR(256),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY partner_id_status_system_name(`partner_id`, `status`, `system_name`),

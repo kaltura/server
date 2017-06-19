@@ -59,7 +59,7 @@ class KalturaViewHistoryUserEntryAdvancedFilter extends KalturaSearchItem
 	
 	public function getBaseFilter ()
 	{
-		$userEntryFilter = new KalturaUserEntryFilter();
+		$userEntryFilter = new KalturaViewHistoryUserEntryFilter();
 		foreach ($this as $key=>$value)
 		{
 			$userEntryFilter->$key = $value;

@@ -26,12 +26,6 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
 
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		if (kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
-			$dbUserEntry->setPrivacyContext($privacyContexts[0]);
-		}
-		
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -137,22 +131,34 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
 		}
 		
-		$ueFilter = new UserEntryFilter();
+		//The Delete job will need the users translated to puser IDs
+		$ueFilter = $filter->toObject($ueFilter);
 		if ($filter->userIdEqual)
 		{
-			$ueFilter->set("_eq_user_id", $filter->userIdEqual);
-			$filter->userIdEqual = null;
+			if(!kuserPeer::retrieveByPK($filter->userIdEqual))
+			{
+				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
+			}
+			
+			$ueFilter->set("_eq_user_id", kuserPeer::retrieveByPK($filter->userIdEqual)->getPuserId());
 		}
 		if($filter->userIdIn)
 		{
-			$ueFilter->set("_in_user_id", $filter->userIdIn);
-			$filter->userIdIn = null;
-		}
-		$ueFilter = $filter->toObject($ueFilter);
-		if (kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
-			$ueFilter->set("_eq_privacy_context", $privacyContexts[0]);
+			$kusersIds = explode(',', $filter->userIdIn);
+			$kusers = kuserPeer::retrieveByPKs($kusersIds);
+			
+			$pusers = array();
+			foreach ($kusers as $kuser)
+			{
+				$pusers[] = $kuser->getPuserId();
+			}	
+			
+			if(!count($pusers))
+			{
+				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
+			}
+		
+			$ueFilter->set("_in_user_id", implode (',', $pusers));
 		}
 		
 		return kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);

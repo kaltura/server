@@ -52,18 +52,22 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		$pager->pageSize = 500;
 		if(KBatchBase::$taskConfig->params->pageSize)
 			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;	
-
+		$totalCount = 0;
 		do
 		{
 			$pager->pageIndex++;
 			$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
+			if (!$totalCount)
+				$totalCount = $dropFolderFiles->totalCount;
 			$dropFolderFiles = $dropFolderFiles->objects;
 			foreach ($dropFolderFiles as $dropFolderFile) 
 			{
 				$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
 			}
 		}while (count($dropFolderFiles) >= $pager->pageSize);
-			
+
+		$mapCount = count($dropFolderFilesMap);
+		KalturaLog::debug("Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list and [$mapCount] files in map");
 		return $dropFolderFilesMap;
 	}
 

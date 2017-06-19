@@ -13,12 +13,20 @@ class KalturaViewHistoryUserEntryFilter extends KalturaUserEntryFilter
 		return $response;
 	}
 	
-	protected function modifyCriteria ($c)
+	public function toObject ($object_to_fill = null, $props_to_skip = array())
 	{
-		if (kEntitlementUtils::getEntitlementEnforcement())
+		if (kCurrentContext::getCurrentSessionType() == SessionType::USER)
 		{
-			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
-			$c->addAnd(UserEntryPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
+			$this->userIdEqual = kCurrentContext::getCurrentKsKuser()->getPuserId();
+			$this->userIdIn = null;
+			$this->userIdNotIn = null;
 		}
+		elseif (!$this->userIdEqual && !$this->userIdIn && !$this->userIdNotIn)
+		{
+			$this->userIdEqual = kCurrentContext::getCurrentKsKuser()->getPuserId();
+		}
+		
+		
+		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }

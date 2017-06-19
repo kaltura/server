@@ -19,6 +19,7 @@
 	
 	var filterStatus = 0;
 	var alwaysDisplay = [];
+	var epocToMonthsField= ['createdAt', 'lastPlayedAt', 'mediaDate', 'updatedAt'];
 	init();
 
 	function init() {
@@ -98,13 +99,24 @@
 	function populateDates() {
 		let f = jQuery('#frmMediaRepurposingConfigure');
 		f.find( "input[innertype=integer]").each(function(idx) {
-			var d = new Date(0);
 			var val = parseInt($(this).val());
-			if (isNaN(val) || val < 315360000) // 10 Year (max relative time)	315360000
+			if (isNaN(val))
 				return;
-			d.setUTCSeconds(val);
-			$(this).val(d.toISOString().slice(0,10).replace(/-/g,"."));
+
+			if ( val > 315360000) {// 10 Year in second (max relative time)
+				var d = new Date(0);
+				d.setUTCSeconds(val);
+				$(this).val(d.toISOString().slice(0,10).replace(/-/g,"."));
+				return;
+			}
+
+			var id = this.id; //set months instead of seconds
+			if (epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
+				$(this).val(val / 2592000); // 60*60*24*30 - one month in seconds
 		});
+
+		var l = f.find( "label[for=relativeTimes]");
+		l.html(l.html() + " [for field " + epocToMonthsField.toString() + " insert in months]")
 	}
 
 	function addTaskButtonExe() {

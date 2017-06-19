@@ -119,5 +119,11 @@ class DropFolderFile extends BaseDropFolderFile implements IBaseObject
 	{
 		return $this->getFileName();
 	}
-	
+
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		if ($deepCopy)
+			$this->setCustomDataObj();
+		parent::copyInto($copyObj, $deepCopy);
+	}
 } // DropFolderFile

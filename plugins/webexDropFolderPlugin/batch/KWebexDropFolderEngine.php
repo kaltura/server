@@ -55,7 +55,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			{
 				$this->handleFileAdded ($physicalFile);
 				$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
-				KalturaLog::info("maxTime updated: $maxTime");
+				KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
 			}
 		}
 		
@@ -210,7 +210,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$newDropFolderFile->recordingId = $webexFile->getRecordingID();
 			$newDropFolderFile->webexHostId = $webexFile->getHostWebExID();
 			$newDropFolderFile->contentUrl = $webexFile->getFileURL();
-			KalturaLog::debug('content url '. $newDropFolderFile->contentUrl . ' file url: ' .$webexFile->getFileURL() );
+			KalturaLog::debug("Adding new WebexDropFolderFile: " . print_r($newDropFolderFile, true));
 			//No such thing as an 'uploading' webex drop folder file - if the file is detected, it is ready for upload. Immediately update status to 'pending'
 			KBatchBase::$kClient->startMultiRequest();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);

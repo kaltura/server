@@ -115,8 +115,8 @@ function dryRun(mediaRepurposingId)
 	changeStatus(
 		mediaRepurposingId,
 		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY; ?>,
-		function() {
-			alert("Dry run for MR profile id [" + mediaRepurposingId + "] has been Assign. This could take couple of minutes. Results will be save to file");
+		function(batchJobId) {
+			alert("Dry run for MR profile id [" + mediaRepurposingId + "] has been Assign. This could take couple of minutes. Results will be save to file. The batch JobId is " + batchJobId);
 		}
 	);
 }
@@ -146,12 +146,12 @@ function changeStatus(mediaRepurposingId, status, callback)
 		url: url,
 		dataType: 'json',
 		success: function(result) {
-			if (result != 'ok')
+			if (result[0] != 'ok')
 				this.error();
 			
 			if (callback && (typeof callback == 'function'))
 			{
-				callback.apply(this);
+				callback.apply(this, [result[1]]);
 			}			
 			jQuery('#frmPaginator1').submit();
 		},
@@ -267,8 +267,13 @@ function convertDates()
 	let f = jQuery('#frmMediaRepurposingConfigure');
 	f.find( "input[innertype=integer]").each(function(idx) {
 		var val = $(this).val();
-		if (isDatesFormat(val))
+		if (isDatesFormat(val)) {
 			$(this).val(getEpocTime(val));
+			return;
+		}
+		var id = this.id;
+		if (val != 'N/A' && epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
+			$(this).val(val * 2592000); // 60*60*24*30 - set relative in seconds from relative months
 	});
 }
 

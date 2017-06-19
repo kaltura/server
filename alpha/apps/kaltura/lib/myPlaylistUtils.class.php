@@ -594,6 +594,10 @@ class myPlaylistUtils
 			
 			// update total count and merge current result with the global list
 			$entry_ids_list = array_merge ( $entry_ids_list , $entry_ids_list_for_filter );
+			
+			//If the criteria had a forced order, this order must also be enforced in the playlist.
+			if($c->forcedOrderIds)
+				$entry_ids_list = array_intersect($c->forcedOrderIds, $entry_ids_list);
 		}
 		
 		if($pager)

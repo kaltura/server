@@ -462,8 +462,9 @@ function assignLiveDeliveryProfile(format, currentDps)
 	);
 }
 
-function assignDeliveryProfile(format, currentDps, type = null)
+function assignDeliveryProfile(format, currentDps, type)
 {
+	var type = type === undefined ? null : type;
 	var partnerId = $("#id")[0].value;
 
 	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-delivery-profile')); ?>';

@@ -32,8 +32,9 @@ abstract class KalturaServerNodeBaseFilter extends KalturaFilter
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
 		"dcEqual" => "_eq_dc",
 		"dcIn" => "_in_dc",
-		"parentIdEqual" => "_eq_parent_id",
-		"parentIdIn" => "_in_parent_id",
+		"parentIdLike" => "_like_parent_id",
+		"parentIdMultiLikeOr" => "_mlikeor_parent_id",
+		"parentIdMultiLikeAnd" => "_mlikeand_parent_id",
 	);
 
 	static private $order_by_map = array
@@ -178,12 +179,17 @@ abstract class KalturaServerNodeBaseFilter extends KalturaFilter
 	public $dcIn;
 
 	/**
-	 * @var int
+	 * @var string
 	 */
-	public $parentIdEqual;
+	public $parentIdLike;
 
 	/**
 	 * @var string
 	 */
-	public $parentIdIn;
+	public $parentIdMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $parentIdMultiLikeAnd;
 }

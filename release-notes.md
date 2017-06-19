@@ -1,3 +1,100 @@
+# Lynx 12.18.0 #
+
+## support new live packages + LC flow + webcast on update or fresh install ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7535
+
+### Configuration ###
+	1. Add the following to you plugins.ini file: "PushNotification", "Queue", "RabbitMQ". 
+	   (This will require execution of install plugins and new clients tp be genrated. Instrunctions can be found in the deploymnet script part).
+
+	Please note that for webcast to work you will need to have rabbit and pub-sub-server installed and correctly configured. For refernce view:
+	1. Install rabbit_mq (for reference view, https://www.rabbitmq.com/download.html)
+	2. Update configurations/rabbit_mq.ini placeholders with the rabbit information.
+	3. Install pub-sub-server (for reference view: https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md)
+
+### Deployment scripts ###
+
+	Deploy new live HD flavors + Live Language package:
+	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_latest_live_params.php
+	
+	Deploy Lecture_Capture conversion profile & flavors:
+	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
+
+	Deploy Webcast Push notification and response profiles:
+	1. Response profiles:
+	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	   1. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/polls_response_profile.template.xml
+	   2. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/qna_response_profiles.template.xml
+	   
+	   Run deployment script:
+	   1. 	php /opt/kaltura/app/deployment/updates/scripts/2017_05_24_deploy_webcast_related_response_profiles.php
+
+	2. Push notitifications:
+	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	   	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
+		2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
+		3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
+		4. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/public_qna_notification.template.xml
+	
+	   Run deployment script:
+		1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+		2. php /opt/kaltura/app/generator/generate.php
+		3. php /opt/kaltura/app/deployment/updates/scripts/2017_06_14_deploy_webcast_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+## eCDN parent redundency ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7371
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_06_07_alter_server_node_table_parent_id.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Polls getVote action ##
+  
+- Issue Type: Bug fix
+- Issue Id: PLAT-7502
+
+### Configuration ###
+- In base.ini add the following parameters to [cache_based_service_actions]:
+	poll_poll_getVote = "/../../plugins/poll/lib/PollActions.php"
+
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+## missing enum in quiz plugin ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Lynx 12.17.0 #
 
 ## Media Repurposing ##
@@ -33,22 +130,6 @@ None.
 	point 'shared_temp_folder' var (in configurations/local.ini) to that folder
 
 ### Deployment scripts ###
-None.
-
-## Q&A/Polls Response profiles and push notifications tempaltes ##
-
-- Issue Type: Feature
-- Issue ID: PLAT-6940
-
-### Configuration ###
-None.
-
-### Deployment scripts ###
-
-	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
-
-#### Known Issues & Limitations ####
-
 None.
 
 ## Add polls support ##

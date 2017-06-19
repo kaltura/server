@@ -271,7 +271,6 @@ class CuePointService extends KalturaBaseService
 
 		$this->validateUserLog($dbCuePoint);
 		
-		$dbCuePoint->setKuserId($this->getKuser()->getId()); 
 		$dbCuePoint->save();
 		
 		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());

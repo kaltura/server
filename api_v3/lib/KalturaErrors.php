@@ -102,6 +102,8 @@ class KalturaErrors extends APIErrors
 
 	const RESOURCE_IS_RESERVED = "RESOURCE_IS_RESERVED;RESOURCE_ID;Resource with id @RESOURCE_ID@ is already reserved";
 	
+	const FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE = "FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE;DYNAMIC_VALUE;Dynamic dependent value \"@DYNAMIC_VALUE@\" not found";
+	
 	/**
 	 * Service Oriented Errors
 	 *

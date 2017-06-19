@@ -151,23 +151,29 @@ class registerNotificationPostProcessor
 	
 	public function getKsObject($requestParams)
 	{
+		$ks = $this->getRequestParamsKs($requestParams);
+		if(!$ks)
+			return null;
+		
+		$ksObj = new kSessionBase();
+		$parseResult = $ksObj->parseKS($ks);
+		$ksStatus = $ksObj->tryToValidateKS();
+		if($parseResult && $ksStatus == kSessionBase::OK)
+			return $ksObj;
+		
+		return null;
+	}
+	
+	private function getRequestParamsKs($requestParams)
+	{
+		if(isset($requestParams['originalKs']))
+			return $requestParams['originalKs'];
+		
 		if(isset($requestParams['ks']))
-		{
-			$ksObj = new kSessionBase();
-			$parseResult = $ksObj->parseKS($requestParams['ks']);
-			$ksStatus = $ksObj->tryToValidateKS();
-			if($parseResult && $ksStatus == kSessionBase::OK)
-				return $ksObj;
-		}
+			return $requestParams['ks'];
 		
 		if(isset($requestParams['service']) && $requestParams['service'] === "multirequest" && isset($requestParams['1:ks']))
-		{
-			$ksObj = new kSessionBase();
-			$parseResult = $ksObj->parseKS($requestParams['1:ks']);
-			$ksStatus = $ksObj->tryToValidateKS();
-			if($parseResult && $ksStatus == kSessionBase::OK)
-				return $ksObj;
-		}	
+			return $requestParams['1:ks'];
 		
 		return null;
 	}
