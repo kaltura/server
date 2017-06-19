@@ -165,11 +165,13 @@ class KalturaFrontController
 				{
 					if(intval($matches[1]) == $index)
 					{
-						$attributePath = explode(':', $matches[2]);
+						if($result instanceof KalturaAPIException)
+							throw new KalturaAPIException(KalturaErrors::FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE, $path);
 						
+						$attributePath = explode(':', $matches[2]);
 						$valueFromObject = $this->getValueFromObject($result, $attributePath);
 						if(!$valueFromObject)
-							throw new KalturaAPIException(KalturaErrors::FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE, $path);
+							KalturaLog::debug("replaceMultiRequestResults: Empty value returned from object");
 							
 						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
 					}
@@ -300,7 +302,7 @@ class KalturaFrontController
 							
 				try
 				{
-					if($listOfRequests[$i]['error'])
+					if(isset($listOfRequests[$i]['error']))
 						throw $listOfRequests[$i]['error'];
 					
 					$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
