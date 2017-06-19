@@ -150,6 +150,7 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 		$pages[] = new MediaRepurposingListAction();
 		$pages[] = new MediaRepurposingConfigureAction();
 		$pages[] = new MediaRepurposingSetStatusAction();
+		$pages[] = new MediaRepurposingLogsAction();
 		return $pages;
 	}
 

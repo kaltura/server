@@ -1,19 +1,17 @@
 <fieldset class="mediaRepurposing-taskData">
 	<legend>Task</legend>
 	This is general info about the task. Add specific params below!
-	<?php echo $this->element->getElement('TaskType'); ?></br>
+	<?php echo $this->element->getElement('TaskType'); ?><br/>
 	<?php echo $this->element->getElement('TaskId'); ?><br/>
 	<?php echo $this->element->getElement('taskTime'); ?><br/>
-
-
+	
 	<input type="hidden" name="belongs" value="<?php echo $this->element->getElementsBelongTo(); ?>" />
-<!--	<a class="remove-condition" href="javascript:;" onclick="removeTask(this);">Remove</a>-->
-
-
+	<a id="removeTaskButton" class="remove-task" href="javascript:;" onclick="removeTask(this);">Remove</a>
 </fieldset>
 
 <style type="text/css">
 	#frmMediaRepurposingConfigure .mediaRepurposing-taskData legend{font-size:16px }
 </style>
+
 
 

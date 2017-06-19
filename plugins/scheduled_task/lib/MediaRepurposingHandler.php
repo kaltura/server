@@ -16,6 +16,6 @@ class MediaRepurposingHandler
 				$newMDP = $templateMDPForMR->copyToPartner($partnerId);
 				$newMDP->save();
 			}
+		}
 	}
-}
 }

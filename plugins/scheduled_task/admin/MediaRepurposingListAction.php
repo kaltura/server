@@ -67,6 +67,8 @@ class MediaRepurposingListAction extends KalturaApplicationPlugin implements IKa
 		$createMediaRepurposingFormFromTemplate = new Form_CreateMediaRepurposingFromTemplate();
 		$createMediaRepurposingFormFromTemplate->setAction($actionUrl);
 		$action->view->newMediaRepurposingFormFromTemplate = $createMediaRepurposingFormFromTemplate;
+
+		$action->view->getDryRunLogForm = new Form_GetDryRunLog();
 	}
 
 
