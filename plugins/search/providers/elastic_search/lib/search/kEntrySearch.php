@@ -88,7 +88,7 @@ class kEntrySearch
         if(kElasticEntitlement::$parentEntitlement)
         {
             //create parent entry part
-            $this->query['body']['query']['bool']['filter'][2]['bool']['should'][0]['bool']['filter'] = array(
+            $this->query['body']['query']['bool']['filter'][1]['bool']['should'][0]['bool']['filter'] = array(
                 array(
                     'exists' => array(
                         'field'=> 'parent_id'
@@ -97,10 +97,10 @@ class kEntrySearch
             );
 
             //assign by reference to create name alias
-            $this->parentEntryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][0]['bool'];
+            $this->parentEntryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool']['should'][0]['bool'];
 
             //create entry part
-            $this->query['body']['query']['bool']['filter'][2]['bool']['should'][1]['bool']['must_not'] = array(
+            $this->query['body']['query']['bool']['filter'][1]['bool']['should'][1]['bool']['must_not'] = array(
                 array(
                     'exists' => array(
                         'field'=> 'parent_id'
@@ -108,13 +108,13 @@ class kEntrySearch
                 )
             );
             //assign by reference to create name alias
-            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][2]['bool']['should'][1]['bool'];
-            $this->query['body']['query']['bool']['filter'][2]['bool']['minimum_should_match'] = 1;
+            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool']['should'][1]['bool'];
+            $this->query['body']['query']['bool']['filter'][1]['bool']['minimum_should_match'] = 1;
         }
         else
         {
             //entry query - assign by reference to create name alias
-            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][2]['bool'];
+            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool'];
         }
         $this->isInitialized = true;
     }
