@@ -314,7 +314,8 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	{
 		if (!$xml)
 			$xml = new SimpleXMLElement("<metadata/>");
-		$xml->addChild('Status', 'Enabled');
+		if (!is_null($xml->Status))
+			$xml->addChild('Status', 'Enabled');
 		$xml->addChild('MRPsOnEntry', "MR_$mrId");
 		if ($error)
 			$xml->addChild('MRPData', "$mrId,Error,1," .self::getUpdateDay());
