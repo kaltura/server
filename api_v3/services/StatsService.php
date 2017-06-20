@@ -23,7 +23,7 @@ class StatsService extends KalturaBaseService
 		if ($actionName === 'reportKceRrror') {
 			return false;
 		}
-		if ($actionName === 'reportDeviceCapabilties') {
+		if ($actionName === 'reportDeviceCapabilities') {
 			return false;
 		}
 		return parent::partnerRequired($actionName);
@@ -187,7 +187,7 @@ referrer
 	 * @ksIgnored
 	 */
 	
-	function reportDeviceCapabilties($data)
+	function reportDeviceCapabilities($data)
 	{
 		// do nothing - the stats will be collected by going over the api log
 	}	
