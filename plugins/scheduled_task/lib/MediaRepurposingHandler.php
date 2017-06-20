@@ -58,7 +58,7 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 			$partnerId = $object->getPartnerId();
 
 			$mediaRepurposingMetadataProfileId = $this->getMediaRepuposingMetadataProfileId($partnerId);
-			if ($mediaRepurposingMetadataProfileId == $changedMetadataProfileId)
+			if (!$mediaRepurposingMetadataProfileId || $mediaRepurposingMetadataProfileId == $changedMetadataProfileId)
 				return false; // should not consume change in the MRP metadata itself
 
 			$mediaRepurposingProfiles = $this->getMRPWithMetadataSearchByProfile($partnerId, $changedMetadataProfileId);
@@ -86,7 +86,9 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 	private function getMediaRepuposingMetadataProfileId($partnerId)
 	{
 		$mrp = MetadataProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, $partnerId);
-		return $mrp->getId();
+		if ($mrp)
+			return $mrp->getId();
+		return null;
 	}
 
 	private function removeMediaRepurposingProfileFromMetadata($xml, $mediaRepurposingId)
