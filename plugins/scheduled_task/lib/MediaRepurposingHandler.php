@@ -9,9 +9,9 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 
 	public static function enableMrPermission($partnerId)
 	{
-		if (!MetadataProfilePeer::retrieveBySystemName('MRP', $partnerId)) {
+		if (!MetadataProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, $partnerId)) {
 			KalturaLog::info("NO MDP on partner [$partnerId] - cloning from admin-console partner");
-			$templateMDPForMR = MetadataProfilePeer::retrieveBySystemName('MRP', MediaRepurposingUtils::ADMIN_CONSOLE_PARTNER);
+			$templateMDPForMR = MetadataProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, MediaRepurposingUtils::ADMIN_CONSOLE_PARTNER);
 			if ($templateMDPForMR) {
 				$newMDP = $templateMDPForMR->copyToPartner($partnerId);
 				$newMDP->save();
@@ -68,7 +68,7 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 
 	private function getMRPWithMetadataSearchByProfile($partnerId, $metadataProfileId)
 	{
-		$allMediaRepurposingProfilesOnPartner = ScheduledTaskProfilePeer::retrieveBySystemName('MRP', $partnerId);
+		$allMediaRepurposingProfilesOnPartner = ScheduledTaskProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, $partnerId);
 		$mediaRepurposingProfilesWithSearchOnGivenMetadataId = array();
 		foreach($allMediaRepurposingProfilesOnPartner as $mediaRepurposingProfile) {
 			/* @var $mr ScheduledTaskProfile*/
