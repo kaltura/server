@@ -23,7 +23,7 @@ class StatsService extends KalturaBaseService
 		if ($actionName === 'reportKceRrror') {
 			return false;
 		}
-			if ($actionName === 'reportDeviceCapabilties') {
+		if ($actionName === 'reportDeviceCapabilties') {
 			return false;
 		}
 		return parent::partnerRequired($actionName);
