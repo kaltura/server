@@ -126,42 +126,16 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function bulkDeleteAction(KalturaUserEntryFilter $filter)
 	{
+		//The Delete job will need the users translated to puser IDs
+		$ueFilter = $filter->toObject($ueFilter);
+		
 		if (!$filter->userIdEqual && !$filter->userIdIn && !$filter->entryIdEqual && !$filter->entryIdIn)
 		{
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
 		}
+		$batchJob = kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
 		
-		//The Delete job will need the users translated to puser IDs
-		$ueFilter = $filter->toObject($ueFilter);
-		if ($filter->userIdEqual)
-		{
-			if(!kuserPeer::retrieveByPK($filter->userIdEqual))
-			{
-				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
-			}
-			
-			$ueFilter->set("_eq_user_id", kuserPeer::retrieveByPK($filter->userIdEqual)->getPuserId());
-		}
-		if($filter->userIdIn)
-		{
-			$kusersIds = explode(',', $filter->userIdIn);
-			$kusers = kuserPeer::retrieveByPKs($kusersIds);
-			
-			$pusers = array();
-			foreach ($kusers as $kuser)
-			{
-				$pusers[] = $kuser->getPuserId();
-			}	
-			
-			if(!count($pusers))
-			{
-				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
-			}
-		
-			$ueFilter->set("_in_user_id", implode (',', $pusers));
-		}
-		
-		return kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
+		return $batchJob->getId();
 	}
 
 }
