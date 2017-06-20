@@ -92,7 +92,12 @@ class kESearchQueryManager
 				$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
 			}
 			else
-				$queryOut[$queryVerbs[0]][$queryVerbs[1]] = array($entrySearchItem->getFieldName() => strtolower($entrySearchItem->getSearchTerm()));
+				$queryOut[$queryVerbs[0]][$queryVerbs[1]][] = array($entrySearchItem->getFieldName() => strtolower($entrySearchItem->getSearchTerm()));
+
+			foreach ($entrySearchItem->getRanges() as $range)
+			{
+				$queryOut[$queryVerbs[0]][$queryVerbs[1]][]['query']['range'][$entrySearchItem->getFieldName()] = array('gte' => $range[0], 'lte' => $range[1]);
+			}
 		}
 		return $queryOut;
 	}
@@ -145,15 +150,11 @@ class kESearchQueryManager
 					break;
 			}
 
-			if (!is_null($eSearchCaptionItem->getStartTimeInVideo()))
+			foreach ($eSearchCaptionItem->getRanges() as $range)
 			{
-				$captionQuery['has_child']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('lines.start_time' => array('gte' => $eSearchCaptionItem->getStartTimeInVideo())));
+				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('caption_assets.lines.start_time' => array('lte' => $range[0])));
+				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('caption_assets.lines.end_time' => array('gte' => $range[1])));
 			}
-			if (!is_null($eSearchCaptionItem->getEndTimeInVideo()))
-			{
-				$captionQuery['has_child']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('lines.end_time' => array('gte' => $eSearchCaptionItem->getEndTimeInVideo())));
-			}
-
 		}
 		foreach ($additionalParams as $addParamKey => $addParamVal)
 		{
