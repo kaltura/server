@@ -8,6 +8,11 @@ if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 	exit;
 }
 
+if($_SERVER['REQUEST_METHOD'] == 'GET' || $_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'HEAD')
+{
+	header('Access-Control-Expose-Headers: Server, Content-Length, Content-Range, Date, X-Kaltura, X-Kaltura-Session, X-Me');
+}
+
 $start = microtime(true);
 // check cache before loading anything
 require_once(dirname(__FILE__)."/../lib/KalturaResponseCacher.php");
