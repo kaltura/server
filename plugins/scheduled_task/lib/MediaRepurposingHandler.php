@@ -28,7 +28,7 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 		$mediaRepurposingMetadataProfileId = $this->getMediaRepuposingMetadataProfileId($partnerId);
 		$mediaRepuposingMetadata = MetadataPeer::retrieveByObject($mediaRepurposingMetadataProfileId, MetadataObjectType::ENTRY, $entryId);
 		if (!$mediaRepuposingMetadata)
-			return; //if no metadata for media repurposing on entry then nothing to do
+			return true; //if no metadata for media repurposing on entry then nothing to do
 		
 		$key = $mediaRepuposingMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xml = kFileSyncUtils::file_get_contents($key, true, false);
@@ -46,6 +46,8 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 
 		if (!kFileSyncUtils::compareContent($key, $xml->asXML()))
 			MetadataPlugin::updateMetadataFileSync($mediaRepuposingMetadata, $xml->asXML());
+
+		return true;
 	}
 
 	public function shouldConsumeDataChangedEvent(BaseObject $object, $previousVersion = null)
