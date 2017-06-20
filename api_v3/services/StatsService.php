@@ -182,7 +182,7 @@ referrer
 	/**
 	 * Use this action to report device capabilities to the kaltura server.
 	 *
-	 * @action reportDeviceCapabilties
+	 * @action reportDeviceCapabilities
 	 * @param string $data
 	 * @ksIgnored
 	 */
