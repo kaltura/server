@@ -139,6 +139,9 @@
 		"moderation" : {
 		  "type" : "keyword"
 		},
+		"contribution_policy" : {
+		  "type" : "keyword"
+		},
 		"metadata" :{
 		  "type"  : "nested",
 		  "properties"  : {
