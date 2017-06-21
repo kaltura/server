@@ -1372,6 +1372,83 @@ $plannedDur = 0;
 				}
 				$wmData->scale = "$widScale"."x$hgtScale";
 			}
+
+			/*
+			 * Apply 'source-proportional-margins' - 
+			 * the margins calculated in proportion to source dims 
+			 * (similar to same 'scale' functionality)
+			 */
+			if(isset($wmData->margins)){
+				$marginsArr = explode("x",$wmData->margins); 
+				$widMargin = trim($marginsArr[0]); 
+				$hgtMargin = trim($marginsArr[1]);
+				/*
+				 * If there is widMargin and it is source-proportional -
+				 *  claculate the correct widMargin value
+				 */
+				if($widMargin!=="") {
+					if(strchr($widMargin,'%')){
+						$widMargin = trim($widMargin,'%');
+						if(isset($srcWid)) {
+							if(isset($fixImageDar))
+								$widMargin = round($srcWid*$widMargin/(100*$fixImageDar));
+							else /**/
+								$widMargin = round($srcWid*$widMargin/100);
+						}
+						else $widMargin = 0;
+					}
+				}
+				/*
+				 * If there is hgtMargin and it is source-proportional -
+				 *  claculate the correct hgtMargin value
+				 */
+				if($hgtMargin!=="") {
+					if(strchr($hgtMargin,'%')){
+						$hgtMargin = trim($hgtMargin,'%');
+						if(isset($srcHgt)){
+								/*
+								 * An attempt to handle 'more' properly rotated ($srcWid>$srcHgt)
+								 * and anamorphic ($fixImageDar) cases.
+								 * This is not a real solution, but partial improvement
+								 */
+							if(isset($fixImageDar) && $srcWid>$srcHgt)
+								$hgtMargin = round($srcHgt*$hgtMargin*$fixImageDar/(100));
+							else /**/
+								$hgtMargin = round($srcHgt*$hgtMargin/100);
+						}
+						else $hgtMargin = 0;
+							/*
+							 * If the widMargin was not set,
+							 *  assign widMargin the hgtMargin value
+							 */
+						if($widMargin===""){
+							$widMargin = $hgtMargin;
+						}
+					}
+				}
+
+					/*
+					 * If the hgtMargin was not set and widMargin exiist 
+					 *  assign hgtMargin the widMargin value
+					 */
+				if($hgtMargin==="" && $widMargin!==""){
+						if(isset($fixImageDar))
+							$hgtMargin = round($widMargin*$fixImageDar);
+						else
+							$hgtMargin = $widMargin;
+				}
+				$wmData->margins = "$widMargin"."x$hgtMargin";
+				KalturaLog::log("srcWid($srcWid),srcHgt($srcHgt),widMargin($widMargin),hgtMargin($hgtMargin)");
+			}
+
+/*
+SRC related
+[{"imageEntry":"0_eutot9cu","margins":"1.6%x2.8%","scale":"0x10%"},  {"imageEntry":"0_eutot9cu","margins":"-1.6%x2.8%","scale":"0x10%",  "fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}, {"imageEntry":"0_eutot9cu","margins":"8%x2.8%","scale":"0x10%","fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}  ]
+
+WM HGT related
+[{"imageEntry":"0_eutot9cu","margins":"30%x30%","scale":"0x10%"},  {"imageEntry":"0_eutot9cu","margins":"-30%x30%","scale":"0x10%",  "fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}, {"imageEntry":"0_eutot9cu","margins":"145%x30%","scale":"0x10%","fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}  ]
+*/
+
 				/*
 				 * fixImageDar - to adjust WM dar/dims in case of anamorphic source
 				 */
