@@ -9,6 +9,11 @@ abstract class ESearchItem extends BaseObject
 	protected $itemType;
 
 	/**
+	 * @var array
+	 */
+	public $ranges;
+
+	/**
 	 * @return ESearchItemType
 	 */
 	public function getItemType()
@@ -23,6 +28,23 @@ abstract class ESearchItem extends BaseObject
 	{
 		$this->itemType = $itemType;
 	}
+
+	/**
+	 * @return array
+	 */
+	public function getRanges()
+	{
+		return $this->ranges;
+	}
+
+	/**
+	 * @param array $ranges
+	 */
+	public function setRanges($ranges)
+	{
+		$this->ranges = $ranges;
+	}
+
 
 	/**
 	 * @return null|string

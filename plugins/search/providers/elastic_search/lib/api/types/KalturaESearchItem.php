@@ -9,9 +9,14 @@ abstract class KalturaESearchItem extends KalturaESearchBaseItem {
 	 */
 	public $itemType;
 
+	/**
+	 * @var KalturaRangeArray
+	 */
+	public $ranges;
 
 	private static $map_between_objects = array(
 		'itemType',
+		'ranges',
 	);
 
 	protected function getMapBetweenObjects()
