@@ -1943,6 +1943,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 				'reference_id' => $this->getReferenceId(),
 				'inherited_parent_id' => $this->getInheritedParentId(),
 				'moderation' => $this->getModeration(),
+				'contribution_policy' => $this->getContributionPolicy(),
 			),
 			'doc_as_upsert' => true
 		);
