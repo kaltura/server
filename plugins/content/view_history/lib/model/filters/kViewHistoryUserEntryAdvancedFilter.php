@@ -65,7 +65,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 			return;
 		}
 		$entryIds = array();
-		$limit = $query->getLimit();
+		$limit = $query->getLimit() ? $query->getLimit() : ($this->filterLimit ? $this->filterLimit : self::ENTRIES_COUNT);
 		
 		$query->setLimit(self::ENTRIES_COUNT);
 		$this->disable = true;
@@ -91,6 +91,11 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 			KalturaLog::info("Too many entries found - query userEntries instead");
 			$userEntryOffset = 0;
 			$chunkSize = max(min($limit * 2, self::MAX_USER_ENTRY_CHUNK_SIZE), self::MIN_USER_ENTRY_CHUNK_SIZE);
+			if ($this->filterLimit)
+			{
+				$chunkSize = $this->filterLimit;
+			}
+			
 			while (true)
 			{
 				if (count($entryIds) >= $limit)
