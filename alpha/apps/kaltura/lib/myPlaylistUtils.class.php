@@ -1053,23 +1053,27 @@ HTML;
 				false, 
 				$pager);
 
-		return self::getPlaylistDataFromEntries($entries);
+		return self::getPlaylistDataFromEntries($entries, null);
 	}
 
 	/**
 	 * @param $entries
 	 * @return array
 	 */
-	public static function getPlaylistDataFromEntries($entries, $flavorParamsIds = null)
+	public static function getPlaylistDataFromEntries($entries, $flavorParamsIds, $captions)
 	{
 		$entryIds = array();
 		$durations = array();
+		$captionFiles = array();
 		$mediaEntry = null;
 		$maxFlavorCount = 0;
 		foreach ($entries as $entry)
 		{
 			$entryIds[] = $entry->getId();
 			$durations[] = $entry->getLengthInMsecs();
+
+			$entryCaptionFiles = self::getCaptionFilesForEntry($entry->getId(), $captions);
+			$captionFiles[$entry->getId()] = $entryCaptionFiles;
 
 			// Note: choosing a reference entry that has max(flavor count) and min(int id)
 			//	the reason for the int id condition is to avoid frequent changes to the 
@@ -1087,6 +1091,31 @@ HTML;
 			}
 		}
 
-		return array($entryIds, $durations, $mediaEntry);
+		return array($entryIds, $durations, $mediaEntry, $captionFiles);
+	}
+
+	protected static function getCaptionFilesForEntry($entryId, $captions)
+	{
+		$captionLangsArr = explode(',', $captions);
+		$c = new Criteria();
+		$c->addAnd(assetPeer::ENTRY_ID, $entryId);
+		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		$captionAssets = assetPeer::doSelect($c);
+		$filteredCaptionAssets = array();
+		foreach ($captionAssets as $captionAsset)
+		{
+			if (in_array($captionAsset->getLanguage(), $captionLangsArr))
+			{
+				$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+
+				list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
+				if ($captionFileSync)
+				{
+					$captionFullPath = $captionFileSync->getFullPath();
+					$filteredCaptionAssets[] = $captionFullPath;
+				}
+			}
+		}
+		return $filteredCaptionAssets;
 	}
 }

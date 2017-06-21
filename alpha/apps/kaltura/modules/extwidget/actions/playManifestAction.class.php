@@ -832,7 +832,7 @@ class playManifestAction extends kalturaAction
 				if (count($sequenceEntries))
 				{
 					$this->deliveryAttributes->setHasValidSequence(true);
-					list($entryIds, $durations, $mediaEntry) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries);
+					list($entryIds, $durations, $mediaEntry) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null);
 					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
 				}
 			}
@@ -1173,6 +1173,7 @@ class playManifestAction extends kalturaAction
 		$config->entryId = $this->entryId;
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
+		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{
