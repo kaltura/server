@@ -162,7 +162,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ( $this->shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
 			if ($dbProfile)
@@ -229,6 +229,22 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 		    return $signingKey;
 	    }
 	    return null;
+    }
+
+	/**
+	 * @param array<kRuleAction> $actions
+	 * @return bool
+	 */
+    protected function shouldContributeToPlaybackContext(array $actions)
+    {
+	    foreach ($actions as $action)
+	    {
+		    /*** @var kRuleAction $action */
+		    if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+			    return true;
+	    }
+
+	    return false;
     }
 
 	/**

@@ -367,6 +367,10 @@ class kPlaybackContextDataHelper
 		foreach ($localDeliveryProfiles as $deliveryProfile)
 		{
 			$deliveryProfileFlavors = $this->localFlavors;
+
+			$flavorTagsArrayByPriority = $this->getTagsByFormat($deliveryProfile->getStreamerType());
+			$deliveryProfileFlavors = $this->filterFlavorsByTags($flavorTagsArrayByPriority, $deliveryProfileFlavors);
+
 			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile, $contextDataHelper);
 
 			if (count($playbackFlavors))
@@ -410,6 +414,9 @@ class kPlaybackContextDataHelper
 			{
 				$deliveryProfileFlavorsForDc = $flavorAssetsForDc;
 
+				$flavorTagsArrayByPriority = $this->getTagsByFormat($deliveryProfile->getStreamerType());
+				$deliveryProfileFlavorsForDc = $this->filterFlavorsByTags($flavorTagsArrayByPriority, $deliveryProfileFlavorsForDc);
+
 				list($flavorToDrmData, $filteredDeliveryProfileFlavorsForDc) = self::getDrmData($dbEntry, $deliveryProfileFlavorsForDc, $deliveryProfile, $contextDataHelper);
 
 				if (count($filteredDeliveryProfileFlavorsForDc))
@@ -426,6 +433,72 @@ class kPlaybackContextDataHelper
 				}
 			}
 		}
+	}
+
+
+	private function getTagsByFormat($format)
+	{
+		switch ($format)
+		{
+			case PlaybackProtocol::SILVER_LIGHT:
+				return array(
+					array(assetParams::TAG_ISM),
+				);
+
+			case PlaybackProtocol::MPEG_DASH:
+				return array(
+					array('dash'),
+					array('ipadnew', 'iphonenew'),
+					array('ipad', 'iphone'),
+				);
+
+			case PlaybackProtocol::APPLE_HTTP:
+			case PlaybackProtocol::HDS:
+				return array(
+					array(assetParams::TAG_APPLEMBR),
+					array('ipadnew', 'iphonenew'),
+					array('ipad', 'iphone'),
+				);
+			case PlaybackProtocol::HTTP:
+				return array(
+					array('widevine', 'widevine_mbr'),
+					array(assetParams::TAG_MBR),
+					array(assetParams::TAG_WEB),
+				);
+			default:
+				return array(
+					array(assetParams::TAG_MBR),
+					array(assetParams::TAG_WEB),
+				);
+		}
+	}
+
+	/**
+	 * @param array $flavorTagsArrayByPriority
+	 * @param array<asset|assetParams> $flavors
+	 * @return array
+	 */
+	private function filterFlavorsByTags($flavorTagsArrayByPriority, $flavors)
+	{
+		foreach ($flavorTagsArrayByPriority as $tagsFallback)
+		{
+			$curFlavors = array();
+
+			foreach ($flavors as $flavor)
+			{
+				foreach ($tagsFallback as $tagOption)
+				{
+					if (!$flavor->hasTag($tagOption))
+						continue;
+					$curFlavors[$flavor->getId()] = $flavor;
+					break;
+				}
+			}
+
+			if ($curFlavors)
+				return $curFlavors;
+		}
+		return array();
 	}
 
 	/**

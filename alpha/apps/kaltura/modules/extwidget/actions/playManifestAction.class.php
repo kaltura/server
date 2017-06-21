@@ -1038,6 +1038,7 @@ class playManifestAction extends kalturaAction
 
 		case PlaybackProtocol::MPEG_DASH:
 			return array(
+				array('dash'),
 				array('ipadnew', 'iphonenew'),
 				array('ipad', 'iphone'),
 			);
