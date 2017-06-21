@@ -55,7 +55,8 @@ class kESearchQueryManager
 			//TODO: partial won't work on most of these since they are not indexed as ngram
 			$entrySubQuery = self::createEntrySearchQuery($categorizedSearchItems['entrySearchItems'], $boolOperator);
 			foreach($entrySubQuery as $queryVerb => $queryVal)
-				$outQuery['bool'][$queryVerb][] = $queryVal;
+				foreach ($queryVal as $internalName => $internalVal)
+					$outQuery['bool'][$queryVerb][][$internalName] = $internalVal;
 		}
 
 
@@ -86,25 +87,30 @@ class kESearchQueryManager
 			 * @var ESearchEntryItem $entrySearchItem
 			 */
 			$queryVerbs = $entrySearchItem->getQueryVerbs();
-			if ($entrySearchItem->getItemType() == ESearchItemType::PARTIAL)
+			$searchTerm = $entrySearchItem->getSearchTerm();
+			if (!empty($searchTerm))
 			{
-				$queryOut[$queryVerbs[0]]['multi_match']['query'] = strtolower($entrySearchItem->getSearchTerm());
-				$queryOut[$queryVerbs[0]]['multi_match']['fields'] = array($entrySearchItem->getFieldName()."^2", $entrySearchItem->getFieldName() . ".raw^2", $entrySearchItem->getFieldName() . ".trigrams");
-				$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
-			}
-			else
-			{
-				$fieldNameAddition = '';
-				if ($entrySearchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL,$allowedSearchTypes[$entrySearchItem->getFieldName()]))
+				if ($entrySearchItem->getItemType() == ESearchItemType::PARTIAL)
 				{
-					$fieldNameAddition = '.raw';
+					$queryOut[$queryVerbs[0]]['multi_match']['query'] = strtolower($entrySearchItem->getSearchTerm());
+					$queryOut[$queryVerbs[0]]['multi_match']['fields'] = array($entrySearchItem->getFieldName() . "^2", $entrySearchItem->getFieldName() . ".raw^2", $entrySearchItem->getFieldName() . ".trigrams");
+					$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
+				} else
+				{
+					$fieldNameAddition = '';
+					if ($entrySearchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$entrySearchItem->getFieldName()]))
+					{
+						$fieldNameAddition = '.raw';
+					}
+					$queryOut[$queryVerbs[0]][$queryVerbs[1]] = array($entrySearchItem->getFieldName().$fieldNameAddition => strtolower($searchTerm));
 				}
-				$queryOut[$queryVerbs[0]][$queryVerbs[1]][$entrySearchItem->getFieldName().$fieldNameAddition] = strtolower($entrySearchItem->getSearchTerm());
 			}
-
-			foreach ($entrySearchItem->getRanges() as $range)
+			if (in_array('Range', $allowedSearchTypes[$entrySearchItem->getFieldName()]))
 			{
-				$queryOut[$queryVerbs[0]][$queryVerbs[1]][]['query']['range'][$entrySearchItem->getFieldName()] = array('gte' => $range[0], 'lte' => $range[1]);
+				foreach ($entrySearchItem->getRanges() as $range)
+				{
+					$queryOut[$queryVerbs[0]]['range'] = array($entrySearchItem->getFieldName() => array('gte' => $range[0], 'lte' => $range[1]));
+				}
 			}
 		}
 		return $queryOut;
@@ -244,20 +250,30 @@ class kESearchQueryManager
 			 * @var ESearchEntryItem $cuePointSearchItem
 			 */
 			$queryVerbs = $cuePointSearchItem->getQueryVerbs();
-			if ($cuePointSearchItem->getItemType() == ESearchItemType::PARTIAL)
+			$searchTerm = $cuePointSearchItem->getSearchTerm();
+			if (!empty($searchTerm))
 			{
-				$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['query'] = strtolower($cuePointSearchItem->getSearchTerm());
-				$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['fields'] = array($cuePointSearchItem->getFieldName()."^2", $cuePointSearchItem->getFieldName() . "raw^2", $cuePointSearchItem->getFieldName() . "trigrams");
-				$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
-			}
-			else
-			{
-				$fieldNameAddition = '';
-				if ($cuePointSearchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$cuePointSearchItem->getFieldName()]))
+				if ($cuePointSearchItem->getItemType() == ESearchItemType::PARTIAL)
 				{
-					$fieldNameAddition = '.raw';
+					$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['query'] = strtolower($cuePointSearchItem->getSearchTerm());
+					$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['fields'] = array($cuePointSearchItem->getFieldName() . "^2", $cuePointSearchItem->getFieldName() . "raw^2", $cuePointSearchItem->getFieldName() . "trigrams");
+					$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
+				} else
+				{
+					$fieldNameAddition = '';
+					if ($cuePointSearchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$cuePointSearchItem->getFieldName()]))
+					{
+						$fieldNameAddition = '.raw';
+					}
+					$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]][$queryVerbs[1]] = array($cuePointSearchItem->getFieldName() . $fieldNameAddition => strtolower($cuePointSearchItem->getSearchTerm()));
 				}
-				$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]][$queryVerbs[1]] = array($cuePointSearchItem->getFieldName().$fieldNameAddition => strtolower($cuePointSearchItem->getSearchTerm()));
+			}
+			if (in_array('Range', $allowedSearchTypes[$cuePointSearchItem->getFieldName()]))
+			{
+				foreach ($cuePointSearchItem->getRanges() as $range)
+				{
+					$queryOut[$queryVerbs[0]]['range'] = array($cuePointSearchItem->getFieldName() => array('gte' => $range[0], 'lte' => $range[1]));
+				}
 			}
 		}
 		return $cuePointQuery;
