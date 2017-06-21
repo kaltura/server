@@ -3684,6 +3684,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'start_date' => $this->getStartDate(null),
 			'end_date' => $this->getEndDate(null),
 			'entry_type' => $this->getType(),
+			'moderation_status' => $this->getModerationStatus(),
+			'created_at' => $this->getCreatedAt(null),
+			'updated_at' => $this->getUpdatedAt(null),
+			'modified_at' => $this->getModifiedAt(null),
+			'total_rank' => $this->getTotalRank(),
+			'access_control_id' => $this->getAccessControlId(),
+			'group_id' => $this->getGroupId(),
+			'partner_sort_value' => $this->getPartnerSortValue(),
+			'redirect_entry_id' => $this->getRedirectEntryId()
 		);
 		
 		if($this->getParentEntryId())

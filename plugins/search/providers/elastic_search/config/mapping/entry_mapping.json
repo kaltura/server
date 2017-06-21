@@ -136,6 +136,33 @@
 		"entry_type": {
 		  "type" : "keyword"
 		},
+		"moderation_status": {
+		  "type" : "keyword"
+		},
+		"created_at" : {
+		  "type" : "date"
+		},
+		"updated_at" : {
+		  "type" : "date"
+		},
+		"modified_at" : {
+		  "type" : "date"
+		},
+		"total_rank": {
+		  "type" : "keyword"
+		},
+		"access_control_id": {
+		  "type" : "keyword"
+		},
+		"group_id": {
+		  "type" : "keyword"
+		},
+		"partner_sort_value": {
+		  "type" : "keyword"
+		},
+		"redirect_entry_id": {
+		  "type" : "keyword"
+		},
 		"parent_entry" : {
 		  "properties" : {
 			"entry_id" : {
