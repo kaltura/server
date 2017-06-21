@@ -98,7 +98,6 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * The label of the flavor asset
 	 * 
 	 * @var string
-	 * @readonly
 	 */
 	public $label;
 	
