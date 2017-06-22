@@ -104,16 +104,16 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $params['id'] = $object->getElasticId();
 
         $params['action'] = $op;
-        $elasticLog = new SphinxLog();
-        $command = serialize($params);
-        $elasticLog->setSql($command);
-        $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
-        $elasticLog->setObjectId($object->getId());
-        $elasticLog->setObjectType($object->getElasticObjectType());
-        //$sphinxLog->setEntryId($object->getEntryId());
-        $elasticLog->setPartnerId($object->getPartnerId());
-        $elasticLog->setType(SphinxLogType::ELASTIC);
-        $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+//        $elasticLog = new SphinxLog();
+//        $command = serialize($params);
+//        $elasticLog->setSql($command);
+//        $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
+//        $elasticLog->setObjectId($object->getId());
+//        $elasticLog->setObjectType($object->getElasticObjectType());
+//        //$sphinxLog->setEntryId($object->getEntryId());
+//        $elasticLog->setPartnerId($object->getPartnerId());
+//        $elasticLog->setType(SphinxLogType::ELASTIC);
+//        $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
         if(!kConf::get('exec_elastic', 'local', 0))
             return true;
