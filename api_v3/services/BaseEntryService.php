@@ -962,7 +962,7 @@ class BaseEntryService extends KalturaEntryService
 			$accessControlScope = new accessControlScope();
 		$contextDataParams->toObject($accessControlScope);
 
-		$contextDataHelper->buildContextDataResult($accessControlScope, $contextDataParams->flavorTags, $contextDataParams->streamerType, $contextDataParams->mediaProtocol, true);
+		$contextDataHelper->buildContextDataResult($accessControlScope, kContextDataHelper::ALL_TAGS, $contextDataParams->streamerType, $contextDataParams->mediaProtocol, true);
 		if ($contextDataHelper->getDisableCache())
 			KalturaResponseCacher::disableCache();
 
