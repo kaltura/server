@@ -2,7 +2,7 @@
 /**
  * @package plugins.fairplay
  */
-class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor, IKalturaPlaybackContextDataContributor
+class FairplayPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending, IKalturaPlayManifestContributor, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'fairplay';
 	const URL_NAME = 'fps';
@@ -127,22 +127,6 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	}
 
 	/**
-	 * @param array<kRuleAction> $actions
-	 * @return bool
-	 */
-	protected function shouldContributeToPlaybackContext(array $actions)
-	{
-		foreach ($actions as $action)
-		{
-			/*** @var kRuleAction $action */
-			if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
-				return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * @param entry $entry
 	 * @return bool
 	 */
@@ -204,7 +188,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
     public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if (self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$fairplayProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(FairplayPlugin::getFairplayProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if ($fairplayProfile)
