@@ -369,9 +369,9 @@ class myEntryUtils
 			}
 			
 			//Check if the recorded entry is the current recorded entry of the live, in that case validate there are not any active server nodes
-			$liveEntryId = $entry->getRootEntryId();
+			$liveEntryId = $entry->getCustomDataRootEntryId();
 			$liveEntry = $liveEntryId ? entryPeer::retrieveByPK($liveEntryId) : null;
-			if($liveEntry && $liveEntry->getRecordedEntryId() &&  $liveEntry->getRecordedEntryId() == $entry->getId())
+			if($liveEntry && $liveEntry->getType() == entryType::LIVE_STREAM && $liveEntry->getRecordedEntryId() &&  $liveEntry->getRecordedEntryId() == $entry->getId())
 			{
 				$connectedEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($liveEntry->getId(), EntryServerNodePeer::$connectedServerNodeStatuses);
 				if(count($connectedEntryServerNodes))
