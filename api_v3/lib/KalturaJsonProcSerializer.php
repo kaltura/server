@@ -13,7 +13,8 @@ class KalturaJsonProcSerializer extends KalturaJsonSerializer
 	public function getHeader()
 	{
 		$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
-		if (is_null($callback))
+		// check for valid callback, prevent xss
+		if (is_null($callback) || !preg_match("/^[0-9_a-zA-Z]*$/", $callback))
 			die("Expecting \"callback\" parameter for jsonp format");
 			
 		return $callback .  "(";
