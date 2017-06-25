@@ -4,6 +4,12 @@
  * @subpackage api.objects
  */
 abstract class KalturaESearchItem extends KalturaESearchBaseItem {
+
+	/**
+	 * @var string
+	 */
+	public $searchTerm;
+
 	/**
 	 * @var KalturaESearchItemType
 	 */
@@ -15,6 +21,7 @@ abstract class KalturaESearchItem extends KalturaESearchBaseItem {
 	public $ranges;
 
 	private static $map_between_objects = array(
+		'searchTerm',
 		'itemType',
 		'ranges',
 	);
