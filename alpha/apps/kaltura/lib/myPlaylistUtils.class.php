@@ -845,8 +845,40 @@ HTML;
 			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		}
 	}
-	
-	
+
+	/**
+	 * @param $captionAsset
+	 * @param $filteredCaptionAssets
+	 * @return array
+	 * @throws Exception
+	 */
+	protected static function getCaptionFilePath($captionAsset)
+	{
+		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+
+		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
+		if ($captionFileSync)
+		{
+			$captionFullPath = $captionFileSync->getFullPath();
+			return $captionFullPath;
+		}
+		return false;
+	}
+
+	/**
+	 * @param $entryId
+	 * @return array
+	 */
+	public static function getEntryCaptions($entryId)
+	{
+		$c = new Criteria();
+		$c->addAnd(assetPeer::ENTRY_ID, $entryId);
+		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		$captionAssets = assetPeer::doSelect($c);
+		return $captionAssets;
+	}
+
+
 	private static function getIds ( $list )
 	{
 		$id_list  =array();
@@ -1053,7 +1085,7 @@ HTML;
 				false, 
 				$pager);
 
-		return self::getPlaylistDataFromEntries($entries, null);
+		return self::getPlaylistDataFromEntries($entries, null, null);
 	}
 
 	/**
@@ -1097,23 +1129,15 @@ HTML;
 	protected static function getCaptionFilesForEntry($entryId, $captions)
 	{
 		$captionLangsArr = explode(',', $captions);
-		$c = new Criteria();
-		$c->addAnd(assetPeer::ENTRY_ID, $entryId);
-		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-		$captionAssets = assetPeer::doSelect($c);
+		$captionAssets = self::getEntryCaptions($entryId);
 		$filteredCaptionAssets = array();
 		foreach ($captionAssets as $captionAsset)
 		{
 			if (in_array($captionAsset->getLanguage(), $captionLangsArr))
 			{
-				$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-
-				list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
-				if ($captionFileSync)
-				{
-					$captionFullPath = $captionFileSync->getFullPath();
-					$filteredCaptionAssets[] = $captionFullPath;
-				}
+				$filePath = self::getCaptionFilePath($captionAsset);
+				if ($filePath)
+					$filteredCaptionAssets[] = $filePath;
 			}
 		}
 		return $filteredCaptionAssets;

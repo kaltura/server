@@ -511,7 +511,7 @@ class playManifestAction extends kalturaAction
 
 	protected function initPlaylistFlavorAssetArray()
 	{
-		list($entryIds, $durations, $mediaEntry) =
+		list($entryIds, $durations, $mediaEntry, $captionFiles) =
 			myPlaylistUtils::executeStitchedPlaylist($this->entry);
 		if (!$mediaEntry)
 		{
@@ -832,7 +832,7 @@ class playManifestAction extends kalturaAction
 				if (count($sequenceEntries))
 				{
 					$this->deliveryAttributes->setHasValidSequence(true);
-					list($entryIds, $durations, $mediaEntry) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null);
+					list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null, null);
 					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
 				}
 			}

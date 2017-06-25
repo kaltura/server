@@ -47,7 +47,6 @@ class VodPackagerDeliveryUtils
 			$captionLanguages = self::getCaptionLangauges($entry->getId());
 			if (!empty($captionLanguages))
 			{
-				$captionLanguages = rtrim(ltrim($captionLanguages, ','), ',');
 				$postfix = '/captions/'.$captionLanguages.$postfix;
 			}
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
@@ -119,16 +118,13 @@ class VodPackagerDeliveryUtils
 	 */
 	protected static function getCaptionLangauges($entryId)
 	{
-		$c = new Criteria();
-		$c->addAnd(assetPeer::ENTRY_ID, $entryId);
-		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-		$captionAssets = assetPeer::doSelect($c);
-		$captionLanguages = "";
+		$captionAssets = myPlaylistUtils::getEntryCaptions($entryId);
+		$captionLanguages = array();
 		foreach ($captionAssets as $captionAsset)
 		{
 			/** @var captionAsset $captionAsset */
-			$captionLanguages = $captionAsset->getLanguage() . ",";
+			$captionLanguages[] = $captionAsset->getLanguage();
 		}
-		return $captionLanguages;
+		return implode(',', $captionLanguages);
 	}
 }
