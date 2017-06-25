@@ -5,6 +5,7 @@
  */ 
 interface ESearchEntryFieldName extends BaseEnum
 {
+	const ENTRY_ID = '_id';
 	const ENTRY_NAME = 'name';
 	const ENTRY_DESCRIPTION = 'description';
 	const ENTRY_TAGS = 'tags';
