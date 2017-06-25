@@ -12,7 +12,7 @@ class KalturaJsonProcSerializer extends KalturaJsonSerializer
 	
 	public function getHeader()
 	{
-        $ALLOWED_REGEX = "/^[0-9_a-zA-Z\.]*$/";
+		$ALLOWED_REGEX = "/^[0-9_a-zA-Z\.]*$/";
 		$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
 		// check for a valid callback, prevent xss
 		if (is_null($callback) || !preg_match($ALLOWED_REGEX, $callback))
