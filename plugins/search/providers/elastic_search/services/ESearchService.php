@@ -77,18 +77,18 @@ class ESearchService extends KalturaBaseService
 		return $result;
 	}
 
-	private function initSearchActionParams(KalturaESearchOperator $searchOperator, $ObjectStatuses = null)
+	private function initSearchActionParams(KalturaESearchOperator $searchOperator, $objectsStatuses = null)
 	{
 		if (!$searchOperator->operator)
 			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
 		//TODO: should we allow doesnt contain without a specific contains
 		$coreSearchOperator = $searchOperator->toObject();
 
-		$entryStatusesArr = array();
-		if (!empty($ObjectStatuses))
-			$entryStatusesArr = explode(',', $ObjectStatuses);
+		$objectsStatusesArr = array();
+		if (!empty($objectsStatuses))
+			$objectsStatusesArr = explode(',', $objectsStatuses);
 
-		return array($coreSearchOperator, $entryStatusesArr);
+		return array($coreSearchOperator, $objectsStatusesArr);
 	}
 
 
