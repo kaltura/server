@@ -16,6 +16,15 @@ abstract class kBaseSearch
 
     public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager =null);
 
+    protected function execSearch(ESearchOperator $eSearchOperator)
+    {
+        $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
+        $this->applyElasticSearchConditions($subQuery);
+        KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
+        $result = $this->elasticClient->search($this->query);
+        return $result;
+    }
+
     protected function initQuery(array $statuses, kPager $pager = null)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
@@ -51,5 +60,11 @@ abstract class kBaseSearch
                 )
             )
         );
+    }
+
+    protected function applyElasticSearchConditions($conditions)
+    {
+        if($conditions)
+            $this->query['body']['query']['bool']['must'] = array($conditions);
     }
 }
