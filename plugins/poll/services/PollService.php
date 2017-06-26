@@ -89,8 +89,6 @@ class PollService extends KalturaBaseService
 	 * @action resetVotes
 	 * @param string $pollId
 	 * @param string $answerIds
-	 * @param string $otherDCVotes json
-	 * @return string
 	 * @throws KalturaAPIException
 	 */
 	public function resetVotesAction($pollId, $answerIds)
