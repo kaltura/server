@@ -40,6 +40,11 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 	 */
 	public $webexHostIdMetadataFieldName;
 	
+	/**
+	 * @var bool
+	 */
+	public $deleteFromRecycleBin;
+	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -51,6 +56,7 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 		'webexPartnerId',
 		'webexServiceUrl',
 		'webexHostIdMetadataFieldName',
+		'deleteFromRecycleBin',
 	 );
 		 
 	public function getMapBetweenObjects()
