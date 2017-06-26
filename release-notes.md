@@ -1,3 +1,19 @@
+# Lynx 12.19.0 #
+
+## Add polls resetVotesAction ##
+
+### configuration ###
+
+	None
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+#### Known Issues & Limitations ####
+
+        None.
+
+
 # Lynx 12.18.0 #
 
 ## support new live packages + LC flow + webcast on update or fresh install ##
