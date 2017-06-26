@@ -1918,7 +1918,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			'doc' => array(
 				'partner_id' => $this->getPartnerId(),
 				'partner_status' => "p{$this->getPartnerId()}s{$this->getStatus()}",
-				'privacy' => "{$this->getPrivacy()}p{$this->getPartnerId()}",
+				'privacy' => self::formatPrivacy($this->getPrivacy(), $this->getPartnerId()),
 				'privacy_context' => $this->getElasticSearchIndexPrivacyContext(),
 				'privacy_contexts' => $this->getElasticSearchIndexPrivacyContexts(),
 				'status' => $this->getStatus(),

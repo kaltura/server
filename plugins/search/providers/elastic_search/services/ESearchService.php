@@ -11,9 +11,10 @@ class ESearchService extends KalturaBaseService
 	 * @action search
 	 * @param KalturaESearchOperator $searchOperator
 	 * @param string $entryStatuses
+	 * @param KalturaPager $pager
 	 * @return KalturaESearchResultArray
 	 */
-	function searchAction (KalturaESearchOperator $searchOperator, $entryStatuses = null)
+	function searchAction (KalturaESearchOperator $searchOperator, $entryStatuses = null, KalturaPager $pager = null)
 	{
 		if (!$searchOperator->operator)
 			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
@@ -25,8 +26,11 @@ class ESearchService extends KalturaBaseService
 		$entryStatusesArr = array();
 		if (!empty($entryStatuses))
 			$entryStatusesArr = explode(',', $entryStatuses);
+		$kPager = null;
+		if($pager)
+			$kPager = $pager->toObject();
 		$entrySearch = new kEntrySearch();
-		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr);//TODO: handle error flow
+		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr, $kPager);//TODO: handle error flow
 		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
 
 		return KalturaESearchResultArray::fromDbArray($coreResults);

@@ -137,6 +137,8 @@ class elasticClient
             $cmd .= '/'.$params['type'];
         if(isset($params['size']))
             $params['body']['size'] = $params['size'];
+        if(isset($params['from']))
+            $params['body']['from'] = $params['from'];
 
         $cmd .= "/_search";
 
