@@ -197,7 +197,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$listRecordingRequest->setCreateTimeScope($createTimeScope);
 				$listRecordingRequest->setListControl($listControl);
 				
-				$listRecordingResponse = $webexClient->send($listRecordingRequest);
+				$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
 				$recordingArr = $listRecordingResponse->getRecording();
 				$id = $recordingArr[0]->getRecordingID();
 				
