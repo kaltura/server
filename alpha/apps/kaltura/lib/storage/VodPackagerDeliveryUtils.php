@@ -118,7 +118,7 @@ class VodPackagerDeliveryUtils
 	 */
 	protected static function getCaptionLangauges($entryId)
 	{
-		$captionAssets = myPlaylistUtils::getEntryCaptions($entryId);
+		$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 		$captionLanguages = array();
 		foreach ($captionAssets as $captionAsset)
 		{

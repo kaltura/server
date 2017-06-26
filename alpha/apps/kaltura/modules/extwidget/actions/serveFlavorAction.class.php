@@ -271,10 +271,9 @@ class serveFlavorAction extends kalturaAction
 
 				$clips[] = array('type' => 'source', 'path' => $path);
 			}
+			$sequences[] = array('clips' => $clips);
 		}
 
-		$sequences[] = array('clips' => $clips);
-		$hasCaptions = false;
 		list($hasCaptions, $captionClips) = $this->getCaptionClips($entryIds, $captionFiles);
 		if ($hasCaptions)
 			$sequences[] = array('clips' => $captionClips);
@@ -316,12 +315,12 @@ class serveFlavorAction extends kalturaAction
 			$flavorParamsIdsArr = array($asset->getFlavorParamsId());
 		}
 		/* @var asset $asset */
-		$allEntris = $sequenceEntries;
-		$allEntris[] = $entry;
+		$allEntries = $sequenceEntries;
+		$allEntries[] = $entry;
 		if (empty($captionLangauges) && $asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
 			$captionLangauges = $asset->getLanguage();
 		list($entryIds, $durations, $referenceEntry, $captionFiles ) =
-			myPlaylistUtils::getPlaylistDataFromEntries($allEntris, $flavorParamsIdsArr, $captionLangauges);
+			myPlaylistUtils::getPlaylistDataFromEntries($allEntries, $flavorParamsIdsArr, $captionLangauges);
 
 		if ($asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
 		{
@@ -624,10 +623,10 @@ class serveFlavorAction extends kalturaAction
 		{
 			if (isset($captionFiles[$entryId]) && count($captionFiles[$entryId]) > 0)
 			{
-				foreach ($captionFiles[$entryId] as $captionFile)
+				foreach ($captionFiles[$entryId] as $captionData)
 				{
 					$hasCaptions = true;
-					$captionClips[] = array('type' => 'source', 'path' => $captionFile);
+					$captionClips[] = array('type' => 'source', 'path' => $captionData[1], 'language' => $captionData[0] );
 				}
 			} else
 			{

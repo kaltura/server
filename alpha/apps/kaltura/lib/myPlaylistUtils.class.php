@@ -869,10 +869,10 @@ HTML;
 	 * @param $entryId
 	 * @return array
 	 */
-	public static function getEntryCaptions($entryId)
+	public static function getEntryIdsCaptions($entryIds)
 	{
 		$c = new Criteria();
-		$c->addAnd(assetPeer::ENTRY_ID, $entryId);
+		$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
 		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 		$captionAssets = assetPeer::doSelect($c);
 		return $captionAssets;
@@ -1104,9 +1104,6 @@ HTML;
 			$entryIds[] = $entry->getId();
 			$durations[] = $entry->getLengthInMsecs();
 
-			$entryCaptionFiles = self::getCaptionFilesForEntry($entry->getId(), $captions);
-			$captionFiles[$entry->getId()] = $entryCaptionFiles;
-
 			// Note: choosing a reference entry that has max(flavor count) and min(int id)
 			//	the reason for the int id condition is to avoid frequent changes to the 
 			//	reference entry in case the playlist content changes
@@ -1123,21 +1120,26 @@ HTML;
 			}
 		}
 
+		$captionFiles = self::getCaptionFilesForEntryIds($entryIds, $captions);
 		return array($entryIds, $durations, $mediaEntry, $captionFiles);
 	}
 
-	protected static function getCaptionFilesForEntry($entryId, $captions)
+	protected static function getCaptionFilesForEntryIds($entryIds, $captionLanguages)
 	{
-		$captionLangsArr = explode(',', $captions);
-		$captionAssets = self::getEntryCaptions($entryId);
+		$captionLangsArr = explode(',', $captionLanguages);
+		$captionAssets = self::getEntryIdsCaptions($entryIds);
 		$filteredCaptionAssets = array();
 		foreach ($captionAssets as $captionAsset)
 		{
-			if (in_array($captionAsset->getLanguage(), $captionLangsArr))
+			/** @var CaptionAsset $captionAsset */
+			if (!in_array($captionAsset->getLanguage(), $captionLangsArr))
+				continue;
+			$filePath = self::getCaptionFilePath($captionAsset);
+			if ($filePath)
 			{
-				$filePath = self::getCaptionFilePath($captionAsset);
-				if ($filePath)
-					$filteredCaptionAssets[] = $filePath;
+				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()]))
+					$filteredCaptionAssets[$captionAsset->getEntryId()] = array();
+				$filteredCaptionAssets[$captionAsset->getEntryId()][] = array($captionAsset->getLanguage(), $filePath);
 			}
 		}
 		return $filteredCaptionAssets;
