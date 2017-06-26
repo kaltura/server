@@ -8,25 +8,41 @@ class ESearchService extends KalturaBaseService
 {
 	/**
 	 *
-	 * @action search
+	 * @action searchEntry
 	 * @param KalturaESearchOperator $searchOperator
 	 * @param string $entryStatuses
 	 * @return KalturaESearchResultArray
 	 */
-	function searchAction (KalturaESearchOperator $searchOperator, $entryStatuses = null)
+	function searchEntryAction (KalturaESearchOperator $searchOperator, $entryStatuses = null)
 	{
-		if (!$searchOperator->operator)
-			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
-		//TODO: should we allow doesnt contain without a specific contains
-		$coreSearchOperator = $searchOperator->toObject();
+		list($coreSearchOperator, $entryStatusesArr) = $this->initSearchActionParams($searchOperator, $entryStatuses);
 		/**
 		 * @var ESearchOperator $coreSearchOperator
 		 */
-		$entryStatusesArr = array();
-		if (!empty($entryStatuses))
-			$entryStatusesArr = explode(',', $entryStatuses);
+
 		$entrySearch = new kEntrySearch();
 		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr);//TODO: handle error flow
+		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
+
+		return KalturaESearchResultArray::fromDbArray($coreResults);
+	}
+
+	/**
+	 *
+	 * @action searchCategory
+	 * @param KalturaESearchOperator $searchOperator
+	 * @param string $categoryStatuses
+	 * @return KalturaESearchResultArray
+	 */
+	function searchCategoryAction (KalturaESearchOperator $searchOperator, $categoryStatuses = null)
+	{
+		list($coreSearchOperator, $categoryStatusesArr) = $this->initSearchActionParams($searchOperator, $categoryStatuses);
+		/**
+		 * @var ESearchOperator $coreSearchOperator
+		 */
+
+		$categorySearch = new kEntrySearch(); //TODO change to category engine
+		$elasticResults = $categorySearch->doSearch($coreSearchOperator, $categoryStatusesArr);//TODO: handle error flow
 		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
 
 		return KalturaESearchResultArray::fromDbArray($coreResults);
@@ -59,6 +75,20 @@ class ESearchService extends KalturaBaseService
 			}
 		}
 		return $result;
+	}
+
+	private function initSearchActionParams(KalturaESearchOperator $searchOperator, $objectsStatuses = null)
+	{
+		if (!$searchOperator->operator)
+			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
+		//TODO: should we allow doesnt contain without a specific contains
+		$coreSearchOperator = $searchOperator->toObject();
+
+		$objectsStatusesArr = array();
+		if (!empty($objectsStatuses))
+			$objectsStatusesArr = explode(',', $objectsStatuses);
+
+		return array($coreSearchOperator, $objectsStatusesArr);
 	}
 
 
