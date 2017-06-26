@@ -104,12 +104,16 @@ class PollService extends KalturaBaseService
 		{
 			throw new KalturaAPIException($e->getMessage());
 		}
-		$remoteDCIds = kDataCenterMgr::getAllDcs();
-		if($remoteDCIds && count($remoteDCIds) > 0)
+
+		if(!kFileUtils::isAlreadyInDumpApi())
 		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
-			if ($remoteDCHost)
-				return kFileUtils::dumpApiRequest($remoteDCHost);
+			$remoteDCIds = kDataCenterMgr::getAllDcs();
+			if ($remoteDCIds && count($remoteDCIds) > 0)
+			{
+				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
+				if ($remoteDCHost)
+					return kFileUtils::dumpApiRequest($remoteDCHost);
+			}
 		}
 	}
 
