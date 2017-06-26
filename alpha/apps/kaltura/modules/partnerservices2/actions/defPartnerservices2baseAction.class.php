@@ -163,7 +163,7 @@ class defPartnerservices2baseAction extends kalturaAction
 			else
 			{
 				$format = $this->getP ( "format" );
-				$response = "Error: Invalid service [$service_name]";
+				$response = "Error: Invalid service [".htmlentities($service_name)."]";
 			}
 		}
 

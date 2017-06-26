@@ -44,6 +44,11 @@ class VodPackagerDeliveryUtils
 		
 		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false) || ($params->getHasValidSequence()))
 		{
+			$captionLanguages = self::getCaptionLangauges($entry->getId());
+			if (!empty($captionLanguages))
+			{
+				$postfix = '/captions/'.$captionLanguages.$postfix;
+			}
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
 			$result = $prefix . $middlePart . $postfix;
 		}
@@ -78,7 +83,7 @@ class VodPackagerDeliveryUtils
 	
 		$urlPrefix = trim(preg_replace('#https?://#', '', $urlPrefix), '/');
 		$urlPrefix = $params->getMediaProtocol() . '://' . $urlPrefix;
-	
+
 		return array('url' => $url, 'urlPrefix' => $urlPrefix);
 	}
 	
@@ -105,5 +110,21 @@ class VodPackagerDeliveryUtils
 		}
 	
 		return $result;
+	}
+
+	/**
+	 * @param string $entryId
+	 * @return string
+	 */
+	protected static function getCaptionLangauges($entryId)
+	{
+		$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		$captionLanguages = array();
+		foreach ($captionAssets as $captionAsset)
+		{
+			/** @var captionAsset $captionAsset */
+			$captionLanguages[] = $captionAsset->getLanguage();
+		}
+		return implode(',', $captionLanguages);
 	}
 }
