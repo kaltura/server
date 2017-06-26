@@ -202,7 +202,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 					$recordingArr = $listRecordingResponse->getRecording();
 					$id = $recordingArr[0]->getRecordingID();
 					
-					KalturaLog::info("Permanently deleting recording with ID: [$id]");
+					KalturaLog::info("Permanently deleting recording with ID: [$id], recording: " . print_r($recordingArr[0], true));
 					
 					$delFromRecycleBinRequest = new WebexXmlDelRecordingFromRecycleBinRequest();
 					$delFromRecycleBinRequest->setRecordingID($id);
