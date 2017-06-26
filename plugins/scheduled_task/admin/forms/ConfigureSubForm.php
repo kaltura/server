@@ -76,7 +76,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 
 	protected function addIntegerElement($name, $prefix) {
 		$params = array('required' => false, 'value'=>	-1, 'innerType' => 'integer', 'oninput'	=> 'checkNumValid(this.value)');
-		$this->addElementByStrType('textarea', $name, "$prefix$name", $params);
+		$this->addElementByStrType('text', $name, "$prefix$name", $params);
 	}
 
 	protected function addStringAreaElement($name, $prefix) {
@@ -85,7 +85,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	}
 
 	protected function addArrayElement($name, $prefix) {
-		$this->addElement('text', "$prefix$name", array(
+		$this->addElement('textarea', "$prefix$name", array(
 			'label' 		=> "$name (Array: enter item comma separated. for key-value insert: key:value)",
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),

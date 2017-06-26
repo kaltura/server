@@ -423,6 +423,13 @@ class kBusinessPreConvertDL
 			KalturaLog::err("Flavor Params Id [$flavorParamsId] not found");
 			return null;
 		}
+		
+		//Check if the flavor we are trying to generate has source flavor, source can only be ingested, not generated.
+		if(in_array(assetParams::TAG_SOURCE, $flavorParams->getTagsArray()))
+		{
+			KalturaLog::notice("Cannot generate flavor params Id [$flavorParamsId], flavor has source tag");
+			return null;
+		}
 
 		$flavorParams->setDynamicAttributes($dynamicAttributes);
 

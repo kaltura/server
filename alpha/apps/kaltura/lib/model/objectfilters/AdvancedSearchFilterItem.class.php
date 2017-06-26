@@ -9,9 +9,12 @@ class AdvancedSearchFilterItem
 	 * @var string
 	 */
 	protected $kalturaClass;
+	
+	public $filterLimit;
 
 	final public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
 	{
+		$this->filterLimit = $filter->getLimit();
 		$this->applyCondition($query);
 	}
 	

@@ -185,13 +185,12 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			
 			try {
 				$response = $this->webexClient->send($deleteRecordingRequest);
-				
-				//Locate recording in recycle bin according to the creation date
-				$listControl = new WebexXmlEpListControlType();
-				$listControl->setStartFrom(1);
-				
+
 				if ($this->dropFolder->deleteFromRecycleBin)
 				{
+					//Locate recording in recycle bin according to the creation date
+					$listControl = new WebexXmlEpListControlType();
+					$listControl->setStartFrom(1);
 					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
 					$createTimeScope->setCreateTimeStart($file->getCreateTime());
 					$createTimeScope->setCreateTimeEnd($file->getCreateTime());

@@ -149,14 +149,10 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			 * On off-sanity frameRate or if it is not set by media info
 			 * - use ffprobe object frameRate
 			 */
-			if(isset($kMi->videoFrameRate)){
-				if($kMi->videoFrameRate>KDLSanityLimits::MaxFramerate && isset($ffMi->videoFrameRate) 
-				&& $ffMi->videoFrameRate<=KDLSanityLimits::MaxFramerate){
+			if(!isset($kMi->videoFrameRate) || $kMi->videoFrameRate>KDLSanityLimits::MaxFramerate){
+				if(isset($ffMi->videoFrameRate) && $ffMi->videoFrameRate<=KDLSanityLimits::MaxFramerate){
 					$kMi->videoFrameRate=$ffMi->videoFrameRate;
 				}
-			}
-			else if (isset($ffMi->videoFrameRate)) {
-				$kMi->videoFrameRate=$ffMi->videoFrameRate;	
 			}
 			
 			/*
