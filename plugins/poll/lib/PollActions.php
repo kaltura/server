@@ -204,6 +204,15 @@ class PollActions
 		return $pollVotes;
 	}
 
+	public function resetVotes($pollId, $ansIds)
+	{
+		if (!$pollId || !$ansIds)
+			throw new Exception('Missing parameter for resetVotes action');
+		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
+		$this->pollsCacheHandler->clearPollVoter($pollId);
+		$this->pollsCacheHandler->clearAnswersCounter($pollId,$answers);
+	}
+
 }
 
 class PollCacheHandler
@@ -270,10 +279,24 @@ class PollCacheHandler
 		}
 	}
 
+	public function clearAnswersCounter($pollId, $ansIds)
+	{
+		foreach($ansIds as $ansId)
+		{
+			$ansCounterId = self::getPollAnswerCounterCacheKey($pollId, $ansId);
+			$this->cache->set($ansCounterId,0,$this->cacheTTL);
+		}
+	}
+
 	public function incrementPollVotersCount($pollId)
 	{
 		$this->cache->add($this->getPollVotersCacheKey($pollId), 0, $this->cacheTTL);
 		$this->cache->increment($this->getPollVotersCacheKey($pollId));
+	}
+
+	public function clearPollVoter($pollId)
+	{
+		$this->cache->set($this->getPollVotersCacheKey($pollId),0,$this->cacheTTL);
 	}
 
 	public function getPollVotersCount($pollId)
