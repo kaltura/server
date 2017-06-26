@@ -20,7 +20,7 @@ class kElasticEntryDisableEntitlementCondition extends kElasticBaseEntitlementCo
 
     public static function applyCondition(&$entryQuery, &$parentEntryQuery)
     {
-        $params['entryIds'] = kElasticEntitlement::$entriesDisabledEntitlement;
+        $params['entryIds'] = kEntryElasticEntitlement::$entriesDisabledEntitlement;
         if($parentEntryQuery)
         {
             $conditions = self::getEntitlementCondition($params, 'parent_entry.entry');
@@ -34,7 +34,7 @@ class kElasticEntryDisableEntitlementCondition extends kElasticBaseEntitlementCo
 
     public static function shouldContribute()
     {
-        if(kElasticEntitlement::$entriesDisabledEntitlement && count(kElasticEntitlement::$entriesDisabledEntitlement))
+        if(kEntryElasticEntitlement::$entriesDisabledEntitlement && count(kEntryElasticEntitlement::$entriesDisabledEntitlement))
             return true;
         
         return false;

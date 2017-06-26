@@ -56,7 +56,7 @@ class kElasticUserEntitlementCondition extends kElasticBaseEntitlementCondition
 
     public static function applyCondition(&$entryQuery, &$parentEntryQuery)
     {
-        $kuserId = kElasticEntitlement::$kuserId;
+        $kuserId = kEntryElasticEntitlement::$kuserId;
         if(!$kuserId)
         {
             KalturaLog::log('cannot add user entitlement to elastic without a kuserId - setting kuser id to -1');
@@ -78,9 +78,9 @@ class kElasticUserEntitlementCondition extends kElasticBaseEntitlementCondition
 
     public static function shouldContribute()
     {
-        if(kElasticEntitlement::$userEntitlement)
+        if(kEntryElasticEntitlement::$userEntitlement)
             return true;
-        
+
         return false;
     }
 }

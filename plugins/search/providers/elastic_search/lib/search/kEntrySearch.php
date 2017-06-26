@@ -3,10 +3,9 @@
  * @package plugins.elasticSearch
  * @subpackage lib.search
  */
-class kEntrySearch
+class kEntrySearch extends kBaseSearch
 {
-    protected $elasticClient;
-    protected $query;
+
     protected $isInitialized;
     private $entryEntitlementQuery;
     private $parentEntryEntitlementQuery;
@@ -19,16 +18,16 @@ class kEntrySearch
 
     public function __construct()
     {
-        $this->elasticClient = new elasticClient();
         $this->isInitialized = false;
+        parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array())
+    public function doSearch(ESearchOperator $eSearchOperator=null, $entriesStatus = array(),kPager $pager = null)
     {
-	    kElasticEntitlement::init();
+	    kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
-        $this->initQuery($entriesStatus);
+        $this->initQuery($entriesStatus, $pager);
         $this->initEntitlement();
         $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
         $this->applyElasticSearchConditions($subQuery);
@@ -37,14 +36,13 @@ class kEntrySearch
         return $result;
     }
     
-    protected function initQuery(array $entriesStatus)
+    protected function initQuery(array $statuses, kPager $pager = null)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_ENTRY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
-        $partnerId = kElasticEntitlement::$partnerId;
-        $this->initBasePartnerFilter($partnerId, $entriesStatus);
+        parent::initQuery($statuses, $pager);
     }
 
     protected function initBasePartnerFilter($partnerId, array $entriesStatus)
@@ -85,7 +83,7 @@ class kEntrySearch
     {
         $this->parentEntryEntitlementQuery = null;
 
-        if(kElasticEntitlement::$parentEntitlement)
+        if(kEntryElasticEntitlement::$parentEntitlement)
         {
             //create parent entry part
             $this->query['body']['query']['bool']['filter'][1]['bool']['should'][0]['bool']['filter'] = array(

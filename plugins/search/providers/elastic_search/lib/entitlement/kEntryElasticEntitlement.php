@@ -1,12 +1,12 @@
 <?php
+
 /**
  * @package plugins.elasticSearch
  * @subpackage lib.entitlement
  */
-
-class kElasticEntitlement
+class kEntryElasticEntitlement extends kBaseElasticEntitlement
 {
-    public static $partnerId;
+    
     public static $kuserId = null;
     public static $privacyContext = null;
     public static $privacy = null;
@@ -16,19 +16,11 @@ class kElasticEntitlement
     public static $publicEntries = false; //active + pending
     public static $publicActiveEntries = false; //active
     public static $parentEntitlement = false;
-    public static $isInitialized = false;
     public static $entryInSomeCategoryNoPC = false; //active + pending
-
-    public static function init()
-    {
-        if(!self::$isInitialized)
-            self::initialize();
-    }
-
+    
     protected static function initialize()
     {
-        $ks = ks::fromSecureString(kCurrentContext::$ks);
-        self::$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+        parent::initialize();
         $partner = PartnerPeer::retrieveByPK(self::$partnerId);
 
         //disable the entitlement checks for partner
@@ -36,18 +28,16 @@ class kElasticEntitlement
             return;//todo
 
         self::initializeParentEntitlement();
-        self::initializeDisableEntitlement($ks);
-        self::$kuserId = self::getKuserIdForEntitlement(self::$partnerId, self::$kuserId, $ks); //todo - kuser is null maybe allow to pass as param
-        self::initializeUserEntitlement($ks);
+        self::initializeDisableEntitlement(self::$ks);
+        self::$kuserId = self::getKuserIdForEntitlement(self::$partnerId, self::$kuserId, self::$ks); //todo - kuser is null maybe allow to pass as param
+        self::initializeUserEntitlement(self::$ks);
 
-        if($ks)
-            self::$privacyContext = $ks->getPrivacyContext();
+        if(self::$ks)
+            self::$privacyContext = self::$ks->getPrivacyContext();
 
-        self::initializePublicEntryEntitlement($ks); //todo - add active category entitlement
-
-        self::initializeUserCategoryEntryEntitlement($ks);
-
-
+        self::initializePublicEntryEntitlement(self::$ks); //todo - add active category entitlement
+        self::initializeUserCategoryEntryEntitlement(self::$ks);
+        
         self::$isInitialized = true;
     }
 
