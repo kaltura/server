@@ -618,6 +618,7 @@ class serveFlavorAction extends kalturaAction
 	 */
 	protected function getCaptionClips($entryIds, $captionFiles)
 	{
+		$hasCaptions = false;
 		$captionClips = array();
 		foreach ($entryIds as $entryId)
 		{
