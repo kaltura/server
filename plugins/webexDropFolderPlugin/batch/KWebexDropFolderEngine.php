@@ -190,29 +190,39 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$listControl = new WebexXmlEpListControlType();
 				$listControl->setStartFrom(1);
 				
-				$createTimeScope = new WebexXmlEpCreateTimeScopeType();
-				$createTimeScope->setCreateTimeStart($file->getCreateTime());
-				$createTimeScope->setCreateTimeEnd($file->getCreateTime());
-				$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
-				$listRecordingRequest->setCreateTimeScope($createTimeScope);
-				$listRecordingRequest->setListControl($listControl);
-				
-				$listRecordingResponse = $webexClient->send($listRecordingRequest);
-				$recordingArr = $listRecordingResponse->getRecording();
-				$id = $recordingArr[0]->getRecordingID();
-				
-				$delFromRecycleBinRequest = new WebexXmlDelRecordingFromRecycleBinRequest();
-				$delFromRecycleBinRequest->setRecordingID($id);
-				
-				$response = $this->webexClient->send($delFromRecycleBinRequest);
-				if($response->getSuccessfulRecordingsCount())
+				if ($this->dropFolder->deleteFromRecycleBin)
 				{
-					KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
-					$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
+					$createTimeScope->setCreateTimeStart($file->getCreateTime());
+					$createTimeScope->setCreateTimeEnd($file->getCreateTime());
+					$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
+					$listRecordingRequest->setCreateTimeScope($createTimeScope);
+					$listRecordingRequest->setListControl($listControl);
+					
+					$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+					$recordingArr = $listRecordingResponse->getRecording();
+					$id = $recordingArr[0]->getRecordingID();
+					
+					KalturaLog::info("Permanently deleting recording with ID: [$id]");
+					
+					$delFromRecycleBinRequest = new WebexXmlDelRecordingFromRecycleBinRequest();
+					$delFromRecycleBinRequest->setRecordingID($id);
+					
+					$response = $this->webexClient->send($delFromRecycleBinRequest);
+					if($response->getSuccessfulRecordingsCount())
+					{
+						KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+						$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+					}
+					else
+					{
+						throw new Exception("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
+					}
 				}
 				else
 				{
-					throw new Exception("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
+					KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+					$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
 				}
 			}
 			catch (Exception $e)
