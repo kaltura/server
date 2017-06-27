@@ -64,7 +64,6 @@ class ESearchService extends KalturaBaseService
 	 *
 	 * @action getAllowedSearchTypes
 	 * @param KalturaESearchItem $searchItem
-	 * @param string $fieldName
 	 * @return KalturaKeyValueArray
 	 * @throws KalturaAPIException
 	 */

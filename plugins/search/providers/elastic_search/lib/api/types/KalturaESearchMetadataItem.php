@@ -8,11 +8,6 @@ class KalturaESearchMetadataItem extends KalturaESearchItem {
 	/**
 	 * @var string
 	 */
-	public $searchTerm;
-
-	/**
-	 * @var string
-	 */
 	public $xpath;
 
 	/**
@@ -21,7 +16,6 @@ class KalturaESearchMetadataItem extends KalturaESearchItem {
 	public $metadataProfileId;
 
 	private static $map_between_objects = array(
-		'searchTerm',
 		'xpath',
 		'metadataProfileId',
 	);

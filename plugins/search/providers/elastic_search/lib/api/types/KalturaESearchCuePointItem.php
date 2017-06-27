@@ -10,14 +10,8 @@ class KalturaESearchCuePointItem extends KalturaESearchItem {
 	 */
 	public $fieldName;
 
-	/**
-	 * @var string
-	 */
-	public $searchTerm;
-
 	private static $map_between_objects = array(
-		'fieldName',
-		'searchTerm',
+		'fieldName'
 	);
 
 	protected function getMapBetweenObjects()

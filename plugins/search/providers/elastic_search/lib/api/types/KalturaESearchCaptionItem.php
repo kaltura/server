@@ -6,11 +6,6 @@
 class KalturaESearchCaptionItem extends KalturaESearchItem {
 
 	/**
-	 * @var string
-	 */
-	public $searchTerm;
-
-	/**
 	 * @var int
 	 */
 	public $startTimeInVideo;
@@ -21,7 +16,6 @@ class KalturaESearchCaptionItem extends KalturaESearchItem {
 	public $endTimeInVideo;
 
 	private static $map_between_objects = array(
-		'searchTerm',
 		'startTimeInVideo',
 		'endTimeInVideo',
 	);

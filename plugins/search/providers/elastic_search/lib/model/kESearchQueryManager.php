@@ -80,7 +80,7 @@ class kESearchQueryManager
 	public static function createEntrySearchQuery(array $eEntrySearchItemsArr, $boolOperator, $additionalParams = array())
 	{
 		$queryOut = array();
-		$allowedSearchTypes = ESearchEntryItem::getAallowedSearchTypesForField();
+		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
 		foreach ($eEntrySearchItemsArr as $entrySearchItem)
 		{
 			/**
@@ -243,7 +243,7 @@ class kESearchQueryManager
 	{
 		$cuePointQuery['nested']['path'] = 'cue_points';
 		$cuePointQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
-		$allowedSearchTypes = ESearchCuePointItem::getAallowedSearchTypesForField();
+		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();
 		foreach ($eSearchCuePointItemsArr as $cuePointSearchItem)
 		{
 			/**
