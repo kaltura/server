@@ -88,5 +88,44 @@ class ESearchEntryItem extends ESearchItem
 		return parent::getQueryVerbs();
 	}
 
+	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $additionalParams = null)
+	{
+		$queryOut = array();
+		$allowedSearchTypes = ESearchEntryItem::getAallowedSearchTypesForField();
+		foreach ($eSearchItemsArr as $entrySearchItem)
+		{
+			/**
+			 * @var ESearchEntryItem $entrySearchItem
+			 */
+			$queryVerbs = $entrySearchItem->getQueryVerbs();
+			$searchTerm = $entrySearchItem->getSearchTerm();
+			if (!empty($searchTerm))
+			{
+				if ($entrySearchItem->getItemType() == ESearchItemType::PARTIAL)
+				{
+					$queryOut[$queryVerbs[0]]['multi_match']['query'] = strtolower($entrySearchItem->getSearchTerm());
+					$queryOut[$queryVerbs[0]]['multi_match']['fields'] = array($entrySearchItem->getFieldName() . "^2", $entrySearchItem->getFieldName() . ".raw^2", $entrySearchItem->getFieldName() . ".trigrams");
+					$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
+				} else
+				{
+					$fieldNameAddition = '';
+					if ($entrySearchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$entrySearchItem->getFieldName()]))
+					{
+						$fieldNameAddition = '.raw';
+					}
+					$queryOut[$queryVerbs[0]][$queryVerbs[1]] = array($entrySearchItem->getFieldName().$fieldNameAddition => strtolower($searchTerm));
+				}
+			}
+			if (in_array('Range', $allowedSearchTypes[$entrySearchItem->getFieldName()]))
+			{
+				foreach ($entrySearchItem->getRanges() as $range)
+				{
+					$queryOut[$queryVerbs[0]]['range'] = array($entrySearchItem->getFieldName() => array('gte' => $range[0], 'lte' => $range[1]));
+				}
+			}
+		}
+		return $queryOut;
+	}
+
 
 }

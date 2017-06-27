@@ -45,10 +45,11 @@ class ESearchOperator extends ESearchItem
 		$this->searchItems = $searchItems;
 	}
 
-	public function createSearchQuery()
+	public static function createSearchQuery(array $eSearchCaptionItemsArr, $boolOperator, $additionalParams = null)
 	{
-		return kESearchQueryManager::createOperatorSearchQuery($this);
+
 	}
+
 
 	public function getType()
 	{
