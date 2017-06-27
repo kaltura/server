@@ -297,37 +297,38 @@ class PollCacheHandler
 		return $counter;
 	}
 
+	private function getCacheKeyPrefix($pollId)
+	{
+		$version = $this->getCacheVersion($pollId);
+		return $pollId .PollCacheHandler::CACHE_KEY_SEPARATOR.$version.PollCacheHandler::CACHE_KEY_SEPARATOR;
+	}
+
 	/* Cache keys functions */
 	private function getPollVotersCacheKey($pollId)
 	{
-		$version = $this->getCacheVersion($pollId);
-		return $pollId .PollCacheHandler::CACHE_KEY_SEPARATOR.$version.PollCacheHandler::CACHE_KEY_SEPARATOR.PollCacheHandler::VOTERS_SUFFIX;
+		return $this->getCacheKeyPrefix($pollId).PollCacheHandler::VOTERS_SUFFIX;
 	}
 
 	private function getPollUserVoteCacheKey($pollId, $userId)
 	{
-		$version = $this->getCacheVersion($pollId);
-		return $pollId.PollCacheHandler::CACHE_KEY_SEPARATOR.$version.PollCacheHandler::CACHE_KEY_SEPARATOR.$userId;
+		return $this->getCacheKeyPrefix($pollId).$userId;
 	}
 
 	private function getPollAnswerCounterCacheKey($pollId, $ansId)
 	{
-		$version = $this->getCacheVersion($pollId);
-		return $pollId. PollCacheHandler::CACHE_KEY_SEPARATOR.$version.PollCacheHandler::CACHE_KEY_SEPARATOR.$ansId;
+		return $this->getCacheKeyPrefix($pollId).$ansId;
 	}
 	private function getCacheVersion($pollId)
 	{
 		$version = $this->cache->get($pollId);
 		if(!$version)
 			$version=0;
-
 		return $version;
 	}
 	public function incrementCacheVersion($pollId)
 	{
 		$version = $this->getCacheVersion($pollId)+1;
 		$this->cache->set($pollId,$version,$this->cacheTTL);
-
 		return $version;
 	}
 
