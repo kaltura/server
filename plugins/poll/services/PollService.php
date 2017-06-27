@@ -90,10 +90,9 @@ class PollService extends KalturaBaseService
 	 * Get resetVotes Action
 	 * @action resetVotes
 	 * @param string $pollId
-	 * @param string $answerIds
 	 * @throws KalturaAPIException
 	 */
-	public function resetVotesAction($pollId, $answerIds)
+	public function resetVotesAction($pollId)
 	{
 
 		KalturaResponseCacher::disableCache();

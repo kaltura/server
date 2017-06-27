@@ -121,7 +121,7 @@ class PollActions
 			//validate User ID
 			$userId = self::getValidUserId($pollType,$userId,$ksUserId);
 			if (is_null($userId))
-				return "User ID is invalid";
+				return "User ID is invalid -  $ksUserId ";
 
 			//validate answers
 			$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
