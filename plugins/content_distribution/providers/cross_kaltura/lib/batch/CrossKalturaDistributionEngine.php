@@ -1053,7 +1053,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 			{
 				/* @var $cuePoint KalturaThumbCuePoint */
 				$thumbCuePoint->entryId = $targetEntryId;
-				$thumbCuePoint->assetId = null;
+				$thumbCuePoint->assetId = "";
 			}
 			$targetCuePointClient = KalturaCuePointClientPlugin::get($this->targetClient);
 			$syncedObjects->thumbCuePoints = $this->syncTargetEntryObjects(
