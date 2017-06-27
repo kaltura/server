@@ -13,14 +13,7 @@ class KalturaESearchEntryResultArray extends KalturaESearchResultArray {
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaESearchEntryResultArray();
-		foreach ( $arr as $obj )
-		{
-			$nObj = new KalturaESearchEntryResult();
-			$nObj->fromObject($obj, $responseProfile);
-			$newArr[] = $nObj;
-		}
-
-		return $newArr;
+		return parent::populateArray($newArr, 'KalturaESearchEntryResult', $arr, $responseProfile);
 	}
 
 }

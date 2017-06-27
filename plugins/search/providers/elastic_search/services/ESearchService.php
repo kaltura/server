@@ -20,12 +20,8 @@ class ESearchService extends KalturaBaseService
 		$entrySearch = new kEntrySearch();
 		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr, $kPager);//TODO: handle error flow
 
-		KalturaLog::info("asdf");
 		$coreResults = elasticSearchUtils::transformElasticToEntry($elasticResults);
-		KalturaLog::info("asdf");
-		
-		// entry array of core 
-		return KalturaESearchResultArray::fromDbArray($coreResults);
+		return KalturaESearchEntryResultArray::fromDbArray($coreResults);
 	}
 
 	/**
@@ -43,8 +39,7 @@ class ESearchService extends KalturaBaseService
 		$elasticResults = $categorySearch->doSearch($coreSearchOperator, $categoryStatusesArr, $kPager);//TODO: handle error flow
 		
 		$coreResults = elasticSearchUtils::transformElasticToCategory($elasticResults);
-		
-		return KalturaESearchResultArray::fromDbArray($coreResults);
+		return KalturaESearchCategoryResultArray::fromDbArray($coreResults);
 	}
 
 	/**

@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchEntryResult extends KalturaESearchResult {
+class KalturaESearchCategoryResult extends KalturaESearchResult {
 	
     private static $map_between_objects = array();
 
@@ -14,9 +14,7 @@ class KalturaESearchEntryResult extends KalturaESearchResult {
 
     protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
     {
-	    $isAdmin = kCurrentContext::$ks_object->isAdmin();
-		$object = KalturaEntryFactory::getInstanceByType($srcObj->getObject()->getType(), $isAdmin);
-		
+		$object = new KalturaCategory();
 		$this->setObject($object, $srcObj);
 	    return parent::doFromObject($srcObj, $responseProfile);
     }
