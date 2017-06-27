@@ -66,6 +66,11 @@ class kFileUtils extends kFile
 		
 		KExternalErrors::dieGracefully();
 	}
+
+	public static function isAlreadyInDumpApi()
+	{
+		return isset($_SERVER["HTTP_X_KALTURA_PROXY"]);
+	}
 	
 	public static function dumpApiRequest($host, $onlyIfAvailable = false)
 	{
