@@ -22,20 +22,17 @@ class kEntrySearch extends kBaseSearch
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator=null, $entriesStatus = array(),kPager $pager = null)
+    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(),kPager $pager = null)
     {
 	    kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $pager);
         $this->initEntitlement();
-        $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
-        $this->applyElasticSearchConditions($subQuery);
-        KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
-        $result = $this->elasticClient->search($this->query);
+        $result = $this->execSearch($eSearchOperator);
         return $result;
     }
-    
+
     protected function initQuery(array $statuses, kPager $pager = null)
     {
         $this->query = array(
@@ -115,12 +112,6 @@ class kEntrySearch extends kBaseSearch
             $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool'];
         }
         $this->isInitialized = true;
-    }
-
-    protected function applyElasticSearchConditions($conditions)
-    {
-        if($conditions)
-            $this->query['body']['query']['bool']['must'] = array($conditions);
     }
 
 }

@@ -18,10 +18,7 @@ class kUserSearch extends kBaseSearch
         if (!count($statuses))
             $statuses = array(KuserStatus::ACTIVE);
         $this->initQuery($statuses);
-        $subQuery = kESearchQueryManager::createSearchQuery($eSearchOperator);
-        $this->applyElasticSearchConditions($subQuery);
-        KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
-        $result = $this->elasticClient->search($this->query);
+        $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
