@@ -39,13 +39,12 @@ class PollService extends KalturaBaseService
 	 * @action getVotes
 	 * @param string $pollId
 	 * @param string $answerIds
-	 * @param string $otherDCVotes json
 	 * @return string
 	 * @throws KalturaAPIException
 	 */
-	public function getVotesAction($pollId, $answerIds, $otherDCVotes = null)
+	public function getVotesAction($pollId, $answerIds)
 	{
-
+		$otherDcVotesKey='otherDCVotes';
 		KalturaResponseCacher::disableCache();
 		try
 		{
@@ -57,29 +56,32 @@ class PollService extends KalturaBaseService
 			throw new KalturaAPIException($e->getMessage());
 		}
 
-		if (!$otherDCVotes)
+		if(!kFileUtils::isAlreadyInDumpApi())
 		{
-			$_POST['otherDCVotes'] = json_encode($localDcVotes);
 			$remoteDCIds = kDataCenterMgr::getAllDcs();
 			if($remoteDCIds && count($remoteDCIds) > 0)
 			{
 				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
 				if ($remoteDCHost)
+				{
+					$_POST[$otherDcVotesKey] = json_encode($localDcVotes);
 					return kFileUtils::dumpApiRequest($remoteDCHost);
+				}
 			}
 		}
 		else
 		{
-			$prevData = json_decode($otherDCVotes);
-			try
+			if(isset($_POST[$otherDcVotesKey]))
 			{
-				$localDcVotes->merge($prevData);
+				$prevData = json_decode($_POST[$otherDcVotesKey]);
+				try
+				{
+					$localDcVotes->merge($prevData);
+				} catch (Exception $e)
+				{
+					throw new KalturaAPIException($e->getMessage());
+				}
 			}
-			catch (Exception $e)
-			{
-				throw new KalturaAPIException($e->getMessage());
-			}
-
 		}
 		return json_encode($localDcVotes);
 	}
@@ -98,7 +100,8 @@ class PollService extends KalturaBaseService
 		try
 		{
 			$pollActions = new PollActions();
-			$pollActions->resetVotes($pollId, $answerIds);
+			$newVersion = $pollActions->resetVotes($pollId);
+			KalturaLog::debug("New cache version - {$newVersion} to PollId - {$pollId}");
 		}
 		catch (Exception $e)
 		{
