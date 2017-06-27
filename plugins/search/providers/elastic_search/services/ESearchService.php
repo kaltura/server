@@ -6,6 +6,58 @@
  */
 class ESearchService extends KalturaBaseService
 {
+
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		// init service and action name
+		$this->serviceId = $serviceId;
+		$this->serviceName = $serviceName;
+		$this->actionName  = $actionName;
+
+		// impersonated partner = partner parameter from the request
+		$this->impersonatedPartnerId = kCurrentContext::$partner_id;
+
+		$this->ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
+
+		// operating partner = partner from the request or the ks partner
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+
+		// if there is no session, assume it's partner 0 using actions that doesn't require ks
+		if(is_null($partnerId))
+			$partnerId = 0;
+
+		$this->partnerId = $partnerId;
+
+		// check if current aciton is allowed and if private partner data access is allowed
+		$allowPrivatePartnerData = false;
+		$actionPermitted = true;
+		//$actionPermitted = $this->isPermitted($allowPrivatePartnerData);
+
+		// action not permitted at all, not even kaltura network
+		if (!$actionPermitted)
+		{
+			$e = new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName); //TODO: should sometimes thorow MISSING_KS instead
+			header("X-Kaltura:error-".$e->getCode());
+			header("X-Kaltura-App: exiting on error ".$e->getCode()." - ".$e->getMessage());
+			throw $e;
+		}
+
+		//$this->validateApiAccessControl();
+
+		// init partner filter parameters
+		$this->private_partner_data = $allowPrivatePartnerData;
+		$this->partnerGroup = kPermissionManager::getPartnerGroup($this->serviceId, $this->actionName);
+
+		//if ($this->globalPartnerAllowed($this->actionName)) {
+		//	$this->partnerGroup = PartnerPeer::GLOBAL_PARTNER.','.trim($this->partnerGroup,',');
+		//}
+
+		$this->setPartnerFilters($partnerId);
+
+		kCurrentContext::$HTMLPurifierBehaviour = $this->getPartner()->getHtmlPurifierBehaviour();
+		kCurrentContext::$HTMLPurifierBaseListOnlyUsage = $this->getPartner()->getHtmlPurifierBaseListUsage();
+	}
+
 	/**
 	 *
 	 * @action search

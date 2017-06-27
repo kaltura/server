@@ -9,7 +9,7 @@ abstract class KalturaBaseService
 	/**
 	 * @var ks
 	 */
-	private $ks = null;
+	protected $ks = null;
 	
 	/**
 	 * @var Partner
@@ -19,7 +19,7 @@ abstract class KalturaBaseService
 	/**
 	 * @var int
 	 */
-	private $partnerId = null;
+	protected $partnerId = null;
 	
 	/**
 	 * @var kuser
