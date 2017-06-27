@@ -85,6 +85,36 @@ class PollService extends KalturaBaseService
 	}
 
 	/**
+	 * Get resetVotes Action
+	 * @action resetVotes
+	 * @param string $pollId
+	 * @param string $answerIds
+	 * @throws KalturaAPIException
+	 */
+	public function resetVotesAction($pollId, $answerIds)
+	{
+
+		KalturaResponseCacher::disableCache();
+		try
+		{
+			$pollActions = new PollActions();
+			$pollActions->resetVotes($pollId, $answerIds);
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException($e->getMessage());
+		}
+		$remoteDCIds = kDataCenterMgr::getAllDcs();
+		if($remoteDCIds && count($remoteDCIds) > 0)
+		{
+			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
+			if ($remoteDCHost)
+				return kFileUtils::dumpApiRequest($remoteDCHost);
+		}
+	}
+
+
+	/**
 	 * Vote Action
 	 * @action vote
 	 * @param string $pollId
