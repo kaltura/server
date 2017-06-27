@@ -3,7 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchCategoryItem extends KalturaESearchItem {
+class KalturaESearchCategoryItem extends KalturaESearchItem
+{
 
 	/**
 	 * @var KalturaESearchCategoryFieldName
