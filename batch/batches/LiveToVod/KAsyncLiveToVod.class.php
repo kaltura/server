@@ -14,6 +14,8 @@
 class KAsyncLiveToVod extends KJobHandlerWorker
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
+	const MAX_CHUNK_DURATION_IN_SEC = 12;
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -45,7 +47,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	{
 		$amfArray = json_decode($data->amfArray);
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
-		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift);
+		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift) + self::MAX_CHUNK_DURATION_IN_SEC;
 		self::normalizeAMFTimes($amfArray, $data->totalVodDuration, $data->lastSegmentDuration);
 
 		$totalCount = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime, $data->lastCuePointSyncTime);
@@ -142,7 +144,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 
 	private static function getSegmentEndTime($amfArray, $segmentDuration)
 	{
-		return ((self::getSegmentStartTime($amfArray) * 1000) + $segmentDuration) / 1000;
+		return ceil(((self::getSegmentStartTime($amfArray) * 1000) + $segmentDuration) / 1000);
 	}
 	// change the PTS of every amf to be relative to the beginning of the recording, and not to the beginning of the segment
 	private static function normalizeAMFTimes(&$amfArray, $totalVodDuration, $currentSegmentDuration)

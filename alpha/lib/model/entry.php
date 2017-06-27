@@ -2085,6 +2085,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $rootEntryId;
 	}
 	
+	public function getCustomDataRootEntryId()
+	{
+		return $this->getFromCustomData("rootEntryId", null, null);
+	}
 	
 	public function setDynamicFlavorAttributes(array $v)
 	{

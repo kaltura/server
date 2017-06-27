@@ -1,3 +1,34 @@
+# Lynx 12.19.0 #
+
+
+## Add polls resetVotesAction ##
+
+### configuration ###
+
+	None
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+#### Known Issues & Limitations ####
+
+        None.
+
+## Add Media-Entry ready email template ##
+
+- Issue Type: Support
+- Issue ID: SUP-8655
+
+### Configuration ###
+script will ask for your: IP, userId and password (of your admin-console account), partner (insert -2 for partner)
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
+
+#### Known Issues & Limitations ####
+None.
+
 # Lynx 12.18.0 #
 
 ## support new live packages + LC flow + webcast on update or fresh install ##

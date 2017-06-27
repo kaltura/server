@@ -198,7 +198,7 @@ class kContextDataHelper
 		if ($this->entry->getType() == entryType::PLAYLIST &&
 			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
 		{
-			list($entryIds, $durations, $mediaEntry) = 
+			list($entryIds, $durations, $mediaEntry, $captionFiles) =
 				myPlaylistUtils::executeStitchedPlaylist($this->entry);
 			if (!$mediaEntry)
 			{

@@ -65,6 +65,7 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
@@ -84,7 +85,9 @@ abstract class KDropFolderEngine implements IKalturaLogger
 			}
 		}while (count($dropFolderFiles) >= $pager->pageSize);
 		$mapCount = count($dropFolderFilesMap);
-		KalturaLog::debug("Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list and [$mapCount] files in map");
+		KalturaLog::debug("Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file");
+		if ($totalCount != $mapCount)
+			KalturaLog::warning("Map is missing files - Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list BUT has [$mapCount] files in map");
 		return $dropFolderFilesMap;
 	}
 

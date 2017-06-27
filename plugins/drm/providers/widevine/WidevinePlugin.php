@@ -2,7 +2,7 @@
 /**
  * @package plugins.widevine
  */
-class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPending, IKalturaPlaybackContextDataContributor
+class WidevinePlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPending, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'widevine';
 	const WIDEVINE_EVENTS_CONSUMER = 'kWidevineEventsConsumer';
@@ -322,7 +322,7 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if (self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			foreach ($entryPlayingDataParams->getFlavors() as $flavor)
 			{
@@ -375,31 +375,4 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return $widevineProfile->getLicenseServerUrl() . "/" . $scheme . "/license?custom_data=" . $customDataObject['custom_data'] . "&signature=" . $customDataObject['signature'];
 	}
 
-	/**
-	 * @param entry $entry
-	 * @return bool
-	 */
-	protected function shouldContribute(entry $entry)
-	{
-		if ($entry->getAccessControl())
-		{
-			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
-			{
-				/**
-				 * @var kRule $rule
-				 */
-				foreach ($rule->getActions() as $action)
-				{
-					/**
-					 * @var kRuleAction $action
-					 */
-					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
-					{
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
 }
