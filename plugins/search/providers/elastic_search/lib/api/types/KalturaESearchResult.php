@@ -6,9 +6,9 @@
 class KalturaESearchResult extends KalturaObject {
 
     /**
-     * @var KalturaBaseEntry
+     * @var KalturaObject
      */
-    public $entry;
+    public $object;
 
     /**
      * @var KalturaESearchItemDataArray
@@ -16,7 +16,7 @@ class KalturaESearchResult extends KalturaObject {
     public $itemData;
 
     private static $map_between_objects = array(
-        'entry',
+        'object',
         'itemData',
     );
 
@@ -27,11 +27,20 @@ class KalturaESearchResult extends KalturaObject {
 
     protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
     {
+		/*
 	    $isAdmin = kCurrentContext::$ks_object->isAdmin();
-	    $entry = KalturaEntryFactory::getInstanceByType($srcObj->getEntry()->getType(), $isAdmin);
 
-	    $entry->fromObject($srcObj->getEntry());
-	    $this->entry = $entry;
+		KalturaLog::info("qwer");
+		
+		$obj = $srcObj->getObject();
+		if ($obj instanceof entry)
+			$object = KalturaEntryFactory::getInstanceByType($srcObj->getObject()->getType(), $isAdmin);
+		else if ($obj instanceof category)
+			$object = new KalturaCategory();
+
+		$object->fromObject($srcObj->getObject());
+	    $this->object = $object;
+		*/
 
 	    return parent::doFromObject($srcObj, $responseProfile);
     }
