@@ -43,6 +43,11 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('checkbox', 'deleteFromRecycleBin', array(
+			'label'	  => 'Delete From Recycle Bin',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
+		));
+		
 	}
 	
 }
