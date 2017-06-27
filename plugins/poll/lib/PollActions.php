@@ -209,7 +209,7 @@ class PollActions
 		if (!$pollId || !$ansIds)
 			throw new Exception('Missing parameter for resetVotes action');
 		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
-		$this->pollsCacheHandler->clearPollVoter($pollId);
+		$this->pollsCacheHandler->clearPollVoters($pollId);
 		$this->pollsCacheHandler->clearAnswersCounter($pollId,$answers);
 	}
 
@@ -294,7 +294,7 @@ class PollCacheHandler
 		$this->cache->increment($this->getPollVotersCacheKey($pollId));
 	}
 
-	public function clearPollVoter($pollId)
+	public function clearPollVoters($pollId)
 	{
 		$this->cache->set($this->getPollVotersCacheKey($pollId),0,$this->cacheTTL);
 	}
