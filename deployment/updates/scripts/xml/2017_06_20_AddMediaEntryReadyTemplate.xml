@@ -9,6 +9,8 @@
     </config>
     <session>
         <!-- script will ask for username / password interactively -->
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
     </session>
 
     <multirequest>
