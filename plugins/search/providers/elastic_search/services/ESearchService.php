@@ -55,9 +55,9 @@ class ESearchService extends KalturaBaseService
 		list($coreSearchOperator, $userStatusesArr, $kPager) = $this->initSearchActionParams($searchOperator, $userStatuses, $pager);
 		$userSearch = new kUserSearch();
 		$elasticResults = $userSearch->doSearch($coreSearchOperator, $userStatusesArr, $kPager);//TODO: handle error flow
-		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
+		$coreResults = elasticSearchUtils::transformElasticToUser($elasticResults);
 
-		return KalturaESearchResultArray::fromDbArray($coreResults);
+		return KalturaESearchUserResultArray::fromDbArray($coreResults);
 	}
 
 	/**

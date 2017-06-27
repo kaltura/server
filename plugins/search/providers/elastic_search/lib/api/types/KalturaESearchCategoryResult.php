@@ -12,12 +12,9 @@ class KalturaESearchCategoryResult extends KalturaESearchResult {
         return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
     }
 
-    protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
-    {
-		$object = new KalturaCategory();
-		$this->setObject($object, $srcObj);
-	    return parent::doFromObject($srcObj, $responseProfile);
-    }
-
+	protected function getAPIObject($srcObj)
+	{
+		return new KalturaCategory();
+	}
 
 }

@@ -126,6 +126,13 @@ class elasticSearchUtils
 		return elasticSearchUtils::getESearchResultinCore($entries, $entriesData, $entriesScore);
 	}
 
+	public static function transformElasticToUser($elasticResults)
+	{
+		list($entriesData, $entriesScore) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
+		$entries = kuserPeer::retrieveByPKs(array_keys($entriesData));
+		return elasticSearchUtils::getESearchResultinCore($entries, $entriesData, $entriesScore);
+	}
+
     public static function transformElasticToObject($elasticResults)
     {
 		$coreObjs = array();
