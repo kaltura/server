@@ -79,41 +79,7 @@ class ESearchMetadataItem extends ESearchItem
 		foreach ($eSearchItemsArr as $metadataESearchItem)
 		{
 			/* @var ESearchMetadataItem $metadataESearchItem */
-			switch ($metadataESearchItem->getItemType())
-			{
-				case ESearchItemType::EXACT_MATCH:
-					$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
-						'term' => array(
-							'metadata.value_text.raw' => strtolower($metadataESearchItem->getSearchTerm())
-						)
-					);
-					break;
-				case ESearchItemType::PARTIAL:
-					$captionQuery['nested']['query']['bool'][$boolOperator][] = array(
-						'multi_match' => array(
-							'query' => strtolower($metadataESearchItem->getSearchTerm()),
-							'fields' => array(
-								'metadata.value_text.trigram',
-								'metadata.value_text',
-							),
-							'type' => 'most_fields'
-						)
-					);
-					break;
-				case ESearchItemType::STARTS_WITH:
-					$captionQuery['nested']['query']['bool'][$boolOperator][] = array(
-						'prefix' => array(
-							'metadata.value_text.raw' => strtolower($metadataESearchItem->getSearchTerm())
-						)
-					);
-					break;
-				case ESearchItemType::DOESNT_CONTAIN:
-					$captionQuery['nested']['query']['bool'][$boolOperator][] = array(
-						'term' => array(
-							'metadata.value_text.raw' => strtolower($metadataESearchItem->getSearchTerm())
-						)
-					);
-			}
+			self::createSingleItemQuery($boolOperator, $metadataESearchItem, $metadataQuery);
 			if ($metadataESearchItem->getXpath())
 			{
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
@@ -129,10 +95,56 @@ class ESearchMetadataItem extends ESearchItem
 						'metadata.metadata_profile_id' => strtolower($metadataESearchItem->getMetadataProfileId())
 					)
 				);
+				return $metadataQuery;
 			}
 		}
 		return $metadataQuery;
 	}
 
+	/**
+	 * @param $boolOperator
+	 * @param $metadataESearchItem
+	 * @param $metadataQuery
+	 * @return mixed
+	 */
+	public static function createSingleItemQuery($boolOperator, $metadataESearchItem, &$metadataQuery)
+	{
+		switch ($metadataESearchItem->getItemType())
+		{
+			case ESearchItemType::EXACT_MATCH:
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'term' => array(
+						'metadata.value_text.raw' => strtolower($metadataESearchItem->getSearchTerm())
+					)
+				);
+				break;
+			case ESearchItemType::PARTIAL:
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'multi_match' => array(
+						'query' => strtolower($metadataESearchItem->getSearchTerm()),
+						'fields' => array(
+							'metadata.value_text.trigram',
+							'metadata.value_text',
+						),
+						'type' => 'most_fields'
+					)
+				);
+				break;
+			case ESearchItemType::STARTS_WITH:
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'prefix' => array(
+						'metadata.value_text.raw' => strtolower($metadataESearchItem->getSearchTerm())
+					)
+				);
+				break;
+			case ESearchItemType::DOESNT_CONTAIN:
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] = array(
+					'term' => array(
+						'metadata.value_text.raw' => strtolower($metadataESearchItem->getSearchTerm())
+					)
+				);
+		}
+		return $metadataQuery;
+	}
 
 }

@@ -80,46 +80,7 @@ class ESearchCaptionItem extends ESearchItem
 		$captionQuery['nested']['query']['nested']['path'] = "caption_assets.lines";
 		foreach ($eSearchItemsArr as $eSearchCaptionItem)
 		{
-			/* @var ESearchCaptionItem $eSearchCaptionItem */
-			switch ($eSearchCaptionItem->getItemType())
-			{
-				case ESearchItemType::EXACT_MATCH:
-					$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
-						'term' => array(
-							'caption_assets.lines.content.raw' => strtolower($eSearchCaptionItem->getSearchTerm())
-						)
-					);
-					break;
-				case ESearchItemType::PARTIAL:
-					$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
-						'multi_match' => array(
-							'query' => strtolower($eSearchCaptionItem->getSearchTerm()),
-							'fields' => array(
-								'caption_assets.lines.content.trigrams',
-								'caption_assets.lines.content.raw^3',
-								'caption_assets.lines.content^2',
-								'caption_assets.lines.content_*^2',
-							),
-							'type' => 'most_fields'
-						)
-					);
-					break;
-				case ESearchItemType::STARTS_WITH:
-					$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
-						'prefix' => array(
-							'caption_assets.lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
-						)
-					);
-					break;
-				case ESearchItemType::DOESNT_CONTAIN:
-					$captionQuery['has_child']['query']['nested']['query']['bool']['must_not'][] = array(
-						'term' => array(
-							'caption_assets.lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
-						)
-					);
-					break;
-			}
-
+			self::createSingleItemSearchQuery($boolOperator, $eSearchCaptionItem, $captionQuery);
 			foreach ($eSearchCaptionItem->getRanges() as $range)
 			{
 				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('caption_assets.lines.start_time' => array('lte' => $range[0])));
@@ -129,6 +90,56 @@ class ESearchCaptionItem extends ESearchItem
 		foreach ($additionalParams as $addParamKey => $addParamVal)
 		{
 			$captionQuery['has_child']['query']['nested']['query']['bool'][$addParamKey] = $addParamVal;
+		}
+		return $captionQuery;
+	}
+
+	/**
+	 * @param $boolOperator
+	 * @param $eSearchCaptionItem
+	 * @param $captionQuery
+	 * @return mixed
+	 */
+	public static function createSingleItemSearchQuery($boolOperator, $eSearchCaptionItem, &$captionQuery)
+	{
+		/* @var ESearchCaptionItem $eSearchCaptionItem */
+		switch ($eSearchCaptionItem->getItemType())
+		{
+			case ESearchItemType::EXACT_MATCH:
+				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
+					'term' => array(
+						'caption_assets.lines.content.raw' => strtolower($eSearchCaptionItem->getSearchTerm())
+					)
+				);
+				break;
+			case ESearchItemType::PARTIAL:
+				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
+					'multi_match' => array(
+						'query' => strtolower($eSearchCaptionItem->getSearchTerm()),
+						'fields' => array(
+							'caption_assets.lines.content.trigrams',
+							'caption_assets.lines.content.raw^3',
+							'caption_assets.lines.content^2',
+							'caption_assets.lines.content_*^2',
+						),
+						'type' => 'most_fields'
+					)
+				);
+				break;
+			case ESearchItemType::STARTS_WITH:
+				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array(
+					'prefix' => array(
+						'caption_assets.lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
+					)
+				);
+				break;
+			case ESearchItemType::DOESNT_CONTAIN:
+				$captionQuery['has_child']['query']['nested']['query']['bool']['must_not'][] = array(
+					'term' => array(
+						'caption_assets.lines.content' => strtolower($eSearchCaptionItem->getSearchTerm())
+					)
+				);
+				break;
 		}
 		return $captionQuery;
 	}

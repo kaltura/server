@@ -40,39 +40,57 @@ class ESearchUnifiedItem extends ESearchItem
 			/** @var ESearchUnifiedItem $eSearchUnifiedItem */
 			$queryVerbs = $eSearchUnifiedItem->getQueryVerbs();
 			$hasQuery = false;
-			$innerQuery = array();
+			$entryQuery = array();
+			//Start handling entry fields
 			foreach($entryAllowedFields as $fieldName => $fieldAllowedTypes)
 			{
 				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array('Unified', $fieldAllowedTypes))
 				{
 					$hasQuery = true;
-					$innerQuery[][$queryVerbs[1]][$fieldName] = $eSearchUnifiedItem->getSearchTerm();
+					$entryQuery[][$queryVerbs[1]][$fieldName] = $eSearchUnifiedItem->getSearchTerm();
 				}
 			}
 			if ($hasQuery)
 			{
-				$fullInnerQuery['bool']['minimum_should_match'] = 1;
-				$fullInnerQuery['bool']['should'] = $innerQuery;
-				$outQuery['bool']['should'][] = $fullInnerQuery;
+				$fullEntryQuery['bool']['minimum_should_match'] = 1;
+				$fullEntryQuery['bool']['should'] = $entryQuery;
+				$outQuery['bool']['should'][] = $fullEntryQuery;
 			}
 
 			$hasQuery = false;
-			$nestedQuery = array();
+			$cuePointQuery = array();
+			//Start handling cue-point fields
 			foreach($cuePointAllowedFields as $fieldName => $fieldAllowedTypes)
 			{
 				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array('Unified', $fieldAllowedTypes))
 				{
 					$hasQuery = true;
-					$nestedQuery['nested']['query']['bool']['should'][][$queryVerbs[1]] =  array($fieldName => strtolower($eSearchUnifiedItem->getSearchTerm()));
+					$cuePointQuery['nested']['query']['bool']['should'][][$queryVerbs[1]] =  array($fieldName => strtolower($eSearchUnifiedItem->getSearchTerm()));
 				}
 			}
 			if ($hasQuery)
 			{
-				$nestedQuery['nested']['path'] = 'cue_points';
-				$nestedQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
-				$nestedQuery['nested']['query']['bool']['minimum_should_match'] = 1;
-				$outQuery['bool']['should'][] = $nestedQuery;
+				$cuePointQuery['nested']['path'] = 'cue_points';
+				$cuePointQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
+				$cuePointQuery['nested']['query']['bool']['minimum_should_match'] = 1;
+				$outQuery['bool']['should'][] = $cuePointQuery;
 			}
+
+			//Start handling caption fields
+			$captionQuery['nested']['path'] = 'caption_assets';
+			$captionQuery['nested']['query']['nested']['inner_hits'] = array('size' => 10); //TODO: get this parameter from config
+			$captionQuery['nested']['inner_hits'] = array('size' => 10, '_source' => false);
+			$captionQuery['nested']['query']['nested']['path'] = "caption_assets.lines";
+
+			ESearchCaptionItem::createSingleItemSearchQuery($boolOperator, $eSearchUnifiedItem, $captionQuery);
+			$outQuery['bool']['should'][] = $captionQuery;
+
+			//Start handling metadata fields
+			$metadataQuery['nested']['path'] = 'metadata';
+			$metadataQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
+			ESearchMetadataItem::createSingleItemQuery($boolOperator, $eSearchUnifiedItem, $metadataQuery);
+
+			$outQuery['bool']['should'][] = $metadataQuery;
 
 		}
 
