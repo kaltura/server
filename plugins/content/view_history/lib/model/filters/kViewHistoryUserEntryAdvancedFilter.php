@@ -103,7 +103,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 			$chunkSize = max(min($limit * 2, self::MAX_USER_ENTRY_CHUNK_SIZE), self::MIN_USER_ENTRY_CHUNK_SIZE);
 			if ($this->filterLimit)
 			{
-				$chunkSize = $this->filterLimit;
+				$chunkSize = $limit;
 			}
 			
 			while (true)
