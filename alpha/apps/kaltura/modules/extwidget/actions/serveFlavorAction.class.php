@@ -322,24 +322,26 @@ class serveFlavorAction extends kalturaAction
 
 		if ($asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
 		{
-			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLanguages);
+			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLanguages, $entry->getPartnerId());
 		}
 
 
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr, $captionFiles, $captionLanguages);
 	}
 
-	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges)
+	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges, $partnerId)
 	{
 		$sequences = array();
 
 		$this->addCaptionSequences($entryIds, $captionFiles, $captionLangauges, $sequences);
 
-//		$sequences[] = array('clips' => $captionClips);
 		$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
 		// build the json
 		$json = json_encode($mediaSet);
 		$renderer = new kRendererString($json, self::JSON_CONTENT_TYPE);
+
+		$this->storeCache($renderer, $partnerId);
+
 		$renderer->output();
 		KExternalErrors::dieGracefully();
 	}
@@ -648,7 +650,7 @@ class serveFlavorAction extends kalturaAction
 				$sequences[] = $currSequence;
 			}
 		}
-		
+
 		return true;
 	}
 }
