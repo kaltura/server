@@ -121,7 +121,7 @@ class PollActions
 			//validate User ID
 			$userId = self::getValidUserId($pollType,$userId,$ksUserId);
 			if (is_null($userId))
-				return "User ID is invalid";
+				return "User ID is invalid -  $ksUserId ";
 
 			//validate answers
 			$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
@@ -204,13 +204,9 @@ class PollActions
 		return $pollVotes;
 	}
 
-	public function resetVotes($pollId, $ansIds)
+	public function resetVotes($pollId)
 	{
-		if (!$pollId || !$ansIds)
-			throw new Exception('Missing parameter for resetVotes action');
-		$answers = explode(self::ANSWER_SEPARATOR_CHAR, $ansIds);
-		$this->pollsCacheHandler->clearPollVoters($pollId);
-		$this->pollsCacheHandler->clearAnswersCounter($pollId,$answers);
+		return $this->pollsCacheHandler->incrementCacheVersion($pollId);
 	}
 
 }
@@ -293,12 +289,6 @@ class PollCacheHandler
 		$this->cache->add($this->getPollVotersCacheKey($pollId), 0, $this->cacheTTL);
 		$this->cache->increment($this->getPollVotersCacheKey($pollId));
 	}
-
-	public function clearPollVoters($pollId)
-	{
-		$this->cache->set($this->getPollVotersCacheKey($pollId),0,$this->cacheTTL);
-	}
-
 	public function getPollVotersCount($pollId)
 	{
 		$counter = $this->cache->get($this->getPollVotersCacheKey($pollId));
@@ -307,20 +297,39 @@ class PollCacheHandler
 		return $counter;
 	}
 
+	private function getCacheKeyPrefix($pollId)
+	{
+		$version = $this->getCacheVersion($pollId);
+		return $pollId .PollCacheHandler::CACHE_KEY_SEPARATOR.$version.PollCacheHandler::CACHE_KEY_SEPARATOR;
+	}
+
 	/* Cache keys functions */
 	private function getPollVotersCacheKey($pollId)
 	{
-		return $pollId .PollCacheHandler::CACHE_KEY_SEPARATOR. PollCacheHandler::VOTERS_SUFFIX;
+		return $this->getCacheKeyPrefix($pollId).PollCacheHandler::VOTERS_SUFFIX;
 	}
 
 	private function getPollUserVoteCacheKey($pollId, $userId)
 	{
-		return $pollId. PollCacheHandler::CACHE_KEY_SEPARATOR. $userId;
+		return $this->getCacheKeyPrefix($pollId).$userId;
 	}
 
 	private function getPollAnswerCounterCacheKey($pollId, $ansId)
 	{
-		return $pollId. PollCacheHandler::CACHE_KEY_SEPARATOR. $ansId;
+		return $this->getCacheKeyPrefix($pollId).$ansId;
+	}
+	private function getCacheVersion($pollId)
+	{
+		$version = $this->cache->get($pollId);
+		if(!$version)
+			$version=0;
+		return $version;
+	}
+	public function incrementCacheVersion($pollId)
+	{
+		$version = $this->getCacheVersion($pollId)+1;
+		$this->cache->set($pollId,$version,$this->cacheTTL);
+		return $version;
 	}
 
 }
