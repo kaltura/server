@@ -68,11 +68,21 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		$limit = $query->getLimit() ? $query->getLimit() : ($this->filterLimit ? $this->filterLimit : self::ENTRIES_COUNT);
 		
 		$query->setLimit(self::ENTRIES_COUNT);
+		if ($this->filterLimit)
+		{
+			KalturaLog::info ("Overriding filter limit to " . self::ENTRIES_COUNT);
+			$this->overrideFilterLimit = self::ENTRIES_COUNT;
+		}
+		
 		$this->disable = true;
 		
 		$entries = entryPeer::doSelect($query);
 		$totalCountEntries = $query->getRecordsCount();
 		$query->setLimit($limit);
+		if ($this->filterLimit)
+		{
+			$this->overrideFilterLimit = $limit;
+		}
 		
 		if ($totalCountEntries <= self::ENTRIES_COUNT)
 		{
