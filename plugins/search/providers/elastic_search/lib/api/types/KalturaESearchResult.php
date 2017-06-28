@@ -3,12 +3,12 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchResult extends KalturaObject {
+abstract class KalturaESearchResult extends KalturaObject {
 
     /**
-     * @var KalturaBaseEntry
+     * @var KalturaObject
      */
-    public $entry;
+    public $object;
 
     /**
      * @var KalturaESearchItemDataArray
@@ -16,7 +16,7 @@ class KalturaESearchResult extends KalturaObject {
     public $itemData;
 
     private static $map_between_objects = array(
-        'entry',
+        'object',
         'itemData',
     );
 
@@ -25,16 +25,15 @@ class KalturaESearchResult extends KalturaObject {
         return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
     }
 
-    protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
-    {
-	    $isAdmin = kCurrentContext::$ks_object->isAdmin();
-	    $entry = KalturaEntryFactory::getInstanceByType($srcObj->getEntry()->getType(), $isAdmin);
+	abstract function getAPIObject($srcObj);
 
-	    $entry->fromObject($srcObj->getEntry());
-	    $this->entry = $entry;
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$object = $this->getAPIObject($srcObj);
+		$object->fromObject($srcObj->getObject());
+		$this->object = $object;
+		return parent::doFromObject($srcObj, $responseProfile);
+	}
 
-	    return parent::doFromObject($srcObj, $responseProfile);
-    }
-
-
+	
 }

@@ -3,25 +3,19 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchOperator extends KalturaESearchBaseItem {
+class KalturaESearchCategoryItem extends KalturaESearchItem
+{
 
-
-    /**
-     * @var KalturaESearchOperatorType
-     */
-    public $operator;
-
-    /**
-     *  @var KalturaESearchBaseItemArray
-     */
-    public $searchItems;
+	/**
+	 * @var KalturaESearchCategoryFieldName
+	 */
+	public $fieldName;
 
 	private static $map_between_objects = array(
-		'operator',
-		'searchItems',
+		'fieldName'
 	);
 
-	public function getMapBetweenObjects()
+	protected function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
@@ -29,7 +23,7 @@ class KalturaESearchOperator extends KalturaESearchBaseItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new ESearchOperator();
+			$object_to_fill = new ESearchCategoryItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 

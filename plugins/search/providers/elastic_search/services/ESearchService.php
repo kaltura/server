@@ -19,9 +19,9 @@ class ESearchService extends KalturaBaseService
 		list($coreSearchOperator, $entryStatusesArr, $kPager) = $this->initSearchActionParams($searchOperator, $entryStatuses, $pager);
 		$entrySearch = new kEntrySearch();
 		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr, $kPager);//TODO: handle error flow
-		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
 
-		return KalturaESearchResultArray::fromDbArray($coreResults);
+		$coreResults = elasticSearchUtils::transformElasticToEntry($elasticResults);
+		return KalturaESearchEntryResultArray::fromDbArray($coreResults);
 	}
 
 	/**
@@ -37,9 +37,9 @@ class ESearchService extends KalturaBaseService
 		list($coreSearchOperator, $categoryStatusesArr, $kPager) = $this->initSearchActionParams($searchOperator, $categoryStatuses, $pager);
 		$categorySearch = new kCategorySearch();
 		$elasticResults = $categorySearch->doSearch($coreSearchOperator, $categoryStatusesArr, $kPager);//TODO: handle error flow
-		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
-
-		return KalturaESearchResultArray::fromDbArray($coreResults);
+		
+		$coreResults = elasticSearchUtils::transformElasticToCategory($elasticResults);
+		return KalturaESearchCategoryResultArray::fromDbArray($coreResults);
 	}
 
 	/**
@@ -55,9 +55,9 @@ class ESearchService extends KalturaBaseService
 		list($coreSearchOperator, $userStatusesArr, $kPager) = $this->initSearchActionParams($searchOperator, $userStatuses, $pager);
 		$userSearch = new kUserSearch();
 		$elasticResults = $userSearch->doSearch($coreSearchOperator, $userStatusesArr, $kPager);//TODO: handle error flow
-		$coreResults = elasticSearchUtils::transformElasticToObject($elasticResults);
+		$coreResults = elasticSearchUtils::transformElasticToUser($elasticResults);
 
-		return KalturaESearchResultArray::fromDbArray($coreResults);
+		return KalturaESearchUserResultArray::fromDbArray($coreResults);
 	}
 
 	/**
