@@ -97,7 +97,7 @@ class elasticSearchUtils
 		return array($objectData, $objectScore);
 	}
 
-	private static function getESearchResultinCore($coreObjects, $objectsData, $objectsScore)
+	private static function getCoreESearchResults($coreObjects, $objectsData, $objectsScore)
 	{
 		$resultsObjects = array();
 		usort($coreObjects, build_sorter($objectsScore));
@@ -115,7 +115,7 @@ class elasticSearchUtils
 	{
 		list($categoryData, $categoryScore) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
 		$categories = categoryPeer::retrieveByPKs(array_keys($categoryData));
-		return elasticSearchUtils::getESearchResultinCore($categories, $categoryData, $categoryScore);
+		return elasticSearchUtils::getCoreESearchResults($categories, $categoryData, $categoryScore);
 
 	}
 
@@ -123,14 +123,14 @@ class elasticSearchUtils
 	{
 		list($entriesData, $entriesScore) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
 		$entries = entryPeer::retrieveByPKs(array_keys($entriesData));
-		return elasticSearchUtils::getESearchResultinCore($entries, $entriesData, $entriesScore);
+		return elasticSearchUtils::getCoreESearchResults($entries, $entriesData, $entriesScore);
 	}
 
 	public static function transformElasticToUser($elasticResults)
 	{
 		list($entriesData, $entriesScore) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
 		$entries = kuserPeer::retrieveByPKs(array_keys($entriesData));
-		return elasticSearchUtils::getESearchResultinCore($entries, $entriesData, $entriesScore);
+		return elasticSearchUtils::getCoreESearchResults($entries, $entriesData, $entriesScore);
 	}
 
     public static function transformElasticToObject($elasticResults)
