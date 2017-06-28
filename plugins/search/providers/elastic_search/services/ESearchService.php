@@ -71,7 +71,7 @@ class ESearchService extends KalturaBaseService
 	{
 		$coreSearchItem = $searchItem->toObject();
 		$coreSearchItemClass = get_class($coreSearchItem);
-		$allowedSearchMap = $coreSearchItemClass::getAallowedSearchTypesForField();
+		$allowedSearchMap = $coreSearchItemClass::getAllowedSearchTypesForField();
 
 		$result = new KalturaKeyValueArray();
 		if (isset($searchItem->fieldName))
