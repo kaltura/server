@@ -618,39 +618,66 @@ class serveFlavorAction extends kalturaAction
 	 * @param $sequences
 	 * @return array
 	 */
-	protected function addCaptionSequences($entryIds, $captionFiles, $captionLangauges, $sequences)
+	protected function addCaptionSequences($entryIds, $captionFiles, $captionLangauges, &$sequences)
 	{
 		$captionLangaugesArr = explode(',', $captionLangauges);
-		$captionClips = array();
-		foreach ($entryIds as $entryId)
+		foreach ($captionLangaugesArr as $captionLang)
 		{
 			$hasCaptions = false;
-			if (isset($captionFiles[$entryId]))
+			$captionClips = array();
+			foreach ($entryIds as $entryId)
 			{
-				foreach ($captionLangaugesArr as $captionLang)
+				if (isset($captionFiles[$entryId][$captionLang]))
 				{
-					if (isset($captionFiles[$entryId][$captionLang]))
-					{
-						$hasCaptions = true;
-						$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][1]);
-					}
-					if ($hasCaptions)
-					{
-						$langString = $captionLang;
-						if (isset(CaptionPlugin::$captionsFormatMap[$langString]))
-							$langString = CaptionPlugin::$captionsFormatMap[$langString];
-						$currSequence = array('clips' => $captionClips, 'language' => $langString);
-						if (!is_null($captionFiles[$entryId][$captionLang][0]))
-							$currSequence['label'] = $captionFiles[$entryId][$captionLang][0];
-						$sequences[] = $currSequence;
-						$captionClips = array();
-					}
+					$hasCaptions = true;
+					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][1]);
 				}
-			} else
+				else
+				{
+					$captionClips[] = array('type' => 'source', 'path' => 'empty');
+				}
+			}
+			if ($hasCaptions)
 			{
-				$captionClips[] = array('type' => 'source', 'path' => 'empty');
+				$langString = $captionLang;
+				if (isset(CaptionPlugin::$captionsFormatMap[$langString]))
+					$langString = CaptionPlugin::$captionsFormatMap[$langString];
+				$currSequence = array('clips' => $captionClips, 'language' => $langString);
+				if (!is_null($captionFiles[$entryId][$captionLang][0]))
+					$currSequence['label'] = $captionFiles[$entryId][$captionLang][0];
+				$sequences[] = $currSequence;
 			}
 		}
+
+//		foreach ($entryIds as $entryId)
+//		{
+//			$hasCaptions = false;
+//			if (isset($captionFiles[$entryId]))
+//			{
+//				foreach ($captionLangaugesArr as $captionLang)
+//				{
+//					if (isset($captionFiles[$entryId][$captionLang]))
+//					{
+//						$hasCaptions = true;
+//						$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][1]);
+//					}
+//					if ($hasCaptions)
+//					{
+//						$langString = $captionLang;
+//						if (isset(CaptionPlugin::$captionsFormatMap[$langString]))
+//							$langString = CaptionPlugin::$captionsFormatMap[$langString];
+//						$currSequence = array('clips' => $captionClips, 'language' => $langString);
+//						if (!is_null($captionFiles[$entryId][$captionLang][0]))
+//							$currSequence['label'] = $captionFiles[$entryId][$captionLang][0];
+//						$sequences[] = $currSequence;
+//						$captionClips = array();
+//					}
+//				}
+//			} else
+//			{
+//				$captionClips[] = array('type' => 'source', 'path' => 'empty');
+//			}
+//		}
 		return true;
 	}
 }
