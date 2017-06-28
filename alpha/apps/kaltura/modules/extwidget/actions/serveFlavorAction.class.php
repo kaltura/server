@@ -137,7 +137,7 @@ class serveFlavorAction extends kalturaAction
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null);
 	}
 
-	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds, $captionFiles)
+	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds, $captionFiles, $captionLanguages)
 	{
 		// get request parameters
 		if (!$flavorParamIds)
@@ -274,9 +274,7 @@ class serveFlavorAction extends kalturaAction
 			$sequences[] = array('clips' => $clips);
 		}
 
-		list($hasCaptions, $captionClips) = $this->getCaptionClips($entryIds, $captionFiles);
-		if ($hasCaptions)
-			$sequences[] = array('clips' => $captionClips);
+		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences);
 
 		// build the media set
 		if ($isLive)
@@ -301,7 +299,7 @@ class serveFlavorAction extends kalturaAction
 	}
 
 
-	protected function serveEntryWithSequence($entry, $sequenceEntries, $flavorId, $captionLangauges)
+	protected function serveEntryWithSequence($entry, $sequenceEntries, $flavorId, $captionLanguages)
 	{
 		$flavorParamsIdsArr = array();
 		$asset = null;
@@ -317,25 +315,27 @@ class serveFlavorAction extends kalturaAction
 		/* @var asset $asset */
 		$allEntries = $sequenceEntries;
 		$allEntries[] = $entry;
-		if (empty($captionLangauges) && $asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
-			$captionLangauges = $asset->getLanguage();
+		if (empty($captionLanguages) && $asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
+			$captionLanguages = $asset->getLanguage();
 		list($entryIds, $durations, $referenceEntry, $captionFiles ) =
-			myPlaylistUtils::getPlaylistDataFromEntries($allEntries, $flavorParamsIdsArr, $captionLangauges);
+			myPlaylistUtils::getPlaylistDataFromEntries($allEntries, $flavorParamsIdsArr, $captionLanguages);
 
 		if ($asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
 		{
-			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations);
+			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLanguages);
 		}
 
 
-		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr, $captionFiles);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr, $captionFiles, $captionLanguages);
 	}
 
-	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations)
+	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges)
 	{
 		$sequences = array();
-		list($hasCaptions, $captionClips) = $this->getCaptionClips($entryIds, $captionFiles);
-		$sequences[] = array('clips' => $captionClips);
+
+		$this->addCaptionSequences($entryIds, $captionFiles, $captionLangauges, $sequences);
+
+//		$sequences[] = array('clips' => $captionClips);
 		$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
 		// build the json
 		$json = json_encode($mediaSet);
@@ -614,26 +614,43 @@ class serveFlavorAction extends kalturaAction
 	/**
 	 * @param $entryIds
 	 * @param $captionFiles
+	 * @param $captionLangauges
+	 * @param $sequences
 	 * @return array
 	 */
-	protected function getCaptionClips($entryIds, $captionFiles)
+	protected function addCaptionSequences($entryIds, $captionFiles, $captionLangauges, $sequences)
 	{
-		$hasCaptions = false;
+		$captionLangaugesArr = explode(',', $captionLangauges);
 		$captionClips = array();
 		foreach ($entryIds as $entryId)
 		{
-			if (isset($captionFiles[$entryId]) && count($captionFiles[$entryId]) > 0)
+			$hasCaptions = false;
+			if (isset($captionFiles[$entryId]))
 			{
-				foreach ($captionFiles[$entryId] as $captionData)
+				foreach ($captionLangaugesArr as $captionLang)
 				{
-					$hasCaptions = true;
-					$captionClips[] = array('type' => 'source', 'path' => $captionData[1], 'language' => $captionData[0] );
+					if (isset($captionFiles[$entryId][$captionLang]))
+					{
+						$hasCaptions = true;
+						$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][1]);
+					}
+					if ($hasCaptions)
+					{
+						$langString = $captionLang;
+						if (isset(CaptionPlugin::$captionsFormatMap[$langString]))
+							$langString = CaptionPlugin::$captionsFormatMap[$langString];
+						$currSequence = array('clips' => $captionClips, 'language' => $langString);
+						if (!is_null($captionFiles[$entryId][$captionLang][0]))
+							$currSequence['label'] = $captionFiles[$entryId][$captionLang][0];
+						$sequences[] = $currSequence;
+						$captionClips = array();
+					}
 				}
 			} else
 			{
 				$captionClips[] = array('type' => 'source', 'path' => 'empty');
 			}
 		}
-		return array($hasCaptions, $captionClips);
+		return true;
 	}
 }
