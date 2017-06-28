@@ -648,36 +648,7 @@ class serveFlavorAction extends kalturaAction
 				$sequences[] = $currSequence;
 			}
 		}
-
-//		foreach ($entryIds as $entryId)
-//		{
-//			$hasCaptions = false;
-//			if (isset($captionFiles[$entryId]))
-//			{
-//				foreach ($captionLangaugesArr as $captionLang)
-//				{
-//					if (isset($captionFiles[$entryId][$captionLang]))
-//					{
-//						$hasCaptions = true;
-//						$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][1]);
-//					}
-//					if ($hasCaptions)
-//					{
-//						$langString = $captionLang;
-//						if (isset(CaptionPlugin::$captionsFormatMap[$langString]))
-//							$langString = CaptionPlugin::$captionsFormatMap[$langString];
-//						$currSequence = array('clips' => $captionClips, 'language' => $langString);
-//						if (!is_null($captionFiles[$entryId][$captionLang][0]))
-//							$currSequence['label'] = $captionFiles[$entryId][$captionLang][0];
-//						$sequences[] = $currSequence;
-//						$captionClips = array();
-//					}
-//				}
-//			} else
-//			{
-//				$captionClips[] = array('type' => 'source', 'path' => 'empty');
-//			}
-//		}
+		
 		return true;
 	}
 }
