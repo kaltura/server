@@ -91,7 +91,7 @@ class ESearchEntryItem extends ESearchItem
 	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $additionalParams = null)
 	{
 		$queryOut = array();
-		$allowedSearchTypes = ESearchEntryItem::getAallowedSearchTypesForField();
+		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $entrySearchItem)
 		{
 			/**

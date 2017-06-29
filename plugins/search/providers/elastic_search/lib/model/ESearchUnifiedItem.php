@@ -33,8 +33,8 @@ class ESearchUnifiedItem extends ESearchItem
 	{
 		$outQuery['bool']['must'] = array();
 		$outQuery = array();
-		$entryAllowedFields = ESearchEntryItem::getAallowedSearchTypesForField();
-		$cuePointAllowedFields = ESearchCuePointItem::getAallowedSearchTypesForField();
+		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
+		$cuePointAllowedFields = ESearchCuePointItem::getAllowedSearchTypesForField();
 		foreach($eSearchItemsArr as $eSearchUnifiedItem)
 		{
 			/** @var ESearchUnifiedItem $eSearchUnifiedItem */

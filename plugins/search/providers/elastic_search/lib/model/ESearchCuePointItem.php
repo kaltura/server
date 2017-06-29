@@ -81,7 +81,7 @@ class ESearchCuePointItem extends ESearchItem
 	{
 		$cuePointQuery['nested']['path'] = 'cue_points';
 		$cuePointQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
-		$allowedSearchTypes = ESearchCuePointItem::getAallowedSearchTypesForField();
+		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $cuePointSearchItem)
 		{
 			/**
