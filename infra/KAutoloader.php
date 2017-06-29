@@ -48,11 +48,13 @@ class KAutoloader
 		}
 		
 		$storeToCache = false;
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_CLASS_MAP);
+		
 		if (!self::$_classMap)
 		{
-			if (function_exists('apc_fetch'))
+			if($cache)
 			{
-				$classPath = apc_fetch(self::$_classMapCacheKey . $class);
+				$classPath = $cache->get(self::$_classMapCacheKey . $class);
 				if (is_string($classPath))
 				{
 					require_once($classPath);
@@ -75,7 +77,7 @@ class KAutoloader
 			$classPath = self::$_classMap[$class];
 
 		if ($storeToCache)
-			apc_store(self::$_classMapCacheKey . $class, $classPath);
+			$cache->set(self::$_classMapCacheKey . $class, $classPath);
 		
 		if ($classPath)
 			require_once($classPath);
@@ -328,12 +330,13 @@ class KAutoloader
 
 	private static function saveToApc()
 	{
-		if (!function_exists('apc_store'))
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_CLASS_MAP);
+		if(!$cache)
 			return;
 		
 		foreach (self::$_classMap as $key => $value)
 		{
-			apc_store(self::$_classMapCacheKey . $key, $value);
+			$cache->set(self::$_classMapCacheKey . $key, $value);
 		}
 	}
 	

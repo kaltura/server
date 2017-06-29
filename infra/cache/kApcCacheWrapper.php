@@ -13,7 +13,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doInit($config)
 	{
-		if (!function_exists('apc_fetch'))
+		if (!function_exists('apc_fetch') && !function_exists('apcu_fetch'))
 			return false;
 		return true;
 	}
@@ -23,7 +23,11 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doGet($key)
 	{
-		return apc_fetch($key);
+		if(function_exists(apc_fetch))
+			return apc_fetch($key);
+		
+		if(function_exists(apcu_fetch))
+			return apcu_fetch($key);
 	}
 		
 	/* (non-PHPdoc)
@@ -31,7 +35,11 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doSet($key, $var, $expiry = 0)
 	{
-		return apc_store($key, $var, $expiry);
+		if(function_exists(apc_store))
+			return apc_store($key);
+		
+		if(function_exists(apcu_store))
+			return apcu_store($key);
 	}
 	
 	/* (non-PHPdoc)
@@ -39,7 +47,11 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doAdd($key, $var, $expiry = 0)
 	{
-		return apc_add($key, $var, $expiry);
+		if(function_exists(apc_add))
+			return apc_add($key);
+		
+		if(function_exists(apcu_add))
+			return apcu_add($key);
 	}
 	
 	/* (non-PHPdoc)
@@ -47,7 +59,11 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doMultiGet($keys)
 	{
-		return apc_fetch($keys);
+		if(function_exists(apc_fetch))
+			return apc_fetch($keys);
+		
+		if(function_exists(apcu_fetch))
+			return apcu_fetch($keys);
 	}
 
 
@@ -56,7 +72,11 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doDelete($key)
 	{
-		return apc_delete($key);
+		if(function_exists(apc_delete))
+			return apc_delete($key);
+		
+		if(function_exists(apcu_delete))
+			return apcu_delete($key);
 	}
 	
 	/* (non-PHPdoc)
@@ -64,7 +84,12 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function doIncrement($key, $delta = 1)
 	{
-		return apc_inc($key, $delta);
+		if(function_exists(apc_inc))
+			return apc_inc($key, $delta);
+		
+		if(function_exists(apcu_inc))
+			return apcu_inc($key, $delta);
+		
 	}
 	
 	/* (non-PHPdoc)
@@ -72,6 +97,10 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function doDecrement($key, $delta = 1)
 	{
-		return apc_dec($key, $delta);
+		if(function_exists(apc_dec))
+			return apc_dec($key, $delta);
+		
+		if(function_exists(apcu_dec))
+			return apcu_dec($key, $delta);
 	}
 }

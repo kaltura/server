@@ -45,19 +45,20 @@ function checkCache()
 		$host = $_SERVER['HTTP_HOST'];
 	$uri = $_SERVER["REQUEST_URI"];
 	
-	if (function_exists('apc_fetch'))
+	$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
+	if($cache)
 	{
-		$url = apc_fetch("redirect-".$protocol.$uri);
+		$url = $cache->get("redirect-".$protocol.$uri);
 		if ($url)
 		{
 			sendCachingHeaders(60, true, time());
-
+			
 			header("X-Kaltura:cached-dispatcher-redirect");
 			header("Location:$url");
 			die;
 		}
 		
-		$errorHeaders = apc_fetch("exterror-$protocol://$host$uri");
+		$errorHeaders = $cache->get("exterror-$protocol://$host$uri");
 		if ($errorHeaders !== false)
 		{
 			sendCachingHeaders(60, true, time());
@@ -128,8 +129,6 @@ function checkCache()
 	}
 	else if (strpos($uri, "/kwidget") !== false)	
 	{
-		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kCacheManager.php");
-
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
 		{
@@ -185,8 +184,6 @@ function checkCache()
 	}
 	else if (strpos($uri, "/thumbnail") !== false)	
 	{
-		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kCacheManager.php");
-		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
 		{
@@ -217,8 +214,6 @@ function checkCache()
 	}	
 	else if (strpos($uri, "/embedIframe/") !== false)
 	{
-		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kCacheManager.php");
-		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
 		{
@@ -234,7 +229,7 @@ function checkCache()
 			}
 		}
 	}
-	else if (strpos($uri, "/serveFlavor/") !== false && function_exists('apc_fetch') && $_SERVER["REQUEST_METHOD"] == "GET")
+	else if (strpos($uri, "/serveFlavor/") !== false && $cache && $_SERVER["REQUEST_METHOD"] == "GET")
 	{
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererDumpFile.php');
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererString.php');
@@ -244,7 +239,8 @@ function checkCache()
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
 		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$uri;
 		
-		$renderer = apc_fetch($cacheKey);
+		
+		$renderer = $cache ? $cache->get($cacheKey) : null;
 		if ($renderer)
 		{
 			KalturaMonitorClient::initApiMonitor(true, 'extwidget.serveFlavor', $renderer->partnerId);

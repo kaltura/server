@@ -11,6 +11,8 @@ if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 $start = microtime(true);
 // check cache before loading anything
 require_once(dirname(__FILE__)."/../lib/KalturaResponseCacher.php");
+require_once(realpath(dirname(__FILE__) . "/../../infra/general/phpCompatibility.php"));
+
 $cache = new KalturaResponseCacher();
 $cache->checkOrStart();
 

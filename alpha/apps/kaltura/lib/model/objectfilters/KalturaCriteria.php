@@ -147,10 +147,12 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	{
 		$pluginClassName = null;
 		$cacheKey = null;
-		if (function_exists('apc_fetch'))
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
+		if($cache)
 		{
 			$cacheKey = "criteriaClass-$objectType";
-			$pluginClassName = apc_fetch($cacheKey);
+			$pluginClassName = $cache->get($cacheKey);
 		}
 		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCriteriaFactory', $pluginClassName);
@@ -161,7 +163,10 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 			{
 				if (!$pluginClassName && $cacheKey)
 				{
-					apc_store($cacheKey, get_class($pluginInstance));
+					if($cache)
+					{
+						$cache->set($cacheKey, get_class($pluginInstance));
+					}
 				}
 				return $criteria;
 			}

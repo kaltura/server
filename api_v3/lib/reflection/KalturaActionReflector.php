@@ -59,6 +59,8 @@ class KalturaActionReflector extends KalturaReflector
 	 */
 	protected $_actionParams;
 	
+	protected $cache = null;
+	
 	/**
 	 * 
 	 * @param string $serviceId
@@ -70,12 +72,13 @@ class KalturaActionReflector extends KalturaReflector
 		
 		$this->_serviceId = $serviceId;
 		$this->_actionId = $actionId;
+		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
 		
 		$fetchFromAPCSuccess = null;
-		if(function_exists('apc_fetch'))
+		if($this->cache)
 		{
-			$actionFromCache = apc_fetch("{$this->_serviceId}_{$this->_actionId}", $fetchFromAPCSuccess);
-			if($fetchFromAPCSuccess && $actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == KalturaServicesMap::getServiceMapModificationTime())
+			$actionFromCache = $this->cache->get("{$this->_serviceId}_{$this->_actionId}");
+			if($actionFromCache && $actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == KalturaServicesMap::getServiceMapModificationTime())
 			{
 				$this->_actionInfo = $actionFromCache["actionInfo"];
 				$this->_actionParams = $actionFromCache["actionParams"];
@@ -268,7 +271,7 @@ class KalturaActionReflector extends KalturaReflector
 	 */
 	protected function cacheReflectionValues()
 	{
-		if (!function_exists('apc_store'))
+		if(!$this->cache)
 			return;
 			
 		$servicesMapLastModTime = KalturaServicesMap::getServiceMapModificationTime();
@@ -280,7 +283,7 @@ class KalturaActionReflector extends KalturaReflector
 			"actionClassInfo" => $this->getActionClassInfo(),
 		);
 		
-		$success = apc_store("{$this->_serviceId}_{$this->_actionId}", $cacheValue);
+		$this->cache->set("{$this->_serviceId}_{$this->_actionId}", $cacheValue);
 	}
 
 

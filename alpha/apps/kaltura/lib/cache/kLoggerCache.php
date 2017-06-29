@@ -17,10 +17,11 @@ class kLoggerCache
 		if (KalturaLog::getLogger())	// already initialized
 			return;
 		
-		if (function_exists('apc_fetch'))
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
+		if($cache)
 		{
 			$cacheKey = self::LOGGER_APC_CACHE_KEY_PREFIX . $configName;
-			$logger = apc_fetch($cacheKey);
+			$logger = $cache->get($cacheKey);
 			if ($logger)
 			{
 				list($logger, $cacheVersionId) = $logger;
@@ -39,9 +40,9 @@ class kLoggerCache
 			KalturaLog::initLog($config->$configName);
 			if ($context)
 				KalturaLog::setContext($context);
-					
-			if (function_exists('apc_store'))
-				apc_store($cacheKey, array(KalturaLog::getLogger(), kConf::getCachedVersionId()));
+			
+			if($cache)
+				$cache->set($cacheKey, array(KalturaLog::getLogger(), kConf::getCachedVersionId()));
 		}
 		catch(Zend_Config_Exception $ex)
 		{

@@ -29,6 +29,9 @@ class SystemService extends KalturaBaseService
 		if(function_exists('apc_fetch') && apc_fetch(self::APIV3_FAIL_PING))
 			return false;
 		
+		if(function_exists('apcu_fetch') && apcu_fetch(self::APIV3_FAIL_PING))
+			return false;
+		
 		return true;
 	}
 	

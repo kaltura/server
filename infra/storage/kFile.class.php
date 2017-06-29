@@ -629,10 +629,11 @@ class kFile
 
 	public static function cacheRedirect($url)
 	{
-		if (function_exists('apc_store'))
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
+		if($cache)
 		{
 			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-			apc_store("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
+			$cache->set("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
 		}
 	}
 	

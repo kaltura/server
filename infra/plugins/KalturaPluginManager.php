@@ -47,6 +47,12 @@ class KalturaPluginManager
 	 */
 	protected static $cacheNamespace = '';
 	
+	/**
+	 * Cache Manager
+	 * @var kBaseCacheWrapper
+	 */
+	protected static $cache = null;
+	
 	protected function __construct()
 	{
 		
@@ -75,6 +81,8 @@ class KalturaPluginManager
 			
 		if($cacheNamespace)
 			self::$cacheNamespace = $cacheNamespace;
+		
+		self::$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLUGINS_LOCAL);
 	}
 	
 	/**
@@ -88,10 +96,10 @@ class KalturaPluginManager
 	{
 		$pluginClassName = null;
 		$cacheKey = null;
-		if (function_exists('apc_fetch') && !$constructorArgs)
+		if(self::$cache)
 		{
 			$cacheKey = "loadObject-$baseClass-$enumValue";
-			$pluginClassName = apc_fetch($cacheKey);
+			$pluginClassName = self::$cache->get($cacheKey);
 		}
 		
 		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader', $pluginClassName);
@@ -103,7 +111,7 @@ class KalturaPluginManager
 			{
 				if (!$pluginClassName && $cacheKey)
 				{
-					apc_store($cacheKey, get_class($pluginInstance));
+					self::$cache->set($cacheKey, get_class($pluginInstance));
 				}
 				
 				return $obj;
@@ -209,10 +217,10 @@ class KalturaPluginManager
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		$cacheKey = null;
-		if (function_exists('apc_fetch'))
+		if(self::$cache)
 		{
 			$cacheKey = "objectClass-$baseClass-$enumValue";
-			$cls = apc_fetch($cacheKey);
+			$cls = self::$cache->get($cacheKey);
 			if ($cls)
 			{
 				return $cls;
@@ -227,7 +235,7 @@ class KalturaPluginManager
 			{
 				if ($cacheKey)
 				{
-					apc_store($cacheKey, $cls);
+					self::$cache->set($cacheKey, $cls);
 				}
 //				KalturaLog::debug("Found class[$cls] in plugin[$pluginName] for object type[$objectType] and enum value[$enumValue]");
 				return $cls;
@@ -393,10 +401,10 @@ class KalturaPluginManager
 	 */
 	public static function getPluginInstances($interface = null, $className = null)
 	{
-		if (function_exists('apc_fetch') && self::$useCache)
+		if(self::$cache)
 		{
 			$cacheKey = self::$cacheNamespace . "pluginsByInterface_$interface";
-			$plugins = apc_fetch($cacheKey);
+			$plugins = self::$cache->get($cacheKey);
 			if ($plugins !== false)
 			{
 				if (!in_array($interface, self::$loadedInterfaces))
@@ -438,8 +446,10 @@ class KalturaPluginManager
 			$plugins[$pluginName] = self::$plugins[$pluginName];
 			$instances[strtolower($pluginName)] = $instance;
 		}
-		if (function_exists('apc_store') && self::$useCache)
-			apc_store($cacheKey, $plugins);
+		
+		if(self::$cache && self::$useCache)
+			self::$cache->set($cacheKey, $plugins);
+			
 		return $instances;
 	}
 	

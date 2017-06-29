@@ -10,6 +10,7 @@ $include_path = realpath(__DIR__ . '/../../vendor/ZendFramework/library') . PATH
 set_include_path($include_path);
 
 require_once __DIR__ . '/../../infra/kEnvironment.php';
+require_once __DIR__ . '/../../infra/general/phpCompatibility.php';
 
 /**
  * Manages all Kaltura configurations
@@ -43,7 +44,7 @@ class kConf extends kEnvironment
 		$fileHash = md5(realpath(__file__));
 		$cacheVersionKey = self::APC_CACHE_MAP . $fileHash;
 		
-		if (!$reloadFileExists && function_exists('apc_fetch'))
+		if (!$reloadFileExists && phpCompatibility::apc_exists() function_exists('apc_fetch'))
 		{
 			self::$cacheVersion = apc_fetch($cacheVersionKey);
 			if(self::$cacheVersion)

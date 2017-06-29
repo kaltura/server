@@ -75,13 +75,11 @@ $limit = getRequestParameter('limit');
 $ks = getRequestParameter('ks');
 $state = getRequestParameter('state');
 
+$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK);
 $feedProcessingKey = "feedProcessing_{$feedId}_{$entryId}_{$limit}";
-if (function_exists('apc_fetch'))
+if($cache && $cache->get($feedProcessingKey))
 {
-	if (apc_fetch($feedProcessingKey))
-	{
-		KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST);
-	}
+	KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST);
 }
 
 try

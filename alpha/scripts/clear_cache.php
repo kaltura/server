@@ -20,11 +20,37 @@ askToDelete(fixPath(kConf::get('cache_root_path')), $interactive);
 // clear APC cache
 if (function_exists('apc_clear_cache'))
 {
+	apcClearCache();
+}
+
+// clear APC cache
+if (function_exists('apcu_clear_cache'))
+{
+	apcuClearCache();
+}
+
+function apcuClearCache()
+{
+	// clear apc system cache
+	if (!apcu_clear_cache())
+	{
+		echo 'Unable to clear APC SYSTEM cache!'.PHP_EOL;
+	}
+	
+	// clear apc user cache
+	if (!apcu_clear_cache('user'))
+	{
+		echo 'Unable to clear APC USER cache!'.PHP_EOL;
+	}
+}
+
+function apcClearCache()
+{
 	// clear apc system cache
 	if (!apc_clear_cache())
 	{
 		echo 'Unable to clear APC SYSTEM cache!'.PHP_EOL;
-	} 
+	}
 	
 	// clear apc user cache
 	if (!apc_clear_cache('user'))

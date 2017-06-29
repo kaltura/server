@@ -150,7 +150,7 @@ class KExternalErrors
 		) {
 			infraRequestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
 
-			if (function_exists('apc_store')) {
+			if (function_exists('apc_store') || function_exists('apcu_store')) {
 				$protocol = infraRequestUtils::getProtocol();
 				$host = "";
 				if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
@@ -158,7 +158,12 @@ class KExternalErrors
 				else if (isset($_SERVER['HTTP_HOST']))
 					$host = $_SERVER['HTTP_HOST'];
 				$uri = $_SERVER["REQUEST_URI"];
-				apc_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
+				
+				if(function_exists('apc_store'))
+					return apc_fetch("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
+				
+				if(function_exists('apcu_store'))
+					return apcu_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
 			}
 		}
 

@@ -9,6 +9,7 @@ require_once KALTURA_ROOT_PATH . '/vendor/htmlpurifier/library/HTMLPurifier.auto
 class kHtmlPurifier
 {
 	private static $purifier = null;
+	private static $cache = null;
 	private static $AllowedProperties = null;
 	private static $allowedTokenPatterns;
 
@@ -66,6 +67,8 @@ class kHtmlPurifier
 	
 	public static function init()
 	{
+		self::$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
+		
 		self::initHTMLPurifier();
 		self::initAllowedProperties();
 		self::initAllowedTokenPatterns();
@@ -74,20 +77,20 @@ class kHtmlPurifier
 	public static function initHTMLPurifier()
 	{
 		$cacheKey = null;
-		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		if(self::$cache)
 		{
 			$cacheKey = 'kHtmlPurifierPurifier-' . kConf::getCachedVersionId();
-			self::$purifier = apc_fetch($cacheKey);
+			self::$purifier = self::$cache->get($cacheKey);
 		}
 		
-		if ( ! self::$purifier )
+		if (!self::$purifier)
 		{
 			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
 			self::$purifier = new HTMLPurifier($config);
-			if ( $cacheKey )
+			if(self::$cache)
 			{
-				apc_store( $cacheKey, self::$purifier );
+				self::$cache->set($cacheKey, self::$purifier);
 			}
 		}
 	}
@@ -95,12 +98,11 @@ class kHtmlPurifier
 	public static function initAllowedProperties()
 	{
 		$cacheKey = null;
-		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		if(self::$cache)
 		{
 			$cacheKey = 'kHtmlPurifierAllowedProperties-' . kConf::getCachedVersionId();
-			self::$AllowedProperties = apc_fetch($cacheKey);
+			self::$AllowedProperties = self::$cache->get($cacheKey);
 		}
-
 		
 		if ( ! self::$AllowedProperties )
 		{
@@ -113,9 +115,9 @@ class kHtmlPurifier
 			// Convert values to keys (we don't care about the values) in order to test via array_key_exists.
 			self::$AllowedProperties = array_flip(self::$AllowedProperties);
 
-			if ( $cacheKey )
+			if (self::$cache)
 			{
-				apc_store( $cacheKey, self::$AllowedProperties );
+				self::$cache->set($cacheKey, self::$AllowedProperties);
 			}
 		}
 	}
@@ -123,10 +125,10 @@ class kHtmlPurifier
 	public static function initAllowedTokenPatterns()
 	{
 		$cacheKey = null;
-		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		if(self::$cache)
 		{
 			$cacheKey = 'kHtmlPurifierAllowedTokenPatterns-' . kConf::getCachedVersionId();
-			self::$allowedTokenPatterns = apc_fetch($cacheKey);
+			self::$allowedTokenPatterns = self::$cache->get($cacheKey);
 		}
 
 		if ( ! self::$allowedTokenPatterns )
@@ -134,9 +136,9 @@ class kHtmlPurifier
 			self::$allowedTokenPatterns = kConf::get("xss_allowed_token_patterns");
 			self::$allowedTokenPatterns = preg_replace("/\\\\/", "\\", self::$allowedTokenPatterns);
 
-			if ( $cacheKey )
+			if (self::$cache)
 			{
-				apc_store( $cacheKey, self::$allowedTokenPatterns );
+				self::$cache->set($cacheKey, self::$allowedTokenPatterns);
 			}
 		}
 	}

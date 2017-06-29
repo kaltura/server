@@ -111,6 +111,11 @@ class KalturaSyndicationFeedRenderer
 	 */
 	private $addLinkForNextIteration = false;
 	
+	/**
+	 * @var kBaseCacheWrapper
+	 */
+	private $cache = null;
+	
 	public function __construct($feedId, $feedProcessingKey = null, $ks = null, $state = null)
 	{
 		$this->feedProcessingKey = $feedProcessingKey;
@@ -209,7 +214,9 @@ class KalturaSyndicationFeedRenderer
 		{
 			$this->entryFilters = array();
 		}
-			
+		
+		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK);
+		
 		$microTimeEnd = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- initialization done [".($microTimeEnd - $microTimeStart)."]");		
 	}
@@ -619,8 +626,8 @@ class KalturaSyndicationFeedRenderer
 
 		echo $renderer->handleFooter();
 		
-		if ($this->feedProcessingKey && function_exists('apc_delete'))
-			apc_delete($this->feedProcessingKey);
+		if ($this->feedProcessingKey && $this->cache)
+			$this->cache->delete($this->feedProcessingKey);
 				
 		$microTimeEnd = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- render time for ({$this->syndicationFeed->type}) is " . ($microTimeEnd - $microTimeStart));
@@ -631,9 +638,9 @@ class KalturaSyndicationFeedRenderer
 	 */
 	private function enableApcProcessingFlag() {
 		$currentTime = time();
-		if ($this->feedProcessingKey && function_exists('apc_store') && $currentTime > $this->nextProcessingSetTime)
+		if ($this->feedProcessingKey && $this->cache && $currentTime > $this->nextProcessingSetTime)
 		{
-			apc_store($this->feedProcessingKey, true, 60);
+			$this->cache->set($this->feedProcessingKey, true, 60);
 			$this->nextProcessingSetTime = $currentTime + 30;
 		}
 	}

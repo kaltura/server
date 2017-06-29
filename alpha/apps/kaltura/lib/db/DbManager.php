@@ -92,9 +92,10 @@ class DbManager
 	
 	protected static function getExtraDatabaseConfigs()
 	{
-		if (function_exists('apc_fetch'))
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
+		if($cache)
 		{
-			$dbConfigs = apc_fetch(self::EXTRA_DB_CONFIG_KEY);
+			$dbConfigs = $cache->get(self::EXTRA_DB_CONFIG_KEY)
 			if ($dbConfigs !== false)
 			{
 				return $dbConfigs;
@@ -109,9 +110,9 @@ class DbManager
 			$dbConfigs[] = $pluginInstance->getDatabaseConfig();
 		}
 
-		if (function_exists('apc_store'))
+		if($cache)
 		{
-			apc_store(self::EXTRA_DB_CONFIG_KEY, $dbConfigs);
+			$cache->set(self::EXTRA_DB_CONFIG_KEY, $dbConfigs);
 		}
 		
 		return $dbConfigs;
@@ -243,6 +244,7 @@ class DbManager
 		// loop twice, on first iteration try only connections not marked as failed
 		// in case all connections failed, try all connections on second iteration
 		$iteration = 2;
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
 		while($iteration--)
 		{
 			$count = count($dataSources);
@@ -256,13 +258,13 @@ class DbManager
 				$curIndex = $offset % count($dataSources);
 				$offset++;
 				$key = $dataSources[$curIndex];
-
-				if (function_exists('apc_fetch'))
+				
+				if($cache)
 				{
 					$badConnCacheKey = "badDBConn:".$key;
 					if (!$iteration) // on the second iteration reset failed connection flag
-						apc_store($badConnCacheKey, false);
-					else if (apc_fetch($badConnCacheKey)) // if connection failed to connect in the past mark it
+						$cache->set($badConnCacheKey, false);
+					else if ($cache->get($badConnCacheKey)) // if connection failed to connect in the past mark it
 						continue;
 				}
 
@@ -279,9 +281,9 @@ class DbManager
 					KalturaLog::err("failed to connect to $key");
 				}
 
-				if (function_exists('apc_store'))
+				if($cache)
 				{
-					apc_store($badConnCacheKey, true, $cacheExpiry);
+					$cache->set($badConnCacheKey, true, $cacheExpiry);
 				}
 			}
 		}

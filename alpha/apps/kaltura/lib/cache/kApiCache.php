@@ -729,7 +729,8 @@ class kApiCache extends kApiCacheBase
 				break;
 			}
 
-			if (apc_add('apiCacheLock-'.$this->_cacheKey, true, 1))
+			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK);
+			if($cache && $cache->add('apiCacheLock-'.$this->_cacheKey, true, 1))
 			{
 				break;
 			}

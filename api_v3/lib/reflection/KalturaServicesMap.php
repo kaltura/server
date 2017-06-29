@@ -178,15 +178,15 @@ class KalturaServicesMap
      */
     public static function retrieveServiceActionItem($serviceId, $actionId)
 	{
-        if (function_exists('apc_fetch'))
-        {
-            $apcFetchSuccess = null;
-            $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
-            if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime())
-            {
-                return $serviceItemFromCache["serviceActionItem"];
-            } 
-        }
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
+		if($cache)
+		{
+			$serviceItemFromCache = $cache->get($serviceId);
+			if ($serviceItemFromCache && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime())
+			{
+				return $serviceItemFromCache["serviceActionItem"];
+			}
+		}
 		
 		// load the service reflector
 		$serviceMap = self::getMap();
@@ -205,10 +205,10 @@ class KalturaServicesMap
 		}
 		$reflector = $serviceMap[$serviceId];
 		
-		if(function_exists('apc_store'))
+		if($cache)
 		{
 			$servicesMapLastModTime = self::getServiceMapModificationTime();
-			$success = apc_store($serviceId, array("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime));
+			$cache->set($serviceId, array("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime));
 		}
 		
 		return $reflector;

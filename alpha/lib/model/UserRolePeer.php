@@ -64,10 +64,11 @@ class UserRolePeer extends BaseUserRolePeer
 	public static function getIdByStrId($strId)
 	{
 		// try to get strId to id mapping form cache
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_APC_LCAL);
 		$cacheKey = 'UserRolePeer_role_str_id_'.$strId;
-		if (kConf::get('enable_cache') && function_exists('apc_fetch') && function_exists('apc_store'))
+		if (kConf::get('enable_cache') && $cache)
 		{
-			$id = apc_fetch($cacheKey); // try to fetch from cache
+			$id = $cache->get($cacheKey); // try to fetch from cache
 			if ($id) {
 				KalturaLog::debug("UserRole str_id [$strId] mapped to id [$id] - fetched from cache");
 				return $id;
@@ -84,9 +85,9 @@ class UserRolePeer extends BaseUserRolePeer
 		
 		if ($id) {
 			// store the found id in cache for later use
-			if (kConf::get('enable_cache') && function_exists('apc_fetch') && function_exists('apc_store'))
+			if (kConf::get('enable_cache') && $cache)
 			{
-				$success = apc_store($cacheKey, $id, kConf::get('apc_cache_ttl'));
+				$success = $cache->set($cacheKey, $id, kConf::get('apc_cache_ttl'));
 				if ($success) {
 					KalturaLog::debug("UserRole str_id [$strId] mapped to id [$id] - stored in cache");
 				}

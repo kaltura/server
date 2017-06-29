@@ -31,6 +31,11 @@ class kCacheManager
 	const CACHE_TYPE_CACHE_ONLY_ACTIONS = 'cacheOnlyActions';
 	const CACHE_TYPE_PLAYKIT_JS = 'playKitJs';
 	const CACHE_TYPE_PLAYKIT_JS_SOURCE_MAP = 'playKitJsSourceMap';
+	
+	const CACHE_TYPE_CLASS_MAP = 'classMapLocal';
+	const CACHE_TYPE_LOCK = 'lockLocal';
+	const CACHE_TYPE_APC_LCAL = 'apcLocal';
+	const CACHE_TYPE_PLUGINS_LOCAL = 'pluginsLocal';
 
 	protected static $caches = array();
 	
