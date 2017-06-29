@@ -185,8 +185,44 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			
 			try {
 				$response = $this->webexClient->send($deleteRecordingRequest);
-				KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
-				$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+
+				if ($this->dropFolder->deleteFromRecycleBin)
+				{
+					//Locate recording in recycle bin according to the creation date
+					$listControl = new WebexXmlEpListControlType();
+					$listControl->setStartFrom(1);
+					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
+					$createTimeScope->setCreateTimeStart($file->getCreateTime());
+					$createTimeScope->setCreateTimeEnd($file->getCreateTime());
+					$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
+					$listRecordingRequest->setCreateTimeScope($createTimeScope);
+					$listRecordingRequest->setListControl($listControl);
+					
+					$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+					$recordingArr = $listRecordingResponse->getRecording();
+					$id = $recordingArr[0]->getRecordingID();
+					
+					KalturaLog::info("Permanently deleting recording with ID: [$id], recording: " . print_r($recordingArr[0], true));
+					
+					$delFromRecycleBinRequest = new WebexXmlDelRecordingFromRecycleBinRequest();
+					$delFromRecycleBinRequest->setRecordingID($id);
+					
+					$response = $this->webexClient->send($delFromRecycleBinRequest);
+					if($response->getSuccessfulRecordingsCount())
+					{
+						KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+						$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+					}
+					else
+					{
+						throw new Exception("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
+					}
+				}
+				else
+				{
+					KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+					$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+				}
 			}
 			catch (Exception $e)
 			{

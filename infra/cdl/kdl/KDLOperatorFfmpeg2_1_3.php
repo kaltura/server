@@ -538,6 +538,7 @@ Disabled 'amix', for better stereo by 'amerge'
 		Positive numbers refer to LeftUp corner, negative to RightDown corner of the video frame.
 		'center' allowed to place the WM relatively to the center of the image. Offset allowed
 		If omitted - LeftUp is assumed. 
+		'n%' - to scale to n% of the source size.
 		Example - 
 			'-100x10'- 100pix from right side, 10 pixs from the upper side
 			'center-10xcenter+30' - place the WM 10pix left to the middle and 30pix bellow the middle 
@@ -550,6 +551,11 @@ Disabled 'amix', for better stereo by 'amerge'
 		'n%' to scale to n% of the source size. 
 		Example
 			'x30%' - scale to 30% of the source height. Calc the width to match the aspect ratio
+	- relative (optional)
+		The WM position (margins) claculated relatively to another WM.
+		Example
+			'1rx0' - X axis position is relative to right side of WM 1, Y axis - standard
+			'0x2b' - Y axis position is relative to bottom side of WM 2, X axis - standard
 	- fade (optional)
 		Several fade in/outs are allowed
 		-- type - in/out, default 'in'
@@ -593,7 +599,7 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 				$watermarkStr.="[$vidIn];";
 			}
 			$fadeDur = 0;
-			$watermarkStr.= self::generateSingleWatermark(clone($watermarkData), $vidIn, $fadeDur, $wmImgIdx, $rotation);
+			$watermarkStr.= self::generateSingleWatermark(clone($watermarkData), $vidIn, $fadeDur, $wmImgIdx, $rotation, $watermarkDataArr);
 			$maxFadeDuration = max($maxFadeDuration,$fadeDur);
 			$vidIn = "overlayed".$wmImgIdx;
 			$wmImgIdx++;
@@ -614,10 +620,13 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 	 * @param unknown_type $rotation
 	 * @return Ambigous <NULL, string>
 	 */
-	protected static function generateSingleWatermark($watermarkData, $vidInIdx, &$maxFadeDuration, $wmImgIdx, $rotation)
+	protected static function generateSingleWatermark($watermarkData, $vidInIdx, &$maxFadeDuration, $wmImgIdx, $rotation,$watermarkDataArr)
 	{
-		$wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight."_$wmImgIdx";
-		$wmWid=KDLCmdlinePlaceholders::WaterMarkWidth."_$wmImgIdx";
+		$wmHgtPfx=KDLCmdlinePlaceholders::WaterMarkHeight."_";
+		$wmWidPfx=KDLCmdlinePlaceholders::WaterMarkWidth."_";
+		
+		$wmHgt=$wmHgtPfx.$wmImgIdx;
+		$wmWid=$wmWidPfx.$wmImgIdx;
 		
 		$watermarkStr = null;
 		$prepArr = array();
@@ -672,6 +681,38 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 		$marginsCrop = null;
 		$marginsOver = null;
 		if(isset($watermarkData->margins)) {
+			if(isset($watermarkData->relative)){
+				$relArr = explode("x",$watermarkData->relative); 
+				if(isset($relArr[0]) && $relArr[0]>0 && ($relIdx=(int)$relArr[0])<$wmImgIdx){
+					$side = substr(trim($relArr[0]), -1);
+					$relWM = $watermarkDataArr[$relIdx-1];
+					$marginsArr = explode("x",$relWM->margins);
+					$relX = $marginsArr[0];
+						
+					if($side=='r') {
+						$relX = "$relX+$wmWidPfx$relIdx";
+					}
+					else if($side!='l'){
+						$relX = null;
+					}
+				}
+				
+				
+				$relY = (isset($relArr[1]) && $relArr[1]>0)? trim($relArr[1]): null;
+				if(isset($relArr[1]) && $relArr[1]>0 && ($relIdx=(int)$relArr[1])<$wmImgIdx){
+					$side = substr(trim($relArr[1]), -1);
+					$relWM = $watermarkDataArr[$relIdx-1];
+					$marginsArr = explode("x",$relWM->margins);
+					$relY = $marginsArr[1];
+						
+					if($side=='b') {
+						$relY = "$relY+$wmHgtPfx$relIdx";
+					}
+					else if($side!='t'){
+						$relY = null;
+					}
+				}
+			}
 			$watermarkData->margins = explode("x",$watermarkData->margins);
 			$w = $watermarkData->margins[0];
 			if(($centerW=strstr($w,"center"))!=false) $w = (int)str_replace("center", "",$w);
@@ -685,6 +726,9 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 				$marginsCrop = "(iw-ow)/2";
 				if($w!=0) $marginsCrop.= ($w<0)? "$w": "+$w";
 			}
+			else if(isset($relX)){
+				$marginsCrop = ($relX<0)? "$w$relX": "$w+$relX";
+			}
 			else
 				$marginsCrop = ($w<0)? "iw-ow$w": "$w";
 			$marginsCrop.=":";
@@ -692,6 +736,9 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 			if($centerH){
 				$marginsCrop.= "(ih-oh)/2";
 				if($h!=0) $marginsCrop.= ($h<0)? "$h": "+$h";
+			}
+			else if(isset($relY)){
+				$marginsCrop.= ($relY<0)? "$h$relY": "$h+$relY";
 			}
 			else
 				$marginsCrop.= ($h<0)? "ih-oh$h": "$h";

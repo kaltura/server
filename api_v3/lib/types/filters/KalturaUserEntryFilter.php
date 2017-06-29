@@ -107,6 +107,28 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+	
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		/* @var $srcObj UserEntryFilter */
+		parent::doFromObject($srcObj, $responseProfile);
+		if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get userEntry objects of deleted users.
+				kuserPeer::setUseCriteriaFilter(false);
+		
+		if ($srcObj->get('_eq_user_id'))
+		{
+			$this->userIdEqual = $this->prepareKusersToPusersFilter($srcObj->get('_eq_user_id'));
+		}
+		if ($srcObj->get('_in_user_id'))
+		{
+			$this->userIdIn = $this->prepareKusersToPusersFilter($srcObj->get('_in_user_id'));
+		}
+		if ($srcObj->get('_notin_user_id'))
+		{
+			$this->userIdNotIn = $this->prepareKusersToPusersFilter($srcObj->get('_notin_user_id'));
+		}
+		
+	}
 
 
 	/**

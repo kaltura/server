@@ -8,7 +8,7 @@ interface IKalturaPlayManifestContributor extends IKalturaBase
 {
 	/**
 	 * Function receives the manifest renderer and edits its output as it requires.
-	 * @param kManifestEditorConfig $config
+	 * @param kManifestContributorConfig $config
 	 * @returns array<BaseManifestEditor>
 	 */
 	public static function getManifestEditors ($config);

@@ -179,7 +179,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		}
 		
 		$userEntryFilter = new UserEntryFilter();
-		$userEntryFilter->set("_eq_user_id", $kuser->getPuserId());
+		$userEntryFilter->set("_eq_user_id", $kuser->getId());
 		
 		$c = new Criteria();
 		$c->add(UserEntryPeer::KUSER_ID, $kuser->getId());

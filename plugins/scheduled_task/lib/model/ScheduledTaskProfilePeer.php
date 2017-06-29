@@ -28,4 +28,21 @@ class ScheduledTaskProfilePeer extends BaseScheduledTaskProfilePeer
 
 		self::$s_criteria_filter->setFilter($c);
 	}
+
+	/**
+	 * Retrieve a all object with given systemName
+	 *
+	 * @param      string $systemName the system name
+	 * @param      int $partnerId the partner Id
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array of ScheduledTaskProfile
+	 */
+	public static function retrieveBySystemName($systemName, $partnerId = null, PropelPDO $con = null)
+	{
+		$criteria = KalturaCriteria::create(ScheduledTaskProfilePeer::OM_CLASS);
+		$criteria->add(ScheduledTaskProfilePeer::SYSTEM_NAME, $systemName);
+		if($partnerId)
+			$criteria->add(ScheduledTaskProfilePeer::PARTNER_ID, $partnerId);
+		return ScheduledTaskProfilePeer::doSelect($criteria, $con);
+	}
 }

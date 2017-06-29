@@ -32,4 +32,10 @@ class kManifestContributorConfig
 	 * @var DeliveryProfile
 	 */
 	public $deliveryProfile;
+
+	/**
+	 * @var bool
+	 */
+	public $hasSequence;
+
 }

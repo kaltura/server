@@ -136,7 +136,7 @@ class localMgr extends kFileTransferMgr
 			$fileObject->filename = $file;
 			$fileObject->fileSize = $this->doFileSize($filepath);
 			$fileObject->modificationTime = $this->doModificationTime($filepath);
-			$res[] = $fileObject;
+			$res[$fileObject->filename] = $fileObject;
 		}
 		
 		return $res;
