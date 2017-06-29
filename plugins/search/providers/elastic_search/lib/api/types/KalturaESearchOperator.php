@@ -18,7 +18,6 @@ class KalturaESearchOperator extends KalturaESearchBaseItem {
 
 	private static $map_between_objects = array(
 		'operator',
-		'not',
 		'searchItems',
 	);
 

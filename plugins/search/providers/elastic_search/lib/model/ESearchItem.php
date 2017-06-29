@@ -72,7 +72,7 @@ abstract class ESearchItem extends BaseObject
 
 	abstract public function getType();
 
-	public static function getAallowedSearchTypesForField()
+	public static function getAllowedSearchTypesForField()
 	{
 		return array();
 	}

@@ -4,9 +4,9 @@ class ESearchResult extends BaseObject
 {
 
 	/**
-	 * @var Baseentry
+	 * @var BaseObject
 	 */
-	protected $entry;
+	protected $object;
 
 	/**
 	 * @var string
@@ -14,19 +14,19 @@ class ESearchResult extends BaseObject
 	protected $itemData;
 
 	/**
-	 * @return Baseentry
+	 * @return BaseObject
 	 */
-	public function getEntry()
+	public function getObject()
 	{
-		return $this->entry;
+		return $this->object;
 	}
 
 	/**
-	 * @param Baseentry $entry
+	 * @param BaseObject $object
 	 */
-	public function setEntry($entry)
+	public function setObject($object)
 	{
-		$this->entry = $entry;
+		$this->object = $object;
 	}
 
 	/**

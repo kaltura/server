@@ -22,14 +22,14 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
 
     public static function applyCondition(&$entryQuery, &$parentEntryQuery)
     {
-        $kuserId = kElasticEntitlement::$kuserId;
+        $kuserId = kEntryElasticEntitlement::$kuserId;
         if(!$kuserId)
         {
             KalturaLog::log('cannot add userCategory to entry entitlement to elastic without a kuserId - setting kuser id to -1');
             $kuserId = -1;
         }
         //get category ids with $privacyContext
-        $categories = self::getUserCategories($kuserId, kElasticEntitlement::$privacyContext, kElasticEntitlement::$privacy);
+        $categories = self::getUserCategories($kuserId, kEntryElasticEntitlement::$privacyContext, kEntryElasticEntitlement::$privacy);
         if(count($categories) == 0)
             $categories = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 
@@ -48,7 +48,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
 
     public static function shouldContribute()
     {
-        if(kElasticEntitlement::$userCategoryToEntryEntitlement || kElasticEntitlement::$entryInSomeCategoryNoPC)
+        if(kEntryElasticEntitlement::$userCategoryToEntryEntitlement || kEntryElasticEntitlement::$entryInSomeCategoryNoPC)
             return true;
         
         return false;
@@ -68,7 +68,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
                     'filter' => array(
                         array(
                             'term' => array(
-                                'partner_status' => 'p'.kElasticEntitlement::$partnerId.'s'.CategoryStatus::ACTIVE
+                                'partner_status' => 'p'.kEntryElasticEntitlement::$partnerId.'s'.CategoryStatus::ACTIVE
                             )
                         ),
                         array(
@@ -98,7 +98,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
             )
         );
 
-        if(kElasticEntitlement::$entryInSomeCategoryNoPC)
+        if(kEntryElasticEntitlement::$entryInSomeCategoryNoPC)
         {
             $body['query']['bool']['filter'][1]['bool']['should'][] = array(
                 'bool' => array(
@@ -113,11 +113,11 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
 
         $privacyContexts = null;
         if (!$privacyContext || trim($privacyContext) == '')
-            $privacyContexts = array(kEntitlementUtils::getDefaultContextString(kElasticEntitlement::$partnerId));
+            $privacyContexts = array(kEntitlementUtils::getDefaultContextString(kEntryElasticEntitlement::$partnerId));
         else
         {
             $privacyContexts = explode(',', $privacyContext);
-            $privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, kElasticEntitlement::$partnerId );
+            $privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, kEntryElasticEntitlement::$partnerId );
         }
         $body['query']['bool']['filter'][] = array('terms' => array('privacy_contexts' => $privacyContexts)); //todo add partner prefix , search in privacy contexts
 

@@ -3,21 +3,16 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchMetadataItem extends KalturaESearchItem {
+class KalturaESearchUserItem extends KalturaESearchItem
+{
 
 	/**
-	 * @var string
+	 * @var KalturaESearchUserFieldName
 	 */
-	public $xpath;
-
-	/**
-	 * @var int
-	 */
-	public $metadataProfileId;
+	public $fieldName;
 
 	private static $map_between_objects = array(
-		'xpath',
-		'metadataProfileId',
+		'fieldName'
 	);
 
 	protected function getMapBetweenObjects()
@@ -28,14 +23,8 @@ class KalturaESearchMetadataItem extends KalturaESearchItem {
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new ESearchMetadataItem();
+			$object_to_fill = new ESearchUserItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
-	}
-
-	public function validateForUsage($sourceObject, $propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull("searchTerm");
-		return parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 
 

@@ -45,7 +45,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     {
         KalturaLog::debug('Saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
         $cmd = $this->getElasticSaveParams($object, $params);
-        //$cmd['body'] = $object->getObjectParams($params);
+
         if(!$cmd)
             return true;
 
@@ -94,7 +94,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     //exe the curl
     public function execElastic($params, IElasticIndexable $object)
     {
-        $client = new elasticClient();
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
@@ -102,22 +101,14 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $params['index'] = $object->getElasticIndexName();
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
-
         $params['action'] = $op;
-        $elasticLog = new SphinxLog();
-        $command = serialize($params);
-        $elasticLog->setSql($command);
-        $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
-        $elasticLog->setObjectId($object->getId());
-        $elasticLog->setObjectType($object->getElasticObjectType());
-        //$sphinxLog->setEntryId($object->getEntryId());
-        $elasticLog->setPartnerId($object->getPartnerId());
-        $elasticLog->setType(SphinxLogType::ELASTIC);
-        $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+
+        $this->saveToSphinxLog($object, $params);
 
         if(!kConf::get('exec_elastic', 'local', 0))
             return true;
-        
+
+        $client = new elasticClient();
         $ret = $client->$op($params);
         if(!$ret)
         {
@@ -126,6 +117,20 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         }
 
         return true;
+    }
+
+    private function saveToSphinxLog($object, $params)
+    {
+        $elasticLog = new SphinxLog();
+        $command = serialize($params);
+        $elasticLog->setSql($command);
+        $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
+        $elasticLog->setObjectId($object->getId());
+        $elasticLog->setObjectType($object->getElasticObjectType());
+        //$elasticLog->setEntryId($object->getEntryId());
+        $elasticLog->setPartnerId($object->getPartnerId());
+        $elasticLog->setType(SphinxLogType::ELASTIC);
+        $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
     }
 
     private function retrieveElasticServerId()

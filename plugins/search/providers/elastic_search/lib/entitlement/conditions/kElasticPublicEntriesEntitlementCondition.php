@@ -24,7 +24,7 @@ class kElasticPublicEntriesEntitlementCondition extends kElasticBaseEntitlementC
 
     public static function applyCondition(&$entryQuery, &$parentEntryQuery)
     {
-        if(kElasticEntitlement::$publicEntries)
+        if(kEntryElasticEntitlement::$publicEntries)
         {
             if($parentEntryQuery)
             {
@@ -37,7 +37,7 @@ class kElasticPublicEntriesEntitlementCondition extends kElasticBaseEntitlementC
             $entryQuery['minimum_should_match'] = 1;
         }
 
-        if(kElasticEntitlement::$publicActiveEntries)
+        if(kEntryElasticEntitlement::$publicActiveEntries)
         {
             if($parentEntryQuery)
             {
@@ -53,7 +53,7 @@ class kElasticPublicEntriesEntitlementCondition extends kElasticBaseEntitlementC
 
     public static function shouldContribute()
     {
-       if(kElasticEntitlement::$publicEntries || kElasticEntitlement::$publicActiveEntries)
+       if(kEntryElasticEntitlement::$publicEntries || kEntryElasticEntitlement::$publicActiveEntries)
            return true;
         
         return false;
