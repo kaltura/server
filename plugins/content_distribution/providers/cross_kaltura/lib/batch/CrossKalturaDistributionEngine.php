@@ -1049,18 +1049,23 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 				'getCuePointAddArgs'
 			);
 
+			$distributedMap = empty($jobData->providerData->distributedTimedThumbAssets) ? array() : unserialize($jobData->providerData->distributedTimedThumbAssets);
 			foreach ($targetObjects->thumbCuePoints as $thumbCuePoint)
 			{
 				/* @var $cuePoint KalturaThumbCuePoint */
 				$thumbCuePoint->entryId = $targetEntryId;
-				$thumbCuePoint->assetId = null;
+				if (isset($distributedMap[$thumbCuePoint->assetId]))
+					$thumbCuePoint->assetId = "";
+				else
+					$thumbCuePoint->assetId = null;
+
 			}
 			$targetCuePointClient = KalturaCuePointClientPlugin::get($this->targetClient);
 			$syncedObjects->thumbCuePoints = $this->syncTargetEntryObjects(
 				$targetCuePointClient->cuePoint,
 				$targetObjects->thumbCuePoints,
 				$this->sourceObjects->thumbCuePoints,
-				$jobData->providerData->distributedThumbCuePoints,
+				$jobData->providerData->distributedCuePoints,
 				$targetEntryId,
 				'getCuePointAddArgs'
 			);

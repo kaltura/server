@@ -2099,6 +2099,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $rootEntryId;
 	}
 	
+	public function getCustomDataRootEntryId()
+	{
+		return $this->getFromCustomData("rootEntryId", null, null);
+	}
 	
 	public function setDynamicFlavorAttributes(array $v)
 	{
@@ -3720,9 +3724,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 	protected function addParentEntryToObjectParams(&$body)
 	{
 		$parentEntry = $this->getParentEntry();
-		if(!$parentEntry || $parentEntry->getId() == $this->getId())
+		if (!$parentEntry || $parentEntry->getId() == $this->getId())
 			return;
-		
+
 		$body['parent_entry'] = array(
 			'entry_id' => $parentEntry->getId(),
 			'partner_id' => $parentEntry->getPartnerId(),
@@ -3735,5 +3739,19 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'category_ids' => $parentEntry->getAllCategoriesIds(true),
 			'active_category_ids' => $parentEntry->getAllCategoriesIds(false),
 		);
+	}
+	
+	public function getTagsArr()
+	{
+		$tags = explode(",", $this->getTags());
+		$tagsToReturn = array();
+		foreach($tags as $tag)
+		{
+			$tag = trim($tag);
+			if ($tag){
+				$tagsToReturn[] = $tag;
+			}
+		}
+		return array_unique($tagsToReturn);
 	}
 }

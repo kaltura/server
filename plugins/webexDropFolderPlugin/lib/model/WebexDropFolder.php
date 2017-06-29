@@ -16,6 +16,8 @@ class WebexDropFolder extends RemoteDropFolder
 	const WEBEX_SERVICE_URL = 'webex_service_url';
 
 	const WEBEX_HOST_ID_METADATA_FIELD_NAME = 'webex_host_id_metadata_field_name';
+	
+	const WEBEX_DELETE_FROM_RECYCLE_BIN = 'deleteFromRecycleBin';
 
 	
 	/**
@@ -144,6 +146,21 @@ class WebexDropFolder extends RemoteDropFolder
 		$this->putInCustomData(self::WEBEX_HOST_ID_METADATA_FIELD_NAME, $v);
 	}
 	
+	/**
+	 * return string
+	 */
+	public function getDeleteFromRecycleBin ()
+	{
+		return $this->getFromCustomData(self::WEBEX_DELETE_FROM_RECYCLE_BIN);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setDeleteFromRecycleBin ($v)
+	{
+		$this->putInCustomData(self::WEBEX_DELETE_FROM_RECYCLE_BIN, $v);
+	}
 	
 	public function getImportJobData()
 	{

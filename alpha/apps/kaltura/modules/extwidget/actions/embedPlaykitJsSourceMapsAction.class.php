@@ -9,7 +9,7 @@ class embedPlaykitJsSourceMapsAction extends sfAction
     public function execute()
     {
         $sourceMapsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS_SOURCE_MAP);
-        if (!sourceMapsCache)
+        if (!$sourceMapsCache)
             KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "PlayKit source maps cache not defined");
 
         //Get cacheKey

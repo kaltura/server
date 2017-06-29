@@ -845,8 +845,40 @@ HTML;
 			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		}
 	}
-	
-	
+
+	/**
+	 * @param $captionAsset
+	 * @param $filteredCaptionAssets
+	 * @return array
+	 * @throws Exception
+	 */
+	protected static function getCaptionFilePath($captionAsset)
+	{
+		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+
+		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
+		if ($captionFileSync)
+		{
+			$captionFullPath = $captionFileSync->getFullPath();
+			return $captionFullPath;
+		}
+		return false;
+	}
+
+	/**
+	 * @param $entryId
+	 * @return array
+	 */
+	public static function getEntryIdsCaptions($entryIds)
+	{
+		$c = new Criteria();
+		$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
+		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		$captionAssets = assetPeer::doSelect($c);
+		return $captionAssets;
+	}
+
+
 	private static function getIds ( $list )
 	{
 		$id_list  =array();
@@ -1052,9 +1084,19 @@ HTML;
 				null,
 				false, 
 				$pager);
-		
+
+		return self::getPlaylistDataFromEntries($entries, null, null);
+	}
+
+	/**
+	 * @param $entries
+	 * @return array
+	 */
+	public static function getPlaylistDataFromEntries($entries, $flavorParamsIds, $captions)
+	{
 		$entryIds = array();
 		$durations = array();
+		$captionFiles = array();
 		$mediaEntry = null;
 		$maxFlavorCount = 0;
 		foreach ($entries as $entry)
@@ -1064,8 +1106,11 @@ HTML;
 
 			// Note: choosing a reference entry that has max(flavor count) and min(int id)
 			//	the reason for the int id condition is to avoid frequent changes to the 
-			//	reference entry in case the playlist content changes 
-			$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
+			//	reference entry in case the playlist content changes
+			if ($flavorParamsIds)
+				$flavorCount = count($flavorParamsIds);
+			else
+				$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
 			if (!$mediaEntry ||
 				$flavorCount > $maxFlavorCount ||
 				($flavorCount == $maxFlavorCount && $entry->getIntId() < $mediaEntry->getIntId()))
@@ -1075,6 +1120,30 @@ HTML;
 			}
 		}
 
-		return array($entryIds, $durations, $mediaEntry);
+		$captionFiles = self::getCaptionFilesForEntryIds($entryIds, $captions);
+		return array($entryIds, $durations, $mediaEntry, $captionFiles);
+	}
+
+	protected static function getCaptionFilesForEntryIds($entryIds, $captionLanguages)
+	{
+		$captionLangsArr = explode(',', $captionLanguages);
+		$captionAssets = self::getEntryIdsCaptions($entryIds);
+		$filteredCaptionAssets = array();
+		foreach ($captionAssets as $captionAsset)
+		{
+			/** @var CaptionAsset $captionAsset */
+			if (!in_array($captionAsset->getLanguage(), $captionLangsArr))
+				continue;
+			$filePath = self::getCaptionFilePath($captionAsset);
+			if ($filePath)
+			{
+				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()]))
+					$filteredCaptionAssets[$captionAsset->getEntryId()] = array();
+				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
+					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
+				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array($captionAsset->getLabel(), $filePath);
+			}
+		}
+		return $filteredCaptionAssets;
 	}
 }
