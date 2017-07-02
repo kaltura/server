@@ -34,12 +34,26 @@ None.
 - Issue Type: Feature
 - Issue ID: PS-3118
 
-Added abilitis -
+Added abilities -
 - Position WM relatively to previous  WM's
 - Positioning expresed as % of source dims
 
 ### Configuration ###
 New options in flavorParams::Watermark field
+
+### Deployment scripts ###
+None
+
+#### Known Issues & Limitations ####
+None.
+
+## FIX invalid source frame-rate setting ##
+
+- Issue Type: Bug
+- Issue ID: PS-3159
+
+### Configuration ###
+None
 
 ### Deployment scripts ###
 None
