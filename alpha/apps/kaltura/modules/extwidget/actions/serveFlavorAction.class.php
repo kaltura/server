@@ -649,28 +649,17 @@ class serveFlavorAction extends kalturaAction
 	 */
 	protected function getFlavorParamIds($flavorId)
 	{
-		$flavorParamsIdsArr = array();
+		$flavorParamsIdsArr = null;
 		$assets = null;
 		if ($flavorId)
 		{
 			$flavorIdsArr = explode(',', $flavorId);
-			$actualFlavorIds = array();
-			if (count($flavorIdsArr) > 1)
-			{
-				for ($i = 1; $i < count($flavorIdsArr); $i++)
-				{
-					$actualFlavorIds[] = $flavorIdsArr[0] . $flavorIdsArr[$i];
-				}
-				$assets = assetPeer::retrieveByIds($actualFlavorIds);
-			}
-			else
-			{
-				$assets = array(assetPeer::retrieveById($flavorId));
-			}
+			$assets = assetPeer::retrieveByIds($flavorIdsArr);
 			if (count($assets) <= 0)
 			{
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 			}
+			$flavorParamsIdsArr = array();
 			foreach ($assets as $asset)
 			{
 				$flavorParamsIdsArr[] = $asset->getFlavorParamsId();
@@ -678,4 +667,5 @@ class serveFlavorAction extends kalturaAction
 		}
 		return array($assets, $flavorParamsIdsArr);
 	}
+
 }

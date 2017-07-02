@@ -20,7 +20,7 @@ class VodPackagerDeliveryUtils
 		$prefix = kString::getCommonPrefix($urls);
 		$postfix = kString::getCommonPostfix($urls);
 		
-		if ($entry->getType() == entryType::PLAYLIST)
+		if (($entry->getType() == entryType::PLAYLIST) || $params->getHasValidSequence())
 		{
 			// in case of a playlist, need to merge the flavor params of the urls
 			// instead of using a urlset, since nginx-vod does not support urlsets of 
@@ -42,21 +42,18 @@ class VodPackagerDeliveryUtils
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
 		
-		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false))
+		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false) || ($params->getHasValidSequence()))
 		{
+			$captionLanguages = self::getCaptionLangauges($entry->getId());
+			if (!empty($captionLanguages))
+			{
+				$postfix = '/captions/'.$captionLanguages.$postfix;
+			}
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
 			$result = $prefix . $middlePart . $postfix;
 		}
 		else
 		{
-			if ($params->getHasValidSequence())
-			{
-				$captionLanguages = self::getCaptionLangauges($entry->getId());
-				if (!empty($captionLanguages))
-				{
-					$postfix = '/captions/'.$captionLanguages.$postfix;
-				}
-			}
 			$result = $prefix . $middlePart . $postfix;
 			if (!$params->getUsePlayServer() && !$params->getHasValidSequence())
 				$result .= '.urlset';

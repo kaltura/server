@@ -59,7 +59,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		}
 		else
 		{
-			$url .= $this->getFlavorVersionString($flavorAsset);
+			if (!$this->getDynamicAttributes()->getHasValidSequence())
+				$url .= $this->getFlavorVersionString($flavorAsset);
 			$url .= '/flavorId/' . $flavorAsset->getId();
 		}
 
