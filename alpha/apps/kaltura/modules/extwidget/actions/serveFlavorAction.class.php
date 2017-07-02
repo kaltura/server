@@ -301,7 +301,7 @@ class serveFlavorAction extends kalturaAction
 
 	protected function serveEntryWithSequence($entry, $sequenceEntries, $flavorId, $captionLanguages)
 	{
-		list($assets, $flavorParamsIdsArr) = $this->getFlavorParamIds($flavorId);
+		list($assets, $flavorParamsIdsArr) = $this->getFlavorFlavorAssetsandParamIds($flavorId);
 		$allEntries = $sequenceEntries;
 		$allEntries[] = $entry;
 		if (empty($captionLanguages) && $assets && (count($assets) == 1) && $assets[0]->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
@@ -647,7 +647,7 @@ class serveFlavorAction extends kalturaAction
 	 * @param $flavorId
 	 * @return array
 	 */
-	protected function getFlavorParamIds($flavorId)
+	protected function getFlavorFlavorAssetsandParamIds($flavorId)
 	{
 		$flavorParamsIdsArr = null;
 		$assets = null;
