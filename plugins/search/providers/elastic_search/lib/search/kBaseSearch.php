@@ -19,6 +19,7 @@ abstract class kBaseSearch
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
         $subQuery = kESearchQueryManager::createOperatorSearchQuery($eSearchOperator);
+        KalturaLog::debug("@@WD [".print_r($subQuery, true)."]");
         $this->applyElasticSearchConditions($subQuery);
         KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
         $result = $this->elasticClient->search($this->query);

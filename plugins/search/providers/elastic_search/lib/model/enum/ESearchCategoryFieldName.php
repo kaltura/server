@@ -5,8 +5,6 @@
  */ 
 interface ESearchCategoryFieldName extends BaseEnum
 {
-	const CATEGORY_PARTNER_ID = 'partner_id';
-	const CATEGORY_STATUS = 'status';
 	const CATEGORY_PRIVACY = 'privacy';
 	const CATEGORY_PRIVACY_CONTEXT = 'privacy_context';
 	const CATEGORY_PRIVACY_CONTEXTS = 'privacy_contexts';
