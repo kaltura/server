@@ -301,26 +301,15 @@ class serveFlavorAction extends kalturaAction
 
 	protected function serveEntryWithSequence($entry, $sequenceEntries, $flavorId, $captionLanguages)
 	{
-		$flavorParamsIdsArr = array();
-		$asset = null;
-		if ($flavorId)
-		{
-			$asset = assetPeer::retrieveById($flavorId);
-			if (is_null($asset))
-			{
-				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-			}
-			$flavorParamsIdsArr = array($asset->getFlavorParamsId());
-		}
-		/* @var asset $asset */
+		list($assets, $flavorParamsIdsArr) = $this->getFlavorFlavorAssetsandParamIds($flavorId);
 		$allEntries = $sequenceEntries;
 		$allEntries[] = $entry;
-		if (empty($captionLanguages) && $asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
-			$captionLanguages = $asset->getLanguage();
+		if (empty($captionLanguages) && $assets && (count($assets) == 1) && $assets[0]->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
+			$captionLanguages = $assets[0]->getLanguage();
 		list($entryIds, $durations, $referenceEntry, $captionFiles ) =
 			myPlaylistUtils::getPlaylistDataFromEntries($allEntries, $flavorParamsIdsArr, $captionLanguages);
 
-		if ($asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
+		if ($assets && (count($assets) == 1) && $assets[0]->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
 		{
 			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLanguages, $entry->getPartnerId());
 		}
@@ -653,4 +642,30 @@ class serveFlavorAction extends kalturaAction
 
 		return true;
 	}
+
+	/**
+	 * @param $flavorId
+	 * @return array
+	 */
+	protected function getFlavorFlavorAssetsandParamIds($flavorId)
+	{
+		$flavorParamsIdsArr = null;
+		$assets = null;
+		if ($flavorId)
+		{
+			$flavorIdsArr = explode(',', $flavorId);
+			$assets = assetPeer::retrieveByIds($flavorIdsArr);
+			if (count($assets) <= 0)
+			{
+				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			}
+			$flavorParamsIdsArr = array();
+			foreach ($assets as $asset)
+			{
+				$flavorParamsIdsArr[] = $asset->getFlavorParamsId();
+			}
+		}
+		return array($assets, $flavorParamsIdsArr);
+	}
+
 }
