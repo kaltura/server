@@ -659,11 +659,8 @@ class serveFlavorAction extends kalturaAction
 	{
 		$url = $_SERVER['REQUEST_URI'];
 		$prefix = substr($url, 0, strpos($url, 'serveFlavor/') + 12);
-		$middle = 'entryId/' . $entryId . "/flavorId/" . $flavorId . "/";
-		$lastSlashPos = strrpos($url, '/') + 1;
-		$queryLoc = strpos($url, '?');
-		$postfix = substr($url, $lastSlashPos, $queryLoc - $lastSlashPos);
-		$outUrl = $prefix . $middle . $postfix;
+		$postfix = 'entryId/' . $entryId . "/flavorId/" . $flavorId . "/";
+		$outUrl = $prefix . $postfix;
 		return $outUrl;
 	}
 	
