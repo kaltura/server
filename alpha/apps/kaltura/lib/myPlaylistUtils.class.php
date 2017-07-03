@@ -1141,7 +1141,7 @@ HTML;
 					$filteredCaptionAssets[$captionAsset->getEntryId()] = array();
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
 					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
-				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array($captionAsset->getLabel(), $filePath);
+				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array($captionAsset->getLabel(), $filePath, $captionAsset->getId());
 			}
 		}
 		return $filteredCaptionAssets;

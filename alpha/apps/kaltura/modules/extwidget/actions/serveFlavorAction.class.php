@@ -271,7 +271,7 @@ class serveFlavorAction extends kalturaAction
 
 				$clips[] = array('type' => 'source', 'path' => $path);
 			}
-			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($referenceFlavor));
+			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($referenceFlavor->getId(), $referenceFlavor->getEntryId()));
 		}
 
 		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences);
@@ -647,6 +647,7 @@ class serveFlavorAction extends kalturaAction
 				$currSequence = array('clips' => $captionClips, 'language' => $langString);
 				if (!is_null($captionFiles[$entryId][$captionLang][0]))
 					$currSequence['label'] = $captionFiles[$entryId][$captionLang][0];
+				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$entryId][$captionLang][2], $entryId);
 				$sequences[] = $currSequence;
 			}
 		}
@@ -654,11 +655,11 @@ class serveFlavorAction extends kalturaAction
 		return true;
 	}
 
-	protected function getServeUrlForFlavor($flavorAsset)
+	protected function getServeUrlForFlavor($flavorId, $entryId)
 	{
 		$url = $_SERVER['REQUEST_URI'];
 		$prefix = substr($url, 0, strpos($url, 'serveFlavor/') + 12);
-		$middle = 'entryId/' . $flavorAsset->getEntryId() . "/flavorId/" . $flavorAsset->getId() . "/";
+		$middle = 'entryId/' . $entryId . "/flavorId/" . $flavorId . "/";
 		$lastSlashPos = strrpos($url, '/') + 1;
 		$queryLoc = strpos($url, '?');
 		$postfix = substr($url, $lastSlashPos, $queryLoc - $lastSlashPos);
