@@ -299,19 +299,8 @@ class serveFlavorAction extends kalturaAction
 	}
 
 
-	protected function serveEntryWithSequence($entry, $sequenceEntries, $flavorId, $captionLanguages)
+	protected function serveEntryWithSequence($entry, $sequenceEntries, $asset, $flavorParamsIdsArr, $captionLanguages)
 	{
-		$flavorParamsIdsArr = array();
-		$asset = null;
-		if ($flavorId)
-		{
-			$asset = assetPeer::retrieveById($flavorId);
-			if (is_null($asset))
-			{
-				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-			}
-			$flavorParamsIdsArr = array($asset->getFlavorParamsId());
-		}
 		/* @var asset $asset */
 		$allEntries = $sequenceEntries;
 		$allEntries[] = $entry;
@@ -377,6 +366,9 @@ class serveFlavorAction extends kalturaAction
 			{
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
+			list($flavorParamsIdsArr, $asset) = $this->getFlavorAssetandParamIds($flavorId);
+			myPartnerUtils::enforceDelivery($entry, $asset);
+
 			$isInternalIp = kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']);
 			if ($entry->getType() == entryType::PLAYLIST && $isInternalIp)
 			{
@@ -389,7 +381,7 @@ class serveFlavorAction extends kalturaAction
 				if (count($sequenceEntries))
 				{
 					$this->verifySequenceEntries($sequenceEntries);
-					$this->serveEntryWithSequence($entry, $sequenceEntries, $flavorId, $captionLanguages);
+					$this->serveEntryWithSequence($entry, $sequenceEntries, $asset, $flavorParamsIdsArr, $captionLanguages);
 				}
 			}
 		}
@@ -663,5 +655,26 @@ class serveFlavorAction extends kalturaAction
 		$outUrl = $prefix . $postfix;
 		return $outUrl;
 	}
-	
+
+	/**
+	 * @param $flavorId
+	 * @return array
+	 */
+	protected function getFlavorAssetandParamIds($flavorId)
+	{
+		$flavorParamsIdsArr = array();
+		$asset = null;
+		if ($flavorId)
+		{
+			$asset = assetPeer::retrieveById($flavorId);
+			if (is_null($asset))
+			{
+				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			}
+			$flavorParamsIdsArr = array($asset->getFlavorParamsId());
+			return array($flavorParamsIdsArr, $asset);
+		}
+		return array($flavorParamsIdsArr, $asset);
+	}
+
 }
