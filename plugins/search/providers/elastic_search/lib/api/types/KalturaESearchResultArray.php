@@ -5,7 +5,7 @@
  */
 abstract class KalturaESearchResultArray extends KalturaTypedArray {
 	
-	protected function populateArray($outputArray, $objectType, $sourceArray, $responseProfile)
+	protected static function populateArray($outputArray, $objectType, $sourceArray, $responseProfile)
 	{
 		foreach ( $sourceArray as $obj )
 		{
