@@ -16,6 +16,11 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 	 * @var int
 	 */
 	public $lastTimeReached;
+	
+	/**
+	 * @var time
+	 */
+	public $lastUpdateTime;
 
 	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -23,6 +28,7 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 	private static $map_between_objects = array(
 		'playbackContext',
 		'lastTimeReached',
+		'lastUpdateTime',
 	);
 		 
 	/* (non-PHPdoc)
@@ -44,15 +50,4 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::toUpdatableObject()
-	 */
-	public function toUpdatableObject($dbObject = null, $propertiesToSkip = array())
-	{
-		if(is_null($dbObject))
-			$dbObject = new ViewHistoryUserEntry();
-		
-		$dbObject->setUpdatedAt(time());	
-		return parent::toUpdatableObject($dbObject, $propertiesToSkip);
-	}
 }
