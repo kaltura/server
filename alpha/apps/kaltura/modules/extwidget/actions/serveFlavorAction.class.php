@@ -659,19 +659,22 @@ class serveFlavorAction extends kalturaAction
 		$url = $_SERVER['REQUEST_URI'];
 		$prefix = substr($url, 0, strpos($url, 'serveFlavor/') + 12);
 		$middle = 'entryId/' . $flavorAsset->getEntryId() . "/flavorId/" . $flavorAsset->getId() . "/";
-		$postfix = '';
-		$flavorIdLoc = strpos($url, 'flavorId/');
-		if ($flavorIdLoc)
-		{
-			$endFlavorIdLoc = strpos($url, '/', $flavorIdLoc + 9);
-			$postfix = substr($url, $endFlavorIdLoc);
-		}
-		else
-		{
-			$entryIdLoc = strpos($url, 'entryId/');
-			$endEntryIdLoc = strpos($url, '/', $entryIdLoc + 8) + 1;
-			$postfix = substr($url, $endEntryIdLoc);
-		}
+		$lastSlashPos = strrpos($url, '/') + 1;
+		$queryLoc = strpos($url, '?');
+		$postfix = substr($url, $lastSlashPos, $queryLoc - $lastSlashPos);
+//		$postfix = '';
+//		$flavorIdLoc = strpos($url, 'flavorId/');
+//		if ($flavorIdLoc)
+//		{
+//			$endFlavorIdLoc = strpos($url, '/', $flavorIdLoc + 9);
+//			$postfix = substr($url, $endFlavorIdLoc);
+//		}
+//		else
+//		{
+//			$entryIdLoc = strpos($url, 'entryId/');
+//			$endEntryIdLoc = strpos($url, '/', $entryIdLoc + 8) + 1;
+//			$postfix = substr($url, $endEntryIdLoc, $queryLoc - $endEntryIdLoc);
+//		}
 		$outUrl = $prefix . $middle . $postfix;
 		return $outUrl;
 	}
