@@ -165,7 +165,17 @@ class DeliveryProfileDynamicAttributes {
 	 * @var bool
 	 */
 	protected $isAclFlavorParamsIdsBlockedList = null;
-	
+
+	/**
+	 * @var string
+	 */
+	protected $sequence = null;
+
+	/**
+	 * @var bool
+	 */
+	protected  $hasValidSequence = false;
+
 	/**
 	 * @return the $addThumbnailExtension
 	 */
@@ -615,6 +625,37 @@ class DeliveryProfileDynamicAttributes {
 		return array();
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getSequence()
+	{
+		return $this->sequence;
+	}
+
+	/**
+	 * @param string $sequence
+	 */
+	public function setSequence($sequence)
+	{
+		$this->sequence = $sequence;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getHasValidSequence()
+	{
+		return $this->hasValidSequence;
+	}
+
+	/**
+	 * @param boolean $hasValidSequence
+	 */
+	public function setHasValidSequence($hasValidSequence)
+	{
+		$this->hasValidSequence = $hasValidSequence;
+	}
 
 	/**
 	 * 
@@ -665,6 +706,8 @@ class DeliveryProfileDynamicAttributes {
 		$this->sessionId = $newObj->getSessionId();
 		$this->aclFlavorParamsIds = $newObj->getAclFlavorParamsIds();
 		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
+		$this->sequence = $newObj->getSequence();
+		$this->hasValidSequence = $newObj->getHasValidSequence();
 	}
 }
 

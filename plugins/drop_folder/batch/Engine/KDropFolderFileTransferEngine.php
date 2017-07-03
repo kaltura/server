@@ -15,75 +15,53 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	public function watchFolder (KalturaDropFolder $folder)
 	{
 		$this->dropFolder = $folder;
-		$this->fileTransferMgr =  self::getFileTransferManager($this->dropFolder);
-		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
-						    										
+		$this->fileTransferMgr = self::getFileTransferManager($this->dropFolder);
+		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
+
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder();
-		if(count($physicalFiles) > 0)
-			$dropFolderFilesMap = $this->loadDropFolderFiles();
-		else 
-			$dropFolderFilesMap = array();
+		$physicalFiles = array_filter($physicalFiles, array($this, 'validatePhysicalFile'));
+		if (count($physicalFiles) <= 0)
+			return;
 
 		$maxModificationTime = 0;
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		if (KBatchBase::$taskConfig->params->pageSize)
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+
+		do
+		{
+			$pager->pageIndex++;
+			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager);
+
+			foreach ($dropFolderFiles as $dropFolderFile)
+			{
+				if (array_key_exists($dropFolderFile->fileName, $physicalFiles))
+				{
+					$physicalFile = $physicalFiles[$dropFolderFile->fileName];
+					unset($physicalFiles[$dropFolderFile->fileName]);
+
+					$maxModificationTime = ($physicalFile->modificationTime > $maxModificationTime) ? $physicalFile->modificationTime : $maxModificationTime;
+					KalturaLog::info('Watch file [' . $physicalFile->filename . ']');
+					$this->handleExistingDropFolderFile($dropFolderFile);
+				} else
+				{
+					$this->handleFilePurged($dropFolderFile->id);
+				}
+			}
+		} while (count($dropFolderFiles) >= $pager->pageSize);
+
 		foreach ($physicalFiles as &$physicalFile)
 		{
-			/* @var $physicalFile FileObject */	
-			$physicalFileName = $physicalFile->filename;
-			$utfFileName = kString::stripUtf8InvalidChars($physicalFileName);
-			
-			if($physicalFileName != $utfFileName)
+			try
 			{
-				KalturaLog::info("File name [$physicalFileName] is not utf-8 compatible, Skipping file...");
-				continue;
+				$this->handleFileAdded($physicalFile->filename, $physicalFile->fileSize, $physicalFile->modificationTime);
+			} catch (Exception $e)
+			{
+				KalturaLog::err("Error handling drop folder file [$physicalFile->filename] " . $e->getMessage());
 			}
-			
-			if(!kXml::isXMLValidContent($utfFileName))
-			{
-				KalturaLog::info("File name [$physicalFileName] contains invalid XML characters, Skipping file...");
-				continue;
-			}
-			
-			if ($this->dropFolder->incremental && $physicalFile->modificationTime < $this->dropFolder->lastFileTimestamp)
-			{
-				KalturaLog::info("File modification time [" . $physicalFile->modificationTime ."] predates drop folder last timestamp [". $this->dropFolder->lastFileTimestamp ."]. Skipping.");
-				if (isset ($dropFolderFilesMap[$physicalFileName]))
-					unset($dropFolderFilesMap[$physicalFileName]);
-				continue;
-			}
-			
-			if($this->validatePhysicalFile($physicalFileName))
-			{
-				$maxModificationTime = ($physicalFile->modificationTime > $maxModificationTime) ? $physicalFile->modificationTime : $maxModificationTime;
-				KalturaLog::info('Watch file ['.$physicalFileName.']');
-				if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
-				{
-					try 
-					{
-						$lastModificationTime = $physicalFile->modificationTime;
-						$fileSize = $physicalFile->fileSize;
-						
-						$this->handleFileAdded($physicalFileName, $fileSize, $lastModificationTime);
-					}
-					catch (Exception $e)
-					{
-						KalturaLog::err("Error handling drop folder file [$physicalFileName] " . $e->getMessage());
-					}											
-				}
-				else //drop folder file entry found
-				{
-					$dropFolderFile = $dropFolderFilesMap[$physicalFileName];
-					//if file exist in the folder remove it from the map
-					//all the files that are left in a map will be marked as PURGED					
-					unset($dropFolderFilesMap[$physicalFileName]);
-					$this->handleExistingDropFolderFile($dropFolderFile);
-				}					
-			}					
 		}
-		foreach ($dropFolderFilesMap as $dropFolderFile) 
-		{
-			$this->handleFilePurged($dropFolderFile->id);
-		}
-		
+
 		if ($this->dropFolder->incremental && $maxModificationTime > $this->dropFolder->lastFileTimestamp)
 		{
 			$updateDropFolder = new KalturaDropFolder();
@@ -198,49 +176,69 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	
 	protected function validatePhysicalFile ($physicalFile)
 	{
-		KalturaLog::log('Validating physical file ['.$physicalFile.']');
-		
-		$ignorePatterns = $this->dropFolder->ignoreFileNamePatterns;	
-		if($ignorePatterns)
-			$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE.','.$ignorePatterns;
-		else
-			$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE;			
-		$ignorePatterns = array_map('trim', explode(',', $ignorePatterns));
-		
 		$isValid = true;
-		try 
+		try
 		{
-			$fullPath = $this->dropFolder->path.'/'.$physicalFile;
-			if ($physicalFile === '.' || $physicalFile === '..')
+			/* @var $physicalFile FileObject */
+			$physicalFileName = $physicalFile->filename;
+
+			KalturaLog::log('Validating physical file [' . $physicalFileName . ']');
+
+			$utfFileName = kString::stripUtf8InvalidChars($physicalFileName);
+
+			if ($physicalFileName != $utfFileName)
+			{
+				KalturaLog::info("File name [$physicalFileName] is not utf-8 compatible, Skipping file...");
+				return false;
+			}
+
+			if (!kXml::isXMLValidContent($utfFileName))
+			{
+				KalturaLog::info("File name [$physicalFileName] contains invalid XML characters, Skipping file...");
+				return false;
+			}
+
+			if ($this->dropFolder->incremental && $physicalFile->modificationTime < $this->dropFolder->lastFileTimestamp)
+			{
+				KalturaLog::info("File modification time [" . $physicalFile->modificationTime . "] predates drop folder last timestamp [" . $this->dropFolder->lastFileTimestamp . "]. Skipping.");
+				return false;
+			}
+
+			$ignorePatterns = $this->dropFolder->ignoreFileNamePatterns;
+			if ($ignorePatterns)
+				$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE . ',' . $ignorePatterns;
+			else
+				$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE;
+			$ignorePatterns = array_map('trim', explode(',', $ignorePatterns));
+
+
+			$fullPath = $this->dropFolder->path . '/' . $physicalFileName;
+			if ($physicalFileName === '.' || $physicalFileName === '..')
 			{
 				KalturaLog::info("Skipping linux current and parent folder indicators");
 				$isValid = false;
-			}
-			else if (empty($physicalFile)) 
+			} else if (empty($physicalFileName))
 			{
 				KalturaLog::err("File name is not set");
 				$isValid = false;
-			}
-			else if(!$fullPath || !$this->fileTransferMgr->fileExists($fullPath))
+			} else if (!$fullPath || !$this->fileTransferMgr->fileExists($fullPath))
 			{
 				KalturaLog::err("Cannot access physical file in path [$fullPath]");
-				$isValid = false;				
-			}
-			else
+				$isValid = false;
+			} else
 			{
 				foreach ($ignorePatterns as $ignorePattern)
 				{
-					if (!is_null($ignorePattern) && ($ignorePattern != '') && fnmatch($ignorePattern, $physicalFile)) 
+					if (!is_null($ignorePattern) && ($ignorePattern != '') && fnmatch($ignorePattern, $physicalFileName))
 					{
-						KalturaLog::err("Ignoring file [$physicalFile] matching ignore pattern [$ignorePattern]");
+						KalturaLog::err("Ignoring file [$physicalFileName] matching ignore pattern [$ignorePattern]");
 						$isValid = false;
 					}
 				}
 			}
-		}
-		catch(Exception $e)
+		} catch (Exception $e)
 		{
-			KalturaLog::err("Failure validating physical file [$physicalFile] - ". $e->getMessage());
+			KalturaLog::err("Failure validating physical file [$physicalFileName] - " . $e->getMessage());
 			$isValid = false;
 		}
 		return $isValid;

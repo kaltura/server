@@ -1,3 +1,66 @@
+# Lynx 12.19.0 #
+
+
+## Add polls resetVotesAction ##
+
+### configuration ###
+
+	None
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+#### Known Issues & Limitations ####
+
+        None.
+
+## Add Media-Entry ready email template ##
+
+- Issue Type: Support
+- Issue ID: SUP-8655
+
+### Configuration ###
+script will ask for your: IP, userId and password (of your admin-console account), partner (insert -2 for partner)
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
+
+#### Known Issues & Limitations ####
+None.
+
+## WaterMarking - functionality extension ##
+
+- Issue Type: Feature
+- Issue ID: PS-3118
+
+Added abilities -
+- Position WM relatively to previous  WM's
+- Positioning expresed as % of source dims
+
+### Configuration ###
+New options in flavorParams::Watermark field
+
+### Deployment scripts ###
+None
+
+#### Known Issues & Limitations ####
+None.
+
+## FIX invalid source frame-rate setting ##
+
+- Issue Type: Bug
+- Issue ID: PS-3159
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+None
+
+#### Known Issues & Limitations ####
+None.
+
 # Lynx 12.18.0 #
 
 ## support new live packages + LC flow + webcast on update or fresh install ##

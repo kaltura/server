@@ -2085,6 +2085,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $rootEntryId;
 	}
 	
+	public function getCustomDataRootEntryId()
+	{
+		return $this->getFromCustomData("rootEntryId", null, null);
+	}
 	
 	public function setDynamicFlavorAttributes(array $v)
 	{
@@ -3601,5 +3605,19 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$url .= "/playManifest/entryId/$entryId/format/$format/protocol/$protocolStr";
 		
 		return $url;
+	}
+
+	public function getTagsArr()
+	{
+		$tags = explode(",", $this->getTags());
+		$tagsToReturn = array();
+		foreach($tags as $tag)
+		{
+			$tag = trim($tag);
+			if ($tag){
+				$tagsToReturn[] = $tag;
+			}
+		}
+		return array_unique($tagsToReturn);
 	}
 }

@@ -11,6 +11,7 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	const PLUGIN_VERSION_BUILD = 0;
 
 	const BATCH_JOB_FLOW_MANAGER = 'kScheduledTaskBatchJobFlowManager';
+	const MEDIA_REPURPOSING_HANDLER = 'MediaRepurposingHandler';
 
 	public static function getPluginName()
 	{
@@ -111,7 +112,10 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	 */
 	public static function getEventConsumers()
 	{
-		return array(self::BATCH_JOB_FLOW_MANAGER);
+		return array(
+			self::BATCH_JOB_FLOW_MANAGER,
+			self::MEDIA_REPURPOSING_HANDLER,
+		);
 	}
 
 	/**
@@ -150,6 +154,7 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 		$pages[] = new MediaRepurposingListAction();
 		$pages[] = new MediaRepurposingConfigureAction();
 		$pages[] = new MediaRepurposingSetStatusAction();
+		$pages[] = new MediaRepurposingLogsAction();
 		return $pages;
 	}
 

@@ -57,6 +57,8 @@
 	</table>
 </div>
 
+<?php echo $this->getDryRunLogForm; ?>
+
 <script type="text/javascript">
 $(function(){
 	addSubTitle('Media Repurposing Profiles');
@@ -205,7 +207,6 @@ function configureMediaRepurposing(mediaRepurposingId)
 		return;
 	}
 
-
 	mediaRepurposingIdStr = '/new_partner_id/' + partnerId + '/media_repurposing_id/' + mediaRepurposingId;
 	loadMediaRepurposing(mediaRepurposingIdStr);
 	
@@ -248,6 +249,21 @@ function loadMediaRepurposing(paramStr)
 			});
 		}
 	);
+}
+
+function getDryRunLog(dryRunId) {
+	if (!isValidParam(dryRunId, 'Dry Run id', true))
+		return;
+	loadMediaRepurposingLogs('/dryRunId/' + dryRunId);
+}
+
+function loadMediaRepurposingLogs(paramStr) {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingLogsAction')); ?>' + paramStr;
+	dialogDiv = jQuery('<div id="media-repurposing-logs-dialog"><iframe width="100%" height="100%" src="' + url + '"></iframe></div>').appendTo('body');
+	dialogDiv.dialog({bgiframe: true, modal: true, resizable: true, width: 600, height: 600,
+		title: '<?php echo $this->translate('Media Repurposing Profile Logs'); ?>',
+		buttons: {'<?php echo $this->translate('Close'); ?>': function() {jQuery(this).dialog('close');}}
+	});
 }
 
 
@@ -330,10 +346,9 @@ function buildCondParams(index) {
 
 function setTaskData() {
 	var tasks = [];
-	var currentIndex = 0;
-	while (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0) {
-		tasks.push(buildTaskParams(currentIndex.toString()));
-		currentIndex++;
+	for (let currentIndex = 0; currentIndex < 30 ; currentIndex++) {
+		if (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0)
+			tasks.push(buildTaskParams(currentIndex.toString()));
 	}
 	jQuery('#TasksData').val(JSON.stringify(tasks));
 }

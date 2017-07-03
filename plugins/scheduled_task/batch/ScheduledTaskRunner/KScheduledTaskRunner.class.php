@@ -79,6 +79,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
 
 		$objectsIds = array();
+		$errorObjectsIds = array();
 		$isMediaRepurposingProfile = $this->isMediaRepurposingProfile($profile);
 		if ($isMediaRepurposingProfile)
 			$this->addDateToFilter($profile);
@@ -113,12 +114,15 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			{
 				$error = $this->processObject($profile, $object);
 
-				if (!$error) {
+				if ($error) {
+					$errorObjectsIds[] = $object->id;
+				} else {
 					if (array_key_exists($object->userId, $objectsIds))
 						$objectsIds[$object->userId][] = $object->id;
 					else
 						$objectsIds[$object->userId] = array($object->id);
-				}
+				} 
+
 				if ($isMediaRepurposingProfile)
 					$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
 			}
@@ -310,7 +314,8 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	{
 		if (!$xml)
 			$xml = new SimpleXMLElement("<metadata/>");
-		$xml->addChild('Status', 'Enabled');
+		if (!isset($xml->Status))
+			$xml->addChild('Status', 'Enabled');
 		$xml->addChild('MRPsOnEntry', "MR_$mrId");
 		if ($error)
 			$xml->addChild('MRPData', "$mrId,Error,1," .self::getUpdateDay());
