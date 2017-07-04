@@ -274,7 +274,7 @@ class serveFlavorAction extends kalturaAction
 			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($referenceFlavor->getId(), $referenceFlavor->getEntryId()));
 		}
 
-		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences);
+		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences, $origEntry);
 
 		// build the media set
 		if ($isLive)
@@ -314,18 +314,18 @@ class serveFlavorAction extends kalturaAction
 
 		if ($asset && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
 		{
-			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLanguages, $entry->getPartnerId());
+			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLanguages, $entry->getPartnerId(), $entry);
 		}
 
 
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr, $captionFiles, $captionLanguages);
 	}
 
-	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges, $partnerId)
+	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges, $partnerId, $mainEntry)
 	{
 		$sequences = array();
 
-		$this->addCaptionSequences($entryIds, $captionFiles, $captionLangauges, $sequences);
+		$this->addCaptionSequences($entryIds, $captionFiles, $captionLangauges, $sequences, $mainEntry);
 
 		$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
 		// build the json
@@ -616,7 +616,7 @@ class serveFlavorAction extends kalturaAction
 	 * @param $sequences
 	 * @return array
 	 */
-	protected function addCaptionSequences($entryIds, $captionFiles, $captionLangauges, &$sequences)
+	protected function addCaptionSequences($entryIds, $captionFiles, $captionLangauges, &$sequences, $mainEntry)
 	{
 		$captionLangaugesArr = explode(',', $captionLangauges);
 		foreach ($captionLangaugesArr as $captionLang)
@@ -643,7 +643,7 @@ class serveFlavorAction extends kalturaAction
 				$currSequence = array('clips' => $captionClips, 'language' => $langString);
 				if (!is_null($captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL]))
 					$currSequence['label'] = $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL];
-				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $entryId);
+				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $mainEntry->getId());
 				$sequences[] = $currSequence;
 			}
 		}
