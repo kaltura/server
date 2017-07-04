@@ -72,8 +72,6 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler implements kObj
 			
 		if($object instanceof MetadataProfile)
 			$this->metadataProfileDeleted($object);
-			
-		return parent::objectDeleted($object);
 	}
 	
 	/**
