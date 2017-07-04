@@ -29,6 +29,38 @@ script will ask for your: IP, userId and password (of your admin-console account
 #### Known Issues & Limitations ####
 None.
 
+## WaterMarking - functionality extension ##
+
+- Issue Type: Feature
+- Issue ID: PS-3118
+
+Added abilities -
+- Position WM relatively to previous  WM's
+- Positioning expresed as % of source dims
+
+### Configuration ###
+New options in flavorParams::Watermark field
+
+### Deployment scripts ###
+None
+
+#### Known Issues & Limitations ####
+None.
+
+## FIX invalid source frame-rate setting ##
+
+- Issue Type: Bug
+- Issue ID: PS-3159
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+None
+
+#### Known Issues & Limitations ####
+None.
+
 # Lynx 12.18.0 #
 
 ## support new live packages + LC flow + webcast on update or fresh install ##
