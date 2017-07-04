@@ -12,23 +12,23 @@ class kCategorySearch extends kBaseSearch
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), kPager $pager = null)
+    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), kPager $pager = null, ESearchOrderBy $order = null)
     {
         kCategoryElasticEntitlement::init();
         if (!count($statuses))
             $statuses = array(CategoryStatus::ACTIVE);
-        $this->initQuery($statuses);
+        $this->initQuery($statuses, $pager, $order);
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null)
+    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
         );
 
-        parent::initQuery($statuses, $pager);
+        parent::initQuery($statuses, $pager, $order);
     }
 }

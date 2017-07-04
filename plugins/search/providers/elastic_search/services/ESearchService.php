@@ -12,14 +12,14 @@ class ESearchService extends KalturaBaseService
 	 * @param KalturaESearchOperator $searchOperator
 	 * @param string $entryStatuses
 	 * @param KalturaPager $pager
+	 * @param KalturaESearchOrderBy $order
 	 * @return KalturaESearchResultArray
 	 */
-	function searchEntryAction (KalturaESearchOperator $searchOperator, $entryStatuses = null, KalturaPager $pager = null)
+	function searchEntryAction (KalturaESearchOperator $searchOperator, $entryStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
 	{
-		list($coreSearchOperator, $entryStatusesArr, $kPager) = $this->initSearchActionParams($searchOperator, $entryStatuses, $pager);
+		list($coreSearchOperator, $entryStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $entryStatuses, $pager, $order);
 		$entrySearch = new kEntrySearch();
-		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr, $kPager);//TODO: handle error flow
-
+		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
 		$coreResults = elasticSearchUtils::transformElasticToEntry($elasticResults);
 		return KalturaESearchEntryResultArray::fromDbArray($coreResults);
 	}
@@ -30,14 +30,14 @@ class ESearchService extends KalturaBaseService
 	 * @param KalturaESearchOperator $searchOperator
 	 * @param string $categoryStatuses
 	 * @param KalturaPager $pager
+	 * @param KalturaESearchOrderBy $order
 	 * @return KalturaESearchResultArray
 	 */
-	function searchCategoryAction (KalturaESearchOperator $searchOperator, $categoryStatuses = null, KalturaPager $pager = null)
+	function searchCategoryAction (KalturaESearchOperator $searchOperator, $categoryStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
 	{
-		list($coreSearchOperator, $categoryStatusesArr, $kPager) = $this->initSearchActionParams($searchOperator, $categoryStatuses, $pager);
+		list($coreSearchOperator, $categoryStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $categoryStatuses, $pager, $order);
 		$categorySearch = new kCategorySearch();
-		$elasticResults = $categorySearch->doSearch($coreSearchOperator, $categoryStatusesArr, $kPager);//TODO: handle error flow
-		
+		$elasticResults = $categorySearch->doSearch($coreSearchOperator, $categoryStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
 		$coreResults = elasticSearchUtils::transformElasticToCategory($elasticResults);
 		return KalturaESearchCategoryResultArray::fromDbArray($coreResults);
 	}
@@ -48,15 +48,15 @@ class ESearchService extends KalturaBaseService
 	 * @param KalturaESearchOperator $searchOperator
 	 * @param string $userStatuses
 	 * @param KalturaPager $pager
+	 * @param KalturaESearchOrderBy $order
 	 * @return KalturaESearchResultArray
 	 */
-	function searchUserAction (KalturaESearchOperator $searchOperator, $userStatuses = null, KalturaPager $pager = null)
+	function searchUserAction (KalturaESearchOperator $searchOperator, $userStatuses = null, KalturaPager $pager = null,  KalturaESearchOrderBy $order = null)
 	{
-		list($coreSearchOperator, $userStatusesArr, $kPager) = $this->initSearchActionParams($searchOperator, $userStatuses, $pager);
+		list($coreSearchOperator, $userStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $userStatuses, $pager, $order);
 		$userSearch = new kUserSearch();
-		$elasticResults = $userSearch->doSearch($coreSearchOperator, $userStatusesArr, $kPager);//TODO: handle error flow
+		$elasticResults = $userSearch->doSearch($coreSearchOperator, $userStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
 		$coreResults = elasticSearchUtils::transformElasticToUser($elasticResults);
-
 		return KalturaESearchUserResultArray::fromDbArray($coreResults);
 	}
 
@@ -87,7 +87,7 @@ class ESearchService extends KalturaBaseService
 		return $result;
 	}
 
-	private function initSearchActionParams(KalturaESearchOperator $searchOperator, $objectStatuses = null, KalturaPager $pager = null)
+	private function initSearchActionParams(KalturaESearchOperator $searchOperator, $objectStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
 	{
 		if (!$searchOperator->operator)
 			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
@@ -102,7 +102,11 @@ class ESearchService extends KalturaBaseService
 		if($pager)
 			$kPager = $pager->toObject();
 
-		return array($coreSearchOperator, $objectStatusesArr, $kPager);
+		$coreOrder = null;
+		if($order)
+			$coreOrder = $order->toObject();
+
+		return array($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
 	}
 
 }
