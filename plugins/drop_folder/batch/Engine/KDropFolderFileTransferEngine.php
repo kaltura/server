@@ -21,7 +21,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		$this->alreadyHandledDropFolderFiles = array();
 	}
 
-	private function markFileHandled($fileName)
+	private function tryMarkFileHandled($fileName)
 	{
 		if(in_array($fileName,$this->alreadyHandledDropFolderFiles))
 			return false;
@@ -82,7 +82,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			foreach ($dropFolderFiles as $dropFolderFile)
 			{
 				$dropFolderFileStr = $this->dropFolderFileGetPrettyStr($dropFolderFile);
-				if($this->markFileHandled($dropFolderFile->fileName))
+				if($this->tryMarkFileHandled($dropFolderFile->fileName))
 				{
 					KalturaLog::info('Handling drop folder file'.$dropFolderFileStr);
 					if ($this->isPhysicalFileExist($dropFolderFile->fileName))
