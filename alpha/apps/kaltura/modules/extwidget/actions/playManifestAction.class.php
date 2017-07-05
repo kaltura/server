@@ -49,6 +49,7 @@ class playManifestAction extends kalturaAction
 		"flavorParamIds" => 'fps',
 		"format" => 'f',
 		"maxBitrate" => 'mb',
+		"minBitrate" => 'mib',
 		"playbackContext" => 'pc',
 		"preferredBitrate" => 'pb',
 		"protocol" => 'pt',
@@ -85,6 +86,11 @@ class playManifestAction extends kalturaAction
 	 * @var int
 	 */
 	private $maxBitrate = null;
+	
+	/**
+	 * @var int
+	 */
+	private $minBitrate = null;
 	
 	/**
 	 * @var array
@@ -495,6 +501,27 @@ class playManifestAction extends kalturaAction
 		return $returnedFlavors;
 	}
 	
+	/**
+	 * @param array $flavorAssets
+	 * @return array
+	 */
+	private function removeMinBitrateFlavors($flavorAssets)
+	{
+		if (!$this->minBitrate)
+			return $flavorAssets;
+
+		$returnedFlavors = array();
+		foreach ($flavorAssets as $flavor)
+		{
+			if ($flavor->getBitrate() >= $this->minBitrate)
+			{
+				$returnedFlavors[] = $flavor;
+			}
+		}
+
+		return $returnedFlavors;
+	}
+
 	protected function shouldInitFlavorAssetsArray()
 	{
 		if ($this->entry->getType() == entryType::LIVE_STREAM)
@@ -587,7 +614,11 @@ class playManifestAction extends kalturaAction
 		$flavorAssets = $this->retrieveAssets();
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+
+		$flavorAssetsFilteredByBitrate = $this->removeMaxBitrateFlavors($flavorAssets);
+		$flavorAssetsFilteredByBitrate = $this->removeMinBitrateFlavors($flavorAssetsFilteredByBitrate);
+		if(count($flavorAssetsFilteredByBitrate))
+			 $flavorAssets = $flavorAssetsFilteredByBitrate;
 
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
@@ -1123,6 +1154,10 @@ class playManifestAction extends kalturaAction
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
+
+		$this->minBitrate = $this->getRequestParameter ( "minBitrate", null );
+		if(($this->minBitrate) && ((!is_numeric($this->minBitrate)) || ($this->minBitrate <= 0)))
+			KExternalErrors::dieError(KExternalErrors::INVALID_MIN_BITRATE);
 
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
