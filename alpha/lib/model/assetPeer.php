@@ -234,6 +234,28 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	}
 	
 	/**
+	 *
+	 * @return flavorAsset
+	 */
+	public static function retrieveByEntryIdAndParamsNoFilter($entryId, $paramsId)
+	{
+		$c = new Criteria();
+		$c->add(self::ENTRY_ID, $entryId);
+		$c->add(self::FLAVOR_PARAMS_ID, $paramsId);
+		
+		if($paramsId == 0) // Same Comment as in retrieveByEntryIdAndParams
+		{
+			$c->addAnd(self::IS_ORIGINAL, 1);
+		}
+	
+		self::setUseCriteriaFilter ( false );
+		$asset = self::doSelectOne($c);
+		self::setUseCriteriaFilter ( true );
+		
+		return $asset; 
+	}
+	
+	/**
 	 * @param string $entryId
 	 * @param array $types
 	 * @param array $statuses
