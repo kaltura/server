@@ -37,6 +37,11 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('text', 'webexServiceType', array(
+			'label'			=> 'Service Type (Default - MeetingCenter):',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		
 		$this->addElement('text', 'webexHostIdMetadataFieldName', array(
 			'label'			=> 'Host ID Metadata Field Name:',

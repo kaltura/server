@@ -108,10 +108,10 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$listRecordingRequest = new WebexXmlListRecordingRequest();
 				$listRecordingRequest->setListControl($listControl);
 				
-				$serviceTypes = $this->dropFolder->webexServiceType ? explode(',', $this->dropFolder->webexServiceType) : array(WebexXmlComServiceTypeType::_MEETINGCENTER);
+				$dropFolderServiceTypes = $this->dropFolder->webexServiceType ? explode(',', $this->dropFolder->webexServiceType) : array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 				$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
 				
-				foreach($serviceTypes as $serviceType)
+				foreach($dropFolderServiceTypes as $serviceType)
 				{
 					$servicesTypes[] = new WebexXmlComServiceTypeType($serviceType);
 				}
