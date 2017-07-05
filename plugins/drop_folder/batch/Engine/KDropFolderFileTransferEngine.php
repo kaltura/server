@@ -47,7 +47,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		return $physicalFile;
 	}
 
-	private function dropFolderFileGetPrettyStr(KalturaDropFolderFile $dropFolderFile)
+	private function getDropFolderFilePrettyStr(KalturaDropFolderFile $dropFolderFile)
 	{
 		$str =  ' id:'                  . $dropFolderFile->id.
 				',status:'              . $dropFolderFile->status.
@@ -81,7 +81,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			/* @var $dropFolderFile KalturaDropFolderFile */
 			foreach ($dropFolderFiles as $dropFolderFile)
 			{
-				$dropFolderFileStr = $this->dropFolderFileGetPrettyStr($dropFolderFile);
+				$dropFolderFileStr = $this->getDropFolderFilePrettyStr($dropFolderFile);
 				if($this->tryMarkFileHandled($dropFolderFile->fileName))
 				{
 					KalturaLog::info('Handling drop folder file'.$dropFolderFileStr);
