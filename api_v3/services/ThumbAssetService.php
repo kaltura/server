@@ -879,13 +879,14 @@ class ThumbAssetService extends KalturaAssetService
 		else
 		{
 			$dbThumbAsset = new thumbAsset();
-			$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
-			$dbThumbAsset->setEntryId($dbEntry->getId());
 			$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 			$dbThumbAsset->setFileExt($ext);
 			$dbThumbAsset->incrementVersion();
-			$dbThumbAsset->save();
 		}
+		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
+		$dbThumbAsset->setEntryId($dbEntry->getId());
+		$dbThumbAsset->save();
+
 		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
 		
