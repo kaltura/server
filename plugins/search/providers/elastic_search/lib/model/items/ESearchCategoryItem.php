@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.items
+ */
 class ESearchCategoryItem extends ESearchItem
 {
 
@@ -96,9 +99,9 @@ class ESearchCategoryItem extends ESearchItem
 		return parent::getQueryVerbs();
 	}
 
-	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $additionalParams = null)
+	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
-		$queryOut = array();
+		$categoryQuery = array();
 
 		$allowedSearchTypes = ESearchCategoryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $categorySearchItem)
@@ -107,22 +110,7 @@ class ESearchCategoryItem extends ESearchItem
 			 * @var ESearchCategoryItem $categorySearchItem
 			 */
 			$queryVerbs = $categorySearchItem->getQueryVerbs();
-			$searchTerm = $categorySearchItem->getSearchTerm();
-			if (!empty($searchTerm))
-			{
-				if ($categorySearchItem->getItemType() == ESearchItemType::PARTIAL)
-				{
-					$queryOut[$queryVerbs[0]]['multi_match']['query'] = strtolower($categorySearchItem->getSearchTerm());
-					$queryOut[$queryVerbs[0]]['multi_match']['fields'] = array($categorySearchItem->getFieldName() . "^2", $categorySearchItem->getFieldName() . ".raw^2", $categorySearchItem->getFieldName() . ".trigrams");
-					$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
-				} else
-				{
-					$fieldNameAddition = '';
-					if ($categorySearchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$categorySearchItem->getFieldName()]))
-						$fieldNameAddition = '.raw';
-					$queryOut[$queryVerbs[1]] = array($categorySearchItem->getFieldName().$fieldNameAddition => strtolower($searchTerm));
-				}
-			}
+			self::createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes);
 			if (in_array('Range', $allowedSearchTypes[$categorySearchItem->getFieldName()]))
 			{
 				foreach ($categorySearchItem->getRanges() as $range)
@@ -131,10 +119,29 @@ class ESearchCategoryItem extends ESearchItem
 				}
 			}
 		}
-
-
-
-
-		return $queryOut;
+		return $categoryQuery;
+	}
+	
+	public static function createSingleItemSearchQuery($categorySearchItem, &$categoryQuery, $allowedSearchTypes)
+	{
+		$queryVerbs = $categorySearchItem->getQueryVerbs();
+		$searchTerm = $categorySearchItem->getSearchTerm();
+		if (!empty($searchTerm))
+		{
+			switch ($categorySearchItem->getItemType())
+			{
+				case ESearchItemType::EXACT_MATCH:
+					$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
+					break;
+				case ESearchItemType::PARTIAL:
+					$categoryQuery[] = kESearchQueryManager::getMultiMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), false);
+					break;
+				case ESearchItemType::STARTS_WITH:
+					$categoryQuery[] = kESearchQueryManager::getPrefixQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
+					break;
+				case ESearchItemType::DOESNT_CONTAIN:
+					$categoryQuery[] = kESearchQueryManager::getDoesntContainQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
+			}
+		}
 	}
 }

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.items
+ */
 class ESearchUnifiedItem extends ESearchItem
 {
 
@@ -29,7 +32,7 @@ class ESearchUnifiedItem extends ESearchItem
 		return 'unified';
 	}
 
-	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $additionalParams = null)
+	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
 		$outQuery['bool']['must'] = array();
 		$outQuery = array();
@@ -82,13 +85,13 @@ class ESearchUnifiedItem extends ESearchItem
 			$captionQuery['nested']['inner_hits'] = array('size' => 10, '_source' => false);
 			$captionQuery['nested']['query']['nested']['path'] = "caption_assets.lines";
 
-			ESearchCaptionItem::createSingleItemSearchQuery($boolOperator, $eSearchUnifiedItem, $captionQuery);
+			ESearchCaptionItem::createSingleItemSearchQuery($boolOperator, $eSearchUnifiedItem, $captionQuery); //todo
 			$outQuery['bool']['should'][] = $captionQuery;
 
 			//Start handling metadata fields
 			$metadataQuery['nested']['path'] = 'metadata';
 			$metadataQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
-			ESearchMetadataItem::createSingleItemQuery($boolOperator, $eSearchUnifiedItem, $metadataQuery);
+			ESearchMetadataItem::createSingleItemQuery($boolOperator, $eSearchUnifiedItem, $metadataQuery); //todo
 
 			$outQuery['bool']['should'][] = $metadataQuery;
 

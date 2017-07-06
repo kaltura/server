@@ -10,6 +10,13 @@
 		  "max_gram": 3
 		}
 	  },
+	  "char_filter": {
+		"kaltura_whitespace_filter": {
+		  "type": "pattern_replace",
+		  "pattern": "(\\s+)",
+		  "replacement": " "
+		}
+	  },
 	  "analyzer": {
 		"trigrams": {
 		  "type": "custom",
@@ -17,6 +24,17 @@
 		  "filter": [
 			"lowercase",
 			"trigrams_filter"
+		  ]
+		},
+		"kaltura_keyword": {
+		  "type": "custom",
+		  "tokenizer": "keyword",
+		  "char_filter": [
+			"kaltura_whitespace_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"trim"
 		  ]
 		}
 	  }
@@ -63,7 +81,8 @@
 			  "analyzer" : "trigrams"
 			},
 			"raw" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			}
 		  }
 		},
@@ -75,7 +94,8 @@
 			  "analyzer" : "trigrams"
 			},
 			"raw" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			}
 		  }
 		},
@@ -114,7 +134,8 @@
 			  "analyzer" : "trigrams"
 			},
 			"raw" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			}
 		  }
 		},
@@ -174,7 +195,8 @@
 				  "analyzer" : "trigrams"
 				},
 				"raw" : {
-				  "type" : "keyword"
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				}
 			  }
 			}

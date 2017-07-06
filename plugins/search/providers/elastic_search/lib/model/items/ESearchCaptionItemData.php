@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.items
+ */
 class ESearchCaptionItemData extends ESearchItemData
 {
 

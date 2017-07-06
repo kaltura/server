@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model
+ */
 class ESearchResult extends BaseObject
 {
 

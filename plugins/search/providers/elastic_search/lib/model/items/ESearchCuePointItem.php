@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.items
+ */
 class ESearchCuePointItem extends ESearchItem
 {
 
@@ -77,7 +80,7 @@ class ESearchCuePointItem extends ESearchItem
 		return parent::getQueryVerbs();
 	}
 
-	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $additionalParams = null)
+	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
 		$cuePointQuery['nested']['path'] = 'cue_points';
 		$cuePointQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
@@ -88,24 +91,7 @@ class ESearchCuePointItem extends ESearchItem
 			 * @var ESearchEntryItem $cuePointSearchItem
 			 */
 			$queryVerbs = $cuePointSearchItem->getQueryVerbs();
-			$searchTerm = $cuePointSearchItem->getSearchTerm();
-			if (!empty($searchTerm))
-			{
-				if ($cuePointSearchItem->getItemType() == ESearchItemType::PARTIAL)
-				{
-					$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['query'] = strtolower($cuePointSearchItem->getSearchTerm());
-					$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]]['multi_match']['fields'] = array($cuePointSearchItem->getFieldName() . "^2", $cuePointSearchItem->getFieldName() . "raw^2", $cuePointSearchItem->getFieldName() . "trigrams");
-					$queryOut[$queryVerbs[0]]['multi_match']['type'] = 'most_fields';
-				} else
-				{
-					$fieldNameAddition = '';
-					if ($cuePointSearchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$cuePointSearchItem->getFieldName()]))
-					{
-						$fieldNameAddition = '.raw';
-					}
-					$cuePointQuery['nested']['query']['bool'][$queryVerbs[0]][$queryVerbs[1]] = array($cuePointSearchItem->getFieldName() . $fieldNameAddition => strtolower($cuePointSearchItem->getSearchTerm()));
-				}
-			}
+			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes);
 			if (in_array('Range', $allowedSearchTypes[$cuePointSearchItem->getFieldName()]))
 			{
 				foreach ($cuePointSearchItem->getRanges() as $range)
@@ -115,6 +101,28 @@ class ESearchCuePointItem extends ESearchItem
 			}
 		}
 		return $cuePointQuery;
+	}
+
+	private static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointQuery, $allowedSearchTypes)
+	{
+		switch ($cuePointSearchItem->getItemType())
+		{
+			case ESearchItemType::EXACT_MATCH:
+				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
+					kESearchQueryManager::getExactMatchQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::PARTIAL:
+				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
+					kESearchQueryManager::getMultiMatchQuery($cuePointSearchItem->getSearchTerm(), $cuePointSearchItem->getFieldName(), false);
+				break;
+			case ESearchItemType::STARTS_WITH:
+				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
+					kESearchQueryManager::getPrefixQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::DOESNT_CONTAIN:
+				$cuePointQuery['nested']['query']['bool']['must_not'][] =
+					kESearchQueryManager::getDoesntContainQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+		}
 	}
 
 

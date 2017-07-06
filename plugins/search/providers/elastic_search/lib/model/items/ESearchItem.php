@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.items
+ */
 abstract class ESearchItem extends BaseObject
 {
 
@@ -77,5 +80,7 @@ abstract class ESearchItem extends BaseObject
 		return array();
 	}
 
-	abstract public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $additionalParams = null);
+	abstract public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null);
+
+	//abstract public static function getQuery($searchItems, $boolOperator, $eSearchOperatorType = null);
 }
