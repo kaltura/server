@@ -41,7 +41,7 @@ class CuePointService extends KalturaBaseService
 
 		$ks = $this->getKs();
 		// when session is not admin, allow access to user entries only
-		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST))) {
+		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))) {
 			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
 			CuePointPeer::setUserContentOnly(true);
 		}
