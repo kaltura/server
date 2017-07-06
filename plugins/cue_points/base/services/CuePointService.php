@@ -39,13 +39,14 @@ class CuePointService extends KalturaBaseService
 			$this->applyPartnerFilterForClass('CuePoint');
 		}
 
+		$ks = $this->getKs();
 		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin()) {
+		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))) {
 			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
 			CuePointPeer::setUserContentOnly(true);
 		}
 		
-		if (!$this->getKs() || $this->getKs()->isAnonymousSession())
+		if (!$ks || $ks->isAnonymousSession())
 		{
 			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}

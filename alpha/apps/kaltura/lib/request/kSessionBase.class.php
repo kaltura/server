@@ -25,7 +25,7 @@ class kSessionBase
 
 	const PRIVILEGE_EDIT = "edit";
 	const PRIVILEGE_VIEW = "sview";
-	const PRIVILEGE_LIST = "list"; // used to bypass the user filter in entry list
+	const PRIVILEGE_LIST = "list"; // used to bypass the user filter in entry and cue point list
 	const PRIVILEGE_DOWNLOAD = "download";
 	const PRIVILEGE_DOWNLOAD_ASSET = 'downloadasset';
 	const PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST = "editplaylist";
