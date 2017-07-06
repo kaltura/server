@@ -1,3 +1,21 @@
+# Lynx 12.20.0 #
+
+## Add Media-Entry ready email template ##
+
+- Issue Type: Support
+- Issue ID: SUP-8655
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_06_20_AddMediaEntryReadyTemplate.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
+
+#### Known Issues & Limitations ####
+None.
+
 # Lynx 12.19.0 #
 
 
@@ -14,20 +32,6 @@
 
         None.
 
-## Add Media-Entry ready email template ##
-
-- Issue Type: Support
-- Issue ID: SUP-8655
-
-### Configuration ###
-script will ask for your: IP, userId and password (of your admin-console account), partner (insert -2 for partner)
-
-### Deployment scripts ###
-
-	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
-
-#### Known Issues & Limitations ####
-None.
 
 ## WaterMarking - functionality extension ##
 
