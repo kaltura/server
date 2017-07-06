@@ -46,7 +46,6 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 	public $deleteFromRecycleBin;
 	
 	/**
-	 * @dynamicType KalturaWebexServiceType
 	 * @var string
 	 */
 	public $webexServiceType;
