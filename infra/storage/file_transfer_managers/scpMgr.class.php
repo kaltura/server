@@ -136,7 +136,7 @@ class scpMgr extends kFileTransferMgr
 		{
 			$fileObject = new FileObject();
 			$fileObject->filename =  $file;
-			$res[$fileObject->filename] = $fileObject;
+			$res[] = $fileObject;
 		}
 		
 		return $res;
