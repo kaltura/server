@@ -859,12 +859,13 @@ class ThumbAssetService extends KalturaAssetService
 	 * @action addFromImage
 	 * @param string $entryId
 	 * @param file $fileData
+	 * @param KalturaThumbAsset $thumbAsset
 	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @validateUser entry entryId edit
 	 */
-	public function addFromImageAction($entryId, $fileData)
+	public function addFromImageAction($entryId, $fileData, KalturaThumbAsset $thumbAsset = null)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
@@ -873,15 +874,19 @@ class ThumbAssetService extends KalturaAssetService
 		
 		
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
-		
-		$dbThumbAsset = new thumbAsset();
+		if ($thumbAsset)
+			$dbThumbAsset = $thumbAsset->toInsertableObject();
+		else
+		{
+			$dbThumbAsset = new thumbAsset();
+			$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
+			$dbThumbAsset->setFileExt($ext);
+			$dbThumbAsset->incrementVersion();
+		}
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbThumbAsset->setEntryId($dbEntry->getId());
-		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
-		$dbThumbAsset->setFileExt($ext);
-		$dbThumbAsset->incrementVersion();
 		$dbThumbAsset->save();
-		
+
 		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
 		
