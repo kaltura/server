@@ -78,5 +78,5 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 	function iptocountryAndCode($ip) 
 	{
 		return null;
-}
+	}
 }
