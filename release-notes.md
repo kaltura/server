@@ -26,7 +26,7 @@ None.
 	None
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_04_add_capture_device_permission_for_cuepoint_add_and_thumbasset_addfromimage.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_09_allow_capture_space_to_add_cue_points_and_thumbs.php
 
 #### Known Issues & Limitations ####
 
