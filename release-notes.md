@@ -18,6 +18,9 @@ None.
 
 ## Add capture space to addFromImage and cuePoint add ##
 
+- Issue Type: Feature
+- Issue ID: PLAT-7682
+
 ### configuration ###
 
 	None
@@ -48,7 +51,8 @@ None.
 
 ## WaterMarking - functionality extension ##
 
-- Issue Type: Feature
+- 
+: Feature
 - Issue ID: PS-3118
 
 Added abilities -
