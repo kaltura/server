@@ -16,6 +16,19 @@ First replcae all tokens from the XML files below and remove ".template" from th
 #### Known Issues & Limitations ####
 None.
 
+## Add capture space to addFromImage and cuePoint add ##
+
+### configuration ###
+
+	None
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_04_add_capture_device_permission_for_cuepoint_add_and_thumbasset_addfromimage.php
+
+#### Known Issues & Limitations ####
+
+        None.
+
 # Lynx 12.19.0 #
 
 
