@@ -1,7 +1,11 @@
 <?php
 // convert Digital Element anonymous db csv file into a binary file with constant record length
-// from ip, to ip, 20 chars proxyType, 20 chars proxyDescription
-const MAX_LEN = 20;
+// the bin file header consists of two comma separated lines for proxy types, and proxy descriptions
+// followed by ip ranges: // from ip, to ip, proxy type lookup, proxy description lookup
+
+$types = array();
+$descs = array();
+$ips = array();
 
 $f = fopen($argv[1], "r");
 while(!feof($f))
@@ -16,8 +20,27 @@ while(!feof($f))
         if (strpos($startIp, "#") === 0)
                 continue;
 
-        $proxyType = substr($proxyType, 0, MAX_LEN);
-        $proxyDescripion = substr($proxyDescription, 0, MAX_LEN);
-        $bin = pack("LLA".MAX_LEN."A".MAX_LEN, ip2long($startIp), ip2long($endIp), $proxyType, $proxyDescripion);
-        echo $bin;
+        if (!isset($types[$proxyType]))
+        {
+                $types[$proxyType] = count($types);
+        }
+
+        $typeNum = $types[$proxyType];
+
+        if (!isset($descs[$proxyDescription]))
+        {
+                $descs[$proxyDescription] = count($descs);
+        }
+
+        $descNum = $descs[$proxyDescription];
+        $record = pack("LLCC", ip2long($startIp), ip2long($endIp), $typeNum, $descNum);
+        $ips[ip2long($startIp)] = $record;
+}
+
+echo implode(",", array_keys($types))."\n";
+echo implode(",", array_keys($descs))."\n";
+ksort($ips);
+foreach($ips as $k => $v)
+{
+        echo $v;
 }

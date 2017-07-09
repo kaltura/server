@@ -4,10 +4,13 @@ require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
 
 class kDigitalElementIPGeocoder extends kGeoCoder
 {
-	const RECORD_LEN = 48;
+	const RECORD_LEN = 10;
 	
 	static $readerAnonymous = null;
+	static $dataOffset;
 	static $lastRecord;
+	static $typeLookup;
+	static $descLookup;
 	
 	/* (non-PHPdoc)
 	 * @see kGeoCoder::getCountry()
@@ -34,7 +37,16 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 			{
 				$dbFilePath = __DIR__ . '/../../../../../data/DigitalElement/Anonymous/kanonymous.bin';
 				self::$readerAnonymous = fopen($dbFilePath, "rb");
-				self::$lastRecord = filesize($dbFilePath) / self::RECORD_LEN - 1;
+				
+				// read proxy type and description lookup
+				$types = trim(fgets(self::$readerAnonymous));
+				self::$typeLookup = explode(",", $types);
+				
+				$descriptions = trim(fgets(self::$readerAnonymous));
+				self::$descLookup = explode(",", $descriptions);
+				
+				self::$dataOffset = ftell(self::$readerAnonymous);
+				self::$lastRecord = (filesize($dbFilePath) - self::$dataOffset) / self::RECORD_LEN - 1;
 			}
 
 			$ipAddr = ip2long($ip);
@@ -43,7 +55,7 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 			while($high >= $low)
 			{
 				$mid = (int)floor(($high + $low) / 2);
-				fseek(self::$readerAnonymous, $mid * self::RECORD_LEN);
+				fseek(self::$readerAnonymous, self::$dataOffset + $mid * self::RECORD_LEN);
 				$record = fread(self::$readerAnonymous, self::RECORD_LEN);
 				$arr = unpack("LstartIp/LendIp", $record);
 				$startIp = $arr["startIp"];
@@ -58,8 +70,9 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 						$low = $mid + 1;
 				}
 				else {
-						$arr = unpack("A20proxyType/A20proxyDescription", substr($record, 8));
-						return array($arr["proxyType"], $arr["proxyDescription"]);
+						$arr = unpack("CproxyType/CproxyDescription", substr($record, 8));
+						$res = array(self::$typeLookup[$arr["proxyType"]], self::$descLookup[$arr["proxyDescription"]]);
+						return $res;
 				}
 			}
 		}
@@ -67,7 +80,7 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 		{
 		}
 		
-        return array("undefined");
+		return array("undefined");
 	}
 
 	function iptocountry($ip) 
@@ -80,3 +93,4 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 		return null;
 	}
 }
+
