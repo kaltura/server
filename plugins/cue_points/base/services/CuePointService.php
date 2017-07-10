@@ -144,7 +144,8 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-			
+		$this->resetUserContantFilter($filter);
+
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
@@ -207,7 +208,8 @@ class CuePointService extends KalturaBaseService
 
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-			
+
+		$this->resetUserContantFilter($filter);
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
 	}
 	
@@ -222,6 +224,7 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
+		$this->resetUserContantFilter($filter);
 						
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
@@ -373,5 +376,13 @@ class CuePointService extends KalturaBaseService
 		$newdbCuePoint->save();
 		$cuePoint = KalturaCuePoint::getInstance($newdbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
+	}
+
+	private function resetUserContantFilter($filter)
+	{
+		if ($filter->entryIdEqual && $this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, $filter->entryIdEqual))
+			return CuePointPeer::setUserContentOnly(false);
+		else if ($filter->entryIdIn && $this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, $filter->entryIdIn))
+			return CuePointPeer::setUserContentOnly(false);
 	}
 }
