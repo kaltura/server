@@ -254,6 +254,10 @@ class serveFlavorAction extends kalturaAction
 					}
 				}
 
+				if ($flavor->getEntryId() == $origEntry->getId())
+				{
+					$origEntryFlavor = $flavor;
+				}
 				// get the file path of the flavor
 				$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey , false, false);
@@ -271,7 +275,7 @@ class serveFlavorAction extends kalturaAction
 
 				$clips[] = array('type' => 'source', 'path' => $path);
 			}
-			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($referenceFlavor->getId(), $referenceFlavor->getEntryId()));
+			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 		}
 
 		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences, $origEntry);
