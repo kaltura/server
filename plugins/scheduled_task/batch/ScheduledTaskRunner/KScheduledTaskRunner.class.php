@@ -133,7 +133,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
 		{
 			$mediaRepurposingName = $this->getMediaRepurposingProfileName($profile);
-			$this->sendMailNotification($profile->objectTasks[0], $objectsIds, $mediaRepurposingName);
+			KObjectTaskMailNotificationEngine::sendMailNotification($profile->objectTasks[0], $objectsIds, $mediaRepurposingName, $profile->partnerId);
 		}
 
 
@@ -235,7 +235,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		if (self::isMediaRepurposingProfile($profile))
 		{
 			$address = $this->getPartnerMail($profile->partnerId);
-			$this->sendMail(array($address), "Media Repurposing Suspended", "MR profile with id [$profile->name] has been suspended");
+			KObjectTaskMailNotificationEngine::sendMail(array($address), "Media Repurposing Suspended", "MR profile with id [$profile->name] has been suspended");
 		}
 	}
 
@@ -363,70 +363,8 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $profile->objectFilter->advancedSearch->items[0];
 	}
 
-	private function getAdminObjectsBody($objectsIds, $sendToUsers)
-	{
-		$body = "\nExecute for entries: (users aggregate)\n";
-		$cnt = 0;
-		foreach($objectsIds as $userId => $entriesIds) {
-			$body .= "[$userId]" . PHP_EOL;
-			foreach($entriesIds as $id) {
-				$body .= "\t$id" . PHP_EOL;
-				$cnt++;
-			}
-		}
-		$body .= "Total count of affected object: $cnt";
-		
-		if ($sendToUsers) {
-			$body .= PHP_EOL . "Send Notification for the following users: ";
-			foreach($objectsIds as $userId => $entriesIds)
-				$body .= "$userId" . PHP_EOL;
-		}
-		return $body;
-	}
+	
 
-	private function getUserObjectsBody($objectsIds)
-	{
-		$body = PHP_EOL ."Execute for entries:" . PHP_EOL;
-		foreach($objectsIds as $id)
-			$body .= "$id" . PHP_EOL;
-
-		$body .= "Total count of affected object: " . count($objectsIds);
-		return $body;
-	}
-
-	private function sendMailNotification($mailTask, $objectsIds, $mediaRepurposingName)
-	{
-		$subject = "Media Repurposing Notification";
-		$bodyPrefix = "Notification from Media Repurposing [$mediaRepurposingName]: \n$mailTask->message " . PHP_EOL;
-		$body = $bodyPrefix . $this->getAdminObjectsBody($objectsIds, $mailTask->sendToUsers);
-
-		$toArr = explode(",", $mailTask->mailAddress);
-		$success = $this->sendMail($toArr, $subject, $body);
-		if (!$success)
-			KalturaLog::info("Mail for MRP [$mediaRepurposingName] did not send successfully");
-
-		if ($mailTask->sendToUsers)
-			foreach ($objectsIds as $user => $objects) {
-				$body = $bodyPrefix . $this->getUserObjectsBody($objects);
-				$success = $this->sendMail(array($user), $subject, $body);
-				if (!$success)
-					KalturaLog::info("Mail for MRP [$mediaRepurposingName] did not send successfully");
-			}
-	}
-
-	private function sendMail($toArray, $subject, $body)
-	{
-		$mailer = new PHPMailer();
-		$mailer->CharSet = 'utf-8';
-		if (!$toArray || count($toArray) < 1 || strlen($toArray[0]) == 0)
-			return true;
-		foreach ($toArray as $to)
-			$mailer->AddAddress($to);
-		$mailer->Subject = $subject;
-		$mailer->Body = $body;
-		KalturaLog::info("sending mail to " . implode(",",$toArray) . " with body: $body");
-		return $mailer->Send();
-	}
 
 	private function getPartnerMail($partnerId)
 	{

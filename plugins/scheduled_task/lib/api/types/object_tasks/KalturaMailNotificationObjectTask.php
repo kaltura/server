@@ -18,7 +18,24 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 	 * @var string area
 	 */
 	public $message;
-
+	/**
+	 * The sender in the mail
+	 *
+	 * @var string
+	 */
+	public $sender;
+	/**
+	 * The basic link for the KMC site
+	 *
+	 * @var string
+	 */
+	public $link;
+	/**
+	 * The subject of the entry
+	 *
+	 * @var string
+	 */
+	public $subject;
 	/**
 	 * Send the mail to each user
 	 *
@@ -38,6 +55,9 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 		$dbObject->setDataValue('mailAddress', $this->mailAddress);
 		$dbObject->setDataValue('message', $this->message);
 		$dbObject->setDataValue('sendToUsers', $this->sendToUsers);
+		$dbObject->setDataValue('sender', $this->sender);
+		$dbObject->setDataValue('subject', $this->subject);
+		$dbObject->setDataValue('link', $this->link);
 		return $dbObject;
 	}
 	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
@@ -47,6 +67,9 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 		$this->mailAddress = $srcObj->getDataValue('mailAddress');
 		$this->message = $srcObj->getDataValue('message');
 		$this->sendToUsers = $srcObj->getDataValue('sendToUsers');
+		$this->sender = $srcObj->getDataValue('sender');
+		$this->subject = $srcObj->getDataValue('subject');
+		$this->link = $srcObj->getDataValue('link');
 	}
 
 }
