@@ -8,12 +8,8 @@ class myPlaylistUtils
 	const TOTAL_RESULTS = 200;
 	
 	const MAX_STITCHED_PLAYLIST_ENTRY_COUNT = 100;
-	
+
 	const CONTEXT_DELIMITER = "context";
-	
-	const CAPTION_FILES_LABEL = "label";
-	const CAPTION_FILES_PATH = "path";
-	const CAPTION_FILES_ID = "captionId";
 	
 	private static $user_cache = null;
 	
@@ -33,8 +29,8 @@ class myPlaylistUtils
 	 * static 	media_type = ENTRY_MEDIA_TYPE_TEXT = 3
 	 * external media_type = ENTRY_MEDIA_TYPE_GENERIC_1= 101;	// these types can be used for derived classes - assume this is some kind of TXT file
 	 *
-	 *
-	 */
+	 * 
+	 */	
 	public static function validatePlaylist ( $playlist )
 	{
 		if ( ! $playlist )	 throw new Exception ( "No playlist to validate" );
@@ -45,13 +41,13 @@ class myPlaylistUtils
 			$static_playlist = explode ( "," , $static_playlist_str );
 			$fixed_playlist = array();
 //			$entry_id = "";
-			foreach ( $static_playlist as &$entry_id )
+			foreach ( $static_playlist as &$entry_id ) 
 			{
 				// TODO - hack for removing 'null' from the entry id due to a bug on the client's side
 				$trimmed = preg_replace ( "/null/" , "" , trim ( $entry_id ) );
 				if ( $trimmed ) { $fixed_playlist[] = $trimmed; }
 			}
-			
+		
 			$fixed_playlist_str = implode ( "," , $fixed_playlist );
 			$playlist->setDataContent( $fixed_playlist_str , false ); // don't increment the version after fixing the data
 		}
@@ -101,20 +97,20 @@ class myPlaylistUtils
 	
 	/**
 	 * a playlist is an entry (type=ENTRY_TYPE_PLAYLIST and media_type=ENTRY_MEDIA_TYPE_XML).
-	 * The XML file will hold a filter list
+	 * The XML file will hold a filter list 
 	 * 	total number of results
 	 *  n x entryFilter (allowing only spesific clips) - limited to a given number of results
 	 * when executing the playlist, each entryFilter will be used to retrieve the number of entries (limited to a system defined max-limit)
 	 * if after the entryFilter retrieved a list, still not enough entries (less than list's total number of results) - go to next list
-	 *
+	 * 
 	 */
 	public static function executePlaylistById ( $partner_id , $playlist_id ,  $filter = null , $detailed = true)
 	{
 		$playlist = entryPeer::retrieveByPK( $playlist_id );
-		
+
 		if ( ! $playlist )
 		{
-			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_ID);
+			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_ID); 
 		}
 		
 		if ( $playlist->getType() != entryType::PLAYLIST )
@@ -123,7 +119,7 @@ class myPlaylistUtils
 		}
 		
 		// the default of detrailed should be true - most of the time the kuse is needed 
-		if ( is_null ( $detailed ) ) $detailed = true ;
+		if ( is_null ( $detailed ) ) $detailed = true ; 
 		
 		return self::executePlaylist ( $partner_id , $playlist ,  $filter , $detailed);
 	}
@@ -134,16 +130,16 @@ class myPlaylistUtils
 		{
 			throw new kCoreException("Invalid entry id", APIErrors::INVALID_ENTRY_ID);
 		}
-		
+		 
 		// the default of detrailed should be true - most of the time the kuse is needed 
-		if ( is_null ( $detailed ) ) $detailed = true ;
-		
+		if ( is_null ( $detailed ) ) $detailed = true ; 
+
 		$entryObjectsArray = null;
 		
 		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
 		{
 			// dynamix playlist
-			// the content is a valid xml that holds the list
+		 	// the content is a valid xml that holds the list
 			$filter_list_content = $playlist->getDataContent();
 			if ( ! $filter_list_content )
 			{
@@ -163,21 +159,21 @@ class myPlaylistUtils
 			// search the roughcut_entry for the playlist as a roughcut / group
 			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $filter , $detailed, $pager );
 		}
-		
+
 		// Perform entries redirection
 		if ( ! empty(self::$playlistContext)
-			&& (self::$playlistContext instanceof kEntryContext)
-			&& self::$playlistContext->getFollowEntryRedirect() )
+				&& (self::$playlistContext instanceof kEntryContext)
+				&& self::$playlistContext->getFollowEntryRedirect() )
 		{
 			$entryObjectsArray = self::replaceRedirectedEntries( $entryObjectsArray );
 		}
-		
+
 		// Clear the context for next time
 		self::$playlistContext = null;
 		
 		return $entryObjectsArray;
 	}
-	
+
 	/**
 	 * For every entry id that requires redirection, fetch the
 	 * redirected entry from db and replace with the original one.
@@ -189,7 +185,7 @@ class myPlaylistUtils
 	{
 		// A map between redirected entry id and an array of positions in $entryObjectsArray 
 		$redirectedEntryIdToPosArrayMap = array();
-		
+	
 		// Gather all entries with a valid redirect id
 		foreach ( $entryObjectsArray as $pos => $entry )
 		{
@@ -204,12 +200,12 @@ class myPlaylistUtils
 					// Create an empty positions array and map to the entity 
 					$redirectedEntryIdToPosArrayMap[ $redirectEntryId ] = array();
 				}
-				
+
 				// Push the position into the array of postions for the given redirected entry id.
 				$redirectedEntryIdToPosArrayMap[ $redirectEntryId ][] = $pos;
 			}
 		}
-		
+	
 		// Are there any entries that need to be redirected?
 		if ( ! empty( $redirectedEntryIdToPosArrayMap ) )
 		{
@@ -221,7 +217,7 @@ class myPlaylistUtils
 			{
 				// Get the [new] redirected entry's id
 				$redirectedEntryId = $redirectedEntry->getId();
-				
+	
 				// Get its associated postions array
 				$posArr = $redirectedEntryIdToPosArrayMap[ $redirectedEntryId ];
 				foreach ( $posArr as $pos )
@@ -231,14 +227,14 @@ class myPlaylistUtils
 				}
 			}
 		}
-		
+	
 		return $entryObjectsArray;
 	}
 	
 	public static function getPlaylistFiltersById($playlist_id)
 	{
 		$playlist = entryPeer::retrieveByPK( $playlist_id );
-		
+
 		if ( ! $playlist )
 		{
 			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_ID);
@@ -290,7 +286,7 @@ class myPlaylistUtils
 		
 		$entry_id_list = explode ( "," , $entry_id_list_str );
 		// clear white spaces - TODO - assume this is done at insert time
-		foreach ( $entry_id_list as &$entry_id )
+		foreach ( $entry_id_list as &$entry_id ) 
 			$entry_id=trim($entry_id);
 		
 		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
@@ -322,7 +318,7 @@ class myPlaylistUtils
 				$limit = $entry_filter->getLimit();
 			}
 			$entry_filter->setLimit(null);
-			
+
 			// read the _eq_display_in_search field but ignore it because it's part of a more complex criterion - see bellow
 			$display_in_search = $entry_filter->get( "_eq_display_in_search");
 			if ( $display_in_search >= 2 )
@@ -335,37 +331,37 @@ class myPlaylistUtils
 			// add some hard-coded criteria
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX, entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
-			
+
 			if ( $display_in_search >= 2 )
 			{
 				// We don't allow searching in the KalturaNEtwork anymore (mainly for performance reasons)
 				// allow only assets for the partner  
 				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); // 
-				/*				
-								$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
-								$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
-								$c->addAnd ( $crit );
-				*/
+/*				
+				$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
+				$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
+				$c->addAnd ( $crit );
+*/
 			}
 		}
-		
+
 		if ( $detailed )
 			$unsorted_entry_list = entryPeer::doSelectJoinkuser( $c ); // maybe join with kuser to add some data about the contributor
 		else
 			$unsorted_entry_list = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
-		
+	
 		// now sort the list according to $entry_id_list
 		
 		$entry_list = array();
 		// build a map where the key is the id of the entry
 		$id_list = self::buildIdMap( $unsorted_entry_list );
-		
+
 		if ( $pager )
 		{
 			$pageSize = $pager->calcPageSize();
 			$startOffset = $pager->calcOffset();
 		}
-		
+
 		// VERY STRANGE !! &$entry_id must be with a & or else the values of the array change !!!
 		foreach ( $entry_id_list as &$entry_id )
 		{
@@ -378,7 +374,7 @@ class myPlaylistUtils
 					{
 						break;
 					}
-					
+
 					if ( $pager )
 					{
 						if ( $startOffset > 0 )
@@ -398,14 +394,14 @@ class myPlaylistUtils
 							}
 						}
 					}
-					
+
 					// add to the entry_list only when the entry_id is not empty 
 					$entry_list[] = $current_entry;
-				}
+				} 
 			}
 		}
 		if ( count( $entry_list ) == 0 ) return null;
-		
+
 		return $entry_list;
 	}
 	private static function buildIdMap ( $list )
@@ -418,43 +414,43 @@ class myPlaylistUtils
 		}
 		return $ids;
 	}
-
-// TODO - create a schema for the xml 
 	
-	/**
-	 * <playlist>
+// TODO - create a schema for the xml 
+		
+/**
+ * <playlist>
 	<total_results>6</total_results>
 	<filters>
-	<filter>
-	<limit>3</limit>
-	<mlikeor_tags>dog football</mlikeor_tags>
-	<gte_created_at></gte_created_at>
-	<lte_created_at></lte_created_at>
-	<in_media_type>1,5</in_media_type>
-	<order_by>-created_at</order_by>
-	</filter>
-	<filter>
-	<limit>7</limit>
-	<like_tags>cat</like_tags>
-	<gte_created_at></gte_created_at>
-	<lte_created_at></lte_created_at>
-	<in_media_type>1,5</in_media_type>
-	</filter>
+		<filter>
+			<limit>3</limit>
+			<mlikeor_tags>dog football</mlikeor_tags>
+			<gte_created_at></gte_created_at>
+			<lte_created_at></lte_created_at>
+			<in_media_type>1,5</in_media_type>
+			<order_by>-created_at</order_by>
+		</filter>
+		<filter>
+			<limit>7</limit>
+			<like_tags>cat</like_tags>
+			<gte_created_at></gte_created_at>
+			<lte_created_at></lte_created_at>
+			<in_media_type>1,5</in_media_type>
+		</filter>
 	</filters>
-	</playlist>
-	 
-	 */
+</playlist>
+ 
+ */	
 	public static function getDynamicPlaylistFilters($xml)
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
-		if ( ! $list_of_filters )
+		if ( ! $list_of_filters ) 
 			return array();
-		
+	
 		$entry_filters = array();
 		foreach ( $list_of_filters as $entry_filter_xml )
 		{
 			$entry_filter = new entryFilter();
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" );
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
 			
 			$entry_filters[] = $entry_filter;
 		}
@@ -464,30 +460,30 @@ class myPlaylistUtils
 	public static function executeDynamicPlaylist ( $partner_id , $xml , $filter = null ,$detailed = true, $pager = null )
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
-		
+	
 		$entry_filters = array();
-		
+
 		if ( ! $list_of_filters ) return null;
 		// TODO - for now we assume that there are more or equal filters in the XML than the ones from the request
-		
+
 		$filterLimit = null;
 		if ( $filter && $filter->getLimit() > 0 )
 		{
 			$filterLimit = $filter->getLimit();
-			
+
 			// Get the max results from the limit of the first filter
 			$total_results = min( $total_results, $filterLimit );
-			
+
 			// Clear this limit so it won't overcloud the limits of $entry_filter_xml rules
 			$filter->setLimit( null );
 		}
-		
+
 		$numFiltersInList = count($list_of_filters);
 		for ( $i = 0; $i < $numFiltersInList; $i++ )
 		{
 			$entry_filter_xml = $list_of_filters[$i];
-			
-			/* @var $entry_filter_xml SimpleXMLElement */
+
+		    /* @var $entry_filter_xml SimpleXMLElement */
 			// 	in general this service can fetch entries from kaltura networks.
 			// for each filter we should decide if thie assumption is true...
 			$allow_partner_only = true;
@@ -498,7 +494,7 @@ class myPlaylistUtils
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
 			$entry_filter = new entryFilter();
 			// add the desired prefix "_" because the XML is not expected to have it while the entryFilter class expects it
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" );
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
 			// make sure there is alway a limit for each filter - if not an explicit one - the system limit should be used
 			if( $entry_filter->getLimit() == null || $entry_filter->getLimit() < 1 )
 			{
@@ -507,7 +503,7 @@ class myPlaylistUtils
 			
 			// merge the current_filter with the correcponding extra_filter
 			// allow the extra_filter to override properties of the current filter
-			
+
 			if ( $filter )
 			{
 				if ( $filterLimit && $i == ($numFiltersInList - 1) )
@@ -518,11 +514,11 @@ class myPlaylistUtils
 					// This handles requests of a $limit which is higher than the total sum of inner XML filter limits.
 					$filter->setLimit( $filterLimit );
 				}
-				
-				$entry_filter->fillObjectFromObject( $filter ,
-					myBaseObject::CLONE_FIELD_POLICY_THIS ,
+
+				$entry_filter->fillObjectFromObject( $filter , 
+					myBaseObject::CLONE_FIELD_POLICY_THIS , 
 					myBaseObject::CLONE_POLICY_PREFER_NEW , null , null , false );
-				
+					
 				$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
 			}
 			
@@ -540,15 +536,15 @@ class myPlaylistUtils
 			if($startOffset + $pageSize > $total_results)
 				$total_results = $startOffset + $pageSize;
 		}
-		
+
 		$entry_ids_list = array();
 		foreach ( $entry_filters as $entry_filter )
 		{
 			$current_limit = max ( 0 , $total_results - count($entry_ids_list) );
-			
+
 			// no need to fetch any more results
 			if ( $current_limit <= 0 ) break;
-			
+
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			// don't fetch the same entries twice - filter out all the entries that were already fetched
 			if( $entry_ids_list ) $c->add ( entryPeer::ID , $entry_ids_list , Criteria::NOT_IN );
@@ -560,7 +556,7 @@ class myPlaylistUtils
 				// set a smaller limit incase the filter's limit is to high
 				$entry_filter->setLimit ( $current_limit );
 			}
-			
+
 			// read the _eq_display_in_search field but ignore it because it's part of a more complex criterion
 			$display_in_search = $entry_filter->get( "_eq_display_in_search");
 			if ( $display_in_search >= 2 )
@@ -569,22 +565,22 @@ class myPlaylistUtils
 			}
 			
 			$entry_filter->attachToCriteria( $c );
-			
+
 			// add some hard-coded criteria
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
-			
+
 			if ( $display_in_search >= 2 )
 			{
 				// We don't allow searching in the KalturaNEtwork anymore (mainly for performance reasons)
 				// allow only assets for the partner  
 				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); // 
-				/*				
-								$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
-								$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
-								$c->addAnd ( $crit );
-				*/
+/*				
+				$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
+				$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
+				$c->addAnd ( $crit );
+*/
 			}
 			
 			if (!self::$isAdminKs)
@@ -608,15 +604,15 @@ class myPlaylistUtils
 		{
 			$entry_ids_list = array_slice($entry_ids_list, $startOffset, $pageSize);
 		}
-		
+
 		// Disable entitlement, which was already applied in entryPeer::prepareEntitlementCriteriaAndFilters()
 		// otherwise we will hit the 150 entries limit from SphinxCriterion
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-		
+
 		$db_entry_list = entryPeer::retrieveByPKs( $entry_ids_list );
-		
+
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-		
+
 		// Map the entries to their IDs
 		$entry_map = array();
 		foreach ( $db_entry_list as $entry )
@@ -631,8 +627,8 @@ class myPlaylistUtils
 			if(isset($entry_map[$entryId]))
 				$entry_list[] = $entry_map[$entryId];
 		}
-		
-		return $entry_list;
+
+		return $entry_list;		 
 	}
 	
 	// will assume that user_id is actually the puser_id and should be replaced by kuser_id to be able to search by in the entry table
@@ -651,7 +647,7 @@ class myPlaylistUtils
 				}
 				self::setPuserKuserFromCache( $target_puser_id , $puser_kuser );
 			}
-		}
+		}		
 	}
 	
 	private static function getPuserKuserFromCache ( $puser_id )
@@ -659,13 +655,13 @@ class myPlaylistUtils
 		if ( self::$user_cache == null ) return null;
 		{
 			return  @self::$user_cache[$puser_id] ;
-		}
+		} 
 	}
-	
+
 	private static  function setPuserKuserFromCache ( $puser_id , $puser_kuser )
 	{
 		if ( self::$user_cache == null ) self::$user_cache = array();
-		self::$user_cache[$puser_id] = $puser_kuser;
+		self::$user_cache[$puser_id] = $puser_kuser; 
 	}
 	
 	public static function getPlaylistFilterListStruct ( $xml )
@@ -677,15 +673,15 @@ class myPlaylistUtils
 			$total_results_node = $simple_xml->xpath ( "total_results" );
 			$total_result = self::TOTAL_RESULTS;
 			if ( $total_results_node  )
-			{
+			{ 
 				if ( is_array ( $total_results_node ) )
 				{
 					if( count ( $total_results_node ) > 1 ) throw new Exception ( "Must not have more than 1 element of 'total_results'");
 //print_r ( $total_results_node)	;				
-					$total_result = $total_results_node[0];
+					$total_result = $total_results_node[0]; 				
 				}
-			}
-			
+			}	
+
 			// TODO - stick to the first option and change all the <filter> objects to be children of <filters>  
 			$list_of_filters = $total_results_node = $simple_xml->xpath ( "filters/filter" );
 			if ( ! $list_of_filters )
@@ -696,7 +692,7 @@ class myPlaylistUtils
 		catch ( Exception $ex )
 		{
 			
-		}
+		}		
 	}
 	
 	public static function getEmbedCode ( entry $playlist , $wid , $ui_conf_id , $uid = null , $autoplay = null )
@@ -717,31 +713,31 @@ class myPlaylistUtils
 		$widget = widgetPeer::retrieveByPK( $wid );
 		
 		// use the ui_conf from the widget only if it was not explicitly set 
-		if ( $ui_conf_id == null )	$ui_conf_id = $widget->getUiConfId();
+		if ( $ui_conf_id == null )	$ui_conf_id = $widget->getUiConfId(); 
 		$ui_conf = uiConfPeer::retrieveByPK( $ui_conf_id );
 		
-		if ( ! $ui_conf )
+		if ( ! $ui_conf ) 
 		{
 			throw new kCoreException("Invalid uiconf id [$ui_conf_id] for widget [$wid]", APIErrors::INVALID_UI_CONF_ID);
 		}
-
+		
 //		$autoplay_str = $autoplay ? "autoPlay=true" : "autoPlay=false" ; 
 		$autoplay_str = "";
-		$embed = <<< HTML
+$embed = <<< HTML
 <object height="{$ui_conf->getHeight()}" width="{$ui_conf->getWidth()}" type="application/x-shockwave-flash" data="{$host}/kwidget/wid/{$wid}/ui_conf_id/{$ui_conf_id}" id="kaltura_playlist" style="visibility: visible;">		
 <param name="allowscriptaccess" value="always"/><param name="allownetworking" value="all"/><param name="bgcolor" value="#000000"/><param name="wmode" value="opaque"/><param name="allowfullscreen" value="true"/>
 <param name="movie" value="{$host}/kwidget/wid/{$wid}/ui_conf_id/{$ui_conf_id}"/>
 <param name="flashvars" value="layoutId=playlistLight&uid={$uid}&partner_id={$partner_id}&subp_id={$subp_id}&$playlist_flashvars"/></object>
 HTML;
-		return array ( $embed , $ui_conf->getWidth() ,  $ui_conf->getHeight() );
+		return array ( $embed , $ui_conf->getWidth() ,  $ui_conf->getHeight() ); 		
 	}
 	
 	public static function toPlaylistUrl ( entry $playlist , $host  , $uid = null )
 	{
 		$partner_id = $playlist->getPartnerId();
-		$subp_id  = $playlist->getSubpId();
+		$subp_id  = $playlist->getSubpId();			
 		
-		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
+		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 ) 
 		{
 			$playlist_url = urlencode ( $playlist->getDataContent() ); // when of type GENERIC === MRSS -> the data content is the url to point to 
 		}
@@ -749,10 +745,10 @@ HTML;
 		{
 			$playlist_url = urlencode ( $host . "/index.php/partnerservices2/executeplaylist?" .
 				"uid={$uid}&partner_id={$partner_id}&subp_id={$subp_id}&format=8&" .   // make sure the format is 8 - mRss
-				"ks={ks}&" .
-				self::toQueryString( $playlist , false ) );
+				"ks={ks}&" .   
+				self::toQueryString( $playlist , false ) ); 
 		}
-
+		
 //		$str = "k_pl_autoContinue=true&k_pl_autoInsertMedia=true&k_pl_0_name=" . $playlist->getName() . "&k_pl_0_url=" . $playlist_url;
 		$str = "k_pl_0_name=" . $playlist->getName() . "&k_pl_0_url=" . $playlist_url;
 		return $str;
@@ -763,16 +759,16 @@ HTML;
 		if ( ! $playlist ) return "";
 		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
-			return $playlist->getDataContent();
+			return $playlist->getDataContent(); 
 		}
 		
 		$host = requestUtils::getRequestHost();
-		$playlist_url =
+		$playlist_url = 
 			$host . "/index.php/partnerservices2/executeplaylist?format=8&" .
 //				"uid={uid}&partner_id={partnerid}&subp_id={subpid}&" .   // make sure the format is 8 - mRss
-			"ks={ks}&" .
-			self::toQueryString( $playlist , false ) ;
-		return 	$playlist_url;
+				"ks={ks}&" .   
+				self::toQueryString( $playlist , false ) ; 		
+		return 	$playlist_url;			
 	}
 	
 	// for now - don't appen dht efilter to the url
@@ -782,14 +778,14 @@ HTML;
 		
 		if ( $playlist->getMediaType() != entry::ENTRY_MEDIA_TYPE_XML )
 			return $query;
-		
+			
 		if ( !$should_append_filter_to_url ) return $query;
-		
+		 
 		$xml = $playlist->getDataContent();
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
 		
 		$entry_filters = array();
-		$partner_id = $playlist->getPartnerId();
+		$partner_id = $playlist->getPartnerId(); 
 		
 		// add ks=_KS_ for the playlist to replace it before hitting the executePlaylist 
 		$query .= "&fp=f"; // make sure the filter prefix is short
@@ -808,7 +804,7 @@ HTML;
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
 			$entry_filter = new entryFilter();
 			// add the desired prefix "_" because the XML is not expected to have it while the entryFilter class expects it
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" );
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
 			// make sure there is alway a limit for each filter - if not an explicit one - the system limit should be used
 			if( $entry_filter->getLimit() == null || $entry_filter->getLimit() < 1 )
 			{
@@ -817,15 +813,15 @@ HTML;
 			
 			$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
 			self::updateEntryFilter( $entry_filter ,  $partner_id );
-			
+
 			//$entry_filters[] = $entry_filter;
 			$fields = $entry_filter->fields;
 			foreach ( $fields as $field => $value )
 			{
 				if ( $value )
-					$query .= "&" . $prefix . $field . "=" . $value;
+				$query .= "&" . $prefix . $field . "=" . $value;				
 			}
-			$i++;
+			$i++;	
 		}
 		return $query;
 	}
@@ -836,20 +832,20 @@ HTML;
 		self::setUser ( $partner_id , $entry_filter );
 		
 		$display_in_search = $entry_filter->getDisplayInSearchEquel();
-		
+	
 		// 2009-07-12, Liron: changed the detfault - prferer partner only unless explicitly defined $display_in_search=2;
 		$allow_partner_only = ( $display_in_search === null || $display_in_search < 2 );
-		if ( $allow_partner_only )
+		if ( $allow_partner_only ) 
 		{
 			$entry_filter->setPartnerIdEquel($partner_id);
 			$entry_filter->setPartnerSearchScope($partner_id);
-		}
+		}	
 		else
 		{
 			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		}
 	}
-	
+
 	/**
 	 * @param $captionAsset
 	 * @param $filteredCaptionAssets
@@ -859,7 +855,7 @@ HTML;
 	protected static function getCaptionFilePath($captionAsset)
 	{
 		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		
+
 		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
 		if ($captionFileSync)
 		{
@@ -868,7 +864,7 @@ HTML;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @param $entryId
 	 * @return array
@@ -881,26 +877,26 @@ HTML;
 		$captionAssets = assetPeer::doSelect($c);
 		return $captionAssets;
 	}
-	
-	
+
+
 	private static function getIds ( $list )
 	{
 		$id_list  =array();
 		foreach ( $list as $elem )
 		{
-			$id_list[] = $elem->getId();
+			$id_list[] = $elem->getId(); 
 		}
 		
 		return $id_list;
 	}
-	
+
 	private static function addSchedulingCriterion(Criteria $c, $field, $min, $max, $allowNull)
 	{
 		$criterion = null;
 		if($min){
 			$criterion = $c->getNewCriterion($field, $min, Criteria::GREATER_EQUAL);
 		}
-		
+
 		if($max){
 			if($criterion){
 				$criterion->addAnd($c->getNewCriterion($field, $max, Criteria::LESS_EQUAL));
@@ -909,14 +905,14 @@ HTML;
 				$criterion = $c->getNewCriterion($field, $max, Criteria::LESS_EQUAL);
 			}
 		}
-		
+
 		if($allowNull){
 			$criterion->addOr($c->getNewCriterion($field, null));
 		}
-		
+
 		$c->addAnd($criterion);
 	}
-	
+
 	private static function addSchedulingToCriteria(Criteria $c, entryFilter $filter = null)
 	{
 		$min = 0;
@@ -944,8 +940,8 @@ HTML;
 			}
 		}
 		self::addSchedulingCriterion($c, entryPeer::START_DATE, $min, $max, $allowNull);
-		
-		
+
+
 		$min = kApiCache::getTime();
 		$max = 0;
 		$allowNull = true;
@@ -977,7 +973,7 @@ HTML;
 	{
 		// add moderation status not pending moderation or rejected
 		$moderationStatusesNotIn = array(
-			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
+			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION, 
 			entry::ENTRY_MODERATION_STATUS_REJECTED);
 		$c->add(entryPeer::MODERATION_STATUS, $moderationStatusesNotIn, Criteria::NOT_IN);
 	}
@@ -997,7 +993,7 @@ HTML;
 			$static_playlist = explode ( "," , $static_playlist_str );
 			if(in_array($entryId, $static_playlist))
 				return true;
-			
+
 			//check if entryId is redirectEntryId of an entry in the playlist
 			$playlistEntries = entryPeer::retrieveByPKs($static_playlist);
 			foreach ($playlistEntries as $entry)
@@ -1022,7 +1018,7 @@ HTML;
 	 */
 	public static function setPlaylistContext (kContext $v)
 	{
-		self::$playlistContext = $v;
+	    self::$playlistContext = $v;
 	}
 	
 	/**
@@ -1031,50 +1027,50 @@ HTML;
 	 */
 	protected static function replaceContextTokens (SimpleXMLElement $contentXml)
 	{
-		$properties = $contentXml->children();
-		foreach ($properties as $property)
-		{
-			/* @var $property SimpleXMLElement */
-			$propertyAttributes = $property->attributes();
-			if (isset($propertyAttributes['dynamic']) && $propertyAttributes['dynamic'] = 1)
-			{
-				$tokenValue = (string)$property;
-				KalturaLog::debug("Apply dynamic token [$property]");
-				$tokenValue = explode("::", $tokenValue);
-				if ($tokenValue[0] == self::CONTEXT_DELIMITER)
-				{
-					array_shift($tokenValue);
-					$replaceValue = self::$playlistContext;
-					foreach ($tokenValue as $tokenPart)
-					{
-						$getter = "get".$tokenPart;
-						if (!method_exists($replaceValue, $getter))
-						{
-							KalturaLog::err("Method [$getter] not found on class [" . get_class($replaceValue) . "] for token [$property]");
-							$replaceValue = null;
-							break;
-						}
-						
-						$replaceValue = $replaceValue->$getter();
-					}
-					
-					if(!$replaceValue)
-					{
-						KalturaLog::debug("Dynamic token [$property] is null");
-						$contentAsDom = dom_import_simplexml($contentXml);
-						$contentAsDom->removeChild(dom_import_simplexml($property));
-						continue;
-					}
-					
-					if (is_numeric($replaceValue) || is_string($replaceValue))
-					{
-						$propertyAsDom = dom_import_simplexml($property);
-						$propertyAsDom->nodeValue = $replaceValue;
-					}
-				}
-				
-			}
-		}
+	    $properties = $contentXml->children();
+	    foreach ($properties as $property)
+	    {
+	        /* @var $property SimpleXMLElement */
+	        $propertyAttributes = $property->attributes();
+	        if (isset($propertyAttributes['dynamic']) && $propertyAttributes['dynamic'] = 1)
+	        {
+	            $tokenValue = (string)$property;
+	            KalturaLog::debug("Apply dynamic token [$property]");
+	            $tokenValue = explode("::", $tokenValue);
+	            if ($tokenValue[0] == self::CONTEXT_DELIMITER)
+	            {
+    	            array_shift($tokenValue);
+    	            $replaceValue = self::$playlistContext;
+    	            foreach ($tokenValue as $tokenPart)
+    	            {
+    	                $getter = "get".$tokenPart;
+    	                if (!method_exists($replaceValue, $getter))
+    	                {
+    	                	KalturaLog::err("Method [$getter] not found on class [" . get_class($replaceValue) . "] for token [$property]");
+    	                	$replaceValue = null;
+    	                	break;
+    	                }
+    	                    
+    	                $replaceValue = $replaceValue->$getter();
+    	            }
+    	            
+    	            if(!$replaceValue)
+    	            {
+    	            	KalturaLog::debug("Dynamic token [$property] is null");
+                        $contentAsDom = dom_import_simplexml($contentXml);
+                        $contentAsDom->removeChild(dom_import_simplexml($property));
+    	            	continue;
+    	            }
+    	            
+    	            if (is_numeric($replaceValue) || is_string($replaceValue))
+    	            {
+                        $propertyAsDom = dom_import_simplexml($property);
+                        $propertyAsDom->nodeValue = $replaceValue;
+    	            }
+	            }
+                        
+	        }
+	    }
 	}
 	
 	public static function executeStitchedPlaylist(entry $playlist)
@@ -1083,15 +1079,15 @@ HTML;
 		$pager->setPageIndex(1);
 		$pager->setPageSize(self::MAX_STITCHED_PLAYLIST_ENTRY_COUNT);
 		$entries = self::executePlaylist(
-			$playlist->getPartnerId(),
-			$playlist,
-			null,
-			false,
-			$pager);
-		
+				$playlist->getPartnerId(),
+				$playlist,
+				null,
+				false, 
+				$pager);
+
 		return self::getPlaylistDataFromEntries($entries, null, null);
 	}
-	
+
 	/**
 	 * @param $entries
 	 * @return array
@@ -1107,7 +1103,7 @@ HTML;
 		{
 			$entryIds[] = $entry->getId();
 			$durations[] = $entry->getLengthInMsecs();
-			
+
 			// Note: choosing a reference entry that has max(flavor count) and min(int id)
 			//	the reason for the int id condition is to avoid frequent changes to the 
 			//	reference entry in case the playlist content changes
@@ -1123,11 +1119,11 @@ HTML;
 				$maxFlavorCount = $flavorCount;
 			}
 		}
-		
+
 		$captionFiles = self::getCaptionFilesForEntryIds($entryIds, $captions);
 		return array($entryIds, $durations, $mediaEntry, $captionFiles);
 	}
-	
+
 	protected static function getCaptionFilesForEntryIds($entryIds, $captionLanguages)
 	{
 		$captionLangsArr = explode(',', $captionLanguages);
@@ -1145,8 +1141,7 @@ HTML;
 					$filteredCaptionAssets[$captionAsset->getEntryId()] = array();
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
 					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
-				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] =
-					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $filePath, self::CAPTION_FILES_ID => $captionAsset->getId());
+				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array($captionAsset->getLabel(), $filePath);
 			}
 		}
 		return $filteredCaptionAssets;
