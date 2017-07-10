@@ -14,22 +14,23 @@ abstract class kBaseSearch
         $this->elasticClient = new elasticClient();
     }
 
-    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager =null);
+    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager = null, ESearchOrderBy $order = null);
 
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
-        $subQuery = kESearchQueryManager::createOperatorSearchQuery($eSearchOperator);
+        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $eSearchOperator->getOperator());
         $this->applyElasticSearchConditions($subQuery);
         KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
         $result = $this->elasticClient->search($this->query);
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null)
+    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
         $this->initBasePartnerFilter($partnerId, $statuses);
         $this->initPager($pager);
+        $this->initOrderBy($order);
     }
 
     protected function initPager(kPager $pager = null)
@@ -38,6 +39,34 @@ abstract class kBaseSearch
         {
             $this->query['from'] = $pager->calcOffset();
             $this->query['size'] = $pager->getPageSize();
+        }
+    }
+
+    protected function initOrderBy(ESearchOrderBy $order = null)
+    {
+        if($order)
+        {
+            $orderItems = $order->getOrderItems();
+            $fields = array();
+            $sortConditions = array();
+            foreach ($orderItems as $orderItem)
+            {
+                $field = $orderItem->getSortField();
+                if(isset($fields[$field]))
+                {
+                    KalturaLog::log("Order by condition already set for field [$field]" );
+                    continue;
+                }
+                $fields[$field] = true;
+                $sortConditions[] = array(
+                    $field => array('order' => $orderItem->getSortOrder())
+                );
+            }
+
+            if(count($sortConditions))
+                $sortConditions[] = '_score'; //todo
+
+            $this->query['body']['sort'] = $sortConditions;
         }
     }
 
@@ -64,7 +93,6 @@ abstract class kBaseSearch
 
     protected function applyElasticSearchConditions($conditions)
     {
-        if($conditions)
-            $this->query['body']['query']['bool']['must'] = array($conditions);
+        $this->query['body']['query']['bool']['must'] = array($conditions);
     }
 }

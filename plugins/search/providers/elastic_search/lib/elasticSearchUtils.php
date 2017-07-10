@@ -5,9 +5,9 @@
  */
 
 
-function build_sorter($entriesScores) {
-	return function ($a, $b) use ($entriesScores) {
-		return ($entriesScores[$a->getId()] > $entriesScores[$b->getId()]) ? -1 : 1;
+function build_sorter($objectsOrder) {
+	return function ($a, $b) use ($objectsOrder) {
+		return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
 	};
 }
 
@@ -68,8 +68,8 @@ class elasticSearchUtils
 	private static function getElasticResultAsArray($elasticResults)
 	{
 		$objectData = array();
-		$objectScore = array();
-		foreach ($elasticResults['hits']['hits'] as $elasticObject)
+		$objectOrder = array();
+		foreach ($elasticResults['hits']['hits'] as $key => $elasticObject)
 		{
 			$itemData = array();
 			if (isset($elasticObject['inner_hits']))
@@ -92,15 +92,15 @@ class elasticSearchUtils
 				}
 			}
 			$objectData[$elasticObject['_id']] = $itemData;
-			$objectScore[$elasticObject['_id']] = $elasticObject['_score'];
+			$objectOrder[$elasticObject['_id']] = $key;
 		}
-		return array($objectData, $objectScore);
+		return array($objectData, $objectOrder);
 	}
 
-	private static function getCoreESearchResults($coreObjects, $objectsData, $objectsScore)
+	private static function getCoreESearchResults($coreObjects, $objectsData, $objectsOrder)
 	{
 		$resultsObjects = array();
-		usort($coreObjects, build_sorter($objectsScore));
+		usort($coreObjects, build_sorter($objectsOrder));
 		foreach ($coreObjects as $coreObject)
 		{
 			$resultObj = new ESearchResult();
@@ -113,68 +113,24 @@ class elasticSearchUtils
 
 	public static function transformElasticToCategory($elasticResults)
 	{
-		list($categoryData, $categoryScore) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
+		list($categoryData, $categoryOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
 		$categories = categoryPeer::retrieveByPKs(array_keys($categoryData));
-		return elasticSearchUtils::getCoreESearchResults($categories, $categoryData, $categoryScore);
-
+		return elasticSearchUtils::getCoreESearchResults($categories, $categoryData, $categoryOrder);
 	}
 
 	public static function transformElasticToEntry($elasticResults)
 	{
-		list($entriesData, $entriesScore) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
+		list($entriesData, $entriesOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
 		$entries = entryPeer::retrieveByPKs(array_keys($entriesData));
-		return elasticSearchUtils::getCoreESearchResults($entries, $entriesData, $entriesScore);
+		return elasticSearchUtils::getCoreESearchResults($entries, $entriesData, $entriesOrder);
 	}
 
 	public static function transformElasticToUser($elasticResults)
 	{
-		list($entriesData, $entriesScore) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
-		$entries = kuserPeer::retrieveByPKs(array_keys($entriesData));
-		return elasticSearchUtils::getCoreESearchResults($entries, $entriesData, $entriesScore);
+		list($usersData, $usersOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
+		$users = kuserPeer::retrieveByPKs(array_keys($usersData));
+		return elasticSearchUtils::getCoreESearchResults($users, $usersData, $usersOrder);
 	}
-
-    public static function transformElasticToObject($elasticResults)
-    {
-		$coreObjs = array();
-	    $entriesData = array();
-	    $entriesScore = array();
-	    foreach ($elasticResults['hits']['hits'] as $elasticEntry)
-	    {
-		    $itemData = array();
-		    if (isset($elasticEntry['inner_hits']))
-		    {
-			    foreach ($elasticEntry['inner_hits'] as $objectType => $hits)
-			    {
-				    foreach ($hits['hits']['hits'] as $objectResult)
-				    {
-					    $itemResults = self::getItemResults($objectResult, $objectType);
-					    foreach ($itemResults as $itemResult)
-					    {
-						    $currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
-						    if ($currItemData)
-						    {
-							    $currItemData->loadFromElasticHits($itemResult);
-							    $itemData[] = $currItemData;
-						    }
-					    }
-				    }
-			    }
-		    }
-		    $entriesData[$elasticEntry['_id']] = $itemData;
-		    $entriesScore[$elasticEntry['_id']] = $elasticEntry['_score'];
-	    }
-
-	    $entries = entryPeer::retrieveByPKs(array_keys($entriesData));
-        usort($entries, build_sorter($entriesScore));
-	    foreach ($entries as $baseEntry)
-	    {
-		    $resultObj = new ESearchResult();
-		    $resultObj->setEntry($baseEntry);
-		    $resultObj->setItemData($entriesData[$baseEntry->getId()]);
-		    $coreObjs[] = $resultObj;
-	    }
-	    return $coreObjs;
-    }
 
 	protected static function getItemResults($objectResult, $objectType)
 	{
@@ -187,7 +143,5 @@ class elasticSearchUtils
 				return array($objectResult);
 		}
 	}
-
-
 
 }

@@ -9,4 +9,5 @@ interface ESearchItemType extends BaseEnum
 	const PARTIAL = 2;
 	const STARTS_WITH = 3;
 	const DOESNT_CONTAIN = 4;
+	const RANGE = 5;
 }

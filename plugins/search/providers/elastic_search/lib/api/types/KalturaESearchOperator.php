@@ -3,9 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchOperator extends KalturaESearchBaseItem {
-
-
+class KalturaESearchOperator extends KalturaESearchBaseItem
+{
     /**
      * @var KalturaESearchOperatorType
      */
@@ -32,6 +31,5 @@ class KalturaESearchOperator extends KalturaESearchBaseItem {
 			$object_to_fill = new ESearchOperator();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
-
-
+	
 }

@@ -1,0 +1,20 @@
+<?php
+/**
+ * @package plugins.elasticSearch
+ * @subpackage api.objects
+ */
+class KalturaESearchUserResult extends KalturaESearchResult
+{
+    private static $map_between_objects = array();
+
+    protected function getMapBetweenObjects()
+    {
+        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+    }
+
+	public function getAPIObject($srcObj)
+	{
+		return new KalturaUser();
+	}
+
+}
