@@ -1321,11 +1321,8 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 		$mysql_function = 'mysqli';
-	
 		$db_config = kConf::get( "reports_db_config" );
-		
-		if($mysql_function == 'mysql') $db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
-		else $db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
+		$db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
 		
 		$error_function = $mysql_function.'_error';
 		if (!$db_selected) {
