@@ -3,7 +3,6 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-//TODO: should class be moved to caption plugin?
 class KalturaESearchCaptionItemData extends KalturaESearchItemData {
 
 	/**

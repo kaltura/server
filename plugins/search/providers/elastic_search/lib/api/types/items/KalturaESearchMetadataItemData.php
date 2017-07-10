@@ -3,8 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchMetadataItemData extends KalturaESearchItemData {
-
+class KalturaESearchMetadataItemData extends KalturaESearchItemData
+{
 	/**
 	 * @var string
 	 */
@@ -16,14 +16,20 @@ class KalturaESearchMetadataItemData extends KalturaESearchItemData {
 	public $metadataProfileId;
 
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $valueText;
+
+	/**
+	 * @var int
+	 */
+	public $valueInt;
 
 	private static $map_between_objects = array(
 		'xpath',
 		'metadataProfileId',
 		'valueText',
+		'valueInt',
 	);
 
 	protected function getMapBetweenObjects()

@@ -6,6 +6,8 @@
 class ESearchUnifiedItem extends ESearchItem
 {
 
+	const UNIFIED = 'unified';
+	
 	/**
 	 * @var string
 	 */
@@ -29,76 +31,116 @@ class ESearchUnifiedItem extends ESearchItem
 
 	public function getType()
 	{
-		return 'unified';
+		return self::UNIFIED;
 	}
 
 	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
-		$outQuery['bool']['must'] = array();
 		$outQuery = array();
+
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
-		$cuePointAllowedFields = ESearchCuePointItem::getAllowedSearchTypesForField();
 		foreach($eSearchItemsArr as $eSearchUnifiedItem)
 		{
+			$subQuery = array();
+			$entryUnifiedQuery = array();
 			/** @var ESearchUnifiedItem $eSearchUnifiedItem */
-			$queryVerbs = $eSearchUnifiedItem->getQueryVerbs();
-			$hasQuery = false;
-			$entryQuery = array();
+			$entryItems = array();
 			//Start handling entry fields
 			foreach($entryAllowedFields as $fieldName => $fieldAllowedTypes)
 			{
-				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array('Unified', $fieldAllowedTypes))
+				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
 				{
-					$hasQuery = true;
-					$entryQuery[][$queryVerbs[1]][$fieldName] = $eSearchUnifiedItem->getSearchTerm();
+					$entryItem = new ESearchEntryItem();
+					$entryItem->setFieldName($fieldName);
+					$entryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+					$entryItem->setItemType($eSearchUnifiedItem->getItemType());
+					$entryItems[] = $entryItem;
 				}
 			}
-			if ($hasQuery)
+
+			if(count($entryItems))
 			{
-				$fullEntryQuery['bool']['minimum_should_match'] = 1;
-				$fullEntryQuery['bool']['should'] = $entryQuery;
-				$outQuery['bool']['should'][] = $fullEntryQuery;
+				$entryUnifiedQuery = ESearchEntryItem::createSearchQuery($entryItems, 'should', null);
 			}
 
-			$hasQuery = false;
-			$cuePointQuery = array();
+
+			$cuePointAllowedFields = ESearchCuePointItem::getAllowedSearchTypesForField();
+			$cuePointItems = array();
 			//Start handling cue-point fields
 			foreach($cuePointAllowedFields as $fieldName => $fieldAllowedTypes)
 			{
-				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array('Unified', $fieldAllowedTypes))
+				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
 				{
-					$hasQuery = true;
-					$cuePointQuery['nested']['query']['bool']['should'][][$queryVerbs[1]] =  array($fieldName => strtolower($eSearchUnifiedItem->getSearchTerm()));
+					$cuePointItem = new ESearchCuePointItem();
+					$cuePointItem->setFieldName($fieldName);
+					$cuePointItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+					$cuePointItem->setItemType($eSearchUnifiedItem->getItemType());
+					$cuePointItems[] = $cuePointItem;
 				}
 			}
-			if ($hasQuery)
+
+			if(count($cuePointItems))
 			{
-				$cuePointQuery['nested']['path'] = 'cue_points';
-				$cuePointQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
-				$cuePointQuery['nested']['query']['bool']['minimum_should_match'] = 1;
-				$outQuery['bool']['should'][] = $cuePointQuery;
+				$cuePointQuery = ESearchCuePointItem::createSearchQuery($cuePointItems, 'should', null);
+				if(count($cuePointQuery))
+					$entryUnifiedQuery[] = $cuePointQuery;
 			}
 
 			//Start handling caption fields
-			$captionQuery['nested']['path'] = 'caption_assets';
-			$captionQuery['nested']['query']['nested']['inner_hits'] = array('size' => 10); //TODO: get this parameter from config
-			$captionQuery['nested']['inner_hits'] = array('size' => 10, '_source' => false);
-			$captionQuery['nested']['query']['nested']['path'] = "caption_assets.lines";
+			$captionItems = array();
+			$captionAllowedFields = ESearchCaptionItem::getAllowedSearchTypesForField();
+			foreach($captionAllowedFields as $fieldName => $fieldAllowedTypes)
+			{
+				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
+				{
+					$captionItem = new ESearchCaptionItem();
+					$captionItem->setFieldName($fieldName);
+					$captionItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+					$captionItem->setItemType($eSearchUnifiedItem->getItemType());
+					$captionItems[] = $captionItem;
+				}
+			}
 
-			ESearchCaptionItem::createSingleItemSearchQuery($boolOperator, $eSearchUnifiedItem, $captionQuery); //todo
-			$outQuery['bool']['should'][] = $captionQuery;
+			if(count($captionItems))
+			{
+				$captionQuery = ESearchCaptionItem::createSearchQuery($captionItems, 'should', null);
+				if(count($captionQuery))
+					$entryUnifiedQuery[] = $captionQuery;
+			}
 
-			//Start handling metadata fields
-			$metadataQuery['nested']['path'] = 'metadata';
-			$metadataQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
-			ESearchMetadataItem::createSingleItemQuery($boolOperator, $eSearchUnifiedItem, $metadataQuery); //todo
 
-			$outQuery['bool']['should'][] = $metadataQuery;
+			
+			$metadataItems = array();
+			$metadataAllowedFields = ESearchMetadataItem::getAllowedSearchTypesForField();
+			foreach($metadataAllowedFields as $fieldName => $fieldAllowedTypes)
+			{
+				if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))//todo
+				{
+					$metadataItem = new ESearchMetadataItem();
+					$metadataItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+					$metadataItem->setItemType($eSearchUnifiedItem->getItemType());
+					$metadataItems[] = $metadataItem;
+				}
+			}
 
+			if(count($metadataItems))
+			{
+				$metadataQuery = ESearchMetadataItem::createSearchQuery($metadataItems, 'should', null);
+				if(count($metadataQuery))
+					$entryUnifiedQuery[] = $metadataQuery;
+			}
+
+			
+			if(count($entryUnifiedQuery))
+			{
+				$subQuery['bool']['should'] = $entryUnifiedQuery;
+				$subQuery['bool']['minimum_should_match'] = 1;
+				$outQuery[] = $subQuery;
+			}
+			
 		}
 
 		return $outQuery;
 	}
-
 
 }

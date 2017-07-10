@@ -28,7 +28,7 @@ class kESearchQueryManager
 		$queryType = 'term';
 		$fieldSuffix = '';
 
-		if ($searchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$searchItem->getFieldName()]))
+		if ($searchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 		{
 			$queryType = 'match';
 			$fieldSuffix = '.raw';
@@ -42,7 +42,7 @@ class kESearchQueryManager
 	{
 		$prefixQuery = array();
 		$queryType = 'prefix';
-		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$searchItem->getFieldName()]))
+		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 			$queryType = 'match_phrase_prefix';
 		$prefixQuery[$queryType] = array( $fieldName => $searchItem->getSearchTerm());
 
@@ -54,4 +54,26 @@ class kESearchQueryManager
 		return self::getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes);
 	}
 
+	public static function getRangeQuery($searchItem, $fieldName, $allowedSearchTypes)
+	{
+		$rangeObject = $searchItem->getRange();
+		if(!$rangeObject)
+			return null;
+		/**@var $rangeObject ESearchRange*/
+		$rangeSubQuery = array();
+		$rangeQuery =  array();
+		$queryType = 'range';
+		if($rangeObject->getGreaterThan())
+			$rangeSubQuery['gt'] = $rangeObject->getGreaterThan();
+		if($rangeObject->getGreaterThanOrEqual())
+			$rangeSubQuery['gte'] = $rangeObject->getGreaterThanOrEqual();
+		if($rangeObject->getLessThan())
+			$rangeSubQuery['lt'] = $rangeObject->getLessThan();
+		if($rangeObject->getLessThanOrEqual())
+			$rangeSubQuery['lte'] = $rangeObject->getLessThanOrEqual();
+
+		$rangeQuery[$queryType][$fieldName] = $rangeSubQuery;
+		return $rangeQuery;
+	}
+	
 }

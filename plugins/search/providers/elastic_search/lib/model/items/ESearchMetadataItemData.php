@@ -21,6 +21,11 @@ class ESearchMetadataItemData extends ESearchItemData
 	 */
 	protected $valueText;
 
+	/**
+	 * @var string
+	 */
+	protected $valueInt;
+
 	public function getType()
 	{
 		return 'metadata';
@@ -74,12 +79,30 @@ class ESearchMetadataItemData extends ESearchItemData
 		$this->valueText = $valueText;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getValueInt()
+	{
+		return $this->valueInt;
+	}
+
+	/**
+	 * @param int $valueInt
+	 */
+	public function setValueInt($valueInt)
+	{
+		$this->valueInt = $valueInt;
+	}
+
 	public function loadFromElasticHits($objectResult)
 	{
 		$this->setXpath($objectResult['_source']['xpath']);
 		$this->setMetadataProfileId($objectResult['_source']['metadata_profile_id']);
-		$this->setValueText(implode(',',$objectResult['_source']['value_text']));
+		if(isset($objectResult['_source']['value_text']))
+			$this->setValueText(implode(',',$objectResult['_source']['value_text']));
+		if(isset($objectResult['_source']['value_int']))
+			$this->setValueInt($objectResult['_source']['value_int']);
 	}
-
-
+	
 }

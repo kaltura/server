@@ -12,9 +12,9 @@ abstract class ESearchItem extends BaseObject
 	protected $itemType;
 
 	/**
-	 * @var array
+	 * @var ESearchRange
 	 */
-	public $ranges;
+	protected $range;
 
 	/**
 	 * @return ESearchItemType
@@ -33,21 +33,20 @@ abstract class ESearchItem extends BaseObject
 	}
 
 	/**
-	 * @return array
+	 * @return ESearchRange
 	 */
-	public function getRanges()
+	public function getRange()
 	{
-		return $this->ranges;
+		return $this->range;
 	}
 
 	/**
-	 * @param array $ranges
+	 * @param ESearchRange $range
 	 */
-	public function setRanges($ranges)
+	public function setRange($range)
 	{
-		$this->ranges = $ranges;
+		$this->range = $range;
 	}
-
 
 	/**
 	 * @return null|string
@@ -73,6 +72,18 @@ abstract class ESearchItem extends BaseObject
 		return $queryVerb;
 	}
 
+	protected function validateAllowedSearchTypes($allowedSearchTypes, $fieldName)
+	{
+		if (!in_array($this->getItemType(),  $allowedSearchTypes[$fieldName]))
+			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $fieldName.']', kCoreException::INTERNAL_SERVER_ERROR);
+	}
+
+	protected function validateEmptySearchTerm($fieldName, $searchTerm)
+	{
+		if (empty($searchTerm) && !in_array($this->getItemType(), ESearchItemType::RANGE))
+			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on empty search term on field ['. $fieldName.']', kCoreException::INTERNAL_SERVER_ERROR);
+	}
+
 	abstract public function getType();
 
 	public static function getAllowedSearchTypesForField()
@@ -82,5 +93,8 @@ abstract class ESearchItem extends BaseObject
 
 	abstract public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null);
 
-	//abstract public static function getQuery($searchItems, $boolOperator, $eSearchOperatorType = null);
+
+	
+	
+
 }

@@ -3,8 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-abstract class KalturaESearchResult extends KalturaObject {
-
+abstract class KalturaESearchResult extends KalturaObject
+{
     /**
      * @var KalturaObject
      */
@@ -35,5 +35,4 @@ abstract class KalturaESearchResult extends KalturaObject {
 		return parent::doFromObject($srcObj, $responseProfile);
 	}
 
-	
 }

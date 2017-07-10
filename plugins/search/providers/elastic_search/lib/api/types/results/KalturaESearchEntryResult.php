@@ -3,7 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchEntryResult extends KalturaESearchResult {
+class KalturaESearchEntryResult extends KalturaESearchResult
+{
 	
     private static $map_between_objects = array();
 
@@ -17,7 +18,5 @@ class KalturaESearchEntryResult extends KalturaESearchResult {
 		$isAdmin = kCurrentContext::$ks_object->isAdmin();
 		return KalturaEntryFactory::getInstanceByType($srcObj->getObject()->getType(), $isAdmin);
 	}
-
-
 
 }

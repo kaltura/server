@@ -17,6 +17,9 @@ class ESearchUserItem extends ESearchItem
 	protected $searchTerm;
 
 	private static $allowed_search_types_for_field = array(
+		'kuser_type'=> array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
+		'role_ids'=> array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
+		'permission_names'=> array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
 		'last_name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
 		'first_name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
 		'screen_name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
@@ -26,7 +29,6 @@ class ESearchUserItem extends ESearchItem
 		'updated_at' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::RANGE'),
 		'created_at' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::RANGE'),
 		'type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
-		'status' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
 	);
 
 	/**
@@ -83,47 +85,32 @@ class ESearchUserItem extends ESearchItem
 	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
 		$userQuery = array();
-		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
+		$allowedSearchTypes = ESearchUserItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $userSearchItem)
 		{
 			self::getSingleItemSearchQuery($userSearchItem, $userQuery, $allowedSearchTypes);
-			//$entryQuery[] = $itemQuery;
 		}
 		return $userQuery;
 	}
 
 	private static function getSingleItemSearchQuery($userSearchItem, &$userQuery, $allowedSearchTypes)
 	{
-		/**
-		 * @var ESearchUserItem $userSearchItem
-		 */
-		$queryVerbs = $userSearchItem->getQueryVerbs();
-		$searchTerm = $userSearchItem->getSearchTerm();
-		if (!empty($searchTerm))
+		switch ($userSearchItem->getItemType())
 		{
-			switch ($userSearchItem->getItemType())
-			{
-				case ESearchItemType::EXACT_MATCH:
-					$userQuery[] = kESearchQueryManager::getExactMatchQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
-					break;
-				case ESearchItemType::PARTIAL:
-					$userQuery[] = kESearchQueryManager::getMultiMatchQuery($userSearchItem, $userSearchItem->getFieldName(), false);
-					break;
-				case ESearchItemType::STARTS_WITH:
-					$userQuery[] = kESearchQueryManager::getPrefixQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
-					break;
-				case ESearchItemType::DOESNT_CONTAIN:
-					$userQuery[] = kESearchQueryManager::getDoesntContainQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
-			}
+			case ESearchItemType::EXACT_MATCH:
+				$userQuery[] = kESearchQueryManager::getExactMatchQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::PARTIAL:
+				$userQuery[] = kESearchQueryManager::getMultiMatchQuery($userSearchItem, $userSearchItem->getFieldName(), false);
+				break;
+			case ESearchItemType::STARTS_WITH:
+				$userQuery[] = kESearchQueryManager::getPrefixQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::DOESNT_CONTAIN:
+				$userQuery[] = kESearchQueryManager::getDoesntContainQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::RANGE:
+				$userQuery[] = kESearchQueryManager::getRangeQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
 		}
-//		if (in_array('Range', $allowedSearchTypes[$entrySearchItem->getFieldName()]))
-//		{
-//			foreach ($entrySearchItem->getRanges() as $range)
-//			{
-//				$queryOut[$queryVerbs[0]]['range'] = array($entrySearchItem->getFieldName() => array('gte' => $range[0], 'lte' => $range[1]));
-//			}
-//		}
-
-		//return $queryOut;
 	}
 }

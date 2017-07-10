@@ -5,17 +5,22 @@
  */
 class ESearchCaptionItem extends ESearchItem
 {
-	//todo
+
 	private static $allowed_search_types_for_field = array(
-		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
-		'caption_assets.lines.start_time' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE'),
-		'caption_assets.lines.end_time' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::RANGE'),
+		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, ESearchUnifiedItem::UNIFIED),
+		'caption_assets.lines.start_time' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		'caption_assets.lines.end_time' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 	);
 
 	/**
 	 * @var string
 	 */
 	protected $searchTerm;
+
+	/**
+	 * @var ESearchCaptionFieldName
+	 */
+	protected $fieldName;
 
 	/**
 	 * @return string
@@ -33,19 +38,28 @@ class ESearchCaptionItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-
+	/**
+	 * @return ESearchCaptionFieldName
+	 */
 	public function getFieldName()
 	{
-		return 'caption_assets.lines.content';
+		return $this->fieldName;
 	}
 
+	/**
+	 * @param ESearchCaptionFieldName $fieldName
+	 */
+	public function setFieldName($fieldName)
+	{
+		$this->fieldName = $fieldName;
+	}
 
 	public function getType()
 	{
 		return 'caption';
 	}
 
-	public static function getAllowedSearchTypesForField() //todo
+	public static function getAllowedSearchTypesForField()
 	{
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
@@ -59,38 +73,47 @@ class ESearchCaptionItem extends ESearchItem
 		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $eSearchCaptionItem)
 		{
-			self::createSingleItemSearchQuery($boolOperator, $eSearchCaptionItem, $captionQuery, $allowedSearchTypes);
-			foreach ($eSearchCaptionItem->getRanges() as $range)
-			{
-				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('caption_assets.lines.start_time' => array('lte' => $range[0])));
-				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] = array('range' => array('caption_assets.lines.end_time' => array('gte' => $range[1])));
-			}
+			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes);
 		}
 		
 		return $captionQuery;
 	}
 
-	public static function createSingleItemSearchQuery($boolOperator, $eSearchCaptionItem, &$captionQuery, $allowedSearchTypes)
+	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionQuery, $allowedSearchTypes)
 	{
-		/* @var ESearchCaptionItem $eSearchCaptionItem */
+		$eSearchCaptionItem->validateItemInput();
 		switch ($eSearchCaptionItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
 				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, 'caption_assets.lines.content', $allowedSearchTypes);
+					kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getMultiMatchQuery($eSearchCaptionItem, 'caption_assets.lines.content', true);
+					kESearchQueryManager::getMultiMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), true);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, 'caption_assets.lines.content', true);
+					kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::DOESNT_CONTAIN:
 				$captionQuery['nested']['query']['nested']['query']['bool']['must_not'][] =
-					kESearchQueryManager::getDoesntContainQuery($eSearchCaptionItem, 'caption_assets.lines.content', true);
+					kESearchQueryManager::getDoesntContainQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::RANGE:
+				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] =
+					kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
 		}
+		
+		if($boolOperator == 'should')
+			$captionQuery['nested']['query']['nested']['query']['bool']['minimum_should_match'] = 1;
+	}
+
+	protected function validateItemInput()
+	{
+		$allowedSearchTypes = self::getAllowedSearchTypesForField();
+		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
+		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
 
 }

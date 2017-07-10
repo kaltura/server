@@ -3,8 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchMetadataItem extends KalturaESearchItem {
-
+class KalturaESearchMetadataItem extends KalturaESearchItem
+{
 	/**
 	 * @var string
 	 */
@@ -37,6 +37,5 @@ class KalturaESearchMetadataItem extends KalturaESearchItem {
 		$this->validatePropertyNotNull("searchTerm");
 		return parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
-
 
 }

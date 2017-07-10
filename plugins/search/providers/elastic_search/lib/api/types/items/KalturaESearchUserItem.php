@@ -26,6 +26,5 @@ class KalturaESearchUserItem extends KalturaESearchItem
 			$object_to_fill = new ESearchUserItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
-
-
+	
 }

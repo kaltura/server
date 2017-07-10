@@ -120,7 +120,7 @@ class ESearchOperator extends ESearchItem
 			
 			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $operatorType);
 
-			if($itemClassName == 'ESearchEntryItem' || $itemClassName == 'ESearchCategoryItem')
+			if($itemClassName == 'ESearchEntryItem' || $itemClassName == 'ESearchCategoryItem' || $itemClassName == 'ESearchUserItem' || $itemClassName == 'ESearchUnifiedItem')
 			{
 				foreach ($subQuery as $key => $value)
 				{

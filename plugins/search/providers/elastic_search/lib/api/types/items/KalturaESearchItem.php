@@ -16,20 +16,19 @@ abstract class KalturaESearchItem extends KalturaESearchBaseItem {
 	public $itemType;
 
 	/**
-	 * @var KalturaRangeArray
+	 * @var KalturaESearchRange
 	 */
-	public $ranges;
+	public $range;
 
 	private static $map_between_objects = array(
 		'searchTerm',
 		'itemType',
-		'ranges',
+		'range',
 	);
 
 	protected function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-
 
 }

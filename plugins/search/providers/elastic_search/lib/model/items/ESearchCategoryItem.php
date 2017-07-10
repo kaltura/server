@@ -36,17 +36,16 @@ class ESearchCategoryItem extends ESearchItem
 		'inherited_parent_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::DOESNT_CONTAIN'=> ESearchItemType::DOESNT_CONTAIN),
 		'moderation' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::DOESNT_CONTAIN'=> ESearchItemType::DOESNT_CONTAIN),
 		'contribution_policy' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::DOESNT_CONTAIN'=> ESearchItemType::DOESNT_CONTAIN),
-		'metadata' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::DOESNT_CONTAIN'=> ESearchItemType::DOESNT_CONTAIN),
 
-		'entries_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => 'Range'),
-		'direct_entries_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => 'Range'),
-		'direct_sub_categories_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => 'Range'),
-		'members_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => 'Range'),
-		'pending_members_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => 'Range'),
-		'pending_entries_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => 'Range'),
+		'entries_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'direct_entries_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'direct_sub_categories_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'members_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'pending_members_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'pending_entries_count' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
 
-		'created_at' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH,'ESearchItemType::DOESNT_CONTAIN'=> ESearchItemType::DOESNT_CONTAIN),
-		'updated_at' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH,'ESearchItemType::DOESNT_CONTAIN'=> ESearchItemType::DOESNT_CONTAIN),
+		'created_at' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'updated_at' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE' => ESearchItemType::RANGE),
 	);
 
 	/**
@@ -111,37 +110,36 @@ class ESearchCategoryItem extends ESearchItem
 			 */
 			$queryVerbs = $categorySearchItem->getQueryVerbs();
 			self::createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes);
-			if (in_array('Range', $allowedSearchTypes[$categorySearchItem->getFieldName()]))
-			{
-				foreach ($categorySearchItem->getRanges() as $range)
-				{
-					$queryOut[$queryVerbs[0]]['range'] = array($categorySearchItem->getFieldName() => array('gte' => $range[0], 'lte' => $range[1]));
-				}
-			}
 		}
 		return $categoryQuery;
 	}
 	
 	public static function createSingleItemSearchQuery($categorySearchItem, &$categoryQuery, $allowedSearchTypes)
 	{
-		$queryVerbs = $categorySearchItem->getQueryVerbs();
-		$searchTerm = $categorySearchItem->getSearchTerm();
-		if (!empty($searchTerm))
+		$categorySearchItem->validateItemInput();
+		switch ($categorySearchItem->getItemType())
 		{
-			switch ($categorySearchItem->getItemType())
-			{
-				case ESearchItemType::EXACT_MATCH:
-					$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
-					break;
-				case ESearchItemType::PARTIAL:
-					$categoryQuery[] = kESearchQueryManager::getMultiMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), false);
-					break;
-				case ESearchItemType::STARTS_WITH:
-					$categoryQuery[] = kESearchQueryManager::getPrefixQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
-					break;
-				case ESearchItemType::DOESNT_CONTAIN:
-					$categoryQuery[] = kESearchQueryManager::getDoesntContainQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
-			}
+			case ESearchItemType::EXACT_MATCH:
+				$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::PARTIAL:
+				$categoryQuery[] = kESearchQueryManager::getMultiMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), false);
+				break;
+			case ESearchItemType::STARTS_WITH:
+				$categoryQuery[] = kESearchQueryManager::getPrefixQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::DOESNT_CONTAIN:
+				$categoryQuery[] = kESearchQueryManager::getDoesntContainQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			case ESearchItemType::RANGE:
+				$categoryQuery[] = kESearchQueryManager::getRangeQuery($categorySearchItem,$categorySearchItem->getFieldName(), $allowedSearchTypes);
 		}
+	}
+
+	protected function validateItemInput()
+	{
+		$allowedSearchTypes = self::getAllowedSearchTypesForField();
+		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
+		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
 }

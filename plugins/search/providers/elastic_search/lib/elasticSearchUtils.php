@@ -7,7 +7,7 @@
 
 function build_sorter($objectsOrder) {
 	return function ($a, $b) use ($objectsOrder) {
-		return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? -1 : 1;
+		return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
 	};
 }
 
@@ -116,7 +116,6 @@ class elasticSearchUtils
 		list($categoryData, $categoryOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
 		$categories = categoryPeer::retrieveByPKs(array_keys($categoryData));
 		return elasticSearchUtils::getCoreESearchResults($categories, $categoryData, $categoryOrder);
-
 	}
 
 	public static function transformElasticToEntry($elasticResults)
@@ -130,7 +129,7 @@ class elasticSearchUtils
 	{
 		list($usersData, $usersOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
 		$users = kuserPeer::retrieveByPKs(array_keys($usersData));
-		return elasticSearchUtils::getCoreESearchResults($users, $usersOrder, $usersOrder);
+		return elasticSearchUtils::getCoreESearchResults($users, $usersData, $usersOrder);
 	}
 
 	protected static function getItemResults($objectResult, $objectType)

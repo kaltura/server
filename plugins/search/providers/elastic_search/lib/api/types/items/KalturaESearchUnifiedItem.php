@@ -3,7 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchUnifiedItem extends KalturaESearchItem {
+class KalturaESearchUnifiedItem extends KalturaESearchItem
+{
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
@@ -11,6 +12,5 @@ class KalturaESearchUnifiedItem extends KalturaESearchItem {
 			$object_to_fill = new ESearchUnifiedItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
-
 
 }

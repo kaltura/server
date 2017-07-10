@@ -3,8 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchCategoryResult extends KalturaESearchResult {
-	
+class KalturaESearchCategoryResult extends KalturaESearchResult
+{
     private static $map_between_objects = array();
 
     protected function getMapBetweenObjects()

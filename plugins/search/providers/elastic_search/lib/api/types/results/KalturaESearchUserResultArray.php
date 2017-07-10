@@ -3,8 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchUserResultArray extends KalturaESearchResultArray {
-	
+class KalturaESearchUserResultArray extends KalturaESearchResultArray
+{
     public function __construct()
     {
         return parent::__construct("KalturaESearchUserResult");

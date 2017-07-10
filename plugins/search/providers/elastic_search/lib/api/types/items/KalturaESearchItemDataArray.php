@@ -3,7 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchItemDataArray extends KalturaTypedArray {
+class KalturaESearchItemDataArray extends KalturaTypedArray
+{
 
     public function __construct()
     {
