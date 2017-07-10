@@ -11,12 +11,12 @@ class KObjectTaskMailNotificationEngine
 
 	private static function getAdminObjectsBody($objectsIds, $sendToUsers, $link = null)
 	{
-		$body = "\nExecute for entries:\n";
+		$body = "Execute for entries:" . PHP_EOL;
 		$cnt = 0;
 		foreach($objectsIds as $userId => $entriesIds) {
 			foreach($entriesIds as $id) {
-				$link = $link ? str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
-				$body .= "\t$id - $link" . PHP_EOL;
+				$link = $link ? " - " . str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
+				$body .= "\t$id$link" . PHP_EOL;
 				$cnt++;
 			}
 		}
@@ -32,10 +32,10 @@ class KObjectTaskMailNotificationEngine
 
 	private static function getUserObjectsBody($objectsIds, $link)
 	{
-		$body = PHP_EOL ."Execute for entries:" . PHP_EOL;
+		$body =  "Execute for entries:" . PHP_EOL;
 		foreach($objectsIds as $id) {
-			$link = $link ? str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
-			$body .= "\t$id - $link" . PHP_EOL;
+			$link = $link ? " - " . str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
+			$body .= "\t$id$link" . PHP_EOL;
 		}
 		$body .= "Total count of affected object: " . count($objectsIds);
 		return $body;
