@@ -144,7 +144,8 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-		$this->resetUserContantFilter($filter);
+		else
+			$this->resetUserContentFilter($filter);
 
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
@@ -208,7 +209,8 @@ class CuePointService extends KalturaBaseService
 
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-		$this->resetUserContantFilter($filter);
+		else
+			$this->resetUserContentFilter($filter);
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
 	}
 	
@@ -223,7 +225,8 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-		$this->resetUserContantFilter($filter);
+		else
+			$this->resetUserContentFilter($filter);
 						
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
@@ -377,7 +380,7 @@ class CuePointService extends KalturaBaseService
 		return $cuePoint;
 	}
 
-	private function resetUserContantFilter($filter)
+	private function resetUserContentFilter($filter)
 	{
 		if (CuePointPeer::getUserContentOnly())
 		{
