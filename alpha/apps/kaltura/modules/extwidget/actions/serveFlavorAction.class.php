@@ -275,7 +275,7 @@ class serveFlavorAction extends kalturaAction
 
 				$clips[] = array('type' => 'source', 'path' => $path);
 			}
-			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getEntryId()));
+			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 		}
 
 		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences, $origEntry);
