@@ -668,7 +668,36 @@ class myPlaylistUtils
 	{
 		try
 		{
-			@$simple_xml = new SimpleXMLElement( $xml );
+			@	public static function getPlaylistFilterListStruct ( $xml )
+		{
+			try
+			{
+				@$simple_xml = new SimpleXMLElement( $xml );
+//print_r ( $simple_xml );			
+				$total_results_node = $simple_xml->xpath ( "total_results" );
+				$total_result = self::TOTAL_RESULTS;
+				if ( $total_results_node  )
+				{
+					if ( is_array ( $total_results_node ) )
+					{
+						if( count ( $total_results_node ) > 1 ) throw new Exception ( "Must not have more than 1 element of 'total_results'");
+//print_r ( $total_results_node)	;				
+						$total_result = $total_results_node[0];
+					}
+				}
+				
+				// TODO - stick to the first option and change all the <filter> objects to be children of <filters>  
+				$list_of_filters = $total_results_node = $simple_xml->xpath ( "filters/filter" );
+				if ( ! $list_of_filters )
+					$list_of_filters = $total_results_node = $simple_xml->xpath ( "filter" );
+				if ( $total_result > self::TOTAL_RESULTS ) $total_result = self::TOTAL_RESULTS; // don't let anyone exceed the system's TOTAL_RESULT
+				return array ( $total_result , $list_of_filters );
+			}
+			catch ( Exception $ex )
+			{
+				
+			}
+		}
 //print_r ( $simple_xml );			
 			$total_results_node = $simple_xml->xpath ( "total_results" );
 			$total_result = self::TOTAL_RESULTS;

@@ -729,7 +729,7 @@ class kApiCache extends kApiCacheBase
 				break;
 			}
 
-			if (apc_add('apiCacheLock-'.$this->_cacheKey, true, 1))
+			if (function_exists('apc_add') && apc_add('apiCacheLock-'.$this->_cacheKey, true, 1))
 			{
 				break;
 			}

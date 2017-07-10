@@ -1465,6 +1465,7 @@ class myReportsMgr
 		
 		$connect_function = $mysql_function.'_connect';
 		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
+		mysqli_set_charset($link, "latin1");
 		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		
 		return $link;
