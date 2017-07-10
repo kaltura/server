@@ -1,4 +1,4 @@
-."\n<?php
+<?php
 class myReportsMgr
 {
 	const REPORT_FLAVOR_GRAPH= 1;
