@@ -212,7 +212,6 @@ class serveFlavorAction extends kalturaAction
 		foreach ($flavorParamIds as $flavorParamsId)
 		{
 			$referenceFlavor = $groupedFlavors[$referenceEntry->getId()][$flavorParamsId];
-			$origEntryFlavor = $groupedFlavors[$origEntry->getId()][$flavorParamsId];
 
 			// build the clips of the current sequence
 			$clips = array();
@@ -255,6 +254,10 @@ class serveFlavorAction extends kalturaAction
 					}
 				}
 
+				if ($flavor->getEntryId() == $origEntry->getId())
+				{
+					$origEntryFlavor = $flavor;
+				}
 				// get the file path of the flavor
 				$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey , false, false);
