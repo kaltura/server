@@ -212,6 +212,7 @@ class serveFlavorAction extends kalturaAction
 		foreach ($flavorParamIds as $flavorParamsId)
 		{
 			$referenceFlavor = $groupedFlavors[$referenceEntry->getId()][$flavorParamsId];
+			$origEntryFlavor = $groupedFlavors[$origEntry->getId()][$flavorParamsId];
 
 			// build the clips of the current sequence
 			$clips = array();
@@ -271,7 +272,7 @@ class serveFlavorAction extends kalturaAction
 
 				$clips[] = array('type' => 'source', 'path' => $path);
 			}
-			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($referenceFlavor->getId(), $referenceFlavor->getEntryId()));
+			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getEntryId()));
 		}
 
 		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences, $origEntry);
