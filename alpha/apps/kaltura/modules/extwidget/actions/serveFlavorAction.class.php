@@ -212,7 +212,7 @@ class serveFlavorAction extends kalturaAction
 		foreach ($flavorParamIds as $flavorParamsId)
 		{
 			$referenceFlavor = $groupedFlavors[$referenceEntry->getId()][$flavorParamsId];
-
+			$origEntryFlavor = $referenceFlavor;
 			// build the clips of the current sequence
 			$clips = array();
 			foreach ($entryIds as $entryId)
