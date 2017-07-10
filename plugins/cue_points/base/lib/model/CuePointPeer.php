@@ -36,6 +36,11 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		self::$userContentOnly = $contentOnly;
 	}
 
+	public static function getUserContentOnly()
+	{
+		return self::$userContentOnly;
+	}
+
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
 	 */
