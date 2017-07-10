@@ -134,7 +134,7 @@ class serveFlavorAction extends kalturaAction
 		
 		list($entryIds, $durations, $referenceEntry, $captionFiles) =
 			myPlaylistUtils::executeStitchedPlaylist($entry);
-		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null, null, null);
 	}
 
 	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds, $captionFiles, $captionLanguages)
@@ -278,7 +278,8 @@ class serveFlavorAction extends kalturaAction
 			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 		}
 
-		$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences, $origEntry);
+		if ($captionFiles)
+			$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences, $origEntry);
 
 		// build the media set
 		if ($isLive)
