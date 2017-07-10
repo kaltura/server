@@ -11,13 +11,7 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 	 *
 	 * @var string
 	 */
-	public $mailAddress;
-	/**
-	 * The message to send in the notification mail
-	 *
-	 * @var string area
-	 */
-	public $message;
+	public $mailTo;
 	/**
 	 * The sender in the mail
 	 *
@@ -25,17 +19,23 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 	 */
 	public $sender;
 	/**
-	 * The basic link for the KMC site
-	 *
-	 * @var string
-	 */
-	public $link;
-	/**
 	 * The subject of the entry
 	 *
 	 * @var string
 	 */
 	public $subject;
+	/**
+	 * The message to send in the notification mail
+	 *
+	 * @var string area
+	 */
+	public $message;
+	/**
+	 * The basic link for the KMC site
+	 *
+	 * @var string
+	 */
+	public $link;
 	/**
 	 * Send the mail to each user
 	 *
@@ -52,7 +52,7 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 	{
 		/** @var kObjectTask $dbObject */
 		$dbObject = parent::toObject($dbObject, $skip);
-		$dbObject->setDataValue('mailAddress', $this->mailAddress);
+		$dbObject->setDataValue('mailTo', $this->mailTo);
 		$dbObject->setDataValue('message', $this->message);
 		$dbObject->setDataValue('sendToUsers', $this->sendToUsers);
 		$dbObject->setDataValue('sender', $this->sender);
@@ -64,7 +64,7 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 	{
 		parent::doFromObject($srcObj, $responseProfile);
 		/** @var kObjectTask $srcObj */
-		$this->mailAddress = $srcObj->getDataValue('mailAddress');
+		$this->mailTo = $srcObj->getDataValue('mailTo');
 		$this->message = $srcObj->getDataValue('message');
 		$this->sendToUsers = $srcObj->getDataValue('sendToUsers');
 		$this->sender = $srcObj->getDataValue('sender');

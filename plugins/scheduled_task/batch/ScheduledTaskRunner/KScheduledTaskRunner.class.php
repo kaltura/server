@@ -132,8 +132,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		
 		if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
 		{
-			$mediaRepurposingName = $this->getMediaRepurposingProfileName($profile);
-			KObjectTaskMailNotificationEngine::sendMailNotification($profile->objectTasks[0], $objectsIds, $mediaRepurposingName, $profile->partnerId);
+			KObjectTaskMailNotificationEngine::sendMailNotification($profile->objectTasks[0], $objectsIds, $profile->id, $profile->partnerId);
 		}
 
 
