@@ -1157,6 +1157,7 @@ class kContentDistributionManager
 
 		assetPeer::setUseCriteriaFilter(false);
 		$flavorAssets = assetPeer::retrieveByIds($flavorAssetsIds);
+		assetPeer::setUseCriteriaFilter(true);
 
 		$outFlavors = array();
 		foreach ($flavorAssets as $asset)

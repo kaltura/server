@@ -32,7 +32,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 				return self::onEntryReady($object);
 			else
-				return self::onEntryChanged($oGbject, $modifiedColumns);
+				return self::onEntryChanged($object, $modifiedColumns);
 		}
 		
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
@@ -1919,8 +1919,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	
 	protected static function assignAssetsAndValidateForSubmission(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile, $action){
 		$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-		$listChanged = ($listChanged || kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
-		$listChanged = ($listChanged || kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile));
+		$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
+		$listChanged = ($listChanged | kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile));
 		
 		if(!$listChanged)
 		{
