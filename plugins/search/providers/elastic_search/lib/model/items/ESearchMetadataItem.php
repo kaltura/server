@@ -111,7 +111,7 @@ class ESearchMetadataItem extends ESearchItem
 				return $metadataQuery;
 			}
 		}
-		return $metadataQuery;
+		return array($metadataQuery);
 	}
 
 	public static function createSingleItemSearchQuery($metadataESearchItem, $boolOperator, &$metadataQuery, $allowedSearchTypes)

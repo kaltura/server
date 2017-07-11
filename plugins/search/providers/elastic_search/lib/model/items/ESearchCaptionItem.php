@@ -76,7 +76,7 @@ class ESearchCaptionItem extends ESearchItem
 			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes);
 		}
 		
-		return $captionQuery;
+		return array($captionQuery);
 	}
 
 	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionQuery, $allowedSearchTypes)

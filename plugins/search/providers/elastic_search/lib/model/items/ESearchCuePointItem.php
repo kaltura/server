@@ -82,7 +82,7 @@ class ESearchCuePointItem extends ESearchItem
 			//$queryVerbs = $cuePointSearchItem->getQueryVerbs();
 			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes);
 		}
-		return $cuePointQuery;
+		return array($cuePointQuery);
 	}
 
 	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointQuery, $allowedSearchTypes)

@@ -120,18 +120,10 @@ class ESearchOperator extends ESearchItem
 			
 			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $operatorType);
 
-			if($itemClassName == 'ESearchEntryItem' || $itemClassName == 'ESearchCategoryItem' || $itemClassName == 'ESearchUserItem' || $itemClassName == 'ESearchUnifiedItem')
+			foreach ($subQuery as $key => $value)
 			{
-				foreach ($subQuery as $key => $value)
-				{
-					$outQuery['bool'][$boolOperator][] = $value;
-				}
+				$outQuery['bool'][$boolOperator][] = $value;
 			}
-			else
-			{
-				$outQuery['bool'][$boolOperator][] = $subQuery;
-			}
-
 		}
 
 		if($eSearchOperatorType == ESearchOperatorType::OR_OP && count($outQuery['bool'][$boolOperator]))
