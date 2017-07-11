@@ -75,7 +75,7 @@ abstract class kBaseSearch
         $partnerStatus = array();
         foreach ($statuses as $status)
         {
-            $partnerStatus[] = "p{$partnerId}s{$status}";
+            $partnerStatus[] = elasticSearchUtils::formatPartnerStatus($partnerId, $status);
         }
 
         $this->query['body'] = array(
@@ -95,4 +95,5 @@ abstract class kBaseSearch
     {
         $this->query['body']['query']['bool']['must'] = array($conditions);
     }
+
 }

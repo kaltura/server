@@ -179,12 +179,12 @@ class ESearchMetadataItem extends ESearchItem
 		$metadataDoesntContain = array();
 		if(ctype_digit($searchItem->getSearchTerm()))
 		{
-			$metadataDoesntContain['bool']['should'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
-			$metadataDoesntContain['bool']['should'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
+			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
 			$metadataDoesntContain['bool']['minimum_should_match'] = 1;
 		}
 		else
-			$metadataDoesntContain = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+			$metadataDoesntContain['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
 
 		return $metadataDoesntContain;
 	}

@@ -1917,7 +1917,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$body = array(
 			'doc' => array(
 				'partner_id' => $this->getPartnerId(),
-				'partner_status' => "p{$this->getPartnerId()}s{$this->getStatus()}",
+				'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 				'privacy' => self::formatPrivacy($this->getPrivacy(), $this->getPartnerId()),
 				'privacy_context' => $this->getElasticSearchIndexPrivacyContext(),
 				'privacy_contexts' => $this->getElasticSearchIndexPrivacyContexts(),

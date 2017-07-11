@@ -47,7 +47,8 @@
 	  },
 	  "properties" : {
 		"group_ids" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"screen_name" : {
 		  "type" : "text",
@@ -63,16 +64,20 @@
 		  }
 		},
 		"kuser_type" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"email" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"tags" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"status" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"partner_status":{
 		  "type" : "keyword"
@@ -84,37 +89,47 @@
 		  "type" : "date"
 		},
 		"first_name" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"last_name" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"role_ids" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"permission_names" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"metadata" :{
 		  "type"  : "nested",
 		  "properties"  : {
 			"metadata_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"system_name" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"xpath" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"metadata_profile_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"systemname_xpath_metadataprofileid" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"metadata_field_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"value_int": {
 			  "type": "long"
