@@ -5,7 +5,7 @@
  * @package plugins.dropFolder
  * @subpackage api.objects
  */
-class KalturaDropFolderFileResource extends KalturaDataEntryAllowedContentResource
+class KalturaDropFolderFileResource extends KalturaGenericDataCenterContentResource
 {
 	/**
 	 * Id of the drop folder file object

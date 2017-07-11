@@ -194,24 +194,25 @@ class DataService extends KalturaEntryService
 	*
 	* @action addContent
 	* @param string $entryId
-	* @param KalturaDataEntryAllowedContentResource $resource
+	* @param KalturaGenericDataCenterContentResource $resource
 	* @return string
 	* @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	* @validateUser entry entryId edit
 	*/
-	function addContentAction($entryId, KalturaDataEntryAllowedContentResource $resource)
+	function addContentAction($entryId, KalturaGenericDataCenterContentResource $resource)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
-		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DATA)
+		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		if($resource) {
-			$kResource = $resource->toObject();
-			$resource->validateEntry($dbEntry);
-			$this->attachResource($kResource, $dbEntry);
-			$resource->entryHandled($dbEntry);
-		}
+		if ($dbEntry->getType() != KalturaEntryType::DATA)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE,$entryId, $dbEntry->getType(), entryType::DATA);
+
+		$resource->validateEntry($dbEntry);
+		$kResource = $resource->toObject();
+		$this->attachResource($kResource, $dbEntry);
+		$resource->entryHandled($dbEntry);
 
 		return $this->getEntry($entryId);
 	}
