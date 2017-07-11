@@ -1,6 +1,6 @@
 # Lynx 12.20.0 #
 
-## Add Media-Entry ready email template ##
+## Add live packager delivery profiles ##
 
 - Issue Type: Feature
 - Issue ID: PLAT-7725
