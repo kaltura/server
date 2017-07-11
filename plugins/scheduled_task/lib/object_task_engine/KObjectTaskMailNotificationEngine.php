@@ -47,7 +47,7 @@ class KObjectTaskMailNotificationEngine
 		$sender = $mailTask->sender;
 		
 		$link = $mailTask->link ? str_replace(self::PARTNER_ID_PLACE_HOLDER, $partnerId,  $mailTask->link) : null;
-		$body = self::getAdminObjectsBody($objectsIds, $mailTask->sendToUsers, $link);
+		$body = $mailTask->message . PHP_EOL . self::getAdminObjectsBody($objectsIds, $mailTask->sendToUsers, $link);
 
 		$toArr = explode(",", $mailTask->mailTo);
 		$success = self::sendMail($toArr, $subject, $body, $sender);
@@ -56,7 +56,7 @@ class KObjectTaskMailNotificationEngine
 
 		if ($mailTask->sendToUsers)
 			foreach ($objectsIds as $user => $objects) {
-				$body = self::getUserObjectsBody($objects, $link);
+				$body = $mailTask->message . PHP_EOL . self::getUserObjectsBody($objects, $link);
 				$success = self::sendMail(array($user), $subject, $body, $sender);
 				if (!$success)
 					KalturaLog::info("Mail for MRP [$mediaRepurposingId] did not send successfully");
