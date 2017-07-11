@@ -20,8 +20,11 @@ class ESearchService extends KalturaBaseService
 		list($coreSearchOperator, $entryStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $entryStatuses, $pager, $order);
 		$entrySearch = new kEntrySearch();
 		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
-		$coreResults = elasticSearchUtils::transformElasticToEntry($elasticResults);
-		return KalturaESearchEntryResultArray::fromDbArray($coreResults);
+		list($coreResults, $objectCount) = elasticSearchUtils::transformElasticToCoreObject($elasticResults, 'entryPeer');
+		$response = new KalturaESearchResponse();
+		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults);
+		$response->totalCount = $objectCount;
+		return $response;
 	}
 
 	/**
@@ -38,8 +41,11 @@ class ESearchService extends KalturaBaseService
 		list($coreSearchOperator, $categoryStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $categoryStatuses, $pager, $order);
 		$categorySearch = new kCategorySearch();
 		$elasticResults = $categorySearch->doSearch($coreSearchOperator, $categoryStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
-		$coreResults = elasticSearchUtils::transformElasticToCategory($elasticResults);
-		return KalturaESearchCategoryResultArray::fromDbArray($coreResults);
+		list($coreResults, $objectCount) = elasticSearchUtils::transformElasticToCoreObject($elasticResults, 'categoryPeer');
+		$response = new KalturaESearchResponse();
+		$response->objects = KalturaESearchCategoryResultArray::fromDbArray($coreResults);
+		$response->totalCount = $objectCount;
+		return $response;
 	}
 
 	/**
@@ -56,8 +62,11 @@ class ESearchService extends KalturaBaseService
 		list($coreSearchOperator, $userStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $userStatuses, $pager, $order);
 		$userSearch = new kUserSearch();
 		$elasticResults = $userSearch->doSearch($coreSearchOperator, $userStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
-		$coreResults = elasticSearchUtils::transformElasticToUser($elasticResults);
-		return KalturaESearchUserResultArray::fromDbArray($coreResults);
+		list($coreResults, $objectCount) = elasticSearchUtils::transformElasticToCoreObject($elasticResults, 'kuserPeer');
+		$response = new KalturaESearchResponse();
+		$response->objects = KalturaESearchUserResultArray::fromDbArray($coreResults);
+		$response->totalCount = $objectCount;
+		return $response;
 	}
 
 	/**

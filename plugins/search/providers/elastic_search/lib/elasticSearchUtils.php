@@ -69,6 +69,7 @@ class elasticSearchUtils
 	{
 		$objectData = array();
 		$objectOrder = array();
+		$objectCount = 0;
 		foreach ($elasticResults['hits']['hits'] as $key => $elasticObject)
 		{
 			$itemData = array();
@@ -94,7 +95,9 @@ class elasticSearchUtils
 			$objectData[$elasticObject['_id']] = $itemData;
 			$objectOrder[$elasticObject['_id']] = $key;
 		}
-		return array($objectData, $objectOrder);
+		if(isset($elasticResults['hits']['total']))
+			$objectCount = $elasticResults['hits']['total'];
+		return array($objectData, $objectOrder, $objectCount);
 	}
 
 	private static function getCoreESearchResults($coreObjects, $objectsData, $objectsOrder)
@@ -111,25 +114,12 @@ class elasticSearchUtils
 		return $resultsObjects;
 	}
 
-	public static function transformElasticToCategory($elasticResults)
+	public static function transformElasticToCoreObject($elasticResults, $peerName)
 	{
-		list($categoryData, $categoryOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
-		$categories = categoryPeer::retrieveByPKs(array_keys($categoryData));
-		return elasticSearchUtils::getCoreESearchResults($categories, $categoryData, $categoryOrder);
-	}
-
-	public static function transformElasticToEntry($elasticResults)
-	{
-		list($entriesData, $entriesOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
-		$entries = entryPeer::retrieveByPKs(array_keys($entriesData));
-		return elasticSearchUtils::getCoreESearchResults($entries, $entriesData, $entriesOrder);
-	}
-
-	public static function transformElasticToUser($elasticResults)
-	{
-		list($usersData, $usersOrder) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
-		$users = kuserPeer::retrieveByPKs(array_keys($usersData));
-		return elasticSearchUtils::getCoreESearchResults($users, $usersData, $usersOrder);
+		list($objectData, $objectOrder, $objectCount) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
+		$objects = $peerName::retrieveByPKs(array_keys($objectData));
+		$coreResults = elasticSearchUtils::getCoreESearchResults($objects, $objectData, $objectOrder);
+		return array($coreResults, $objectCount);
 	}
 
 	protected static function getItemResults($objectResult, $objectType)
