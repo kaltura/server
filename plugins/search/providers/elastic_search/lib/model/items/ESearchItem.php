@@ -48,30 +48,6 @@ abstract class ESearchItem extends BaseObject
 		$this->range = $range;
 	}
 
-	/**
-	 * @return null|string
-	 */
-	public function getQueryVerbs()
-	{
-		$queryVerb = null;
-		switch ($this->getItemType())
-		{
-			case ESearchItemType::EXACT_MATCH:
-				$queryVerb = array('must','term');
-				break;
-			case ESearchItemType::PARTIAL:
-				$queryVerb = array('must','match');
-				break;
-			case ESearchItemType::STARTS_WITH:
-				$queryVerb = array('must','prefix');
-				break;
-			case ESearchItemType::DOESNT_CONTAIN:
-				$queryVerb = array('must_not','term');
-				break;
-		}
-		return $queryVerb;
-	}
-
 	protected function validateAllowedSearchTypes($allowedSearchTypes, $fieldName)
 	{
 		if (!in_array($this->getItemType(),  $allowedSearchTypes[$fieldName]))
@@ -92,9 +68,5 @@ abstract class ESearchItem extends BaseObject
 	}
 
 	abstract public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null);
-
-
-	
-	
 
 }
