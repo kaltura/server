@@ -97,10 +97,6 @@ class ESearchCategoryItem extends ESearchItem
 		$allowedSearchTypes = ESearchCategoryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $categorySearchItem)
 		{
-			/**
-			 * @var ESearchCategoryItem $categorySearchItem
-			 */
-			$queryVerbs = $categorySearchItem->getQueryVerbs();
 			self::createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes);
 		}
 		return $categoryQuery;
