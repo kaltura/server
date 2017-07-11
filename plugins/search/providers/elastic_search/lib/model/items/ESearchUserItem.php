@@ -73,15 +73,6 @@ class ESearchUserItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
-	public function getQueryVerbs()
-	{
-		$allowedSearchTypes = self::getAllowedSearchTypesForField();
-		if (!in_array($this->getItemType(),  $allowedSearchTypes[$this->getFieldName()]))
-			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $this->getFieldName().']', kCoreException::INTERNAL_SERVER_ERROR);
-		return parent::getQueryVerbs();
-	}
-
-
 	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
 		$userQuery = array();
