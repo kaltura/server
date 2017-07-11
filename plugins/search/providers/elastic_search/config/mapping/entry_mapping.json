@@ -73,91 +73,116 @@
 		  }
 		},
 		"partner_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"partner_status" : {
 		  "type" : "keyword"
 		},
 		"parent_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"status" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"entitled_kusers_edit" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"entitled_kusers_publish" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"kuser_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"puser_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"creator_puser_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"creator_kuser_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"category_ids" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"active_category_ids" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"tags" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"reference_id": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"conversion_profile_id": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"template_entry_id": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"display_in_search": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"media_type": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"source_type": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"length_in_msecs": {
 		  "type" : "long"
 		},
 		"recorded_entry_id": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"credit": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"start_date": {
-		  "type" : "keyword"
+		  "type" : "date"
 		},
 		"end_date": {
-		  "type" : "keyword"
+		  "type" : "date"
 		},
 		"site_url": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"admin_tags": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"push_publish": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"entry_type": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"moderation_status": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"created_at" : {
 		  "type" : "date"
@@ -169,51 +194,65 @@
 		  "type" : "date"
 		},
 		"total_rank": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"access_control_id": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"group_id": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"partner_sort_value": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"redirect_entry_id": {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"parent_entry" : {
 		  "properties" : {
 			"entry_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"status" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"partner_id" :{
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"partner_status" :{
 			  "type" : "keyword"
 			},
 			"entitled_kusers_edit" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"entitled_kusers_publish" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"kuser_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"creator_kuser_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"category_ids" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"active_category_ids" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			}
 		  }
 		},
@@ -221,10 +260,12 @@
 		  "type"  : "nested",
 		  "properties"  : {
 			"id": {
-			  "type"  : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"language" : {
-			  "type"  : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"lines"  : {
 			  "type"  : "nested",
@@ -388,22 +429,28 @@
 		  "type"  : "nested",
 		  "properties"  : {
 			"metadata_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"system_name" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"xpath" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"metadata_profile_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"systemname_xpath_metadataprofileid" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"metadata_field_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"value_int": {
 			  "type": "long"
@@ -427,10 +474,12 @@
 		  "type" : "nested",
 		  "properties"  : {
 			"cue_point_type" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"cue_point_id": {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"cue_point_name" : {
 			  "type" : "text",
@@ -459,7 +508,8 @@
 			  }
 			},
 			"cue_point_tags" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"cue_point_start_time" : {
 			  "type" : "long"
@@ -468,7 +518,8 @@
 			  "type" : "long"
 			},
 			"cue_point_sub_type" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"cue_point_question" : { //for polls
 			  "type" : "text",
@@ -526,22 +577,28 @@
 			  "type"  : "nested",
 			  "properties"  : {
 				"metadata_id" : {
-				  "type" : "keyword"
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				},
 				"system_name" : {
-				  "type" : "keyword"
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				},
 				"xpath" : {
-				  "type" : "keyword"
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				},
 				"metadata_profile_id" : {
-				  "type" : "keyword"
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				},
 				"systemname_xpath_metadataprofileid" : {
-				  "type" : "keyword"
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				},
 				"metadata_field_id" : {
-				  "type" : "keyword"
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				},
 				"value_int": {
 				  "type": "long"

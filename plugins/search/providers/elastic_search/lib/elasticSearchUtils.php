@@ -144,4 +144,9 @@ class elasticSearchUtils
 		}
 	}
 
+	public static function formatPartnerStatus($partnerId, $status)
+	{
+		return sprintf("p%ss%s", $partnerId, $status);
+	}
+
 }

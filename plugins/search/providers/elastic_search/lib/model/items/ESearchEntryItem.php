@@ -118,7 +118,7 @@ class ESearchEntryItem extends ESearchItem
 				$entryQuery[] = kESearchQueryManager::getPrefixQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::DOESNT_CONTAIN:
-				$entryQuery[] = kESearchQueryManager::getDoesntContainQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes);
+				$entryQuery[]['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::RANGE:
 				$entryQuery[] = kESearchQueryManager::getRangeQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes);

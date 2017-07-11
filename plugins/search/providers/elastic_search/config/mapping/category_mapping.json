@@ -47,28 +47,35 @@
 	  },
 	  "properties" : {
 		"partner_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"status" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"partner_status" : {
 		  "type" : "keyword"
 		},
 		"privacy" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"privacy_context" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"privacy_contexts" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"kuser_ids" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"parent_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"depth" : {
 		  "type" : "short"
@@ -100,7 +107,8 @@
 		  }
 		},
 		"full_ids" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"entries_count" : {
 		  "type" : "integer"
@@ -140,46 +148,59 @@
 		  }
 		},
 		"tags" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"display_in_search" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"inheritance_type" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"kuser_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"reference_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"inherited_parent_id" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"moderation" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"contribution_policy" : {
-		  "type" : "keyword"
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
 		},
 		"metadata" :{
 		  "type"  : "nested",
 		  "properties"  : {
 			"metadata_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"system_name" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"xpath" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"metadata_profile_id" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"systemname_xpath_metadataprofileid" : {
-			  "type" : "keyword"
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
 			},
 			"metadata_field_id" : {
 			  "type" : "long"

@@ -25,14 +25,13 @@ class kESearchQueryManager
 	public static function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes)
 	{
 		$exactMatch = array();
-		$queryType = 'term';
-		$fieldSuffix = '';
+		$queryType = 'match';
 
-		if ($searchItem->getItemType() == ESearchItemType::EXACT_MATCH && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
-		{
-			$queryType = 'match';
+		$fieldSuffix = '';
+		$itemType = $searchItem->getItemType();
+
+		if ( ($itemType == ESearchItemType::EXACT_MATCH || $itemType == ESearchItemType::DOESNT_CONTAIN) && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 			$fieldSuffix = '.raw';
-		}
 
 		$exactMatch[$queryType] = array( $fieldName . $fieldSuffix => $searchItem->getSearchTerm());
 		return $exactMatch;
@@ -41,9 +40,7 @@ class kESearchQueryManager
 	public static function getPrefixQuery($searchItem, $fieldName, $allowedSearchTypes)
 	{
 		$prefixQuery = array();
-		$queryType = 'prefix';
-		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
-			$queryType = 'match_phrase_prefix';
+		$queryType = 'match_phrase_prefix';
 		$prefixQuery[$queryType] = array( $fieldName => $searchItem->getSearchTerm());
 
 		return $prefixQuery;
