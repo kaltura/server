@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaServerFileResource extends KalturaDataCenterContentResource
+class KalturaServerFileResource extends KalturaDataEntryAllowedContentResource
 {
 	/**
 	 * Full path to the local file 
