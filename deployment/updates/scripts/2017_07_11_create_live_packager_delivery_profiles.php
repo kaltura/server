@@ -18,7 +18,7 @@ $configMss = realpath(dirname(__FILE__) . '/../../') . '/base/scripts/init_data/
 if(!file_exists($configHls) || !file_exists($configHds) || !file_exists($configDash) || !file_exists($configMss))
 {
 	KalturaLog::err("Missing delivery profile configuration files for deploying live packager delivery porfiles");
-	exit(-2);
+	return;
 }
 
 passthru("php $script $configHls");
