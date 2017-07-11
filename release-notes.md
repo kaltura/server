@@ -1,5 +1,29 @@
 # Lynx 12.20.0 #
 
+## Add live packager delivery profiles ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7725
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerDash.template.ini
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerHds.template.ini
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerHls.template.ini
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerMss.template.ini
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/2017_07_11_create_live_packager_delivery_profiles.php
+
+#### Known Issues & Limitations ####
+The followign modules need to be insatlled and correctly configured for this to work:
+
+- Please note that for live packaging to work you need to have the  [nginx-vod-module](https://github.com/kaltura/nginx-vod-module) correctly installed and configured to support live packaging.
+- This also requires your Kaltura live platform to work with Kaltura's [liveDvr](https://github.com/kaltura/liveDVR) 
+
+
 ## Add Media-Entry ready email template ##
 
 - Issue Type: Support
