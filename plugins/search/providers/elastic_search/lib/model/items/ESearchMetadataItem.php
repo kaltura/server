@@ -5,6 +5,7 @@
  */
 class ESearchMetadataItem extends ESearchItem
 {
+	const DEFAULT_INNER_HITS_SIZE = 10;
 
 	private static $allowed_search_types_for_field = array(
 		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH,ESearchUnifiedItem::UNIFIED),
@@ -86,8 +87,10 @@ class ESearchMetadataItem extends ESearchItem
 
 	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
+		$innerHitsConfig = kConf::get('innerHits', 'elastic');
+		$innerHitsSize = isset($innerHitsConfig['metadataInnerHitsSize']) ? $innerHitsConfig['metadataInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
 		$metadataQuery['nested']['path'] = 'metadata';
-		$metadataQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
+		$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchMetadataItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $metadataESearchItem)
 		{
@@ -96,7 +99,7 @@ class ESearchMetadataItem extends ESearchItem
 			if ($metadataESearchItem->getXpath())
 			{
 				$metadataQuery['nested']['query']['bool']['must'][] = array(
-					'term' => array(
+					'match' => array(
 						'metadata.xpath' => $metadataESearchItem->getXpath()
 					)
 				);
@@ -104,7 +107,7 @@ class ESearchMetadataItem extends ESearchItem
 			if ($metadataESearchItem->getMetadataProfileId())
 			{
 				$metadataQuery['nested']['query']['bool']['must'][] = array(
-					'term' => array(
+					'match' => array(
 						'metadata.metadata_profile_id' => $metadataESearchItem->getMetadataProfileId()
 					)
 				);
@@ -137,6 +140,9 @@ class ESearchMetadataItem extends ESearchItem
 			case ESearchItemType::RANGE:
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
 					self::getMetadataRangeQuery($metadataESearchItem, $allowedSearchTypes);
+				break;
+			default:
+				KalturaLog::log("Undefined item type[".$metadataESearchItem->getItemType()."]");
 		}
 
 		if($boolOperator == 'should')

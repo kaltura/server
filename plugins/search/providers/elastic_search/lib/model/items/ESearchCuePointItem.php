@@ -5,6 +5,7 @@
  */
 class ESearchCuePointItem extends ESearchItem
 {
+	const DEFAULT_INNER_HITS_SIZE = 10;
 
 	/**
 	 * @var ESearchCuePointFieldName
@@ -74,8 +75,10 @@ class ESearchCuePointItem extends ESearchItem
 
 	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
+		$innerHitsConfig = kConf::get('innerHits', 'elastic');
+		$innerHitsSize = isset($innerHitsConfig['cuePointsInnerHitsSize']) ? $innerHitsConfig['cuePointsInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
 		$cuePointQuery['nested']['path'] = 'cue_points';
-		$cuePointQuery['nested']['inner_hits'] = array('size' => 10, '_source' => true);
+		$cuePointQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $cuePointSearchItem)
 		{
@@ -109,6 +112,9 @@ class ESearchCuePointItem extends ESearchItem
 			case ESearchItemType::RANGE:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
 					kESearchQueryManager::getRangeQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			default:
+				KalturaLog::log("Undefined item type[".$cuePointSearchItem->getItemType()."]");
 		}
 
 		if($boolOperator == 'should')

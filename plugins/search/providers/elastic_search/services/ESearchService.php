@@ -13,7 +13,7 @@ class ESearchService extends KalturaBaseService
 	 * @param string $entryStatuses
 	 * @param KalturaPager $pager
 	 * @param KalturaESearchOrderBy $order
-	 * @return KalturaESearchResultArray
+	 * @return KalturaESearchResponse
 	 */
 	function searchEntryAction (KalturaESearchOperator $searchOperator, $entryStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
 	{
@@ -34,7 +34,7 @@ class ESearchService extends KalturaBaseService
 	 * @param string $categoryStatuses
 	 * @param KalturaPager $pager
 	 * @param KalturaESearchOrderBy $order
-	 * @return KalturaESearchResultArray
+	 * @return KalturaESearchResponse
 	 */
 	function searchCategoryAction (KalturaESearchOperator $searchOperator, $categoryStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
 	{
@@ -55,7 +55,7 @@ class ESearchService extends KalturaBaseService
 	 * @param string $userStatuses
 	 * @param KalturaPager $pager
 	 * @param KalturaESearchOrderBy $order
-	 * @return KalturaESearchResultArray
+	 * @return KalturaESearchResponse
 	 */
 	function searchUserAction (KalturaESearchOperator $searchOperator, $userStatuses = null, KalturaPager $pager = null,  KalturaESearchOrderBy $order = null)
 	{
@@ -100,7 +100,7 @@ class ESearchService extends KalturaBaseService
 	{
 		if (!$searchOperator->operator)
 			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
-		//TODO: should we allow doesnt contain without a specific contains
+
 		$coreSearchOperator = $searchOperator->toObject();
 
 		$objectStatusesArr = array();

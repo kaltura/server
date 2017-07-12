@@ -6,6 +6,8 @@
 class ESearchCaptionItem extends ESearchItem
 {
 
+	const DEFAULT_INNER_HITS_SIZE = 10;
+
 	private static $allowed_search_types_for_field = array(
 		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, ESearchUnifiedItem::UNIFIED),
 		'caption_assets.lines.start_time' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::RANGE'=>ESearchItemType::RANGE),
@@ -66,9 +68,11 @@ class ESearchCaptionItem extends ESearchItem
 
 	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
+		$innerHitsConfig = kConf::get('innerHits', 'elastic');
+		$innerHitsSize = isset($innerHitsConfig['captionInnerHitsSize']) ? $innerHitsConfig['captionInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
 		$captionQuery['nested']['path'] = 'caption_assets';
-		$captionQuery['nested']['query']['nested']['inner_hits'] = array('size' => 10); //TODO: get this parameter from config
-		$captionQuery['nested']['inner_hits'] = array('size' => 10, '_source' => false);
+		$captionQuery['nested']['query']['nested']['inner_hits'] = array('size' => $innerHitsSize);
+		$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => false);
 		$captionQuery['nested']['query']['nested']['path'] = "caption_assets.lines";
 		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $eSearchCaptionItem)
@@ -103,6 +107,9 @@ class ESearchCaptionItem extends ESearchItem
 			case ESearchItemType::RANGE:
 				$captionQuery['nested']['query']['nested']['query']['bool'][$boolOperator][] =
 					kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+				break;
+			default:
+				KalturaLog::log("Undefined item type[".$eSearchCaptionItem->getItemType()."]");
 		}
 		
 		if($boolOperator == 'should')

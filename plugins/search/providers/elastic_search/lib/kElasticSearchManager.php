@@ -103,6 +103,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $params['id'] = $object->getElasticId();
         $params['action'] = $op;
 
+        //todo - remove after staging
+        if(kConf::get('disableElastic', 'elastic', true))
+            return true;
+
         $this->saveToSphinxLog($object, $params);
 
         if(!kConf::get('exec_elastic', 'local', 0))
@@ -138,7 +142,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticServerId = null;
         if(kConf::hasParam('exec_elastic') && kConf::get('exec_elastic'))
         {
-            $elasticHostName = kConf::get('elasticHost', 'local');
+            $elasticHostName = kConf::get('elasticHost', 'elastic');
             $elasticServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_SERVER);
             if ($elasticServerCacheStore)
             {

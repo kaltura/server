@@ -42,27 +42,6 @@ class kEntrySearch extends kBaseSearch
         parent::initQuery($statuses, $pager, $order);
     }
 
-    protected function initBasePartnerFilter($partnerId, array $entriesStatus)
-    {
-        $partnerStatus = array();
-        foreach ($entriesStatus as $entryStatus)
-        {
-            $partnerStatus[] = "p{$partnerId}s{$entryStatus}";
-        }
-
-        $this->query['body'] = array(
-            'query' => array(
-                'bool' => array(
-                    'filter' => array(
-                        array(
-                            'terms' => array('partner_status' => $partnerStatus)
-                        )
-                    )
-                )
-            )
-        );
-    }
-
     protected function initEntitlement()
     {
         foreach (self::$entitlementContributors as $contributor)

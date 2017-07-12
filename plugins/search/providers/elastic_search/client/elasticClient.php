@@ -19,11 +19,11 @@ class elasticClient
     public function __construct($host = null, $port = null, $curlTimeout = null)
     {
         if(!$host)
-            $host = kConf::get('elasticHost', 'local', null);
+            $host = kConf::get('elasticHost', 'elastic', null);
         $this->elasticHost = $host;
 
         if(!$port)
-            $port = kConf::get('elasticPort', 'local', null);;
+            $port = kConf::get('elasticPort', 'elastic', null);;
         $this->elasticPort = $port;
 
         $this->ch = curl_init();
@@ -32,7 +32,7 @@ class elasticClient
         curl_setopt($this->ch, CURLOPT_PORT, $this->elasticPort);
 
         if(!$curlTimeout)
-            $curlTimeout = kConf::get('elasticClientTimeout', 'local', 10);//default curl 10 seconds
+            $curlTimeout = kConf::get('elasticClientCurlTimeout', 'elastic', 10);
         $this->setTimeout($curlTimeout);
     }
 
