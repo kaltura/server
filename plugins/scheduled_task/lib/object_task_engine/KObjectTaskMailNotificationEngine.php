@@ -67,6 +67,9 @@ class KObjectTaskMailNotificationEngine
 	{
 		$mailer = new PHPMailer();
 		$mailer->CharSet = 'utf-8';
+		$mailer->Mailer = 'smtp';
+		$mailer->SMTPKeepAlive = true;
+
 		if (!$toArray || count($toArray) < 1 || strlen($toArray[0]) == 0)
 			return true;
 		foreach ($toArray as $to)
