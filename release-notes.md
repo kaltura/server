@@ -2452,8 +2452,8 @@ Download Couchbase server and install according to [official instructions](http:
 
 #### Server Setup ####
 
- - Install Couchbase PHP extension: `pecl install couchbase`
-     - Required `php-devel` and `libcouchbase-devel`.
+ - Install Couchbase PHP extension: `pecl install couchbase-2.0.7`
+     - Required `php-devel` `gcc` `gcc-c++` `libcouchbase-devel` `libcouchbase-bin`
  - Add couchbase extension in your php.ini file.
  - Setup Couchbase server [http://@WWW_HOST@:8091](http://@WWW_HOST@:8091 "").
  - Define username and password to be used later in cache.ini configuration.
