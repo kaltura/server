@@ -2448,7 +2448,7 @@ None.
 - Issue Type: optimization
 
 ### Couchbase Deployment Instructions ###
-Download Couchbase server and install according to [official instructions](http://www.couchbase.com/nosql-databases/downloads#Couchbase_Server "http://www.couchbase.com/").
+Download Couchbase server and install according to [official instructions](http://www.couchbase.com/nosql-databases/downloads#Couchbase_Server "http://www.couchbase.com/") (Minimal version Couchbase server 4.0.0).
 
 #### Server Setup ####
 
