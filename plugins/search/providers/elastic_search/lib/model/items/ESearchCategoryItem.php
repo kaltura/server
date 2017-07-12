@@ -97,10 +97,6 @@ class ESearchCategoryItem extends ESearchItem
 		$allowedSearchTypes = ESearchCategoryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $categorySearchItem)
 		{
-			/**
-			 * @var ESearchCategoryItem $categorySearchItem
-			 */
-			$queryVerbs = $categorySearchItem->getQueryVerbs();
 			self::createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes);
 		}
 		return $categoryQuery;
@@ -125,6 +121,9 @@ class ESearchCategoryItem extends ESearchItem
 				break;
 			case ESearchItemType::RANGE:
 				$categoryQuery[] = kESearchQueryManager::getRangeQuery($categorySearchItem,$categorySearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			default:
+				KalturaLog::log("Undefined item type[".$categorySearchItem->getItemType()."]");
 		}
 	}
 

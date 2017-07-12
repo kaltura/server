@@ -102,6 +102,9 @@ class ESearchUserItem extends ESearchItem
 				break;
 			case ESearchItemType::RANGE:
 				$userQuery[] = kESearchQueryManager::getRangeQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				break;
+			default:
+				KalturaLog::log("Undefined item type[".$userSearchItem->getItemType()."]");
 		}
 	}
 }
