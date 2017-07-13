@@ -525,7 +525,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->save();
 		}
 		
-		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbLiveEntry->getId(), $flavorParamsId);
+		//In case conversion profile was changed we need to fetch passed streamed assets as well
+		$dbAsset = assetPeer::retrieveByEntryIdAndParamsNoFilter($dbLiveEntry->getId(), $flavorParamsId);
 		if(!$dbAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
 		

@@ -218,7 +218,7 @@ class ftpMgr extends kFileTransferMgr
 			$fileObject->filename = $matches['file'];
 			$fileObject->fileSize = $matches['fileSize'];
 			$fileObject->modificationTime = strtotime($matches['date']);
-			$fileObjectsResult[$fileObject->filename] = $fileObject;
+			$fileObjectsResult[] = $fileObject;
 	    }
 		
 	    return $fileObjectsResult;

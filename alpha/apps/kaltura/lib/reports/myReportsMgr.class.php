@@ -1321,15 +1321,12 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 		$mysql_function = 'mysqli';
-	
 		$db_config = kConf::get( "reports_db_config" );
-		
-		if($mysql_function == 'mysql') $db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
-		else $db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
+		$db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
 		
 		$error_function = $mysql_function.'_error';
 		if (!$db_selected) {
-			throw new kCoreException('Can\'t use foo : ' . $error_function($link), kCoreException::INVALID_QUERY);
+			throw new kCoreException('mysqli_select_db('. $db_config["db_name"].') failed, check settings in the reports_db_config section of configurations/local.ini', kCoreException::INVALID_QUERY);
 		}
 
 		if($mysql_function == 'mysql') $result = mysql_query($query);
@@ -1464,8 +1461,11 @@ class myReportsMgr
 		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
 		
 		$connect_function = $mysql_function.'_connect';
-		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
-		mysqli_set_charset($link, "latin1");
+		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );		
+		if (mysqli_connect_errno()) {
+		        throw new kCoreException('DB connection failed: '. mysqli_connect_error()."\ncheck settings in the reports_db_config section of configurations/local.ini", kCoreException::INVALID_QUERY);
+		}
+    mysqli_set_charset($link, "latin1");
 		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		
 		return $link;

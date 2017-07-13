@@ -30,6 +30,12 @@ class kGeoCoderManager
 			// require direct path as the call may arrive for the caching layer			
 			require_once(dirname(__FILE__) . '/kMaxMindIPGeoCoder.php');
 			return new kMaxMindIPGeocoder();
+			
+		case geoCoderType::DIGITAL_ELEMENT:
+			// require direct path as the call may arrive for the caching layer			
+			require_once(dirname(__FILE__) . '/kDigitalElementIPGeoCoder.php');
+			return new kDigitalElementIPGeocoder();
+			
 		}
 			
 		//currently there aren't any GeoCoder plugins and the caching layer won't support auto loading them anyway

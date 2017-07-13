@@ -428,7 +428,7 @@ class sftpMgr extends kFileTransferMgr
 			$fileObject->filename = $file;
 			$fileObject->fileSize = $this->fileSize($remote_path . "/$file");
 			$fileObject->modificationTime = $this->modificationTime($remote_path . "/$file");
-			$res[$fileObject->filename] = $fileObject;
+			$res[] = $fileObject;
 		}
 
 		return $res;

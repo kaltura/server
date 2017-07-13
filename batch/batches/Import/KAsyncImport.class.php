@@ -94,8 +94,9 @@ class KAsyncImport extends KJobHandlerWorker
     				$curlWrapper->close();
     				return $job;
     			}
-    			$contentType = $curlHeaderResponse->headers['content-type'];
-    			if(isset($curlHeaderResponse->headers['content-length']))
+			if(isset($curlHeaderResponse->headers['content-type']))
+                        	$contentType = $curlHeaderResponse->headers['content-type'];
+			if(isset($curlHeaderResponse->headers['content-length']))
     				$fileSize = $curlHeaderResponse->headers['content-length'];
     			$curlWrapper->close();
 
@@ -119,7 +120,8 @@ class KAsyncImport extends KJobHandlerWorker
 			if(is_null($fileSize)) {
 				// Read file size
 				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
-				$contentType = $curlHeaderResponse->headers['content-type'];
+				if(isset($curlHeaderResponse->headers['content-type']))
+	                               	$contentType = $curlHeaderResponse->headers['content-type'];
 				if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
 					$fileSize = $curlHeaderResponse->headers['content-length'];
 				

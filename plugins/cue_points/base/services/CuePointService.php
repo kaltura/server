@@ -39,13 +39,14 @@ class CuePointService extends KalturaBaseService
 			$this->applyPartnerFilterForClass('CuePoint');
 		}
 
+		$ks = $this->getKs();
 		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin()) {
+		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))) {
 			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
 			CuePointPeer::setUserContentOnly(true);
 		}
 		
-		if (!$this->getKs() || $this->getKs()->isAnonymousSession())
+		if (!$ks || $ks->isAnonymousSession())
 		{
 			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
@@ -143,7 +144,9 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-			
+		else
+			$this->resetUserContentFilter($filter);
+
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
@@ -206,7 +209,8 @@ class CuePointService extends KalturaBaseService
 
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-			
+		else
+			$this->resetUserContentFilter($filter);
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
 	}
 	
@@ -221,6 +225,8 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
+		else
+			$this->resetUserContentFilter($filter);
 						
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
@@ -372,5 +378,15 @@ class CuePointService extends KalturaBaseService
 		$newdbCuePoint->save();
 		$cuePoint = KalturaCuePoint::getInstance($newdbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
+	}
+
+	private function resetUserContentFilter($filter)
+	{
+		if (CuePointPeer::getUserContentOnly())
+		{
+			$entryFilter = $filter->entryIdEqual ? $filter->entryIdEqual : $filter->entryIdIn;
+			if($entryFilter && $this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, $entryFilter))
+				CuePointPeer::setUserContentOnly(false);
+		}
 	}
 }
