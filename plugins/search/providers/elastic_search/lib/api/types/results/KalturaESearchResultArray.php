@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-abstract class KalturaESearchResultArray extends KalturaTypedArray
+class KalturaESearchResultArray extends KalturaTypedArray
 {
 
 	protected static function populateArray($outputArray, $objectType, $sourceArray, $responseProfile)
