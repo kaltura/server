@@ -11,6 +11,7 @@
  * @subpackage api.filters
  */
 class KalturaBeaconFilter extends KalturaBeacon{
+
     /**
      * @var string
      */

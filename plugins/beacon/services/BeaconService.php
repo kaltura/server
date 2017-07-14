@@ -28,8 +28,17 @@ class BeaconService extends KalturaBaseService{
      */
     public function addAction(KalturaBeacon $beacon , $shouldLog,$ttl=600)
     {
-        //TODO add item to elastic server
-        $beaconObject = new BeaconObject(kCurrentContext::$partner_id,$beacon->relatedObjectType, $beacon->eventType , $beacon->objectId ,$beacon->privateData);
+        //validate input
+        if($beacon->eventType == null)
+            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,'eventType');
+
+        if($beacon->objectId == null)
+            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,'objectId');
+
+        if($beacon->relatedObjectType == null)
+            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,'relatedObjectType');
+
+        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$beacon);
         $beaconObject->indexObjectState();
         if($shouldLog)
         {
@@ -40,7 +49,7 @@ class BeaconService extends KalturaBaseService{
 
     /**
      * @action getLast
-     * @param KalturaBeacon $beaconParams
+     * @param KalturaBeaconFilter $beaconParams
      * @param KalturaFilterPager $pager
      * @return KalturaBeaconListResponse
      */
@@ -50,11 +59,17 @@ class BeaconService extends KalturaBaseService{
         {
             throw new KalturaAPIException("Allowed only with admin KS");
         }
+
+        $response = new KalturaBeaconListResponse();
+
+        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$beaconParams);
+        $response->objects =  $beaconObject->searchObject($pager->pageSize,$pager->pageIndex);
+        return $response;
     }
 
     /**
      * @action enhanceSearch
-     * @param KalturaBeacon $beaconParams
+     * @param KalturaBeaconFilter $beaconParams
      * @param string $externalElasticQueryObject
      * @param KalturaFilterPager $pager
      * @return KalturaBeaconListResponse
@@ -66,10 +81,11 @@ class BeaconService extends KalturaBaseService{
         {
             throw new KalturaAPIException("Allowed only with admin KS");
         }
+        $response = new KalturaBeaconListResponse();
+        $beaconObject = new BeaconObject(kCurrentContext::$partner_id,$beaconParams);
+        $response->objects =  $beaconObject->search($externalElasticQueryObject,$pager->pageSize,$pager->pageIndex);
 
-        //TODO add item to elastic server
-
-        //TODO add item to elastic server
+        return $response;
     }
 
 
