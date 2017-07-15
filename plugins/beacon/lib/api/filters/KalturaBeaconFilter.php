@@ -10,7 +10,27 @@
  * @package plugins.beacon
  * @subpackage api.filters
  */
-class KalturaBeaconFilter extends KalturaBeacon{
+class KalturaBeaconFilter {
+
+    /**
+     * @var KalturaBeaconObjectTypes
+     */
+    public $relatedObjectType;
+
+    /**
+     * @var string
+     */
+    public $eventType;
+
+    /**
+     * @var string
+     */
+    public $objectId;
+
+    /**
+     * @var string
+     */
+    public $privateData;
 
     /**
      * @var string

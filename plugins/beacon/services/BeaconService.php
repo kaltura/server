@@ -38,7 +38,7 @@ class BeaconService extends KalturaBaseService{
         if($beacon->relatedObjectType == null)
             throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,'relatedObjectType');
 
-        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$beacon);
+        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),get_object_vars($beacon));
         $beaconObject->indexObjectState();
         if($shouldLog)
         {
@@ -62,7 +62,9 @@ class BeaconService extends KalturaBaseService{
 
         $response = new KalturaBeaconListResponse();
 
-        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$beaconParams);
+
+
+        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),get_object_vars($beaconParams));
         $response->objects =  $beaconObject->searchObject($pager->pageSize,$pager->pageIndex);
         return $response;
     }
@@ -82,7 +84,7 @@ class BeaconService extends KalturaBaseService{
             throw new KalturaAPIException("Allowed only with admin KS");
         }
         $response = new KalturaBeaconListResponse();
-        $beaconObject = new BeaconObject(kCurrentContext::$partner_id,$beaconParams);
+        $beaconObject = new BeaconObject(kCurrentContext::$partner_id,get_object_vars($beaconParams));
         $response->objects =  $beaconObject->search($externalElasticQueryObject,$pager->pageSize,$pager->pageIndex);
 
         return $response;
