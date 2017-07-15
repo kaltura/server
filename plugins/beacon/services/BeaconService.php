@@ -30,13 +30,13 @@ class BeaconService extends KalturaBaseService{
     {
         //validate input
         if($beacon->eventType == null)
-            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,KalturaBeacon::EVENT_TYPE_STRING);
+            throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER,KalturaBeacon::EVENT_TYPE_STRING);
 
         if($beacon->objectId == null)
-            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,KalturaBeacon::OBJECT_ID_STRING);
+            throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER,KalturaBeacon::OBJECT_ID_STRING);
 
         if($beacon->relatedObjectType == null)
-            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,KalturaBeacon::RELATED_OBJECT_TYPE_STRING);
+            throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER,KalturaBeacon::RELATED_OBJECT_TYPE_STRING);
 
         $beacon->indexObjectState();
         if($shouldLog)
@@ -68,21 +68,20 @@ class BeaconService extends KalturaBaseService{
 
     /**
      * @action enhanceSearch
-     * @param KalturaBeaconFilter $beaconFilter
-     * @param string $externalElasticQueryObject
+     * @param KalturaBeaconEnhanceFilter $beaconFilter
      * @param KalturaFilterPager $pager
      * @return KalturaBeaconListResponse
      * @throws KalturaAPIException
      */
 
-    public function enhanceSearchAction($beaconFilter, $externalElasticQueryObject,$pager)
+    public function enhanceSearchAction($beaconFilter,$pager)
     {
         if (!kCurrentContext::$is_admin_session)
         {
             throw new KalturaAPIException("Allowed only with admin KS");
         }
 
-        return $beaconFilter->enhanceSearch($externalElasticQueryObject,pager);
+        return $beaconFilter->enhanceSearch($pager);
 
     }
 

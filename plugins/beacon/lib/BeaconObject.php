@@ -16,16 +16,35 @@ class BeaconElasticClient
     {
         $this->client =  Elasticsearch\ClientBuilder::create()->setHosts(array(self::HOST))->build();
     }
+
+    private function prepareParams($indexType,$mappingArray,$ttl=null)
+    {
+
+        $params =   ['index'=>self::INDEX_NAME ,
+            'type' => $indexType ,
+            'body' => $mappingArray];
+
+        if(!is_null($ttl))
+        $params['ttl'] = $ttl."S";
+
+        return $params;
+    }
+
     function index($indexType,$mappingArray,$ttl=3600)
     {
-        $params =   ['index'=>self::INDEX_NAME ,
-                    'type' => $indexType ,
-                    'ttl' => $ttl."S" ,
-                    'body' => $mappingArray];
-
+        $params = $this-> prepareParams($indexType,$mappingArray,$ttl);
         $ret =  $this->client->index($params);
         return $ret;
     }
+
+    function update($indexType,$mappingArray,$id)
+    {
+        $params = $this-> prepareParams($indexType,$mappingArray);
+        $params['id']=$id;
+        $ret =  $this->client->index($params);
+        return $ret;
+    }
+
     function search($indexType,$searchParamsArray,$pageSize , $pageIndex)
     {
         $query = array ();
@@ -39,18 +58,20 @@ class BeaconElasticClient
 
 
         $params =   [
-            'index'=>self::INDEX_NAME ,
-            'type' => $indexType ,
-            'body' => [
-                'query' => [
-                     'bool'=> [
-                        'must' =>
-                            [
-                                $query
-                            ]
-                    ]
+                'index'=>self::INDEX_NAME ,
+                'type' => $indexType ,
+                'body' => [
+                    'size' => $pageSize ,
+                    'from' => $pageIndex,
+                    'query' => [
+                         'bool'=> [
+                            'must' =>
+                                [
+                                    $query
+                                ]
+                        ]
+                ]
             ]
-        ]
         ];
 
         $response = $this->client->search($params);
@@ -65,31 +86,50 @@ class BeaconElasticClient
 
 class BeaconObject
 {
+    /**
+     * @var KalturaBeaconObjectTypes
+     */
+    public $relatedObjectType;
+
+    /**
+     * @var string
+     */
+    public $eventType;
+
+    /**
+     * @var string
+     */
+    public $objectId;
+
+    /**
+     * @var string
+     */
+    public $privateData;
+
     function __construct ($partnerId,array $params)
     {
-        $this->content = $params;
-        $this->content['partnerId'] =$partnerId;
-        $this->client = new BeaconElasticClient();
+        $this->content              = $params;
+        $this->content['partnerId'] = $partnerId;
+        $this->client               = new BeaconElasticClient();
     }
 
-    function indexObjectState()
+    function indexObjectState($id)
     {
-        $this->client->index("State" , $this->content);
+        $this->client->update("State",$this->content,$id);
     }
 
     function log($ttl)
     {
-        $this->client->index("log" , $this->content ,3600);
+        $this->client->index("log",$this->content,3600);
     }
 
     function searchObject($pageSize,$pageIndex)
     {
         return $this->client->search("State", $this->content,$pageSize,$pageIndex);
     }
-    function search($param,$pageSize,$pageIndex)
+    function search($pageSize,$pageIndex)
     {
-        $param = array_merge($this->content,$param);
-        return $this->client->search("log",$param,$pageSize,$pageIndex);
+        return $this->client->search("log",$this->content,$pageSize,$pageIndex);
     }
 
 }

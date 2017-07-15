@@ -3,7 +3,7 @@
  * @package plugins.beacon
  * @subpackage api.filters
  */
-class KalturaBeaconFilter extends KalturaRelatedFilter {
+class KalturaBeaconFilter extends KalturaObject{
 
     /**
      * @var KalturaBeaconObjectTypes
@@ -46,22 +46,22 @@ class KalturaBeaconFilter extends KalturaRelatedFilter {
         $query = $this->createSearchObject();
         $partnerId = kCurrentContext::getCurrentPartnerId();
         $beaconObject  = new BeaconObject($partnerId , $query);
-        $responseArray = $beaconObject->searchObject($pager->pageIndex ,$pager->pageSize );
+        $responseArray = $beaconObject->searchObject($pager->pageSize,$pager->pageIndex  );
         $response->objects = KalturaBeaconArray::fromDbArray($responseArray);
         return $response;
     }
 
-    public function enhanceSearch($elasticQuery , KalturaFilterPager $pager)
+    public function enhanceSearch(KalturaFilterPager $pager)
     {
         $response = new KalturaBeaconListResponse();
         $query = $this->createSearchObject();
-        $beaconObject  = new BeaconObject(CurrentContext::getCurrentPartnerId() , $query);
-        $responseArray = $beaconObject->search($elasticQuery ,$pager->pageIndex ,$pager->pageSize );
+        $beaconObject  = new BeaconObject(kCurrentContext::getCurrentPartnerId() , $query);
+        $responseArray = $beaconObject->search($pager->pageSize,$pager->pageIndex);
         $response->objects = KalturaBeaconArray::fromDbArray($responseArray);
         return $response;
     }
 
-    private function createSearchObject()
+    protected function createSearchObject()
     {
         $searchObject = array();
         $searchObject[KalturaBeacon::RELATED_OBJECT_TYPE_STRING] = $this->relatedObjectType;

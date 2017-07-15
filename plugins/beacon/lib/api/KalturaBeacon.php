@@ -9,6 +9,8 @@ class KalturaBeacon extends KalturaObject{
     const RELATED_OBJECT_TYPE_STRING = 'relatedObjectType';
     const EVENT_TYPE_STRING          = 'eventType'        ;
     const OBJECT_ID_STRING           = 'objectId'         ;
+    const PRIVATE_DATA_STRING           = 'privateData'         ;
+
     /**
      * @var KalturaBeaconObjectTypes
      */
@@ -34,7 +36,8 @@ class KalturaBeacon extends KalturaObject{
     public function indexObjectState()
     {
         $beaconObject = $this->prepareBeaconObject();
-        $ret  = $beaconObject->indexObjectState();
+        $id = md5($this->relatedObjectType.'_'. $this->eventType.'_'.$this->objectId);
+        $ret  = $beaconObject->indexObjectState($id);
         return $ret;
     }
 
@@ -47,11 +50,12 @@ class KalturaBeacon extends KalturaObject{
 
     private function prepareBeaconObject()
     {
-        $indexObject = array();
+        $indexObject=array();
+        //$indexObject[self::PRIVATE_DATA_STRING] = json_decode($this->privateData,true);
+        $indexObject[self::PRIVATE_DATA_STRING] = $this->privateData;
         $indexObject[self::RELATED_OBJECT_TYPE_STRING] = $this->relatedObjectType;
         $indexObject[self::EVENT_TYPE_STRING] = $this->eventType;
         $indexObject[self::OBJECT_ID_STRING] = $this->objectId;
-        $indexObject[] = $this->privateData;
         $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$indexObject);
         return $beaconObject;
     }
