@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.beacon
+ * @subpackage api.objects
+ */
 class KalturaBeaconArray extends  KalturaTypedArray{
 
     public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
@@ -11,7 +14,7 @@ class KalturaBeaconArray extends  KalturaTypedArray{
         foreach ($arr as $obj)
         {
             $nObj = new KalturaBeacon();
-            $nObj->fromObject($obj, $responseProfile);
+            $nObj->fromArray($obj);
             $newArr[] = $nObj;
         }
 

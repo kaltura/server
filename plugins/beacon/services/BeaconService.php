@@ -30,30 +30,30 @@ class BeaconService extends KalturaBaseService{
     {
         //validate input
         if($beacon->eventType == null)
-            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,'eventType');
+            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,KalturaBeacon::EVENT_TYPE_STRING);
 
         if($beacon->objectId == null)
-            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,'objectId');
+            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,KalturaBeacon::OBJECT_ID_STRING);
 
         if($beacon->relatedObjectType == null)
-            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,'relatedObjectType');
+            throw new KalturaAPIException(MISSING_MANDATORY_PARAMETER,KalturaBeacon::RELATED_OBJECT_TYPE_STRING);
 
-        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),get_object_vars($beacon));
-        $beaconObject->indexObjectState();
+        $beacon->indexObjectState();
         if($shouldLog)
         {
-            $beaconObject->Log($ttl);
+            $beacon->logObjectState($ttl);
         }
         return true;
     }
 
     /**
      * @action getLast
-     * @param KalturaBeaconFilter $beaconParams
+     * @param KalturaBeaconFilter $beaconFilter
      * @param KalturaFilterPager $pager
      * @return KalturaBeaconListResponse
+     * @throws KalturaAPIException
      */
-    public function getLastAction($beaconParams, $pager )
+    public function getLastAction($beaconFilter, $pager )
     {
         if (!kCurrentContext::$is_admin_session)
         {
@@ -62,32 +62,28 @@ class BeaconService extends KalturaBaseService{
 
         $response = new KalturaBeaconListResponse();
 
-
-
-        $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),get_object_vars($beaconParams));
-        $response->objects =  $beaconObject->searchObject($pager->pageSize,$pager->pageIndex);
+        $response =  $beaconFilter->searchLastBeacons($pager);
         return $response;
     }
 
     /**
      * @action enhanceSearch
-     * @param KalturaBeaconFilter $beaconParams
+     * @param KalturaBeaconFilter $beaconFilter
      * @param string $externalElasticQueryObject
      * @param KalturaFilterPager $pager
      * @return KalturaBeaconListResponse
+     * @throws KalturaAPIException
      */
 
-    public function enhanceSearchAction($beaconParams, $externalElasticQueryObject,$pager)
+    public function enhanceSearchAction($beaconFilter, $externalElasticQueryObject,$pager)
     {
         if (!kCurrentContext::$is_admin_session)
         {
             throw new KalturaAPIException("Allowed only with admin KS");
         }
-        $response = new KalturaBeaconListResponse();
-        $beaconObject = new BeaconObject(kCurrentContext::$partner_id,get_object_vars($beaconParams));
-        $response->objects =  $beaconObject->search($externalElasticQueryObject,$pager->pageSize,$pager->pageIndex);
 
-        return $response;
+        return $beaconFilter->enhanceSearch($externalElasticQueryObject,pager);
+
     }
 
 

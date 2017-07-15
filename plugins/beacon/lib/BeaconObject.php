@@ -65,12 +65,10 @@ class BeaconElasticClient
 
 class BeaconObject
 {
-
     function __construct ($partnerId,array $params)
     {
         $this->content = $params;
         $this->content['partnerId'] =$partnerId;
-        //open connection to elastic server
         $this->client = new BeaconElasticClient();
     }
 
