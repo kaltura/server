@@ -483,8 +483,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 */
 	protected function cuePointAdded(CuePoint $cuePoint)
 	{
-		if($cuePoint->shouldReIndexEntry())
-			$this->reIndexCuePointEntry($cuePoint);
+		$this->reIndexToSearchEngines($cuePoint);
 	}
 
 	/**
@@ -497,9 +496,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 		$this->deleteCuePoints($c);
 
-		//re-index cue point on entry
-		if($cuePoint->shouldReIndexEntry())
-			$this->reIndexCuePointEntry($cuePoint);
+		//re-index cue point on entry if needed
+		$this->reIndexToSearchEngines($cuePoint);
 	}
 
 	/**
@@ -746,7 +744,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 		if(self::shouldReIndexEntry($object, $modifiedColumns))
 		{
-			$this->reIndexCuePointEntry($object);
+			$this->reIndexToSearchEngines($object, $modifiedColumns);
 		}
 		if ( self::wasEntryClipped($object, $modifiedColumns) )
 		{
@@ -808,9 +806,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	{
 		if(!($object instanceof CuePoint))
 			return false;
-
+		
 		/* @var $object CuePoint */
-		return $object->shouldReIndexEntry($modifiedColumns);
+		return $object->shouldReIndexEntry($modifiedColumns) || $object->shouldReIndexEntryToElastic($modifiedColumns);
 	}
 
 	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )
@@ -908,7 +906,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return;
  	}
 
-	protected function reIndexCuePointEntry(CuePoint $cuePoint)
+	public static function reIndexCuePointEntry(CuePoint $cuePoint, $shouldReIndexToSphinx, $shouldReIndexToElastic)
 	{
 		//index the entry after the cue point was added|deleted
 		$entryId = $cuePoint->getEntryId();
@@ -916,7 +914,15 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($entry){
 			$entry->setUpdatedAt(time());
 			$entry->save();
-			$entry->indexToSearchIndex();
+			if($shouldReIndexToSphinx){
+
+				$entry->indexToSearchIndex();
+			}
+
+			if(!$shouldReIndexToSphinx && $shouldReIndexToElastic) //we don't need to index to elastic if already indexing to sphinx
+			{
+				$entry->indexToElastic();
+			}
 		}
 	}
 
@@ -959,5 +965,15 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 				KalturaLog::alert("Can't copy cuePoints for entry [{$clipEntry->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY . "]");
 			}
 		}
+	}
+
+	protected function reIndexToSearchEngines(CuePoint $cuePoint, array $modifiedColumns = array())
+	{
+		$shouldReIndexToSphinx = $cuePoint->shouldReIndexEntry($modifiedColumns);
+		KalturaLog::debug("@nh@".print_r($shouldReIndexToSphinx,true));
+		$shouldReIndexToElastic = $cuePoint->shouldReIndexEntryToElastic($modifiedColumns);
+		KalturaLog::debug("@nh@".print_r($shouldReIndexToElastic,true));
+		if($shouldReIndexToSphinx || $shouldReIndexToElastic)
+			$this->reIndexCuePointEntry($cuePoint, $shouldReIndexToSphinx, $shouldReIndexToElastic);
 	}
 }

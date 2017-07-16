@@ -1065,7 +1065,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 				$targetCuePointClient->cuePoint,
 				$targetObjects->thumbCuePoints,
 				$this->sourceObjects->thumbCuePoints,
-				$jobData->providerData->distributedThumbCuePoints,
+				$jobData->providerData->distributedCuePoints,
 				$targetEntryId,
 				'getCuePointAddArgs'
 			);

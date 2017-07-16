@@ -1,0 +1,155 @@
+{
+  "settings" : {
+	"number_of_shards" : 5,
+	"number_of_replicas" : 0,
+	"analysis": { //todo - we can move the analyzer to config filebecause he is common for all indices
+	  "filter": {
+		"trigrams_filter": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3
+		}
+	  },
+	  "char_filter": {
+		"kaltura_whitespace_filter": {
+		  "type": "pattern_replace",
+		  "pattern": "(\\s+)",
+		  "replacement": " "
+		}
+	  },
+	  "analyzer": {
+		"trigrams": {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "filter": [
+			"lowercase",
+			"trigrams_filter"
+		  ]
+		},
+		"kaltura_keyword": {
+		  "type": "custom",
+		  "tokenizer": "keyword",
+		  "char_filter": [
+			"kaltura_whitespace_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"trim"
+		  ]
+		}
+	  }
+	}
+  },
+  "mappings" : {
+	"kuser" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "properties" : {
+		"group_ids" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"screen_name" : {
+		  "type" : "text",
+		  "fields": {
+			"trigrams" : {
+			  "type" : "text",
+			  "analyzer" : "trigrams"
+			},
+			"raw" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			}
+		  }
+		},
+		"kuser_type" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"email" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"tags" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"status" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"partner_status":{
+		  "type" : "keyword"
+		},
+		"created_at" : {
+		  "type" : "date"
+		},
+		"updated_at" : {
+		  "type" : "date"
+		},
+		"first_name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"last_name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"role_ids" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"permission_names" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"metadata" :{
+		  "type"  : "nested",
+		  "properties"  : {
+			"metadata_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"system_name" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"xpath" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"metadata_profile_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"systemname_xpath_metadataprofileid" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"metadata_field_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"value_int": {
+			  "type": "long"
+			},
+			"value_text": {
+			  "type" : "text",
+			  "fields": {
+				"trigrams" : {
+				  "type" : "text",
+				  "analyzer" : "trigrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+}

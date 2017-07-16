@@ -56,4 +56,29 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 	{
 		return array("kuserKgroup:kuserId=".strtolower($this->getKuserId()));
 	}
+
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+
+		if (!$this->alreadyInSave)
+			$this->updateKuserIndex();
+	}
+
+	public function postUpdate(PropelPDO $con = null)
+	{
+		parent::postUpdate($con);
+
+		if (!$this->alreadyInSave)
+			$this->updateKuserIndex();
+	}
+
+	protected function updateKuserIndex()
+	{
+		$kuserId = $this->getKuserId();
+		$kuser = kuserPeer::retrieveByPK($kuserId);
+		if(!$kuser)
+			throw new kCoreException('kuser not found');
+		$kuser->indexToElastic();
+	}
 } // KuserKgroup
