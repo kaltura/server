@@ -23,7 +23,6 @@ interface ESearchCategoryFieldName extends BaseEnum
 	const CATEGORY_INHERITED_PARENT_ID = 'inherited_parent_id';
 	const CATEGORY_MODERATION = 'moderation';
 	const CATEGORY_CONTRIBUTION_POLICY = 'contribution_policy';
-	const CATEGORY_METADATA = 'metadata';
 	const CATEGORY_ENTRIES_COUNT = 'entries_count';
 	const CATEGORY_DIRECT_ENTRIES_COUNT = 'direct_entries_count';
 	const CATEGORY_DIRECT_SUB_CATEGORIES_COUNT = 'direct_sub_categories_count';

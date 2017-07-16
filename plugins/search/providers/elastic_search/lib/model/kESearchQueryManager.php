@@ -25,23 +25,28 @@ class kESearchQueryManager
 	public static function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes)
 	{
 		$exactMatch = array();
-		$queryType = 'match';
-
+		$queryType = 'term';
 		$fieldSuffix = '';
-		$itemType = $searchItem->getItemType();
 
-		if ( ($itemType == ESearchItemType::EXACT_MATCH || $itemType == ESearchItemType::DOESNT_CONTAIN) && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
+		if (in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 			$fieldSuffix = '.raw';
 
-		$exactMatch[$queryType] = array( $fieldName . $fieldSuffix => $searchItem->getSearchTerm());
+		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
+		$exactMatch[$queryType] = array( $fieldName . $fieldSuffix => $searchTerm);
 		return $exactMatch;
 	}
 
 	public static function getPrefixQuery($searchItem, $fieldName, $allowedSearchTypes)
 	{
 		$prefixQuery = array();
-		$queryType = 'match_phrase_prefix';
-		$prefixQuery[$queryType] = array( $fieldName => $searchItem->getSearchTerm());
+		$queryType = 'prefix';
+		$fieldSuffix = '';
+
+		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
+			$fieldSuffix = '.raw';
+
+		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
+		$prefixQuery[$queryType] = array( $fieldName . $fieldSuffix => $searchTerm);
 
 		return $prefixQuery;
 	}
