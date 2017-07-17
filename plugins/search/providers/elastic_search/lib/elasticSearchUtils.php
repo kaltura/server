@@ -139,4 +139,14 @@ class elasticSearchUtils
 		return sprintf("p%ss%s", $partnerId, $status);
 	}
 
+	public static function formatSearchTerm($searchTerm)
+	{
+		//remove extra spaces
+		$term = preg_replace('/\s+/', ' ', $searchTerm);
+		//lowercase and trim
+		$term = strtolower($term);
+		$term = trim($term);
+		return $term;
+	}
+
 }

@@ -11,7 +11,7 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_TAGS = 'tags';
 	const ENTRY_CATEGORY_IDS = 'category_ids';
 	const ENTRY_USER_ID = 'puser_id';
-	const ENTRY_CREATOR_ID = 'creator_kuser_id';
+	const ENTRY_CREATOR_ID = 'creator_puser_id';
 	const ENTRY_START_DATE = 'start_time';
 	const ENTRY_END_DATE = 'end_time';
 	const ENTRY_REFERENCE_ID = 'reference_id';
@@ -27,5 +27,7 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_RECORDED_ENTRY_ID = 'recorded_entry_id';
 	const ENTRY_PUSH_PUBLISH = 'push_publish';
 	const ENTRY_LENGTH_IN_MSECS = 'length_in_msecs';
+	const ENTRY_CREATED_AT = 'created_at';
+	const ENTRY_UPDATED_AT = 'updated_at';
 
 }
