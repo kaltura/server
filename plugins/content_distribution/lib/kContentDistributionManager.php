@@ -839,14 +839,13 @@ class kContentDistributionManager
 			$assignedThumbAssets = assetPeer::retrieveByIds(explode(',', $assignedThumbAssetIds));
 			foreach($assignedThumbAssets as $assignedThumbAsset)
 			{
-				$key = $assignedThumbAsset->getWidth() . 'x' . $assignedThumbAsset->getHeight();
-				
 				if(isset($thumbDimensionsWithKeys["0x0"]))
 				{
 					$thumbAssetsIds[] = $assignedThumbAsset->getId();
 					continue;
 				}
-				
+
+				$key = $assignedThumbAsset->getWidth() . 'x' . $assignedThumbAsset->getHeight();
 				if(isset($thumbDimensionsWithKeys[$key]))
 				{
 					unset($thumbDimensionsWithKeys[$key]);
@@ -870,7 +869,7 @@ class kContentDistributionManager
 			//If defined dimension of 0x0 distribute all
 			if(isset($thumbDimensionsWithKeys["0x0"]))
 			{
-				KalturaLog::log("Assign thumb asset [" . $thumbAsset->getId() . "] from dimension [$key] for entry Distribution [".$entryDistribution->getId()."]");
+				KalturaLog::log("Thumb Dimensions 0x0 set adding [" . $thumbAsset->getId() . "] to entry Distribution [".$entryDistribution->getId()."]");
 				$thumbAssetsIds[] = $thumbAsset->getId();
 				continue;
 			}
