@@ -1138,7 +1138,7 @@ class playManifestAction extends kalturaAction
 
 		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
 
-		if ( in_array($this->deliveryAttributes->getFormat(), array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::HDS)) )
+		if ( in_array($this->deliveryAttributes->getFormat(), array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::AKAMAI_HDS)) )
 			$this->deliveryAttributes->setSequence($this->getRequestParameter("sequence"));
 
 		if($this->secureEntryHelper)
