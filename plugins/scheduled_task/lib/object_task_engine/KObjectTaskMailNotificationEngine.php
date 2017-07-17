@@ -80,8 +80,16 @@ class KObjectTaskMailNotificationEngine
 		$mailer->From = '';
 		$mailer->FromName = $sender;
 
-		KalturaLog::info("sending mail to " . implode(",",$toArray) . " with body: $body");
-		return $mailer->Send();
+		KalturaLog::info("sending mail to " . implode(",",$toArray) . ",from: [$sender]. subject: [$subject] with body: [$body]");
+		try
+		{
+			return $mailer->Send();
+		}
+		catch ( Exception $e )
+		{
+			KalturaLog::err( $e );
+			return false;
+		}
 	}
 
 }
