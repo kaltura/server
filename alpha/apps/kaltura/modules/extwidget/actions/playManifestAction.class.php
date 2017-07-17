@@ -49,6 +49,7 @@ class playManifestAction extends kalturaAction
 		"flavorParamIds" => 'fps',
 		"format" => 'f',
 		"maxBitrate" => 'mb',
+		"minBitrate" => 'mib',
 		"playbackContext" => 'pc',
 		"preferredBitrate" => 'pb',
 		"protocol" => 'pt',
@@ -85,6 +86,11 @@ class playManifestAction extends kalturaAction
 	 * @var int
 	 */
 	private $maxBitrate = null;
+	
+	/**
+	 * @var int
+	 */
+	private $minBitrate = null;
 	
 	/**
 	 * @var array
@@ -478,18 +484,19 @@ class playManifestAction extends kalturaAction
 	 * @param array $flavorAssets
 	 * @return array
 	 */
-	private function removeMaxBitrateFlavors($flavorAssets)
+	private function removeFlavorsByBitrate($flavorAssets)
 	{
-		if (!$this->maxBitrate)			
+		if (!($this->minBitrate || $this->maxBitrate))
 			return $flavorAssets;
-			
 		$returnedFlavors = array();		
 		foreach ($flavorAssets as $flavor)
 		{
-			if ($flavor->getBitrate() <= $this->maxBitrate)
-			{
-				$returnedFlavors[] = $flavor;
-			}
+			$currentBitrate = $flavor->getBitrate();
+			if ($this->minBitrate && $currentBitrate < $this->minBitrate)
+				continue;
+			if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
+				continue;
+			$returnedFlavors[] = $flavor;
 		}
 	
 		return $returnedFlavors;
@@ -587,7 +594,10 @@ class playManifestAction extends kalturaAction
 		$flavorAssets = $this->retrieveAssets();
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+
+		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
+		if(count($flavorAssetsFilteredByBitrate))
+			 $flavorAssets = $flavorAssetsFilteredByBitrate;
 
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
@@ -1124,6 +1134,10 @@ class playManifestAction extends kalturaAction
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
 
+		$this->minBitrate = $this->getRequestParameter ( "minBitrate", null );
+		if(($this->minBitrate) && ((!is_numeric($this->minBitrate)) || ($this->minBitrate <= 0)))
+			KExternalErrors::dieError(KExternalErrors::INVALID_MIN_BITRATE);
+
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
@@ -1250,7 +1264,7 @@ class playManifestAction extends kalturaAction
 
 		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntryId);
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$flavorAssets = $this->removeFlavorsByBitrate($flavorAssets);
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
