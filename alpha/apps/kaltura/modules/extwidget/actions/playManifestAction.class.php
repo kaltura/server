@@ -1262,7 +1262,7 @@ class playManifestAction extends kalturaAction
 
 		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntryId);
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$flavorAssets = $this->removeFlavorsByBitrate($flavorAssets);
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
