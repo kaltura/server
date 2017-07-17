@@ -902,7 +902,7 @@ class playManifestAction extends kalturaAction
 		$this->setParamsForPlayServer($this->deliveryProfile->getAdStitchingEnabled());
 
 		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
-		if ($filter)
+		if ($filter && !$this->deliveryAttributes->getHasValidSequence())
 		{
 			$c = new Criteria();
 			$filter->attachToCriteria($c);

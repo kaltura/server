@@ -47,6 +47,7 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
 
 		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
 		return $dropFolderFiles->objects;
@@ -92,7 +93,7 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	}
 
 	/**
- 	 * Update drop folder entity with error
+	 * Update drop folder entity with error
 	 * @param int $dropFolderFileId
 	 * @param int $errorStatus
 	 * @param int $errorCode
