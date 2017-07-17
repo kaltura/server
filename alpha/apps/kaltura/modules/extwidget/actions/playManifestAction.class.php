@@ -484,44 +484,24 @@ class playManifestAction extends kalturaAction
 	 * @param array $flavorAssets
 	 * @return array
 	 */
-	private function removeMaxBitrateFlavors($flavorAssets)
+	private function removeFlavorsByBitrate($flavorAssets)
 	{
-		if (!$this->maxBitrate)			
+		if (!($this->minBitrate || $this->maxBitrate))
 			return $flavorAssets;
-			
 		$returnedFlavors = array();		
 		foreach ($flavorAssets as $flavor)
 		{
-			if ($flavor->getBitrate() <= $this->maxBitrate)
-			{
-				$returnedFlavors[] = $flavor;
-			}
+			$currentBitrate = $flavor->getBitrate();
+			if ($this->minBitrate && $currentBitrate < $this->minBitrate)
+				continue;
+			if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
+				continue;
+			$returnedFlavors[] = $flavor;
 		}
 	
 		return $returnedFlavors;
 	}
 	
-	/**
-	 * @param array $flavorAssets
-	 * @return array
-	 */
-	private function removeMinBitrateFlavors($flavorAssets)
-	{
-		if (!$this->minBitrate)
-			return $flavorAssets;
-
-		$returnedFlavors = array();
-		foreach ($flavorAssets as $flavor)
-		{
-			if ($flavor->getBitrate() >= $this->minBitrate)
-			{
-				$returnedFlavors[] = $flavor;
-			}
-		}
-
-		return $returnedFlavors;
-	}
-
 	protected function shouldInitFlavorAssetsArray()
 	{
 		if ($this->entry->getType() == entryType::LIVE_STREAM)
@@ -615,8 +595,7 @@ class playManifestAction extends kalturaAction
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 
-		$flavorAssetsFilteredByBitrate = $this->removeMaxBitrateFlavors($flavorAssets);
-		$flavorAssetsFilteredByBitrate = $this->removeMinBitrateFlavors($flavorAssetsFilteredByBitrate);
+		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
 		if(count($flavorAssetsFilteredByBitrate))
 			 $flavorAssets = $flavorAssetsFilteredByBitrate;
 
