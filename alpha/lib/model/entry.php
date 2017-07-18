@@ -2881,11 +2881,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	private function syncEntitlement(Entry $target)
 	{
-		$EntitlementAllreadySynced = $target->getEntitledPusersEdit() == $this->getEntitledPusersEdit() 
+		$entitlementAllreadySynced = $target->getEntitledPusersEdit() == $this->getEntitledPusersEdit() 
 				&& $target->getEntitledPusersPublish() == $this->getEntitledPusersPublish()
 				&& $target->getPuserId() == $this->getPuserId();
 		
-		if($EntitlementAllreadySynced)
+		if($entitlementAllreadySynced)
 			return;
 		
 		$EntitledPusersEdit = implode(",", array_merge($target->getEntitledUserPuserEditArray() ,$this->getEntitledUserPuserEditArray(), array($this->getPuserId())));
