@@ -50,6 +50,11 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 	 */
 	public $webexServiceType;
 	
+	/**
+	 * @var time
+	 */
+	public $deleteFromTimestamp;
+	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -63,6 +68,7 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 		'webexHostIdMetadataFieldName',
 		'deleteFromRecycleBin',
 		'webexServiceType',
+		'deleteFromTimestamp',
 	 );
 		 
 	public function getMapBetweenObjects()
