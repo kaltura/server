@@ -13,7 +13,7 @@ abstract class kBaseElasticEntitlement
     public static function init()
     {
         if(!self::$isInitialized)
-            self::initialize();
+            static::initialize();
     }
     
     protected static function initialize()
