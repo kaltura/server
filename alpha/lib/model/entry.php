@@ -2013,22 +2013,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );
 	}
 	
-	public function getEntitledKusersPublish()
+	private function getEntitledPusersPublishArray()
 	{
 		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
-		if(!$entitledUserPuserPublish)
-			return '';
-
-		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
+		if (!$entitledUserPuserPublish)
+			return array();
+		
+		return unserialize($entitledUserPuserPublish);
+	}
+	
+	public function getEntitledKusersPublish()
+	{
+		return implode(',', array_keys($this->getEntitledPusersPublishArray()));
 	}
 	
 	public function getEntitledPusersPublish()
 	{
-		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
-		if (!$entitledUserPuserPublish)
-			return '';
-
-		return implode(',', unserialize($entitledUserPuserPublish));
+		return implode(',', $this->getEntitledPusersPublishArray());
 	}
 	
 	public function isEntitledKuserPublish($kuserId, $useUserGroups = true)
@@ -2725,6 +2726,26 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 // ----------- Extra object connections ----------------
 
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(entryPeer::PUSER_ID))
+		{
+			$parentEntry = $this->getParentEntry();
+			if($parentEntry->getId() != $this->getId() && !in_array($parentEntry->getPuserId(), $this->getEntitledUserPuserEditArray()))
+			{
+				$this->setEntitledPusersEdit(implode(",", array_merge($this->getEntitledUserPuserEditArray(), array($parentEntry->getPuserId()))));
+				$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))));
+			}
+		}
+		
+		return parent::preSave($con);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postUpdate()
 	 */
@@ -2809,41 +2830,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			}
 		}
 
-		//Has entitledUserPuserEdit/Publish changed for current entry
-		if ($this->customDataValueHasChanged('entitledUserPuserEdit') ||
-			$this->customDataValueHasChanged('entitledUserPuserPublish') ||
-			$this->isColumnModified(entryPeer::PUSER_ID) )
+		if ($this->customDataValueHasChanged('entitledUserPuserEdit') || $this->customDataValueHasChanged('entitledUserPuserPublish') || $this->isColumnModified(entryPeer::PUSER_ID))
 		{
-			//Change for parent entry (and thus changing all brother entries.
-			$parentEntry = $this->getParentEntry();
-			if ( $parentEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit() ||
-				$parentEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
-				$parentEntry->getPuserId() != $this->getPuserId())
-			{
-				$parentEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
-				$parentEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
-				$parentEntry->setPuserId($this->getPuserId());
-				$parentEntry->save();
-			}
-
-			//Change all child entries.
 			$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->getId(), $this->getPartnerId());
 			foreach ($childEntries as $childEntry)
 			{
-				/**
-				 * @var entry $childEntry
-				 */
-				if ( $childEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit()	||
-					$childEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
-					$childEntry->getPuserId() != $this->getPuserId() )
-				{
-					$childEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
-					$childEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
-					$childEntry->setPuserId($this->getPuserId());
-					$childEntry->save();
-				}
+				$this->syncEntitlement($childEntry);
 			}
-
 		}
 
 		$ret = parent::postUpdate($con);
@@ -2884,6 +2877,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		
 		return $ret;
+	}
+	
+	private function syncEntitlement(Entry $target)
+	{
+		$shouldUpdateEntitlement = $target->getEntitledPusersEdit() == $this->getEntitledPusersEdit() 
+				&& $target->getEntitledPusersPublish() == $this->getEntitledPusersPublish()
+				&& $target->getPuserId() == $this->getPuserId();
+		
+		if(!$shouldUpdateEntitlement)
+			return;
+		
+		$EntitledPusersEdit = implode(",", array_merge($target->getEntitledUserPuserEditArray() ,$this->getEntitledUserPuserEditArray(), array($this->getPuserId())));
+		$EntitledPusersPublish = implode(",", array_merge($target->getEntitledPusersPublishArray() ,$this->getEntitledPusersPublishArray(), array($this->getPuserId())));
+		
+		$target->setEntitledPusersEdit($EntitledPusersEdit);
+		$target->setEntitledPusersPublish($EntitledPusersPublish);
+		$target->save();
 	}
 	
 	/* (non-PHPdoc)
