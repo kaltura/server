@@ -1,3 +1,18 @@
+# Mercury 13.0.0 #
+
+## Add Data addContent action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7669
+
+### configuration ###
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_11_addContent_data_permissions.php
+
+
 # Lynx 12.20.0 #
 
 ## Add live packager delivery profiles ##

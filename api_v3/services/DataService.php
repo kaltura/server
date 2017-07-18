@@ -187,4 +187,53 @@ class DataService extends KalturaEntryService
 			}
 		}	
 	}
+
+
+	/**
+	* Update the dataContent of data entry using a resource
+	*
+	* @action addContent
+	* @param string $entryId
+	* @param KalturaGenericDataCenterContentResource $resource
+	* @return string
+	* @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	* @validateUser entry entryId edit
+	*/
+	function addContentAction($entryId, KalturaGenericDataCenterContentResource $resource)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		if ($dbEntry->getType() != KalturaEntryType::DATA)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE,$entryId, $dbEntry->getType(), entryType::DATA);
+
+		$resource->validateEntry($dbEntry);
+		$kResource = $resource->toObject();
+		$this->attachResource($kResource, $dbEntry);
+		$resource->entryHandled($dbEntry);
+
+		return $this->getEntry($entryId);
+	}
+
+	/**
+	* @param kResource $resource
+	* @param entry $dbEntry
+	* @param asset $dbAsset
+	* @return asset
+	*/
+	protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
+	{
+		if(($resource->getType() == 'kLocalFileResource')&&($resource->getSourceType != KalturaSourceType::WEBCAM))
+		{
+			$file_path = $resource->getLocalFilePath();
+			$dbEntry->setDataContent(kFile::getFileContent( $file_path ));
+		}
+		else
+		{
+			KalturaLog::err("Resource of type [" . get_class($resource) . "] is not supported");
+			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($resource));
+		}
+	}
 }
