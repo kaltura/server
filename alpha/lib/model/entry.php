@@ -2881,18 +2881,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	private function syncEntitlement(Entry $target)
 	{
-		$entitlementAllreadySynced = $target->getEntitledPusersEdit() == $this->getEntitledPusersEdit() 
-				&& $target->getEntitledPusersPublish() == $this->getEntitledPusersPublish()
+		$entitlementAllreadySynced = count(array_diff($target->getEntitledPusersPublishArray(), $this->getEntitledPusersEdit())) 
+				&& count(array_diff($target->getEntitledPusersPublishArray(), $this->getEntitledPusersPublishArray()))  
 				&& $target->getPuserId() == $this->getPuserId();
 		
 		if($entitlementAllreadySynced)
 			return;
 		
-		$EntitledPusersEdit = implode(",", array_merge($target->getEntitledUserPuserEditArray() ,$this->getEntitledUserPuserEditArray(), array($this->getPuserId())));
-		$EntitledPusersPublish = implode(",", array_merge($target->getEntitledPusersPublishArray() ,$this->getEntitledPusersPublishArray(), array($this->getPuserId())));
+		$entitledPusersEditArray = array_unique(array_merge($target->getEntitledUserPuserEditArray() ,$this->getEntitledUserPuserEditArray(), array($this->getPuserId())));
+		$entitledPusersPublishArray = array_unique(array_merge($target->getEntitledPusersPublishArray() ,$this->getEntitledPusersPublishArray(), array($this->getPuserId())));
 		
-		$target->setEntitledPusersEdit($EntitledPusersEdit);
-		$target->setEntitledPusersPublish($EntitledPusersPublish);
+		$target->setEntitledPusersEdit(implode(",", $EntitledPusersEditArray));
+		$target->setEntitledPusersPublish(implode(",", $entitledPusersPublishArray));
 		$target->save();
 	}
 	
