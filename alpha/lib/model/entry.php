@@ -2881,7 +2881,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	private function syncEntitlement(Entry $target)
 	{
-		$entitlementAllreadySynced = count(array_diff($target->getEntitledPusersPublishArray(), $this->getEntitledPusersEdit())) 
+		$entitlementAllreadySynced = count(array_diff($target->getEntitledPusersPublishArray(), $this->getEntitledPusersPublishArray())) 
 				&& count(array_diff($target->getEntitledPusersPublishArray(), $this->getEntitledPusersPublishArray()))  
 				&& $target->getPuserId() == $this->getPuserId();
 		
