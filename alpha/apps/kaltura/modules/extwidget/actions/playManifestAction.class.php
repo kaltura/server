@@ -1168,12 +1168,14 @@ class playManifestAction extends kalturaAction
 			case entryType::MEDIA_CLIP:
 				// VOD
 				$renderer = $this->serveVodEntry();
+				$entryType = 'vod';
 				break;
 				
 			case entryType::LIVE_STREAM:			
 			case entryType::LIVE_CHANNEL:
 				// Live stream
 				$renderer = $this->serveLiveEntry();
+				$entryType = 'live';
 				break;
 			
 			default:
@@ -1199,6 +1201,8 @@ class playManifestAction extends kalturaAction
 		}
 
 		$renderer->entryId = $this->entryId;
+		$renderer->partnerId = $this->entry->getPartnerId();
+		$renderer->entryType = $entryType;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
 		{
