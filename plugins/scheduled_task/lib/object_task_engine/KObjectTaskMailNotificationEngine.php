@@ -77,10 +77,11 @@ class KObjectTaskMailNotificationEngine
 		$mailer->Subject = $subject;
 		$mailer->Body = $body;
 
-		$mailer->From = '';
+		$mailer->Sender = KAsyncMailer::MAILER_DEFAULT_SENDER_EMAIL;
+		$mailer->From = KAsyncMailer::MAILER_DEFAULT_SENDER_EMAIL;
 		$mailer->FromName = $sender;
 
-		KalturaLog::info("sending mail to " . implode(",",$toArray) . ",from: [$sender]. subject: [$subject] with body: [$body]");
+		KalturaLog::info("sending mail to " . implode(",",$toArray) . ", from: [$sender]. subject: [$subject] with body: [$body]");
 		try
 		{
 			return $mailer->Send();
