@@ -2733,13 +2733,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		if($this->isColumnModified(entryPeer::PUSER_ID))
+		if($this->customDataValueHasChanged('parentEntryId'))
 		{
 			$parentEntry = $this->getParentEntry();
-			if($parentEntry->getId() != $this->getId() && !in_array($parentEntry->getPuserId(), $this->getEntitledUserPuserEditArray()))
+			if($parentEntry->getId() != $this->getId() && $parentEntry->getPuserId() != $this->getPuserId())
 			{
-				$this->setEntitledPusersEdit(implode(",", array_merge($this->getEntitledUserPuserEditArray(), array($parentEntry->getPuserId()))));
-				$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))));
+				if(!in_array($parentEntry->getPuserId(), $this->getEntitledUserPuserEditArray()))
+					$this->setEntitledPusersEdit(implode(",", array_merge($this->getEntitledUserPuserEditArray(), array($parentEntry->getPuserId()))));
+				
+				if(!in_array($parentEntry->getPuserId(), $this->getEntitledPusersPublishArray()))
+					$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))));
 			}
 		}
 		
@@ -2881,18 +2884,34 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	private function syncEntitlement(Entry $target)
 	{
-		$entitlementAllreadySynced = count(array_diff($target->getEntitledPusersPublishArray(), $this->getEntitledPusersPublishArray())) 
-				&& count(array_diff($target->getEntitledPusersPublishArray(), $this->getEntitledPusersPublishArray()))  
-				&& $target->getPuserId() == $this->getPuserId();
+		$shouldSave = false;
+		$entitledPusersEditArray = $this->getEntitledUserPuserEditArray();
+		$entitledPusersPublishArray = $this->getEntitledPusersPublishArray();
 		
-		if($entitlementAllreadySynced)
+		if(count(array_diff($target->getEntitledUserPuserEditArray(), $entitledPusersEditArray)))
+		{
+			$entitledPusersEditArray = array_merge($target->getEntitledUserPuserEditArray(), $entitledPusersEditArray);
+			$shouldSave = true;
+		}
+		
+		if(count(array_diff($target->getEntitledPusersPublishArray(), $entitledPusersPublishArray)))
+		{
+			$entitledPusersPublishArray = array_merge($target->getEntitledPusersPublishArray(), $entitledPusersPublishArray);
+			$shouldSave = true;
+		}
+		
+		if($target->getPuserId() != $this->getPuserId())
+		{
+			$entitledPusersPublishArray = array_merge($entitledPusersEditArray, array($this->getPuserId()));
+			$entitledPusersPublishArray = array_merge($entitledPusersPublishArray, array($this->getPuserId()));
+			$shouldSave = true;
+		}
+		
+		if(!$shouldSave)
 			return;
 		
-		$entitledPusersEditArray = array_unique(array_merge($target->getEntitledUserPuserEditArray() ,$this->getEntitledUserPuserEditArray(), array($this->getPuserId())));
-		$entitledPusersPublishArray = array_unique(array_merge($target->getEntitledPusersPublishArray() ,$this->getEntitledPusersPublishArray(), array($this->getPuserId())));
-		
-		$target->setEntitledPusersEdit(implode(",", $EntitledPusersEditArray));
-		$target->setEntitledPusersPublish(implode(",", $entitledPusersPublishArray));
+		$target->setEntitledPusersEdit(implode(",", array_unique($entitledPusersEditArray)));
+		$target->setEntitledPusersPublish(implode(",", array_unique($entitledPusersPublishArray)));
 		$target->save();
 	}
 	
@@ -3579,9 +3598,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function customDataValueHasChanged($name, $namespace = '')
 	{
-		if ( isset($this->oldCustomDataValues[$namespace]) &&
-			 isset($this->oldCustomDataValues[$namespace][$name]) &&
-			 $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
+		if ( isset($this->oldCustomDataValues[$namespace]) 
+				&& ( isset($this->oldCustomDataValues[$namespace][$name]) || array_key_exists($name, $this->oldCustomDataValues[$namespace]) )
+				&& $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
 				return true;
 		return false;
 	}
