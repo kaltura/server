@@ -174,7 +174,7 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var bool
 	 */
-	protected  $hasValidSequence = false;
+	protected  $validSequenceIds = false;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -644,17 +644,17 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @return boolean
 	 */
-	public function getHasValidSequence()
+	public function getValidSequenceIds()
 	{
-		return $this->hasValidSequence;
+		return $this->validSequenceIds;
 	}
 
 	/**
-	 * @param boolean $hasValidSequence
+	 * @param boolean $validSequenceIds
 	 */
-	public function setHasValidSequence($hasValidSequence)
+	public function setValidSequenceIds($validSequenceIds)
 	{
-		$this->hasValidSequence = $hasValidSequence;
+		$this->validSequenceIds = $validSequenceIds;
 	}
 
 	/**
@@ -707,7 +707,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->aclFlavorParamsIds = $newObj->getAclFlavorParamsIds();
 		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
 		$this->sequence = $newObj->getSequence();
-		$this->hasValidSequence = $newObj->getHasValidSequence();
+		$this->validSequenceIds = $newObj->getValidSequenceIds();
 	}
 }
 

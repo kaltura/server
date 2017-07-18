@@ -841,12 +841,12 @@ class playManifestAction extends kalturaAction
 				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
 				if (count($sequenceEntries))
 				{
-					$this->deliveryAttributes->setHasValidSequence(true);
+					$this->deliveryAttributes->setValidSequenceIds($sequenceArr);
 					list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null, null);
 					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
 				}
 			}
-			if (!$this->deliveryAttributes->getHasValidSequence())
+			if (!$this->deliveryAttributes->getValidSequenceIds())
 			{
 				$this->initFlavorAssetArray();
 				$this->initEntryDuration();
@@ -912,7 +912,7 @@ class playManifestAction extends kalturaAction
 		$this->setParamsForPlayServer($this->deliveryProfile->getAdStitchingEnabled());
 
 		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
-		if ($filter && !$this->deliveryAttributes->getHasValidSequence())
+		if ($filter && !$this->deliveryAttributes->getValidSequenceIds())
 		{
 			$c = new Criteria();
 			$filter->attachToCriteria($c);
@@ -1190,7 +1190,7 @@ class playManifestAction extends kalturaAction
 		$config->entryId = $this->entryId;
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
-		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
+		$config->hasSequence = $this->deliveryAttributes->getValidSequenceIds()?true:false;
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{

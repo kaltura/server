@@ -14,13 +14,23 @@ class VodPackagerDeliveryUtils
 		if (count($urls) == 1)
 		{
 			$baseUrl = reset($urls);
+			$baseUrl = '/' . ltrim($baseUrl, '/');
+			if ($params->getValidSequenceIds())
+			{
+				$entryIds = $params->getValidSequenceIds();
+				$entryIds[] = $entry->getId();
+				$captionLanguages = self::getCaptionLangauges($entryIds);
+				if (!empty($captionLanguages)) {
+					$baseUrl .= '/captions/' . $captionLanguages;
+				}
+			}
 			return '/' . ltrim($baseUrl, '/');
 		}
 	
 		$prefix = kString::getCommonPrefix($urls);
 		$postfix = kString::getCommonPostfix($urls);
 		
-		if ( ($entry->getType() == entryType::PLAYLIST) || $params->getHasValidSequence() )
+		if ( ($entry->getType() == entryType::PLAYLIST) || $params->getValidSequenceIds() )
 		{
 			// in case of a playlist, need to merge the flavor params of the urls
 			// instead of using a urlset, since nginx-vod does not support urlsets of 
@@ -42,9 +52,11 @@ class VodPackagerDeliveryUtils
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
 		
-		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false) || ($params->getHasValidSequence()))
+		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false) || ($params->getValidSequenceIds()))
 		{
-			$captionLanguages = self::getCaptionLangauges($entry->getId());
+			$entryIds = $params->getValidSequenceIds();
+			$entryIds[] = $entry->getId();
+			$captionLanguages = self::getCaptionLangauges($entryIds);
 			if (!empty($captionLanguages))
 			{
 				$postfix = '/captions/'.$captionLanguages.$postfix;
@@ -116,14 +128,19 @@ class VodPackagerDeliveryUtils
 	 * @param string $entryId
 	 * @return string
 	 */
-	protected static function getCaptionLangauges($entryId)
+	protected static function getCaptionLangauges($entryIds)
 	{
-		$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
+		$c->add(assetPeer::TYPE, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), Criteria::IN);
+		$captionAssets = assetPeer::doSelect($c);
+
 		$captionLanguages = array();
 		foreach ($captionAssets as $captionAsset)
 		{
 			/** @var captionAsset $captionAsset */
-			$captionLanguages[] = $captionAsset->getLanguage();
+			$lang = $captionAsset->getLanguage();
+			$captionLanguages[$lang] = $lang;
 		}
 		return implode(',', $captionLanguages);
 	}
