@@ -188,7 +188,7 @@ class WebexDropFolder extends RemoteDropFolder
 		$this->putInCustomData(self::WEBEX_DELETE_FROM_TIMESTAMP, $v);
 	}
 	
-	public function setDeleteFromTimestamp()
+	public function getDeleteFromTimestamp()
 	{
 		return $this->getFromCustomData(self::WEBEX_DELETE_FROM_TIMESTAMP);
 	}
