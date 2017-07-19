@@ -940,6 +940,9 @@ class myEntryUtils
 		if($entry->getType() == entryType::PLAYLIST)
 		{
 			$firstEntry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
+			if (!$firstEntry)
+				return false;
+
 			$flavorAsset = self::getFlavorSupportedByPackager($firstEntry->getId());
 			if(!$flavorAsset)
 				return false;
