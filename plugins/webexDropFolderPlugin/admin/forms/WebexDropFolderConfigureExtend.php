@@ -57,6 +57,7 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 		$this->addElement('text', 'deleteFromTimestamp', array(
 			'label'			=> 'Delete only files older than:',
 			'value'			=> time(),
+			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
 		
