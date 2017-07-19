@@ -1151,4 +1151,13 @@ HTML;
 		}
 		return $filteredCaptionAssets;
 	}
+
+	public static function getFirstEntryFromPlaylist($playlist)
+	{
+		$entryList = self::executePlaylist($playlist->getPartnerId(), $playlist);
+		if(empty($entryList))
+			return null;
+		$firstEntry = $entryList[0];
+			return $firstEntry;
+	}
 }

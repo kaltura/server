@@ -761,6 +761,9 @@ class myEntryUtils
 		$flavorAssetId = null;
 		$packagerRetries = 3;
 
+		if ($entry->getType() == entryType::PLAYLIST)
+			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
+
 		while($count--)
 		{
 			if (
@@ -769,9 +772,12 @@ class myEntryUtils
 				// 3. the actual thumbnail doesnt exist on disk
 				($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO && ($vid_sec != -1 || $vid_slices != -1))
 				||
+				($entry->getType() == entryType::PLAYLIST && ($vid_sec != -1 || $vid_slices != -1))
+				||
 				(!file_exists($orig_image_path))
 				)
 			{
+
 				if ($vid_sec != -1) // a specific second was requested
 				{
 					$calc_vid_sec = min($vid_sec, floor($entry->getLengthInMsecs() / 1000));
@@ -808,15 +814,20 @@ class myEntryUtils
 
 					if($multi && $packagerRetries)
 					{
-						$success = self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
 						if(!$success)
 							$packagerRetries--;
 					}
 
 					if (!$success)
 					{
-						$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
-							self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+						if ($entry->getType() == entryType::PLAYLIST)
+							$success = self::capturePlaylistThumbUsingFirstEntry($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $orig_image_path);
+
+						if (!$success)
+						{
+							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) || self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+						}
 					}
 
 					if ($cache)
@@ -898,7 +909,71 @@ class myEntryUtils
 				
 		return $finalThumbPath;
 	}
-	
+
+
+	public static function capturePlaylistThumbUsingFirstEntry($playlist, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing,$orig_image_path)
+	{
+		$entry = myPlaylistUtils::getFirstEntryFromPlaylist($playlist);
+		if (!$entry)
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) || self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+		return $success;
+	}
+
+
+	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	{
+		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
+		if(in_array($entry->getType(), $mappedThumbEntryTypes))
+			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+
+		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+	}
+
+
+	public static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	{
+		$packagerCaptureUrl = kConf::get('packager_mapped_thumb_capture_url', 'local', null);
+		if (!$packagerCaptureUrl)
+			return false;
+
+		if($entry->getType() == entryType::PLAYLIST)
+		{
+			$firstEntry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
+			$flavorAsset = self::getFlavorSupportedByPackager($firstEntry->getId());
+			if(!$flavorAsset)
+				return false;
+
+			$flavorAssetId = $flavorAsset->getId();
+			$flavorParamsId = $flavorAsset->getFlavorParamsId();
+			if(!$flavorParamsId)
+				return false;
+
+			$flavorUrl = self::buildPlaylistThumbPath($entry, $flavorAsset);
+
+			$success = self::captureSpecificThumbUsingPackager($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+			if(!$success)
+				return false;
+
+			return true;
+		}
+	}
+
+
+	public static function captureSpecificThumbUsingPackager($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath)
+	{
+		$packagerThumbCapture = str_replace(
+		array ( "{url}", "{offset}" ),
+		array ( $url , floor($calc_vid_sec*1000)  ) ,
+		$packagerCaptureUrl );
+
+		$tempThumbPath = $capturedThumbPath.'temp_1.jpg';
+		kFile::closeDbConnections();
+		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath);
+		return $success;
+	}
+
+
 	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
@@ -974,19 +1049,24 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-
-		$packagerThumbCapture = str_replace(
-			array ( "{url}", "{offset}" ),
-			array ( $entry_data_path , floor($calc_vid_sec*1000)  ) ,
-			$packagerCaptureUrl );
-
-		$tempThumbPath = $capturedThumbPath.'temp_1.jpg';
-		kFile::closeDbConnections();
-		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath);
+		$success = self::captureSpecificThumbUsingPackager($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
 		if(!$success)
 			return false;
 
 		return true;
+	}
+
+	public static function buildPlaylistThumbPath($entry, $flavorAsset)
+	{
+		$partnerId = $flavorAsset->getPartnerId();
+		$subpId = $entry->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$entryVersion = $entry->getVersion();
+
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= ($entryVersion ? "/v/$entryVersion" : '');
+		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId()."/name/a.mp4";
+		return $url;
 	}
 
 	private static function getFlavorSupportedByPackager($entryId)
