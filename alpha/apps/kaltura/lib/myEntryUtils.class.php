@@ -951,7 +951,7 @@ class myEntryUtils
 
 			$flavorUrl = self::buildPlaylistThumbPath($entry, $flavorAsset);
 
-			$success = self::captureSpecificThumbUsingPackager($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+			$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
 			if(!$success)
 				return false;
 
@@ -960,7 +960,7 @@ class myEntryUtils
 	}
 
 
-	public static function captureSpecificThumbUsingPackager($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath)
+	public static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath)
 	{
 		$packagerThumbCapture = str_replace(
 		array ( "{url}", "{offset}" ),
@@ -1049,7 +1049,7 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-		$success = self::captureSpecificThumbUsingPackager($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+		$success = self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
 		if(!$success)
 			return false;
 
