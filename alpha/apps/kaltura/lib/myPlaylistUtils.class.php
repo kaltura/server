@@ -1160,4 +1160,17 @@ HTML;
 		$firstEntry = $entryList[0];
 			return $firstEntry;
 	}
+
+	public static function buildPlaylistThumbPath($entry, $flavorAsset)
+	{
+		$partnerId = $flavorAsset->getPartnerId();
+		$subpId = $entry->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$entryVersion = $entry->getVersion();
+
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= ($entryVersion ? "/v/$entryVersion" : '');
+		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId()."/name/a.mp4";
+		return $url;
+	}
 }
