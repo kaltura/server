@@ -23,7 +23,7 @@ class KalturaViewHistoryUserEntryFilter extends KalturaUserEntryFilter
 		}
 		elseif (!$this->userIdEqual && !$this->userIdIn && !$this->userIdNotIn)
 		{
-			$this->userIdEqual = kCurrentContext::getCurrentKsKuser()->getPuserId();
+			$this->userIdEqual = kCurrentContext::getCurrentKsKuser() ? kCurrentContext::getCurrentKsKuser()->getPuserId() : null;
 		}
 		
 		
