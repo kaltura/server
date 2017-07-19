@@ -1220,7 +1220,7 @@ class playManifestAction extends kalturaAction
 		$canCacheAccessControl = false;
 		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))
 		{
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 			$renderer->forceCachingHeaders = true;
 		}
 		if (!$this->secureEntryHelper)
@@ -1236,7 +1236,7 @@ class playManifestAction extends kalturaAction
 		if (!$renderer->tokenizer && $canCacheAccessControl)
 		{
 			// Note: kApiCache::hasExtraFields is checked in kManifestRenderers
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 		}
 		if ($this->deliveryProfile && $this->deliveryProfile->getAdStitchingEnabled())
 			$renderer->cachingHeadersAge = 0;
