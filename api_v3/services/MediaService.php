@@ -855,11 +855,9 @@ class MediaService extends KalturaEntryService
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
-
 	    if (!$filter)
 			$filter = new KalturaMediaEntryFilter();
-
-	    $filter->typeEqual = KalturaEntryType::MEDIA_CLIP;
+	
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 
 	    $newList = KalturaMediaEntryArray::fromDbArray($list, $this->getResponseProfile());
