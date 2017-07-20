@@ -229,7 +229,7 @@ class DataService extends KalturaEntryService
 		{
 			$file_path = $resource->getLocalFilePath();
 			$fileType = kFile::mimeType($file_path);
-			if(substr($fileType, 0, 5) == 'text/') {
+			if((substr($fileType, 0, 5) == 'text/') || ($fileType == 'application/xml')) {
 				$dbEntry->setDataContent(kFile::getFileContent($file_path));
 			}
 			else{
