@@ -56,7 +56,7 @@ abstract class ESearchItem extends BaseObject
 
 	protected function validateEmptySearchTerm($fieldName, $searchTerm)
 	{
-		if (empty($searchTerm) && !in_array($this->getItemType(), ESearchItemType::RANGE))
+		if (empty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE)))
 			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on empty search term on field ['. $fieldName.']', kCoreException::INTERNAL_SERVER_ERROR);
 	}
 
