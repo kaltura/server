@@ -43,6 +43,7 @@ None
 - You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support mapped thumbnail capture.
 
 - Add the following to local.ini and replace with the tokens with the correct values:
+
     packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
 
 ### Deployment scripts ###
