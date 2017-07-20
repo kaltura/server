@@ -14,6 +14,7 @@ class myPlaylistUtils
 	const CAPTION_FILES_LABEL = "label";
 	const CAPTION_FILES_PATH = "path";
 	const CAPTION_FILES_ID = "captionId";
+	const MP4_EXTENTION = "/name/a.mp4";
 
 	private static $user_cache = null;
 	
@@ -1157,8 +1158,7 @@ HTML;
 		$entryList = self::executePlaylist($playlist->getPartnerId(), $playlist);
 		if(empty($entryList))
 			return null;
-		$firstEntry = $entryList[0];
-			return $firstEntry;
+		return $entryList[0];
 	}
 
 	public static function buildPlaylistThumbPath($entry, $flavorAsset)
@@ -1170,7 +1170,7 @@ HTML;
 
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
-		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId()."/name/a.mp4";
+		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId().self::MP4_EXTENTION;
 		return $url;
 	}
 }

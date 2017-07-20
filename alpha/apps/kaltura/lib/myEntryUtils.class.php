@@ -2,6 +2,9 @@
 
 class myEntryUtils
 {
+
+	const TEMP_FILE_POSTFIX = "temp_1.jpg";
+
 	public static function updateThumbnailFromFile(entry $dbEntry, $filePath, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
 	{
 		$dbEntry->setThumbnail(".jpg"); // this will increase the thumbnail version
@@ -770,9 +773,7 @@ class myEntryUtils
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
 				// 3. the actual thumbnail doesnt exist on disk
-				($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO && ($vid_sec != -1 || $vid_slices != -1))
-				||
-				($entry->getType() == entryType::PLAYLIST && ($vid_sec != -1 || $vid_slices != -1))
+				(($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getType() == entryType::PLAYLIST) && ($vid_sec != -1 || $vid_slices != -1))
 				||
 				(!file_exists($orig_image_path))
 				)
@@ -798,7 +799,7 @@ class myEntryUtils
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
-				$orig_image_path = $capturedThumbPath."temp_1.jpg";
+				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
 	
 				// if we already captured the frame at that second, dont recapture, just use the existing file
 				if (!file_exists($orig_image_path))
@@ -931,46 +932,43 @@ class myEntryUtils
 	}
 
 
-	public static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
 	{
 		$packagerCaptureUrl = kConf::get('packager_mapped_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
 			return false;
 
-		if($entry->getType() == entryType::PLAYLIST)
-		{
-			$firstEntry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
-			if (!$firstEntry)
-				return false;
+		$firstEntry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
+		if (!$firstEntry)
+			return false;
 
-			$flavorAsset = self::getFlavorSupportedByPackager($firstEntry->getId());
-			if(!$flavorAsset)
-				return false;
+		$flavorAsset = self::getFlavorSupportedByPackager($firstEntry->getId());
+		if(!$flavorAsset)
+			return false;
 
-			$flavorAssetId = $flavorAsset->getId();
-			$flavorParamsId = $flavorAsset->getFlavorParamsId();
-			if(!$flavorParamsId)
-				return false;
+		$flavorAssetId = $flavorAsset->getId();
+		$flavorParamsId = $flavorAsset->getFlavorParamsId();
+		if(!$flavorParamsId)
+			return false;
 
-			$flavorUrl = myPlaylistUtils::buildPlaylistThumbPath($entry, $flavorAsset);
+		$flavorUrl = myPlaylistUtils::buildPlaylistThumbPath($entry, $flavorAsset);
 
-			$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
-			if(!$success)
-				return false;
+		$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+		if(!$success)
+			return false;
 
-			return true;
-		}
+		return true;
 	}
 
 
-	public static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath)
+	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath)
 	{
 		$packagerThumbCapture = str_replace(
 		array ( "{url}", "{offset}" ),
 		array ( $url , floor($calc_vid_sec*1000)  ) ,
 		$packagerCaptureUrl );
 
-		$tempThumbPath = $capturedThumbPath.'temp_1.jpg';
+		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
 		kFile::closeDbConnections();
 		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath);
 		return $success;
