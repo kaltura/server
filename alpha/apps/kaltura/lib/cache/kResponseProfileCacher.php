@@ -764,7 +764,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 
 				$queryStart = microtime(true);
 				$list = $cacheStore->query($query);
-				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds triggerKey=".$triggerKey);
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds objectKey = " . $objectKey);
 
 				KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 				$array = array();
