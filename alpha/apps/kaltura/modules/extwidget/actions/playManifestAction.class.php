@@ -491,11 +491,15 @@ class playManifestAction extends kalturaAction
 		$returnedFlavors = array();		
 		foreach ($flavorAssets as $flavor)
 		{
-			$currentBitrate = $flavor->getBitrate();
-			if ($this->minBitrate && $currentBitrate < $this->minBitrate)
-				continue;
-			if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
-				continue;
+			//audio language assets shouldn't be filtered
+			if(!$flavorAsset->hasTag(assetParams::TAG_ALT_AUDIO))
+			{
+				$currentBitrate = $flavor->getBitrate();
+				if ($this->minBitrate && $currentBitrate < $this->minBitrate)
+					continue;
+				if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
+					continue;
+			}
 			$returnedFlavors[] = $flavor;
 		}
 	
@@ -595,10 +599,6 @@ class playManifestAction extends kalturaAction
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 
-		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
-		if(count($flavorAssetsFilteredByBitrate))
-			 $flavorAssets = $flavorAssetsFilteredByBitrate;
-
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
@@ -634,6 +634,10 @@ class playManifestAction extends kalturaAction
 				return;
 		}
 
+		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
+		if(count($flavorAssetsFilteredByBitrate))
+			$flavorAssets = $flavorAssetsFilteredByBitrate;
+		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
