@@ -1,5 +1,27 @@
 # Mercury 13.0.0 #
 
+## Update Apache headers to support Kea Access-Control-Allow-Origin ##
+ - Issue type: Feature
+ - Issue ID : PLAT-7758
+ 
+### configuration ###
+Need to add the following section to apache config files /etc/apache2/sites-enabled/kaltura & /etc/apache2/sites-enabled/kaltura-ssl
+
+	Alias /apps/kea "/opt/kaltura/apps/kea"
+	<Directory "/opt/kaltura/apps/kea">
+	    DirectoryIndex index.php
+	    Options ExecCGI -Indexes FollowSymLinks Includes
+	    Order allow,deny
+	    Allow from all
+	    AllowOverride all
+	</Directory>
+
+### Deployment scripts ###
+None 
+ 
+#### Known Issues & Limitations ####
+None
+
 ## Add Data addContent action ##
 
 - Issue Type: Feature
@@ -11,6 +33,20 @@ None
 ### Deployment scripts ###
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_11_addContent_data_permissions.php
+
+## Add support for Thumbnail and Thumbnail Stripes for Stitched Playlist ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7571
+
+### configuration ###
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support mapped thumbnail capture.
+
+- Add the following to local.ini and replace with the tokens with the correct values:
+    packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
+
+### Deployment scripts ###
+None
 
 
 # Lynx 12.20.0 #
