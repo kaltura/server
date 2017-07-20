@@ -1,5 +1,27 @@
 # Mercury 13.0.0 #
 
+## Update Apache headers to support Kea Access-Control-Allow-Origin ##
+ - Issue type: Feature
+ - Issue ID : PLAT-7758
+ 
+### configuration ###
+Need to add the following section to apache config files /etc/apache2/sites-enabled/kaltura & /etc/apache2/sites-enabled/kaltura-ssl
+
+	Alias /apps/kea "/opt/kaltura/apps/kea"
+	<Directory "/opt/kaltura/apps/kea">
+	    DirectoryIndex index.php
+	    Options ExecCGI -Indexes FollowSymLinks Includes
+	    Order allow,deny
+	    Allow from all
+	    AllowOverride all
+	</Directory>
+
+### Deployment scripts ###
+None 
+ 
+#### Known Issues & Limitations ####
+None
+
 ## Add Data addContent action ##
 
 - Issue Type: Feature
