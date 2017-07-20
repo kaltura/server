@@ -225,10 +225,17 @@ class DataService extends KalturaEntryService
 	*/
 	protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
-		if(($resource->getType() == 'kLocalFileResource')&&($resource->getSourceType != KalturaSourceType::WEBCAM))
+		if(($resource->getType() == 'kLocalFileResource') && (!isset($resource->getSourceType) || (isset($resource->getSourceType) && $resource->getSourceType != KalturaSourceType::WEBCAM)))
 		{
 			$file_path = $resource->getLocalFilePath();
-			$dbEntry->setDataContent(kFile::getFileContent( $file_path ));
+			$fileType = kFile::mimeType($file_path);
+			if(substr($fileType, 0, 5) == 'text/') {
+				$dbEntry->setDataContent(kFile::getFileContent($file_path));
+			}
+			else{
+				KalturaLog::err("Resource of type [" . get_class($resource) . "] with file type ". $fileType. " is not supported");
+				throw new KalturaAPIException(KalturaErrors::FILE_TYPE_NOT_SUPPORTED);
+			}
 		}
 		else
 		{
