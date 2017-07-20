@@ -571,7 +571,11 @@ class myPlaylistUtils
 			$entry_filter->attachToCriteria( $c );
 
 			// add some hard-coded criteria
-			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
+			$typeArray = array (entryType::MEDIA_CLIP, entryType::MIX, entryType::LIVE_STREAM );
+			$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
+			$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM));
+			
+			$c->addAnd ( entryPeer::TYPE , array_unique($typeArray) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 
