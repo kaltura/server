@@ -38,7 +38,7 @@ Alias /apps "@BASE_DIR@/apps"
 Alias /apps/kea "@BASE_DIR@/apps/kea"
 <Directory "@BASE_DIR@/apps/kea">
     DirectoryIndex index.php
-    Options ExecCGI -Indexes FollowSymLinks Includes
+    Options -Indexes +FollowSymLinks +Includes
     Order allow,deny
     Allow from all
     AllowOverride all
