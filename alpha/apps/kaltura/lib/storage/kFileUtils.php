@@ -250,4 +250,16 @@ class kFileUtils extends kFile
 		
 		KExternalErrors::dieGracefully();
 	}
+
+	public static function validateTextualMimeType(kResource $resource, $file_path)
+	{
+		$fileType = kFile::mimeType($file_path);
+		if((substr($fileType, 0, 5) == 'text/') || ($fileType == 'application/xml')) {
+			return true;
+		}
+		else{
+			KalturaLog::err("Resource of type [" . get_class($resource) . "] with file type ". $fileType. " is not supported");
+			throw new KalturaAPIException(KalturaErrors::FILE_TYPE_NOT_SUPPORTED, $fileType);
+		}
+	}
 }
