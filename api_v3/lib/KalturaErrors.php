@@ -462,7 +462,7 @@ class KalturaErrors extends APIErrors
 	
 	const FILE_PENDING = "FILE_PENDING;;File is pending";
 
-	const FILE_TYPE_NOT_SUPPORTED = "FILE_TYPE_NOT_SUPPORTED;;File type is not supported";
+	const FILE_TYPE_NOT_SUPPORTED = "FILE_TYPE_NOT_SUPPORTED;TYPE;File type @TYPE@ is not supported";
 	
 	/*
 	 * resetUserPassword
