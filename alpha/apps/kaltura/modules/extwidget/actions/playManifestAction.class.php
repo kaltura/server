@@ -492,7 +492,7 @@ class playManifestAction extends kalturaAction
 		foreach ($flavorAssets as $flavor)
 		{
 			//audio language assets shouldn't be filtered
-			if(!$flavorAsset->hasTag(assetParams::TAG_ALT_AUDIO))
+			if(!$flavor->hasTag(assetParams::TAG_ALT_AUDIO))
 			{
 				$currentBitrate = $flavor->getBitrate();
 				if ($this->minBitrate && $currentBitrate < $this->minBitrate)
