@@ -1996,7 +1996,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$overrideParam = $flavorParamsConversionProfile->getTwoPass();
 			if(isset($overrideParam))
 				$flavorParams->setTwoPass($overrideParam);
-			if($flavorParamsConversionProfile->getTags()!==null) $flavorParams->setTags($flavorParamsConversionProfile->getTags());
+			if($flavorParamsConversionProfile->getTags()!==null) 
+				$flavorParams->setTags($flavorParamsConversionProfile->getTags());
+			if($flavorParamsConversionProfile->getChunkedEncodeMode()!==null)
+				$flavorParams->setChunkedEncodeMode($flavorParamsConversionProfile->getChunkedEncodeMode());
 		}
 	}
 
