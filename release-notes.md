@@ -34,6 +34,21 @@ None
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_11_addContent_data_permissions.php
 
+## Add support for Thumbnail and Thumbnail Stripes for Stitched Playlist ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7571
+
+### configuration ###
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support mapped thumbnail capture.
+
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
+
+### Deployment scripts ###
+None
+
 
 # Lynx 12.20.0 #
 
