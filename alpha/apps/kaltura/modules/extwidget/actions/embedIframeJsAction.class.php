@@ -102,6 +102,9 @@ class embedIframeJsAction extends sfAction
 			{
 				header('Content-Type: application/javascript');
 				$headers = array("X-Forwarded-For" =>  requestUtils::getRemoteAddress());
+				if(isset($_SERVER["HTTP_REFERER"]))
+					$headers["referrer"] = $_SERVER["HTTP_REFERER"];
+					
 				$partner = PartnerPeer::retrieveByPK( $partner_id );
 				if ( $partner )
 				{
