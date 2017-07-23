@@ -898,7 +898,7 @@ class myReportsMgr
 		}
 	}
 		
-	private static $flavor_map = array ( 
+	static $flavor_map = array ( 
 		self::REPORT_FLAVOR_GRAPH => "graph" ,
 		self::REPORT_FLAVOR_TOTAL => "total" ,
 		self::REPORT_FLAVOR_TABLE => "detail" ,
@@ -906,7 +906,7 @@ class myReportsMgr
 		self::REPORT_FLAVOR_BASE_TOTAL =>"base_total",
 	);
 	
-	private static $type_map = array ( 
+	static $type_map = array ( 
 		self::REPORT_TYPE_TOP_CONTENT => "top_content" ,
 		self::REPORT_TYPE_CONTENT_DROPOFF => "content_dropoff" ,
 		self::REPORT_TYPE_CONTENT_INTERACTIONS => "content_interactions" ,
