@@ -68,6 +68,7 @@ return array(
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_VP8' => 'Convert - FFMpeg Vp8',
+	'Kaltura_Client_Enum_ConversionEngineType::CHUNKED_FFMPEG' => 'Convert - Chunked FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::ON2' => 'Convert - On2',
 	'Kaltura_Client_Enum_ConversionEngineType::MENCODER' => 'Convert - MEncoder',
 	'Kaltura_Client_Enum_ConversionEngineType::ENCODING_COM' => 'Convert - Encoding.com',
