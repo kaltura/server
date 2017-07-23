@@ -12,6 +12,8 @@ interface conversionEngineType extends BaseEnum
 	const ENCODING_COM = 4;
 	const EXPRESSION_ENCODER3 = 5;
 	
+	const CHUNKED_FFMPEG = 92;
+	
 	const FFMPEG_VP8 = 98;
 	const FFMPEG_AUX = 99;
 	
