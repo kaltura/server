@@ -111,7 +111,7 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
 		$recordedLengthInMs = $sourceObject->getRecordedLengthInMsecs();
-		if ($sourceObject->getIsRecordedEntry() && $recordedLengthInMs > 0)
+		if ($sourceObject->getIsRecordedEntry() && $recordedLengthInMs > 0 && myEntryUtils::shouldServeVodFromLive($sourceObject))
 		{
 			$this->msDuration = $recordedLengthInMs;
 			$this->duration = (int)round($recordedLengthInMs / 1000);
