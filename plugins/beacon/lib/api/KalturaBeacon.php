@@ -5,11 +5,12 @@
  * @subpackage api.objects
  */
 
-class KalturaBeacon extends KalturaObject{
-    const RELATED_OBJECT_TYPE_STRING = 'relatedObjectType';
-    const EVENT_TYPE_STRING          = 'eventType'        ;
-    const OBJECT_ID_STRING           = 'objectId'         ;
-    const PRIVATE_DATA_STRING           = 'privateData'         ;
+class KalturaBeacon extends KalturaObject
+{
+    const RELATED_OBJECT_TYPE_STRING	= 'relatedObjectType';
+    const EVENT_TYPE_STRING				= 'eventType';
+    const OBJECT_ID_STRING				= 'objectId';
+    const PRIVATE_DATA_STRING			= 'privateData';
 
     /**
      * @var KalturaBeaconObjectTypes
@@ -31,7 +32,29 @@ class KalturaBeacon extends KalturaObject{
      */
     public $privateData;
 
+    private static $map_between_objects = array
+    (
+    	'relatedObjectType',
+		'eventType',
+    	'objectId',
+    	'privateData',
+    	'partnerId',
+    );
+    
+    public function getMapBetweenObjects()
+    {
+    	return array_merge(self::$map_between_objects);
+    }
 
+    public function index($shouldLog, $ttl)
+    {
+    	$ret = $this->indexObjectState();
+    	if($shouldLog)
+    		$this->logObjectState($ttl);
+    	
+    	return $ret;
+    }
+    
     //Todo add map between objects
     public function indexObjectState()
     {
@@ -58,17 +81,5 @@ class KalturaBeacon extends KalturaObject{
         $indexObject[self::OBJECT_ID_STRING] = $this->objectId;
         $beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$indexObject);
         return $beaconObject;
-    }
-
-    private static $map_between_objects = array(
-    'relatedObjectType',
-    'eventType',
-    'objectId',
-    'privateData',
-    'partnerId');
-
-    public function getMapBetweenObjects()
-    {
-        return array_merge(self::$map_between_objects);
     }
 }
