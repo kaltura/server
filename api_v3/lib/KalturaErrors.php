@@ -102,8 +102,6 @@ class KalturaErrors extends APIErrors
 
 	const RESOURCE_IS_RESERVED = "RESOURCE_IS_RESERVED;RESOURCE_ID;Resource with id @RESOURCE_ID@ is already reserved";
 	
-	const FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE = "FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE;DYNAMIC_VALUE;Dynamic dependent value \"@DYNAMIC_VALUE@\" not found";
-	
 	/**
 	 * Service Oriented Errors
 	 *
@@ -461,8 +459,6 @@ class KalturaErrors extends APIErrors
 	const STORAGE_PROFILE_RULES_NOT_FULFILLED = "STORAGE_PROFILE_RULES_NOT_FULFILLED;ID;Storage profile rules for profile id @ID@ are not fulfilled";
 	
 	const FILE_PENDING = "FILE_PENDING;;File is pending";
-
-	const FILE_TYPE_NOT_SUPPORTED = "FILE_TYPE_NOT_SUPPORTED;TYPE;File type @TYPE@ is not supported";
 	
 	/*
 	 * resetUserPassword
@@ -654,8 +650,6 @@ class KalturaErrors extends APIErrors
 	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE,USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
 	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER;;Must filter on entry ID or user ID';
 	const USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED = 'USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED;;UserEntry filter object forbidden fields used';
-	const USER_ENTRY_ALREADY_EXISTS = 'USER_ENTRY_ALREADY_EXISTS;;UserEntry for this type already exists';
-	const USER_ENTRY_FILTER_MISSSING_MANDATORY_PARAMS = 'USER_ENTRY_FILTER_MISSSING_MANDATORY_PARAMS;;One of the following parameters must be supplied: userIdEqual, userIdIn, entryIdEqual, entryIdIn ';
 	
 	/*
 	 * serverNode service
