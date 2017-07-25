@@ -1,5 +1,16 @@
 # Mercury 13.0.0 #
 
+## Fix deleting users on KMS ##
+
+- Issue Type: Bug
+- Issue ID: KMS-14633
+
+### configuration ###
+None
+
+### Deployment scripts ###
+Re-index Kuser sphinx table (php deployment/base/scripts/populateSphinxKusers.php)
+
 ## Update Apache headers to support Kea Access-Control-Allow-Origin ##
  - Issue type: Feature
  - Issue ID : PLAT-7758
