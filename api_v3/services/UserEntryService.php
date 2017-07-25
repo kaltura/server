@@ -25,14 +25,14 @@ class UserEntryService extends KalturaBaseService {
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
 
+		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
 		$lockUser = $userEntry->userId ? $userEntry->userId : kCurrentContext::getCurrentKsKuserId();
 		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $lockUser;
-		return kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($userEntry));
+		return kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($userEntry, $dbUserEntry));
 	}
 	
-	public function addUserEntryImpl($userEntry)
+	public function addUserEntryImpl($userEntry, $dbUserEntry)
 	{
-		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
 		$existingUserEntry = UserEntryPeer::getUserEntry($dbUserEntry->getPartnerId(), $dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), $dbUserEntry->getType());
 		if ($existingUserEntry)
 		{
