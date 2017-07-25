@@ -24,14 +24,14 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
-	protected function getSimpleMappingRenderer($path, asset $asset)
+	protected function getSimpleMappingRenderer($path, asset $asset = null)
 	{
 		$source = array(
 			'type' => 'source',
 			'path' => $path,
 		);
 
-		if ($asset->getEncryptionKey())
+		if ($asset && $asset->getEncryptionKey())
 		{
 			$source['encryptionKey'] = $asset->getEncryptionKey();
 		}
@@ -40,7 +40,7 @@ class serveFlavorAction extends kalturaAction
 			'clips' => array($source)
 		);
 
-		if (method_exists($asset, 'getLanguage') && $asset->getLanguage())
+		if ($asset && method_exists($asset, 'getLanguage') && $asset->getLanguage())
 		{
 			$language = languageCodeManager::getObjectFromKalturaName($asset->getLanguage());
 			$language = $language[1];
@@ -57,7 +57,7 @@ class serveFlavorAction extends kalturaAction
 			}
 		}
 
-		if (method_exists($asset, 'getLabel') && $asset->getLabel())
+		if ($asset && method_exists($asset, 'getLabel') && $asset->getLabel())
 		{
 			$sequence['label'] = $asset->getLabel();
 		}
@@ -71,6 +71,15 @@ class serveFlavorAction extends kalturaAction
 		return new kRendererString(
 				$json,
 				self::JSON_CONTENT_TYPE);
+	}
+
+	protected function renderEmptySimpleMapping($pathOnly)
+	{
+		if (!$pathOnly || !kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+			return;
+
+		$renderer = $this->getSimpleMappingRenderer('', null);
+		$renderer->output();
 	}
 	
 	protected function serveLivePlaylist($durations, $sequences)
@@ -366,14 +375,22 @@ class serveFlavorAction extends kalturaAction
 		$entryId = $this->getRequestParameter("entryId");
 		$sequence = $this->getRequestParameter('sequence');
 		$captionLanguages = $this->getRequestParameter('captions', '');
+		$pathOnly = $this->getRequestParameter('pathOnly', false);
 
 		if ($entryId)
 		{
-			$entry = entryPeer::retrieveByPK($entryId);
+			$entry = entryPeer::retrieveByPKNoFilter($entryId);
 			if (!$entry)
 			{
+				// rendering empty response in case entry was not replicated yet
+				$this->renderEmptySimpleMapping($pathOnly);
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
+
+			if ($entry->getStatus() == entryStatus::DELETED) {
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+			}
+
 			$isInternalIp = kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']);
 			if ($entry->getType() == entryType::PLAYLIST && $isInternalIp)
 			{
@@ -399,14 +416,15 @@ class serveFlavorAction extends kalturaAction
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
-		$pathOnly = $this->getRequestParameter( "pathOnly", false );
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
 		
 		$flavorAsset = assetPeer::retrieveById($flavorId);
-		if (is_null($flavorAsset))
+		if (is_null($flavorAsset)) {
+			$this->renderEmptySimpleMapping($pathOnly);
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		}
 
 		if (!is_null($entryId) && $flavorAsset->getEntryId() != $entryId)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
