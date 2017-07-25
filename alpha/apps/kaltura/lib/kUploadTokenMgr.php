@@ -177,15 +177,15 @@ class kUploadTokenMgr
      * Try to find the file type by running the file cmd will return empty string if failed
      */
 	private function findFileTypeByFileCmd($filePath)
-    {
-        $fileType = '';
-        $fileBrief = shell_exec('file -b '.$filePath);
-        $moPattern = "GNU message catalog";
-        if(substr( $fileBrief, 0, strlen($moPattern) ) === $moPattern)
-            $fileType = 'application/mo';
+	{
+		$fileType = '';
+		$fileBrief = shell_exec('file -b ' . $filePath);
+		$moPattern = "GNU message catalog";
+		if (substr($fileBrief, 0, strlen($moPattern)) === $moPattern)
+			$fileType = 'application/mo';
 
-        return $fileType;
-    }
+		return $fileType;
+	}
 
 	/**
 	 * Updates the file name of the token (if empty) using the file name from the file data 
