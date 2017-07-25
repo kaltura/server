@@ -45,7 +45,7 @@ class KIndexingEntryEngine extends KIndexingEngine
 		return count($results);
 	}
 	
-	public function initAdvancedFilter(KalturaIndexAdvancedFilter &$advancedFilter , &$data)
+	public function initAdvancedFilter(&$advancedFilter , &$data)
 	{
 		parent::initAdvancedFilter($advancedFilter, $data);
 		$advancedFilter->idColumnName = "int_id";
