@@ -179,7 +179,8 @@ class kUploadTokenMgr
     {
         $fileType = '';
         $fileBrief = shell_exec('file -b '.$filePath);
-        if(substr( $fileBrief, 0, strlen("GNU message catalog") ) === "GNU message catalog")
+        $moPattern = "GNU message catalog";
+        if(substr( $fileBrief, 0, strlen($moPattern) ) === $moPattern)
             $fileType = 'application/mo';
 
         return $fileType;
