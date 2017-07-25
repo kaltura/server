@@ -185,7 +185,7 @@ class kUploadTokenMgr
 		if (substr($fileBrief, 0, strlen($moPattern)) === $moPattern)
 			$fileType = 'application/mo';
 
-			return $fileType;
+		return $fileType;
 	}
 
 	/**
