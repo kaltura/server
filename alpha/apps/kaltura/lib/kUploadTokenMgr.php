@@ -147,7 +147,8 @@ class kUploadTokenMgr
 		
 		// check if is a real uploaded file
 		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null; 
-		if (!is_uploaded_file($tempPath)) {
+		if (!is_uploaded_file($tempPath))
+		{
             $msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
             KalturaLog::log($msg . ' ' . print_r($fileData, true));
             throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
@@ -161,7 +162,8 @@ class kUploadTokenMgr
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFile::mimeType($uploadFilePath);
-		if ($fileType == 'application/octet-stream') {//stream of byte - can be media or executable
+		if ($fileType == 'application/octet-stream')//stream of byte - can be media or executable
+        {
             $fileType = kFile::getMediaInfoFormat($uploadFilePath);
             if (empty($fileType))
                 $fileType = $this->findFileTypeByFileCmd($uploadFilePath);
