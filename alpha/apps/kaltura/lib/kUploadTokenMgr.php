@@ -173,10 +173,10 @@ class kUploadTokenMgr
 		return in_array($fileType, $fileTypes['allowed']);
 	}
 
-    /**
-     * Try to find the file type by running the file cmd and match the output to a pattern
+	/**
+	* Try to find the file type by running the file cmd and match the output to a pattern
 	 * It will return empty string if no pattern was matched
-     */
+	*/
 	private function findFileTypeByFileCmd($filePath)
 	{
 		$fileType = '';
