@@ -131,6 +131,12 @@ abstract class KIndexingEngine
 		$this->lastIndexDepth = $lastIndexDepth;
 	}
 
-	
+	public function initAdvancedFilter(&$advancedFilter , &$data)
+	{
+		if($data->lastIndexId)
+			$advancedFilter->indexIdGreaterThan = $data->lastIndexId;
+		if($data->lastIndexDepth)
+			$advancedFilter->depthGreaterThanEqual = $data->lastIndexDepth;
+	}
 	
 }

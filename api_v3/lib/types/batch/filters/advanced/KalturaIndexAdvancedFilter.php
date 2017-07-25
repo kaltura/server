@@ -9,6 +9,11 @@ class KalturaIndexAdvancedFilter extends KalturaSearchItem
 	 * @var int
 	 */
 	public $indexIdGreaterThan;
+	
+	/**
+	 * @var string
+	 */
+	public $idColumnName; 
 
 	/**
 	 * @var int
@@ -18,6 +23,7 @@ class KalturaIndexAdvancedFilter extends KalturaSearchItem
 	private static $map_between_objects = array
 	(
 		"indexIdGreaterThan",
+		"idColumnName",
 		"depthGreaterThanEqual",
 	);
 
