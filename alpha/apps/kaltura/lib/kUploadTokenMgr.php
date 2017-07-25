@@ -149,9 +149,9 @@ class kUploadTokenMgr
 		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null; 
 		if (!is_uploaded_file($tempPath))
 		{
-            $msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
-            KalturaLog::log($msg . ' ' . print_r($fileData, true));
-            throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
+			$msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
+			KalturaLog::log($msg . ' ' . print_r($fileData, true));
+			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
 		}
 	}
 
