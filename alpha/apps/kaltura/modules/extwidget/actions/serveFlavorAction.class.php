@@ -73,6 +73,11 @@ class serveFlavorAction extends kalturaAction
 				self::JSON_CONTENT_TYPE);
 	}
 
+	/**
+	 * This will make nginx-vod dump the request to the remote dc
+	 *
+	 * @param $pathOnly
+	 */
 	protected function renderEmptySimpleMapping($pathOnly)
 	{
 		if (!$pathOnly || !kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
@@ -420,9 +425,14 @@ class serveFlavorAction extends kalturaAction
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
 		
-		$flavorAsset = assetPeer::retrieveById($flavorId);
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($flavorId);
 		if (is_null($flavorAsset)) {
+			// rendering empty response in case flavor asset was not replicated yet
 			$this->renderEmptySimpleMapping($pathOnly);
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		}
+
+		if ($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED) {
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		}
 
