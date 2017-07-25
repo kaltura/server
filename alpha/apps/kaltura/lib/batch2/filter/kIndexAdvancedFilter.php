@@ -26,13 +26,13 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 		if($query instanceof IKalturaIndexQuery)
 		{
 			if(is_null($this->depthGreaterThanEqual))
-				$query->addColumnWhere('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
+				$query->addColumnWhere('int_id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
 			else
-				$query->addCondition('( ((id '.Criteria::GREATER_THAN.' '. $this->indexIdGreaterThan.') and (depth '.Criteria::EQUAL.' '.$this->depthGreaterThanEqual.')) or (depth'.Criteria::GREATER_THAN.' '.$this->depthGreaterThanEqual.') )');
+				$query->addCondition('( ((int_id '.Criteria::GREATER_THAN.' '. $this->indexIdGreaterThan.') and (depth '.Criteria::EQUAL.' '.$this->depthGreaterThanEqual.')) or (depth'.Criteria::GREATER_THAN.' '.$this->depthGreaterThanEqual.') )');
 		}
 
 		elseif($query instanceof Criteria)
-			$query->add('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
+			$query->add('int_id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
 	}
 	
 	/**
