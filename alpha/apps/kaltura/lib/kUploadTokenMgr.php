@@ -162,12 +162,28 @@ class kUploadTokenMgr
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFile::mimeType($uploadFilePath);
-		if ($fileType == 'application/octet-stream') //stream of byte - can be media or executable
-			$fileType = kFile::getMediaInfoFormat($uploadFilePath);
+		if ($fileType == 'application/octet-stream') {//stream of byte - can be media or executable
+            $fileType = kFile::getMediaInfoFormat($uploadFilePath);
+            if (empty($fileType))
+                $fileType = findFileTypeByFileCmd($uploadFilePath);
+        }
 
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
 	}
+
+    /**
+     * Try to find the file type by running the file cmd will return empty string if failed
+     */
+	private function findFileTypeByFileCmd($filePath)
+    {
+        $fileType = '';
+        $fileBrief = shell_exec('file -b '.$filePath);
+        if(substr( $fileBrief, 0, strlen("GNU message catalog") ) === "GNU message catalog")
+            $fileType = 'application/mo';
+
+        return $fileType;
+    }
 
 	/**
 	 * Updates the file name of the token (if empty) using the file name from the file data 
