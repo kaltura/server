@@ -165,7 +165,7 @@ class kUploadTokenMgr
 		if ($fileType == 'application/octet-stream') {//stream of byte - can be media or executable
             $fileType = kFile::getMediaInfoFormat($uploadFilePath);
             if (empty($fileType))
-                $fileType = findFileTypeByFileCmd($uploadFilePath);
+                $fileType = $this->findFileTypeByFileCmd($uploadFilePath);
         }
 
 		$fileTypes = kConf::get('file_type');
