@@ -174,7 +174,8 @@ class kUploadTokenMgr
 	}
 
     /**
-     * Try to find the file type by running the file cmd will return empty string if failed
+     * Try to find the file type by running the file cmd and match the output to a pattern
+	 * It will return empty string if no pattern was matched
      */
 	private function findFileTypeByFileCmd($filePath)
 	{
