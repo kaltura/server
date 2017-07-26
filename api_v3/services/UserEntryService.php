@@ -94,10 +94,6 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function listAction(KalturaUserEntryFilter $filter, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-		{
-			$filter = new KalturaUserEntryFilter();
-		}
 		if (!$pager)
 		{
 			$pager = new KalturaFilterPager();

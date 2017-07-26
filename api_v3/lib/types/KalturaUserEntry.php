@@ -32,6 +32,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $partnerId;
 

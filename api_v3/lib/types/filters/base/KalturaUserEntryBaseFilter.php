@@ -17,6 +17,8 @@ abstract class KalturaUserEntryBaseFilter extends KalturaRelatedFilter
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
 		"userIdNotIn" => "_notin_user_id",
+		"partnerIdEqual" => "_eq_partner_id",
+		"partnerIdIn" => "_in_partner_id",
 		"statusEqual" => "_eq_status",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -90,6 +92,16 @@ abstract class KalturaUserEntryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $userIdNotIn;
+
+	/**
+	 * @var int
+	 */
+	public $partnerIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $partnerIdIn;
 
 	/**
 	 * @var KalturaUserEntryStatus
