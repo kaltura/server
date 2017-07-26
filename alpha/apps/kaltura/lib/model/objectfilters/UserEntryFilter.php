@@ -30,8 +30,6 @@ class UserEntryFilter extends baseObjectFilter
 			"_notin_extended_status",
 			"_eq_privacy_context",
 			"_in_privacy_context",
-			"_in_partner_id",
-			"_eq_partner_id",
 		) , NULL );
 
 		$this->allowed_order_fields = array (
