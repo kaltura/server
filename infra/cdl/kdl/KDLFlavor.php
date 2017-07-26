@@ -1249,7 +1249,8 @@ $plannedDur = 0;
 		if($assetWid==0) {
 			$assetWid = round($assetHgt*$dar/2)*2;
 		}
-		KalturaLog::log("1 - $srcWid $srcHgt $assetWid $assetHgt\n");
+		$assetHgt = min($assetHgt,$srcHgt);
+		$assetWid = min($assetWid,$srcWid);
 		
 		if($assetWid>$assetHgt*$dar) {
 			$assetWid = round($assetHgt*$dar/2)*2;
