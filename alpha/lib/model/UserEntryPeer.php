@@ -33,9 +33,6 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
 			$c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
 		}
-
-		$c->addAnd (UserEntryPeer::PARTNER_ID,$partnerId);
-
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
