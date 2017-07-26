@@ -252,6 +252,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 
 			$content = kString::stripUtf8InvalidChars($content);
 			$content = kXml::stripXMLInvalidChars($content);
+			$content= substr($content, 0 , kElasticSearchManager::MAX_LENGTH);
 			$line['content'] = $content;
 
 			$analyzedFieldName = elasticSearchUtils::getAnalyzedFieldName($language, 'content');

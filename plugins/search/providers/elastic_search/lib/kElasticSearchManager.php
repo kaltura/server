@@ -7,7 +7,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 {
 
     const CACHE_PREFIX = 'executed_elastic_server_';
-
+    const MAX_LENGTH = 32766;
     /**
      * @param BaseObject $object
      * @param BatchJob $raisedJob
@@ -54,7 +54,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function getElasticSaveParams($object, $params)
     {
-        $cmd['body'] = $object->getObjectParams($params);
+        $cmd['body'] = $this->trimParamFields($object->getObjectParams($params));
 
         $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaElasticSearchDataContributor');
         $dataContributionPath = null;
@@ -280,5 +280,21 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             }
         }
         return false;
+    }
+
+    /**
+     * @param $tempParams
+     * @return mixed
+     */
+    private function trimParamFields($tempParams)
+    {
+        $itemsToTrim = array('description', 'reference_id');
+
+        foreach ($itemsToTrim as $item)
+        {
+            if (array_key_exists($item, $tempParams))
+                $tempParams[$item] = substr($tempParams[$item], 0, self::MAX_LENGTH);
+        }
+        return $tempParams;
     }
 }

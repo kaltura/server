@@ -399,7 +399,8 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			{
 				/* @var $cuePoint CuePoint */
 				$contributedData = $cuePoint->contributeElasticData();
-
+				if (isset($contributedData['cue_point_text']))
+					$contributedData['cue_point_text']= substr($contributedData['cue_point_text'], 0 , kElasticSearchManager::MAX_LENGTH);
 				if(!$contributedData)
 					continue;
 
