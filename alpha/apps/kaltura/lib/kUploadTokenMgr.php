@@ -166,26 +166,11 @@ class kUploadTokenMgr
 		{
 			$fileType = kFile::getMediaInfoFormat($uploadFilePath);
 			if (empty($fileType))
-				$fileType = $this->findFileTypeByFileCmd($uploadFilePath);
+				$fileType = kFile::findFileTypeByFileCmd($uploadFilePath);
 		}
 
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
-	}
-
-	/**
-	* Try to find the file type by running the file cmd and match the output to a pattern
-	 * It will return empty string if no pattern was matched
-	*/
-	private function findFileTypeByFileCmd($filePath)
-	{
-		$fileType = '';
-		$fileBrief = shell_exec('file -b ' . $filePath);
-		$moPattern = "GNU message catalog";
-		if (substr($fileBrief, 0, strlen($moPattern)) === $moPattern)
-			$fileType = 'application/mo';
-
-		return $fileType;
 	}
 
 	/**
