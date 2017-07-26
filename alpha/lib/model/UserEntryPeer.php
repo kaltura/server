@@ -24,20 +24,19 @@ class UserEntryPeer extends BaseUserEntryPeer {
 	 */
 	public static function setDefaultCriteriaFilter()
 	{
-	    if(self::$s_criteria_filter == null)
-	        self::$s_criteria_filter = new criteriaFilter();
-	    
-	    $c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
-	    $c->addAnd ( UserEntryPeer::STATUS, array(UserEntryStatus::DELETED), Criteria::NOT_IN);
-	    // when session is not admin, allow access to user's userEntries only
-	    if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
-    	    $c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
-	    }
+		if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
 
-        $partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-        $c->addAnd (UserEntryPeer::PARTNER_ID,$partnerId);
+		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
+		$c->addAnd ( UserEntryPeer::STATUS, array(UserEntryStatus::DELETED), Criteria::NOT_IN);
+		// when session is not admin, allow access to user's userEntries only
+		if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
+			$c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
+		}
 
-	    self::$s_criteria_filter->setFilter($c);
+		$c->addAnd (UserEntryPeer::PARTNER_ID,$partnerId);
+
+		self::$s_criteria_filter->setFilter($c);
 	}
 	
 	public static function getOMClass($row, $colnum)
