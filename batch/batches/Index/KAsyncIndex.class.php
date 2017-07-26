@@ -39,8 +39,7 @@ class KAsyncIndex extends KJobHandlerWorker
 	
 		$filter = clone $data->filter;
 		$advancedFilter = new KalturaIndexAdvancedFilter();
-
-		$this->initAdvancedFilter($advancedFilter,$data);
+		$engine->initAdvancedFilter($advancedFilter,$data);
 
 		$filter->advancedSearch = $advancedFilter;
 
@@ -63,13 +62,4 @@ class KAsyncIndex extends KJobHandlerWorker
 		
 		return $this->closeJob($job, null, null, "Index objects finished", KalturaBatchJobStatus::FINISHED);
 	}
-
-	private function initAdvancedFilter(&$advancedFilter , &$data)
-	{
-		if($data->lastIndexId)
-			$advancedFilter->indexIdGreaterThan = $data->lastIndexId;
-		if($data->lastIndexDepth)
-			$advancedFilter->depthGreaterThanEqual = $data->lastIndexDepth;
-	}
-
 }

@@ -5,13 +5,20 @@
  */
 class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 {
+	const DEFAULT_ID_COLUMN_NAME = "id"; 
+	
 	/**
- 	 * @var string
+ 	 * @var int
  	 */
 	protected $indexIdGreaterThan = null;
 
 	/**
 	 * @var string
+	 */
+	public $idColumnName = null;
+	
+	/**
+	 * @var int
 	 */
 	protected $depthGreaterThanEqual = null;
 
@@ -26,17 +33,17 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 		if($query instanceof IKalturaIndexQuery)
 		{
 			if(is_null($this->depthGreaterThanEqual))
-				$query->addColumnWhere('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
+				$query->addColumnWhere($this->getIdColumnName(), $this->indexIdGreaterThan, Criteria::GREATER_THAN);
 			else
-				$query->addCondition('( ((id '.Criteria::GREATER_THAN.' '. $this->indexIdGreaterThan.') and (depth '.Criteria::EQUAL.' '.$this->depthGreaterThanEqual.')) or (depth'.Criteria::GREATER_THAN.' '.$this->depthGreaterThanEqual.') )');
+				$query->addCondition('( ((' . $this->getIdColumnName().' '.Criteria::GREATER_THAN.' '. $this->indexIdGreaterThan.') and (depth '.Criteria::EQUAL.' '.$this->depthGreaterThanEqual.')) or (depth'.Criteria::GREATER_THAN.' '.$this->depthGreaterThanEqual.') )');
 		}
 
 		elseif($query instanceof Criteria)
-			$query->add('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
+			$query->add($this->getIdColumnName(), $this->indexIdGreaterThan, Criteria::GREATER_THAN);
 	}
 	
 	/**
-     * @return string $indexIdGreaterThan
+     * @return int $indexIdGreaterThan
      */
 	public function getIndexIdGreaterThan()
 	{
@@ -44,7 +51,7 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	}
 
 	/**
-	 * @param string $indexIdGreaterThan
+	 * @param int $indexIdGreaterThan
 	 */
 	public function setIndexIdGreaterThan($indexIdGreaterThan)
 	{
@@ -52,7 +59,7 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	}
 
 	/**
-	 * @return string $depthGreaterThanEqual
+	 * @return int $depthGreaterThanEqual
 	 */
 	public function getDepthGreaterThanEqual()
 	{
@@ -60,10 +67,29 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	}
 
 	/**
-	 * @param string $depthGreaterThanEqual
+	 * @param int $depthGreaterThanEqual
 	 */
 	public function setDepthGreaterThanEqual($depthGreaterThanEqual)
 	{
 		$this->depthGreaterThanEqual = $depthGreaterThanEqual;
+	}
+	
+	/**
+	 * @return string $idColumnName
+	 */
+	public function getIdColumnName()
+	{
+		if(!$this->idColumnName)
+			return self::DEFAULT_ID_COLUMN_NAME;
+		
+		return $this->idColumnName;
+	}
+	
+	/**
+	 * @param string $idColumnName
+	 */
+	public function setIdColumnName($idColumnName)
+	{
+		$this->idColumnName = $idColumnName;
 	}
 }
