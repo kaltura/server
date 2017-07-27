@@ -53,6 +53,9 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 
+		if (!$this->userIdEqual && !$this->userIdIn && !$this->entryIdEqual && !$this->entryIdIn  )
+			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_FILTER_MISSSING_MANDATORY_PARAMS);
+
 		$response = new KalturaUserEntryListResponse();
 		if ( in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)) )
 		{
