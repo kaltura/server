@@ -5,7 +5,7 @@ class kKavaReportsMgr
     static $aggregations_def = array();
     static $metrics_def = array();
     
-    const HISTORICAL_DATASOUTCE = "player-events-historical";
+    const HISTORICAL_DATASOURCE = "player-events-historical";
     private static $event_type_count_aggr_template = array("type" => "filtered",
         "filter" => array("type" => "selector",
             "dimension" => "eventType",
@@ -22,15 +22,14 @@ class kKavaReportsMgr
         "aggregator" => array("type" => "longSum",
             "name" => "name",
             "fieldName" => "count"));
-    
-    
+        
     private static $arithmetic_post_aggr_template = array("type" => "arithmetic",
         "name" => "name",
         "fn" => "function",
     );
     
     private static $top_n_query_template = array("queryType" => "topN",
-        "dataSource" => self::HISTORICAL_DATASOUTCE,
+        "dataSource" => self::HISTORICAL_DATASOURCE,
         "intervals" => "time_intervals",
         "granularity" => "all",
         "dimension" => "dimension",
@@ -38,18 +37,23 @@ class kKavaReportsMgr
         "threshold" => "threshould");
     
     private static $time_series_query_teample = array("queryType" => "timeseries",
-        "dataSource" => self::HISTORICAL_DATASOUTCE,
+        "dataSource" => self::HISTORICAL_DATASOURCE,
         "intervals" => "time_intervals",
         "granularity" => "granularity");
     
     private static $group_by_query_template = array("queryType" => "groupBy",
-        "dataSource" => self::HISTORICAL_DATASOUTCE,
+        "dataSource" => self::HISTORICAL_DATASOURCE,
         "intervals" => "time_intervals",
         "granularity" => "all",
         "dimensions" => "dimension");
     
     static $reportsGranularity = array("content_dropoff" => "all",
-        "live" => "hour");
+        "user_content_dropoff" => "all",
+        "live" => "hour",
+        "platforms_drilldown"=> "all",
+        "os" => "all",
+        "browsers" => "all"
+    );
     
     static $reportsDimensions = array("top_content" => "entryId",
         "content_dropoff" => "entryId",
@@ -65,7 +69,7 @@ class kKavaReportsMgr
         "user_content_interactions" => "userId",
         "applications" => "application",
         "platforms" => "userAgent.device",
-        "platfrom_drilldown"=> "userAgent.operatingSystem",
+        "platforms_drilldown"=> "userAgent.operatingSystem",
         "os" => "userAgent.operatingSystem",
         "os_drilldown" => "userAgent.browser",
         "browsers" => "userAgent.browser",
@@ -81,7 +85,7 @@ class kKavaReportsMgr
         "top_syndication_drilldown" => array("play", "playTimeSum","playTimeAvg","playerImpression","playerImpressionRatio"),
         "user_engagement" => array("totalEntries", "play", "playTimeSum","playTimeAvg","avgDropOffRatio", "playerImpression","playerImpressionRatio"),
         "specific_user_engagement" => array("totalEntries", "play", "playTimeSum","playTimeAvg","avgDropOffRatio", "playerImpression","playerImpressionRatio"),
-        "user_top_content" => "",
+        "user_top_content" => array("play", "playTimeSum","playTimeAvg","avgDropOffRatio", "playerImpression","playerImpressionRatio"),
         "user_content_dropoff" => array("play","playThrough25","playThrough50","playThrough75","playThrough100","playThroughRatio"),
         "user_content_interactions" => array("play","editClicked","shareClicked","downloadClicked","reportClicked"),
         "applications" => array("playerImpression"),
@@ -138,7 +142,7 @@ class kKavaReportsMgr
         "top_syndication" => array("play", "playTimeSum","playTimeAvg","playerImpression"),
         "user_engagement" => array("play", "playTimeSum","playTimeAvg","avgDropOffRatio"),
         "specific_user_engagement" => array("play","playTimeSum","playTimeAvg","playerImpression"),
-        "user_top_content" => array("userId"),
+        "user_top_content" => array("play","playTimeSum","playTimeAvg","playerImpression"),
         "user_content_dropoff" => array("play","playThrough25","playThrough50","playThrough75","playThrough100","playThroughRatio"),
         "user_content_interactions" => array("play","editClicked","shareClicked","downloadClicked","reportClicked"),
         "applications" => array("application"),
@@ -148,7 +152,12 @@ class kKavaReportsMgr
         "live" => array("play"),
         "top_playback_context" => array("play", "playTimeSum","playTimeAvg","avgDropOffRatio", "playerImpression","playerImpressionRatio"));
     
-    static $reportTotalAdditionalMetrics = array("user_engagement" => array("uniqueUsers"));
+    static $reportTotalAdditionalMetrics = array("user_engagement" => array("uniqueUsers"),
+        "specific_user_engagement" => array("uniqueUsers"),
+        "user_top_content" => array("uniqueUsers"),
+        "user_content_dropoff" => array("uniqueUsers"),
+        "user_content_interactions" => array("uniqueUsers")
+    );
     
     static $reportsToEnrich = array("top_content" => array("object_id", "name"),
         "content_dropoff" => array("object_id", "name"),
@@ -159,12 +168,6 @@ class kKavaReportsMgr
     static $reportEnrichFunc = array("top_content" => "self::getEntriesNames",
         "content_dropoff" => "self::getEntriesNames",
         "content_interactions" => "self::getEntriesNames",
-        "user_engagement" => array(),
-        "specific_user_engagement" => array(),
-        "user_top_content" => array(),
-        "user_content_dropoff" => array(),
-        "user_content_interactions" => array(),
-        "applications" => array(),
         "live" => "self::getEntriesNames",
         "top_playback_context" => "self::getCategoriesNames");
     
@@ -336,26 +339,31 @@ class kKavaReportsMgr
         }    
     }
     
-    public static function getGraph ( $partner_id , $report_type , reportsInputFilter $input_filter , $dimension = null , $object_ids = null )
+    public static function getGraph ( $partner_id , $report_type , reportsInputFilter $input_filter , $dimension = null , $object_ids = null, $tz_offset = 0)
     {
         self::init();
         $start = microtime(true);
-        $result  = self::executeQueryByType( $partner_id , $report_type , myReportsMgr::REPORT_FLAVOR_GRAPH , $input_filter , null , null , null , $object_ids );
+        $result  = self::executeQueryByType( $partner_id , $report_type , myReportsMgr::REPORT_FLAVOR_GRAPH , $input_filter , null , null , null , $object_ids, $tz_offset );
         $report_str = myReportsMgr::$type_map[$report_type];
         if ( $report_type == myReportsMgr::REPORT_TYPE_PLATFORMS)
         {
             if ($object_ids != NULL && count($object_ids) > 0)
-                $res = self::getGraphsByDateId ( $result , $report_str);
+                $res = self::getMultiGraphsByColumnName( $result , $report_str, "userAgent.operatingSystem");
             else
-                $res = self::getMultiGraphsByDateId ( $result , "userAgent.device", $report_str);
+                $res = self::getMultiGraphsByDateId ( $result , "userAgent.device", $report_str, $tz_offset);
         }
+        else if ($report_type == myReportsMgr::REPORT_TYPE_OPERATION_SYSTEM || $report_type == myReportsMgr::REPORT_TYPE_BROWSERS) {
+            $dimension = self::$reportsDimensions[$report_str];
+            $res = self::getMultiGraphsByColumnName( $result , $report_str, $dimension);     
+        }
+        
         else if ( $report_type == myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF|| $report_type == myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF)
         {
             $res = self::getGraphsByColumnName ( $result , $report_str);
         }
         else
         {
-            $res = self::getGraphsByDateId ( $result , $report_str);
+            $res = self::getGraphsByDateId ( $result , $report_str, $tz_offset);
         }
         
         $end = microtime(true);
@@ -408,25 +416,12 @@ class kKavaReportsMgr
     
     
     public static function getTable ( $partner_id , $report_type , reportsInputFilter $input_filter  ,
-        $page_size , $page_index , $order_by , $object_ids = null , $offset = null)
+        $page_size , $page_index , $order_by , $object_ids = null , $tz_offset = 0)
     {
         self::init();
         $start = microtime ( true );
         $total_count = 0;
         
-        if ((!($input_filter instanceof endUserReportsInputFilter)) || in_array($report_type, myReportsMgr::$end_user_filter_get_count_reports) )
-        {
-            $total_count = self::getTotalTableCount( $partner_id , $report_type , $input_filter  ,
-                $page_size , $page_index , $order_by , $object_ids );
-            
-            if ( $total_count <= 0 )
-            {
-                $end = microtime(true);
-                KalturaLog::log( "getTable took [" . ( $end - $start ) . "]" );
-                return array ( array() , array() , 0 );
-            }
-        }   
-       
         if ( ! $page_size || $page_size < 0 ) $page_size = 10;
         //$page_size = min($page_size , self::REPORTS_TABLE_MAX_QUERY_SIZE);
         
@@ -435,12 +430,18 @@ class kKavaReportsMgr
         {
             //todo: result is too big
         }
-        $result  = self::executeQueryByType( $partner_id , $report_type , myReportsMgr::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids, $offset );
+        $result  = self::executeQueryByType( $partner_id , $report_type , myReportsMgr::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids, $tz_offset );
         if ( count($result) > 0 )
         {
             $report_str = myReportsMgr::$type_map[$report_type];
             $rows = $result[0]->result;
             $rows_count = count($rows);
+            
+            if ($page_index * $page_size > $rows_count)
+            {
+                $total_count = $rows_count;
+            }
+            
             if ($page_index * $page_size < $rows_count) {
                 $rows = array_slice($rows, ($page_index -1) * $page_size, $page_size);
             }
@@ -457,7 +458,7 @@ class kKavaReportsMgr
                 $headers = array();
                 
                 $dimensionHeaders = self::$detailDimensionHeaders[$report_str];
-                $reportMetrics = self::$reportsMetrics[$report_str];
+                $reportMetrics = ($report_type == myReportsMgr::REPORT_TYPE_APPLICATIONS) ? array() : self::$reportsMetrics[$report_str];
                 $dimension = self::$reportsDimensions[$report_str];
                 if ($object_ids)
                 {
@@ -519,7 +520,25 @@ class kKavaReportsMgr
                     }
                     
                 }
-            
+                
+                // since the query limit is $page_index * page_size we can set result count as total count in case limit is bigger than result count 
+                // and don't count the cardinality query
+                if ($total_count == 0) 
+                {
+                    if ((!($input_filter instanceof endUserReportsInputFilter)) || in_array($report_type, myReportsMgr::$end_user_filter_get_count_reports) )
+                    {
+                        $total_count = self::getTotalTableCount( $partner_id , $report_type , $input_filter  ,
+                            $page_size , $page_index , $order_by , $object_ids );
+                        
+                        if ( $total_count <= 0 )
+                        {
+                            $end = microtime(true);
+                            KalturaLog::log( "getTable took [" . ( $end - $start ) . "]" );
+                            return array ( array() , array() , 0 );
+                        }
+                    }
+                    
+                }
                 $res = array ( $headers , $data , $total_count );
             }
             else
@@ -541,6 +560,23 @@ class kKavaReportsMgr
         
     }
     
+    private static function getGranularityDef($granularity, $timezone_offset) 
+    {
+       $granularity_def = "all";
+       $timezone_name = timezone_name_from_abbr("", $timezone_offset * 60 * -1, 0);
+       if ($granularity === "day") {
+           $granularity_def = array("type" => "period",
+                                    "period" => "P1D",
+                                    "timeZone" => $timezone_name);
+       }
+       if ($granularity === "hour") {
+           $granularity_def = array("type" => "period",
+               "period" => "PT1H",
+               "timeZone" => $timezone_name);
+       }
+       return  $granularity_def;
+    }
+    
     public static function getReport($partner_id, $type_str , $flavor_str , $object_ids, $input_filter, $filter, $order_by, $order_dir, $threshold, $tz = 0) {
        
        $intervals = array(self::dateIdToInterval($input_filter->from_day, $tz) . "/" .  self::dateIdToInterval($input_filter->to_day, $tz));
@@ -555,6 +591,11 @@ class kKavaReportsMgr
        switch ($flavor_str) {
         case "graph":
             $granularity = array_key_exists($type_str, self::$reportsGranularity) ? self::$reportsGranularity[$type_str] : "day";
+            if ($object_ids)
+                $granularity = array_key_exists($type_str."_drilldown", self::$reportsGranularity) ? self::$reportsGranularity[$type_str. "_drilldown"] : $granularity;
+            
+            $granularity = self::getGranularityDef($granularity, $tz);
+                
             if ($type_str === "platforms")
                 $query = self::getGroupByReport($partner_id, $intervals, $granularity, array($dimension), $metrics, $filter);
             else
@@ -579,25 +620,50 @@ class kKavaReportsMgr
        return $query;
    }
    
-   private static function dateIdToInterval($dateId, $tz) 
+   private static function dateIdToInterval($dateId, $offset) 
    {
        $year = substr($dateId, 0, 4);
        $month = substr($dateId, 4, 2);
        $day = substr($dateId, 6, 2);
-       return "$year-$month-$day" . "T00:00:00.000";
+       $timezone_offset = $offset/60*-1;
+       if ($timezone_offset >= 0 && $timezone_offset < 10) {
+           $timezone_offset = "+0$timezone_offset";
+       } else if ($timezone_offset >= 10) {
+           $timezone_offset = "+$timezone_offset";
+       } else if ($timezone_offset < 0 && $timezone_offset > -10) {
+           $timezone_offset = $timezone_offset * -1;           
+           $timezone_offset = "-0$timezone_offset";
+       }
+       return "$year-$month-$day" . "T00:00:00" . $timezone_offset . ":00";
        
    }
    
-   private static function timestampToDateId($timestamp) 
+   // shift date by tz offset
+   private static function timestampToDateId($timestamp, $offset) 
+   {
+       $date = new DateTime($timestamp);
+       $date->modify($offset*-1 . " minute");
+       $client_timestamp = $date->format('Y-m-d H:i:s'); // 2012-07-15 05:00:00 
+       
+       $year = substr($client_timestamp, 0, 4);
+       $month = substr($client_timestamp, 5, 2);
+       $day = substr($client_timestamp, 8, 2);
+       return "$year$month$day";
+   }
+   
+   // hours are returned from druid query with the right offset so no need to change it
+   private static function timestampToHourId($timestamp, $offset)
    {
        $year = substr($timestamp, 0, 4);
        $month = substr($timestamp, 5, 2);
        $day = substr($timestamp, 8, 2);
-       return "$year$month$day";
+       $hour = substr($timestamp, 11, 2);
+       return "$year$month$day$hour";
    }
    
+   
    private static function executeQueryByType ( $partner_id , $report_type , $report_flavor , reportsInputFilter $input_filter  ,
-       $page_size , $page_index , $order_by , $object_ids = null , $offset = null)
+       $page_size , $page_index , $order_by , $object_ids = null , $offset = 0)
    {
        $start = microtime(true);
        try
@@ -608,11 +674,42 @@ class kKavaReportsMgr
            $shouldSelectFromSearchEngine = false;
            
            $druid_filter = null;
+           if ($report_type == myReportsMgr::REPORT_TYPE_LIVE) 
+           {
+               $druid_filter[] = array("dimension" => "playbackType",
+                   "values" => array("live"));
+           } 
+           else
+           {
+               $druid_filter[] = array("dimension" => "playbackType",
+                   "values" => array("vod"));
+           }
            if ($input_filter instanceof endUserReportsInputFilter)
            {
                if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
                {
-                   $categoryIds = self::getCategoriesIds($input_filter);
+                   $categoryFilter = new categoryFilter();
+                   if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
+                       $categoryIds = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+                   else 
+                   {
+                           if ($input_filter->playbackContext)
+                               $categoryFilter->set("_in_full_name", $input_filter->playbackContext);
+                           if ($input_filter->ancestorPlaybackContext)
+                               $categoryFilter->set("_matchor_likex_full_name", $input_filter->ancestorPlaybackContext);
+                                   
+                           $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+                           $categoryFilter->attachToCriteria($c);
+                           $categoryFilter->setPartnerSearchScope($partner_id);
+                           $c->applyFilters();
+                                   
+                           $categoryIdsFromDB = $c->getFetchedIds();
+                                   
+                           if (count($categoryIdsFromDB))
+                                $categoryIds = implode(",", $categoryIdsFromDB);
+                           else
+                                $categoryIds = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+                   }
                    $druid_filter[] = array("dimension" => "playbackContext",
                        "values" => explode(',', $categoryIds)
                    );
@@ -637,7 +734,7 @@ class kKavaReportsMgr
            
            if ($input_filter->categories)
            {
-               $categoryIds = self::getCategoriesIds($input_filter);
+               $categoryIds = self::getCategoriesIds($input_filter->categories, $partner_id);
                $druid_filter[] = array("dimension" => "categories",
                    "values" => explode(",", $categoryIds)
                );
@@ -690,7 +787,7 @@ class kKavaReportsMgr
                
                else if ( $report_type == myReportsMgr::REPORT_TYPE_PLATFORMS)
                {
-                   $druid_filter[] = array("dimension" => "userAgent.device ",
+                   $druid_filter[] = array("dimension" => "userAgent.device",
                        "values" => $object_ids_arr
                    );
                }
@@ -747,7 +844,7 @@ class kKavaReportsMgr
            }
            
            $flavor_str = myReportsMgr::$flavor_map[$report_flavor];
-           $query = self::getReport($partner_id, $type_str, $flavor_str, $object_ids, $input_filter, $druid_filter, $order_by, $order_by_dir, $page_size * $page_index);
+           $query = self::getReport($partner_id, $type_str, $flavor_str, $object_ids, $input_filter, $druid_filter, $order_by, $order_by_dir, $page_size * $page_index, $offset);
                        
            $query_header = "/* -- " .$type_str . " " . $flavor_str . " -- */\n";
            KalturaLog::log( "\n{$query_header}{$query}" );
@@ -945,7 +1042,7 @@ class kKavaReportsMgr
        return $json_res;
    }
    
-   public static function getGraphsByDateId ( $result , $report_type )
+   public static function getGraphsByDateId ( $result , $report_type, $tz_offset )
    {
        $graphs = array();
        $graphMetrics = self::$reportsGraphMetrics[$report_type];
@@ -959,7 +1056,10 @@ class kKavaReportsMgr
        {
            $row_data = $row->result;
            
-           $date = self::timestampToDateId($row->timestamp);
+           if ($report_type === "live")
+                $date = self::timestampToHourId($row->timestamp, $tz_offset);
+           else
+               $date = self::timestampToDateId($row->timestamp, $tz_offset);
          
            foreach ( $graphMetrics as $column )
            {
@@ -971,7 +1071,7 @@ class kKavaReportsMgr
        return $graphs;
    }
    
-   public static function getMultiGraphsByDateId ( $result , $multiline_column, $report_type )
+   public static function getMultiGraphsByDateId ( $result , $multiline_column, $report_type, $tz_offset )
    {
        $graphs = array();
        $graphMetrics = self::$reportsGraphMetrics[$report_type];
@@ -986,7 +1086,7 @@ class kKavaReportsMgr
        {
            $row_data = $row->event;
            
-           $date = self::timestampToDateId($row->timestamp);
+           $date = self::timestampToDateId($row->timestamp, $tz_offset);
            $multiline_val = $row_data->$multiline_column;
            foreach ( $graphMetrics as $column )
            {
@@ -999,6 +1099,32 @@ class kKavaReportsMgr
                            $graph[$date] = $multiline_val . ":" .  $row_data->$column;
                            $graphs[self::$metricsToHeaders[$column]] = $graph;
                }
+           }
+       }
+       return $graphs;
+   }
+   
+   public static function getMultiGraphsByColumnName ( $result , $report_type, $dimension )
+   {
+       $graphs = array();
+       $graphMetrics = self::$reportsGraphMetrics[$report_type];
+       
+       foreach ( $graphMetrics as $column )
+       {
+           $graphs[self::$metricsToHeaders[$column]] = array();
+       }
+       
+       foreach ( $result as $row )
+       {
+           $row_data = $row->event;
+           
+           $dimValue = $row_data->$dimension;
+           
+           foreach ( $graphMetrics as $column )
+           {
+               $graph = $graphs[self::$metricsToHeaders[$column]];
+               $graph[$dimValue] = $row_data->$column; // the value for graph 1 will be column #1 in the row
+               $graphs[self::$metricsToHeaders[$column]] = $graph;
            }
        }
        return $graphs;
@@ -1067,6 +1193,29 @@ class kKavaReportsMgr
        
    }
    
+   private static function getCategoriesIds($categories, $partner_id)
+   {
+       $categoryFilter = new categoryFilter();
+       $categoryFilter->set("_eq_full_name", $categories);
+       $categoryFilter->setPartnerSearchScope($partner_id);
+       $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+       $categoryFilter->attachToCriteria($c);
+       $c->applyFilters();
+                       
+       $categoryIdsFromDB = $c->getFetchedIds();
+                       
+       if (count($categoryIdsFromDB))
+       {
+            $categoryIds = implode(",", $categoryIdsFromDB);
+       }
+       else
+       {
+            $categoryIds = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+       }
+       return $categoryIds;
+       
+   }
+   
    
    private static $count_cache ;
    private static function getTotalTableCount( $partner_id , $report_type , reportsInputFilter $input_filter  ,
@@ -1116,5 +1265,4 @@ class kKavaReportsMgr
                        return $key;
    }
 }
-
 
