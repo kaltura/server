@@ -44,6 +44,14 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	{
 		return new UserEntryFilter();
 	}
+	
+	protected function validateFilter()
+	{
+		if(!$this->userIdEqual && !$this->userIdIn && !$this->entryIdEqual && !$this->entryIdIn)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
+				$this->getFormattedPropertyNameWithClassName('userIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('userIdIn') . '/' .
+				$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
+	}
 
 	/**
 	 * @param KalturaFilterPager $pager
@@ -52,10 +60,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-
-		if (!$this->userIdEqual && !$this->userIdIn && !$this->entryIdEqual && !$this->entryIdIn  )
-			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_FILTER_MISSSING_MANDATORY_PARAMS);
-
+		$this->validateFilter();
 		$response = new KalturaUserEntryListResponse();
 		if ( in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)) )
 		{
