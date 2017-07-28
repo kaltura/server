@@ -91,6 +91,8 @@ class LiveStreamService extends KalturaLiveEntryService
 
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
+		$dbEntry = $this->copyTemplateEntry($entry);
+		
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 		/* @var $dbEntry LiveStreamEntry */
 				
@@ -102,11 +104,30 @@ class LiveStreamService extends KalturaLiveEntryService
 				if($partner)
 					$dbEntry->setConversionProfileId($partner->getDefaultLiveConversionProfileId());
 			}
-				
-			$dbEntry->save();
 		}
 		
 		return $dbEntry;
+	}
+	
+	protected function copyTemplateEntry (KalturaBaseEntry $entry)
+	{
+		$conversionProfileId = $entry->conversionProfileId;
+		if(in_array($entry->sourceType, array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+		{
+			if(!$entry->conversionProfileId)
+			{
+				$partner = $this->getPartner();
+				if($partner)
+					$conversionProfileId = $partner->getDefaultLiveConversionProfileId();
+			}
+		}
+		
+		if ($conversionProfileId || $entry->templateEntryId)
+		{
+			return $this->duplicateTemplateEntry($conversionProfileId, $entry->templateEntryId, new LiveStreamEntry());
+		}
+		
+		return new LiveStreamEntry();
 	}
 	
 	/**
