@@ -10,6 +10,7 @@ class UserEntryService extends KalturaBaseService {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+		$this->applyPartnerFilterForClass('userEntry');
 	}
 
 	/**
@@ -26,8 +27,20 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
 
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
+		$lockUser = $userEntry->userId ? $userEntry->userId : kCurrentContext::getCurrentKsKuserId();
+		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $lockUser;
+		return kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($userEntry, $dbUserEntry));
+	}
+	
+	public function addUserEntryImpl($userEntry, $dbUserEntry)
+	{
+// Due to PLAT-7837 - Only one anonimous user can take quiz
+//		$existingUserEntry = UserEntryPeer::getUserEntry($dbUserEntry->getPartnerId(), $dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), $dbUserEntry->getType());
+//		if ($existingUserEntry)
+//		{
+//			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_ALREADY_EXISTS);
+//		}
 		$dbUserEntry->save();
-
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 
 		return $userEntry;
@@ -83,10 +96,6 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function listAction(KalturaUserEntryFilter $filter, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-		{
-			$filter = new KalturaUserEntryFilter();
-		}
 		if (!$pager)
 		{
 			$pager = new KalturaFilterPager();

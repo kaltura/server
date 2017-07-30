@@ -693,7 +693,11 @@ class MediaService extends KalturaEntryService
 	 */
 	function getAction($entryId, $version = -1)
 	{
-		return $this->getEntry($entryId, $version, KalturaEntryType::MEDIA_CLIP);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType() instanceof KalturaMediaEntry)))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		return $this->getEntry($entryId, $version);
 	}
 
     /**
@@ -851,11 +855,9 @@ class MediaService extends KalturaEntryService
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
-
 	    if (!$filter)
 			$filter = new KalturaMediaEntryFilter();
-
-	    $filter->typeEqual = KalturaEntryType::MEDIA_CLIP;
+	
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 
 	    $newList = KalturaMediaEntryArray::fromDbArray($list, $this->getResponseProfile());

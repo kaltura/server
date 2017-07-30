@@ -1054,6 +1054,27 @@ $plannedDur = 0;
 			}
 		}
 
+			/*
+			 * AR Mode:5 - force target AR to be as close as possible to source 'intentional' AR
+			 * 	The source AR is checked againts 'known' AR (16:9, 4:3, 2.40:1, 2.35:1, ...)
+			 * 	if the source AR is 'close enough' to obe of the 'well-known' AR's, the asset is 
+			 *	generated with the well-known AR. Otherwise the calculated source AR is taken.
+			 *	The asset frame size is adapted to get as close as possible (4 dig percesion) to that AR.
+			 *
+			 *	This code should reside above, along with other AR processing. But this could lead to 
+			 *	behaviour change for some of the customer's that use the ARMode feature.
+			 */
+		if(isset($target->_arProcessingMode) && $target->_arProcessingMode==5){
+			$flvrVid = $this->_video;
+			list($w,$h,$d) = self::matchBestAspectRatio($widSrc, $hgtSrc, $flvrVid->_width, $flvrVid->_height);
+			if($w!==false) {
+				$target->_width = $w;
+				$target->_height = $h;
+				$target->_dar = $d;
+				KalturaLog::log("AR: FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)\n");
+			}
+		}
+
 		$target->_height = round($target->_height);
 		$target->_width  = round($target->_width);
 		
@@ -1187,6 +1208,69 @@ $plannedDur = 0;
 		}
 	}
 
+	/* ---------------------------
+	 * matchBestAspectRatio
+	 * 	Force target AR to be as close as possible to source 'intentional' AR
+	 * 	The source AR is checked againts 'known' AR (16:9, 4:3, 2.40:1, 2.35:1, ...)
+	 * 	if the source AR is 'close enough' to obe of the 'well-known' AR's, the asset is 
+	 *	generated with the well-known AR. Otherwise the calculated source AR is taken.
+	 *	The asset frame size is adapted to get as close as possible - 4 dig percesion, to that AR
+	 */
+	protected static function matchBestAspectRatio($srcWid, $srcHgt, $assetWid, $assetHgt, $percision=4)
+	{
+		KalturaLog::log("srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt,percision:$percision\n");
+
+		$dar = null;
+	/**/
+		$wellKnown = array(4/3,5/4,5/3,16/9,16/8,16/10,2.4,2.39,2.35,1.85);
+		foreach($wellKnown as $idx=>$d) {
+			if(abs(($srcWid/$srcHgt)-$d)<0.01){
+				$dar = round($d,$percision);
+				break;
+			}
+		}
+		if(!isset($dar)) {
+			$darAux = round($srcWid/$srcHgt,2);
+			foreach($wellKnown as $idx=>$d) {
+				if(abs($darAux-$d)<0.01){
+					$dar = round($d,$percision);
+					break;
+				}
+			}
+		}
+
+		if(!isset($dar)) {
+			$dar = round($srcWid/$srcHgt,$percision);
+		}
+
+		if($assetHgt==0) {
+			$assetHgt = round($assetWid/$dar/2)*2;
+		}
+		if($assetWid==0) {
+			$assetWid = round($assetHgt*$dar/2)*2;
+		}
+		$assetHgt = min($assetHgt,$srcHgt);
+		$assetWid = min($assetWid,$srcWid);
+		
+		if($assetWid>$assetHgt*$dar) {
+			$assetWid = round($assetHgt*$dar/2)*2;
+		}
+		KalturaLog::log("$srcWid $srcHgt $assetWid $assetHgt $dar \n");
+		
+		for($w=$assetWid; $w>=0; $w-=2){
+			$h = round($w/$dar);
+			if($h==0) break;
+			$d = round($w/$h,$percision);
+//KalturaLog::log("$w $h $d\n");
+			if($d==$dar && $h%2==0) {
+				break;
+			}
+		}
+
+		if($d==$dar) return array($w,$h,$d);
+		else return false;
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetVideoBitrate
 	 * If flavor BR is higher than the source - keep the source BR

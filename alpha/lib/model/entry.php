@@ -2013,22 +2013,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );
 	}
 	
-	public function getEntitledKusersPublish()
+	private function getEntitledPusersPublishArray()
 	{
 		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
-		if(!$entitledUserPuserPublish)
-			return '';
-
-		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
+		if (!$entitledUserPuserPublish)
+			return array();
+		
+		return unserialize($entitledUserPuserPublish);
+	}
+	
+	public function getEntitledKusersPublish()
+	{
+		return implode(',', array_keys($this->getEntitledPusersPublishArray()));
 	}
 	
 	public function getEntitledPusersPublish()
 	{
-		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
-		if (!$entitledUserPuserPublish)
-			return '';
-
-		return implode(',', unserialize($entitledUserPuserPublish));
+		return implode(',', $this->getEntitledPusersPublishArray());
 	}
 	
 	public function isEntitledKuserPublish($kuserId, $useUserGroups = true)
@@ -2725,6 +2726,29 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 // ----------- Extra object connections ----------------
 
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		if($this->customDataValueHasChanged('parentEntryId'))
+		{
+			$parentEntry = $this->getParentEntry();
+			if($parentEntry->getId() != $this->getId() && $parentEntry->getPuserId() != $this->getPuserId())
+			{
+				if(!in_array($parentEntry->getPuserId(), $this->getEntitledUserPuserEditArray()))
+					$this->setEntitledPusersEdit(implode(",", array_merge($this->getEntitledUserPuserEditArray(), array($parentEntry->getPuserId()))));
+				
+				if(!in_array($parentEntry->getPuserId(), $this->getEntitledPusersPublishArray()))
+					$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))));
+			}
+		}
+		
+		return parent::preSave($con);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postUpdate()
 	 */
@@ -2809,41 +2833,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			}
 		}
 
-		//Has entitledUserPuserEdit/Publish changed for current entry
-		if ($this->customDataValueHasChanged('entitledUserPuserEdit') ||
-			$this->customDataValueHasChanged('entitledUserPuserPublish') ||
-			$this->isColumnModified(entryPeer::PUSER_ID) )
+		if ($this->customDataValueHasChanged('entitledUserPuserEdit') || $this->customDataValueHasChanged('entitledUserPuserPublish') || $this->isColumnModified(entryPeer::PUSER_ID))
 		{
-			//Change for parent entry (and thus changing all brother entries.
-			$parentEntry = $this->getParentEntry();
-			if ( $parentEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit() ||
-				$parentEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
-				$parentEntry->getPuserId() != $this->getPuserId())
-			{
-				$parentEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
-				$parentEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
-				$parentEntry->setPuserId($this->getPuserId());
-				$parentEntry->save();
-			}
-
-			//Change all child entries.
 			$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->getId(), $this->getPartnerId());
 			foreach ($childEntries as $childEntry)
 			{
-				/**
-				 * @var entry $childEntry
-				 */
-				if ( $childEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit()	||
-					$childEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
-					$childEntry->getPuserId() != $this->getPuserId() )
-				{
-					$childEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
-					$childEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
-					$childEntry->setPuserId($this->getPuserId());
-					$childEntry->save();
-				}
+				$this->syncEntitlement($childEntry);
 			}
-
 		}
 
 		$ret = parent::postUpdate($con);
@@ -2884,6 +2880,39 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		
 		return $ret;
+	}
+	
+	private function syncEntitlement(Entry $target)
+	{
+		$shouldSave = false;
+		$entitledPusersEditArray = $this->getEntitledUserPuserEditArray();
+		$entitledPusersPublishArray = $this->getEntitledPusersPublishArray();
+		
+		if(count(array_diff($target->getEntitledUserPuserEditArray(), $entitledPusersEditArray)))
+		{
+			$entitledPusersEditArray = array_merge($target->getEntitledUserPuserEditArray(), $entitledPusersEditArray);
+			$shouldSave = true;
+		}
+		
+		if(count(array_diff($target->getEntitledPusersPublishArray(), $entitledPusersPublishArray)))
+		{
+			$entitledPusersPublishArray = array_merge($target->getEntitledPusersPublishArray(), $entitledPusersPublishArray);
+			$shouldSave = true;
+		}
+		
+		if($target->getPuserId() != $this->getPuserId())
+		{
+			$entitledPusersPublishArray = array_merge($entitledPusersEditArray, array($this->getPuserId()));
+			$entitledPusersPublishArray = array_merge($entitledPusersPublishArray, array($this->getPuserId()));
+			$shouldSave = true;
+		}
+		
+		if(!$shouldSave)
+			return;
+		
+		$target->setEntitledPusersEdit(implode(",", array_unique($entitledPusersEditArray)));
+		$target->setEntitledPusersPublish(implode(",", array_unique($entitledPusersPublishArray)));
+		$target->save();
 	}
 	
 	/* (non-PHPdoc)
@@ -3392,7 +3421,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
 		
 		}
-		elseif ($this->getType () == entryType::MEDIA_CLIP) {
+		elseif ($this->getType () == entryType::MEDIA_CLIP || $this->getType() == entryType::PLAYLIST) {
 			try {
 				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
 			} catch ( Exception $ex ) {
@@ -3569,9 +3598,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function customDataValueHasChanged($name, $namespace = '')
 	{
-		if ( isset($this->oldCustomDataValues[$namespace]) &&
-			 isset($this->oldCustomDataValues[$namespace][$name]) &&
-			 $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
+		if ( isset($this->oldCustomDataValues[$namespace]) 
+				&& ( isset($this->oldCustomDataValues[$namespace][$name]) || array_key_exists($name, $this->oldCustomDataValues[$namespace]) )
+				&& $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
 				return true;
 		return false;
 	}
