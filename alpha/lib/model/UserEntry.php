@@ -30,4 +30,9 @@ abstract class UserEntry extends BaseUserEntry {
 		$this->setStatus(UserEntryStatus::ACTIVE);
 	}
 
+	public function isDuplicationAllowed()
+	{
+		return false;
+	}
+
 } // UserEntry
