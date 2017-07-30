@@ -85,7 +85,7 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		$userEntryCriteria->add(self::ENTRY_ID, $entryId);
 		$userEntryCriteria->add(self::KUSER_ID, $userId);
 		$userEntryCriteria->add(self::TYPE, $type);
-
+		
 		return self::doSelectOne($userEntryCriteria);
 	}
 
