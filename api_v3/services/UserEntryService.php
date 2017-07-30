@@ -34,7 +34,7 @@ class UserEntryService extends KalturaBaseService {
 	
 	public function addUserEntryImpl($userEntry, $dbUserEntry)
 	{
-		if($dbUserEntry->getType() == ViewHistoryPlugin::getViewHistoryUserEntryTypeCoreValue(ViewHistoryUserEntryType::VIEW_HISTORY))
+		if(!$dbUserEntry->isDuplicationAllowed())
 		{
 			$existingUserEntry = UserEntryPeer::getUserEntry($dbUserEntry->getPartnerId(), $dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), $dbUserEntry->getType());
 			if ($existingUserEntry)
