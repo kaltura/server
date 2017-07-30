@@ -86,26 +86,6 @@ class BeaconElasticClient
 
 class BeaconObject
 {
-    /**
-     * @var KalturaBeaconObjectTypes
-     */
-    public $relatedObjectType;
-
-    /**
-     * @var string
-     */
-    public $eventType;
-
-    /**
-     * @var string
-     */
-    public $objectId;
-
-    /**
-     * @var string
-     */
-    public $privateData;
-
     function __construct ($partnerId,array $params)
     {
         $this->content              = $params;

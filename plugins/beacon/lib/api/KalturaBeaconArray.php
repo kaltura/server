@@ -3,8 +3,8 @@
  * @package plugins.beacon
  * @subpackage api.objects
  */
-class KalturaBeaconArray extends  KalturaTypedArray{
-
+class KalturaBeaconArray extends  KalturaTypedArray
+{
     public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
     {
         $newArr = new KalturaBeaconArray();

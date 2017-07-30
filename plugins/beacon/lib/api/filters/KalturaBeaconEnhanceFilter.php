@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: moshe.maor
- * Date: 7/24/2017
- * Time: 7:57 AM
+ * @package plugins.beacon
+ * @subpackage api.filters
  */
 
 class KalturaBeaconEnhanceFilter extends KalturaBeaconFilter
