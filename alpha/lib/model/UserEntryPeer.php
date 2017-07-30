@@ -78,7 +78,7 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		return $ids;
 	}
 	
-	public static function getUserEntry ($partnerId, $userId, $entryId, $type)
+	public static function getUserEntry ($partnerId, $userId, $entryId, $type, $statuses = array())
 	{
 		$userEntryCriteria = new Criteria();
 		$userEntryCriteria->add(self::PARTNER_ID, $partnerId);
@@ -86,6 +86,9 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		$userEntryCriteria->add(self::KUSER_ID, $userId);
 		$userEntryCriteria->add(self::TYPE, $type);
 		
+		if(!empty($statuses))
+			$userEntryCriteria->add(self::STATUS, $statuses, Criteria::IN);
+
 		return self::doSelectOne($userEntryCriteria);
 	}
 
