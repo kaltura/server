@@ -631,10 +631,12 @@ class ks extends kSessionBase
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE)
 			{
-				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0)){
+				if (isset($exPrivileges[1]) && (is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0))
+				{
 					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::INVALID_SET_ROLE);
 				}
-				return $exPrivileges[1];
+				
+				return isset($exPrivileges[1]) ? $exPrivileges[1] : false;
 			}
 		}
 		
