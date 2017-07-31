@@ -43,6 +43,7 @@
 		</tbody>
 	</table>
 </div>
+<?php echo $this->adminApiForm; ?>
 
 <script type="text/javascript">
 $(function(){
@@ -194,6 +195,21 @@ function loadDrmProfileSuccess(html) {
 	});
 }
 
+function adminApi(partnerId, drmType, apiAction) {
+	let paramStr = '/pId/' + partnerId + '/drmType/' + drmType + '/apiAction/' + apiAction;
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DrmAdminApiAction')); ?>' + paramStr;
+	dialogDiv = jQuery('<div id="drm-admin-api-dialog"><iframe id="adminApiIFrame" width="100%" height="100%" src="' + url + '"></iframe></div>').appendTo('body');
+	dialogDiv.dialog({bgiframe: true, modal: true, resizable: true, width: 600, height: 600,
+		title: '<?php echo $this->translate('DRM admin-api'); ?>',
+		buttons:
+			{
+			'<?php echo $this->translate('Save'); ?>': function() {
+				var iframedoc = document.getElementById('adminApiIFrame').contentWindow.document;
+				iframedoc.getElementById('frmAdminApiConfigure').submit();},
+			'<?php echo $this->translate('Close'); ?>': function() {jQuery(this).dialog('close');}}
+	});
+
+}
 
 
 

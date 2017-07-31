@@ -1,0 +1,21 @@
+<?php if($this->errMessage): ?>
+<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+
+<?php
+	$this->form->setAction($this->url(array('controller' => 'plugin', 'action' => 'DrmAdminApiAction')));
+	echo $this->form;
+?>
+
+<style type="text/css">
+	#frmAdminApiConfigure dl dd input{width: 500px; height: 22px;}
+</style>
+
+
+<script type="text/javascript">
+	jQuery(function() {
+		<?php if ($this->formValid): ?>
+		dialogDiv.dialog('close');
+		<?php endif; ?>
+	});
+</script>

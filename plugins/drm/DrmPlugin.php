@@ -35,6 +35,7 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 		$pages[] = new DrmProfileListAction();
 		$pages[] = new DrmProfileConfigureAction();
 		$pages[] = new DrmProfileDeleteAction();
+		$pages[] = new DrmAdminApiAction();
 
 		return $pages;
 	}
