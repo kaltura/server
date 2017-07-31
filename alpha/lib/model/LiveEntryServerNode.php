@@ -10,7 +10,9 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_STREAMS = "streams";
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
-	
+	const CUSTOM_DATA_RECORDED_ENTRY_DURATION = "recorded_entry_duration";
+	const RECORDED_ENTRIES_DURATIONS_TO_KEEP = 20;
+
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
 	 */
@@ -200,5 +202,43 @@ class LiveEntryServerNode extends EntryServerNode
 		
 		KalturaLog::debug("Live entry with id [{$liveEntry->getId()}], is set with recording disabled, clearing entry server node id [{$this->getId()}] from db");
 		$this->delete();
+	}
+
+	public function setRecordedEntryDuration($recordedEntryId, $duration)
+	{
+		$recordedEntriesDurations = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, null, array());
+		$recordedEntryIndex = -1;
+		for ($i = 0; $i < count($recordedEntriesDurations); $i++)
+		{
+			if ($recordedEntriesDurations[$i]['entryId'] == $recordedEntryId) {
+				$recordedEntryIndex = $i;
+				break;
+			}
+
+		}
+		$recordedEnteryDuration = array('entryId' => $recordedEntryId, 'duration' => $duration);
+		if ($recordedEntryIndex >= 0)
+			$recordedEntriesDurations[$recordedEntryIndex] = $recordedEnteryDuration;
+		else
+			$recordedEntriesDurations[] = $recordedEnteryDuration;
+		$this->putInCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, $recordedEntriesDurations);
+	}
+
+	public function keepLatestRecordedEntriesDurations()
+	{
+		$recordedEntriesDurations = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, null, array());
+		array_splice($recordedEntriesDurations, self::RECORDED_ENTRIES_DURATIONS_TO_KEEP);
+		$this->putInCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, $recordedEntriesDurations);
+	}
+
+	public function getRecordedEntriesDurations()
+	{
+		$recordedEntriesDurations = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, null, array());
+		$outArr = array();
+		foreach($recordedEntriesDurations as $recordedEntryDuration)
+		{
+			$outArr[$recordedEntryDuration['entryId']] = $recordedEntryDuration['duration'];
+		}
+		return $outArr;
 	}
 }

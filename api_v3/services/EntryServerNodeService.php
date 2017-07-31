@@ -139,4 +139,41 @@ class EntryServerNodeService extends KalturaBaseService
 		/* @var EntryServerNode $dbEntryServerNode */
 		$dbEntryServerNode->validateEntryServerNode();
 	}
+
+	/**
+	 *
+	 * @action updateRecordedEntryDuration
+	 * @param string $id
+	 * @param int $duration
+	 * @return KalturaEntryServerNode
+	 *
+	 * @throws KalturaAPIException
+	 */
+	public function updateRecordedEntryDurationAction($id, $duration)
+	{
+		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK( $id );
+		if(!$dbEntryServerNode)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $id);
+
+		if (!in_array($dbEntryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY, EntryServerNodeType::LIVE_BACKUP)))
+		{
+			KalturaLog::err("Entry server node is not of live type ".$dbEntryServerNode->getServerType());
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR, $dbEntryServerNode->getServerType(), $id);
+		}
+
+		/** @var LiveEntryServerNode $dbEntryServerNode */
+		$liveEntry = entryPeer::retrieveByPK($dbEntryServerNode->getEntryId());
+		if (!$liveEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryServerNode->getEntryId());
+		/** @var LiveEntry $liveEntry */
+		$recordedEntryId = $liveEntry->getRecordedEntryId();
+
+		$dbEntryServerNode->setRecordedEntryDuration($recordedEntryId, $duration);
+		$dbEntryServerNode->save();
+		$entryServerNode = KalturaEntryServerNode::getInstance($dbEntryServerNode, $this->getResponseProfile());
+		$entryServerNode->fromObject($dbEntryServerNode);
+		return $entryServerNode;
+
+	}
+
 }
