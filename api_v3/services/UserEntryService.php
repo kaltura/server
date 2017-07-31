@@ -34,12 +34,14 @@ class UserEntryService extends KalturaBaseService {
 	
 	public function addUserEntryImpl($userEntry, $dbUserEntry)
 	{
-// Due to PLAT-7837 - Only one anonimous user can take quiz
-//		$existingUserEntry = UserEntryPeer::getUserEntry($dbUserEntry->getPartnerId(), $dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), $dbUserEntry->getType());
-//		if ($existingUserEntry)
-//		{
-//			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_ALREADY_EXISTS);
-//		}
+		if(!$dbUserEntry->isDuplicationAllowed())
+		{
+			$existingUserEntry = UserEntryPeer::getUserEntry($dbUserEntry->getPartnerId(), $dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), $dbUserEntry->getType());
+			if ($existingUserEntry)
+			{
+				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_ALREADY_EXISTS);
+			}
+		}
 		$dbUserEntry->save();
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 
