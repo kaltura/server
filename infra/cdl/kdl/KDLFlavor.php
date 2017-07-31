@@ -1066,18 +1066,12 @@ $plannedDur = 0;
 			 */
 		if(isset($target->_arProcessingMode) && $target->_arProcessingMode==5){
 			$flvrVid = $this->_video;
-			list($w,$h,$d) = self::matchBestAspectRatio(round($widSrc), round($hgtSrc), $flvrVid->_width, $flvrVid->_height);
+			list($w,$h,$d) = self::matchBestAspectRatio($widSrc, $hgtSrc, $flvrVid->_width, $flvrVid->_height);
 			if($w!==false) {
 				$target->_width = $w;
 				$target->_height = $h;
 				$target->_dar = $d;
-				KalturaLog::log("AR Match: FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)");
-			}
-			else {
-				$w = round($target->_width);
-				$h = round($target->_height);
-				$d = $w/$h;
-				KalturaLog::log("AR Match: NOT FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)");
+				KalturaLog::log("AR: FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)\n");
 			}
 		}
 
@@ -1224,7 +1218,7 @@ $plannedDur = 0;
 	 */
 	protected static function matchBestAspectRatio($srcWid, $srcHgt, $assetWid, $assetHgt, $percision=4)
 	{
-		KalturaLog::log("Input - srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt,percision:$percision");
+		KalturaLog::log("srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt,percision:$percision\n");
 
 		$dar = null;
 	/**/
@@ -1261,9 +1255,9 @@ $plannedDur = 0;
 		if($assetWid>$assetHgt*$dar) {
 			$assetWid = round($assetHgt*$dar/2)*2;
 		}
-		KalturaLog::log("Adjusted - srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt");
+		KalturaLog::log("$srcWid $srcHgt $assetWid $assetHgt $dar \n");
 		
-		for($w=round($assetWid/2)*2; $w>=0; $w-=2){
+		for($w=$assetWid; $w>=0; $w-=2){
 			$h = round($w/$dar);
 			if($h==0) break;
 			$d = round($w/$h,$percision);
@@ -1274,7 +1268,7 @@ $plannedDur = 0;
 		}
 
 		if($d==$dar) return array($w,$h,$d);
-		else return array(false,false,false);
+		else return false;
 	}
 	
 	/* ---------------------------
