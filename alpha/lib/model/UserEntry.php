@@ -30,9 +30,14 @@ abstract class UserEntry extends BaseUserEntry {
 		$this->setStatus(UserEntryStatus::ACTIVE);
 	}
 
-	public function isDuplicationAllowed()
+	public function checkAlreadyExists()
 	{
-		return false;
+		$userEntryCriteria = new Criteria();
+		$userEntryCriteria->add(UserEntryPeer::ENTRY_ID, $this->getEntryId());
+		$userEntryCriteria->add(UserEntryPeer::KUSER_ID, $this->getKuserId());
+		$userEntryCriteria->add(UserEntryPeer::TYPE, $this->getType());
+		
+		return UserEntryPeer::doSelectOne($userEntryCriteria);
 	}
 
 } // UserEntry
