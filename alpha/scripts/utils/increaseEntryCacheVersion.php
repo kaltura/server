@@ -2,7 +2,7 @@
 
 if($argc != 2)
 {
-	echo "Arguments missing.\n\n";
+	echo "Arguments missing." . PHP_EOL;
 	echo "Usage: php " . _FILE_ . " {entry id} " . PHP_EOL;
 	exit;
 }
