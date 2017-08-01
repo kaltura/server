@@ -26,8 +26,8 @@ class BeaconService extends KalturaBaseService
     public function addAction(KalturaBeacon $beacon, $shouldLog = KalturaNullableBoolean::FALSE_VALUE, $ttl = 600)
     {
     	$beaconObj = $beacon->toInsertableObject();
-        $beaconObj->index($shouldLog, $ttl);
-        return true;
+    	$beaconObj->index($shouldLog, $ttl);
+    	return true;
     }
 
     /**
@@ -64,7 +64,7 @@ class BeaconService extends KalturaBaseService
     	if(!$pager)
     		$pager = new KalturaFilterPager();
     	
-        return $beaconFilter->enhanceSearch($pager);
+        return $filter->enhanceSearch($pager);
     }
 
 

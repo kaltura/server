@@ -11,6 +11,7 @@ class kBeacon
 	const EVENT_TYPE_STRING				= 'eventType';
 	const OBJECT_ID_STRING				= 'objectId';
 	const PRIVATE_DATA_STRING			= 'privateData';
+	const PARTNBER_ID					= 'partnerId';
 	
 	protected $relatedObjectType;
 	protected $eventType;
@@ -23,10 +24,10 @@ class kBeacon
 		$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
 	}
 	
-	public function setRelatedObjectType($relatedObjectType) 	{ $this->relatedObjectType = $relatedObjectType; }
-	public function setEventType($eventType) 					{ $this->eventType = $eventType; }
+	public function setRelatedObjectType($relatedObjectType)	{ $this->relatedObjectType = $relatedObjectType; }
+	public function setEventType($eventType)					{ $this->eventType = $eventType; }
 	public function setObjectId($objectId)						{ $this->objectId = $objectId; }	
-	public function setPrivateData($privateData) 				{ $this->privateData = $privateData; }
+	public function setPrivateData($privateData)				{ $this->privateData = $privateData; }
 	public function setPartnerId($partnerId)					{ $this->partnerId = $partnerId; }
 	
 	public function getRelatedObjectType()						{ return $this->relatedObjectType; }
@@ -60,10 +61,11 @@ class kBeacon
 	{
 		$indexObject=array();
 		//$indexObject[self::PRIVATE_DATA_STRING] = json_decode($this->privateData,true);
-		$indexObject[self::PRIVATE_DATA_STRING] = $this->privateData;
 		$indexObject[self::RELATED_OBJECT_TYPE_STRING] = $this->relatedObjectType;
 		$indexObject[self::EVENT_TYPE_STRING] = $this->eventType;
 		$indexObject[self::OBJECT_ID_STRING] = $this->objectId;
+		$indexObject[self::PRIVATE_DATA_STRING] = $this->privateData;
+		
 		$beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$indexObject);
 		return $beaconObject;
 	}

@@ -41,13 +41,13 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("eventType","objectId", "relatedObjectType"));
+		$this->validatePropertyNotNull(array("eventType","objectId","relatedObjectType"), true);
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
 	public function getMapBetweenObjects()
 	{
-		return array_merge(self::$map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	public function getExtraFilters()

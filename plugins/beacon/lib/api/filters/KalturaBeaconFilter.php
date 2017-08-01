@@ -42,10 +42,10 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
         $searchObject[kBeacon::RELATED_OBJECT_TYPE_STRING] = $this->relatedObjectTypeEqual;
         $searchObject[kBeacon::OBJECT_ID_STRING] = $this->objectIdEqual;
         $searchObject[kBeacon::EVENT_TYPE_STRING] = $this->eventTypeEqual;
-        //foreach($this->privateData as $key=>$value)
-        //{
-        //    $searchObject[$key]=$value;
-        //}
+        foreach($this->privateData as $key=>$value)
+        {
+            $searchObject[$key]=$value;
+        }
         return $searchObject;
     }
 
