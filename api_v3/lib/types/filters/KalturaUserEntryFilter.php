@@ -60,7 +60,6 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$this->validateFilter();
 		$response = new KalturaUserEntryListResponse();
 		if ( in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)) )
 		{
@@ -71,6 +70,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$c = new Criteria();
 		
 		$userEntryFilter = $this->toObject();
+		$this->validateFilter();
 		$userEntryFilter->attachToCriteria($c);
 
 		$pager->attachToCriteria($c);
