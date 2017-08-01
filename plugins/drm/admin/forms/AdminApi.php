@@ -22,7 +22,7 @@ class Form_AdminApi extends Infra_Form
 		$this->addElement('select', 'drmType', array(
 			'label'			=> 'DRM Type:',
 			'filters'		=> array('StringTrim'),
-			'multiOptions'	=> array('CENC' => 'CENC', 'FPS' => 'FPS'),
+			'multiOptions'	=> array('cenc' => 'cenc', 'fps' => 'fps'),
 		));
 
 		$this->addElement('select', 'apiAction', array(
