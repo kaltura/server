@@ -25,17 +25,17 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
         //disable the entitlement checks for partner
         if(!$partner->getDefaultEntitlementEnforcement())
-            return;//todo
+            return;
 
         self::initializeParentEntitlement();
         self::initializeDisableEntitlement(self::$ks);
-        self::$kuserId = self::getKuserIdForEntitlement(self::$partnerId, self::$kuserId, self::$ks); //todo - kuser is null maybe allow to pass as param
+        self::$kuserId = self::getKuserIdForEntitlement(self::$partnerId, self::$kuserId, self::$ks);
         self::initializeUserEntitlement(self::$ks);
 
         if(self::$ks)
             self::$privacyContext = self::$ks->getPrivacyContext();
 
-        self::initializePublicEntryEntitlement(self::$ks); //todo - add active category entitlement
+        self::initializePublicEntryEntitlement(self::$ks);
         self::initializeUserCategoryEntryEntitlement(self::$ks);
         
         self::$isInitialized = true;
@@ -62,7 +62,7 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
     private static function initializeUserEntitlement($ks)
     {
-        if($ks && self::$kuserId) //todo to check if kuserId ==''
+        if($ks && self::$kuserId)
         {
             self::$userEntitlement = true;
         }

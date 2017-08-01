@@ -11,6 +11,7 @@ class kMetadataManager
 	
 	const SEARCH_TEXT_SUFFIX = 'mdend';
 	const ELASTIC_DATA_FIELD_NAME = 'metadata';
+	const NO_SYSTEM_NAME = 'NOSYSTEMNAME';
 	
 	protected static $objectTypeNames = array(
 		MetadataObjectType::ENTRY => 'entry',
@@ -796,7 +797,7 @@ class kMetadataManager
 			if($metadataProfile)
 				$systemName = $metadataProfile->getSystemName();
 			else
-				$systemName = 'NOSYSTEMNAME'; //todo - move to const
+				$systemName = self::NO_SYSTEM_NAME;
 			$profileFieldData['system_name'] = $systemName;
 			$xpath = $profileField->getXpath();
 			$profileFieldData['xpath'] = $xpath;

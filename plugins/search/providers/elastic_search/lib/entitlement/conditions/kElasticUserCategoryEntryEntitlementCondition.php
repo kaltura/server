@@ -119,12 +119,11 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
             $privacyContexts = explode(',', $privacyContext);
             $privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, kEntryElasticEntitlement::$partnerId );
         }
-        $body['query']['bool']['filter'][] = array('terms' => array('privacy_contexts' => $privacyContexts)); //todo add partner prefix , search in privacy contexts
+        $body['query']['bool']['filter'][] = array('terms' => array('privacy_contexts' => $privacyContexts));
 
-        //todo add privacy on category
         if($privacy) //privacy is an array
         {
-            $body['query']['bool']['filter'][] = array('terms' => array('privacy' => $privacy)); //todo add partner prefix
+            $body['query']['bool']['filter'][] = array('terms' => array('privacy' => $privacy));
         }
 
         $params['body'] = $body;

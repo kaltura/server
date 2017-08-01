@@ -20,7 +20,7 @@ abstract class kBaseSearch
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $eSearchOperator->getOperator());
         $this->applyElasticSearchConditions($subQuery);
-        KalturaLog::debug("@@NH [".print_r($this->query, true)."]");; //todo - remove after debug
+        KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
         $result = $this->elasticClient->search($this->query);
         return $result;
     }
@@ -64,7 +64,7 @@ abstract class kBaseSearch
             }
 
             if(count($sortConditions))
-                $sortConditions[] = '_score'; //todo
+                $sortConditions[] = '_score';
 
             $this->query['body']['sort'] = $sortConditions;
         }

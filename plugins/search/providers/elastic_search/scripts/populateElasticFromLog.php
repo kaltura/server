@@ -37,7 +37,7 @@ if(!file_exists($configFile))
     exit(-1);
 }
 $config = parse_ini_file($configFile);
-$elasticServer = $config['elasticServer']; //here we will write for example the ingest node/load balancer for ny/pa cluster
+$elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
 $systemSettings = kConf::getMap('system');
 if(!$systemSettings || !$systemSettings['LOG_DIR'])
@@ -130,7 +130,6 @@ while(true)
                 $action = $command['action'];
 
                 $response = $elasticClient->$action($command);
-                //todo - choose what to do with an error from elastic
             }
 
             // If the record is an historical record, don't take back the last log id

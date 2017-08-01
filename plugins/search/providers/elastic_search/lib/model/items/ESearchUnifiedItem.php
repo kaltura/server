@@ -137,7 +137,7 @@ class ESearchUnifiedItem extends ESearchItem
 		$metadataAllowedFields = ESearchMetadataItem::getAllowedSearchTypesForField();
 		foreach($metadataAllowedFields as $fieldName => $fieldAllowedTypes)
 		{
-			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))//todo
+			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
 			{
 				$metadataItem = new ESearchMetadataItem();
 				$metadataItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());

@@ -103,7 +103,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $params['id'] = $object->getElasticId();
         $params['action'] = $op;
 
-        //todo - remove after staging
         if(kConf::get('disableElastic', 'elastic', true))
             return true;
 

@@ -2,7 +2,7 @@
   "settings" : {
 	"number_of_shards" : 5,
 	"number_of_replicas" : 0,
-	"analysis": { //todo - we can move the analyzer to config filebecause he is common for all indices
+	"analysis": {
 	  "filter": {
 		"trigrams_filter": {
 		  "type": "ngram",
