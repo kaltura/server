@@ -122,7 +122,10 @@ class ESearchOperator extends ESearchItem
 
 			foreach ($subQuery as $key => $value)
 			{
-				$outQuery['bool'][$boolOperator][] = $value;
+				if($itemClassName == get_class())
+					$outQuery['bool'][$boolOperator][] = $subQuery;
+				else
+					$outQuery['bool'][$boolOperator][] = $value;
 			}
 		}
 
