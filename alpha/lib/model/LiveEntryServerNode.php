@@ -221,12 +221,6 @@ class LiveEntryServerNode extends EntryServerNode
 			$recordedEntriesDurations[$recordedEntryIndex] = $recordedEnteryDuration;
 		else
 			$recordedEntriesDurations[] = $recordedEnteryDuration;
-		$this->putInCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, $recordedEntriesDurations);
-	}
-
-	public function keepLatestRecordedEntriesDurations()
-	{
-		$recordedEntriesDurations = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, null, array());
 		array_splice($recordedEntriesDurations, self::RECORDED_ENTRIES_DURATIONS_TO_KEEP);
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, $recordedEntriesDurations);
 	}

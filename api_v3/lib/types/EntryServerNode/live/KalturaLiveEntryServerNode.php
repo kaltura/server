@@ -15,6 +15,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	public $streams;
 
 	/**
+	 * @readonly
 	 * @var KalturaKeyValueArray
 	 */
 	public $recordedEntriesDurations;
@@ -22,6 +23,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	private static $map_between_objects = array
 	(
 		"streams",
+		"duration",
 		"recordedEntriesDurations",
 	);
 

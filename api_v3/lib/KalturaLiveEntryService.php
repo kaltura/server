@@ -458,7 +458,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		if($mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)// TODO: should be removed?
+		if($mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)
 		{
 			$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
 			$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
@@ -502,7 +502,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbLiveEntry->setLengthInMsecs($totalDuration);
 		$dbLiveEntry->save();
 
-		$this->handleRecordingDuration($dbLiveEntry, $mediaServerIndex, $duration);
 		$this->handleRecording($dbLiveEntry, $recordedEntry, $resource, $flavorParamsId);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
@@ -541,17 +540,4 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile);
 	}
 
-	protected function handleRecordingDuration(LiveEntry $liveEntry, $mediaServerIndex, $duration)
-	{
-		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), $mediaServerIndex);
-		if (!$entryServerNode)
-			return false; 
-
-		if (!in_array($entryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY, EntryServerNodeType::LIVE_BACKUP)))
-			return false;
-		/** @var LiveEntryServerNode $entryServerNode */
-		$entryServerNode->setRecordedEntryDuration($liveEntry->getRecordedEntryId(), $duration);
-		$entryServerNode->keepLatestRecordedEntriesDurations();
-		$entryServerNode->save();
-	}
 }
