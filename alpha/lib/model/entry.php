@@ -1586,7 +1586,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getThumbnailVersion()
 	{
 		// For image entry, the data file sync sub type is used as thumbnail
-		if($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
+		if(($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE) || ($this->getType() == entryType::PLAYLIST))
 			return $this->getVersion();
 			
 		$version = parent::getThumbnail();
