@@ -29,21 +29,21 @@ class UserEntryService extends KalturaBaseService {
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
 		$lockUser = $userEntry->userId ? $userEntry->userId : kCurrentContext::getCurrentKsKuserId();
 		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $lockUser;
-		return kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($userEntry, $dbUserEntry));
-	}
-	
-	public function addUserEntryImpl($userEntry, $dbUserEntry)
-	{
-// Due to PLAT-7837 - Only one anonimous user can take quiz
-//		$existingUserEntry = UserEntryPeer::getUserEntry($dbUserEntry->getPartnerId(), $dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), $dbUserEntry->getType());
-//		if ($existingUserEntry)
-//		{
-//			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_ALREADY_EXISTS);
-//		}
-		$dbUserEntry->save();
+		$dbUserEntry = kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($dbUserEntry));
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 
 		return $userEntry;
+	}
+	
+	public function addUserEntryImpl($dbUserEntry)
+	{
+		if($dbUserEntry->checkAlreadyExists())
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_ALREADY_EXISTS);
+		}
+		$dbUserEntry->save();
+		
+		return $dbUserEntry;
 	}
 
 	/**
