@@ -41,7 +41,9 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("eventType","objectId","relatedObjectType"), true);
+		$this->validatePropertyNotNull("eventType");
+		$this->validatePropertyNotNull("objectId");
+		$this->validatePropertyNotNull("relatedObjectType");
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
