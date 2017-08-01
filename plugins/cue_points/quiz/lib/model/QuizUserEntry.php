@@ -103,9 +103,9 @@ class QuizUserEntry extends UserEntry{
 		return array($totalPoints, $userPoints);
 	}
 
-	public function isDuplicationAllowed()
+	public function checkAlreadyExists()
 	{
-		return true;
+		return false;
 	}
 
 }

@@ -78,15 +78,4 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		return $ids;
 	}
 	
-	public static function getUserEntry ($partnerId, $userId, $entryId, $type)
-	{
-		$userEntryCriteria = new Criteria();
-		$userEntryCriteria->add(self::PARTNER_ID, $partnerId);
-		$userEntryCriteria->add(self::ENTRY_ID, $entryId);
-		$userEntryCriteria->add(self::KUSER_ID, $userId);
-		$userEntryCriteria->add(self::TYPE, $type);
-		
-		return self::doSelectOne($userEntryCriteria);
-	}
-
 } // UserEntryPeer
