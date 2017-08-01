@@ -105,25 +105,6 @@ class QuizUserEntry extends UserEntry{
 
 	public function checkAlreadyExists()
 	{
-		$isAnonymous = false;
-		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('', 0));
-		foreach ($anonKusers as $anonKuser)
-		{
-			if ($anonKuser->getKuserId() == $this->getKuserId())
-			{
-				$isAnonymous = true;
-			}
-		}
-		if (!$isAnonymous)
-		{
-			$c = new Criteria();
-			$c->add(UserEntryPeer::KUSER_ID, $this->getKuserId());
-			$c->add(UserEntryPeer::ENTRY_ID, $this->getEntryId());
-			$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
-			
-			return UserEntryPeer::doSelectOne($c);
-		}
-		
 		return false;
 	}
 
