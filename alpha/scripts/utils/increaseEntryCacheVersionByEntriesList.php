@@ -26,4 +26,3 @@ function increaseEntryVersion($entryId)
 	$entry->setCacheFlavorVersion($entry->getCacheFlavorVersion() + 1);
 	$entry->save();
 }
-?>

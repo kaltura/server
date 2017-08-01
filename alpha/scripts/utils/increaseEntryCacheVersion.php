@@ -20,4 +20,3 @@ $entry->setCacheFlavorVersion($entry->getCacheFlavorVersion() + 1);
 $entry->save();
 
 KalturaLog::debug('Done');
-?>
