@@ -8,7 +8,7 @@ class ESearchMetadataItem extends ESearchItem
 	const DEFAULT_INNER_HITS_SIZE = 10;
 
 	private static $allowed_search_types_for_field = array(
-		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH,ESearchUnifiedItem::UNIFIED),
+		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
 		'metadata.value_int' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::RANGE'=>ESearchItemType::RANGE, ESearchUnifiedItem::UNIFIED),
 	);
 
@@ -92,27 +92,10 @@ class ESearchMetadataItem extends ESearchItem
 		$metadataQuery['nested']['path'] = 'metadata';
 		$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchMetadataItem::getAllowedSearchTypesForField();
+
 		foreach ($eSearchItemsArr as $metadataESearchItem)
 		{
-			/* @var ESearchMetadataItem $metadataESearchItem */
 			self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes);
-			if ($metadataESearchItem->getXpath())
-			{
-				$metadataQuery['nested']['query']['bool']['must'][] = array(
-					'match' => array(
-						'metadata.xpath' => $metadataESearchItem->getXpath()
-					)
-				);
-			}
-			if ($metadataESearchItem->getMetadataProfileId())
-			{
-				$metadataQuery['nested']['query']['bool']['must'][] = array(
-					'match' => array(
-						'metadata.metadata_profile_id' => $metadataESearchItem->getMetadataProfileId()
-					)
-				);
-				return $metadataQuery;
-			}
 		}
 		return array($metadataQuery);
 	}
@@ -159,6 +142,16 @@ class ESearchMetadataItem extends ESearchItem
 			$metadataExactMatch['bool']['should'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
 			$metadataExactMatch['bool']['minimum_should_match'] = 1;
 		}
+		else if($searchItem->getXpath() || $searchItem->getMetadataProfileId())
+		{
+			$metadataExactMatch['bool']['must'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+
+			if($searchItem->getXpath())
+				$metadataExactMatch['bool']['must'][] = self::getXPathQuery($searchItem);
+
+			if($searchItem->getMetadataProfileId())
+				$metadataExactMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+		}
 		else
 			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
 
@@ -172,12 +165,42 @@ class ESearchMetadataItem extends ESearchItem
 		if(ctype_digit($searchItem->getSearchTerm()))//add metadata.value_int
 			$metadataMultiMatch['multi_match']['fields'][] = 'metadata.value_int^3';
 
+		if($searchItem->getXpath() || $searchItem->getMetadataProfileId())
+		{
+			$metadataMultiMatchQuery = $metadataMultiMatch;
+			$metadataMultiMatch = null;
+
+			$metadataMultiMatch['bool']['must'][] = $metadataMultiMatchQuery;
+
+			if($searchItem->getXpath())
+				$metadataMultiMatch['bool']['must'][] = self::getXPathQuery($searchItem);
+
+			if($searchItem->getMetadataProfileId())
+				$metadataMultiMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+		}
+
 		return $metadataMultiMatch;
 	}
 
 	protected static function getMetadataPrefixQuery($searchItem, $allowedSearchTypes)
 	{
-		return kESearchQueryManager::getPrefixQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+		$metaDataPrefix = kESearchQueryManager::getPrefixQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+
+		if($searchItem->getXpath() || $searchItem->getMetadataProfileId())
+		{
+			$metaDataPrefixQuery = $metaDataPrefix;
+			$metaDataPrefix = null;
+
+			$metaDataPrefix['bool']['must'][] = $metaDataPrefixQuery;
+
+			if($searchItem->getXpath())
+				$metaDataPrefix['bool']['must'][] = self::getXPathQuery($searchItem);
+
+			if($searchItem->getMetadataProfileId())
+				$metaDataPrefix['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+		}
+
+		return $metaDataPrefix;
 	}
 
 	protected static function getMetadataDoesntContainQuery($searchItem, $allowedSearchTypes)
@@ -185,20 +208,77 @@ class ESearchMetadataItem extends ESearchItem
 		$metadataDoesntContain = array();
 		if(ctype_digit($searchItem->getSearchTerm()))
 		{
-			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
-			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
+			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = self::getMetadataDoesntContainSubQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = self::getMetadataDoesntContainSubQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
 			$metadataDoesntContain['bool']['minimum_should_match'] = 1;
 		}
 		else
-			$metadataDoesntContain['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+			$metadataDoesntContain['bool']['must_not'][] = self::getMetadataDoesntContainSubQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+
+		return $metadataDoesntContain;
+	}
+
+	protected static function getMetadataDoesntContainSubQuery($searchItem, $value, $allowedSearchTypes)
+	{
+		$metadataDoesntContain = kESearchQueryManager::getDoesntContainQuery($searchItem, $value, $allowedSearchTypes);
+
+		if($searchItem->getXpath() || $searchItem->getMetadataProfileId())
+		{
+			$metadataDoesntContainQuery = $metadataDoesntContain;
+			$metadataDoesntContain = null;
+
+			$metadataDoesntContain['bool']['must'][] = $metadataDoesntContainQuery;
+
+			if($searchItem->getXpath())
+				$metadataDoesntContain['bool']['must'][] = self::getXPathQuery($searchItem);
+
+			if($searchItem->getMetadataProfileId())
+				$metadataDoesntContain['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+		}
 
 		return $metadataDoesntContain;
 	}
 	
 	protected static function getMetadataRangeQuery($searchItem, $allowedSearchTypes)
 	{
-		return kESearchQueryManager::getRangeQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
+		$metadataRange = kESearchQueryManager::getRangeQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
+
+		if($searchItem->getXpath() || $searchItem->getMetadataProfileId())
+		{
+			$metadataRangeQuery = $metadataRange;
+			$metadataRange = null;
+
+			$metadataRange['bool']['must'][] = $metadataRangeQuery;
+
+			if($searchItem->getXpath())
+				$metadataRange['bool']['must'][] = self::getXPathQuery($searchItem);
+
+			if($searchItem->getMetadataProfileId())
+				$metadataRange['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+		}
+		return $metadataRange;
 	}
 
+	protected static function getXPathQuery($metadataESearchItem)
+	{
+		$xpathQuery = array(
+			'term' => array(
+				'metadata.xpath' => elasticSearchUtils::formatSearchTerm($metadataESearchItem->getXpath())
+			)
+		);
+
+		return $xpathQuery;
+	}
+
+	protected static function getMetadataProfileIdQuery($metadataESearchItem)
+	{
+		$metadataProfileIdQuery = array(
+			'term' => array(
+				'metadata.metadata_profile_id' => elasticSearchUtils::formatSearchTerm($metadataESearchItem->getMetadataProfileId())
+			)
+		);
+
+		return $metadataProfileIdQuery;
+	}
 
 }

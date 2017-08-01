@@ -72,6 +72,8 @@ class ESearchUnifiedItem extends ESearchItem
 				$entryItem->setFieldName($fieldName);
 				$entryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$entryItem->setItemType($eSearchUnifiedItem->getItemType());
+				if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
+					$entryItem->setRange($eSearchUnifiedItem->getRange());
 				$entryItems[] = $entryItem;
 			}
 		}
@@ -95,6 +97,8 @@ class ESearchUnifiedItem extends ESearchItem
 				$cuePointItem->setFieldName($fieldName);
 				$cuePointItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$cuePointItem->setItemType($eSearchUnifiedItem->getItemType());
+				if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
+					$cuePointItem->setRange($eSearchUnifiedItem->getRange());
 				$cuePointItems[] = $cuePointItem;
 			}
 		}
@@ -119,6 +123,8 @@ class ESearchUnifiedItem extends ESearchItem
 				$captionItem->setFieldName($fieldName);
 				$captionItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$captionItem->setItemType($eSearchUnifiedItem->getItemType());
+				if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
+					$captionItem->setRange($eSearchUnifiedItem->getRange());
 				$captionItems[] = $captionItem;
 			}
 		}
@@ -133,25 +139,18 @@ class ESearchUnifiedItem extends ESearchItem
 
 	private static function addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery)
 	{
+		//metadata is special case - we don't need to check for allowed field types
 		$metadataItems = array();
-		$metadataAllowedFields = ESearchMetadataItem::getAllowedSearchTypesForField();
-		foreach($metadataAllowedFields as $fieldName => $fieldAllowedTypes)
-		{
-			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
-			{
-				$metadataItem = new ESearchMetadataItem();
-				$metadataItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
-				$metadataItem->setItemType($eSearchUnifiedItem->getItemType());
-				$metadataItems[] = $metadataItem;
-			}
-		}
+		$metadataItem = new ESearchMetadataItem();
+		$metadataItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+		$metadataItem->setItemType($eSearchUnifiedItem->getItemType());
+		if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
+			$metadataItem->setRange($eSearchUnifiedItem->getRange());
+		$metadataItems[] = $metadataItem;
 
-		if(count($metadataItems))
-		{
-			$metadataQuery = ESearchMetadataItem::createSearchQuery($metadataItems, 'should', null);
-			if(count($metadataQuery))
-				$entryUnifiedQuery[] = $metadataQuery;
-		}
+		$metadataQuery = ESearchMetadataItem::createSearchQuery($metadataItems, 'should', null);
+		if(count($metadataQuery))
+			$entryUnifiedQuery[] = $metadataQuery;
 	}
 
 }
