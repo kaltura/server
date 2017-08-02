@@ -5,8 +5,7 @@
  */
 class DrmAdminApiAction extends KalturaApplicationPlugin
 {
-	const HOST = 'http://winderd:81';
-	const SECRET = 'asdf';
+
 	/**
 	 * @return string - absolute file path of the phtml template
 	 */
@@ -26,28 +25,39 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		$actionApi = $this->_getParam('apiAction');
 		
 		$adminApiForm = new Form_AdminApiConfigure($partnerId, $drmType, $actionApi);
-
+		KalturaLog::info("qwer - 1");
 		try
 		{
 			if ($request->isPost())
 			{
-				KalturaLog::info("qwer - got post");
-				
-				
-				if ($actionApi == AdminApiActionType::REMOVE)
-					$res = $this->sendData($drmType, $partnerId, $actionApi);
+				KalturaLog::info("qwer - 2");
+//				if ($actionApi == AdminApiActionType::REMOVE)
+//					$res = $this->sendData($drmType, $partnerId, $actionApi);
 
-				$params = array(); // get data params
+				//$params = $request->getPost();
+
+//				foreach($params as &$key =>$val) {
+//					if (!$val)
+//						unset($params[$key]);
+//					else
+//						$key = $this->translateName($key);
+//				}
+				$params = $this->getParams($request);
+
+
+				KalturaLog::info("asdf");
+				KalturaLog::info(print_r($params, true));
+				
+//				$params = array(); // get data params
 				if ($actionApi == AdminApiActionType::ADD)
 					$res = $this->sendData($drmType, $partnerId, $actionApi, $params);
-
-
+				
+				$action->view->formValid = true;
 			}
 			else
 			{
 				$res = $this->sendData($drmType, $partnerId, AdminApiActionType::GET);
-				if ($res)
-					$adminApiForm->populate(json_decode($res, true));
+				$adminApiForm->populate($res);
 			}
 		}
 		catch(Exception $e)
@@ -58,6 +68,28 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		$action->view->form = $adminApiForm;
 	}
 
+
+	private function translateName($name)
+	{
+		$nameArray = array('provider_sign_key' => 'providerSignKey');
+		if (isset($nameArray[$name]))
+			return $this->nameArray[$name];
+		return $name;
+	}
+
+	private function getParams($request)
+	{
+		$params = $request->getPost();
+		$newParams = array();
+		foreach($params as $key =>$val) {
+			if ($val)
+				$newParams[$this->translateName($key)] = $val;
+		}
+		return $newParams;
+
+
+	}
+
 	private function getBody($drmType, $partnerId, $params)
 	{
 		$body = "drmType=$drmType&partnerId=$partnerId";
@@ -66,29 +98,33 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		return $body;
 	}
 
+	private function getConfigParams()
+	{
+		$host = Zend_Registry::get('config')->admin_api_server_url;
+		$secret = Zend_Registry::get('config')->admin_request_secret;
+		KalturaLog::info("Got configuration params as: host [$host] secret [$secret] ");
+		if (!$secret || !$host)
+			throw new Exception("Missing configuration Params. check for UDRM server host or Admin secret");
+		return array($host, $secret);
+	}
+
 	private function sendData($drmType, $partnerId, $action, $params = array())
 	{
-		//$host = kConf::get('license_server_url', 'drm', null);
-		//$secret = kConf::get('admin_secret', 'drm', null);
-		//KalturaLog::info("qwer - $host $secret");
-
-		if (!self::SECRET || !self::HOST)
-		{
-			KalturaLog::info("Missing configuration Params. check for UDRM server host or Admin secret");
-			return null;
-		}
-
+		list($host, $secret) = $this->getConfigParams();
 		$body = $this->getBody($drmType, $partnerId, $params);
-		$signature = DrmLicenseUtils::signDataWithKey($body,self::SECRET);
-		$url = self::HOST . '/admin/' . $action . 'Partner' . '?signature=' . $signature;
+		$signature = DrmLicenseUtils::signDataWithKey($body,$secret);
+		$url = $host . '/admin/' . $action . 'Partner' . '?signature=' . $signature;
 
+		KalturaLog::debug("Send to UDRM server [$url] and body: [$body]");
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,            $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt($ch, CURLOPT_POST,           1 );
 		curl_setopt($ch, CURLOPT_POSTFIELDS,     $body);
 		$result=curl_exec ($ch);
+		curl_close($ch);
 		KalturaLog::debug("Got response from UDRM server as [$result]");
+
 		return $result;
 
 	}

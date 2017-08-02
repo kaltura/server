@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor
+class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'drm';
 
@@ -269,6 +269,15 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 		{
 			kDrmPartnerSetup::setupPartner($partnerId);
 		}
+	}
+
+	public static function getConfig($configName)
+	{
+		$path = dirname(__FILE__) . '/config/drm.ini';
+		if($configName == 'admin' && file_exists($path))
+			return new Zend_Config_Ini($path);
+
+		return null;
 	}
 
 }

@@ -9,11 +9,15 @@
 
 <style type="text/css">
 	#frmAdminApiConfigure dl dd input{width: 520px; height: 18px;}
-	#frmAdminApiConfigure dt,dd {padding-top: 6px;}
+	#frmAdminApiConfigure dt,dd {padding-top: 5px;}
 </style>
 
 
 <script type="text/javascript">
-
+	jQuery(function() {
+		<?php if ($this->formValid): ?>
+		parent.closeAdminApiWindow();
+		<?php endif; ?>
+	});
 
 </script>

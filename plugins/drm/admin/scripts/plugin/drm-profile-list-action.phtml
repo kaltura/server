@@ -199,16 +199,31 @@ function adminApi(partnerId, drmType, apiAction) {
 	let paramStr = '/pId/' + partnerId + '/drmType/' + drmType + '/apiAction/' + apiAction;
 	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DrmAdminApiAction')); ?>' + paramStr;
 	dialogDiv = jQuery('<div id="drm-admin-api-dialog"><iframe id="adminApiIFrame" width="100%" height="100%" src="' + url + '"></iframe></div>').appendTo('body');
-	dialogDiv.dialog({bgiframe: true, modal: true, resizable: true, width: 570, height: 620,
+	dialogDiv.dialog({bgiframe: true, modal: true, resizable: true, width: 570, height: 660,
 		title: '<?php echo $this->translate('DRM admin-api'); ?>',
 		buttons:
 			{
 			'<?php echo $this->translate('Execute'); ?>': function() {
 				var iframedoc = document.getElementById('adminApiIFrame').contentWindow.document;
+				removeUnneededField(iframedoc);
 				iframedoc.getElementById('frmAdminApiConfigure').submit();},
 			'<?php echo $this->translate('Close'); ?>': function() {jQuery(this).dialog('close');}}
 	});
 
+}
+
+function removeUnneededField(iframedoc)
+{
+	iframedoc.getElementById('pIdFrm').remove();
+	iframedoc.getElementById('drmTypeFrm').remove();
+
+	if (iframedoc.getElementById('serverResults'))
+		iframedoc.getElementById('serverResults').remove();
+}
+
+function closeAdminApiWindow(){
+	$('#adminApiIFrame').remove();
+	$('#drm-admin-api-dialog').remove();
 }
 
 

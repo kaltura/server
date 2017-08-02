@@ -37,7 +37,8 @@ class Form_AdminApiConfigure extends Infra_Form
 
 	private function addDocFields()
 	{
-		$partnerDocFields = array('providerSignKey', 'key', 'iv', 'provider', 'seed', 'cas_username', 'cas_password');
+//		$partnerDocFields = array('providerSignKey', 'key', 'iv', 'provider', 'seed', 'cas_username', 'cas_password');
+		$partnerDocFields = array('provider_sign_key', 'key', 'iv', 'provider', 'seed', 'cas_username', 'cas_password');
 		$fpsDocFields = array('ask', 'keyPem');
 
 		foreach($partnerDocFields as $field)
@@ -53,12 +54,19 @@ class Form_AdminApiConfigure extends Infra_Form
 
 	}
 	
-	public function populate($values = array()) {
-		foreach($values as $key => $val)
-			if ($elem = $this->getElement($key))
-				$elem->setValue($val);
+	public function populate($res)
+	{
+		$values = json_decode($res, true);
+		if (json_last_error() == JSON_ERROR_NONE)
+		{
+			foreach($values as $key => $val)
+				if ($elem = $this->getElement($key))
+					$elem->setValue($val);
+		} else {
+			$this->addLine("server_results_line");
+			$this->addTextElement('serverResults', 'Raw Results', $res);
+		}
 	}
-
 
 
 	private function addTextElement($id, $label, $value = '', $readOnly = true) {
