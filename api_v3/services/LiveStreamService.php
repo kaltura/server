@@ -52,20 +52,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
 		}
 	
-		$conversionProfileId = null;
-		if(in_array($liveStreamEntry->sourceType, array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
-		{
-			$conversionProfileId = $liveStreamEntry->conversionProfileId;
-			if(!$conversionProfileId)
-			{
-				$partner = $this->getPartner();
-				if($partner)
-					$conversionProfileId = $partner->getDefaultLiveConversionProfileId();
-			}
-		}
-	
-		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId, $liveStreamEntry->templateEntryId, new LiveStreamEntry());
-		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry, $dbEntry);
+		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry);
 		$dbEntry->save();
 		
 		$te = new TrackEntry();
@@ -115,27 +102,11 @@ class LiveStreamService extends KalturaLiveEntryService
 				if($partner)
 					$dbEntry->setConversionProfileId($partner->getDefaultLiveConversionProfileId());
 			}
+				
+			$dbEntry->save();
 		}
 		
 		return $dbEntry;
-	}
-	
-	protected function getTemplateEntry($conversionProfileId, $templateEntryId)
-	{
-		if(!$templateEntryId && $conversionProfileId)
-		{
-			$conversionProfile = conversionProfile2Peer::retrieveByPk($conversionProfileId);
-			if($conversionProfile)
-				$templateEntryId = $conversionProfile->getDefaultEntryId();
-				
-		}
-		if($templateEntryId)
-		{
-			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
-			return $templateEntry;
-		}
-		
-		return null;
 	}
 	
 	/**
