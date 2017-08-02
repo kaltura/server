@@ -5,6 +5,8 @@
  */
 class kFile
 {
+	const MO_PATTERN = "GNU message catalog";
+
 	/**
 	 * Returns directory $path contents as an array of :
 	 *  array[0] = name
@@ -683,6 +685,24 @@ class kFile
 		$mediaInfoParser = new KMediaInfoMediaParser($path);
 		$mediaInfo = $mediaInfoParser->getMediaInfo();
 		return $mediaInfo->containerFormat;
+	}
+
+	/**
+	 * Try to find the file type by running the file cmd and match the output to a pattern
+	 * It will return empty string if no pattern was matched
+	 */
+	public static function findFileTypeByFileCmd($filePath)
+	{
+		$fileType = '';
+		$realPath = realpath($filePath);
+		if($realPath)
+		{
+			$fileBrief = shell_exec('file -b ' . $realPath);
+			if(kString::beginsWith($fileBrief,self::MO_PATTERN))
+				$fileType = 'application/mo';
+		}
+
+		return $fileType;
 	}
 
 	public static function safeFilePutContents($filePath, $var, $mode=null)
