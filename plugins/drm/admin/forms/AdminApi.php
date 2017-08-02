@@ -28,7 +28,7 @@ class Form_AdminApi extends Infra_Form
 		$this->addElement('select', 'apiAction', array(
 			'label'			=> 'Action:',
 			'filters'		=> array('StringTrim'),
-			'multiOptions'	=> array('Get' => 'Get','Add' => 'Add', 'Remove' => 'Remove'),
+			'multiOptions'	=> array('Get' => AdminApiActionType::GET,'Add' => AdminApiActionType::ADD, 'Remove' => AdminApiActionType::REMOVE),
 		));
 
 		// submit button

@@ -15,7 +15,7 @@ class Form_AdminApiConfigure extends Infra_Form
 		$this->partnerId = $partnerId;
 		$this->drmType = $drmType;
 		$this->actionApi = $actionApi;
-		$this->readOnly = !($actionApi == 'Add');
+		$this->readOnly = !($actionApi == AdminApiActionType::ADD);
 
 		parent::__construct();
 	}
@@ -26,7 +26,7 @@ class Form_AdminApiConfigure extends Infra_Form
 		$this->setAttrib('id', 'frmAdminApiConfigure');
 		$this->setMethod('post');
 
-		if ($this->actionApi == 'Remove')
+		if ($this->actionApi == AdminApiActionType::REMOVE)
 			$this->addTitle('ARE YOU SURE YOU WANT TO REMOVE THIS DOC? if you do, click Execute');
 
 		$this->addTextElement('pIdFrm', 'Partner ID:', $this->partnerId);

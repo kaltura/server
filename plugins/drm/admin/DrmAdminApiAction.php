@@ -32,15 +32,22 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 			if ($request->isPost())
 			{
 				KalturaLog::info("qwer - got post");
-				//if remove  -> exe
-				// if add -> exe
+				
+				
+				if ($actionApi == AdminApiActionType::REMOVE)
+					$res = $this->sendData($drmType, $partnerId, $actionApi);
+
+				$params = array(); // get data params
+				if ($actionApi == AdminApiActionType::ADD)
+					$res = $this->sendData($drmType, $partnerId, $actionApi, $params);
+
+
 			}
 			else
 			{
-				$res = $this->getDoc($drmType, $partnerId);
-
-				KalturaLog::debug("Got response from UDRM server as [$res]");
-				$adminApiForm->populate(json_decode($res, true));
+				$res = $this->sendData($drmType, $partnerId, AdminApiActionType::GET);
+				if ($res)
+					$adminApiForm->populate(json_decode($res, true));
 			}
 		}
 		catch(Exception $e)
@@ -51,17 +58,29 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		$action->view->form = $adminApiForm;
 	}
 
-	private static function createUDRMSignature($secret, $msg)
+	private function getBody($drmType, $partnerId, $params)
 	{
-		$sha1 = sha1($secret.$msg, true);
-		$b64 = base64_encode($sha1);
-		return urlencode($b64);
+		$body = "drmType=$drmType&partnerId=$partnerId";
+		foreach($params as $key => $value)
+			$body .= "&$key=$value";
+		return $body;
 	}
 
-	private function sendPost($body, $path)
+	private function sendData($drmType, $partnerId, $action, $params = array())
 	{
-		$signature = $this->createUDRMSignature(self::SECRET, $body);
-		$url = self::HOST . $path . '?signature=' . $signature;
+		//$host = kConf::get('license_server_url', 'drm', null);
+		//$secret = kConf::get('admin_secret', 'drm', null);
+		//KalturaLog::info("qwer - $host $secret");
+
+		if (!self::SECRET || !self::HOST)
+		{
+			KalturaLog::info("Missing configuration Params. check for UDRM server host or Admin secret");
+			return null;
+		}
+
+		$body = $this->getBody($drmType, $partnerId, $params);
+		$signature = DrmLicenseUtils::signDataWithKey($body,self::SECRET);
+		$url = self::HOST . '/admin/' . $action . 'Partner' . '?signature=' . $signature;
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,            $url);
@@ -69,33 +88,10 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		curl_setopt($ch, CURLOPT_POST,           1 );
 		curl_setopt($ch, CURLOPT_POSTFIELDS,     $body);
 		$result=curl_exec ($ch);
+		KalturaLog::debug("Got response from UDRM server as [$result]");
 		return $result;
 
 	}
-	
-	private function getDoc($drmType, $partnerId)
-	{
-		$body = "drmType=$drmType&partnerId=$partnerId";
-		$path = '/admin/getPartner';
-		return $this->sendPost($body, $path);
 
-	}
-
-	private function removeDoc($drmType, $partnerId)
-	{
-		$body = "drmType=$drmType&partnerId=$partnerId";
-		$path = '/admin/removePartner';
-		return $this->sendPost($body, $path);
-	}
-
-	private function addDoc($drmType, $partnerId, $params)
-	{
-		$body = "drmType=$drmType&partnerId=$partnerId";
-		foreach($params as $key => $value)
-			$body .= "&$key=$value";
-		$path = '/admin/addPartner';
-		return $this->sendPost($body, $path);
-	}
-	
 }
 
