@@ -627,16 +627,17 @@ class ks extends kSessionBase
 		// foreach pair - check privileges on playlist
 		foreach($allPrivileges as $priv)
 		{
-			// extract playlist ID from pair
+			// extract RoleID from pair
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE)
 			{
-				if (isset($exPrivileges[1]) && (is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0))
+				$roleId = isset($exPrivileges[1]) ? $exPrivileges[1] : null; 
+				if ($roleId && (is_numeric($roleId)) && ($roleId < 0))
 				{
 					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::INVALID_SET_ROLE);
 				}
 				
-				return isset($exPrivileges[1]) ? $exPrivileges[1] : false;
+				return $roleId;
 			}
 		}
 		
