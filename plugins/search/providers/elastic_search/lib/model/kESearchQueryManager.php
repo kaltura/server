@@ -65,13 +65,13 @@ class kESearchQueryManager
 		$rangeSubQuery = array();
 		$rangeQuery =  array();
 		$queryType = 'range';
-		if($rangeObject->getGreaterThan())
+		if(is_numeric($rangeObject->getGreaterThan()))
 			$rangeSubQuery['gt'] = $rangeObject->getGreaterThan();
-		if($rangeObject->getGreaterThanOrEqual())
+		if(is_numeric($rangeObject->getGreaterThanOrEqual()))
 			$rangeSubQuery['gte'] = $rangeObject->getGreaterThanOrEqual();
-		if($rangeObject->getLessThan())
+		if(is_numeric($rangeObject->getLessThan()))
 			$rangeSubQuery['lt'] = $rangeObject->getLessThan();
-		if($rangeObject->getLessThanOrEqual())
+		if(is_numeric($rangeObject->getLessThanOrEqual()))
 			$rangeSubQuery['lte'] = $rangeObject->getLessThanOrEqual();
 
 		$rangeQuery[$queryType][$fieldName] = $rangeSubQuery;
