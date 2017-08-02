@@ -12,8 +12,8 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_CATEGORY_IDS = 'category_ids';
 	const ENTRY_USER_ID = 'puser_id';
 	const ENTRY_CREATOR_ID = 'creator_puser_id';
-	const ENTRY_START_DATE = 'start_time';
-	const ENTRY_END_DATE = 'end_time';
+	const ENTRY_START_DATE = 'start_date';
+	const ENTRY_END_DATE = 'end_date';
 	const ENTRY_REFERENCE_ID = 'reference_id';
 	const ENTRY_CONVERSION_PROFILE_ID = 'conversion_profile_id';
 	const ENTRY_REDIRECT_ENTRY_ID = 'redirect_entry_id';
