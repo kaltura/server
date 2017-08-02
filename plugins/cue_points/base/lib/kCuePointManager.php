@@ -970,9 +970,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	protected function reIndexToSearchEngines(CuePoint $cuePoint, array $modifiedColumns = array())
 	{
 		$shouldReIndexToSphinx = $cuePoint->shouldReIndexEntry($modifiedColumns);
-		KalturaLog::debug("@nh@".print_r($shouldReIndexToSphinx,true));
 		$shouldReIndexToElastic = $cuePoint->shouldReIndexEntryToElastic($modifiedColumns);
-		KalturaLog::debug("@nh@".print_r($shouldReIndexToElastic,true));
 		if($shouldReIndexToSphinx || $shouldReIndexToElastic)
 			$this->reIndexCuePointEntry($cuePoint, $shouldReIndexToSphinx, $shouldReIndexToElastic);
 	}

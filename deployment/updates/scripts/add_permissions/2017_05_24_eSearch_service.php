@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage jupiter.roles_and_permissions
+ * @subpackage mercury.roles_and_permissions
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';

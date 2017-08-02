@@ -12,7 +12,6 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	public $type;
 
 	/**
-	/**
 	 * @var string
 	 **/
 	public $id;

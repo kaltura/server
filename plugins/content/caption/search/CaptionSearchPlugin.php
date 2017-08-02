@@ -220,7 +220,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				continue;
 			}
 
-			$items = $captionsContentManager->parse($content);//todo - maybe save the result to cache
+			$items = $captionsContentManager->parse($content);
 
 			if(!$items)
 				continue;
