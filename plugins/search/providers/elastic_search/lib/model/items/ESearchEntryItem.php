@@ -41,6 +41,7 @@ class ESearchEntryItem extends ESearchItem
 		'length_in_msecs' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 		'created_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 		'updated_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'moderation_status' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN),
 	);
 
 	/**
