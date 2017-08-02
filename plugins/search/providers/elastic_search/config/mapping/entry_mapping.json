@@ -115,6 +115,10 @@
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
+		"categories" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
 		"active_category_ids" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"

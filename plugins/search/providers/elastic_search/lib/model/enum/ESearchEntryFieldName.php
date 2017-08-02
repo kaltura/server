@@ -31,4 +31,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_UPDATED_AT = 'updated_at';
 	const ENTRY_MODERATION_STATUS = 'moderation_status';
 	const ENTRY_TYPE = 'entry_type';
+	const ENTRY_CATEGORIES = 'categories';
 }

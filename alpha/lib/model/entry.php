@@ -3725,7 +3725,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'access_control_id' => $this->getAccessControlId(),
 			'group_id' => $this->getGroupId(),
 			'partner_sort_value' => $this->getPartnerSortValue(),
-			'redirect_entry_id' => $this->getRedirectEntryId()
+			'redirect_entry_id' => $this->getRedirectEntryId(),
+			'categories' => explode(',', $this->getCategories()),
 		);
 		
 		if($this->getParentEntryId())
