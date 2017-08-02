@@ -5,7 +5,7 @@
  * @package plugins.beacon
  */
 
-class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions
+class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending
 {
 	const PLUGIN_NAME = "beacon";
 
@@ -35,5 +35,14 @@ class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
 	public static function getPluginName ()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see IKalturaPending::dependsOn()
+ 	*/
+	public static function dependsOn()
+	{
+		$dependency = new KalturaDependency(RabbitMQPlugin::getPluginName());
+		return array($dependency);
 	}
 }

@@ -12,36 +12,38 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 
     public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
     {
-
+		
     }
 
     public function searchLastBeacons(KalturaFilterPager $pager)
     {
-        $response = new KalturaBeaconListResponse();
-        $query = $this->createSearchObject();
-        $partnerId = kCurrentContext::getCurrentPartnerId();
-        $beaconObject  = new BeaconObject($partnerId , $query);
-        $responseArray = $beaconObject->searchObject($pager->pageSize,$pager->pageIndex  );
-        $response->objects = KalturaBeaconArray::fromDbArray($responseArray);
-        return $response;
+		$queryParams = $this->createSearchObject();
+		return $this->search($queryParams, kBeacon::FIELD_TYPE_VALUE_STATS, $pager);
     }
 
     public function enhanceSearch(KalturaFilterPager $pager)
     {
-        $response = new KalturaBeaconListResponse();
-        $query = $this->createSearchObject();
-        $beaconObject  = new BeaconObject(kCurrentContext::getCurrentPartnerId() , $query);
-        $responseArray = $beaconObject->search($pager->pageSize,$pager->pageIndex);
-        $response->objects = KalturaBeaconArray::fromDbArray($responseArray);
-        return $response;
+		$queryParams = $this->createSearchObject();
+		return $this->search($queryParams, kBeacon::FIELD_TYPE_VALUE_LOG, $pager);
     }
+    
+    private function search($queryParams, $indexType, KalturaFilterPager $pager)
+	{
+		$elasticClient = new BeaconElasticClient();
+		$responseArray = $elasticClient->search($indexType, $queryParams, $pager->pageSize, $pager->calcOffset());
+		
+		$response = new KalturaBeaconListResponse();
+		$response->objects = KalturaBeaconArray::fromDbArray($responseArray);
+        return $response;
+	}
 
     protected function createSearchObject()
     {
         $searchObject = array();
-        $searchObject[kBeacon::RELATED_OBJECT_TYPE_STRING] = $this->relatedObjectTypeEqual;
-        $searchObject[kBeacon::OBJECT_ID_STRING] = $this->objectIdEqual;
-        $searchObject[kBeacon::EVENT_TYPE_STRING] = $this->eventTypeEqual;
+        $searchObject[kBeacon::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectTypeEqual;
+        $searchObject[kBeacon::FIELD_OBJECT_ID] = $this->objectIdEqual;
+        $searchObject[kBeacon::FIELD_EVENT_TYPE] = $this->eventTypeEqual;
+		$searchObject[kBeacon::FIELD_PARTNER_ID] = kCurrentContext::getCurrentPartnerId();
         foreach($this->privateData as $key=>$value)
         {
             $searchObject[$key]=$value;

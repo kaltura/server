@@ -36,7 +36,6 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 		'eventType',
 		'objectId',
 		'privateData',
-		'partnerId',
 	);
 
 	public function validateForInsert($propertiesToSkip = array())

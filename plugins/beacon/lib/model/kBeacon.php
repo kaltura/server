@@ -7,11 +7,25 @@
 
 class kBeacon
 {
-	const RELATED_OBJECT_TYPE_STRING	= 'relatedObjectType';
-	const EVENT_TYPE_STRING				= 'eventType';
-	const OBJECT_ID_STRING				= 'objectId';
-	const PRIVATE_DATA_STRING			= 'privateData';
-	const PARTNBER_ID					= 'partnerId';
+	const BEACONS_QUEUE_NAME					= 'beacons';
+	const BEACONS_EXCHANGE_NAME					= 'beacon_exchange';
+	
+	const FIELD_ACTION 							= '_action';
+	const FIELD_INDEX							= '_index';
+	const FIELD_TYPE							= '_type';
+	const FIELD_DOCUMENT_ID 					= '_id';
+	const FIELD_DOCUMENT_TTL 					= 'ttl';
+	
+	const FIELD_ACTION_VALUE					= 'index';
+	const FIELD_INDEX_VALUE						= 'beaconindex';
+	const FIELD_TYPE_VALUE_STATS				= 'State';
+	const FIELD_TYPE_VALUE_LOG					= 'Log';
+	
+	const FIELD_RELATED_OBJECT_TYPE				= 'relatedObjectType';
+	const FIELD_EVENT_TYPE						= 'eventType';
+	const FIELD_OBJECT_ID						= 'objectId';
+	const FIELD_PRIVATE_DATA					= 'privateData';
+	const FIELD_PARTNER_ID						= 'partnerId';
 	
 	protected $relatedObjectType;
 	protected $eventType;
@@ -36,37 +50,59 @@ class kBeacon
 	public function getPrivateData()							{ return $this->privateData; }
 	public function getPartnerId()								{ return $this->partnerId; }
 	
-	public function index($shouldLog, $ttl)
+	public function index($shouldLog = false, $ttl = 3600)
 	{
-		$beaconObject = $this->prepareBeaconObject();
-		$this->indexObjectState($beaconObject);
-		if($shouldLog)
-			$this->logObjectState($beaconObject, $ttl);
-	}
-	
-	//Todo add map between objects
-	public function indexObjectState(BeaconObject $beaconObject)
-	{
-		$id = md5($this->relatedObjectType.'_'. $this->eventType.'_'.$this->objectId);
-		$beaconObject->indexObjectState($id);
-	}
-	
-	public function logObjectState(BeaconObject $beaconObject, $ttl)
-	{
-		$ret = $beaconObject->log($ttl);
-		return $ret;
-	}
-	
-	private function prepareBeaconObject()
-	{
-		$indexObject=array();
-		//$indexObject[self::PRIVATE_DATA_STRING] = json_decode($this->privateData,true);
-		$indexObject[self::RELATED_OBJECT_TYPE_STRING] = $this->relatedObjectType;
-		$indexObject[self::EVENT_TYPE_STRING] = $this->eventType;
-		$indexObject[self::OBJECT_ID_STRING] = $this->objectId;
-		$indexObject[self::PRIVATE_DATA_STRING] = $this->privateData;
+		// get instance of activated queue provider to send message
+		$constructorArgs = array();
+		$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
 		
-		$beaconObject = new BeaconObject(kCurrentContext::getCurrentPartnerId(),$indexObject);
-		return $beaconObject;
+		/* @var $queueProvider RabbitMQProvider */
+		$queueProvider = QueueProvider::getInstance(null, $constructorArgs);
+		
+		//Create base object for index
+		$indexBaseObject = $this->createIndexBaseObject();
+		
+		//Modify base object to index to State 
+		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject);
+		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
+		
+		//Sent to log index of requested
+		if($shouldLog)
+		{
+			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject, $ttl);
+			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
+		}
+	}
+	
+	public function getIndexObjectForState($indexObject)
+	{
+		$indexObject[self::FIELD_TYPE] = self::FIELD_TYPE_VALUE_STATS;
+		return json_encode($indexObject);
+	}
+	
+	public function getIndexObjectForLog($indexObject, $ttl)
+	{
+		$indexObject[self::FIELD_TYPE] = self::FIELD_TYPE_VALUE_LOG;
+		$indexObject[self::FIELD_DOCUMENT_TTL] = $ttl . "S";
+		return json_encode($indexObject);
+	}
+	
+	private function createIndexBaseObject()
+	{
+		$indexObject = array();
+		
+		//Set Action Name and Index Name and calculated docuemtn id
+		$indexObject[self::FIELD_ACTION] = self::FIELD_ACTION_VALUE;
+		$indexObject[self::FIELD_INDEX] = self::FIELD_INDEX_VALUE;
+		$indexObject[self::FIELD_DOCUMENT_ID] = md5($this->relatedObjectType.'_'. $this->eventType.'_'.$this->objectId);
+		
+		//Set values provided in input
+		$indexObject[self::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectType;
+		$indexObject[self::FIELD_EVENT_TYPE] = $this->eventType;
+		$indexObject[self::FIELD_OBJECT_ID] = $this->objectId;
+		$indexObject[self::FIELD_PRIVATE_DATA] = $this->privateData;
+		$indexObject[self::FIELD_PARTNER_ID] = $this->partnerId;
+		
+		return $indexObject;
 	}
 }
