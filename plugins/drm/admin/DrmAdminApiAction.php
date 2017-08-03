@@ -22,35 +22,26 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 
 		$partnerId = $this->_getParam('pId');
 		$drmType = $this->_getParam('drmType');
-		$actionApi = $this->_getParam('apiAction');
+		$actionApi = $this->_getParam('adminApiAction');
 		
 		$adminApiForm = new Form_AdminApiConfigure($partnerId, $drmType, $actionApi);
 		KalturaLog::info("qwer - 1");
+		KalturaLog::info("[$partnerId] [$drmType] [$actionApi] ");
 		try
 		{
 			if ($request->isPost())
 			{
-				KalturaLog::info("qwer - 2");
-//				if ($actionApi == AdminApiActionType::REMOVE)
-//					$res = $this->sendData($drmType, $partnerId, $actionApi);
 
-				//$params = $request->getPost();
-
-//				foreach($params as &$key =>$val) {
-//					if (!$val)
-//						unset($params[$key]);
-//					else
-//						$key = $this->translateName($key);
-//				}
-				$params = $this->getParams($request);
+				if ($actionApi == AdminApiActionType::REMOVE)
+					$res = $this->sendData($drmType, $partnerId, $actionApi);
 
 
-				KalturaLog::info("asdf");
-				KalturaLog::info(print_r($params, true));
-				
-//				$params = array(); // get data params
-				if ($actionApi == AdminApiActionType::ADD)
+				if ($actionApi == AdminApiActionType::ADD) {
+					$params = $this->getParams($request);
+					KalturaLog::info("Got Data as " . print_r($params, true));
 					$res = $this->sendData($drmType, $partnerId, $actionApi, $params);
+				}
+
 				
 				$action->view->formValid = true;
 			}
@@ -73,7 +64,7 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 	{
 		$nameArray = array('provider_sign_key' => 'providerSignKey');
 		if (isset($nameArray[$name]))
-			return $this->nameArray[$name];
+			return $nameArray[$name];
 		return $name;
 	}
 
@@ -120,6 +111,7 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		curl_setopt($ch, CURLOPT_URL,            $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt($ch, CURLOPT_POST,           1 );
+		curl_setopt($ch, CURLOPT_TIMEOUT,           5 );
 		curl_setopt($ch, CURLOPT_POSTFIELDS,     $body);
 		$result=curl_exec ($ch);
 		curl_close($ch);

@@ -25,17 +25,17 @@ class Form_AdminApi extends Infra_Form
 			'multiOptions'	=> array('cenc' => 'cenc', 'fps' => 'fps'),
 		));
 
-		$this->addElement('select', 'apiAction', array(
+		$this->addElement('select', 'adminApiAction', array(
 			'label'			=> 'Action:',
 			'filters'		=> array('StringTrim'),
-			'multiOptions'	=> array('Get' => AdminApiActionType::GET,'Add' => AdminApiActionType::ADD, 'Remove' => AdminApiActionType::REMOVE),
+			'multiOptions'	=> array('Get' => AdminApiActionType::GET, 'Add' => AdminApiActionType::ADD, 'Remove' => AdminApiActionType::REMOVE),
 		));
 
 		// submit button
 		$this->addElement('button', 'submit', array(
 			'ignore'	=> true,
 			'label'		=> 'Execute',
-			'onclick'		=> "adminApi($('#PartnerIdForApi').val(), $('#drmType').val(), $('#apiAction').val())",
+			'onclick'		=> "adminApi($('#PartnerIdForApi').val(), $('#drmType').val(), $('#adminApiAction').val())",
 			'decorators' => array('ViewHelper')
 		));
 	}
