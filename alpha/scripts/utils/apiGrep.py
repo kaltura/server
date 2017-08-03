@@ -22,11 +22,40 @@ def parseCmdLine():
 					  help="print the file name for each match")
 	parser.add_option("--label", dest="stdinLabel", default="(standard input)", metavar="LABEL", 
 					  help="use LABEL as the standard input file name prefix")
+	parser.add_option("--match-any",
+					  action="store_true", dest="matchAny", default=False,
+					  help="match the pattern against any line (default is to match only starting log lines)")
 	return parser.parse_args()
 
 def shellQuote(s):
     return "'" + s.replace("'", "'\\''") + "'"
 
+def processFileMatchStart(inputFile, pattern, prefix):
+	output = False
+	for curLine in inputFile:
+		logStart = isLineLogStart(curLine)
+		if output:
+			if not logStart:
+				print prefix + curLine.rstrip()
+				continue
+			output = False
+
+		if logStart and pattern in curLine:
+			print prefix + curLine.rstrip()
+			output = True
+
+def processFileMatchAny(inputFile, pattern, prefix):
+	block = ''
+	for curLine in inputFile:
+		if isLineLogStart(curLine):
+			if pattern in block:
+				print block
+			block = curLine
+		else:
+			block += curLine
+	if pattern in block:
+		print block
+	
 # parse the command line
 (options, args) = parseCmdLine()
 if len(args) < 1:
@@ -47,6 +76,11 @@ elif options.noFilename:
 else:
 	outputFileName = len(fileNames) > 1
 
+if options.matchAny:
+	processFile = processFileMatchAny
+else:
+	processFile = processFileMatchStart
+	
 prefix = ''
 for fileName in fileNames:
 	if fileName.endswith('.gz'):
@@ -54,6 +88,8 @@ for fileName in fileNames:
 		params = [__file__, '--label=' + fileName]
 		if outputFileName:
 			params.append('-H')
+		if options.matchAny:
+			params.append('--match-any')
 		params.append(pattern)
 		params = ' '.join(map(shellQuote, params))
 		cmdLine = "gzip -cd %s | python %s" % (shellQuote(fileName), params)
@@ -73,16 +109,4 @@ for fileName in fileNames:
 		else:
 			prefix = '%s:' % fileName
 
-	# process the file
-	output = False
-	for curLine in inputFile:
-		logStart = isLineLogStart(curLine)
-		if output:
-			if not logStart:
-				print prefix + curLine.rstrip()
-				continue
-			output = False
-
-		if logStart and pattern in curLine:
-			print prefix + curLine.rstrip()
-			output = True
+	processFile(inputFile, pattern, prefix)
