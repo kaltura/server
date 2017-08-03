@@ -1,6 +1,5 @@
 #!/usr/bin/python
 from optparse import OptionParser
-import gzip
 import sys
 import os
 
@@ -21,7 +20,12 @@ def parseCmdLine():
 	parser.add_option("-H", "--with-filename",
 					  action="store_true", dest="withFilename", default=False,
 					  help="print the file name for each match")
+	parser.add_option("--label", dest="stdinLabel", default="(standard input)", metavar="LABEL", 
+					  help="use LABEL as the standard input file name prefix")
 	return parser.parse_args()
+
+def shellQuote(s):
+    return "'" + s.replace("'", "'\\''") + "'"
 
 # parse the command line
 (options, args) = parseCmdLine()
@@ -45,18 +49,27 @@ else:
 
 prefix = ''
 for fileName in fileNames:
-	# open the file
+	if fileName.endswith('.gz'):
+		# using zcat | python is faster than using python's gzip module
+		params = [__file__, '--label=' + fileName]
+		if outputFileName:
+			params.append('-H')
+		params.append(pattern)
+		params = ' '.join(map(shellQuote, params))
+		cmdLine = "gzip -cd %s | python %s" % (shellQuote(fileName), params)
+		if os.system(cmdLine) != 0:
+			break
+		continue
+
 	if fileName == '-':
 		inputFile = sys.stdin
-	elif fileName.endswith('.gz'):
-		inputFile = gzip.GzipFile(fileName, 'r')
 	else:
 		inputFile = file(fileName, 'r')
 
 	# get the prefix
 	if outputFileName:
 		if fileName == '-':
-			prefix = '(standard input):'
+			prefix = options.stdinLabel + ':'
 		else:
 			prefix = '%s:' % fileName
 
