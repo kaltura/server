@@ -3,7 +3,7 @@
  * Enable indexing and searching caption asset objects
  * @package plugins.captionSearch
  */
-class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
+class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor
 {
 	const MAX_CAPTION_FILE_SIZE_FOR_INDEXING = 900000; // limit the size of text which can indexed, the mysql packet size is limited by default to 1M anyway
 	const PLUGIN_NAME = 'captionSearch';
@@ -139,11 +139,11 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	    		KalturaLog::err("Captions content manager not found for format [" . $captionAsset->getContainerFormat() . "]");
 	    		continue;
 	    	}
-	    		
+
 	    	$content = $captionsContentManager->getContent($content);
 	    	if(!$content)
 	    		continue;
-	    	
+
 			$data[] = $captionAsset->getId() . " ca_prefix $content ca_sufix";
 		}
 		
@@ -181,5 +181,87 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			return  'plugins_data';
 			
 		return CaptionPlugin::getPluginName() . '_' . $fieldName;
+	}
+
+	/**
+	 * Return textual search data to be associated with the object
+	 *
+	 * @param BaseObject $object
+	 * @return ArrayObject
+	 */
+	public static function getElasticSearchData(BaseObject $object)
+	{
+		if($object instanceof entry && self::isAllowedPartner($object->getPartnerId()))
+			return self::getCaptionElasticSearchData($object);
+
+		return null;
+	}
+
+	public static function getCaptionElasticSearchData($entry)
+	{
+		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		if(!$captionAssets || !count($captionAssets))
+			return null;
+
+		$data = array();
+		foreach($captionAssets as $captionAsset)
+		{
+			/* @var $captionAsset CaptionAsset */
+
+			$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_CAPTION_FILE_SIZE_FOR_INDEXING);
+			if(!$content)
+				continue;
+
+			$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
+			if(!$captionsContentManager)
+			{
+				KalturaLog::err("Captions content manager not found for format [" . $captionAsset->getContainerFormat() . "]");
+				continue;
+			}
+
+			$items = $captionsContentManager->parse($content);
+
+			if(!$items)
+				continue;
+
+			$language = $captionAsset->getLanguage();
+			$data['caption_assets'][] = array(
+				'id' => $captionAsset->getId(),
+				'language' => $language,
+				'lines' => self::getElasticLines($items, $language)
+			);
+		}
+
+		return $data;
+	}
+
+	protected static function getElasticLines($items, $language)
+	{
+		$lines = array();
+		foreach ($items as $item)
+		{
+			$line = array(
+				'start_time' => $item['startTime'],
+				'end_time' => $item['endTime']
+			);
+
+			$content = '';
+			foreach ($item['content'] as $curChunk)
+				$content .= $curChunk['text'];
+
+			$content = kString::stripUtf8InvalidChars($content);
+			$content = kXml::stripXMLInvalidChars($content);
+			$content= substr($content, 0 , kElasticSearchManager::MAX_LENGTH);
+			$line['content'] = $content;
+
+			$analyzedFieldName = elasticSearchUtils::getAnalyzedFieldName($language, 'content');
+			if($analyzedFieldName)
+				$line[$analyzedFieldName] = $content;
+
+			$lines[] = $line;
+		}
+
+		return $lines;
 	}
 }

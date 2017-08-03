@@ -26,4 +26,9 @@ interface IKalturaCuePoint extends IKalturaPermissions, IKalturaEnumerator, IKal
 	 * @return boolean that indicates if clone is needed
 	 */
 	public static function shouldCloneByProperty(entry $entry);
+
+	/**
+	 * @return array of core cue point types to index to elasticsearch on entry.
+	 */
+	public static function getTypesToElasticIndexOnEntry();
 }
