@@ -220,9 +220,10 @@ class LiveEntryServerNode extends EntryServerNode
 		return $this->putInCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES, $v);
 	}
 
-	public function setRecordedEntryDuration($recordedEntryId, $duration)
+	public function setRecordedEntryDuration($recordedEntryId, $duration, $recordedProps)
 	{
-		$recordedProps = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES);
+		if (!$recordedProps)
+			$recordedProps = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES);
 		if (!$recordedProps)
 		{
 			$recordedProps = new LiveEntryServerNodeRecordedProperties();
