@@ -569,13 +569,8 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 
 		$actionElement->appendChild($resultElement);
 
-		if(!empty($actionInfo->actionAlias)) 
-		{
-			$package = $actionReflector->getActionClassInfo()->package;
-			list($prefix, $pluginName) = explode('.', $package);
+		if(!empty($actionInfo->actionAlias))
 			$actionElement->setAttribute('actionAlias', $actionInfo->actionAlias);
-			$actionElement->setAttribute('plugin', $pluginName);
-		}
 		
 		foreach($actionInfo->errors as $error)
 		{
