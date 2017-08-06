@@ -35,7 +35,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
     private function search($queryParams, $indexType, KalturaFilterPager $pager)
 	{
 		$elasticClient = new BeaconElasticClient();
-		$responseArray = $elasticClient->search($indexType, $queryParams, $pager->pageSize, $pager->calcOffset());
+		$responseArray = $elasticClient->search(kBeacon::FIELD_INDEX_VALUE, $indexType, $queryParams, $pager->pageSize, $pager->calcOffset());
 		
 		$response = new KalturaBeaconListResponse();
 		$response->objects = KalturaBeaconArray::fromDbArray($responseArray);
