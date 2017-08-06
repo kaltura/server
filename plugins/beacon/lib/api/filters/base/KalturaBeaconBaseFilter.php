@@ -11,9 +11,6 @@ abstract class KalturaBeaconBaseFilter extends KalturaRelatedFilter
 		"relatedObjectTypeEqual" => "_eq_related_object_type",
 		"eventTypeEqual" => "_eq_event_type",
 		"objectIdEqual" => "_eq_object_id",
-		"privateDataLike" => "_like_private_data",
-		"privateDataMultiLikeOr" => "_mlikeor_private_data",
-		"privateDataMultiLikeAnd" => "_mlikeand_private_data",
 	);
 
 	static private $order_by_map = array
@@ -44,19 +41,4 @@ abstract class KalturaBeaconBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $objectIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $privateDataLike;
-
-	/**
-	 * @var string
-	 */
-	public $privateDataMultiLikeOr;
-
-	/**
-	 * @var string
-	 */
-	public $privateDataMultiLikeAnd;
 }

@@ -5,6 +5,11 @@
  */
 class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 {
+	/**
+	 * @var string
+	 */
+	public $privateData;
+	
     public function getCoreFilter()
     {
 		return null;
