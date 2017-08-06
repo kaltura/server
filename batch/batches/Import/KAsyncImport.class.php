@@ -120,13 +120,6 @@ class KAsyncImport extends KJobHandlerWorker
 			if(is_null($fileSize)) {
 				// Read file size
 				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
-				if(!$curlHeaderResponse->isGoodCode())
-				{
-					$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::RETRY);
-					$curlWrapper->close();
-					return $job;
-				}
-
 				if(isset($curlHeaderResponse->headers['content-type']))
 	                               	$contentType = $curlHeaderResponse->headers['content-type'];
 
@@ -154,10 +147,17 @@ class KAsyncImport extends KJobHandlerWorker
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 
-			$res = $curlWrapper->exec($sourceUrl, $data->destFileLocalPath);
-			KalturaLog::debug("Curl results: $res");
-
-			if(!$res || $curlWrapper->getError())
+			$res = $curlWrapper->exec($sourceUrl, $data->destFileLocalPath, true);
+			$responseStatusCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
+			{
+				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: [$responseStatusCode]", KalturaBatchJobStatus::RETRY);
+				$curlWrapper->close();
+				return $job;
+			}
+			
+			KalturaLog::debug("Curl results: [$res]");
+			if(!$res || $curlWrapper->getError() || KCurlHeaderResponse::isError($responseStatusCode))
 			{
 				$errNumber = $curlWrapper->getErrorNumber();
 				if($errNumber != CURLE_OPERATION_TIMEOUTED)
