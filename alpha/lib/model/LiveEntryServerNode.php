@@ -10,7 +10,7 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_STREAMS = "streams";
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
-	const CUSTOM_DATA_RECORDED_ENTRY_DURATION = "recorded_entry_duration";
+	const CUSTOM_DATA_RECORDED_PROPERTIES = "recorded_properties";
 	const RECORDED_ENTRIES_DURATIONS_TO_KEEP = 20;
 
 	/* (non-PHPdoc)
@@ -204,9 +204,30 @@ class LiveEntryServerNode extends EntryServerNode
 		$this->delete();
 	}
 
+	public function getRecordedProperties()
+	{
+		$recordedProps = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES);
+		if (!$recordedProps)
+		{
+			$recordedProps = new LiveEntryServerNodeRecordedProperties();
+		}
+		return $recordedProps;
+
+	}
+
+	public function setRecordedProperties($v)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES, $v);
+	}
+
 	public function setRecordedEntryDuration($recordedEntryId, $duration)
 	{
-		$recordedEntriesDurations = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, null, array());
+		$recordedProps = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES);
+		if (!$recordedProps)
+		{
+			$recordedProps = new LiveEntryServerNodeRecordedProperties();
+		}
+		$recordedEntriesDurations = $recordedProps->getRecordedEntriesDurations();
 		$recordedEntryIndex = -1;
 		for ($i = 0; $i < count($recordedEntriesDurations); $i++)
 		{
@@ -222,17 +243,8 @@ class LiveEntryServerNode extends EntryServerNode
 		else
 			$recordedEntriesDurations[] = $recordedEnteryDuration;
 		array_splice($recordedEntriesDurations, self::RECORDED_ENTRIES_DURATIONS_TO_KEEP);
-		$this->putInCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, $recordedEntriesDurations);
+		$recordedProps->setRecordedEntriesDurations($recordedEntriesDurations);
+		$this->setRecordedProperties($recordedProps);
 	}
 
-	public function getRecordedEntriesDurations()
-	{
-		$recordedEntriesDurations = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_DURATION, null, array());
-		$outArr = array();
-		foreach($recordedEntriesDurations as $recordedEntryDuration)
-		{
-			$outArr[$recordedEntryDuration['entryId']] = $recordedEntryDuration['duration'];
-		}
-		return $outArr;
-	}
 }

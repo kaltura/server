@@ -15,16 +15,15 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	public $streams;
 
 	/**
-	 * @readonly
-	 * @var KalturaKeyValueArray
+	 * @var KalturaLiveEntryServerNodeRecrodedProperties
 	 */
-	public $recordedEntriesDurations;
+	public $recordedProperties;
+
 
 	private static $map_between_objects = array
 	(
 		"streams",
-		"duration",
-		"recordedEntriesDurations",
+		"recordedProperties",
 	);
 
 	/* (non-PHPdoc)
@@ -107,4 +106,21 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 		
 		return $result;
 	}
+
+	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
+	{
+		$object_to_fill = parent::toUpdatableObject($object_to_fill, $props_to_skip);
+		if ($this->recordedProperties->duration > 0) {
+			/** @var LiveEntryServerNode $dbEntryServerNode */
+			$liveEntry = entryPeer::retrieveByPK($object_to_fill->getEntryId());
+			if (!$liveEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+			/** @var LiveEntry $liveEntry */
+			$recordedEntryId = $liveEntry->getRecordedEntryId();
+			$object_to_fill->setRecordedEntryDuration($recordedEntryId, $this->recordedProperties->duration);
+		}
+		return $object_to_fill;
+	}
+
+
 }

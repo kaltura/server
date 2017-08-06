@@ -58,24 +58,13 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @return KalturaEntryServerNode|null|object
 	 * @throws KalturaAPIException
 	 */
-	public function updateAction($id, KalturaEntryServerNode $entryServerNode, $duration = 0)
+	public function updateAction($id, KalturaEntryServerNode $entryServerNode)
 	{
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
 		if (!$dbEntryServerNode)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
 		$dbEntryServerNode = $entryServerNode->toUpdatableObject($dbEntryServerNode);
-
-		if ($duration > 0) {
-			/** @var LiveEntryServerNode $dbEntryServerNode */
-			$liveEntry = entryPeer::retrieveByPK($dbEntryServerNode->getEntryId());
-			if (!$liveEntry)
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryServerNode->getEntryId());
-			/** @var LiveEntry $liveEntry */
-			$recordedEntryId = $liveEntry->getRecordedEntryId();
-			$dbEntryServerNode->setRecordedEntryDuration($recordedEntryId, $duration);
-		}
-
 		$dbEntryServerNode->save();
 
 		$entryServerNode = KalturaEntryServerNode::getInstance($dbEntryServerNode, $this->getResponseProfile());
