@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveEntryServerNodeRecrodedProperties extends KalturaObject
+class KalturaLiveEntryServerNodeRecordedProperties extends KalturaObject
 {
 
 	/**

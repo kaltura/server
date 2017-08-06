@@ -15,7 +15,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	public $streams;
 
 	/**
-	 * @var KalturaLiveEntryServerNodeRecrodedProperties
+	 * @var KalturaLiveEntryServerNodeRecordedProperties
 	 */
 	public $recordedProperties;
 
