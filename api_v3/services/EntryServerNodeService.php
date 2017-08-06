@@ -54,7 +54,6 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @action update
 	 * @param int $id
 	 * @param KalturaEntryServerNode $entryServerNode
-	 * @param int $duration
 	 * @return KalturaEntryServerNode|null|object
 	 * @throws KalturaAPIException
 	 */
