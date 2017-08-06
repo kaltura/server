@@ -10,7 +10,7 @@ Add the following to plugins.ini file: "Search"
 
 ### Deployment scripts ###
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
+mysql -h{HOSTNAME}  -u{USER} -p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
 
 
 # Mercury 13.0.0 #
