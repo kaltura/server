@@ -12,6 +12,18 @@ Add the following to plugins.ini file: "Search"
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
 
+## Add create recorded entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7827
+
+### configuration ###
+None
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2017_08_06_live_stream_add_create_recording_across_dc.php
+
+
 
 # Mercury 13.0.0 #
 
