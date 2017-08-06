@@ -1,6 +1,6 @@
 <?php
 /**
- * @package api
+ * @package plugins.drm
  * @subpackage api.enum
  */
 class KalturaDrmSchemeName extends KalturaDynamicEnum implements DrmSchemeName
