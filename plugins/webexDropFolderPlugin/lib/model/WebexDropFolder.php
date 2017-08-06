@@ -20,6 +20,8 @@ class WebexDropFolder extends RemoteDropFolder
 	const WEBEX_DELETE_FROM_RECYCLE_BIN = 'deleteFromRecycleBin';
 	
 	const WEBEX_SERVICE_TYPE = 'webexServiceType';
+	
+	const WEBEX_DELETE_FROM_TIMESTAMP = 'deleteFromTimestamp';
 
 	
 	/**
@@ -51,6 +53,7 @@ class WebexDropFolder extends RemoteDropFolder
 	 * @var string
 	 */
 	protected $webexHostIdMetadataFieldName;
+	
 	
 	/**
 	 * return string
@@ -178,6 +181,16 @@ class WebexDropFolder extends RemoteDropFolder
 	public function setWebexServiceType ($v)
 	{
 		$this->putInCustomData(self::WEBEX_SERVICE_TYPE, $v);
+	}
+	
+	public function setDeleteFromTimestamp ($v)
+	{
+		$this->putInCustomData(self::WEBEX_DELETE_FROM_TIMESTAMP, $v);
+	}
+	
+	public function getDeleteFromTimestamp()
+	{
+		return $this->getFromCustomData(self::WEBEX_DELETE_FROM_TIMESTAMP);
 	}
 	
 	public function getImportJobData()
