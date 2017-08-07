@@ -85,11 +85,7 @@ class ReportService extends KalturaBaseService
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 	
-		$reportsMgrClass = "myReportsMgr";
-		if (in_array($reportType, self::$kavaReports))
-		{
-		    $reportsMgrClass = "kKavaReportsMgr";
-		}
+	   $reportsMgrClass = $this->getReportsManagerClass($reportType);
 		        
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( call_user_func(array($reportsMgrClass, "getGraph"),$this->getPartnerId() ,
 		    $reportType ,
@@ -116,11 +112,7 @@ class ReportService extends KalturaBaseService
 		
 		$reportTotal = new KalturaReportTotal();
 		
-		$reportsMgrClass = "myReportsMgr";
-		if (in_array($reportType, self::$kavaReports))
-		{
-		    $reportsMgrClass = "kKavaReportsMgr";
-		}
+		$reportsMgrClass = $this->getReportsManagerClass($reportType);
 		
 		list ( $header , $data ) = call_user_func(array($reportsMgrClass, "getTotal"), $this->getPartnerId() ,
 		    $reportType ,
@@ -169,11 +161,7 @@ class ReportService extends KalturaBaseService
 		
 		$reportTable = new KalturaReportTable();
 		
-		$reportsMgrClass = "myReportsMgr";
-		if (in_array($reportType, self::$kavaReports))
-		{
-		    $reportsMgrClass = "kKavaReportsMgr";
-		}
+		$reportsMgrClass = $this->getReportsManagerClass($reportType);
 		
 		list ( $header , $data , $totalCount ) = call_user_func(array($reportsMgrClass, "getTable"), $this->getPartnerId() ,
 		    $reportType ,
@@ -371,5 +359,16 @@ class ReportService extends KalturaBaseService
 		$partnerIdParam->key = 'partner_id';
 		$partnerIdParam->value = $this->getPartnerId();
 		$params[] = $partnerIdParam;
+	}
+	
+	protected function getReportsManagerClass($reportType) 
+	{
+	    $reportsMgrClass = "myReportsMgr";
+	    if (in_array($reportType, self::$kavaReports) && kConf::hasParam("druid_url"))
+	    {
+	        $reportsMgrClass = "kKavaReportsMgr";
+	    }
+	    
+	    return $reportsMgrClass;
 	}
 }
