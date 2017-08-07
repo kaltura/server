@@ -149,6 +149,8 @@ class KAsyncImport extends KJobHandlerWorker
 
 			$res = $curlWrapper->exec($sourceUrl, $data->destFileLocalPath, true);
 			$responseStatusCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+			KalturaLog::debug("Curl results: [$res] responseStatusCode [$responseStatusCode]");
+			
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{
 				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: [$responseStatusCode]", KalturaBatchJobStatus::RETRY);
@@ -156,8 +158,7 @@ class KAsyncImport extends KJobHandlerWorker
 				return $job;
 			}
 			
-			KalturaLog::debug("Curl results: [$res]");
-			if(!$res || $curlWrapper->getError() || KCurlHeaderResponse::isError($responseStatusCode))
+			if(!$res || $curlWrapper->getError())
 			{
 				$errNumber = $curlWrapper->getErrorNumber();
 				if($errNumber != CURLE_OPERATION_TIMEOUTED)
