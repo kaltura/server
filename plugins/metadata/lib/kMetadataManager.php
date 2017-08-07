@@ -830,7 +830,8 @@ class kMetadataManager
 				{
 					if(iconv_strlen($searchItemValue, 'UTF-8') >= 128)
 						continue;
-
+					
+					$searchItemValue= substr($searchItemValue, 0 , kElasticSearchManager::MAX_LENGTH);
 					$profileFieldData['value_text'][] = $searchItemValue;
 				}
 				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
@@ -854,6 +855,7 @@ class kMetadataManager
 			}
 			else
 			{
+				$searchItemValue= substr($searchItemValue, 0 , kElasticSearchManager::MAX_LENGTH);
 				$profileFieldData['value_text'] = $searchItemValues;
 			}
 
