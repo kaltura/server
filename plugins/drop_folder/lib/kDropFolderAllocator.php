@@ -58,7 +58,7 @@ class kDropFolderAllocator
 		
 		if(!$cache)
 		{
-			KalturaLog::notice("Cache layer [" . kCacheManager::CACHE_TYPE_BATCH_JOBS . "] not found, drop folder will not be allocated");
+			KalturaLog::err("Cache layer [" . kCacheManager::CACHE_TYPE_BATCH_JOBS . "] not found, drop folder will not be allocated");
 			return null;
 		}
 			
