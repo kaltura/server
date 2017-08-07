@@ -53,11 +53,16 @@ class kDropFolderAllocator
 	 */
 	public static function getDropFolder($tag, $maxTimeForWatch = 600)
 	{
+		$dropFolders = null;
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
 		kApiCache::disableConditionalCache();
 		
-		$tagKey = self::getCacheKeyForDropFolderTag($tag);
-		$dropFolders = $cache->get($tagKey);
+		if($cache)
+		{
+			$tagKey = self::getCacheKeyForDropFolderTag($tag);
+			$dropFolders = $cache->get($tagKey);
+		}
+		
 		if (!$dropFolders || empty($dropFolders))
 			$dropFolders = self::refreshDropFolderListFromDB($cache, $tag);
 
@@ -72,6 +77,7 @@ class kDropFolderAllocator
 				return $allocateDropFolder;
 			}
 		}
+		
 		return null;
 	}
 
