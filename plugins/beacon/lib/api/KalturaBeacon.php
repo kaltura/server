@@ -7,6 +7,26 @@
 class KalturaBeacon extends KalturaObject implements IFilterable
 {
 	/**
+	 * Beacon creation date as Unix timestamp (In seconds)
+	 *
+	 * @var time
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $createdAt;
+	
+	/**
+	 * Beacon update date as Unix timestamp (In seconds)
+	 *
+	 * @var time
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $updatedAt;
+	
+	/**
+	 * The object which this beacon belongs to
+	 * 
 	 * @var KalturaBeaconObjectTypes
 	 * @filter eq
 	 */
@@ -31,6 +51,8 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	
 	private static $map_between_objects = array
 	(
+		'createdAt',
+		'updatedAt',
 		'relatedObjectType',
 		'eventType',
 		'objectId',
