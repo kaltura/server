@@ -147,7 +147,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 
-			$res = $curlWrapper->exec($sourceUrl, $data->destFileLocalPath, true);
+			$res = $curlWrapper->exec($sourceUrl, $data->destFileLocalPath);
 			$responseStatusCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
 			KalturaLog::debug("Curl results: [$res] responseStatusCode [$responseStatusCode]");
 			
