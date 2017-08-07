@@ -153,7 +153,7 @@ class KAsyncImport extends KJobHandlerWorker
 			
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{
-				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: [$responseStatusCode]", KalturaBatchJobStatus::RETRY);
+				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, KalturaBatchJobAppErrors::REMOTE_DOWNLOAD_FAILED, "Failed while reading file. HTTP Error: [$responseStatusCode]", KalturaBatchJobStatus::RETRY);
 				$curlWrapper->close();
 				return $job;
 			}
