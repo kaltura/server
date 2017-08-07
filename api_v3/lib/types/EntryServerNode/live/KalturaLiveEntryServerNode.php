@@ -14,9 +14,15 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	 */
 	public $streams;
 
+	/**
+	 * @var KalturaLiveEntryServerNodeRecordingInfoArray
+	 */
+	public $recordingInfo;
+
 	private static $map_between_objects = array
 	(
-		"streams"
+		"streams",
+		"recordingInfo",
 	);
 
 	/* (non-PHPdoc)

@@ -10,7 +10,9 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_STREAMS = "streams";
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
-	
+	const CUSTOM_DATA_RECORDING_INFO = "recording_info";
+	const RECORDED_ENTRIES_DURATIONS_TO_KEEP = 20;
+
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
 	 */
@@ -201,4 +203,38 @@ class LiveEntryServerNode extends EntryServerNode
 		KalturaLog::debug("Live entry with id [{$liveEntry->getId()}], is set with recording disabled, clearing entry server node id [{$this->getId()}] from db");
 		$this->delete();
 	}
+
+	public function setRecordingInfo(array $v)
+	{
+		$existingRecordingInfoArr = $this->getRecordingInfo();
+		foreach ($v as $recordingInfo)
+		{
+			$foundRecordingInfoIndex = -1;
+			/** @var LiveEntryServerNodeRecordingInfo $recordingInfo */
+			for ($i = 0; $i < count($existingRecordingInfoArr); $i++)
+			{
+				/** @var LiveEntryServerNodeRecordingInfo $existingRecordingInfo */
+				if ($recordingInfo->getRecordedEntryId() == $existingRecordingInfoArr[$i]->getRecordedEntryId())
+				{
+					$foundRecordingInfoIndex = $i;
+					break;
+				}
+			}
+			if ($foundRecordingInfoIndex >= 0)
+				$existingRecordingInfoArr[$foundRecordingInfoIndex] = $recordingInfo;
+			else
+				array_unshift($existingRecordingInfoArr, $recordingInfo);
+		}
+		array_splice($existingRecordingInfoArr, self::RECORDED_ENTRIES_DURATIONS_TO_KEEP);
+		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_INFO, serialize($existingRecordingInfoArr));
+	}
+
+	public function getRecordingInfo()
+	{
+		$recordingInfo = $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_INFO, null, array());
+		if(count($recordingInfo))
+			$recordingInfo = unserialize($recordingInfo);
+		return $recordingInfo;
+	}
+
 }
