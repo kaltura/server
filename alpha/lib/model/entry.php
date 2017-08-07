@@ -3791,4 +3791,14 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 		return array_unique($tagsToReturn);
 	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		if($this->getStatus() == entryStatus::DELETED)
+			return true;
+		return false;
+	}
 }
