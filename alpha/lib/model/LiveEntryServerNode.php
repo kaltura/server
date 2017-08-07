@@ -10,9 +10,7 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_STREAMS = "streams";
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
-	const CUSTOM_DATA_RECORDED_PROPERTIES = "recorded_properties";
-	const RECORDED_ENTRIES_DURATIONS_TO_KEEP = 20;
-
+	
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
 	 */
@@ -203,49 +201,4 @@ class LiveEntryServerNode extends EntryServerNode
 		KalturaLog::debug("Live entry with id [{$liveEntry->getId()}], is set with recording disabled, clearing entry server node id [{$this->getId()}] from db");
 		$this->delete();
 	}
-
-	public function getRecordedProperties()
-	{
-		$recordedProps = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES);
-		if (!$recordedProps)
-		{
-			$recordedProps = new LiveEntryServerNodeRecordedProperties();
-		}
-		return $recordedProps;
-
-	}
-
-	public function setRecordedProperties($v)
-	{
-		return $this->putInCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES, $v);
-	}
-
-	public function setRecordedEntryDuration($recordedEntryId, $duration, $recordedProps)
-	{
-		if (!$recordedProps)
-			$recordedProps = $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_PROPERTIES);
-		if (!$recordedProps)
-		{
-			$recordedProps = new LiveEntryServerNodeRecordedProperties();
-		}
-		$recordedEntriesDurations = $recordedProps->getRecordedEntriesDurations();
-		$recordedEntryIndex = -1;
-		for ($i = 0; $i < count($recordedEntriesDurations); $i++)
-		{
-			if ($recordedEntriesDurations[$i]['entryId'] == $recordedEntryId) {
-				$recordedEntryIndex = $i;
-				break;
-			}
-
-		}
-		$recordedEnteryDuration = array('entryId' => $recordedEntryId, 'duration' => $duration);
-		if ($recordedEntryIndex >= 0)
-			$recordedEntriesDurations[$recordedEntryIndex] = $recordedEnteryDuration;
-		else
-			$recordedEntriesDurations[] = $recordedEnteryDuration;
-		array_splice($recordedEntriesDurations, self::RECORDED_ENTRIES_DURATIONS_TO_KEEP);
-		$recordedProps->setRecordedEntriesDurations($recordedEntriesDurations);
-		$this->setRecordedProperties($recordedProps);
-	}
-
 }
