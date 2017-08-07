@@ -457,7 +457,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		
+
 		if($mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)
 		{
 			$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
@@ -501,7 +501,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$totalDuration = (int)($duration * 1000);
 		$dbLiveEntry->setLengthInMsecs($totalDuration);
 		$dbLiveEntry->save();
-		
+
 		$this->handleRecording($dbLiveEntry, $recordedEntry, $resource, $flavorParamsId);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
@@ -539,4 +539,5 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
 		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile);
 	}
+
 }
