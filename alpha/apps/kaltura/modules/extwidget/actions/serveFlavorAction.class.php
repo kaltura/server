@@ -10,9 +10,27 @@ class serveFlavorAction extends kalturaAction
 	
 	const JSON_CONTENT_TYPE = 'application/json';
 	
+	public function getFileSyncFullPath(FileSync $fileSync)
+	{
+		$fullPath = $fileSync->getFullPath();
+
+		$pathPrefix = kConf::get('serve_flavor_path_search_prefix', 'local', '');
+		if ($pathPrefix &&
+			kString::beginsWith($fullPath, $pathPrefix))
+		{
+			$pathReplace = kConf::get('serve_flavor_path_replace');
+			$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
+			$fullPath = $newPrefix . substr($fullPath, strlen($pathPrefix));
+		}
+
+		return $fullPath;
+	}
+
 	protected function storeCache($renderer, $partnerId)
 	{
-		if (!function_exists('apc_store') || $_SERVER["REQUEST_METHOD"] != "GET")
+		if (!function_exists('apc_store') || 
+			$_SERVER["REQUEST_METHOD"] != "GET" || 
+			$renderer instanceof kRendererString)
 		{
 			return;
 		}
@@ -278,7 +296,7 @@ class serveFlavorAction extends kalturaAction
 				if ($fileSync)
 				{
 					$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
-					$path = $resolvedFileSync->getFullPath();
+					$path = $this->getFileSyncFullPath($resolvedFileSync);
 				}
 				else
 				{
@@ -471,7 +489,7 @@ class serveFlavorAction extends kalturaAction
 			if ( $file_sync )
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-				$path = $parent_file_sync->getFullPath();
+				$path = $this->getFileSyncFullPath($parent_file_sync);
 				if ($fileParam && is_dir($path)) 
 				{
 					$path .= "/$fileParam";
