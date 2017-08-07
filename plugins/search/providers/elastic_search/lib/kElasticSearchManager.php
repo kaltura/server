@@ -21,7 +21,12 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         }
 
         if($object instanceof IElasticIndexable)
-            $this->saveToElastic($object);
+        {
+            if($object->shouldDeleteFromElastic())
+                $this->deleteFromElastic($object);
+            else
+                $this->saveToElastic($object);
+        }
 
         return true;
     }
@@ -168,7 +173,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function objectReadyForElasticIndex($object, $params = null)
     {
-        $this->saveToElastic($object, $params);
+        if($object->shouldDeleteFromElastic())
+            $this->deleteFromElastic($object);
+        else
+            $this->saveToElastic($object);
         return true;
     }
 
@@ -295,5 +303,14 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 $tempParams[$item] = substr($tempParams[$item], 0, self::MAX_LENGTH);
         }
         return $tempParams;
+    }
+
+    public function deleteFromElastic(IElasticIndexable $object)
+    {
+        $params['index'] = $object->getElasticIndexName();
+        $params['type'] = $object->getElasticObjectType();
+        $params['id'] = $object->getElasticId();
+        $client = new elasticClient();
+        $client->delete($params);
     }
 }

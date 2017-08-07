@@ -1965,4 +1965,14 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
 	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		if($this->getStatus() == CategoryStatus::PURGED)
+			return true;
+		return false;
+	}
 }
