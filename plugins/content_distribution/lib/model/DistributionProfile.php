@@ -25,6 +25,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	const CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE					= "recommendedDcForExecute";
 	const CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES		= "requiredAssetDistributionRules";
 	const CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES		= "optionalAssetDistributionRules";
+	const CUSTOM_DATA_ASSET_TYPES_NOT_ALLOWED 						= "assetTypesNotAllowed";
 	
 	/**
 	 * @return IDistributionProvider
@@ -452,6 +453,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function getRecommendedDcForExecute()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE);}
 	public function getRequiredAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES, null, array());}
 	public function getOptionalAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES, null, array());}
+	public function getAssetTypesNotAllowed()					{return $this->getFromCustomData(self::CUSTOM_DATA_ASSET_TYPES_NOT_ALLOWED, null, array());}
 	
 	public function setSunriseDefaultOffset($v)					{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET, $v);}
 	public function setSunsetDefaultOffset($v)					{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET, $v);}
@@ -460,6 +462,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function setRecommendedDcForExecute($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE, $v);}
 	public function setRequiredAssetDistributionRules($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES, $v);}
 	public function setOptionalAssetDistributionRules($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES, $v);}
+	public function setAssetTypesNotAllowed($v)					{return $this->putInCustomData(self::CUSTOM_DATA_ASSET_TYPES_NOT_ALLOWED, $v);}
 	
 	public function getCacheInvalidationKeys()
 	{
