@@ -1812,16 +1812,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 	
-			if($distributionProfile->getAssetTypesNotAllowed())
+			if(!$distributionProfile->isAssetTypeAllowed($asset->getType()))
 			{
-				$assetType = $asset->getType();
-				foreach($distributionProfile->getAssetTypesNotAllowed() as $assetTypeInfo)
-				{
-					if($assetType == $assetTypeInfo->getType())
-					{
-						continue 2;
-					}
-				}
+				continue;
 			}
 	
 			$distributionProvider = $distributionProfile->getProvider();

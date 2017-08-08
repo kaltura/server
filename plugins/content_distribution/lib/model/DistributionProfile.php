@@ -446,6 +446,21 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION, $version);
 	}
 	
+	public function isAssetTypeAllowed($assetType)
+	{
+		if($this->getAssetTypesNotAllowed())
+		{
+			foreach($this->getAssetTypesNotAllowed() as $assetTypeInfo)
+			{
+				if($assetType == $assetTypeInfo->getType())
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public function getSunriseDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	
 	public function getSunsetDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET);}	
 	public function getRecommendedStorageProfileForDownload()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD);}	
