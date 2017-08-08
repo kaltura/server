@@ -296,7 +296,11 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     private function trimParamFields($tempParams)
     {
         $itemsToTrim = array('description', 'reference_id');
-
+        
+        // in case we are handling category we need to handle the 'doc' element.
+        if(isset($tempParams['doc']))
+            $tempParams = $tempParams['doc'];
+        
         foreach ($itemsToTrim as $item)
         {
             if (array_key_exists($item, $tempParams))
