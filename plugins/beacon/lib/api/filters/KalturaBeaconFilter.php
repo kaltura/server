@@ -44,16 +44,21 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 
     protected function createSearchObject()
     {
-        $searchObject = array();
-        $searchObject[kBeacon::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectTypeEqual;
-        $searchObject[kBeacon::FIELD_OBJECT_ID] = $this->objectIdEqual;
-        $searchObject[kBeacon::FIELD_EVENT_TYPE] = $this->eventTypeEqual;
+		$searchObject = array();
+		$searchObject[kBeacon::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectTypeEqual;
+		$searchObject[kBeacon::FIELD_OBJECT_ID] = $this->objectIdEqual;
+		$searchObject[kBeacon::FIELD_EVENT_TYPE] = $this->eventTypeEqual;
 		$searchObject[kBeacon::FIELD_PARTNER_ID] = kCurrentContext::getCurrentPartnerId();
-        foreach($this->privateData as $key=>$value)
-        {
-            $searchObject[$key]=$value;
-        }
-        return $searchObject;
+		
+		$privateDataSearchObject = $this->privateData ? json_decode($this->privateData) : null;
+		if(!$privateDataSearchObject) 
+			return $searchObject;
+		
+		foreach($privateDataSearchObject as $key => $value)
+		{
+		    $searchObject[$key] = $value;
+		}
+		return $searchObject;
     }
 
 }

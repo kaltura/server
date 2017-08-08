@@ -28,19 +28,19 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	 * The object which this beacon belongs to
 	 * 
 	 * @var KalturaBeaconObjectTypes
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $relatedObjectType;
 	
 	/**
 	 * @var string
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $eventType;
 	
 	/**
 	 * @var string
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $objectId;
 	
@@ -48,6 +48,11 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $privateData;
+	
+	/**
+	 * @var string
+	 */
+	public $rawData;
 	
 	private static $map_between_objects = array
 	(
@@ -57,6 +62,7 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 		'eventType',
 		'objectId',
 		'privateData',
+		'rawData',
 	);
 
 	public function validateForInsert($propertiesToSkip = array())

@@ -27,12 +27,14 @@ class kBeacon
 	const FIELD_EVENT_TYPE						= 'eventType';
 	const FIELD_OBJECT_ID						= 'objectId';
 	const FIELD_PRIVATE_DATA					= 'privateData';
+	const FIELD_RAW_DATA						= 'rawData';
 	const FIELD_PARTNER_ID						= 'partnerId';
 	
 	protected $relatedObjectType;
 	protected $eventType;
 	protected $objectId;
 	protected $privateData;
+	protected $rawData;
 	protected $partnerId;
 	protected $createdAt;
 	protected $updatedAt;
@@ -46,6 +48,7 @@ class kBeacon
 	public function setEventType($eventType)					{ $this->eventType = $eventType; }
 	public function setObjectId($objectId)						{ $this->objectId = $objectId; }	
 	public function setPrivateData($privateData)				{ $this->privateData = $privateData; }
+	public function setRawData($rawData)						{ $this->rawData = $rawData; }
 	public function setPartnerId($partnerId)					{ $this->partnerId = $partnerId; }
 	public function setCreatedAt($createdAt)					{ $this->createdAt = $createdAt; }
 	public function setUpdatedAt($updatedAt)					{ $this->updatedAt = $updatedAt; }
@@ -54,6 +57,7 @@ class kBeacon
 	public function getEventType()								{ return $this->eventType; }
 	public function getObjectId()								{ return $this->objectId; }
 	public function getPrivateData()							{ return $this->privateData; }
+	public function getRawData()								{ return $this->rawData; }
 	public function getPartnerId()								{ return $this->partnerId; }
 	public function getCreatedAt()								{ return $this->createdAt; }
 	public function getUpdatedAt()								{ return $this->updatedAt; }
@@ -133,8 +137,17 @@ class kBeacon
 		$indexObject[self::FIELD_EVENT_TYPE] = $this->eventType;
 		$indexObject[self::FIELD_OBJECT_ID] = $this->objectId;
 		$indexObject[self::FIELD_PRIVATE_DATA] = $this->privateData;
+		$indexObject[self::FIELD_RAW_DATA] = $this->rawData;
 		$indexObject[self::FIELD_PARTNER_ID] = $this->partnerId;
 		$indexObject[self::FIELD_UPDATED_AT] = $currTime;
+		
+		$privateDataObject = $this->privateData ? json_decode($this->privateData) : null;
+		if(!$privateDataObject)
+			return $indexObject;
+		
+		//Index private data as key value as well to allow search|sort|filter on these values 
+		foreach ($privateDataObject as $key => $value)
+			$indexObject[$key] = $value;
 		
 		return $indexObject;
 	}
