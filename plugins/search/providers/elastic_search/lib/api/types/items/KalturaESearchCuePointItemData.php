@@ -9,7 +9,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	/**
 	 * @var string
 	 **/
-	public $type;
+	public $cuePointType;
 
 	/**
 	 * @var string
@@ -63,7 +63,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 
 
 	private static $map_between_objects = array(
-		'type',
+		'cuePointType',
 		'id',
 		'name',
 		'text',
