@@ -10,13 +10,16 @@ class serveFlavorAction extends kalturaAction
 	
 	const JSON_CONTENT_TYPE = 'application/json';
 	
+	protected $pathOnly = false;
+	
 	public function getFileSyncFullPath(FileSync $fileSync)
 	{
 		$fullPath = $fileSync->getFullPath();
 
 		$pathPrefix = kConf::get('serve_flavor_path_search_prefix', 'local', '');
 		if ($pathPrefix &&
-			kString::beginsWith($fullPath, $pathPrefix))
+			kString::beginsWith($fullPath, $pathPrefix) &&
+			$this->pathOnly)
 		{
 			$pathReplace = kConf::get('serve_flavor_path_replace');
 			$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
@@ -93,12 +96,10 @@ class serveFlavorAction extends kalturaAction
 
 	/**
 	 * This will make nginx-vod dump the request to the remote dc
-	 *
-	 * @param $pathOnly
 	 */
-	protected function renderEmptySimpleMapping($pathOnly)
+	protected function renderEmptySimpleMapping()
 	{
-		if (!$pathOnly || !kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+		if (!$this->pathOnly || !kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 			return;
 
 		$renderer = $this->getSimpleMappingRenderer('', null);
@@ -398,7 +399,7 @@ class serveFlavorAction extends kalturaAction
 		$entryId = $this->getRequestParameter("entryId");
 		$sequence = $this->getRequestParameter('sequence');
 		$captionLanguages = $this->getRequestParameter('captions', '');
-		$pathOnly = $this->getRequestParameter('pathOnly', false);
+		$this->pathOnly = $this->getRequestParameter('pathOnly', false);
 
 		if ($entryId)
 		{
@@ -406,7 +407,7 @@ class serveFlavorAction extends kalturaAction
 			if (!$entry)
 			{
 				// rendering empty response in case entry was not replicated yet
-				$this->renderEmptySimpleMapping($pathOnly);
+				$this->renderEmptySimpleMapping();
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 
@@ -446,7 +447,7 @@ class serveFlavorAction extends kalturaAction
 		$flavorAsset = assetPeer::retrieveByIdNoFilter($flavorId);
 		if (is_null($flavorAsset)) {
 			// rendering empty response in case flavor asset was not replicated yet
-			$this->renderEmptySimpleMapping($pathOnly);
+			$this->renderEmptySimpleMapping();
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		}
 
@@ -482,7 +483,7 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+		if ($this->pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
 			$path = '';
 			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
