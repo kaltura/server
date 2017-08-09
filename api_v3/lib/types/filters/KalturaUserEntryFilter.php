@@ -45,14 +45,6 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		return new UserEntryFilter();
 	}
 	
-	protected function validateFilter()
-	{
-		if(!$this->userIdEqual && !$this->userIdIn && !$this->entryIdEqual && !$this->entryIdIn)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
-				$this->getFormattedPropertyNameWithClassName('userIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('userIdIn') . '/' .
-				$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
-	}
-
 	/**
 	 * @param KalturaFilterPager $pager
 	 * @param KalturaDetachedResponseProfile $responseProfile
@@ -70,7 +62,6 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$c = new Criteria();
 		
 		$userEntryFilter = $this->toObject();
-		$this->validateFilter();
 		$userEntryFilter->attachToCriteria($c);
 
 		$pager->attachToCriteria($c);
@@ -186,4 +177,13 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		return $anonKuserIds;
 	}
 	
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		if(!$this->userIdEqual && !$this->userIdIn && !$this->entryIdEqual && !$this->entryIdIn)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
+				$this->getFormattedPropertyNameWithClassName('userIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('userIdIn') . '/' .
+				$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
+		
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+	}
 }
