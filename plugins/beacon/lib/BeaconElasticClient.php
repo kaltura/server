@@ -11,17 +11,24 @@ class BeaconElasticClient
 		$this->client =  Elasticsearch\ClientBuilder::create()->setHosts(array(self::HOST))->build();
 	}
 	
-	public function search($indexName, $indexType, $searchParamsArray, $pageSize ,$pageIndex)
+	public function search($indexName, $indexType, $searchObject, $orderObject, $pageSize ,$pageIndex)
 	{
 		$query = array ();
-		foreach($searchParamsArray as $key => $value)
+		foreach($searchObject as $key => $value)
 		{
 			if(!empty($value))
 			{
-				$query[]=array('match'=>[$key=>$value]);
+				$query[] = array('match'=>[$key=>$value]);
 			}
 		}
 		
+		$sort = array();
+		foreach ($orderObject as $field_name => $ascending) {
+			if($ascending)
+				$sort[$field_name] = array('order' => 'asc');
+			else
+				$sort[$field_name] = array('order' => 'desc');
+		}
 		
 		$params =   [
 			'index' => $indexName,
@@ -33,6 +40,9 @@ class BeaconElasticClient
 					'bool'=> [
 						'must' => $query
 					]
+				],
+				'sort' => [
+					$sort
 				]
 			]
 		];
