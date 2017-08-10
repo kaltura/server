@@ -95,7 +95,7 @@ class kBeacon
 		$searchObject[self::FIELD_DOCUMENT_ID] = $docId;
 		
 		$elasticClient = new BeaconElasticClient();
-		$response = $elasticClient->search(kBeacon::FIELD_INDEX_VALUE, self::FIELD_TYPE_VALUE_STATS, $searchObject, 1, 0);
+		$response = $elasticClient->search(kBeacon::FIELD_INDEX_VALUE, self::FIELD_TYPE_VALUE_STATS, $searchObject, array(), 1, 0);
 		
 		if(!count($response))
 			return $currTime;
