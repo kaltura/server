@@ -59,7 +59,8 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 			$criteria->add(SphinxLogPeer::PARTNER_ID, $disabledPartnerIds, Criteria::NOT_IN);
 		}
 
-		$criteria->add(SphinxLogPeer::TYPE, $type, Criteria::IN);
+		$types = array($type);
+		$criteria->add(SphinxLogPeer::TYPE, $types, Criteria::IN);
 		
 		$criteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
 		$criteria->setLimit($limit);
