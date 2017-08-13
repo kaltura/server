@@ -198,7 +198,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
 	 * @param string $applicationName the application to which entry is being broadcast
 	 * @param KalturaEntryServerNodeStatus $liveEntryStatus the status KalturaEntryServerNodeStatus::PLAYABLE | KalturaEntryServerNodeStatus::BROADCASTING
-	 * @param bool shouldCreateRecordedEntry
+	 * @param bool $shouldCreateRecordedEntry
 	 * @return KalturaLiveEntry The updated live entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
