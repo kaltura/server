@@ -157,7 +157,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 		
 		if(!$delivery)
-			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
+      $delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
 		
 		return $delivery;
 	}
