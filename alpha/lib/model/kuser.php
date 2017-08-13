@@ -1345,4 +1345,14 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
 	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		if($this->getStatus() == KuserStatus::DELETED)
+			return true;
+		return false;
+	}
 }

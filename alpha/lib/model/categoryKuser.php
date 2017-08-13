@@ -484,4 +484,12 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
 	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		return false;
+	}
 } // categoryKuser

@@ -41,4 +41,9 @@ interface IElasticIndexable extends IBaseObject
      */
     public function indexToElastic($params = null);
 
+    /**
+     * return true if the object needs to be deleted from elastic
+     */
+    public function shouldDeleteFromElastic();
+
 }

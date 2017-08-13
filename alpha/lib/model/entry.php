@@ -3700,8 +3700,6 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'description' => $this->getDescription(),
 			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
-			'category_ids' => $this->getAllCategoriesIds(true),
-			'active_category_ids' => $this->getAllCategoriesIds(false),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 			'parent_id' => $this->getParentEntryId(),
 			'reference_id' => $this->getReferenceID(),
@@ -3726,8 +3724,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'group_id' => $this->getGroupId(),
 			'partner_sort_value' => $this->getPartnerSortValue(),
 			'redirect_entry_id' => $this->getRedirectEntryId(),
-			'categories' => explode(',', $this->getCategories()),
 		);
+
+		$this->addCategoriesToObjectParams($body);
 		
 		if($this->getParentEntryId())
 			$this->addParentEntryToObjectParams($body);
@@ -3770,7 +3769,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'active_category_ids' => $parentEntry->getAllCategoriesIds(false),
 		);
 	}
-	
+
+	protected function addCategoriesToObjectParams(&$body)
+	{
+		$categoryIds = $this->getAllCategoriesIds(true);
+		$body['category_ids'] = $categoryIds;
+		$body['active_category_ids'] = $this->getAllCategoriesIds(false);
+		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);;
+	}
+
 	public function getTagsArr()
 	{
 		$tags = explode(",", $this->getTags());
@@ -3783,5 +3790,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 			}
 		}
 		return array_unique($tagsToReturn);
+	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		if($this->getStatus() == entryStatus::DELETED)
+			return true;
+		return false;
 	}
 }

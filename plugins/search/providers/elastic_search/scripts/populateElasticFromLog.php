@@ -75,13 +75,13 @@ foreach($serverLastLogs as $serverLastLog) {
 
 while(true)
 {
-    $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, SphinxLogType::ELASTIC, $gap, $limit, $handledRecords, $sphinxLogReadConn);
+    $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
 
     while(!count($elasticLogs))
     {
         $skipExecutedUpdates = true;
         sleep(1);
-        $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, SphinxLogType::ELASTIC, $gap, $limit, $handledRecords, $sphinxLogReadConn);
+        $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
     }
 
     $elasticClient = new elasticClient($elasticServer, $elasticPort); //take the server and port from config - $elasticServer , $elasticPort

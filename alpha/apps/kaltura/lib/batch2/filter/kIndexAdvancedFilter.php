@@ -20,19 +20,24 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	public function applyCondition(IKalturaDbQuery $query)
 	{
+		$this->applyConditionImpl($query, "id");
+	}
+	
+	public function applyConditionImpl(IKalturaDbQuery $query, $ColumnName)
+	{
 		if (is_null($this->indexIdGreaterThan))
 			return;
-
+		
 		if($query instanceof IKalturaIndexQuery)
 		{
 			if(is_null($this->depthGreaterThanEqual))
-				$query->addColumnWhere('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
+				$query->addColumnWhere($ColumnName, $this->indexIdGreaterThan, Criteria::GREATER_THAN);
 			else
-				$query->addCondition('( ((id '.Criteria::GREATER_THAN.' '. $this->indexIdGreaterThan.') and (depth '.Criteria::EQUAL.' '.$this->depthGreaterThanEqual.')) or (depth'.Criteria::GREATER_THAN.' '.$this->depthGreaterThanEqual.') )');
+				$query->addCondition('( (('.$ColumnName.' '.Criteria::GREATER_THAN.' '. $this->indexIdGreaterThan.') and (depth '.Criteria::EQUAL.' '.$this->depthGreaterThanEqual.')) or (depth'.Criteria::GREATER_THAN.' '.$this->depthGreaterThanEqual.') )');
 		}
-
+		
 		elseif($query instanceof Criteria)
-			$query->add('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
+		$query->add($ColumnName, $this->indexIdGreaterThan, Criteria::GREATER_THAN);
 	}
 	
 	/**

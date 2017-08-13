@@ -32,7 +32,7 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 	 * @param      PropelPDO $con the connection to use
 	 * @return     SphinxLog
 	 */
-	public static function retrieveByLastId(array $servers, $type, $gap = 0, $limit = 1000, array $handledEntries = null, PropelPDO $con = null)
+	public static function retrieveByLastId(array $servers, $gap = 0, $limit = 1000, array $handledEntries = null, PropelPDO $con = null, $type = SphinxLogType::SPHINX)
 	{
 		$criteria = new Criteria();
 		$criterions = null;
@@ -59,7 +59,8 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 			$criteria->add(SphinxLogPeer::PARTNER_ID, $disabledPartnerIds, Criteria::NOT_IN);
 		}
 
-		$criteria->add(SphinxLogPeer::TYPE, $type, Criteria::IN);
+		$types = array($type);
+		$criteria->add(SphinxLogPeer::TYPE, $types, Criteria::IN);
 		
 		$criteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
 		$criteria->setLimit($limit);
