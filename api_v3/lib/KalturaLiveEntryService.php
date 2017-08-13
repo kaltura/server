@@ -198,13 +198,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
 	 * @param string $applicationName the application to which entry is being broadcast
 	 * @param KalturaEntryServerNodeStatus $liveEntryStatus the status KalturaEntryServerNodeStatus::PLAYABLE | KalturaEntryServerNodeStatus::BROADCASTING
+	 * @param bool shouldCreateRecordedEntry
 	 * @return KalturaLiveEntry The updated live entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::SERVER_NODE_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_SERVER_NODE_MULTI_RESULT
 	 */
-	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaEntryServerNodeStatus::PLAYABLE)
+	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaEntryServerNodeStatus::PLAYABLE, $shouldCreateRecordedEntry = true)
 	{
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
@@ -218,7 +219,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbLiveEntry->setRedirectEntryId(null);
 		$dbLiveEntry->save();
 
-		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true);
+		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
 	}
 
 	protected function setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName)
@@ -510,7 +511,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 	}
 
-	protected function checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, $forcePrimaryValidation)
+	protected function checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, $forcePrimaryValidation, $shouldCreateRecordedEntry = true)
 	{
 		if ((!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
 			in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) &&
@@ -553,7 +554,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 					}
 				}
 			}
-			if ($createRecordedEntry)
+			if ($createRecordedEntry && $shouldCreateRecordedEntry)
 			{
 				KalturaLog::info("Creating a recorded entry for ".$dbLiveEntry->getId());
 				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
