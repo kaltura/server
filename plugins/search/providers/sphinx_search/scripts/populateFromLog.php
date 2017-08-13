@@ -73,13 +73,13 @@ foreach($serverLastLogs as $serverLastLog) {
 
 while(true)
 {
-	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, SphinxLogType::SPHINX, $gap, $limit, $handledRecords, $sphinxReadConn);
+	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxReadConn, SphinxLogType::SPHINX);
 	
 	while(!count($sphinxLogs))
 	{
 		$skipExecutedUpdates = true;
 		sleep(1);
-		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, SphinxLogType::SPHINX, $gap, $limit, $handledRecords, $sphinxReadConn);
+		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxReadConn, SphinxLogType::SPHINX);
 	}
 
 	$sphinxCon = null;
