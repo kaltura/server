@@ -495,4 +495,18 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 	{
 		return false;
 	}
+
+	public static function getFullNamesByCategoryIds(array $categoryIds)
+	{
+		$fullNames = array();
+		if(!count($categoryIds))
+			return $fullNames;
+		$categories = self::retrieveByPKs($categoryIds);
+		foreach($categories as $category)
+		{
+			$fullNames[] = $category->getFullName();
+		}
+
+		return $fullNames;
+	}
 }
