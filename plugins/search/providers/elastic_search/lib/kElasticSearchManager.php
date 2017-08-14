@@ -128,7 +128,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         }
         catch (Exception $e)
         {
-            KalturaLog::log('Failed to execute elastic');
+            KalturaLog::warning('Failed to execute elastic');
         }
 
         return true;
