@@ -108,20 +108,27 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $params['id'] = $object->getElasticId();
         $params['action'] = $op;
 
-        if(kConf::get('disableElastic', 'elastic', true))
-            return true;
-
-        $this->saveToSphinxLog($object, $params);
-
-        if(!kConf::get('exec_elastic', 'local', 0))
-            return true;
-
-        $client = new elasticClient();
-        $ret = $client->$op($params);
-        if(!$ret)
+        try
         {
-            KalturaLog::err('Failed to Execute elasticSearch query: '.print_r($params,true));
-            return false;
+            if(kConf::get('disableElastic', 'elastic', true))
+                return true;
+
+            $this->saveToSphinxLog($object, $params);
+
+            if(!kConf::get('exec_elastic', 'local', 0))
+                return true;
+
+            $client = new elasticClient();
+            $ret = $client->$op($params);
+            if(!$ret)
+            {
+                KalturaLog::err('Failed to Execute elasticSearch query: '.print_r($params,true));
+                return false;
+            }
+        }
+        catch (Exception $e)
+        {
+            KalturaLog::log('Failed to execute elastic');
         }
 
         return true;
