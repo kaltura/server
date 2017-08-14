@@ -2,25 +2,19 @@
 require_once(__DIR__ . '/../bootstrap.php');
 
 $host = gethostname();
-echo "Running for $host";
+echo "Running for $host\n";
 
-$c = new Criteria();
-$c->add(SchedulerPeer::HOST, $host);
-$scheduler = SchedulerPeer::doSelectOne( $c);
-if (!$scheduler)
+$id = SchedulerPeer::getConfiguredIdByHostName($host);
+
+if (!$id)
 {
-	echo "Could not find scheduler for host.\n";
-	exit(0);
+        echo "Could not find scheduler id for scheduler.\n";
+        exit(0);
 }
 
-if (!$scheduler->getConfiguredId())
-{
-	echo "Could not find scheduler id for scheduler.\n";
-	exit(0);
-}
+echo "Found Scheduler configured Id: $id \n";
 
-echo "Found Scheduler configured Id: ". $scheduler->getConfiguredId(). "\n";
-
+exit(0);
 $c = new Criteria();
 $c->add(BatchJobLockPeer::SCHEDULER_ID, $scheduler->getConfiguredId());
 $batchLocks = BatchJobLockPeer::doSelect( $c);
