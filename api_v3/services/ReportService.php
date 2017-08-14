@@ -85,13 +85,13 @@ class ReportService extends KalturaBaseService
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 	
-	   $reportsMgrClass = $this->getReportsManagerClass($reportType);
+	    $reportsMgrClass = $this->getReportsManagerClass($reportType);
 		        
-		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( call_user_func(array($reportsMgrClass, "getGraph"),$this->getPartnerId() ,
-		    $reportType ,
-		    $reportInputFilter->toReportsInputFilter() ,
-		    $dimension ,
-		    $objectIds) );
+		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray (call_user_func(array($reportsMgrClass, "getGraph"),$this->getPartnerId(),
+		    $reportType,
+		    $reportInputFilter->toReportsInputFilter(),
+		    $dimension,
+		    $objectIds));
 
 		return $reportGraphs;
 	}
