@@ -29,13 +29,13 @@ class SchedulerPeer extends BaseSchedulerPeer
 		$c->add(SchedulerPeer::HOST, $hostname);
 		$result = SchedulerPeer::doSelect( $c);
 		if (!$result)
-			throw new KalturaAPIException("Could not find scheduler for host $hostname");
+			throw new kCoreException("Could not find scheduler for host $hostname");
 
 		if ( count($result)> 1 )
-			throw new KalturaAPIException("More than one result for host $hostname");
+			throw new kCoreException("More than one result for host $hostname");
 
 		if (!$result[0]->getConfiguredId())
-			throw new KalturaAPIException("Could not find scheduler id for scheduler.");
+			throw new kCoreException("Could not find scheduler id for scheduler.");
 
 		return $result[0]->getConfiguredId();
 	}
