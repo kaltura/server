@@ -11,6 +11,17 @@ None
 ### Deployment scripts ###
 	php deployment/updates/scripts/add_permissions/2017_08_06_live_stream_add_create_recording_across_dc.php
 
+## Add Delete to Entry-Server-Node ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7833
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_15_entry_server_enable_delete.php
+
 # Mercury 13.1.0 #
 
 ## Add new Search plugin ##
