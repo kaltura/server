@@ -139,7 +139,6 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 		$this->validateMandatoryAttributes(true);
 		$this->validateDuplications(null, $type);
 		$this->validateParentId();
-		$this->validateParentLoop(null, explode(",", $this->parentId));
 	
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -255,29 +254,26 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 		if(!isset($this->parentId) || $this->parentId == '')
 			return;
 		
-		$parentIdsArr = explode(",", $this->parentId);
-		$parentIdsDb = ServerNodePeer::retrieveByPKs($parentIdsArr);
-		$parentIdsDb = array_map(function($serverNode) { return $serverNode->getId(); }, $parentIdsDb);
+		$inputParentIds = explode(",", $this->parentId);
+		$dbParents = ServerNodePeer::retrieveByPKs($inputParentIds);
+		$dbParentIds = array_map(function($serverNode) { return $serverNode->getId(); }, $dbParents);
 		
-		if(count($parentIdsArr) !== count($parentIdsDb))
+		if(count($inputParentIds) !== count($dbParentIds))
 		{
-			$parentIdsDiff = array_diff($parentIdsArr, $parentIdsDb);
+			$parentIdsDiff = array_diff($inputParentIds, $dbParentIds);
 			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND, implode(",", $parentIdsDiff));
-			
 		}
 	}
 	
-	public function validateParentLoop($currentServerNodeId = null, $directParentIds = array(), $parentIdsTree = array())
+	public function validateParentLoop($currentServerNodeId, $directParentIds = array(), $parentIdsTree = array())
 	{
-		if($currentServerNodeId && in_array($currentServerNodeId, $directParentIds) || in_array($currentServerNodeId, $parentIdsTree))
+		if(in_array($currentServerNodeId, $directParentIds) || in_array($currentServerNodeId, $parentIdsTree))
 			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_PARENT_LOOP_DETECTED, $currentServerNodeId);
 		
 		if(!count($directParentIds))
 			return;
 		
-		if($currentServerNodeId)
-			$parentIdsTree[] = $currentServerNodeId;
-		
+		$parentIdsTree[] = $currentServerNodeId;
 		foreach ($directParentIds as $key => $parentId)
 		{
 			if(!$parentId)
