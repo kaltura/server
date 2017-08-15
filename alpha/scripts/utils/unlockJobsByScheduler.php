@@ -4,7 +4,7 @@ require_once(__DIR__ . '/../bootstrap.php');
 if($argc != 2)
  	die ('Usage: php unlockJobsByScheduler.php {hostname}.' . PHP_EOL);
 
-$host = argv[1];
+$host = $argv[1];
 echo "Running for $host\n";
 
 $id = SchedulerPeer::getConfiguredIdByHostName($host);
@@ -17,9 +17,8 @@ if (!$id)
 
 echo "Found Scheduler configured Id: $id \n";
 
-exit(0);
 $c = new Criteria();
-$c->add(BatchJobLockPeer::SCHEDULER_ID, $scheduler->getConfiguredId());
+$c->add(BatchJobLockPeer::SCHEDULER_ID, $id);
 $batchLocks = BatchJobLockPeer::doSelect( $c);
 echo "Got " . count($batchLocks) . " Job to reset from machine ID: " . $argv[1] . PHP_EOL;
 
