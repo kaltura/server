@@ -6,7 +6,7 @@
 class kLockBase
 {
 	const LOCK_KEY_PREFIX = '__LOCK';
-	const LOCK_GRAB_TRY_INTERVAL = 20000;
+	const LOCK_TRY_INTERVAL = 20000;
 	
 	/**
 	 * @var kBaseCacheWrapper
@@ -42,7 +42,7 @@ class kLockBase
 		{
 			if (!$this->store->add($this->key, true, $lockHoldTimeout))
 			{
-				usleep(self::LOCK_GRAB_TRY_INTERVAL);
+				usleep(self::LOCK_TRY_INTERVAL);
 				continue;
 			}
 			
@@ -60,7 +60,28 @@ class kLockBase
 		$this->store->delete($this->key);
 		self::safeLog("Lock released [{$this->key}]");
 	}
-	
+
+	public function safeUnlock($lockReleaseTimeout = 2)
+	{
+		self::safeLog("Releasing lock [{$this->key}]");
+
+		$retryTimeout = microtime(true) + $lockReleaseTimeout;
+		while (microtime(true) < $retryTimeout)
+		{
+			if (!$this->store->delete($this->key))
+			{
+				usleep(self::LOCK_TRY_INTERVAL);
+				continue;
+			}
+
+			self::safeLog("Lock released [{$this->key}]");
+			return true;
+		}
+
+		self::safeLog("Lock released failed for [{$this->key}]");
+		return false;
+	}
+
 	/**
 	 * This function is required since this code can run before the autoloader
 	 *
