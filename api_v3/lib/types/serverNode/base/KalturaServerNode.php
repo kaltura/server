@@ -138,6 +138,8 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	{
 		$this->validateMandatoryAttributes(true);
 		$this->validateDuplications(null, $type);
+		$this->validateParentId();
+		$this->validateParentLoop(null, explode(",", $this->parentId));
 	
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -146,6 +148,8 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	{
 		$this->validateMandatoryAttributes();
 		$this->validateDuplications($sourceObject->getId(), $type);
+		$this->validateParentId();
+		$this->validateParentLoop($sourceObject->getId(), explode(",", $this->parentId));
 				
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -244,5 +248,43 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 		 
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
+	}
+	
+	public function validateParentId()
+	{
+		if(!isset($this->parentId) || $this->parentId == '')
+			return;
+		
+		$parentIdsArr = explode(",", $this->parentId);
+		$parentIdsDb = ServerNodePeer::retrieveByPKs($parentIdsArr);
+		$parentIdsDb = array_map(function($serverNode) { return $serverNode->getId(); }, $parentIdsDb);
+		
+		if(count($parentIdsArr) !== count($parentIdsDb))
+		{
+			$parentIdsDiff = array_diff($parentIdsArr, $parentIdsDb);
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND, implode(",", $parentIdsDiff));
+			
+		}
+	}
+	
+	public function validateParentLoop($currentServerNodeId = null, $directParentIds = array(), $parentIdsTree = array())
+	{
+		if($currentServerNodeId && in_array($currentServerNodeId, $directParentIds) || in_array($currentServerNodeId, $parentIdsTree))
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_PARENT_LOOP_DETECTED, $currentServerNodeId);
+		
+		if(!count($directParentIds))
+			return;
+		
+		if($currentServerNodeId)
+			$parentIdsTree[] = $currentServerNodeId;
+		
+		foreach ($directParentIds as $key => $parentId)
+		{
+			if(!$parentId)
+				continue;
+			
+			$parentObj = ServerNodePeer::retrieveByPK($parentId);
+			$this->validateParentLoop($parentId, $parentObj->getParentIdsArray(), $parentIdsTree);
+		}
 	}
 }
