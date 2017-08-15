@@ -54,14 +54,7 @@ class kLockBase
 		return false;
 	}
 	
-	public function unlock()
-	{
-		self::safeLog("Releasing lock [{$this->key}]");
-		$this->store->delete($this->key);
-		self::safeLog("Lock released [{$this->key}]");
-	}
-
-	public function safeUnlock($lockReleaseTimeout = 2)
+	public function unlock($lockReleaseTimeout = 2)
 	{
 		self::safeLog("Releasing lock [{$this->key}]");
 
