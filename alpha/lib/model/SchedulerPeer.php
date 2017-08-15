@@ -35,7 +35,7 @@ class SchedulerPeer extends BaseSchedulerPeer
 			throw new kCoreException("More than one result for host $hostname");
 
 		if (!$result[0]->getConfiguredId())
-			throw new kCoreException("Could not find scheduler id for scheduler.");
+			throw new kCoreException("Could not find scheduler id for scheduler for host $hostname.");
 
 		return $result[0]->getConfiguredId();
 	}
