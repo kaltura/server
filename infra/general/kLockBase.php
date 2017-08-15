@@ -59,17 +59,18 @@ class kLockBase
 		self::safeLog("Releasing lock [{$this->key}]");
 
 		$retryTimeout = microtime(true) + $lockReleaseTimeout;
-		while (microtime(true) < $retryTimeout)
+		do
 		{
 			if (!$this->store->delete($this->key))
 			{
+				self::safeLog("Lock released failed retrying [{$this->key}]");
 				usleep(self::LOCK_TRY_INTERVAL);
 				continue;
 			}
 
 			self::safeLog("Lock released [{$this->key}]");
 			return true;
-		}
+		} while  (microtime(true) < $retryTimeout);
 
 		self::safeLog("Lock released failed for [{$this->key}]");
 		return false;
