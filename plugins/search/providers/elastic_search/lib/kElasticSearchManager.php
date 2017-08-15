@@ -102,7 +102,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
-        $op = $object->getElasticSaveMethod();
+        $op = isset($params['action']) ? $params['action'] : $object->getElasticSaveMethod();
         $params['index'] = $object->getElasticIndexName();
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
@@ -141,7 +141,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog->setSql($command);
         $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
         $elasticLog->setObjectId($object->getId());
-        $elasticLog->setObjectType($object->getElasticObjectType());
+        $elasticLog->setObjectType($object->getElasticObjectName());
         //$elasticLog->setEntryId($object->getEntryId());
         $elasticLog->setPartnerId($object->getPartnerId());
         $elasticLog->setType(SphinxLogType::ELASTIC);
@@ -319,10 +319,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function deleteFromElastic(IElasticIndexable $object)
     {
-        $params['index'] = $object->getElasticIndexName();
-        $params['type'] = $object->getElasticObjectType();
-        $params['id'] = $object->getElasticId();
-        $client = new elasticClient();
-        $client->delete($params);
+        $params['action'] = 'delete';
+        $this->execElastic($params, $object);
     }
+
 }
