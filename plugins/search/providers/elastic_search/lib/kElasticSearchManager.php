@@ -54,7 +54,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if(!$cmd)
             return true;
 
-        return $this->execElastic($cmd, $object);
+        return $this->execElastic($cmd, $object, $object->getElasticSaveMethod());
     }
 
     public function getElasticSaveParams($object, $params)
@@ -97,16 +97,15 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     }
 
     //exe the curl
-    public function execElastic($params, IElasticIndexable $object)
+    public function execElastic($params, IElasticIndexable $object, $action)
     {
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
-        $op = isset($params['action']) ? $params['action'] : $object->getElasticSaveMethod();
         $params['index'] = $object->getElasticIndexName();
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
-        $params['action'] = $op;
+        $params['action'] = $action;
 
         try
         {
@@ -119,7 +118,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 return true;
 
             $client = new elasticClient();
-            $ret = $client->$op($params);
+            $ret = $client->$action($params);
             if(!$ret)
             {
                 KalturaLog::err('Failed to Execute elasticSearch query: '.print_r($params,true));
@@ -319,8 +318,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function deleteFromElastic(IElasticIndexable $object)
     {
-        $params['action'] = 'delete';
-        $this->execElastic($params, $object);
+        $this->execElastic(null, $object, 'delete');
     }
 
 }
