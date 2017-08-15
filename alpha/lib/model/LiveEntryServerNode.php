@@ -188,7 +188,8 @@ class LiveEntryServerNode extends EntryServerNode
 				return;
 			}
 			
-			if(!myEntryUtils::shouldServeVodFromLive($recordedEntry, false))
+			if(!myEntryUtils::shouldServeVodFromLive($recordedEntry, false) &&
+				($liveEntry->getRecordStatus() != RecordStatus::APPENDED || $recordedEntry->getRecordedLengthInMsecs() == 0))
 			{
 				KalturaLog::debug("Recorded entry with id [{$this->getEntryId()}] found and ready or recorded is of old source type, clearing entry server node from db");
 				$this->delete();
