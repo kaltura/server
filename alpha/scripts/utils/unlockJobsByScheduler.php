@@ -1,7 +1,10 @@
 <?php
 require_once(__DIR__ . '/../bootstrap.php');
 
-$host = gethostname();
+if($argc != 2)
+ 	die ('Usage: php unlockJobsByScheduler.php {hostname}.' . PHP_EOL);
+
+$host = argv[1];
 echo "Running for $host\n";
 
 $id = SchedulerPeer::getConfiguredIdByHostName($host);
