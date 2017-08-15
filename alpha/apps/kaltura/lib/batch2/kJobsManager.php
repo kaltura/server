@@ -1541,6 +1541,7 @@ class kJobsManager
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$entry = $flavorAsset->getentry();
 		
+		$shouldDetectGOP = null;
 		if($entry)
 		{
 			if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
@@ -1554,7 +1555,7 @@ class kJobsManager
 			}
 		}
 		
-		if($shouldDetectGOP===null)
+		if($shouldDetectGOP === null)
 			$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
 		$extractMediaData->setDetectGOP($shouldDetectGOP);
 		
