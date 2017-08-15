@@ -134,16 +134,4 @@ class EdgeServerNode extends DeliveryServerNode {
 		return $activeParentEdge;
 	}
 	
-	public function getParentIdsArray()
-	{
-		$parentIds = array();
-		
-		$ids = $this->getParentId();
-		if($ids)
-		{
-			$parentIds = explode(",", $ids);
-		}
-		
-		return $parentIds;
-	}
 } // EdgeServer
