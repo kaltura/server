@@ -48,7 +48,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$dbStreamsInfo = $sourceObject ? $sourceObject->getStreams() : array();
-		$inputStreamsInfo = isset($this->streams) ? $this->streams : array();
+		$inputStreamsInfo = isset($this->streams) ? $this->streams : new KalturaLiveStreamParamsArray();
 		
 		if(count($dbStreamsInfo) === count($inputStreamsInfo))
 		{
