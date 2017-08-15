@@ -17,6 +17,8 @@ abstract class EntryServerNode extends BaseEntryServerNode {
 	
 	abstract public function validateEntryServerNode();
 
+	abstract public function deleteOrMarkForDeletion($entry = null);
+
 	public function getCacheInvalidationKeys()
 	{
 		return array("entryServerNode:entryId".strtolower($this->getEntryId()));

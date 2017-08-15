@@ -76,7 +76,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @param int $id
 	 * @throws KalturaAPIException
 	 */
-	private function deleteAction($id)
+	public function deleteAction($id)
 	{
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
 		if (!$dbEntryServerNode)

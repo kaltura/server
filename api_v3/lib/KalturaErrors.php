@@ -674,4 +674,9 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
+
+	/*
+	 * KalturaResource
+	 */
+	const LIVE_CLIPPING_OPERATION_RESOURCE_REQUIRES_CLIP_ATTRIBUTES = "LIVE_CLIPPING_OPERATION_RESOURCE_REQUIRES_CLIP_ATTRIBUTES; Operation resource of live entry requires clip attributes";
 }

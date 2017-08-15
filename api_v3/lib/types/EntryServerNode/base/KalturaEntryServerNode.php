@@ -124,7 +124,9 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 			case KalturaEntryServerNodeType::LIVE_PRIMARY:
 				$object = new KalturaLiveEntryServerNode();
 				break;
-
+			case KalturaEntryServerNodeType::LIVE_CLIPPING_TASK:
+				$object = new KalturaClippingTaskEntryServerNode();
+				break;
 			default:
 				KalturaLog::err("Did not expect source object to be of type ".$type);
 		}
