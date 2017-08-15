@@ -24,17 +24,16 @@ class UserEntryPeer extends BaseUserEntryPeer {
 	 */
 	public static function setDefaultCriteriaFilter()
 	{
-	    if(self::$s_criteria_filter == null)
-	        self::$s_criteria_filter = new criteriaFilter();
-	    
-	    $c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
-	    $c->addAnd ( UserEntryPeer::STATUS, array(UserEntryStatus::DELETED), Criteria::NOT_IN);
-	    // when session is not admin, allow access to user's userEntries only
-	    if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
-    	    $c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
-	    }
-	    
-	    self::$s_criteria_filter->setFilter($c);
+		if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
+
+		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
+		$c->addAnd ( UserEntryPeer::STATUS, array(UserEntryStatus::DELETED), Criteria::NOT_IN);
+		// when session is not admin, allow access to user's userEntries only
+		if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
+			$c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
+		}
+		self::$s_criteria_filter->setFilter($c);
 	}
 	
 	public static function getOMClass($row, $colnum)
@@ -79,15 +78,4 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		return $ids;
 	}
 	
-	public static function getUserEntry ($partnerId, $userId, $entryId, $type)
-	{
-		$userEntryCriteria = new Criteria();
-		$userEntryCriteria->add(self::PARTNER_ID, $partnerId);
-		$userEntryCriteria->add(self::ENTRY_ID, $entryId);
-		$userEntryCriteria->add(self::KUSER_ID, $userId);
-		$userEntryCriteria->add(self::TYPE, $type);
-		
-		return self::doSelectOne($userEntryCriteria);
-	}
-
 } // UserEntryPeer

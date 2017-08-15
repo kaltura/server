@@ -1,3 +1,88 @@
+# Mercury 13.1.0 #
+
+## Add new Search plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### configuration ###
+Add the following to plugins.ini file: "Search"
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
+
+## Preserve Aspect Ratio accurately  ##
+
+- Issue Type: Feature
+- Issue ID: SUP-11599
+
+### configuration ###
+New mode (5) for flavorParams::AspectRatioMode field
+
+# Mercury 13.0.0 #
+
+## Fix deleting users on KMS ##
+
+- Issue Type: Bug
+- Issue ID: KMS-14633
+
+### configuration ###
+None
+
+### Deployment scripts ###
+Re-index Kuser sphinx table (php deployment/base/scripts/populateSphinxKusers.php)
+
+## Update Apache headers to support Kea Access-Control-Allow-Origin ##
+ - Issue type: Feature
+ - Issue ID : PLAT-7758
+ 
+### configuration ###
+Need to add the following section to apache config files /etc/apache2/sites-enabled/kaltura & /etc/apache2/sites-enabled/kaltura-ssl
+
+	Alias /apps/kea "/opt/kaltura/apps/kea"
+	<Directory "/opt/kaltura/apps/kea">
+	    DirectoryIndex index.php
+	    Options ExecCGI -Indexes FollowSymLinks Includes
+	    Order allow,deny
+	    Allow from all
+	    AllowOverride all
+	</Directory>
+
+### Deployment scripts ###
+None 
+ 
+#### Known Issues & Limitations ####
+None
+
+## Add Data addContent action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7669
+
+### configuration ###
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_11_addContent_data_permissions.php
+
+## Add support for Thumbnail and Thumbnail Stripes for Stitched Playlist ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7571
+
+### configuration ###
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support mapped thumbnail capture.
+
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
+
+### Deployment scripts ###
+None
+
+
 # Lynx 12.20.0 #
 
 ## Add live packager delivery profiles ##

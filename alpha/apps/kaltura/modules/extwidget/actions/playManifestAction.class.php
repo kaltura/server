@@ -491,11 +491,15 @@ class playManifestAction extends kalturaAction
 		$returnedFlavors = array();		
 		foreach ($flavorAssets as $flavor)
 		{
-			$currentBitrate = $flavor->getBitrate();
-			if ($this->minBitrate && $currentBitrate < $this->minBitrate)
-				continue;
-			if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
-				continue;
+			//audio language assets shouldn't be filtered
+			if(!($flavor->hasTag(assetParams::TAG_ALT_AUDIO) || $flavor->hasTag(assetParams::TAG_AUDIO_ONLY)))
+			{
+				$currentBitrate = $flavor->getBitrate();
+				if ($this->minBitrate && $currentBitrate < $this->minBitrate)
+					continue;
+				if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
+					continue;
+			}
 			$returnedFlavors[] = $flavor;
 		}
 	
@@ -595,10 +599,6 @@ class playManifestAction extends kalturaAction
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 
-		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
-		if(count($flavorAssetsFilteredByBitrate))
-			 $flavorAssets = $flavorAssetsFilteredByBitrate;
-
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
@@ -634,6 +634,10 @@ class playManifestAction extends kalturaAction
 				return;
 		}
 
+		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
+		if(count($flavorAssetsFilteredByBitrate))
+			$flavorAssets = $flavorAssetsFilteredByBitrate;
+		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
@@ -1168,12 +1172,14 @@ class playManifestAction extends kalturaAction
 			case entryType::MEDIA_CLIP:
 				// VOD
 				$renderer = $this->serveVodEntry();
+				$entryType = 'vod';
 				break;
 				
 			case entryType::LIVE_STREAM:			
 			case entryType::LIVE_CHANNEL:
 				// Live stream
 				$renderer = $this->serveLiveEntry();
+				$entryType = 'live';
 				break;
 			
 			default:
@@ -1199,6 +1205,8 @@ class playManifestAction extends kalturaAction
 		}
 
 		$renderer->entryId = $this->entryId;
+		$renderer->partnerId = $this->entry->getPartnerId();
+		$renderer->entryType = $entryType;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
 		{
@@ -1216,7 +1224,7 @@ class playManifestAction extends kalturaAction
 		$canCacheAccessControl = false;
 		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))
 		{
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 			$renderer->forceCachingHeaders = true;
 		}
 		if (!$this->secureEntryHelper)
@@ -1232,7 +1240,7 @@ class playManifestAction extends kalturaAction
 		if (!$renderer->tokenizer && $canCacheAccessControl)
 		{
 			// Note: kApiCache::hasExtraFields is checked in kManifestRenderers
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 		}
 		if ($this->deliveryProfile && $this->deliveryProfile->getAdStitchingEnabled())
 			$renderer->cachingHeadersAge = 0;

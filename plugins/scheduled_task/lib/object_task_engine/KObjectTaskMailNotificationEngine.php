@@ -15,8 +15,8 @@ class KObjectTaskMailNotificationEngine
 		$cnt = 0;
 		foreach($objectsIds as $userId => $entriesIds) {
 			foreach($entriesIds as $id) {
-				$link = $link ? " - " . str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
-				$body .= "\t$id$link" . PHP_EOL;
+				$readyLink = $link ? " - " . str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
+				$body .= "\t$id$readyLink" . PHP_EOL;
 				$cnt++;
 			}
 		}
@@ -34,8 +34,8 @@ class KObjectTaskMailNotificationEngine
 	{
 		$body =  "Execute for entries:" . PHP_EOL;
 		foreach($objectsIds as $id) {
-			$link = $link ? " - " . str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
-			$body .= "\t$id$link" . PHP_EOL;
+			$readyLink = $link ? " - " . str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
+			$body .= "\t$id$readyLink" . PHP_EOL;
 		}
 		$body .= "Total count of affected object: " . count($objectsIds);
 		return $body;
@@ -77,10 +77,11 @@ class KObjectTaskMailNotificationEngine
 		$mailer->Subject = $subject;
 		$mailer->Body = $body;
 
-		$mailer->From = '';
+		$mailer->Sender = KAsyncMailer::MAILER_DEFAULT_SENDER_EMAIL;
+		$mailer->From = KAsyncMailer::MAILER_DEFAULT_SENDER_EMAIL;
 		$mailer->FromName = $sender;
 
-		KalturaLog::info("sending mail to " . implode(",",$toArray) . ",from: [$sender]. subject: [$subject] with body: [$body]");
+		KalturaLog::info("sending mail to " . implode(",",$toArray) . ", from: [$sender]. subject: [$subject] with body: [$body]");
 		try
 		{
 			return $mailer->Send();

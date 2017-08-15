@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUploadedFileResource extends KalturaDataCenterContentResource
+class KalturaUploadedFileResource extends KalturaGenericDataCenterContentResource
 {
 	/**
 	 * Represents the $_FILE 
