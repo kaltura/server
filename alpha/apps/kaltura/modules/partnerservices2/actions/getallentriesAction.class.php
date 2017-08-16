@@ -228,7 +228,7 @@ $this->benchmarkStart( "list_type_kuser" );
 			if ( $merge_entry_lists )
 			{
 				$kshow_entry_list = kArray::append  ( $kshow_entry_list , $kuser_entry_list );
-				$kuser_entry_list = null;
+				$kuser_entry_list = array();
 			}
 		}
 $this->benchmarkEnd( "list_type_kuser" );

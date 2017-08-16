@@ -25,10 +25,42 @@ function getPartnerUpdates($updatedAt)
 	$result = array();
 	foreach ($rows as $row)
 	{
-		$partnerId = $row['ID'];
+		$id = $row['ID'];
 		$status = $row['STATUS'];
 		$secret = $status == Partner::PARTNER_STATUS_ACTIVE ? $row['ADMIN_SECRET'] : '';
-		$result[$partnerId] = $secret;
+		$result[$id] = $secret;
+		$updatedAt = new DateTime($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+	}
+	
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+}
+
+function getEntryUpdates($updatedAt)
+{
+	// get the partners
+	$c = new Criteria();
+	$c->addSelectColumn(entryPeer::ID);
+	$c->addSelectColumn(entryPeer::STATUS);
+	$c->addSelectColumn(entryPeer::LENGTH_IN_MSECS);
+	$c->addSelectColumn(entryPeer::UPDATED_AT);
+	$c->add(entryPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
+	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
+	$c->setLimit(MAX_ITEMS);
+	entryPeer::setUseCriteriaFilter(false);
+	$stmt = entryPeer::doSelectStmt($c);
+	entryPeer::setUseCriteriaFilter(true);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	
+	$maxUpdatedAt = 0;
+	$result = array();
+	foreach ($rows as $row)
+	{
+		$id = $row['ID'];
+		$status = $row['STATUS'];
+		$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
+		$duration = ($status == entryStatus::READY && $duration > 0) ? strval($duration) : '';
+		$result[$id] = $duration;
 		$updatedAt = new DateTime($row['UPDATED_AT']);
 		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
 	}
@@ -102,6 +134,10 @@ switch ($requestType)
 {
 case 'partner':
 	$result = getPartnerUpdates($updatedAt);
+	break;
+	
+case 'entry':
+	$result = getEntryUpdates($updatedAt);
 	break;
 	
 case 'categoryEntry':

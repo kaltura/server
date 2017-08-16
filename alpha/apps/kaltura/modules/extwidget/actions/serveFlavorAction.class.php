@@ -10,9 +10,30 @@ class serveFlavorAction extends kalturaAction
 	
 	const JSON_CONTENT_TYPE = 'application/json';
 	
+	protected $pathOnly = false;
+	
+	public function getFileSyncFullPath(FileSync $fileSync)
+	{
+		$fullPath = $fileSync->getFullPath();
+
+		$pathPrefix = kConf::get('serve_flavor_path_search_prefix', 'local', '');
+		if ($pathPrefix &&
+			kString::beginsWith($fullPath, $pathPrefix) &&
+			$this->pathOnly)
+		{
+			$pathReplace = kConf::get('serve_flavor_path_replace');
+			$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
+			$fullPath = $newPrefix . substr($fullPath, strlen($pathPrefix));
+		}
+
+		return $fullPath;
+	}
+
 	protected function storeCache($renderer, $partnerId)
 	{
-		if (!function_exists('apc_store') || $_SERVER["REQUEST_METHOD"] != "GET")
+		if (!function_exists('apc_store') || 
+			$_SERVER["REQUEST_METHOD"] != "GET" || 
+			$renderer instanceof kRendererString)
 		{
 			return;
 		}
@@ -24,14 +45,14 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
-	protected function getSimpleMappingRenderer($path, asset $asset)
+	protected function getSimpleMappingRenderer($path, asset $asset = null)
 	{
 		$source = array(
 			'type' => 'source',
 			'path' => $path,
 		);
 
-		if ($asset->getEncryptionKey())
+		if ($asset && $asset->getEncryptionKey())
 		{
 			$source['encryptionKey'] = $asset->getEncryptionKey();
 		}
@@ -40,7 +61,7 @@ class serveFlavorAction extends kalturaAction
 			'clips' => array($source)
 		);
 
-		if (method_exists($asset, 'getLanguage') && $asset->getLanguage())
+		if ($asset && method_exists($asset, 'getLanguage') && $asset->getLanguage())
 		{
 			$language = languageCodeManager::getObjectFromKalturaName($asset->getLanguage());
 			$language = $language[1];
@@ -57,7 +78,7 @@ class serveFlavorAction extends kalturaAction
 			}
 		}
 
-		if (method_exists($asset, 'getLabel') && $asset->getLabel())
+		if ($asset && method_exists($asset, 'getLabel') && $asset->getLabel())
 		{
 			$sequence['label'] = $asset->getLabel();
 		}
@@ -71,6 +92,18 @@ class serveFlavorAction extends kalturaAction
 		return new kRendererString(
 				$json,
 				self::JSON_CONTENT_TYPE);
+	}
+
+	/**
+	 * This will make nginx-vod dump the request to the remote dc
+	 */
+	protected function renderEmptySimpleMapping()
+	{
+		if (!$this->pathOnly || !kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+			return;
+
+		$renderer = $this->getSimpleMappingRenderer('', null);
+		$renderer->output();
 	}
 	
 	protected function serveLivePlaylist($durations, $sequences)
@@ -264,7 +297,7 @@ class serveFlavorAction extends kalturaAction
 				if ($fileSync)
 				{
 					$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
-					$path = $resolvedFileSync->getFullPath();
+					$path = $this->getFileSyncFullPath($resolvedFileSync);
 				}
 				else
 				{
@@ -366,14 +399,22 @@ class serveFlavorAction extends kalturaAction
 		$entryId = $this->getRequestParameter("entryId");
 		$sequence = $this->getRequestParameter('sequence');
 		$captionLanguages = $this->getRequestParameter('captions', '');
+		$this->pathOnly = $this->getRequestParameter('pathOnly', false);
 
 		if ($entryId)
 		{
-			$entry = entryPeer::retrieveByPK($entryId);
+			$entry = entryPeer::retrieveByPKNoFilter($entryId);
 			if (!$entry)
 			{
+				// rendering empty response in case entry was not replicated yet
+				$this->renderEmptySimpleMapping();
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
+
+			if ($entry->getStatus() == entryStatus::DELETED) {
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+			}
+
 			$isInternalIp = kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']);
 			if ($entry->getType() == entryType::PLAYLIST && $isInternalIp)
 			{
@@ -399,14 +440,20 @@ class serveFlavorAction extends kalturaAction
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
-		$pathOnly = $this->getRequestParameter( "pathOnly", false );
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
 		
-		$flavorAsset = assetPeer::retrieveById($flavorId);
-		if (is_null($flavorAsset))
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($flavorId);
+		if (is_null($flavorAsset)) {
+			// rendering empty response in case flavor asset was not replicated yet
+			$this->renderEmptySimpleMapping();
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		}
+
+		if ($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED) {
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		}
 
 		if (!is_null($entryId) && $flavorAsset->getEntryId() != $entryId)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
@@ -436,14 +483,14 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+		if ($this->pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
 			$path = '';
 			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
 			if ( $file_sync )
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-				$path = $parent_file_sync->getFullPath();
+				$path = $this->getFileSyncFullPath($parent_file_sync);
 				if ($fileParam && is_dir($path)) 
 				{
 					$path .= "/$fileParam";

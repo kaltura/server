@@ -7,7 +7,7 @@
  * @see api/services/UploadService#uploadAction()
  * @see api/services/UploadTokenService#addAction()
  */
-class KalturaUploadedFileTokenResource extends KalturaDataCenterContentResource
+class KalturaUploadedFileTokenResource extends KalturaGenericDataCenterContentResource
 {
 	/**
 	 * Token that returned from upload.upload action or uploadToken.add action. 

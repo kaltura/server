@@ -56,6 +56,9 @@ abstract class KConversionEngine
 			case KalturaConversionEngineType::FFMPEG:
 				$engine = new KConversionEngineFfmpeg();
 				break;
+			case KalturaConversionEngineType::CHUNKED_FFMPEG:
+				$engine = new KConversionEngineChunkedFfmpeg();
+				break;
 			case KalturaConversionEngineType::MENCODER:
 				$engine = new KConversionEngineMencoder();
 				break;

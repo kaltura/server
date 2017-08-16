@@ -51,7 +51,4 @@ class UserEntryFilter extends baseObjectFilter
 	{
         return UserEntryPeer::ID;
 	}
-
-
-
 }

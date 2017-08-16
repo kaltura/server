@@ -10,6 +10,7 @@ class UserEntryService extends KalturaBaseService {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+		$this->applyPartnerFilterForClass('userEntry');
 	}
 
 	/**
@@ -26,11 +27,23 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
 
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		$dbUserEntry->save();
-
+		$lockUser = $userEntry->userId ? $userEntry->userId : kCurrentContext::getCurrentKsKuserId();
+		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $lockUser;
+		$dbUserEntry = kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($dbUserEntry));
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 
 		return $userEntry;
+	}
+	
+	public function addUserEntryImpl($dbUserEntry)
+	{
+		if($dbUserEntry->checkAlreadyExists())
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_ALREADY_EXISTS);
+		}
+		$dbUserEntry->save();
+		
+		return $dbUserEntry;
 	}
 
 	/**
@@ -81,12 +94,13 @@ class UserEntryService extends KalturaBaseService {
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaUserEntryListResponse
 	 */
-	public function listAction(KalturaUserEntryFilter $filter, KalturaFilterPager $pager = null)
+	public function listAction(KalturaUserEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
+		if(!$filter)
 		{
 			$filter = new KalturaUserEntryFilter();
 		}
+		
 		if (!$pager)
 		{
 			$pager = new KalturaFilterPager();

@@ -163,8 +163,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	 */
 	protected function purgeFiles ($dropFolderFilesMap)
 	{
-		$createTimeEnd = strtotime ("now") - ($this->dropFolder->autoFileDeleteDays*86400);
-		$fileList = $this->listRecordings(self::ZERO_DATE, date('m/j/Y H:i:s',$createTimeEnd));
+		$createTimeEnd = strtotime ("now");
+		$createTimeStart = self::ZERO_DATE;
+		if ($this->dropFolder->deleteFromTimestamp)
+		{
+			$createTimeStart = date('m/j/Y H:i:s',$this->dropFolder->deleteFromTimestamp);
+		}
+		
+		$fileList = $this->listRecordings($createTimeStart, date('m/j/Y H:i:s',$createTimeEnd));
 		KalturaLog::info("Files to delete: " . count($fileList));
 		
 		foreach ($fileList as $file)
@@ -181,6 +187,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			if (!in_array($dropFolderFile->status, array(KalturaDropFolderFileStatus::HANDLED, KalturaDropFolderFileStatus::DELETED)))
 			{
 				KalturaLog::info("File with name $physicalFileName not in final status. Ignoring");
+				continue;
+			}
+			
+			$deleteTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays*86400;
+			if (time() < $deleteTime)
+			{
+				KalturaLog::info("File with name $physicalFileName- not time to delete yet. Ignoring");
 				continue;
 			}
 			

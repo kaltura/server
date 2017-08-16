@@ -140,6 +140,78 @@ abstract class kManifestRenderer
 	{
 		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
 	}
+
+	protected function sendAnalyticsBeacon($host, $port)
+	{
+		// build the uri
+		$output = array(
+			'eventType' => '100',
+			'service' => 'analytics',
+			'action' => 'trackEvent',
+			'entryId' => $this->entryId,
+			'partnerId' => $this->partnerId,
+			'playbackType' => $this->entryType,
+		);
+
+		$params = infraRequestUtils::getRequestParams();
+		$mapping = array(
+			'ks' => 'ks',
+			'format' => 'deliveryType',
+			'uiConfId' => 'uiConfId',
+			'playSessionId' => 'sessionId',
+			'clientTag' => 'clientTag', 
+		);
+		foreach ($mapping as $src => $dest)
+		{
+			if (!isset($params[$src]))
+			{
+				continue;
+			}
+
+			$output[$dest] = $params[$src];
+		}
+
+		if (isset($params['clientTag']) && strpos($params['clientTag'], 'html5:v') === 0)
+		{
+			$output['clientVer'] = substr($params['clientTag'], 7);
+		}
+
+		if (isset($params['referrer']))
+		{
+			$base64Referrer = $params['referrer'];
+			$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer));
+			if ($referrer)
+			{
+				$output['referrer'] = $referrer;
+			}
+		}
+
+		$uri = '/api_v3/index.php?' . http_build_query($output, '', '&');
+
+		// build the request
+		$headers = array(
+			'Host' => $host,
+			'X-Forwarded-For' => infraRequestUtils::getRemoteAddress(),
+		);
+		if (isset($_SERVER['HTTP_USER_AGENT']))
+		{
+			$headers['User-Agent'] = $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		$out = "GET {$uri} HTTP/1.1\r\n";
+
+		foreach($headers as $header => $value)
+		{
+			$out .= "$header: $value\r\n";
+		}
+
+		$out .= "\r\n";
+
+		// send the request
+		$fp = fsockopen($host, $port, $errno, $errstr, 1);
+		fwrite($fp, $out);
+		fclose($fp);
+	}
 	
 	final public function output()
 	{
@@ -191,6 +263,14 @@ abstract class kManifestRenderer
 		
 		echo $content;
 		
+		if (kConf::hasParam('internal_analytics_host'))
+		{
+			$statsHost = explode(':', kConf::get('internal_analytics_host'));
+			$this->sendAnalyticsBeacon(
+				$statsHost[0], 
+				isset($statsHost[1]) ? $statsHost[1] : 80);
+		}
+
 		die;
 	}
 	

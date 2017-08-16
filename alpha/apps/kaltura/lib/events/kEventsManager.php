@@ -15,6 +15,13 @@ class kEventsManager
 	protected static $multiDeferredEvents = array();
 
 	/**
+	 * When this flag is false, all raised events are ignored.
+	 * 
+	 * @var bool
+	 */
+	protected static $eventsEnabled = true;
+
+	/**
 	 * When this flag is false, deferred events are raised synchronously.
 	 * 
 	 * @var bool
@@ -126,6 +133,16 @@ class kEventsManager
 	}
 	
 	/**
+	 * Enable or disable events
+	 *
+	 * @param bool $enable
+	 */
+	public static function enableEvents($enable)
+	{
+		self::$eventsEnabled = $enable;
+	}
+
+	/**
 	 * Enable or disable deferred events
 	 * 
 	 * @param bool $enable
@@ -202,6 +219,9 @@ class kEventsManager
 	
 	public static function raiseEventDeferred(KalturaEvent $event)
 	{
+		if (!self::$eventsEnabled)
+			return;
+
 		$eventKey = $event->getKey();
 		
 		if(!self::$deferredEventsEnabled)
@@ -222,6 +242,9 @@ class kEventsManager
 	
 	public static function raiseEvent(KalturaEvent $event)
 	{
+		if (!self::$eventsEnabled)
+			return;
+
 		if ( self::$deferredEventsEnabled && self::$forceDeferredEvents ) {
 			return self::raiseEventDeferred($event);
 		}
