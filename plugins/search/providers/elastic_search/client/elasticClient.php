@@ -55,14 +55,17 @@ class elasticClient
         return curl_setopt($this->ch, CURLOPT_TIMEOUT, $seconds);
     }
 
-    protected function getQueryParams($params)
+    protected function getQueryParams(&$params)
     {
         $val = '';
         $queryParams = array();
-        if(isset($params['parent']))
-            $queryParams['parent'] = $params['parent'];
-        if(isset($params['retry_on_conflict']))
-            $queryParams['retry_on_conflict'] = $params['retry_on_conflict'];
+
+        if(isset($params['body']['retry_on_conflict']))
+        {
+            $queryParams['retry_on_conflict'] = $params['body']['retry_on_conflict'];
+            unset($params['body']['retry_on_conflict']);
+        }
+
 
         if(count($queryParams) >0)
         {
@@ -179,7 +182,7 @@ class elasticClient
         $queryParams = $this->getQueryParams($params);
         $cmd .= $queryParams;
 
-        $response = $this->sendRequest($cmd, 'POST' ,$params['body']);
+        $response = $this->sendRequest($cmd, 'POST', $params['body']);
         return $response;
     }
 

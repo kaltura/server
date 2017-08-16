@@ -1975,4 +1975,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			return true;
 		return false;
 	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'category';
+	}
 }

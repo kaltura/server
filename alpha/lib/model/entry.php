@@ -3801,4 +3801,12 @@ public function copyTemplate($copyPartnerId = false, $template)
 			return true;
 		return false;
 	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'entry';
+	}
 }
