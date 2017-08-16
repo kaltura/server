@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2017-08-15
+/*! KMC - v6.0.11 - 2017-08-16
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2017 Amir Chervinsky; Licensed GNU */
 /**
@@ -3998,8 +3998,8 @@ kmc.functions = {
         var modal_content = '<iframe id="liveDashboardIF" src="' + url + '" width="100%" height="100%" frameborder="0"></iframe>';
 
         kmc.layout.modal.open( {
-            'width' : 1040,
-            'height' : '90%',
+            'width' : 1050,
+            'height' : 695,
             'title' : title,
             'content' : modal_content,
             'contentHeight' : '94%'
