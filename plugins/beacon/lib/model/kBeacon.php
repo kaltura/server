@@ -7,22 +7,28 @@
 
 class kBeacon
 {
+	const HOST									= "127.0.0.1";
+	const PORT 									= "9200";
+	const INDEX_NAME 							= "beaconindex";
+	
 	const BEACONS_QUEUE_NAME					= 'beacons';
 	const BEACONS_EXCHANGE_NAME					= 'beacon_exchange';
 	
-	const FIELD_ACTION 							= '_action';
-	const FIELD_INDEX							= '_index';
-	const FIELD_TYPE							= '_type';
-	const FIELD_DOCUMENT_ID 					= '_id';
-	const FIELD_DOCUMENT_TTL 					= 'ttl';
+	const ELASTIC_ACTION_KEY					= '_action';
+	const ELASTIC_ACTION_VALUE					= 'index';
+	
+	const ELASTIC_INDEX_KEY						= '_index';
+	const ELASTIC_INDEX_VALUE					= 'beaconindex';
+	
+	const ELASTIC_INDEX_TYPE					= '_type';
+	const ELASTIC_INDEX_TYPE_STATS				= 'State';
+	const ELASTIC_INDEX_TYPE_LOG				= 'Log';
+	
+	const ELASTIC_DOCUMENT_ID_KEY				= '_id';
+	const ELASTIC_DOCUMENT_TTL_KEY				= 'ttl';
+	
 	const FIELD_CREATED_AT 						= 'createdAt';
 	const FIELD_UPDATED_AT 						= 'updatedAt';
-	
-	const FIELD_ACTION_VALUE					= 'index';
-	const FIELD_INDEX_VALUE						= 'beaconindex';
-	const FIELD_TYPE_VALUE_STATS				= 'State';
-	const FIELD_TYPE_VALUE_LOG					= 'Log';
-	
 	const FIELD_RELATED_OBJECT_TYPE				= 'relatedObjectType';
 	const FIELD_EVENT_TYPE						= 'eventType';
 	const FIELD_OBJECT_ID						= 'objectId';
@@ -89,39 +95,44 @@ class kBeacon
 		}
 	}
 	
-	public function getDocCreatedAt($docId, $currTime)
-	{
-		$searchObject = array();
-		$searchObject[self::FIELD_DOCUMENT_ID] = $docId;
-		
-		$elasticClient = new BeaconElasticClient();
-		$response = $elasticClient->search(kBeacon::FIELD_INDEX_VALUE, self::FIELD_TYPE_VALUE_STATS, $searchObject, array(), 1, 0);
-		
-		if(!count($response))
-			return $currTime;
-		
-		$doc = reset($response);
-		if(!$doc[self::FIELD_CREATED_AT])
-			return $currTime;
-		
-		return $doc[self::FIELD_CREATED_AT];
-	}
-	
 	public function getIndexObjectForState($indexObject, $currTime)
 	{
 		$docId = md5($this->relatedObjectType.'_'. $this->eventType.'_'.$this->objectId);
+		
+		$indexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
+		$indexObject[self::ELASTIC_INDEX_TYPE] = self::ELASTIC_INDEX_TYPE_STATS;
 		$indexObject[self::FIELD_CREATED_AT] = $this->getDocCreatedAt($docId, $currTime);
-		$indexObject[self::FIELD_DOCUMENT_ID] = $docId;
-		$indexObject[self::FIELD_TYPE] = self::FIELD_TYPE_VALUE_STATS;
+		
 		return json_encode($indexObject);
 	}
 	
 	public function getIndexObjectForLog($indexObject, $ttl, $currTime)
 	{
 		$indexObject[self::FIELD_CREATED_AT] = $currTime;
-		$indexObject[self::FIELD_TYPE] = self::FIELD_TYPE_VALUE_LOG;
-		$indexObject[self::FIELD_DOCUMENT_TTL] = $ttl . "S";
+		$indexObject[self::ELASTIC_DOCUMENT_TTL_KEY] = $ttl . "S";
+		$indexObject[self::ELASTIC_INDEX_TYPE] = self::ELASTIC_INDEX_TYPE_LOG;
+		
 		return json_encode($indexObject);
+	}
+	
+	private function getDocCreatedAt($docId, $currTime)
+	{
+		$searchObject = array();
+		$searchObject[elasticClient::ELASTIC_ID_KEY] = $docId;
+		$searchObject[elasticClient::ELASTIC_TYPE_KEY] = self::ELASTIC_INDEX_TYPE_STATS;
+		$searchObject[elasticClient::ELASTIC_INDEX_KEY] = self::ELASTIC_INDEX_VALUE;
+		
+		$elasticClient = new elasticClient(self::HOST, self::PORT);
+		$response = $elasticClient->get($searchObject);
+		
+		if($response['found'] == false)
+			return $currTime;
+		
+		$doc = $response['_source'];
+		if(!$doc[self::FIELD_CREATED_AT])
+			return $currTime;
+		
+		return $doc[self::FIELD_CREATED_AT];
 	}
 	
 	private function createIndexBaseObject($currTime)
@@ -129,8 +140,8 @@ class kBeacon
 		$indexObject = array();
 		
 		//Set Action Name and Index Name and calculated docuemtn id
-		$indexObject[self::FIELD_ACTION] = self::FIELD_ACTION_VALUE;
-		$indexObject[self::FIELD_INDEX] = self::FIELD_INDEX_VALUE;
+		$indexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_ACTION_VALUE;
+		$indexObject[self::ELASTIC_INDEX_KEY] = self::ELASTIC_INDEX_VALUE;
 		
 		//Set values provided in input
 		$indexObject[self::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectType;

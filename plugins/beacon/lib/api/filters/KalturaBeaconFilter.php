@@ -24,26 +24,30 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
     {
 		$searchObject = $this->createSearchObject();
 		$orderObject = $this->getOrderByObject();
-		return $this->search($searchObject, $orderObject, kBeacon::FIELD_TYPE_VALUE_STATS, $pager);
+		$searchQuery = $this->buildSearchQuery(kBeacon::ELASTIC_INDEX_VALUE, kBeacon::ELASTIC_INDEX_TYPE_STATS, $searchObject, $orderObject, $pager->pageSize, $pager->calcOffset());
+		return $this->search($searchQuery);
     }
 
     public function enhanceSearch(KalturaFilterPager $pager)
     {
-		$queryParams = $this->createSearchObject();
-		return $this->search($queryParams, kBeacon::FIELD_TYPE_VALUE_LOG, $pager);
+		$searchObject = $this->createSearchObject();
+		$orderObject = $this->getOrderByObject();
+		$searchQuery = $this->buildSearchQuery(kBeacon::ELASTIC_INDEX_VALUE, kBeacon::ELASTIC_INDEX_TYPE_LOG, $searchObject, $orderObject, $pager->pageSize, $pager->calcOffset());
+		return $this->search($searchQuery);
     }
     
-    private function search($searchObject, $orderObject,  $indexType, KalturaFilterPager $pager)
+	private function search($searchQuery)
 	{
-		$elasticClient = new BeaconElasticClient();
-		$responseArray = $elasticClient->search(kBeacon::FIELD_INDEX_VALUE, $indexType, $searchObject, $orderObject, $pager->pageSize, $pager->calcOffset());
+		$elasticClient = new elasticClient(kBeacon::HOST, kBeacon::PORT);
+		$responseArray = $elasticClient->search($searchQuery);
+		$responseArray = $this->getHitsFromElasticResponse($responseArray);
 		
 		$response = new KalturaBeaconListResponse();
 		$response->objects = KalturaBeaconArray::fromDbArray($responseArray);
-        return $response;
+		return $response;
 	}
 
-    protected function createSearchObject()
+    private function createSearchObject()
     {
 		$searchObject = array();
 		$searchObject[kBeacon::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectTypeEqual;
@@ -62,7 +66,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		return $searchObject;
     }
     
-    public function getOrderByObject()
+	private function getOrderByObject()
 	{
 		if(!$this->orderBy)
 			return null;
@@ -81,5 +85,63 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		
 		return $orderObject;
 	}
-
+	
+	private function getHitsFromElasticResponse($elasticResponse)
+	{
+		$ret = array();
+		
+		if(!isset($elasticResponse['hits']))
+			return $ret;
+		
+		if(!isset($elasticResponse['hits']['hits']))
+			return $ret;
+		
+		foreach($elasticResponse['hits']['hits'] as $hit)
+		{
+			$ret[]=$hit['_source'];
+		}
+		
+		return $ret;
+	}
+	
+	private function buildSearchQuery($indexName, $indexType, $searchObject, $orderObject = array(), $pageSize ,$pageIndex)
+	{
+		$query = array ();
+		foreach($searchObject as $key => $value)
+		{
+			if(!$value)
+				continue;
+			
+			$match = array($key => $value);
+			$query[] = array( 'match'=> $match );
+		}
+		
+		$sort = array();
+		foreach ($orderObject as $field_name => $ascending)
+		{
+			if($ascending)
+				$sort[$field_name] = array('order' => 'asc');
+			else
+				$sort[$field_name] = array('order' => 'desc');
+		}
+		
+		$params = array();
+		$params['index'] = $indexName;
+		$params['type'] = $indexType;
+		
+		$params['body'] = array();
+		$params['body']['size'] = $pageSize;
+		$params['body']['from'] = $pageIndex;
+		
+		$params['body']['query'] = array();
+		$params['body']['query']['bool'] = array();
+		$params['body']['query']['bool']['must'] = $query;
+		
+		if(count($sort))
+		{
+			$params['body']['sort'] = $sort;
+		}
+		
+		return $params;
+	}
 }

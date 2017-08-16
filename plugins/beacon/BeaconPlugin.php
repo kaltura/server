@@ -42,7 +42,8 @@ class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
  	*/
 	public static function dependsOn()
 	{
-		$dependency = new KalturaDependency(RabbitMQPlugin::getPluginName());
-		return array($dependency);
+		$rabbitMqDependency = new KalturaDependency(RabbitMQPlugin::getPluginName());
+		$elasticSearchDependency = new KalturaDependency(ElasticSearchPlugin::getPluginName());
+		return array($rabbitMqDependency, $elasticSearchDependency);
 	}
 }
