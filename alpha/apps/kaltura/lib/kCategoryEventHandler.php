@@ -154,7 +154,10 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		
 		foreach ($aggregationCategories as $categoryIdToAdd)
 		{
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$aggregationCategory = categoryPeer::retrieveByPK($categoryIdToAdd);
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			
 			if (!$aggregationCategory)
 				continue;
 			
