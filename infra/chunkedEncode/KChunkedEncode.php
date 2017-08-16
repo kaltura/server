@@ -14,8 +14,7 @@
 		public $params = null;			// Additional encoding parameters, evaluated from the cmd-line
 		public $setup = null;
 		
-		public $chunkDataArr = array();	// Chunk design, processing and resultant data
-		public $chunkDataIdx = 0;		// ...
+		protected $chunkDataArr = array();	// Chunk design, processing and resultant data
 
 		public $sourceFileDt = null;	// Source file mediaInfo
 		public $mergedFileDt = null;	// Generated file mediaInfo
@@ -169,14 +168,14 @@
 				 * Generate the pre-planned chunk params (start, frames, ...)
 				 */
 			$start = $this->setup->startFrom;
-			$this->chunkDataIdx=round($start/$this->setup->chunkDuration);
+//			$this->chunkDataIdx=round($start/$this->setup->chunkDuration);
 			$finish = $this->setup->startFrom+$params->duration;
 			$duration = $this->setup->chunkDuration+$this->calcChunkDrift();
-			$idx = $this->chunkDataIdx;
+			$idx = 0;
 
 			while($finish>$start) {
-				$chunkData = new KChunkData($start, $duration);
-				if($idx>$this->chunkDataIdx) {
+				$chunkData = new KChunkData($idx, $start, $duration);
+				if($idx>0) {
 					$this->chunkDataArr[$idx-1]->calcGapToNext($chunkData, $params->frameDuration);
 				}
 				$this->chunkDataArr[$idx++] = $chunkData;
@@ -203,34 +202,28 @@
 				$this->refFileDt = $this->getMediaData($this->setup->ref);
 			}
 
-KalturaLog::log("cmdLine:$this->cmdLine");
-   ;
+			KalturaLog::log("cmdLine:$this->cmdLine");
 			return true;
 		}
 		
 		/********************
 		 *
 		 */
-		public function GetNext()
+		public function GetChunk($idx)
 		{
-			$setup = $this->setup;
-			$chunkIdx = $this->chunkDataIdx++;
-			if($chunkIdx>=count($this->chunkDataArr)) {
-				KalturaLog::log("Finish!!!");
+			if($idx>count($this->chunkDataArr)-1) {
+				KalturaLog::log("Bad index ($idx), max allowed".(count($this->chunkDataArr)-1)."!!!");
 				return null;
 			}
-			$finish = $setup->startFrom+$this->params->duration;
-			$start = $this->chunkDataArr[$chunkIdx]->start;
-			KalturaLog::log(" chunk($chunkIdx), start($start), finish($finish)");
-			return array($start,$chunkIdx);
+			return $this->chunkDataArr[$idx];
 		}
 		
 		/********************
-		 * Returns count of yet-to-be-processed chunks
+		 *
 		 */
-		public function PendingChunksCount()
+		public function GetMaxChunks()
 		{
-			return (count($this->chunkDataArr)-$this->chunkDataIdx);
+			return count($this->chunkDataArr);
 		}
 		
 		/********************
@@ -371,7 +364,6 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 			KalturaLog::log("start($start), chunkIdx($chunkIdx), chunkFilename($chunkFilename) :".date("Y-m-d H:i:s"));
 			$setup = $this->setup;
 			$chunkWithOverlap = $setup->chunkDuration + $setup->chunkOverlap;
-//			$cmdLine = "time $setup->ffmpegBin ".self::adjustCmdLine($this->cmdLine, $this->setup, $start, $chunkWithOverlap);
 			
 			{
 				$cmdLine = $this->cmdLine." -t $chunkWithOverlap";
@@ -492,7 +484,7 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 		}
 
 		/********************
-		 * rv  - PID, 0(dry), -1(error), null(no audio)
+		 * rv  - null(no audio)
 		 */
 		public function BuildAudioCommandLine()
 		{
@@ -622,12 +614,9 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 		 * updateChunkFileStatData
 		 *	Retrieve chunk stat data and update the chunks data array
 		 */
-		public function updateChunkFileStatData($idx)
+		public function updateChunkFileStatData($idx, $stat)
 		{
-			$chunkFileName = $this->getChunkName($idx);
-			$stat = new KChunkFramesStat($chunkFileName, $this->setup->ffprobeBin, $this->setup->ffmpegBin);
 			$this->chunkDataArr[$idx]->stat = $stat;
-			return $stat;
 		}
 		
 		/********************
@@ -967,6 +956,7 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 	 * Preset and processing chunk data
 	 */
 	class KChunkData {
+		public $index = 0;
 		public $start = 0;		// Chunks start timing
 		public $duration = 0;	// Chunk duration
 		public $frames = 0;		// Frame count
@@ -979,7 +969,8 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 		/********************
 		 * 
 		 */
-		public function __construct($start=null, $finish=null, $frames=null, $gap=null) {
+		public function __construct($index=null, $start=null, $finish=null, $frames=null, $gap=null) {
+			$this->index = $index;
 			$this->start = $start;
 			$this->duration = $finish;
 			$this->frames = $frames;
