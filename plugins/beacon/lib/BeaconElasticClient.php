@@ -16,34 +16,34 @@ class BeaconElasticClient
 		$query = array ();
 		foreach($searchObject as $key => $value)
 		{
-			if(!empty($value))
-			{
-				$query[] = array('match'=>[$key=>$value]);
-			}
+			if(!$value)
+				continue;
+			
+			$match = array($key => $value);
+			$query[] = array( 'match'=> $match );
 		}
 		
 		$sort = array();
-		foreach ($orderObject as $field_name => $ascending) {
+		foreach ($orderObject as $field_name => $ascending) 
+		{
 			if($ascending)
 				$sort[$field_name] = array('order' => 'asc');
 			else
 				$sort[$field_name] = array('order' => 'desc');
 		}
 		
-		$params =   [
-			'index' => $indexName,
-			'type' => $indexType,
-			'body' => [
-				'size' => $pageSize ,
-				'from' => $pageIndex,
-				'query' => [
-					'bool'=> [
-						'must' => $query
-					]
-				]
-			]
-		];
+		$params = array();
+		$params['index'] = $indexName;
+		$params['type'] = $indexType;
 		
+		$params['body'] = array();
+		$params['body']['size'] = $pageSize;
+		$params['body']['from'] = $pageIndex;
+		
+		$params['body']['query'] = array();
+		$params['body']['query']['bool'] = array();
+		$params['body']['query']['bool']['must'] = $query;
+
 		if(count($sort))
 		{
 			$params['body']['sort'] = $sort;
