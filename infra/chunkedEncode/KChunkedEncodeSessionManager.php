@@ -5,1057 +5,518 @@
  */
 //ini_set("memory_limit","2048M");
 
-	/********************
-	 * Session exit statuses
+	/****************************
+	 * KChunkedEncodeJobData
 	 */
-	class KChunkedEncodeReturnStatus {
-		const OK = 0;
-		const InitializeError = 1000;
-		const GenerateVideoError = 1001;
-		const GenerateAudioError = 1002;
-		const FixDriftError = 1003;
-		const AnalyzeError = 1004;
-		const MergeError = 1005;
-		const MergeAttemptsError = 1006;
-		const MergeThreshError = 1007;
-	}
-	
-	/********************
-	 * Chunked Encoding Session Manager module
-	 */
-	class KChunkedEncodeSessionManager {
+	class KChunkedEncodeJobData
+	{
+		const STATE_PENDING = 0;
+		const STATE_RUNNING = 1;
+		const STATE_SUCCESS = 2;
+		const STATE_FAIL = -1;
+		const STATE_RETRY = -2;
 		
-		public $chunker = null;
+		public $session = null;
+		public $keyIdx = 0;			// memcache ogject id (1..N)
 		
-		public $chunkExecutionDataArr = array();
-		public $processArr = array();	// Chunk process ids array
-		public $audioProcess = null;	// Audio porcess id
+		public $id = null;			// chunk id (0..N)
+		public $cmdLine = null;
+		public $state = self::STATE_PENDING;
 
-		public $returnStatus = null;	// KChunkedEncodeReturnStatus
-		public $returnMessages = array();
-		
-		public $startedAt = null;
-		public $funishedAt = null;
-		
-		public $dry = 0;				// 'Dry'/test runs - 0:'wet' run, 1:skip vid/aud encoding,just concat&merge, 2:same as 1, but regenerate stats
+		public $sessionTime = 0;	// Session creation time (secs), batch asset start time
+		public $createTime = 0;		// Chunk job creation time (secs), by batch srv
+		public $queueTime = 0;		// Retrived from the queue time (secs), by scheduler
+		public $startTime = 0;		// Excution start/finish times (secs), by final exection party
+		public $finishTime = 0;
 
-		/********************
+		public $process = 0;		// Linux process id
+		
+		/* ---------------------------
 		 *
 		 */
-		public function __construct(KChunkedEncodeSetup $setup)
+		public function __construct($session=null, $id=null, $cmdLine=null, $sessionTime=0)
 		{
-			$this->chunker = new KChunkedEncode($setup);
-			KalturaLog::log(date("Y-m-d H:i:s"));
-			KalturaLog::log("sessionData:".print_r($this,1));
-		}
-		
-		/********************
-		 *
-		 */
-		public static function LoadFromCmdLineArgs(array $argv)
-		{
-			$setup = new KChunkedEncodeSetup();
-			self::parseArgsToSetup($argv,$setup);
-
-				/*
-				 * Otherwise - start Chunked Encode session
-				 */
-			$sessionManager = new KChunkedEncodeSessionManager($setup);
-			if(isset($setup->dry)){
-				$sessionManager->dry = $setup->dry;
-				unset($setup->dry);
-			}
-			return $sessionManager;
-		}
-		
-		/********************
-		 * 
-		 */
-		public static function LoadFromSessionFile($sessionFilename)
-		{
-			if(file_exists($sessionFilename)!=true){
-				return null;
-			}
-			$sessionData =  unserialize(file_get_contents($sessionFilename));
-			KalturaLog::log("sessionData:".print_r($sessionData,1));
-			$setup = new KChunkedEncodeSetup();
-			$sessionManager = new KChunkedEncodeSessionManager($setup);
-			$fldsArr = get_object_vars($sessionData);
-			foreach($fldsArr as $fld=>$val){
-				$sessionManager->$fld = $val;
-			}
-			return $sessionManager;
-		}
-		
-		/********************
-		 * Initialize the chunked encode session
-		 */
-		public function Initialize()
-		{
-			$this->startedAt = date_create();
+			$this->session = $session;
 			
-			$mergedFilenameSession = $this->chunker->getSessionName("session");
-			if((isset($this->chunker->setup->restore) && $this->chunker->setup->restore==1) 
-			&& file_exists($mergedFilenameSession)==true){
-				$sessionData =  unserialize(file_get_contents($mergedFilenameSession));
-				$fldsArr = get_object_vars($sessionData);
-				foreach($fldsArr as $fld=>$val){
-					$this->$fld = $val;
-				}
+			$this->id = $id;
+			$this->cmdLine = $cmdLine;
 
-				KalturaLog::log("sessionData:".print_r($this,1));
-				KalturaLog::log("duration(".$this->chunker->params->duration."), frameDuration(".$this->chunker->params->frameDuration.")\n");
-				return true;
-			}
-
-			$rv = $this->chunker->Initialize();
-			if($rv!=true){
-				$this->SerializeSession();
-				$this->returnStatus = KChunkedEncodeReturnStatus::InitializeError;
-				return $rv;
-			}
-			
-			if(!isset($this->chunker->setup->commandExecitionScript)) {
-				$this->chunker->setup->commandExecitionScript = $this->chunker->setup->output."execitionScript.sh";
-				file_put_contents($this->chunker->setup->commandExecitionScript, 'echo $@'."\n".'echo $1'."\n".'eval "$1"'."\n"."echo exit_code:".'$?');
-				chmod($this->chunker->setup->commandExecitionScript,0755);
-				sleep(2);
-			}
-			$this->SerializeSession();
-			return $rv;
+			$this->sessionTime = $sessionTime;
+			$this->createTime = time();
 		}
 		
-		/********************
+		/* ---------------------------
 		 *
 		 */
-		public function Generate()
+		public function isFinished()
 		{
-			if($this->GenerateAudioStart()!=true){
-				return false;
-			}
-			
-			if($this->GenerateVideo()!=true){
-				return false;
-			}
-
-			if($this->GenerateAudioFinish()!=true){
-				return false;
-			}
-
-			if($this->Analyze()!=true){
-				return false;
-			}
-			
-			if($this->Merge()!=true){
-				return false;
-			}
-			
-			if(isset($this->chunker->setup->cleanUp) && $this->chunker->setup->cleanUp){
-				$this->CleanUp();
-			}
-			
-			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
-			
-			return true;
-		}
-		
-		/********************
-		 *
-		 */
-		public function GenerateVideo()
-		{
-			while(1)	{
-				if($this->chunker->PendingChunksCount()==0) {
-					break;
-				}
-				if($this->GenerateVideoChunk()!=true) {
-					return false;
-				}
-			}
-			$rv = $this->GenerateVideoFinish();
-			if($rv!=true) 
-				return $rv;
-			$this->SerializeSession();
-			return true;
-		}
-		
-		/********************
-		 * Analyze and fix chunks
-		 */
-		public function Analyze()
-		{
-			$setup = $this->chunker->setup;
-
-			$toFixCnt = $this->chunker->CheckChunksContinuity();
-			if($toFixCnt==0) 
-				return true;
-				
-			$processArr = array();
-			foreach($this->chunker->chunkDataArr as $badChunkIdx=>$chunkData){
-				if(!isset($chunkData->toFix) || $chunkData->toFix==0)
-					continue;
-
-				$chunkFixName = $this->chunker->getChunkName($badChunkIdx, "fix");
-				$cmdLine = $this->chunker->BuildFixVideoCommandLine($badChunkIdx);
-				$process = self::executeCmdline($cmdLine, 0, "$chunkFixName.log", $setup->commandExecitionScript);
-				if($process==false){
-					KalturaLog::log($msgStr="Chunk ($chunkFixName) fix FAILED !");
-					$this->returnMessages[] = $msgStr;
-					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
-					return false;
-				}
-				$processArr[$badChunkIdx] = $process;
-
-			}
-			KalturaLog::log("waiting ...");
-			foreach($processArr as $idx=>$process) {
-				self::waitForCompletion($process);
-				$chunkFixName = $this->chunker->getChunkName($idx, "fix");
-				$execData = new KProcessExecutionData($process, $chunkFixName.".log");
-				if($execData->exitCode!=0) {
-					KalturaLog::log($msgStr="Chunk ($idx) fix FAILED, exitCode($execData->exitCode)!");
-					$this->returnMessages[] = $msgStr;
-					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		/********************
-		 *
-		 */
-		public function GenerateVideoChunk() 
-		{
-			list($start,$chunkIdx) = $this->GetNext();
-			if(!isset($start))
-				return true;
-				
-			KalturaLog::log("chunk $chunkIdx:".date("Y-m-d H:i:s"));
-			$rv = $this->startVideoChunkConvert($start, $chunkIdx);
-			if($rv==false) {
-				KalturaLog::log($msgStr="Failed to convert chunk $chunkIdx!");
-				$this->returnMessages[] = $msgStr;
-				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
-				return false;
-			}
-
-			$rv = $this->waitForChunksCompletion();
-			if($rv==false){
-				KalturaLog::log($msgStr="Failed to convert chunks 1(".serialize($this->processArr).")!");
-				$this->returnMessages[] = $msgStr;
-				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
-				return false;
-			}
-			$this->SerializeSession();
-
-			return true;
-		}
-
-		/********************
-		 *
-		 */
-		public function GenerateVideoFinish() 
-		{
-			KalturaLog::log("Inside");
-			if(count($this->processArr)!=0) {
-				$rv = $this->waitForChunksCompletion();
-				if($rv==false){
-					KalturaLog::log($msgStr="Failed to convert chunks 2(".serialize($this->processArr).")!");
-					$this->returnMessages[] = $msgStr;
-					$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
-					return false;
-				}
-			}
-			$this->getChunkArrFileStatData(0);
-			
-			$this->SerializeSession();
-			
-			return true;
-
-		}
-		
-		/********************
-		 *
-		 */
-		public function GenerateAudioStart() 
-		{
-			/*
-			 * Generate audio stream
-			 */
-			if(isset($this->audioProcess)) {
-				$mergedFilenameAudio = $this->chunker->getSessionName("audio");
-				if($this->audioProcess!=0 && file_exists("$mergedFilenameAudio.rv")) {
-					$rv = file_get_contents("$mergedFilenameAudio.rv");
-				}
-			}
-			else
-				$rv = 1;
-			if($rv) {
-				$this->audioProcess = $this->generateAudioStream();
-				if($this->audioProcess==false) {
-					KalturaLog::log($msgStr="Audio convert: FAILED!");
-					$this->returnMessages[] = $msgStr;
-					$this->returnStatus = KChunkedEncodeReturnStatus::GenerateAudioError;
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		/********************
-		 *
-		 */
-		public function GenerateAudioFinish() 
-		{
-			if(!(isset($this->audioProcess) && $this->audioProcess!=0))
-				return true;
-
-			KalturaLog::log("Audio convert: waiting ...");
-			$mergedFilenameAudio = $this->chunker->getSessionName("audio");
-			self::waitForCompletion($this->audioProcess);
-			$execData = new KProcessExecutionData($this->audioProcess, $mergedFilenameAudio.".log");
-			if($execData->exitCode!=0) {
-				KalturaLog::log($msgStr="Audio convert: FAILED, exitCode($execData->exitCode)!");
-				$this->returnMessages[] = $msgStr;
-				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateAudioError;
-				return false;
-			}
-			$this->audioProcess = 0;
-			KalturaLog::log("Audio convert: OK!");
-			
-			$this->SerializeSession();
-			
-			return true;
-		}
-		
-		/********************
-		 *
-		 */
-		public function Merge()
-		{
-			$setup = $this->chunker->setup;
-
-			$concatFilenameLog = $this->chunker->getSessionName("concat");
-
-			$mergeCmd = $this->chunker->BuildMergeCommandLine();
-
-			if($this->dry<4) {
-				$maxAttempts = 3;
-				for($attempt=0; $attempt<$maxAttempts; $attempt++) {
-
-					$process = self::executeCmdline($mergeCmd, 0, $concatFilenameLog, $setup->commandExecitionScript);
-					if($process==false) {
-						KalturaLog::log("FAILED to merge (attempt:$attempt)!");
-						sleep(5);
-						continue;
-					}
-					KalturaLog::log("waiting ...");
-					self::waitForCompletion($process);
-					$execData = new KProcessExecutionData($process, $concatFilenameLog);
-					if($execData->exitCode!=0) {
-						KalturaLog::log("FAILED to merge (attempt:$attempt, exitCode:$execData->exitCode)!");
-						sleep(5);
-						continue;
-					}
-					break;
-				}
-				if($attempt==$maxAttempts){
-					KalturaLog::log($msgStr="FAILED to merge, leaving!");
-					$this->returnMessages[] = $msgStr;
-					$this->returnStatus = KChunkedEncodeReturnStatus::MergeAttemptsError;
-					return false;
-				}
-			}
-			if($this->chunker->ValidateMergedFile($msgStr)!=true){
-				$this->returnMessages[] = $msgStr;
-				$this->returnStatus = KChunkedEncodeReturnStatus::MergeThreshError;
-				return false;
-			}
-			return true;
-		}
-		
-		/********************
-		 *
-		 */
-		public function CleanUp()
-		{
-			$setup = $this->chunker->setup;
-			foreach($this->chunker->chunkDataArr as $idx=>$chunkData){
-				$chunkName_wc = $this->chunker->getChunkName($idx,"*");
-				$cmd = "rm -f $chunkName_wc";
-				KalturaLog::log("cleanup cmd:$cmd");
-				$rv = null; $op = null;
-				$output = exec($cmd, $op, $rv);
-			}
-			$mergedFilenameAudio = $this->chunker->getSessionName("audio");
-			$cmd = "rm -f $mergedFilenameAudio* ".$concatFilenameLog = $this->chunker->getSessionName("concat");
-			KalturaLog::log("cleanup cmd:$cmd");
-			$rv = null; $op = null;
-			$output = exec($cmd, $op, $rv);
-			return;
-			$cmd = "rm -f $setup->output*.$this->videoChunkPostfix*";
-			$cmd.= " ".$this->chunker->getSessionName("audio")."*";
-			$cmd.= " ".$this->chunker->getSessionName("session");
-			KalturaLog::log("cleanup cmd:$cmd");
-			$rv = null; $op = null;
-			$output = exec($cmd, $op, $rv);
-		}
-		
-		/********************
-		 *
-		 */
-		public function GetNext()
-		{
-			return $this->chunker->GetNext();
-		}
-		
-		/********************
-		 * Evaluate the ad-hock concurrency level
-		 * - Check whether there are active jobs (linux) that do not belong to the current session,
-		 * - Evaluate how many other sessions are running.
-		 * - Set the next concurrency level to match the max-concurrency and number of running sessions
-		 */
-		protected function evaluateConcurrency()
-		{
-// ps -ef | grep "ffmpeg.*chunkenc" | grep -v 'reference\|sh \|php\|grep\|audio' | '
-// Previous - 
-// ps -ef | grep ffmpeg | grep -v "sh \|grep\|"/web2/content/shared/tmp/qualityTest/TestBench.9/conversions/Dec24/1_snny9faa_400_1_b79i4vhn_29.97fps | grep chunkenc | awk 'NF>1{print $NF}'
-			$setup = $this->chunker->setup;
-
-				/*
-				 * Filter in - ffmpeg & chunkenc
-				 */
-			$cmdLine = "ps -ef | grep \"$setup->ffmpegBin.*".$this->chunker->chunkEncodeToken."\"";
-				/*
-				 * Filter out - reference & sh & php & grep & audio & current-session-name
-				 */
-			$cmdLine.= "| grep -v 'reference\|sh \|php\|grep\|audio\|time'";
-
-			$lastLine=exec($cmdLine , $outputArr, $rv);
-			if($rv!=0) {
-				KalturaLog::log("No other chunk sessions (rv:$rv).");
-			}
-			$chunkedSesssionsArr = array();
-			$fallbackSesssionsArr = array();
-			$thisChunks = 0;
-			foreach($outputArr as $idx=>$line) {
-				$line = trim($line);
-				if(strlen($line)==0)
-					continue;
-				$lineArr = explode(' ', $line);
-				if(count($lineArr)==0)
-					continue;
-				
-				/*
-				 * Retrieve the ouput filename from the ffmpeg cmd-line 
-				 */
-				if(($key=array_search('-pass', $lineArr))!==false && $lineArr[$key+1]==1) {
-					if(($key=array_search('-passlogfile', $lineArr))!==false) {
-						$outputFileName = basename($lineArr[$key+1]);
-					}
-				}
-				else
-					$outputFileName = basename(end($lineArr));
-				
-				/*
-				 * Skip cases/cmd-lines that does not contain the 'chunkEncodeToken'
-				 * Only cmd-lines with this token participate in chunked encode flow
-				 */
-				if(($sessionName=strstr($outputFileName,"_".$this->chunker->chunkEncodeToken, true))===false)
-					continue;
-				
-				/*
-				 * Gather into separete arrays - 
-				 * - 'normal' chunked encodes (chunkedSesssionsArr)
-				 * - the 'fallback' cases (fallbackSesssionsArr)
-				 * - Sum up jobs that belong to that specific session (this) 
-				 */
-				if(strstr($outputFileName,"_fallback")===false){
-					if(key_exists($sessionName,$chunkedSesssionsArr))
-						$chunkedSesssionsArr[$sessionName] = $chunkedSesssionsArr[$sessionName]+1;
-					else 
-						$chunkedSesssionsArr[$sessionName] = 1;
-					if(strstr($setup->output,$sessionName)!==false)
-						$thisChunks++;
-				}
-				else {
-					if(key_exists($sessionName,$fallbackSesssionsArr))
-						$fallbackSesssionsArr[$sessionName] = $fallbackSesssionsArr[$sessionName]+1;
-					else 
-						$fallbackSesssionsArr[$sessionName] = 1;
-				}
-			}
-			
-				/*
-				 * Sum up 
-				 * - all currently processing chunks
-				 * - all currenly processed sessions
-				 * - all fallback sessions
-				 */
-			$allChunks = array_sum($chunkedSesssionsArr);
-			$chunkedSesssionsCnt = count($chunkedSesssionsArr);
-			if($thisChunks==0)
-				$chunkedSesssionsCnt+= 1;
-			$fallbackSesssionsCnt = count($fallbackSesssionsArr);
-			
-				/*
-				 * Concurrency evaluation rules - 
-				 * - Every active session should ALWAYS run at least ONE chunk
-				 * - All sessions should get the same concurrency level (number of concurrently running chunks)
-				 * -- An exception to the above are fallback sessions (they are not chunked)
-				 * Therefore the calculation is bellow - 
-				 */
-			$newConcurrency = round(($setup->concurrent-$fallbackSesssionsCnt)/$chunkedSesssionsCnt);
-				/*
-				 * If for some reason the total sum of all concurrently executed chunks 
-				 * is going to be higher than the allowed limit (setup::concurrent) => trim it to the limit val
-				 */
-			if($setup->concurrent<($allChunks-$thisChunks)+$newConcurrency)
-				$newConcurrency = $setup->concurrent - ($allChunks-$thisChunks);
-				/*
-				 * If on the other hand there are remaining free execution slots - 
-				 * randomly assign it to th ecurrent session
-				 */
-			else if($setup->concurrent>($allChunks-$thisChunks)+$newConcurrency) {
-				$additional = rand(1,$chunkedSesssionsCnt);
-				if($additional==1){
-					$newConcurrency++;
-				}
-			}
-			if($newConcurrency<$setup->concurrentMin)
-				$newConcurrency = $setup->concurrentMin;
-			$msgStr = "maxConcurrent($newConcurrency),sessions($chunkedSesssionsCnt),chunks($allChunks),this($thisChunks),fallbacks($fallbackSesssionsCnt),".serialize($chunkedSesssionsArr);
-			if(isset($additional))
-				$msgStr.=",added";
-			KalturaLog::log($msgStr);
-			return $newConcurrency;
-		}
-
-		/********************
-		 * 
-		 */
-		public function ExecuteFallback($cmdLine, &$returnVar)
-		{
-			$outputName = $this->chunker->params->output;
-			$tmpOutputName = $outputName."_".$this->chunker->chunkEncodeToken."_fallback";
-			$cmdLineAdjusted = str_replace ($outputName, $tmpOutputName, $cmdLine);
-			KalturaLog::log("Cannot run chunked, fallback to normal - cmdLine($cmdLineAdjusted)");
-
-			$output = system($cmdLineAdjusted, $returnVar);
-			if(file_exists($tmpOutputName)) {
-				copy($tmpOutputName, $outputName);
-			}
-			return $output;
-		}
-		
-		/********************
-		 * rv - bool
-		 */
-		protected function waitForChunksCompletion($sleepTime=2)
-		{
-			if($this->dry>0)
-				return true;
-			$runningArr = array();
-			$processCnt = 0;
-
-			$runningArr = $this->getRunningArray($processCnt);
-
-			$this->processArr = $runningArr;
-			$runningCnt = count($runningArr);
-			while(1) {
-				if($processCnt<count($this->chunker->chunkDataArr)) {
-					$concurrent = $this->evaluateConcurrency();
-					if($runningCnt<$concurrent) {
-						KalturaLog::log("Available(".($concurrent-$runningCnt).") processing slots (runningCnt:$runningCnt, maxConcurrent:$concurrent)");
-						break;
-					}
-				}
-				if($this->monitorFinished($runningArr)!=true){
-					return false;
-				}
-
-				$runningCnt = count($runningArr);
-					// If none of the processes got finished and there are still running process - sleep for a while ...
-					// otherwise - get out to run a new chunk;
-				if($runningCnt==0) {
-					KalturaLog::log("Finished - No running processes!!");
-					break;
-				}
-				KalturaLog::log("Running($runningCnt=>".implode(',',$runningArr)."),Pending(".$this->chunker->PendingChunksCount().")");
-				if($this->getChunkArrFileStatData()==0)
-					sleep($sleepTime);
-			}
-			KalturaLog::log("Running($runningCnt=>".implode(',',$runningArr)."),Pending(".$this->chunker->PendingChunksCount().")");
-			$this->processArr = $runningArr;
-			return true;
-		}
-
-		/********************
-		 *
-		 */
-		public static function waitForCompletion($process, $sleepTime=2)
-		{
-			KalturaLog::log("process($process), sleepTime($sleepTime)");
-			while(1) {
-				if($process=="Dry_Mode") {
-					break;
-				}
-				if(self::isProcessRunning($process)==false){
-					break;
-				}
-				sleep($sleepTime);
-			}
-			KalturaLog::log("process($process)==>finished");
-		}
-
-		/********************
-		 *
-		 */
-		protected function monitorFinished(&$runningArr)
-		{
-			foreach($runningArr as $idx=>$process) {
-				if(self::isProcessRunning($process)==true){
-					continue;
-				}
-				
-				$executionData = $this->chunkExecutionDataArr[$idx];
-				if($process=="Dry_Mode") {
-					$executionData->exitCode =  0;
-				}
-				else {
-					$logFileName = $this->chunker->getChunkName($idx,".log");
-					$executionData->parseLogFile($logFileName);
-					KalturaLog::log(print_r($executionData,1));
-				}
-				unset($runningArr[$idx]);
-				if($executionData->exitCode!=0) {
-					KalturaLog::log("Failed to convert chunk($idx),process($process)==>exitCode($executionData->exitCode)!");
-					$this->processArr = $runningArr;
-					return false;
-				}
-				KalturaLog::log("chunk($idx),process($process)==>exitCode($executionData->exitCode)");
-				break;
-			}
-			return true;
-		}
-
-		/********************
-		 *
-		 */
-		protected static function isProcessRunning($process)
-		{
-			if(file_exists( "/proc/$process" )){
+			if($this->state==self::STATE_SUCCESS || $this->state==self::STATE_FAIL) {
 				return true;
 			}
 			return false;
 		}
 		
-		/********************
+		/* ---------------------------
 		 *
 		 */
-		protected static function executeCmdline($cmdLine, $dry, $logFile, $executionScript=null)
+		public function isRetry()
 		{
-
-			if($dry>0) {
-				KalturaLog::log("cmdLine:\n$cmdLine\n");
-				return "Dry_Mode";
+			if($this->state==self::STATE_RETRY) {
+				return true;
 			}
-			
-//			$cmdLine = "$executionScript \"time $cmdLine\" -rvFile $rvFile >> $logFile 2>&1 & echo $!";
-//			$cmdLine = "$executionScript \"time ./ffmpeg_wrapper.sh $cmdLine\" -rvFile $rvFile >> $logFile 2>&1 & echo $!";q
-//			$cmdLine = "nohup ./ffmpeg_wrapper.sh time $cmdLine >> $logFile 2>&1 & echo $! ";
-			$cmdLine = str_replace("&& ", "&& time ", $cmdLine);
-			$cmdLine = "$executionScript \"time $cmdLine \" >> $logFile 2>&1 & echo $! ";
-			$started = date_create();
-			file_put_contents($logFile, "Started:".$started->format('Y-m-d H:i:s')."\n");
-			KalturaLog::log("cmdLine:\n$cmdLine\n");
+			return false;
+		}
+	}
+	/*****************************
+	 * End of KChunkedEncodeJobData
+	 *****************************/
+	
+	/****************************
+	 * KChunkedEncodeJobsContainer
+	 */
+	class KChunkedEncodeJobsContainer {
+		public $jobs = array();
+		public $failed = array();
+		public $states = array();
 
-			$rv = 0;
-			$op = null;
-			exec($cmdLine,$op,$rv);
-			if($rv!=0) {
-				return false;
+		/* ---------------------------
+		 *
+		 */
+		public function sumJobsStates()
+		{
+			$states = array(KChunkedEncodeJobData::STATE_PENDING=>0,
+							KChunkedEncodeJobData::STATE_RUNNING=>0,
+							KChunkedEncodeJobData::STATE_SUCCESS=>0,
+							KChunkedEncodeJobData::STATE_FAIL=>0,
+							KChunkedEncodeJobData::STATE_RETRY=>0);
+			foreach($this->jobs as $job){
+				$states[$job->state] = $states[$job->state]+1;
+				if($job->state==KChunkedEncodeJobData::STATE_FAIL) {
+					if(!array_key_exists($job->id, $this->failed)){
+						$this->failed[$job->id] = $job->keyIdx;
+					}
+				}
 			}
-			$pid = implode("\n",$op);
-			KalturaLog::log("pid($pid), rv($rv)");
-			return $pid;
+			$this->states = $states;
 		}
 
-		/********************
-		 * rv  - PID, 0(dry), -1(error)
+		/* ---------------------------
+		 * Fetch
 		 */
-		protected function startVideoChunkConvert($start, $chunkIdx)
+		public function Fetch($manager)
 		{
-			$chunkFilename = $this->chunker->getChunkName($chunkIdx,"base");
-			KalturaLog::log("start($start), chunkIdx($chunkIdx), chunkFilename($chunkFilename) :".date("Y-m-d H:i:s"));
 
-			$cmdLine = $this->chunker->BuildVideoCommandLine($start, $chunkIdx);
+			foreach($this->jobs as $idx=>$job) {
+				if(!isset($job))
+					continue;
+				$job = $manager->FetchJob($job->keyIdx);
+				if($job===false)
+					return false;
 
-			$process = self::executeCmdline($cmdLine, $this->dry, "$chunkFilename.log", $this->chunker->setup->commandExecitionScript);
-			$execData = new KProcessExecutionData($process);
-			$this->chunkExecutionDataArr[$chunkIdx] = $execData;
-			if($process==false) {
-				KalturaLog::log("Failed to convert chunk $chunkIdx!");
-				return false;
+				$this->jobs[$job->id] = $job;
 			}
+			return true;
+		}
+	}
+	/*****************************
+	 * End of KChunkedEncodeJobsContainer
+	 *****************************/
 
-			$this->processArr[$chunkIdx] = $process;
+	 /****************************
+	 * KChunkedEncodeSessionManager
+	 */
+	class KChunkedEncodeSessionManager extends KBaseChunkedEncodeSessionManager 
+	{
+			/*
+			 * Video/Audio chunk jobs, indexed with chunk id
+			 */
+		protected $videoJobs = null;	
+		protected $audioJobs = null;
+		
+		protected $storeManager = null;
+
+		/* ---------------------------
+		 * C'tor
+		 */
+		public function __construct(KChunkedEncodeSetup $setup, $storeManager, $name=null)
+		{
+			parent::__construct($setup, $name);
+			if(!isset($this->chunker->setup->concurrent))
+				$this->chunker->setup->concurrent = 20;
+			
+			$this->storeManager = $storeManager;
+
+			$this->videoJobs = new KChunkedEncodeJobsContainer();	
+			$this->audioJobs = new KChunkedEncodeJobsContainer();
+		}
+
+		/* ---------------------------
+		 *
+		 */
+		public function getVideoJobs() { return $this->videoJobs->jobs; }
+		public function getAudioJobs() { return $this->audioJobs->jobs; }
+		//public function setVideoJobs($val) { $this->videoJobs->jobs = $val; }
+		
+		/* ---------------------------
+		 *
+		 */
+		public function getName() { return $this->name;}
+		public function setName($val) { $this->name = $val;}
+		
+		/* ---------------------------
+		 *
+		 */
+		public function getMaxConcurrent() { return $this->chunker->setup->concurrent;}
+		public function setMaxConcurrent($val) { $this->chunker->setup->concurrent = $val;}
+		
+		/* ---------------------------
+		 * getJobsStates
+		 */
+		public function getJobsStates(&$videoStats, &$audioStats) { 
+			$videoStats = $this->videoJobs->states;
+			$audioStats = $this->audioJobs->states;
+		}
+
+		/* ---------------------------
+		 * getElapsed
+		 */
+		public function getElapsed() { 
+			return (time()-$this->createTime);
+		}
+
+		/* ---------------------------
+		 * IsFinished
+		 */
+		public function IsFinished()
+		{
+			$videoStats = $this->videoJobs->states;
+			$audioStats = $this->audioJobs->states;
+			$finished = $videoStats[KChunkedEncodeJobData::STATE_SUCCESS] +
+						$videoStats[KChunkedEncodeJobData::STATE_FAIL] +
+						$audioStats[KChunkedEncodeJobData::STATE_SUCCESS] +
+						$audioStats[KChunkedEncodeJobData::STATE_FAIL];
+			return ($finished==(count($this->videoCmdLines)+count($this->audioCmdLines)));
+		}
+		
+		/* ---------------------------
+		 * GenerateContent
+		 */
+		public function GenerateContent()
+		{
+			$this->addAudioJobs();
+			
+			while(1) {
+				$rv=$this->processVideoJobs();
+				if($rv!==null)
+					break;
+				sleep(2);
+			}
+			return $rv;
+		}
+		
+		/* ---------------------------
+		 * Analyze
+		 */
+		public function Analyze()
+		{
+			$chunker = $this->chunker;
+			$videoJobs = $this->getVideoJobs();
+			foreach($videoJobs as $job) {
+				$chunker->updateChunkFileStatData($job->id,$job->stat); 
+				$logFilename = $chunker->getChunkName($job->id,".log");
+				$execData = new KProcessExecutionData($job->process, $logFilename);
+				$execData->startedAt = $job->startTime;
+				$this->chunkExecutionDataArr[$job->id] = $execData;
+			}
+			$toFixCnt = $chunker->CheckChunksContinuity();
+			return $toFixCnt;
+		}
+		
+		/* ---------------------------
+		 * fetch
+		 */
+		protected function fetch()
+		{
+			if($this->videoJobs->Fetch($this->storeManager)===false)
+				return false;
+			if($this->audioJobs->Fetch($this->storeManager)===false)
+				return false;
 			
 			return true;
 		}
 
-		/********************
-		 * rv  - PID, 0(dry), -1(error), null(no audio)
+		/* ---------------------------
+		 * detectErrors
 		 */
-		protected function generateAudioStream()
+		protected function detectErrors()
 		{
-			KalturaLog::log(date("Y-m-d H:i:s"));
-			$cmdLine = $this->chunker->BuildAudioCommandLine();
-			if(!isset($cmdLine))
-				return null;
+			$this->videoJobs->sumJobsStates();
+			$this->audioJobs->sumJobsStates();
 
-			$mergedFilenameAudio = $this->chunker->getSessionName("audio");
-			$createAudioFile = file_exists($mergedFilenameAudio)? $this->dry: 0;
-			$process = self::executeCmdline($cmdLine, $createAudioFile, "$mergedFilenameAudio.log", $this->chunker->setup->commandExecitionScript);
-			KalturaLog::log("pid:".print_r($process,1));
-			return $process;
-		}
-
-		/********************
-		 *
-		 */
-		protected function getChunkArrFileStatData($maxCnt=4)
-		{
-			if($maxCnt==0) $maxCnt = PHP_INT_MAX;
-			$cnt = 0;
-			foreach($this->chunker->chunkDataArr as $idx=>$chunkData){
-				if(key_exists($idx,$this->chunkExecutionDataArr)) {
-					$execData = $this->chunkExecutionDataArr[$idx];
-					if((isset($execData->exitCode) && $execData->exitCode==0 && !isset($chunkData->stat))
-					|| $this->dry==2){
-						$this->updateChunkFileStatData($idx);
-						if(++$cnt>=$maxCnt) break;
+			foreach($this->videoJobs->jobs as $idx=>$job) {
+				if($job->startTime==0 || $job->state==$job::STATE_RETRY|| $job->state==$job::STATE_SUCCESS)
+					continue;
+				$elapsed = time()-$job->startTime;
+				if($elapsed>$this->maxExecutionTime) {
+					if(!array_key_exists($job->id, $this->videoJobs->failed)){
+						$job->state = $job::STATE_RETRY;
+						$this->storeManager->SaveJob($job);
+						$this->videoJobs->failed[$job->id] = $job->keyIdx;
+						KalturaLog::log("Chunk ($job->id) failed on execution timeout ($elapsed sec, maxExecutionTime:$this->maxExecutionTime");
 					}
 				}
 			}
-			return($cnt);
-		}
-		
-		/********************
-		 * updateChunkFileStatData
-		 *	
-		 */
-		protected function updateChunkFileStatData($idx)
-		{
-			$chunkFileName = $this->chunker->getChunkName($idx);
-			$dry = $this->dry;
-			
-			$statFileName = "$chunkFileName.stat";
-			if($dry==1 && file_exists($statFileName)){
-				$jsonStr = file_get_contents($statFileName);
-				$stat = json_decode($jsonStr);
-				return $stat;
-			}
-
-			$stat = $this->chunker->updateChunkFileStatData($idx); 
-			$jsonStr = json_encode($stat);
-			if($dry>0 || !file_exists($statFileName)){
-				file_put_contents($statFileName, $jsonStr);
-			}
-			return $stat;
 		}
 
-		/********************
-		 *
+		/* ---------------------------
+		 * processFailed
 		 */
-		public static function quickFixCmdline($cmdLine)
+		protected function processFailed()
 		{
-			$cmdLineArr = explode(" ",$cmdLine);
-			
-			$toFixArr = array("-force_key_frames","-filter_complex","-rc_eq");
-			foreach($toFixArr as $param){
-				if(($key=array_search($param, $cmdLineArr))!==false){
-					if(strstr($cmdLineArr[$key+1], "'")===false) {
-						$cmdLineArr[$key+1] = "'".$cmdLineArr[$key+1]."'";
+			if(count($this->videoJobs->failed)>$this->maxFailures) {
+				KalturaLog::log("FAILED - too many failures per session (".count($this->videoJobs->failed)
+.", maxFailures:$this->maxFailures)");
+				return false;
+			}
+			if(count($this->videoJobs->failed)>0)
+				KalturaLog::log("Retrying failed chunks(".count($this->videoJobs->failed).")");
+
+			foreach($this->videoJobs->failed as $idx=>$keyIdx){
+				$job = $this->videoJobs->jobs[$idx];
+				if($job->state==$job::STATE_SUCCESS) {
+					unset($this->videoJobs->failed[$idx]);
+					continue;
+				}
+
+				if($this->processFailedJob($job)==false){
+					return false;
+				}
+
+				$this->videoJobs->jobs[$job->id] = $job;
+			}
+
+			if(count($this->audioJobs->jobs)>0) {
+			$job = $this->audioJobs->jobs[0];
+				if($job->state!=$job::STATE_SUCCESS) {
+					if($this->processFailedJob($job)==false){
+						return false;
 					}
+					$this->audioJobs->jobs[$job->id] = $job;
 				}
 			}
-			$cmdLine = implode(" ", $cmdLineArr);
-			return $cmdLine;
+			return true;
 		}
 		
-		/********************
-		 *
+		/* ---------------------------
+		 * processVideoJobs
 		 */
-		protected function getRunningArray(&$processCnt)
+		protected function processVideoJobs()
 		{
-			$runningArr = array();
-			foreach($this->chunkExecutionDataArr as $idx=>$execData) {
-				if(isset($execData->process)){
-					if(!isset($execData->exitCode))
-						$runningArr[$idx] = $execData->process;
-					$processCnt++;
-				}
-			}
-			return $runningArr;
-		}
-		
-		/********************
-		 *
-		 */
-		public function Report()
-		{
-			$this->finishedAt = date_create();
-			$sessionData = $this;
-			$chunker = $this->chunker;
-			KalturaLog::log("sessionData:".print_r($sessionData,1));
-			  // messages for logs
-			$frmCnt = 0;
-			$genChkDur = 0;
+			$this->fetch();
+			$this->detectErrors();
+
+			$videoStats = $this->videoJobs->states;
+			$audioStats = $this->audioJobs->states;
+
+			$pending = $videoStats[KChunkedEncodeJobData::STATE_PENDING]
+					 + $audioStats[KChunkedEncodeJobData::STATE_PENDING];
+			$running = $videoStats[KChunkedEncodeJobData::STATE_RUNNING]
+					 + $audioStats[KChunkedEncodeJobData::STATE_RUNNING];
+			$succeed = $videoStats[KChunkedEncodeJobData::STATE_SUCCESS]
+					 + $audioStats[KChunkedEncodeJobData::STATE_SUCCESS];
+			$failed  = $videoStats[KChunkedEncodeJobData::STATE_FAIL]
+					 + $audioStats[KChunkedEncodeJobData::STATE_FAIL];
+			
+			$concurrent = $pending+$running;
+			$finished   = $succeed+$failed;
+			//count($cmdLineArr)+1 ==> video chunks and audio
+			$left = count($this->videoCmdLines)+count($this->audioCmdLines)-$finished;
+			$loaded = count($this->videoJobs->jobs);
+
+			
+			/*
+			 * Print statuses to log
+			 */
 			{
-				foreach($chunker->chunkDataArr as $chunkData){
-					if(isset($stat)){
-						$frmCnt+= $stat->cnt;
-						$genChkDur+= $stat->dur;
-					}
-				}
-			}
-			$msgStr = "Merged:generated(frames:$frmCnt,dur:$genChkDur)";
-			$durStr = null;
-			$fileDtMrg = $chunker->mergedFileDt;
-			if(isset($fileDtMrg)){
-				KalturaLog::log("merged:".print_r($fileDtMrg,1));
-				$msgStr.= ",file dur(v:".round($fileDtMrg->videoDuration/1000,4).",a:".round($fileDtMrg->audioDuration/1000,4).")";
-			}
-			if(isset($sessionData->refFileDt)) {
-				$fileDtRef = $sessionData->refFileDt;
-				KalturaLog::log("reference:".print_r($fileDtRef,1));
-			}
-			$fileDtSrc = $chunker->sourceFileDt;
-			if(isset($fileDtSrc)){
-				KalturaLog::log("source:".print_r($fileDtSrc,1));
+				$msgStr = "Session($this->name) - states: ";
+				$msgStr.= "pn:$pending,rn:$running,su:$succeed,fa:$failed,w/q:$loaded, ";
+				$msgStr.= "left:$left,elap:".($this->getElapsed())."sec";
+				if(count($this->videoJobs->failed)>0) $msgStr.= ", failedJobs:".serialize($this->videoJobs->failed);
+				KalturaLog::log($msgStr);
 			}
 			
+			if($this->IsFinished() && $failed==0) {
+				KalturaLog::log("Session($this->name) - Result:SUCCESS! (jobs:$succeed,elapsed:".($this->getElapsed())."sec)");
+				return true;
+			}
+
+			if($this->processFailed()==false){
+				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED too many failed chunks!");
+				$this->returnMessages[] = $msgStr;
+				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
+				return false;			
+			}
+			
+			while($loaded<count($this->videoCmdLines)) {
+				$cnt = $this->addVideoJobs($concurrent);
+				if($cnt===false) {
+					KalturaLog::log($msgStr="Session($this->name) - Result:FAILED to add jobs");
+					$this->returnMessages[] = $msgStr;
+					$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
+					return false;
+				}
+				$loaded = count($this->videoJobs->jobs);
+				$concurrent++;
+			}
+			return null;
+		}
+		
+		/* ---------------------------
+		 * addVideoJobs
+		 */
+		protected function addVideoJobs($concurrent=0)
+		{
+			KalturaLog::log("Session($this->name) - concurrent($concurrent)");
+			
+			$startChunk = count($this->videoJobs->jobs);
+			$countChunks = count($this->videoCmdLines)-$startChunk;
+			
+			if($countChunks<1){
+				KalturaLog::log("Session($this->name) - Bad positioning/count settings");
+				return false;
+			}
+
+			/*
+			 * Evaluate concurrency  
+			 */
 			{
-				KalturaLog::log("CSV,idx,startedAt,user,system,elapsed,cpu");
-				$userAcc = $systemAcc = $elapsedAcc = $cpuAcc = 0;
-				foreach($this->chunkExecutionDataArr as $idx=>$execData){
-					$userAcc+= $execData->user;
-					$systemAcc+= $execData->system;
-					$elapsedAcc+= $execData->elapsed;
-					$cpuAcc+= $execData->cpu;
-					
-					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
+				$maxConcurrent = $this->chunker->setup->concurrent;
+				if(($concurrent+$countChunks)>$maxConcurrent) {
+					if($maxConcurrent-$concurrent<1){
+						KalturaLog::log("Session($this->name) - Reached max concurrent jobs per session ($maxConcurrent, countChunks:$countChunks,concurrent:$concurrent)");
+						return 0;
+					}
+					else
+						$countChunks = $maxConcurrent-$concurrent;
 				}
-				$cnt = count($chunker->chunkDataArr);
-				$userAvg 	= round($userAcc/$cnt,3);
-				$systemAvg 	= round($systemAcc/$cnt,3);
-				$elapsedAvg = round($elapsedAcc/$cnt,3);
-				$cpuAvg 	= round($cpuAcc/$cnt,3);
 			}
 			
-//			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));
-			KalturaLog::log("***********************************************************");
-			KalturaLog::log("* Session Summary (".date("Y-m-d H:i:s").")");
-			KalturaLog::log("* ");
-			KalturaLog::log("ExecutionStats:chunks($cnt),accum(elapsed:$elapsedAcc,user:$userAcc,system:$systemAcc),average(elapsed:$elapsedAvg,user:$userAvg,system:$systemAvg,cpu:$cpuAvg)");
-			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::AnalyzeError){
-				$msgStr.= ",analyze:BAD";
-			}
-			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::OK){
-				$msgStr.= ",analyze:OK";
-				$frameRateMode = stristr($fileDtMrg->rawData,"Frame rate mode                          : ");
-				$frameRateMode = strtolower(substr($frameRateMode, strlen("Frame rate mode                          : ")));
-				$frameRateMode = strncmp($frameRateMode,"constant",8);
-				if($frameRateMode==0) {
-					$msgStr.= ",frameRateMode(constant)";
-				}
-				else
-					$msgStr.= ",frameRateMode(variable)";
-			}
-			if(isset($chunker->sourceFileDt)
-			&& (!isset($chunker->setup->duration) || $chunker->setup->duration<=0 || abs($chunker->setup->duration-round($chunker->sourceFileDt->containerDuration/1000,4))<0.1)) {
-				if(isset($fileDtMrg)){
-					$deltaStr = null;
-					if(isset($fileDtRef)){
-						$vidDelta = round(($fileDtMrg->videoDuration - $fileDtRef->videoDuration)/1000,4);
-						$audDelta = round(($fileDtMrg->audioDuration - $fileDtRef->audioDuration)/1000,4);
-						$deltaStr = "MergedToRef:(v:$vidDelta,a:$audDelta)";
-						$videoOk = (abs($vidDelta)<$chunker->maxInaccuracyValue);
-						$deltaStr.=$videoOk?",video:OK":",video:BAD";
-						$audioOk = (abs($audDelta)<$chunker->maxInaccuracyValue);
-						$deltaStr.=$audioOk?",audio:OK":",audio:BAD";
-						$deltaStr.=($audioOk && $videoOk)?",delta:OK":",delta:BAD";
-						$deltaStr.= ",dur(v:".round($fileDtRef->videoDuration/1000,4).",a:".round($fileDtRef->audioDuration/1000,4).")";
-						KalturaLog::log("$deltaStr");
-					}
+			$cnt = $this->addJobs($startChunk, $countChunks, $this->videoJobs->jobs);
+			return $cnt;
+		}
 
-					$deltaStr = null;
-					if(isset($fileDtSrc)){
-						$dur=$fileDtSrc->videoDuration = ($fileDtSrc->videoDuration>0)? $fileDtSrc->videoDuration: $dur=$fileDtSrc->containerDuration;
-						$vidDelta = ($fileDtMrg->videoDuration - $dur)/1000;//round(($fileDtMrg->videoDuration - $dur)/1000,6);
-						$dur=$fileDtSrc->audioDuration = ($fileDtSrc->audioDuration>0)? $fileDtSrc->audioDuration: $dur=$fileDtSrc->containerDuration;
-						$audDelta = ($fileDtMrg->audioDuration - $dur)/1000;//round(($fileDtMrg->audioDuration - $dur)/1000,6);
-						$deltaStr = "MergedToSrc:(v:$vidDelta,a:$audDelta)";
-						$videoOk = (abs($vidDelta)<$chunker->maxInaccuracyValue);
-						$deltaStr.=$videoOk?",video:OK":",video:BAD";
-						$audioOk = (abs($audDelta)<$chunker->maxInaccuracyValue);
-						$deltaStr.=$audioOk?",audio:OK":",audio:BAD";
-						$deltaStr.=($audioOk && $videoOk)?",delta:OK":",delta:BAD";
-						$deltaStr.= ",dur(v:".round($fileDtSrc->videoDuration/1000,6).",a:".round($fileDtSrc->audioDuration/1000,6).")";
-						KalturaLog::log("$deltaStr");
-					}
+		/* ---------------------------
+		 * addAudioJobs
+		 */
+		protected function addAudioJobs($cmdLines=null)
+		{
+			if(isset($cmdLines))
+				$this->audioCmdLines = $cmdLines;
+			else if(isset($this->audioCmdLines))
+				$cmdLines = $this->audioCmdLines;
+			foreach($cmdLines as $idx=>$cmdLine) {
+				$jobIdx = $idx;
+				$job = $this->addJob($jobIdx, $cmdLine);
+				if($job===false) {
+					KalturaLog::log("Session($this->name) - Failed to add job($jobIdx)");
+					return false;
 				}
+				$this->audioJobs->jobs[$idx] = $job;
 			}
-			
-			KalturaLog::log("$msgStr");
-			KalturaLog::log("OutputFile: ".realpath($chunker->getSessionName()));
-			
-			$errStr = null;
-			$lasted = date_diff($this->startedAt,$this->finishedAt);
-				
-			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::OK) {
-				$msgStr = "RESULT:Success"."  Lasted:".$lasted->format('%h:%i:%s')."/".($lasted->s+60*$lasted->i+3600*$lasted->h)."secs";
-			}
-			else {
-				switch($sessionData->returnStatus){
-				case KChunkedEncodeReturnStatus::InitializeError: 	 $errStr = "InitializeError"; break;
-				case KChunkedEncodeReturnStatus::GenerateVideoError: $errStr = "GenerateVideoError"; break;
-				case KChunkedEncodeReturnStatus::GenerateAudioError: $errStr = "GenerateAudioError"; break;
-				case KChunkedEncodeReturnStatus::FixDriftError: 	 $errStr = "FixDriftError"; break;
-				case KChunkedEncodeReturnStatus::AnalyzeError: 		 $errStr = "AnalyzeError"; break;
-				case KChunkedEncodeReturnStatus::MergeError: 		 $errStr = "MergeError"; break;
-				case KChunkedEncodeReturnStatus::MergeAttemptsError: $errStr = "MergeAttemptsError"; break;
-				case KChunkedEncodeReturnStatus::MergeThreshError:   $errStr = "MergeThreshError"; break;
-				}
-				$msgStr = "RESULT:Failure - error($errStr/$sessionData->returnStatus),message(".implode(',',$sessionData->returnMessages).")";
-			}
-			KalturaLog::log($msgStr);
-			KalturaLog::log("***********************************************************");
-			
-			$this->SerializeSession();
+			return count($cmdLines);
 		}
 		
-		/*****************************
-		 * parseArgsToSetup
+		/* ---------------------------
+		 * processFailedJob
 		 */
-		protected static function parseArgsToSetup($argv, $setup)
+		protected function processFailedJob($job)
 		{
-			unset($argv[0]);
-			if(($idx=array_search("ANDAND", $argv))!==false){
-				$argv[$idx] = '&&';
+			if($job->state==$job::STATE_PENDING || $job->state==$job::STATE_RUNNING) {
+				return true;
 			}
-			$setupArr = get_object_vars($setup);
-			foreach($setupArr as $fld=>$val){
-				if(($idx=array_search("-$fld", $argv))!==false){
-					$setup->$fld = $argv[$idx+1];
-					unset($argv[$idx+1]);
-					unset($argv[$idx]);
-				}
+			if(isset($job->attempt) && $job->attempt>$this->maxRetries){
+				KalturaLog::log("FAILED - job id($job->id) exeeded retry limit ($job->attempt, max:$this->maxRetries)");
+				return false;
 			}
-			KalturaLog::log($setup);
-
-			if(!isset($setup->startFrom)) 		$setup->startFrom = 0;
-			if(!isset($setup->dry)) 			$setup->dry = 0;
-			if(!isset($setup->createFolder))	$setup->createFolder = 1;
-			
-			$setup->cmd = implode(' ',$argv);
-			
-			KalturaLog::log("Setup:".print_r($setup,1));
+			$failedIdx = $job->keyIdx;
+			$job->state = $job::STATE_RETRY;
+			$this->storeManager->SaveJob($job);
+	
+			$job->state = $job::STATE_PENDING;
+			$job->attempt++;
+			if($this->storeManager->AddJob($job)===false) {
+				KalturaLog::log("FAILED to retry job($job->id)");
+				return false;
+			}
+			KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
+			return true;
 		}
 
+		/* ---------------------------
+		 * addJobs
+		 */
+		protected function addJobs($startChunk, $countChunks, &$jobs)
+		{
+			KalturaLog::log("Session($this->name) - params:startChunk($startChunk), countChunks($countChunks)");
+			
+			$cmdLines = $this->videoCmdLines;
+			if($countChunks>count($cmdLines)){
+				KalturaLog::log("Session($this->name) - Invalid countChunks($countChunks), larger than num of cmdlines (".count($cmdLines).")");
+				return false;
+			}
+			
+			if($startChunk+$countChunks>count($cmdLines)){
+				KalturaLog::log("Session($this->name) - Invalid startChunk($startChunk), final position larger than num of cmdlines (".count($cmdLines).")");
+				return false;
+			}
+			
+			for($jobIdx = $startChunk; $jobIdx<$startChunk+$countChunks; $jobIdx++) {
+				if(!array_key_exists($jobIdx, $cmdLines)){
+					KalturaLog::log("Session($this->name) - Bad cmd-lines index ($jobIdx)");
+					return false;
+				}
+
+				$job = $this->addJob($jobIdx, $cmdLines[$jobIdx]);
+				if($job===false) {
+					KalturaLog::log("Session($this->name) - Failed to add job($jobIdx)");
+					return false;
+				}
+				$jobs[$job->id] = $job;
+			}
+
+			$cnt = $jobIdx - $startChunk;
+			KalturaLog::log("Session($this->name) - Added ($cnt) jobs");
+			
+			return $cnt;
+		}
+		
+		/* ---------------------------
+		 * addJob
+		 */
+		protected function addJob($jobIdx, $cmdLine)
+		{
+			$job = new KChunkedEncodeJobData($this->name, $jobIdx, $cmdLine, $this->createTime);
+			if($this->storeManager->AddJob($job)===false) {
+				return false;
+			}
+			return $job;
+		}
+		
 		/********************
-		 * Save the sessionData to .ses file
+		 * executeCmdline
 		 */
-		public function SerializeSession()
+		protected function executeCmdline($cmdLine, $logFile=null)
 		{
-			file_put_contents($this->chunker->getSessionName("session"), serialize($this));
+			$cmdLine = "time $cmdLine >> $logFile 2>&1 ";
+			$started = time();
+			file_put_contents($logFile, "Started:".date('Y-m-d H:i:s', $started)."\n");
+			KalturaLog::log("cmdLine:\n$cmdLine\n");
+			return parent::executeCmdline($cmdLine);
 		}
-		
+
+
 	}
-
-	/********************
-	 * Process stat data
-	 */
-	class KProcessExecutionData {
-		public $process = null;	// ...
-		public $exitCode = null;// ...
-		public $startedAt = null;
-		
-		public $user = null;
-		public $system = null;
-		public $elapsed = null;
-		public $cpu = null;
-		
-		/********************
-		 *
-		 */
-		public function __construct($process = null, $logFileName = null)
-		{
-			if(isset($process)){
-				$this->process = $process;
-			}
-			if(isset($logFileName)){
-				$this->parseLogFile($logFileName);
-			}
-		}
-		
-		/********************
-		 *
-		 */
-		public function parseLogFile($logFileName)
-		{
-			$fp = fopen($logFileName, 'r');
-			$line = fgets($fp);
-			$logLines = null;
-			$logLines = $this->readLastLines($fp, 300);							
-			$logLines[] = $line;
-			fclose($fp);
-			foreach($logLines as $line){
-				if(strstr($line, "elapsed")!==false) {
-					$tmpArr = explode(" ",$line);
-					foreach($tmpArr as $tmpStr){
-						if(($pos=strpos($tmpStr, "user"))!==false) {
-							$this->user = substr($tmpStr,0,$pos);
-						}
-						else if(($pos=strpos($tmpStr, "system"))!==false) {
-							$this->system = substr($tmpStr,0,$pos);
-						}
-						else if(($pos=strpos($tmpStr, "elapsed"))!==false) {
-							$elapsed = substr($tmpStr,0,$pos);
-							$tmpTmArr = array_reverse(explode(":",$elapsed));
-							$this->elapsed = 0;
-							foreach($tmpTmArr as $i=>$tm){
-								$this->elapsed+= $tm*pow(60,$i);
-							}
-						}
-						else if(($pos=strpos($tmpStr, "%CPU"))!==false) {
-							$this->cpu = substr($tmpStr,0,$pos);
-						}
-					}
-				}
-				else if(strstr($line, "Started:")!==false){
-					$this->startedAt = trim(substr($line,strlen("started:2017-03-15 ")));
-				}
-				else if(strstr($line, "exit_code:")!==false){
-					$this->exitCode = trim(substr($line,strlen("exit_code:")));
-				}
-			}
-		}
-		
-		/********************
-		 *
-		 */
-		private function readLastLines($fp, $length)
-		{
-			fseek($fp, -$length, SEEK_END);
-			$lines=array();
-			while(!feof($fp)){
-				$line = fgets($fp);
-				$lines[] = $line;
-			}
-			return $lines;
-		}
-	}
-
+	/*****************************
+	 * End of KChunkedEncodeSessionManager
+	 *****************************/
+	
