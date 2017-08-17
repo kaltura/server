@@ -78,20 +78,20 @@ $elasticClient = new elasticClient($elasticServer, $elasticPort); //take the ser
 
 while(true)
 {
-
     $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
 
     while(!count($elasticLogs))
     {
-        if(!elasticSearchUtils::isMaster($elasticClient, $elasticServer))
-        {
-            KalturaLog::log('elastic server ['.$elasticServer.'] is not the master , sleeping for 60 seconds');
-            sleep(60);
-            continue;
-        }
         $skipExecutedUpdates = true;
         sleep(1);
         $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
+    }
+
+    if(!elasticSearchUtils::isMaster($elasticClient, $elasticServer))
+    {
+        KalturaLog::log('elastic server ['.$elasticServer.'] is not the master , sleeping for 60 seconds');
+        sleep(60);
+        continue;
     }
 
     $ping = $elasticClient->ping();
