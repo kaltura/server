@@ -50,4 +50,21 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toInsertableObject()
+	 */
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
+		if (kCurrentContext::getCurrentSessionType() == SessionType::USER)
+		{
+			if ($this->userId && (!kCurrentContext::getCurrentKsKuser() || kCurrentContext::getCurrentKsKuser()->getPuserId() != $this->userId))
+			{
+				throw new KalturaAPIException (KalturaErrors::INVALID_USER_ID);	
+			}
+		}
+		
+		return $object_to_fill;
+	}
+	
 }

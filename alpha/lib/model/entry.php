@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject
+class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject, IElasticIndexable
 {
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
@@ -1328,7 +1328,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return null;
 		return parent::getCategoriesIds();
 	}
-		
+
 	/*public function renameCategory($oldFullName, $newFullName)
 	{
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
@@ -1586,7 +1586,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getThumbnailVersion()
 	{
 		// For image entry, the data file sync sub type is used as thumbnail
-		if($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
+		if(($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE) || ($this->getType() == entryType::PLAYLIST))
 			return $this->getVersion();
 			
 		$version = parent::getThumbnail();
@@ -1941,6 +1941,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return implode(',', array_keys($this->getEntitledUserPuserEditArray()));
 	}
+
+	public function getEntitledKusersEditArray()
+	{
+		return array_keys($this->getEntitledUserPuserEditArray());
+	}
 	
 	public function getEntitledPusersEdit()
 	{
@@ -2013,22 +2018,32 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );
 	}
 	
+	private function getEntitledPusersPublishArray()
+	{
+		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
+		if (!$entitledUserPuserPublish)
+			return array();
+		
+		return unserialize($entitledUserPuserPublish);
+	}
+	
 	public function getEntitledKusersPublish()
+	{
+		return implode(',', array_keys($this->getEntitledPusersPublishArray()));
+	}
+
+	public function getEntitledKusersPublishArray()
 	{
 		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
 		if(!$entitledUserPuserPublish)
-			return '';
+			return array();
 
-		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
+		return array_keys(unserialize($entitledUserPuserPublish));
 	}
 	
 	public function getEntitledPusersPublish()
 	{
-		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
-		if (!$entitledUserPuserPublish)
-			return '';
-
-		return implode(',', unserialize($entitledUserPuserPublish));
+		return implode(',', $this->getEntitledPusersPublishArray());
 	}
 	
 	public function isEntitledKuserPublish($kuserId, $useUserGroups = true)
@@ -2725,6 +2740,29 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 // ----------- Extra object connections ----------------
 
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		if($this->customDataValueHasChanged('parentEntryId'))
+		{
+			$parentEntry = $this->getParentEntry();
+			if($parentEntry->getId() != $this->getId() && $parentEntry->getPuserId() != $this->getPuserId())
+			{
+				if(!in_array($parentEntry->getPuserId(), $this->getEntitledUserPuserEditArray()))
+					$this->setEntitledPusersEdit(implode(",", array_merge($this->getEntitledUserPuserEditArray(), array($parentEntry->getPuserId()))));
+				
+				if(!in_array($parentEntry->getPuserId(), $this->getEntitledPusersPublishArray()))
+					$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))));
+			}
+		}
+		
+		return parent::preSave($con);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postUpdate()
 	 */
@@ -2809,41 +2847,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			}
 		}
 
-		//Has entitledUserPuserEdit/Publish changed for current entry
-		if ($this->customDataValueHasChanged('entitledUserPuserEdit') ||
-			$this->customDataValueHasChanged('entitledUserPuserPublish') ||
-			$this->isColumnModified(entryPeer::PUSER_ID) )
+		if ($this->customDataValueHasChanged('entitledUserPuserEdit') || $this->customDataValueHasChanged('entitledUserPuserPublish') || $this->isColumnModified(entryPeer::PUSER_ID))
 		{
-			//Change for parent entry (and thus changing all brother entries.
-			$parentEntry = $this->getParentEntry();
-			if ( $parentEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit() ||
-				$parentEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
-				$parentEntry->getPuserId() != $this->getPuserId())
-			{
-				$parentEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
-				$parentEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
-				$parentEntry->setPuserId($this->getPuserId());
-				$parentEntry->save();
-			}
-
-			//Change all child entries.
 			$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->getId(), $this->getPartnerId());
 			foreach ($childEntries as $childEntry)
 			{
-				/**
-				 * @var entry $childEntry
-				 */
-				if ( $childEntry->getEntitledPusersEdit() != $this->getEntitledPusersEdit()	||
-					$childEntry->getEntitledPusersPublish() != $this->getEntitledPusersPublish() ||
-					$childEntry->getPuserId() != $this->getPuserId() )
-				{
-					$childEntry->setEntitledPusersEdit($this->getEntitledPusersEdit());
-					$childEntry->setEntitledPusersPublish($this->getEntitledPusersPublish());
-					$childEntry->setPuserId($this->getPuserId());
-					$childEntry->save();
-				}
+				$this->syncEntitlement($childEntry);
 			}
-
 		}
 
 		$ret = parent::postUpdate($con);
@@ -2884,6 +2894,39 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		
 		return $ret;
+	}
+	
+	private function syncEntitlement(Entry $target)
+	{
+		$shouldSave = false;
+		$entitledPusersEditArray = $this->getEntitledUserPuserEditArray();
+		$entitledPusersPublishArray = $this->getEntitledPusersPublishArray();
+		
+		if(count(array_diff($target->getEntitledUserPuserEditArray(), $entitledPusersEditArray)))
+		{
+			$entitledPusersEditArray = array_merge($target->getEntitledUserPuserEditArray(), $entitledPusersEditArray);
+			$shouldSave = true;
+		}
+		
+		if(count(array_diff($target->getEntitledPusersPublishArray(), $entitledPusersPublishArray)))
+		{
+			$entitledPusersPublishArray = array_merge($target->getEntitledPusersPublishArray(), $entitledPusersPublishArray);
+			$shouldSave = true;
+		}
+		
+		if($target->getPuserId() != $this->getPuserId())
+		{
+			$entitledPusersPublishArray = array_merge($entitledPusersEditArray, array($this->getPuserId()));
+			$entitledPusersPublishArray = array_merge($entitledPusersPublishArray, array($this->getPuserId()));
+			$shouldSave = true;
+		}
+		
+		if(!$shouldSave)
+			return;
+		
+		$target->setEntitledPusersEdit(implode(",", array_unique($entitledPusersEditArray)));
+		$target->setEntitledPusersPublish(implode(",", array_unique($entitledPusersPublishArray)));
+		$target->save();
 	}
 	
 	/* (non-PHPdoc)
@@ -3392,7 +3435,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
 		
 		}
-		elseif ($this->getType () == entryType::MEDIA_CLIP) {
+		elseif ($this->getType () == entryType::MEDIA_CLIP || $this->getType() == entryType::PLAYLIST) {
 			try {
 				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
 			} catch ( Exception $ex ) {
@@ -3569,9 +3612,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function customDataValueHasChanged($name, $namespace = '')
 	{
-		if ( isset($this->oldCustomDataValues[$namespace]) &&
-			 isset($this->oldCustomDataValues[$namespace][$name]) &&
-			 $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
+		if ( isset($this->oldCustomDataValues[$namespace]) 
+				&& ( isset($this->oldCustomDataValues[$namespace][$name]) || array_key_exists($name, $this->oldCustomDataValues[$namespace]) )
+				&& $this->oldCustomDataValues[$namespace][$name] != $this->getFromCustomData($name, $namespace) )
 				return true;
 		return false;
 	}
@@ -3607,6 +3650,134 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return $url;
 	}
 
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return ElasticIndexMap::ELASTIC_ENTRY_INDEX;
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return ElasticIndexMap::ELASTIC_ENTRY_TYPE;
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'parent_id' => $this->getParentEntryId(),
+			'status' => $this->getStatus(),
+			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
+			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
+			'kuser_id' => $this->getKuserId(),
+			'puser_id' => $this->getPuserId(),
+			'creator_puser_id' => $this->getCreatorPuserId(),
+			'creator_kuser_id' => $this->getCreatorKuserId(),
+			'name' => $this->getName(),
+			'description' => $this->getDescription(),
+			'tags' => explode(',', $this->getTags()),
+			'partner_id' => $this->getPartnerId(),
+			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
+			'parent_id' => $this->getParentEntryId(),
+			'reference_id' => $this->getReferenceID(),
+			'conversion_profile_id' => $this->getConversionProfileId(),
+			'template_entry_id' => $this->getTemplateEntryId(),
+			'display_in_search' => $this->getDisplayInSearch(),
+			'media_type' => $this->getMediaType(),
+			'source_type' => $this->getSourceType(),
+			'length_in_msecs' => $this->getLengthInMsecs(),
+			'admin_tags' => explode(',',$this->getAdminTags()),
+			'credit' => $this->getCredit(),
+			'site_url' => $this->getSiteUrl(),
+			'start_date' => $this->getStartDate(null),
+			'end_date' => $this->getEndDate(null),
+			'entry_type' => $this->getType(),
+			'moderation_status' => $this->getModerationStatus(),
+			'created_at' => $this->getCreatedAt(null),
+			'updated_at' => $this->getUpdatedAt(null),
+			'modified_at' => $this->getModifiedAt(null),
+			'total_rank' => $this->getTotalRank(),
+			'access_control_id' => $this->getAccessControlId(),
+			'group_id' => $this->getGroupId(),
+			'partner_sort_value' => $this->getPartnerSortValue(),
+			'redirect_entry_id' => $this->getRedirectEntryId(),
+		);
+
+		$this->addCategoriesToObjectParams($body);
+		
+		if($this->getParentEntryId())
+			$this->addParentEntryToObjectParams($body);
+		
+		return $body;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::INDEX;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
+	}
+	
+	protected function addParentEntryToObjectParams(&$body)
+	{
+		$parentEntry = $this->getParentEntry();
+		if (!$parentEntry || $parentEntry->getId() == $this->getId())
+			return;
+
+		$body['parent_entry'] = array(
+			'entry_id' => $parentEntry->getId(),
+			'partner_id' => $parentEntry->getPartnerId(),
+			'status' => $parentEntry->getStatus(),
+			'partner_status' => "p{$parentEntry->getPartnerId()}s{$parentEntry->getStatus()}",
+			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),
+			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
+			'kuser_id' => $parentEntry->getKuserId(),
+			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
+			'category_ids' => $parentEntry->getAllCategoriesIds(true),
+			'active_category_ids' => $parentEntry->getAllCategoriesIds(false),
+		);
+	}
+
+	protected function addCategoriesToObjectParams(&$body)
+	{
+		$categoryIds = $this->getAllCategoriesIds(true);
+		$body['category_ids'] = $categoryIds;
+		$body['active_category_ids'] = $this->getAllCategoriesIds(false);
+		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);;
+	}
+
 	public function getTagsArr()
 	{
 		$tags = explode(",", $this->getTags());
@@ -3619,5 +3790,23 @@ public function copyTemplate($copyPartnerId = false, $template)
 			}
 		}
 		return array_unique($tagsToReturn);
+	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		if($this->getStatus() == entryStatus::DELETED)
+			return true;
+		return false;
+	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'entry';
 	}
 }

@@ -304,6 +304,14 @@ class KCurlWrapper
 
 		return $err;
 	}
+	
+	/**
+	 * @return string
+	 */
+	public function getInfo($opt)
+	{
+		return curl_getinfo($this->ch, $opt);
+	}
 
 	/**
 	 * @return number

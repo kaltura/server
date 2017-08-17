@@ -888,6 +888,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
         return false;
     }
 
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION));
+	}
+
 }
 
 function copmareNumbersAscending($a,$b)

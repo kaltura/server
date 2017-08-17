@@ -24,6 +24,8 @@ class KDLWrap
 		conversionEngineType::EXPRESSION_ENCODER3=>KDLTranscoders::EE3,
 			
 		"quickTimeTools.QuickTimeTools"=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
+		//CHUNKED_FFMPEG is a special case, it is not porcessed (yet) by the KDL
+		conversionEngineType::CHUNKED_FFMPEG=>conversionEngineType::CHUNKED_FFMPEG,
 	);
 	
 	/* ------------------------------
@@ -136,14 +138,6 @@ class KDLWrap
 			else
 				$this->_rv = true;
 		}
-			/*
-			 * For 'passthrough' quick&dirty
-			 
-		if(isset($mediaSet->_container) && $mediaSet->_container->_id=="arf")
-			$isArf = true;
-		else
-			$isArf = false;
-			*/
 		foreach ($trgList as $trg){
 			KalturaLog::log("...T-->".$trg->ToString());
 				/*
@@ -153,16 +147,19 @@ class KDLWrap
 				continue;
 			}
 			*/
+			/*
+			 * Handle Chunked-Encode cases
+			 */
+			if($trg->_cdlObject->getChunkedEncodeMode()==1)	{
+				$tmpTrans = clone $trg->_transcoders[0];
+				if($tmpTrans->_id==KDLTranscoders::FFMPEG) {
+					$tmpTrans->_id=conversionEngineType::CHUNKED_FFMPEG;
+					array_unshift($trg->_transcoders,$tmpTrans);
+				}
+			}
+
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
 			
-			/*
-			 * 'passthrough' temporal, quick&dirty implementation to support imitation of 
-			 * 'auto-inter-src' for webex/arf.
-			 
-			if($isArf==false && isset($trg->_transcoders)
-			&& $trg->_transcoders[0]->_id=="webexNbrplayer.WebexNbrplayer"){
-				$cdlFlvrOut->_passthrough=true;
-			}*/
 			$this->_targetList[] = $cdlFlvrOut;
 		}
 		return $this;

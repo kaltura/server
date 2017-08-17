@@ -14,6 +14,7 @@ class myPlaylistUtils
 	const CAPTION_FILES_LABEL = "label";
 	const CAPTION_FILES_PATH = "path";
 	const CAPTION_FILES_ID = "captionId";
+	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 
 	private static $user_cache = null;
 	
@@ -25,7 +26,7 @@ class myPlaylistUtils
 	{
 		self::$isAdminKs = $v;
 	}
-	
+
 	/**
 	 * Playlist is an entry of type ENTRY_TYPE_PLAYLIST = 5.
 	 * Within this type there are 3 media_types to tell the difference between dynamic,static and external playslits:
@@ -571,7 +572,11 @@ class myPlaylistUtils
 			$entry_filter->attachToCriteria( $c );
 
 			// add some hard-coded criteria
-			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
+			$typeArray = array (entryType::MEDIA_CLIP, entryType::MIX, entryType::LIVE_STREAM );
+			$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
+			$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM));
+			
+			$c->addAnd ( entryPeer::TYPE , array_unique($typeArray) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 
@@ -1150,5 +1155,26 @@ HTML;
 			}
 		}
 		return $filteredCaptionAssets;
+	}
+
+	public static function getFirstEntryFromPlaylist($playlist)
+	{
+		$entryList = self::executePlaylist($playlist->getPartnerId(), $playlist);
+		if(empty($entryList))
+			return null;
+		return $entryList[0];
+	}
+
+	public static function buildPlaylistThumbPath($entry, $flavorAsset)
+	{
+		$partnerId = $flavorAsset->getPartnerId();
+		$subpId = $entry->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$entryVersion = $entry->getVersion();
+
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= ($entryVersion ? "/v/$entryVersion" : '');
+		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId().self::MP4_FILENAME_PARAMETER;
+		return $url;
 	}
 }

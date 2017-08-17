@@ -1,0 +1,10 @@
+elasticHost = @ELASTIC_HOST@
+elasticPort = @ELASTIC_PORT@
+elasticClientCurlTimeout = @CURL_TIMEOUT_IN_SEC@
+;set to true in order to disable elastic indexing
+disableElastic = false
+
+[innerHits]
+captionInnerHitsSize = 10
+cuePointsInnerHitsSize = 10
+metadataInnerHitsSize = 10
