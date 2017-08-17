@@ -287,20 +287,14 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		$this->validatePropertyNotNull('recurrenceType');
 		$this->validatePropertyNotNull('summary');
 		$this->validatePropertyNotNull('startDate');
-		$this->validatePropertyNotNull('endDate');
-		$this->validate($this->startDate, $this->endDate);
-
-
-		$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
-
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
 		{
-			$this->validatePropertyNotNull('recurrence');
-			$this->validatePropertyNotNull('duration');
-			if ($this->duration > $maxSingleEventDuration)
-				throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+			$this->validateRecurringEventForInsert();
 		}
 
+		$this->validatePropertyNotNull('endDate');
+		$this->validate($this->startDate, $this->endDate);
+		$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
 		{
 			if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
@@ -309,7 +303,25 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 
 		parent::validateForInsert($propertiesToSkip);
 	}
-	
+
+	public function validateRecurringEventForInsert()
+	{
+		$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
+
+		if ($this->isNull('duration') && !$this->isNull('endDate'))
+		{
+			$this->duration = $this->endDate - $this->startDate;
+		}
+		else if($this->isNull('endDate') && !$this->isNull('duration'))
+		{
+			$this->endDate = $this->startDate + $this->duration;
+		}
+
+		$this->validatePropertyNotNull('recurrence');
+		$this->validatePropertyNotNull('duration');
+		if ($this->duration > $maxSingleEventDuration)
+			throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+	}
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate($sourceObject, $propertiesToSkip)
 	 */
