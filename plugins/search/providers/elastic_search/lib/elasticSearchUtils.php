@@ -149,4 +149,15 @@ class elasticSearchUtils
 		return $term;
 	}
 
+	public static function isMaster($elasticClient, $elasticHostName)
+	{
+		$masterInfo = $elasticClient->getMasterInfo();
+		if(!$masterInfo)
+			return false;
+		$masterHostName = isset($masterInfo[0]['node']) ? $masterInfo[0]['node'] : '';
+		if($masterHostName == $elasticHostName)
+			return true;
+		return false;
+	}
+
 }
