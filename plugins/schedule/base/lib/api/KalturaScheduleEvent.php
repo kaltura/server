@@ -301,7 +301,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		parent::validateForInsert($propertiesToSkip);
 	}
 
-	public function validateRecurringEventForInsert()
+	private function validateRecurringEventForInsert()
 	{
 		if ($this->isNull('duration') && !$this->isNull('endDate'))
 		{
