@@ -228,4 +228,14 @@ class elasticClient
         $response = $this->sendRequest($cmd, 'GET');
         return $response;
     }
+
+    /**
+     * return info about the master node of the cluster
+     */
+    public function getMaster()
+    {
+        $cmd = $this->elasticHost . '/_cat/master?format=json';
+        $response = $this->sendRequest($cmd, 'GET');
+        return $response;
+    }
 }

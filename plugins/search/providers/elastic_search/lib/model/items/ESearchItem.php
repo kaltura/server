@@ -51,13 +51,23 @@ abstract class ESearchItem extends BaseObject
 	protected function validateAllowedSearchTypes($allowedSearchTypes, $fieldName)
 	{
 		if (!in_array($this->getItemType(),  $allowedSearchTypes[$fieldName]))
-			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $fieldName.']', kCoreException::INTERNAL_SERVER_ERROR);
+		{
+			$data = array();
+			$data['itemType'] = $this->getItemType();
+			$data['fieldName'] = $fieldName;
+			throw new kESearchException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $fieldName.']', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data);
+		}
 	}
 
 	protected function validateEmptySearchTerm($fieldName, $searchTerm)
 	{
 		if (empty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE)))
-			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on empty search term on field ['. $fieldName.']', kCoreException::INTERNAL_SERVER_ERROR);
+		{
+			$data = array();
+			$data['itemType'] = $this->getItemType();
+			$data['fieldName'] = $fieldName;
+			throw new kESearchException('Empty search term is not allowed on Field ['. $fieldName.'] and search type ['.$this->getItemType().']', kESearchException::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data);
+		}
 	}
 
 	abstract public function getType();

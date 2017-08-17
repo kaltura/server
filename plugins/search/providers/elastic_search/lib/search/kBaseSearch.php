@@ -18,7 +18,15 @@ abstract class kBaseSearch
 
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
-        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $eSearchOperator->getOperator());
+        try
+        {
+            $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $eSearchOperator->getOperator());
+        }
+        catch (kESearchException $e)
+        {
+            $this->handleSearchException($e);
+        }
+
         $this->applyElasticSearchConditions($subQuery);
         KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
         $result = $this->elasticClient->search($this->query);
@@ -94,6 +102,23 @@ abstract class kBaseSearch
     protected function applyElasticSearchConditions($conditions)
     {
         $this->query['body']['query']['bool']['must'] = array($conditions);
+    }
+
+    protected function handleSearchException($exception)
+    {
+        $code = $exception->getCode();
+        if($code == kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD)
+        {
+            $data = $exception->getData();
+            throw new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data['itemType'], $data['fieldName']);
+        }
+        if($code == kESearchException::EMPTY_SEARCH_TERM_NOT_ALLOWED)
+        {
+            {
+                $data = $exception->getData();
+                throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data['fieldName'], $data['itemType']);
+            }
+        }
     }
 
 }
