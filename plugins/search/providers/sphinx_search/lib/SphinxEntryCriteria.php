@@ -37,9 +37,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 				}
 								
 				// Get the id of the entry id that is being redirected from the original entry
-				$redirectEntryId = $origEntry->getRedirectEntryId(); 
-				
-				if ( is_null( $redirectEntryId ) ) // No redirection required? 
+				$redirectEntryId = $origEntry->getRedirectEntryId();
+                $redirectEntry = entryPeer::retrieveByPK($redirectEntryId);
+                if ( is_null( $redirectEntryId ) || $redirectEntry->getStatus() != entryStatus::READY) // No redirection required?
 				{
 					$filter->set( '_eq_id', $origEntryId ); // Continue with original entry id
 				}
