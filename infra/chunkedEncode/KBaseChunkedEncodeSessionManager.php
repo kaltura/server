@@ -190,7 +190,7 @@
 				return false;
 			}
 
-			if($this->chunker->ValidateMergedFile(&$msgStr)!=true){
+			if($this->chunker->ValidateMergedFile($msgStr)!=true){
 				KalturaLog::log($msgStr);
 				$this->returnMessages[] = $msgStr;
 				$this->returnStatus = KChunkedEncodeReturnStatus::MergeThreshError;
@@ -327,20 +327,20 @@
 				$cmd = "rm -f $chunkName_wc";
 				KalturaLog::log("cleanup cmd:$cmd");
 				$rv = null; $op = null;
-				$output = exec($cmd, $op, &$rv);
+				$output = exec($cmd, $op, $rv);
 			}
 			$mergedFilenameAudio = $this->chunker->getSessionName("audio");
 			$cmd = "rm -f $mergedFilenameAudio* ".$concatFilenameLog = $this->chunker->getSessionName("concat");
 			KalturaLog::log("cleanup cmd:$cmd");
 			$rv = null; $op = null;
-			$output = exec($cmd, $op, &$rv);
+			$output = exec($cmd, $op, $rv);
 			return;
 			$cmd = "rm -f $setup->output*.$this->videoChunkPostfix*";
 			$cmd.= " ".$this->chunker->getSessionName("audio")."*";
 			$cmd.= " ".$this->chunker->getSessionName("session");
 			KalturaLog::log("cleanup cmd:$cmd");
 			$rv = null; $op = null;
-			$output = exec($cmd, $op, &$rv);
+			$output = exec($cmd, $op, $rv);
 		}
 		
 		/********************
