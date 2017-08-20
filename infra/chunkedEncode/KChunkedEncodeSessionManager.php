@@ -312,7 +312,12 @@
 		 */
 		protected function processVideoJobs()
 		{
-			$this->fetch();
+			if($this->fetch()==false) {
+				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED to fetch chunk jobs!");
+				$this->returnMessages[] = $msgStr;
+				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
+				return false;			
+			}
 			$this->detectErrors();
 
 			$videoStats = $this->videoJobs->states;
@@ -365,8 +370,11 @@
 					$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
 					return false;
 				}
+				if($cnt==0) {
+					return null;
+				}
 				$loaded = count($this->videoJobs->jobs);
-				$concurrent++;
+				$concurrent+=$cnt;
 			}
 			return null;
 		}
@@ -379,9 +387,9 @@
 			KalturaLog::log("Session($this->name) - concurrent($concurrent)");
 			
 			$startChunk = count($this->videoJobs->jobs);
-			$countChunks = count($this->videoCmdLines)-$startChunk;
+			$chunksToProcess = count($this->videoCmdLines)-$startChunk;
 			
-			if($countChunks<1){
+			if($chunksToProcess<1){
 				KalturaLog::log("Session($this->name) - Bad positioning/count settings");
 				return false;
 			}
@@ -391,17 +399,17 @@
 			 */
 			{
 				$maxConcurrent = $this->chunker->setup->concurrent;
-				if(($concurrent+$countChunks)>$maxConcurrent) {
+				if(($concurrent+$chunksToProcess)>$maxConcurrent) {
 					if($maxConcurrent-$concurrent<1){
-						KalturaLog::log("Session($this->name) - Reached max concurrent jobs per session ($maxConcurrent, countChunks:$countChunks,concurrent:$concurrent)");
+						KalturaLog::log("Session($this->name) - Reached max concurrent jobs per session($maxConcurrent), toProcess:$chunksToProcess,concurrent:$concurrent");
 						return 0;
 					}
 					else
-						$countChunks = $maxConcurrent-$concurrent;
+						$chunksToProcess = $maxConcurrent-$concurrent;
 				}
 			}
 			
-			$cnt = $this->addJobs($startChunk, $countChunks, $this->videoJobs->jobs);
+			$cnt = $this->addJobs($startChunk, $chunksToProcess, $this->videoJobs->jobs);
 			return $cnt;
 		}
 
