@@ -35,13 +35,4 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
 		return;
 	}
 
-	public function deleteOrMarkForDeletion($entry = null)
-	{
-		$this->delete();
-		return;
-	}
-
-
-
-
 }
