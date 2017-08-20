@@ -3,7 +3,8 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveEntryServerNodeRecordingInfo extends KalturaObject {
+class KalturaLiveEntryServerNodeRecordingInfo extends KalturaObject
+{
 	
 	/**
 	 * @var string

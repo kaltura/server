@@ -3,7 +3,8 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveEntryServerNodeRecordingInfoArray extends KalturaTypedArray {
+class KalturaLiveEntryServerNodeRecordingInfoArray extends KalturaTypedArray
+{
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaLiveEntryServerNodeRecordingInfoArray();
