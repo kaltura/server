@@ -364,7 +364,7 @@
 			$runningArr = array();
 			$processCnt = 0;
 
-			$runningArr = $this->getRunningArray(&$processCnt);
+			$runningArr = $this->getRunningArray($processCnt);
 
 			$this->processArr = $runningArr;
 			$runningCnt = count($runningArr);
