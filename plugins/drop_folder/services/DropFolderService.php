@@ -255,10 +255,8 @@ class DropFolderService extends KalturaBaseService
 	 * @action freeExclusiveDropFolder
 	 * @param int $dropFolderId
 	 * @param string $errorCode
-	 * @param string $errorDescriptioncd..
-	 *
+	 * @param string $errorDescription
 	 * @throws KalturaAPIException
-	 *
 	 * @return KalturaDropFolder
 	 */
 	public function freeExclusiveDropFolderAction($dropFolderId, $errorCode = null, $errorDescription = null)
