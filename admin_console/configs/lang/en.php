@@ -95,6 +95,7 @@ return array(
 	'Kaltura_Client_Enum_ConversionEngineType::VLC' => 'Convert - VLC',
 	'Kaltura_Client_Enum_ConversionEngineType::WEBEX_NBRPLAYER' => 'Convert - Webex',
 	'Kaltura_Client_Enum_ConversionEngineType::WIDEVINE' => 'Convert - Widevine',
+	'Kaltura_Client_Enum_ConversionEngineType::THUMB_ASSETS' => 'Convert - Thumbnail Assets',
 
 	'Kaltura_Client_Enum_BatchJobStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Enum_BatchJobStatus::QUEUED' => 'Started',
