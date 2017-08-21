@@ -15,12 +15,14 @@
 				<th><?php echo $this->translate('Handler Type'); ?></th>
 				<th><?php echo $this->translate('Tags'); ?></th>
 				<th><?php echo $this->translate('Creation Date'); ?></th>
-				<th><?php echo $this->translate('Action'); ?></th>
+                <th><?php echo $this->translate('Error Message'); ?></th>
+                <th><?php echo $this->translate('Error Code'); ?></th>
+                <th><?php echo $this->translate('Action'); ?></th>
 			</tr>
 		</thead>
 		<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="12">
 			<?php echo $this->paginator; ?>
 			</td>
 		</tr>
@@ -37,7 +39,9 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType', $dropFolder->fileHandlerType); ?></td>
 				<td><?php echo $dropFolder->tags; ?></td>
 				<td><?php echo date($this->translate('time format'), $dropFolder->createdAt); ?></td>
-				<td>
+                <td><?php echo $dropFolder->errorDescription; ?></td>
+                <td><?php echo $dropFolder->errorCode; ?></td>
+                <td>
 					<select class="options" onchange="doAction(this.value, <?php echo $dropFolder->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configureDropFolder" ><?php echo $this->translate('Configure'); ?></option>

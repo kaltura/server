@@ -163,7 +163,7 @@ class DropFolderService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->conversionProfileId);
 			}
 		}
-					
+
 		$dbDropFolder = $dropFolder->toUpdatableObject($dbDropFolder);
 		$dbDropFolder->save();
 	
@@ -254,14 +254,14 @@ class DropFolderService extends KalturaBaseService
 	 *
 	 * @action freeExclusiveDropFolder
 	 * @param int $dropFolderId
-	 * @param int $status
 	 * @param string $errorCode
-	 * @param string $errorDescription
+	 * @param string $errorDescriptioncd..
+	 *
 	 * @throws KalturaAPIException
 	 *
 	 * @return KalturaDropFolder
 	 */
-	public function freeExclusiveDropFolderAction($dropFolderId, $status, $errorCode = null, $errorDescription = null)
+	public function freeExclusiveDropFolderAction($dropFolderId, $errorCode = null, $errorDescription = null)
 	{
 		kDropFolderAllocator::freeDropFolder($dropFolderId);
 
@@ -270,7 +270,6 @@ class DropFolderService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
 
 		$dbDropFolder->setLastAccessedAt(time());
-		$dbDropFolder->setStatus($status);
 		$dbDropFolder->setErrorCode($errorCode);
 		$dbDropFolder->setErrorDescription($errorDescription);
 		$dbDropFolder->save();
