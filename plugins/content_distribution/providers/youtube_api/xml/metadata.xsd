@@ -31,8 +31,6 @@
               <xsd:enumeration value="Animals"/>
               <xsd:enumeration value="Sports"/>
               <xsd:enumeration value="Travel"/>
-              <xsd:enumeration value="Shortmov"/>
-              <xsd:enumeration value="Videoblog"/>
               <xsd:enumeration value="Games"/>
               <xsd:enumeration value="Comedy"/>
               <xsd:enumeration value="People"/>
@@ -42,21 +40,6 @@
               <xsd:enumeration value="Howto"/>
               <xsd:enumeration value="Nonprofit"/>
               <xsd:enumeration value="Tech"/>
-              <xsd:enumeration value="Movies_Anime_animation"/>
-              <xsd:enumeration value="Movies"/>
-              <xsd:enumeration value="Movies_Comedy"/>
-              <xsd:enumeration value="Movies_Documentary"/>
-              <xsd:enumeration value="Movies_Action_adventure"/>
-              <xsd:enumeration value="Movies_Classics"/>
-              <xsd:enumeration value="Movies_Foreign"/>
-              <xsd:enumeration value="Movies_Horror"/>
-              <xsd:enumeration value="Movies_Drama"/>
-              <xsd:enumeration value="Movies_Family"/>
-              <xsd:enumeration value="Movies_Shorts"/>
-              <xsd:enumeration value="Shows"/>
-              <xsd:enumeration value="Movies_Sci_fi_fantasy"/>
-              <xsd:enumeration value="Movies_Thriller"/>
-              <xsd:enumeration value="Trailers"/>
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:element>
