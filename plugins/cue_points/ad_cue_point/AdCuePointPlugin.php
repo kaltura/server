@@ -272,4 +272,9 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKaltu
 	{
 		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryAdCuePointCloneOptions::AD_CUE_POINTS), false);
 	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array();
+	}
 }

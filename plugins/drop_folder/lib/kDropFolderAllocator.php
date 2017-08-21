@@ -56,6 +56,12 @@ class kDropFolderAllocator
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
 		kApiCache::disableConditionalCache();
 		
+		if(!$cache)
+		{
+			KalturaLog::err("Cache layer [" . kCacheManager::CACHE_TYPE_BATCH_JOBS . "] not found, drop folder will not be allocated");
+			return null;
+		}
+			
 		$tagKey = self::getCacheKeyForDropFolderTag($tag);
 		$dropFolders = $cache->get($tagKey);
 		if (!$dropFolders || empty($dropFolders))
@@ -72,6 +78,7 @@ class kDropFolderAllocator
 				return $allocateDropFolder;
 			}
 		}
+		
 		return null;
 	}
 

@@ -219,6 +219,9 @@ class kmc4Action extends kalturaAction
 			'usagedashboard'			=> array(
 				'version'				=> kConf::get("usagedashboard_version"),
 			),
+			'liveDashboard'             => array(
+                'version'				=> kConf::get("live_dashboard_version"),
+            ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
 			'language'					=> $language,

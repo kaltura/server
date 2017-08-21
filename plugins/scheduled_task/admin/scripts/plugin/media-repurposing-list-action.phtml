@@ -379,7 +379,7 @@ function buildTaskParams(index) {
 		taskData[name] = val;
 		$(this).remove();
 	});
-	return {id, type, taskTimeToNext, taskData};
+	return {id:id, type:type, taskTimeToNext:taskTimeToNext, taskData:taskData};
 }
 
 function getCheckboxVal(element) {

@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class kuser extends Basekuser implements IIndexable, IRelatedObject
+class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticIndexable
 {
 	public function __construct()
 	{
@@ -1272,5 +1272,95 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 			$dbCategoryKuser->updateKuser($puserId);
 			$dbCategoryKuser->save();
 		}
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return ElasticIndexMap::ELASTIC_KUSER_INDEX;
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return ElasticIndexMap::ELASTIC_KUSER_TYPE;
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'partner_id' => $this->getPartnerId(),
+			'status' => $this->getStatus(),
+			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
+			'screen_name' => $this->getScreenName(),
+			'kuser_type' => $this->getType(),
+			'email' => $this->getEmail(),
+			'tags' => $this->getTagsArray(), //todo - check
+			'created_at' => $this->getCreatedAtAsInt(),
+			'updated_at' => $this->getUpdateAtAsInt(),
+			'first_name' => $this->getFirstName(),
+			'last_name' => $this->getLastName(),
+			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
+			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
+			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId())
+		);
+		return $body;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::INDEX;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
+	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		if($this->getStatus() == KuserStatus::DELETED)
+			return true;
+		return false;
+	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'kuser';
 	}
 }
