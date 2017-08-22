@@ -698,16 +698,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$advancedOptions->keepManualThumbnails = 1;
 		}
 
-		if ($updateEntry->streams )
+		if($resource)
 		{
-			$baseEntry = new KalturaMediaEntry();
-			$baseEntry->streams = array();
-			$baseEntry->streams = $updateEntry->streams;
-			$updatedEntry = KBatchBase::$kClient->baseEntry->update($entryId, $baseEntry);
+			if ($updateEntry->streams )
+			{
+				$baseEntry = new KalturaMediaEntry();
+				$baseEntry->streams = $updateEntry->streams;
+				$updatedEntry = KBatchBase::$kClient->baseEntry->update($entryId, $baseEntry);
+			}
+			KBatchBase::$kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId, $advancedOptions); //to create a temporery entry.
 		}
 
-		if($resource)
-			KBatchBase::$kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId, $advancedOptions); //to create a temporery entry.
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
