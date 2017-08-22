@@ -138,6 +138,7 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	{
 		$this->validateMandatoryAttributes(true);
 		$this->validateDuplications(null, $type);
+		$this->validateParentId();
 	
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -146,6 +147,8 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	{
 		$this->validateMandatoryAttributes();
 		$this->validateDuplications($sourceObject->getId(), $type);
+		$this->validateParentId();
+		$this->validateParentLoop($sourceObject->getId(), explode(",", $this->parentId));
 				
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -244,5 +247,40 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 		 
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
+	}
+	
+	public function validateParentId()
+	{
+		if(!isset($this->parentId) || $this->parentId == '')
+			return;
+		
+		$inputParentIds = explode(",", $this->parentId);
+		$dbParents = ServerNodePeer::retrieveByPKs($inputParentIds);
+		$dbParentIds = array_map(function($serverNode) { return $serverNode->getId(); }, $dbParents);
+		
+		if(count($inputParentIds) !== count($dbParentIds))
+		{
+			$parentIdsDiff = array_diff($inputParentIds, $dbParentIds);
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND, implode(",", $parentIdsDiff));
+		}
+	}
+	
+	public function validateParentLoop($currentServerNodeId, $directParentIds = array(), $parentIdsTree = array())
+	{
+		if(in_array($currentServerNodeId, $directParentIds) || in_array($currentServerNodeId, $parentIdsTree))
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_PARENT_LOOP_DETECTED, $currentServerNodeId);
+		
+		if(!count($directParentIds))
+			return;
+		
+		$parentIdsTree[] = $currentServerNodeId;
+		foreach ($directParentIds as $key => $parentId)
+		{
+			if(!$parentId)
+				continue;
+			
+			$parentObj = ServerNodePeer::retrieveByPK($parentId);
+			$this->validateParentLoop($parentId, $parentObj->getParentIdsArray(), $parentIdsTree);
+		}
 	}
 }

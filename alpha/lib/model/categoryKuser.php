@@ -442,6 +442,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	public function getObjectParams($params = null)
 	{
 		$body = array(
+			'scripted_upsert' => true,
 			'script' => array(
 				'inline' => $this->getInlineScript(),
 				'lang' => 'painless',
@@ -449,6 +450,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 					'kuser_id' => $this->getKuserId(),
 				)
 			),
+			'upsert' => new stdClass(),
 			'retry_on_conflict' => 10
 		);
 		return $body;
@@ -494,11 +496,18 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	}
 
 	/**
-         * @return partner
-         */
+  * @return partner
+  */
         public function getPartner()
         {
                 return PartnerPeer::retrieveByPK( $this->getPartnerId() );
         }
 
+/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'category_kuser';
+	}
 } // categoryKuser
