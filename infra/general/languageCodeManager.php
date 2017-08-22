@@ -100,10 +100,10 @@ class languageCodeManager
     }
 
     /**
-     * @param $arrayISO639_1
+     * @param $arrayISO639
      * @param $arrayISO639_T
      * @param $arrayKalturaName
-     * @param $ISO639_1Upper - upper case language code as in ISO 639-1
+     * @param $ISO639Upper - upper case language code as in ISO 639-1
      * @param $ISO639_1Lower - lower case language code as in ISO 639-1
      * @param $ISO639_T - lower case three letters language code as in ISO 639-2/T  - if two code is not official then the 3 code is made up
      * @param $ISO639_B - lower case three letters language code as in ISO 639-2/B  - if two code is not official then the 3 code is made up
@@ -112,11 +112,13 @@ class languageCodeManager
      * @param $kalturaName - kaltura language name as in KalturaLanguage, if the language is not defined in kaltura then $kalturaName is the same as $languageName
      */
     private static function addLanguageToArrays(&$arrayISO639 , &$arrayISO639_T , &$arrayKalturaName,
-                                                $ISO639Upper ,$ISO639_1Lower,$ISO639_T,$ISO639_B,$languageName,$nativeName,$kalturaName=null)
+                                                $ISO639Upper ,$ISO639Lower,$ISO639_T,$ISO639_B,$languageName,$nativeName,$kalturaName=null)
     {
         if(is_null($kalturaName))
             $kalturaName = $languageName;
-        $arrayISO639_1[$ISO639Upper] = array($ISO639_1Lower,$ISO639_T,$ISO639_B,$languageName,$nativeName,$kalturaName);
+        if(is_null($ISO639_T))
+            $ISO639_T = $ISO639_B;
+        $arrayISO639[$ISO639Upper] = array($ISO639Lower,$ISO639_T,$ISO639_B,$languageName,$nativeName,$kalturaName);
         $arrayISO639_T[$ISO639_T] = $ISO639Upper;
         $arrayKalturaName[$kalturaName] = $ISO639Upper;
     }
