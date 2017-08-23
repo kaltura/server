@@ -6,7 +6,7 @@
 class kLockBase
 {
 	const LOCK_KEY_PREFIX = '__LOCK';
-	const LOCK_TRY_INTERVAL = 20000;
+	const LOCK_GRAB_TRY_INTERVAL = 20000;
 	
 	/**
 	 * @var kBaseCacheWrapper
@@ -42,7 +42,7 @@ class kLockBase
 		{
 			if (!$this->store->add($this->key, true, $lockHoldTimeout))
 			{
-				usleep(self::LOCK_TRY_INTERVAL);
+				usleep(self::LOCK_GRAB_TRY_INTERVAL);
 				continue;
 			}
 			
