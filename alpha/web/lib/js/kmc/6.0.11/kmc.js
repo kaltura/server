@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2017-07-24
+/*! KMC - v6.0.11 - 2017-08-16
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2017 Amir Chervinsky; Licensed GNU */
 /**
@@ -3989,6 +3989,22 @@ kmc.functions = {
 			'contentHeight' : '94%'
 		} );
     },
+    openLiveDashboard: function(entryId){
+        // Set title
+        var title = 'Live Dashboard';
+        kmc.vars.liveDashboard.entryId = entryId;
+        var url = kmc.vars.base_url + '/apps/liveDashboard/' + kmc.vars.liveDashboard.version + '/index.html';
+
+        var modal_content = '<iframe id="liveDashboardIF" src="' + url + '" width="100%" height="100%" frameborder="0"></iframe>';
+
+        kmc.layout.modal.open( {
+            'width' : 1050,
+            'height' : 695,
+            'title' : title,
+            'content' : modal_content,
+            'contentHeight' : '94%'
+        } );
+    },
 	openUsageDashboard: function(){
 		kmc.utils.hideFlash(true);
 		kmc.utils.openIframe(kmc.vars.base_url + '/apps/usage-dashboard/' + kmc.vars.usagedashboard.version + '/index.html');
@@ -4418,8 +4434,8 @@ kmc.preview_embed = {
 		if( ! is_playlist ) {
 			embedOptions.entryId = id;
 			embedOptions.entryMeta = {
-				'name': unescape(name),
-				'description': unescape(description),
+				'name': name,
+				'description': description,
                 'duration': duration,
                 'thumbnailUrl': thumbnailUrl
 			};
@@ -4430,10 +4446,10 @@ kmc.preview_embed = {
 			// Multiple Playlists
 			if( id == 'multitab_playlist' ) {
 				embedOptions.playerOnly = true;
-				embedOptions.name = unescape(name);
+				embedOptions.name = name;
 			} else { // Single playlist
 				embedOptions.playlistId = id;
-				embedOptions.playlistName = unescape(name);
+				embedOptions.playlistName = name;
 			}
 		}
 		kmc.Preview.openPreviewEmbed( embedOptions, kmc.Preview.Service );
@@ -4459,7 +4475,7 @@ kmc.preview_embed = {
 		});
 
 		var modal_content = '<div class="center">' + code + '</div><dl>' +
-		'<dt>Entry Name:</dt><dd>&nbsp;' + unescape(entryName) + '</dd>' +
+		'<dt>Entry Name:</dt><dd>&nbsp;' + entryName + '</dd>' +
 		'<dt>Entry Id:</dt><dd>&nbsp;' + entryId + '</dd>' +
 		'<dt>Flavor Name:</dt><dd>&nbsp;' + flavorDetails.flavor_name + '</dd>' +
 		'<dt>Flavor Asset Id:</dt><dd>&nbsp;' + flavorDetails.asset_id + '</dd>' +

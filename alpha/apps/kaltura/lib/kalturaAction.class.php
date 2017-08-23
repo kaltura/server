@@ -453,21 +453,7 @@ abstract class kalturaAction extends sfAction
  
   protected function getUserzoneCookie() 
   {
-  	$cookie = $this->getContext()->getRequest()->getCookie('userzone');
-  	$length = strlen($cookie);
-  	if ($length <= 0)
-  		return null;
-  		
-  	$serialized_data = substr($cookie, 0, $length - 32);
-  	$hash_signiture = substr($cookie, $length - 32);
-  	  	 
-  	// check the signiture
-  	if (md5($serialized_data . $this->cookieSecret) != $hash_signiture)
-  		return null;
-  	
-  	$userzone_data = unserialize(base64_decode($serialized_data));
-  	
-  	return array($userzone_data['id'], $userzone_data['email'], $userzone_data['screenname']);
+  	return null;
   }
   
   protected function followRedirectCookie()

@@ -52,7 +52,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 				$this->getFormattedPropertyNameWithClassName('userIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('userIdIn') . '/' .
 				$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
 	}
-
+	
 	/**
 	 * @param KalturaFilterPager $pager
 	 * @param KalturaDetachedResponseProfile $responseProfile
@@ -70,7 +70,6 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$c = new Criteria();
 		
 		$userEntryFilter = $this->toObject();
-		$this->validateFilter();
 		$userEntryFilter->attachToCriteria($c);
 
 		$pager->attachToCriteria($c);
@@ -112,6 +111,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		{
 			$this->fixFilterUserId();
 		}
+		$this->validateFilter();
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}

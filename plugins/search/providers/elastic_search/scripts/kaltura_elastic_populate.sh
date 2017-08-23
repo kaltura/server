@@ -4,7 +4,7 @@
 echo `date`
 
 #
-# populateMgr		This shell script takes care of starting and stopping a Kaltura Elasticsearch Populate Service
+# elasticPopulateMgr		This shell script takes care of starting and stopping a Kaltura Elasticsearch Populate Service
 #
 # chkconfig: 2345 13 87
 # description: Kaltura Elasticsearch Populate
@@ -16,8 +16,8 @@ echo `date`
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # X-Interactive:     true
-# Short-Description: Start/stop Kaltura populate daemon
-# Description:       Control the Kaltura populate daemon
+# Short-Description: Start/stop Kaltura elastic  populate daemon
+# Description:       Control the Kaltura elastic populate daemon
 ### END INIT INFO
 
 # Source function library.

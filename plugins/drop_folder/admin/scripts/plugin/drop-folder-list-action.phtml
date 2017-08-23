@@ -15,12 +15,14 @@
 				<th><?php echo $this->translate('Handler Type'); ?></th>
 				<th><?php echo $this->translate('Tags'); ?></th>
 				<th><?php echo $this->translate('Creation Date'); ?></th>
+				<th><?php echo $this->translate('Error Message'); ?></th>
+				<th><?php echo $this->translate('Error Code'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
 			</tr>
 		</thead>
 		<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="12">
 			<?php echo $this->paginator; ?>
 			</td>
 		</tr>
@@ -37,6 +39,8 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType', $dropFolder->fileHandlerType); ?></td>
 				<td><?php echo $dropFolder->tags; ?></td>
 				<td><?php echo date($this->translate('time format'), $dropFolder->createdAt); ?></td>
+				<td><?php echo $dropFolder->errorDescription; ?></td>
+				<td><?php echo $dropFolder->errorCode; ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $dropFolder->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
@@ -48,7 +52,7 @@
 						<?php endif; ?>
 						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
 					</select>
-				</td>				
+				</td>
 			</tr>
 			<?php endforeach; ?>
 		</tbody>
@@ -86,8 +90,8 @@ function doAction(action, folderId) {
 function enable(folderId)
 {
 	changeStatus(
-		folderId, 
-		<?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED; ?>, 
+		folderId,
+		<?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED; ?>,
 		function() {
 			alert('<?php echo $this->translate('Drop folder enabled');?>');
 		}
@@ -97,8 +101,8 @@ function enable(folderId)
 function disable(folderId)
 {
 	changeStatus(
-		folderId, 
-		<?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::DISABLED; ?>, 
+		folderId,
+		<?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::DISABLED; ?>,
 		function() {
 			alert('<?php echo $this->translate('Drop folder disabled');?>');
 		}
@@ -111,8 +115,8 @@ function remove(folderId)
 	if (ok)
 	{
 		changeStatus(
-			folderId, 
-			<?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::DELETED; ?>, 
+			folderId,
+			<?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::DELETED; ?>,
 			function() {
 				alert('<?php echo $this->translate('Drop folder removed');?>');
 			}
@@ -131,11 +135,11 @@ function changeStatus(folderId, status, callback)
 		success: function(result) {
 			if (result != 'ok')
 				this.error();
-			
+
 			if (callback && (typeof callback == 'function'))
 			{
 				callback.apply(this);
-			}			
+			}
 			jQuery('#frmPaginator1').submit();
 		},
 		error: function() {
@@ -151,7 +155,7 @@ function newDropFolder(partnerId, dropFolderType)
 		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
 		return;
 	}
-	
+
 	if(!dropFolderType.length){
 		alert('<?php echo $this->translate('Drop folder type not supplied'); ?>');
 		return;
@@ -170,7 +174,7 @@ function configureDropFolder(folderId)
 	}
 
 	folderIdStr = '/drop_folder_id/' + folderId;
-	
+
 	loadDropFolder(folderIdStr);
 }
 
@@ -178,10 +182,10 @@ function configureDropFolder(folderId)
 function loadDropFolder(paramStr)
 {	
 	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DropFolderConfigureAction')); ?>' + paramStr;
-	
+
 	jQuery('#drop-folder-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="drop-folder-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
-	
+
 	dialogDiv.dialog({
 		bgiframe: true,
 		modal: true,
@@ -198,10 +202,10 @@ function loadDropFolder(paramStr)
 			}
 		}
 	});
-	
+
 	dialogDiv.load(
-		url, 
-		null, 
+		url,
+		null,
 		function() {
 			jQuery(this).find('#frmDropFolderConfigure').ajaxForm({
 				success: loadDropFolderSuccess,
@@ -213,7 +217,7 @@ function loadDropFolder(paramStr)
 
 
 function loadDropFolderSuccess(html) {
-	if (jQuery(html).filter('#frmDropFolderConfigure').hasClass('valid')) 
+	if (jQuery(html).filter('#frmDropFolderConfigure').hasClass('valid'))
 	{
 		dialogDiv.dialog('close');
 		if (jQuery('#frmPaginator1').length){

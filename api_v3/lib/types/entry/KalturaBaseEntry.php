@@ -671,6 +671,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		/* @var $sourceObject entry */
 		$this->validateUsers();
 		$this->validateCategories();
+		$this->validateParentEntryId();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
 //		if($this->referenceId)

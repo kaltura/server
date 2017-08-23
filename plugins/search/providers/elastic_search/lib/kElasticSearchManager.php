@@ -54,7 +54,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if(!$cmd)
             return true;
 
-        return $this->execElastic($cmd, $object);
+        return $this->execElastic($cmd, $object, $object->getElasticSaveMethod());
     }
 
     public function getElasticSaveParams($object, $params)
@@ -97,31 +97,37 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     }
 
     //exe the curl
-    public function execElastic($params, IElasticIndexable $object)
+    public function execElastic($params, IElasticIndexable $object, $action)
     {
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
-        $op = $object->getElasticSaveMethod();
         $params['index'] = $object->getElasticIndexName();
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
-        $params['action'] = $op;
+        $params['action'] = $action;
 
-        if(kConf::get('disableElastic', 'elastic', true))
-            return true;
-
-        $this->saveToSphinxLog($object, $params);
-
-        if(!kConf::get('exec_elastic', 'local', 0))
-            return true;
-
-        $client = new elasticClient();
-        $ret = $client->$op($params);
-        if(!$ret)
+        try
         {
-            KalturaLog::err('Failed to Execute elasticSearch query: '.print_r($params,true));
-            return false;
+            if(kConf::get('disableElastic', 'elastic', true))
+                return true;
+
+            $this->saveToSphinxLog($object, $params);
+
+            if(!kConf::get('exec_elastic', 'local', 0))
+                return true;
+
+            $client = new elasticClient();
+            $ret = $client->$action($params);
+            if(!$ret)
+            {
+                KalturaLog::err('Failed to Execute elasticSearch query: '.print_r($params,true));
+                return false;
+            }
+        }
+        catch (Exception $e)
+        {
+            KalturaLog::warning('Failed to execute elastic');
         }
 
         return true;
@@ -134,7 +140,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog->setSql($command);
         $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
         $elasticLog->setObjectId($object->getId());
-        $elasticLog->setObjectType($object->getElasticObjectType());
+        $elasticLog->setObjectType($object->getElasticObjectName());
         //$elasticLog->setEntryId($object->getEntryId());
         $elasticLog->setPartnerId($object->getPartnerId());
         $elasticLog->setType(SphinxLogType::ELASTIC);
@@ -312,10 +318,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function deleteFromElastic(IElasticIndexable $object)
     {
-        $params['index'] = $object->getElasticIndexName();
-        $params['type'] = $object->getElasticObjectType();
-        $params['id'] = $object->getElasticId();
-        $client = new elasticClient();
-        $client->delete($params);
+        $this->execElastic(null, $object, 'delete');
     }
+
 }

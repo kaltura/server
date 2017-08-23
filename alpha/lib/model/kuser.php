@@ -1355,4 +1355,12 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			return true;
 		return false;
 	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'kuser';
+	}
 }
