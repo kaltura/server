@@ -47,7 +47,7 @@ class elasticClient
 		$this->close();
 	}
 	
-	public function close()
+	private function close()
 	{
 		curl_close($this->ch);
 	}

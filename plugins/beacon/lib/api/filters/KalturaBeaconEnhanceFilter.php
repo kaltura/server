@@ -1,25 +1,33 @@
 <?php
+
 /**
  * @package plugins.beacon
  * @subpackage api.filters
  */
-
-class KalturaBeaconEnhanceFilter extends KalturaBeaconFilter
+class KalturaBeaconEnhanceFilter extends KalturaFilter
 {
-    /**
-     * @var string
-     */
-    public $externalElasticQueryObject;
-
-    protected function createSearchObject()
-    {
-        $arr = parent::createSearchObject();
-        $utf8Query = utf8_encode($this->externalElasticQueryObject);
-        $extraElasticQuery = json_decode($utf8Query,true);
-        foreach($extraElasticQuery as $key => $value)
-        {
-            $arr[$key] = $value;
-        }
-        return $arr;
-    }
+	/**
+	 * @var string
+	 */
+	public $externalElasticQueryObject;
+	
+	public function getCoreFilter()
+	{
+		return null;
+	}
+	
+	public function enhanceSearch(KalturaFilterPager $pager)
+	{
+		$utf8Query = utf8_encode($this->externalElasticQueryObject);
+		$extraElasticQuery = json_decode($utf8Query, true);
+		$extraElasticQuery['index'] = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
+		
+		$searchMgr = new kBeaconSearchManger();
+		$responseArray = $searchMgr->search($extraElasticQuery);
+		$responseArray = $searchMgr->getHitsFromElasticResponse($responseArray);
+		
+		$response = new KalturaBeaconListResponse();
+		$response->objects = KalturaBeaconArray::fromDbArray($responseArray);
+		return $response;
+	}
 }

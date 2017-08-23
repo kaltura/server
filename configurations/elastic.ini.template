@@ -8,3 +8,7 @@ disableElastic = false
 captionInnerHitsSize = 10
 cuePointsInnerHitsSize = 10
 metadataInnerHitsSize = 10
+
+[beacon]
+elasticHost = @BEACONS_ELASTIC_HOST@
+elasticPort = @BEACONS_ELASTIC_PORT@

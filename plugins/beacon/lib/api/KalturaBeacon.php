@@ -26,21 +26,21 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	
 	/**
 	 * The object which this beacon belongs to
-	 * 
+	 *
 	 * @var KalturaBeaconObjectTypes
-	 * @filter eq,in
+	 * @filter in
 	 */
 	public $relatedObjectType;
 	
 	/**
 	 * @var string
-	 * @filter eq,in
+	 * @filter in
 	 */
 	public $eventType;
 	
 	/**
 	 * @var string
-	 * @filter eq,in
+	 * @filter in,order
 	 */
 	public $objectId;
 	
@@ -64,7 +64,7 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 		'privateData',
 		'rawData',
 	);
-
+	
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull("eventType");
@@ -93,9 +93,17 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	 */
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
-		if(is_null($object_to_fill))
+		if (is_null($object_to_fill))
 			$object_to_fill = new kBeacon();
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	}
+	
+	public function fromArray($source_array)
+	{
+		parent::fromArray($source_array);
+		
+		if (isset($source_array['privateData']))
+			$this->privateData = json_encode($source_array['privateData']);
 	}
 }

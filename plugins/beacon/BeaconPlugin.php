@@ -4,22 +4,21 @@
  * Sending beacons on various objects
  * @package plugins.beacon
  */
-
 class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending
 {
 	const PLUGIN_NAME = "beacon";
-
-    /* (non-PHPdoc)
+	
+	/* (non-PHPdoc)
 	 * @see IKalturaServices::getServicesMap()
 	 */
-	public static function getServicesMap ()
+	public static function getServicesMap()
 	{
 		$map = array(
-        	'beacon' => 'BeaconService',
+			'beacon' => 'BeaconService',
 		);
 		return $map;
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPermissions::isAllowedPartner()
 	 */
@@ -27,12 +26,12 @@ class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
 	{
 		return true;
 	}
-
-
+	
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
-	public static function getPluginName ()
+	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
 	}
