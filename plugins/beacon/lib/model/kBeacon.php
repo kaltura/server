@@ -202,11 +202,9 @@ class kBeacon
 		$indexObject[self::FIELD_EVENT_TYPE] = $this->eventType;
 		$indexObject[self::FIELD_OBJECT_ID] = $this->objectId;
 		
-		$privateDataObject = $this->privateData ? json_decode($this->privateData) : null;
-		if (!$privateDataObject)
-			$privateDataObject = $this->privateData;
-		
+		$privateDataObject = $this->privateData ? json_decode($this->privateData) : json_decode("{}");
 		$indexObject[self::FIELD_PRIVATE_DATA] = $privateDataObject;
+		
 		$indexObject[self::FIELD_RAW_DATA] = $this->rawData;
 		$indexObject[self::FIELD_PARTNER_ID] = $this->partnerId;
 		$indexObject[self::FIELD_UPDATED_AT] = $currTime;
