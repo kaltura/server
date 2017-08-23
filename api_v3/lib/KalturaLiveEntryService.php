@@ -502,7 +502,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	public function createRecordedEntryAction($entryId, $mediaServerIndex, $liveEntryStatus)
 	{
-		KalturaLog::debug("Creating recorded entry for [$entryId]");
 		$this->dumpApiRequest($entryId);
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
@@ -513,7 +512,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 	protected function checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, $forcePrimaryValidation, $shouldCreateRecordedEntry = true)
 	{
-		if ((!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
+		if ($shouldCreateRecordedEntry && (!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
 			in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) &&
 			$dbLiveEntry->getRecordStatus()
 		)
@@ -554,7 +553,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 					}
 				}
 			}
-			if ($createRecordedEntry && $shouldCreateRecordedEntry)
+			if ($createRecordedEntry)
 			{
 				KalturaLog::info("Creating a recorded entry for ".$dbLiveEntry->getId());
 				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);

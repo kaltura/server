@@ -496,6 +496,14 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	}
 
 	/**
+  * @return partner
+  */
+        public function getPartner()
+        {
+                return PartnerPeer::retrieveByPK( $this->getPartnerId() );
+        }
+
+/**
 	 * return the name of the object we are indexing
 	 */
 	public function getElasticObjectName()
