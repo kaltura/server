@@ -2389,14 +2389,13 @@ form#frmCreateDrmProfile {
 	margin-left: 20px;
 }
 
-form#frmCreateDrmProfile dd,dt,form#frmCreateDrmProfile dt {
+form#frmCreateDrmProfile dd,form#frmCreateDrmProfile dt {
 	float: left;
 }
 
 form#frmAdminApi dd,dt,form#frmAdminApi dt {
 	float: left;
 }
-
 
 #drm-profile-configure-dialog {
 	padding-top: 10px;

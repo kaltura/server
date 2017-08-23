@@ -25,24 +25,21 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		$actionApi = $this->_getParam('adminApiAction');
 		
 		$adminApiForm = new Form_AdminApiConfigure($partnerId, $drmType, $actionApi);
-		KalturaLog::info("qwer - 1");
-		KalturaLog::info("[$partnerId] [$drmType] [$actionApi] ");
+		KalturaLog::info("Got params for the ADMIN-API action as: [$partnerId] [$drmType] [$actionApi] ");
 		try
 		{
 			if ($request->isPost())
 			{
 
 				if ($actionApi == AdminApiActionType::REMOVE)
-					$res = $this->sendData($drmType, $partnerId, $actionApi);
-
+					$this->sendData($drmType, $partnerId, $actionApi);
 
 				if ($actionApi == AdminApiActionType::ADD) {
 					$params = $this->getParams($request);
 					KalturaLog::info("Got Data as " . print_r($params, true));
-					$res = $this->sendData($drmType, $partnerId, $actionApi, $params);
+					$this->sendData($drmType, $partnerId, $actionApi, $params);
 				}
 
-				
 				$action->view->formValid = true;
 			}
 			else

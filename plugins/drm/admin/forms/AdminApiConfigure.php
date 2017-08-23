@@ -37,7 +37,6 @@ class Form_AdminApiConfigure extends Infra_Form
 
 	private function addDocFields()
 	{
-//		$partnerDocFields = array('providerSignKey', 'key', 'iv', 'provider', 'seed', 'cas_username', 'cas_password');
 		$partnerDocFields = array('provider_sign_key', 'key', 'iv', 'provider', 'seed', 'cas_username', 'cas_password');
 		$fpsDocFields = array('ask', 'keyPem');
 
