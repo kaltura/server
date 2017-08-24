@@ -22,11 +22,13 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		
 		$searchMgr = new kBeaconSearchManger();
 		$searchQuery = $searchMgr->buildSearchQuery(kBeacon::ELASTIC_BEACONS_INDEX_NAME, $this->indexTypeEqual, $searchObject, $pager->pageSize, $pager->calcOffset());
-		$responseArray = $searchMgr->search($searchQuery);
-		$responseArray = $searchMgr->getHitsFromElasticResponse($responseArray);
+		$elasticQueryResponse = $searchMgr->search($searchQuery);
+		$responseArray = $searchMgr->getHitsFromElasticResponse($elasticQueryResponse);
+		$totalCount = $searchMgr->getTotalCount($elasticQueryResponse);
 		
 		$response = new KalturaBeaconListResponse();
 		$response->objects = KalturaBeaconArray::fromDbArray($responseArray);
+		$response->totalCount = $totalCount;
 		return $response;
 	}
 	

@@ -113,4 +113,17 @@ class kBeaconSearchManger
 		
 		return $ret;
 	}
+	
+	public function getTotalCount($elasticResponse)
+	{
+		$totalCount = 0;
+		
+		if (!isset($elasticResponse['hits']))
+			return $totalCount;
+		
+		if (!isset($elasticResponse['hits']['total']))
+			return $totalCount;
+		
+		return $elasticResponse['hits']['total'];
+	}
 }
