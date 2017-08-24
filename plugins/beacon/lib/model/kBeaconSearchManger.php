@@ -45,16 +45,16 @@ class kBeaconSearchManger
 		
 		foreach ($searchObject['range'] as $key => $value)
 		{
-			if (!$value['gte'] && !$value['lte'])
+			if (!$value[baseObjectFilter::GTE] && !$value[baseObjectFilter::LTE])
 				continue;
 			
 			$range = array();
 			
-			if($value['gte'])
-				$range['gte'] = $value['gte'];
+			if($value[baseObjectFilter::GTE])
+				$range[baseObjectFilter::GTE] = $value[baseObjectFilter::GTE];
 			
-			if($value['lte'])
-				$range['lte'] = $value['lte'];
+			if($value[baseObjectFilter::LTE])
+				$range[baseObjectFilter::LTE] = $value[baseObjectFilter::LTE];
 			
 			$term = array($key => $range);
 			$query[] = array('range' => $term);
