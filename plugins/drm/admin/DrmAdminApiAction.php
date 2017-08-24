@@ -13,11 +13,6 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 	{
 		return realpath(dirname(__FILE__));
 	}
-
-	public function getRequiredPermissions()
-	{
-		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_DRM_PROFILE_MODIFY);
-	}
 	
 	public function doAction(Zend_Controller_Action $action)
 	{

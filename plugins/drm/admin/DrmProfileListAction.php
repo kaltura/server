@@ -63,7 +63,9 @@ class DrmProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 			
 		$action->view->newProfileForm = $createProfileForm;
 
-		$action->view->adminApiForm = new Form_AdminApi();
+		$currentPermissions = Infra_AclHelper::getCurrentPermissions();
+		if ($currentPermissions && in_array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_DRM_PROFILE_MODIFY, $currentPermissions))
+			$action->view->adminApiForm = new Form_AdminApi();
 	}
 	
 	
