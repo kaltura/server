@@ -8,7 +8,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 {
 	/**
 	 * unique auto-generated identifier
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 */
 	public $id;

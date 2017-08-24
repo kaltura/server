@@ -8,7 +8,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	/**
 	 * Auto generated numeric identifier
 	 * 
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 * @filter eq,in
 	 */

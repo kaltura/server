@@ -610,7 +610,7 @@ DROP TABLE IF EXISTS `batch_job_lock`;
 
 CREATE TABLE `batch_job_lock`
 (
-	`id` INTEGER  NOT NULL,
+	`id` BIGINT NOT NULL,
 	`job_type` INTEGER,
 	`job_sub_type` INTEGER,
 	`object_id` VARCHAR(20) default '',
@@ -630,10 +630,10 @@ CREATE TABLE `batch_job_lock`
 	`execution_attempts` TINYINT,
 	`version` INTEGER,
 	`dc` INTEGER,
-	`batch_job_id` INTEGER,
+	`batch_job_id` BIGINT,
 	`custom_data` TEXT,
 	`batch_version` INTEGER,
-	`root_job_id` INTEGER,
+	`root_job_id` BIGINT,
 	PRIMARY KEY (`id`),
 	KEY `status_job_type_index`(`status`, `job_type`),
 	KEY `entry_id_index_id`(`entry_id`, `id`),
@@ -662,7 +662,7 @@ DROP TABLE IF EXISTS `batch_job_lock_suspend`;
 
 CREATE TABLE `batch_job_lock_suspend`
 (
-	`id` INTEGER  NOT NULL,
+	`id` BIGINT NOT NULL,
 	`job_type` INTEGER,
 	`job_sub_type` INTEGER,
 	`object_id` VARCHAR(20) default '',
@@ -682,7 +682,7 @@ CREATE TABLE `batch_job_lock_suspend`
 	`execution_attempts` TINYINT,
 	`version` INTEGER,
 	`dc` INTEGER,
-	`batch_job_id` INTEGER,
+	`batch_job_id` BIGINT,
 	`custom_data` TEXT,
 	`batch_version` INTEGER,
 	`root_job_id` INTEGER,
@@ -749,7 +749,7 @@ CREATE TABLE `bulk_upload_result`
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`bulk_upload_job_id` INTEGER,
+	`bulk_upload_job_id` BIGINT,
 	`line_index` INTEGER,
 	`partner_id` INTEGER,
 	`status` INTEGER,
@@ -1329,7 +1329,7 @@ DROP TABLE IF EXISTS `file_sync`;
 
 CREATE TABLE `file_sync`
 (
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER,
 	`object_type` TINYINT,
 	`object_id` VARCHAR(20),
@@ -1343,7 +1343,7 @@ CREATE TABLE `file_sync`
 	`sync_time` INTEGER,
 	`status` TINYINT,
 	`file_type` TINYINT,
-	`linked_id` INTEGER,
+	`linked_id` BIGINT,
 	`link_count` INTEGER,
 	`file_root` VARCHAR(64),
 	`file_path` VARCHAR(128),
