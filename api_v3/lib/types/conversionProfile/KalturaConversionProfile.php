@@ -187,7 +187,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	/**
 	 * Default replacement options to be applied to entries
 	 * 
-	 * KalturaEntryReplacementOptions
+	 * @var KalturaEntryReplacementOptions
 	 */
 	public $defaultReplacementOptions;
 	
