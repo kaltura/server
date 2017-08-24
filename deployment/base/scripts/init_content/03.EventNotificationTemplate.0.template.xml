@@ -225,7 +225,7 @@
 		<!-- New Item Pending Moderation -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
-				<name>New Item Pending Moderation</name>
+				<name>Existing Item Pending Moderation</name>
 				<systemName>New_Item_Pending_Moderation_2</systemName>
 				<description>Email notification template to be sent when a new item is pending moderation in a specific category (channel).</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
