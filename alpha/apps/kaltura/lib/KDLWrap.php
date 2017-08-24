@@ -165,18 +165,27 @@ class KDLWrap
 			}
 
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
-			// handle audio streams in case we are handling trimming a video with flavor_params -1
+			// Handle audio streams for ffmpeg command in case we are handling trimming a source with flavor_params -1
+			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
+			// and replace it with the language mapping for the correct audio streams
+			// if only audio streams exist without video we ignore the video mapping
 			if ($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)
 			{
 				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
 				$command = null;
-				if ($contentStreams != null && isset($contentStreams['video']) && isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
+				if ($contentStreams != null)
 				{
-					$command = '-map v -map a ';
-					foreach ($contentStreams['audio'] as $audioStream)
+					if ( isset($contentStreams['video']) )
+					$command .= '-map v ';
+
+					if( isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
 					{
-						if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
-							$command .= "-metadata:s:0:{$audioStream['id']} language={$audioStream['audioLanguage']} ";
+						$command .= '-map a ';
+						foreach ($contentStreams['audio'] as $audioStream)
+						{
+							if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
+								$command .= "-metadata:s:0:{$audioStream['id']} language={$audioStream['audioLanguage']} ";
+						}
 					}
 				}
 
