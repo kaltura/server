@@ -278,6 +278,12 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 			return new Zend_Config_Ini($path);
 		return null;
 	}
+	
+	public static function isAllowAdminApi($actionApi = null)
+	{
+		$currentPermissions = Infra_AclHelper::getCurrentPermissions();
+		return ($currentPermissions && in_array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_DRM_PROFILE_MODIFY, $currentPermissions));
+	}
 
 }
 

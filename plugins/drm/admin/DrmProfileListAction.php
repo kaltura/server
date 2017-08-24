@@ -62,10 +62,7 @@ class DrmProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 			$createProfileForm->getElement("newPartnerId")->setValue($drmProfileFilter->partnerIdEqual);
 			
 		$action->view->newProfileForm = $createProfileForm;
-
-		$currentPermissions = Infra_AclHelper::getCurrentPermissions();
-		if ($currentPermissions && in_array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_DRM_PROFILE_MODIFY, $currentPermissions))
-			$action->view->adminApiForm = new Form_AdminApi();
+		$action->view->adminApiForm = new Form_AdminApi();
 	}
 	
 	

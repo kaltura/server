@@ -23,9 +23,15 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		$partnerId = $this->_getParam('pId');
 		$drmType = $this->_getParam('drmType');
 		$actionApi = $this->_getParam('adminApiAction');
+
+		if (!DrmPlugin::isAllowAdminApi($actionApi)) {
+			$action->view->errMessage = 'You do not have permission for this action';
+			return;
+		}
 		
 		$adminApiForm = new Form_AdminApiConfigure($partnerId, $drmType, $actionApi);
-		KalturaLog::info("Got params for the ADMIN-API action as: [$partnerId] [$drmType] [$actionApi] ");
+		KalturaLog::info("Got params for the ADMIN-API action as: partnerId: [$partnerId], drmType: [$drmType] ,actionApi: [$actionApi] ");
+
 		try
 		{
 			if ($request->isPost())
@@ -34,11 +40,8 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 				if ($actionApi == AdminApiActionType::REMOVE)
 					$this->sendData($drmType, $partnerId, $actionApi);
 
-				if ($actionApi == AdminApiActionType::ADD) {
-					$params = $this->getParams($request);
-					KalturaLog::info("Got Data as " . print_r($params, true));
-					$this->sendData($drmType, $partnerId, $actionApi, $params);
-				}
+				if ($actionApi == AdminApiActionType::ADD)
+					$this->sendData($drmType, $partnerId, $actionApi, $this->getParams($request));
 
 				$action->view->formValid = true;
 			}
@@ -108,7 +111,7 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		curl_setopt($ch, CURLOPT_URL,            $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt($ch, CURLOPT_POST,           1 );
-		curl_setopt($ch, CURLOPT_TIMEOUT,           5 );
+		curl_setopt($ch, CURLOPT_TIMEOUT,        10 );
 		curl_setopt($ch, CURLOPT_POSTFIELDS,     $body);
 		$result=curl_exec ($ch);
 		curl_close($ch);
