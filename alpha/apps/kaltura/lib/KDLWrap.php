@@ -173,22 +173,19 @@ class KDLWrap
 			{
 				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
 				$command = null;
-				if ($contentStreams != null)
+				if ($contentStreams != null && isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
 				{
-					if ( isset($contentStreams['video']) )
-					$command .= '-map v ';
+					if (isset($contentStreams['video']))
+						$command .= '-map v ';
 
-					if( isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
+					$command .= '-map a ';
+					foreach ($contentStreams['audio'] as $audioStream)
 					{
-						$command .= '-map a ';
-						foreach ($contentStreams['audio'] as $audioStream)
-						{
-							if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
-								$command .= "-metadata:s:0:{$audioStream['id']} language={$audioStream['audioLanguage']} ";
-						}
+						if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
+							$command .= "-metadata:s:0:{$audioStream['id']} language={$audioStream['audioLanguage']} ";
 					}
 				}
-
+				
 				$cmdLines = $cdlFlvrOut->getCommandLines();
 				foreach ($cmdLines as $key => $cmdLine)
 				{
