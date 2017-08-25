@@ -310,7 +310,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         foreach ($itemsToTrim as $item)
         {
-            if (array_key_exists($item, $params))
+            if (array_key_exists($item, $params) && strlen($params[$item]))
                 $params[$item] = substr($params[$item], 0, self::MAX_LENGTH);
         }
         return $tempParams;

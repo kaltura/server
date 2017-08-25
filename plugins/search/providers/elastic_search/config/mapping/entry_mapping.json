@@ -1,15 +1,8 @@
 {
   "settings" : {
-	"number_of_shards" : 5,
+	"number_of_shards" : 6,
 	"number_of_replicas" : 0,
 	"analysis": {
-	  "filter": {
-		"trigrams_filter": {
-		  "type": "ngram",
-		  "min_gram": 3,
-		  "max_gram": 3
-		}
-	  },
 	  "char_filter": {
 		"kaltura_whitespace_filter": {
 		  "type": "pattern_replace",
@@ -17,13 +10,23 @@
 		  "replacement": " "
 		}
 	  },
+	  "tokenizer": {
+		"kaltura_trigram_tokenizer": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3,
+		  "token_chars": [
+			"letter",
+			"digit"
+		  ]
+		}
+	  },
 	  "analyzer": {
 		"trigrams": {
 		  "type": "custom",
-		  "tokenizer": "standard",
+		  "tokenizer": "kaltura_trigram_tokenizer",
 		  "filter": [
-			"lowercase",
-			"trigrams_filter"
+			"lowercase"
 		  ]
 		},
 		"kaltura_keyword": {
@@ -92,6 +95,14 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"entitled_kusers_publish" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_pusers_edit" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_pusers_publish" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
@@ -424,6 +435,14 @@
 				},
 				"end_time"  : {
 				  "type" : "long"
+				},
+				"caption_asset_id": {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"language" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				}
 			  }
 			}

@@ -3,6 +3,7 @@ elasticPort = @ELASTIC_PORT@
 elasticClientCurlTimeout = @CURL_TIMEOUT_IN_SEC@
 ;set to true in order to disable elastic indexing
 disableElastic = false
+trigramPercentage = 80
 
 [innerHits]
 captionInnerHitsSize = 10

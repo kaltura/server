@@ -14,7 +14,7 @@ class elasticClient
      * elasticClient constructor.
      * @param null $host
      * @param null $port
-     * @param null $curlTimeout -timeout in seconds
+     * @param null $curlTimeout - timeout in seconds
      */
     public function __construct($host = null, $port = null, $curlTimeout = null)
     {
@@ -101,6 +101,13 @@ class elasticClient
         {
             //return the response as associative array
             $response = json_decode($response, true);
+            if(isset($response['error']) && isset($response['status']))
+            {
+                $data = array();
+                $data['errorMsg'] = $response['error'];
+                $data['status'] = $response['status'];
+                throw new kESearchException('Elastic search engine error ['.print_r($response,true).']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
+            }
             KalturaLog::debug("Elastic client response ".print_r($response,true));
         }
 

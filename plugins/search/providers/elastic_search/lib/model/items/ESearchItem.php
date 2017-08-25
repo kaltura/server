@@ -61,7 +61,7 @@ abstract class ESearchItem extends BaseObject
 
 	protected function validateEmptySearchTerm($fieldName, $searchTerm)
 	{
-		if (empty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE)))
+		if (empty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE, ESearchItemType::EXISTS)))
 		{
 			$data = array();
 			$data['itemType'] = $this->getItemType();

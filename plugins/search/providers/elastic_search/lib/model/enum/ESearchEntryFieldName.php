@@ -17,8 +17,8 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_REFERENCE_ID = 'reference_id';
 	const ENTRY_CONVERSION_PROFILE_ID = 'conversion_profile_id';
 	const ENTRY_REDIRECT_ENTRY_ID = 'redirect_entry_id';
-	const ENTRY_ENTITLED_USER_EDIT = 'entitled_kusers_edit';
-	const ENTRY_ENTITLED_USER_PUBLISH = 'entitled_kusers_publish';
+	const ENTRY_ENTITLED_USER_EDIT = 'entitled_pusers_edit';
+	const ENTRY_ENTITLED_USER_PUBLISH = 'entitled_pusers_publish';
 	const ENTRY_TEMPLATE_ENTRY_ID = 'template_entry_id';
 	const ENTRY_DISPLAY_IN_SEARCH = 'display_in_search';
 	const ENTRY_PARENT_ENTRY_ID = 'parent_id';

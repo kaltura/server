@@ -74,30 +74,53 @@ class elasticSearchUtils
 		{
 			$itemData = array();
 			if (isset($elasticObject['inner_hits']))
-			{
-				foreach ($elasticObject['inner_hits'] as $objectType => $hits)
-				{
-					foreach ($hits['hits']['hits'] as $objectResult)
-					{
-						$itemResults = self::getItemResults($objectResult, $objectType);
-						foreach ($itemResults as $itemResult)
-						{
-							$currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
-							if ($currItemData)
-							{
-								$currItemData->loadFromElasticHits($itemResult);
-								$itemData[] = $currItemData;
-							}
-						}
-					}
-				}
-			}
+				self::getItemDataFromInnerHits($elasticObject, $itemData);
+
 			$objectData[$elasticObject['_id']] = $itemData;
 			$objectOrder[$elasticObject['_id']] = $key;
 		}
+
 		if(isset($elasticResults['hits']['total']))
 			$objectCount = $elasticResults['hits']['total'];
+
 		return array($objectData, $objectOrder, $objectCount);
+	}
+
+	private static function getItemDataFromInnerHits($elasticObject, &$itemData)
+	{
+		foreach ($elasticObject['inner_hits'] as $innerHitsKey => $hits)
+		{
+			$objectType = self::getInnerHitsObjectType($innerHitsKey);
+			$itemData[$objectType] = array();
+			$itemData[$objectType]['totalCount'] = self::getInnerHitsTotalCountForObject($hits, $objectType);
+			foreach ($hits['hits']['hits'] as $itemResult)
+			{
+				$currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
+				if ($currItemData)
+				{
+					$currItemData->loadFromElasticHits($itemResult);
+					$itemData[$objectType]['items'][] = $currItemData;
+				}
+			}
+		}
+	}
+
+	private static function getInnerHitsObjectType($innerHitsKey)
+	{
+		switch ($innerHitsKey)
+		{
+			case 'caption_assets.lines':
+				return ESearchItemDataType::CAPTION;
+			case 'metadata':
+				return ESearchItemDataType::METADATA;
+			case 'cue_points':
+				return ESearchItemDataType::CUE_POINTS;
+			default:
+			{
+				KalturaLog::err('Unsupported inner object key in elastic results['.$innerHitsKey.']');
+				return $innerHitsKey;
+			}
+		}
 	}
 
 	private static function getCoreESearchResults($coreObjects, $objectsData, $objectsOrder)
@@ -108,10 +131,30 @@ class elasticSearchUtils
 		{
 			$resultObj = new ESearchResult();
 			$resultObj->setObject($coreObject);
-			$resultObj->setItemData($objectsData[$coreObject->getId()]);
+			$itemsData = array();
+			foreach ($objectsData[$coreObject->getId()] as $objectType => $values)
+			{
+				$itemsDataResult = self::getItemsDataResult($objectType, $values);
+				if($itemsDataResult)
+					$itemsData[] = $itemsDataResult;
+			}
+			$resultObj->setItemsData($itemsData);
 			$resultsObjects[] = $resultObj;
 		}
 		return $resultsObjects;
+	}
+
+	private static function getItemsDataResult($objectType, $values)
+	{
+		if(!isset($values['items']))
+			return null;
+
+		$result = new ESearchItemsDataResult();
+		$result->setTotalCount($values['totalCount']);
+		$result->setItems($values['items']);
+		$result->setItemsType($objectType);
+
+		return $result;
 	}
 
 	public static function transformElasticToCoreObject($elasticResults, $peerName)
@@ -122,15 +165,19 @@ class elasticSearchUtils
 		return array($coreResults, $objectCount);
 	}
 
-	protected static function getItemResults($objectResult, $objectType)
+	protected static function getInnerHitsTotalCountForObject($objectResult, $objectType)
 	{
 		switch ($objectType)
 		{
-			case 'caption_assets':
-				return $objectResult['inner_hits']['caption_assets.lines']['hits']['hits'];
-			case 'metadata':
-			case 'cue_points':
-				return array($objectResult);
+			case ESearchItemDataType::CAPTION:
+			case ESearchItemDataType::METADATA:
+			case ESearchItemDataType::CUE_POINTS:
+				 return $objectResult['hits']['total'];
+			default:
+			{
+				KalturaLog::err('Unsupported inner object type in elastic results['.$objectType.']');
+				return 0;
+			}
 		}
 	}
 
@@ -152,11 +199,9 @@ class elasticSearchUtils
 	public static function isMaster($elasticClient, $elasticHostName)
 	{
 		$masterInfo = $elasticClient->getMasterInfo();
-		if(!$masterInfo)
-			return false;
-		$masterHostName = isset($masterInfo[0]['node']) ? $masterInfo[0]['node'] : '';
-		if($masterHostName == $elasticHostName)
+		if(isset($masterInfo[0]['node']) && $masterInfo[0]['node'] == $elasticHostName)
 			return true;
+
 		return false;
 	}
 

@@ -229,21 +229,23 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			$data['caption_assets'][] = array(
 				'id' => $captionAsset->getId(),
 				'language' => $language,
-				'lines' => self::getElasticLines($items, $language)
+				'lines' => self::getElasticLines($items, $language, $captionAsset->getId())
 			);
 		}
 
 		return $data;
 	}
 
-	protected static function getElasticLines($items, $language)
+	protected static function getElasticLines($items, $language, $assetId)
 	{
 		$lines = array();
 		foreach ($items as $item)
 		{
 			$line = array(
 				'start_time' => $item['startTime'],
-				'end_time' => $item['endTime']
+				'end_time' => $item['endTime'],
+				'language' => $language,
+				'caption_asset_id' => $assetId
 			);
 
 			$content = '';
@@ -252,7 +254,8 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 
 			$content = kString::stripUtf8InvalidChars($content);
 			$content = kXml::stripXMLInvalidChars($content);
-			$content= substr($content, 0 , kElasticSearchManager::MAX_LENGTH);
+			if(strlen($content))
+				$content = substr($content, 0, kElasticSearchManager::MAX_LENGTH);
 			$line['content'] = $content;
 
 			$analyzedFieldName = elasticSearchUtils::getAnalyzedFieldName($language, 'content');

@@ -6,6 +6,7 @@
 
 class kCategorySearch extends kBaseSearch
 {
+    const PEER_NAME = 'categoryPeer';
 
     public function __construct()
     {
@@ -31,4 +32,10 @@ class kCategorySearch extends kBaseSearch
 
         parent::initQuery($statuses, $pager, $order);
     }
+
+    function getPeerName()
+    {
+        return self::PEER_NAME;
+    }
+
 }

@@ -5,19 +5,26 @@
  */
 class kESearchQueryManager
 {
+	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
+
 	public static function getMultiMatchQuery($searchItem, $fieldName, $shouldAddLanguageFields = false)
 	{
 		$multiMatch = array();
-		$multiMatch['multi_match']['query'] = $searchItem->getSearchTerm();
-		$multiMatch['multi_match']['fields'] = array(
-			$fieldName.'.trigrams',
+		$multiMatch['bool']['should'][0]['multi_match']['query'] = $searchItem->getSearchTerm();
+		$multiMatch['bool']['should'][0]['multi_match']['fields'] = array(
 			$fieldName.'.raw^3',
 			$fieldName.'^2',
 		);
-		$multiMatch['multi_match']['type'] = 'most_fields';
+		$multiMatch['bool']['should'][0]['multi_match']['type'] = 'most_fields';
 
 		if($shouldAddLanguageFields)
-			$multiMatch['multi_match']['fields'][] = $fieldName.'_*^2';
+			$multiMatch['bool']['should'][0]['multi_match']['fields'][] = $fieldName.'_*^2';
+
+		$trigramFieldName = $fieldName.'.trigrams';
+		$multiMatch['bool']['should'][1]['match'][$trigramFieldName]['query'] = $searchItem->getSearchTerm();
+		$trigramPercentage = kConf::get('trigramPercentage', 'elastic', self::DEFAULT_TRIGRAM_PERCENTAGE);
+		$multiMatch['bool']['should'][1]['match'][$trigramFieldName]['minimum_should_match'] = "$trigramPercentage%";
+		$multiMatch['bool']['minimum_should_match'] = 1;
 
 		return $multiMatch;
 	}
@@ -51,11 +58,6 @@ class kESearchQueryManager
 		return $prefixQuery;
 	}
 
-	public static function getDoesntContainQuery($searchItem, $fieldName, $allowedSearchTypes)
-	{
-		return self::getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes);
-	}
-
 	public static function getRangeQuery($searchItem, $fieldName, $allowedSearchTypes)
 	{
 		$rangeObject = $searchItem->getRange();
@@ -77,5 +79,13 @@ class kESearchQueryManager
 		$rangeQuery[$queryType][$fieldName] = $rangeSubQuery;
 		return $rangeQuery;
 	}
-	
+
+	public static function getExistsQuery($searchItem, $fieldName, $allowedSearchTypes)
+	{
+		$ExistsQuery = array();
+		$queryType = 'exists';
+		$ExistsQuery[$queryType]['field'] = $fieldName;
+		return $ExistsQuery;
+	}
+
 }
