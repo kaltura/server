@@ -6,6 +6,7 @@ class VoicebaseClientHelper
 {
 	const VOICEBASE_FAILURE_MEESAGE = "FAILURE";
 	const VOICEBASE_MACHINE_COMPLETE_MEESAGE = "MACHINECOMPLETE";
+	const VOICE_MACHINE_FAILURE_MESSAGE = "ERROR";
 	
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;
@@ -24,18 +25,26 @@ class VoicebaseClientHelper
 	}
 	
 	public function checkExistingExternalContent($entryId)
-	{
-		$params = array("action" => "getFileStatus", "externalID" => $entryId);
-		$exitingEntryQueryUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
-	
-		$curlResult = $this->sendAPICall($exitingEntryQueryUrl);
+	{	
+		$curlResult = $this->retrieveRemoteProcess($entryId);
 		if($curlResult)
 		{
 			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MEESAGE || !isset($curlResult->fileStatus) || !$curlResult->fileStatus == self::VOICEBASE_MACHINE_COMPLETE_MEESAGE)
 				return false;
 			return true;
 		}
+		
 		return false;
+	}
+	
+	public function retrieveRemoteProcess ($entryId)
+	{
+		$params = array("action" => "getFileStatus", "externalID" => $entryId);
+		$exitingEntryQueryUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
+	
+		$curlResult = $this->sendAPICall($exitingEntryQueryUrl);
+		
+		return $curlResult;
 	}
 	
 	public function uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation = null)
@@ -70,6 +79,7 @@ class VoicebaseClientHelper
 	
 		if($curlResult->requestStatus == self::VOICEBASE_FAILURE_MEESAGE)
 			return false;
+		
 		return true;
 	}
 	
@@ -94,7 +104,7 @@ class VoicebaseClientHelper
 		if(!$noDecoding)
 		{
 			$stringResult = $result;
-			$result = json_decode($result);
+			$result = json_decode($result, true);
 				
 			if (json_last_error() !== JSON_ERROR_NONE)
 			{
@@ -105,6 +115,7 @@ class VoicebaseClientHelper
 		}
 		KalturaLog::debug('result is - ' . var_dump($result));
 		curl_close($ch);
+		
 		return $result;
 	}
 	
@@ -137,13 +148,14 @@ class VoicebaseClientHelper
 			$result = $this->sendAPICall($url);
 			$results[$format] = $result->transcript;
 		}
+		
 		return $results;
 	}
 	
 	public function calculateAccuracy($entryId)
 	{
 		$contentArr = $this->getRemoteTranscripts($entryId, array("JSON"));
-		$transcriptWordObjects = json_decode($contentArr["JSON"]);
+		$transcriptWordObjects = json_decode($contentArr["JSON"], true);
 		$sumOfAccuracies = 0;
 		$numberOfElements = 0;
 		
@@ -158,6 +170,7 @@ class VoicebaseClientHelper
 	
 		if($numberOfElements)
 			return $sumOfAccuracies/$numberOfElements;
+		
 		return 0;
 	}
 	
@@ -180,6 +193,7 @@ class VoicebaseClientHelper
 	private function addUrlParams($url, array $params, $init = false)
 	{
 		$url .= $init ? '?' : '&' ;
+		
 		return $url . http_build_query($params);
 	}
 }
