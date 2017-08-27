@@ -75,5 +75,9 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $this->entryId);
 		parent::validateForInsert($propertiesToSkip);
 	}
-
+	
+	public function validateAlreadyExistsByType()
+	{
+		parent::validateAlreadyExistsByType(QuizPlugin::getApiValue(QuizUserEntryType::QUIZ));
+	}
 }

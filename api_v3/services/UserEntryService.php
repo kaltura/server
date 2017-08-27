@@ -22,12 +22,8 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function addAction(KalturaUserEntry $userEntry)
 	{
-		$entry = entryPeer::retrieveByPK($userEntry->entryId);
-		if (!$entry)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $userEntry->entryId);
-
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		$lockUser = $userEntry->userId ? $userEntry->userId : kCurrentContext::getCurrentKsKuserId();
+		$lockUser = $dbUserEntry->setKuserId();
 		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $lockUser;
 		$dbUserEntry = kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($dbUserEntry));
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -130,7 +126,6 @@ class UserEntryService extends KalturaBaseService {
 		$userEntry->fromObject($dbUserEntry);
 		return $userEntry;
 	}
-
 	
 	/**
 	 * @action bulkDelete
@@ -151,5 +146,21 @@ class UserEntryService extends KalturaBaseService {
 		
 		return $batchJob->getId();
 	}
-
+	
+	/**
+	 * Adds | Update a user_entry to the Kaltura DB based on if matching record already exists.
+	 *
+	 * @action upsert
+	 * @param KalturaUserEntry $userEntry
+	 * @return KalturaUserEntry
+	 */
+	public function upsertAction(KalturaUserEntry $userEntry)
+	{
+		$userEntryObject = $userEntry->validateAlreadyExistsByType();
+		
+		if(!$userEntryObject)
+			return $this->addAction($userEntry);
+		else 
+			return $this->updateAction($userEntryObject->getId(), $userEntry);
+	}
 }

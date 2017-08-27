@@ -67,4 +67,9 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 		return $object_to_fill;
 	}
 	
+	public function validateAlreadyExistsByType()
+	{
+		parent::validateAlreadyExistsByType(ViewHistoryPlugin::getApiValue(ViewHistoryUserEntryType::VIEW_HISTORY));
+	}
+	
 }

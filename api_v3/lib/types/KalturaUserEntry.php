@@ -104,6 +104,23 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		}
 		return $obj;
 	}
+	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		$this->validatePropertyNotNull("entryId");
+		$this->validateEntryId();
+		$this->validateUserID();
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if($this->entryId !== null)
+			$this->validateEntryId($sourceObject->getId());
+		
+		$this->validateUserID($sourceObject->getId());
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toInsertableObject()
@@ -158,5 +175,68 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		}
 		parent::doFromObject($srcObj, $responseProfile);
 	}
+	
+	/*
+	 * @param string $userEntryID
+	 * @throw KalturaAPIException
+	 */
+	private function validateEntryId($userEntryID = null)
+	{
+		if($userEntryID === null)
+		{
+			$dbEntry = entryPeer::retrieveByPK($this->entryId);
+			if (!$dbEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+		}
+		else 
+		{
+			// update
+			$dbUserEntry = UserEntryPeer::retrieveByPK($userEntryID);
+			if(!$dbUserEntry)
+				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $userEntryID);
+			
+			if($this->entryId !== null && $this->entryId != $dbUserEntry->getEntryId())
+				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID, $userEntryID);
+		}
+	}
 
+	/*
+	 * @param string $userEntryID
+	 * @throw KalturaAPIException
+	 */
+	private function validateUserId($userEntryID = null)
+	{
+		if($userEntryID === null)
+		{
+			$userId = $this->userId ? $this->userId : kCurrentContext::getCurrentKsKuserId();
+			if(!$userId)
+				throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED);
+		}
+		else 
+		{
+			// update
+			$dbUserEntry = UserEntryPeer::retrieveByPK($userEntryID);
+			if(!$dbUserEntry)
+				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $userEntryID);
+			
+			if($userId != $dbUserEntry->getKuserId())
+				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_DOES_NOT_MATCH_USER_ID, $userEntryID);
+		}
+	}
+	
+	public function validateAlreadyExistsByType($type = null)
+	{
+		$userId = $this->userId ? $this->userId : kCurrentContext::getCurrentKsKuserId();
+		if(!$userId || !$this->entryId)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 
+					$this->getFormattedPropertyNameWithClassName('userId') . '/' . $this->getFormattedPropertyNameWithClassName('entryId'));
+		
+		$userEntryCriteria = new Criteria();
+		
+		$userEntryCriteria->add(UserEntryPeer::ENTRY_ID, $this->entryId);
+		$userEntryCriteria->add(UserEntryPeer::KUSER_ID, $this->userId);
+		$userEntryCriteria->add(UserEntryPeer::TYPE, $type);
+		
+		return UserEntryPeer::doSelectOne($userEntryCriteria);
+	}
 }
