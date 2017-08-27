@@ -159,11 +159,11 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
 		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 		
-		$this->liveAUiConf = kmcUtils::getLiveUiconf(self::LIVE_ANALYTICS_UICONF_TAG);
+		$this->liveAUiConf = kmcUtils::getLiveUiconfByTag(self::LIVE_ANALYTICS_UICONF_TAG);
 		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->content_uiconf_livea = (is_array($this->content_uiconfs_livea) && reset($this->content_uiconfs_livea)) ? reset($this->content_uiconfs_livea) : null;
 		
-		$this->liveDUiConf = kmcUtils::getLiveUiconf(self::LIVE_DASHBOARD_UICONF_TAG);
+		$this->liveDUiConf = kmcUtils::getLiveUiconfByTag(self::LIVE_DASHBOARD_UICONF_TAG);
 		$this->content_uiconfs_lived = isset($this->liveDUiConf) ? array_values($this->liveDUiConf) : null;
 		$this->content_uiconf_lived = (is_array($this->content_uiconfs_lived) && reset($this->content_uiconfs_lived)) ? reset($this->content_uiconfs_lived) : null;
 
