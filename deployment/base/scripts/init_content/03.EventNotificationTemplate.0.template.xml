@@ -239,7 +239,7 @@
 					</item>
 				</eventConditions>
 				<format>1</format>
-				<subject>[AppTitle] - New Item Pending Moderation</subject>
+				<subject>[AppTitle] - Existing Item Pending Moderation</subject>
 				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
