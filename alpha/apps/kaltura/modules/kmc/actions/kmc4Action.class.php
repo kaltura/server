@@ -7,7 +7,7 @@ class kmc4Action extends kalturaAction
 {
 	const CURRENT_KMC_VERSION = 4;
 	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
-	const LIVE_DASHBOARD_UICONF_TAG = 'live_dashboard_player';
+	const LIVE_DASHBOARD_UICONF_TAG = 'lived_player';
 	
 	private $confs = array();
 	
