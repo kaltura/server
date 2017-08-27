@@ -1,5 +1,16 @@
 # Mercury 13.2.0 #
 
+## Add user permission for kclip attributes ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7929
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_24_add_kClip_Attribute_user_permission.php
+
 ## Add create recorded entry action ##
 
 - Issue Type: Feature
