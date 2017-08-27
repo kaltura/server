@@ -114,13 +114,12 @@ class kmcUtils
 		return $confs;
 	}
 
-	public static function getLiveUiconf($uiConfTag)
+	public static function getLiveUiconfByTag($uiConfTag)
 	{
 		$c = new Criteria();
-		$tag = $uiConfTag;
 		$c->addAnd(uiConfPeer::PARTNER_ID, 0);
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::TAGS, '%'.$tag.'%', Criteria::LIKE );
+		$c->addAnd ( uiConfPeer::TAGS, '%'.$uiConfTag.'%', Criteria::LIKE );
 		$c->addAnd ( uiConfPeer::TAGS, '%deprecated%', Criteria::NOT_LIKE );
 		$c->addDescendingOrderByColumn(uiConfPeer::CREATED_AT);	
 		$confs = uiConfPeer::doSelect($c);
