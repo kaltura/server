@@ -786,6 +786,7 @@ class MediaService extends KalturaEntryService
      	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
      	try{
        		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+			$this->updateContantInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
 			if($lock){
@@ -1150,6 +1151,34 @@ class MediaService extends KalturaEntryService
 			}
 		}
 		return false;
+	}
+
+	private function updateContantInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
+	{
+		if ($resource instanceof KalturaOperationResource && $resource->resource instanceof KalturaEntryResource)
+		{
+			$relatedEntries = $this->getRelatedEntries($dbEntry);
+			foreach ($relatedEntries as $relatedEntry)
+			{
+				KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry");
+				$resource->resource->entryId = $relatedEntry->getId();
+				$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
+			}
+		}
+	}
+
+	private function getRelatedEntries($entry)
+	{
+		/* @var $entry entry */
+		if (!$entry->getParentEntryId())
+			return entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getId(), $entry->getPartnerId());
+		$relatedEntries = array(entryPeer::retrieveByPK($entry->getParentEntryId()));
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getParentEntryId(), $entry->getPartnerId());
+		foreach($childEntries as $childEntry)
+			if ($childEntry->getId() != $entry->getId())
+				$relatedEntries[] = $childEntry;
+		return $relatedEntries;
+
 	}
 
 }
