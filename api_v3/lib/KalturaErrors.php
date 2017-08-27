@@ -655,6 +655,8 @@ class KalturaErrors extends APIErrors
 	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER;;Must filter on entry ID or user ID';
 	const USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED = 'USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED;;UserEntry filter object forbidden fields used';
 	const USER_ENTRY_ALREADY_EXISTS = 'USER_ENTRY_ALREADY_EXISTS;;UserEntry for this type already exists';
+	const USER_ID_NOT_PROVIDED = 'USER_ID_NOT_PROVIDED;;User ID not found neither on the object or KS';
+	const USER_ENTRY_DOES_NOT_MATCH_USER_ID = 'USER_ENTRY_DOES_NOT_MATCH_USER_ID;USER_ENTRY_ID;The userID on the user-entry [@USER_ENTRY_ID@] does not match the entry-id given';
 	
 	/*
 	 * serverNode service
