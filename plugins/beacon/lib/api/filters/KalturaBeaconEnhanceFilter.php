@@ -22,7 +22,7 @@ class KalturaBeaconEnhanceFilter extends KalturaFilter
 		$extraElasticQuery = json_decode($utf8Query, true);
 		$extraElasticQuery['index'] = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
 		
-		$searchMgr = new kBeaconSearchManger();
+		$searchMgr = new kBeaconSearchQueryManger();
 		$responseArray = $searchMgr->search($extraElasticQuery);
 		$responseArray = $searchMgr->getHitsFromElasticResponse($responseArray);
 		

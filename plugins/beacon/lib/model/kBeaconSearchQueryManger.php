@@ -4,7 +4,7 @@
  * @package plugins.beacon
  * @subpackage model
  */
-class kBeaconSearchManger
+class kBeaconSearchQueryManger
 {
 	private static $elasticClient = null;
 	

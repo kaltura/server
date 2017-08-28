@@ -20,7 +20,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 	{
 		$searchObject = $this->createSearchObject();
 		
-		$searchMgr = new kBeaconSearchManger();
+		$searchMgr = new kBeaconSearchQueryManger();
 		$searchQuery = $searchMgr->buildSearchQuery(kBeacon::ELASTIC_BEACONS_INDEX_NAME, $this->indexTypeEqual, $searchObject, $pager->pageSize, $pager->calcOffset());
 		$elasticQueryResponse = $searchMgr->search($searchQuery);
 		$responseArray = $searchMgr->getHitsFromElasticResponse($elasticQueryResponse);

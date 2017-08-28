@@ -176,7 +176,7 @@ class kBeacon
 		$searchObject[elasticClient::ELASTIC_TYPE_KEY] = BeaconIndexType::STATE;
 		$searchObject[elasticClient::ELASTIC_INDEX_KEY] = self::ELASTIC_BEACONS_INDEX_NAME;
 		
-		$searchMgr = new kBeaconSearchManger();
+		$searchMgr = new kBeaconSearchQueryManger();
 		$response = $searchMgr->get($searchObject);
 		
 		if ($response['found'] == false)
