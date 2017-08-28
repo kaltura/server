@@ -167,60 +167,26 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		$this->validateUserID();
 	}
 	
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	/*
+	 * @param string $userEntryID
+	 * @throw KalturaAPIException
+	 */
+	protected function validateEntryId()
 	{
-		if($this->entryId !== null)
-			$this->validateEntryId($sourceObject->getId());
-
-		$this->validateUserID($sourceObject->getId());
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 	}
 	
 	/*
 	 * @param string $userEntryID
 	 * @throw KalturaAPIException
 	 */
-	private function validateEntryId($userEntryID = null)
+	protected function validateUserId()
 	{
-		if($userEntryID === null)
-		{
-			$dbEntry = entryPeer::retrieveByPK($this->entryId);
-			if (!$dbEntry)
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		}
-		else
-		{
-			// update
-			$dbUserEntry = UserEntryPeer::retrieveByPK($userEntryID);
-			if(!$dbUserEntry)
-				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $userEntryID);
-				
-			if($this->entryId !== null && $this->entryId != $dbUserEntry->getEntryId())
-				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID, $userEntryID);
-		}
-	}
-	
-	/*
-	 * @param string $userEntryID
-	 * @throw KalturaAPIException
-	 */
-	private function validateUserId($userEntryID = null)
-	{
-		if($userEntryID === null)
-		{
-			$userId = $this->userId ? $this->userId : kCurrentContext::getCurrentKsKuserId();
-			if(!$userId)
-				throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED);
-		}
-		else
-		{
-			// update
-			$dbUserEntry = UserEntryPeer::retrieveByPK($userEntryID);
-			if(!$dbUserEntry)
-				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $userEntryID);
-				
-			if($userId != $dbUserEntry->getKuserId())
-				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_DOES_NOT_MATCH_USER_ID, $userEntryID);
-		}
+		
+		$userId = $this->userId ? $this->userId : kCurrentContext::getCurrentKsKuserId();
+		if(!$userId)
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED);
 	}
 }
