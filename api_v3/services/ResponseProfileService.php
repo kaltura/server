@@ -59,7 +59,7 @@ class ResponseProfileService extends KalturaBaseService
 	 * Get response profile by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaResponseProfile
 	 * 
 	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
@@ -79,7 +79,7 @@ class ResponseProfileService extends KalturaBaseService
 	 * Update response profile by id
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaResponseProfile $updateResponseProfile
 	 * @return KalturaResponseProfile
 	 * 
@@ -103,7 +103,7 @@ class ResponseProfileService extends KalturaBaseService
 	 * Update response profile status by id
 	 * 
 	 * @action updateStatus
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaResponseProfileStatus $status
 	 * @return KalturaResponseProfile
 	 * 
@@ -135,7 +135,7 @@ class ResponseProfileService extends KalturaBaseService
 	 * Delete response profile by id
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * 
 	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
 	 */
@@ -205,7 +205,7 @@ class ResponseProfileService extends KalturaBaseService
 	 * Clone an existing response profile
 	 * 
 	 * @action clone
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaResponseProfile $profile
 	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME
