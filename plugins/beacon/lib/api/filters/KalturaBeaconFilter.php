@@ -58,11 +58,12 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 	private function getSearchRangeTerms()
 	{
 		$range = array();
+		
 		$range[kBeacon::FIELD_CREATED_AT][baseObjectFilter::GTE] = $this->createdAtGreaterThanOrEqual;
 		$range[kBeacon::FIELD_CREATED_AT][baseObjectFilter::LTE] = $this->createdAtLessThanOrEqual;
 		
-		$range[kBeacon::FIELD_CREATED_AT][baseObjectFilter::GTE] = $this->updatedAtGreaterThanOrEqual;
-		$range[kBeacon::FIELD_CREATED_AT][baseObjectFilter::LTE] = $this->updatedAtLessThanOrEqual;
+		$range[kBeacon::FIELD_UPDATED_AT][baseObjectFilter::GTE] = $this->updatedAtGreaterThanOrEqual;
+		$range[kBeacon::FIELD_UPDATED_AT][baseObjectFilter::LTE] = $this->updatedAtLessThanOrEqual;
 		
 		return $range;
 	}
