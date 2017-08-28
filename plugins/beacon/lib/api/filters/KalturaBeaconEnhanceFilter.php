@@ -16,7 +16,7 @@ class KalturaBeaconEnhanceFilter extends KalturaFilter
 		return null;
 	}
 	
-	public function enhanceSearch(KalturaFilterPager $pager)
+	public function enhanceSearch()
 	{
 		$utf8Query = utf8_encode($this->externalElasticQueryObject);
 		$extraElasticQuery = json_decode($utf8Query, true);
