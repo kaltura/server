@@ -185,11 +185,14 @@ class MediaService extends KalturaEntryService
 			if ($conversionProfileId && !$advancedOptions)
 			{
 				$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
-				$defaultReplacementOptions = $conversionProfile->getDefaultReplacementOptions(); 
-				if ($defaultReplacementOptions) 
+				if($conversionProfile)
 				{
-					$dbEntry->setReplacementOptions($defaultReplacementOptions);
-    				$dbEntry->save();
+					$defaultReplacementOptions = $conversionProfile->getDefaultReplacementOptions(); 
+					if ($defaultReplacementOptions) 
+					{
+						$dbEntry->setReplacementOptions($defaultReplacementOptions);
+						$dbEntry->save();
+					}
 				}
 			}
 
