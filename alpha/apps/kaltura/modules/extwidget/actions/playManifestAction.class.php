@@ -932,7 +932,7 @@ class playManifestAction extends kalturaAction
 
 		$this->enforceAudioVideoEntry();
 		
-		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
+		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);
 		return $this->deliveryProfile->serve();
 	}
 	
@@ -1150,6 +1150,10 @@ class playManifestAction extends kalturaAction
 		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
 		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
 
+		$preventCaptions = $this->getRequestParameter("preventCaptions",null);
+		if($preventCaptions && $preventCaptions == "true")
+			$this->deliveryAttributes->setCaptionOptionByName("preventCaptions", $preventCaptions);
+
 		// Initialize
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
@@ -1197,6 +1201,8 @@ class playManifestAction extends kalturaAction
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
 		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
+		$config->preventCaptions = $this->deliveryAttributes->getCaptionOptionByName("preventCaptions") == "true" ? true : false;
+
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{

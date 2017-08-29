@@ -481,6 +481,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	 */
 	public static function getManifestEditors ($config)
 	{
+		if($config->preventCaptions == true)
+			return array();
+
 		$contributors = array();
 
 		switch ($config->format)

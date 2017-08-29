@@ -38,4 +38,9 @@ class kManifestContributorConfig
 	 */
 	public $hasSequence;
 
+	/**
+	 * @var bool
+	 */
+	public $preventCaptions;
+
 }
