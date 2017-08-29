@@ -932,7 +932,7 @@ class playManifestAction extends kalturaAction
 
 		$this->enforceAudioVideoEntry();
 		
-		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);
+		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 		return $this->deliveryProfile->serve();
 	}
 	
