@@ -1,0 +1,96 @@
+{
+	"settings" : {
+		"number_of_shards" : 5,
+		"number_of_replicas" : 2,
+		"analysis": {
+			"char_filter": {
+				"kaltura_whitespace_filter": {
+					"type": "pattern_replace",
+					"pattern": "(\\s+)",
+					"replacement": " "
+				}
+			},
+			"analyzer": {
+				"kaltura_keyword": {
+					"type": "custom",
+					"tokenizer": "keyword",
+					"char_filter": [
+						"kaltura_whitespace_filter"
+					],
+					"filter": [
+						"lowercase",
+						"trim"
+					]
+				}
+			}
+		}
+	},
+	"mappings": {
+		"State": {
+			"properties": {
+				"createdAt": {
+					"type": "date"
+				},
+				"eventType": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"objectId": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"partnerId": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"privateData": {
+					"type" : "object"
+				},
+				"rawData": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"relatedObjectType": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"updatedAt": {
+					"type": "date"
+				}
+			}
+		},
+		"Log": {
+			"properties": {
+				"createdAt": {
+					"type": "date"
+				},
+				"eventType": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"objectId": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"partnerId": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"privateData": {
+					"type" : "object"
+				},
+				"rawData": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"relatedObjectType": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"updatedAt": {
+					"type": "date"
+				}
+			}
+		}
+	}
+}
