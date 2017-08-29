@@ -189,6 +189,20 @@ class elasticClient
 	}
 	
 	/**
+	 * delete API
+	 * @param array $params
+	 * @return mixed
+	 */
+	public function deleteByQuery(array $params)
+	{
+		$queryParams = $this->getQueryParams($params);
+		$cmd = $this->buildElasticCommandUrl($params, $queryParams, 'delete_by_query');
+		
+		$response = $this->sendRequest($cmd, 'POST', $params['body']);
+		return $response;
+	}
+	
+	/**
 	 * get API
 	 * @param array $params
 	 * @return mixed

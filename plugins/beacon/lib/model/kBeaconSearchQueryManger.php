@@ -30,7 +30,21 @@ class kBeaconSearchQueryManger
 		return self::$elasticClient->get($searchQuery);
 	}
 	
-	public function buildSearchQuery($indexName, $indexType = null, $searchObject, $pageSize, $pageIndex)
+	public function delete($deleteQuery)
+	{
+		return self::$elasticClient->deleteByQuery($deleteQuery);
+	}
+	
+	public function deleteByObjectId($objectId)
+	{
+		$deleteObject = array();
+		$deleteObject['terms'] = array(kBeacon::FIELD_OBJECT_ID => $objectId, kBeacon::FIELD_PARTNER_ID => kCurrentContext::getCurrentPartnerId());
+		
+		$deleteQuery = $this->buildSearchQuery(kBeacon::ELASTIC_BEACONS_INDEX_NAME, null, $deleteObject);
+		return $this->delete($deleteQuery);
+	}
+	
+	public function buildSearchQuery($indexName, $indexType = null, $searchObject, $pageSize = 30, $pageIndex = 1)
 	{
 		$query = array();
 		
@@ -77,8 +91,12 @@ class kBeaconSearchQueryManger
 			$params['type'] = $indexType;
 		
 		$params['body'] = array();
-		$params['body']['size'] = $pageSize;
-		$params['body']['from'] = $pageIndex;
+		
+		if($pageSize)
+			$params['body']['size'] = $pageSize;
+		
+		if($pageIndex)
+			$params['body']['from'] = $pageIndex;
 		
 		$params['body']['query'] = array();
 		$params['body']['query']['bool'] = array();

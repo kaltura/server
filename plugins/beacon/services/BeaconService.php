@@ -64,4 +64,16 @@ class BeaconService extends KalturaBaseService
 		
 		return $filter->enhanceSearch();
 	}
+	
+	/**
+	 * @action delete
+	 * @param string $id
+	 */
+	
+	public function deleteAction($id)
+	{
+		$searchMgr = new kBeaconSearchQueryManger();
+		$searchMgr->deleteByObjectId($id);
+		return true;
+	}
 }
