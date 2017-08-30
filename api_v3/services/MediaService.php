@@ -787,7 +787,7 @@ class MediaService extends KalturaEntryService
      	try{
        		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 			if ($this->shouldUpdateRelatedEntry($resource))
-				$this->updateContantInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
 			if($lock){
@@ -1154,7 +1154,7 @@ class MediaService extends KalturaEntryService
 		return false;
 	}
 
-	private function updateContantInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
+	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
 	{
 		if (!isset($resource->resource->entryId))
 			return;
