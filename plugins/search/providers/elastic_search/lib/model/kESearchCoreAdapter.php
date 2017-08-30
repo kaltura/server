@@ -17,6 +17,8 @@ class kESearchCoreAdapter
 	const INNER_HITS_KEY = 'inner_hits';
 	const ID_KEY = '_id';
 	const TOTAL_KEY = 'total';
+	const TOTAL_COUNT_KEY = 'totalCount';
+	const ITEMS_KEY = 'items';
 
 	private static $innerHitsObjectType = array(
 		'caption_assets.lines' => ESearchItemDataType::CAPTION,
@@ -80,14 +82,14 @@ class kESearchCoreAdapter
 		{
 			$objectType = self::getInnerHitsObjectType($innerHitsKey);
 			$itemData[$objectType] = array();
-			$itemData[$objectType]['totalCount'] = self::getInnerHitsTotalCountForObject($hits, $objectType);
+			$itemData[$objectType][self::TOTAL_COUNT_KEY] = self::getInnerHitsTotalCountForObject($hits, $objectType);
 			foreach ($hits[self::HITS_KEY][self::HITS_KEY] as $itemResult)
 			{
 				$currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
 				if ($currItemData)
 				{
 					$currItemData->loadFromElasticHits($itemResult);
-					$itemData[$objectType]['items'][] = $currItemData;
+					$itemData[$objectType][self::ITEMS_KEY][] = $currItemData;
 				}
 			}
 		}
@@ -104,12 +106,12 @@ class kESearchCoreAdapter
 
 	private static function getItemsDataResult($objectType, $values)
 	{
-		if(!isset($values['items']))
+		if(!isset($values[self::ITEMS_KEY]))
 			return null;
 		
 		$result = new ESearchItemsDataResult();
-		$result->setTotalCount($values['totalCount']);
-		$result->setItems($values['items']);
+		$result->setTotalCount($values[self::TOTAL_COUNT_KEY]);
+		$result->setItems($values[self::ITEMS_KEY]);
 		$result->setItemsType($objectType);
 		
 		return $result;
