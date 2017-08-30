@@ -182,6 +182,20 @@ class MediaService extends KalturaEntryService
 			}
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
+			
+			if ($conversionProfileId && !$advancedOptions)
+			{
+				$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+				if($conversionProfile)
+				{
+					$defaultReplacementOptions = $conversionProfile->getDefaultReplacementOptions(); 
+					if ($defaultReplacementOptions) 
+					{
+						$dbEntry->setReplacementOptions($defaultReplacementOptions);
+						$dbEntry->save();
+					}
+				}
+			}
 
 			$this->replaceResourceByEntry($dbEntry, $resource, $tempMediaEntry);
 		}
@@ -784,6 +798,7 @@ class MediaService extends KalturaEntryService
 		
 	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
      	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+		
      	try{
        		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
