@@ -144,7 +144,12 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
-		
+
+        $kResource = $resource->toObject();
+        if ($kResource->getType() == 'kOperationResource'){
+            $tempDbEntry->setIsTrimmed(true);
+        }
+
 		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry, $tempDbEntry);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 		$tempDbEntry->save();
@@ -154,8 +159,7 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL) || $dbEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 		$dbEntry->save();
-		
-		$kResource = $resource->toObject();
+
 		$this->attachResource($kResource, $tempDbEntry);
 	}
 	
