@@ -1169,10 +1169,13 @@ class MediaService extends KalturaEntryService
 	
 	private function shouldUpdateRelatedEntry($resource)
 	{
-		//TODO check if clip or trim as clip app
-		if ($resource instanceof KalturaOperationResource && $resource->resource instanceof KalturaEntryResource)
-			return true;
-		return false;
+		return $this->isClipTrimFlow($resource);
+	}
+
+	private function isClipTrimFlow($resource)
+	{
+		return ($resource instanceof KalturaOperationResource && $resource->resource instanceof KalturaEntryResource
+			&& $resource->operationAttributes[0] instanceof KalturaClipAttributes);
 	}
 
 
