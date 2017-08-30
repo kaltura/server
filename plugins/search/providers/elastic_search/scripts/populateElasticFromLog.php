@@ -37,6 +37,7 @@ if(!file_exists($configFile))
     exit(-1);
 }
 $config = parse_ini_file($configFile);
+$elasticCluster = $config['elasticCluster'];
 $elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
 $systemSettings = kConf::getMap('system');
@@ -62,7 +63,7 @@ $gap = 500;
 
 $sphinxLogReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
 
-$serverLastLogs = SphinxLogServerPeer::retrieveByServer($elasticServer, $sphinxLogReadConn);
+$serverLastLogs = SphinxLogServerPeer::retrieveByServer($elasticCluster, $sphinxLogReadConn);
 
 
 $lastLogs = array();
@@ -72,6 +73,8 @@ foreach($serverLastLogs as $serverLastLog) {
     $lastLogs[$serverLastLog->getDc()] = $serverLastLog;
     $handledRecords[$serverLastLog->getDc()] = array();
 }
+
+$elasticClient = new elasticClient($elasticServer, $elasticPort); //take the server and port from config - $elasticServer , $elasticPort
 
 while(true)
 {
@@ -84,7 +87,13 @@ while(true)
         $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
     }
 
-    $elasticClient = new elasticClient($elasticServer, $elasticPort); //take the server and port from config - $elasticServer , $elasticPort
+    if(!elasticSearchUtils::isMaster($elasticClient, $elasticServer))
+    {
+        KalturaLog::log('elastic server ['.$elasticServer.'] is not the master , sleeping for 60 seconds');
+        sleep(60);
+        continue;
+    }
+
     $ping = $elasticClient->ping();
 
     if(!$ping)
@@ -107,7 +116,7 @@ while(true)
             $serverLastLog = $lastLogs[$dc];
         } else {
             $serverLastLog = new SphinxLogServer();
-            $serverLastLog->setServer($elasticServer);
+            $serverLastLog->setServer($elasticCluster);
             $serverLastLog->setDc($dc);
 
             $lastLogs[$dc] = $serverLastLog;

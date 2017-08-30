@@ -239,7 +239,7 @@ class ESearchCuePointItemData extends ESearchItemData
 
 	public function getType()
 	{
-		return 'cue_points';
+		return ESearchItemDataType::CUE_POINTS;
 	}
 
 	public function loadFromElasticHits($objectResult)

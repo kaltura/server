@@ -6,6 +6,8 @@
 class kEntrySearch extends kBaseSearch
 {
 
+    const PEER_NAME = 'entryPeer';
+
     protected $isInitialized;
     private $entryEntitlementQuery;
     private $parentEntryEntitlementQuery;
@@ -39,7 +41,19 @@ class kEntrySearch extends kBaseSearch
             'index' => ElasticIndexMap::ELASTIC_ENTRY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
+        $statuses = $this->initEntryStatuses($statuses);
         parent::initQuery($statuses, $pager, $order);
+    }
+
+    protected function initEntryStatuses($statuses)
+    {
+        $enumType = call_user_func(array('KalturaEntryStatus', 'getEnumClass'));
+
+        $finalStatuses = array();
+        foreach($statuses as $status)
+            $finalStatuses[] = kPluginableEnumsManager::apiToCore($enumType, $status);
+
+        return $finalStatuses;
     }
 
     protected function initEntitlement()
@@ -91,6 +105,11 @@ class kEntrySearch extends kBaseSearch
             $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool'];
         }
         $this->isInitialized = true;
+    }
+
+    function getPeerName()
+    {
+        return self::PEER_NAME;
     }
 
 }

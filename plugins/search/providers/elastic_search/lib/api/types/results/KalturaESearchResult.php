@@ -11,13 +11,13 @@ abstract class KalturaESearchResult extends KalturaObject
     public $object;
 
     /**
-     * @var KalturaESearchItemDataArray
+     * @var KalturaESearchItemDataResultArray
      */
-    public $itemData;
+    public $itemsData;
 
     private static $map_between_objects = array(
         'object',
-        'itemData',
+        'itemsData',
     );
 
     protected function getMapBetweenObjects()

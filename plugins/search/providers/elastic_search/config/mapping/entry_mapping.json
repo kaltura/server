@@ -1,15 +1,8 @@
 {
   "settings" : {
-	"number_of_shards" : 5,
+	"number_of_shards" : 6,
 	"number_of_replicas" : 0,
 	"analysis": {
-	  "filter": {
-		"trigrams_filter": {
-		  "type": "ngram",
-		  "min_gram": 3,
-		  "max_gram": 3
-		}
-	  },
 	  "char_filter": {
 		"kaltura_whitespace_filter": {
 		  "type": "pattern_replace",
@@ -17,13 +10,23 @@
 		  "replacement": " "
 		}
 	  },
+	  "tokenizer": {
+		"kaltura_ngram_tokenizer": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3,
+		  "token_chars": [
+			"letter",
+			"digit"
+		  ]
+		}
+	  },
 	  "analyzer": {
-		"trigrams": {
+		"kaltura_ngrams": {
 		  "type": "custom",
-		  "tokenizer": "standard",
+		  "tokenizer": "kaltura_ngram_tokenizer",
 		  "filter": [
-			"lowercase",
-			"trigrams_filter"
+			"lowercase"
 		  ]
 		},
 		"kaltura_keyword": {
@@ -49,9 +52,9 @@
 		"name" : {
 		  "type" : "text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
@@ -62,9 +65,9 @@
 		"description" : {
 		  "type" : "text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
@@ -92,6 +95,14 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"entitled_kusers_publish" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_pusers_edit" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_pusers_publish" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
@@ -277,9 +288,9 @@
 				"content" : {
 				  "type" : "text",
 				  "fields": {
-					"trigrams" : {
+					"ngrams" : {
 					  "type" : "text",
-					  "analyzer" : "trigrams"
+					  "analyzer" : "kaltura_ngrams"
 					},
 					"raw" : {
 					  "type" : "text",
@@ -424,6 +435,14 @@
 				},
 				"end_time"  : {
 				  "type" : "long"
+				},
+				"caption_asset_id": {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"language" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
 				}
 			  }
 			}
@@ -462,9 +481,9 @@
 			"value_text": {
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
@@ -488,9 +507,9 @@
 			"cue_point_name" : {
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"kaltura_ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
@@ -501,9 +520,9 @@
 			"cue_point_text" : {
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
@@ -528,9 +547,9 @@
 			"cue_point_question" : { //for polls
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
@@ -541,9 +560,9 @@
 			"cue_point_answers" : {
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
@@ -554,9 +573,9 @@
 			"cue_point_hint" : {
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
@@ -567,9 +586,9 @@
 			"cue_point_explanation" : {
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
@@ -610,9 +629,9 @@
 				"value_text": {
 				  "type" : "text",
 				  "fields": {
-					"trigrams" : {
+					"ngrams" : {
 					  "type" : "text",
-					  "analyzer" : "trigrams"
+					  "analyzer" : "kaltura_ngrams"
 					},
 					"raw" : {
 					  "type" : "text",

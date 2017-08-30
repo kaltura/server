@@ -15,6 +15,8 @@ class KalturaESearchCategoryItem extends KalturaESearchItem
 		'fieldName'
 	);
 
+	private static $map_dynamic_enum = array();
+
 	protected function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -27,5 +29,14 @@ class KalturaESearchCategoryItem extends KalturaESearchItem
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
+	protected function getItemFieldName()
+	{
+		return $this->fieldName;
+	}
+
+	protected function getDynamicEnumMap()
+	{
+		return self::$map_dynamic_enum;
+	}
 
 }

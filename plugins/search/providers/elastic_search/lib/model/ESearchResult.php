@@ -12,9 +12,9 @@ class ESearchResult extends BaseObject
 	protected $object;
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected $itemData;
+	protected $itemsData;
 
 	/**
 	 * @return BaseObject
@@ -33,19 +33,19 @@ class ESearchResult extends BaseObject
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
-	public function getItemData()
+	public function getItemsData()
 	{
-		return $this->itemData;
+		return $this->itemsData;
 	}
 
 	/**
-	 * @param string $itemData
+	 * @param array $itemsData
 	 */
-	public function setItemData($itemData)
+	public function setItemsData($itemsData)
 	{
-		$this->itemData = $itemData;
+		$this->itemsData = $itemsData;
 	}
 
 
