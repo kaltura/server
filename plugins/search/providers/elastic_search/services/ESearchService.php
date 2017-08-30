@@ -122,23 +122,21 @@ class ESearchService extends KalturaBaseService
 			$this->handleSearchException($e);
 		}
 
-		list($coreResults, $objectCount) = elasticSearchUtils::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName());
+		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName());
 		return array($coreResults, $objectCount);
 	}
 
 	private function handleSearchException($exception)
 	{
 		$code = $exception->getCode();
+		$data = $exception->getData();
 		switch($code)
 		{
 			case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD:
-				$data = $exception->getData();
 				throw new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data['itemType'], $data['fieldName']);
 			case kESearchException::EMPTY_SEARCH_TERM_NOT_ALLOWED:
-				$data = $exception->getData();
 				throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data['fieldName'], $data['itemType']);
 			case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH:
-				$data = $exception->getData();
 				throw new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH, $data['itemType']);
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);

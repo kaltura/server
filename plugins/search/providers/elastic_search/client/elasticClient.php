@@ -81,6 +81,7 @@ class elasticClient
      * @param $method
      * @param null $body
      * @return mixed
+     * @throws kESearchException
      */
     protected function sendRequest($cmd, $method, $body = null)
     {
@@ -101,7 +102,7 @@ class elasticClient
         {
             //return the response as associative array
             $response = json_decode($response, true);
-            if(isset($response['error']) && isset($response['status']))
+            if(isset($response['error']))
             {
                 $data = array();
                 $data['errorMsg'] = $response['error'];
@@ -197,10 +198,15 @@ class elasticClient
      * delete API
      * @param array $params
      * @return mixed
+     * @throws kESearchException
      */
     public function delete(array $params)
     {
         $cmd = $this->elasticHost;
+        $validate  = $this->validateParamsForDelete($params);
+        if(!$validate)
+            throw new kESearchException('Missing mandatory params for delete in elastic client', kESearchException::MISSING_PARAMS_FOR_DELETE);
+
         $cmd .='/'.$params['index'].'/'.$params['type'].'/'.$params['id'];
 
         $queryParams = $this->getQueryParams($params);
@@ -244,5 +250,20 @@ class elasticClient
         $cmd = $this->elasticHost . '/_cat/master?format=json';
         $response = $this->sendRequest($cmd, 'GET');
         return $response;
+    }
+
+    /**
+     * return true if index, type and document id are set
+     * @param $params
+     * @return bool
+     */
+    private function validateParamsForDelete($params)
+    {
+        if( isset($params['index']) && (strlen($params['index']) > 0) &&
+            isset($params['type']) && (strlen($params['type']) > 0) &&
+            isset($params['id']) && (strlen($params['id']) > 0) )
+            return true;
+
+        return false;
     }
 }

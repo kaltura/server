@@ -3,13 +3,6 @@
 	"number_of_shards" : 5,
 	"number_of_replicas" : 0,
 	"analysis": {
-	  "filter": {
-		"trigrams_filter": {
-		  "type": "ngram",
-		  "min_gram": 3,
-		  "max_gram": 3
-		}
-	  },
 	  "char_filter": {
 		"kaltura_whitespace_filter": {
 		  "type": "pattern_replace",
@@ -17,13 +10,23 @@
 		  "replacement": " "
 		}
 	  },
+	  "tokenizer": {
+		"kaltura_ngram_tokenizer": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3,
+		  "token_chars": [
+			"letter",
+			"digit"
+		  ]
+		}
+	  },
 	  "analyzer": {
-		"trigrams": {
+		"kaltura_ngrams": {
 		  "type": "custom",
-		  "tokenizer": "standard",
+		  "tokenizer": "kaltura_ngram_tokenizer",
 		  "filter": [
-			"lowercase",
-			"trigrams_filter"
+			"lowercase"
 		  ]
 		},
 		"kaltura_keyword": {
@@ -83,9 +86,9 @@
 		"name" : {
 		  "type" : "text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
@@ -96,9 +99,9 @@
 		"full_name" : {
 		  "type" : "text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
@@ -137,9 +140,9 @@
 		"description" : {
 		  "type" : "text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
@@ -211,9 +214,9 @@
 			"value_text": {
 			  "type" : "text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",
