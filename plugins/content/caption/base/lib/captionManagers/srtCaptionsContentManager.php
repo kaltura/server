@@ -83,4 +83,40 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new srtCaptionsContentManager();
 	}
+
+    public function buildSrtFile($captionItems, $clipStartTime)
+    {
+        $result = '';
+        $index = 0;
+
+        foreach($captionItems as $captionAssetItem) {
+            $result .= $this->addItemToSrt($captionAssetItem, $index, $clipStartTime);
+            $index += 1;
+        }
+
+        return $result;
+    }
+
+    private function addItemToSrt($captionAssetItem, $index, $clipStartTime)
+    {
+        $adjustedStartTime = $captionAssetItem->startTime - $clipStartTime;
+        if ($adjustedStartTime < 0)
+            $adjustedStartTime = 0;
+        $adjustedEndTime = $captionAssetItem->endTime - $clipStartTime;
+        $content = '';
+        $content .= $index. "\n";
+        $content .= $this->formatTime($adjustedStartTime);
+        $content .= " --> ". $this->formatTime($adjustedEndTime). "\n";
+        $content .= $captionAssetItem->content. "\n\n";
+        return $content;
+    }
+
+
+    private function formatTime($timeInMili){
+        $seconds = $timeInMili / 1000;
+        $remainder = round($seconds - ($seconds >> 0), 3) * 1000;
+        $formatted_remainder = sprintf("%03d", $remainder);
+
+        return gmdate('H:i:s,', $seconds).$formatted_remainder;
+    }
 }

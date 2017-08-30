@@ -145,10 +145,10 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 
-        $kResource = $resource->toObject();
-        if ($kResource->getType() == 'kOperationResource'){
-            $tempDbEntry->setIsTrimmed(true);
-        }
+		$kResource = $resource->toObject();
+		if ($kResource->getType() == 'kOperationResource'){
+			$tempDbEntry->setIsTrimmed(true);
+		}
 
 		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry, $tempDbEntry);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());

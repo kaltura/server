@@ -64,7 +64,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::RECALCULATE_CACHE' => 'Recalculate Cache',
 	'Kaltura_Client_Enum_BatchJobType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET' => 'Parse Multi Language Caption Asset',
 	'Kaltura_Client_Enum_BatchJobType::LIVE_TO_VOD' => 'Live To Vod',
-    'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
+	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',

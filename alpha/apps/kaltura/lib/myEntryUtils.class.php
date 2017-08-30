@@ -1846,19 +1846,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$entry->save();
 	}
 
-    public static function wasEntryClipped(BaseObject $object, array $modifiedColumns)
-    {
-        if ($object instanceof entry && in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
-                && $object->isCustomDataModified('operationAttributes')
-                && $object->isCustomDataModified('sourceEntryId')){
-            //clip case
-            if(!$object->getReplacedEntryId())
-                return true;
-            //trim case
-            if($object->getIsTrimmed())
-                return true;
-        }
-        return false;
-    }
+	public static function wasEntryClipped(BaseObject $object, array $modifiedColumns)
+	{
+	if ($object instanceof entry && in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
+		&& $object->isCustomDataModified('operationAttributes')
+		&& $object->isCustomDataModified('sourceEntryId')){
+		//clip case
+		if(!$object->getReplacedEntryId())
+			return true;
+		//trim case
+		if($object->getIsTrimmed())
+			return true;
+		}
+	return false;
+	}
 
 }

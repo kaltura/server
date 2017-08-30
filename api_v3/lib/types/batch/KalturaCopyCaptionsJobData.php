@@ -6,50 +6,50 @@
 class KalturaCopyCaptionsJobData extends KalturaJobData
 {
 
-    /** source entry Id
-     * @var string
-     */
-    public $sourceEntryId = null;
+	/** source entry Id
+	 * @var string
+	 */
+	public $sourceEntryId = null;
 
-    /** entry Id
-     * @var string
-     */
-    public $entryId = null;
+	/** entry Id
+	 * @var string
+	 */
+	public $entryId = null;
 
-    /** clip offset
-     * @var int
-     */
-    public $offset;
+	/** clip offset
+	 * @var int
+	 */
+	public $offset;
 
-    /** clip duration
-     * @var int
-     */
-    public $duration;
+	/** clip duration
+	 * @var int
+	 */
+	public $duration;
 
-    private static $map_between_objects = array
-    (
-        'entryId',
-        'sourceEntryId',
-        'offset',
-        'duration',
-    );
+	private static $map_between_objects = array
+	(
+		'entryId',
+		'sourceEntryId',
+		'offset',
+		'duration',
+	);
 
-    /* (non-PHPdoc)
+	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
 	 */
-    public function getMapBetweenObjects ( )
-    {
-        return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
-    }
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
 
-    /* (non-PHPdoc)
-     * @see KalturaObject::toObject()
-     */
-    public function toObject($dbData = null, $props_to_skip = array())
-    {
-        if(is_null($dbData))
-            $dbData = new kCopyCaptionsJobData();
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($dbData = null, $props_to_skip = array())
+	{
+		if(is_null($dbData))
+			$dbData = new kCopyCaptionsJobData();
 
-        return parent::toObject($dbData, $props_to_skip);
-    }
+		return parent::toObject($dbData, $props_to_skip);
+	}
 }
