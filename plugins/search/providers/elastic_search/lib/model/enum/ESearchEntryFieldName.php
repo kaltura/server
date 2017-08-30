@@ -32,4 +32,8 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_MODERATION_STATUS = 'moderation_status';
 	const ENTRY_TYPE = 'entry_type';
 	const ENTRY_CATEGORIES = 'categories';
+	const ENTRY_ADMIN_TAGS = 'admin_tags';
+	const ENTRY_CREDIT = 'credit';
+	const ENTRY_SITE_URL = 'site_url';
+	const ENTRY_ACCESS_CONTROL_ID = 'access_control_id';
 }
