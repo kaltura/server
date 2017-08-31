@@ -8,7 +8,7 @@ class KalturaLiveChannelSegment extends KalturaObject implements IRelatedFiltera
 	/**
 	 * Unique identifier
 	 * 
-	 * @var string
+	 * @var bigint
 	 * @readonly
 	 */
 	public $id;
@@ -97,7 +97,7 @@ class KalturaLiveChannelSegment extends KalturaObject implements IRelatedFiltera
 	/**
 	 * Live channel segment that the trigger relates to
 	 * 
-	 * @var string
+	 * @var bigint
 	 */
 	public $triggerSegmentId;
 	

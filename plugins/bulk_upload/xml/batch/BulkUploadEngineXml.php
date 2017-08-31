@@ -506,7 +506,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				{
 					continue;
 				}
-								
+
 				$flavorAsset = $this->getFlavorAsset($contentElement, $conversionProfileId);
 				$flavorAssetResource = $this->getResource($contentElement, $conversionProfileId);
 				if(!$flavorAssetResource)
@@ -520,7 +520,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					KalturaLog::info("Asset id [ $assetId]");
 					$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 				}
-			
+
+				if(isset($contentElement->streams))
+					$this->handleStreamsElement($contentElement->streams, $entry);
+
 				KalturaLog::info("assetParamsId [$assetParamsId]");
 							
 				if(is_null($assetParamsId)) // no params resource
@@ -539,6 +542,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$assetResource->resource = $flavorAssetResource;
 				$assetResource->assetParamsId = $assetParamsId;
 				$resource->resources[] = $assetResource;
+
 			}
 		}
 		
@@ -658,7 +662,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 										array $noParamsFlavorAssets, array $noParamsFlavorResources,
 										array $noParamsThumbAssets, array $noParamsThumbResources, array $pluginReplacementOptions, $keepManualThumbnails = false)
 	{
-		
+
 		KalturaLog::info("Resource is: " . print_r($resource, true));
 		
 		KBatchBase::impersonate($this->currentPartnerId);;
@@ -693,9 +697,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$advancedOptions = new KalturaEntryReplacementOptions();
 			$advancedOptions->keepManualThumbnails = 1;
 		}
-		
+
 		if($resource)
+		{
+			if ($updateEntry->streams )
+			{
+				$baseEntry = new KalturaMediaEntry();
+				$baseEntry->streams = $updateEntry->streams;
+				$updatedEntry = KBatchBase::$kClient->baseEntry->update($entryId, $baseEntry);
+			}
 			KBatchBase::$kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId, $advancedOptions); //to create a temporery entry.
+		}
+
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{

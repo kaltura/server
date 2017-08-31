@@ -945,6 +945,7 @@
 					<tr>
 						<th title="<?php echo $this->translate('entry-investigate history batch tooltip'); ?>"><?php echo $this->translate('entry-investigate history batch th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history status tooltip'); ?>"><?php echo $this->translate('entry-investigate history status th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history object th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history abort th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history recheck th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history msg th'); ?></th>
@@ -997,6 +998,7 @@
 										echo "<font color=\"$color\">$status</font>";
 									?>
 								</td>
+								<td><?php echo $job->jobObjectId; ?></td>
 								<td><?php echo $job->abort; ?></td>
 								<td><?php echo ($job->checkAgainTimeout ? date($this->translate('time format'), $job->checkAgainTimeout) : ''); ?></td>
 								<td><?php echo htmlspecialchars($job->message); ?></td>

@@ -6,6 +6,8 @@
 class kmc4Action extends kalturaAction
 {
 	const CURRENT_KMC_VERSION = 4;
+	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
+	const LIVE_DASHBOARD_UICONF_TAG = 'lived_player';
 	
 	private $confs = array();
 	
@@ -157,10 +159,13 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
 		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 		
-		$this->liveAUiConf = kmcUtils::getLiveAUiconf();
+		$this->liveAUiConf = kmcUtils::getLiveUiconfByTag(self::LIVE_ANALYTICS_UICONF_TAG);
 		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->content_uiconf_livea = (is_array($this->content_uiconfs_livea) && reset($this->content_uiconfs_livea)) ? reset($this->content_uiconfs_livea) : null;
 		
+		$this->liveDUiConf = kmcUtils::getLiveUiconfByTag(self::LIVE_DASHBOARD_UICONF_TAG);
+		$this->content_uiconfs_lived = isset($this->liveDUiConf) ? array_values($this->liveDUiConf) : null;
+		$this->content_uiconf_lived = (is_array($this->content_uiconfs_lived) && reset($this->content_uiconfs_lived)) ? reset($this->content_uiconfs_lived) : null;
 
 		$kmcVars = array(
 			'kmc_version'				=> $this->kmc_swf_version,
@@ -219,6 +224,10 @@ class kmc4Action extends kalturaAction
 			'usagedashboard'			=> array(
 				'version'				=> kConf::get("usagedashboard_version"),
 			),
+			'liveDashboard'             => array(
+                'version'				=> kConf::get("live_dashboard_version"),
+				'uiConfId'				=> isset($this->content_uiconf_lived) ? $this->content_uiconf_lived->getId() : '',
+            ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
 			'language'					=> $language,

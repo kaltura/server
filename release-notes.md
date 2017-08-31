@@ -1,5 +1,28 @@
 # Mercury 13.2.0 #
 
+## Add new ElasticSearch plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### configuration ###
+Add the following to plugins.ini file: "ElasticSearch"
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. create configurations/elastic.ini from configurations/elastic.ini.template and update placeholders with the elastic cluster information.
+
+## Add user permission for kclip attributes ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7929
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_24_add_kClip_Attribute_user_permission.php
+
 ## Add create recorded entry action ##
 
 - Issue Type: Feature

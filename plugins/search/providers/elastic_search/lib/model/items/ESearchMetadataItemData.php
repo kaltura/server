@@ -28,7 +28,7 @@ class ESearchMetadataItemData extends ESearchItemData
 
 	public function getType()
 	{
-		return 'metadata';
+		return ESearchItemDataType::METADATA;
 	}
 
 	/**
