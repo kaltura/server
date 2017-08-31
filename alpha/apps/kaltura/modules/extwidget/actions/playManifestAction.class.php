@@ -1197,10 +1197,7 @@ class playManifestAction extends kalturaAction
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
 		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
-
-		$preventCaptions = $this->getRequestParameter("preventCaptions",null);
-		if($preventCaptions && $preventCaptions == "true")
-			$config->preventCaptions = true;
+		$config->disableCaptions = $this->getRequestParameter("disableCaptions", "") == "true" ? true : false;
 
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
