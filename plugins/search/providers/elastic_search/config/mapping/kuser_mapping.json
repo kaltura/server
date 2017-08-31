@@ -86,10 +86,12 @@
 		  "type" : "keyword"
 		},
 		"created_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"updated_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"first_name" : {
 		  "type" : "text",

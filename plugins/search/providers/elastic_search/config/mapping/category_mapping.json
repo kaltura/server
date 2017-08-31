@@ -117,10 +117,12 @@
 		  "type" : "integer"
 		},
 		"created_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"updated_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"direct_entries_count" : {
 		  "type" : "integer"

@@ -174,10 +174,12 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"start_date": {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"end_date": {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"site_url": {
 		  "type" : "text",
@@ -200,13 +202,16 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"created_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"updated_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"modified_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"total_rank": {
 		  "type" : "text",
