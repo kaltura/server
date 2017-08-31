@@ -25,17 +25,17 @@ None
  - The workers.ini has been change, make sure to add the following to your workers.ini:
 
 	[KAsyncCopyCaptions : JobHandlerWorker]
-    id													= 650
-    friendlyName										= Copy Caption Assets
-    type												= KAsyncCopyCaptions
-    scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
+
+	id													= 650
+	friendlyName										= Copy Caption Assets
+	type												= KAsyncCopyCaptions
+	scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
 
  - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
 
     under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
 
 ### Deployment scripts ###
-	run:
 
 		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
 
