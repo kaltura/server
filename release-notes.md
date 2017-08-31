@@ -27,8 +27,11 @@ None
 	[KAsyncCopyCaptions : JobHandlerWorker]
 
 	id													= 650
+
 	friendlyName										= Copy Caption Assets
+
 	type												= KAsyncCopyCaptions
+
 	scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
 
  - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
@@ -37,7 +40,7 @@ None
 
 ### Deployment scripts ###
 
-		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
 
 
 # Mercury 13.1.0 #
