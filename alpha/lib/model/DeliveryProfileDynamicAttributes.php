@@ -177,11 +177,6 @@ class DeliveryProfileDynamicAttributes {
 	protected  $hasValidSequence = false;
 
 	/**
-	 * @var array
-	 */
-	protected $captionOptions = array();
-
-	/**
 	 * @return the $addThumbnailExtension
 	 */
 	public function getAddThumbnailExtension() {
@@ -660,36 +655,6 @@ class DeliveryProfileDynamicAttributes {
 	public function setHasValidSequence($hasValidSequence)
 	{
 		$this->hasValidSequence = $hasValidSequence;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getCaptionOptions()
-	{
-		return $this->captionOptions;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getCaptionOptionByName($name)
-	{
-		if($name != "")
-			return $this->captionOptions[$name];
-		return null;
-	}
-
-	/**
-	 * @param string $name
-	 * @param string $value
-	 */
-	public function setCaptionOptionByName($name, $value)
-	{
-		if($name != "")
-		{
-			$this->captionOptions[$name] = $value;
-		}
 	}
 
 	/**
