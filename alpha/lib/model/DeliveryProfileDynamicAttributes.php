@@ -488,7 +488,29 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function setPlayerConfig($playerConfig)
 	{
+		if($this->usePlayServer && !$this->isPlayerConfigValid($playerConfig))
+			return;
+		
 		$this->playerConfig = $playerConfig;
+	}
+	
+	private function isPlayerConfigValid($playerConfig)
+	{
+		$playConfigJson = json_decode($playerConfig);
+		
+		if(json_last_error() != JSON_ERROR_NONE)
+		{
+			KalturaLog::debug("playerConfig provided is not a json object, data will not be forward to playServer [$playerConfig]");
+			return false;
+		}
+		
+		if(isset($playConfigJson->sessionId) && is_int($playConfigJson->sessionId))
+		{
+			KalturaLog::debug("Integer sessionId value provided in player config, data will not be forward to playServer [$playerConfig]");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
