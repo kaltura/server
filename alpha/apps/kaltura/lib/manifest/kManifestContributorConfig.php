@@ -41,6 +41,6 @@ class kManifestContributorConfig
 	/**
 	 * @var bool
 	 */
-	public $preventCaptions;
+	public $disableCaptions;
 
 }
