@@ -1797,8 +1797,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setRecordedEntrySegmentCount ( $v )	{	$this->putInCustomData ( "recordedEntrySegmentCount" , $v );	}
 	public function getRecordedEntrySegmentCount(  )		{	return $this->getFromCustomData( "recordedEntrySegmentCount", null, 0 );	}
 
-	public function setIsTrimmed ($v)	    { $this->putInCustomData ( "isTrimmed" , $v );	}
-	public function getIsTrimmed ()		{	return $this->getFromCustomData( "isTrimmed", null, false );	}
+	public function setTempTrimEntry ($v)	    { $this->putInCustomData ( "tempTrimEntry" , $v );	}
+	public function getTempTrimEntry ()		{	return $this->getFromCustomData( "tempTrimEntry", null, false );	}
 
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		

@@ -146,9 +146,8 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 
 		$kResource = $resource->toObject();
-		if ($kResource->getType() == 'kOperationResource'){
-			$tempDbEntry->setIsTrimmed(true);
-		}
+		if ($kResource->getType() == 'kOperationResource')
+			$tempDbEntry->setTempTrimEntry(true);
 
 		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry, $tempDbEntry);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());

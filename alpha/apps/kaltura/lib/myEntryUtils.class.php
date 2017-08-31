@@ -385,9 +385,9 @@ class myEntryUtils
 			}
 		}
 
+		KalturaLog::log("delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
 
-        KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
-        kJobsManager::abortEntryJobs($entry->getId());
+		kJobsManager::abortEntryJobs($entry->getId());
 		
 		$media_type = $entry->getMediaType();
 		$need_to_fix_roughcut = false;
@@ -1846,16 +1846,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$entry->save();
 	}
 
-	public static function wasEntryClipped(BaseObject $object, array $modifiedColumns)
+	public static function wasEntryClipped(entry $entry, array $modifiedColumns)
 	{
-	if ($object instanceof entry && in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
-		&& $object->isCustomDataModified('operationAttributes')
-		&& $object->isCustomDataModified('sourceEntryId')){
+	if (in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
+		&& $entry->isCustomDataModified('operationAttributes')
+		&& $entry->isCustomDataModified('sourceEntryId'))
+		{
 		//clip case
-		if(!$object->getReplacedEntryId())
+		if(!$entry->getReplacedEntryId())
 			return true;
 		//trim case
-		if($object->getIsTrimmed())
+		if($entry->getTempTrimEntry())
 			return true;
 		}
 	return false;

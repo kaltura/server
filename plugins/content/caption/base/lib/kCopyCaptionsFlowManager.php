@@ -6,9 +6,9 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
   */
 	public function shouldConsumeReplacedEvent(BaseObject $object)
 	{
-		if($object instanceof entry) {
+		if($object instanceof entry)
 			return true;
-		}
+
 		return false;
 	}
 
@@ -17,7 +17,7 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary() && !$object->getIsTrimmed())
+		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary() && !$object->getTempTrimEntry())
 			return true;
 
 		return false;
@@ -28,7 +28,7 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	  */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary() && !$object->getIsTrimmed())
+		if($object instanceof entry && $object->getReplacedEntryId() && $object->getIsTemporary() && !$object->getTempTrimEntry())
 		{
 			$this->copyUpdatedCaptionsToEntry($object);
 		}
@@ -43,7 +43,8 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null) {
 		$clipAttributes = self::getClipAttributesFromEntry($replacingObject);
 		//replacement as a result of trimming
-		if (!is_null($clipAttributes)) {
+		if (!is_null($clipAttributes))
+		{
 			kEventsManager::setForceDeferredEvents(true);
 			$c = new Criteria();
 			$c->add(assetPeer::ENTRY_ID, $object->getId());
@@ -53,7 +54,8 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 			$this->deleteCaptions($c);
 			//copy captions from replacement entry
 			$replacementCaptions = assetPeer::retrieveByEntryId($replacingObject->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
-			foreach ($replacementCaptions as $captionAsset) {
+			foreach ($replacementCaptions as $captionAsset)
+			{
 				$newCaptionAsset = $captionAsset->copyToEntry($object->getId());
 				$newCaptionAsset->save();
 			}
@@ -86,8 +88,10 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
    */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if (myEntryUtils::wasEntryClipped($object, $modifiedColumns)) {
-			return true;
+		if($object instanceof entry)
+		{
+			if (myEntryUtils::wasEntryClipped($object, $modifiedColumns))
+				return true;
 		}
 		return false;
 	}
@@ -97,9 +101,10 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if (myEntryUtils::wasEntryClipped($object, $modifiedColumns))
+		if($object instanceof entry)
 		{
-			$this->copyUpdatedCaptionsToEntry($object);
+			if (myEntryUtils::wasEntryClipped($object, $modifiedColumns))
+				$this->copyUpdatedCaptionsToEntry($object);
 		}
 		return true;
 	}
@@ -115,7 +120,7 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 		$jobData->setEntryId($destEntry->getId());
 
 		//regular replacement
-		if(!$destEntry->getIsTrimmed() && $destEntry->getReplacedEntryId()){
+		if(!$destEntry->getTempTrimEntry() && $destEntry->getReplacedEntryId()){
 			$sourceEntryId = $destEntry->getReplacedEntryId();
 			$sourceEntry = entryPeer::retrieveByPK($sourceEntryId);
 			if(!$sourceEntry)
@@ -125,18 +130,22 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 			}
 			$jobData->setOffset(0);
 			$jobData->setDuration($sourceEntry->getLengthInMsecs());
+			$jobData->setFullCopy(true);
 		}
 		else { //trim or clip
 			$clipAttributes = self::getClipAttributesFromEntry($destEntry);
-			if (!is_null($clipAttributes)) {
+			if (!is_null($clipAttributes))
+			{
 				$sourceEntry = entryPeer::retrieveByPK($destEntry->getSourceEntryId());
-				if (is_null($sourceEntry)) {
+				if (is_null($sourceEntry))
+				{
 					KalturaLog::info("Didn't copy captions for entry [{$destEntry->getId()}] because source entry [" . $destEntry->getSourceEntryId() . "] wasn't found");
 					return;
 				}
 
 				$jobData->setOffset($clipAttributes->getOffset());
 				$jobData->setDuration($clipAttributes->getDuration());
+				$jobData->setFullCopy(false);
 			}
 		}
 
@@ -155,13 +164,14 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	 * @return kClipAttributes|null
 	 */
 	protected static function getClipAttributesFromEntry(BaseObject $object) {
-		if ($object instanceof entry) {
+		if ($object instanceof entry)
+		{
 			$operationAttributes = $object->getOperationAttributes();
-			if (!is_null($operationAttributes) && count($operationAttributes) > 0) {
+			if (!is_null($operationAttributes) && count($operationAttributes) > 0)
+			{
 				$clipAttributes = reset($operationAttributes);
-				if ($clipAttributes instanceof kClipAttributes) {
+				if ($clipAttributes instanceof kClipAttributes)
 					return $clipAttributes;
-				}
 			}
 		}
 		return null;

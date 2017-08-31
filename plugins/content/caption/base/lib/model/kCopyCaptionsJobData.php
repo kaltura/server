@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Core
+ * @package plugins.caption
  * @subpackage model.data
  */
 class kCopyCaptionsJobData extends kJobData
@@ -24,6 +24,11 @@ class kCopyCaptionsJobData extends kJobData
 	* @var int
 	*/
 	private $duration;
+
+	/**
+	 * @var bool
+	 */
+	private $fullCopy;
 
 
 	/**
@@ -89,5 +94,21 @@ class kCopyCaptionsJobData extends kJobData
 	{
 		$this->duration = $duration;
 	}
+
+    /**
+     * @return bool
+     */
+    public function getFullCopy()
+    {
+        return $this->fullCopy;
+    }
+
+    /**
+     * @param bool $fullCopy
+     */
+    public function setFullCopy($fullCopy)
+    {
+        $this->fullCopy = $fullCopy;
+    }
 
 }

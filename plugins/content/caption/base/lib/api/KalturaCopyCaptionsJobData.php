@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage objects
+ * @package plugins.caption
+ * @subpackage api.objects
  */
 class KalturaCopyCaptionsJobData extends KalturaJobData
 {
@@ -26,12 +26,18 @@ class KalturaCopyCaptionsJobData extends KalturaJobData
 	 */
 	public $duration;
 
+	/**
+	 * @var bool
+	 */
+	public $fullCopy;
+
 	private static $map_between_objects = array
 	(
 		'entryId',
 		'sourceEntryId',
 		'offset',
 		'duration',
+		'fullCopy',
 	);
 
 	/* (non-PHPdoc)

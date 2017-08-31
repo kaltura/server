@@ -3,8 +3,8 @@
 /**
  * Executes the KAsyncCopyCaptions
  *
- * @package Scheduler
- * @subpackage Copy
+ * @package plugins.caption
+ * @subpackage Scheduler
  */
 require_once(__DIR__ . "/../../../../../../batch/bootstrap.php");
 
