@@ -1811,7 +1811,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile [" . $entryDistribution->getDistributionProfileId() . "] not found");
 				continue;
 			}
-			
+	
+			if(!$distributionProfile->isAssetTypeAllowed($asset->getType()))
+			{
+				continue;
+			}
+	
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
 			{

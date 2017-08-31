@@ -154,6 +154,12 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 	 */
 	public $recommendedDcForExecute;
 	
+	/**
+	 * Updates should not be done on events on these asset types' context
+	 * @var KalturaAssetTypeInfoArray
+	 */
+	public $assetTypesNotAllowed;
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -179,6 +185,7 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 		'recommendedStorageProfileForDownload',
 		'recommendedDcForDownload',
 		'recommendedDcForExecute',
+		'assetTypesNotAllowed',
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -243,7 +250,9 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 			return;
 			
 		parent::doFromObject($sourceObject, $responseProfile);
-		
+
+		$this->assetTypesNotAllowed = KalturaAssetTypeInfoArray::fromDbArray($sourceObject->getAssetTypesNotAllowed());
+
 		if($this->shouldGet('optionalThumbDimensions', $responseProfile))
 			$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
 		if($this->shouldGet('requiredThumbDimensions', $responseProfile))
