@@ -1846,5 +1846,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$entry->save();
 	}
 
+	public static function getRelatedEntries($entry)
+	{
+		/* @var $entry entry */
+		if (!$entry->getParentEntryId())
+			return entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getId(), $entry->getPartnerId());
+		$relatedEntries = array(entryPeer::retrieveByPK($entry->getParentEntryId()));
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getParentEntryId(), $entry->getPartnerId());
+		foreach($childEntries as $childEntry)
+			if ($childEntry->getId() != $entry->getId())
+				$relatedEntries[] = $childEntry;
+		return $relatedEntries;
+	}
 
 }

@@ -801,6 +801,8 @@ class MediaService extends KalturaEntryService
 		
      	try{
        		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+			if ($this->shouldUpdateRelatedEntry($resource))
+				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
 			if($lock){
@@ -1166,5 +1168,31 @@ class MediaService extends KalturaEntryService
 		}
 		return false;
 	}
+
+	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
+	{
+		if (!isset($resource->resource->entryId))
+			return;
+		$relatedEntries = myEntryUtils::getRelatedEntries($dbEntry);
+		foreach ($relatedEntries as $relatedEntry)
+		{
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry");
+			$resource->resource->entryId = $relatedEntry->getId();
+			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
+		}
+	}
+	
+	private function shouldUpdateRelatedEntry($resource)
+	{
+		return $this->isClipTrimFlow($resource);
+	}
+
+	private function isClipTrimFlow($resource)
+	{
+		return ($resource instanceof KalturaOperationResource && $resource->resource instanceof KalturaEntryResource
+			&& $resource->operationAttributes[0] instanceof KalturaClipAttributes);
+	}
+
+
 
 }
