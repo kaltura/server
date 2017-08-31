@@ -87,10 +87,10 @@ while(true)
         $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
     }
 
-    if(!elasticSearchUtils::isMaster($elasticClient, $elasticServer))
+    if(!elasticSearchUtils::isMaster($elasticClient, $hostname))
     {
-        KalturaLog::log('elastic server ['.$elasticServer.'] is not the master , sleeping for 60 seconds');
-        sleep(60);
+        KalturaLog::log('elastic server ['.$hostname.'] is not the master , sleeping for 30 seconds');
+        sleep(30);
         continue;
     }
 
