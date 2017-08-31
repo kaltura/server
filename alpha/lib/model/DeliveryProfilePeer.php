@@ -159,9 +159,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		if(!$delivery)
 			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
 		
-		if($delivery)
-			$delivery->setDynamicAttributes($deliveryAttributes);
-		
 		return $delivery;
 	}
 	
@@ -196,7 +193,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 		$delivery = self::getDeliveryByPartner($entry, $partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured, $isLive);
 		if($delivery)
+		{
 			$delivery->setEntryId($entryId);
+			$delivery->setDynamicAttributes($deliveryAttributes);
+		}
 		
 		return $delivery;
 	}
