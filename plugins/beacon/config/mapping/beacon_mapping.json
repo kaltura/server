@@ -29,7 +29,8 @@
 		"State": {
 			"properties": {
 				"createdAt": {
-					"type": "date"
+					"type": "date",
+					"format": "epoch_second"
 				},
 				"eventType": {
 					"type" : "text",
@@ -55,14 +56,16 @@
 					"analyzer" : "kaltura_keyword"
 				},
 				"updatedAt": {
-					"type": "date"
+					"type": "date",
+					"format": "epoch_second"
 				}
 			}
 		},
 		"Log": {
 			"properties": {
 				"createdAt": {
-					"type": "date"
+					"type": "date",
+					"format": "epoch_second"
 				},
 				"eventType": {
 					"type" : "text",
@@ -88,7 +91,8 @@
 					"analyzer" : "kaltura_keyword"
 				},
 				"updatedAt": {
-					"type": "date"
+					"type": "date",
+					"format": "epoch_second"
 				}
 			}
 		}
