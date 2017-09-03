@@ -20,6 +20,11 @@ class LiveEntryServerNodeRecordingInfo
 	protected $duration;
 
 	/**
+	 * @var int
+	 */
+	protected $recordingStatus;
+
+	/**
 	 * @return string
 	 */
 	public function getRecordedEntryId()
@@ -49,6 +54,22 @@ class LiveEntryServerNodeRecordingInfo
 	public function setDuration($duration)
 	{
 		$this->duration = $duration;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getRecordingStatus()
+	{
+		return $this->recordingStatus;
+	}
+
+	/**
+	 * @param int $recordingStatus
+	 */
+	public function setRecordingStatus($recordingStatus)
+	{
+		$this->recordingStatus = $recordingStatus;
 	}
 
 }

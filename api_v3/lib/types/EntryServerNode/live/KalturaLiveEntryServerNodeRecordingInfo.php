@@ -15,11 +15,17 @@ class KalturaLiveEntryServerNodeRecordingInfo extends KalturaObject
 	 * @var int
 	 */
 	public $duration;
+
+	/**
+	 * @var KalturaEntryServerNodeRecordingStatus
+	 */
+	public $recordingStatus;
 	
 	private static $mapBetweenObjects = array
 	(
 			"recordedEntryId",
 			"duration",
+			"recordingStatus",
 	);
 	
 	/* (non-PHPdoc)
@@ -38,6 +44,8 @@ class KalturaLiveEntryServerNodeRecordingInfo extends KalturaObject
 		{
 			$dbObject = new LiveEntryServerNodeRecordingInfo();
 		}
+		if (is_null($this->recordingStatus))
+			$this->recordingStatus = KalturaEntryServerNodeRecordingStatus::STOPPED;
 	
 		return parent::toObject($dbObject, $propsToSkip);
 	}

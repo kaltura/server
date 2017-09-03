@@ -33,9 +33,10 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 	
 	public function getRegiteredNodeServers()
 	{
+		KalturaLog::debug("@@NA getting registered node servers");
 		$edgeServerIds = explode(',', $this->getEdgeServerIds());
 		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($edgeServerIds);
-		
+
 		return $edgeServers;
 	}
 	
