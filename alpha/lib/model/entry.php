@@ -1796,7 +1796,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setRecordedEntrySegmentCount ( $v )	{	$this->putInCustomData ( "recordedEntrySegmentCount" , $v );	}
 	public function getRecordedEntrySegmentCount(  )		{	return $this->getFromCustomData( "recordedEntrySegmentCount", null, 0 );	}
-	
+
+	public function setTempTrimEntry ($v)	    { $this->putInCustomData ( "tempTrimEntry" , $v );	}
+	public function getTempTrimEntry ()		{	return $this->getFromCustomData( "tempTrimEntry", null, false );	}
+
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
@@ -1833,7 +1836,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setReachedMaxRecordingDuration ( $v )	{	$this->putInCustomData ( "reachedMaxRecordingDuration" , (bool) $v );	}
 	public function getReachedMaxRecordingDuration() 	{	return (bool) $this->getFromCustomData( "reachedMaxRecordingDuration" ,null, false );	}
-		
+
+
 	public function getParentEntry()
 	{
 		if(!$this->getParentEntryId())
