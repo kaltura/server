@@ -15,10 +15,16 @@ class kESearchQueryManager
 	const TYPE_KEY = 'type';
 	const MOST_FIELDS = 'most_fields';
 	const MATCH_KEY = 'match';
+	const SORT_KEY = 'sort';
+	const MUST_KEY = 'must';
 	const MINIMUM_SHOULD_MATCH_KEY = 'minimum_should_match';
 	const PREFIX_KEY = 'prefix';
 	const TERM_KEY = 'term';
+	const TERMS_KEY = 'terms';
 	const RANGE_KEY = 'range';
+	const ORDER_KEY = 'order';
+	const ORDER_ASC_KEY = 'asc';
+	const ORDER_DESC_KEY = 'desc';
 	const GT_KEY = 'gt';
 	const GTE_KEY = 'gte';
 	const LT_KEY = 'lt';

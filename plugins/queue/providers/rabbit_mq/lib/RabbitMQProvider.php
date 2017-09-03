@@ -25,7 +25,7 @@ class RabbitMQProvider extends QueueProvider
 	private $timeout;
 	private $exchangeName;
 
-	public function __construct(array $rabbitConfig)
+	public function __construct(array $rabbitConfig, $constructorArgs)
 	{
 		$this->username = $rabbitConfig['username'];
 		$this->password = $rabbitConfig['password'];
@@ -33,7 +33,12 @@ class RabbitMQProvider extends QueueProvider
 		$this->port = $rabbitConfig['port'];
 		$this->curlPort = $rabbitConfig['curl_port'];
 		$this->timeout = $rabbitConfig['timeout'];
-		$this->exchangeName = kConf::get("push_server_exchange");
+		
+		$exchangeName = kConf::get("push_server_exchange");
+		if(isset($constructorArgs['exchangeName']))
+			$exchangeName = $constructorArgs['exchangeName'];
+		
+		$this->exchangeName = $exchangeName;
 	}
 	
 	/*
