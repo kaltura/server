@@ -71,7 +71,7 @@ class kBeaconManager implements kObjectDeletedEventConsumer
 		
 		$deleteObject = array();
 		
-		//Set Action Name and Index Name and calculated docuemtn idec-3	
+		//Create delete object
 		$deleteObject[kBeacon::ELASTIC_ACTION_KEY] = kBeacon::ELASTIC_DELETE_ACTION_VALUE;
 		$deleteObject[kBeacon::ELASTIC_INDEX_KEY] = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
 		$deleteObject[kBeacon::ELASTIC_DOCUMENT_ID_KEY] = $beaconId;
