@@ -39,6 +39,10 @@
 			"lowercase",
 			"trim"
 		  ]
+		},
+		"kaltura_text" : {
+		  "tokenizer" : "standard",
+		  "filter" : ["standard", "asciifolding"]
 		}
 	  }
 	}
@@ -85,6 +89,7 @@
 		},
 		"name" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
 			"ngrams" : {
 			  "type" : "text",
@@ -98,6 +103,7 @@
 		},
 		"full_name" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
 			"ngrams" : {
 			  "type" : "text",
@@ -141,6 +147,7 @@
 		},
 		"description" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
 			"ngrams" : {
 			  "type" : "text",
@@ -215,6 +222,7 @@
 			},
 			"value_text": {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"ngrams" : {
 				  "type" : "text",

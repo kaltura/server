@@ -39,6 +39,10 @@
 			"lowercase",
 			"trim"
 		  ]
+		},
+		"kaltura_text" : {
+		  "tokenizer" : "standard",
+		  "filter" : ["standard", "asciifolding"]
 		}
 	  }
 	}
@@ -51,6 +55,7 @@
 	  "properties" : {
 		"name" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
 			"ngrams" : {
 			  "type" : "text",
@@ -64,6 +69,7 @@
 		},
 		"description" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
 			"ngrams" : {
 			  "type" : "text",
@@ -292,6 +298,7 @@
 			  "properties"  : {
 				"content" : {
 				  "type" : "text",
+				  "analyzer" : "kaltura_text",
 				  "fields": {
 					"ngrams" : {
 					  "type" : "text",
@@ -485,6 +492,7 @@
 			},
 			"value_text": {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"ngrams" : {
 				  "type" : "text",
@@ -511,6 +519,7 @@
 			},
 			"cue_point_name" : {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"kaltura_ngrams" : {
 				  "type" : "text",
@@ -524,6 +533,7 @@
 			},
 			"cue_point_text" : {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"ngrams" : {
 				  "type" : "text",
@@ -551,6 +561,7 @@
 			},
 			"cue_point_question" : { //for polls
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"ngrams" : {
 				  "type" : "text",
@@ -564,6 +575,7 @@
 			},
 			"cue_point_answers" : {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"ngrams" : {
 				  "type" : "text",
@@ -577,6 +589,7 @@
 			},
 			"cue_point_hint" : {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"ngrams" : {
 				  "type" : "text",
@@ -590,6 +603,7 @@
 			},
 			"cue_point_explanation" : {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
 				"ngrams" : {
 				  "type" : "text",
@@ -633,6 +647,7 @@
 				},
 				"value_text": {
 				  "type" : "text",
+				  "analyzer" : "kaltura_text",
 				  "fields": {
 					"ngrams" : {
 					  "type" : "text",
