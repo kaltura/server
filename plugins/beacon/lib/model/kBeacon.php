@@ -13,7 +13,7 @@ class kBeacon
 	const BEACONS_EXCHANGE_NAME = 'beacon_exchange';
 	
 	const ELASTIC_ACTION_KEY = '_action';
-	const ELASTIC_ACTION_VALUE = 'index';
+	const ELASTIC_INDEX_ACTION_VALUE = 'index';
 	
 	const ELASTIC_INDEX_KEY = '_index';
 	const ELASTIC_INDEX_TYPE_KEY = '_type';
@@ -149,7 +149,7 @@ class kBeacon
 		}
 	}
 	
-	public function getIndexObjectForState($indexObject, $currTime)
+	private function getIndexObjectForState($indexObject, $currTime)
 	{
 		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
 		
@@ -160,7 +160,7 @@ class kBeacon
 		return json_encode($indexObject);
 	}
 	
-	public function getIndexObjectForLog($indexObject, $ttl, $currTime)
+	private function getIndexObjectForLog($indexObject, $ttl, $currTime)
 	{
 		$indexObject[self::FIELD_CREATED_AT] = $currTime;
 		$indexObject[self::ELASTIC_DOCUMENT_TTL_KEY] = $ttl . "S";
@@ -194,7 +194,7 @@ class kBeacon
 		$indexObject = array();
 		
 		//Set Action Name and Index Name and calculated docuemtn id
-		$indexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_ACTION_VALUE;
+		$indexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_INDEX_ACTION_VALUE;
 		$indexObject[self::ELASTIC_INDEX_KEY] = self::ELASTIC_BEACONS_INDEX_NAME;
 		
 		//Set values provided in input

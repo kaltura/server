@@ -21,13 +21,23 @@ class KAsyncClearBeacons extends KJobHandlerWorker
 	protected function exec(KalturaBatchJob $job)
 	{
 		KalturaLog::debug("Testing:: job = " . print_r($job, true));
-		return $this->clearBeacons($job, $job->data);
+		
+		try
+		{
+			$this->clearBeacons($job, $job->data);
+		}
+		catch(Exception $ex)
+		{
+			self::unimpersonate();
+			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+		
+		return $job;
 	}
 	
 	private function clearBeacons(KalturaBatchJob $job, KalturaClearBeaconsJobData $data)
 	{
 		$this->updateJob($job, "Start handling beacons clear for object id [{$data->objectId} related object type [{$data->relatedObjectType}]", KalturaBatchJobStatus::PROCESSING);
-		
 		
 		$beaconsFilter = new KalturaBeaconFilter();
 		$beaconsFilter->objectIdIn = $data->objectId;
@@ -41,22 +51,18 @@ class KAsyncClearBeacons extends KJobHandlerWorker
 		$beaconPlugin = KalturaBeaconClientPlugin::get(self::$kClient);
 		$this->impersonate($job->partnerId);
 		$beaconsListResponse = $beaconPlugin->beacon->listAction($beaconsFilter, $pager);
-		$this->unimpersonate();
 		
 		while(count($beaconsListResponse->objects))
 		{
 			foreach($beaconsListResponse->objects as $beacon)
 			{
-				$this->impersonate($job->partnerId);
 				$beaconPlugin->beacon->delete($beacon->objectId);
-				$this->unimpersonate();
 			}
 			
 			$pager->pageIndex++;
-			$this->impersonate($job->partnerId);
 			$beaconsListResponse = $beaconPlugin->beacon->listAction($beaconsFilter, $pager);
-			$this->unimpersonate();
 		}
+		$this->unimpersonate();
 		
 		return $this->closeJob($job, null, null, "Beacons Cleared for object id [{$data->objectId}] related object type [{$data->relatedObjectType}]", KalturaBatchJobStatus::FINISHED, $data);
 	}

@@ -48,65 +48,65 @@ class kBeaconSearchQueryManger
 	{
 		$query = array();
 		
-		foreach ($searchObject['terms'] as $key => $value)
+		foreach ($searchObject[kESearchQueryManager::TERMS_KEY] as $key => $value)
 		{
 			if (!$value)
 				continue;
 			
 			$terms = array($key => explode(",",$value));
-			$query[] = array('terms' => $terms);
+			$query[] = array(kESearchQueryManager::TERMS_KEY => $terms);
 		}
 		
-		foreach ($searchObject['range'] as $key => $value)
+		foreach ($searchObject[kESearchQueryManager::RANGE_KEY] as $key => $value)
 		{
-			if (!$value[baseObjectFilter::GTE] && !$value[baseObjectFilter::LTE])
+			if (!$value[kESearchQueryManager::GTE_KEY] && !$value[kESearchQueryManager::LTE_KEY])
 				continue;
 			
 			$range = array();
 			
-			if($value[baseObjectFilter::GTE])
-				$range[baseObjectFilter::GTE] = $value[baseObjectFilter::GTE];
+			if($value[kESearchQueryManager::GTE_KEY])
+				$range[kESearchQueryManager::GTE_KEY] = $value[kESearchQueryManager::GTE_KEY];
 			
-			if($value[baseObjectFilter::LTE])
-				$range[baseObjectFilter::LTE] = $value[baseObjectFilter::LTE];
+			if($value[kESearchQueryManager::LTE_KEY])
+				$range[kESearchQueryManager::LTE_KEY] = $value[kESearchQueryManager::LTE_KEY];
 			
 			$term = array($key => $range);
-			$query[] = array('range' => $term);
+			$query[] = array(kESearchQueryManager::RANGE_KEY => $term);
 		}
 		
 		
 		$sort = array();
-		foreach ($searchObject['order'] as $field_name => $ascending) 
+		foreach ($searchObject[kESearchQueryManager::ORDER_KEY] as $field_name => $ascending)
 		{
 			if ($ascending)
-				$sort[$field_name] = array('order' => 'asc');
+				$sort[$field_name] = array(kESearchQueryManager::ORDER_KEY => kESearchQueryManager::ORDER_ASC_KEY);
 			else
-				$sort[$field_name] = array('order' => 'desc');
+				$sort[$field_name] = array(kESearchQueryManager::ORDER_KEY => kESearchQueryManager::ORDER_DESC_KEY);
 		}
 		
 		$params = array();
-		$params['index'] = $indexName;
+		$params[elasticClient::ELASTIC_INDEX_KEY] = $indexName;
 		
 		if ($indexType)
-			$params['type'] = $indexType;
+			$params[elasticClient::ELASTIC_TYPE_KEY] = $indexType;
 		
-		$params['body'] = array();
+		$params[kESearchQueryManager::BODY_KEY] = array();
 		
 		if($pageSize)
-			$params['body']['size'] = $pageSize;
+			$params[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_SIZE_KEY] = $pageSize;
 		
 		if($pageIndex)
-			$params['body']['from'] = $pageIndex;
+			$params[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_FROM_KEY] = $pageIndex;
 		
-		$params['body']['query'] = array();
-		$params['body']['query']['bool'] = array();
-		$params['body']['query']['bool']['filter'] = array();
-		$params['body']['query']['bool']['filter']['bool'] = array();
-		$params['body']['query']['bool']['filter']['bool']['must']= $query;
+		$params[kESearchQueryManager::BODY_KEY][kESearchQueryManager::QUERY_KEY] = array();
+		$params[kESearchQueryManager::BODY_KEY][kESearchQueryManager::QUERY_KEY][kESearchQueryManager::BOOL_KEY] = array();
+		$params[kESearchQueryManager::BODY_KEY][kESearchQueryManager::QUERY_KEY][kESearchQueryManager::BOOL_KEY][kESearchQueryManager::FILTER_KEY] = array();
+		$params[kESearchQueryManager::BODY_KEY][kESearchQueryManager::QUERY_KEY][kESearchQueryManager::BOOL_KEY][kESearchQueryManager::FILTER_KEY][kESearchQueryManager::BOOL_KEY] = array();
+		$params[kESearchQueryManager::BODY_KEY][kESearchQueryManager::QUERY_KEY][kESearchQueryManager::BOOL_KEY][kESearchQueryManager::FILTER_KEY][kESearchQueryManager::BOOL_KEY][kESearchQueryManager::MUST_KEY] = $query;
 		
-		if (count($sort)) 
+		if (count($sort))
 		{
-			$params['body']['sort'] = $sort;
+			$params[kESearchQueryManager::BODY_KEY][kESearchQueryManager::SORT_KEY] = $sort;
 		}
 		
 		KalturaLog::debug("Body = " . print_r($params, true));
@@ -118,13 +118,13 @@ class kBeaconSearchQueryManger
 	{
 		$ret = array();
 		
-		if (!isset($elasticResponse['hits']))
+		if (!isset($elasticResponse[kESearchCoreAdapter::HITS_KEY]))
 			return $ret;
 		
-		if (!isset($elasticResponse['hits']['hits']))
+		if (!isset($elasticResponse[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::HITS_KEY]))
 			return $ret;
 		
-		foreach ($elasticResponse['hits']['hits'] as $hit) 
+		foreach ($elasticResponse[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::HITS_KEY] as $hit)
 		{
 			$ret[] = $hit['_source'];
 		}

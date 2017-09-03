@@ -65,7 +65,7 @@ enabledWorkers.KAsyncIntegrateCloser				= 1
 enabledWorkers.KAsyncClearCuePoints					= 1
 enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 enabledWorkers.KAsyncLiveToVod      				= 1
-enabledWorkers.KAsyncClearBeacons                   = 1
+
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -779,9 +779,3 @@ params.skipSourceValidation             = 1
 id													= 640
 type												= KAsyncLiveToVod
 scriptPath											= batches/LiveToVod/KAsyncLiveToVodExe.php
-
-[KAsyncClearBeacons : JobHandlerWorker]
-id                                                  = 650
-friendlyName                                        = Clear Beacons
-type                                                = KAsyncClearBeacons
-scriptPath                                          = ../plugins/beacon/batch/KAsyncClearBeaconsExe.php

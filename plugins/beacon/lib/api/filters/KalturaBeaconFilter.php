@@ -36,9 +36,9 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 	{
 		$searchObject = array();
 		
-		$searchObject['terms'] = $this->getSearchTerms();
-		$searchObject['range'] = $this->getSearchRangeTerms();
-		$searchObject['order'] = $this->getOrderByObject();
+		$searchObject[kESearchQueryManager::TERMS_KEY] = $this->getSearchTerms();
+		$searchObject[kESearchQueryManager::RANGE_KEY] = $this->getSearchRangeTerms();
+		$searchObject[kESearchQueryManager::ORDER_KEY] = $this->getOrderByObject();
 		
 		return $searchObject;
 	}
@@ -48,7 +48,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		$terms = array();
 		
 		$terms[kBeacon::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectTypeIn;
-		$terms[kBeacon::FIELD_OBJECT_ID] = $this->objectIdIn;
+		$terms[kBeacon::FIELD_OBJECT_ID] = trim(strtolower(($this->objectIdIn));
 		$terms[kBeacon::FIELD_EVENT_TYPE] = trim(strtolower($this->eventTypeIn));
 		$terms[kBeacon::FIELD_PARTNER_ID] = kCurrentContext::getCurrentPartnerId();
 		
@@ -59,11 +59,11 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 	{
 		$range = array();
 		
-		$range[kBeacon::FIELD_CREATED_AT][baseObjectFilter::GTE] = $this->createdAtGreaterThanOrEqual;
-		$range[kBeacon::FIELD_CREATED_AT][baseObjectFilter::LTE] = $this->createdAtLessThanOrEqual;
+		$range[kBeacon::FIELD_CREATED_AT][kESearchQueryManager::GTE_KEY] = $this->createdAtGreaterThanOrEqual;
+		$range[kBeacon::FIELD_CREATED_AT][kESearchQueryManager::LTE_KEY] = $this->createdAtLessThanOrEqual;
 		
-		$range[kBeacon::FIELD_UPDATED_AT][baseObjectFilter::GTE] = $this->updatedAtGreaterThanOrEqual;
-		$range[kBeacon::FIELD_UPDATED_AT][baseObjectFilter::LTE] = $this->updatedAtLessThanOrEqual;
+		$range[kBeacon::FIELD_UPDATED_AT][kESearchQueryManager::GTE_KEY] = $this->updatedAtGreaterThanOrEqual;
+		$range[kBeacon::FIELD_UPDATED_AT][kESearchQueryManager::LTE_KEY] = $this->updatedAtLessThanOrEqual;
 		
 		return $range;
 	}
