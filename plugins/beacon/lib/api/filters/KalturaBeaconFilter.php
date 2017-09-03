@@ -48,8 +48,8 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		$terms = array();
 		
 		$terms[kBeacon::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectTypeIn;
-		$terms[kBeacon::FIELD_OBJECT_ID] = trim(strtolower(($this->objectIdIn)));
-		$terms[kBeacon::FIELD_EVENT_TYPE] = trim(strtolower($this->eventTypeIn));
+		$terms[kBeacon::FIELD_OBJECT_ID] = elasticSearchUtils::formatSearchTerm($this->objectIdIn);
+		$terms[kBeacon::FIELD_EVENT_TYPE] = elasticSearchUtils::formatSearchTerm($this->eventTypeIn);
 		$terms[kBeacon::FIELD_PARTNER_ID] = kCurrentContext::getCurrentPartnerId();
 		
 		return $terms;
