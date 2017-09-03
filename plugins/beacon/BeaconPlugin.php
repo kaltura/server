@@ -52,7 +52,7 @@ class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
  	 */
 	public static function getEventConsumers()
 	{
-		//TODO: Once delete support is add BEACON_MANAGER to events consumern list 
+		//TODO: Once delete support is added return BEACON_MANAGER to events consumern list 
 		return array(
 			//self::BEACON_MANAGER,
 		);
