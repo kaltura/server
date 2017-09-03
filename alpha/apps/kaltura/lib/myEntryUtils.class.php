@@ -1860,7 +1860,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 				return true;
 			}
 		return false;
-  }
+	}
 	public static function getRelatedEntries($entry)
 	{
 		/* @var $entry entry */
