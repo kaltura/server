@@ -127,7 +127,7 @@ class CaptionAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
    		else
    			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
-   		
+
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
