@@ -9,6 +9,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	const KS_PRIVILEGE_CAPTION = 'caption';
 
 	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
+	const COPY_CAPTIONS_FLOW_MANAGER_CLASS = 'kCopyCaptionsFlowManager';
 
        const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
@@ -193,6 +194,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		return array(
 			self::MULTI_CAPTION_FLOW_MANAGER_CLASS,
+			self::COPY_CAPTIONS_FLOW_MANAGER_CLASS,
 		);
 	}
 

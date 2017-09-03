@@ -1,5 +1,56 @@
 # Mercury 13.2.0 #
 
+## Add new Beacon plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7580
+
+### pre-requisite ###
+	
+* Install elasticSearch for refernce view [how to install Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html) (Tested with elasticSearch 5.5.2).
+* Install logstash for refernce view [how to install Logstah](https://www.elastic.co/guide/en/logstash/current/installing-logstash.html) (Tested with logstash 5.2.2).
+* Install RabbitMQ for refernce view [how to install RabbitMQ](https://www.rabbitmq.com/install-debian.html) (Tested with rabbitMQ 3.6.10).
+
+### configuration ###
+Enable beacon plugin:
+
+	- Enable beacon plugin:
+		1. Add the following to plugins.ini file: "Beacon"
+		2. Make sure the following plugins are enabled sicne they are erquired for beaon service to work: ElasticSearch, RabbitMQ, Queue
+
+Configure elasticSearch Kaltura configuration:
+		  
+	- Add the following to your elastic.ini file:
+	elasticClientCurlTimeout = CURL_TIMEOUT_IN_SEC
+	
+	[beacon]
+	elasticHost = "ELASTIC_HOST"
+	elasticPort = "ELASTIC_PORT"
+	
+	- Create new beaconindes in elastic by runing: curl -XPUT '"ELASTIC_HOST":"ELASTIC_PORT"/beaconindex' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_mapping.json"
+
+Configure logstash Kaltura configuration:
+
+	- Copy configurations/logstash/kaltura_beacons.template.conf to configurations/logstash/kaltura_beacons.conf and update the folloiwng tokens:
+		@RABBIT_MQ_SERVER@ = rabbitMQ server
+		@RABBIT_MQ_PASSWORD@ = rabbitMQ server Password
+		@RABBIT_MQ_USERNAME@ = rabbitMQ server User Name
+		@RABBIT_PORT@ = rabbitMQ server port
+		@LOG_DIR@ = You main log directory
+		@ELASTIC_SEARCH_HOST@ = elasticSearch server host
+		@ELASTIC_SEARCH_PORT@ = elasticSearch server port
+		
+	- Add new symlink in /etc/logstash/conf.d/kaltura_beacons to point to /opt/kaltura/app/plugins/beacon/config/mapping/beacon_mapping.json
+
+Configure rabbitMq:
+	- Add new exchange called: beacon_exchange (Type=fanout, durable=true, Policy=ha-all)
+	- Add new queue called: beacons (x-message-ttl=86400000, durable=true, Policy=ha-all)
+	- Bind queue to exchange.
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+    2. php alpha/scripts/utils/permissions/addPermissionsAndItems.php deployment/permissions/service.beacon.beacon.ini
+
 ## Add new ElasticSearch plugin ##
 
 - Issue Type: Feature
@@ -33,6 +84,38 @@ None
 
 ### Deployment scripts ###
 	php deployment/updates/scripts/add_permissions/2017_08_06_live_stream_add_create_recording_across_dc.php
+
+
+## Add new batch job for handling copy caption assets ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-7889
+
+### Configuration ###
+ - The batch.ini has been changed, make sure to add the following to your batch.ini:
+
+	enabledWorkers.KAsyncCopyCaptions					= 1
+
+ - The workers.ini has been change, make sure to add the following to your workers.ini:
+
+	[KAsyncCopyCaptions : JobHandlerWorker]
+
+	id													= 650
+
+	friendlyName										= Copy Caption Assets
+
+	type												= KAsyncCopyCaptions
+
+	scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
+
+ - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
+
+    under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
+
 
 # Mercury 13.1.0 #
 

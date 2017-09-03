@@ -8,7 +8,7 @@ class KalturaResponseProfileHolder extends KalturaBaseResponseProfile
 	/**
 	 * Auto generated numeric identifier
 	 * 
-	 * @var int
+	 * @var bigint
 	 */
 	public $id;
 	
