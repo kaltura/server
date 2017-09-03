@@ -1848,18 +1848,18 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	public static function wasEntryClipped(entry $entry, array $modifiedColumns)
 	{
-	if (in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
-		&& $entry->isCustomDataModified('operationAttributes')
-		&& $entry->isCustomDataModified('sourceEntryId'))
-		{
-		//clip case
-		if(!$entry->getReplacedEntryId())
-			return true;
-		//trim case
-		if($entry->getTempTrimEntry())
-			return true;
-		}
-	return false;
+		if (in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
+			&& $entry->isCustomDataModified('operationAttributes')
+			&& $entry->isCustomDataModified('sourceEntryId'))
+			{
+				//clip case
+				if(!$entry->getReplacedEntryId())
+				return true;
+				//trim case
+				if($entry->getTempTrimEntry())
+				return true;
+			}
+		return false;
 	}
 
 }
