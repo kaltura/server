@@ -11,8 +11,6 @@ class kBeaconManager implements kObjectDeletedEventConsumer
  	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
-		return false;
-		
 		if ($object instanceof entry)
 			return true;
 		
