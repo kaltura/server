@@ -199,4 +199,84 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new dfxpCaptionsContentManager();
 	}
+
+
+	public function buildDfxpFile($captionContent, $clipStartTime, $clipEndTime)
+	{
+		$xml = new KDOMDocument();
+		try
+		{
+			$captionContent = trim($captionContent, " \r\n\t");
+			$xml->loadXML($captionContent);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return null;
+		}
+		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime);
+		$xmlUpdatedContent = trim($xmlUpdatedContent, " \r\n\t");
+		$xmlUpdatedContent = str_replace("      \n", "", $xmlUpdatedContent);
+		return $xmlUpdatedContent;
+	}
+
+	private function editBody(DOMNode $curNode, $clipStartTime, $clipEndTime)
+	{
+		for ($i = 0; $i < $curNode->childNodes->length; $i++)
+		{
+			$childNode = $curNode->childNodes->item($i);
+			if ($childNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+
+			if (strtolower($childNode->nodeName) != 'p')
+			{
+				$this->editBody($childNode, $clipStartTime, $clipEndTime);
+				continue;
+			}
+
+			$captionStartTime = $this->parseStrTTTime($childNode->getAttribute('begin'));
+			$captionEndTime = $captionStartTime;
+			if($childNode->hasAttribute('end'))
+			{
+				$captionEndTime = $this->parseStrTTTime($childNode->getAttribute('end'));
+			}
+			elseif($childNode->hasAttribute('dur'))
+			{
+				$duration = floatval($childNode->getAttribute('dur')) * 1000;
+				$captionEndTime = $captionStartTime + $duration;
+			}
+			if(!$this->onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
+				$curNode->removeChild($childNode);
+			else
+				{
+				$adjustedStartTime = $captionStartTime - $clipStartTime;
+				if ($adjustedStartTime < 0)
+					$adjustedStartTime = 0;
+				$adjustedEndTime = $captionEndTime - $clipStartTime;
+
+				$childNode->setAttribute('begin',kXml::integerToTime($adjustedStartTime));
+				if($childNode->hasAttribute('end'))
+					$childNode->setAttribute('end',kXml::integerToTime($adjustedEndTime));
+			}
+		}
+		$content = "";
+		if(!$curNode instanceof DOMElement)
+		{
+			$content = $curNode->saveXML();
+		}
+		return $content;
+	}
+
+	private function onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime){
+	    //caption asset items which started before clip start time but ended after the clip started
+		if(($captionEndTime >= $clipStartTime) && ($captionEndTime <= $clipEndTime) && ($captionStartTime <= $clipStartTime))
+			return true;
+
+        //caption asset items which started during clip time range
+		if (($captionStartTime >= $clipStartTime) && ($captionStartTime <= $clipEndTime))
+			return true;
+
+		return false;
+	}
+
 }

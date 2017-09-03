@@ -85,6 +85,38 @@ None
 ### Deployment scripts ###
 	php deployment/updates/scripts/add_permissions/2017_08_06_live_stream_add_create_recording_across_dc.php
 
+
+## Add new batch job for handling copy caption assets ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-7889
+
+### Configuration ###
+ - The batch.ini has been changed, make sure to add the following to your batch.ini:
+
+	enabledWorkers.KAsyncCopyCaptions					= 1
+
+ - The workers.ini has been change, make sure to add the following to your workers.ini:
+
+	[KAsyncCopyCaptions : JobHandlerWorker]
+
+	id													= 650
+
+	friendlyName										= Copy Caption Assets
+
+	type												= KAsyncCopyCaptions
+
+	scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
+
+ - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
+
+    under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
+
+
 # Mercury 13.1.0 #
 
 ## Add new Search plugin ##
