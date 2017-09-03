@@ -37,17 +37,14 @@ class SphinxEntryCriteria extends SphinxCriteria
 				}
 								
 				// Get the id of the entry id that is being redirected from the original entry
-				$redirectEntryId = $origEntry->getRedirectEntryId(); 
-				
-				if ( is_null( $redirectEntryId ) ) // No redirection required? 
+				$redirectEntryId = $origEntry->getRedirectEntryId();
+				$redirectedEntry = entryPeer::retrieveByPK( $redirectEntryId );
+				if ( is_null( $redirectEntryId ) || (!empty($redirectedEntry) && ($redirectedEntry->getStatus() != entryStatus::READY)) )
 				{
 					$filter->set( '_eq_id', $origEntryId ); // Continue with original entry id
 				}
 				else
 				{
-					// Get the redirected entry and check if it exists and is ready
-					$redirectedEntry = entryPeer::retrieveByPK( $redirectEntryId );
-					
 					if (!empty($redirectedEntry) && 
 						($redirectedEntry->getStatus() == entryStatus::READY || 
 							myEntryUtils::shouldServeVodFromLive($redirectEntryId)

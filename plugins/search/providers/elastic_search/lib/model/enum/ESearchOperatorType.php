@@ -7,4 +7,5 @@ interface ESearchOperatorType extends BaseEnum
 {
 	const AND_OP = 1;
 	const OR_OP = 2;
+	const NOT_OP = 3;
 }

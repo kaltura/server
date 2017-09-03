@@ -620,6 +620,7 @@ return array(
 	'entry-investigate history data th' => 'Data',
 	'entry-investigate history status th' => 'Status (failure reason)',
 	'entry-investigate history status tooltip' => 'The status of this task. The task status is one of the following: Waiting, In Process, completed, Failed',
+	'entry-investigate history object th' => 'Object',
 	'entry-investigate history abort th' => 'Aborted',
 	'entry-investigate history recheck th' => 'Check Again',
 	'entry-investigate history msg th' => 'Message',

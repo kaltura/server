@@ -152,9 +152,11 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 			$aggregationCategories = array_diff($aggregationCategories, array($aggregationCategoryEntry->getCategoryId()));
 		}
 		
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		foreach ($aggregationCategories as $categoryIdToAdd)
 		{
 			$aggregationCategory = categoryPeer::retrieveByPK($categoryIdToAdd);
+			
 			if (!$aggregationCategory)
 				continue;
 			
@@ -163,6 +165,7 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 			$categoryEntry->setCategoryFullIds($aggregationCategory->getFullIds());
 			$categoryEntry->save();
 		}
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 	}
 
 	/* (non-PHPdoc)

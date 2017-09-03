@@ -8,8 +8,8 @@ class ESearchMetadataItem extends ESearchItem
 	const DEFAULT_INNER_HITS_SIZE = 10;
 
 	private static $allowed_search_types_for_field = array(
-		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
-		'metadata.value_int' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, "ESearchItemType::DOESNT_CONTAIN"=> ESearchItemType::DOESNT_CONTAIN, 'ESearchItemType::RANGE'=>ESearchItemType::RANGE, ESearchUnifiedItem::UNIFIED),
+		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
+		'metadata.value_int' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, 'ESearchItemType::RANGE'=>ESearchItemType::RANGE, ESearchUnifiedItem::UNIFIED),
 	);
 
 	/**
@@ -116,9 +116,9 @@ class ESearchMetadataItem extends ESearchItem
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
 					self::getMetadataPrefixQuery($metadataESearchItem, $allowedSearchTypes);
 				break;
-			case ESearchItemType::DOESNT_CONTAIN:
-				$metadataQuery['nested']['query']['bool']['must_not'][] =
-					self::getMetadataDoesntContainQuery($metadataESearchItem, $allowedSearchTypes);
+			case ESearchItemType::EXISTS:
+				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
+					self::getMetadataExistQuery($metadataESearchItem, $allowedSearchTypes);
 				break;
 			case ESearchItemType::RANGE:
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
@@ -203,42 +203,23 @@ class ESearchMetadataItem extends ESearchItem
 		return $metaDataPrefix;
 	}
 
-	protected static function getMetadataDoesntContainQuery($searchItem, $allowedSearchTypes)
+	protected static function getMetadataExistQuery($searchItem, $allowedSearchTypes)
 	{
-		$metadataDoesntContain = array();
-		if(ctype_digit($searchItem->getSearchTerm()))
-		{
-			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = self::getMetadataDoesntContainSubQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
-			$metadataDoesntContain['bool']['should'][]['bool']['must_not'][] = self::getMetadataDoesntContainSubQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
-			$metadataDoesntContain['bool']['minimum_should_match'] = 1;
-		}
-		else
-			$metadataDoesntContain['bool']['must_not'][] = self::getMetadataDoesntContainSubQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+		$metadataExist = array();
 
-		return $metadataDoesntContain;
+		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_text', $allowedSearchTypes);
+		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_int', $allowedSearchTypes);
+		$metadataExist['bool']['minimum_should_match'] = 1;
+
+		if($searchItem->getXpath())
+			$metadataExist['bool']['must'][] = self::getXPathQuery($searchItem);
+
+		if($searchItem->getMetadataProfileId())
+			$metadataExist['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+
+		return $metadataExist;
 	}
 
-	protected static function getMetadataDoesntContainSubQuery($searchItem, $value, $allowedSearchTypes)
-	{
-		$metadataDoesntContain = kESearchQueryManager::getDoesntContainQuery($searchItem, $value, $allowedSearchTypes);
-
-		if($searchItem->getXpath() || $searchItem->getMetadataProfileId())
-		{
-			$metadataDoesntContainQuery = $metadataDoesntContain;
-			$metadataDoesntContain = null;
-
-			$metadataDoesntContain['bool']['must'][] = $metadataDoesntContainQuery;
-
-			if($searchItem->getXpath())
-				$metadataDoesntContain['bool']['must'][] = self::getXPathQuery($searchItem);
-
-			if($searchItem->getMetadataProfileId())
-				$metadataDoesntContain['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
-		}
-
-		return $metadataDoesntContain;
-	}
-	
 	protected static function getMetadataRangeQuery($searchItem, $allowedSearchTypes)
 	{
 		$metadataRange = kESearchQueryManager::getRangeQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);

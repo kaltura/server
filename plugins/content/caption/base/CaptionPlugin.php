@@ -235,12 +235,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET))
 			return new KalturaParseMultiLanguageCaptionAssetJobData();
 
-		if ($baseClass == 'KalturaESearchItemData' && $enumValue == 'caption')
-			return new KalturaESearchCaptionItemData();
-		if ($baseClass == 'ESearchItemData' && $enumValue == 'caption_assets')
-			return new ESearchCaptionItemData();
-
-
 		return null;
 	}
 

@@ -46,4 +46,9 @@ interface IElasticIndexable extends IBaseObject
      */
     public function shouldDeleteFromElastic();
 
+    /**
+     * return the name of the object we are indexing
+     */
+    public function getElasticObjectName();
+
 }

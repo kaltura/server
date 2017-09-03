@@ -6,7 +6,8 @@
 
 class kUserSearch extends kBaseSearch
 {
-    
+    const PEER_NAME = 'kuserPeer';
+
     public function __construct()
     {
         parent::__construct();
@@ -30,5 +31,10 @@ class kUserSearch extends kBaseSearch
         );
 
         parent::initQuery($statuses, $pager, $order);
+    }
+
+    function getPeerName()
+    {
+        return self::PEER_NAME;
     }
 }

@@ -62,6 +62,9 @@ class ESearchOperator extends ESearchItem
 			case ESearchOperatorType::OR_OP:
 				$boolOperator = 'should';
 				break;
+			case ESearchOperatorType::NOT_OP:
+				$boolOperator = 'must_not';
+				break;
 			default:
 				KalturaLog::crit('unknown operator type');
 				return null;
@@ -104,7 +107,7 @@ class ESearchOperator extends ESearchItem
 		return $allCategorizedSearchItems;
 	}
 
-	private static function createSearchQueryForItems($categorizedSearchItems, $boolOperator,  $eSearchOperatorType)
+	private static function createSearchQueryForItems($categorizedSearchItems, $boolOperator, $eSearchOperatorType)
 	{
 		$outQuery = array();
 		foreach ($categorizedSearchItems as $categorizedSearchItem)
