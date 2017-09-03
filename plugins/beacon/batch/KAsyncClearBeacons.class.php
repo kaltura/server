@@ -56,7 +56,7 @@ class KAsyncClearBeacons extends KJobHandlerWorker
 		{
 			foreach($beaconsListResponse->objects as $beacon)
 			{
-				$beaconPlugin->beacon->delete($beacon->objectId);
+				$beaconPlugin->beacon->delete($beacon->id, $beacon->indexType);
 			}
 			
 			$pager->pageIndex++;

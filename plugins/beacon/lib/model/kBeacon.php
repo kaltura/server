@@ -14,6 +14,7 @@ class kBeacon
 	
 	const ELASTIC_ACTION_KEY = '_action';
 	const ELASTIC_INDEX_ACTION_VALUE = 'index';
+	const ELASTIC_DELETE_ACTION_VALUE = 'delete';
 	
 	const ELASTIC_INDEX_KEY = '_index';
 	const ELASTIC_INDEX_TYPE_KEY = '_type';
@@ -29,6 +30,7 @@ class kBeacon
 	const FIELD_RAW_DATA = 'rawData';
 	const FIELD_PARTNER_ID = 'partnerId';
 	
+	protected $id;
 	protected $relatedObjectType;
 	protected $eventType;
 	protected $objectId;
@@ -41,6 +43,11 @@ class kBeacon
 	public function __construct()
 	{
 		$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
+	}
+	
+	public function setId($id)
+	{
+		$this->id = $id;
 	}
 	
 	public function setRelatedObjectType($relatedObjectType)
@@ -81,6 +88,11 @@ class kBeacon
 	public function setUpdatedAt($updatedAt)
 	{
 		$this->updatedAt = $updatedAt;
+	}
+	
+	public function getId()
+	{
+		return $this->id;
 	}
 	
 	public function getRelatedObjectType()
@@ -143,7 +155,8 @@ class kBeacon
 		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
 		
 		//Sent to log index of requested
-		if ($shouldLog) {
+		if ($shouldLog) 
+		{
 			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject, $ttl, $currTime);
 			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
 		}
