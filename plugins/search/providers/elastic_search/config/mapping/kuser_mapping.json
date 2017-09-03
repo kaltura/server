@@ -42,7 +42,7 @@
 		},
 		"kaltura_text" : {
 		  "tokenizer" : "standard",
-		  "filter" : ["standard", "asciifolding"]
+		  "filter" : ["standard", "lowercase", "asciifolding"]
 		}
 	  }
 	}
