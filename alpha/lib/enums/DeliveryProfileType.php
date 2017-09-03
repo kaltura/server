@@ -45,6 +45,7 @@ interface DeliveryProfileType extends BaseEnum
 	const VOD_PACKAGER_HDS = 63;
 	const VOD_PACKAGER_MSS = 67;
 	const VOD_PACKAGER_DASH = 68;
+	const VOD_PACKAGER_HLS_DIRECT = 69;
 	
 	const LIVE_HLS = 1001;
 	const LIVE_HDS = 1002;

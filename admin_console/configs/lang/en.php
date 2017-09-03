@@ -1294,6 +1294,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH" => "VOD_PACKAGER_DASH",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HDS" => "VOD_PACKAGER_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS" => "VOD_PACKAGER_HLS",
+	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS_DIRECT" => "VOD_PACKAGER_HLS_DIRECT",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_MSS" => "VOD_PACKAGER_MSS",
 	
 	"Kaltura_Client_Enum_DeliveryStatus::ACTIVE" => "Active",
