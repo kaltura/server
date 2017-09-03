@@ -23,16 +23,10 @@ class DeliveryProfileVodPackagerHlsDirect extends DeliveryProfileVodPackagerHls 
 		return $url;
 	}
 	
-	protected function doGetFileSyncUrl(FileSync $fileSync)
-	{
-		$url = parent::doGetFileSyncUrl($fileSync);
-		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
-		return $url;
-	}
-	
 	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
+		$flavors = $this->sortFlavors($flavors);
 		
 		$flavor = VodPackagerDeliveryUtils::getVodPackagerUrl(
 			$flavors,
@@ -41,5 +35,28 @@ class DeliveryProfileVodPackagerHlsDirect extends DeliveryProfileVodPackagerHls 
 			$this->params);
 		
 		return array($flavor);
+	}
+	
+	protected function flavorCmpFunction ($flavor1, $flavor2)
+	{
+		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
+		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
+		
+		//Move all Dolby audio flavors to the beginning of the audio flavors list
+		if($isAudio1 == true && $isAudio1 == $isAudio2)
+		{
+			if($this->isDolbyAudioCodec($flavor2['audioCodec']))
+				return 1;
+			
+			if($this->isDolbyAudioCodec($flavor1['audioCodec']))
+				return -1;
+		}
+		
+		return parent::flavorCmpFunction($flavor1, $flavor2);
+	}
+	
+	private function isDolbyAudioCodec($audioCodec)
+	{
+		return in_array($audioCodec, array('eac3','e-ac-3','ec-3','ec3','ac3','ac-3','a-c-3'));
 	}
 }
