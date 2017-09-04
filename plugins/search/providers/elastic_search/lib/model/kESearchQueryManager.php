@@ -33,6 +33,7 @@ class kESearchQueryManager
 	const FIELD_KEY = 'field';
 	const NGRAMS_FIELD_SUFFIX = 'ngrams';
 	const RAW_FIELD_SUFFIX = 'raw';
+	const MATCH_PHRASE_KEY = 'match_phrase';
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
 
@@ -65,7 +66,7 @@ class kESearchQueryManager
 		$fieldSuffix = '';
 
 		if (in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
-			$fieldSuffix = '.'.self::RAW_FIELD_SUFFIX;
+			$queryType = self::MATCH_PHRASE_KEY;
 
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
 		$exactMatch[$queryType] = array( $fieldName . $fieldSuffix => $searchTerm);
