@@ -1,13 +1,15 @@
-<?php 
+<?php
+require_once (dirname(__FILE__) . '/../../../admin_console/web/tools/safeGetInput.php');
+
 if(!isset($_GET['partnerId']))
 	die('partnerId must be supplied in query string');
 	
 if(!isset($_GET['playerVersion']))
 	die('html5 lib version must be supplied in query string');
 
-$partnerId = $_GET['partnerId'];
+$partnerId = safeGetInput('partnerId', '/[^0-9]/');
+$html5Version = safeGetInput('playerVersion', '/[^v0-9.]/');
 
-$html5Version = $_GET['playerVersion'];
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -212,19 +214,19 @@ $html5Version = $_GET['playerVersion'];
 	  	<table>
 		<tr style="display: none; ">
 			<td>Admin Secret:</td>
-			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? $_GET['secret'] : ''; ?>" />
+			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? safeGetInput('secret', '/[^A-Za-z0-9]/') : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
 			<td>Entry Id:</td>
-			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? $_GET['entryId'] : ''; ?>" />
+			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? safeGetInput('entryId', '/[^a-z0-9_]/') : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
         	<td>Admin uiConf Id:</td>
-            <td><input type="text" id="txtAdminUiConfId" value="<?php echo isset($_GET['adminUiConfId']) ? $_GET['adminUiConfId'] : ''; ?>" />
+            <td><input type="text" id="txtAdminUiConfId" value="<?php echo isset($_GET['adminUiConfId']) ? safeGetInput('adminUiConfId', '/[^0-9]/') : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
         	<td>User uiConf Id:</td>
-            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? $_GET['uiConfId'] : ''; ?>" />
+            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? safeGetInput('uiConfId', '/[^0-9]/') : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
 			<td colspan="2">

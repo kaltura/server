@@ -1,13 +1,15 @@
 <?php 
+
+require_once (dirname(__FILE__) . '/safeGetInput.php');
+
 if(!isset($_GET['partnerId']))
 	die('partnerId must be supplied in query string');
 	
 if(!isset($_GET['playerVersion']))
 	die('html5 lib version must be supplied in query string');
 
-$partnerId = strip_tags($_GET['partnerId']);
-
-$html5Version = strip_tags($_GET['playerVersion']);
+$partnerId = safeGetInput('partnerId', '/[^0-9]/');
+$html5Version = safeGetInput('playerVersion', '/[^v0-9.]/');
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -305,15 +307,15 @@ $html5Version = strip_tags($_GET['playerVersion']);
 		</tr>
 		<tr>
 			<td>Admin Secret:</td>
-			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? strip_tags($_GET['secret']) : ''; ?>" />
+			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? safeGetInput('secret', '/[^A-Za-z0-9]/') : ''; ?>" />
 		</td>
 		<tr>
 			<td>Entry Id:</td>
-			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? strip_tags($_GET['entryId']) : ''; ?>" />
+			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? safeGetInput('entryId', '/[^a-z0-9_]/') : ''; ?>" />
 		</td>
 		<tr>
         	<td>uiConf Id:</td>
-            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? strip_tags($_GET['uiConfId']) : ''; ?>" />
+            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? safeGetInput('uiConfId', '/[^0-9]/') : ''; ?>" />
 		</td>
 		<tr>
 			<td colspan="2">
