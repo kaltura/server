@@ -3815,4 +3815,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return 'entry';
 	}
+	
+	public function isInsideDeleteGracePeriod()
+	{
+		return $this->getCreatedAt(null) > (time() - dateUtils::DAY * 7);
+	}
 }
