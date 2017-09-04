@@ -4,7 +4,7 @@
  * Sending beacons on various objects
  * @package plugins.beacon
  */
-class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader
+class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = "beacon";
 	const BEACON_MANAGER = 'kBeaconManager';
@@ -52,10 +52,11 @@ class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
  	 */
 	public static function getEventConsumers()
 	{
-		//TODO: Once delete support is added return BEACON_MANAGER to events consumern list 
-		return array(
-			//self::BEACON_MANAGER,
-		);
+		//TODO: Remove comment to enable the batch mechanism which will handle deleting beacons for deleted objects
+		//      Will need to add IKalturaEventConsumers to the list of implemented interfaces as well
+		//return array(
+		//	self::BEACON_MANAGER,
+		//);
 	}
 	
 	/* (non-PHPdoc)

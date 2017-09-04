@@ -16,18 +16,7 @@ Enable beacon plugin:
 
 	- Enable beacon plugin:
 		1. Add the following to plugins.ini file: "Beacon"
-		2. Make sure the following plugins are enabled since they are required for beacon service to work: ElasticSearch, RabbitMQ, Queue
-
-Add new batch Config:
-	
-	- Add the following to batch.ini:
-		1. enabledWorkers.KAsyncClearBeacons                   = 1
-		2. [KAsyncClearBeacons : JobHandlerWorker]
-		  id                                                  = 660
-		  friendlyName                                        = Clear Beacons
-		  type                                                = KAsyncClearBeacons
-		  scriptPath                                          = ../plugins/beacon/batch/KAsyncClearBeaconsExe.php
-
+		2. Make sure the following plugins are enabled since they are required for beacon service to work: ElasticSearch, RabbitMQ, Queue.
 
 Configure elasticSearch Kaltura configuration:
 		  
