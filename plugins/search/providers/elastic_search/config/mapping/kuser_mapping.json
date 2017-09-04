@@ -37,7 +37,8 @@
 		  ],
 		  "filter": [
 			"lowercase",
-			"trim"
+			"trim",
+			"asciifolding"
 		  ]
 		},
 		"kaltura_text" : {
