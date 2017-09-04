@@ -348,7 +348,7 @@ class myEntryUtils
 				if($recordedEntry)
 				{
 					//If entry is pending for recording to finish for more than 7 days than it will probably never happen 
-					if($recordedEntry->getCreatedAt(null) > time() - dateUtils::DAY * 7)
+					if($recordedEntry->isInsideDeleteGracePeriod())
 					{
 						if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
 						{
@@ -369,7 +369,7 @@ class myEntryUtils
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
-			if(($entry->getCreatedAt(null) > time() - dateUtils::DAY * 7) && myEntryUtils::shouldServeVodFromLive($entry, false))
+			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false))
 			{
 				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
