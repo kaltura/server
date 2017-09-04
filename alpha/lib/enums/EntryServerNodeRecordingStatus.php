@@ -6,6 +6,6 @@
 interface EntryServerNodeRecordingStatus extends BaseEnum
 {
 	const STOPPED = 0;
-	const RECORDING = 1;
+	const ON_GOING = 1;
 	const DONE = 2;
 }
