@@ -356,6 +356,16 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				return -1;
 			}
 		}
+		
+		//Move all Dolby audio flavors to the beginning of the audio flavors list
+		if($isAudio1 == true && $isAudio1 == $isAudio2)
+		{
+			if($this->isDolbyAudioCodec($flavor2['audioCodec']))
+				return 1;
+			
+			if($this->isDolbyAudioCodec($flavor1['audioCodec']))
+				return -1;
+		}
 	
 		// if a preferred bitrate was defined place it first
 		if ($this->preferredFlavor == $flavor2)
@@ -374,6 +384,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		}
 	
 		return -1;
+	}
+	
+	private function isDolbyAudioCodec($audioCodec)
+	{
+		return in_array($audioCodec, array('ec-3','ac-3'));
 	}
 	
 	/**

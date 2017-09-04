@@ -281,19 +281,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioCodec($flavor)
 	{
-		$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+		$mediaInfoObj = $flavor->getMediaInfo();
 		if(!$mediaInfoObj)
 			return null;
 		
-		$contentStreams = $mediaInfoObj->getContentStreams();
-		if (!isset($contentStreams))
-			return null;
-		
-		$contentStreamsJsonObj = json_decode($contentStreams, true);
-		if (isset($contentStreamsJsonObj['audio'][0]['audioFormat']))
-			return $contentStreamsJsonObj['audio'][0]['audioFormat'];
-		
-		return null;
+		return $mediaInfoObj->getAudioCodecId();
 	}
 	
 	protected function getAudioLanguage($flavor) 
@@ -302,9 +294,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$obj = null;
 		$audioLanguage = null;
 		$audioLanguageName = null;
+		$mediaInfoObj = $flavor->getMediaInfo();
 
 		if(!isset($lang)) { //for backward compatibility
-			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+			$mediaInfoObj = $flavor->getMediaInfo();
 			if (!$mediaInfoObj)
 				return null;
 

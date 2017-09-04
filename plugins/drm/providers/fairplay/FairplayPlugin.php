@@ -180,9 +180,7 @@ class FairplayPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
 
 	private static function shouldEditManifest($config)
 	{
-		if($config->rendererClass == 'kM3U8ManifestRenderer' 
-			&& in_array($config->deliveryProfile->getType(), array(DeliveryProfileType::VOD_PACKAGER_HLS, DeliveryProfileType::VOD_PACKAGER_HLS_DIRECT)) 
-			&& $config->deliveryProfile->getAllowFairplayOffline())
+		if($config->rendererClass == 'kM3U8ManifestRenderer' && $config->deliveryProfile->getType() == DeliveryProfileType::VOD_PACKAGER_HLS && $config->deliveryProfile->getAllowFairplayOffline())
 			return true;
 
 		return false;
