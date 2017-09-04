@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<variables>
+		<variable name="partnerId">{prompt:Target Partner ID:}</variable>
+	</variables>
+    <config>
+        <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <!-- script will ask for username / password interactively -->
+    </session>
+
+    <multirequest>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="{variable:partnerId}">
+            <template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry Status Equals - Replaced Entry</name>
+				<systemName>HTTP_ENTRY_STATUS_EQUALS_REPLACED_ENTRY</systemName>
+				<description>HTTP notification template to be sent when a temporary entry status changed to specific value - values of replaced entry are sent</description>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Entry status that triggers the event, See:KalturaEntryStatus:/api_v3/testmeDoc/?object=KalturaEntryStatus</description>
+						<value objectType="KalturaStringValue">
+							<value>2</value>
+						</value>
+					</item>
+				</userParameters>
+				<contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_created_at</key>
+                        <description>Entry created at</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getReplacedEntryId())) ? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getCreatedAt() : $scope->getObject()->getCreatedAt()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description/>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description/>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getReplacedEntryId())) ? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getName() : $scope->getObject()->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getReplacedEntryId())) ? $scope->getObject()->getReplacedEntryId() : $scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_status</key>
+                        <description>Entry status</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getReplacedEntryId())) ? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getStatus() : $scope->getObject()->getStatus()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_reference_id</key>
+                        <description>Entry reference ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getReplacedEntryId())) ? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getReferenceID() : $scope->getObject()->getReferenceID()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_download_url</key>
+                        <description>Entry download URL</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getReplacedEntryId())) ? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getDownloadUrl() : $scope->getObject()->getDownloadUrl()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_id</key>
+                        <description>Entry creator ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getReplacedEntryId())) ? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getPuserId() : $scope->getObject()->getPuserId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+        </request>
+    </multirequest>
+</xml>
+                
