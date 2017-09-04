@@ -294,7 +294,6 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$obj = null;
 		$audioLanguage = null;
 		$audioLanguageName = null;
-		$mediaInfoObj = $flavor->getMediaInfo();
 
 		if(!isset($lang)) { //for backward compatibility
 			$mediaInfoObj = $flavor->getMediaInfo();
