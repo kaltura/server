@@ -1,7 +1,7 @@
 {
 	"settings" : {
-		"number_of_shards" : 5,
-		"number_of_replicas" : 2,
+		"number_of_shards" : 6,
+		"number_of_replicas" : 0,
 		"analysis": {
 			"char_filter": {
 				"kaltura_whitespace_filter": {
