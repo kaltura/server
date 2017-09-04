@@ -16,7 +16,18 @@ Enable beacon plugin:
 
 	- Enable beacon plugin:
 		1. Add the following to plugins.ini file: "Beacon"
-		2. Make sure the following plugins are enabled sicne they are erquired for beaon service to work: ElasticSearch, RabbitMQ, Queue
+		2. Make sure the following plugins are enabled since they are required for beacon service to work: ElasticSearch, RabbitMQ, Queue
+
+Add new batch Config:
+	
+	- Add the following to batch.ini:
+		1. enabledWorkers.KAsyncClearBeacons                   = 1
+		2. [KAsyncClearBeacons : JobHandlerWorker]
+		  id                                                  = 660
+		  friendlyName                                        = Clear Beacons
+		  type                                                = KAsyncClearBeacons
+		  scriptPath                                          = ../plugins/beacon/batch/KAsyncClearBeaconsExe.php
+
 
 Configure elasticSearch Kaltura configuration:
 		  
@@ -40,7 +51,7 @@ Configure logstash Kaltura configuration:
 		@ELASTIC_SEARCH_HOST@ = elasticSearch server host
 		@ELASTIC_SEARCH_PORT@ = elasticSearch server port
 		
-	- Add new symlink in /etc/logstash/conf.d/kaltura_beacons to point to /opt/kaltura/app/plugins/beacon/config/mapping/beacon_mapping.json
+	- Add new symlink in /etc/logstash/conf.d/kaltura_beacons to point to /opt/kaltura/app/configurations/logstash/kaltura_beacons.conf
 
 Configure rabbitMq:
 	- Add new exchange called: beacon_exchange (Type=fanout, durable=true, Policy=ha-all)
@@ -49,7 +60,7 @@ Configure rabbitMq:
 
 ### Deployment scripts ###
     1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
-    2. php alpha/scripts/utils/permissions/addPermissionsAndItems.php deployment/permissions/service.beacon.beacon.ini
+    2. php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionsAndItems.php /opt/kaltura/app/deployment/permissions/service.beacon.beacon.ini
 
 ## Add new ElasticSearch plugin ##
 

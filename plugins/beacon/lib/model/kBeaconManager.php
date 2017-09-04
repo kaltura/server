@@ -46,7 +46,7 @@ class kBeaconManager implements kObjectDeletedEventConsumer
 		return true;
 	}
 	
-	private function entryDeleted($object, $objectType)
+	private function handleObjectDeleted($object, $objectType)
 	{
 		$jobData = new kClearBeconsJobData();
 		$jobData->setObjectId($object->getId());
@@ -58,5 +58,25 @@ class kBeaconManager implements kObjectDeletedEventConsumer
 		$batchJob->setObjectId($object->getId());
 		
 		return kJobsManager::addJob($batchJob, $jobData, $jobType);
+	}
+	
+	public static function deleteByBeaconId($beaconId, $indexType)
+	{
+		// get instance of activated queue provider to send message
+		$constructorArgs = array();
+		$constructorArgs['exchangeName'] = kBeacon::BEACONS_EXCHANGE_NAME;
+		
+		/* @var $queueProvider RabbitMQProvider */
+		$queueProvider = QueueProvider::getInstance(null, $constructorArgs);
+		
+		$deleteObject = array();
+		
+		//Create delete object
+		$deleteObject[kBeacon::ELASTIC_ACTION_KEY] = kBeacon::ELASTIC_DELETE_ACTION_VALUE;
+		$deleteObject[kBeacon::ELASTIC_INDEX_KEY] = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
+		$deleteObject[kBeacon::ELASTIC_DOCUMENT_ID_KEY] = $beaconId;
+		$deleteObject[kBeacon::ELASTIC_INDEX_TYPE_KEY] = $indexType;
+		
+		$queueProvider->send(kBeacon::BEACONS_QUEUE_NAME, json_encode($deleteObject));
 	}
 }

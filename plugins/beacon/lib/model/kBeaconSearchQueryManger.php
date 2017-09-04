@@ -126,6 +126,8 @@ class kBeaconSearchQueryManger
 		
 		foreach ($elasticResponse[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::HITS_KEY] as $hit)
 		{
+			$hit['_source']['id'] = $hit['_id'];
+			$hit['_source']['indexType'] = $hit['_type'];
 			$ret[] = $hit['_source'];
 		}
 		
