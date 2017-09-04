@@ -347,7 +347,7 @@ class myEntryUtils
 				$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
 				if($recordedEntry)
 				{
-					//If entry is pending for recording to finish for more than 3 days than it will probably never happen 
+					//If entry is pending for recording to finish for more than 7 days than it will probably never happen 
 					if($recordedEntry->getCreatedAt(null) > time() - dateUtils::DAY * 7)
 					{
 						if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
