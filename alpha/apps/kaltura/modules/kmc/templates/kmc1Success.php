@@ -902,7 +902,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 		width_str = '400';
 		height_str = '332';
 		ui_conf_id = '48110';
-<?	}	else { ?>
+<?php	}	else { ?>
 		// check if the page is now in state where there is a selected_uiconfId
 		if(sub_nav_tab == "Playlist")
 		  selected_uiconfId = null;
@@ -945,7 +945,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 				height_str = '<?php echo $player_uiconf_list[0]->getHeight(); ?>';
 			}
 		}
-<?	} ?>
+<?php	} ?>
 
 
 	// for now the embed code will be hard-coded
