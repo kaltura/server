@@ -8,8 +8,8 @@ if(!isset($_GET['partnerId']))
 if(!isset($_GET['playerVersion']))
 	die('html5 lib version must be supplied in query string');
 
-$partnerId = safeGetInput('partnerId', '/[^0-9]/');
-$html5Version = safeGetInput('playerVersion', '/[^v0-9.]/');
+$partnerId = safeGetInput('partnerId', INTEGER_ONLY_PATTERN);
+$html5Version = safeGetInput('playerVersion', HTML_VERSION_PATTERN);
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -307,15 +307,15 @@ $html5Version = safeGetInput('playerVersion', '/[^v0-9.]/');
 		</tr>
 		<tr>
 			<td>Admin Secret:</td>
-			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? safeGetInput('secret', '/[^A-Za-z0-9]/') : ''; ?>" />
+			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? safeGetInput('secret', SECRET_PATTERN) : ''; ?>" />
 		</td>
 		<tr>
 			<td>Entry Id:</td>
-			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? safeGetInput('entryId', '/[^a-z0-9_]/') : ''; ?>" />
+			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? safeGetInput('entryId', ENTRY_ID_PATTERN) : ''; ?>" />
 		</td>
 		<tr>
         	<td>uiConf Id:</td>
-            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? safeGetInput('uiConfId', '/[^0-9]/') : ''; ?>" />
+            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? safeGetInput('uiConfId', INTEGER_ONLY_PATTERN) : ''; ?>" />
 		</td>
 		<tr>
 			<td colspan="2">

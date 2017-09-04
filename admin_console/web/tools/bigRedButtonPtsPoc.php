@@ -7,8 +7,8 @@ if(!isset($_GET['partnerId']))
 if(!isset($_GET['playerVersion']))
 	die('html5 lib version must be supplied in query string');
 
-$partnerId = safeGetInput('partnerId', '/[^0-9]/');
-$html5Version = safeGetInput('playerVersion', '/[^v0-9.]/');
+$partnerId = safeGetInput('partnerId', INTEGER_ONLY_PATTERN);
+$html5Version = safeGetInput('playerVersion', HTML_VERSION_PATTERN);
 
 ?>
 <!DOCTYPE html>
@@ -212,19 +212,19 @@ $html5Version = safeGetInput('playerVersion', '/[^v0-9.]/');
 	  	<table>
 		<tr style="display: none; ">
 			<td>Admin Secret:</td>
-			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? safeGetInput('secret', '/[^A-Za-z0-9]/') : ''; ?>" />
+			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? safeGetInput('secret', SECRET_PATTERN) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
 			<td>Entry Id:</td>
-			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? safeGetInput('entryId', '/[^a-z0-9_]/') : ''; ?>" />
+			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? safeGetInput('entryId', ENTRY_ID_PATTERN) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
         	<td>Admin uiConf Id:</td>
-            <td><input type="text" id="txtAdminUiConfId" value="<?php echo isset($_GET['adminUiConfId']) ? safeGetInput('adminUiConfId', '/[^0-9]/') : ''; ?>" />
+            <td><input type="text" id="txtAdminUiConfId" value="<?php echo isset($_GET['adminUiConfId']) ? safeGetInput('adminUiConfId', INTEGER_ONLY_PATTERN) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
         	<td>User uiConf Id:</td>
-            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? safeGetInput('uiConfId', '/[^0-9]/') : ''; ?>" />
+            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? safeGetInput('uiConfId', INTEGER_ONLY_PATTERN) : ''; ?>" />
 		</td>
 		<tr style="display: none; ">
 			<td colspan="2">
