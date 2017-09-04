@@ -773,12 +773,8 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	public function getMediaInfo()
 	{
 		if($this->m_media_info)
-		{
-			KalturaLog::debug("Testing::: MEDIA_INFO already defined");
 			return $this->m_media_info;
-		}
 		
-		KalturaLog::debug("Testing::: MEDIA_INFO NOT defined");
 		$this->m_media_info = mediaInfoPeer::retrieveByFlavorAssetId($this->getId());
 	}
 		

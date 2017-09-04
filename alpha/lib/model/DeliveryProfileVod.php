@@ -358,13 +358,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		}
 		
 		//Move all Dolby audio flavors to the beginning of the audio flavors list
-		if($isAudio1 == true && $isAudio1 == $isAudio2)
+		if($isAudio1 == true)
 		{
-			if($this->isDolbyAudioCodec($flavor2['audioCodec']))
-				return 1;
-			
-			if($this->isDolbyAudioCodec($flavor1['audioCodec']))
-				return -1;
+			return $this->compareAudio($flavor1['audioCodec'], $flavor2['audioCodec']);
 		}
 	
 		// if a preferred bitrate was defined place it first
@@ -386,9 +382,23 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return -1;
 	}
 	
-	private function isDolbyAudioCodec($audioCodec)
+	private function compareAudio($audioCodec1, $audioCodec2)
 	{
-		return in_array($audioCodec, array('ec-3','ac-3'));
+		$dolbyAudioCodecList = array('ec-3','ac-3');
+		$audioPriority = array('ec-3' => 2, 'ac-3' => 1);
+		
+		if(in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList))
+		{
+			return $audioPriority[$audioCodec2] - $audioPriority[$audioCodec1];
+		}
+		
+		if(in_array($audioCodec1, $dolbyAudioCodecList))
+			return -1;
+		
+		if(in_array($audioCodec2, $dolbyAudioCodecList))
+			return 1;
+		
+		return -1;
 	}
 	
 	/**
