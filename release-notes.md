@@ -49,7 +49,7 @@ Configure rabbitMq:
 
 ### Deployment scripts ###
     1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
-    2. php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionsAndItems.php /opt/kaltura/app/deployment/permissions/service.beacon.beacon.ini
+    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_04_add_beacon_service_permissions.php
 
 ## Add new ElasticSearch plugin ##
 
