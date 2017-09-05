@@ -4,7 +4,7 @@
  * Sending beacons on various objects
  * @package plugins.beacon
  */
-class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending, IKalturaEnumerator
+class BeaconPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending
 {
 	const PLUGIN_NAME = "beacon";
 	const BEACON_MANAGER = 'kBeaconManager';
