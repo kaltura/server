@@ -370,7 +370,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				}
 				
 				$audioCodec = $this->getAudioCodec($flavor);
-				if(!($audioCodec))
+				if(!$audioCodec)
 					$audioCodec = "und";
 			}
 		}

@@ -387,7 +387,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$dolbyAudioCodecList = array('ec-3','ac-3');
 		$audioPriority = array('ec-3' => 2, 'ac-3' => 1);
 		
-		if(in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList))
+		//If both audio codec's are dolby prioritize them based on the audioPriority array
+		if(in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList) && ($audioPriority[$audioCodec2] != $audioPriority[$audioCodec1]))
 		{
 			return $audioPriority[$audioCodec2] - $audioPriority[$audioCodec1];
 		}
