@@ -139,6 +139,7 @@ class DeliveryController extends Zend_Controller_Action
 				return new Form_Delivery_DeliveryProfileGenericSilverLight();
 			case Kaltura_Client_Enum_DeliveryProfileType::GENERIC_RTMP:
 				return new Form_Delivery_DeliveryProfileGenericRtmp();
+			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST:
 			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS:
 				return new Form_Delivery_DeliveryProfileVodPackagerHls();
 			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH:
@@ -176,6 +177,7 @@ class DeliveryController extends Zend_Controller_Action
 				return 'Kaltura_Client_Type_DeliveryProfileGenericSilverLight';
 			case Kaltura_Client_Enum_DeliveryProfileType::GENERIC_RTMP:
 				return 'Kaltura_Client_Type_DeliveryProfileGenericRtmp';
+			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST:
 			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS:
 				return 'Kaltura_Client_Type_DeliveryProfileVodPackagerHls';
 			case Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH:
