@@ -19,7 +19,6 @@ class kBeacon
 	const ELASTIC_INDEX_KEY = '_index';
 	const ELASTIC_INDEX_TYPE_KEY = '_type';
 	const ELASTIC_DOCUMENT_ID_KEY = '_id';
-	const ELASTIC_DOCUMENT_TTL_KEY = 'ttl';
 	
 	const FIELD_CREATED_AT = 'createdAt';
 	const FIELD_UPDATED_AT = 'updatedAt';
@@ -135,7 +134,7 @@ class kBeacon
 		return $this->updatedAt;
 	}
 	
-	public function index($shouldLog = false, $ttl)
+	public function index($shouldLog = false)
 	{
 		// get instance of activated queue provider to send message
 		$constructorArgs = array();
@@ -157,7 +156,7 @@ class kBeacon
 		//Sent to log index of requested
 		if ($shouldLog) 
 		{
-			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject, $ttl, $currTime);
+			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject, $currTime);
 			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
 		}
 	}
@@ -173,10 +172,9 @@ class kBeacon
 		return json_encode($indexObject);
 	}
 	
-	private function getIndexObjectForLog($indexObject, $ttl, $currTime)
+	private function getIndexObjectForLog($indexObject, $currTime)
 	{
 		$indexObject[self::FIELD_CREATED_AT] = $currTime;
-		$indexObject[self::ELASTIC_DOCUMENT_TTL_KEY] = $ttl . "S";
 		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::LOG;
 		
 		return json_encode($indexObject);
