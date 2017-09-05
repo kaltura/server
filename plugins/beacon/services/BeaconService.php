@@ -21,13 +21,12 @@ class BeaconService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaBeacon $beacon
 	 * @param KalturaNullableBoolean $shouldLog
-	 * @param int $ttl
 	 * @return bool
 	 */
-	public function addAction(KalturaBeacon $beacon, $shouldLog = KalturaNullableBoolean::FALSE_VALUE, $ttl = dateUtils::DAY)
+	public function addAction(KalturaBeacon $beacon, $shouldLog = KalturaNullableBoolean::FALSE_VALUE)
 	{
 		$beaconObj = $beacon->toInsertableObject();
-		$beaconObj->index($shouldLog, $ttl);
+		$beaconObj->index($shouldLog);
 		
 		return true;
 	}
@@ -63,16 +62,5 @@ class BeaconService extends KalturaBaseService
 			$filter = new KalturaBeaconEnhanceFilter();
 		
 		return $filter->enhanceSearch();
-	}
-	
-	/**
-	 * @action delete
-	 * @param string $id
-	 * @param string $indexType
-	 */
-	public function deleteAction($id, $indexType)
-	{
-		kBeaconManager::deleteByBeaconId($id, $indexType);
-		return true;
 	}
 }
