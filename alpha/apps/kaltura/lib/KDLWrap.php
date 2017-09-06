@@ -169,7 +169,7 @@ class KDLWrap
 			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
 			// and replace it with the language mapping for the correct audio streams
 			// if only audio streams exist without video we ignore the video mapping
-			if ($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)
+			if (($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID) && !is_null($cdlMediaInfo))
 			{
 				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
 				$command = null;
