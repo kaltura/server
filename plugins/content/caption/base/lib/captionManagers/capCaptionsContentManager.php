@@ -170,4 +170,10 @@ class capCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new capCaptionsContentManager();
 	}
+
+	public function buildFile($content, $clipStartTime, $clipEndTime)
+	{
+	}
+
+
 }

@@ -5,6 +5,9 @@
  */
 class srtCaptionsContentManager extends kCaptionsContentManager
 {
+
+	const SRT_TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3})( .*)?$#';
+
 	/* (non-PHPdoc)
 	 * @see kCaptionsContentManager::parse()
 	 */
@@ -84,40 +87,73 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		return new srtCaptionsContentManager();
 	}
 
-	public function buildSrtFile($captionItems, $clipStartTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime)
 	{
-		$result = '';
-		$index = 0;
-
-		foreach($captionItems as $captionAssetItem)
+		$fileContentArray = kCaptionsContentManager::getFileContentAsArray($content);
+		$editedContent = '';
+		$currentBlock = '';
+		while (($line = kCaptionsContentManager::getNextValueFromArray($fileContentArray)) !== false)
 		{
-			$result .= $this->addItemToSrt($captionAssetItem, $index, $clipStartTime);
-			$index += 1;
+			$matches = array();
+			$timecode_match = preg_match(self::SRT_TIMECODE_PATTERN, $line, $matches);
+			if ($timecode_match)
+			{
+				$startCaption = self::parseCaptionTime($matches[1]);
+				$endCaption = self::parseCaptionTime($matches[2]);
+				if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
+				{
+					$currentBlock = '';
+					while (trim($line = kCaptionsContentManager::getNextValueFromArray($fileContentArray)) !== '')
+					{
+					}
+					continue;
+				}
+
+				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
+				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
+				$currentBlock .= $this->formatSrtTimeStamp($adjustedStartTime) . ' --> ' . $this->formatSrtTimeStamp($adjustedEndTime). kCaptionsContentManager::UNIX_LINE_ENDING;
+
+				$text = '';
+				while (trim($line = kCaptionsContentManager::getNextValueFromArray($fileContentArray)) !== '')
+				{
+					$line = kCaptionsContentManager::handleTextLines($line);
+					$text .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
+				}
+
+				$currentBlock .= $text . kCaptionsContentManager::UNIX_LINE_ENDING;
+				$editedContent .= $currentBlock;
+				$currentBlock = '';
+			}
+			else
+			{
+				$currentBlock .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
+				if ($line === '')
+				{
+					$editedContent .= $currentBlock;
+					$currentBlock = '';
+				}
+			}
 		}
-
-		return $result;
-	}
-
-	private function addItemToSrt($captionAssetItem, $index, $clipStartTime)
-	{
-		$adjustedStartTime = $captionAssetItem->startTime - $clipStartTime;
-		if ($adjustedStartTime < 0)
-			$adjustedStartTime = 0;
-		$adjustedEndTime = $captionAssetItem->endTime - $clipStartTime;
-		$content = '';
-		$content .= $index. "\n";
-		$content .= $this->formatTime($adjustedStartTime);
-		$content .= " --> ". $this->formatTime($adjustedEndTime). "\n";
-		$content .= $captionAssetItem->content. "\n\n";
-		return $content;
+		return $editedContent;
 	}
 
 
-	private function formatTime($timeInMili){
+	/**
+	 * @param int $timeStamp
+	 * @return string
+	 */
+	private function formatSrtTimeStamp($timeInMili){
 		$seconds = $timeInMili / 1000;
 		$remainder = round($seconds - ($seconds >> 0), 3) * 1000;
 		$formatted_remainder = sprintf("%03d", $remainder);
-
 		return gmdate('H:i:s,', $seconds).$formatted_remainder;
 	}
+
+
+	private function parseCaptionTime($time){
+		$modifiedTime = str_replace(',','.',$time);
+		list($CaptionTime, $errorStart) = kCaptionsContentManager::parseStrTTTime($modifiedTime);
+		return $CaptionTime;
+	}
+
 }
