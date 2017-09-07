@@ -1182,6 +1182,36 @@ class MediaService extends KalturaEntryService
 			&& $resource->operationAttributes[0] instanceof KalturaClipAttributes);
 	}
 
+   /**
+	 * Get volume map by entry id
+	 *
+	 * @action getVolumeMap
+	 * @param string $entryId Entry id
+	 * @return file
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getVolumeMapAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		header("Content-Disposition: attachment; filename=".$entryId."_volumeMap.csv");
+		// currently the values for the map are randomly generated, need to take the correct ones from the packager
+		$content = $this->generateVolumeMapContent($dbEntry);
+		return new kRendererString($content, 'text/csv');
+	}
 
+	private function generateVolumeMapContent($entry)
+	{
+		$content = "pts,rms_level"."\r\n";
+		$pts = 1000;
+		while($entry->getLengthInMsecs() >= $pts)
+		{
+			$rms = rand(-100, 0);
+			$content .= $pts.", ".$rms."\r\n";
+			$pts += 1000;
+		}
+		return $content;
+	}
 }
