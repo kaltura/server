@@ -63,6 +63,14 @@ class languageCodeManager
         return self::getObjectFromTwoCode($val);
     }
 
+    public static function getFullLanguageNameFromThreeCode($codeT)
+    {
+        if(!self::isAlreadyLoaded())
+            self::loadLanguageCodeMap();
+        $languageObj = self::getObjectFromThreeCode($codeT);
+        return !is_null($languageObj) ? $languageObj[self::KALTURA_NAME] : $codeT;
+    }
+
     public static function getObjectFromKalturaName($kalturaName)
     {
         if(!self::isAlreadyLoaded())

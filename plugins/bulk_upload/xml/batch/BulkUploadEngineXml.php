@@ -1448,9 +1448,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
 		if (isset($contentElement->assetInfo))
 		{
-			$languageCode = kXml::getXmlAttributeAsString($contentElement->assetInfo, "language");
-			$languageObj = languageCodeManager::getObjectFromThreeCode($languageCode);
-			$flavorAsset->language = !is_null($languageObj) ? $languageObj[languageCodeManager::KALTURA_NAME] : $languageCode;
+			$flavorAsset->language = languageCodeManager::getFullLanguageNameFromThreeCode(kXml::getXmlAttributeAsString($contentElement->assetInfo, "language"));
 			$flavorAsset->label = kXml::getXmlAttributeAsString($contentElement->assetInfo, "label");
 		}
 		return $flavorAsset;
