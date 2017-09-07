@@ -120,6 +120,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		foreach (self::$stringFields as $string)
 		{
 			$event->$string = $this->getField($string);
+			if ( $string == 'duration')
+			{
+				if ($event->$string != '0' || intval($event->$string) == 0)
+				{
+					$datetime = new DateTime('@0');
+					$datetime->add(new DateInterval($event->$string));
+
+					$output = $datetime->format('U');
+					$event->$string = $output;
+				}
+			}
 		}
 
 		foreach (self::$dateFields as $date => $field)
