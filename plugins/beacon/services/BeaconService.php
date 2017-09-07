@@ -52,15 +52,19 @@ class BeaconService extends KalturaBaseService
 	/**
 	 * @action enhanceSearch
 	 * @param KalturaBeaconEnhanceFilter $filter
+	 * @param KalturaFilterPager $pager
 	 * @return KalturaBeaconListResponse
 	 * @throws KalturaAPIException
 	 */
 	
-	public function enhanceSearchAction(KalturaBeaconEnhanceFilter $filter = null)
+	public function enhanceSearchAction(KalturaBeaconEnhanceFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaBeaconEnhanceFilter();
 		
-		return $filter->enhanceSearch();
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+		
+		return $filter->enhanceSearch($pager);
 	}
 }
