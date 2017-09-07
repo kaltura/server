@@ -595,6 +595,17 @@ class UserService extends KalturaBaseUserService
 			
 		return $kuser->getPuserId();
 	}
-
+	
+	/**
+	 * Loges a user to the destination account as long the ks user id exists in the desc acount and the loginData id match for both accounts
+	 *
+	 * @action loginByKs
+	 * @param int $destPartnerId
+	 * @throws APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED
+	 */
+	public function loginByKsAction($destPartnerId)
+	{
+		return parent::loginByKsImpl($this->getKs()->getOriginalString(), $destPartnerId);
+	}
 
 }
