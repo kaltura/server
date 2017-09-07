@@ -121,16 +121,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$event->$string = $this->getField($string);
 			if ( $string == 'duration')
-			{
-				if ($event->$string != '0' || intval($event->$string) == 0)
-				{
-					$datetime = new DateTime('@0');
-					$datetime->add(new DateInterval($event->$string));
-
-					$output = $datetime->format('U');
-					$event->$string = $output;
-				}
-			}
+				$event->$string = $this->formatDuration($event->string);
 		}
 
 		foreach (self::$dateFields as $date => $field)
@@ -304,5 +295,21 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 
 		return $object;
+	}
+
+	/**
+	 * @param $duration
+	 */
+	private function formatDuration($duration)
+	{
+		if ($duration != '0' || intval($duration) == 0)
+		{
+			$datetime = new DateTime('@0');
+			$datetime->add(new DateInterval($duration));
+
+			$output = $datetime->format('U');
+			return $output;
+		}
+		return $duration;
 	}
 }
