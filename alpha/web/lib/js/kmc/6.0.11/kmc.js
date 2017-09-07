@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2017-08-16
+/*! KMC - v6.0.11 - 2017-09-10
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2017 Amir Chervinsky; Licensed GNU */
 /**
@@ -4434,8 +4434,8 @@ kmc.preview_embed = {
 		if( ! is_playlist ) {
 			embedOptions.entryId = id;
 			embedOptions.entryMeta = {
-				'name': name,
-				'description': description,
+				'name': unescape(name),
+				'description': unescape(description),
                 'duration': duration,
                 'thumbnailUrl': thumbnailUrl
 			};
@@ -4446,10 +4446,10 @@ kmc.preview_embed = {
 			// Multiple Playlists
 			if( id == 'multitab_playlist' ) {
 				embedOptions.playerOnly = true;
-				embedOptions.name = name;
+				embedOptions.name = unescape(name);
 			} else { // Single playlist
 				embedOptions.playlistId = id;
-				embedOptions.playlistName = name;
+				embedOptions.playlistName = unescape(name);
 			}
 		}
 		kmc.Preview.openPreviewEmbed( embedOptions, kmc.Preview.Service );
@@ -4475,7 +4475,7 @@ kmc.preview_embed = {
 		});
 
 		var modal_content = '<div class="center">' + code + '</div><dl>' +
-		'<dt>Entry Name:</dt><dd>&nbsp;' + entryName + '</dd>' +
+		'<dt>Entry Name:</dt><dd>&nbsp;' + unescape(entryName) + '</dd>' +
 		'<dt>Entry Id:</dt><dd>&nbsp;' + entryId + '</dd>' +
 		'<dt>Flavor Name:</dt><dd>&nbsp;' + flavorDetails.flavor_name + '</dd>' +
 		'<dt>Flavor Asset Id:</dt><dd>&nbsp;' + flavorDetails.asset_id + '</dd>' +

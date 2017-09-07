@@ -766,8 +766,7 @@ class playManifestAction extends kalturaAction
 		foreach($flavors as $flavorAsset)
 		{
 			/* @var $flavorAsset flavorAsset */
-			
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+			$mediaInfo = $flavorAsset->getMediaInfo();
 			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 			{
 				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 

@@ -45,4 +45,5 @@ interface BatchJobType extends BaseEnum
 	const RECALCULATE_CACHE = 41;
 	const LIVE_TO_VOD = 42;
 	const COPY_CAPTIONS = 43;
+	const CHUNKED_ENCODE_JOB_SCHEDULER  = 44;
 }

@@ -270,7 +270,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const DYU = 'Dyula';
 	const EEE = 'E';
 	const EGL = 'Emilian';
-	const ENM = 'English	 Middle (1100-1500)';
+	const ENM = 'English Middle (1100-1500)';
 	const EVE = 'Even';
 	const EVN = 'Evenki';
 	const FAN = 'Fang (Equatorial Guinea)';
@@ -415,7 +415,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const NON = 'Norse Old';
 	const NOV = 'Novial';
 	const NSK = 'Naskapi';
-	const NSO = 'Northern Sotho	 Pedi Sepedi';
+	const NSO = 'Northern Sotho Pedi Sepedi';
 	const NYM = 'Nyamwezi';
 	const NYO = 'Nyoro';
 	const NYS = 'Nyungah';
@@ -427,7 +427,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const ONE = 'Oneida';
 	const ONO = 'Onondaga';
 	const OOD = 'Tohono Oodham';
-	const OTA = 'Turkish	 Ottoman';
+	const OTA = 'Turkish Ottoman';
 	const OTW = 'Ottawa';
 	const PAG = 'Pangasinan';
 	const PAM = 'Pampanga';
@@ -504,7 +504,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const SZL = 'Silesian';
 	const TAB = 'Tabassaran';
 	const TAQ = 'Tamasheq';
-	const TAR = 'Tarahumara	 Central';
+	const TAR = 'Tarahumara Central';
 	const TBW = 'Tagbanwa';
 	const TCX = 'Toda';
 	const TCY = 'Tulu';
@@ -530,7 +530,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const TUV = 'Turkana';
 	const TVL = 'Tuvalu';
 	const TYV = 'Tuvinian';
-	const TZM = 'Tamazight	 Central Atlas';
+	const TZM = 'Tamazight Central Atlas';
 	const UBY = 'Ubykh';
 	const UDI = 'Udi';
 	const UDM = 'Udmurt';

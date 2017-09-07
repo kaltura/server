@@ -21,13 +21,12 @@ class BeaconService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaBeacon $beacon
 	 * @param KalturaNullableBoolean $shouldLog
-	 * @param int $ttl
 	 * @return bool
 	 */
-	public function addAction(KalturaBeacon $beacon, $shouldLog = KalturaNullableBoolean::FALSE_VALUE, $ttl = dateUtils::DAY)
+	public function addAction(KalturaBeacon $beacon, $shouldLog = KalturaNullableBoolean::FALSE_VALUE)
 	{
 		$beaconObj = $beacon->toInsertableObject();
-		$beaconObj->index($shouldLog, $ttl);
+		$beaconObj->index($shouldLog);
 		
 		return true;
 	}
@@ -53,26 +52,19 @@ class BeaconService extends KalturaBaseService
 	/**
 	 * @action enhanceSearch
 	 * @param KalturaBeaconEnhanceFilter $filter
+	 * @param KalturaFilterPager $pager
 	 * @return KalturaBeaconListResponse
 	 * @throws KalturaAPIException
 	 */
 	
-	public function enhanceSearchAction(KalturaBeaconEnhanceFilter $filter = null)
+	public function enhanceSearchAction(KalturaBeaconEnhanceFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaBeaconEnhanceFilter();
 		
-		return $filter->enhanceSearch();
-	}
-	
-	/**
-	 * @action delete
-	 * @param string $id
-	 * @param string $indexType
-	 */
-	public function deleteAction($id, $indexType)
-	{
-		kBeaconManager::deleteByBeaconId($id, $indexType);
-		return true;
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+		
+		return $filter->enhanceSearch($pager);
 	}
 }
