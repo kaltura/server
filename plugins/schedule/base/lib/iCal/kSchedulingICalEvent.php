@@ -302,7 +302,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	 */
 	private function formatDuration($duration)
 	{
-		if ($duration != '0' || intval($duration) == 0)
+		if ($duration && ( $duration != '0' || intval($duration) == 0))
 		{
 			$datetime = new DateTime('@0');
 			$datetime->add(new DateInterval($duration));
