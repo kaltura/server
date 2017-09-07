@@ -306,9 +306,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$datetime = new DateTime('@0');
 			$datetime->add(new DateInterval($duration));
-
-			$output = $datetime->format('U');
-			return $output;
+			$duration = $datetime->format('U');
 		}
 		return $duration;
 	}
