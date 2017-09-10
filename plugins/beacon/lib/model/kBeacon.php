@@ -39,9 +39,12 @@ class kBeacon
 	protected $createdAt;
 	protected $updatedAt;
 	
-	public function __construct()
+	public function __construct($partnerId = null)
 	{
-		$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		if($partnerId)
+			$this->setPartnerId($partnerId);
+		else
+			$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
 	}
 	
 	public function setId($id)
@@ -134,14 +137,17 @@ class kBeacon
 		return $this->updatedAt;
 	}
 	
-	public function index($shouldLog = false)
+	public function index($shouldLog = false, $queueProvider = null)
 	{
-		// get instance of activated queue provider to send message
-		$constructorArgs = array();
-		$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
-		
-		/* @var $queueProvider RabbitMQProvider */
-		$queueProvider = QueueProvider::getInstance(null, $constructorArgs);
+		if(!$queueProvider)
+		{
+			// get instance of activated queue provider to send message
+			$constructorArgs = array();
+			$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
+			
+			/* @var $queueProvider RabbitMQProvider */
+			$queueProvider = QueueProvider::getInstance(null, $constructorArgs);	
+		}
 		
 		//Get current time to add to indexed object info
 		$currTime = time();
@@ -159,9 +165,11 @@ class kBeacon
 			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject, $currTime);
 			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
 		}
+		
+		return true;
 	}
 	
-	private function getIndexObjectForState($indexObject, $currTime)
+	public function getIndexObjectForState($indexObject, $currTime)
 	{
 		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
 		
@@ -172,7 +180,7 @@ class kBeacon
 		return json_encode($indexObject);
 	}
 	
-	private function getIndexObjectForLog($indexObject, $currTime)
+	public function getIndexObjectForLog($indexObject, $currTime)
 	{
 		$indexObject[self::FIELD_CREATED_AT] = $currTime;
 		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::LOG;
@@ -200,7 +208,7 @@ class kBeacon
 		return $doc[self::FIELD_CREATED_AT];
 	}
 	
-	private function createIndexBaseObject($currTime)
+	public function createIndexBaseObject($currTime)
 	{
 		$indexObject = array();
 		
