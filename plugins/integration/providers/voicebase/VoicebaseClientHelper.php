@@ -4,8 +4,9 @@
  */
 class VoicebaseClientHelper
 {
-	const VOICEBASE_FAILURE_MEESAGE = "FAILURE";
-	const VOICEBASE_MACHINE_COMPLETE_MEESAGE = "MACHINECOMPLETE";
+	const VOICEBASE_FAILURE_MESSAGE = "FAILURE";
+	const VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS = "SUCCESS";
+	const VOICEBASE_MACHINE_COMPLETE_MESSAGE = "MACHINECOMPLETE";
 	const VOICE_MACHINE_FAILURE_MESSAGE = "ERROR";
 	
 	private $supportedLanguages = array();
@@ -29,7 +30,7 @@ class VoicebaseClientHelper
 		$curlResult = $this->retrieveRemoteProcess($entryId);
 		if($curlResult)
 		{
-			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MEESAGE || !isset($curlResult->fileStatus) || !$curlResult->fileStatus == self::VOICEBASE_MACHINE_COMPLETE_MEESAGE)
+			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE || !isset($curlResult->fileStatus) || !$curlResult->fileStatus == self::VOICEBASE_MACHINE_COMPLETE_MESSAGE)
 				return false;
 			return true;
 		}
@@ -77,7 +78,7 @@ class VoicebaseClientHelper
 
 		$curlResult = $this->sendAPICall($uploadAPIUrl, $urlOptions);
 	
-		if($curlResult->requestStatus == self::VOICEBASE_FAILURE_MEESAGE)
+		if($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE)
 			return false;
 		
 		return true;
@@ -104,7 +105,7 @@ class VoicebaseClientHelper
 		if(!$noDecoding)
 		{
 			$stringResult = $result;
-			$result = json_decode($result, true);
+			$result = json_decode($result);
 				
 			if (json_last_error() !== JSON_ERROR_NONE)
 			{
@@ -155,7 +156,7 @@ class VoicebaseClientHelper
 	public function calculateAccuracy($entryId)
 	{
 		$contentArr = $this->getRemoteTranscripts($entryId, array("JSON"));
-		$transcriptWordObjects = json_decode($contentArr["JSON"], true);
+		$transcriptWordObjects = json_decode($contentArr["JSON"]);
 		$sumOfAccuracies = 0;
 		$numberOfElements = 0;
 		

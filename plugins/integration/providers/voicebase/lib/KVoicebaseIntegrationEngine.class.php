@@ -26,7 +26,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 	
 	protected function doDispatch(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVoicebaseJobProviderData $providerData)
 	{
-		KalturaLog::info ();
+		KalturaLog::info ("Starting dispatch - VoiceBase");
 		$entryId = $providerData->entryId;
 		$flavorAssetId = $providerData->flavorAssetId;
 		$spokenLanguage = $providerData->spokenLanguage;
@@ -75,9 +75,14 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$remoteProcess = $this->clientHelper->retrieveRemoteProcess($entryId);
 		
 		//false result means that something has gone wrong - the VB job is either in status error or missing altogether
-		if(!$remoteProcess || $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MEESAGE || !isset($remoteProcess->fileStatus) || $curlResult->fileStatus == VoicebaseClientHelper::VOICE_MACHINE_FAILURE_MESSAGE)
+		if(!$remoteProcess || $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE || !isset($remoteProcess->fileStatus) || $curlResult->fileStatus == VoicebaseClientHelper::VOICE_MACHINE_FAILURE_MESSAGE)
 		{
 			throw new Exception("VoiceBase transcription failed.");
+		}
+		
+		if($remoteProcess && $remoteProcess->fileStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_MESSAGE && $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS)
+		{
+			return true;
 		}
 		
 		return false;
