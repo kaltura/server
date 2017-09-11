@@ -139,15 +139,10 @@ class kBeacon
 	
 	public function index($shouldLog = false, $queueProvider = null)
 	{
-		if(!$queueProvider)
-		{
-			// get instance of activated queue provider to send message
-			$constructorArgs = array();
-			$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
-			
-			/* @var $queueProvider RabbitMQProvider */
-			$queueProvider = QueueProvider::getInstance(null, $constructorArgs);	
-		}
+		kApiCache::disableConditionalCache();
+		
+		// get instance of activated queue provider to send message
+		$queueProvider = $queueProvider ? $queueProvider : $this->getQueueProvider();
 		
 		//Get current time to add to indexed object info
 		$currTime = time();
@@ -167,6 +162,15 @@ class kBeacon
 		}
 		
 		return true;
+	}
+	
+	private function getQueueProvider()
+	{
+		$constructorArgs = array();
+		$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
+		
+		/* @var $queueProvider RabbitMQProvider */
+		return QueueProvider::getInstance(null, $constructorArgs);
 	}
 	
 	public function getIndexObjectForState($indexObject, $currTime)
