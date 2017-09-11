@@ -110,6 +110,16 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $segmentDuration;
 
+	/**
+	 * @var bool
+	 */
+	public $explicitLive;
+
+	/**
+	 * @var KalturaExplicitLiveStatus
+	 */
+	public $explicitLiveStatus;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -126,7 +136,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"currentBroadcastStartTime",
 		"recordingOptions",
 		"liveStatus",
-		"segmentDuration"
+		"segmentDuration",
+		"explicitLive",
+		"explicitLiveStatus",
 	);
 	
 	/* (non-PHPdoc)
@@ -163,6 +175,10 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions->shouldCopyEntitlement = true;
 		}
 
+		if (PermissionPeer::isValidForPartner(KalturaPermissionName::FEATURE_EXPLICIT_LIVE_IS_DEFAULT, kCurrentContext::getCurrentPartnerId()) && !isset($this->explicitLive))
+		{
+			$this->explicitLive = true;
+		}
 
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}

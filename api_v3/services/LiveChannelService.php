@@ -126,6 +126,6 @@ class LiveChannelService extends KalturaLiveEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::LIVE_CHANNEL)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
 
-		return $dbEntry->hasMediaServer();
+		return $dbEntry->canPlayLive();
 	}
 }

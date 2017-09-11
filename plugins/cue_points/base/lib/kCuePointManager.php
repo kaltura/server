@@ -788,7 +788,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	{
 		if(	$object instanceof LiveEntry
 			&& $object->getRecordStatus() == RecordStatus::DISABLED // If ENABLED, it will be handled at the end of copyCuePointsFromLiveToVodEntry()
-			&& !$object->hasMediaServer()
+			&& !$object->canPlayLive()
 		)
 		{
 			// checking if the live-entry media-server was just unregistered
