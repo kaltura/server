@@ -1446,7 +1446,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$flavorAsset = new KalturaFlavorAsset(); //we create a new asset (for add)
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
 		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
-			
+		if (isset($contentElement->assetInfo))
+		{
+			$flavorAsset->language = languageCodeManager::getFullLanguageNameFromThreeCode(kXml::getXmlAttributeAsString($contentElement->assetInfo, "language"));
+			$flavorAsset->label = kXml::getXmlAttributeAsString($contentElement->assetInfo, "label");
+		}
 		return $flavorAsset;
 	}
 	
