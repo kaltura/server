@@ -241,7 +241,7 @@ class DropFolderService extends KalturaBaseService
 	public function getExclusiveDropFolderAction($tag, $maxTime)
 	{
 		$allocateDropFolder = kDropFolderAllocator::getDropFolder($tag, $maxTime);
-		if ($allocateDropFolder)
+		if ($allocateDropFolder && self::isValidForWatch($allocateDropFolder))
 		{
 			$dropFolder = KalturaDropFolder::getInstanceByType($allocateDropFolder->getType());
 			$dropFolder->fromObject($allocateDropFolder, $this->getResponseProfile());
@@ -277,6 +277,15 @@ class DropFolderService extends KalturaBaseService
 
 		return $dropFolder;
 	}
-	
+
+	private static function isValidForWatch(DropFolder $dropFolder)
+	{
+		$partner = PartnerPeer::retrieveByPK($dropFolder->getPartnerId());
+		if (!$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE
+			|| !$partner->getPluginEnabled(DropFolderPlugin::PLUGIN_NAME))
+			return false;
+
+		return true;
+	}
 	
 }
