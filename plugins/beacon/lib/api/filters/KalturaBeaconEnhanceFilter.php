@@ -11,6 +11,11 @@ class KalturaBeaconEnhanceFilter extends KalturaFilter
 	 */
 	public $externalElasticQueryObject;
 	
+	/**
+	 * @var KalturaBeaconIndexType
+	 */
+	public $indexTypeEqual;
+	
 	public function getCoreFilter()
 	{
 		return null;
@@ -33,6 +38,9 @@ class KalturaBeaconEnhanceFilter extends KalturaFilter
 		$searchQuery[elasticClient::ELASTIC_INDEX_KEY] = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
 		$searchQuery[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_SIZE_KEY] = $pager->pageSize;
 		$searchQuery[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_FROM_KEY] = $pager->calcOffset();
+		
+		if($this->indexTypeEqual)
+			$searchQuery[elasticClient::ELASTIC_TYPE_KEY] = $this->indexTypeEqual;
 		
 		$searchMgr = new kBeaconSearchQueryManger();
 		$responseArray = $searchMgr->search($searchQuery);
