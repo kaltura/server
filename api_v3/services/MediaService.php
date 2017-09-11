@@ -152,8 +152,7 @@ class MediaService extends KalturaEntryService
 			$kResource = $resource->toObject();
 			if ( ($kResource instanceof kOperationResource ) && ($this->isResourceKClip($kResource)) ) {
 				$internalResource = $kResource->getResource();
-				if ($dbEntry->getIsTrimDisabled()
-					&& $internalResource instanceof kFileSyncResource
+				if ($internalResource instanceof kFileSyncResource
 					&& $dbEntry->getId() == $internalResource->getOriginEntryId()
 				)
 				{
