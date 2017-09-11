@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2017-07-24
+/*! KMC - v6.0.11 - 2017-09-10
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2017 Amir Chervinsky; Licensed GNU */
 /**
@@ -3988,6 +3988,22 @@ kmc.functions = {
 			'content' : modal_content,
 			'contentHeight' : '94%'
 		} );
+    },
+    openLiveDashboard: function(entryId){
+        // Set title
+        var title = 'Live Dashboard';
+        kmc.vars.liveDashboard.entryId = entryId;
+        var url = kmc.vars.base_url + '/apps/liveDashboard/' + kmc.vars.liveDashboard.version + '/index.html';
+
+        var modal_content = '<iframe id="liveDashboardIF" src="' + url + '" width="100%" height="100%" frameborder="0"></iframe>';
+
+        kmc.layout.modal.open( {
+            'width' : 1050,
+            'height' : 695,
+            'title' : title,
+            'content' : modal_content,
+            'contentHeight' : '94%'
+        } );
     },
 	openUsageDashboard: function(){
 		kmc.utils.hideFlash(true);

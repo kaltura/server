@@ -64,6 +64,8 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::RECALCULATE_CACHE' => 'Recalculate Cache',
 	'Kaltura_Client_Enum_BatchJobType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET' => 'Parse Multi Language Caption Asset',
 	'Kaltura_Client_Enum_BatchJobType::LIVE_TO_VOD' => 'Live To Vod',
+	'Kaltura_Client_Enum_BatchJobType::CLEAR_BEACONS' => 'Clear Beacons',
+	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -619,6 +621,7 @@ return array(
 	'entry-investigate history data th' => 'Data',
 	'entry-investigate history status th' => 'Status (failure reason)',
 	'entry-investigate history status tooltip' => 'The status of this task. The task status is one of the following: Waiting, In Process, completed, Failed',
+	'entry-investigate history object th' => 'Object',
 	'entry-investigate history abort th' => 'Aborted',
 	'entry-investigate history recheck th' => 'Check Again',
 	'entry-investigate history msg th' => 'Message',
@@ -1293,6 +1296,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH" => "VOD_PACKAGER_DASH",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HDS" => "VOD_PACKAGER_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS" => "VOD_PACKAGER_HLS",
+	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST" => "VOD_PACKAGER_HLS_MANIFEST",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_MSS" => "VOD_PACKAGER_MSS",
 	
 	"Kaltura_Client_Enum_DeliveryStatus::ACTIVE" => "Active",

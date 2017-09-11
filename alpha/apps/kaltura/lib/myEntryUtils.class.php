@@ -347,16 +347,20 @@ class myEntryUtils
 				$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
 				if($recordedEntry)
 				{
-					if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+					//If entry is pending for recording to finish for more than 7 days than it will probably never happen 
+					if($recordedEntry->isInsideDeleteGracePeriod())
 					{
-						KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
-						throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getId());
-					}
-					
-					if(myEntryUtils::shouldServeVodFromLive($recordedEntry))
-					{
-						KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, entry still beeing handled by recordign engien");
-						throw new KalturaAPIException(KalturaErrors::RECORDING_FLOW_NOT_COMPLETE, $entry->getId());
+						if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+						{
+							KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
+							throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getId());
+						}
+						
+						if(myEntryUtils::shouldServeVodFromLive($recordedEntry))
+						{
+							KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, entry still beeing handled by recordign engien");
+							throw new KalturaAPIException(KalturaErrors::RECORDING_FLOW_NOT_COMPLETE, $entry->getId());
+						}
 					}
 				}	
 			}
@@ -365,7 +369,7 @@ class myEntryUtils
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
-			if(myEntryUtils::shouldServeVodFromLive($entry, false))
+			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false))
 			{
 				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
@@ -385,8 +389,8 @@ class myEntryUtils
 			}
 		}
 
-		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
-		
+		KalturaLog::log("delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
+
 		kJobsManager::abortEntryJobs($entry->getId());
 		
 		$media_type = $entry->getMediaType();
@@ -1846,5 +1850,31 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$entry->save();
 	}
 
-
+	public static function wasEntryClipped(entry $entry, array $modifiedColumns)
+	{
+		if (in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
+			&& $entry->isCustomDataModified('operationAttributes')
+			&& $entry->isCustomDataModified('sourceEntryId'))
+			{
+				//clip case
+				if(!$entry->getReplacedEntryId())
+				return true;
+				//trim case
+				if($entry->getTempTrimEntry())
+				return true;
+			}
+		return false;
+	}
+	public static function getRelatedEntries($entry)
+	{
+		/* @var $entry entry */
+		if (!$entry->getParentEntryId())
+			return entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getId(), $entry->getPartnerId());
+		$relatedEntries = array(entryPeer::retrieveByPK($entry->getParentEntryId()));
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getParentEntryId(), $entry->getPartnerId());
+		foreach($childEntries as $childEntry)
+			if ($childEntry->getId() != $entry->getId())
+				$relatedEntries[] = $childEntry;
+		return $relatedEntries;
+	}
 }

@@ -209,6 +209,11 @@ abstract class kManifestRenderer
 
 		// send the request
 		$fp = fsockopen($host, $port, $errno, $errstr, 1);
+		if ($fp === false)
+		{
+			return;
+		}
+
 		fwrite($fp, $out);
 		fclose($fp);
 	}

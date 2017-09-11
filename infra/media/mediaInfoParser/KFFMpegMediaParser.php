@@ -792,5 +792,40 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		else
 			return null;
 	}
+	
+	/**
+	 * 
+	 * @param unknown_type $ffprobeBin
+	 * @param unknown_type $srcFileName
+	 * $param unknown_type $reset
+	 * @return array of volumeLevels
+	 */	
+	public static function retrieveVolumeLevels($ffprobeBin, $srcFileName, $reset=1)
+	{
+		KalturaLog::log("srcFileName($srcFileName)");
+				
+		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
+		KalturaLog::log("$cmdLine");
+		$lastLine=exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::err("Volume level detection failed on ffprobe call - rv($rv),lastLine($lastLine)");
+			return null;
+		}
+		$volumeLevels = array();
+		foreach($outputArr as $line) {
+			list($tm,$vol) = explode(',', $line);
+			$tm = (int)($tm*1000);
+			if(!isset($tm) || !isset($vol))
+				continue;
+			$vol = trim($vol);
+			if($vol!='-inf')
+				$volumeLevels[$tm] = $vol;
+			else
+				$volumeLevels[$tm] = -1000;
+		}
+
+		return $volumeLevels;
+	}
+
 };
 	

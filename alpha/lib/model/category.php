@@ -492,11 +492,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	}
       
 	/**
-	* Decrement direct entries count (will decrement recursively the parent categories too)
+	* Decrement direct pending entries count
 	*/
 	public function decrementPendingEntriesCount()
 	{
 		$this->setPendingEntriesCount(max(0, $this->getPendingEntriesCount() - 1));
+		$this->save();
 	}
       
 	protected function validateFullNameIsUnique()
@@ -1974,5 +1975,13 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		if($this->getStatus() == CategoryStatus::PURGED)
 			return true;
 		return false;
+	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'category';
 	}
 }

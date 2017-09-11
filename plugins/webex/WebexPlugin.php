@@ -141,6 +141,8 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		
 		$curlWrapper->close();
 		$importData->fileSize = kFile::fileSize($importData->destFileLocalPath);
+		if (!$importData->fileSize)
+			throw new kTemporaryException("File size download from WEBEX was 0");
 		
 		return $importData;
 	}

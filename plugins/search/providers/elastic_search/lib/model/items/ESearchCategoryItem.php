@@ -113,8 +113,8 @@ class ESearchCategoryItem extends ESearchItem
 			case ESearchItemType::STARTS_WITH:
 				$categoryQuery[] = kESearchQueryManager::getPrefixQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
 				break;
-			case ESearchItemType::DOESNT_CONTAIN:
-				$categoryQuery[]['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
+			case ESearchItemType::EXISTS:
+				$categoryQuery[] = kESearchQueryManager::getExistsQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::RANGE:
 				$categoryQuery[] = kESearchQueryManager::getRangeQuery($categorySearchItem,$categorySearchItem->getFieldName(), $allowedSearchTypes);

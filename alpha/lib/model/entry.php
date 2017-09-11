@@ -1796,7 +1796,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setRecordedEntrySegmentCount ( $v )	{	$this->putInCustomData ( "recordedEntrySegmentCount" , $v );	}
 	public function getRecordedEntrySegmentCount(  )		{	return $this->getFromCustomData( "recordedEntrySegmentCount", null, 0 );	}
-	
+
+	public function setTempTrimEntry ($v)	    { $this->putInCustomData ( "tempTrimEntry" , $v );	}
+	public function getTempTrimEntry ()		{	return $this->getFromCustomData( "tempTrimEntry", null, false );	}
+
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
@@ -1833,7 +1836,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setReachedMaxRecordingDuration ( $v )	{	$this->putInCustomData ( "reachedMaxRecordingDuration" , (bool) $v );	}
 	public function getReachedMaxRecordingDuration() 	{	return (bool) $this->getFromCustomData( "reachedMaxRecordingDuration" ,null, false );	}
-		
+
+
 	public function getParentEntry()
 	{
 		if(!$this->getParentEntryId())
@@ -3692,6 +3696,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'status' => $this->getStatus(),
 			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
 			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
+			'entitled_pusers_edit' => array_values($this->getEntitledUserPuserEditArray()),
+			'entitled_pusers_publish' => array_values($this->getEntitledPusersPublishArray()),
 			'kuser_id' => $this->getKuserId(),
 			'puser_id' => $this->getPuserId(),
 			'creator_puser_id' => $this->getCreatorPuserId(),
@@ -3760,7 +3766,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entry_id' => $parentEntry->getId(),
 			'partner_id' => $parentEntry->getPartnerId(),
 			'status' => $parentEntry->getStatus(),
-			'partner_status' => "p{$parentEntry->getPartnerId()}s{$parentEntry->getStatus()}",
+			'partner_status' => elasticSearchUtils::formatPartnerStatus($parentEntry->getPartnerId(), $parentEntry->getStatus()),
 			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),
 			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
 			'kuser_id' => $parentEntry->getKuserId(),
@@ -3800,5 +3806,18 @@ public function copyTemplate($copyPartnerId = false, $template)
 		if($this->getStatus() == entryStatus::DELETED)
 			return true;
 		return false;
+	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'entry';
+	}
+	
+	public function isInsideDeleteGracePeriod()
+	{
+		return $this->getCreatedAt(null) > (time() - dateUtils::DAY * 7);
 	}
 }

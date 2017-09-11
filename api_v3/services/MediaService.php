@@ -165,6 +165,7 @@ class MediaService extends KalturaEntryService
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
 			$tempMediaEntry->sourceType = $dbEntry->getSourceType();
+			$tempMediaEntry->streams = $dbEntry->getStreams();
 
 			if ( !$conversionProfileId ) {
 				$originalConversionProfileId = $dbEntry->getConversionQuality();
@@ -181,6 +182,20 @@ class MediaService extends KalturaEntryService
 			}
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
+			
+			if ($conversionProfileId && !$advancedOptions)
+			{
+				$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+				if($conversionProfile)
+				{
+					$defaultReplacementOptions = $conversionProfile->getDefaultReplacementOptions(); 
+					if ($defaultReplacementOptions) 
+					{
+						$dbEntry->setReplacementOptions($defaultReplacementOptions);
+						$dbEntry->save();
+					}
+				}
+			}
 
 			$this->replaceResourceByEntry($dbEntry, $resource, $tempMediaEntry);
 		}
@@ -783,8 +798,11 @@ class MediaService extends KalturaEntryService
 		
 	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
      	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+		
      	try{
        		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+			if ($this->shouldUpdateRelatedEntry($resource))
+				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
 			if($lock){
@@ -1150,5 +1168,31 @@ class MediaService extends KalturaEntryService
 		}
 		return false;
 	}
+
+	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
+	{
+		if (!isset($resource->resource->entryId))
+			return;
+		$relatedEntries = myEntryUtils::getRelatedEntries($dbEntry);
+		foreach ($relatedEntries as $relatedEntry)
+		{
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry");
+			$resource->resource->entryId = $relatedEntry->getId();
+			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
+		}
+	}
+	
+	private function shouldUpdateRelatedEntry($resource)
+	{
+		return $this->isClipTrimFlow($resource);
+	}
+
+	private function isClipTrimFlow($resource)
+	{
+		return ($resource instanceof KalturaOperationResource && $resource->resource instanceof KalturaEntryResource
+			&& $resource->operationAttributes[0] instanceof KalturaClipAttributes);
+	}
+
+
 
 }

@@ -20,6 +20,8 @@ class KalturaESearchMetadataItem extends KalturaESearchItem
 		'metadataProfileId',
 	);
 
+	private static $map_dynamic_enum = array();
+
 	protected function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -36,6 +38,16 @@ class KalturaESearchMetadataItem extends KalturaESearchItem
 	{
 		$this->validatePropertyNotNull("searchTerm");
 		return parent::validateForUsage($sourceObject, $propertiesToSkip);
+	}
+
+	protected function getItemFieldName()
+	{
+		return null;
+	}
+
+	protected function getDynamicEnumMap()
+	{
+		return self::$map_dynamic_enum;
 	}
 
 }

@@ -3,8 +3,13 @@ elasticPort = @ELASTIC_PORT@
 elasticClientCurlTimeout = @CURL_TIMEOUT_IN_SEC@
 ;set to true in order to disable elastic indexing
 disableElastic = false
+ngramPercentage = 80
 
 [innerHits]
 captionInnerHitsSize = 10
 cuePointsInnerHitsSize = 10
 metadataInnerHitsSize = 10
+
+[beacon]
+elasticHost = @BEACONS_ELASTIC_HOST@
+elasticPort = @BEACONS_ELASTIC_PORT@

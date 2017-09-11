@@ -9,7 +9,7 @@ class ESearchCuePointItemData extends ESearchItemData
 	/**
 	 * @string
 	 **/
-	protected $type;
+	protected $cuePointType;
 
 	/**
 	 * @string
@@ -60,6 +60,22 @@ class ESearchCuePointItemData extends ESearchItemData
 	 * @string
 	 **/
 	protected $explanation;
+
+	/**
+	 * @return mixed
+	 */
+	public function getCuePointType()
+	{
+		return $this->cuePointType;
+	}
+
+	/**
+	 * @param mixed $cuePointType
+	 */
+	public function setCuePointType($cuePointType)
+	{
+		$this->cuePointType = $cuePointType;
+	}
 
 	/**
 	 * @return mixed
@@ -223,12 +239,12 @@ class ESearchCuePointItemData extends ESearchItemData
 
 	public function getType()
 	{
-		return 'cue_points';
+		return ESearchItemDataType::CUE_POINTS;
 	}
 
 	public function loadFromElasticHits($objectResult)
 	{
-		$this->type = $objectResult['_source']['cue_point_type'];
+		$this->cuePointType = $objectResult['_source']['cue_point_type'];
 		$this->id = $objectResult['_source']['cue_point_id'];
 		$this->name = $objectResult['_source']['cue_point_name'];
 		$this->startTime = $objectResult['_source']['cue_point_start_time'];
@@ -238,7 +254,7 @@ class ESearchCuePointItemData extends ESearchItemData
 		if (isset($objectResult['_source']['cue_point_tags']))
 			$this->tags = $objectResult['_source']['cue_point_tags'];
 		if (isset($objectResult['_source']['cue_point_sub_type']))
-			$this->sub_type = $objectResult['_source']['cue_point_sub_type'];
+			$this->subType = $objectResult['_source']['cue_point_sub_type'];
 		if (isset($objectResult['_source']['cue_point_answers']))
 			$this->answers = $objectResult['_source']['cue_point_answers'];
 		if (isset($objectResult['_source']['cue_point_hint']))

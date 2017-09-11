@@ -9,18 +9,14 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchEntry
-	 * @param KalturaESearchOperator $searchOperator
-	 * @param string $entryStatuses
+	 * @param KalturaESearchParams $searchParams
 	 * @param KalturaPager $pager
-	 * @param KalturaESearchOrderBy $order
 	 * @return KalturaESearchResponse
 	 */
-	function searchEntryAction (KalturaESearchOperator $searchOperator, $entryStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
+	function searchEntryAction (KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
-		list($coreSearchOperator, $entryStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $entryStatuses, $pager, $order);
 		$entrySearch = new kEntrySearch();
-		$elasticResults = $entrySearch->doSearch($coreSearchOperator, $entryStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
-		list($coreResults, $objectCount) = elasticSearchUtils::transformElasticToCoreObject($elasticResults, 'entryPeer');
+		list($coreResults, $objectCount) = $this->initAndSearch($entrySearch, $searchParams, $pager);
 		$response = new KalturaESearchResponse();
 		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults);
 		$response->totalCount = $objectCount;
@@ -30,18 +26,14 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchCategory
-	 * @param KalturaESearchOperator $searchOperator
-	 * @param string $categoryStatuses
+	 * @param KalturaESearchParams $searchParams
 	 * @param KalturaPager $pager
-	 * @param KalturaESearchOrderBy $order
 	 * @return KalturaESearchResponse
 	 */
-	function searchCategoryAction (KalturaESearchOperator $searchOperator, $categoryStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
+	function searchCategoryAction (KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
-		list($coreSearchOperator, $categoryStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $categoryStatuses, $pager, $order);
 		$categorySearch = new kCategorySearch();
-		$elasticResults = $categorySearch->doSearch($coreSearchOperator, $categoryStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
-		list($coreResults, $objectCount) = elasticSearchUtils::transformElasticToCoreObject($elasticResults, 'categoryPeer');
+		list($coreResults, $objectCount) = $this->initAndSearch($categorySearch, $searchParams, $pager);
 		$response = new KalturaESearchResponse();
 		$response->objects = KalturaESearchCategoryResultArray::fromDbArray($coreResults);
 		$response->totalCount = $objectCount;
@@ -51,18 +43,14 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchUser
-	 * @param KalturaESearchOperator $searchOperator
-	 * @param string $userStatuses
+	 * @param KalturaESearchParams $searchParams
 	 * @param KalturaPager $pager
-	 * @param KalturaESearchOrderBy $order
 	 * @return KalturaESearchResponse
 	 */
-	function searchUserAction (KalturaESearchOperator $searchOperator, $userStatuses = null, KalturaPager $pager = null,  KalturaESearchOrderBy $order = null)
+	function searchUserAction (KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
-		list($coreSearchOperator, $userStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchOperator, $userStatuses, $pager, $order);
 		$userSearch = new kUserSearch();
-		$elasticResults = $userSearch->doSearch($coreSearchOperator, $userStatusesArr, $kPager, $coreOrder);//TODO: handle error flow
-		list($coreResults, $objectCount) = elasticSearchUtils::transformElasticToCoreObject($elasticResults, 'kuserPeer');
+		list($coreResults, $objectCount) = $this->initAndSearch($userSearch, $searchParams, $pager);
 		$response = new KalturaESearchResponse();
 		$response->objects = KalturaESearchUserResultArray::fromDbArray($coreResults);
 		$response->totalCount = $objectCount;
@@ -96,26 +84,63 @@ class ESearchService extends KalturaBaseService
 		return $result;
 	}
 
-	private function initSearchActionParams(KalturaESearchOperator $searchOperator, $objectStatuses = null, KalturaPager $pager = null, KalturaESearchOrderBy $order = null)
+	private function initSearchActionParams(KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
+		$searchOperator = $searchParams->searchOperator;
+
 		if (!$searchOperator->operator)
 			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
 
 		$coreSearchOperator = $searchOperator->toObject();
 
 		$objectStatusesArr = array();
-		if (!empty($objectStatuses))
-			$objectStatusesArr = explode(',', $objectStatuses);
+		if (!empty($searchParams->objectStatuses))
+			$objectStatusesArr = explode(',', $searchParams->objectStatuses);
 
 		$kPager = null;
 		if($pager)
 			$kPager = $pager->toObject();
 
 		$coreOrder = null;
+		$order = $searchParams->orderBy;
 		if($order)
 			$coreOrder = $order->toObject();
 
 		return array($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+	}
+
+	private function initAndSearch($coreSearchObject, $searchParams, $pager)
+	{
+		list($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchParams, $pager);
+
+		try
+		{
+			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+		}
+		catch (kESearchException $e)
+		{
+			$this->handleSearchException($e);
+		}
+
+		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName());
+		return array($coreResults, $objectCount);
+	}
+
+	private function handleSearchException($exception)
+	{
+		$code = $exception->getCode();
+		$data = $exception->getData();
+		switch($code)
+		{
+			case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD:
+				throw new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data['itemType'], $data['fieldName']);
+			case kESearchException::EMPTY_SEARCH_TERM_NOT_ALLOWED:
+				throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data['fieldName'], $data['itemType']);
+			case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH:
+				throw new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH, $data['itemType']);
+			default:
+				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);
+		}
 	}
 
 }

@@ -28,7 +28,7 @@ class helperAction extends kalturaSystemAction
 		}
 		elseif ( $algo == "wiki_decode" )
 		{
-			$res = @unserialize ( base64_decode (str_replace ( array ( "|02" , "|01" ) , array ( "/" , "|" ) , $str ) ) ) ;
+			$res = null;
 		}
 		elseif ( $algo == "wiki_decode_no_serialize" )
 		{

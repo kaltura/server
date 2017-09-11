@@ -96,8 +96,8 @@ class ESearchUserItem extends ESearchItem
 			case ESearchItemType::STARTS_WITH:
 				$userQuery[] = kESearchQueryManager::getPrefixQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
 				break;
-			case ESearchItemType::DOESNT_CONTAIN:
-				$userQuery[]['bool']['must_not'][] = kESearchQueryManager::getDoesntContainQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+			case ESearchItemType::EXISTS:
+				$userQuery[] = kESearchQueryManager::getExistsQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::RANGE:
 				$userQuery[] = kESearchQueryManager::getRangeQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);

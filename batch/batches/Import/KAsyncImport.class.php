@@ -209,10 +209,9 @@ class KAsyncImport extends KJobHandlerWorker
 				if($actualFileSize < $fileSize && $shouldCheckFileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
-					$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
-					self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-//					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Expected file size[$fileSize] actual file size[$actualFileSize]", KalturaBatchJobStatus::RETRY);
-					return $job;
+					$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
+					$e->setResetJobExecutionAttempts(true);
+					throw $e;
 				}
 				
 				KalturaLog::info("headers " . print_r($curlHeaderResponse, true));
