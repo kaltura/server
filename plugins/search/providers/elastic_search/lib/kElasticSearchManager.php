@@ -109,7 +109,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         try
         {
-            if(kConf::get('disableElastic', 'elastic', true))
+           // if(kConf::get('disableElastic', 'elastic', true))
                 return true;
 
             $this->saveToSphinxLog($object, $params);
