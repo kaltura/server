@@ -160,6 +160,7 @@ abstract class kManifestRenderer
 			'uiConfId' => 'uiConfId',
 			'playSessionId' => 'sessionId',
 			'clientTag' => 'clientTag', 
+			'playbackType' => 'playbackType',
 		);
 		foreach ($mapping as $src => $dest)
 		{
