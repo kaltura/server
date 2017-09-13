@@ -455,7 +455,7 @@ abstract class LiveEntry extends entry
 	{
 		if ($this->getExplicitLive())
 		{
-			$isAdmin = kCurrentContext::$ks_object->isAdmin();
+			$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
 			$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 			if ($this->getExplicitLiveStatus() == ExplicitLiveStatus::PREVIEW && !$isAdmin && !$isUserAllowedPreview)
 				return false;
