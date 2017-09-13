@@ -27,6 +27,16 @@
 	},
 	"mappings": {
 		"State": {
+			"dynamic_templates": [
+				{
+					"integers": {
+						"match_mapping_type": "long",
+						"mapping": {
+							"type": "float"
+						}
+					}
+				}
+			],
 			"properties": {
 				"createdAt": {
 					"type": "date",
@@ -62,6 +72,16 @@
 			}
 		},
 		"Log": {
+			"dynamic_templates": [
+				{
+					"integers": {
+						"match_mapping_type": "long",
+						"mapping": {
+							"type": "float"
+						}
+					}
+				}
+			],
 			"properties": {
 				"createdAt": {
 					"type": "date",
