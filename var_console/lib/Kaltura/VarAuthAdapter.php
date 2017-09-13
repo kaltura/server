@@ -8,7 +8,7 @@ class Kaltura_VarAuthAdapter extends Infra_AuthAdapter
 	/* (non-PHPdoc)
 	 * @see Infra_AuthAdapter::getUserIdentity()
 	 */
-	protected function getUserIdentity(Kaltura_Client_Type_User $user, $ks, $partnerId)
+	protected function getUserIdentity(Kaltura_Client_Type_User $user = null, $ks = null, $partnerId = null)
 	{
 		$identity = new Kaltura_VarUserIdentity($user, $ks, $this->timezoneOffset, $partnerId);
 		$identity->setPassword($this->password);
