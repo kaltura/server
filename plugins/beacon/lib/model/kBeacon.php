@@ -20,7 +20,6 @@ class kBeacon
 	const ELASTIC_INDEX_TYPE_KEY = '_type';
 	const ELASTIC_DOCUMENT_ID_KEY = '_id';
 	
-	const FIELD_CREATED_AT = 'createdAt';
 	const FIELD_UPDATED_AT = 'updatedAt';
 	const FIELD_RELATED_OBJECT_TYPE = 'relatedObjectType';
 	const FIELD_EVENT_TYPE = 'eventType';
@@ -36,7 +35,6 @@ class kBeacon
 	protected $privateData;
 	protected $rawData;
 	protected $partnerId;
-	protected $createdAt;
 	protected $updatedAt;
 	
 	public function __construct($partnerId = null)
@@ -82,11 +80,6 @@ class kBeacon
 		$this->partnerId = $partnerId;
 	}
 	
-	public function setCreatedAt($createdAt)
-	{
-		$this->createdAt = $createdAt;
-	}
-	
 	public function setUpdatedAt($updatedAt)
 	{
 		$this->updatedAt = $updatedAt;
@@ -127,11 +120,6 @@ class kBeacon
 		return $this->partnerId;
 	}
 	
-	public function getCreatedAt()
-	{
-		return $this->createdAt;
-	}
-	
 	public function getUpdatedAt()
 	{
 		return $this->updatedAt;
@@ -143,21 +131,20 @@ class kBeacon
 		
 		// get instance of activated queue provider to send message
 		$queueProvider = $queueProvider ? $queueProvider : $this->getQueueProvider();
-		
-		//Get current time to add to indexed object info
-		$currTime = time();
+		if(!$queueProvider)
+			return false;
 		
 		//Create base object for index
-		$indexBaseObject = $this->createIndexBaseObject($currTime);
+		$indexBaseObject = $this->createIndexBaseObject();
 		
 		//Modify base object to index to State 
-		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject, $currTime);
+		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject);
 		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
 		
 		//Sent to log index of requested
 		if ($shouldLog) 
 		{
-			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject, $currTime);
+			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject);
 			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
 		}
 		
@@ -173,50 +160,28 @@ class kBeacon
 		return QueueProvider::getInstance(null, $constructorArgs);
 	}
 	
-	public function getIndexObjectForState($indexObject, $currTime)
+	private function getIndexObjectForState($indexObject)
 	{
 		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
 		
 		$indexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
 		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::STATE;
-		$indexObject[self::FIELD_CREATED_AT] = $this->getDocCreatedAt($docId, $currTime);
 		
 		return json_encode($indexObject);
 	}
 	
-	public function getIndexObjectForLog($indexObject, $currTime)
+	private function getIndexObjectForLog($indexObject)
 	{
-		$indexObject[self::FIELD_CREATED_AT] = $currTime;
 		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::LOG;
 		
 		return json_encode($indexObject);
 	}
 	
-	private function getDocCreatedAt($docId, $currTime)
-	{
-		$searchObject = array();
-		$searchObject[elasticClient::ELASTIC_ID_KEY] = $docId;
-		$searchObject[elasticClient::ELASTIC_TYPE_KEY] = BeaconIndexType::STATE;
-		$searchObject[elasticClient::ELASTIC_INDEX_KEY] = self::ELASTIC_BEACONS_INDEX_NAME;
-		
-		$searchMgr = new kBeaconSearchQueryManger();
-		$response = $searchMgr->get($searchObject);
-		
-		if ($response['found'] == false)
-			return $currTime;
-		
-		$doc = $response['_source'];
-		if (!$doc[self::FIELD_CREATED_AT])
-			return $currTime;
-		
-		return $doc[self::FIELD_CREATED_AT];
-	}
-	
-	public function createIndexBaseObject($currTime)
+	private function createIndexBaseObject()
 	{
 		$indexObject = array();
 		
-		//Set Action Name and Index Name and calculated docuemtn id
+		//Set Action Name and Index Name and calculated document id
 		$indexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_INDEX_ACTION_VALUE;
 		$indexObject[self::ELASTIC_INDEX_KEY] = self::ELASTIC_BEACONS_INDEX_NAME;
 		
@@ -230,7 +195,9 @@ class kBeacon
 		
 		$indexObject[self::FIELD_RAW_DATA] = $this->rawData;
 		$indexObject[self::FIELD_PARTNER_ID] = $this->partnerId;
-		$indexObject[self::FIELD_UPDATED_AT] = $currTime;
+		
+		//Get current time to add to indexed object info
+		$indexObject[self::FIELD_UPDATED_AT] = time();
 		
 		return $indexObject;
 	}

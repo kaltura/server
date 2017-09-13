@@ -15,10 +15,6 @@ require_once (dirname(__FILE__) . '/../../../../plugins/queue/lib/QueueProvider.
 require_once (dirname(__FILE__) . '/../../../../plugins/queue/providers/rabbit_mq/lib/RabbitMQProvider.php');
 require_once (dirname(__FILE__) . '/../../../../plugins/queue/providers/rabbit_mq/lib/MultiCentersRabbitMQProvider.php');
 
-require_once (dirname(__FILE__) . '/../../../../alpha/apps/kaltura/lib/exceptions/kCoreException.php');
-require_once (dirname(__FILE__) . '/../../../../plugins/search/providers/elastic_search/client/elasticClient.php');
-require_once (dirname(__FILE__) . '/../../../../plugins/search/providers/elastic_search/lib/exceptions/kESearchException.php');
-
 
 class kBeaconCacheLayerActions
 {
@@ -37,13 +33,17 @@ class kBeaconCacheLayerActions
 	
 	public static function add($params)
 	{
-		if (!is_null($params) &&
-			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_EVENT_TYPE) ||
-			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_OBJECT_ID) ||
-			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_RELATED_OBJECT_TYPE) ||
-			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_PARTNER_ID)
-		)
+		if(is_null($params))
+			throw new Exception("Params not provided");
+		
+		if(self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_PARTNER_ID))
 			return false;
+		
+		if (self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_EVENT_TYPE) ||
+			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_OBJECT_ID) ||
+			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_RELATED_OBJECT_TYPE)
+		)
+			throw new Exception("Params array missing mandatory values");
 		
 		$beacon = new kBeacon($params[kBeaconCacheLayerActions::PARAM_PARTNER_ID]);
 		$beacon->setObjectId($params[kBeaconCacheLayerActions::PARAM_OBJECT_ID]);
@@ -62,7 +62,7 @@ class kBeaconCacheLayerActions
 		
 		$queueProvider = self::loadQueueProvider();
 		if(!$queueProvider)
-			return false;
+			throw new Exception("Queue Provider could not be initilized");
 		
 		return $beacon->index($shouldLog, $queueProvider);
 	}

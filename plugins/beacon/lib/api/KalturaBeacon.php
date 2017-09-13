@@ -23,15 +23,6 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	public $indexType;
 	
 	/**
-	 * Beacon creation date as Unix timestamp (In seconds)
-	 *
-	 * @var time
-	 * @readonly
-	 * @filter gte,lte,order
-	 */
-	public $createdAt;
-	
-	/**
 	 * Beacon update date as Unix timestamp (In seconds)
 	 *
 	 * @var time
