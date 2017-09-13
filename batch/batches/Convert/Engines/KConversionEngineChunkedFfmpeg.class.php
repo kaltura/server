@@ -104,30 +104,17 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		}
 		{
 			$cmdLine = 'php -r "';
-//			$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
-				/********************************************************
-				 * The bellow includes to be removed for production
-				 ********************************************************
-				 */
-			{
-				$cmdLine.= 'require_once \'/opt/kaltura/app/alpha/scripts/bootstrap.php\';';
-				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/client/KalturaTypes.php\';';
-//				$dirName = "/web/content/shared/tmp/qualityTest/TestBench.10";
-				$dirName = "/opt/kaltura/app/infra/chunkedEncode";
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncode.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KBaseChunkedEncodeSessionManager.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeSessionManager.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeDistrExecInterface.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
-			}
-			$cmdLine.= ' KChunkedEncodeMemcacheWrap::ExecuteSession(';
+			$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
+
+			$cmdLine.= '\$rv=KChunkedEncodeMemcacheWrap::ExecuteSession(';
 			$cmdLine.= '\''.($host).'\',';
 			$cmdLine.= '\''.($port).'\',';
 			$cmdLine.= '\''.($token).'\',';
 			$cmdLine.= '\''.($concurrent).'\',';
 			$cmdLine.= '\''.($sessionName).'\',';
-			$cmdLine.= '\''.$cmdLineAdjusted.'\');"';
+			$cmdLine.= '\''.$cmdLineAdjusted.'\');';
+			$cmdLine.= 'if(\$rv==false) exit(1);';
+			$cmdLine.= '"';
 		}
 		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
 		KalturaLog::log("Final cmdLine:$cmdLine");
@@ -167,27 +154,15 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$sessionName = null;
 			
 			$cmdLine = 'php -r "';
-//			$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
-				/********************************************************
-				 * The bellow includes to be removed for production
-				 ********************************************************
-				 */
-			{
-				$cmdLine.= 'require_once \'/opt/kaltura/app/alpha/scripts/bootstrap.php\';';
-				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/client/KalturaTypes.php\';';
-//				$dirName = "/web/content/shared/tmp/qualityTest/TestBench.10";
-				$dirName = "/opt/kaltura/app/infra/chunkedEncode";
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncode.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KBaseChunkedEncodeSessionManager.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeSessionManager.php\';';
-				$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeSessionManagerStandalone.php\';';
-			}
-			$cmdLine.= ' KChunkedEncodeSessionManagerStandalone::ExecuteSession(';
+			$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
+			
+			$cmdLine.= '\$rv=KChunkedEncodeSessionManagerStandalone::ExecuteSession(';
 			$cmdLine.= '\''.($concurrent).'\',';
 			$cmdLine.= '\''.($concurrentMin).'\',';
 			$cmdLine.= '\''.($sessionName).'\',';
-			$cmdLine.= '\''.$cmdLineAdjusted.'\');"';
+			$cmdLine.= '\''.$cmdLineAdjusted.'\');';
+                        $cmdLine.= 'if(\$rv==false) exit(1);';
+                        $cmdLine.= '"';
 		}
 		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
 		KalturaLog::log("Final cmdLine:$cmdLine");
