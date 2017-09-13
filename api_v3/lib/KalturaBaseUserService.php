@@ -29,9 +29,6 @@ class KalturaBaseUserService extends KalturaBaseService
 	{
 		parent::initService ($serviceId, $serviceName, $actionName);
 		$this->applyPartnerFilterForClass('kuser');
-		
-		if($this->actionName == 'loginByKs')
-			myPartnerUtils::resetPartnerFilter('kuser');
 	}	
 	
 	/**

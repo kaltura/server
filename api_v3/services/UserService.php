@@ -618,6 +618,9 @@ class UserService extends KalturaBaseUserService
 	 */
 	public function loginByKsAction($requestedPartnerId)
 	{
+		$this->partnerGroup .= ",$requestedPartnerId";
+		$this->applyPartnerFilterForClass('kuser');
+		
 		$ks = parent::loginByKsImpl($this->getKs()->getOriginalString(), $requestedPartnerId);
 		
 		$res = new KalturaSessionResponse();
