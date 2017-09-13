@@ -698,7 +698,7 @@ class MediaService extends KalturaEntryService
 	function getAction($entryId, $version = -1)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType() instanceof KalturaMediaEntry)))
+		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType()) instanceof KalturaMediaEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		return $this->getEntry($entryId, $version);
