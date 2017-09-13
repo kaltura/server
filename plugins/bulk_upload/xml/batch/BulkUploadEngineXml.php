@@ -2371,7 +2371,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $bulkUploadResult;
 	}
 	
-	protected function updateObjectsResults($requestResults, $bulkUploadResults)
+	protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 	    KBatchBase::$kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
