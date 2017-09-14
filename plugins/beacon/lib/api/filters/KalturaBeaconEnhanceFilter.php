@@ -39,6 +39,9 @@ class KalturaBeaconEnhanceFilter extends KalturaFilter
 		$searchQuery[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_SIZE_KEY] = $pager->pageSize;
 		$searchQuery[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_FROM_KEY] = $pager->calcOffset();
 		
+		if(isset($queryJsonObject['sort']))
+			$searchQuery[kESearchQueryManager::BODY_KEY][kESearchQueryManager::SORT_KEY] = $queryJsonObject['sort'];
+		
 		if($this->indexTypeEqual)
 			$searchQuery[elasticClient::ELASTIC_TYPE_KEY] = $this->indexTypeEqual;
 		
