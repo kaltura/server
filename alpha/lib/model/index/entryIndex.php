@@ -94,6 +94,7 @@ class entryIndex extends BaseIndexObject
 				'last_played_at' => 'lastPlayedAt',
 				'entitled_kusers_publish' => 'entitledKusersPublish',
 				'entitled_kusers_edit' => 'entitledKusersEdit',
+				'entitled_kusers_view' => 'entitledKusersView',
 				'entitled_kusers' => 'entitledKusers',
 				'privacy_by_contexts' => 'privacyByContexts',
 				'creator_kuser_id' => 'creatorKuserId',

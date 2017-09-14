@@ -80,6 +80,8 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaRelatedFilter
 		"entitledUsersEditMatchOr" => "_matchor_entitled_users_edit",
 		"entitledUsersPublishMatchAnd" => "_matchand_entitled_users_publish",
 		"entitledUsersPublishMatchOr" => "_matchor_entitled_users_publish",
+		"entitledUsersViewMatchAnd" => "_matchand_entitled_users_view",
+		"entitledUsersViewMatchOr" => "_matchor_entitled_users_view",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
 		"tagsAdminTagsMultiLikeOr" => "_mlikeor_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeOr" => "_mlikeor_tags-admin_tags-name",
@@ -540,6 +542,16 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $entitledUsersPublishMatchOr;
+
+	/**
+	 * @var string
+	 */
+	public $entitledUsersViewMatchAnd;
+
+	/**
+	 * @var string
+	 */
+	public $entitledUsersViewMatchOr;
 
 	/**
 	 * @var string
