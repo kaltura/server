@@ -11,7 +11,7 @@ class Form_Partner_KmcUsersResetPassword extends Infra_Form
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmKmcUsersResetPassword');
 		
-		$this->addElement('password', 'newPassword', array(
+		$this->addElement('text', 'newPassword', array(
 			'label' 		=> 'New Password:',
 			'required'		=> true,
 			'filters' 		=> array('StringTrim'),	
