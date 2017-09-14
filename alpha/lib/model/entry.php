@@ -3691,52 +3691,53 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	public function getObjectParams($params = null)
 	{
-		$body = array(
-			'parent_id' => $this->getParentEntryId(),
-			'status' => $this->getStatus(),
-			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
-			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
-			'entitled_pusers_edit' => array_values($this->getEntitledUserPuserEditArray()),
-			'entitled_pusers_publish' => array_values($this->getEntitledPusersPublishArray()),
-			'kuser_id' => $this->getKuserId(),
-			'puser_id' => $this->getPuserId(),
-			'creator_puser_id' => $this->getCreatorPuserId(),
-			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => $this->getName(),
-			'description' => $this->getDescription(),
-			'tags' => explode(',', $this->getTags()),
-			'partner_id' => $this->getPartnerId(),
-			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
-			'parent_id' => $this->getParentEntryId(),
-			'reference_id' => $this->getReferenceID(),
-			'conversion_profile_id' => $this->getConversionProfileId(),
-			'template_entry_id' => $this->getTemplateEntryId(),
-			'display_in_search' => $this->getDisplayInSearch(),
-			'media_type' => $this->getMediaType(),
-			'source_type' => $this->getSourceType(),
-			'length_in_msecs' => $this->getLengthInMsecs(),
-			'admin_tags' => explode(',',$this->getAdminTags()),
-			'credit' => $this->getCredit(),
-			'site_url' => $this->getSiteUrl(),
-			'start_date' => $this->getStartDate(null),
-			'end_date' => $this->getEndDate(null),
-			'entry_type' => $this->getType(),
-			'moderation_status' => $this->getModerationStatus(),
-			'created_at' => $this->getCreatedAt(null),
-			'updated_at' => $this->getUpdatedAt(null),
-			'modified_at' => $this->getModifiedAt(null),
-			'total_rank' => $this->getTotalRank(),
-			'access_control_id' => $this->getAccessControlId(),
-			'group_id' => $this->getGroupId(),
-			'partner_sort_value' => $this->getPartnerSortValue(),
-			'redirect_entry_id' => $this->getRedirectEntryId(),
-		);
+		$body = array();
+		elasticSearchUtils::validateAndAddElasticValue($body, 'parent_id', $this->getParentEntryId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'status', $this->getStatus());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'entitled_kusers_edit', $this->getEntitledKusersEditArray());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'entitled_kusers_publish', $this->getEntitledKusersPublishArray());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'entitled_pusers_edit', array_values($this->getEntitledUserPuserEditArray()));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'entitled_pusers_publish', array_values($this->getEntitledPusersPublishArray()));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'kuser_id', $this->getKuserId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'puser_id', $this->getPuserId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'creator_puser_id', $this->getCreatorPuserId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'creator_kuser_id', $this->getCreatorKuserId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'name', $this->getName());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'description', $this->getDescription());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'tags', explode(',', $this->getTags()));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'partner_id', $this->getPartnerId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'partner_status', elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'parent_id', $this->getParentEntryId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'reference_id', $this->getReferenceID());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'conversion_profile_id', $this->getConversionProfileId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'template_entry_id', $this->getTemplateEntryId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'display_in_search', $this->getDisplayInSearch());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'media_type' , $this->getMediaType());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'source_type',$this->getSourceType());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'length_in_msecs', $this->getLengthInMsecs());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'admin_tags', explode(',',$this->getAdminTags()));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'credit', $this->getCredit());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'site_url', $this->getSiteUrl());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'start_date', $this->getStartDate(null));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'end_date', $this->getEndDate(null));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'entry_type', $this->getType());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'moderation_status', $this->getModerationStatus());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'created_at', $this->getCreatedAt(null));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'updated_at', $this->getUpdatedAt(null));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'modified_at', $this->getModifiedAt(null));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'total_rank', $this->getTotalRank());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'access_control_id', $this->getAccessControlId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'group_id', $this->getGroupId());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'partner_sort_value', $this->getPartnerSortValue());
+		elasticSearchUtils::validateAndAddElasticValue($body, 'redirect_entry_id', $this->getRedirectEntryId());
+
+
 
 		$this->addCategoriesToObjectParams($body);
 		
 		if($this->getParentEntryId())
 			$this->addParentEntryToObjectParams($body);
-		
+
 		return $body;
 	}
 
@@ -3762,26 +3763,27 @@ public function copyTemplate($copyPartnerId = false, $template)
 		if (!$parentEntry || $parentEntry->getId() == $this->getId())
 			return;
 
-		$body['parent_entry'] = array(
-			'entry_id' => $parentEntry->getId(),
-			'partner_id' => $parentEntry->getPartnerId(),
-			'status' => $parentEntry->getStatus(),
-			'partner_status' => elasticSearchUtils::formatPartnerStatus($parentEntry->getPartnerId(), $parentEntry->getStatus()),
-			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),
-			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
-			'kuser_id' => $parentEntry->getKuserId(),
-			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
-			'category_ids' => $parentEntry->getAllCategoriesIds(true),
-			'active_category_ids' => $parentEntry->getAllCategoriesIds(false),
-		);
+		$parentEntryBody = array();
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'entry_id', $parentEntry->getId());
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'partner_id', $parentEntry->getPartnerId());
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'status', $parentEntry->getStatus());
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'partner_status', elasticSearchUtils::formatPartnerStatus($parentEntry->getPartnerId(), $parentEntry->getStatus()));
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'entitled_kusers_edit', $parentEntry->getEntitledKusersEditArray());
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'entitled_kusers_publish', $parentEntry->getEntitledKusersPublishArray());
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'kuser_id', $parentEntry->getKuserId());
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'creator_kuser_id', $parentEntry->getCreatorKuserId());
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'category_ids', $parentEntry->getAllCategoriesIds(true));
+		elasticSearchUtils::validateAndAddElasticValue($parentEntryBody, 'active_category_ids', $parentEntry->getAllCategoriesIds(false));
+
+		elasticSearchUtils::validateAndAddElasticValue($body, 'parent_entry', $parentEntryBody);
 	}
 
 	protected function addCategoriesToObjectParams(&$body)
 	{
 		$categoryIds = $this->getAllCategoriesIds(true);
-		$body['category_ids'] = $categoryIds;
-		$body['active_category_ids'] = $this->getAllCategoriesIds(false);
-		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);;
+		elasticSearchUtils::validateAndAddElasticValue($body, 'category_ids', $categoryIds);
+		elasticSearchUtils::validateAndAddElasticValue($body, 'active_category_ids', $this->getAllCategoriesIds(false));
+		elasticSearchUtils::validateAndAddElasticValue($body, 'categories' ,categoryPeer::getFullNamesByCategoryIds($categoryIds));
 	}
 
 	public function getTagsArr()

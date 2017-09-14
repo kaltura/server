@@ -11,7 +11,6 @@ class kMetadataManager
 	
 	const SEARCH_TEXT_SUFFIX = 'mdend';
 	const ELASTIC_DATA_FIELD_NAME = 'metadata';
-	const NO_SYSTEM_NAME = 'NOSYSTEMNAME';
 	
 	protected static $objectTypeNames = array(
 		MetadataObjectType::ENTRY => 'entry',
@@ -743,10 +742,10 @@ class kMetadataManager
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::info("Found " . count($metadatas) . " metadata object");
 
-		return self::getElasticMetadataValuesByMetadataObjects($metadatas);
+		return self::getElasticMetadataValuesByMetadataObjects($metadatas, $objectType);
 	}
 
-	public static function getElasticMetadataValuesByMetadataObjects(array $metadatas)
+	public static function getElasticMetadataValuesByMetadataObjects(array $metadatas, $objectType)
 	{
 		$metaDataSearchValues = array();
 		$searchValues = null;
@@ -757,7 +756,13 @@ class kMetadataManager
 		if(count($metaDataSearchValues))
 			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = $metaDataSearchValues;
 		else
-			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
+		{
+			if($objectType == MetadataObjectType::CATEGORY)
+				$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
+			else
+				$searchValues = null;
+		}
+
 		return $searchValues; //return an array(metadata => array(...)) or null if no values
 	}
 
@@ -796,9 +801,10 @@ class kMetadataManager
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($profileId);
 			if($metadataProfile)
 				$systemName = $metadataProfile->getSystemName();
-			else
-				$systemName = self::NO_SYSTEM_NAME;
-			$profileFieldData['system_name'] = $systemName;
+
+			if($systemName)
+				$profileFieldData['system_name'] = $systemName;
+
 			$xpath = $profileField->getXpath();
 			$profileFieldData['xpath'] = $xpath;
 			$profileFieldData['metadata_field_id'] = $profileField->getId();
