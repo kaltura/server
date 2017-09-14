@@ -144,6 +144,16 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		{
 			$this->entitledUsersPublishMatchOr = $this->preparePusersToKusersFilter( $this->entitledUsersPublishMatchOr );
 		}
+		
+		if(!empty($this->entitledUsersViewMatchOr))
+		{
+			$this->entitledUsersViewMatchOr = $this->preparePusersToKusersFilter( $this->entitledUsersViewMatchOr );
+		}
+
+		if(!empty($this->entitledUsersViewMatchAnd))
+		{
+			$this->entitledUsersViewMatchAnd = $this->preparePusersToKusersFilter( $this->entitledUsersViewMatchAnd );
+		}
 	}
 	
 	/**

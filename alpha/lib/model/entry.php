@@ -1953,12 +1953,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function getEntitledKusersView()
 	{
-		return implode(',', array_keys($this->getEntitledPuserViewArray()));
+		return implode(',', array_keys($this->getEntitledPusersViewArray()));
 	}
 
 	public function getEntitledKusersViewArray()
 	{
-		return array_keys($this->getEntitledPuserViewArray());
+		return array_keys($this->getEntitledPusersViewArray());
 	}
 	
 	public function getEntitledPusersEdit()
@@ -2011,6 +2011,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function isEntitledKuserEdit($kuserId)
 	{
 		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
+		if(in_array(trim($kuserId), $entitledKuserArray))
+			return true;
+
+		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+		foreach($kuserKGroupIds as $groupKId)
+			if(in_array($groupKId, $entitledKuserArray))
+				return true;
+
+		return $this->isOwnerActionsAllowed($kuserId);
+	}
+	
+	public function isEntitledKuserView($kuserId)
+	{
+		$entitledKuserArray = array_keys($this->getEntitledPusersViewArray());
 		if(in_array(trim($kuserId), $entitledKuserArray))
 			return true;
 
