@@ -133,7 +133,7 @@ class VoicebaseClientHelper
 		);
 		$options = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postFields);
 	
-		$this->sendAPICall($updateTranscriptUrl, $options);
+		return $this->sendAPICall($updateTranscriptUrl, $options);
 	}
 	
 	public function getRemoteTranscripts($entryId, array $formats)
