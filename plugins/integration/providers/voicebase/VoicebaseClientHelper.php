@@ -7,7 +7,7 @@ class VoicebaseClientHelper
 	const VOICEBASE_FAILURE_MESSAGE = "FAILURE";
 	const VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS = "SUCCESS";
 	const VOICEBASE_MACHINE_COMPLETE_MESSAGE = "MACHINECOMPLETE";
-	const VOICE_MACHINE_FAILURE_MESSAGE = "ERROR";
+	const VOICEBASE_MACHINE_FAILURE_MESSAGE = "ERROR";
 	
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;

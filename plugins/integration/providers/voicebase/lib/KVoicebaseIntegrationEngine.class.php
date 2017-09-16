@@ -79,7 +79,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$remoteProcess = $this->clientHelper->retrieveRemoteProcess($entryId);
 		
 		//false result means that something has gone wrong - the VB job is either in status error or missing altogether
-		if(!$remoteProcess || $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE || !isset($remoteProcess->fileStatus) || $remoteProcess->fileStatus == VoicebaseClientHelper::VOICE_MACHINE_FAILURE_MESSAGE)
+		if(!$remoteProcess || $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE || !isset($remoteProcess->fileStatus) || $remoteProcess->fileStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_FAILURE_MESSAGE)
 		{
 			throw new Exception("VoiceBase transcription failed. Message: [" . $remoteProcess->response . "]");
 		}
