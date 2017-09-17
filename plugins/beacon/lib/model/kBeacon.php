@@ -20,6 +20,7 @@ class kBeacon
 	const ELASTIC_INDEX_TYPE_KEY = '_type';
 	const ELASTIC_DOCUMENT_ID_KEY = '_id';
 	
+	const FIELD_CREATED_AT = 'createdAt';
 	const FIELD_UPDATED_AT = 'updatedAt';
 	const FIELD_RELATED_OBJECT_TYPE = 'relatedObjectType';
 	const FIELD_EVENT_TYPE = 'eventType';
@@ -35,14 +36,12 @@ class kBeacon
 	protected $privateData;
 	protected $rawData;
 	protected $partnerId;
+	protected $createdAt;
 	protected $updatedAt;
 	
-	public function __construct($partnerId = null)
+	public function __construct()
 	{
-		if($partnerId)
-			$this->setPartnerId($partnerId);
-		else
-			$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
 	}
 	
 	public function setId($id)
@@ -78,6 +77,11 @@ class kBeacon
 	public function setPartnerId($partnerId)
 	{
 		$this->partnerId = $partnerId;
+	}
+	
+	public function setCreatedAt($createdAt)
+	{
+		$this->createdAt = $createdAt;
 	}
 	
 	public function setUpdatedAt($updatedAt)
@@ -120,68 +124,87 @@ class kBeacon
 		return $this->partnerId;
 	}
 	
+	public function getCreatedAt()
+	{
+		return $this->createdAt;
+	}
+	
 	public function getUpdatedAt()
 	{
 		return $this->updatedAt;
 	}
 	
-	public function index($shouldLog = false, $queueProvider = null)
+	public function index($shouldLog = false)
 	{
-		kApiCache::disableConditionalCache();
-		
 		// get instance of activated queue provider to send message
-		$queueProvider = $queueProvider ? $queueProvider : $this->getQueueProvider();
-		if(!$queueProvider)
-			return false;
+		$constructorArgs = array();
+		$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
+		
+		/* @var $queueProvider RabbitMQProvider */
+		$queueProvider = QueueProvider::getInstance(null, $constructorArgs);
+		
+		//Get current time to add to indexed object info
+		$currTime = time();
 		
 		//Create base object for index
-		$indexBaseObject = $this->createIndexBaseObject();
+		$indexBaseObject = $this->createIndexBaseObject($currTime);
 		
 		//Modify base object to index to State 
-		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject);
+		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject, $currTime);
 		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
 		
 		//Sent to log index of requested
 		if ($shouldLog) 
 		{
-			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject);
+			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject, $currTime);
 			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
 		}
-		
-		return true;
 	}
 	
-	private function getQueueProvider()
-	{
-		$constructorArgs = array();
-		$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
-		
-		/* @var $queueProvider RabbitMQProvider */
-		return QueueProvider::getInstance(null, $constructorArgs);
-	}
-	
-	private function getIndexObjectForState($indexObject)
+	private function getIndexObjectForState($indexObject, $currTime)
 	{
 		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
 		
 		$indexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
 		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::STATE;
+		$indexObject[self::FIELD_CREATED_AT] = $this->getDocCreatedAt($docId, $currTime);
 		
 		return json_encode($indexObject);
 	}
 	
-	private function getIndexObjectForLog($indexObject)
+	private function getIndexObjectForLog($indexObject, $currTime)
 	{
+		$indexObject[self::FIELD_CREATED_AT] = $currTime;
 		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::LOG;
 		
 		return json_encode($indexObject);
 	}
 	
-	private function createIndexBaseObject()
+	private function getDocCreatedAt($docId, $currTime)
+	{
+		$searchObject = array();
+		$searchObject[elasticClient::ELASTIC_ID_KEY] = $docId;
+		$searchObject[elasticClient::ELASTIC_TYPE_KEY] = BeaconIndexType::STATE;
+		$searchObject[elasticClient::ELASTIC_INDEX_KEY] = self::ELASTIC_BEACONS_INDEX_NAME;
+		
+		$searchMgr = new kBeaconSearchQueryManger();
+		$response = $searchMgr->get($searchObject);
+		
+		if ($response['found'] == false)
+			return $currTime;
+		
+		$doc = $response['_source'];
+		if (!$doc[self::FIELD_CREATED_AT])
+			return $currTime;
+		
+		return $doc[self::FIELD_CREATED_AT];
+	}
+	
+	private function createIndexBaseObject($currTime)
 	{
 		$indexObject = array();
 		
-		//Set Action Name and Index Name and calculated document id
+		//Set Action Name and Index Name and calculated docuemtn id
 		$indexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_INDEX_ACTION_VALUE;
 		$indexObject[self::ELASTIC_INDEX_KEY] = self::ELASTIC_BEACONS_INDEX_NAME;
 		
@@ -195,9 +218,7 @@ class kBeacon
 		
 		$indexObject[self::FIELD_RAW_DATA] = $this->rawData;
 		$indexObject[self::FIELD_PARTNER_ID] = $this->partnerId;
-		
-		//Get current time to add to indexed object info
-		$indexObject[self::FIELD_UPDATED_AT] = time();
+		$indexObject[self::FIELD_UPDATED_AT] = $currTime;
 		
 		return $indexObject;
 	}

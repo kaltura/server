@@ -8,6 +8,8 @@ abstract class KalturaBeaconBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
+		"createdAtGreaterThanOrEqual" => "_gte_created_at",
+		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"relatedObjectTypeIn" => "_in_related_object_type",
@@ -17,6 +19,8 @@ abstract class KalturaBeaconBaseFilter extends KalturaFilter
 
 	static private $order_by_map = array
 	(
+		"+createdAt" => "+created_at",
+		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
 		"+objectId" => "+object_id",
@@ -32,6 +36,16 @@ abstract class KalturaBeaconBaseFilter extends KalturaFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/**
+	 * @var time
+	 */
+	public $createdAtGreaterThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $createdAtLessThanOrEqual;
 
 	/**
 	 * @var time
