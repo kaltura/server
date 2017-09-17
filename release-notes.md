@@ -11,7 +11,7 @@
 
 ### Deployment scripts ###
 
-	  php /opt/kaltura/app/eployment/updates/scripts/add_permissions/2017_09_07_add_user_loginByKs_permissions.php
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_07_add_user_loginByKs_permissions.php
 
 #### Known Issues & Limitations ####
 
