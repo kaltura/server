@@ -154,6 +154,7 @@ class elasticClient
 	 */
 	public function search(array $params)
 	{
+		kApiCache::disableConditionalCache();
 		$cmd = $this->buildElasticCommandUrl($params, '', self::ELASTIC_ACTION_SEARCH);
 		
 		if (isset($params[self::ELASTIC_SIZE_KEY]))
