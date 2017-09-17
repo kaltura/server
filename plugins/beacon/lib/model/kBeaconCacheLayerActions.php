@@ -62,7 +62,7 @@ class kBeaconCacheLayerActions
 		
 		$queueProvider = self::loadQueueProvider();
 		if(!$queueProvider)
-			throw new Exception("Queue Provider could not be initilized");
+			throw new Exception("Queue Provider could not be initialized");
 		
 		return $beacon->index($shouldLog, $queueProvider);
 	}
