@@ -56,11 +56,8 @@ class LiveEntryServerNode extends EntryServerNode
 			
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::MARKED_FOR_DELETION)
 			{
-				$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getEntryId());
-				if(!count($playableServerNodes))
-				{
-					$liveEntry->unsetMediaServer();
-				}
+				$lockKey = "checkEntryOffline_" . $this->getPartnerId() . "_" . $this->getEntryId();
+				kLock::runLocked($lockKey, array($this, 'checkEntryOffline'), array($liveEntry));
 				
 				$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			}
@@ -89,14 +86,22 @@ class LiveEntryServerNode extends EntryServerNode
 		if($liveEntry && $this->getStatus() !== EntryServerNodeStatus::MARKED_FOR_DELETION)
 		{
 			/* @var $liveEntry LiveEntry */
-			$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($liveEntry->getId());
-			if(!count($entryServerNodes))
-				$liveEntry->unsetMediaServer();
+			$lockKey = "checkEntryOffline_" . $this->getPartnerId() . "_" . $this->getEntryId();
+			kLock::runLocked($lockKey, array($this, 'checkEntryOffline'), array($liveEntry));
 			
 			$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
+		}
+	}
+	
+	public function checkEntryOffline(LiveStreamEntry $liveEntry)
+	{
+		$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($liveEntry->getId());
+		if(!count($playableServerNodes))
+		{
+			$liveEntry->unsetMediaServer();
 		}
 	}
 
