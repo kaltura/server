@@ -730,7 +730,7 @@ abstract class KalturaObject implements IApiObject
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						KalturaLog::err($e->getMessage());
 						$this->$propertyName = null;
-						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error: '.$e->getMessage());
 					}
 				}
 
