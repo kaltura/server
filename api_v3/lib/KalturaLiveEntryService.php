@@ -131,7 +131,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 				if ($recordedEntry->getSourceType() !== EntrySourceType::RECORDED_LIVE)
 				{
 					$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
-					$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 					$recordedEntry->save();
 				}
 				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
@@ -290,6 +289,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
 			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
+			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
@@ -467,12 +467,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$service->initService('media', 'media', 'updateContent');
 			$service->updateContentAction($recordedEntry->getId(), $resource);
 			return;
-		}
-
-		if (!$recordedEntry->getConversionProfileId())
-		{
-			$recordedEntry->setConversionProfileId($dbLiveEntry->getConversionProfileId());
-			$recordedEntry->save();
 		}
 
 		//In case conversion profile was changed we need to fetch passed streamed assets as well
