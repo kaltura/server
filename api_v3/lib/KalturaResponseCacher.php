@@ -347,10 +347,6 @@ class KalturaResponseCacher extends kApiCache
 						}
 						else
 						    $result = "Failed to parse $actionKey as a valid class configuration";
-						
-						if($result === false)
-							return;
-						
 						$processingTime = microtime(true) - $startTime;
 						self::returnCacheResponseStructure($processingTime, $format, $result);
 					}
