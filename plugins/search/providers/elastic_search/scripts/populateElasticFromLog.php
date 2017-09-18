@@ -78,14 +78,6 @@ $elasticClient = new elasticClient($elasticServer, $elasticPort); //take the ser
 
 while(true)
 {
-    $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
-
-    while(!count($elasticLogs))
-    {
-        $skipExecutedUpdates = true;
-        sleep(1);
-        $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
-    }
 
     if(!elasticSearchUtils::isMaster($elasticClient, $hostname))
     {
@@ -98,7 +90,17 @@ while(true)
             $lastLogs[$serverLastLog->getDc()] = $serverLastLog;
             $handledRecords[$serverLastLog->getDc()] = array();
         }
+        SphinxLogServerPeer::clearInstancePool();
         continue;
+    }
+
+    $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
+
+    while(!count($elasticLogs))
+    {
+        $skipExecutedUpdates = true;
+        sleep(1);
+        $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
     }
 
     $ping = $elasticClient->ping();
