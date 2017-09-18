@@ -91,6 +91,13 @@ while(true)
     {
         KalturaLog::log('elastic server ['.$hostname.'] is not the master , sleeping for 30 seconds');
         sleep(30);
+        //update the last log ids
+        $serverLastLogs = SphinxLogServerPeer::retrieveByServer($elasticCluster, $sphinxLogReadConn);
+        foreach($serverLastLogs as $serverLastLog)
+        {
+            $lastLogs[$serverLastLog->getDc()] = $serverLastLog;
+            $handledRecords[$serverLastLog->getDc()] = array();
+        }
         continue;
     }
 
