@@ -43,8 +43,11 @@ class LiveEntryServerNode extends EntryServerNode
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
-		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
+		// First call parent to clear query cache
+		parent::postUpdate($con);
 		
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
+
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
@@ -56,8 +59,11 @@ class LiveEntryServerNode extends EntryServerNode
 			
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::MARKED_FOR_DELETION)
 			{
-				$lockKey = "checkEntryOffline_" . $this->getPartnerId() . "_" . $this->getEntryId();
-				kLock::runLocked($lockKey, array($this, 'checkEntryOffline'), array($liveEntry));
+				$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getEntryId());
+				if(!count($playableServerNodes))
+				{
+					$liveEntry->unsetMediaServer();
+				}
 				
 				$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			}
@@ -68,8 +74,6 @@ class LiveEntryServerNode extends EntryServerNode
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
 		}
-
-		parent::postUpdate($con);
 	}
 	
 	/* (non-PHPdoc)
@@ -86,22 +90,14 @@ class LiveEntryServerNode extends EntryServerNode
 		if($liveEntry && $this->getStatus() !== EntryServerNodeStatus::MARKED_FOR_DELETION)
 		{
 			/* @var $liveEntry LiveEntry */
-			$lockKey = "checkEntryOffline_" . $this->getPartnerId() . "_" . $this->getEntryId();
-			kLock::runLocked($lockKey, array($this, 'checkEntryOffline'), array($liveEntry));
+			$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($liveEntry->getId());
+			if(!count($entryServerNodes))
+				$liveEntry->unsetMediaServer();
 			
 			$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
-		}
-	}
-	
-	public function checkEntryOffline(LiveStreamEntry $liveEntry)
-	{
-		$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($liveEntry->getId());
-		if(!count($playableServerNodes))
-		{
-			$liveEntry->unsetMediaServer();
 		}
 	}
 
