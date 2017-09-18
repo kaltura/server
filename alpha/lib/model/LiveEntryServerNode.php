@@ -56,6 +56,7 @@ class LiveEntryServerNode extends EntryServerNode
 			
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::MARKED_FOR_DELETION)
 			{
+				//TODO - move this logic into update event handler
 				//invalidateQueryCache is called only in postUpdate of base class so, Invalidate query cache to avoid getting stale response.
 				kQueryCache::invalidateQueryCache($this);
 				$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getEntryId());
