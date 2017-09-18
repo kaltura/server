@@ -148,7 +148,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticClusterId = null;
         if(kConf::hasParam('exec_elastic') && kConf::get('exec_elastic'))
         {
-            $elasticClusterName = kConf::get('elasticCluster', 'elastic');
+            $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
             $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
             if ($elasticClusterCacheStore)
             {
