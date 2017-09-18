@@ -65,7 +65,6 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	(
 		'id',
 		'indexType',
-		'createdAt',
 		'updatedAt',
 		'relatedObjectType',
 		'eventType',
