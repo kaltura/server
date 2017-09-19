@@ -3786,7 +3786,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$categoryIds = $this->getAllCategoriesIds(true);
 		$body['category_ids'] = $categoryIds;
 		$body['active_category_ids'] = $this->getAllCategoriesIds(false);
-		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);;
+		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);
 	}
 
 	public function getTagsArr()
