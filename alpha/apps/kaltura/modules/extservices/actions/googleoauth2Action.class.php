@@ -167,9 +167,15 @@ class googleoauth2Action extends oauth2Action
 		}
 
 		$tokenJsonStr = $client->getAccessToken();
+		
+		$origTimeZone = date_default_timezone_get();
+		date_default_timezone_set(kConf::get( "date_default_timezone"));
+		
 		$partner->setGoogleOAuth2($appId, $tokenJsonStr, $subId);
 		$partner->save();
 
+		date_default_timezone_set($origTimeZone);
+		
 		$params = array(
 			'ytid' => $appId,
 			'status' => 1,
