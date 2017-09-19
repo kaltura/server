@@ -81,15 +81,13 @@ class elasticSearchUtils
 		return false;
 	}
 
-	public static function validateAndAddElasticValue(&$body, $key, &$value)
+	public static function validateElasticValue(&$body, $key, &$value)
 	{
 		//don't insert null/empty arrays/empty strings
 		if(is_null($value) || $value === '')
-			return;
-		if(is_array($value) && (count($value) == 0 || (isset($value[0])) && $value[0] === '' ))
-			return;
-
-		$body[$key] = $value;
+			unset($body[$key]);
+		if(is_array($value) && ( count($value) == 0 || ( (count($value) == 1 && (isset($value[0])) && $value[0] === '' ) ) ))
+			unset($body[$key]);
 	}
 
 

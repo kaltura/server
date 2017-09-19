@@ -904,10 +904,17 @@ abstract class LiveEntry extends entry
 
 	public function getObjectParams($params = null)
 	{
-		$liveEntryBody = array();
-		elasticSearchUtils::validateAndAddElasticValue($liveEntryBody, 'recorded_entry_id', $this->getRecordedEntryId());
-		elasticSearchUtils::validateAndAddElasticValue($liveEntryBody, 'push_publish', $this->getPushPublishEnabled());
-		return array_merge(parent::getObjectParams($params), $liveEntryBody);
+		$body = array(
+			'recorded_entry_id' => $this->getRecordedEntryId(),
+			'push_publish' => $this->getPushPublishEnabled(),
+		);
+
+		foreach ($body as $key => $value)
+		{
+			elasticSearchUtils::validateElasticValue($body, $key, $value);
+		}
+
+		return array_merge(parent::getObjectParams($params), $body);
 	}
 
 
