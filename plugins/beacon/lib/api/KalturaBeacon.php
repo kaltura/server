@@ -64,7 +64,7 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	private static $map_between_objects = array
 	(
 		'id',
-		'indexType' => "indexType",
+		'indexType',
 		'updatedAt' => "updated_at",
 		'relatedObjectType' => 'related_object_type',
 		'eventType' => 'event_type',
