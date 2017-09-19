@@ -54,7 +54,7 @@ class kBeaconCacheLayerActions
 			$beacon->setPrivateData($params[kBeaconCacheLayerActions::PARAM_PRIVATE_DATA]);
 		
 		if(isset($params[kBeaconCacheLayerActions::PARAM_RAW_DATA]))
-			$beacon->setPrivateData($params[kBeaconCacheLayerActions::PARAM_RAW_DATA]);
+			$beacon->setRawData($params[kBeaconCacheLayerActions::PARAM_RAW_DATA]);
 		
 		$shouldLog = false;
 		if(isset($params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG]))
