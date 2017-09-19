@@ -1311,21 +1311,24 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 */
 	public function getObjectParams($params = null)
 	{
-		$body = array();
-		elasticSearchUtils::validateAndAddElasticValue($body, 'partner_id', $this->getPartnerId());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'status', $this->getStatus());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'partner_status' , elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()));
-		elasticSearchUtils::validateAndAddElasticValue($body, 'screen_name' , $this->getScreenName());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'kuser_type', $this->getType());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'email' , $this->getEmail());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'tags' , $this->getTagsArray()); //todo - check
-		elasticSearchUtils::validateAndAddElasticValue($body, 'created_at' , $this->getCreatedAtAsInt());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'updated_at' , $this->getUpdateAtAsInt());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'first_name' , $this->getFirstName());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'last_name' , $this->getLastName());
-		elasticSearchUtils::validateAndAddElasticValue($body, 'role_ids' , explode(',',$this->getRoleIds())); //todo - maybe add help to elastic here
-		elasticSearchUtils::validateAndAddElasticValue($body, 'permission_names' , $this->getIndexedPermissionNames()); //todo - replace to array
-		elasticSearchUtils::validateAndAddElasticValue($body, 'group_ids' , KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId()));
+		$body = array(
+			'partner_id' => $this->getPartnerId(),
+			'status' => $this->getStatus(),
+			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
+			'screen_name' => $this->getScreenName(),
+			'kuser_type' => $this->getType(),
+			'email' => $this->getEmail(),
+			'tags' => $this->getTagsArray(), //todo - check
+			'created_at' => $this->getCreatedAtAsInt(),
+			'updated_at' => $this->getUpdateAtAsInt(),
+			'first_name' => $this->getFirstName(),
+			'last_name' => $this->getLastName(),
+			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
+			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
+			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId())
+		);
+
+		elasticSearchUtils::cleanEmptyValues($body);
 
 		return $body;
 	}
