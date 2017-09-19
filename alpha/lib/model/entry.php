@@ -3737,10 +3737,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		if($this->getParentEntryId())
 			$this->addParentEntryToObjectParams($body);
 
-		foreach ($body as $key => $value)
-		{
-			elasticSearchUtils::validateElasticValue($body, $key, $value);
-		}
+		elasticSearchUtils::cleanEmptyValues($body);
 
 		return $body;
 	}

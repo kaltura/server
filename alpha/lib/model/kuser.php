@@ -1328,10 +1328,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId())
 		);
 
-		foreach ($body as $key => $value)
-		{
-			elasticSearchUtils::validateElasticValue($body, $key, $value);
-		}
+		elasticSearchUtils::cleanEmptyValues($body);
 
 		return $body;
 	}

@@ -909,10 +909,7 @@ abstract class LiveEntry extends entry
 			'push_publish' => $this->getPushPublishEnabled(),
 		);
 
-		foreach ($body as $key => $value)
-		{
-			elasticSearchUtils::validateElasticValue($body, $key, $value);
-		}
+		elasticSearchUtils::cleanEmptyValues($body);
 
 		return array_merge(parent::getObjectParams($params), $body);
 	}
