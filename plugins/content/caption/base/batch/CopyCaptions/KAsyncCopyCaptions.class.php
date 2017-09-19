@@ -70,12 +70,12 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 			$newCaptionAssetResource = $this->createNewCaptionsFile($originalCaptionAsset->id, $data->offset, $data->duration, $newCaptionAsset->format, $data->fullCopy);
 			if (!$newCaptionAssetResource)
 			{
-				$errorMsg = "Couldn't create new captions file. Empty resource returned for captionAssetId: [$originalCaptionAsset->id] and format: [$newCaptionAsset->format]";
+				$errorMsg = "Couldn't create new captions file for captionAssetId: [$originalCaptionAsset->id] and format: [$newCaptionAsset->format]";
 				continue;
 			}
 			$updatedCaption = $this->loadNewCaptionAssetFile($newCaptionAsset->id, $newCaptionAssetResource);
 			if (!$updatedCaption)
-				$errorMsg = "New caption file was not created for asset: [$newCaptionAsset->id]";
+				$errorMsg = "Created caption asset with id: [$newCaptionAsset->id], but couldn't load the new captions file to it";
 		}
 		self::unimpersonate();
 
@@ -105,15 +105,23 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 
 	private function retrieveCaptionAssetsOnlyFromSupportedTypes($originalCaptionAssets)
 	{
-		$unsupportedFormats = array (CaptionType::CAP);
+		$unsupportedFormats = $this->getUnsupportedFormats();
 		$originalCaptionAssetsFiltered = array();
-		foreach ($originalCaptionAssets as $originalCaptionAsset) {
+		foreach ($originalCaptionAssets as $originalCaptionAsset)
+		{
 			if (!in_array($originalCaptionAsset->format, $unsupportedFormats))
 				array_push($originalCaptionAssetsFiltered, $originalCaptionAsset);
 		}
 		$objectsNum = count($originalCaptionAssetsFiltered);
 		KalturaLog::info("[$objectsNum] caption assets left after filtering");
 		return $originalCaptionAssetsFiltered;
+	}
+
+
+	private function getUnsupportedFormats()
+	{
+		$unsupportedFormats = array (CaptionType::CAP);
+		return $unsupportedFormats;
 	}
 
 	private function cloneCaption($targetEntryId, $originalCaptionAsset)
@@ -134,7 +142,8 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		return $newCaption;
 	}
 
-	private function loadNewCaptionAssetFile($captionAssetId, $contentResource){
+	private function loadNewCaptionAssetFile($captionAssetId, $contentResource)
+	{
 		try
 		{
 			$updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $contentResource);
@@ -152,14 +161,15 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		KalturaLog::info("Create new caption file based on captionAssetId:[$captionAssetId] in format: [$format] with offset: [$offset] and duration: [$duration]");
 		$captionContent = "";
 
-		$unsupported_formats = array (CaptionType::CAP);
+		$unsupported_formats = $this->getUnsupportedFormats();
 
 		if($fullCopy)
 		{
 			KalturaLog::info("fullCopy mode - copy the content of captionAssetId: [$captionAssetId] without editing");
 			$captionContent = $this->getCaptionContent($captionAssetId);
 		}
-		else {
+		else
+		{
 			KalturaLog::info("Copy only the relevant content of captionAssetId: [$captionAssetId]");
 			$endTime = $offset + $duration;
 

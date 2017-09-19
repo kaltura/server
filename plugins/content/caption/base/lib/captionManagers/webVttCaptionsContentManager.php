@@ -137,161 +137,71 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return new webVttCaptionsContentManager();
 	}
 
+
 	/**
 	 * @param $content
 	 * @return array
 	 */
 	public function parseWebVTT($content)
 	{
-		$blocks = self::retrieveBlocksAsArray($content);
-		$items = self::retrieveItemsFromBlocks($blocks);
-		return $items;
-	}
-
-
-	/**
-	 * @param $content
-	 * @return array
-	 */
-	public function retrieveBlocksAsArray($content)
-	{
 		$this->headerInfo = array();
-		$blocks = array();
-		$fileContentArray = self::getFileContentAsArray($content);
-
-		$header = self::getNextValueFromArray($fileContentArray);
-		if (!$this->validateWebVttHeader($header)) {
-			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
-			return array();
-		}
-		$this->headerInfo[] = $header . self::UNIX_LINE_ENDING;
-
-		$currentBlock = '';
-		while (($line = kCaptionsContentManager::getNextValueFromArray($fileContentArray)) !== false) {
-			$currentBlock .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
-			while (trim($line = kCaptionsContentManager::getNextValueFromArray($fileContentArray)) !== '')
-				$currentBlock .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
-			$currentBlock = rtrim($currentBlock);
-			if ($currentBlock !== '') {
-				$currentBlock = explode(self::UNIX_LINE_ENDING, $currentBlock);
-				$blocks[] = $currentBlock;
-			}
-			$currentBlock = '';
-		}
-
-		if (count($this->parsingErrors) > 0) {
-			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
-			return array();
-		}
-		return $blocks;
-	}
-
-
-	/**
-	 * @param $blocks
-	 * @return array
-	 */
-	public function retrieveItemsFromBlocks($blocks)
-	{
-		$itemsData = array();
 		$foundFirstTimeCode = false;
-		// Parse text by blocks - ignore comments, ids, styles, notes, etc
-		foreach ($blocks as $currentBlock) {
-			$textRowsNum = sizeof($currentBlock);
-			for ($i = 0; $i < $textRowsNum; $i++) {
-				$line = $currentBlock[$i];
-				$matches = array();
-				$timecode_match = preg_match(self::WEBVTT_TIMECODE_PATTERN, $line, $matches);
-				if ($timecode_match) {
-					$foundFirstTimeCode = true;
-					$startCaption = $this->parseWebvttStrTTTime($matches[1]);
-					$endCaption = $this->parseWebvttStrTTTime($matches[2]);
-					$text = '';
-					while ($i < ($textRowsNum - 1)) {
-						$i++;
-						$line = $currentBlock[$i];
-						$line = kCaptionsContentManager::handleTextLines($line);
-						$text .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
-					}
-					$text = rtrim($text);
-					$itemsData[] = array('startTime' => $startCaption, 'endTime' => $endCaption, 'content' => array(array('text' => $text)));
-				} elseif ($foundFirstTimeCode == false)
-					$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
-			}
+		$itemsData = array();
+		$fileContentArray = self::getFileContentAsArray($content);
+		// Parse signature.
+		$header = self::getNextValueFromArray($fileContentArray);
+		if (!$this->validateWebVttHeader($header))
+		{
+			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
+			return array();
+		}
+		$this->headerInfo[] = $header.self::UNIX_LINE_ENDING;
+		// Parse text - ignore comments, ids, styles, notes, etc
+		while (($line = self::getNextValueFromArray($fileContentArray)) !== false)
+		{
+			// Timecode.
+			$matches = array();
+			$timecode_match = preg_match(self::WEBVTT_TIMECODE_PATTERN, $line, $matches);
+			if ($timecode_match)
+			{
+				$foundFirstTimeCode = true;
+				$start = $this->parseStrTTTime($matches[1]);
+				$stop = $this->parseStrTTTime($matches[2]);
+				$text = '';
+				while (trim($line = self::getNextValueFromArray($fileContentArray)) !== '')
+				{
+					$line = $this->handleTextLines($line);
+					$text .= $line . self::UNIX_LINE_ENDING;
+				}
+				$itemsData[] = array('startTime' => $start, 'endTime' => $stop, 'content' => array(array('text' => $text)));
+			}elseif ($foundFirstTimeCode == false)
+				$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
+		};
+		if (count($this->parsingErrors) > 0)
+		{
+			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
+			return array();
 		}
 		return $itemsData;
 	}
 
 
-	/**
-	 * @param $blocks
-	 * @param $clipStartTime
-	 * @param $clipEndTime
-	 * @return string
-	 */
-	public function retrieveEditedContentFromBlocks($blocks, $clipStartTime, $clipEndTime)
-	{
-		$editedContent = "WEBVTT\n\n";
-
-		foreach ($blocks as $currentBlock) {
-			$addBlockToEditedContent = true;
-			foreach ($currentBlock as $line) {
-				$result = $this->shouldWeCopyBlock($line, $clipStartTime, $clipEndTime);
-				if (!$result) {
-					$addBlockToEditedContent = false;
-					continue;
-				}
-			}
-			//if the block contains timeCode that match the clip timeFrame or if the block doesn't contain
-			//timeCode at all add it to the edited content
-			if ($addBlockToEditedContent) {
-				foreach ($currentBlock as $line) {
-					$matches = array();
-					$timecode_match = preg_match(self::WEBVTT_TIMECODE_PATTERN, $line, $matches);
-					if ($timecode_match) {
-						$startCaption = $this->parseWebvttStrTTTime($matches[1]);
-						$endCaption = $this->parseWebvttStrTTTime($matches[2]);
-						$adjustedLineTime = $this->createAdjustedTimeLine($startCaption, $clipStartTime, $clipEndTime, $endCaption);
-						$settings = isset($matches[3]) ? trim($matches[3]) : '';
-						$line = $adjustedLineTime . ' ' . $settings . kCaptionsContentManager::UNIX_LINE_ENDING;
-						$editedContent .= $line;
-					} else
-						$editedContent .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
-				}
-				$editedContent .= kCaptionsContentManager::UNIX_LINE_ENDING;
-			}
-		}
-		return $editedContent;
-	}
-
-
-	private function shouldWeCopyBlock($line, $clipStartTime, $clipEndTime)
-	{
-		$addBlockToEditedContent = true;
-		$matches = array();
-		$timecode_match = preg_match(self::WEBVTT_TIMECODE_PATTERN, $line, $matches);
-		if ($timecode_match) {
-			$startCaption = $this->parseWebvttStrTTTime($matches[1]);
-			$endCaption = $this->parseWebvttStrTTTime($matches[2]);
-			if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
-				$addBlockToEditedContent = false;
-		}
-		return $addBlockToEditedContent;
-	}
-
-
 	public function buildFile($content, $clipStartTime, $clipEndTime)
 	{
-		$blocks = self::retrieveBlocksAsArray($content);
-		$editedContent = self::retrieveEditedContentFromBlocks($blocks, $clipStartTime, $clipEndTime);
-		return $editedContent;
+		$newFileContent = kCaptionsContentManager::createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN);
+		return $newFileContent;
 	}
 
-	private function createAdjustedTimeLine($startCaption, $clipStartTime, $clipEndTime, $endCaption)
+	public function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime)
 	{
+		$startCaption = $this->parseWebvttStrTTTime($matches[1]);
+		$endCaption = $this->parseWebvttStrTTTime($matches[2]);
+		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
+			return null;
 		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
 		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
-		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime);
+		$settings = isset($matches[3]) ? trim($matches[3]) : '';
+		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime). $settings . kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;
 	}
 
