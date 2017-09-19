@@ -20,13 +20,13 @@ class kBeacon
 	const ELASTIC_INDEX_TYPE_KEY = '_type';
 	const ELASTIC_DOCUMENT_ID_KEY = '_id';
 	
-	const FIELD_UPDATED_AT = 'updatedAt';
-	const FIELD_RELATED_OBJECT_TYPE = 'relatedObjectType';
-	const FIELD_EVENT_TYPE = 'eventType';
-	const FIELD_OBJECT_ID = 'objectId';
-	const FIELD_PRIVATE_DATA = 'privateData';
-	const FIELD_RAW_DATA = 'rawData';
-	const FIELD_PARTNER_ID = 'partnerId';
+	const FIELD_UPDATED_AT = 'updated_at';
+	const FIELD_RELATED_OBJECT_TYPE = 'related_object_type';
+	const FIELD_EVENT_TYPE = 'event_type';
+	const FIELD_OBJECT_ID = 'object_id';
+	const FIELD_PRIVATE_DATA = 'private_data';
+	const FIELD_RAW_DATA = 'raw_data';
+	const FIELD_PARTNER_ID = 'partner_id';
 	
 	protected $id;
 	protected $relatedObjectType;

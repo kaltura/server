@@ -38,34 +38,34 @@
 				}
 			],
 			"properties": {
-				"createdAt": {
+				"created_at": {
 					"type": "date",
 					"format": "epoch_second"
 				},
-				"eventType": {
+				"event_type": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"objectId": {
+				"object_id": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"partnerId": {
+				"partner_id": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"privateData": {
+				"private_data": {
 					"type" : "object"
 				},
-				"rawData": {
+				"raw_data": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"relatedObjectType": {
+				"related_object_type": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"updatedAt": {
+				"updated_at": {
 					"type": "date",
 					"format": "epoch_second"
 				}
@@ -83,34 +83,34 @@
 				}
 			],
 			"properties": {
-				"createdAt": {
+				"created_at": {
 					"type": "date",
 					"format": "epoch_second"
 				},
-				"eventType": {
+				"event_type": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"objectId": {
+				"object_id": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"partnerId": {
+				"partner_id": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"privateData": {
+				"private_data": {
 					"type" : "object"
 				},
-				"rawData": {
+				"raw_data": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"relatedObjectType": {
+				"related_object_type": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
 				},
-				"updatedAt": {
+				"updated_at": {
 					"type": "date",
 					"format": "epoch_second"
 				}
