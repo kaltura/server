@@ -1,3 +1,21 @@
+# Mercury 13.4.0 #
+
+## Support unlimited recording as feature flip ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8030
+
+### Configuration ####
+
+	- Add new module to the admin-console in admin.ini
+        moduls.liveStreamUnlimitedRecording.enabled = true
+        moduls.liveStreamUnlimitedRecording.permissionType = 2
+        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording
+        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING
+        moduls.liveStreamUnlimitedRecording.basePermissionType = 2
+        moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+        moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
 # Mercury 13.3.0 #
 
 ## Expose new API for login by KS ##
@@ -5470,20 +5488,3 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
-
-## Support 24/7 recording as feature flip ##
-
-
-- Issue Type: Feature
-- Issue ID: PLAT-8030
-
-### Configuration ####
-
-	- Add new module to the admin-console in admin.ini
-        moduls.liveStreamUnlimitedRecording.enabled = true
-        moduls.liveStreamUnlimitedRecording.permissionType = 2
-        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording
-        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING
-        moduls.liveStreamUnlimitedRecording.basePermissionType = 2
-        moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
-        moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
