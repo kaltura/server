@@ -95,8 +95,9 @@ class LiveStreamEntry extends LiveEntry
 	{
 		$capabilities = parent::getCapabilities();
 
-		if (PermissionPeer::isValidForPartner("FEATURE_KALTURA_24_BY_7_RECORDING", $this->getPartnerId()))
-			$capabilities = $capabilities.",FEATURE_KALTURA_24_BY_7_RECORDING";
+		if (PermissionPeer::isValidForPartner("FEATURE_KALTURA_UNLIMITED_RECORDING", $this->getPartnerId()))
+			$capabilities = strlen($capabilities) > 0 ? $capabilities."," : $capabilities;
+			$capabilities =  $capabilities."FEATURE_KALTURA_UNLIMITED_RECORDING";
 		return $capabilities;
 	}
 
