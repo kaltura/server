@@ -50,6 +50,9 @@ class kBeaconCacheLayerActions
 		if(isset($params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID]))
 			$partnerId = $params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID];
 		
+		if(!$partnerId)
+			return false;
+		
 		$beacon = new kBeacon($partnerId);
 		$beacon->setObjectId($params[kBeaconCacheLayerActions::PARAM_OBJECT_ID]);
 		$beacon->setEventType($params[kBeaconCacheLayerActions::PARAM_EVENT_TYPE]);
