@@ -24,7 +24,8 @@ class kBeaconCacheLayerActions
 	const PARAM_PRIVATE_DATA = "beacon:privateData";
 	const PARAM_RAW_DATA = "beacon:rawData";
 	const PARAM_SHOULD_LOG = "beacon:shouldLog";
-	const PARAM_PARTNER_ID = "___cache___partnerId";
+	const PARAM_KS_PARTNER_ID = "___cache___partnerId";
+	const PARAM_IMPERSONATED_PARTNER_ID = "partnerId";
 	
 	public static function validateInputExists($params, $paramKey)
 	{
@@ -36,7 +37,7 @@ class kBeaconCacheLayerActions
 		if(is_null($params))
 			throw new Exception("Params not provided");
 		
-		if(self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_PARTNER_ID))
+		if(self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID))
 			return false;
 		
 		if (self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_EVENT_TYPE) ||
@@ -45,7 +46,14 @@ class kBeaconCacheLayerActions
 		)
 			throw new Exception("Params array missing mandatory values");
 		
-		$beacon = new kBeacon($params[kBeaconCacheLayerActions::PARAM_PARTNER_ID]);
+		$partnerId =  $params[kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID];
+		if(isset($params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID]))
+			$partnerId = $params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID];
+		
+		if(!$partnerId)
+			return false;
+		
+		$beacon = new kBeacon($partnerId);
 		$beacon->setObjectId($params[kBeaconCacheLayerActions::PARAM_OBJECT_ID]);
 		$beacon->setEventType($params[kBeaconCacheLayerActions::PARAM_EVENT_TYPE]);
 		$beacon->setRelatedObjectType($params[kBeaconCacheLayerActions::PARAM_RELATED_OBJECT_TYPE]);
