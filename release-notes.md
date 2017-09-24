@@ -5470,3 +5470,9 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
+
+## Support 24/7 recording as feature flip ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8030
+

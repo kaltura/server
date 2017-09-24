@@ -90,4 +90,14 @@ class LiveStreamEntry extends LiveEntry
 		$url = $manager->$functionName($this, $protocol);
 		return $url;
 	}
+
+	public function getCapabilities()
+	{
+		$capabilities = parent::getCapabilities();
+
+		if (PermissionPeer::isValidForPartner("FEATURE_KALTURA_24_BY_7_RECORDING", $this->getPartnerId()))
+			$capabilities = $capabilities.",FEATURE_KALTURA_24_BY_7_RECORDING";
+		return $capabilities;
+	}
+
 }
