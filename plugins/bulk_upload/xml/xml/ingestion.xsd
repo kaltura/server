@@ -732,14 +732,15 @@
 					</xs:annotation>
 				</xs:element>
 				<xs:element maxOccurs="1" minOccurs="1" ref="contentResource-extension"/>
+				<xs:element maxOccurs="1" minOccurs="1" ref="assetInfo">
+					<xs:annotation>
+						<xs:documentation>
+							Holds assetInfo elements
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 			</xs:choice>
-			<xs:element maxOccurs="1" minOccurs="0" ref="assetInfo">
-				<xs:annotation>
-					<xs:documentation>
-						Holds assetInfo elements
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
+
 
 			<xs:element maxOccurs="unbounded" minOccurs="0" ref="content-extension"/>
 			<xs:element maxOccurs="1" minOccurs="0" ref="streams">

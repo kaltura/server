@@ -509,9 +509,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 				$flavorAsset = $this->getFlavorAsset($contentElement, $conversionProfileId);
 				$flavorAssetResource = $this->getResource($contentElement, $conversionProfileId);
-				if(!$flavorAssetResource)
-					continue;
-				
+
 				$assetParamsId = $flavorAsset->flavorParamsId;
 	
 				$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
@@ -1199,10 +1197,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(!isset($existingflavorAssets[$flavorParamsId]))
 			{
 				KBatchBase::$kClient->flavorAsset->add($entryId, $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorAssetsResource);
+				if (!is_null($flavorAssetsResource))
+					KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorAssetsResource);
 			}else{
 				KBatchBase::$kClient->flavorAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
+				if (!is_null($flavorAssetsResource))
+					KBatchBase::$kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
 			}
 		}
 
