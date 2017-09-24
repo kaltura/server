@@ -10,8 +10,8 @@
 	- Add new module to the admin-console in admin.ini
         moduls.liveStreamUnlimitedRecording.enabled = true
         moduls.liveStreamUnlimitedRecording.permissionType = 2
-        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording
-        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING
+        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording Duration
+        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING_DURATION
         moduls.liveStreamUnlimitedRecording.basePermissionType = 2
         moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
         moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
