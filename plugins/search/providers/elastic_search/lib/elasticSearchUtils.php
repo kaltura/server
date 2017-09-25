@@ -81,4 +81,15 @@ class elasticSearchUtils
 		return false;
 	}
 
+	public static function cleanEmptyValues(&$body)
+	{
+		foreach ($body as $key => $value)
+		{
+			if(is_null($value) || $value === '')
+				unset($body[$key]);
+			if(is_array($value) && ( count($value) == 0 || ( (count($value) == 1 && (isset($value[0])) && $value[0] === '' ) ) ))
+				unset($body[$key]);
+		}
+	}
+
 }

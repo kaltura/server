@@ -150,17 +150,6 @@ class MediaService extends KalturaEntryService
 		else
 		{
 			$kResource = $resource->toObject();
-			if ( ($kResource instanceof kOperationResource ) && ($this->isResourceKClip($kResource)) ) {
-				$internalResource = $kResource->getResource();
-				if ($dbEntry->getIsTrimDisabled()
-					&& $internalResource instanceof kFileSyncResource
-					&& $dbEntry->getId() == $internalResource->getOriginEntryId()
-				)
-				{
-					throw new KalturaAPIException(KalturaErrors::ENTRY_CANNOT_BE_TRIMMED);
-				}
-			}
-
 			$tempMediaEntry = new KalturaMediaEntry();
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
@@ -709,7 +698,7 @@ class MediaService extends KalturaEntryService
 	function getAction($entryId, $version = -1)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType() instanceof KalturaMediaEntry)))
+		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType()) instanceof KalturaMediaEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		return $this->getEntry($entryId, $version);

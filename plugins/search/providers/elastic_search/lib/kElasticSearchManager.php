@@ -6,7 +6,7 @@
 class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjectReadyForElasticIndexEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer
 {
 
-    const CACHE_PREFIX = 'executed_elastic_server_';
+    const CACHE_PREFIX = 'executed_elastic_cluster_';
     const MAX_LENGTH = 32766;
     /**
      * @param BaseObject $object
@@ -15,7 +15,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function objectReadyForIndex(BaseObject $object, BatchJob $raisedJob = null)
     {
-        if($object instanceof CuePoint && in_array($object->getType(),CuePointPlugin::getElasticIndexOnEntryTypes()))
+        if($object instanceof CuePoint && in_array($object->getType(), CuePointPlugin::getElasticIndexOnEntryTypes()) && !in_array($object->getType(), CuePointPlugin::getIndexOnEntryTypes()))
         {
             kCuePointManager::reIndexCuePointEntry($object, false, true);//reindex the entry only on elastic
         }
@@ -37,7 +37,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeReadyForIndexEvent(BaseObject $object)
     {
-        if($object instanceof CuePoint && in_array($object->getType(),CuePointPlugin::getElasticIndexOnEntryTypes()))
+        if($object instanceof CuePoint && in_array($object->getType(), CuePointPlugin::getElasticIndexOnEntryTypes()) && !in_array($object->getType(), CuePointPlugin::getIndexOnEntryTypes()))
             return true;
 
         if($object instanceof IElasticIndexable)
@@ -85,11 +85,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
             if($elasticPluginData)
             {
-                KalturaLog::debug("Elastic data for $pluginName [" . print_r($elasticPluginData,true) . "]");
-                foreach ($elasticPluginData as $fieldName => $fieldValue)
-                {
-                    $dataContributionPath[$fieldName] = $fieldValue;
-                }
+                $dataContributionPath = array_merge($dataContributionPath, $elasticPluginData);
             }
         }
         
@@ -138,7 +134,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog = new SphinxLog();
         $command = serialize($params);
         $elasticLog->setSql($command);
-        $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
+        $elasticLog->setExecutedServerId($this->retrieveElasticClusterId());
         $elasticLog->setObjectId($object->getId());
         $elasticLog->setObjectType($object->getElasticObjectName());
         //$elasticLog->setEntryId($object->getEntryId());
@@ -147,29 +143,29 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
     }
 
-    private function retrieveElasticServerId()
+    private function retrieveElasticClusterId()
     {
-        $elasticServerId = null;
+        $elasticClusterId = null;
         if(kConf::hasParam('exec_elastic') && kConf::get('exec_elastic'))
         {
-            $elasticHostName = kConf::get('elasticHost', 'elastic');
-            $elasticServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_SERVER);
-            if ($elasticServerCacheStore)
+            $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
+            $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+            if ($elasticClusterCacheStore)
             {
-                $elasticServerId = $elasticServerCacheStore->get(self::CACHE_PREFIX . $elasticHostName);
-                if ($elasticServerId)
-                    return $elasticServerId;
+                $elasticClusterId = $elasticClusterCacheStore->get(self::CACHE_PREFIX . $elasticClusterName);
+                if ($elasticClusterId)
+                    return $elasticClusterId;
             }
-            $elasticServer = SphinxLogServerPeer::retrieveByLocalServer($elasticHostName);
-            if($elasticServer)
+            $elasticCluster = SphinxLogServerPeer::retrieveByLocalServer($elasticClusterName);
+            if($elasticCluster)
             {
-                $elasticServerId = $elasticServer->getId();
-                if ($elasticServerCacheStore)
-                    $elasticServerCacheStore->set(self::CACHE_PREFIX . $elasticHostName, $elasticServerId);
+                $elasticClusterId = $elasticCluster->getId();
+                if ($elasticClusterCacheStore)
+                    $elasticClusterCacheStore->set(self::CACHE_PREFIX . $elasticClusterName, $elasticClusterId);
             }
         }
 
-        return $elasticServerId;
+        return $elasticClusterId;
     }
 
     /**

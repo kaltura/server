@@ -160,6 +160,7 @@ abstract class kManifestRenderer
 			'uiConfId' => 'uiConfId',
 			'playSessionId' => 'sessionId',
 			'clientTag' => 'clientTag', 
+			'playbackType' => 'playbackType',
 		);
 		foreach ($mapping as $src => $dest)
 		{
@@ -171,9 +172,28 @@ abstract class kManifestRenderer
 			$output[$dest] = $params[$src];
 		}
 
-		if (isset($params['clientTag']) && strpos($params['clientTag'], 'html5:v') === 0)
+		if (isset($params['clientTag']))
 		{
-			$output['clientVer'] = substr($params['clientTag'], 7);
+			$clientVer = $params['clientTag'];
+
+			// strip version prefixes
+			$prefixes = array(
+				'kdp:v',
+				'html5:v',
+				'kwidget:v',
+			);
+			foreach ($prefixes as $prefix)
+			{
+				if (substr($clientVer, 0, strlen($prefix)) == $prefix)
+				{
+					$clientVer = substr($clientVer, strlen($prefix));
+				}
+			}
+
+			$clientVer = preg_replace('/,cache_st:\d+/', '', $clientVer);
+			$clientVer = explode('__', $clientVer);
+
+			$output['clientVer'] = $clientVer[0];
 		}
 
 		if (isset($params['referrer']))

@@ -908,6 +908,9 @@ abstract class LiveEntry extends entry
 			'recorded_entry_id' => $this->getRecordedEntryId(),
 			'push_publish' => $this->getPushPublishEnabled(),
 		);
+
+		elasticSearchUtils::cleanEmptyValues($body);
+
 		return array_merge(parent::getObjectParams($params), $body);
 	}
 

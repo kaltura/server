@@ -408,22 +408,24 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 				$cuePointData = $contributedData;
 				$cuePointData['cue_point_type'] = $cuePoint->getType();
 				$cuePointData['cue_point_id'] = $cuePoint->getId();
-				$cuePointData['cue_point_start_time'] = $cuePoint->getStartTime();
-				$cuePointData['cue_point_end_time'] = $cuePoint->getEndTime();
-				//add cue point metadata
-				$metaDataPlugin = KalturaPluginManager::getPluginInstance(CuePointMetadataPlugin::PLUGIN_NAME);
-				if($metaDataPlugin)
-				{
-					$cuePointElasticMetaData = $metaDataPlugin::getElasticSearchData($cuePoint);
-
-					if($cuePointElasticMetaData && count($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME]))
-					{
-						foreach ($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME] as $fieldName => $fieldValue)
-						{
-							$cuePointData['cue_point_metadata'][$fieldName] = $fieldValue;
-						}
-					}
-				}
+				if(!is_null($cuePoint->getStartTime()))
+					$cuePointData['cue_point_start_time'] = $cuePoint->getStartTime();
+				if(!is_null($cuePoint->getEndTime()))
+					$cuePointData['cue_point_end_time'] = $cuePoint->getEndTime();
+				//add cue point metadata - todo maybe add checkbox
+//				$metaDataPlugin = KalturaPluginManager::getPluginInstance(CuePointMetadataPlugin::PLUGIN_NAME);
+//				if($metaDataPlugin)
+//				{
+//					$cuePointElasticMetaData = $metaDataPlugin::getElasticSearchData($cuePoint);
+//
+//					if($cuePointElasticMetaData && count($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME]))
+//					{
+//						foreach ($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME] as $fieldName => $fieldValue)
+//						{
+//							$cuePointData['cue_point_metadata'][$fieldName] = $fieldValue;
+//						}
+//					}
+//				}
 				$data[] = $cuePointData;
 			}
 

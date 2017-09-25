@@ -1,3 +1,22 @@
+# Mercury 13.3.0 #
+
+## Expose new API for login by KS ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7952
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_07_add_user_loginByKs_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Mercury 13.2.0 #
 
 ## Add new Beacon plugin ##

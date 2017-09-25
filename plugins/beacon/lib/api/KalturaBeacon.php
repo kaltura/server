@@ -23,15 +23,6 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	public $indexType;
 	
 	/**
-	 * Beacon creation date as Unix timestamp (In seconds)
-	 *
-	 * @var time
-	 * @readonly
-	 * @filter gte,lte,order
-	 */
-	public $createdAt;
-	
-	/**
 	 * Beacon update date as Unix timestamp (In seconds)
 	 *
 	 * @var time
@@ -74,13 +65,12 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	(
 		'id',
 		'indexType',
-		'createdAt',
-		'updatedAt',
-		'relatedObjectType',
-		'eventType',
-		'objectId',
-		'privateData',
-		'rawData',
+		'updatedAt' => "updated_at",
+		'relatedObjectType' => 'related_object_type',
+		'eventType' => 'event_type',
+		'objectId' => "object_id",
+		'privateData' => 'private_data',
+		'rawData' => 'raw_data',
 	);
 	
 	public function validateForInsert($propertiesToSkip = array())
@@ -121,7 +111,7 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	{
 		parent::fromArray($source_array);
 		
-		if (isset($source_array['privateData']))
-			$this->privateData = json_encode($source_array['privateData']);
+		if (isset($source_array[kBeacon::FIELD_PRIVATE_DATA]))
+			$this->privateData = json_encode($source_array[kBeacon::FIELD_PRIVATE_DATA]);
 	}
 }

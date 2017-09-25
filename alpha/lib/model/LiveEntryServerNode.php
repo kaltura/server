@@ -42,9 +42,9 @@ class LiveEntryServerNode extends EntryServerNode
 	 * @see BaseEntryServerNode::postUpdate()
 	 */
 	public function postUpdate(PropelPDO $con = null)
-	{
+	{		
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
-		
+
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
@@ -56,6 +56,9 @@ class LiveEntryServerNode extends EntryServerNode
 			
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::MARKED_FOR_DELETION)
 			{
+				//TODO - move this logic into update event handler
+				//invalidateQueryCache is called only in postUpdate of base class so, Invalidate query cache to avoid getting stale response.
+				kQueryCache::invalidateQueryCache($this);
 				$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getEntryId());
 				if(!count($playableServerNodes))
 				{
@@ -71,7 +74,7 @@ class LiveEntryServerNode extends EntryServerNode
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
 		}
-
+		
 		parent::postUpdate($con);
 	}
 	

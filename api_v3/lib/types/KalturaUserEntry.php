@@ -184,9 +184,8 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	 */
 	protected function validateUserId()
 	{
-		
 		$userId = $this->userId ? $this->userId : kCurrentContext::getCurrentKsKuserId();
-		if(!$userId)
-			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED);
+		if(!$userId || trim($userId) == '')
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED_OR_EMPTY);
 	}
 }
