@@ -44,7 +44,7 @@ class kBeaconCacheLayerActions
 			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_OBJECT_ID) ||
 			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_RELATED_OBJECT_TYPE)
 		)
-			throw new Exception("Params array missing mandatory values");
+			return false;
 		
 		$partnerId =  $params[kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID];
 		if(isset($params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID]))
@@ -70,7 +70,7 @@ class kBeaconCacheLayerActions
 		
 		$queueProvider = self::loadQueueProvider();
 		if(!$queueProvider)
-			throw new Exception("Queue Provider could not be initialized");
+			return false;
 		
 		return $beacon->index($shouldLog, $queueProvider);
 	}
