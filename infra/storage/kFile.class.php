@@ -301,6 +301,11 @@ class kFile
 		}
 		fclose($fh);
 	}
+
+	static public function appendToFile($file_name , $str)
+	{
+		file_put_contents($file_name, $str, FILE_APPEND);
+	}
 	
 	static public function fixPath($file_name)
 	{
