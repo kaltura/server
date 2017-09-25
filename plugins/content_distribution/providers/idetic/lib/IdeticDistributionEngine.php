@@ -3,7 +3,7 @@
  * @package plugins.ideticDistribution
  * @subpackage lib
  */
-class IdeticDistributionEngine extends DistributionEngine implements 
+class IdeticDistributionEngine extends SftpDistributionEngine implements 
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
@@ -23,7 +23,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	const USAGE_COUNTER_TIMESPENT = 8;
 	const USAGE_COUNTER_RECOMMENDED = 9;
 
-	
+	const TEMP_DIRECTORY = 'idetic_distribution';
 	private $domain = 'jukebox.mobitv.com';
 	
 	protected $tempXmlPath;
@@ -425,29 +425,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		return $sftpManager;
 	}
 
-	/*
-	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged 
-	 */
-	protected function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
-	{
-		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
-		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation))
-		{
-			file_put_contents($fileLocation, $keyContent);
-			chmod($fileLocation, 0600);
-		}
-		else
-		{
-			if (file_get_contents($fileLocation) !== $keyContent) // if key was updated
-			{
-				file_put_contents($fileLocation, $keyContent);
-				chmod($fileLocation, 0600);
-			}
-		}
-		
-		return $fileLocation;
-	}
+
+
 	
 /**
 	 * @param KalturaDistributionJobData $data
@@ -472,5 +451,10 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		}
 		
 		return $statusXml;
+	}
+
+	public function getTempDirectory()
+	{
+		return self::TEMP_DIRECTORY;
 	}
 }
