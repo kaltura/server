@@ -1194,16 +1194,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($flavorAssetsResources as $flavorParamsId => $flavorAssetsResource)
 		{
-			if(!isset($existingflavorAssets[$flavorParamsId]))
+			$id = null;
+			if (!isset($existingflavorAssets[$flavorParamsId]))
 			{
 				KBatchBase::$kClient->flavorAsset->add($entryId, $flavorAssets[$flavorParamsId]);
-				if (!is_null($flavorAssetsResource))
-					KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorAssetsResource);
-			}else{
-				KBatchBase::$kClient->flavorAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
-				if (!is_null($flavorAssetsResource))
-					KBatchBase::$kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
+				$id = KBatchBase::$kClient->getMultiRequestResult()->id;
+			} else
+			{
+				$id = $existingflavorAssets[$flavorParamsId];
+				KBatchBase::$kClient->flavorAsset->update($id, $flavorAssets[$flavorParamsId]);
 			}
+			if ($flavorAssetsResource)
+				KBatchBase::$kClient->flavorAsset->setContent($id, $flavorAssetsResource);
 		}
 
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
