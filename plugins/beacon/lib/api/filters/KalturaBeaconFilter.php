@@ -79,6 +79,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 			if (!$order || !isset($orderByMap[$order]))
 				continue;
 			
+			$order = $orderByMap[$order];
 			list ($field_name, $ascending) = baseObjectFilter::getFieldAndDirection($order);
 			$orderObject[$field_name] = $ascending;
 		}
