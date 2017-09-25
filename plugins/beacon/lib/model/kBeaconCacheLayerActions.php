@@ -23,7 +23,7 @@ class kBeaconCacheLayerActions
 	const PARAM_RELATED_OBJECT_TYPE = "beacon:relatedObjectType";
 	const PARAM_PRIVATE_DATA = "beacon:privateData";
 	const PARAM_RAW_DATA = "beacon:rawData";
-	const PARAM_SHOULD_LOG = "beacon:shouldLog";
+	const PARAM_SHOULD_LOG = "shouldLog";
 	const PARAM_KS_PARTNER_ID = "___cache___partnerId";
 	const PARAM_IMPERSONATED_PARTNER_ID = "partnerId";
 	
@@ -65,7 +65,7 @@ class kBeaconCacheLayerActions
 			$beacon->setRawData($params[kBeaconCacheLayerActions::PARAM_RAW_DATA]);
 		
 		$shouldLog = false;
-		if(isset($params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG]))
+		if(isset($params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG]) && $params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG])
 			$shouldLog = true;
 		
 		$queueProvider = self::loadQueueProvider();
