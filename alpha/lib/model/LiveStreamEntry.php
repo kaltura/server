@@ -95,9 +95,9 @@ class LiveStreamEntry extends LiveEntry
 	{
 		$capabilities = parent::getCapabilities();
 
-		if (PermissionPeer::isValidForPartner("FEATURE_UNLIMITED_RECORDING_DURATION", $this->getPartnerId())) {
-			$capabilities = strlen($capabilities) > 0 ? $capabilities . "," : $capabilities;
-			$capabilities = $capabilities . "FEATURE_UNLIMITED_RECORDING_DURATION";
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_UNLIMITED_RECORDING_DURATION, $this->getPartnerId())) {
+			$capabilities = strlen(trim($capabilities)) ? $capabilities. "," : $capabilities;
+			$capabilities = $capabilities.EntryCapability::UNLIMITED_RECORDING_DURATION_CAPABILITY;
 		}
 		return $capabilities;
 	}
