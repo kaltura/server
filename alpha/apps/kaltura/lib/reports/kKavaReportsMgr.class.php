@@ -41,6 +41,9 @@ class kKavaReportsMgr
     const DRUID_TIMEZONE = "timeZone";
     const DRUID_NUMERIC = "numeric";
     const DRUID_INVERTED = "inverted";
+    const DRUID_CONTEXT = "context";
+    const DRUID_PRIORITY = "priority";
+        
     
     const DIMENSION_PARTNER_ID = "partnerId";
     const DIMENSION_ENTRY_ID = "entryId";
@@ -109,6 +112,9 @@ class kKavaReportsMgr
     const REPORT_DRILLDOWN_METRICS = "report_drilldown_metrics";
     const REPORT_DRILLDOWN_DETAIL_DIM_HEADERS = "report_drilldown_deatil_dimensions_headers";
     const REPORT_CARDINALITY_METRIC = "report_caredinality_metric";
+    
+    const CLIENT_TAG_PRIORITY = 5;
+    const MAX_RESULT_SIZE = 12000;
     
     static $aggregations_def = array();
     static $metrics_def = array();
@@ -582,14 +588,13 @@ class kKavaReportsMgr
         
         if (!$page_size || $page_size < 0) 
             $page_size = 10;
-        //$page_size = min($page_size , self::REPORTS_TABLE_MAX_QUERY_SIZE);
         
         if (!$page_index || $page_index < 0) 
             $page_index = 1;
         
-        if ($page_index * $page_size > 12000) 
+            if ($page_index * $page_size > self::MAX_RESULT_SIZE) 
         {
-            //todo: result is too big
+            throw new Exception("result limit is " . self::MAX_RESULT_SIZE . " rows");
         }
         
         $report_def = self::$reports_def[$report_type];
@@ -606,6 +611,9 @@ class kKavaReportsMgr
             
             if (isset(self::$headers_to_metrics[$order_by]))
                 $order_by = self::$headers_to_metrics[$order_by];
+            else 
+                throw new Exception("Order by parameter is not a valid column");
+                
         }
         
         $granularity = self::DRUID_GRANULARITY_ALL;
@@ -776,27 +784,10 @@ class kKavaReportsMgr
        $month = substr($date_id, 4, 2);
        $day = substr($date_id, 6, 2);
        
-       switch ($offset % 60) 
-       {
-            case 0: 
-                $timezone_offset_minutes = "00";
-                break;
-            case 30:
-                $timezone_offset_minutes = "30";
-                break;
-            default: 
-                //throw exception;
-       }
-       
-       $timezone_offset = -intval($offset/60);
-       if ($timezone_offset > 0)
-           $timezone_offset = sprintf("+%02d", $timezone_offset); 
-       else 
-           $timezone_offset = sprintf("-%02d", -$timezone_offset);
-       
+       $timezone_offset = sprintf("%s%02d:%02d", $offset <= 0 ? '+' : '-', intval(abs($offset)/60), abs($offset) % 60);
        $time = $end_of_the_day? "T23:59:59" : "T00:00:00";
        
-       return "$year-$month-$day$time$timezone_offset:$timezone_offset_minutes";
+       return "$year-$month-$day$time$timezone_offset";
        
    }
    
@@ -910,6 +901,19 @@ class kKavaReportsMgr
    } 
    
    private static function getBaseReportDef($partner_id, $intervals, $metrics, $filter, $granularity) {
+       $client_tag = kCurrentContext::$client_lang;
+     
+       if (kConf::hasParam('kava_top_priority_client_tags')) {
+           $priority_tags = kConf::get('kava_top_priority_client_tags');
+           foreach ($priority_tags as $tag) 
+           {
+               if (strpos($client_tag, $tag) === 0) 
+               {
+                   $report_def[self::DRUID_CONTEXT] = array(self::DRUID_PRIORITY => self::CLIENT_TAG_PRIORITY);
+                   break;
+               }
+           }
+       }
        $report_def[self::DRUID_DATASOURCE] = self::HISTORICAL_DATASOURCE;
        $report_def[self::DRUID_INTERVALS] = $intervals;
        $report_def[self::DRUID_GRANULARITY] = $granularity;
@@ -942,7 +946,7 @@ class kKavaReportsMgr
        
        if (count($event_types))
             $filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-                self::DRUID_VALUES => array_unique($event_types));
+                self::DRUID_VALUES => array_values(array_unique($event_types)));
        
        $filter_def = self::buildFilter($filter);
        $filter_def[]= array(self::DRUID_TYPE => self::DRUID_SELECTOR_FILTER, self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID, self::DRUID_VALUE => $partner_id);
@@ -993,22 +997,14 @@ class kKavaReportsMgr
    
    private static function getDimCardinalityReport($partner_id, $intervals, $dimension, $filter, $event_type)
    { 
-       $report_def = self::$time_series_query_template;
-       $report_def[self::DRUID_INTERVALS] = $intervals;
-       $report_def[self::DRUID_GRANULARITY] = self::DRUID_GRANULARITY_ALL;
-       if ($filter) 
-           $filter_def = self::buildFilter($filter);
-       else 
-           $filter_def = array();
+       if (!$filter)
+           $filter = array();
+       $filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+                         self::DRUID_VALUES => array($event_type));
        
-       $filter_def[] = array(self::DRUID_TYPE => self::DRUID_SELECTOR_FILTER, self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID, self::DRUID_VALUE => $partner_id);
-       $filter_def[] = array(self::DRUID_TYPE => self::DRUID_SELECTOR_FILTER, self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE, self::DRUID_VALUE => $event_type);
-       $report_def[self::DRUID_FILTER] = array(self::DRUID_TYPE => "and",
-               self::DRUID_FIELDS => $filter_def);
-           
+       $report_def = self::getBaseReportDef($partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
+       $report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
        
-       $report_def[self::DRUID_AGGR] = array();
-       $report_def[self::DRUID_POST_AGGR] = array();
        $report_def[self::DRUID_AGGR][] = array(self::DRUID_TYPE => self::DRUID_CARDINALITY,
                                                self::DRUID_NAME => "total_count",
                                                self::DRUID_FIELDS => array($dimension));
@@ -1027,6 +1023,7 @@ class kKavaReportsMgr
    
    public static function runReport($content) {
        
+       kApiCache::disableConditionalCache();
        KalturaLog::log("{" . print_r($content, true) . "}");
        
        $post = json_encode($content);
@@ -1044,9 +1041,14 @@ class kKavaReportsMgr
        
        $druid_start = microtime(true);
        $results = curl_exec($ch);
-       curl_close($ch);
+       
        $druid_took = microtime(true) - $druid_start;
        KalturaLog::debug("Druid query took - " . $druid_took. " seconds");
+       
+       if (curl_errno($ch))
+           throw new Exception("Error while trying to connect to:". $remote_path ." error=".curl_error($ch));
+       
+       curl_close($ch);
        
        $json_res = json_decode($results);
        if (isset($json_res->error)) {
