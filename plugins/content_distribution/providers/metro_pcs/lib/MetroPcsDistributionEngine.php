@@ -146,7 +146,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$xmlString = $feed->getXmlString();
 		
 		KalturaLog::info('result xml - '.PHP_EOL.$xmlString);
-		$tempFile = $this->getTempFileWithContent($xmlString);
+		$tempFile = kFile::getTempFileWithContent($xmlString, 'tmp', null, true);
 		
 		//load the FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);
@@ -189,7 +189,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$destXmlFile = "{$path}/{$xmlFileName}";		
 		$xmlString = $feed->getXmlString();	
 		KalturaLog::info('result xml - '.PHP_EOL.$xmlString);
-		$tempFile = $this->getTempFileWithContent($xmlString);
+		$tempFile = kFile::getTempFileWithContent($xmlString, 'tmp', null, true);
 	
 		//load the FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);
@@ -326,14 +326,6 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$videoAssetFilePathArray = unserialize($providerData->assetLocalPaths);
 		$sourceName = $videoAssetFilePathArray[$flavorAsset->id];
 		$ftpManager->putFile($destName, $sourceName, true);
-	}
-	
-	protected static function getTempFileWithContent($fileContent) 
-	{
-		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, 'tmp');		
-		file_put_contents($fileLocation, $fileContent);
-		return $fileLocation;
 	}
 	
 }

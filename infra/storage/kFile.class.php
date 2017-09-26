@@ -722,6 +722,26 @@ class kFile
 		}
 		return true;
 	}
+
+	/**
+	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
+	 * @param string $fileContent
+	 * @param string $prefix
+	 * @param integer $permission
+	 * @param boolean $strict - check if to write file without content
+	 * @return string path to temporary file location
+	 */
+	public static function getTempFileWithContent($fileContent, $prefix = '' , $permission = null, $strict = false )
+	{
+		if(!$fileContent && !$strict)
+			return null;
+		$tempDirectory = sys_get_temp_dir();
+		$fileLocation = tempnam($tempDirectory, $prefix);
+		file_put_contents($fileLocation, $fileContent);
+		if ($permission)
+			chmod($fileLocation, $permission);
+		return $fileLocation;
+	}
 	
 }
 
