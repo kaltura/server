@@ -158,30 +158,36 @@ class embedPlaykitJsAction extends sfAction
 		return $this->eTagHash;
 	}
 	
-	private function getAutoEmbedCode($targetId = "")
+	private function getAutoEmbedCode($targetId = null)
 	{
-		if (empty($targetId)){
+		if (!$targetId){
 			$targetId = $this->getRequestParameter('targetId');
 		}
+		if (!$targetId){
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Player target ID not defined");
+		}
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);		
-		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME);
+		if (!$entry_id){
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
+		}
+		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME);		
+		//enable passing nested config options
+		foreach ($config as $key=>$val){
+			$config[$key] = json_decode($val);
+		}
+
 		$config["partnerId"] = $this->partnerId;		
 		$config["uiConfId"] = $this->uiconfId;
-
-		if (array_key_exists("beUrl", $config) && array_key_exists("baseUrl", $config)){		
-			$config["env"] = array(
-				"beUrl" => $config["beUrl"], 
-				"baseUrl" => $config["baseUrl"]
-			);
-			unset($config["beUrl"]);
-			unset($config["baseUrl"]);
-		}
 		
-		$config = json_encode($config);		
+		try{
+			$config = json_encode($config);		
+		} catch (Exception $ex) {
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Invalid config object");
+		}
 
 		$autoEmbedCode = "
 		try {
-		    var kalturaPlayer = KalturaPlayer.setup(\"$targetId\", $config);
+			var kalturaPlayer = KalturaPlayer.setup(\"$targetId\", $config);
 		    kalturaPlayer.loadMedia(\"" . $entry_id . "\");
 		  } catch (e) {
 		    console.error(e.message)
