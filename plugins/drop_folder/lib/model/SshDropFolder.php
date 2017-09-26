@@ -150,9 +150,11 @@ abstract class SshDropFolder extends RemoteDropFolder
 	{
 		if ($this->getSshPrivateKey() || $this->getSshPublicKey()) 
         {
-        	$privKeyFile = kFile::getTempFileWithContent($this->getSshPrivateKey(), 'privateKey');
-        	$pubKeyFile = kFile::getTempFileWithContent($this->getSshPublicKey(), 'publicKey');
-        	return $fileTransferMgr->loginPubKey($this->getSshHost(), $this->getSshUsername(), $pubKeyFile, $privKeyFile, $this->getSshPassPhrase(), $this->getSshPort());
+			$privateKey = $this->getSshPrivateKey();
+			$publicKey = $this->getSshPublicKey();
+        	$privateKeyFile = $privateKey ? kFile::createTempFile($privateKey, 'privateKey') : null;
+        	$publicKeyFile = $publicKey ? kFile::createTempFile($publicKey, 'publicKey') : null;
+        	return $fileTransferMgr->loginPubKey($this->getSshHost(), $this->getSshUsername(), $publicKeyFile, $privateKeyFile, $this->getSshPassPhrase(), $this->getSshPort());
         }
         else
 			return $fileTransferMgr->login($this->getSshHost(), $this->getSshUsername(), $this->getSshPassword(), $this->getSshPort());

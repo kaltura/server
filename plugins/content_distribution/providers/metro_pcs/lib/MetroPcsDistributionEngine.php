@@ -146,7 +146,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$xmlString = $feed->getXmlString();
 		
 		KalturaLog::info('result xml - '.PHP_EOL.$xmlString);
-		$tempFile = kFile::getTempFileWithContent($xmlString, 'tmp', null, true);
+		$tempFile = kFile::createTempFile($xmlString, 'tmp');
 		
 		//load the FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);
@@ -189,7 +189,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$destXmlFile = "{$path}/{$xmlFileName}";		
 		$xmlString = $feed->getXmlString();	
 		KalturaLog::info('result xml - '.PHP_EOL.$xmlString);
-		$tempFile = kFile::getTempFileWithContent($xmlString, 'tmp', null, true);
+		$tempFile = kFile::createTempFile($xmlString, 'tmp', null, true);
 	
 		//load the FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);

@@ -277,8 +277,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
         // login to server
         if ($privateKey || $publicKey) 
         {
-	       	$privateKeyFile = kFile::getTempFileWithContent($privateKey, 'privateKey');
-        	$publicKeyFile = kFile::getTempFileWithContent($publicKey, 'publicKey');
+	       	$privateKeyFile = $privateKey ? kFile::createTempFile($privateKey, 'privateKey') : null;
+        	$publicKeyFile = $publicKey ? kFile::createTempFile($publicKey, 'publicKey'): null;
         	$fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);        	
         }
         else 
