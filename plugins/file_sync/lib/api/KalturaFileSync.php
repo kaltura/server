@@ -331,7 +331,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 				$this->fileDiscSize = kFile::fileSize($path);
 			if($this->shouldGet('fileContent', $responseProfile))
 			{
-				$content = file_get_contents($path, false, null, 0, 1024);
+				$content = substr(kFileSyncUtils::getContentsByFileSync($source_object), 0, 1024);
 				if(ctype_print($content) || ctype_cntrl($content))
 					$this->fileContent = $content;
 			}
