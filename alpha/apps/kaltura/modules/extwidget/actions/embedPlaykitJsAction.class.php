@@ -8,6 +8,8 @@ class embedPlaykitJsAction extends sfAction
 {
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
+	const ENTRY_ID_PARAM_NAME = "entry_id";
+	const CONFIG_PARAM_NAME = "config";	
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
@@ -95,7 +97,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = $bundleContentParts[1];
 		
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
-		$iframeEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
+		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 		
 		//if auto embed selected add embed script to bundle content
 		if ($autoEmbed) 
@@ -156,30 +158,58 @@ class embedPlaykitJsAction extends sfAction
 		return $this->eTagHash;
 	}
 	
-	private function getAutoEmbedCode()
+	private function getAutoEmbedCode($targetId = "")
 	{
-		$config = json_encode($this->getRequestParameter("config"));
-		$entry_id = $this->getRequestParameter('entry_id');
-		$autoEmbedCode = "\n var player; var ovpProvider = new Providers.OvpProvider($this->partnerId,\"\",$config);\n" .
-			"\t    ovpProvider.getConfig(\"" . $entry_id . "\",$this->uiconfId).then(config => {\n" .
-			"\t    player = Playkit.playkit(config);\n" .
-			"\t }, \n" .
-			"\t err => {\n" .
-			"\t    console.log(err)\n" .
-			"\t})\n";
+		if (empty($targetId)){
+			$targetId = $this->getRequestParameter('targetId');
+		}
+		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);		
+		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME);
+		$config["partnerId"] = $this->partnerId;		
+		$config["uiConfId"] = $this->uiconfId;
+
+		if (array_key_exists("beUrl", $config) && array_key_exists("baseUrl", $config)){		
+			$config["env"] = array(
+				"beUrl" => $config["beUrl"], 
+				"baseUrl" => $config["baseUrl"]
+			);
+			unset($config["beUrl"]);
+			unset($config["baseUrl"]);
+		}
+		
+		$config = json_encode($config);		
+
+		$autoEmbedCode = "
+		try {
+		    var kalturaPlayer = KalturaPlayer.setup(\"$targetId\", $config);
+		    kalturaPlayer.loadMedia(\"" . $entry_id . "\");
+		  } catch (e) {
+		    console.error(e.message)
+		  }
+		";
 		
 		return $autoEmbedCode;
 	}
 	
 	private function getIfarmEmbedCode($bundleContent)
 	{
-		$bundleContent .= $this->getAutoEmbedCode();
+		$bundleContent .= $this->getAutoEmbedCode("player_container");
 		$htmlDoc = '<!DOCTYPE html PUBLIC " -//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
                     <html xmlns = "http://www.w3.org/1999/xhtml" >
                         <head >
                             <meta http - equiv = "Content-Type" content = "text/html; charset=iso-8859-1" />
+                            <style>
+                            	#player_container{
+	                            	position: absolute;
+								    top: 0;
+								    left: 0;
+								    height: 100%;
+								    width: 100%;
+                        		}
+                            </style>
                         </head >
                         <body >
+                        	<div id="player_container"></div>
                             <script type = "text/javascript" > ' . $bundleContent . '</script >
                         </body >
                     </html >';
