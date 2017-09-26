@@ -89,12 +89,12 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 
 	public function buildFile($content, $clipStartTime, $clipEndTime)
 	{
-		$newFileContent = kCaptionsContentManager::createCaptionsFile($content, $clipStartTime, $clipEndTime, self::SRT_TIMECODE_PATTERN);
+		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::SRT_TIMECODE_PATTERN);
 		return $newFileContent;
 	}
 
 
-	public function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
 	{
 		$startCaption = self::parseCaptionTime($matches[1]);
 		$endCaption = self::parseCaptionTime($matches[2]);

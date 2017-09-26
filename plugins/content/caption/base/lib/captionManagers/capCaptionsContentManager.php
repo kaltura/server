@@ -175,5 +175,8 @@ class capCaptionsContentManager extends kCaptionsContentManager
 	{
 	}
 
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	{
+	}
 
 }

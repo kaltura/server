@@ -188,11 +188,11 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 
 	public function buildFile($content, $clipStartTime, $clipEndTime)
 	{
-		$newFileContent = kCaptionsContentManager::createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN);
+		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN);
 		return $newFileContent;
 	}
 
-	public function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime)
 	{
 		$startCaption = $this->parseWebvttStrTTTime($matches[1]);
 		$endCaption = $this->parseWebvttStrTTTime($matches[2]);

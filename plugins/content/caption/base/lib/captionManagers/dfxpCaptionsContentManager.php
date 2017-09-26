@@ -200,6 +200,9 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return new dfxpCaptionsContentManager();
 	}
 
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	{
+	}
 
 	public function buildFile($content, $clipStartTime, $clipEndTime)
 	{

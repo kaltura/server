@@ -36,7 +36,7 @@ abstract class kCaptionsContentManager
 	 * @param array $array
 	 * @return mixed
 	 */
-	public static function getNextValueFromArray(array &$array)
+	protected static function getNextValueFromArray(array &$array)
 	{
 		$element = each($array);
 		if (is_array($element))
@@ -83,9 +83,8 @@ abstract class kCaptionsContentManager
 	 * @param int $clipEndTime
 	 * @return string
 	 */
-	public function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
-	{
-	}
+	protected abstract function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime);
+
 
 
 	/**
