@@ -55,7 +55,10 @@
 					"analyzer" : "kaltura_keyword"
 				},
 				"privateData": {
-					"type" : "object"
+					"type" : "object",
+				  	"properties": {
+					  "timestamp": {"type":"date"}
+					}
 				},
 				"rawData": {
 					"type" : "text",
