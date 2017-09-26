@@ -55,18 +55,16 @@ class serveIsmAction extends sfAction
 			kFileUtils::dumpUrl($remoteUrl);
 		}
 		
-		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
-		
 		if($type == 'ism')
 		{
-			$fileData = kExtWidgetUtils::fixIsmManifestForReplacedEntry($path, $this->entry, true);
+			$fileData = kExtWidgetUtils::fixIsmManifestForReplacedEntry($syncKey, $this->entry, true);
 			$renderer = new kRendererString($fileData, 'image/ism');
 			$renderer->output();
             KExternalErrors::dieGracefully();	
 		}
 		else 
 		{
-			kFileUtils::dumpFile($path);
+			kFileSyncUtils::dumpFileByFileSyncKey($syncKey);
 		}
 		
 		

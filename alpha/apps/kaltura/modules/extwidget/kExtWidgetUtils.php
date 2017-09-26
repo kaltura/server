@@ -28,7 +28,7 @@ class kExtWidgetUtils {
     }
 
 
-    private function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType ,$fetch_from_remote_if_no_local = false)
+    private static function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType ,$fetch_from_remote_if_no_local = false)
     {
         $replacingFileName = null;
         $fileName = null;
@@ -44,12 +44,12 @@ class kExtWidgetUtils {
     }
 
 
-    public static function fixIsmManifestForReplacedEntry($path, entry $entry, $fetch_from_remote_if_no_local = false)
+    public static function fixIsmManifestForReplacedEntry($syncKey, entry $entry, $fetch_from_remote_if_no_local = false)
     {
-        $fileData = file_get_contents($path);
+        $fileData = kFileSyncUtils::file_get_contents($syncKey);
         $xml = new SimpleXMLElement($fileData);
         $ismcFileName = $xml->head->meta['content'];
-        list($ismcObjectId, $version, $subType, $isAsset, $entryId) = kExtWidgetUtils::parseObjectId($ismcFileName);
+        list($ismcObjectId, $version, $subType, $isAsset, $entryId) = self::parseObjectId($ismcFileName);
 
         if($entryId != $entry->getId())
         {
@@ -57,19 +57,21 @@ class kExtWidgetUtils {
             $flavorAssets = assetPeer::retrieveByEntryIdAndStatus($entry->getId(), asset::ASSET_STATUS_READY);
             foreach ($flavorAssets as $asset)
             {
-                list($replacingFileName, $fileName) = kExtWidgetUtils::getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fetch_from_remote_if_no_local);
-                if($replacingFileName && $fileName)
+                if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
                 {
-                    if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
+                    list($replacingFileName, $fileName) = self::getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+                    if($replacingFileName && $fileName)
                         $fileData = str_replace("content=\"$replacingFileName\"", "content=\"$fileName\"", $fileData);
-                    else
+                }
+                else
+                {
+                    list($replacingFileName, $fileName) = self::getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+                    if($replacingFileName && $fileName)
                         $fileData = str_replace("src=\"$replacingFileName\"", "src=\"$fileName\"", $fileData);
                 }
             }
-            return $fileData;
         }
-        else
-            return $fileData;
+        return $fileData;
     }
 
 }

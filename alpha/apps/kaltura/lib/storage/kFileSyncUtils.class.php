@@ -1610,4 +1610,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return ($fileSync->getContentMd5() == md5($contentMd5));
 		}
 	}
+
+	public static function dumpFileByFileSync( FileSync $fileSync)
+	{
+			$resolveFileSync = self::resolve($fileSync);
+			$path = $resolveFileSync->getFileRoot() . $resolveFileSync->getFilePath();
+			kFileUtils::dumpFile($path);
+	}
+
+	public static function dumpFileByFileSyncKey( FileSyncKey $key , $strict = false )
+	{
+		list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
+		if ( $file_sync )
+			self::dumpFileByFileSync($file_sync);
+	}
 }
