@@ -1,3 +1,22 @@
+# Mercury 13.4.0 #
+
+## Add permission to restore-deleted-entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8064
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_12_22_update_adminconsole_entryadmin_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Mercury 13.3.0 #
 
 ## Expose new API for login by KS ##
