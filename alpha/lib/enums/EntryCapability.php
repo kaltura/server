@@ -5,5 +5,5 @@
  */
 interface EntryCapability extends BaseEnum
 {
-    const UNLIMITED_RECORDING_DURATION_CAPABILITY = "UNLIMITED_RECORDING_DURATION";
+
 }
