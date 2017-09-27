@@ -93,8 +93,16 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"uploadedFileSize",
 		"createdAt",
 		"updatedAt",
-		"url",
-	); 
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function doFromObject($uploadTokenDb, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($uploadTokenDb, $responseProfile);
+		$this->url = infraRequestUtils::getProtocol() . "://" . kConf::get('upload_uri', 'local', null);
+	}
 
 	public function getMapBetweenObjects()
 	{
