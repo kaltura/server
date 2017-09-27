@@ -539,15 +539,6 @@ class myFileConverter
 		return $source_file . $add_on . ".txt";
 	}
 
-
-	private static function addToLogFile ( $file_name , $str )
-	{
-		// TODO - append text to file, don't read it all and then write it again
-		if ( file_exists ( $file_name ))		$log_content = @file_get_contents( $file_name ) ; // sync - OK
-		else $log_content = "";
-		$extra_content = "\n\n----------------------\n$str\n----------------------\n\n";
-		file_put_contents( $file_name , $log_content . $extra_content ); // sync - OK
-	}
 }
 
 class conversionInfo

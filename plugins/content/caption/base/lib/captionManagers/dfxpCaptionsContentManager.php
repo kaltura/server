@@ -91,11 +91,11 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				continue;
 			}
 			
-			$startTime = $this->parseStrTTTime($childNode->getAttribute('begin'));
+			$startTime = $this->parseDfxpStrTTTime($childNode->getAttribute('begin'));
 			$endTime = $startTime;
 			if($childNode->hasAttribute('end'))
 			{
-				$endTime = $this->parseStrTTTime($childNode->getAttribute('end'));
+				$endTime = $this->parseDfxpStrTTTime($childNode->getAttribute('end'));
 			}
 			elseif($childNode->hasAttribute('dur'))
 			{
@@ -161,7 +161,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return $itemsData;
 	}
 	
-	private function parseStrTTTime($timeStr)
+	private function parseDfxpStrTTTime($timeStr)
 	{
 		$matches = null;
 		if(preg_match('/(\d+)s/', $timeStr))
@@ -200,19 +200,22 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return new dfxpCaptionsContentManager();
 	}
 
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	{
+	}
 
-	public function buildDfxpFile($captionContent, $clipStartTime, $clipEndTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime)
 	{
 		$xml = new KDOMDocument();
 		try
 		{
-			$captionContent = trim($captionContent, " \r\n\t");
-			$xml->loadXML($captionContent);
+			$content = trim($content, " \r\n\t");
+			$xml->loadXML($content);
 		}
 		catch(Exception $e)
 		{
 			KalturaLog::err($e->getMessage());
-			return null;
+			return '';
 		}
 		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime);
 		$xmlUpdatedContent = trim($xmlUpdatedContent, " \r\n\t");
@@ -234,25 +237,23 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				continue;
 			}
 
-			$captionStartTime = $this->parseStrTTTime($childNode->getAttribute('begin'));
+			$captionStartTime = $this->parseDfxpStrTTTime($childNode->getAttribute('begin'));
 			$captionEndTime = $captionStartTime;
 			if($childNode->hasAttribute('end'))
 			{
-				$captionEndTime = $this->parseStrTTTime($childNode->getAttribute('end'));
+				$captionEndTime = $this->parseDfxpStrTTTime($childNode->getAttribute('end'));
 			}
 			elseif($childNode->hasAttribute('dur'))
 			{
 				$duration = floatval($childNode->getAttribute('dur')) * 1000;
 				$captionEndTime = $captionStartTime + $duration;
 			}
-			if(!$this->onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
+			if(!kCaptionsContentManager::onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
 				$curNode->removeChild($childNode);
 			else
 				{
-				$adjustedStartTime = $captionStartTime - $clipStartTime;
-				if ($adjustedStartTime < 0)
-					$adjustedStartTime = 0;
-				$adjustedEndTime = $captionEndTime - $clipStartTime;
+				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime);
+				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime);
 
 				$childNode->setAttribute('begin',kXml::integerToTime($adjustedStartTime));
 				if($childNode->hasAttribute('end'))
@@ -265,18 +266,6 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 			$content = $curNode->saveXML();
 		}
 		return $content;
-	}
-
-	private function onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime){
-	    //caption asset items which started before clip start time but ended after the clip started
-		if(($captionEndTime >= $clipStartTime) && ($captionEndTime <= $clipEndTime) && ($captionStartTime <= $clipStartTime))
-			return true;
-
-        //caption asset items which started during clip time range
-		if (($captionStartTime >= $clipStartTime) && ($captionStartTime <= $clipEndTime))
-			return true;
-
-		return false;
 	}
 
 }

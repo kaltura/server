@@ -1,5 +1,6 @@
 # Mercury 13.4.0 #
 
+
 ## Support unlimited recording duration as feature flip ##
 
 - Issue Type: Feature
@@ -15,6 +16,23 @@
         moduls.liveStreamUnlimitedRecording.basePermissionType = 2
         moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
         moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## Add permission to restore-deleted-entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8064
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_12_22_update_adminconsole_entryadmin_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
 
 # Mercury 13.3.0 #
 

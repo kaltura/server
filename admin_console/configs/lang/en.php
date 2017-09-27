@@ -453,7 +453,7 @@ return array(
 	'entry-investigate info entry created label' => 'Created At',
 	'entry-investigate info entry modified label' => 'Modified At',
 	'entry-investigate info entry updated label' => 'Updated At',
-	'entry-investigate info entry actions label' => 'Reconvert',
+	'entry-investigate info entry actions label' => 'Action',
 	'entry-investigate info entry boost label' => 'Boost Jobs',
 
 	'entry-investigate info entry ip1 label' => 'IP 1',
@@ -478,6 +478,7 @@ return array(
 	'entry-investigate info entry big-red-button label' => 'Big-Red-Button',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
+	'entry-investigate entry restore' => 'Restore',
 	'entry-investigate entry boostJobs' => 'Boost Jobs',
 
 	'entry-investigate entry upload support' => 'Investigate File',
