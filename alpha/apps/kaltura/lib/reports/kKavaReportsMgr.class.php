@@ -88,7 +88,8 @@ class kKavaReportsMgr
     const EVENT_TYPE_INFO = "info";
     const EVENT_TYPE_SPEED = "speed";
     const EVENT_TYPE_VIEW = "view";
-    const METRIC_TOTAL_PLAY_TIME = "playTimeSum";
+    const METRIC_TOTAL_PLAY_TIME = "playTimeSumMin";
+    const METRIC_TOTAL_PLAY_TIME_SEC = "playTimeSum";
     const METRIC_AVG_PLAY_TIME = "playTimeAvg";
     const METRIC_PLAYER_IMPRESSION_RATIO = "playerImpressionRatio";
     const METRIC_AVG_DROP_OFF = "avgDropOffRatio";
@@ -195,7 +196,7 @@ class kKavaReportsMgr
         self::EVENT_TYPE_PLAY_END,
         self::METRIC_PLAYTHROUGH,
         self::METRIC_TOTAL_ENTRIES,
-        self::METRIC_TOTAL_PLAY_TIME,
+        self::METRIC_TOTAL_PLAY_TIME_SEC,
         self::METRIC_UNIQUE_USERS);
     
     private static $simple_event_type_aggrs = array(
@@ -381,7 +382,7 @@ class kKavaReportsMgr
         $ratio_aggr = self::$arithmetic_post_aggr_template;
         $ratio_aggr[self::DRUID_NAME] = $agg_name;
         $ratio_aggr[self::DRUID_FUNCTION] = "/";
-        $fields= array(array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => $field1, self::DRUID_FIELD_NAME => $field1),
+        $fields = array(array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => $field1, self::DRUID_FIELD_NAME => $field1),
             array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => $field2, self::DRUID_FIELD_NAME => $field2));
         $ratio_aggr[self::DRUID_FIELDS] = $fields;
         
@@ -400,8 +401,10 @@ class kKavaReportsMgr
             self::$metrics_def[$metric] = array(self::DRUID_AGGR => array($metric));
         }
         
-        self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME, self::EVENT_TYPE_PLAY),
-            self::DRUID_POST_AGGR => array(self::METRIC_AVG_PLAY_TIME));
+        self::$metrics_def[self::METRIC_TOTAL_PLAY_TIME] = array(self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME_SEC),
+            self::DRUID_POST_AGGR => array(self::METRIC_TOTAL_PLAY_TIME));
+        self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY),
+            self::DRUID_POST_AGGR => array(self::METRIC_AVG_PLAY_TIME, self::METRIC_TOTAL_PLAY_TIME));
         self::$metrics_def[self::METRIC_PLAYER_IMPRESSION_RATIO] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
             self::DRUID_POST_AGGR => array(self::METRIC_PLAYER_IMPRESSION_RATIO));
         self::$metrics_def[self::METRIC_AVG_DROP_OFF] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_PLAYTHROUGH),
@@ -425,8 +428,8 @@ class kKavaReportsMgr
         $play_time_aggr = self::$events_types_count_aggr_template;
         $play_time_aggr[self::DRUID_FILTER][self::DRUID_TYPE] = self::DRUID_IN_FILTER;
         $play_time_aggr[self::DRUID_FILTER][self::DRUID_VALUES] = array(self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100);
-        $play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_NAME] = self::METRIC_TOTAL_PLAY_TIME;
-        $play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_FIELD_NAME] = self::METRIC_TOTAL_PLAY_TIME;
+        $play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_NAME] = self::METRIC_TOTAL_PLAY_TIME_SEC;
+        $play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_FIELD_NAME] = self::METRIC_TOTAL_PLAY_TIME_SEC;
         
         $play_through_aggr = self::$events_types_count_aggr_template;
         $play_through_aggr[self::DRUID_FILTER][self::DRUID_TYPE] = self::DRUID_IN_FILTER;
@@ -441,7 +444,7 @@ class kKavaReportsMgr
             self::DRUID_NAME => self::METRIC_UNIQUE_USERS,
             self::DRUID_FIELD_NAME => self::METRIC_UNIQUE_USER_IDS);
         
-        self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME] = $play_time_aggr;
+        self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME_SEC] = $play_time_aggr;
         self::$aggregations_def[self::METRIC_PLAYTHROUGH] = $play_through_aggr;
         self::$aggregations_def[self::METRIC_TOTAL_ENTRIES] = $total_entries_aggr;
         self::$aggregations_def[self::METRIC_UNIQUE_USERS] = $unique_users_aggr;
@@ -458,8 +461,15 @@ class kKavaReportsMgr
             array(self::DRUID_TYPE => self::DRUID_CONSTANT, self::DRUID_NAME => "quarter", "value" => "4"));
         $avg_dropoff_ratio_sub_calc[self::DRUID_FIELDS] = $sub_calc_fields;
         $avg_dropoff_ratio[self::DRUID_FIELDS] = array($avg_dropoff_ratio_sub_calc, array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => self::EVENT_TYPE_PLAY, self::DRUID_FIELD_NAME => self::EVENT_TYPE_PLAY));
-        
         self::$aggregations_def[self::METRIC_AVG_DROP_OFF] = $avg_dropoff_ratio;
+        
+        $play_time_aggr_min = self::$arithmetic_post_aggr_template;
+        $play_time_aggr_min[self::DRUID_NAME] = self::METRIC_TOTAL_PLAY_TIME;
+        $play_time_aggr_min[self::DRUID_FUNCTION] = "/";
+        $fields = array(array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => self::METRIC_TOTAL_PLAY_TIME_SEC, self::DRUID_FIELD_NAME => self::METRIC_TOTAL_PLAY_TIME_SEC),
+            array(self::DRUID_TYPE => self::DRUID_CONSTANT, self::DRUID_NAME => "seconds", "value" => 60));
+        $play_time_aggr_min[self::DRUID_FIELDS] = $fields;
+        self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME] = $play_time_aggr_min;
         
         foreach (self::$metrics_to_headers as $metric => $header)
         {
@@ -939,6 +949,8 @@ class kKavaReportsMgr
            if (array_key_exists(self::DRUID_POST_AGGR, $metric_aggr))
            {
                 foreach ($metric_aggr[self::DRUID_POST_AGGR] as $aggr) {
+                    if (in_array(self::$aggregations_def[$aggr], $report_def[self::DRUID_POST_AGGR]))
+                        continue;
                     $report_def[self::DRUID_POST_AGGR][] = self::$aggregations_def[$aggr];
                 }
            } 
@@ -1289,3 +1301,4 @@ class kKavaReportsMgr
    }
    
 }
+
