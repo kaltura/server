@@ -1613,9 +1613,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function dumpFileByFileSync( FileSync $fileSync)
 	{
-			$resolveFileSync = self::resolve($fileSync);
-			$path = $resolveFileSync->getFileRoot() . $resolveFileSync->getFilePath();
-			kFileUtils::dumpFile($path);
+		$resolveFileSync = self::resolve($fileSync);
+		$path = $resolveFileSync->getFullPath();
+		kFileUtils::dumpFile($path);
 	}
 
 	public static function dumpFileByFileSyncKey( FileSyncKey $key , $strict = false )
