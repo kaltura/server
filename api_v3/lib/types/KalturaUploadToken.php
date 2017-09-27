@@ -74,6 +74,13 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $updatedAt;
+
+	/**
+	 * Upload url - to explicitly determine to which domain to adress the uploadToken->upload call
+	 * @var string
+	 * @readonly
+	 */
+	public $url;
 	
 	private static $map_between_objects = array
 	(
@@ -85,7 +92,8 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"fileSize",
 		"uploadedFileSize",
 		"createdAt",
-		"updatedAt", 
+		"updatedAt",
+		"url",
 	); 
 
 	public function getMapBetweenObjects()

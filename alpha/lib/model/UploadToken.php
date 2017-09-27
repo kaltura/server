@@ -40,7 +40,32 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	 * Deleted via api
 	 */
 	const UPLOAD_TOKEN_DELETED = 5;
-	
+
+	/**
+	* The value for url.
+	* @var string
+	*/
+	protected $url = null;
+
+	/**
+	 * Get the [url] value.
+	 *
+	 * @return     string
+	 */
+	public function getUrl()
+	{
+		return $this->url;
+	}
+
+	/**
+	 * Set the [url] value.
+	 * @param string
+	 */
+	public function setUrl($url)
+	{
+		$this->url = $url;
+	}
+
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isNew())

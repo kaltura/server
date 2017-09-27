@@ -40,9 +40,9 @@ class UploadTokenService extends KalturaBaseService
 		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb);
 		$uploadTokenMgr->saveAsNewUploadToken();
 		$uploadTokenDb = $uploadTokenMgr->getUploadToken();
-		
+		$uploadTokenDb->setUrl(kConf::get('upload_uri', 'local', null));
 		$uploadToken->fromObject($uploadTokenDb, $this->getResponseProfile());
-		
+//		$uploadToken->url = kConf::get('upload_uri', 'local', null);
 		return $uploadToken;
 	}
 	
