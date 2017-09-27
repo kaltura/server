@@ -1979,6 +1979,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$entitledPusersView = explode(',',$v);
 				
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		foreach ($entitledPusersView as $puserId)
 		{
 			$puserId = trim($puserId);
@@ -1987,7 +1988,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				continue;
 			}
 
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
@@ -2008,9 +2008,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return in_array($ownerKuserId, $kuserKGroupIds);
 	}
 	
-	public function isEntitledKuserEdit($kuserId)
+	
+	private function isEntitledKuser ($kuserId, $entitledKuserArray)
 	{
-		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
 		if(in_array(trim($kuserId), $entitledKuserArray))
 			return true;
 
@@ -2022,18 +2022,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $this->isOwnerActionsAllowed($kuserId);
 	}
 	
+	public function isEntitledKuserEdit($kuserId)
+	{
+		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
+		
+		return $this->isEntitledKuser($kuserId, $entitledKuserArray);
+	}
+	
 	public function isEntitledKuserView($kuserId)
 	{
 		$entitledKuserArray = array_keys($this->getEntitledPusersViewArray());
-		if(in_array(trim($kuserId), $entitledKuserArray))
-			return true;
 
-		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
-		foreach($kuserKGroupIds as $groupKId)
-			if(in_array($groupKId, $entitledKuserArray))
-				return true;
-
-		return $this->isOwnerActionsAllowed($kuserId);
+		return $this->isEntitledKuser($kuserId, $entitledKuserArray);
 	}
 
 	private function getEntitledUserPuserEditArray()
