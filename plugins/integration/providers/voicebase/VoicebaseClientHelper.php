@@ -72,6 +72,8 @@ class VoicebaseClientHelper
 			$postParams["transcriptType"] = "machine-bestAvailable";
 			$postParams["machineReadyCallBack"] = $callBackUrl;
 		}
+		
+		$postParams["speakerDelimiter"] = "{{}}"; 
 		$uploadAPIUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 
 		$urlOptions = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postParams);
@@ -100,7 +102,7 @@ class VoicebaseClientHelper
 		{
 			KalturaLog::err('problem with curl - ' . $errString . ' error num - ' . $errNum);
 			curl_close($ch);
-			throw new Exception("curl error with url " . $url);
+			throw new Exception("curl error with url " . $url . " error num [$errNum] error message [$errString]");
 		}
 		if(!$noDecoding)
 		{
