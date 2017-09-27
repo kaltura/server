@@ -213,10 +213,8 @@ abstract class kCaptionsContentManager
 	 */
 	public function parseCaptionTime($time)
 	{
-		if($this instanceof srtCaptionsContentManager)
-			$time = str_replace(',','.',$time);
-		list($CaptionTime, $error) = kCaptionsContentManager::parseStrTTTime($time);
-		return $CaptionTime;
+		list($captionTime, $error) = kCaptionsContentManager::parseStrTTTime($time);
+		return $captionTime;
 	}
 
 	private static function shortTimeFormatToInteger($time)
