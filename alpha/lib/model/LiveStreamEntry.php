@@ -90,5 +90,4 @@ class LiveStreamEntry extends LiveEntry
 		$url = $manager->$functionName($this, $protocol);
 		return $url;
 	}
-
 }
