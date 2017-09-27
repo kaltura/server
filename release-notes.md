@@ -1,6 +1,6 @@
 # Mercury 13.4.0 #
 
-## Support unlimited recording as feature flip ##
+## Support unlimited recording duration as feature flip ##
 
 - Issue Type: Feature
 - Issue ID: PLAT-8030
