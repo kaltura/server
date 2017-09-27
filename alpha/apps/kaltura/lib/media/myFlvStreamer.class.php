@@ -61,9 +61,11 @@ class myFlvStreamer
 	}
 
 	// TODO - should move to some metadata wrapper
-	public static function getAllAssetsIds ( $filePath )
+	public static function getAllAssetsIds ( $entry )
 	{
-		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $filePath );
+		$filePath = self::addRootPath($entry->getDataPath());
+		$xmlStr = file_get_contents($filePath);
+		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $xmlStr );
 
 		$asset_ids = self::getElementsList( $xpath , "*" );
 		//$asset_ids = $xpath->query( "//VideoAssets/vidAsset" );
@@ -79,9 +81,10 @@ class myFlvStreamer
 		return $arr;
 	}
 
-	public static function getAllAssetsData ( $filePath )
+	public static function getAllAssetsData ( $sync_key )
 	{
-		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $filePath );
+		$xmlStr = kFileSyncUtils::file_get_contents($sync_key);
+		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $xmlStr );
 
 		$asset_ids = self::getElementsList( $xpath , "*" );
 		//$asset_ids = $xpath->query( "//VideoAssets/vidAsset" );
@@ -94,7 +97,6 @@ class myFlvStreamer
 			$stream_info_elem = kXml::getFirstElement ( $asset_id , "StreamInfo" );
 			$node["start_time"] = $stream_info_elem->getAttribute ( "start_time" );
 			$node["len_time"] = $stream_info_elem->getAttribute ( "len_time" );
-			//start_time="0" len_time=
 
 			$arr[] = $node;
 		}
@@ -107,18 +109,20 @@ class myFlvStreamer
 		return $xpath->query( "//".$prefix."[@type='VIDEO']|//".$prefix."[@type='IMAGE']|//".$prefix."[@type='AUDIO']|//".$prefix."[@type='VOICE']" );
 	}
 
-	private static function getDomAndXpath ( $filePath )
+	private static function addRootPath($filePath)
 	{
 		if ( substr_count ( $filePath  , myContentStorage::getFSContentRootPath() ) == 0  )
 			$contentRoot = myContentStorage::getFSContentRootPath();
 		else
 			$contentRoot = "";
+		return $contentRoot.$filePath;
+	}
+
+	private static function getDomAndXpath ( $xmlStr )
+	{
 		$xml_doc = new DOMDocument();
-		$xml_doc->loadXML( file_get_contents($contentRoot.$filePath) );
-
-
+		$xml_doc->loadXML( $xmlStr);
 		$xpath = new DOMXPath($xml_doc);
-
 		return array ( $xml_doc , $xpath );
 	}
 
