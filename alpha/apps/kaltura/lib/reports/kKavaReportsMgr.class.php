@@ -560,8 +560,7 @@ class kKavaReportsMgr
             $row = $result[0];
             $row_data = $row->result;
             $header = array();
-            if (array_key_exists(self::REPORT_TOTAL_ADDITIONAL_METRICS, $report_def))
-                $metrics = array_merge($report_def[self::REPORT_TOTAL_ADDITIONAL_METRICS], $metrics); 
+           
             foreach ($metrics as $column)
             {
                 $headers[] = self::$metrics_to_headers[$column];
