@@ -1182,6 +1182,67 @@ class MediaService extends KalturaEntryService
 			&& $resource->operationAttributes[0] instanceof KalturaClipAttributes);
 	}
 
+	/**
+	 * Get volume map by entry id
+	 *
+	 * @action getVolumeMap
+	 * @param string $entryId Entry id
+	 * @return file
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getVolumeMapAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$supportedFlavor = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		if(!$supportedFlavor)
+			throw new KalturaAPIException(KalturaErrors::SUPPORTED_FLAVOR_NOT_EXIST, $entryId);
+		$supportedFlavorId = $supportedFlavor->getId();
+
+		$packagerRetries = 3;
+		$content = null;
+		while ($packagerRetries && !$content)
+		{
+			$content = $this->retrieveLocalVolumeMapFromPackager($supportedFlavor);
+			if(!$content)
+				$packagerRetries--;
+		}
+		if(!$content)
+			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED, $entryId);
+
+		header("Content-Disposition: attachment; filename=".$entryId.'_'.$supportedFlavorId."_volumeMap.csv");
+		return new kRendererString($content, 'text/csv');
+	}
+
+	private function retrieveLocalVolumeMapFromPackager($flavorAsset)
+	{
+		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
+		if (!$packagerVolumeMapUrlPattern)
+			return null;
+
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
+		if (!$entry_data_path)
+			return null;
+
+
+		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
+		if(!$content)
+			return false;
+
+		return $content;
+	}
+
+	private static function curlLocalVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
+	{
+		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
+		kFile::closeDbConnections();
+		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
+		return $content;
+	}
 
 
 }

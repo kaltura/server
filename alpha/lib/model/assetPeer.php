@@ -556,7 +556,54 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
      * @return flavorAsset that has a file_sync in status ready
      */
 	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false)
-    {
+	{
+		$highestBitrateFlavor = self::getFlavorWithHighestOrLowestBitrate($entryId, $tag, $excludeTag, $external, true);
+		return $highestBitrateFlavor;
+	}
+
+
+	/**
+	 * @param string $entryId
+	 * @param string $tag tag filter
+	 * @return flavorAsset that has a file_sync in status ready
+	 */
+	public static function retrieveLowestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false)
+	{
+		$lowestBitrateFlavor = self::getFlavorWithHighestOrLowestBitrate($entryId, $tag, $excludeTag, $external, false);
+		return $lowestBitrateFlavor;
+	}
+
+
+	public static function getFlavorWithHighestOrLowestBitrate($entryId, $tag, $excludeTag, $external, $retrieveHighestBitrate = true)
+	{
+		$flavorAssets = self::retrieveFlavorsWithTagsFiltering($entryId, $tag, $excludeTag);
+		if(!$flavorAssets)
+			return null;
+
+		$ret = null;
+		foreach($flavorAssets as $flavorAsset)
+		{
+			// if $retrieveHighestBitrate is set to true we will retrieve the flavor with the highest bitrate,
+			// else we will retrieve the flavor with the lowest bitrate
+			if (!$ret || ($retrieveHighestBitrate && $ret->getBitrate() < $flavorAsset->getBitrate())
+				|| (!$retrieveHighestBitrate && $ret->getBitrate() > $flavorAsset->getBitrate())) {
+				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				if ($external)
+					$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($flavorSyncKey);
+				else
+					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+
+				if ($fileSync){
+					$ret = $flavorAsset;
+				}
+			}
+		}
+		return $ret;
+	}
+
+
+	public static function retrieveFlavorsWithTagsFiltering($entryId, $tag = null, $excludeTag = null)
+	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
@@ -570,24 +617,11 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		if (!is_null($excludeTag))
 			$flavorAssets = self::excludeByTag($flavorAssets, $excludeTag);
 		if(!count($flavorAssets))
-			return null;
-		$ret = null;
-		foreach($flavorAssets as $flavorAsset)
-		{
-			if (!$ret || $ret->getBitrate() < $flavorAsset->getBitrate()) {
-				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				if ($external)
-					$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($flavorSyncKey);
-				else
-					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
-				
-				if ($fileSync){
-					$ret = $flavorAsset;
-				}
-			}
-		}
-		return $ret;
+			   return null;
+
+		return $flavorAssets;
 	}
+
 
 	/**
 	 * Leaves only the specified tag in the flavor assets array
