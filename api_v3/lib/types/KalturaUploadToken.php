@@ -80,7 +80,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 * @var string
 	 * @readonly
 	 */
-	public $url;
+	public $uploadUrl;
 	
 	private static $map_between_objects = array
 	(
@@ -101,8 +101,9 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	public function doFromObject($uploadTokenDb, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($uploadTokenDb, $responseProfile);
-		if (kConf::hasParam('upload_uri'))
-			$this->url = infraRequestUtils::getProtocol() . "://" . kConf::get('upload_uri');
+		$dc = kDataCenterMgr::getDcById($uploadTokenDb->getDc());
+		if (isset($dc['uploadUrl']))
+			$this->uploadUrl = infraRequestUtils::getProtocol() . "://" . $dc['uploadUrl'];
 	}
 
 	public function getMapBetweenObjects()
