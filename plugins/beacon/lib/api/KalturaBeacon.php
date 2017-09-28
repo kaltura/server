@@ -65,12 +65,12 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	(
 		'id',
 		'indexType',
-		'updatedAt' => "updated_at",
-		'relatedObjectType' => 'related_object_type',
-		'eventType' => 'event_type',
-		'objectId' => "object_id",
-		'privateData' => 'private_data',
-		'rawData' => 'raw_data',
+		'updatedAt',
+		'relatedObjectType',
+		'eventType',
+		'objectId',
+		'privateData',
+		'rawData'
 	);
 	
 	public function validateForInsert($propertiesToSkip = array())
@@ -111,7 +111,15 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	{
 		parent::fromArray($source_array);
 		
+		$this->updatedAt = $source_array[kBeacon::FIELD_UPDATED_AT];
+		$this->relatedObjectType = $source_array[kBeacon::FIELD_RELATED_OBJECT_TYPE];
+		$this->eventType = $source_array[kBeacon::FIELD_EVENT_TYPE];
+		$this->objectId = $source_array[kBeacon::FIELD_OBJECT_ID];
+		
 		if (isset($source_array[kBeacon::FIELD_PRIVATE_DATA]))
 			$this->privateData = json_encode($source_array[kBeacon::FIELD_PRIVATE_DATA]);
+		
+		if (isset($source_array[kBeacon::FIELD_RAW_DATA]))
+			$this->rawData = $source_array[kBeacon::FIELD_RAW_DATA];
 	}
 }
