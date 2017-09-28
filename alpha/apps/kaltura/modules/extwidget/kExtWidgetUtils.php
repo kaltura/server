@@ -59,13 +59,13 @@ class kExtWidgetUtils {
             {
                 if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
                 {
-                    list($replacingFileName, $fileName) = self::getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+                    list($replacingFileName, $fileName) = self::getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fetch_from_remote_if_no_local);
                     if($replacingFileName && $fileName)
                         $fileData = str_replace("content=\"$replacingFileName\"", "content=\"$fileName\"", $fileData);
                 }
                 else
                 {
-                    list($replacingFileName, $fileName) = self::getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+                    list($replacingFileName, $fileName) = self::getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fetch_from_remote_if_no_local);
                     if($replacingFileName && $fileName)
                         $fileData = str_replace("src=\"$replacingFileName\"", "src=\"$fileName\"", $fileData);
                 }
