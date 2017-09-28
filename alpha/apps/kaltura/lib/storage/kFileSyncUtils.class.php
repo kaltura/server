@@ -64,7 +64,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( file_exists ( $real_path ) )
 		{
 			$startTime = microtime(true);
-			$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
+			if (!$maxlen)
+				$contents = file_get_contents( $real_path);
+			else
+				$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
 			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
 
 			return $contents;
