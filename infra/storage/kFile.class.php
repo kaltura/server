@@ -723,9 +723,29 @@ class kFile
 		}
 		if($mode)
 		{
-			chmod($filePath, $mode);
+			self::chmod($filePath, $mode);
 		}
 		return true;
+	}
+
+	public static function chmod($filePath, $mode)
+	{
+		chmod($filePath, $mode);
+	}
+	
+	/**
+	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
+	 * @param string $fileContent
+	 * @param string $prefix
+	 * @param integer $permission
+	 * @return string path to temporary file location
+	 */
+	public static function createTempFile($fileContent, $prefix = '' , $permission = null)
+	{
+		$tempDirectory = sys_get_temp_dir();
+		$fileLocation = tempnam($tempDirectory, $prefix);
+		if (self::safeFilePutContents($fileLocation, $fileContent, $permission))
+			return $fileLocation;
 	}
 	
 }
