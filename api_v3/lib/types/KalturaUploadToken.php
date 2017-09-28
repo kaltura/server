@@ -101,7 +101,8 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	public function doFromObject($uploadTokenDb, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($uploadTokenDb, $responseProfile);
-		$this->url = infraRequestUtils::getProtocol() . "://" . kConf::get('upload_uri', 'local', null);
+		if (kConf::hasParam('upload_uri'))
+			$this->url = infraRequestUtils::getProtocol() . "://" . kConf::get('upload_uri');
 	}
 
 	public function getMapBetweenObjects()
