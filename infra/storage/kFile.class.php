@@ -718,11 +718,16 @@ class kFile
 		}
 		if($mode)
 		{
-			chmod($filePath, $mode);
+			self::chmod($filePath, $mode);
 		}
 		return true;
 	}
 
+	public static function chmod($filePath, $mode)
+	{
+		chmod($filePath, $mode);
+	}
+	
 	/**
 	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
 	 * @param string $fileContent
@@ -734,10 +739,8 @@ class kFile
 	{
 		$tempDirectory = sys_get_temp_dir();
 		$fileLocation = tempnam($tempDirectory, $prefix);
-		file_put_contents($fileLocation, $fileContent);
-		if ($permission)
-			chmod($fileLocation, $permission);
-		return $fileLocation;
+		if (self::safeFilePutContents($fileLocation, $fileContent, $permission))
+			return $fileLocation;
 	}
 	
 }
