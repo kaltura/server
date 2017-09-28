@@ -12,7 +12,7 @@ abstract class LiveEntry extends entry
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
-	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 10000;
+	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
