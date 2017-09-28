@@ -59,7 +59,7 @@ class myFlvStreamer
 	public static function getAllAssetsIds ( $entry )
 	{
 		$filePath = self::addRootPath($entry->getDataPath());
-		$xmlStr = file_get_contents($filePath);
+		$xmlStr = kFile::getFileContent($filePath);
 		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $xmlStr );
 
 		$asset_ids = self::getElementsList( $xpath , "*" );
