@@ -15,12 +15,11 @@ abstract class SftpDistributionEngine extends DistributionEngine
 	{
 		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
 		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
+		$content = kFile::getFileContent($fileLocation);
+		if (!$content || $content !== $keyContent)
 		{
-			file_put_contents($fileLocation, $keyContent);
-			chmod($fileLocation, 0600);
+			kFile::safeFilePutContents($fileLocation, $keyContent, 0600);
 		}
-
 		return $fileLocation;
 	}
 
@@ -30,8 +29,7 @@ abstract class SftpDistributionEngine extends DistributionEngine
 	protected function getTempDirectoryForProfile($distributionProfileId)
 	{
 		$tempFilePath = $this->tempDirectory . '/' . $this->getTempDirectory() . '/' . $distributionProfileId . '/';
-		if (!file_exists($tempFilePath))
-			mkdir($tempFilePath, 0777, true);
+		kFile::fullMkdir($tempFilePath,0777, true);
 		return $tempFilePath;
 	}
 
