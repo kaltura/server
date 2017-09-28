@@ -1,5 +1,16 @@
 # Mercury 13.4.0 #
 
+## Add upload url domain to uploadToken API object ##
+
+- Issue Type: Task
+- Issue ID: SUP-12069
+
+### Configuration ####
+
+- Add upload domain in dc_config.ini 
+example:
+0.uploadUrl = dc0-upload.kaltura.com       
+1.uploadUrl = dc1-host-upload.kaltura.com       
 
 ## Support unlimited recording duration as feature flip ##
 
