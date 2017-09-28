@@ -165,8 +165,8 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 			if ($timecode_match)
 			{
 				$foundFirstTimeCode = true;
-				$start = $this->parseStrTTTime($matches[1]);
-				$stop = $this->parseStrTTTime($matches[2]);
+				$start = $this->parseCaptionTime($matches[1]);
+				$stop = $this->parseCaptionTime($matches[2]);
 				$text = '';
 				while (trim($line = self::getNextValueFromArray($fileContentArray)) !== '')
 				{
@@ -184,7 +184,6 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		}
 		return $itemsData;
 	}
-
 
 	public function buildFile($content, $clipStartTime, $clipEndTime)
 	{

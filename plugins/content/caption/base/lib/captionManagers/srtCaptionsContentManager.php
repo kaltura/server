@@ -119,12 +119,15 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		return gmdate('H:i:s,', $seconds).$formatted_remainder;
 	}
 
-
-	private function parseCaptionTime($time)
+	/**
+	 * @param $time
+	 * @return string
+	 */
+	public function parseCaptionTime($time)
 	{
-		$modifiedTime = str_replace(',','.',$time);
-		list($CaptionTime, $errorStart) = kCaptionsContentManager::parseStrTTTime($modifiedTime);
-		return $CaptionTime;
+		$time = str_replace(',','.',$time);
+		$captionTime = parent::parseCaptionTime($time);
+		return $captionTime;
 	}
 
 }

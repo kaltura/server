@@ -189,7 +189,7 @@ abstract class kCaptionsContentManager
 
 	/**
 	 * @param $timeStr
-	 * @return string
+	 * @return array
 	 */
 	public static function parseStrTTTime($timeStr)
 	{
@@ -205,6 +205,16 @@ abstract class kCaptionsContentManager
 			$error = 'Error parsing time to milliseconds. invalid format for '.$timeStr;
 
 		return array ($timeInMilliseconds, $error);
+	}
+
+	/**
+	 * @param $time
+	 * @return string
+	 */
+	public function parseCaptionTime($time)
+	{
+		list($captionTime, $error) = kCaptionsContentManager::parseStrTTTime($time);
+		return $captionTime;
 	}
 
 	private static function shortTimeFormatToInteger($time)
