@@ -179,9 +179,8 @@ class embedPlaykitJsAction extends sfAction
 		$config["partnerId"] = $this->partnerId;		
 		$config["uiConfId"] = $this->uiconfId;
 		
-		try{
-			$config = json_encode($config);		
-		} catch (Exception $ex) {
+		$config = json_encode($config);		
+		if ($config === false){
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Invalid config object");
 		}
 
