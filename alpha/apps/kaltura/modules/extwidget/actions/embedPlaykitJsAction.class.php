@@ -160,19 +160,21 @@ class embedPlaykitJsAction extends sfAction
 	
 	private function getAutoEmbedCode($targetId = null)
 	{
-		if (!$targetId){
-			$targetId = $this->getRequestParameter('targetId');
-		}
-		if (!$targetId){
+		$targetId = $targetId ? $targetId : $this->getRequestParameter('targetId');
+		
+		if (!$targetId)
+		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Player target ID not defined");
 		}
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);		
-		if (!$entry_id){
+		if (!$entry_id)
+		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
 		}
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME);		
 		//enable passing nested config options
-		foreach ($config as $key=>$val){
+		foreach ($config as $key=>$val)
+		{
 			$config[$key] = json_decode($val);
 		}
 
@@ -180,7 +182,8 @@ class embedPlaykitJsAction extends sfAction
 		$config["uiConfId"] = $this->uiconfId;
 		
 		$config = json_encode($config);		
-		if ($config === false){
+		if ($config === false)
+		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Invalid config object");
 		}
 
