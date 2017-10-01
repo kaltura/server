@@ -161,6 +161,8 @@ class KalturaErrors extends APIErrors
 
 	const DYNAMIC_SEGMENT_DURATION_DISABLED = "DYNAMIC_SEGMENT_DURATION_DISABLED;;Cannot edit segment duration. Dynamic segment duration feature is disabled";
 
+	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
+
 	/**
 	 * Notification Service
 	 */

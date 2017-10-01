@@ -557,7 +557,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
      */
 	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false)
 	{
-		$highestBitrateFlavor = self::getFlavorWithHighestOrLowestBitrate($entryId, $tag, $excludeTag, $external, true);
+		$highestBitrateFlavor = self::getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, true);
 		return $highestBitrateFlavor;
 	}
 
@@ -569,7 +569,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	 */
 	public static function retrieveLowestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false)
 	{
-		$lowestBitrateFlavor = self::getFlavorWithHighestOrLowestBitrate($entryId, $tag, $excludeTag, $external, false);
+		$lowestBitrateFlavor = self::getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, false);
 		return $lowestBitrateFlavor;
 	}
 
@@ -579,7 +579,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	 * if $retrieveHighestBitrate is set to true we will retrieve the flavor with the highest bitrate among the suitable entry flavors,
 	 * else we will retrieve the flavor with the lowest bitrate
 	 */
-	public static function getFlavorWithHighestOrLowestBitrate($entryId, $tag, $excludeTag, $external, $retrieveHighestBitrate = true)
+	public static function getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, $retrieveHighestBitrate = true)
 	{
 		$flavorAssets = self::retrieveFlavorsWithTagsFiltering($entryId, $tag, $excludeTag);
 		if(!$flavorAssets)
@@ -588,7 +588,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$ret = null;
 		foreach($flavorAssets as $flavorAsset)
 		{
-			if (!$ret || self::replaceSavedFlavorWithBetterBitrateFlavor($flavorAsset, $ret, $retrieveHighestBitrate)) {
+			if (!$ret || self::replaceCurrentFlavorWithCandidateFlavor($flavorAsset, $ret, $retrieveHighestBitrate)) {
 				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if ($external)
 					$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($flavorSyncKey);
@@ -604,15 +604,21 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	}
 
 	/**
-	 * if $retrieveHighestBitrate is set to true we will retrieve true if flavotAsset bitrate is higher then ret bitrate
-	 * if $retrieveHighestBitrate is set to false we will retrieve true if flavotAsset bitrate is lower then ret bitrate
+	 *
+	 * @param flavorAsset $candidateFlavorAsset
+	 * @param flavorAsset $currentFlavorAsset
+	 * @param bool $retrieveHighestBitrate
+	 * @return bool
+	 *
+	 * if $retrieveHighestBitrate is set to true we will retrieve true if candidate bitrate is higher then current bitrate
+	 * if $retrieveHighestBitrate is set to false we will retrieve true if candidate bitrate is lower then current bitrate
 	 *
 	 */
-	public static function replaceSavedFlavorWithBetterBitrateFlavor($flavorAsset, $ret, $retrieveHighestBitrate)
+	public static function replaceCurrentFlavorWithCandidateFlavor($candidateFlavorAsset, $currentFlavorAsset, $retrieveHighestBitrate)
 	{
-		if ($retrieveHighestBitrate && $ret->getBitrate() < $flavorAsset->getBitrate())
+		if ($retrieveHighestBitrate && $currentFlavorAsset->getBitrate() < $candidateFlavorAsset->getBitrate())
 			return true;
-		if (!$retrieveHighestBitrate && $ret->getBitrate() > $flavorAsset->getBitrate())
+		if (!$retrieveHighestBitrate && $currentFlavorAsset->getBitrate() > $candidateFlavorAsset->getBitrate())
 			return true;
 		return false;
 	}

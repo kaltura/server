@@ -1206,8 +1206,7 @@ class MediaService extends KalturaEntryService
 		while ($packagerRetries && !$content)
 		{
 			$content = $this->retrieveLocalVolumeMapFromPackager($supportedFlavor);
-			if(!$content)
-				$packagerRetries--;
+			$packagerRetries--;
 		}
 		if(!$content)
 			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED, $entryId);
@@ -1220,7 +1219,7 @@ class MediaService extends KalturaEntryService
 	{
 		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
 		if (!$packagerVolumeMapUrlPattern)
-			return null;
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
 
 		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
