@@ -59,6 +59,7 @@ class KExternalErrors
 	const BUNDLE_CREATION_FAILED = 47;
 	const ENTRY_NOT_SEQUENCE = 48;
 	const INVALID_MIN_BITRATE = 49;
+	const INVALID_PARAMETER = 50;
 
 	const HTTP_STATUS_NOT_FOUND = 404;
 
