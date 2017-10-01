@@ -184,7 +184,7 @@ class embedPlaykitJsAction extends sfAction
 		$config = json_encode($config);		
 		if ($config === false)
 		{
-			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Invalid config object");
+			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
 
 		$autoEmbedCode = "
