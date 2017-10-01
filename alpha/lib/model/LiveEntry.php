@@ -674,7 +674,12 @@ abstract class LiveEntry extends entry
 		$segmentDuration = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, null);
 		
 		$partner = $this->getPartner();
-		if($partner && !$segmentDuration)
+
+		if ($partner && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $partner->getId()))
+		{
+			$segmentDuration = LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
+		}
+		else if($partner && !$segmentDuration)
 			$segmentDuration = $partner->getDefaultLiveStreamSegmentDuration();
 		
 		if(!$segmentDuration)
