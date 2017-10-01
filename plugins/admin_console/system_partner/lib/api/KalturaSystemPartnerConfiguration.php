@@ -552,12 +552,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				$dbPermission->save();
 				
 				
-				if($dbPermission->getStatus() == PermissionStatus::ACTIVE) {
+				if($dbPermission->getStatus() == PermissionStatus::ACTIVE)
 					$this->enablePermissionForPlugins($object_to_fill->getId(), $dbPermission->getName());
-				}
-				else if ($dbPermission->getName == PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION) {
-					$this->defaultLiveStreamSegmentDuration = LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
-				}
 			}
 			
 			//Raise template partner's conversion profiles (so far) and check whether the partner now has permissions for them.

@@ -675,7 +675,7 @@ abstract class LiveEntry extends entry
 		
 		$partner = $this->getPartner();
 
-		if ($partner && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $partner->getId()))
+		if ($partner && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->getPartnerId()))
 		{
 			$segmentDuration = LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
 		}
