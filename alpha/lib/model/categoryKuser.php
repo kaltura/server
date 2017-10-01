@@ -33,7 +33,13 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	const PERMISSION_NAME_FIELD_INDEX_PREFIX = "per";
 	
 	const STATUS_FIELD_PREFIX = "status";
-	
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
+
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
