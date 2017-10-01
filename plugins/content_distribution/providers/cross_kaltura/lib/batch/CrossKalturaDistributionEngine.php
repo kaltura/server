@@ -780,11 +780,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 			$objInfo = array();
 			$objInfo[self::DISTRIBUTED_INFO_SOURCE_ID] = $sourceId;
 			$objInfo[self::DISTRIBUTED_INFO_TARGET_ID] = $targetObj->id;
-			$objInfo[self::DISTRIBUTED_INFO_SOURCE_VERSION] = $sourceObj->version;
-			$objInfo[self::DISTRIBUTED_INFO_SOURCE_UPDATED_AT] = $sourceObj->updatedAt;
+			if(property_exists($sourceObj->version))
+				$objInfo[self::DISTRIBUTED_INFO_SOURCE_VERSION] = $sourceObj->version;
 
+			$objInfo[self::DISTRIBUTED_INFO_SOURCE_UPDATED_AT] = $sourceObj->updatedAt;
 			$info[$sourceId] = $objInfo;
 		}
+
 		return serialize($info);
 	}
 

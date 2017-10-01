@@ -98,7 +98,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 
 	protected function doUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		try {
+		try
+		{
 			$facebookMetadata = $this->convertToFacebookData($data->providerData->fieldValues);
 
 			FacebookGraphSdkUtils::updateUploadedVideo($this->appId,
@@ -106,7 +107,9 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				$data->distributionProfile->pageAccessToken,
 				$facebookMetadata,
 				$data->entryDistribution->remoteId);
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			throw new Exception("Failed to update facebook video , reason:".$e->getMessage());
 		}
 
@@ -116,11 +119,15 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			$this->deleteCaption($data->distributionProfile, $mediaFile->remoteId, $data->entryDistribution->remoteId);
 		}
 		// last add all the captions available
-		foreach ($data->providerData->captionsInfo as $captionInfo)
+		if(isset($data->providerData->captionsInfo))
 		{
-			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
-			$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+			foreach ($data->providerData->captionsInfo as $captionInfo)
+			{
+				/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
+				$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+			}
 		}
+
 		return true;
 	}
 
@@ -128,20 +135,23 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	{
 		if (!$captionInfo->label && !$captionInfo->language)
 			throw new Exception("No label/language were configured for this caption aborting");
+
 		if ($captionInfo->language)
 			$locale = KalturaFacebookLanguageMatch::getFacebookCodeForKalturaLanguage($captionInfo->language);
+
 		if (!$locale && $captionInfo->label)
 			$locale = $captionInfo->label;
+
 		if (!$locale)
 			throw new Exception("Failed to find matching language for language ".$captionInfo->language." and there was no label available");
+
 		FacebookGraphSdkUtils::uploadCaptions(
 			$this->appId,
 			$this->appSecret,
 			$distributionProfile->pageAccessToken,
 			$remoteId,
 			$captionInfo->filePath,
-			$locale,
-			$this->tempDirectory);
+			$locale);
 
 		$mediaFile = new KalturaDistributionRemoteMediaFile();
 		$mediaFile->assetId = $captionInfo->assetId;
