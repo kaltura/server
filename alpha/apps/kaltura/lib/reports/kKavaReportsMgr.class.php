@@ -43,6 +43,7 @@ class kKavaReportsMgr
     const DRUID_INVERTED = "inverted";
     const DRUID_CONTEXT = "context";
     const DRUID_PRIORITY = "priority";
+    const DRUID_SKIP_EMPTY_BUCKETS = "skipEmptyBuckets";
         
     
     const DIMENSION_PARTNER_ID = "partnerId";
@@ -541,7 +542,7 @@ class kKavaReportsMgr
         return $res;
     }
     
-    public static function getTotal ($partner_id ,$report_type ,reportsInputFilter $input_filter ,$object_ids = null)
+    public static function getTotal($partner_id ,$report_type ,reportsInputFilter $input_filter ,$object_ids = null)
     {
         self::init();
         $start = microtime (true);
@@ -554,12 +555,11 @@ class kKavaReportsMgr
         if (array_key_exists(self::REPORT_TOTAL_ADDITIONAL_METRICS, $report_def))
             $metrics = array_merge($report_def[self::REPORT_TOTAL_ADDITIONAL_METRICS], $metrics);
         $query = self::getTimeSeriesReport($partner_id, $intervals, $granularity, $metrics, $druid_filter);
-        $result = self::runReport($query);    
+        $result = self::runReport($query);
         if (count($result) > 0)
         {
             $row = $result[0];
             $row_data = $row->result;
-            $header = array();
            
             foreach ($metrics as $column)
             {
@@ -572,15 +572,18 @@ class kKavaReportsMgr
                 if (false !== $field_index) {
                     $data[$field_index] = floor($data[$field_index]);
                 }
-            }
-            
-            $res = array ($headers, $data);           
+            }                
         }
         else
         {
-            $res = array (null , null);
+            foreach ($metrics as $column)
+            {
+                $headers[] = self::$metrics_to_headers[$column];
+                $data[] = '';
+            }
         }
         
+        $res = array ($headers, $data);   
         $end = microtime(true);
         KalturaLog::log("getTotal took [" . ($end - $start) . "]");
         
@@ -1002,7 +1005,9 @@ class kKavaReportsMgr
    {
        $report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, $granularity);
        $report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
-       
+       if (!isset($report_def[self::DRUID_CONTEXT]))
+           $report_def[self::DRUID_CONTEXT] = array();
+       $report_def[self::DRUID_CONTEXT][self::DRUID_SKIP_EMPTY_BUCKETS] = "true";
        return $report_def;
    }
    
