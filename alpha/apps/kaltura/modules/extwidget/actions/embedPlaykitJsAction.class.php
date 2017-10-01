@@ -161,8 +161,7 @@ class embedPlaykitJsAction extends sfAction
 	private function getAutoEmbedCode($targetId = null)
 	{
 		$targetId = $targetId ? $targetId : $this->getRequestParameter('targetId');
-		$hasTargetId = !is_null($targetId) && $targetId != "";
-		if (!$hasTargetId)
+		if (is_null($targetId) && $targetId == "")
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Player target ID not defined");
 		}
