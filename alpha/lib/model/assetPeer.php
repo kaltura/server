@@ -574,6 +574,11 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	}
 
 
+
+	/**
+	 * if $retrieveHighestBitrate is set to true we will retrieve the flavor with the highest bitrate among the suitable entry flavors,
+	 * else we will retrieve the flavor with the lowest bitrate
+	 */
 	public static function getFlavorWithHighestOrLowestBitrate($entryId, $tag, $excludeTag, $external, $retrieveHighestBitrate = true)
 	{
 		$flavorAssets = self::retrieveFlavorsWithTagsFiltering($entryId, $tag, $excludeTag);
@@ -583,10 +588,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$ret = null;
 		foreach($flavorAssets as $flavorAsset)
 		{
-			// if $retrieveHighestBitrate is set to true we will retrieve the flavor with the highest bitrate,
-			// else we will retrieve the flavor with the lowest bitrate
-			if (!$ret || ($retrieveHighestBitrate && $ret->getBitrate() < $flavorAsset->getBitrate())
-				|| (!$retrieveHighestBitrate && $ret->getBitrate() > $flavorAsset->getBitrate())) {
+			if (!$ret || self::replaceSavedFlavorWithBetterBitrateFlavor($flavorAsset, $ret, $retrieveHighestBitrate)) {
 				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if ($external)
 					$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($flavorSyncKey);
@@ -599,6 +601,20 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 			}
 		}
 		return $ret;
+	}
+
+	/**
+	 * if $retrieveHighestBitrate is set to true we will retrieve true if flavotAsset bitrate is higher then ret bitrate
+	 * if $retrieveHighestBitrate is set to false we will retrieve true if flavotAsset bitrate is lower then ret bitrate
+	 *
+	 */
+	public static function replaceSavedFlavorWithBetterBitrateFlavor($flavorAsset, $ret, $retrieveHighestBitrate)
+	{
+		if ($retrieveHighestBitrate && $ret->getBitrate() < $flavorAsset->getBitrate())
+			return true;
+		if (!$retrieveHighestBitrate && $ret->getBitrate() > $flavorAsset->getBitrate())
+			return true;
+		return false;
 	}
 
 

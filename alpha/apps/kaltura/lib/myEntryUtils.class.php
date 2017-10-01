@@ -1093,7 +1093,15 @@ class myEntryUtils
 		}
 
 		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM);
-		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
+		if($flavorAsset->hasTag(flavorParams::TAG_WEB) && self::isSupportedContainerFormat($flavorAsset))
+			return true;
+		return false;
+	}
+
+	public static function isSupportedContainerFormat($flavorAsset){
+		if ($flavorAsset->getContainerFormat() == assetParams::CONTAINER_FORMAT_MP42)
+			return true;
+		if (strpos($flavorAsset->getContainerFormat(), assetParams::CONTAINER_FORMAT_ISOM) !== false)
 			return true;
 		return false;
 	}
