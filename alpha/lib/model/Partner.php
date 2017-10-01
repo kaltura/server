@@ -1808,7 +1808,7 @@ class Partner extends BasePartner
 	{
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->getId()))
 		{
-			return $this->getFromCustomData("default_live_stream_segment_duration", null, null);
+			return $this->getFromCustomData("default_live_stream_segment_duration", null, LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS);
 		}
 		return LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
 	}
