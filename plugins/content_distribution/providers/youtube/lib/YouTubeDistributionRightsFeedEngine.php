@@ -3,7 +3,7 @@
  * @package plugins.youTubeDistribution
  * @subpackage lib
  */
-class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
+class YouTubeDistributionRightsFeedEngine extends SftpDistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
@@ -417,31 +417,10 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		return $this->_sftpManager;
 	}
 	
-	/*
-	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged 
-	 */
-	protected function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
-	{
-		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
-		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
-		{
-			file_put_contents($fileLocation, $keyContent);
-			chmod($fileLocation, 0600);
-		}
-		
-		return $fileLocation;
-	}
 	
-	/*
-	 * Creates and return the temp directory used for this distribution profile 
-	 */
-	protected function getTempDirectoryForProfile($distributionProfileId)
+	public function getTempDirectory()
 	{
-		$metadataTempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
-		if (!file_exists($metadataTempFilePath))
-			mkdir($metadataTempFilePath, 0777, true);
-		return $metadataTempFilePath;
+		return self::TEMP_DIRECTORY;
 	}
 
 	/**

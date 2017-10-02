@@ -143,8 +143,10 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 					return;
 				}
 
-				$jobData->setOffset($clipAttributes->getOffset());
-				$jobData->setDuration($clipAttributes->getDuration());
+				$offset = $clipAttributes->getOffset() ? $clipAttributes->getOffset() : 0;
+				$jobData->setOffset($offset);
+				$duration = $clipAttributes->getDuration() ? $clipAttributes->getDuration() : $sourceEntry->getLengthInMsecs();
+				$jobData->setDuration($duration);
 				$jobData->setFullCopy(false);
 			}
 		}

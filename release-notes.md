@@ -1,6 +1,5 @@
 # Mercury 13.4.0 #
 
-
 ## Add getVolumeMap action to media service ##
 
 - Issue Type: Feature
@@ -21,7 +20,6 @@
 #### Known Issues & Limitations ####
 
 None.
-
 
 ## Add upload url domain to uploadToken API object ##
 

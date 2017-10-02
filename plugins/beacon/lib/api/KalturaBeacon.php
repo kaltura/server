@@ -120,6 +120,6 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 			$this->privateData = json_encode($source_array[kBeacon::FIELD_PRIVATE_DATA]);
 		
 		if (isset($source_array[kBeacon::FIELD_RAW_DATA]))
-			$this->privateData = $source_array[kBeacon::FIELD_RAW_DATA];
+			$this->rawData = $source_array[kBeacon::FIELD_RAW_DATA];
 	}
 }

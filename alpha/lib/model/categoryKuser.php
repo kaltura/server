@@ -33,7 +33,13 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	const PERMISSION_NAME_FIELD_INDEX_PREFIX = "per";
 	
 	const STATUS_FIELD_PREFIX = "status";
-	
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
+
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -460,7 +466,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	{
 		if($this->getStatus() == CategoryKuserStatus::DELETED)
 		{
-			$script = 'ctx._source.kuser_ids.remove(ctx._source.kuser_ids.indexOf(params.kuser_id));';
+			$script = 'int idx = ctx._source.kuser_ids.indexOf(params.kuser_id); if(idx != -1) {ctx._source.kuser_ids.remove(idx);}';
 		}
 		else
 		{

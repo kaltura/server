@@ -12,7 +12,7 @@ abstract class LiveEntry extends entry
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
-	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 10000;
+	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
@@ -671,9 +671,15 @@ abstract class LiveEntry extends entry
 
 	public function getSegmentDuration()
 	{
-		$segmentDuration = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, null);
-		
 		$partner = $this->getPartner();
+
+		if ($partner && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->getPartnerId()))
+		{
+			return LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
+		}
+
+		$segmentDuration = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, null);
+
 		if($partner && !$segmentDuration)
 			$segmentDuration = $partner->getDefaultLiveStreamSegmentDuration();
 		
