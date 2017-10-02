@@ -600,36 +600,49 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	/**
 	 * @param Google_Http_MediaFileUpload $media
+	 * @param String $filePath
+	 * @param Integer $chunkSizeBytes
 	 * @throw kTemporaryException
 	 * @return Google_Service_YouTube_Video
 	 */
-	private static function uploadInChunks($media, $filePath , $chunkSizeBytes = 1048576)
+	private static function uploadInChunks($media, $filePath , $chunkSizeBytes = self::DEFAULT_CHUNK_SIZE_BYTE)
 	{
+		//return self::uploadInChunks2($media, $filePath, $chunkSizeBytes);
 		$ingestedVideo = false;
 		$handle = fopen($filePath, "rb");
 		while (!$ingestedVideo && !feof($handle))
 		{
 			$chunk = fread($handle, $chunkSizeBytes);
-			$numOfTries = 0;
-			while (true)
-			{
-				try
-				{
-					$ingestedVideo = $media->nextChunk($chunk);
-					break;
-				} catch (Google_IO_Exception $e)
-				{
-					KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
-					$numOfTries++;
-					if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
-					{
-						throw new kTemporaryException($e->getMessage(), $e->getCode());
-					}
-				}
-			}
+			$ingestedVideo = self::uploadChunk($media, $chunk);
 		}
 		/* @var $ingestedVideo Google_Service_YouTube_Video */
 		fclose($handle);
 		return $ingestedVideo;
 	}
+
+	private static function uploadChunk($media, $chunk)
+	{
+		$numOfTries = 0;
+		$ingestedVideo = null;
+		while (true)
+		{
+			try
+			{
+				$ingestedVideo = $media->nextChunk($chunk);
+				break;
+			} catch (Google_IO_Exception $e)
+			{
+				KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
+				$numOfTries++;
+				if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
+				{
+					throw new kTemporaryException($e->getMessage(), $e->getCode());
+				}
+			}
+		}
+		return $ingestedVideo;
+
+	}
+
+
 }
