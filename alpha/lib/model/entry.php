@@ -944,7 +944,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
 			if ( $from_cache ) return $this->data_content;
-			$content_path = myContentStorage::getFSContentRootPath();
 			$version = $this->desired_version;
 			if ( ! $version || $version == -1 ) $version = null;
 			
