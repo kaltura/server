@@ -277,6 +277,9 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         if($object instanceof entry)
         {
+            if(isset($modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES]))
+                unset($modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES]);
+
             if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
                 return true;
 
