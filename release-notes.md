@@ -60,7 +60,7 @@ example:
 
 ### Deployment scripts ###
 
-	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_12_22_update_adminconsole_entryadmin_permissions.php
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_02_update_adminconsole_entryadmin_permissions.php
 
 #### Known Issues & Limitations ####
 
