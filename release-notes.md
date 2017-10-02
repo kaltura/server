@@ -61,6 +61,19 @@ example:
 ### Deployment scripts ###
 
 	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_02_update_adminconsole_entryadmin_permissions.php
+	  
+## Add co-viewers field to the KalturaBaseEntry object ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7951
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	 Index entry table to sphinx
 
 #### Known Issues & Limitations ####
 
