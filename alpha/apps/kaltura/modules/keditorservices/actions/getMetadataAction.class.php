@@ -32,7 +32,7 @@ class getMetadataAction extends defKeditorservicesAction
 		}
 		
 		// fetch content of file from disk - it should hold the XML
-		$file_name = myContentStorage::getFSContentRootPath() . "/" . $entry->getDataPath( $version );
+		$file_name = $entry->getFullDataPath();
 		
 		//echo "[$file_name]";
 		
