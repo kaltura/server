@@ -720,7 +720,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	// return the full path on the disk
 	public function getFullDataPath( $version = NULL )
 	{
-		return myContentStorage::getFSContentRootPath() . $this->getDataPath();
+		return myContentStorage::getFSContentRootPath() . $this->getDataPath($version);
 	}
 	
 	/**
