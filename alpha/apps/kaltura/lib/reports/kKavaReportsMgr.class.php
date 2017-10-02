@@ -807,7 +807,6 @@ class kKavaReportsMgr
    private static function timestampToDateId($timestamp, $offset) 
    {
        $date = new DateTime($timestamp);
-       $date->modify($offset*-1 . " minute");
        return $date->format('Ymd');
    }
    
@@ -1305,4 +1304,3 @@ class kKavaReportsMgr
    }
    
 }
-
