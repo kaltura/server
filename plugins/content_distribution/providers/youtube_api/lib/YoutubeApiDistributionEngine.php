@@ -607,19 +607,21 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	 */
 	private static function uploadInChunks($media, $filePath , $chunkSizeBytes = self::DEFAULT_CHUNK_SIZE_BYTE)
 	{
-		//return self::uploadInChunks2($media, $filePath, $chunkSizeBytes);
 		$ingestedVideo = false;
-		$handle = fopen($filePath, "rb");
-		while (!$ingestedVideo && !feof($handle))
+		$currentByte = 0;
+		while (!$ingestedVideo && $chunk = kFile::getFileContent($filePath, $currentByte, $currentByte + $chunkSizeBytes, 'rb'))
 		{
-			$chunk = fread($handle, $chunkSizeBytes);
 			$ingestedVideo = self::uploadChunk($media, $chunk);
+			$currentByte += $chunkSizeBytes;
 		}
-		/* @var $ingestedVideo Google_Service_YouTube_Video */
-		fclose($handle);
-		return $ingestedVideo;
 	}
 
+	/**
+	 * @param Google_Http_MediaFileUpload $media
+	 * @param String $chunk
+	 * @throws kTemporaryException
+	 * @return Google_Service_YouTube_Video
+	 */
 	private static function uploadChunk($media, $chunk)
 	{
 		$numOfTries = 0;
