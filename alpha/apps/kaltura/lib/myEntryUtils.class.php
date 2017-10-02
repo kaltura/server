@@ -1420,6 +1420,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$copyCategories = true;
 	    $copyChildren = false;
 	    $copyAccessControl = true;
+	    $copyMetaData = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1444,6 +1445,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$copyAccessControl = false;
 			}
+			if ($currentOption == BaseEntryCloneOptions::METADATA && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyMetaData = false;
+			}
 		}
 
  		$newEntry = $entry->copy();
@@ -1451,7 +1456,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
 		$newEntry->setCategoriesIds(null);
-		
+
  		if ($toPartner instanceof Partner)
  		{
  			$newEntry->setPartnerId($toPartner->getId());
@@ -1504,8 +1509,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$oldPartnerId = $defaultCategoryFilter->get(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
- 		
- 		// save the entry
+
+ 		if (!$copyMetaData)
+		    $newEntry->copyMetaData = false;
+
+	    // save the entry
  		$newEntry->save();
  		 		
  		// restore the original partner id in the default category criteria filter
@@ -1675,6 +1683,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	    {
 		    self::cloneFamilyEntries($entry, $toPartner, $cloneOptions, $newEntry);
 	    }
+
 	    return $newEntry;
  	} 	
  	
