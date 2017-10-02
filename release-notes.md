@@ -1,5 +1,26 @@
 # Mercury 13.4.0 #
 
+## Add getVolumeMap action to media service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7986
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_26_add_media_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Add upload url domain to uploadToken API object ##
 
 - Issue Type: Task

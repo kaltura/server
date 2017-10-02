@@ -75,6 +75,8 @@ class APIErrors
 	const INTERNAL_DATABASE_ERROR = "INTERNAL_DATABASE_ERROR;;Internal database error";
 	
 	const SEARCH_ENGINE_QUERY_FAILED = "SEARCH_ENGINE_QUERY_FAILED;;Search engine query failed";
+
+	const RETRIEVE_VOLUME_MAP_FAILED = "RETRIEVE_VOLUME_MAP_FAILED;ENTRY_ID;Could not retrieve volume map for entryId [@ENTRY_ID@]";
 	
 	const SERVERL_ERROR = "SERVERL_ERROR;ERR_TEXT;Server error @ERR_TEXT@";
 	
@@ -138,6 +140,8 @@ class APIErrors
 	const ERROR_KSHOW_ROLLBACK = "ERROR_KSOHW_ROLLBACK;KSHOW_ID,VERSION;Error while rollbacking kshow [@KSHOW_ID@] to version [@VERSION@]";
 	
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND;ENTRY_ID;Entry id \"@ENTRY_ID@\" not found";
+
+	const SUPPORTED_FLAVOR_NOT_EXIST = "SUPPORTED_FLAVOR_NOT_EXIST;ENTRY_ID;Could not find supported flavor for entry id \"@ENTRY_ID@\" ";
 	
 	// ENTRY_TYPE - type
 	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE;ENTRY_TYPE;source entry must be of type [@ENTRY_TYPE@]";

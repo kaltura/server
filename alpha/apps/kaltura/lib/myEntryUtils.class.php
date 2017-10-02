@@ -946,7 +946,7 @@ class myEntryUtils
 		if (!$firstEntry)
 			return false;
 
-		$flavorAsset = self::getFlavorSupportedByPackager($firstEntry->getId());
+		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($firstEntry->getId());
 		if(!$flavorAsset)
 			return false;
 
@@ -1043,7 +1043,7 @@ class myEntryUtils
 		if (!$packagerCaptureUrl)
 			return false;
 
-		$flavorAsset = self::getFlavorSupportedByPackager($entry->getId());
+		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
 		if(!$flavorAsset)
 			return false;
 
@@ -1062,7 +1062,7 @@ class myEntryUtils
 	}
 
 
-	private static function getFlavorSupportedByPackager($entryId)
+	private static function getFlavorSupportedByPackagerForThumbCapture($entryId)
 	{
 		//look for the highest bitrate flavor tagged with thumbsource
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
@@ -1082,14 +1082,25 @@ class myEntryUtils
 		return $flavorAsset;
 	}
 
-	public static function isFlavorSupportedByPackager($flavorAsset)
+	public static function isFlavorSupportedByPackager($flavorAsset, $excludeAudioFlavors = true)
 	{
-		//filter audio flavors and encrypted flavors
-		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0) || $flavorAsset->getEncryptionKey())
+		if($flavorAsset->getEncryptionKey())
 			return false;
+		if($excludeAudioFlavors)
+		{
+			if (!$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0))
+				return false;
+		}
 
-		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM);
-		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
+		if($flavorAsset->hasTag(flavorParams::TAG_WEB) && self::isSupportedContainerFormat($flavorAsset))
+			return true;
+		return false;
+	}
+
+	public static function isSupportedContainerFormat($flavorAsset){
+		if ($flavorAsset->getContainerFormat() == assetParams::CONTAINER_FORMAT_MP42)
+			return true;
+		if (strpos($flavorAsset->getContainerFormat(), assetParams::CONTAINER_FORMAT_ISOM) !== false)
 			return true;
 		return false;
 	}
@@ -1882,5 +1893,26 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if ($childEntry->getId() != $entry->getId())
 				$relatedEntries[] = $childEntry;
 		return $relatedEntries;
+	}
+
+
+	public static function getFlavorSupportedByPackagerForVolumeMap($entryId)
+	{
+		//look for the lowest bitrate flavor
+		$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
+
+		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+		{
+			// look for the lowest bitrate flavor the packager can parse
+			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+			{
+				//retrieve original ready
+				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+					return null;
+			}
+		}
+		return $flavorAsset;
 	}
 }
