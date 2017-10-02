@@ -32,7 +32,7 @@ class getMetadataAction extends defKeditorservicesAction
 		}
 		
 		// fetch content of file from disk - it should hold the XML
-		$file_name = $entry->getFullDataPath();
+		$file_name = $entry->getFullDataPath($version);
 		
 		//echo "[$file_name]";
 		
