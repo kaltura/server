@@ -1166,11 +1166,11 @@ class MediaService extends KalturaEntryService
 			$shouldUseRootEntryId = true;
 		foreach ($relatedEntries as $relatedEntry)
 		{
-			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry");
 			if($shouldUseRootEntryId)
 				$resource->resource->entryId = $relatedEntry->getRootEntryId();
 			else
 				$resource->resource->entryId = $relatedEntry->getId();
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [". $resource->resource->entryId ."]");
 			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
 		}
 	}
