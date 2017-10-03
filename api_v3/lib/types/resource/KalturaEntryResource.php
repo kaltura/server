@@ -75,7 +75,19 @@ class KalturaEntryResource extends KalturaContentResource
 		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
 			return parent::validateEntry($dbEntry);
 	}
-	
+
+	/* (non-PHPdoc)
+	* @see KalturaResource::improveResource()
+	*/
+	public function improveResource()
+	{
+		parent::improveResource();
+		$srcEntry = entryPeer::retrieveByPK($this->entryId);
+		if ($srcEntry->getStatus() == KalturaEntryStatus::NO_CONTENT && !is_null($srcEntry->getRootEntryId()))
+			$this->entryId = $srcEntry->getRootEntryId();
+
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
