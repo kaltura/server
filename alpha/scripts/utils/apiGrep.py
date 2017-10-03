@@ -22,6 +22,9 @@ def parseCmdLine():
 					  help="print the file name for each match")
 	parser.add_option("--label", dest="stdinLabel", default="(standard input)", metavar="LABEL", 
 					  help="use LABEL as the standard input file name prefix")
+	parser.add_option("-i", "--ignore-case",
+					  action="store_true", dest="ignoreCase", default=False,
+					  help="ignore case distinctions")
 	parser.add_option("--match-any",
 					  action="store_true", dest="matchAny", default=False,
 					  help="match the pattern against any line (default is to match only starting log lines)")
@@ -30,6 +33,12 @@ def parseCmdLine():
 def shellQuote(s):
     return "'" + s.replace("'", "'\\''") + "'"
 
+def matchCaseSensitive(pattern, block):
+	return pattern in block
+	
+def matchCaseInsensitive(pattern, block):
+	return pattern in block.lower()
+	
 def processFileMatchStart(inputFile, pattern, prefix):
 	output = False
 	for curLine in inputFile:
@@ -40,7 +49,7 @@ def processFileMatchStart(inputFile, pattern, prefix):
 				continue
 			output = False
 
-		if logStart and pattern in curLine:
+		if logStart and match(pattern, curLine):
 			print prefix + curLine.rstrip()
 			output = True
 
@@ -49,12 +58,12 @@ def processFileMatchAny(inputFile, pattern, prefix):
 	for curLine in inputFile:
 		if isLineLogStart(curLine):
 			if pattern in block:
-				print block
+				print prefix + block.rstrip().replace('\n', '\n' + prefix)
 			block = curLine
 		else:
 			block += curLine
-	if pattern in block:
-		print block
+	if match(pattern, block):
+		print prefix + block.rstrip().replace('\n', '\n' + prefix)
 	
 # parse the command line
 (options, args) = parseCmdLine()
@@ -81,6 +90,12 @@ if options.matchAny:
 else:
 	processFile = processFileMatchStart
 	
+if options.ignoreCase:
+	match = matchCaseInsensitive
+	pattern = pattern.lower()
+else:
+	match = matchCaseSensitive
+
 prefix = ''
 for fileName in fileNames:
 	if fileName.endswith('.gz'):
@@ -109,4 +124,7 @@ for fileName in fileNames:
 		else:
 			prefix = '%s:' % fileName
 
-	processFile(inputFile, pattern, prefix)
+	try:
+		processFile(inputFile, pattern, prefix)
+	except IOError:		# broken pipe
+		sys.exit(1)
