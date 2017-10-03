@@ -129,7 +129,7 @@ class MediaService extends KalturaEntryService
      */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null, $advancedOptions = null)
     {
-    	if($advancedOptions)
+	    if($advancedOptions)
     	{
     		$dbEntry->setReplacementOptions($advancedOptions->toObject());
     		$dbEntry->save();
@@ -1160,13 +1160,17 @@ class MediaService extends KalturaEntryService
 
 	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
 	{
-		if (!isset($resource->resource->entryId))
-			return;
 		$relatedEntries = myEntryUtils::getRelatedEntries($dbEntry);
+		$shouldUseRootEntryId = false;
+		if ($resource->resource->entryId == $dbEntry->getRootEntryId() )
+			$shouldUseRootEntryId = true;
 		foreach ($relatedEntries as $relatedEntry)
 		{
-			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry");
-			$resource->resource->entryId = $relatedEntry->getId();
+			if($shouldUseRootEntryId)
+				$resource->resource->entryId = $relatedEntry->getRootEntryId();
+			else
+				$resource->resource->entryId = $relatedEntry->getId();
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [". $resource->resource->entryId ."]");
 			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
 		}
 	}

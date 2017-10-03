@@ -1317,7 +1317,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setTotalRank(0);
 	}
 
-	public static function copyEntryData(entry $entry, entry $targetEntry)
+	public static function copyEntryData(entry $entry, entry $targetEntry, $copyFlavors = true)
 	{
 		// for any type that does not require assets:
 		$shouldCopyDataForNonClip = true;
@@ -1394,14 +1394,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset))
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors))
+			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
+			}
 	}
 
-	private static function shouldCopyAsset($sourceAsset)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-		if ($sourceAsset instanceof timedThumbAsset)
+			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset))
 			return false;
 		return true;
 	}
@@ -1431,6 +1433,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$copyCategories = true;
 	    $copyChildren = false;
 	    $copyAccessControl = true;
+	    $copyMetaData = true;
+	    $copyFlavors  = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1455,6 +1459,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$copyAccessControl = false;
 			}
+			if ($currentOption == BaseEntryCloneOptions::METADATA && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyMetaData = false;
+			}
+			if ($currentOption == BaseEntryCloneOptions::FLAVORS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyFlavors = false;
+			}
 		}
 
  		$newEntry = $entry->copy();
@@ -1462,8 +1474,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
 		$newEntry->setCategoriesIds(null);
-		
- 		if ($toPartner instanceof Partner)
+
+	    if (!$copyFlavors)
+		    $newEntry->setStatus(entryStatus::NO_CONTENT);
+
+	    if ($toPartner instanceof Partner)
  		{
  			$newEntry->setPartnerId($toPartner->getId());
  			$newEntry->setSubpId($toPartner->getId() * 100);
@@ -1515,8 +1530,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$oldPartnerId = $defaultCategoryFilter->get(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
- 		
- 		// save the entry
+
+ 		if (!$copyMetaData)
+		    $newEntry->copyMetaData = false;
+
+	    // save the entry
  		$newEntry->save();
  		 		
  		// restore the original partner id in the default category criteria filter
@@ -1529,7 +1547,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
 		} else {
-			self::copyEntryData( $entry, $newEntry );
+			self::copyEntryData( $entry, $newEntry, $copyFlavors );
 		}
 
  	    //if entry is a static playlist, link between it and its new child entries
@@ -1685,6 +1703,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	    if ($copyChildren)
 	    {
 		    self::cloneFamilyEntries($entry, $toPartner, $cloneOptions, $newEntry);
+	    }
+
+	    if($newEntry->getPartnerId() == $newEntry->getPartnerId())
+	    {
+		    $newEntry->setRootEntryId($entry->getId());
+		    $newEntry->save();
 	    }
 	    return $newEntry;
  	} 	
