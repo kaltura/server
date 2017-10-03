@@ -1392,7 +1392,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-			if ($sourceAsset instanceof timedThumbAsset || !$copyFlavors)
+			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset))
 			return false;
 		return true;
 	}
