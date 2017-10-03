@@ -1392,7 +1392,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-		if ($sourceAsset instanceof timedThumbAsset || !$copyFlavors)
+			if ($sourceAsset instanceof timedThumbAsset || !$copyFlavors)
 			return false;
 		return true;
 	}
@@ -1694,6 +1694,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		    self::cloneFamilyEntries($entry, $toPartner, $cloneOptions, $newEntry);
 	    }
 
+	    if($newEntry->getPartnerId() == $newEntry->getPartnerId())
+	    {
+		    $newEntry->setRootEntryId($entry->getId());
+		    $newEntry->save();
+	    }
 	    return $newEntry;
  	} 	
  	

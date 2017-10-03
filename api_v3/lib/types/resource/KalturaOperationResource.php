@@ -89,12 +89,4 @@ class KalturaOperationResource extends KalturaContentResource
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
-	/* (non-PHPdoc)
-	 * @see KalturaResource::improveResource()
-	 */
-	public function improveResource()
-	{
-		parent::improveResource();
-		$this->resource->improveResource();
-	}
 }

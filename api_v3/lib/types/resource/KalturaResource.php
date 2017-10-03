@@ -18,8 +18,4 @@ abstract class KalturaResource extends KalturaObject
 		
 	}
 
-	public function improveResource()
-	{
-
-	}
 }
