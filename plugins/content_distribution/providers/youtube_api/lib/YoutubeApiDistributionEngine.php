@@ -609,11 +609,15 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	{
 		$ingestedVideo = false;
 		$currentByte = 0;
-		while (!$ingestedVideo && $chunk = kFile::getFileContent($filePath, $currentByte, $currentByte + $chunkSizeBytes, 'rb'))
+		$size = kFile::fileSize($filePath);
+		while (!$ingestedVideo && $currentByte < $size)
 		{
+			$chunk = kFile::getFileContent($filePath, $currentByte, $currentByte + $chunkSizeBytes, 'rb');
 			$ingestedVideo = self::uploadChunk($media, $chunk);
 			$currentByte += $chunkSizeBytes;
 		}
+		return $ingestedVideo;
+
 	}
 
 	/**
