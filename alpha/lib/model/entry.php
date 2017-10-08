@@ -1951,9 +1951,51 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return array_keys($this->getEntitledUserPuserEditArray());
 	}
 	
+	public function getEntitledKusersView()
+	{
+		return implode(',', array_keys($this->getEntitledPusersViewArray()));
+	}
+
+	public function getEntitledKusersViewArray()
+	{
+		return array_keys($this->getEntitledPusersViewArray());
+	}
+	
 	public function getEntitledPusersEdit()
 	{
 		return implode(',', $this->getEntitledUserPuserEditArray());
+	}
+	
+	public function setEntitledPusersView($v)
+	{
+		$entitledUserPuserView = array();
+		
+		$v = trim($v);
+		if($v == '')
+		{
+			$this->putInCustomData ( "entitledUserPuserView" , serialize($entitledUserPuserView) );
+			return;
+		}
+		
+		$entitledPusersView = explode(',',$v);
+				
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		foreach ($entitledPusersView as $puserId)
+		{
+			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
+
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
+			if (!$kuser)
+				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
+			
+			$entitledUserPuserView[$kuser->getId()] = $kuser->getPuserId();
+		}
+				
+		$this->putInCustomData ( "entitledUserPuserView" , serialize($entitledUserPuserView) );
 	}
 	
 	public function isOwnerActionsAllowed($kuserId)
@@ -1966,9 +2008,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return in_array($ownerKuserId, $kuserKGroupIds);
 	}
 	
-	public function isEntitledKuserEdit($kuserId)
+	
+	private function isEntitledKuser ($kuserId, $entitledKuserArray)
 	{
-		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
 		if(in_array(trim($kuserId), $entitledKuserArray))
 			return true;
 
@@ -1978,6 +2020,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				return true;
 
 		return $this->isOwnerActionsAllowed($kuserId);
+	}
+	
+	public function isEntitledKuserEdit($kuserId)
+	{
+		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
+		
+		return $this->isEntitledKuser($kuserId, $entitledKuserArray);
+	}
+	
+	public function isEntitledKuserView($kuserId)
+	{
+		$entitledKuserArray = array_keys($this->getEntitledPusersViewArray());
+
+		return $this->isEntitledKuser($kuserId, $entitledKuserArray);
 	}
 
 	private function getEntitledUserPuserEditArray()
@@ -2031,6 +2087,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return unserialize($entitledUserPuserPublish);
 	}
 	
+	private function getEntitledPusersViewArray()
+	{
+		$entitledUserPuserView = $this->getFromCustomData( "entitledUserPuserView", null, 0 );
+		if (!$entitledUserPuserView)
+			return array();
+		
+		return unserialize($entitledUserPuserView);
+	}
+	
 	public function getEntitledKusersPublish()
 	{
 		return implode(',', array_keys($this->getEntitledPusersPublishArray()));
@@ -2048,6 +2113,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getEntitledPusersPublish()
 	{
 		return implode(',', $this->getEntitledPusersPublishArray());
+	}
+	
+	public function getEntitledPusersView()
+	{
+		return implode(',', $this->getEntitledPusersViewArray());
 	}
 	
 	public function isEntitledKuserPublish($kuserId, $useUserGroups = true)
@@ -3203,8 +3273,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		$entitledKusersPublish = explode(',', $this->getEntitledKusersPublish());
 		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
+		$entitledKusersView = explode(',', $this->getEntitledKusersView());
 		
-		$entitledKusersNoPrivacyContext = array_merge($entitledKusersPublish, $entitledKusersEdit);
+		$entitledKusersNoPrivacyContext = array_merge($entitledKusersPublish, $entitledKusersEdit, $entitledKusersView);
 		$entitledKusersNoPrivacyContext[] = $this->getKuserId();
 		
 		foreach ($entitledKusersNoPrivacyContext as $key => $value)

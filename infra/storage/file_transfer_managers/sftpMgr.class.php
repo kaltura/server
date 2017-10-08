@@ -243,7 +243,7 @@ class sftpMgr extends kFileTransferMgr
 		if($this->passphrase || !$this->useCmd || kFile::fileSize($localFile) < $this->cmdPutMinimumFileSize)
 		{
 			$absolutePath = trim($remoteFile, '/');
-			$stream = @fopen("ssh2.sftp://$sftp/$absolutePath", 'w');
+			$stream = @fopen("ssh2.sftp://" . intval($sftp) . "/$absolutePath", 'w');
 			if($stream)
 			{
 				// Writes the file in chunks (for large files bug)
@@ -282,7 +282,7 @@ class sftpMgr extends kFileTransferMgr
 			
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remoteFile, '/');
-		$stream = @fopen("ssh2.sftp://$sftp/$absolutePath", 'r');
+		$stream = @fopen("ssh2.sftp://" . intval($sftp) . "/$absolutePath", 'r');
 		if(!$stream)
 			return false;
 			
@@ -396,7 +396,7 @@ class sftpMgr extends kFileTransferMgr
 	{
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remotePath, '/');
-		$handle = opendir("ssh2.sftp://{$sftp}/{$absolutePath}");
+		$handle = opendir("ssh2.sftp://" . intval($sftp) . "/$absolutePath");
 	   	if($handle !== false)
 	   	{
 	   		$ls = array();
@@ -449,8 +449,7 @@ class sftpMgr extends kFileTransferMgr
 		
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remoteFile, '/');
-		$uri = "ssh2.sftp://$sftp/$absolutePath";
-		$stream = @fopen($uri, 'w');
+		$stream = @fopen("ssh2.sftp://" . intval($sftp) . "/$absolutePath", 'w');
 		if(!$stream)
 			throw new kFileTransferMgrException("Failed to open stream [" . $uri . "]");
 		

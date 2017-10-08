@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2017-09-10
+/*! KMC - v6.0.11 - 2017-09-27
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2017 Amir Chervinsky; Licensed GNU */
 /**
@@ -3979,7 +3979,7 @@ kmc.functions = {
 		var title = entryName ? entryName : '';
 		var url = kmc.vars.base_url + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html#/entry/' + entryId + '/nonav';
 		
-		var modal_content = '<iframe id="liveIF" src="' + url + '" width="100%" height="100%" frameborder="0"></iframe>';
+		var modal_content = '<iframe id="liveIF" src="' + url + '" width="100%" height="100%" frameborder="0" ></iframe>';
 
 		kmc.layout.modal.open( {
 			'width' : 1040,
@@ -3995,7 +3995,8 @@ kmc.functions = {
         kmc.vars.liveDashboard.entryId = entryId;
         var url = kmc.vars.base_url + '/apps/liveDashboard/' + kmc.vars.liveDashboard.version + '/index.html';
 
-        var modal_content = '<iframe id="liveDashboardIF" src="' + url + '" width="100%" height="100%" frameborder="0"></iframe>';
+        var modal_content = '<iframe id="liveDashboardIF" src="' + url + '" width="100%" height="100%" frameborder="0" ' +
+	        'allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>';
 
         kmc.layout.modal.open( {
             'width' : 1050,

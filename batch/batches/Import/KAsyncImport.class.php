@@ -298,8 +298,8 @@ class KAsyncImport extends KJobHandlerWorker
 				    $fileTransferMgr->login($host, $username, $password, $port);
 				}
 				else {
-				    $privateKeyFile = $this->getFileLocationForSshKey($privateKey, 'privateKey');
-				    $publicKeyFile = $this->getFileLocationForSshKey($publicKey, 'publicKey');
+					$privateKeyFile = kFile::createTempFile($privateKey, 'privateKey');
+					$publicKeyFile = kFile::createTempFile($publicKey, 'publicKey');
 				    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase);
 				}
 			
@@ -421,17 +421,7 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		return $job;
 	}
-
-	/*
-	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged
-	 */
-	protected function getFileLocationForSshKey($keyContent, $prefix = 'key')
-	{
-		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, $prefix);
-		file_put_contents($fileLocation, $keyContent);
-		return $fileLocation;
-	}
+	
 
 
 	protected function getTempFilePath($remotePath)

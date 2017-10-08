@@ -150,28 +150,14 @@ abstract class SshDropFolder extends RemoteDropFolder
 	{
 		if ($this->getSshPrivateKey() || $this->getSshPublicKey()) 
         {
-        	$privKeyFile = $this->getTempFileWithContent($this->getSshPrivateKey(), 'privateKey');
-        	$pubKeyFile = $this->getTempFileWithContent($this->getSshPublicKey(), 'publicKey');
-        	return $fileTransferMgr->loginPubKey($this->getSshHost(), $this->getSshUsername(), $pubKeyFile, $privKeyFile, $this->getSshPassPhrase(), $this->getSshPort());
+			$privateKey = $this->getSshPrivateKey();
+			$publicKey = $this->getSshPublicKey();
+        	$privateKeyFile = $privateKey ? kFile::createTempFile($privateKey, 'privateKey') : null;
+        	$publicKeyFile = $publicKey ? kFile::createTempFile($publicKey, 'publicKey') : null;
+        	return $fileTransferMgr->loginPubKey($this->getSshHost(), $this->getSshUsername(), $publicKeyFile, $privateKeyFile, $this->getSshPassPhrase(), $this->getSshPort());
         }
         else
 			return $fileTransferMgr->login($this->getSshHost(), $this->getSshUsername(), $this->getSshPassword(), $this->getSshPort());
-	}
-	
-	/**
-	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
-	 * @param string $fileContent
-	 * @param string $prefix
-	 * @return string path to temporary file location
-	 */
-	private function getTempFileWithContent($fileContent, $prefix = '') 
-	{
-		if(!$fileContent)
-			return null;
-		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, $prefix);		
-		file_put_contents($fileLocation, $fileContent);
-		return $fileLocation;
 	}
 	
 	

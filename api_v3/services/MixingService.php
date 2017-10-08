@@ -347,7 +347,7 @@ class MixingService extends KalturaEntryService
 		if(!$mixFileName)
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 
-		$entryDataFromMix = myFlvStreamer::getAllAssetsData($mixFileName);
+		$entryDataFromMix = myFlvStreamer::getAllAssetsData($dataSyncKey);
 
 		$ids = array();
 		foreach($entryDataFromMix as $data)

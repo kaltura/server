@@ -14,8 +14,8 @@
 		protected $chunker = null;
 
 		protected $maxFailures = 3;		// Max allowed job failures (if more, get out w/out retry)
-		protected $maxRetries = 3;		// Max retries per failed job
-		protected $maxExecutionTime = 600; // In seconds 
+		protected $maxRetries = 10;		// Max retries per failed job
+		protected $maxExecutionTime = 3600;	// In seconds 
 		
 		protected $videoCmdLines = array();
 		protected $audioCmdLines = array();

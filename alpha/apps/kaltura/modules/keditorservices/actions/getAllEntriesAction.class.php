@@ -67,9 +67,7 @@ class getAllEntriesAction extends defKeditorservicesAction
 		{
 			if ( $kshow->getHasRoughcut() )
 			{
-				$roughcut_file_name =  $entry->getDataPath();
-				
-				$entry_ids_from_roughcut = myFlvStreamer::getAllAssetsIds ( $roughcut_file_name );
+				$entry_ids_from_roughcut = myFlvStreamer::getAllAssetsIds ( $entry );
 				
 				$final_id_list = array();
 				foreach ( $entry_ids_from_roughcut as $id )

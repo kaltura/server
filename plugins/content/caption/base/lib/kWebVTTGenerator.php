@@ -9,7 +9,7 @@ class kWebVTTGenerator
 	 * @param int $timeStamp
 	 * @return string
 	 */
-	protected static function formatWebVTTTimeStamp($timeStamp)
+	public static function formatWebVTTTimeStamp($timeStamp)
 	{
 		$millis = $timeStamp % 1000;
 		$timeStamp = (int)($timeStamp / 1000);

@@ -1460,17 +1460,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 				$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
  		}
  		
- 		$newKuser = null;
+		$kuserForNewEntry = null;
 		if ($copyUsers)
- 		{
- 			// copy the kuser (if the same puser id exists its kuser will be used)
- 			kuserPeer::setUseCriteriaFilter(false);
- 			$kuser = $entry->getKuser();
- 			$newKuser = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
- 			$newEntry->setKuserId($newKuser->getId());
- 			$newEntry->setCreatorKuserId($newKuser->getId());
- 			kuserPeer::setUseCriteriaFilter(true);
- 		} 		
+		{
+			// copy the kuser (if the same puser id exists its kuser will be used)
+			kuserPeer::setUseCriteriaFilter(false);
+			$kuser = $entry->getKuser();
+			$kuserForNewEntry = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
+			kuserPeer::setUseCriteriaFilter(true);
+		}
+		else
+			$kuserForNewEntry = kCurrentContext::getCurrentKsKuser();
+
+		if($kuserForNewEntry)
+		{
+			$newEntry->setKuserId($kuserForNewEntry->getId());
+			$newEntry->setCreatorKuserId($kuserForNewEntry->getId());
+		}
  		
  		// copy the kshow
  		kshowPeer::setUseCriteriaFilter(false);
@@ -1481,8 +1487,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  			$newKshow->setIntId(null);
  			$newKshow->setPartnerId($toPartner->getId());
  			$newKshow->setSubpId($toPartner->getId() * 100);
- 			if ($newKuser) {
- 				$newKshow->setProducerId($newKuser->getId());
+ 			if ($kuserForNewEntry) {
+ 				$newKshow->setProducerId($kuserForNewEntry->getId());
  			}
  			$newKshow->save();
  			
