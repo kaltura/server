@@ -914,12 +914,6 @@ class BaseEntryService extends KalturaEntryService
 		// Copy the entry into a new one based on the given partner data.
 		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreClonedOptionsArray);
 
-		if($clonedEntry->getPartnerId() == $coreEntry->getPartnerId())
-		{
-			$clonedEntry->setRootEntryId($entryId);
-			$clonedEntry->save();
-		}
-
 		return $this->getEntry($clonedEntry->getId());
 	}
 

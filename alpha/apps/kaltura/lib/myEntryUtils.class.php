@@ -946,7 +946,7 @@ class myEntryUtils
 		if (!$firstEntry)
 			return false;
 
-		$flavorAsset = self::getFlavorSupportedByPackager($firstEntry->getId());
+		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($firstEntry->getId());
 		if(!$flavorAsset)
 			return false;
 
@@ -1043,7 +1043,7 @@ class myEntryUtils
 		if (!$packagerCaptureUrl)
 			return false;
 
-		$flavorAsset = self::getFlavorSupportedByPackager($entry->getId());
+		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
 		if(!$flavorAsset)
 			return false;
 
@@ -1062,7 +1062,7 @@ class myEntryUtils
 	}
 
 
-	private static function getFlavorSupportedByPackager($entryId)
+	private static function getFlavorSupportedByPackagerForThumbCapture($entryId)
 	{
 		//look for the highest bitrate flavor tagged with thumbsource
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
@@ -1082,14 +1082,25 @@ class myEntryUtils
 		return $flavorAsset;
 	}
 
-	public static function isFlavorSupportedByPackager($flavorAsset)
+	public static function isFlavorSupportedByPackager($flavorAsset, $excludeAudioFlavors = true)
 	{
-		//filter audio flavors and encrypted flavors
-		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0) || $flavorAsset->getEncryptionKey())
+		if($flavorAsset->getEncryptionKey())
 			return false;
+		if($excludeAudioFlavors)
+		{
+			if (!$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0))
+				return false;
+		}
 
-		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM);
-		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
+		if($flavorAsset->hasTag(flavorParams::TAG_WEB) && self::isSupportedContainerFormat($flavorAsset))
+			return true;
+		return false;
+	}
+
+	public static function isSupportedContainerFormat($flavorAsset){
+		if ($flavorAsset->getContainerFormat() == assetParams::CONTAINER_FORMAT_MP42)
+			return true;
+		if (strpos($flavorAsset->getContainerFormat(), assetParams::CONTAINER_FORMAT_ISOM) !== false)
 			return true;
 		return false;
 	}
@@ -1306,7 +1317,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setTotalRank(0);
 	}
 
-	public static function copyEntryData(entry $entry, entry $targetEntry)
+	public static function copyEntryData(entry $entry, entry $targetEntry, $copyFlavors = true)
 	{
 		// for any type that does not require assets:
 		$shouldCopyDataForNonClip = true;
@@ -1383,14 +1394,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset))
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors))
+			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
+			}
 	}
 
-	private static function shouldCopyAsset($sourceAsset)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-		if ($sourceAsset instanceof timedThumbAsset)
+			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset))
 			return false;
 		return true;
 	}
@@ -1420,6 +1433,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$copyCategories = true;
 	    $copyChildren = false;
 	    $copyAccessControl = true;
+	    $copyMetaData = true;
+	    $copyFlavors  = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1444,6 +1459,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$copyAccessControl = false;
 			}
+			if ($currentOption == BaseEntryCloneOptions::METADATA && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyMetaData = false;
+			}
+			if ($currentOption == BaseEntryCloneOptions::FLAVORS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyFlavors = false;
+			}
 		}
 
  		$newEntry = $entry->copy();
@@ -1451,8 +1474,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
 		$newEntry->setCategoriesIds(null);
-		
- 		if ($toPartner instanceof Partner)
+
+	    if (!$copyFlavors)
+		    $newEntry->setStatus(entryStatus::NO_CONTENT);
+
+	    if ($toPartner instanceof Partner)
  		{
  			$newEntry->setPartnerId($toPartner->getId());
  			$newEntry->setSubpId($toPartner->getId() * 100);
@@ -1460,17 +1486,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 				$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
  		}
  		
- 		$newKuser = null;
+		$kuserForNewEntry = null;
 		if ($copyUsers)
- 		{
- 			// copy the kuser (if the same puser id exists its kuser will be used)
- 			kuserPeer::setUseCriteriaFilter(false);
- 			$kuser = $entry->getKuser();
- 			$newKuser = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
- 			$newEntry->setKuserId($newKuser->getId());
- 			$newEntry->setCreatorKuserId($newKuser->getId());
- 			kuserPeer::setUseCriteriaFilter(true);
- 		} 		
+		{
+			// copy the kuser (if the same puser id exists its kuser will be used)
+			kuserPeer::setUseCriteriaFilter(false);
+			$kuser = $entry->getKuser();
+			$kuserForNewEntry = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
+			kuserPeer::setUseCriteriaFilter(true);
+		}
+		else
+			$kuserForNewEntry = kCurrentContext::getCurrentKsKuser();
+
+		if($kuserForNewEntry)
+		{
+			$newEntry->setKuserId($kuserForNewEntry->getId());
+			$newEntry->setCreatorKuserId($kuserForNewEntry->getId());
+		}
  		
  		// copy the kshow
  		kshowPeer::setUseCriteriaFilter(false);
@@ -1481,8 +1513,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  			$newKshow->setIntId(null);
  			$newKshow->setPartnerId($toPartner->getId());
  			$newKshow->setSubpId($toPartner->getId() * 100);
- 			if ($newKuser) {
- 				$newKshow->setProducerId($newKuser->getId());
+ 			if ($kuserForNewEntry) {
+ 				$newKshow->setProducerId($kuserForNewEntry->getId());
  			}
  			$newKshow->save();
  			
@@ -1498,8 +1530,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$oldPartnerId = $defaultCategoryFilter->get(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
- 		
- 		// save the entry
+
+ 		if (!$copyMetaData)
+		    $newEntry->copyMetaData = false;
+
+	    // save the entry
  		$newEntry->save();
  		 		
  		// restore the original partner id in the default category criteria filter
@@ -1512,7 +1547,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
 		} else {
-			self::copyEntryData( $entry, $newEntry );
+			self::copyEntryData( $entry, $newEntry, $copyFlavors );
 		}
 
  	    //if entry is a static playlist, link between it and its new child entries
@@ -1668,6 +1703,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	    if ($copyChildren)
 	    {
 		    self::cloneFamilyEntries($entry, $toPartner, $cloneOptions, $newEntry);
+	    }
+
+	    if($newEntry->getPartnerId() == $newEntry->getPartnerId())
+	    {
+		    $newEntry->setRootEntryId($entry->getId());
+		    $newEntry->save();
 	    }
 	    return $newEntry;
  	} 	
@@ -1876,5 +1917,26 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if ($childEntry->getId() != $entry->getId())
 				$relatedEntries[] = $childEntry;
 		return $relatedEntries;
+	}
+
+
+	public static function getFlavorSupportedByPackagerForVolumeMap($entryId)
+	{
+		//look for the lowest bitrate flavor
+		$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
+
+		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+		{
+			// look for the lowest bitrate flavor the packager can parse
+			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+			{
+				//retrieve original ready
+				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+					return null;
+			}
+		}
+		return $flavorAsset;
 	}
 }

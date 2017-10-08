@@ -209,7 +209,7 @@ abstract class KOperationEngine
 	protected function addToLogFile($str, $priority = KalturaLog::DEBUG)
 	{
 		KalturaLog::log($str, $priority);
-		file_put_contents($this->logFilePath, $str, FILE_APPEND);
+		kFile::appendToFile($this->logFilePath, $str);
 	}
 	
 	/**

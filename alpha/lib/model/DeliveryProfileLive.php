@@ -120,8 +120,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode)
 			{
-				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				//Order by primary DC first
+				KalturaLog::debug("liveEntryServerNode->getServerType [" . $liveEntryServerNode->getServerType() . "]");
+				if($liveEntryServerNode->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 				{
 					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
 					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());

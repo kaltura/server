@@ -17,16 +17,11 @@ class myFlvStreamer
 	
 	private $metadata;
 
-	public function __construct ( $filePath, $timeline, $streamNum, $addPadding = false)
+	public function __construct ( $dataKey, $timeline, $streamNum, $addPadding = false)
 	{
 		$this->addPadding = $addPadding;
-		$contentRoot = myContentStorage::getFSContentRootPath();
-		if(substr_count($filePath, $contentRoot))
-		{
-			$contentRoot = '';
-		}
-		$this->filePath = $contentRoot.$filePath;
-		list ( $this->totalLength , $this->assetList  , $this->streamInfo, $this->pendingEntries ) = @self::getAssets( $filePath, $timeline, $streamNum, $addPadding);
+		$this->filePath = self::addRootPath(kFileSyncUtils::getReadyLocalFilePathForKey($dataKey));
+		list ( $this->totalLength , $this->assetList  , $this->streamInfo, $this->pendingEntries ) = @self::getAssets( $dataKey, $timeline, $streamNum, $addPadding);
 	}
 
 	public function pendingEntriesCount()
@@ -61,9 +56,11 @@ class myFlvStreamer
 	}
 
 	// TODO - should move to some metadata wrapper
-	public static function getAllAssetsIds ( $filePath )
+	public static function getAllAssetsIds ( $entry )
 	{
-		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $filePath );
+		$filePath = self::addRootPath($entry->getDataPath());
+		$xmlStr = kFile::getFileContent($filePath);
+		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $xmlStr );
 
 		$asset_ids = self::getElementsList( $xpath , "*" );
 		//$asset_ids = $xpath->query( "//VideoAssets/vidAsset" );
@@ -79,9 +76,10 @@ class myFlvStreamer
 		return $arr;
 	}
 
-	public static function getAllAssetsData ( $filePath )
+	public static function getAllAssetsData ( $sync_key )
 	{
-		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $filePath );
+		$xmlStr = kFileSyncUtils::file_get_contents($sync_key);
+		list ( $xml_doc , $xpath ) = self::getDomAndXpath ( $xmlStr );
 
 		$asset_ids = self::getElementsList( $xpath , "*" );
 		//$asset_ids = $xpath->query( "//VideoAssets/vidAsset" );
@@ -94,7 +92,6 @@ class myFlvStreamer
 			$stream_info_elem = kXml::getFirstElement ( $asset_id , "StreamInfo" );
 			$node["start_time"] = $stream_info_elem->getAttribute ( "start_time" );
 			$node["len_time"] = $stream_info_elem->getAttribute ( "len_time" );
-			//start_time="0" len_time=
 
 			$arr[] = $node;
 		}
@@ -107,49 +104,44 @@ class myFlvStreamer
 		return $xpath->query( "//".$prefix."[@type='VIDEO']|//".$prefix."[@type='IMAGE']|//".$prefix."[@type='AUDIO']|//".$prefix."[@type='VOICE']" );
 	}
 
-	private static function getDomAndXpath ( $filePath )
+	private static function addRootPath($filePath)
 	{
-		if ( substr_count ( $filePath  , myContentStorage::getFSContentRootPath() ) == 0  )
-			$contentRoot = myContentStorage::getFSContentRootPath();
-		else
-			$contentRoot = "";
+		$contentRoot = myContentStorage::getFSContentRootPath();
+		if(substr_count($filePath, $contentRoot))
+			$contentRoot = '';
+		return $contentRoot.$filePath;
+	}
+
+	private static function getDomAndXpath ( $xmlStr )
+	{
 		$xml_doc = new DOMDocument();
-		$xml_doc->loadXML( file_get_contents($contentRoot.$filePath) );
-
-
+		$xml_doc->loadXML( $xmlStr);
 		$xpath = new DOMXPath($xml_doc);
-
 		return array ( $xml_doc , $xpath );
 	}
 
 	/**
 		Returns an array of total_length and a list of all relevant assets
 		*/
-	private static function getAssets($filePath, $timeline, $streamNum, $addPadding)
+	private static function getAssets($dataKey, $timeline, $streamNum, $addPadding)
 	{
-		$contentRoot = myContentStorage::getFSContentRootPath();
-		if(substr_count($filePath, $contentRoot))
-			$contentRoot = '';
+		$filePath = kFileSyncUtils::getReadyLocalFilePathForKey($dataKey);
+		$fullPath = self::addRootPath($filePath);
 		
 		$xml_doc = new DOMDocument();
-		if ( ! file_exists( $contentRoot.$filePath ) )
-		{
-			return null;
-		}
-
 		try
 		{
-			@$xml_doc->loadXML( file_get_contents($contentRoot.$filePath) );
+			@$xml_doc->loadXML( kFileSyncUtils::file_get_contents($dataKey));
 		}
 		catch ( Exception $ex )
 		{
-			KalturaLog::log ( "Cannot find XML file at [" . $contentRoot.$filePath . "],  timeline:$timeline, streamNum:$streamNum"  );
+			KalturaLog::log ( "Cannot find XML file at [" . $fullPath . "],  timeline:$timeline, streamNum:$streamNum"  );
 			return null;
 		}
 
 		list($already_pending, $already_pending_arr) = myMetadataUtils::getPending($xml_doc);
 
-		$fileTimestamp = filectime($contentRoot.$filePath) ;
+		$fileTimestamp = filectime($fullPath) ;
 
 		$xpath = new DOMXPath($xml_doc);
 
