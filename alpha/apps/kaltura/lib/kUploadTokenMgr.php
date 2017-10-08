@@ -2,10 +2,22 @@
 class kUploadTokenMgr
 {
 	const NO_EXTENSION_IDENTIFIER = 'noext';
+	const AUTO_FINALIZE_CACHE_TTL = dateUtils::MONTH;
+	
 	/**
 	 * @var UploadToken
 	 */
 	protected $_uploadToken;
+	
+	/**
+	 * @var bool
+	 */
+	protected $_autoFinalize;
+	
+	/**
+	 * @var kBaseCacheWrapper
+	 */
+	protected $_autoFinalizeCache;
 	
 	/**
 	 * Construct new upload token manager for the upload token object
@@ -15,6 +27,18 @@ class kUploadTokenMgr
 	{
 		KalturaLog::info("Init for upload token id [{$uploadToken->getId()}]");
 		$this->_uploadToken = $uploadToken;
+	}
+	
+	private function initUploadTokenMemcache()
+	{
+		if($this->_uploadToken->getAutoFinalize()) 
+		{
+			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+			if (!$cache)
+				throw new Exception("Cache instance required for AutoFinalize functionality Could not initiated");
+		}
+		
+		$this->_autoFinalizeCache = $cache;
 	}
 	
 	/**
@@ -48,6 +72,9 @@ class kUploadTokenMgr
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $finalChunk = true, $resumeAt = -1)
 	{
+		if($this->_uploadToken->getAutoFinalize())
+			$this->initUploadTokenMemcache();
+		
 		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
 		if (!in_array($this->_uploadToken->getStatus(), $allowedStatuses, true))
 			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
@@ -68,7 +95,7 @@ class kUploadTokenMgr
 		}
 		
 		if ($resume)
-			$fileSize = $this->handleResume($fileData, $finalChunk, $resumeAt);
+			list($fileSize, $finalChunk) = $this->handleResume($fileData, $finalChunk, $resumeAt);
 		else
 		{
 			$this->handleMoveFile($fileData);
@@ -225,7 +252,7 @@ class kUploadTokenMgr
 		
 		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
 		{
-			// support backwards compatiblity of overriding a final chunk at the offset zero  
+			// support backwards compatibility of overriding a final chunk at the offset zero  
 			$verifyFinalChunk = $finalChunk && $resumeAt > 0;
 			
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
@@ -234,6 +261,13 @@ class kUploadTokenMgr
 
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
 			rename($sourceFilePath, $chunkFilePath);
+			
+			if($this->_uploadToken->getAutoFinalize() && $this->checkFileSizeReached($chunkSize))
+			{
+				$finalChunk = true;
+				$verifyFinalChunk = true;
+				$expectedFileSize = $this->_uploadToken->getFileSize();
+			}
 			
 			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
 			
@@ -256,10 +290,26 @@ class kUploadTokenMgr
 			self::appendChunk($sourceFilePath, $uploadFileResource);
 			
 			$currentFileSize = ftell($uploadFileResource);
+			
+			if($this->_uploadToken->getAutoFinalize() && $this->_uploadToken->getFileSize() >= $currentFileSize)
+				$finalChunk = true;
+			
 			fclose($uploadFileResource);
 		}
 		
-		return $currentFileSize; 
+		return array($currentFileSize, $finalChunk); 
+	}
+	
+	private function checkFileSizeReached($currentFileSize)
+	{
+		$cacheFileSizeValue = $this->_autoFinalizeCache->increment($this->_uploadToken->getId(), $currentFileSize);	
+		if($cacheFileSizeValue >= $this->_uploadToken->getFileSize())
+		{
+			if($this->_autoFinalizeCache->add($this->_uploadToken->getId().".lock", "true", 30))
+				return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -289,6 +339,10 @@ class kUploadTokenMgr
 		}
 		
 		chmod($uploadFilePath, 0600);
+		
+		//If uplaodToken is set to AutoFinalize set file size into memcache
+		if($this->_uploadToken->getAutoFinalize())
+			$this->_autoFinalizeCache->set($this->_uploadToken->getId(), filesize($uploadFilePath), self::AUTO_FINALIZE_CACHE_TTL);
 	}
 
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
@@ -336,7 +390,7 @@ class kUploadTokenMgr
 						continue;
 					
 					// dismiss chunks which won't enlarge the file or which are starting after the end of the file
-					// support backwards compatiblity of overriding a final chunk at the offset zero
+					// support backwards compatibility of overriding a final chunk at the offset zero
 					if ($chunkOffset == 0 || ($chunkOffset <= $currentFileSize && $chunkOffset + filesize($nextChunk) > $currentFileSize))
 					{
 						fseek($targetFileResource, $chunkOffset, SEEK_SET);
@@ -360,6 +414,8 @@ class kUploadTokenMgr
 				break;
 			}
 			
+			KalturaLog::debug("Testing:: lockedFile filesize = [" . filesize($lockedFile) . "]");
+			KalturaLog::debug("Testing:: Eran filesize = [" . max(0,$chunkOffset+filesize($lockedFile)-$currentFileSize) . "] chunkOffset [$chunkOffset] filesize of nextChunk [" . filesize($lockedFile) . " currentFileSize [$currentFileSize]");
 			self::appendChunk($lockedFile, $targetFileResource);
 		}
 		
