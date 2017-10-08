@@ -29,7 +29,8 @@ abstract class SftpDistributionEngine extends DistributionEngine
 	protected function getTempDirectoryForProfile($distributionProfileId)
 	{
 		$tempFilePath = $this->tempDirectory . '/' . $this->getTempDirectory() . '/' . $distributionProfileId . '/';
-		kFile::fullMkdir($tempFilePath,0777, true);
+		if (!file_exists($tempFilePath))		
+			mkdir($tempFilePath, 0777, true);
 		return $tempFilePath;
 	}
 
