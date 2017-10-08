@@ -142,7 +142,9 @@ class APIErrors
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND;ENTRY_ID;Entry id \"@ENTRY_ID@\" not found";
 
 	const SUPPORTED_FLAVOR_NOT_EXIST = "SUPPORTED_FLAVOR_NOT_EXIST;ENTRY_ID;Could not find supported flavor for entry id \"@ENTRY_ID@\" ";
-	
+
+	const FLAVOR_IS_NOT_SUPPORTED = "FLAVOR_IS_NOT_SUPPORTED;FLAVOR_ID;Generating volume map for flavor id \"@FLAVOR_ID@\" is not supported";
+
 	// ENTRY_TYPE - type
 	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE;ENTRY_TYPE;source entry must be of type [@ENTRY_TYPE@]";
 	
