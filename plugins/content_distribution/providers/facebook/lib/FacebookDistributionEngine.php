@@ -151,7 +151,9 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			$distributionProfile->pageAccessToken,
 			$remoteId,
 			$captionInfo->filePath,
-			$locale);
+			$locale,
+			$this->tempDirectory
+			);
 
 		$mediaFile = new KalturaDistributionRemoteMediaFile();
 		$mediaFile->assetId = $captionInfo->assetId;
