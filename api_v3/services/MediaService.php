@@ -1191,19 +1191,25 @@ class MediaService extends KalturaEntryService
 	 *
 	 * @action getVolumeMap
 	 * @param string $entryId Entry id
+	 * @param string $flavorId Flavor id
 	 * @return file
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function getVolumeMapAction($entryId)
+	function getVolumeMapAction($entryId, $flavorId = null)
 	{
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$supportedFlavor = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
-		if(!$supportedFlavor)
-			throw new KalturaAPIException(KalturaErrors::SUPPORTED_FLAVOR_NOT_EXIST, $entryId);
-		$supportedFlavorId = $supportedFlavor->getId();
+		if(!$flavorId)
+		{
+			$supportedFlavor = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+			if (!$supportedFlavor)
+				throw new KalturaAPIException(KalturaErrors::SUPPORTED_FLAVOR_NOT_EXIST, $entryId);
+			$flavorId = $supportedFlavor->getId();
+		}
+		else
+			$supportedFlavor = $this->checkIfFlavorExistAndSupported($entryId, $flavorId);
 
 		$packagerRetries = 3;
 		$content = null;
@@ -1215,7 +1221,7 @@ class MediaService extends KalturaEntryService
 		if(!$content)
 			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED, $entryId);
 
-		header("Content-Disposition: attachment; filename=".$entryId.'_'.$supportedFlavorId."_volumeMap.csv");
+		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
 		return new kRendererString($content, 'text/csv');
 	}
 
@@ -1230,7 +1236,6 @@ class MediaService extends KalturaEntryService
 		$entry_data_path = ltrim($entry_data_path, "/");
 		if (!$entry_data_path)
 			return null;
-
 
 		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
 		if(!$content)
@@ -1247,5 +1252,16 @@ class MediaService extends KalturaEntryService
 		return $content;
 	}
 
+	private static function checkIfFlavorExistAndSupported($entryId, $flavorId)
+	{
+		$flavorAsset = assetPeer::retrieveById($flavorId);
+		if(!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $flavorId);
+
+		if(!myEntryUtils::isFlavorSupportedByPackager($flavorAsset, false))
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_IS_NOT_SUPPORTED, $entryId);
+
+		return $flavorAsset;
+	}
 
 }
