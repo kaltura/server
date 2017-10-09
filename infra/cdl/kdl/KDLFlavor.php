@@ -1106,8 +1106,8 @@ $plannedDur = 0;
 		$modVal = 16;
 		if((isset($target->_forceMult16) && $target->_forceMult16 == 0)
 		|| (($target->_width == 640 || $target->_width == 480) && $target->_height == 360) || ($target->_width == 1920 && $target->_height == 1080)){
-			$h264targets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H);
-			if(in_array($target->_id, $h264targets)) {
+			$auxTargets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H, KDLVideoTarget::H265);
+			if(in_array($target->_id, $auxTargets)) {
 				$modVal = 2;
 		}
 		else {
