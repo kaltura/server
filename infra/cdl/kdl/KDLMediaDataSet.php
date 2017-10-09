@@ -341,6 +341,12 @@ class KDLMediaDataSet  {
 			else if($obj->IsFormatOf(array("pcm"))){
 				$valsArr["audioFormat"]="pcm";
 			}
+			else if($obj->IsFormatOf(array("ac3","ac-3"))){
+				$valsArr["audioFormat"]="ac3";
+			}
+			else if($obj->IsFormatOf(array("eac3","eac-3","e-ac-3"))){
+				$valsArr["audioFormat"]="eac3";
+			}
 			else
 				$valsArr["audioFormat"]="undefined";
 			$valsArr["audioDuration"]=$obj->_duration;
@@ -348,6 +354,11 @@ class KDLMediaDataSet  {
 			$valsArr["audioChannels"]=$obj->_channels;
 			$valsArr["audioSampleRate"]=$obj->_sampleRate;
 			$valsArr["audioResolution"]=$obj->_resolution;
+			if(isset($this->_contentStreams->audio)) {
+				$valsArr["audioStreams"]=count($this->_contentStreams->audio);
+			}
+			else 
+				$valsArr["audioStreams"]=0;
 		}
 		else {
 			$valsArr["audioFormat"]="undefined";
@@ -356,7 +367,7 @@ class KDLMediaDataSet  {
 			$valsArr["audioChannels"]=0;
 			$valsArr["audioSamplingRate"]=0;
 			$valsArr["audioResolution"]=0;
-			
+			$valsArr["audioStreams"]=0;			
 		}
 			/*
 			 * Check 'isWeb' and 'isMbr' presets
@@ -377,7 +388,7 @@ class KDLMediaDataSet  {
 			 */
 		$containerFormats = array("mp4","mxf","wmv3","mpegps","mpegts","webm","mp3");
 		$videoCodecs = array("h264","h265","vp6","vp8","vp9","wmv3","mpeg2");
-		$audioCodecs = array("mp3","aac","mpeg2","pcm");
+		$audioCodecs = array("mp3","aac","mpeg2","pcm","ac3","eac3");
 		$allowedFormats = array_merge($containerFormats, $videoCodecs, $audioCodecs);
 		$allowedFormats[] = "undefined";
 		$allowedChars = ' +-*/()!=<>&|;';

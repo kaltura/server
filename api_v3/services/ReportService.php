@@ -7,6 +7,23 @@
  */
 class ReportService extends KalturaBaseService
 {
+    static $kavaReports = array(KalturaReportType::TOP_CONTENT,
+        KalturaReportType::CONTENT_DROPOFF,
+        KalturaReportType::CONTENT_INTERACTIONS,
+        KalturaReportType::MAP_OVERLAY,
+        KalturaReportType::TOP_SYNDICATION,
+        KalturaReportType::USER_ENGAGEMENT,
+        KalturaReportType::SPECIFIC_USER_ENGAGEMENT,
+        KalturaReportType::USER_TOP_CONTENT,
+        KalturaReportType::USER_CONTENT_DROPOFF,
+        KalturaReportType::USER_CONTENT_INTERACTIONS,
+        KalturaReportType::APPLICATIONS,
+        KalturaReportType::PLATFORMS,
+        KalturaReportType::OPERATING_SYSTEM,
+        KalturaReportType::BROWSERS,
+        KalturaReportType::LIVE,
+        KalturaReportType::TOP_PLAYBACK_CONTEXT
+    );
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -67,12 +84,14 @@ class ReportService extends KalturaBaseService
 	{
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
-		
-		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( myReportsMgr::getGraph( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() ,
-			$dimension , 
-			$objectIds ) );
+	
+	    $reportsMgrClass = $this->getReportsManagerClass($reportType);
+		        
+		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray (call_user_func(array($reportsMgrClass, "getGraph"),$this->getPartnerId(),
+		    $reportType,
+		    $reportInputFilter->toReportsInputFilter(),
+		    $dimension,
+		    $objectIds));
 
 		return $reportGraphs;
 	}
@@ -93,9 +112,12 @@ class ReportService extends KalturaBaseService
 		
 		$reportTotal = new KalturaReportTotal();
 		
-		list ( $header , $data ) = myReportsMgr::getTotal( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() , $objectIds );
+		$reportsMgrClass = $this->getReportsManagerClass($reportType);
+		
+		list ( $header , $data ) = call_user_func(array($reportsMgrClass, "getTotal"), $this->getPartnerId() ,
+		    $reportType ,
+		    $reportInputFilter->toReportsInputFilter() , $objectIds);
+		
 		$reportTotal->fromReportTotal ( $header , $data );
 			
 		return $reportTotal;
@@ -139,11 +161,13 @@ class ReportService extends KalturaBaseService
 		
 		$reportTable = new KalturaReportTable();
 		
-		list ( $header , $data , $totalCount ) = myReportsMgr::getTable( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() ,
-			$pager->pageSize , $pager->pageIndex ,
-			$order ,  $objectIds);
+		$reportsMgrClass = $this->getReportsManagerClass($reportType);
+		
+		list ( $header , $data , $totalCount ) = call_user_func(array($reportsMgrClass, "getTable"), $this->getPartnerId() ,
+		    $reportType ,
+		    $reportInputFilter->toReportsInputFilter() ,
+		    $pager->pageSize , $pager->pageIndex ,
+		    $order ,  $objectIds);
 
 		$reportTable->fromReportTable ( $header , $data , $totalCount );
 			
@@ -335,5 +359,16 @@ class ReportService extends KalturaBaseService
 		$partnerIdParam->key = 'partner_id';
 		$partnerIdParam->value = $this->getPartnerId();
 		$params[] = $partnerIdParam;
+	}
+	
+	protected function getReportsManagerClass($reportType) 
+	{
+	    $reportsMgrClass = "myReportsMgr";
+	    if (in_array($reportType, self::$kavaReports) && kConf::hasParam("druid_url"))
+	    {
+	        $reportsMgrClass = "kKavaReportsMgr";
+	    }
+	    
+	    return $reportsMgrClass;
 	}
 }
