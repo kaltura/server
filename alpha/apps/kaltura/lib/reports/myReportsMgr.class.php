@@ -17,8 +17,8 @@ class myReportsMgr
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
 	const REPORT_TYPE_USER_ENGAGEMENT = 11;
 	const REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE = 110;
-	const REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT = 12;
-	const REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE = 120;
+	const REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT = 12;
+	const REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT_TOTAL_UNIQUE = 120;
 	const REPORT_TYPE_USER_TOP_CONTENT = 13;
 	const REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE = 130;
 	const REPORT_TYPE_USER_CONTENT_DROPOFF = 14;
@@ -37,7 +37,7 @@ class myReportsMgr
 	const REPORT_TYPE_VAR_USAGE = 19;
 	const REPORT_TYPE_TOP_CREATORS = 20;
 	const REPORT_TYPE_PLATFORMS = 21;
-	const REPORT_TYPE_OPERATION_SYSTEM = 22;
+	const REPORT_TYPE_OPERATING_SYSTEM = 22;
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 	const REPORT_TYPE_TOP_PLAYBACK_CONTEXT = 25;
@@ -59,13 +59,13 @@ class myReportsMgr
 	const UNKNOWN_NAME_CLAUSE = "'Unknown'";
 
 	static $unique_total_reports = array (self::REPORT_TYPE_USER_ENGAGEMENT,
-										self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT, 
+										self::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT, 
 										self::REPORT_TYPE_USER_TOP_CONTENT,
 										self::REPORT_TYPE_USER_CONTENT_DROPOFF,
 										self::REPORT_TYPE_USER_CONTENT_INTERACTIONS);
 										
 	static $end_user_filter_get_count_reports = array (self::REPORT_TYPE_PLATFORMS,
-										self::REPORT_TYPE_OPERATION_SYSTEM, 
+										self::REPORT_TYPE_OPERATING_SYSTEM, 
 										self::REPORT_TYPE_BROWSERS,
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
@@ -898,7 +898,7 @@ class myReportsMgr
 		}
 	}
 		
-	private static $flavor_map = array ( 
+	static $flavor_map = array ( 
 		self::REPORT_FLAVOR_GRAPH => "graph" ,
 		self::REPORT_FLAVOR_TOTAL => "total" ,
 		self::REPORT_FLAVOR_TABLE => "detail" ,
@@ -906,7 +906,7 @@ class myReportsMgr
 		self::REPORT_FLAVOR_BASE_TOTAL =>"base_total",
 	);
 	
-	private static $type_map = array ( 
+	static $type_map = array ( 
 		self::REPORT_TYPE_TOP_CONTENT => "top_content" ,
 		self::REPORT_TYPE_CONTENT_DROPOFF => "content_dropoff" ,
 		self::REPORT_TYPE_CONTENT_INTERACTIONS => "content_interactions" ,
@@ -918,8 +918,8 @@ class myReportsMgr
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
 		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
-		self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
-		self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
+		self::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT => "specific_user_engagement",
+		self::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
 		self::REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_CONTENT_DROPOFF => "user_content_dropoff", 
@@ -937,7 +937,7 @@ class myReportsMgr
 		self::REPORT_TYPE_SPECIFIC_USER_USAGE => 'specific_user_usage',
 		self::REPORT_TYPE_VAR_USAGE => 'var_usage',
 		self::REPORT_TYPE_PLATFORMS => 'platforms',
-		self::REPORT_TYPE_OPERATION_SYSTEM => 'os',
+		self::REPORT_TYPE_OPERATING_SYSTEM => 'os',
 		self::REPORT_TYPE_BROWSERS => 'browsers',
 		self::REPORT_TYPE_LIVE => "live",
 		self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => "top_playback_context",
