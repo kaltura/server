@@ -395,6 +395,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE = "UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE;;Failed to match expected file size";
 
 	const UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD = "UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD;;Upload token is restricted due to the file type";
+	
+	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
 
 	/*
 	 * Partenrs service

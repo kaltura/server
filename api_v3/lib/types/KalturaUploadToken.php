@@ -128,4 +128,19 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	{
 		return array();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		
+		//If autoFinalize flag was set check file size also provided
+		if(isset($this->autoFinalize) && $this->autoFinalize == KalturaNullableBoolean::TRUE_VALUE)
+		{
+			if(!isset($this->fileSize))
+				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_MISSING_FILE_SIZE);
+		}
+	}
 }

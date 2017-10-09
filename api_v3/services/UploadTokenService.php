@@ -97,10 +97,10 @@ class UploadTokenService extends KalturaBaseService
 			kFileUtils::dumpApiRequest($remoteDCHost);
 		}
 
-		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb);
+		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb, $finalChunk);
 		try
 		{
-			$uploadTokenMgr->uploadFileToToken($fileData, $resume, $finalChunk, $resumeAt);
+			$uploadTokenMgr->uploadFileToToken($fileData, $resume, $resumeAt);
 		}
 		catch(kUploadTokenException $ex)
 		{
