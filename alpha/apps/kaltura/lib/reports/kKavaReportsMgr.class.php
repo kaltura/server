@@ -44,7 +44,9 @@ class kKavaReportsMgr
     const DRUID_CONTEXT = "context";
     const DRUID_PRIORITY = "priority";
     const DRUID_SKIP_EMPTY_BUCKETS = "skipEmptyBuckets";
-        
+    const DRUID_RESULT = "result";
+    const DRUID_TIMESTAMP = "timestamp";
+    const DRUID_EVENT = "event";
     
     const DIMENSION_PARTNER_ID = "partnerId";
     const DIMENSION_ENTRY_ID = "entryId";
@@ -99,6 +101,7 @@ class kKavaReportsMgr
     const METRIC_UNIQUE_USERS = "uniqueUsers";
     const METRIC_UNIQUE_USER_IDS = "uniqueUserIds";
     const METRIC_PLAYTHROUGH = "playThrough";
+    const METRIC_TOTAL_COUNT = "total_count";
  
     const REPORT_DIMENSION = "report_dimension";
     const REPORT_METRICS = "report_metrics";
@@ -559,12 +562,12 @@ class kKavaReportsMgr
         if (count($result) > 0)
         {
             $row = $result[0];
-            $row_data = $row->result;
+            $row_data = $row[self::DRUID_RESULT];
            
             foreach ($metrics as $column)
             {
                 $headers[] = self::$metrics_to_headers[$column];
-                $data[] = $row_data->$column;
+                $data[] = $row_data[$column];
             }
             
             foreach (self::$transform_metrics as $metric) {
@@ -639,7 +642,7 @@ class kKavaReportsMgr
         if (count($result) > 0)
         {
             $report_str = myReportsMgr::$type_map[$report_type];
-            $rows = $result[0]->result;
+            $rows = $result[0][self::DRUID_RESULT];
             $rows_count = count($rows);
             
             if ($page_index * $page_size > $rows_count)
@@ -675,13 +678,13 @@ class kKavaReportsMgr
                 
                 foreach ($rows as $row)
                 {
-                    $dimension_ids[] = $row->$dimension;
+                    $dimension_ids[] = $row[$dimension];
                     $row_data = array();
-                    $row_data = array_fill(0, count($dimension_headers), $row->$dimension);
+                    $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
                     
                     foreach ($report_metrics as $column)
                     {
-                        $row_data[] = $row->$column;
+                        $row_data[] = $row[$column];
                     }
                     $data[] = $row_data;
                     
@@ -1021,7 +1024,7 @@ class kKavaReportsMgr
        $report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
        
        $report_def[self::DRUID_AGGR][] = array(self::DRUID_TYPE => self::DRUID_CARDINALITY,
-                                               self::DRUID_NAME => "total_count",
+                                               self::DRUID_NAME => self::METRIC_TOTAL_COUNT,
                                                self::DRUID_FIELDS => array($dimension));
       
        return $report_def;
@@ -1065,10 +1068,11 @@ class kKavaReportsMgr
        
        curl_close($ch);
        
-       $json_res = json_decode($results);
-       if (isset($json_res->error)) {
-           KalturaLog::err("Error while running report $json_res->errorMessage");
-           throw new Exception("Error while running report $json_res->errorMessage");
+       $json_res = json_decode($results, true);
+       if (isset($json_res["error"])) {
+           $error_msg = $json_res["errorMessage"];
+           KalturaLog::err("Error while running report $error_msg");
+           throw new Exception("Error while running report $error_msg");
        }
        
        return $json_res;
@@ -1085,16 +1089,16 @@ class kKavaReportsMgr
        
        foreach ($result as $row)
        {
-           $row_data = $row->result;
+           $row_data = $row[self::DRUID_RESULT];
            
            if ($is_hourly)
-               $date = self::timestampToHourId($row->timestamp);
+               $date = self::timestampToHourId($row[self::DRUID_TIMESTAMP]);
            else
-               $date = self::timestampToDateId($row->timestamp, $tz_offset);
+               $date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz_offset);
          
            foreach ($graph_metrics_to_headers as $column => $header)
            {
-               $graphs[$header][$date] = $row_data->$column;
+               $graphs[$header][$date] = $row_data[$column];
            }
        }
        return $graphs;
@@ -1112,10 +1116,10 @@ class kKavaReportsMgr
        
        foreach ($result as $row)
        {
-           $row_data = $row->event;
+           $row_data = $row[self::DRUID_EVENT];
            
-           $date = self::timestampToDateId($row->timestamp, $tz_offset);
-           $multiline_val = $row_data->$multiline_column;
+           $date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz_offset);
+           $multiline_val = $row_data[$multiline_column];
            foreach ($graph_metrics_to_headers as $column => $header)
            {
                if (isset($graphs[$header][$date]))
@@ -1123,7 +1127,7 @@ class kKavaReportsMgr
                else 
                    $graphs[$header][$date] = "";
                
-               $graphs[$header][$date] .= $multiline_val . ":" .  $row_data->$column;
+               $graphs[$header][$date] .= $multiline_val . ":" .  $row_data[$column];
                
            }
        }
@@ -1141,13 +1145,13 @@ class kKavaReportsMgr
        
        foreach ($result as $row)
        {
-           $row_data = $row->event;
+           $row_data = $row[self::DRUID_EVENT];
            
-           $dim_value = $row_data->$dimension;
+           $dim_value = $row_data[$dimension];
            
            foreach ($graph_metrics_to_headers as $column => $header)
            {
-               $graphs[$header][$dim_value] = $row_data->$column;
+               $graphs[$header][$dim_value] = $row_data[$column];
            }
        }
        return $graphs;
@@ -1160,10 +1164,10 @@ class kKavaReportsMgr
        $row = $result[0];
        if (isset($row))
        {
-           $row_data = $row->result;
+           $row_data = $row[self::DRUID_RESULT];
            foreach ($graph_metrics_to_headers as $column => $header)
            {
-               $graph[$header] = $row_data->$column;
+               $graph[$header] = $row_data[$column];
            }
        }
        
@@ -1287,9 +1291,9 @@ class kKavaReportsMgr
        $query = self::getDimCardinalityReport($partner_id, $intervals, $dimension, $druid_filter, $event_type);
        
        $total_count_arr = self::runReport($query);
-       if (isset($total_count_arr[0]->result->total_count))
+       if (isset($total_count_arr[0][self::DRUID_RESULT][self::METRIC_TOTAL_COUNT]))
        {
-           $total_count = floor($total_count_arr[0]->result->total_count);
+           $total_count = floor($total_count_arr[0][self::DRUID_RESULT][self::METRIC_TOTAL_COUNT]);
        }
        else
        {
