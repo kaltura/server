@@ -32,14 +32,28 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
 		$this->validate($data);
-		if ($data->entryDistribution->remoteId) {
+		if ($data->entryDistribution->remoteId)
+		{
 			$data->remoteId = $data->entryDistribution->remoteId;
-		} else {
+		}
+		else
+		{
 			$this->doSubmit($data);
 		}
 		return true;
 	}
 
+	/** on submission of a video we can take care of the following :
+	 * 1. video content
+	 * 2. thumbnail
+	 * 3. call to action
+	 * 4. name + description
+	 * 5. place
+	 * 6. tags
+	 * 7. targeting
+	 * 8. scheduled_publishing_time
+	 * 9. feed targeting
+	 */
 	protected function doSubmit(KalturaDistributionSubmitJobData $data)
 	{
 		$videoPath = $data->providerData->videoAssetFilePath;
@@ -50,18 +64,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 
 		$facebookMetadata = $this->convertToFacebookData($data->providerData->fieldValues, true);
 
-		try {
-			/** on submission of a video we can take care of the following :
-			 * 1. video content
-			 * 2. thumbnail
-			 * 3. call to action
-			 * 4. name + description
-			 * 5. place
-			 * 6. tags
-			 * 7. targeting
-			 * 8. scheduled_publishing_time
-			 * 9. feed targeting
-			 */
+		try
+		{
 			$data->remoteId = FacebookGraphSdkUtils::uploadVideo(
 				$this->appId,
 				$this->appSecret,
@@ -72,7 +76,9 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				filesize($videoPath),
 				$this->tempDirectory,
 				$facebookMetadata);
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
 
@@ -87,6 +93,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
 			}
 		}
+
 		return true;
 	}
 
@@ -126,9 +133,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	private function handleTags($pageAccessToken, $tags, $videoId)
 	{
 		if(empty($tags))
-		{
 			return;
-		}
 
 		try
 		{
@@ -145,15 +150,16 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		try
 		{
 			// first delete the captions that were already distributed
-			while ($mediaFile = array_pop($data->mediaFiles)) {
+			while ($mediaFile = array_pop($data->mediaFiles))
+			{
 				$this->deleteCaption($data->distributionProfile, $mediaFile->remoteId, $data->entryDistribution->remoteId);
 			}
 
 			// last add all the captions available
-		if(isset($data->providerData->captionsInfo))
-		{
-			foreach ($data->providerData->captionsInfo as $captionInfo)
+			if(isset($data->providerData->captionsInfo))
 			{
+				foreach ($data->providerData->captionsInfo as $captionInfo)
+				{
 					/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
 					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
 				}
@@ -195,6 +201,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		$mediaFile->remoteId = $locale;
 		return $mediaFile;
 	}
+
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineDelete::delete()
 	*/
@@ -320,10 +327,14 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				if (strpos($value, self::FACEBOOK_CUSTOM_DATA_DELIMITER) !== false)
 				{
 					$metadataArray[$key] = explode(self::FACEBOOK_CUSTOM_DATA_DELIMITER, $value);
-				} else {
+				}
+				else
+				{
 					$metadataArray[$key] = array($value);
 				}
-			} else {
+			}
+			else
+			{
 				$metadataArray[$key] = $value;
 			}
 		}
