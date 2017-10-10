@@ -613,6 +613,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		while (!$ingestedVideo && $currentByte < $size)
 		{
 			$chunk = kFile::getFileContent($filePath, $currentByte, $currentByte + $chunkSizeBytes, 'rb');
+			if (!$chunk)
+				throw new Exception("Cannot get chunk from file [$filePath] starting from [$currentByte]");
 			$ingestedVideo = self::uploadChunk($media, $chunk);
 			$currentByte += $chunkSizeBytes;
 		}
