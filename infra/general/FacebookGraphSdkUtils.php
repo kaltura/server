@@ -419,8 +419,21 @@ class FacebookGraphSdkUtils
 			throw new Exception("Failed to ".($isDelete? "delete " : "update ").$subCategory." video ".$videoId);
 	}
 
+	public static function updateTags($appId, $appSecret, $accessToken, $tags, $videoId)
+	{
+		$fb = self::createFacebookInstance($appId, $appSecret);
+		foreach ($tags as $tag)
+		{
+			$data = array('tag_uid' => $tag);
+			$response = $fb->post("/" . $videoId . "/tags", $data, $accessToken);
+			$graphNode = $response->getGraphNode();
+			if ($graphNode['success'] != 1)
+				throw new Exception("Failed to add tag ".$tag." to video id ".$videoId);
+		}
+	}
+
 	/**
-	 * Retuns a new Facebook client using teh facebook sdk using the arguments
+	 * Retuns a new Facebook client using the facebook sdk using the arguments
 	 * @param string $appId
 	 * @param string $appSecret
 	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler

@@ -76,6 +76,9 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
 
+		$tags = FacebookDistributionEngine::helperGetTags($data->providerData->fieldValues);
+		$this->handleTags($data->distributionProfile->pageAccessToken,$tags ,$data->remoteId);
+
 		if ($data->providerData->captionsInfo)
 		{
 			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
@@ -98,7 +101,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 
 	protected function doUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		try {
+		try
+		{
 			$facebookMetadata = $this->convertToFacebookData($data->providerData->fieldValues);
 
 			FacebookGraphSdkUtils::updateUploadedVideo($this->appId,
@@ -106,22 +110,57 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				$data->distributionProfile->pageAccessToken,
 				$facebookMetadata,
 				$data->entryDistribution->remoteId);
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			throw new Exception("Failed to update facebook video , reason:".$e->getMessage());
 		}
 
-		// first delete the captions that were already distributed
-		while ($mediaFile = array_pop($data->mediaFiles))
-		{
-			$this->deleteCaption($data->distributionProfile, $mediaFile->remoteId, $data->entryDistribution->remoteId);
-		}
-		// last add all the captions available
-		foreach ($data->providerData->captionsInfo as $captionInfo)
-		{
-			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
-			$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
-		}
+		$tags = FacebookDistributionEngine::helperGetTags($data->providerData->fieldValues);
+		$this->handleTags($data->distributionProfile->pageAccessToken, $tags ,$data->entryDistribution->remoteId);
+		$this->handleCaptions($data);
+
 		return true;
+	}
+
+	private function handleTags($pageAccessToken, $tags, $videoId)
+	{
+		if(empty($tags))
+		{
+			return;
+		}
+
+		try
+		{
+			FacebookGraphSdkUtils::updateTags($this->appId, $this->appSecret, $pageAccessToken, $tags, $videoId);
+		}
+		catch (Exception $e)
+		{
+			throw new Exception("Failed to update facebook tags , reason:".$e->getMessage());
+		}
+	}
+
+	private function handleCaptions(KalturaDistributionUpdateJobData $data)
+	{
+		try
+		{
+			// first delete the captions that were already distributed
+			while ($mediaFile = array_pop($data->mediaFiles)) {
+				$this->deleteCaption($data->distributionProfile, $mediaFile->remoteId, $data->entryDistribution->remoteId);
+			}
+
+			// last add all the captions available
+			if ($data->providerData->captionsInfo) {
+				foreach ($data->providerData->captionsInfo as $captionInfo) {
+					/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
+					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			throw new Exception("Failed to update facebook video captions, reason:".$e->getMessage());
+		}
 	}
 
 	private function submitCaption(KalturaFacebookDistributionProfile $distributionProfile, KalturaFacebookCaptionDistributionInfo $captionInfo, $remoteId)
@@ -195,14 +234,11 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			throw new Exception("Facebook appSecret is not configured");
 	}
 
-
 	private function convertToFacebookData($fieldValues, $isSubmit=false)
 	{
 		$fieldValues = unserialize($fieldValues);
 		$facebookMetadata = array();
 		$this->insertToFacebookMetadata($facebookMetadata, 'description', $fieldValues[FacebookDistributionField::DESCRIPTION], false);
-		$this->insertToFacebookMetadata($facebookMetadata, 'place', $fieldValues[FacebookDistributionField::PLACE], false);
-		$this->insertToFacebookMetadata($facebookMetadata, 'tags', $fieldValues[FacebookDistributionField::TAGS], true);
 
 		if ($isSubmit) // these fields should not update
 		{
@@ -240,6 +276,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			$this->insertToFacebookMetadata($targetingMetadata, 'locales', $fieldValues[FacebookDistributionField::TARGETING_LOCALES], true);
 			if (!empty($targetingMetadata))
 				$facebookMetadata['targeting'] = json_encode($targetingMetadata);
+
 			$feedTargetingMetadata = array();
 			$this->insertToFacebookMetadata($feedTargetingMetadata, 'countries', $fieldValues[FacebookDistributionField::FEED_TARGETING_COUNTRIES], true);
 			$this->insertToFacebookMetadata($feedTargetingMetadata, 'regions', $fieldValues[FacebookDistributionField::FEED_TARGETING_REGIONS], true);
@@ -257,7 +294,9 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			if (!empty($feedTargetingMetadata))
 				$facebookMetadata['feed_targeting'] = json_encode($feedTargetingMetadata);
 
-		} else {
+		}
+		else
+		{
 			$this->insertToFacebookMetadata($facebookMetadata, 'name', $fieldValues[FacebookDistributionField::TITLE], false);
 		}
 
@@ -283,4 +322,19 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		}
 	}
 
+	private static function helperGetTags($fieldValues)
+	{
+		$fieldValues = unserialize($fieldValues);
+		$value = $fieldValues[FacebookDistributionField::TAGS];
+		if (strpos($value, self::FACEBOOK_CUSTOM_DATA_DELIMITER) !== false)
+		{
+			$value = explode(self::FACEBOOK_CUSTOM_DATA_DELIMITER, $value);
+		}
+		else
+		{
+			$value = array($value);
+		}
+
+		return $value;
+	}
 }
