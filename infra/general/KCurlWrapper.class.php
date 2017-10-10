@@ -225,7 +225,7 @@ class KCurlWrapper
 		if(!$params || !isset($params->curlVerifySSL) || !$params->curlVerifySSL)
 		{
 			curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
-			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 1);
+			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 0);
 		}
 	}
 
