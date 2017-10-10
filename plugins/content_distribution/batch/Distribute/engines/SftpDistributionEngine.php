@@ -30,7 +30,7 @@ abstract class SftpDistributionEngine extends DistributionEngine
 	{
 		$tempFilePath = $this->tempDirectory . '/' . $this->getTempDirectory() . '/' . $distributionProfileId . '/';
 		if (!file_exists($tempFilePath))		
-			mkdir($tempFilePath, 0777, true);
+			kFile::fullMkfileDir($tempFilePath);
 		return $tempFilePath;
 	}
 
