@@ -785,7 +785,7 @@ abstract class KalturaObject implements IApiObject
 						KalturaLog::err('Current user has not update permission for property ' . $this->getFormattedPropertyNameWithClassName($propertyName));
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						$this->$propertyName = null;
-						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error: '.$e->getMessage());
 					}
 				}
 			}
@@ -842,8 +842,8 @@ abstract class KalturaObject implements IApiObject
 						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_USAGE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						$this->$propertyName = null;
-						KalturaLog::err($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
-						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
+						KalturaLog::err($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error:: '.$e->getMessage());
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error: '.$e->getMessage());
 					}
 				}
 			}
