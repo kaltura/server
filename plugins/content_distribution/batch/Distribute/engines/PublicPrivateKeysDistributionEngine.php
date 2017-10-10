@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage Scheduler.Distribute
  */
-abstract class SftpDistributionEngine extends DistributionEngine
+abstract class PublicPrivateKeysDistributionEngine extends DistributionEngine
 {
 	
 	abstract function getTempDirectory();

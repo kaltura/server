@@ -3,7 +3,7 @@
  * @package plugins.ftpDistribution
  * @subpackage lib
  */
-class FtpDistributionEngine extends SftpDistributionEngine implements
+class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implements
 	IDistributionEngineSubmit,
 	IDistributionEngineUpdate,
 	IDistributionEngineDelete
