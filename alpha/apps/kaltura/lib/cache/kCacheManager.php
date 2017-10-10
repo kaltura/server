@@ -33,6 +33,7 @@ class kCacheManager
 	const CACHE_TYPE_PLAYKIT_JS = 'playKitJs';
 	const CACHE_TYPE_PLAYKIT_JS_SOURCE_MAP = 'playKitJsSourceMap';
 	const CACHE_TYPE_REPORTS_COUNT = "reportscount";
+	const CACHE_TYPE_GEO_COORDINATES = 'geoCoordinates';
 
 	protected static $caches = array();
 	

@@ -1,96 +1,7 @@
 <?php
 
-class kKavaReportsMgr
+class kKavaReportsMgr extends kKavaBase
 {
-    const HISTORICAL_DATASOURCE = "player-events-historical";
-    const DRUID_QUERY_TYPE = "queryType";
-    const DRUID_TOPN = "topN";
-    const DRUID_TIMESERIES = "timeseries";
-    const DRUID_GROUP_BY = "groupBy";
-    const DRUID_FILTERED_AGGR = "filtered";
-    const DRUID_SELECTOR_FILTER = "selector";
-    const DRUID_IN_FILTER = "in";
-    const DRUID_TYPE = "type";
-    const DRUID_FILTER = "filter";
-    const DRUID_DIMENSION = "dimension";
-    const DRUID_DIMENSIONS = "dimensions";
-    const DRUID_VALUE = "value";
-    const DRUID_VALUES = "values";
-    const DRUID_ARITHMETIC_POST_AGGR = "arithmetic";
-    const DRUID_FUNCTION = "fn";
-    const DRUID_AGGREGATOR = "aggregator";
-    const DRUID_NAME = "name";
-    const DRUID_METRIC = "metric";
-    const DRUID_THRESHOLD = "threshold";
-    const DRUID_FIELD_NAME = "fieldName";
-    const DRUID_LONG_SUM_AGGR = "longSum";
-    const DRUID_GRANULARITY = "granularity";
-    const DRUID_GRANULARITY_ALL = "all";
-    const DRUID_GRANULARITY_DAY = "day";
-    const DRUID_GRANULARITY_HOUR = "hour";
-    const DRUID_DATASOURCE = "dataSource";
-    const DRUID_INTERVALS = "intervals";
-    const DRUID_FIELDS = "fields";
-    const DRUID_CARDINALITY = "cardinality";
-    const DRUID_HYPER_UNIQUE = "hyperUnique";
-    const DRUID_POST_AGGR = "postAggregations";
-    const DRUID_AGGR = "aggregations";
-    const DRUID_FIELD_ACCESS = "fieldAccess";
-    const DRUID_CONSTANT = "constant";
-    const DRUID_GRANULARITY_PERIOD = "period";
-    const DRUID_TIMEZONE = "timeZone";
-    const DRUID_NUMERIC = "numeric";
-    const DRUID_INVERTED = "inverted";
-    const DRUID_CONTEXT = "context";
-    const DRUID_PRIORITY = "priority";
-    const DRUID_SKIP_EMPTY_BUCKETS = "skipEmptyBuckets";
-    const DRUID_RESULT = "result";
-    const DRUID_TIMESTAMP = "timestamp";
-    const DRUID_EVENT = "event";
-    
-    const DIMENSION_PARTNER_ID = "partnerId";
-    const DIMENSION_ENTRY_ID = "entryId";
-    const DIMENSION_LOCATION_COUNTRY = "location.country";
-    const DIMENSION_LOCATION_CITY = "location.city";
-    const DIMENSION_DOMAIN = "urlParts.domain";
-    const DIMENSION_URL = "urlParts.canonicalUrl";
-    const DIMENSION_USER_ID = "userId";
-    const DIMENSION_APPLICATION = "application";
-    const DIMENSION_DEVICE = "userAgent.device";
-    const DIMENSION_OS = "userAgent.operatingSystem";
-    const DIMENSION_BROWSER = "userAgent.browser";
-    const DIMENSION_PLAYBACK_CONTEXT = "playbackContext";
-    const DIMENSION_PLAYBACK_TYPE = "playbackType";
-    const DIMENSION_CATEGORIES = "categories";
-    const DIMENSION_EVENT_TYPE = "eventType";
-    
-    const EVENT_TYPE_PLAYER_IMPRESSION = "playerImpression";
-    const EVENT_TYPE_PLAY_REQUESTED = "playRequested";
-    const EVENT_TYPE_PLAY = "play";
-    const EVENT_TYPE_RESUME = "resume";
-    const EVENT_TYPE_PLAYTHROUGH_25 = "playThrough25";
-    const EVENT_TYPE_PLAYTHROUGH_50 = "playThrough50";
-    const EVENT_TYPE_PLAYTHROUGH_75 = "playThrough75";
-    const EVENT_TYPE_PLAYTHROUGH_100 = "playThrough100";
-    const EVENT_TYPE_EDIT_CLICKED = "editClicked";
-    const EVENT_TYPE_SHARE_CLICKED = "shareClicked";
-    const EVENT_TYPE_SHARED = "shared";
-    const EVENT_TYPE_DOWNLOAD_CLICKED = "downloadClicked";
-    const EVENT_TYPE_REPORT_CLICKED = "reportClicked";
-    const EVENT_TYPE_PLAY_END = "playEnd";
-    const EVENT_TYPE_REPORT_SUBMITTED = "reportSubmitted";
-    const EVENT_TYPE_ENTER_FULL_SCREEN = "enterFullscreen";
-    const EVENT_TYPE_EXIT_FULL_SCREEN = "exitFullscreen";
-    const EVENT_TYPE_PAUSE = "pauseClicked";
-    const EVENT_TYPE_REPLAY = "replay";
-    const EVENT_TYPE_SEEK = "seek";
-    const EVENT_TYPE_RELATED_CLICKED = "relatedClicked";
-    const EVENT_TYPE_RELATED_SELECTED = "relatedSelected";
-    const EVENT_TYPE_CAPTIONS = "captions";
-    const EVENT_TYPE_SOURCE_SELECTED = "sourceSelected";
-    const EVENT_TYPE_INFO = "info";
-    const EVENT_TYPE_SPEED = "speed";
-    const EVENT_TYPE_VIEW = "view";
     const METRIC_TOTAL_PLAY_TIME = "playTimeSumMin";
     const METRIC_TOTAL_PLAY_TIME_SEC = "playTimeSum";
     const METRIC_AVG_PLAY_TIME = "playTimeAvg";
@@ -102,7 +13,7 @@ class kKavaReportsMgr
     const METRIC_UNIQUE_USER_IDS = "uniqueUserIds";
     const METRIC_PLAYTHROUGH = "playThrough";
     const METRIC_TOTAL_COUNT = "total_count";
- 
+
     const REPORT_DIMENSION = "report_dimension";
     const REPORT_METRICS = "report_metrics";
     const REPORT_DETAIL_DIM_HEADERS = "report_deatil_dimensions_headers";
@@ -511,7 +422,7 @@ class kKavaReportsMgr
                 
         }
         
-        $result = self::runReport($query);
+        $result = self::runQuery($query);
         
         $graph_metrics = $report_def[self::REPORT_GRAPH_METRICS];
         foreach ($graph_metrics as $column)
@@ -558,7 +469,7 @@ class kKavaReportsMgr
         if (array_key_exists(self::REPORT_TOTAL_ADDITIONAL_METRICS, $report_def))
             $metrics = array_merge($report_def[self::REPORT_TOTAL_ADDITIONAL_METRICS], $metrics);
         $query = self::getTimeSeriesReport($partner_id, $intervals, $granularity, $metrics, $druid_filter);
-        $result = self::runReport($query);
+        $result = self::runQuery($query);
         if (count($result) > 0)
         {
             $row = $result[0];
@@ -638,7 +549,7 @@ class kKavaReportsMgr
         $metrics = self::getMetrics($report_type);
         
         $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $page_size * $page_index);
-        $result = self::runReport($query);
+        $result = self::runQuery($query);
         if (count($result) > 0)
         {
             $report_str = myReportsMgr::$type_map[$report_type];
@@ -824,7 +735,8 @@ class kKavaReportsMgr
    {
        $druid_filter = array();
        $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
-           self::DRUID_VALUES => array($report_type == myReportsMgr::REPORT_TYPE_LIVE ? "live" : "vod"));
+           self::DRUID_VALUES => array($report_type == myReportsMgr::REPORT_TYPE_LIVE ? 
+           		self::PLAYBACK_TYPE_LIVE : self::PLAYBACK_TYPE_VOD));
        
        if ($input_filter instanceof endUserReportsInputFilter)
        {
@@ -1039,45 +951,6 @@ class kKavaReportsMgr
        return $report_def;
    }
    
-   public static function runReport($content) {
-       
-       kApiCache::disableConditionalCache();
-       KalturaLog::log("{" . print_r($content, true) . "}");
-       
-       $post = json_encode($content);
-       KalturaLog::log($post);
-       
-       $remote_path = kConf::get('druid_url');       
-       
-       $ch = curl_init($remote_path);
-       curl_setopt($ch, CURLOPT_HEADER, false);
-       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-       curl_setopt($ch, CURLOPT_POST, true);
-       curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-       curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-       curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-       
-       $druid_start = microtime(true);
-       $results = curl_exec($ch);
-       
-       $druid_took = microtime(true) - $druid_start;
-       KalturaLog::debug("Druid query took - " . $druid_took. " seconds");
-       
-       if (curl_errno($ch))
-           throw new Exception("Error while trying to connect to:". $remote_path ." error=".curl_error($ch));
-       
-       curl_close($ch);
-       
-       $json_res = json_decode($results, true);
-       if (isset($json_res["error"])) {
-           $error_msg = $json_res["errorMessage"];
-           KalturaLog::err("Error while running report $error_msg");
-           throw new Exception("Error while running report $error_msg");
-       }
-       
-       return $json_res;
-   }
-   
    public static function getGraphsByDateId ($result, $graph_metrics_to_headers, $tz_offset, $is_hourly = false)
    {
        $graphs = array();
@@ -1290,7 +1163,7 @@ class kKavaReportsMgr
        
        $query = self::getDimCardinalityReport($partner_id, $intervals, $dimension, $druid_filter, $event_type);
        
-       $total_count_arr = self::runReport($query);
+       $total_count_arr = self::runQuery($query);
        if (isset($total_count_arr[0][self::DRUID_RESULT][self::METRIC_TOTAL_COUNT]))
        {
            $total_count = floor($total_count_arr[0][self::DRUID_RESULT][self::METRIC_TOTAL_COUNT]);
