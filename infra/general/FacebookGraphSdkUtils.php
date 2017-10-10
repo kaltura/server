@@ -223,15 +223,16 @@ class FacebookGraphSdkUtils
 	 * @param $videoId
 	 * @param $filePath
 	 * @param $locale
+	 * @param $tempDirectory
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale)
+	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale, $tempDirectory)
 	{
 		if (!file_exists($filePath))
 			throw new Exception("Captions file given does not exist: ".$filePath);
 		//create file name in format: filename.locale.srt
-		$newFilePath = basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
+		$newFilePath = $tempDirectory.'/'.basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
 		copy($filePath, $newFilePath);
 		$data = array (
 			'captions_file' => new FacebookCaptionsFile($newFilePath),

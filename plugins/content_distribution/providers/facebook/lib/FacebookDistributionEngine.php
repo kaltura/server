@@ -150,8 +150,10 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			}
 
 			// last add all the captions available
-			if ($data->providerData->captionsInfo) {
-				foreach ($data->providerData->captionsInfo as $captionInfo) {
+		if(isset($data->providerData->captionsInfo))
+		{
+			foreach ($data->providerData->captionsInfo as $captionInfo)
+			{
 					/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
 					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
 				}
@@ -167,12 +169,16 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	{
 		if (!$captionInfo->label && !$captionInfo->language)
 			throw new Exception("No label/language were configured for this caption aborting");
+
 		if ($captionInfo->language)
 			$locale = KalturaFacebookLanguageMatch::getFacebookCodeForKalturaLanguage($captionInfo->language);
+
 		if (!$locale && $captionInfo->label)
 			$locale = $captionInfo->label;
+
 		if (!$locale)
 			throw new Exception("Failed to find matching language for language ".$captionInfo->language." and there was no label available");
+
 		FacebookGraphSdkUtils::uploadCaptions(
 			$this->appId,
 			$this->appSecret,
@@ -180,7 +186,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			$remoteId,
 			$captionInfo->filePath,
 			$locale,
-			$this->tempDirectory);
+			$this->tempDirectory
+			);
 
 		$mediaFile = new KalturaDistributionRemoteMediaFile();
 		$mediaFile->assetId = $captionInfo->assetId;
