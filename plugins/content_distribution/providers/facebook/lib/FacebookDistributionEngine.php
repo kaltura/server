@@ -79,7 +79,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		$tags = FacebookDistributionEngine::helperGetTags($data->providerData->fieldValues);
 		$this->handleTags($data->distributionProfile->pageAccessToken,$tags ,$data->remoteId);
 
-		if ($data->providerData->captionsInfo)
+		if (isset($data->providerData->captionsInfo))
 		{
 			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
 			foreach ($data->providerData->captionsInfo as $captionInfo)
