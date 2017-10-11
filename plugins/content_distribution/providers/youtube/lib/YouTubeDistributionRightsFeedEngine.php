@@ -3,7 +3,7 @@
  * @package plugins.youTubeDistribution
  * @subpackage lib
  */
-class YouTubeDistributionRightsFeedEngine extends SftpDistributionEngine implements
+class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,

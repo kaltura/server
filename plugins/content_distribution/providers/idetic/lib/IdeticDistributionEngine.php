@@ -3,7 +3,7 @@
  * @package plugins.ideticDistribution
  * @subpackage lib
  */
-class IdeticDistributionEngine extends SftpDistributionEngine implements 
+class IdeticDistributionEngine extends PublicPrivateKeysDistributionEngine implements 
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,

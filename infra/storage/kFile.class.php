@@ -315,11 +315,11 @@ class kFile
 	}
 	
 	/**
-	 * 
 	 * creates a dirctory using the specified path
-	 * @param unknown_type $path
-	 * @param unknown_type $rights
-	 * @param unknown_type $recursive
+	 * @param string $path
+	 * @param int $rights
+	 * @param bool $recursive
+	 * @return bool true on success or false on failure.
 	 */
 	public static function fullMkfileDir ($path, $rights = 0777, $recursive = true)
 	{		
@@ -335,9 +335,10 @@ class kFile
 	/**
 	 * 
 	 * creates a dirctory using the dirname of the specified path
-	 * @param unknown_type $path
-	 * @param unknown_type $rights
-	 * @param unknown_type $recursive
+	 * @param string $path
+	 * @param int $rights
+	 * @param bool $recursive
+	 * @return bool true on success or false on failure.
 	 */
 	public static function fullMkdir($path, $rights = 0755, $recursive = true)
 	{

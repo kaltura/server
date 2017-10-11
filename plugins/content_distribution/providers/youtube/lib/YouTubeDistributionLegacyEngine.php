@@ -3,7 +3,7 @@
  * @package plugins.youTubeDistribution
  * @subpackage lib
  */
-class YouTubeDistributionLegacyEngine extends SftpDistributionEngine implements
+class YouTubeDistributionLegacyEngine extends PublicPrivateKeysDistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
