@@ -82,7 +82,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
 
-		$tags = FacebookDistributionEngine::helperGetTags($data->providerData->fieldValues);
+		$tags = self::helperGetTags($data->providerData->fieldValues);
 		$this->handleTags($data->distributionProfile->pageAccessToken,$tags ,$data->remoteId);
 
 		if (isset($data->providerData->captionsInfo))
@@ -123,7 +123,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			throw new Exception("Failed to update facebook video , reason:".$e->getMessage());
 		}
 
-		$tags = FacebookDistributionEngine::helperGetTags($data->providerData->fieldValues);
+		$tags = self::helperGetTags($data->providerData->fieldValues);
 		$this->handleTags($data->distributionProfile->pageAccessToken, $tags ,$data->entryDistribution->remoteId);
 		$this->handleCaptions($data);
 
