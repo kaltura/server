@@ -964,5 +964,25 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::GENERATE_TRANSCODING_COMMAND_FAIL, $assetId, $ffprobeJson, $e->getMessage());
 		}
 	}
+
+
+
+	/**
+	 * Get volume map by entry id
+	 *
+	 * @action getVolumeMap
+	 * @param string $flavorId Flavor id
+	 * @return file
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getVolumeMapAction($flavorId)
+	{
+		$flavorAsset = assetPeer::retrieveById($flavorId);
+		if(!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $flavorId);
+
+		$content = myEntryUtils::getVolumeMapContent(null, $flavorAsset);
+		return $content;
+	}
 }
 

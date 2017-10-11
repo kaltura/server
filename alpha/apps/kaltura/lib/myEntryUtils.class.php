@@ -1920,23 +1920,85 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	}
 
 
-	public static function getFlavorSupportedByPackagerForVolumeMap($entryId)
+	public static function getFlavorSupportedByPackagerForVolumeMap($entryId, $flavorAsset = null)
 	{
-		//look for the lowest bitrate flavor
-		$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
-
-		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+		if($flavorAsset)
 		{
-			// look for the lowest bitrate flavor the packager can parse
-			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+			if(!self::isFlavorSupportedByPackager($flavorAsset, false))
+				return null;
+			else
+				return $flavorAsset;
+		}
+		else
+		{
+			if(!$entryId)
+				return null;
+			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
 			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
 			{
-				//retrieve original ready
-				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
-				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
-					return null;
+				// look for the lowest bitrate flavor the packager can parse
+				$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+				if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+				{
+					//retrieve original ready
+					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+					if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+						return null;
+				}
 			}
+			return $flavorAsset;
 		}
-		return $flavorAsset;
 	}
+
+	public static function getVolumeMapContent($entryId, $flavorAsset = null)
+	{
+		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId, $flavorAsset);
+		if (!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+		$flavorId = $flavorAsset->getId();
+		$entryId = $flavorAsset->getEntryId();
+
+		$packagerRetries = 3;
+		$content = null;
+		while ($packagerRetries && !$content)
+		{
+			$content = self::retrieveLocalVolumeMapFromPackager($flavorAsset);
+			$packagerRetries--;
+		}
+		if(!$content)
+			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+
+		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
+		return new kRendererString($content, 'text/csv');
+	}
+
+
+	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
+	{
+		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
+		if (!$packagerVolumeMapUrlPattern)
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
+		if (!$entry_data_path)
+			return null;
+
+		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
+		if(!$content)
+			return false;
+
+		return $content;
+	}
+
+	private static function curlLocalVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
+	{
+		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
+		kFile::closeDbConnections();
+		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
+		return $content;
+	}
+
+
 }
