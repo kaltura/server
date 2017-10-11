@@ -11,5 +11,6 @@ interface BaseEntryCloneOptions extends BaseEnum
     const ACCESS_CONTROL = 4;
     const METADATA = 5;
     const FLAVORS = 6;
+    const CAPTIONS = 7;
 
 }
