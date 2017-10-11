@@ -631,21 +631,20 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	private static function uploadChunk($media, $chunk)
 	{
 		$numOfTries = 0;
-		$ingestedVideo = null;
+		$ingestedVideo = false;
 		while (true)
 		{
 			try
 			{
 				$ingestedVideo = $media->nextChunk($chunk);
 				break;
-			} catch (Google_IO_Exception $e)
+			}
+			catch (Google_IO_Exception $e)
 			{
 				KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
 				$numOfTries++;
 				if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
-				{
 					throw new kTemporaryException($e->getMessage(), $e->getCode());
-				}
 			}
 		}
 		return $ingestedVideo;
