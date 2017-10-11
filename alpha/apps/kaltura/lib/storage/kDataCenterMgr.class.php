@@ -193,7 +193,7 @@ class kDataCenterMgr
 			KalturaLog::log("Already exists in temp folder [{$local_file_path}]");
 		}
 
-		return file_get_contents( $local_file_path );
+		return kFile::getFileContent($local_file_path);
 	}
 
 	/*

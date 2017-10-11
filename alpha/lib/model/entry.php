@@ -720,9 +720,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	// return the full path on the disk
 	public function getFullDataPath( $version = NULL )
 	{
-		$path = myContentStorage::getFSContentRootPath() . $this->getDataPath();
-		if ( file_exists( $path )) return $path;
-		return $path;
+		return myContentStorage::getFSContentRootPath() . $this->getDataPath($version);
 	}
 	
 	/**
@@ -946,7 +944,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
 			if ( $from_cache ) return $this->data_content;
-			$content_path = myContentStorage::getFSContentRootPath();
 			$version = $this->desired_version;
 			if ( ! $version || $version == -1 ) $version = null;
 			
