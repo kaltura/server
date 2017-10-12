@@ -1200,7 +1200,11 @@ class MediaService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$content = myEntryUtils::getVolumeMapContent($entryId);
+		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		if (!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
 	}
 

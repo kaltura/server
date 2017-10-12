@@ -1920,41 +1920,26 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	}
 
 
-	public static function getFlavorSupportedByPackagerForVolumeMap($entryId, $flavorAsset = null)
+	public static function getFlavorSupportedByPackagerForVolumeMap($entryId)
 	{
-		if($flavorAsset)
+		$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
+		if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
 		{
-			if(!self::isFlavorSupportedByPackager($flavorAsset, false))
-				return null;
-			else
-				return $flavorAsset;
-		}
-		else
-		{
-			if(!$entryId)
-				return null;
-			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
+			// look for the lowest bitrate flavor the packager can parse
+			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
 			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
 			{
-				// look for the lowest bitrate flavor the packager can parse
-				$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+				//retrieve original ready
+				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
 				if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
-				{
-					//retrieve original ready
-					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
-					if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
-						return null;
-				}
+					return null;
 			}
-			return $flavorAsset;
 		}
+		return $flavorAsset;
 	}
 
-	public static function getVolumeMapContent($entryId, $flavorAsset = null)
+	public static function getVolumeMapContent($flavorAsset)
 	{
-		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId, $flavorAsset);
-		if (!$flavorAsset)
-			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
 		$flavorId = $flavorAsset->getId();
 		$entryId = $flavorAsset->getEntryId();
 

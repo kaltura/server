@@ -973,7 +973,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * @action getVolumeMap
 	 * @param string $flavorId Flavor id
 	 * @return file
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::INVALID_FLAVOR_ASSET_ID
 	 */
 	function getVolumeMapAction($flavorId)
 	{
@@ -981,7 +981,10 @@ class FlavorAssetService extends KalturaAssetService
 		if(!$flavorAsset)
 			throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $flavorId);
 
-		$content = myEntryUtils::getVolumeMapContent(null, $flavorAsset);
+		if(!myEntryUtils::isFlavorSupportedByPackager($flavorAsset, false))
+			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
 	}
 }
