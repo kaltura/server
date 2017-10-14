@@ -193,6 +193,10 @@ class kDruidBase
 	{
 		$query[self::DRUID_GRANULARITY] = self::getGranularityAll();
 		$result = self::runQuery($query);
+		if (!$result)
+		{
+			return array();
+		}
 		$result = reset($result);
 		return $result[self::DRUID_RESULT];
 	}

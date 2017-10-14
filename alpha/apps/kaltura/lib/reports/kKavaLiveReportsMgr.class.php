@@ -3,6 +3,7 @@
 class kKavaLiveReportsMgr extends kKavaBase
 {
 	const MAX_RESULTS = 1000;
+	const PEAK_AUDIENCE_MAX_BUCKETS = 1000;
 	
 	// intermediate metrics
 	const METRIC_VIEW_COUNT = 'viewCount';
@@ -23,19 +24,23 @@ class kKavaLiveReportsMgr extends kKavaBase
 	const OUTPUT_PLAYS = 'plays';
 	const OUTPUT_REFERRER = 'referrer';
 		
-	protected static function getLiveNowEntries($partnerId, $isLive, $entryIds)
+	protected static function getLiveEntries($partnerId, $entryIds, $isLive)
 	{
 		$filter = new entryFilter();
 		$filter->setTypeEquel(entryType::LIVE_STREAM);
-		$filter->setIsLive($isLive);
 		$filter->setPartnerSearchScope($partnerId);
 		if ($entryIds)
 		{
 			$filter->setIdIn($entryIds);
 		}
+		if (!is_null($isLive))
+		{
+			$filter->setIsLive($isLive);
+		}
 		
 		$criteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$criteria->addAscendingOrderByColumn(entryPeer::NAME);		// Note: don't really care about order here, this is a hack to force the query to go to sphinx 
+		$criteria->addAscendingOrderByColumn(entryPeer::NAME);		// Note: don't really care about order here, this is a hack to force the query to go to sphinx
+		$criteria->setLimit(self::MAX_RESULTS);
 		$filter->attachToCriteria($criteria);
 	
 		$criteria->applyFilters();
@@ -44,6 +49,11 @@ class kKavaLiveReportsMgr extends kKavaBase
 	
 	protected static function sortByEntryName($input)
 	{
+		if (!$input)
+		{
+			return $input;
+		}
+		
 		$criteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$criteria->add(entryPeer::ID, array_keys($input), Criteria::IN);
 		$criteria->addAscendingOrderByColumn(entryPeer::NAME);
@@ -61,18 +71,18 @@ class kKavaLiveReportsMgr extends kKavaBase
 	// filters
 	protected static function getBaseFilter($partnerId, $eventTypes, $filter)
 	{
-		if (!$eventTypes)
-		{
-			$eventTypes = array(self::EVENT_TYPE_VIEW, self::EVENT_TYPE_PLAY);
-		}
-		
 		$result = array(
-			self::getSelectorFilter(self::DIMENSION_PARTNER_ID, strval($partnerId)),
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, $eventTypes),
 			self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(
 				self::PLAYBACK_TYPE_LIVE, 
 				self::PLAYBACK_TYPE_DVR)),
 		);
+
+		// Note: the code assumes only view/play events exist in the realtime datasource
+		//		if this changes, the below will need to be updated 
+		if ($eventTypes)
+		{
+			$result[] = self::getInFilter(self::DIMENSION_EVENT_TYPE, $eventTypes);
+		}
 		
 		$entryIds = array();
 		if ($filter->entryIds)
@@ -80,21 +90,31 @@ class kKavaLiveReportsMgr extends kKavaBase
 			$entryIds = explode(',', $filter->entryIds);
 		}
 		
-		if (!is_null($filter->live))
+		if ($entryIds || !is_null($filter->live))
 		{
-			$entryIds = self::getLiveNowEntries($partnerId, $filter->live, $entryIds);
+			$entryIds = self::getLiveEntries($partnerId, $entryIds, $filter->live);
 			if (!$entryIds)
 			{
 				throw new kKavaNoResultsException();
 			}
-		}
-		
-		if ($entryIds)
-		{
+			
+			// Note: since the entry ids where already filtered by partner, 
+			//		we can skip filtering by partnerId in druid
 			$result[] = self::getInFilter(self::DIMENSION_ENTRY_ID, $entryIds);
+		}
+		else
+		{
+			$result[] = self::getSelectorFilter(self::DIMENSION_PARTNER_ID, strval($partnerId));
 		}
 		
 		return self::getAndFilter($result);
+	}
+	
+	protected static function getFilterIntervals($filter)
+	{
+		$fromTime = $filter->fromTime;
+		$toTime = max($filter->fromTime + self::VIEW_EVENT_INTERVAL, $filter->toTime);
+		return self::getIntervals($fromTime, $toTime);
 	}
 	
 	protected static function getViewEventPlaybackTypeFilter($playbackType)
@@ -119,7 +139,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_TIMESERIES,
 			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
-			self::DRUID_INTERVALS => self::getIntervals($filter->fromTime, $filter->toTime),
+			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 		);
 	}
@@ -129,7 +149,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_TOPN,
 			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
-			self::DRUID_INTERVALS => self::getIntervals($filter->fromTime, $filter->toTime),
+			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 			self::DRUID_DIMENSION => $dimension,
 			self::DRUID_METRIC => $metric,
@@ -142,7 +162,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_GROUP_BY,
 			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
-			self::DRUID_INTERVALS => self::getIntervals($filter->fromTime, $filter->toTime),
+			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 			self::DRUID_DIMENSIONS => $dimensions,
 		);
@@ -296,7 +316,12 @@ class kKavaLiveReportsMgr extends kKavaBase
 			self::getDvrAudienceAggregator(),
 		);
 		
-		$queryResult = self::runGranularityPeriodQuery($query, self::VIEW_EVENT_PERIOD);
+		$bucketSize = intval(($filter->toTime - $filter->fromTime) / 
+				(self::PEAK_AUDIENCE_MAX_BUCKETS * self::VIEW_EVENT_INTERVAL));
+		$bucketSize = max($bucketSize, 1);
+		$period = 'PT' . ($bucketSize * self::VIEW_EVENT_INTERVAL) . 'S';
+		
+		$queryResult = self::runGranularityPeriodQuery($query, $period);
 		
 		$fieldMapping = array(
 			self::OUTPUT_AUDIENCE => self::OUTPUT_PEAK_AUDIENCE, 
@@ -314,7 +339,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 				
 				foreach ($fieldMapping as $src => $dest)
 				{
-					$value = intval($entryResult[$src]);
+					$value = intval($entryResult[$src] / $bucketSize);
 					if ($value > $result[$entryId][$dest])
 					{
 						$result[$entryId][$dest] = $value;
