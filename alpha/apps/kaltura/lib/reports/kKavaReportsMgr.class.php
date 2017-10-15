@@ -282,7 +282,11 @@ class kKavaReportsMgr extends kKavaBase
     
     static $headers_to_metrics = array();
     
-    static $transform_metrics = array(self::METRIC_TOTAL_ENTRIES, self::METRIC_UNIQUE_USERS);
+    static $transform_metrics = array(
+    	self::METRIC_TOTAL_ENTRIES => 'floor', 
+    	self::METRIC_UNIQUE_USERS => 'floor',
+    	self::DIMENSION_DEVICE => 'strtoupper',
+    );
     
     private static function getEventTypeCountAggr($event_type) {
         $count_aggr = self::$event_type_count_aggr_template;
@@ -396,7 +400,7 @@ class kKavaReportsMgr extends kKavaBase
     {
         self::init();
         $start = microtime(true);
-        $intervals = self::getIntervals($input_filter);
+        $intervals = self::getFilterIntervals($input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         $dimension = self::getDimension($report_type, $object_ids);
         $metrics = self::getMetrics($report_type);
@@ -460,7 +464,7 @@ class kKavaReportsMgr extends kKavaBase
     {
         self::init();
         $start = microtime (true);
-        $intervals = self::getIntervals($input_filter);
+        $intervals = self::getFilterIntervals($input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         $dimension = self::getDimension($report_type, $object_ids);
         $metrics = self::getMetrics($report_type);
@@ -481,10 +485,10 @@ class kKavaReportsMgr extends kKavaBase
                 $data[] = $row_data[$column];
             }
             
-            foreach (self::$transform_metrics as $metric) {
+            foreach (self::$transform_metrics as $metric => $func) {
                 $field_index = array_search(self::$metrics_to_headers[$metric], $headers);
                 if (false !== $field_index) {
-                    $data[$field_index] = floor($data[$field_index]);
+                    $data[$field_index] = call_user_func($func, $data[$field_index]);
                 }
             }                
         }
@@ -543,7 +547,7 @@ class kKavaReportsMgr extends kKavaBase
         }
         
         $granularity = self::DRUID_GRANULARITY_ALL;
-        $intervals = self::getIntervals($input_filter);
+        $intervals = self::getFilterIntervals($input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         $dimension = self::getDimension($report_type, $object_ids);
         $metrics = self::getMetrics($report_type);
@@ -601,12 +605,12 @@ class kKavaReportsMgr extends kKavaBase
                     
                 }
                 
-                foreach (self::$transform_metrics as $metric) {
+                foreach (self::$transform_metrics as $metric => $func) {
                     $field_index = array_search(self::$metrics_to_headers[$metric], $headers);
                     if (false !== $field_index) {
                         $rows_count = count($data);
                         for ($i = 0; $i < $rows_count; $i++) {
-                            $data[$i][$field_index] = floor($data[$i][$field_index]);
+                            $data[$i][$field_index] = call_user_func($func, $data[$i][$field_index]);
                         }
                     }
                 }
@@ -666,8 +670,30 @@ class kKavaReportsMgr extends kKavaBase
     
    private static function getGranularityDef($granularity, $timezone_offset) 
    {
-      
-      $timezone_name = timezone_name_from_abbr("", $timezone_offset * 60 * -1, 0);
+      // choose a timezone from - http://joda-time.sourceforge.net/timezones.html
+      // prefer a timezone relative to GMT, so that it won't be affected by DST
+      $timezone_name = null;
+      if ($timezone_offset % 60 == 0)
+      {
+         $offset_hours = intval($timezone_offset / 60);
+         if ($offset_hours >= -14 && $offset_hours < 0)
+         {
+            $timezone_name = 'Etc/GMT' . $offset_hours;
+         }
+         else if ($offset_hours > 0 && $offset_hours <= 12)
+         {
+            $timezone_name = 'Etc/GMT+' . $offset_hours;
+         }
+         else if ($offset_hours == 0)
+         {
+            $timezone_name = 'Etc/GMT';
+         }
+      }
+   	
+      if (!$timezone_name)
+      {
+         $timezone_name = timezone_name_from_abbr("", $timezone_offset * 60 * -1, 0);
+      }
       switch ($granularity)
       {
         case self::DRUID_GRANULARITY_DAY:
@@ -686,7 +712,7 @@ class kKavaReportsMgr extends kKavaBase
       return  $granularity_def;
    }
     
-   private static function getIntervals($input_filter) {
+   private static function getFilterIntervals($input_filter) {
        $input_filter->timeZoneOffset = round($input_filter->timeZoneOffset / 30) * 30;
        $intervals = array(self::dateIdToInterval($input_filter->from_day, $input_filter->timeZoneOffset) . "/" .  self::dateIdToInterval($input_filter->to_day, $input_filter->timeZoneOffset, true));
        return $intervals;  
@@ -706,6 +732,12 @@ class kKavaReportsMgr extends kKavaBase
     
    private static function dateIdToInterval($date_id, $offset, $end_of_the_day = false) 
    {
+       if (!preg_match('/^\d+$/', substr($date_id, 0, 8)))
+       {
+          $timestamp = $end_of_the_day ? time() : time() - 30 * 86400; 
+          $date_id = date('Ymd', $timestamp);
+       }
+
        $year = substr($date_id, 0, 4);
        $month = substr($date_id, 4, 2);
        $day = substr($date_id, 6, 2);
@@ -721,6 +753,7 @@ class kKavaReportsMgr extends kKavaBase
    private static function timestampToDateId($timestamp, $offset) 
    {
        $date = new DateTime($timestamp);
+       $date->modify((12 * 60 - $offset) . " minute");		// adding 12H in order to round to the nearest day
        return $date->format('Ymd');
    }
    
