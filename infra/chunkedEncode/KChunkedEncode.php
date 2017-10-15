@@ -447,7 +447,7 @@
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
 			$mergeCmd.= " -i $vidConcatStr";
-			$mergeCmd.= "$audioInputParams -map 0:v -c:v copy $audioCopyParams $params->formatParams -f $params->format -copyts -y $mergedFilename";
+			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams $params->formatParams -f $params->format -copyts -y $mergedFilename";
 			KalturaLog::log("mergeCmd:\n$mergeCmd ".date("Y-m-d H:i:s"));
 			return $mergeCmd;
 		}
@@ -506,23 +506,43 @@
 			}
 
 			/*
-			 * Generate audio stream
+			 * Generate audio cmd line
 			 */
-			$cmdLine = null;
+			 
+			 /*
+			  * 'amerge' does not work properly with source side 'async'
+			  * The code below removes 'async' this case
+			  */
+			$asyncStr = "-async 1";
+			if(isset($params->audioFilters)){
+				$filterStr = "-filter_complex ".end($params->audioFilters);
+				if(strstr($filterStr,"amerge")!==false){
+					$asyncStr = null;
+				}
+			}
+			else 
+				$filterStr = null;
+			
+			$setup = $this->setup;
+			$cmdLine = $setup->ffmpegBin;
+			if(isset($asyncStr))
+				$cmdLine.= " $asyncStr";
+			if(isset($setup->startFrom))
+				$cmdLine.= " -ss $setup->startFrom";
+			$cmdLine.= " -i $params->source";
+			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
-			$cmdLine.= " -map 0:a:0 -vn";
+			if(isset($filterStr))
+				$cmdLine.= " $filterStr";
+			$cmdLine.= " -map 0:a:0";
 			if(isset($params->abitrate)) $cmdLine.= " -b:a ".$params->abitrate."k";
 			if(isset($params->ar)) $cmdLine.= " -ar ".$params->ar;
 			if(isset($params->ac)) $cmdLine.= " -ac ".$params->ac;
 			if(isset($params->volume)) $cmdLine.= " -vol ".$params->volume;
-			if(isset($params->audioFilters))
-				$cmdLine.= " -filter_complex ". end($params->audioFilters);
-				
-			$setup = $this->setup;
 			$durStr = null;
 			if($setup->duration!=-1) $durStr = " -t ".$setup->duration;
 			$cmdLine.= "$durStr -f $this->chunkFileFormat -y ".$this->getSessionName("audio");
-			$cmdLine = "$setup->ffmpegBin -ss $setup->startFrom -async 1 -i $params->source $cmdLine";
+			
 			KalturaLog::log("cmdLine:$cmdLine");
 			return $cmdLine;
 		}
@@ -842,11 +862,11 @@
 				case "-vf":
 				case "-af":
 				case "-filter_complex":
+					$val = ltrim($val,'-');
 					if(isset($this->$val))
 						$arr = $this->$val;
 					else
 						$arr = array();
-					$val = ltrim($val,'-');
 					$arr[$idx] = $cmdLineArr[$idx+1];
 					$this->$val = $arr;
 					break;
@@ -929,15 +949,15 @@
 				else if($mode=='audio' && preg_match("/\b(pan|amix|amerge)\b/", $filter)==1) { 
 					$filterArrOut[$idx] = $filter;
 				}
-				else if($mode=='video' && preg_match("/\b(scale|fade|crop|overlay|rotate)\b/", $filter)==1) { 
+				else if($mode=='video' && preg_match("/\b(scale|fade|crop|overlay|rotate|yadif|subtitles)\b/", $filter)==1) { 
 					$filterArrOut[$idx] = $filter;
 				}
 				else
 					$skipArr[$idx] = 1;
 			}
-			if(count($filterArrOut)==0)
+			if(count($filterArrOut)==0){
 				return null;
-			
+			}
 			foreach($skipArr as $idx=>$val) {
 				if($idx>0 && key_exists($idx-1,$filterArrOut)){
 					$filter = $filterArrOut[$idx-1];
