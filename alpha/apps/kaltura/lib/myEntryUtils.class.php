@@ -1317,7 +1317,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setTotalRank(0);
 	}
 
-	public static function copyEntryData(entry $entry, entry $targetEntry, $copyFlavors = true)
+	public static function copyEntryData(entry $entry, entry $targetEntry, $copyFlavors = true, $copyCaptions = true)
 	{
 		// for any type that does not require assets:
 		$shouldCopyDataForNonClip = true;
@@ -1394,16 +1394,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset, $copyFlavors))
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions))
 			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
 	}
 
-	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset))
+			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset)
+			|| ( !$copyCaptions && $sourceAsset instanceof captionAsset))
 			return false;
 		return true;
 	}
@@ -1431,10 +1432,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		$copyUsers = true;
 		$copyCategories = true;
-	    $copyChildren = false;
-	    $copyAccessControl = true;
-	    $copyMetaData = true;
-	    $copyFlavors  = true;
+		$copyChildren = false;
+		$copyAccessControl = true;
+		$copyMetaData = true;
+		$copyFlavors  = true;
+		$copyCaptions  = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1466,6 +1468,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if ($currentOption == BaseEntryCloneOptions::FLAVORS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 			{
 				$copyFlavors = false;
+			}
+			if ($currentOption == BaseEntryCloneOptions::CAPTIONS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyCaptions = false;
 			}
 		}
 
@@ -1547,7 +1553,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
 		} else {
-			self::copyEntryData( $entry, $newEntry, $copyFlavors );
+			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
 
  	    //if entry is a static playlist, link between it and its new child entries
