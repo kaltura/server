@@ -266,9 +266,9 @@ class kUploadTokenMgr
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			rename($sourceFilePath, $chunkFilePath);
+			$succeeded = rename($sourceFilePath, $chunkFilePath);
 			
-			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize))
+			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
 			{
 				$verifyFinalChunk = true;
 				$expectedFileSize = $this->_uploadToken->getFileSize();
