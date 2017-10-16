@@ -245,7 +245,7 @@ class kFile
 		return $results;
 	}
 	
-	static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1)
+	static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1, $mode = 'r')
 	{
 		$file_name = self::fixPath($file_name);
 		
@@ -253,7 +253,7 @@ class kFile
 		{
 			if(! file_exists($file_name))
 				return NULL;
-			$fh = fopen($file_name, 'r');
+			$fh = fopen($file_name, $mode);
 			
 			if($fh == NULL)
 				return NULL;
