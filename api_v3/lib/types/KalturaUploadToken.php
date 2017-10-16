@@ -74,6 +74,13 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $updatedAt;
+
+	/**
+	 * Upload url - to explicitly determine to which domain to adress the uploadToken->upload call
+	 * @var string
+	 * @readonly
+	 */
+	public $uploadUrl;
 	
 	private static $map_between_objects = array
 	(
@@ -85,8 +92,19 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"fileSize",
 		"uploadedFileSize",
 		"createdAt",
-		"updatedAt", 
-	); 
+		"updatedAt",
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function doFromObject($uploadTokenDb, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($uploadTokenDb, $responseProfile);
+		$dc = kDataCenterMgr::getDcById($uploadTokenDb->getDc());
+		if (isset($dc['uploadUrl']))
+			$this->uploadUrl = infraRequestUtils::getProtocol() . "://" . $dc['uploadUrl'];
+	}
 
 	public function getMapBetweenObjects()
 	{

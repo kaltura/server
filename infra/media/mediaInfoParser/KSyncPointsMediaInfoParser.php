@@ -99,7 +99,6 @@ class KSyncPointsMediaInfoParser
 	private function parseStreamSyncPointInfo($rawStreamSyncPointInfo)
 	{
 		$syncPoints = array();
-		$firstPtsTime = null;
 		$rawStreamSyncPointInfo = strtolower($rawStreamSyncPointInfo);
 		$streamSyncPointInfoJson = json_decode($rawStreamSyncPointInfo);
 		
@@ -115,11 +114,6 @@ class KSyncPointsMediaInfoParser
 			{
 				$streamId3tagTimeStamp = $this->getTimestampFromStreamInfo($streamSyncPointInfo->data);
 				$streamPtsTime = (int)($streamSyncPointInfo->pts_time * 1000); //convert for seconds to milliseconds
-				
-				if(!$firstPtsTime)
-					$firstPtsTime = $streamPtsTime;
-				
-				$streamPtsTime = $streamPtsTime - $firstPtsTime;
 				
 				if(!isset($streamPtsTime) || !isset($streamId3tagTimeStamp))
 				{

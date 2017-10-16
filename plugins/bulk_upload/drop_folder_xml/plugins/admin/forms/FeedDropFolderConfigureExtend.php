@@ -20,7 +20,7 @@ class Form_FeedDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigur
 		$this->addSubForm(new Form_FeedItemInfoConfigureExtend(), 'feedItemInfo');
 	}
 	
-	public function populateFromObject($dropFolder)
+	public function populateFromObject($dropFolder, $add_underscore = true)
 	{
 		parent::populateFromObject($dropFolder, false);
 		

@@ -39,7 +39,7 @@ class LiveChannelSegmentService extends KalturaBaseService
 	 * Get live channel segment by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaLiveChannelSegment
 	 * 
 	 * @throws KalturaErrors::LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND
@@ -59,7 +59,7 @@ class LiveChannelSegmentService extends KalturaBaseService
 	 * Update live channel segment by id
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaLiveChannelSegment $liveChannelSegment
 	 * @return KalturaLiveChannelSegment
 	 * 
@@ -83,7 +83,7 @@ class LiveChannelSegmentService extends KalturaBaseService
 	 * Delete live channel segment by id
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * 
 	 * @throws KalturaErrors::LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND
 	 */

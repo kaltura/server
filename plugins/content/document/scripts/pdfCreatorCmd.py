@@ -80,6 +80,19 @@ def killProcessesByName(exeNames):
             result = True
     return result
 
+def clearJobsQueue():
+    printer = win32print.OpenPrinter('PDFCreator')
+    jobs = win32print.EnumJobs(printer, 0, 100, 2)
+    while len(jobs) > 0:
+        for currentJob in jobs:
+            print '\nDeleting print job with id [' + str(currentJob['JobId']) + ']'
+            win32print.SetJob(printer, currentJob['JobId'], 0, None, win32print.JOB_CONTROL_DELETE)
+        win32print.ClosePrinter(printer)
+        time.sleep(.5)
+        printer = win32print.OpenPrinter('PDFCreator')
+        jobs = win32print.EnumJobs(printer, 0, 100, 2)
+    win32print.ClosePrinter(printer)
+
 if len(sys.argv) < 4:
     print 'wrong usage of this script. usage: %s {inputFile} {outFile} [--readOnly]' % os.path.dirname(__file__);
     sys.exit(1)
@@ -119,16 +132,21 @@ if readOnly and inputFileExt == '.pdf':
 else:
     commandParams.append('/PF"%s"' % inputFile)
 
-command = ' '.join(commandParams)
+#make sure print queue is empty, if not delete existing jobs.
+clearJobsQueue()
 
+printer = win32print.OpenPrinter('PDFCreator')
+command = ' '.join(commandParams)
+    
 # execute the command
 print '\ncommand: %s' % command
 os.system(command)
 
 # wait until the printer queue becomes empty
-printer = win32print.OpenPrinter('PDFCreator')
+
 
 while True:
     if len(win32print.EnumJobs(printer, 0, 1, 2)) == 0:
         break
     time.sleep(.5)
+    

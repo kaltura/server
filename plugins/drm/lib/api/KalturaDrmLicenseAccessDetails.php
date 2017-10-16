@@ -24,4 +24,8 @@ class KalturaDrmLicenseAccessDetails extends  KalturaObject {
      */
     public $absolute_duration;
 
+    /**
+     * @var KalturaKeyValueArray
+     */
+    public $licenseParams;
 }

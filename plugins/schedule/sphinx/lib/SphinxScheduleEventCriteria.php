@@ -129,7 +129,19 @@ class SphinxScheduleEventCriteria extends SphinxCriteria
 			$filter->set('_mlikeand_resource_system_names', implode(',', $systemNamesMd5));
 		}
 
+		if($filter->is_set('_eq_resource_ids'))
+		{
+			$resourceId = ScheduleEvent::RESOURCES_INDEXED_FIELD_PREFIX . kCurrentContext::getCurrentPartnerId() . " " .  $filter->get('_eq_resource_ids');
+			$filter->unsetByName('_eq_resource_ids');
+			$filter->set('_eq_resource_ids', $resourceId);
+		}
+
 		return parent::applyFilterFields($filter);
+	}
+
+	public function getTranslateIndexId($id)
+	{
+		return $id;
 	}
 
 	private function buildMd5String($str)

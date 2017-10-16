@@ -1,0 +1,670 @@
+{
+  "settings" : {
+	"number_of_shards" : 6,
+	"number_of_replicas" : 0,
+	"analysis": {
+	  "char_filter": {
+		"kaltura_whitespace_filter": {
+		  "type": "pattern_replace",
+		  "pattern": "(\\s+)",
+		  "replacement": " "
+		}
+	  },
+	  "tokenizer": {
+		"kaltura_ngram_tokenizer": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3,
+		  "token_chars": [
+			"letter",
+			"digit"
+		  ]
+		}
+	  },
+	  "analyzer": {
+		"kaltura_ngrams": {
+		  "type": "custom",
+		  "tokenizer": "kaltura_ngram_tokenizer",
+		  "filter": [
+			"lowercase"
+		  ]
+		},
+		"kaltura_keyword": {
+		  "type": "custom",
+		  "tokenizer": "keyword",
+		  "char_filter": [
+			"kaltura_whitespace_filter"
+			],
+		  "filter": [
+			"lowercase",
+			"trim",
+			"asciifolding"
+		  ]
+		},
+		"kaltura_text" : {
+		  "tokenizer" : "standard",
+		  "filter" : ["standard", "lowercase", "asciifolding"]
+		}
+	  }
+	}
+  },
+  "mappings" : {
+	"entry" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "properties" : {
+		"name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			}
+		  }
+		},
+		"description" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			}
+		  }
+		},
+		"partner_id" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"partner_status" : {
+		  "type" : "keyword"
+		},
+		"parent_id" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"status" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_kusers_edit" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_kusers_publish" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_pusers_edit" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entitled_pusers_publish" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"kuser_id" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"puser_id" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"creator_puser_id" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"creator_kuser_id" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"category_ids" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"categories" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"active_category_ids" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"tags" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"reference_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"conversion_profile_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"template_entry_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"display_in_search": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"media_type": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"source_type": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"length_in_msecs": {
+		  "type" : "long"
+		},
+		"recorded_entry_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"credit": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"start_date": {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"end_date": {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"site_url": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"admin_tags": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"push_publish": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"entry_type": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"moderation_status": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"created_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"updated_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"modified_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"total_rank": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"access_control_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"group_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"partner_sort_value": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"redirect_entry_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"parent_entry" : {
+		  "properties" : {
+			"entry_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"status" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"partner_id" :{
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"partner_status" :{
+			  "type" : "keyword"
+			},
+			"entitled_kusers_edit" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"entitled_kusers_publish" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"kuser_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"creator_kuser_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"category_ids" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"active_category_ids" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			}
+		  }
+		},
+		"caption_assets": {
+		  "type"  : "nested",
+		  "properties"  : {
+			"id": {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"language" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"lines"  : {
+			  "type"  : "nested",
+			  "properties"  : {
+				"content" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_text",
+				  "fields": {
+					"ngrams" : {
+					  "type" : "text",
+					  "analyzer" : "kaltura_ngrams"
+					},
+					"raw" : {
+					  "type" : "text",
+					  "analyzer" : "kaltura_keyword"
+					}
+				  }
+				},
+				"content_english" : {
+				  "type" : "text",
+				  "analyzer": "english"
+				},
+				"content_arabic" : {
+				  "type" : "text",
+				  "analyzer": "arabic"
+				},
+				"content_armenian" : {
+				  "type" : "text",
+				  "analyzer" : "armenian"
+				},
+				"content_basque" : {
+				  "type" : "text",
+				  "analyzer" : "basque"
+				},
+				"content_brazilian" : {
+				  "type" : "text",
+				  "analyzer" : "brazilian"
+				},
+				"content_bulgarian" : {
+				  "type" : "text",
+				  "analyzer" : "bulgarian"
+				},
+				"content_catalan" : {
+				  "type" : "text",
+				  "analyzer" : "catalan"
+				},
+				"content_cjk" : {
+				  "type" : "text",
+				  "analyzer" : "cjk"
+				},
+				"content_czech" : {
+				  "type" : "text",
+				  "analyzer" : "czech"
+				},
+				"content_danish" : {
+				  "type" : "text",
+				  "analyzer" : "danish"
+				},
+				"content_dutch" : {
+				  "type" : "text",
+				  "analyzer" : "dutch"
+				},
+				"content_finnish" : {
+				  "type" : "text",
+				  "analyzer" : "finnish"
+				},
+				"content_french" : {
+				  "type" : "text",
+				  "analyzer" : "french"
+				},
+				"content_galician" : {
+				  "type" : "text",
+				  "analyzer" : "galician"
+				},
+				"content_german" : {
+				  "type" : "text",
+				  "analyzer" : "german"
+				},
+				"content_greek" : {
+				  "type" : "text",
+				  "analyzer" : "greek"
+				},
+				"content_hindi" : {
+				  "type" : "text",
+				  "analyzer" : "hindi"
+				},
+				"content_hungarian" : {
+				  "type" : "text",
+				  "analyzer" : "hungarian"
+				},
+				"content_indonesian" : {
+				  "type" : "text",
+				  "analyzer" : "indonesian"
+				},
+				"content_irish" : {
+				  "type" : "text",
+				  "analyzer" : "irish"
+				},
+				"content_italian" : {
+				  "type" : "text",
+				  "analyzer" : "italian"
+				},
+				"content_latvian" : {
+				  "type" : "text",
+				  "analyzer" : "latvian"
+				},
+				"content_lithuanian" : {
+				  "type" : "text",
+				  "analyzer" : "lithuanian"
+				},
+				"content_norwegian" : {
+				  "type" : "text",
+				  "analyzer" : "norwegian"
+				},
+				"content_persian" : {
+				  "type" : "text",
+				  "analyzer" : "persian"
+				},
+				"content_portuguese" : {
+				  "type" : "text",
+				  "analyzer" : "portuguese"
+				},
+				"content_romanian" : {
+				  "type" : "text",
+				  "analyzer" : "romanian"
+				},
+				"content_russian" : {
+				  "type" : "text",
+				  "analyzer" : "russian"
+				},
+				"content_sorani" : {
+				  "type" : "text",
+				  "analyzer" : "sorani"
+				},
+				"content_spanish" : {
+				  "type" : "text",
+				  "analyzer" : "spanish"
+				},
+				"content_swedish" : {
+				  "type" : "text",
+				  "analyzer" : "swedish"
+				},
+				"content_turkish" : {
+				  "type" : "text",
+				  "analyzer" : "turkish"
+				},
+				"content_thai" : {
+				  "type" : "text",
+				  "analyzer" : "thai"
+				},
+				"start_time"  : {
+				  "type" : "long"
+				},
+				"end_time"  : {
+				  "type" : "long"
+				},
+				"caption_asset_id": {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"language" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			}
+		  }
+		},
+		"metadata" :{
+		  "type"  : "nested",
+		  "properties"  : {
+			"metadata_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"system_name" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"xpath" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"metadata_profile_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"systemname_xpath_metadataprofileid" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"metadata_field_id" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"value_int": {
+			  "type": "long"
+			},
+			"value_text": {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			}
+		  }
+		},
+		"cue_points" : {
+		  "type" : "nested",
+		  "properties"  : {
+			"cue_point_type" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"cue_point_id": {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"cue_point_name" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			},
+			"cue_point_text" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			},
+			"cue_point_tags" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"cue_point_start_time" : {
+			  "type" : "long"
+			},
+			"cue_point_end_time" : {
+			  "type" : "long"
+			},
+			"cue_point_sub_type" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"cue_point_question" : { //for polls
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			},
+			"cue_point_answers" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			},
+			"cue_point_hint" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			},
+			"cue_point_explanation" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
+			},
+			"cue_point_metadata" :{
+			  "type"  : "nested",
+			  "properties"  : {
+				"metadata_id" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"system_name" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"xpath" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"metadata_profile_id" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"systemname_xpath_metadataprofileid" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"metadata_field_id" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				},
+				"value_int": {
+				  "type": "long"
+				},
+				"value_text": {
+				  "type" : "text",
+				  "analyzer" : "kaltura_text",
+				  "fields": {
+					"ngrams" : {
+					  "type" : "text",
+					  "analyzer" : "kaltura_ngrams"
+					},
+					"raw" : {
+					  "type" : "text",
+					  "analyzer" : "kaltura_keyword"
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+}

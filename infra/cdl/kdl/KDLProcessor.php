@@ -145,7 +145,7 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 			 * For ARF ==> webex plugin 
 			 */
 			if(isset($mediaSet->_container) && $mediaSet->_container->IsFormatOf(array("arf"))) {
-				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::COPY,
+				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::WMV,
 						KDLVideoTarget::WVC1A, 4000, 1080,
 						KDLAudioTarget::WMA, 128, 0,
 						1, "webexNbrplayer.WebexNbrplayer");

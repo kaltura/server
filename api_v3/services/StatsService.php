@@ -23,6 +23,9 @@ class StatsService extends KalturaBaseService
 		if ($actionName === 'reportKceRrror') {
 			return false;
 		}
+		if ($actionName === 'reportDeviceCapabilities') {
+			return false;
+		}
 		return parent::partnerRequired($actionName);
 	}
 	
@@ -56,6 +59,7 @@ referrer
 	 * 
 	 * @action collect
 	 * @return bool
+	 * @ksIgnored
 	 */
 	
 	// TODO - should move to a lighter php script that is not part of the API - it is unnecessarily  heavy	
@@ -114,6 +118,7 @@ referrer
 	 * @action kmcCollect
 	 * 
 	 * @param KalturaStatsKmcEvent $kmcEvent
+	 * @ksIgnored
 	 */
 	public function kmcCollectAction( KalturaStatsKmcEvent $kmcEvent )
 	{
@@ -143,6 +148,7 @@ referrer
 	 * @action reportKceError
 	 * @param KalturaCEError $kalturaCEError 
 	 * @return KalturaCEError
+	 * @ksIgnored
 	 */
 	function reportKceErrorAction( KalturaCEError $kalturaCEError )
 	{
@@ -166,9 +172,23 @@ referrer
 	 * @action reportError
 	 * @param string $errorCode 
 	 * @param string $errorMessage 
+	 * @ksIgnored
 	 */
 	function reportError($errorCode, $errorMessage)
 	{
 		// do nothing - the stats will be collected by going over the api log 
 	}
+	
+	/**
+	 * Use this action to report device capabilities to the kaltura server.
+	 *
+	 * @action reportDeviceCapabilities
+	 * @param string $data
+	 * @ksIgnored
+	 */
+	
+	function reportDeviceCapabilities($data)
+	{
+		// do nothing - the stats will be collected by going over the api log
+	}	
 }

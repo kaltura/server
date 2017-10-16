@@ -51,21 +51,29 @@ class kPlaybackContextDataHelper
 		if ($this->hasBlockAction($contextDataHelper))
 			return;
 
-		if ($dbEntry->getType() == entryType::LIVE_STREAM)
+		$this->getRelevantFlavorAssets($contextDataHelper);
+
+		if (myEntryUtils::shouldServeVodFromLive($dbEntry))
+		{
+			$rootEntryId = $dbEntry->getRootEntryId();
+			$rootEntry = entryPeer::retrieveByPK($rootEntryId);
+			if (!$rootEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $rootEntryId);
+
+			$this->constructLivePlaybackSources($rootEntry, $contextDataHelper, $dbEntry);
+		} elseif ($dbEntry->getType() == entryType::LIVE_STREAM)
 		{
 			$this->constructLivePlaybackSources($dbEntry, $contextDataHelper);
-			$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
-		}
-		else
+		} else
 		{
-			$this->getRelevantFlavorAssets($contextDataHelper);
 			$this->createFlavorsMapping($dbEntry);
 			$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
 			$this->constructRemotePlaybackSources($dbEntry, $contextDataHelper);
-			$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
-			$this->filterFlavorsBySources();
-			$this->playbackContext->setFlavorAssets($this->flavorAssets);
 		}
+
+		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
+		$this->filterFlavorsBySources();
+		$this->playbackContext->setFlavorAssets($this->flavorAssets);
 	}
 
 	/**
@@ -145,10 +153,10 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	private function getFlavorsToFilter(kContextDataHelper $contextDataHelper)
+	private function getFlavorParamsIdsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
-		$flavorsIds = null;
+		$flavorParamsIds = null;
 		$flavorsParamsNotIn = false;
 
 		foreach ($actions as $action)
@@ -161,7 +169,7 @@ class kPlaybackContextDataHelper
 				$flavorsParamsNotIn = $action->getIsBlockedList();
 			}
 		}
-		return array($flavorsIds, $flavorsParamsNotIn);
+		return array($flavorParamsIds, $flavorsParamsNotIn);
 	}
 
 
@@ -172,10 +180,11 @@ class kPlaybackContextDataHelper
 	private function getRelevantFlavorAssets(kContextDataHelper $contextDataHelper)
 	{
 		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
-		list($flavorsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorsToFilter($contextDataHelper);
 
-		if(count($flavorsIdsToFilter) || $flavorsParamsNotIn)
-			self::filterFlavorAssets($flavorAssets, $flavorsIdsToFilter, $flavorsParamsNotIn);
+		list($flavorParamsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorParamsIdsToFilter($contextDataHelper);
+
+		if(count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
+			self::filterFlavorAssetsByFlavorParamsIds($flavorAssets, $flavorParamsIdsToFilter, $flavorsParamsNotIn);
 
 		$this->flavorAssets = $flavorAssets;
 	}
@@ -192,7 +201,7 @@ class kPlaybackContextDataHelper
 
 		$remoteFileSyncs = array();
 
-		if ( $dbEntry->getType() == entryType::LIVE_STREAM )
+		if($dbEntry->getType() == entryType::LIVE_STREAM)
 			return;
 
 		foreach ($this->flavorAssets as $flavorAsset)
@@ -203,7 +212,7 @@ class kPlaybackContextDataHelper
 			$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
 			$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 
-			switch ($servePriority)
+			switch($servePriority)
 			{
 				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 					$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
@@ -271,7 +280,7 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
-	private function constructLivePlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper)
+	private function constructLivePlaybackSources(entry $dbEntry, kContextDataHelper $contextDataHelper, $replacementEntry = null)
 	{
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 
@@ -295,12 +304,29 @@ class kPlaybackContextDataHelper
 		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($liveDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
 
+		$this->filterDeliveryProfilesByStreamerType($liveDeliveryProfiles, $contextDataHelper);
+
+		$flavorAssets = $contextDataHelper->getAllowedFlavorAssets();
+
 		foreach ($liveDeliveryProfiles as $deliveryProfile)
 		{
-			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, array(), $deliveryProfile, $contextDataHelper);
-			$protocols = $this->constructProtocol($deliveryProfile);
-			$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
-			$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $flavorAssets, $deliveryProfile, $contextDataHelper);
+			$playbackFlavorParamsIds = array();
+			foreach ($playbackFlavors as $playbackFlavor)
+			{
+				/* @var $playbackFlavor flavorAsset */
+				$playbackFlavorParamsIds [] = $playbackFlavor->getId();
+			}
+
+			$protocols = $this->constructProtocols($deliveryProfile, $contextDataHelper);
+			if (!empty($protocols))
+			{
+				if ($replacementEntry)
+					$manifestUrl = myEntryUtils::buildManifestUrl($replacementEntry, $protocols, $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+				else
+					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", $playbackFlavorParamsIds), $manifestUrl, $drmData);
+			}
 		}
 	}
 
@@ -334,18 +360,27 @@ class kPlaybackContextDataHelper
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
 
 		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
-			$this->filterDeliveryProfiles($localDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
+			$this->filterDeliveryProfiles($localDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn, $contextDataHelper);
+
+		$this->filterDeliveryProfilesByStreamerType($localDeliveryProfiles, $contextDataHelper);
 
 		foreach ($localDeliveryProfiles as $deliveryProfile)
 		{
 			$deliveryProfileFlavors = $this->localFlavors;
+
+			$flavorTagsArrayByPriority = $this->getTagsByFormat($deliveryProfile->getStreamerType());
+			$deliveryProfileFlavors = $this->filterFlavorsByTags($flavorTagsArrayByPriority, $deliveryProfileFlavors);
+
 			list($drmData, $playbackFlavors) = self::getDrmData($dbEntry, $deliveryProfileFlavors, $deliveryProfile, $contextDataHelper);
 
 			if (count($playbackFlavors))
 			{
-				$protocols = $this->constructProtocol($deliveryProfile);
-				$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",", $protocols), $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
-				$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+				$protocols = $this->constructProtocols($deliveryProfile, $contextDataHelper);
+				if (!empty($protocols))
+				{
+					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+					$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+				}
 			}
 		}
 	}
@@ -365,7 +400,9 @@ class kPlaybackContextDataHelper
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
 		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
-			$this->filterDeliveryProfiles($remoteDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
+			$this->filterDeliveryProfiles($remoteDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn, $contextDataHelper);
+
+		$this->filterDeliveryProfilesByStreamerType($remoteDeliveryProfiles, $contextDataHelper);
 
 		foreach ($remoteDeliveryProfiles as $deliveryProfile)
 		{
@@ -377,6 +414,9 @@ class kPlaybackContextDataHelper
 			{
 				$deliveryProfileFlavorsForDc = $flavorAssetsForDc;
 
+				$flavorTagsArrayByPriority = $this->getTagsByFormat($deliveryProfile->getStreamerType());
+				$deliveryProfileFlavorsForDc = $this->filterFlavorsByTags($flavorTagsArrayByPriority, $deliveryProfileFlavorsForDc);
+
 				list($flavorToDrmData, $filteredDeliveryProfileFlavorsForDc) = self::getDrmData($dbEntry, $deliveryProfileFlavorsForDc, $deliveryProfile, $contextDataHelper);
 
 				if (count($filteredDeliveryProfileFlavorsForDc))
@@ -384,12 +424,81 @@ class kPlaybackContextDataHelper
 					foreach ($filteredDeliveryProfileFlavorsForDc as $flavorAssetForDc)
 						$dcFlavorIds[] = $flavorAssetForDc->getId();
 
-					$protocols = $this->constructProtocol($deliveryProfile);
-					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, explode(",",$protocols), $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
-					$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), $protocols, implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
+					$protocols = $this->constructProtocols($deliveryProfile, $contextDataHelper);
+					if (!empty($protocols))
+					{
+						$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
+						$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
+					}
 				}
 			}
 		}
+	}
+
+
+	private function getTagsByFormat($format)
+	{
+		switch ($format)
+		{
+			case PlaybackProtocol::SILVER_LIGHT:
+				return array(
+					array(assetParams::TAG_ISM),
+				);
+
+			case PlaybackProtocol::MPEG_DASH:
+				return array(
+					array('dash'),
+					array('ipadnew', 'iphonenew'),
+					array('ipad', 'iphone'),
+				);
+
+			case PlaybackProtocol::APPLE_HTTP:
+			case PlaybackProtocol::HDS:
+				return array(
+					array(assetParams::TAG_APPLEMBR),
+					array('ipadnew', 'iphonenew'),
+					array('ipad', 'iphone'),
+				);
+			case PlaybackProtocol::HTTP:
+				return array(
+					array('widevine', 'widevine_mbr'),
+					array(assetParams::TAG_MBR),
+					array(assetParams::TAG_WEB),
+				);
+			default:
+				return array(
+					array(assetParams::TAG_MBR),
+					array(assetParams::TAG_WEB),
+				);
+		}
+	}
+
+	/**
+	 * @param array $flavorTagsArrayByPriority
+	 * @param array<asset|assetParams> $flavors
+	 * @return array
+	 */
+	private function filterFlavorsByTags($flavorTagsArrayByPriority, $flavors)
+	{
+		foreach ($flavorTagsArrayByPriority as $tagsFallback)
+		{
+			$curFlavors = array();
+
+			foreach ($flavors as $flavor)
+			{
+				foreach ($tagsFallback as $tagOption)
+				{
+					if (!$flavor->hasTag($tagOption))
+						continue;
+					$curFlavors[$flavor->getId()] = $flavor;
+					break;
+				}
+			}
+
+			if ($curFlavors)
+				return $curFlavors;
+		}
+		return array();
 	}
 
 	/**
@@ -402,6 +511,28 @@ class kPlaybackContextDataHelper
 		foreach ($flavorAssets as $key => $flavorAsset)
 		{
 			if (in_array($flavorAsset->getId(), $flavorAssetsIdsToFilter))
+			{
+				if ($flavorAssetsParamsNotIn)
+					unset($flavorAssets[$key]);
+			} else
+			{
+				if (!$flavorAssetsParamsNotIn)
+					unset($flavorAssets[$key]);
+			}
+		}
+	}
+
+	/**
+	 * @param $flavorAssets
+	 * @param $flavorParamsIdsToFilter
+	 * @param $flavorAssetsParamsNotIn
+	 */
+	private static function filterFlavorAssetsByFlavorParamsIds(&$flavorAssets, $flavorParamsIdsToFilter, $flavorAssetsParamsNotIn)
+	{
+		foreach ($flavorAssets as $key => $flavorAsset)
+		{
+			/* @var flavorAsset $flavorAsset */
+			if (in_array($flavorAsset->getFlavorParamsId(), $flavorParamsIdsToFilter))
 			{
 				if ($flavorAssetsParamsNotIn)
 					unset($flavorAssets[$key]);
@@ -436,6 +567,24 @@ class kPlaybackContextDataHelper
 		}
 	}
 
+	/**
+	 * @param $deliveryProfiles
+	 * @param $contextDataHelper
+	 */
+	private function filterDeliveryProfilesByStreamerType(&$deliveryProfiles, kContextDataHelper $contextDataHelper)
+	{
+		$streamerTypes = $contextDataHelper->getStreamerType();
+		if (!is_null($streamerTypes))
+		{
+			$streamerTypes = explode(",", $streamerTypes);
+			foreach ($deliveryProfiles as $key => $deliveryProfile)
+			{
+				if (!in_array($deliveryProfile->getStreamerType(), $streamerTypes))
+					unset($deliveryProfiles[$key]);
+			}
+		}
+	}
+
 	private function getStreamsTypeToExclude($localCustomDeliveries)
 	{
 		$streamTypes = array();
@@ -464,7 +613,7 @@ class kPlaybackContextDataHelper
 		if (count($result->getFlavorIdsToRemove()))
 			self::filterFlavorAssets($flavorAssets, $result->getFlavorIdsToRemove(), true);
 
-		return array($result->getPluginData(),$flavorAssets) ;
+		return array($result->getPluginData(), $flavorAssets);
 	}
 
 	private function setPlaybackSources($servePriority)
@@ -475,13 +624,13 @@ class kPlaybackContextDataHelper
 				$this->playbackContext->setSources($this->localPlaybackSources);
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				$this->playbackContext->setSources(array_merge($this->localPlaybackSources,$this->remotePlaybackSources));
+				$this->playbackContext->setSources(array_merge($this->localPlaybackSources, $this->remotePlaybackSources));
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				$this->playbackContext->setSources($this->remotePlaybackSources);
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				$this->playbackContext->setSources(array_merge($this->remotePlaybackSources,$this->localPlaybackSources));
+				$this->playbackContext->setSources(array_merge($this->remotePlaybackSources, $this->localPlaybackSources));
 				break;
 			default:
 				$this->playbackContext->setSources(array());
@@ -495,26 +644,44 @@ class kPlaybackContextDataHelper
 		foreach ($this->playbackContext->getSources() as $source)
 		{
 			/* @var $source kPlaybackSource */
-			$flavorAssetsIds = array_merge($flavorAssetsIds,explode(",", $source->getFlavorIds()));
+			$flavorAssetsIds = array_merge($flavorAssetsIds, explode(",", $source->getFlavorIds()));
 		}
 
-		self::filterFlavorAssets($this->flavorAssets, $flavorAssetsIds, false );
+		self::filterFlavorAssets($this->flavorAssets, $flavorAssetsIds, false);
 	}
 
 	/**
 	 * @param $deliveryProfile
+	 * @param $contextDataHelper
 	 * @return string
 	 * */
-	private function constructProtocol($deliveryProfile)
+	private function constructProtocols($deliveryProfile, kContextDataHelper $contextDataHelper)
 	{
+		$protocols = array();
 		if (is_null($deliveryProfile->getMediaProtocols()))
 		{
 			if ($deliveryProfile->getStreamerType() == PlaybackProtocol::RTMP)
-				return PlaybackProtocol::RTMP;
+				$protocols[] = PlaybackProtocol::RTMP;
 			else
-				return infraRequestUtils::PROTOCOL_HTTP .",". infraRequestUtils::PROTOCOL_HTTPS;
-		}
-		return $deliveryProfile->getMediaProtocols();
-	}
+			{
+				$protocols[] = infraRequestUtils::PROTOCOL_HTTP;
+				$protocols[] = infraRequestUtils::PROTOCOL_HTTPS;
+			}
+		} else
+			$protocols = explode(",", $deliveryProfile->getMediaProtocols());
 
+		$mediaProtocols = $contextDataHelper->getMediaProtocol();
+
+		if (is_null($mediaProtocols))
+			return $protocols;
+
+		$mediaProtocols = explode(",", $mediaProtocols);
+		foreach ($mediaProtocols as $mediaProtocol)
+		{
+			if (!in_array($mediaProtocol, $protocols))
+				return array();
+		}
+
+		return $mediaProtocols;
+	}
 }

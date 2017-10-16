@@ -55,7 +55,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			{
 				$this->handleFileAdded ($physicalFile);
 				$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
-				KalturaLog::info("maxTime updated: $maxTime");
+				KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
 			}
 		}
 		
@@ -108,8 +108,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$listRecordingRequest = new WebexXmlListRecordingRequest();
 				$listRecordingRequest->setListControl($listControl);
 				
+				$dropFolderServiceTypes = $this->dropFolder->webexServiceType ? explode(',', $this->dropFolder->webexServiceType) : array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 				$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
-				$servicesTypes[] = new WebexXmlComServiceTypeType(WebexXmlComServiceTypeType::_MEETINGCENTER);
+				
+				foreach($dropFolderServiceTypes as $serviceType)
+				{
+					$servicesTypes[] = new WebexXmlComServiceTypeType($serviceType);
+				}
+				
 				$listRecordingRequest->setServiceTypes($servicesTypes);
 	 			
 				if($startTime && $endTime)
@@ -157,8 +163,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	 */
 	protected function purgeFiles ($dropFolderFilesMap)
 	{
-		$createTimeEnd = strtotime ("now") - ($this->dropFolder->autoFileDeleteDays*86400);
-		$fileList = $this->listRecordings(self::ZERO_DATE, date('m/j/Y H:i:s',$createTimeEnd));
+		$createTimeEnd = strtotime ("now");
+		$createTimeStart = self::ZERO_DATE;
+		if ($this->dropFolder->deleteFromTimestamp)
+		{
+			$createTimeStart = date('m/j/Y H:i:s',$this->dropFolder->deleteFromTimestamp);
+		}
+		
+		$fileList = $this->listRecordings($createTimeStart, date('m/j/Y H:i:s',$createTimeEnd));
 		KalturaLog::info("Files to delete: " . count($fileList));
 		
 		foreach ($fileList as $file)
@@ -178,6 +190,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				continue;
 			}
 			
+			$deleteTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays*86400;
+			if (time() < $deleteTime)
+			{
+				KalturaLog::info("File with name $physicalFileName- not time to delete yet. Ignoring");
+				continue;
+			}
+			
 			/* @var $file WebexXmlEpRecordingType */
 			$deleteRecordingRequest = new WebexXmlDelRecordingRequest();
 			$deleteRecordingRequest->setRecordingID($file->getRecordingID());
@@ -185,8 +204,44 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			
 			try {
 				$response = $this->webexClient->send($deleteRecordingRequest);
-				KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
-				$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+
+				if ($this->dropFolder->deleteFromRecycleBin)
+				{
+					//Locate recording in recycle bin according to the creation date
+					$listControl = new WebexXmlEpListControlType();
+					$listControl->setStartFrom(1);
+					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
+					$createTimeScope->setCreateTimeStart($file->getCreateTime());
+					$createTimeScope->setCreateTimeEnd($file->getCreateTime());
+					$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
+					$listRecordingRequest->setCreateTimeScope($createTimeScope);
+					$listRecordingRequest->setListControl($listControl);
+					
+					$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+					$recordingArr = $listRecordingResponse->getRecording();
+					$id = $recordingArr[0]->getRecordingID();
+					
+					KalturaLog::info("Permanently deleting recording with ID: [$id], recording: " . print_r($recordingArr[0], true));
+					
+					$delFromRecycleBinRequest = new WebexXmlDelRecordingFromRecycleBinRequest();
+					$delFromRecycleBinRequest->setRecordingID($id);
+					
+					$response = $this->webexClient->send($delFromRecycleBinRequest);
+					if($response->getSuccessfulRecordingsCount())
+					{
+						KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+						$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+					}
+					else
+					{
+						throw new Exception("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
+					}
+				}
+				else
+				{
+					KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+					$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
+				}
 			}
 			catch (Exception $e)
 			{
@@ -210,7 +265,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$newDropFolderFile->recordingId = $webexFile->getRecordingID();
 			$newDropFolderFile->webexHostId = $webexFile->getHostWebExID();
 			$newDropFolderFile->contentUrl = $webexFile->getFileURL();
-			KalturaLog::debug('content url '. $newDropFolderFile->contentUrl . ' file url: ' .$webexFile->getFileURL() );
+			KalturaLog::debug("Adding new WebexDropFolderFile: " . print_r($newDropFolderFile, true));
 			//No such thing as an 'uploading' webex drop folder file - if the file is detected, it is ready for upload. Immediately update status to 'pending'
 			KBatchBase::$kClient->startMultiRequest();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);

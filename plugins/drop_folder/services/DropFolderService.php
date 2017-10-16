@@ -163,7 +163,7 @@ class DropFolderService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->conversionProfileId);
 			}
 		}
-					
+
 		$dbDropFolder = $dropFolder->toUpdatableObject($dbDropFolder);
 		$dbDropFolder->save();
 	
@@ -228,6 +228,64 @@ class DropFolderService extends KalturaBaseService
 		$response->totalCount = $count;
 		
 		return $response;
+	}
+
+	/**
+	 * getExclusive KalturaDropFolder object
+	 *
+	 * @action getExclusiveDropFolder
+	 * @param string $tag
+	 * @param int $maxTime
+	 * @return KalturaDropFolder
+	 */
+	public function getExclusiveDropFolderAction($tag, $maxTime)
+	{
+		$allocateDropFolder = kDropFolderAllocator::getDropFolder($tag, $maxTime);
+		if ($allocateDropFolder && self::isValidForWatch($allocateDropFolder))
+		{
+			$dropFolder = KalturaDropFolder::getInstanceByType($allocateDropFolder->getType());
+			$dropFolder->fromObject($allocateDropFolder, $this->getResponseProfile());
+			return $dropFolder;
+		}
+	}
+ 	
+	/**
+	 * freeExclusive KalturaDropFolder object
+	 *
+	 * @action freeExclusiveDropFolder
+	 * @param int $dropFolderId
+	 * @param string $errorCode
+	 * @param string $errorDescription
+	 * @throws KalturaAPIException
+	 * @return KalturaDropFolder
+	 */
+	public function freeExclusiveDropFolderAction($dropFolderId, $errorCode = null, $errorDescription = null)
+	{
+		kDropFolderAllocator::freeDropFolder($dropFolderId);
+
+		$dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
+		if (!$dbDropFolder)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
+
+		$dbDropFolder->setLastAccessedAt(time());
+		$dbDropFolder->setErrorCode($errorCode);
+		$dbDropFolder->setErrorDescription($errorDescription);
+		$dbDropFolder->save();
+
+		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
+		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
+
+		return $dropFolder;
+	}
+
+	private static function isValidForWatch(DropFolder $dropFolder)
+	{
+		$partner = PartnerPeer::retrieveByPK($dropFolder->getPartnerId());
+		if (!$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE
+			|| !$partner->getPluginEnabled(DropFolderPlugin::PLUGIN_NAME))
+			return false;
+
+		return true;
 	}
 	
 }

@@ -2,12 +2,14 @@
 /**
  * @package plugins.bulkUploadXml
  */
-class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaVersion, IKalturaSchemaDefiner, IKalturaPending
+class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaVersion, IKalturaSchemaDefiner, IKalturaPending, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'bulkUploadXml';
 	const PLUGIN_VERSION_MAJOR = 1;
 	const PLUGIN_VERSION_MINOR = 1;
 	const PLUGIN_VERSION_BUILD = 0;
+	
+	const BULKUPLOAD_XML_FLOW_MANAGER = "kBulkUploadXmlFlowManager";
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -244,5 +246,10 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	public static function getEventConsumers()
+	{
+		return array(self::BULKUPLOAD_XML_FLOW_MANAGER);
 	}
 }

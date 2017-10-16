@@ -27,6 +27,12 @@ class KalturaSyndicationFeedFactory
 			case KalturaSyndicationFeedType::KALTURA_XSLT:
 				$obj = new KalturaGenericXsltSyndicationFeed();
 				break;
+			case KalturaSyndicationFeedType::OPERA_TV_SNAP:
+				$obj = new KalturaOperaSyndicationFeed();
+				break;
+			case KalturaSyndicationFeedType::ROKU_DIRECT_PUBLISHER:
+				$obj = new KalturaRokuSyndicationFeed();
+				break;
 			default:
 				$obj = new KalturaBaseSyndicationFeed();
 				break;
@@ -53,6 +59,8 @@ class KalturaSyndicationFeedFactory
 				break;
 			case KalturaSyndicationFeedType::KALTURA:
 			case KalturaSyndicationFeedType::KALTURA_XSLT:
+			case KalturaSyndicationFeedType::OPERA_TV_SNAP:
+			case KalturaSyndicationFeedType::ROKU_DIRECT_PUBLISHER:
 			default:
 				return new KalturaFeedRenderer();
 				break;

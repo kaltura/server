@@ -13,6 +13,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	const HEIGHT = 'height';
 	const MATCH_SOURCE = 'match-source';
 	const KILO = 1000;
+	const DEFAULT_NAME_GROUP = 'all';
 	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::initService()
@@ -152,15 +153,16 @@ class LiveConversionProfileService extends KalturaBaseService
 					$defaultFrameRate = $liveParamsItem->getFrameRate();
 				}
 			}
-			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $streamParametersArray);
-			$tags = array("all");
-			foreach($tags as $tag)
-			{
-				if(!isset($groups[$tag]))
-					$groups[$tag] = array();
-
-				$systemName = $liveParamsItem->getSystemName() ? $liveParamsItem->getSystemName() : $liveParamsItem->getId();
-				$groups[$tag][] = $systemName;
+			$shouldAddFlavor = $this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $streamParametersArray);
+			if ($shouldAddFlavor) {
+				$tags = array(self::DEFAULT_NAME_GROUP);
+				foreach ($tags as $tag) {
+					if (!isset($groups[$tag]))
+						$groups[$tag] = array();
+					
+					$systemName = $liveParamsItem->getSystemName() ? $liveParamsItem->getSystemName() : $liveParamsItem->getId();
+					$groups[$tag][] = $systemName;
+				}
 			}
 		}
 		
@@ -214,7 +216,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	private function checkFlavorsDataRate($ingestDataRate, $flavorDataRate)
 	{
 		$percentageFactor = 1 + (kConf::get('transcoding_profile_bitrate_percentage_gap_between_flavors') / 100);
-		return ($ingestDataRate !== 0) && (($ingestDataRate * self::KILO) < ($flavorDataRate * $percentageFactor));
+		return ($ingestDataRate != 0) && (($ingestDataRate * self::KILO) < ($flavorDataRate * $percentageFactor));
 	}
 	
 	private function checkFlavorsHeight($ingestHeight, $flavorHeight)
@@ -305,7 +307,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			if (!$this->isFlavorCompatibile($streamParametersArray, $flavorBitrateValue, $flavorResolutionInfo, $liveParams->getId()))
 			{
 				// Flavor is not compatible with the ingest's parameters -> discard it.
-				return;
+				return false;
 			}
 		}
 		
@@ -329,7 +331,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			{
 				$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * self::KILO : 96000);
 			}
-			return;
+			return true;
 		}
 		
 		if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
@@ -422,5 +424,6 @@ class LiveConversionProfileService extends KalturaBaseService
 
 		$audio->addChild('Codec', $audioCodec);
 		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * self::KILO : 96000);
+		return true;
 	}
 }

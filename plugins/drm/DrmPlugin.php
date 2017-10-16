@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor
+class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'drm';
 
@@ -122,7 +122,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return "KDLOperatorrm";
         if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return "KalturaDrmProfile";
-        if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
+        if($baseClass == 'DrmProfile' && $enumValue == DrmProviderType::CENC)
             return "DrmProfile";
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return 'Kaltura_Client_Drm_Type_DrmProfile';
@@ -162,7 +162,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($this->shouldContribute($entry) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ( self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
 			if ($dbProfile)

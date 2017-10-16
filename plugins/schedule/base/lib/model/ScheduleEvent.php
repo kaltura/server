@@ -126,7 +126,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	/**
 	 * @param string $v
 	 */
-	protected function setOwnerId($puserId)
+	public function setOwnerId($puserId)
 	{
 		$kuser = kuserPeer::createKuserForPartner(kCurrentContext::getCurrentPartnerId(), $puserId, kCurrentContext::$is_admin_session);
 		$this->setOwnerKuserId($kuser->getId());
@@ -293,5 +293,10 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 			$fieldVals[] = $scheduleEvent->$field(null);
 		}
 		return $fieldVals;
+	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("scheduleEvent:id".strtolower($this->getId()));
 	}
 } // ScheduleEvent

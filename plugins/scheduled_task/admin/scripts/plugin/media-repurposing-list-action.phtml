@@ -1,0 +1,413 @@
+<p><?php echo $this->translate('Media Repurposing list intro text'); ?></p>
+
+<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to Media Repurposing Admin'); return;} ?>
+<?php echo $this->filterForm; ?>
+<br><br><br><br><br><br><br>
+<?php echo $this->newMediaRepurposingForm; ?>
+<?php echo $this->newMediaRepurposingFormFromTemplate; ?>
+
+<div id="media_repurposing_list_div" class="clear">
+	<table>
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('Engine Type'); ?></th>
+				<th><?php echo $this->translate('Filter'); ?></th>
+				<th><?php echo $this->translate('Schedule Task IDs'); ?></th>
+				<th><?php echo $this->translate('Last Run:'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="10">
+			<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as $mediaRepurposing): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next();
+			?>">
+				<td><?php echo $mediaRepurposing->id; ?></td>
+				<td><?php echo $mediaRepurposing->name; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus', $mediaRepurposing->status); ?></td>
+				<td><?php echo $mediaRepurposing->objectFilterEngineType; ?></td>
+				<td><?php echo get_class($mediaRepurposing->objectFilter); ?></td>
+				<td><?php echo $mediaRepurposing->description; ?></td>
+				<td><?php if ($mediaRepurposing->lastExecutionStartedAt) echo date('r', $mediaRepurposing->lastExecutionStartedAt); else echo "NEVER"?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, '<?php echo $mediaRepurposing->id; ?>')">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="configureMediaRepurposing" ><?php echo $this->translate('Configure'); ?></option>
+						<?php if ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED): ?>
+							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
+						<?php elseif ($mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE || $mediaRepurposing->status === Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY): ?>
+							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
+						<?php endif; ?>
+						<option value="dryRun" ><?php echo $this->translate('Execute Dry-Run'); ?></option>
+						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
+					</select>
+				</td>				
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<?php echo $this->getDryRunLogForm; ?>
+
+<script type="text/javascript">
+$(function(){
+	addSubTitle('Media Repurposing Profiles');
+});
+
+
+
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+	}
+});
+
+jQuery('#filter_type').change();
+
+partnerId = <?php echo $this->filterForm->partnerId ?>;
+function doAction(action, mediaRepurposingName) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+
+function enable(mediaRepurposingId)
+{
+	changeStatus(
+		mediaRepurposingId,
+		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE; ?>,
+		function() {
+			alert('<?php echo $this->translate('Media Repurposing active');?>');
+		}
+	);
+}
+
+function disable(mediaRepurposingId)
+{
+	changeStatus(
+		mediaRepurposingId,
+		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED; ?>,
+		function() {
+			alert('<?php echo $this->translate('Media Repurposing disabled. NOTICE: disabling will not stop currently running process');?>');
+		}
+	);
+}
+
+function dryRun(mediaRepurposingId)
+{
+	changeStatus(
+		mediaRepurposingId,
+		<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY; ?>,
+		function(batchJobId) {
+			alert("Dry run for MR profile id [" + mediaRepurposingId + "] has been Assign. This could take couple of minutes. Results will be save to file. The batch JobId is " + batchJobId);
+		}
+	);
+}
+
+function remove(mediaRepurposingId)
+{
+	var ok = confirm('<?php echo $this->translate("Are you sure you want to remove media Repurposing? 	NOTICE: delete will not stop currently running process"); ?>');
+	if (ok)
+	{
+		changeStatus(
+			mediaRepurposingId,
+			<?php echo Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DELETED; ?>,
+			function() {
+				alert('<?php echo $this->translate('Media Repurposing removed');?>');
+			}
+		);
+	}
+}
+
+function changeStatus(mediaRepurposingId, status, callback)
+{
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingSetStatusAction', 'mediaRepurposingId' => 'MEDIAREPURPOSINGID', 'mediaRepurposingStatus' => 'STATUS', 'partnerId' => 'PARTNERID')); ?>';
+	url = url.replace('STATUS', status);
+	url = url.replace('MEDIAREPURPOSINGID', mediaRepurposingId);
+	url = url.replace('PARTNERID', partnerId);
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(result) {
+			if (result[0] != 'ok')
+				this.error();
+			
+			if (callback && (typeof callback == 'function'))
+			{
+				callback.apply(this, [result[1]]);
+			}			
+			jQuery('#frmPaginator1').submit();
+		},
+		error: function() {
+			alert('<?php echo $this->translate('an error occured'); ?>');
+		}
+	});
+}
+
+function newMediaRepurposingFromTemplate(partnerId, templateType)
+{
+	if (!isValidParam(partnerId, 'Publisher ID', true))
+		return;
+	if (!isValidParam(templateType, 'Media Repurposing Template', false))
+		return;
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_template_type/' + templateType;
+	loadMediaRepurposing(paramsStr);
+}
+
+function newMediaRepurposing(partnerId, filterEngineType, filterType)
+{
+	if (!isValidParam(partnerId, 'Publisher ID', true))
+		return;
+	if (!isValidParam(filterEngineType, 'Media Repurposing Engine Type', true))
+		return;
+	if (!isValidParam(filterType, 'Media Repurposing Filter Type', false))
+		return;
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_mr_filter_engine_type/' + filterEngineType + '/new_mr_filter_type/' + filterType;
+	loadMediaRepurposing(paramsStr);
+}
+
+function isValidParam(param, name, number)
+{
+	if (!param.length || (param == 'N/A')) {
+		alert(name + " not supplied");
+		return false;
+	}
+	if (number && isNaN(param)) {
+		alert(name + " is not a number");
+		return false;
+	}
+	return true;
+}
+
+function configureMediaRepurposing(mediaRepurposingId)
+{
+	if(typeof mediaRepurposingId == 'undefined'){
+		alert('<?php echo $this->translate('Media Repurposing ID not supplied'); ?>');
+		return;
+	}
+
+	mediaRepurposingIdStr = '/new_partner_id/' + partnerId + '/media_repurposing_id/' + mediaRepurposingId;
+	loadMediaRepurposing(mediaRepurposingIdStr);
+	
+}
+
+
+function loadMediaRepurposing(paramStr)
+{	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingConfigureAction')); ?>' + paramStr;
+	
+	jQuery('#media-repurposing-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="media-repurposing-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 600,
+		height: 600,
+		title: '<?php echo $this->translate('Media Repurposing Profile'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				rearrangeData();
+				jQuery(this).find('#frmMediaRepurposingConfigure').submit();
+				setTimeout(function () { window.location.reload(); }, 100);
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		}
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmMediaRepurposingConfigure').ajaxForm({
+				success: loadMediaRepurposingSuccess,
+				iframe: true
+			});
+		}
+	);
+}
+
+function getDryRunLog(dryRunId) {
+	if (!isValidParam(dryRunId, 'Dry Run id', true))
+		return;
+	loadMediaRepurposingLogs('/dryRunId/' + dryRunId);
+}
+
+function loadMediaRepurposingLogs(paramStr) {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingLogsAction')); ?>' + paramStr;
+	dialogDiv = jQuery('<div id="media-repurposing-logs-dialog"><iframe width="100%" height="100%" src="' + url + '"></iframe></div>').appendTo('body');
+	dialogDiv.dialog({bgiframe: true, modal: true, resizable: true, width: 600, height: 600,
+		title: '<?php echo $this->translate('Media Repurposing Profile Logs'); ?>',
+		buttons: {'<?php echo $this->translate('Close'); ?>': function() {jQuery(this).dialog('close');}}
+	});
+}
+
+
+function rearrangeData() {
+	//remove all template field
+	$('dd[id^="MR_tasksDataTemplate_"]').remove();
+	$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
+
+	convertDates();
+	setConditionData();
+	setTaskData();
+}
+
+
+function convertDates()
+{
+	let f = jQuery('#frmMediaRepurposingConfigure');
+	f.find( "input[innertype=integer]").each(function(idx) {
+		var val = $(this).val();
+		if (isDatesFormat(val)) {
+			$(this).val(getEpocTime(val));
+			return;
+		}
+		var id = this.id;
+		if (val != 'N/A' && epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
+			$(this).val(val * 2592000); // 60*60*24*30 - set relative in seconds from relative months
+	});
+}
+
+function isDatesFormat(val) {
+	return (val.split(".").length == 3 || val.split("/").length == 3);
+}
+
+function getEpocTime(val) {
+	let epoc = new Date(val).getTime() / 1000 + 3600*4; // + 4 hour for not slide a day backward in for time zones
+	if (epoc)
+		return epoc;
+	alert("Date is not valid. insert time 0 instead");
+	return 0;
+}
+
+function checkNumValid(val) {
+	if (isDatesFormat(val)) {
+		if(isNaN(new Date(val).getTime()))
+			alert("Not a valid Date!");
+		return;
+	}
+	if (isNaN(val))
+		alert("You need to enter number!");
+}
+
+
+function setConditionData() {
+	var conditions = [];
+	var currentIndex = 0;
+	while (jQuery('#Cond_' + currentIndex.toString()).length > 0) {
+		conditions.push(buildCondParams(currentIndex));
+		currentIndex++;
+	}
+	jQuery('#AdvanceSearch').val(JSON.stringify(conditions));
+}
+
+function buildCondParams(index) {
+	var cond = {};
+	jQuery('#Cond_' + index).find('input,select').each(function(idx) {
+		var type = $( this ).attr("type");
+		var name = $( this ).attr("name");
+		var val = $( this ).val();
+		if (type == 'hidden')
+			return;
+
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
+
+		cond[name] = val;
+		$(this).remove();
+	});
+	return cond;
+}
+
+function setTaskData() {
+	var tasks = [];
+	for (let currentIndex = 0; currentIndex < 30 ; currentIndex++) {
+		if (jQuery('#mr_task_' + currentIndex.toString() + '-TaskType').length > 0)
+			tasks.push(buildTaskParams(currentIndex.toString()));
+	}
+	jQuery('#TasksData').val(JSON.stringify(tasks));
+}
+
+function buildTaskParams(index) {
+
+	var taskTypeElement = jQuery('#mr_task_' + index + '-TaskType');
+	var type = taskTypeElement.val();
+	taskTypeElement.remove();
+
+	var taskIdElement = jQuery('#mr_task_' + index + '-TaskId');
+	var id = taskIdElement.val();
+	taskIdElement.remove();
+
+	var taskTimeToNextElement = jQuery('#mr_task_' + index + '-taskTime');
+	var taskTimeToNext = taskTimeToNextElement.val();
+	taskTimeToNextElement.remove();
+
+	var taskData = {};
+	jQuery('#mr_task_data_' + index).find('input,select,textarea').each(function(idx) {
+		var type = $( this ).attr("type");
+		var name = $( this ).attr("name");
+		var val = $( this ).val();
+
+		if (type == 'checkbox')
+			val = getCheckboxVal(this);
+
+		taskData[name] = val;
+		$(this).remove();
+	});
+	return {id:id, type:type, taskTimeToNext:taskTimeToNext, taskData:taskData};
+}
+
+function getCheckboxVal(element) {
+	if ($(element).attr("checked") == 'checked')
+		return "1";
+	return "0";
+}
+
+
+function loadMediaRepurposingSuccess(html) {
+	if (jQuery(html).filter('#frmMediaRepurposingConfigure').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+		if (jQuery('#frmPaginator1').length){
+			jQuery('#frmPaginator1').submit();
+		}
+		else {
+			jQuery('#frmPartnerIdFilter').submit();
+		}
+	}
+	jQuery('#frmMediaRepurposingConfigure').replaceWith(html);
+	jQuery('#frmMediaRepurposingConfigure').ajaxForm({
+		success: loadMediaRepurposingSuccess,
+		iframe: true
+	});
+}
+
+
+
+
+</script>

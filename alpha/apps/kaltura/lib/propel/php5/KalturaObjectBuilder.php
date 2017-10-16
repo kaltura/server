@@ -742,12 +742,16 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	if ($this->isDeletable())
 	{
 	    $script .= "
+	    
 	/**
 	 * Code to be run after deleting the object from database
 	 * @param PropelPDO \$con
 	 */
 	public function postDelete(PropelPDO \$con = null)
-	{";
+	{
+		kQueryCache::invalidateQueryCache(\$this);
+		
+		";
 		if ($this->shouldRaiseEvents())
 		{
 			$script .= "

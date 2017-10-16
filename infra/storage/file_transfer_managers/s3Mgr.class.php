@@ -128,39 +128,55 @@ class s3Mgr extends kFileTransferMgr
 	// upload a file to the server (ftp_mode is irrelevant
 	protected function doPutFile ($remote_file , $local_file)
 	{
+		$retries = 3;
+		while($retries)
+		{
+			list($success, $message) = @($this->doPutFileHelper($remote_file , $local_file));
+			if($success)
+				return true;
+
+			KalturaLog::debug("Failed to export File: ".$remote_file." number of retries left: ".$retries);
+			$retries--;
+		}
+		//throw temporary exception so that the batch will retry
+		throw new kTemporaryException("Can't put file [$remote_file] - " . $message);
+	}
+
+	private function doPutFileHelper($remote_file , $local_file)
+	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
-		
+
 		try
 		{
-			
+
 			$params = array(
 					'Bucket'       => $bucket,
 					'Key'          => $remote_file,
 					'SourceFile'   => $local_file,
 					'ACL'          => $this->filesAcl,
 			);
-			
+
 			if($this->sseType === "KMS")
 			{
 				$params['ServerSideEncryption'] = "aws:kms";
 				$params['SSEKMSKeyId'] = $this->sseKmsKeyId;
 			}
-			
+
 			if($this->sseType === "AES256")
 			{
 				$params['ServerSideEncryption'] = "AES256";
 			}
-			
+
 			$res = $this->s3->putObject($params);
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
-			return true;
- 		}
+			return array(true, null);
+		}
 		catch ( Exception $e )
 		{
 			KalturaLog::err("error uploading file ".$local_file." s3 info: ".$e->getMessage());
-			return false;
+			return array(false, $e->getMessage());
 		}
 	}
 

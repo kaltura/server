@@ -71,7 +71,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
-			return array('QuizCuePointType','QuizUserEntryType',"QuizUserEntryStatus","QuizEntryCapability","QuizReportType");
+			return array('QuizCuePointType','QuizUserEntryType',"QuizUserEntryStatus","QuizEntryCapability","QuizReportType","QuizCuePointMetadataObjectType");
 		if ($baseEnumName == 'CuePointType')
 			return array('QuizCuePointType');
 		if ($baseEnumName == "UserEntryType")
@@ -89,6 +89,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		if ($baseEnumName == 'ReportType')
 		{
 			return array("QuizReportType");
+		}
+		if ($baseEnumName == 'MetadataObjectType')
+		{
+			return array('QuizCuePointMetadataObjectType');
 		}
 
 
@@ -883,6 +887,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
     {
         return false;
     }
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION));
+	}
 
 }
 

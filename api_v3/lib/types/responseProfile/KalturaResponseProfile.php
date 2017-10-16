@@ -8,7 +8,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	/**
 	 * Auto generated numeric identifier
 	 * 
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 * @filter eq,in
 	 */
@@ -95,7 +95,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 		$this->validatePropertyMinLength('systemName', 2, !is_null($sourceObject));
 		
 		//Check uniqueness of new object's system name
-		$systemNameProfile = ResponseProfilePeer::retrieveBySystemName($this->systemName, ($sourceObject && $sourceObject->getId()) ? $sourceObject->getId() : null);
+		$systemNameProfile = ResponseProfilePeer::retrieveBySystemName($this->systemName, ($sourceObject && $sourceObject->getId()) ? $sourceObject->getId() : null, kCurrentContext::getCurrentPartnerId());
 		if ($systemNameProfile)
 			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $this->systemName);
 	

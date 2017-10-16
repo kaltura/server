@@ -174,6 +174,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	
 	/**
 	 * @var int
+	 */
+	public $forcedKeyFramesMode;
+	
+	/**
+	 * @var int
 	 * 	IMX files (MXF/Mpeg2) have a 32pix black strip at top of the frame.
 	 * 	When set - this strip will be removed automatically (just for those files)
 	 */
@@ -222,6 +227,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	public $contentAwareness;
 	
 	/**
+	* @var int
+	*/
+	public $chunkedEncodeMode;
+
+	/**
 	 * @var int
 	 */
 	public $clipOffset;
@@ -260,6 +270,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"multiStream",
 		"anamorphicPixels",
 		"isAvoidForcedKeyFrames",
+		"forcedKeyFramesMode",
 		"isCropIMX",
 		"optimizationPolicy",
 		"maxFrameRate",
@@ -269,6 +280,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"subtitlesData",
 		"isEncrypted",
 		"contentAwareness",
+		"chunkedEncodeMode",
 		"clipOffset",
 		"clipDuration",
 	);

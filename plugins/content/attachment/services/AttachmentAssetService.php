@@ -426,6 +426,7 @@ class AttachmentAssetService extends KalturaAssetService
 	 * @param string $attachmentAssetId
 	 * @param KalturaAttachmentServeOptions $serveOptions
 	 * @return file
+	 * @ksOptional
 	 *  
 	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
 	 */

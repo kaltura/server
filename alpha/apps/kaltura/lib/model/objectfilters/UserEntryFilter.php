@@ -11,8 +11,10 @@ class UserEntryFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",
+			"_notin_id",
 			"_eq_entry_id",
 			"_in_entry_id",
+			"_notin_entry_id",
 			"_eq_user_id",
 			"_in_user_id",
 			"_notin_user_id",
@@ -22,6 +24,12 @@ class UserEntryFilter extends baseObjectFilter
 			"_lte_updated_at",
 			"_eq_status",
 			"_in_status",
+			"_eq_type",
+			"_eq_extended_status",
+			"_in_extended_status",
+			"_notin_extended_status",
+			"_eq_privacy_context",
+			"_in_privacy_context",
 		) , NULL );
 
 		$this->allowed_order_fields = array (
@@ -43,7 +51,4 @@ class UserEntryFilter extends baseObjectFilter
 	{
         return UserEntryPeer::ID;
 	}
-
-
-
 }

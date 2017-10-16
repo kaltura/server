@@ -127,7 +127,7 @@ class CaptionAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
    		else
    			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
-   		
+
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
@@ -539,6 +539,7 @@ class CaptionAssetService extends KalturaAssetService
 	 * @action serve
 	 * @param string $captionAssetId
 	 * @return file
+	 * @ksOptional
 	 *  
 	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
 	 */
@@ -564,6 +565,7 @@ class CaptionAssetService extends KalturaAssetService
 	 * @param int $segmentIndex
 	 * @param int $localTimestamp
 	 * @return file
+	 * @ksOptional
 	 *
 	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
 	 */

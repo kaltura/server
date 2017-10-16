@@ -4,8 +4,10 @@
  */
 class VoicebaseClientHelper
 {
-	const VOICEBASE_FAILURE_MEESAGE = "FAILURE";
-	const VOICEBASE_MACHINE_COMPLETE_MEESAGE = "MACHINECOMPLETE";
+	const VOICEBASE_FAILURE_MESSAGE = "FAILURE";
+	const VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS = "SUCCESS";
+	const VOICEBASE_MACHINE_COMPLETE_MESSAGE = "MACHINECOMPLETE";
+	const VOICEBASE_MACHINE_FAILURE_MESSAGE = "ERROR";
 	
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;
@@ -24,18 +26,26 @@ class VoicebaseClientHelper
 	}
 	
 	public function checkExistingExternalContent($entryId)
+	{	
+		$curlResult = $this->retrieveRemoteProcess($entryId);
+		if($curlResult)
+		{
+			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE || !isset($curlResult->fileStatus) || !$curlResult->fileStatus == self::VOICEBASE_MACHINE_COMPLETE_MESSAGE)
+				return false;
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public function retrieveRemoteProcess ($entryId)
 	{
 		$params = array("action" => "getFileStatus", "externalID" => $entryId);
 		$exitingEntryQueryUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	
 		$curlResult = $this->sendAPICall($exitingEntryQueryUrl);
-		if($curlResult)
-		{
-			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MEESAGE || !isset($curlResult->fileStatus) || !$curlResult->fileStatus == self::VOICEBASE_MACHINE_COMPLETE_MEESAGE)
-				return false;
-			return true;
-		}
-		return false;
+		
+		return $curlResult;
 	}
 	
 	public function uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation = null)
@@ -68,8 +78,9 @@ class VoicebaseClientHelper
 
 		$curlResult = $this->sendAPICall($uploadAPIUrl, $urlOptions);
 	
-		if($curlResult->requestStatus == self::VOICEBASE_FAILURE_MEESAGE)
+		if($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE)
 			return false;
+		
 		return true;
 	}
 	
@@ -105,6 +116,7 @@ class VoicebaseClientHelper
 		}
 		KalturaLog::debug('result is - ' . var_dump($result));
 		curl_close($ch);
+		
 		return $result;
 	}
 	
@@ -121,7 +133,7 @@ class VoicebaseClientHelper
 		);
 		$options = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postFields);
 	
-		$this->sendAPICall($updateTranscriptUrl, $options);
+		return $this->sendAPICall($updateTranscriptUrl, $options);
 	}
 	
 	public function getRemoteTranscripts($entryId, array $formats)
@@ -137,6 +149,7 @@ class VoicebaseClientHelper
 			$result = $this->sendAPICall($url);
 			$results[$format] = $result->transcript;
 		}
+		
 		return $results;
 	}
 	
@@ -158,6 +171,7 @@ class VoicebaseClientHelper
 	
 		if($numberOfElements)
 			return $sumOfAccuracies/$numberOfElements;
+		
 		return 0;
 	}
 	
@@ -180,6 +194,7 @@ class VoicebaseClientHelper
 	private function addUrlParams($url, array $params, $init = false)
 	{
 		$url .= $init ? '?' : '&' ;
+		
 		return $url . http_build_query($params);
 	}
 }

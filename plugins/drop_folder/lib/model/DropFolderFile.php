@@ -13,7 +13,7 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolderFile extends BaseDropFolderFile implements IRelatedObject
+class DropFolderFile extends BaseDropFolderFile implements IBaseObject
 {
 
 	const CUSTOM_DATA_LAST_MODIFICATION_TIME = 'last_modification_time';
@@ -119,5 +119,11 @@ class DropFolderFile extends BaseDropFolderFile implements IRelatedObject
 	{
 		return $this->getFileName();
 	}
-	
+
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		if ($deepCopy)
+			$this->setCustomDataObj();
+		parent::copyInto($copyObj, $deepCopy);
+	}
 } // DropFolderFile

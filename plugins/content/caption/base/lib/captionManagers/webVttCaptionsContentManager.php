@@ -5,11 +5,8 @@
  */
 class webVttCaptionsContentManager extends kCaptionsContentManager
 {
-	const UNIX_LINE_ENDING = "\n";
-	const MAC_LINE_ENDING = "\r";
-	const WINDOWS_LINE_ENDING = "\r\n";
 
-	const TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3})( .*)?$#';
+	const WEBVTT_TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3})( .*)?$#';
 
 	const BOM_CODE =  "\xEF\xBB\xBF";
 	/**
@@ -40,37 +37,6 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return $itemsData;
 	}
 
-	/**
-	 * @param content
-	 * @return array
-	 */
-	public static function getFileContentAsArray($content)
-	{
-		$textContent = str_replace( // So we change line endings to one format
-			array(
-				self::WINDOWS_LINE_ENDING,
-				self::MAC_LINE_ENDING,
-			),
-			self::UNIX_LINE_ENDING,
-			$content
-		);
-		$contentArray = explode(self::UNIX_LINE_ENDING, $textContent); // Create array from text content
-		return $contentArray;
-	}
-
-	/**
-	 * @param array $array
-	 * @return mixed
-	 */
-	public static function getNextValueFromArray(array &$array)
-	{
-		$element = each($array);
-		if (is_array($element))
-		{
-			return $element['value'];
-		}
-		return false;
-	}
 
 	/**
 	 * @param $parsing_errors
@@ -122,58 +88,19 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return true;
 	}
 
-	/**
-	 * @param $line
-	 * @return string
-	 * @throws Exception
-	 */
-	public static function handleTextLines($line)
-	{
-		$lines = array_map('trim', preg_split('/$\R?^/m', $line));
-		$line = implode(self::UNIX_LINE_ENDING, $lines);
-		return $line;
-	}
 
 	/**
 	 * @param $timeStr
 	 * @return string
 	 */
-	public function parseStrTTTime($timeStr)
+	public function parseWebvttStrTTTime($timeStr)
 	{
-		$tabs = explode(':', $timeStr);
-		$result = count($tabs);
-		$timeInMilliseconds = null;
-		if ($result == 2){
-			$timeInMilliseconds = self::shortTimeFormatToInteger($timeStr) ;
-		} elseif  ($result == 3){
-			$timeInMilliseconds = kXml::timeToInteger($timeStr);
-		} else {
-			$this->parsingErrors[] = 'Error parsing time to milliseconds. invalid format for '.$timeStr;
-		}
+		list ($timeInMilliseconds, $error) = kCaptionsContentManager::parseStrTTTime($timeStr);
+		if($error)
+			$this->parsingErrors[] = $error;
 		return $timeInMilliseconds;
 	}
 
-	private static function shortTimeFormatToInteger($time)
-	{
-		$parts = explode(':', $time);
-		if(!isset($parts[0]) || !is_numeric($parts[0]))
-			return null;
-
-		$ret = intval($parts[0]) * (60 * 1000);  // hours im milliseconds
-
-		if(!isset($parts[1]))
-			return $ret;
-		if(!is_numeric($parts[1]))
-			return null;
-
-		if(!isset($parts[1]))
-			return $ret;
-		if(!is_numeric($parts[1]))
-			return null;
-
-		$ret += floatval($parts[1]) * 1000;  // seconds im milliseconds
-		return round($ret);
-	}
 
 	/* (non-PHPdoc)
 	 * @see kCaptionsContentManager::getContent()
@@ -210,6 +137,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return new webVttCaptionsContentManager();
 	}
 
+
 	/**
 	 * @param $content
 	 * @return array
@@ -218,43 +146,36 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	{
 		$this->headerInfo = array();
 		$foundFirstTimeCode = false;
-
 		$itemsData = array();
-
 		$fileContentArray = self::getFileContentAsArray($content);
-
 		// Parse signature.
 		$header = self::getNextValueFromArray($fileContentArray);
-
 		if (!$this->validateWebVttHeader($header))
 		{
 			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
 			return array();
 		}
-
-		$this->headerInfo[] = $header.self::UNIX_LINE_ENDING;
+		$this->headerInfo[] = $header.self::WINDOWS_LINE_ENDING;
 		// Parse text - ignore comments, ids, styles, notes, etc
 		while (($line = self::getNextValueFromArray($fileContentArray)) !== false)
 		{
 			// Timecode.
 			$matches = array();
-			$timecode_match = preg_match(self::TIMECODE_PATTERN, $line, $matches);
+			$timecode_match = preg_match(self::WEBVTT_TIMECODE_PATTERN, $line, $matches);
 			if ($timecode_match)
 			{
 				$foundFirstTimeCode = true;
-				$start = $this->parseStrTTTime($matches[1]);
-				$stop = $this->parseStrTTTime($matches[2]);
+				$start = $this->parseCaptionTime($matches[1]);
+				$stop = $this->parseCaptionTime($matches[2]);
 				$text = '';
 				while (trim($line = self::getNextValueFromArray($fileContentArray)) !== '')
 				{
 					$line = $this->handleTextLines($line);
-					$text .= $line . self::UNIX_LINE_ENDING;
+					$text .= $line . self::WINDOWS_LINE_ENDING;
 				}
-
 				$itemsData[] = array('startTime' => $start, 'endTime' => $stop, 'content' => array(array('text' => $text)));
 			}elseif ($foundFirstTimeCode == false)
-					$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
-
+				$this->headerInfo[] = $line . self::WINDOWS_LINE_ENDING;
 		};
 		if (count($this->parsingErrors) > 0)
 		{
@@ -262,6 +183,25 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 			return array();
 		}
 		return $itemsData;
+	}
+
+	public function buildFile($content, $clipStartTime, $clipEndTime)
+	{
+		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN);
+		return $newFileContent;
+	}
+
+	protected function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime)
+	{
+		$startCaption = $this->parseWebvttStrTTTime($matches[1]);
+		$endCaption = $this->parseWebvttStrTTTime($matches[2]);
+		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
+			return null;
+		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
+		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
+		$settings = isset($matches[3]) ? trim($matches[3]) : '';
+		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime). $settings . kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		return $timeLine;
 	}
 
 }

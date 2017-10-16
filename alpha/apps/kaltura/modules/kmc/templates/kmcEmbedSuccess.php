@@ -11,7 +11,7 @@ foreach ( $embed_code_list as $embed_code )
 ?>
 <div id="embed_<?php echo $i ?>_xml">
 	<textarea style='width:75%; height:120px; ' id="embed_<?php echo $i ?>_xml" name="embed_<?php echo $i ?>_xml">
-<?php  echo html_entity_decode( $embed_code )?>	
+<?php  echo htmlspecialchars(html_entity_decode( $embed_code ))?>
 	</textarea>
 </div>
 <?php

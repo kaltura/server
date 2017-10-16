@@ -1,6 +1,6 @@
 <?php
 
-class kObjectDeleteHandler implements kObjectDeletedEventConsumer
+class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
@@ -79,25 +79,6 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	}
 
 	/**
-	 * @param string $id
-	 * @param int $type
-	 */
-	protected function syncableDeleted($id, $type) 
-	{
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_ID, $id);
-		$c->add(FileSyncPeer::OBJECT_TYPE, $type);
-		$c->add(FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_PURGED, FileSync::FILE_SYNC_STATUS_DELETED), Criteria::NOT_IN);
-		
-		$fileSyncs = FileSyncPeer::doSelect($c);
-		foreach($fileSyncs as $fileSync)
-		{
-			$key = kFileSyncUtils::getKeyForFileSync($fileSync);
-			kFileSyncUtils::deleteSyncFileForKey($key);
-		}
-	}
-
-	/**
 	 * @param entry $entry
 	 */
 	protected function entryDeleted(entry $entry) 
@@ -135,11 +116,20 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		
 		$c = new Criteria();
 		$c->add(categoryEntryPeer::ENTRY_ID, $entry->getId());
-		if(!categoryEntryPeer::doSelectOne($c)) {
+		if(categoryEntryPeer::doSelectOne($c)) {
+			kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
+		}
+		
+		$userEntryFilter = new UserEntryFilter();
+		$userEntryFilter->set("_eq_entry_id", $entry->getId());
+		
+		$c = new Criteria();
+		$c->add(UserEntryPeer::ENTRY_ID, $entry->getId());
+		if(!UserEntryPeer::doSelectOne($c)) {
 			return;
 		}
 		
-		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
+		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::USER_ENTRY, $userEntryFilter);
 	}
 	
 	protected function kuserDelete(kuser $kuser)
@@ -168,6 +158,17 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 				kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::GROUP_USER, $filter);
 			}
 		}
+		
+		$userEntryFilter = new UserEntryFilter();
+		$userEntryFilter->set("_eq_user_id", $kuser->getId());
+		
+		$c = new Criteria();
+		$c->add(UserEntryPeer::KUSER_ID, $kuser->getId());
+		if(!UserEntryPeer::doSelectOne($c)) {
+			return;
+		}
+		
+		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::USER_ENTRY, $userEntryFilter);
 	}
 	
 	/**

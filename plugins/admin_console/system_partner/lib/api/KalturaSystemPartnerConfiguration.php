@@ -350,6 +350,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $htmlPurifierBaseListUsage;
 	
+	/**
+ * @var int
+ */
+	public $defaultLiveStreamSegmentDuration;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -418,6 +423,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	    "timeAlignedRenditions",
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
+		"defaultLiveStreamSegmentDuration"
 	);
 
 	public function getMapBetweenObjects()
@@ -478,6 +484,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$liveThumbEntry = entryPeer::retrieveByPK($liveThumbEntryId);
 			if (!$liveThumbEntry || $liveThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
 				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_LIVE_THUMB_ENTRY_ID_ERROR, $liveThumbEntryId);
+		}
+		
+		if (!$this->isNull('defaultLiveStreamSegmentDuration'))
+		{
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->id)) {
+				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName('defaultLiveStreamSegmentDuration'));
+			}
+			
+			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
+			$this->validatePropertyMinMaxValue('defaultLiveStreamSegmentDuration', KalturaLiveEntry::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, KalturaLiveEntry::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
 	
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);

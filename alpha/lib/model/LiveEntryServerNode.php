@@ -10,7 +10,9 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_STREAMS = "streams";
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
-	
+	const CUSTOM_DATA_RECORDING_INFO = "recording_info";
+	const MAX_DURATIONS_TO_KEEP = 20;
+
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
 	 */
@@ -40,9 +42,9 @@ class LiveEntryServerNode extends EntryServerNode
 	 * @see BaseEntryServerNode::postUpdate()
 	 */
 	public function postUpdate(PropelPDO $con = null)
-	{
+	{		
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
-		
+
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
@@ -54,6 +56,9 @@ class LiveEntryServerNode extends EntryServerNode
 			
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::MARKED_FOR_DELETION)
 			{
+				//TODO - move this logic into update event handler
+				//invalidateQueryCache is called only in postUpdate of base class so, Invalidate query cache to avoid getting stale response.
+				kQueryCache::invalidateQueryCache($this);
 				$playableServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($this->getEntryId());
 				if(!count($playableServerNodes))
 				{
@@ -69,7 +74,7 @@ class LiveEntryServerNode extends EntryServerNode
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
 		}
-
+		
 		parent::postUpdate($con);
 	}
 	
@@ -78,6 +83,9 @@ class LiveEntryServerNode extends EntryServerNode
 	 */
 	public function postDelete(PropelPDO $con = null)
 	{
+		// First call parent to clear query cache
+		parent::postDelete($con);
+		
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":dc=".$this->getDc());
 		
 		$liveEntry = $this->getLiveEntry();
@@ -93,8 +101,6 @@ class LiveEntryServerNode extends EntryServerNode
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
 		}
-		
-		parent::postDelete($con);
 	}
 
 	public function setStreams(array $v) 
@@ -185,7 +191,7 @@ class LiveEntryServerNode extends EntryServerNode
 				return;
 			}
 			
-			if(!myEntryUtils::shouldServeVodFromLive($recordedEntry))
+			if(!myEntryUtils::shouldServeVodFromLive($recordedEntry, false) && $recordedEntry->getRecordedLengthInMsecs() == 0)
 			{
 				KalturaLog::debug("Recorded entry with id [{$this->getEntryId()}] found and ready or recorded is of old source type, clearing entry server node from db");
 				$this->delete();
@@ -200,4 +206,47 @@ class LiveEntryServerNode extends EntryServerNode
 		KalturaLog::debug("Live entry with id [{$liveEntry->getId()}], is set with recording disabled, clearing entry server node id [{$this->getId()}] from db");
 		$this->delete();
 	}
+
+	public function setRecordingInfo(array $v)
+	{
+		$existingRecordingInfoArr = $this->getRecordingInfo();
+		foreach ($v as $recordingInfo)
+		{
+			$this->handleSignleRecordingInfo($existingRecordingInfoArr, $recordingInfo);
+		}
+		array_splice($existingRecordingInfoArr, self::MAX_DURATIONS_TO_KEEP);
+		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_INFO, serialize($existingRecordingInfoArr));
+	}
+
+	public function getRecordingInfo()
+	{
+		$recordingInfo = $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_INFO, null, array());
+		if(count($recordingInfo))
+			$recordingInfo = unserialize($recordingInfo);
+		return $recordingInfo;
+	}
+
+	/**
+	 * @param $existingRecordingInfoArr
+	 * @param $recordingInfo
+	 */
+	private function handleSignleRecordingInfo(&$existingRecordingInfoArr, $recordingInfo)
+	{
+		$foundRecordingInfoIndex = -1;
+		/** @var LiveEntryServerNodeRecordingInfo $recordingInfo */
+		for ($i = 0; $i < count($existingRecordingInfoArr); $i++)
+		{
+			/** @var LiveEntryServerNodeRecordingInfo $existingRecordingInfo */
+			if ($recordingInfo->getRecordedEntryId() == $existingRecordingInfoArr[$i]->getRecordedEntryId())
+			{
+				$foundRecordingInfoIndex = $i;
+				break;
+			}
+		}
+		if ($foundRecordingInfoIndex >= 0)
+			$existingRecordingInfoArr[$foundRecordingInfoIndex] = $recordingInfo;
+		else
+			array_unshift($existingRecordingInfoArr, $recordingInfo);
+	}
+
 }

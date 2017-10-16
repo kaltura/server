@@ -12,11 +12,13 @@ class kApiCacheBase
 	const ECF_COUNTRY = 'country';
 	const ECF_IP = 'ip';
 	const ECF_COORDINATES = 'coordinates';
+	const ECF_ANONYMOUS_IP = 'anonymousIp';
 	
 	// extra cache fields data
 	const ECFD_IP_HTTP_HEADER = 'httpHeader';
 	const ECFD_IP_ACCEPT_INTERNAL_IPS = 'acceptInternalIps';
-
+	const ECFD_GEO_CODER_TYPE = 'geoCoderType';
+	
 	// extra cache fields conditions
 	// 	the conditions will be applied on the extra fields when generating the cache key
 	//	for example, when using country restriction of US allowed, we can take country==US
@@ -24,6 +26,7 @@ class kApiCacheBase
 	//	the entry, instead of 200)
 	const COND_NONE = '';
 	const COND_MATCH = 'match';					// used by kCountryCondition
+	const COND_MATCH_ALL = 'matchAll';
 	const COND_REGEX = 'regex';					// used by kUserAgentCondition
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
@@ -57,7 +60,11 @@ class kApiCacheBase
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
 	protected $_sqlConditions = array();				// list of sql queries that the api depends on
 	protected static $_allowStaleResponse = false;		// when enabled, sql conditions will not be used and database access will not disable the cache
-														// instead, the cache expiration time will be shortened
+														// instead, the cache expiration time will be shortene
+	
+	// response post processor fields
+	protected static $_responsePostProcessor = null;			// Response post processor object
+	protected static $_enableResponsePostProcessor = false;			// Response post processor object
 
 	// extra fields
 	protected $_extraFields = array();
@@ -151,6 +158,26 @@ class kApiCacheBase
 	public static function enableLock()
 	{
 		self::$_lockEnabled = true;
+	}
+	
+	public static function setResponsePostProcessor($postProcessor)
+	{
+		self::$_responsePostProcessor = $postProcessor;
+	}
+	
+	public static function getResponsePostProcessor()
+	{
+		return self::$_responsePostProcessor;
+	}
+	
+	public static function enableResponsePostProcessor()
+	{
+		self::$_enableResponsePostProcessor = true;
+	}
+	
+	public static function getEnableResponsePostProcessor()
+	{
+		return self::$_enableResponsePostProcessor;
 	}
 
 	// expiry control functions

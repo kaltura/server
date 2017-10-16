@@ -1,0 +1,35 @@
+<?php if($this->errMessage): ?>
+<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+<?php
+	$this->form->setAction($this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingLogsAction')));
+	echo $this->form;
+?>
+
+<?php if(count($this->paginator)): ?>
+<div id="log_list" class="clear">
+	<table>
+		<thead>
+		<tr>
+			<?php foreach($this->scheme as $col): ?>
+				<th><?php echo $this->translate($col); ?></th>
+			<?php endforeach; ?>
+		</tr>
+		</thead>
+		<tfoot>
+		<td colspan="20">
+			<?php echo $this->paginator; ?>
+		</td>
+		</tfoot>
+		<tbody>
+		<?php foreach($this->paginator as $obj): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<?php foreach($this->scheme as $col): ?>
+					<td><?php echo $obj->$col; ?></td>
+				<?php endforeach; ?>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+<?php endif; ?>

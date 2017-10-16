@@ -116,7 +116,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		foreach ($cacheStores as $cacheStore)
 		{
 			/* @var $cacheStore kBaseCacheWrapper */
+			$queryStart = microtime(true);
 			$cacheStore->set($invalidationKey, $value);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds key=$invalidationKey");
 		}
 	}
 	
@@ -128,24 +130,28 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$value[self::CACHE_VALUE_VERSION] = self::getCacheVersion();
 		
 		$key = self::addCacheVersion($key);
-		KalturaLog::debug("Key [$key]");
+		//KalturaLog::debug("Key [$key]");
 		
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
 			/* @var $cacheStore kBaseCacheWrapper */
+			$queryStart = microtime(true);
 			$cacheStore->set($key, $value);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds key=$key");
 		}
 	}
 	
 	protected static function delete($key)
 	{
 		$key = self::addCacheVersion($key);
-		KalturaLog::debug("Key [$key]");
+		//KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
+			$queryStart = microtime(true);
 			$cacheStore->delete($key);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds key=$key");
 		}
 	}
 	
@@ -156,6 +162,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$value = null;
 		foreach ($cacheStores as $cacheStore)
 		{
+			$queryStart = microtime(true);
 			if($touch && $cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				$value = is_array($keys) ? $cacheStore->multiGetAndTouch($keys) : $cacheStore->getAndTouch($keys);
@@ -164,7 +171,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				$value = is_array($keys) ? $cacheStore->multiGet($keys) : $cacheStore->get($keys);
 			}
-			
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds keys=".print_r($keys, true));
+
 			if($value)
 			{
 				if(is_array($keys))
@@ -451,8 +459,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
 			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
 			$query->setLimit(1);
-			
+
+			$queryStart = microtime(true);
 			$list = $cacheStore->query($query);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds objectClass=".get_class($object));
 			if($list->getCount())
 			{
 				$this->queryCache[__METHOD__] = true;
@@ -521,7 +531,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			$query->setKey(self::getObjectKey($object));
 			$query->setLimit(1);
 			
+			$queryStart = microtime(true);
 			$list = $cacheStore->query($query);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds objectClass=".get_class($object));
 			if($list->getCount())
 			{
 				$this->queryCache[__METHOD__] = true;
@@ -566,7 +578,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
 			$query->setLimit(1);
 
+			$queryStart = microtime(true);
 			$list = $cacheStore->query($query);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds objectType=".$objectType);
 			$query->setLimit(2);
 			$offset = -1;
 			$array = array();
@@ -593,7 +607,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				}
 				$offset += self::MAX_CACHE_KEYS_PER_JOB;
 				$query->setOffset($offset);
+				$queryStart = microtime(true);
 				$list = $cacheStore->query($query);
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds objectType=".$objectType);
 			}
 			return $array;
 		}
@@ -628,7 +644,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 
 			$offset = 0;
 			$array = array();
+			$queryStart = microtime(true);
 			$list = $cacheStore->query($query);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds triggerKey=".$triggerKey);
+
 			KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 			while(count($list->getObjects()))
 			{
@@ -652,7 +671,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				
 				$offset += count($list->getObjects());
 				$query->setOffset($offset);
+				$queryStart = microtime(true);
 				$list = $cacheStore->query($query);
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds triggerKey=".$triggerKey);
+
 				KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 			}
 			return $array;
@@ -686,7 +708,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 
 			$offset = 0;
 			$array = array();
+			$queryStart = microtime(true);
 			$list = $cacheStore->query($query);
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds triggerKey=".$triggerKey);
+
 			KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 			while(count($list->getObjects()))
 			{
@@ -699,7 +724,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				
 				$offset += count($list->getObjects());
 				$query->setOffset($offset);
+				$queryStart = microtime(true);
 				$list = $cacheStore->query($query);
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds triggerKey=".$triggerKey);
+
 				KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 			}
 			return array_keys($array);
@@ -734,7 +762,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'z');
 				$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 
+				$queryStart = microtime(true);
 				$list = $cacheStore->query($query);
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds objectKey = " . $objectKey);
+
 				KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 				$array = array();
 				foreach ($list->getObjects() as $cacheObject)

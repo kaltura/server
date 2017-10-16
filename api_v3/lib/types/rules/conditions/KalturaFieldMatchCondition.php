@@ -65,6 +65,10 @@ class KalturaFieldMatchCondition extends KalturaMatchCondition
 				$this->field = new KalturaCoordinatesContextField();
 				break;
 
+			case 'kAnonymousIPContextField':
+				$this->field = new KalturaAnonymousIPContextField();
+				break;
+
 			case 'kEvalStringField':
 			    $this->field = new KalturaEvalStringField();
 			    break;

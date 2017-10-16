@@ -103,6 +103,9 @@ class ConversionProfileService extends KalturaBaseService
 		
 		if($conversionProfile->xslTransformation)
 			$conversionProfileDb->incrementXslVersion();
+		
+		if($conversionProfile->mediaInfoXslTransformation)
+			$conversionProfileDb->incrementMediaInfoXslVersion();
 			
 		$conversionProfileDb->save();
 		
@@ -116,6 +119,13 @@ class ConversionProfileService extends KalturaBaseService
 		{
 			$xsl = html_entity_decode($conversionProfile->xslTransformation);
 			$key = $conversionProfileDb->getSyncKey(conversionProfile2::FILE_SYNC_MRSS_XSL);
+			kFileSyncUtils::file_put_contents($key, $xsl);
+		}
+		
+		if($conversionProfile->mediaInfoXslTransformation)
+		{
+			$xsl = html_entity_decode($conversionProfile->mediaInfoXslTransformation);
+			$key = $conversionProfileDb->getSyncKey(conversionProfile2::FILE_SYNC_MEDIAINFO_XSL);
 			kFileSyncUtils::file_put_contents($key, $xsl);
 		}
 		
@@ -171,6 +181,9 @@ class ConversionProfileService extends KalturaBaseService
 		
 		if($conversionProfile->xslTransformation)
 			$conversionProfileDb->incrementXslVersion();
+		
+		if($conversionProfile->mediaInfoXslTransformation)
+			$conversionProfileDb->incrementMediaInfoXslVersion();
 			
 		$conversionProfileDb->save();
 		
@@ -188,6 +201,13 @@ class ConversionProfileService extends KalturaBaseService
 		{
 			$xsl = html_entity_decode($conversionProfile->xslTransformation);
 			$key = $conversionProfileDb->getSyncKey(conversionProfile2::FILE_SYNC_MRSS_XSL);
+			kFileSyncUtils::file_put_contents($key, $xsl);
+		}
+		
+		if($conversionProfile->mediaInfoXslTransformation)
+		{
+			$xsl = html_entity_decode($conversionProfile->mediaInfoXslTransformation);
+			$key = $conversionProfileDb->getSyncKey(conversionProfile2::FILE_SYNC_MEDIAINFO_XSL);
 			kFileSyncUtils::file_put_contents($key, $xsl);
 		}
 		

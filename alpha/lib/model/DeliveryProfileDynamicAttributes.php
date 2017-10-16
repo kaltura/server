@@ -144,10 +144,37 @@ class DeliveryProfileDynamicAttributes {
 	protected $serveLiveAsVodEntryId;
 
 	/**
+	 * @var string
+	 */
+	protected $sessionId;
+
+	/**
 	 * request a specific delivery profile id
 	 * @var int
 	 */
 	protected $deliveryProfileId = null;
+	
+	/**
+	 * List of flavor params ids swhich should be enfroced due to an access control action
+	 * @var array
+	 */
+	protected $aclFlavorParamsIds = null;
+	
+	/**
+	 * Defines whether the list of flavor params ids should be whitelist or blacklisted 
+	 * @var bool
+	 */
+	protected $isAclFlavorParamsIdsBlockedList = null;
+
+	/**
+	 * @var string
+	 */
+	protected $sequence = null;
+
+	/**
+	 * @var bool
+	 */
+	protected  $hasValidSequence = false;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -461,7 +488,29 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function setPlayerConfig($playerConfig)
 	{
+		if($this->usePlayServer && !$this->isPlayerConfigValid($playerConfig))
+			return;
+		
 		$this->playerConfig = $playerConfig;
+	}
+	
+	private function isPlayerConfigValid($playerConfig)
+	{
+		$playConfigJson = json_decode($playerConfig);
+		
+		if(json_last_error() != JSON_ERROR_NONE)
+		{
+			KalturaLog::debug("playerConfig provided is not a json object, data will not be forward to playServer [$playerConfig]");
+			return false;
+		}
+		
+		if(isset($playConfigJson->sessionId) && is_int($playConfigJson->sessionId))
+		{
+			KalturaLog::debug("Integer sessionId value provided in player config, data will not be forward to playServer [$playerConfig]");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -531,7 +580,46 @@ class DeliveryProfileDynamicAttributes {
 	{
 		return $this->serveLiveAsVodEntryId;
 	}
+
+	/**
+	 * @return the $sessionId
+	 */
+	public function getSessionId() {
+		return $this->sessionId;
+	}
+
+	/**
+	 * @param $sessionId
+	 */
+	public function setSessionId($sessionId) {
+		$this->sessionId = $sessionId;
+	}
 	
+	/**
+	 * @param array $aclFlavorParamsIds
+	 * @param bool $isAclFlavorParamsIdsBlockedList
+	 */
+	public function setAclFlavorParamsIds($aclFlavorParamsIds, $isAclFlavorParamsIdsBlockedList)
+	{
+		$this->aclFlavorParamsIds = $aclFlavorParamsIds;
+		$this->isAclFlavorParamsIdsBlockedList = $isAclFlavorParamsIdsBlockedList;
+	
+	}
+	
+	/**
+	 * @return the $aclFlavorParamsIds
+	 */
+	public function getAclFlavorParamsIds() {
+		return $this->aclFlavorParamsIds;
+	}
+	
+	/**
+	 * @return the $isAclFlavorParamsIdsBlockedList
+	 */
+	public function getIsAclFlavorParamsIdsBlockedList() {
+		return $this->isAclFlavorParamsIdsBlockedList;
+	}
+
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
@@ -559,6 +647,37 @@ class DeliveryProfileDynamicAttributes {
 		return array();
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getSequence()
+	{
+		return $this->sequence;
+	}
+
+	/**
+	 * @param string $sequence
+	 */
+	public function setSequence($sequence)
+	{
+		$this->sequence = $sequence;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getHasValidSequence()
+	{
+		return $this->hasValidSequence;
+	}
+
+	/**
+	 * @param boolean $hasValidSequence
+	 */
+	public function setHasValidSequence($hasValidSequence)
+	{
+		$this->hasValidSequence = $hasValidSequence;
+	}
 
 	/**
 	 * 
@@ -604,7 +723,13 @@ class DeliveryProfileDynamicAttributes {
 		$this->edgeServerIds = $newObj->getEdgeServerIds();
 		$this->serveVodFromLive = $newObj->getServeVodFromLive();
 		$this->serveLiveAsVodEntryId = $newObj->getServeLiveAsVodEntryId();
+		$this->urlParams = $newObj->getUrlParams();
 		$this->deliveryProfileId = $newObj->getDeliveryProfileId();
+		$this->sessionId = $newObj->getSessionId();
+		$this->aclFlavorParamsIds = $newObj->getAclFlavorParamsIds();
+		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
+		$this->sequence = $newObj->getSequence();
+		$this->hasValidSequence = $newObj->getHasValidSequence();
 	}
 }
 

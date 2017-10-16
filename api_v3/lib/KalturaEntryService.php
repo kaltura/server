@@ -144,7 +144,11 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
-		
+
+		$kResource = $resource->toObject();
+		if ($kResource->getType() == 'kOperationResource')
+			$tempDbEntry->setTempTrimEntry(true);
+
 		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry, $tempDbEntry);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 		$tempDbEntry->save();
@@ -154,8 +158,7 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL) || $dbEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 		$dbEntry->save();
-		
-		$kResource = $resource->toObject();
+
 		$this->attachResource($kResource, $tempDbEntry);
 	}
 	
@@ -1296,10 +1299,12 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
 		}
-		
+
+
 		// need to create kuser if this is an admin creating the entry on a different user
-		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
-		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->creatorId);  
+		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), trim($entry->userId));
+		$creatorId = is_null($entry->creatorId) ? $entry->creatorId : trim($entry->creatorId);
+		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $creatorId);
 
 		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 		$dbEntry->setKuserId($kuser->getId());
@@ -1324,8 +1329,9 @@ class KalturaEntryService extends KalturaBaseService
 			KalturaLog::log("entry->userId is null, not changing user");
 			return;
 		}
-		
-		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
+
+		$ks = $this->getKs();
+		if (!$ks ||(!$this->getKs()->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_USER, $entry->userId)))
 		{
 			$entryPuserId = $dbEntry->getPuserId();
 			

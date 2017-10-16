@@ -22,6 +22,7 @@ class SystemService extends KalturaBaseService
 	/**
 	 * @action ping
 	 * @return bool Always true if service is working
+	 * @ksIgnored
 	 */
 	function pingAction()
 	{
@@ -34,6 +35,7 @@ class SystemService extends KalturaBaseService
 	/**
 	 * @action pingDatabase
 	 * @return bool Always true if database available and writeable
+	 * @ksIgnored
 	 */
 	function pingDatabaseAction()
 	{
@@ -57,6 +59,7 @@ class SystemService extends KalturaBaseService
 	 *
 	 * @action getTime
 	 * @return int Return current server timestamp
+	 * @ksIgnored
 	 */
 	function getTimeAction()
 	{
@@ -67,6 +70,7 @@ class SystemService extends KalturaBaseService
 	/**
 	 * @action getVersion
 	 * @return string the current server version
+	 * @ksIgnored
 	 */
 	function getVersionAction()
 	{	

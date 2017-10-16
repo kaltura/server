@@ -52,6 +52,7 @@ class DrmLicenseAccessService extends KalturaBaseService
                         $expirationDate = DrmLicenseUtils::calculateExpirationDate($dbPolicy, $entry);
 
                         $response->policy = $dbPolicy->getName();
+                        $response->licenseParams = $this->buildPolicy($dbPolicy);
                         $response->duration = $expirationDate;
                         $response->absolute_duration = $expirationDate;
                         KalturaLog::info("response is  '" . print_r($response, true) . "' ");
@@ -87,6 +88,14 @@ class DrmLicenseAccessService extends KalturaBaseService
             }
         }
         return true;
+    }
+
+    protected function buildPolicy(DrmPolicy $dbDrmPolicy)
+    {
+        $licenseParams = $dbDrmPolicy->getLicenseParams();
+        if (is_null($licenseParams))
+            return null;
+        return $licenseParams;
     }
 
 }

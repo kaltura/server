@@ -21,4 +21,18 @@ class ServerNode extends BaseServerNode {
 	{
 		return array("serverNode:id".strtolower($this->getId()));
 	}
+	
+	public function getParentIdsArray()
+	{
+		$parentIds = array();
+	
+		$ids = $this->getParentId();
+		if($ids)
+		{
+			$parentIds = explode(",", $ids);
+		}
+	
+		return $parentIds;
+	}
+	
 } // ServerNode

@@ -60,6 +60,7 @@ class flavorParams extends assetParams
 	const AUDIO_CODEC_AMRNB = "amrnb";
 	const AUDIO_CODEC_MPEG2 = "mpeg2";
 	const AUDIO_CODEC_AC3 = "ac3";
+	const AUDIO_CODEC_EAC3 = "eac3";
 	const AUDIO_CODEC_PCM = "pcm";
 	const AUDIO_CODEC_COPY = "copy";
 	
@@ -168,4 +169,9 @@ class flavorParams extends assetParams
 	public function setContentAwareness($v){ $this->putInCustomData('ContentAwareness', $v);}
 	public function getContentAwareness(){return $this->getFromCustomData('ContentAwareness', null, 0.5);}
 
+	public function setForcedKeyFramesMode($v){ $this->putInCustomData('ForcedKeyFramesMode', $v);}
+	public function getForcedKeyFramesMode(){return $this->getFromCustomData('ForcedKeyFramesMode', null, 1);}
+
+	public function setChunkedEncodeMode($v){ $this->putInCustomData('ChunkedEncodeMode', $v);}
+	public function getChunkedEncodeMode(){return $this->getFromCustomData('ChunkedEncodeMode', null, 0);}
 }

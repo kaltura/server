@@ -37,8 +37,9 @@ class FileAssetService extends KalturaBaseService
 	 * Get file asset by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaFileAsset
+	 * @ksIgnored
 	 * 
 	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
 	 */
@@ -57,7 +58,7 @@ class FileAssetService extends KalturaBaseService
 	 * Update file asset by id
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaFileAsset $fileAsset
 	 * @return KalturaFileAsset
 	 * 
@@ -81,7 +82,7 @@ class FileAssetService extends KalturaBaseService
 	 * Delete file asset by id
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * 
 	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
 	 */
@@ -99,8 +100,9 @@ class FileAssetService extends KalturaBaseService
 	 * Serve file asset by id
 	 *  
 	 * @action serve
-	 * @param int $id
+	 * @param bigint $id
 	 * @return file
+	 * @ksIgnored
 	 *  
 	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::FILE_DOESNT_EXIST
@@ -118,7 +120,7 @@ class FileAssetService extends KalturaBaseService
      * Set content of file asset
      *
      * @action setContent
-     * @param string $id
+     * @param bigint $id
      * @param KalturaContentResource $contentResource
      * @return KalturaFileAsset
 	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
@@ -246,6 +248,7 @@ class FileAssetService extends KalturaBaseService
 	 * @param KalturaFilterPager $filter
 	 * @param KalturaFileAssetFilter $pager
 	 * @return KalturaFileAssetListResponse
+	 * @ksIgnored
 	 */
 	function listAction(KalturaFileAssetFilter $filter, KalturaFilterPager $pager = null)
 	{

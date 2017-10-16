@@ -7,6 +7,7 @@ class playManifestAction extends kalturaAction
 {
 	
 	const URL = 'url';
+	const DOWNLOAD = 'download';
 	
 	const HDNETWORKSMIL = 'hdnetworksmil';
 	
@@ -48,6 +49,7 @@ class playManifestAction extends kalturaAction
 		"flavorParamIds" => 'fps',
 		"format" => 'f',
 		"maxBitrate" => 'mb',
+		"minBitrate" => 'mib',
 		"playbackContext" => 'pc',
 		"preferredBitrate" => 'pb',
 		"protocol" => 'pt',
@@ -84,6 +86,11 @@ class playManifestAction extends kalturaAction
 	 * @var int
 	 */
 	private $maxBitrate = null;
+	
+	/**
+	 * @var int
+	 */
+	private $minBitrate = null;
 	
 	/**
 	 * @var array
@@ -221,8 +228,10 @@ class playManifestAction extends kalturaAction
 		$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer));
 		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data
-			
-		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, ContextType::PLAY, $keyValueHashes);
+
+		$context = $this->deliveryAttributes->getFormat() == self::DOWNLOAD ? ContextType::DOWNLOAD : ContextType::PLAY;
+		
+		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, $context, $keyValueHashes);
 		
 		if ($this->secureEntryHelper->shouldPreview())
 		{
@@ -475,18 +484,23 @@ class playManifestAction extends kalturaAction
 	 * @param array $flavorAssets
 	 * @return array
 	 */
-	private function removeMaxBitrateFlavors($flavorAssets)
+	private function removeFlavorsByBitrate($flavorAssets)
 	{
-		if (!$this->maxBitrate)			
+		if (!($this->minBitrate || $this->maxBitrate))
 			return $flavorAssets;
-			
 		$returnedFlavors = array();		
 		foreach ($flavorAssets as $flavor)
 		{
-			if ($flavor->getBitrate() <= $this->maxBitrate)
+			//audio language assets shouldn't be filtered
+			if(!($flavor->hasTag(assetParams::TAG_ALT_AUDIO) || $flavor->hasTag(assetParams::TAG_AUDIO_ONLY)))
 			{
-				$returnedFlavors[] = $flavor;
+				$currentBitrate = $flavor->getBitrate();
+				if ($this->minBitrate && $currentBitrate < $this->minBitrate)
+					continue;
+				if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
+					continue;
 			}
+			$returnedFlavors[] = $flavor;
 		}
 	
 		return $returnedFlavors;
@@ -508,29 +522,14 @@ class playManifestAction extends kalturaAction
 
 	protected function initPlaylistFlavorAssetArray()
 	{
-		list($entryIds, $durations, $mediaEntry) =
+		list($entryIds, $durations, $mediaEntry, $captionFiles) =
 			myPlaylistUtils::executeStitchedPlaylist($this->entry);
 		if (!$mediaEntry)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
-		
-		$this->duration = array_sum($durations) / 1000;
 
-		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntry->getId());
-		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
-
-		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
-		{
-			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
-			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
-				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
-		}
-
-		$this->deliveryAttributes->setStorageId(null);
-		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
+		$this->setPlaylistFlavorAssets($durations, $mediaEntry->getId());
 	}
 
 	private function filterFlavorsByAssetIdOrParamsIds($flavorAssets)
@@ -571,19 +570,34 @@ class playManifestAction extends kalturaAction
 		return false;
 	}
 
+	protected function retrieveAssets()
+	{
+		//in case asset id specified, allow url and download regardless of asset type
+		//ignoring flavor-assets due to backward compat.
+		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
+		{
+			$asset = assetPeer::retrieveById($this->flavorIds[0]);
+			if($asset && $asset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && !in_array($asset->getType(), assetPeer::retrieveAllFlavorsTypes()))
+				return array($asset);
+		}
+		return assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+	}
+	
 	protected function initFlavorAssetArray()
 	{
 		if(!$this->shouldInitFlavorAssetsArray())
 			return;
 		
 		$oneOnly = false;
-		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP || $this->deliveryAttributes->getFormat() == "url" || $this->deliveryAttributes->getFormat() == "rtsp")
+		if(in_array($this->deliveryAttributes->getFormat(), 
+			array(PlaybackProtocol::HTTP, PlaybackProtocol::RTSP, self::URL, self::DOWNLOAD)))
+		{
 			$oneOnly = true;
+		}
 
-		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+		$flavorAssets = $this->retrieveAssets();
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
@@ -620,6 +634,10 @@ class playManifestAction extends kalturaAction
 				return;
 		}
 
+		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
+		if(count($flavorAssetsFilteredByBitrate))
+			$flavorAssets = $flavorAssetsFilteredByBitrate;
+		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
@@ -748,8 +766,7 @@ class playManifestAction extends kalturaAction
 		foreach($flavors as $flavorAsset)
 		{
 			/* @var $flavorAsset flavorAsset */
-			
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+			$mediaInfo = $flavorAsset->getMediaInfo();
 			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 			{
 				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 
@@ -789,6 +806,21 @@ class playManifestAction extends kalturaAction
 		}
 	}
 
+	protected function getDownloadFileName()
+	{
+		$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
+		$flavorAsset = reset($flavorAssets);
+		list($fileName, $extension) = kAssetUtils::getFileName($this->entry, $flavorAsset);
+
+		$fileName = str_replace("\n", ' ', $fileName);
+		$fileName = kString::keepOnlyValidUrlChars($fileName);
+
+		if ($extension)
+			$fileName .= ".$extension";
+
+		return $fileName;
+	}
+
 ///////////////////////////////////////////////////////////////////////////////////
 	//	Main functions
 
@@ -806,8 +838,22 @@ class playManifestAction extends kalturaAction
 			break;
 		
 		case entryType::MEDIA_CLIP:
-			$this->initFlavorAssetArray();
-			$this->initEntryDuration();
+			if ($this->deliveryAttributes->getSequence())
+			{
+				$sequenceArr = explode(',',$this->deliveryAttributes->getSequence());
+				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
+				if (count($sequenceEntries))
+				{
+					$this->deliveryAttributes->setHasValidSequence(true);
+					list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null, null);
+					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
+				}
+			}
+			if (!$this->deliveryAttributes->getHasValidSequence())
+			{
+				$this->initFlavorAssetArray();
+				$this->initEntryDuration();
+			}
 			break;
 		}
 		
@@ -824,22 +870,39 @@ class playManifestAction extends kalturaAction
 		
 		// Fixing ALL kinds of historical bugs.
 		
-		if($this->deliveryAttributes->getFormat() == self::URL) {
+		switch ($this->deliveryAttributes->getFormat())
+		{
+		case self::URL:
 			if(is_null($this->deliveryAttributes->getResponseFormat()))
 				$this->deliveryAttributes->setResponseFormat('redirect');
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
-		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HD) {
+			break;
+
+		case self::DOWNLOAD:
+			if(is_null($this->deliveryAttributes->getResponseFormat()))
+				$this->deliveryAttributes->setResponseFormat('redirect');
+			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
+			$this->deliveryAttributes->setUrlParams('/fileName/' . $this->getDownloadFileName());
+			break;
+
+		case PlaybackProtocol::AKAMAI_HD:
 			// This is a hack to return an f4m that has a URL of a smil
 			return $this->serveHDNetwork();
-		} else if($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL) {
+
+		case self::HDNETWORKSMIL:
 			// Translate to playback protocol format 	
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::AKAMAI_HD);
-		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::RTMP) {
+			break;
+
+		case PlaybackProtocol::RTMP:
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0) 
 				$this->deliveryAttributes->setMediaProtocol("rtmp");
-		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP) {
+			break;
+
+		case PlaybackProtocol::HTTP:
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
 				$this->deliveryAttributes->setMediaProtocol("http");
+			break;
 		}
 
 		// <-- 
@@ -852,7 +915,7 @@ class playManifestAction extends kalturaAction
 		$this->setParamsForPlayServer($this->deliveryProfile->getAdStitchingEnabled());
 
 		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
-		if ($filter)
+		if ($filter && !$this->deliveryAttributes->getHasValidSequence())
 		{
 			$c = new Criteria();
 			$filter->attachToCriteria($c);
@@ -987,6 +1050,7 @@ class playManifestAction extends kalturaAction
 
 		case PlaybackProtocol::MPEG_DASH:
 			return array(
+				array('dash'),
 				array('ipadnew', 'iphonenew'),
 				array('ipad', 'iphone'),
 			);
@@ -1018,6 +1082,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 			if(!$this->deliveryAttributes->getUiConfId())
 				$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiconf"));
+			if($this->getRequestParameter("sessionId"))
+				$this->deliveryAttributes->setSessionId($this->getRequestParameter("sessionId"));
 		}
 	}
 
@@ -1031,7 +1097,6 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setSeekFromTime($this->getRequestParameter ( "seekFrom" , -1));
 		if ($this->deliveryAttributes->getSeekFromTime() <= 0)
 			$this->deliveryAttributes->setSeekFromTime(-1);
-
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
 
 		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
@@ -1049,7 +1114,7 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS || $this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL)  
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
 			    $this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
-			
+
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
 		{
@@ -1066,11 +1131,15 @@ class playManifestAction extends kalturaAction
 			
 			$this->deliveryAttributes->setTags($tags);
 		}
-				
+
 		$this->deliveryAttributes->setpreferredBitrate($this->getRequestParameter ( "preferredBitrate", null ));
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
+
+		$this->minBitrate = $this->getRequestParameter ( "minBitrate", null );
+		if(($this->minBitrate) && ((!is_numeric($this->minBitrate)) || ($this->minBitrate <= 0)))
+			KExternalErrors::dieError(KExternalErrors::INVALID_MIN_BITRATE);
 
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
@@ -1086,25 +1155,30 @@ class playManifestAction extends kalturaAction
 
 		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
 
+		if ( in_array($this->deliveryAttributes->getFormat(), array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::AKAMAI_HDS)) )
+			$this->deliveryAttributes->setSequence($this->getRequestParameter("sequence"));
+
 		if($this->secureEntryHelper)
 			$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
 
 		$this->enforceEncryption();
 		
 		$renderer = null;
-		
+
 		switch($this->entry->getType())
 		{
 			case entryType::PLAYLIST:
 			case entryType::MEDIA_CLIP:
 				// VOD
 				$renderer = $this->serveVodEntry();
+				$entryType = 'vod';
 				break;
 				
 			case entryType::LIVE_STREAM:			
 			case entryType::LIVE_CHANNEL:
 				// Live stream
 				$renderer = $this->serveLiveEntry();
+				$entryType = 'live';
 				break;
 			
 			default:
@@ -1121,14 +1195,19 @@ class playManifestAction extends kalturaAction
 		$config->entryId = $this->entryId;
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
+		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
+		$config->disableCaptions = $this->getRequestParameter("disableCaptions", false);
+
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{
 			/* @var $contributor IKalturaPlayManifestContributor */
 			$renderer->contributors = array_merge($renderer->contributors, $contributor->getManifestEditors($config));
 		}
-			
+
 		$renderer->entryId = $this->entryId;
+		$renderer->partnerId = $this->entry->getPartnerId();
+		$renderer->entryType = $entryType;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
 		{
@@ -1146,7 +1225,7 @@ class playManifestAction extends kalturaAction
 		$canCacheAccessControl = false;
 		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))
 		{
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 			$renderer->forceCachingHeaders = true;
 		}
 		if (!$this->secureEntryHelper)
@@ -1162,7 +1241,7 @@ class playManifestAction extends kalturaAction
 		if (!$renderer->tokenizer && $canCacheAccessControl)
 		{
 			// Note: kApiCache::hasExtraFields is checked in kManifestRenderers
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 		}
 		if ($this->deliveryProfile && $this->deliveryProfile->getAdStitchingEnabled())
 			$renderer->cachingHeadersAge = 0;
@@ -1182,5 +1261,29 @@ class playManifestAction extends kalturaAction
 		$renderer->setDeliveryCode($deliveryCode);
 		
 		$renderer->output();
+	}
+
+	/**
+	 * @param $durations
+	 * @param $mediaEntry
+	 */
+	protected function setPlaylistFlavorAssets($durations, $mediaEntryId)
+	{
+		$this->duration = array_sum($durations) / 1000;
+
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntryId);
+		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+		$flavorAssets = $this->removeFlavorsByBitrate($flavorAssets);
+		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
+
+		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
+		{
+			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
+			if (count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
+		}
+
+		$this->deliveryAttributes->setStorageId(null);
+		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
 	}
 }

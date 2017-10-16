@@ -24,7 +24,7 @@ CREATE TABLE `business_process_server`
 	`custom_data` TEXT,
 	`dc` INTEGER,
 	PRIMARY KEY (`id`)
-)Type=InnoDB;
+)ENGINE=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- business_process_case
@@ -39,7 +39,7 @@ CREATE TABLE `business_process_case`
 	`partner_id` INTEGER  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`case_id` INTEGER,
+	`case_id` VARCHAR(64),
 	`process_id` VARCHAR(255),
 	`template_id` INTEGER,
 	`server_id` INTEGER,
@@ -49,7 +49,7 @@ CREATE TABLE `business_process_case`
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`),
 	KEY `object_id_and_type`(`object_type`, `object_id`)
-)Type=InnoDB;
+)ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

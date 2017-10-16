@@ -45,4 +45,9 @@ class AttachmentAsset extends asset
 		
 		return $finalPath;
 	}
+	
+	public function getName()
+	{
+		return $this->getFilename();
+	}
 }

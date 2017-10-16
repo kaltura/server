@@ -18,6 +18,8 @@ class syndicationFeedPeer extends BasesyndicationFeedPeer
 		syndicationFeedType::YAHOO => parent::OM_CLASS,
 		syndicationFeedType::KALTURA => 'genericSyndicationFeed',
 		syndicationFeedType::KALTURA_XSLT => 'genericSyndicationFeed',		
+		syndicationFeedType::ROKU_DIRECT_PUBLISHER => 'genericSyndicationFeed',
+		syndicationFeedType::OPERA_TV_SNAP  => 'genericSyndicationFeed'
 	);
 	
 	public static function setDefaultCriteriaFilter ()

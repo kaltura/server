@@ -27,20 +27,16 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 			$taskCategoryIds[] = $categoryIntValue->value;
 		}
 
+		if ($addRemoveType == KalturaScheduledTaskAddOrRemoveType::MOVE)
+		{
+			$this->removeAllCategories($entryId, $object->partnerId);
+			$addRemoveType = KalturaScheduledTaskAddOrRemoveType::ADD;
+		}
+
 		// remove all categories if nothing was configured in the list
 		if (count($taskCategoryIds) == 0 && $addRemoveType == KalturaScheduledTaskAddOrRemoveType::REMOVE)
 		{
-			try
-			{
-				$this->impersonate($object->partnerId);
-				$this->removeAllCategories($entryId);
-				$this->unimpersonate();
-			}
-			catch(Exception $ex)
-			{
-				$this->unimpersonate();
-				KalturaLog::err($ex);
-			}
+			$this->removeAllCategories($entryId, $object->partnerId);
 		}
 		else
 		{
@@ -93,8 +89,27 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 
 	/**
 	 * @param $entryId
+	 * @param $partnerId
 	 */
-	public function removeAllCategories($entryId)
+	public function removeAllCategories($entryId, $partnerId)
+	{
+		try
+		{
+			$this->impersonate($partnerId);
+			$this->doRemoveAllCategories($entryId);
+			$this->unimpersonate();
+		}
+		catch(Exception $ex)
+		{
+			$this->unimpersonate();
+			KalturaLog::err($ex);
+		}
+	}
+
+	/**
+	 * @param $entryId
+	 */
+	public function doRemoveAllCategories($entryId)
 	{
 		$client = $this->getClient();
 		$filter = new KalturaCategoryEntryFilter();

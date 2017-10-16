@@ -75,6 +75,8 @@ class APIErrors
 	const INTERNAL_DATABASE_ERROR = "INTERNAL_DATABASE_ERROR;;Internal database error";
 	
 	const SEARCH_ENGINE_QUERY_FAILED = "SEARCH_ENGINE_QUERY_FAILED;;Search engine query failed";
+
+	const RETRIEVE_VOLUME_MAP_FAILED = "RETRIEVE_VOLUME_MAP_FAILED;;Could not retrieve volume map for the given Id";
 	
 	const SERVERL_ERROR = "SERVERL_ERROR;ERR_TEXT;Server error @ERR_TEXT@";
 	
@@ -138,7 +140,11 @@ class APIErrors
 	const ERROR_KSHOW_ROLLBACK = "ERROR_KSOHW_ROLLBACK;KSHOW_ID,VERSION;Error while rollbacking kshow [@KSHOW_ID@] to version [@VERSION@]";
 	
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND;ENTRY_ID;Entry id \"@ENTRY_ID@\" not found";
-	
+
+	const SUPPORTED_FLAVOR_NOT_EXIST = "SUPPORTED_FLAVOR_NOT_EXIST;ENTRY_ID;Could not find supported flavor for entry id \"@ENTRY_ID@\" ";
+
+	const GIVEN_ID_NOT_SUPPORTED = "GIVEN_ID_NOT_SUPPORTED;;The action is not supported for the given id";
+
 	// ENTRY_TYPE - type
 	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE;ENTRY_TYPE;source entry must be of type [@ENTRY_TYPE@]";
 	
@@ -200,8 +206,8 @@ class APIErrors
 	const NO_FIELDS_SET_FOR_PARTNER = "NO_FIELDS_SET_FOR_PARTNER;;Missing fiedls when adding partner" ;
 	
 	// ERR_TEXT - a more specific error from myPartnerRegistration - TODO - make the module use more specific error codes
-	const PARTNER_REGISTRATION_ERROR = "PARTNER_REGISTRATION_ERROR;;Error while registering partner";
-	
+	const PARTNER_REGISTRATION_ERROR = "PARTNER_REGISTRATION_ERROR;MESSAGE;Error while registering partner with message \"@MESSAGE@\"";
+
 	// MEDIA_TYPE - media_type
 	const SEARCH_UNSUPPORTED_MEDIA_TYPE = "SEARCH_UNSUPPORTED_MEDIA_TYPE;MEDIA_TYPE;Unsupported media type [@MEDIA_TYPE@]";
 
@@ -423,4 +429,12 @@ class APIErrors
 	const UNSAFE_HTML_TAGS = "UNSAFE_HTML_TAGS;CLASS_NAME,PROPERTY_NAME;Potential Unsafe HTML tags found in [@CLASS_NAME@]::[@PROPERTY_NAME@]";
 	
 	const RECORDED_NOT_READY = "RECORDED_NOT_READY;ENTRY_ID;Live entry [@ENTRY_ID@] cannot be deleted, recorded entry not in ready status yet";
+	
+	const RECORDING_FLOW_NOT_COMPLETE = "RECORDING_FLOW_NOT_COMPLETE;ENTRY_ID;Live entry [@ENTRY_ID@] cannot be deleted, recording engine still proccesing live event";
+	
+	const RECORDED_ENTRY_LIVE_MISMATCH = "RECORDED_ENTRY_LIVE_MISMATCH;LIVE_ENTRY_ID,RECORDED_ENTRY_ID;Recorded entry [@RECORDED_ENTRY_ID@] was not created while streaming to the given live entry [@LIVE_ENTRY_ID@]";
+	
+	const CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING = "CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING;LIVE_ENTRY_ID;Live entry [@LIVE_ENTRY_ID@] cannot be deleted while streaming";
+	
+	const RECORDING_CONTENT_NOT_YET_SET = "RECORDING_CONTENT_NOT_YET_SET;ENTRY_ID;Entry [@ENTRY_ID@] cannot be deleted, waiting for recording engine to finish handling";
 }

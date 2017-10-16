@@ -10,9 +10,15 @@ class KalturaUrlTokenizerKs extends KalturaUrlTokenizer
 	 */
 	public $usePath;
 
+	/**
+	 * @var string
+	 */
+	public $additionalUris;
+
 	private static $map_between_objects = array
 	(
 			"usePath",
+			"additionalUris",
 	);
 
 	public function getMapBetweenObjects ( )

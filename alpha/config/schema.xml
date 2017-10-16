@@ -1714,7 +1714,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="host_name" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="playback_host_name" type="varchar" size="256" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="partner_id_status_system_name">
 			<index-column name="partner_id" />
@@ -2108,6 +2108,25 @@
 		<column name="status" type="integer"/>
 		<column name="type" type="integer" inheritance="single"/>
 		<column name="custom_data" type="longvarchar"/>
+		<column name="extended_status" type="integer" />
+		<column name="privacy_context" type="varchar" size="255" />
+		<column name="custom_data" type="longvarchar"/>
+		<index name="kuser_id_entry_id">
+            <index-column name="kuser_id" />
+            <index-column name="entry_id" />
+            <index-column name="privacy_context" />
+        </index>
+        <index name="kuser_id_updated_at">
+            <index-column name="kuser_id" />
+            <index-column name="updated_at" />
+            <index-column name="privacy_context" />
+        </index>
+        <index name="kuser_id_extended_status_updated_at">
+            <index-column name="kuser_id" />
+            <index-column name="extended_status" />
+            <index-column name="updated_at" />
+            <index-column name="privacy_context" />
+        </index>
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
 			<reference local="entry_id" foreign="id" />
 		</foreign-key>
@@ -2131,7 +2150,7 @@
 		<column name="token" type="longvarchar"/>
 		<column name="custom_data" type="longvarchar"/>
 	</table>
-    <table skipSql="false" abstract="false" name="entry_server_node">
+    <table skipSql="false" abstract="false" name="entry_server_node" deletable="true">
         <column primaryKey="true" required="true" autoIncrement="true" lazyLoad="false" name="id" type="bigint" size="20"/>
         <column name="entry_id" type="varchar" size="20" required="true" />
         <column name="server_node_id" type="integer" />

@@ -9,7 +9,7 @@ class kWebVTTGenerator
 	 * @param int $timeStamp
 	 * @return string
 	 */
-	protected static function formatWebVTTTimeStamp($timeStamp)
+	public static function formatWebVTTTimeStamp($timeStamp)
 	{
 		$millis = $timeStamp % 1000;
 		$timeStamp = (int)($timeStamp / 1000);
@@ -28,18 +28,26 @@ class kWebVTTGenerator
 	 */
 	public static function buildWebVTTM3U8File($segmentDuration, $entryDuration)
 	{
-		$result = "#EXTM3U\r\n";
-		$result .= "#EXT-X-TARGETDURATION:{$segmentDuration}\r\n";
-		$result .= "#EXT-X-VERSION:3\r\n";
-		$result .= "#EXT-X-MEDIA-SEQUENCE:1\r\n";
-		$result .= "#EXT-X-PLAYLIST-TYPE:VOD\r\n";
+		$result = "#EXTM3U".kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		$result .= "#EXT-X-TARGETDURATION:{$segmentDuration}".kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		$result .= "#EXT-X-VERSION:3".kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		$result .= "#EXT-X-MEDIA-SEQUENCE:1".kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		$result .= "#EXT-X-PLAYLIST-TYPE:VOD".kCaptionsContentManager::WINDOWS_LINE_ENDING;
 		$segmentCount = ceil($entryDuration / $segmentDuration);
+		$lastSegmentDuration = $entryDuration - ($segmentCount - 1) * $segmentDuration;
 		for ($curIndex = 1; $curIndex <= $segmentCount; $curIndex++)
 		{
-			$result .= "#EXTINF:{$segmentDuration}.0,\r\n";
-			$result .= "segmentIndex/{$curIndex}.vtt\r\n";
+			if ($curIndex == $segmentCount)
+			{
+				$result .= "#EXTINF:{$lastSegmentDuration}.0,".kCaptionsContentManager::WINDOWS_LINE_ENDING;
+			}
+			else
+			{
+				$result .= "#EXTINF:{$segmentDuration}.0,".kCaptionsContentManager::WINDOWS_LINE_ENDING;
+			}
+			$result .= "segmentIndex/{$curIndex}.vtt".kCaptionsContentManager::WINDOWS_LINE_ENDING;
 		}
-		$result .= "#EXT-X-ENDLIST\r\n";
+		$result .= "#EXT-X-ENDLIST".kCaptionsContentManager::WINDOWS_LINE_ENDING;
 		return $result;
 	}
 
@@ -55,8 +63,12 @@ class kWebVTTGenerator
 		$segmentStartTime = ($segmentIndex - 1) * $segmentDuration * 1000;
 		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
 
-		$result = "WEBVTT\n";
-		$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+		$result = "WEBVTT".kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		if ($localTimestamp != 10000)
+		{
+			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) .kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		}
+		$result .= kCaptionsContentManager::WINDOWS_LINE_ENDING;
 
 		foreach ($parsedCaption as $curCaption)
 		{
@@ -104,12 +116,12 @@ class kWebVTTGenerator
 			}
 
 			// make sure the content does not contain 2 consecutive newlines
-			$content = preg_replace('/\n+/', "\n", str_replace("\r", '', $content));
+			$content = preg_replace('/\n+/', kCaptionsContentManager::WINDOWS_LINE_ENDING, str_replace("\r", '', $content));
 
 			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
 				self::formatWebVTTTimeStamp($curCaption["endTime"]) .
-				$styling . "\n";
-			$result .= trim($content) . "\n\n";
+				$styling .kCaptionsContentManager::WINDOWS_LINE_ENDING;
+			$result .= trim($content) .kCaptionsContentManager::WINDOWS_LINE_ENDING.kCaptionsContentManager::WINDOWS_LINE_ENDING;
 		}
 		return $result;
 	}
@@ -130,7 +142,11 @@ class kWebVTTGenerator
 		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
 
 		$result = implode('', $headerInfo);
-		$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+		if ($localTimestamp != 10000)
+		{
+			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) .kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		}
+		$result .= kCaptionsContentManager::WINDOWS_LINE_ENDING;
 
 		foreach ($parsedCaption as $curCaption)
 		{
@@ -146,11 +162,11 @@ class kWebVTTGenerator
 			}
 
 			// make sure the content does not contain 2 consecutive newlines
-			$content = preg_replace('/\n+/', "\n", str_replace("\r", '', $content));
+			$content = preg_replace('/\n+/', kCaptionsContentManager::WINDOWS_LINE_ENDING, str_replace("\r", '', $content));
 
 			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
-				self::formatWebVTTTimeStamp($curCaption["endTime"]) ."\n";
-			$result .= trim($content) . "\n\n";
+				self::formatWebVTTTimeStamp($curCaption["endTime"]) .kCaptionsContentManager::WINDOWS_LINE_ENDING;
+			$result .= trim($content) .kCaptionsContentManager::WINDOWS_LINE_ENDING.kCaptionsContentManager::WINDOWS_LINE_ENDING;
 		}
 		return $result;
 	}

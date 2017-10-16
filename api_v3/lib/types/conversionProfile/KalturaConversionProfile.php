@@ -162,6 +162,34 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	 * @var string
 	 */
 	public $collectionTags;
+
+	/**
+	 * JSON string with array of "condition,profile-id" pairs.
+	 *
+	 * @var string
+	 */
+	public $conditionalProfiles;
+	
+	/**
+	 * When set, the ExtractMedia job should detect the source file GOP using this value as the max calculated period
+	 *
+	 * @var int
+	 */
+	public $detectGOP;
+	
+	/**
+	 * XSL to transform ingestion Media Info XML
+	 * 
+	 * @var string
+	 */
+	public $mediaInfoXslTransformation;
+	
+	/**
+	 * Default replacement options to be applied to entries
+	 * 
+	 * @var KalturaEntryReplacementOptions
+	 */
+	public $defaultReplacementOptions;
 	
 	private static $map_between_objects = array
 	(
@@ -183,6 +211,9 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		"mediaParserType",
 		"calculateComplexity",
 		"collectionTags",
+		"conditionalProfiles",
+		"detectGOP",
+		"defaultReplacementOptions",
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -201,6 +232,11 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		{
 			$this->cropDimensions = new KalturaCropDimensions();
 			$this->cropDimensions->fromObject($sourceObject);
+		}
+		
+		if($this->shouldGet('mediaInfoXslTransformation', $responseProfile))
+		{
+			$this->mediaInfoXslTransformation = $sourceObject->getMediaInfoXslTransformation();
 		}
 	}
 	

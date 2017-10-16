@@ -141,6 +141,12 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	 */
 	protected $password;
 	
+	/**
+	 *
+	 * @var string
+	 */
+	protected $deleteTime;
+	
 	/* (non-PHPdoc)
 	 * @see WebexXmlObject::getAttributeType()
 	 */
@@ -216,6 +222,9 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 
 			case 'password':
 				return 'string';
+				
+			case 'deleteTime':
+				return 'string';
 	
 		}
 		
@@ -251,6 +260,7 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 			'postRecordingSurvey',
 			'confID',
 			'password',
+			'deleteTime',
 		);
 	}
 	
@@ -649,6 +659,22 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	public function getPassword()
 	{
 		return $this->password;
+	}
+	
+	/**
+	 * @param string $deleteTime
+	 */
+	public function setDeleteTime($deleteTime)
+	{
+		$this->deleteTime = $deleteTime;
+	}
+
+	/**
+	 * @return string $deleteTime
+	 */
+	public function getDeleteTime()
+	{
+		return $this->deleteTime;
 	}
 	
 }

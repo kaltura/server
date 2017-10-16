@@ -435,8 +435,15 @@ class kMrssManager
 			else
 				$mrss = new SimpleXMLElement('<item/>');
 		}
+	
+		$mrss->addChild('entryId', $entry->getId());		
+		if($entry->getStatus() == entryStatus::DELETED)
+		{
+			$mrss->addChild('status', self::stringToSafeXml($entry->getStatus()));
+			self::addInstanceToPool($instanceKey, $mrss);
+			return $mrss;
+		}
 		
-		$mrss->addChild('entryId', $entry->getId());
 		if($entry->getReferenceID())
 			$mrss->addChild('referenceID', self::stringToSafeXml($entry->getReferenceID()));
 		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
@@ -444,7 +451,7 @@ class kMrssManager
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
 		if($mrssParams && !is_null($mrssParams->getLink()))
 			$mrss->addChild('link', $mrssParams->getLink() . $entry->getId());
-		$mrss->addChild('type', $entry->getType());
+		$mrss->addChild('type', kPluginableEnumsManager::coreToApi('entryType', $entry->getType()));
 		$mrss->addChild('licenseType', $entry->getLicenseType());
 		$mrss->addChild('userId', $entry->getPuserId());
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
@@ -555,7 +562,18 @@ class kMrssManager
 			if($asset instanceof thumbAsset)
 				self::appendThumbAssetMrss($asset, $mrss);
 		}
-			
+
+		$capabilities = $entry->getCapabilities();
+		if($capabilities)
+		{
+			$capabilitiesNode = $mrss->addChild('capabilities');
+			$capabilitiesArr = explode(",", $capabilities);
+			foreach($capabilitiesArr as $capability)
+			{
+				$capabilitiesNode->addChild('capability', kPluginableEnumsManager::coreToApi('EntryCapability', $capability));
+			}
+		}
+
 		$mrssContributors = self::getMrssContributors();
 		if(count($mrssContributors))
 		{

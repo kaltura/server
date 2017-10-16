@@ -34,8 +34,18 @@ class KalturaCrossKalturaDistributionJobProviderData extends KalturaConfigurable
      * @var string
      */
     public $distributedCuePoints;
-    
-    
+
+	/**
+	 * Key-value array where the keys are IDs of distributed thumb cue points in the source account and the values are the matching IDs in the target account
+	 * @var string
+	 */
+	public $distributedThumbCuePoints;
+
+	/**
+	 * Key-value array where the keys are IDs of distributed timed thumb assets in the source account and the values are the matching IDs in the target account
+	 * @var string
+	 */
+	public $distributedTimedThumbAssets;
     
     public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{			   
@@ -62,6 +72,8 @@ class KalturaCrossKalturaDistributionJobProviderData extends KalturaConfigurable
 		$this->distributedMetadata = $entryDistributionDb->getFromCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_METADATA);
 		$this->distributedCaptionAssets = $entryDistributionDb->getFromCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_CAPTION_ASSETS);
 		$this->distributedCuePoints = $entryDistributionDb->getFromCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_CUE_POINTS);
+		$this->distributedThumbCuePoints = $entryDistributionDb->getFromCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_THUMB_CUE_POINTS);
+		$this->distributedTimedThumbAssets = $entryDistributionDb->getFromCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_TIMED_THUMB_ASSETS);
 	}
 	
 	
@@ -72,6 +84,8 @@ class KalturaCrossKalturaDistributionJobProviderData extends KalturaConfigurable
 		'distributedMetadata',
 		'distributedCaptionAssets',
     	'distributedCuePoints',
+    	'distributedThumbCuePoints',
+	    'distributedTimedThumbAssets',
 	);
 
 	public function getMapBetweenObjects()

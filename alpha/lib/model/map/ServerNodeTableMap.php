@@ -51,7 +51,7 @@ class ServerNodeTableMap extends TableMap {
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('HOST_NAME', 'HostName', 'VARCHAR', true, 256, null);
 		$this->addColumn('PLAYBACK_HOST_NAME', 'PlaybackHostName', 'VARCHAR', false, 256, null);
-		$this->addColumn('PARENT_ID', 'ParentId', 'INTEGER', false, null, 0);
+		$this->addColumn('PARENT_ID', 'ParentId', 'VARCHAR', false, 256, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

@@ -115,10 +115,10 @@ class KDLStreamDescriptor {
 			$target = $this->generateTargetMappedChannels($sourceAudioStreams, $sourceAnalize);
 		}
 		/*
-		 * If no mapping and olayout - try to generate using lingual notation
+		 * If no mapping - try to generate using lingual notation
 		 * 	go to default/nonmapped flow
 		 */
-		else if(!isset($this->olayout) && (!isset($this->mapping) || count($this->mapping)==0)){
+		else if((!isset($this->mapping) || count($this->mapping)==0)){
 			return $this->generateTargetLingualNotated($sourceAudioStreams, $sourceAnalize);
 		}
 		else {
@@ -544,7 +544,8 @@ class KDLStreamDescriptor {
 		 * Currently handle just the first language entity
 		 */
 		if(isset($streams[0]->audioChannels)){
-			$target = new KDLStreamDescriptor(array($streams[0]->id),$streams[0]->audioChannels,$this->lang);
+			$olayout = (isset($this->olayout) && $this->olayout>0)? $this->olayout: $streams[0]->audioChannels;
+			$target = new KDLStreamDescriptor(array($streams[0]->id),$olayout,$this->lang);
 		}
 		else {
 			$target =  new KDLStreamDescriptor(array($streams[0]->id),0,$this->lang);

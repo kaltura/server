@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */
-class category extends Basecategory implements IIndexable, IRelatedObject
+class category extends Basecategory implements IIndexable, IRelatedObject, IElasticIndexable
 {
 	protected $childs_for_save = array();
 	
@@ -492,11 +492,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	}
       
 	/**
-	* Decrement direct entries count (will decrement recursively the parent categories too)
+	* Decrement direct pending entries count
 	*/
 	public function decrementPendingEntriesCount()
 	{
 		$this->setPendingEntriesCount(max(0, $this->getPendingEntriesCount() - 1));
+		$this->save();
 	}
       
 	protected function validateFullNameIsUnique()
@@ -1488,9 +1489,11 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			$filter->setIdNotIn($entryIds);
 		$filter->setLimit(1);
 		$filter->attachToCriteria($baseCriteria);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		$baseCriteria->applyFilters();
 		
 		$count = $baseCriteria->getRecordsCount();
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		
 		// Save the result within the cache		
 		if($count >= category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY) {
@@ -1693,6 +1696,28 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$this->setDirectSubCategoriesCount($c->getRecordsCount());
 	}
+
+	protected function getElasticSearchIndexPrivacyContext()
+	{
+		if(is_null($this->getPrivacyContext()) || trim($this->getPrivacyContext()) == '')
+			return null;
+
+		$privacyContexts = explode(',', $this->getPrivacyContext());
+		$privacyContexts[] = kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+		$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, $this->getPartnerId() );
+		return $privacyContexts;
+	}
+
+	protected function getElasticSearchIndexPrivacyContexts()
+	{
+		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
+			return kEntitlementUtils::getDefaultContextString( $this->getPartnerId() );
+
+		$privacyContexts = explode(',', $this->getPrivacyContexts());
+		$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, $this->getPartnerId() );
+
+		return $privacyContexts;
+	}
 	
 	public function getSearchIndexPrivacyContext()
 	{
@@ -1705,7 +1730,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 
 		return implode(' ',$privacyContexts);
 	}
-	
+
 	public function getSearchIndexPrivacyContexts()
 	{
 		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
@@ -1851,5 +1876,112 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$c->applyFilters();
 		$categoryIds = $c->getFetchedIds();
 		return $categoryIds;
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return ElasticIndexMap::ELASTIC_CATEGORY_INDEX;
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return ElasticIndexMap::ELASTIC_CATEGORY_TYPE;
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'doc' => array(
+				'partner_id' => $this->getPartnerId(),
+				'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
+				'privacy' => self::formatPrivacy($this->getPrivacy(), $this->getPartnerId()),
+				'privacy_context' => $this->getElasticSearchIndexPrivacyContext(),
+				'privacy_contexts' => $this->getElasticSearchIndexPrivacyContexts(),
+				'status' => $this->getStatus(),
+				'parent_id' => $this->getParentId(),
+				'depth' => $this->getDepth(),
+				'name' => $this->getName(),
+				'full_name' => $this->getFullName(),
+				'full_ids' => explode(',',$this->getFullIds()),
+				'entries_count' => $this->getEntriesCount(),
+				'created_at' => $this->getCreatedAt(null),
+				'updated_at' => $this->getUpdatedAt(null),
+				'direct_entries_count' => $this->getDirectEntriesCount(),
+				'direct_sub_categories_count' => $this->getDirectSubCategoriesCount(),
+				'members_count' => $this->getMembersCount(),
+				'pending_members_count' => $this->getPendingMembersCount(),
+				'pending_entries_count' => $this->getPendingEntriesCount(),
+				'description' => $this->getDescription(),
+				'tags' => explode(',', $this->getTags()),
+				'display_in_search' => $this->getDisplayInSearch(),
+				'inheritance_type' => $this->getInheritanceType(),
+				'kuser_id' => $this->getKuserId(),
+				'reference_id' => $this->getReferenceId(),
+				'inherited_parent_id' => $this->getInheritedParentId(),
+				'moderation' => $this->getModeration(),
+				'contribution_policy' => $this->getContributionPolicy(),
+			),
+			'doc_as_upsert' => true
+		);
+		return $body;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::UPADTE;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
+	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		if($this->getStatus() == CategoryStatus::PURGED)
+			return true;
+		return false;
+	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'category';
 	}
 }

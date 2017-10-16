@@ -139,17 +139,20 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	public function toInsertableObject($sourceObject = null, $propsToSkip = array())
 	{
+		$isRecordPermissionValidForPartner = PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ||
+				PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_KALTURA_RECORDING, kCurrentContext::getCurrentPartnerId());
+		
+		if(isset($this->recordStatus) && $this->recordStatus != KalturaRecordStatus::DISABLED && !$isRecordPermissionValidForPartner)
+			throw new KalturaAPIException(KalturaErrors::RECORDING_DISABLED);
+		
 		if(is_null($this->recordStatus))
 		{
 			$this->recordStatus = KalturaRecordStatus::DISABLED;
-			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ||
-				PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_KALTURA_RECORDING, kCurrentContext::getCurrentPartnerId()) )
+			if($isRecordPermissionValidForPartner)
 			{
 				$this->recordStatus = KalturaRecordStatus::APPENDED;
 			}
 		}
-			
-
 
 		if ((is_null($this->recordingOptions) || is_null($this->recordingOptions->shouldCopyEntitlement)) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, kCurrentContext::getCurrentPartnerId()))
 		{
@@ -232,13 +235,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	protected function validatePropertyChanged($sourceObject, $attr)
 	{
-		$resolvedAttrName = $this->getObjectPropertyName($attr);
-		if(!$resolvedAttrName)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
-		
-		/* @var $sourceObject LiveEntry */
-		$getter = "get" . ucfirst($resolvedAttrName);
-		if($sourceObject->$getter() !== $this->$attr && $sourceObject->getLiveStatus() !== KalturaEntryServerNodeStatus::STOPPED)
+		if($this->hasPropertyChanged($sourceObject, $attr) && $sourceObject->getLiveStatus() !== KalturaEntryServerNodeStatus::STOPPED )
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, $attr);
 		}
@@ -246,16 +243,8 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	protected function validateRecordedEntryId($sourceObject, $attr)
 	{
-		$resolvedAttrName = $this->getObjectPropertyName($attr);
-		if(!$resolvedAttrName)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
-		
-		/* @var $sourceObject LiveEntry */
-		$getter = "get" . ucfirst($resolvedAttrName);
-		if($sourceObject->$getter() !== $this->$attr)
-		{
+		if($this->hasPropertyChanged($sourceObject, $attr))
 			$this->validateRecordingDone($sourceObject, $attr);
-		}
 	}
 	
 	private function validateRecordingDone($sourceObject, $attr)
@@ -302,14 +291,30 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	private function validateSegmentDurationValue($sourceObject, $attr)
 	{
 
-		if (!$this->isNull($attr)) {
-			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) {
+		if (!$this->isNull($attr) && $this->hasPropertyChanged($sourceObject, $attr)) 
+		{
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, kCurrentContext::getCurrentPartnerId())) 
+			{
 				throw new KalturaAPIException(KalturaErrors::DYNAMIC_SEGMENT_DURATION_DISABLED, $this->getFormattedPropertyNameWithClassName($attr));
 			}
 
 			$this->validatePropertyNumeric($attr);
 			$this->validatePropertyMinMaxValue($attr, self::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, self::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
+	}
+	
+	private function hasPropertyChanged($sourceObject, $attr)
+	{
+		$resolvedAttrName = $this->getObjectPropertyName($attr);
+		if(!$resolvedAttrName)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
+		
+		/* @var $sourceObject LiveEntry */
+		$getter = "get" . ucfirst($resolvedAttrName);
+		if($sourceObject->$getter() !== $this->$attr)
+			return true;
+		
+		return false;
 	}
 
 }

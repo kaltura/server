@@ -1,3 +1,952 @@
+# Mercury 13.5.0 #
+
+## Add getVolumeMap action to flavorAsset service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8113
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_11_add_flavorasset_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.4.0 #
+
+## Add getVolumeMap action to media service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7986
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_26_add_media_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add upload url domain to uploadToken API object ##
+
+- Issue Type: Task
+- Issue ID: SUP-12069
+
+### Configuration ####
+
+- Add upload domain in dc_config.ini 
+example:
+0.uploadUrl = dc0-upload.kaltura.com       
+1.uploadUrl = dc1-host-upload.kaltura.com       
+
+## Support unlimited recording duration as feature flip ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8030
+
+### Configuration ####
+
+	- Add new module to the admin-console in admin.ini
+        moduls.liveStreamUnlimitedRecording.enabled = true
+        moduls.liveStreamUnlimitedRecording.permissionType = 2
+        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording Duration
+        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING_DURATION
+        moduls.liveStreamUnlimitedRecording.basePermissionType = 2
+        moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+        moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## Add permission to restore-deleted-entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8064
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_02_update_adminconsole_entryadmin_permissions.php
+	  
+## Add co-viewers field to the KalturaBaseEntry object ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7951
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	 Index entry table to sphinx
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.3.0 #
+
+## Expose new API for login by KS ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7952
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_07_add_user_loginByKs_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.2.0 #
+
+## Add new Beacon plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7580
+
+### pre-requisite ###
+	
+* Install elasticSearch for refernce view [how to install Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html) (Tested with elasticSearch 5.5.2).
+* Install logstash for refernce view [how to install Logstah](https://www.elastic.co/guide/en/logstash/current/installing-logstash.html) (Tested with logstash 5.2.2).
+* Install RabbitMQ for refernce view [how to install RabbitMQ](https://www.rabbitmq.com/install-debian.html) (Tested with rabbitMQ 3.6.10).
+
+### configuration ###
+Enable beacon plugin:
+
+	- Enable beacon plugin:
+		1. Add the following to plugins.ini file: "Beacon"
+		2. Make sure the following plugins are enabled since they are required for beacon service to work: ElasticSearch, RabbitMQ, Queue.
+
+Configure elasticSearch Kaltura configuration:
+		  
+	- Add the following to your elastic.ini file:
+	elasticClientCurlTimeout = CURL_TIMEOUT_IN_SEC
+	
+	[beacon]
+	elasticHost = "ELASTIC_HOST"
+	elasticPort = "ELASTIC_PORT"
+	
+	- Create new beaconindes in elastic by runing: curl -XPUT '"ELASTIC_HOST":"ELASTIC_PORT"/beaconindex' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_mapping.json"
+
+Configure logstash Kaltura configuration:
+
+	- Copy configurations/logstash/kaltura_beacons.template.conf to configurations/logstash/kaltura_beacons.conf and update the folloiwng tokens:
+		@RABBIT_MQ_SERVER@ = rabbitMQ server
+		@RABBIT_MQ_PASSWORD@ = rabbitMQ server Password
+		@RABBIT_MQ_USERNAME@ = rabbitMQ server User Name
+		@RABBIT_PORT@ = rabbitMQ server port
+		@LOG_DIR@ = You main log directory
+		@ELASTIC_SEARCH_HOST@ = elasticSearch server host
+		@ELASTIC_SEARCH_PORT@ = elasticSearch server port
+		
+	- Add new symlink in /etc/logstash/conf.d/kaltura_beacons to point to /opt/kaltura/app/configurations/logstash/kaltura_beacons.conf
+
+Configure rabbitMq:
+	- Add new exchange called: beacon_exchange (Type=fanout, durable=true, Policy=ha-all)
+	- Add new queue called: beacons (x-message-ttl=86400000, durable=true, Policy=ha-all)
+	- Bind queue to exchange.
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_04_add_beacon_service_permissions.php
+
+## Add new ElasticSearch plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### configuration ###
+Add the following to plugins.ini file: "ElasticSearch"
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. create configurations/elastic.ini from configurations/elastic.ini.template and update placeholders with the elastic cluster information.
+
+## Add user permission for kclip attributes ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7929
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_24_add_kClip_Attribute_user_permission.php
+
+## Add create recorded entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7827
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_06_live_stream_add_create_recording_across_dc.php
+
+
+## Add new batch job for handling copy caption assets ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-7889
+
+### Configuration ###
+ - The batch.ini has been changed, make sure to add the following to your batch.ini:
+
+	enabledWorkers.KAsyncCopyCaptions					= 1
+
+ - The workers.ini has been change, make sure to add the following to your workers.ini:
+
+	[KAsyncCopyCaptions : JobHandlerWorker]
+
+	id													= 650
+
+	friendlyName										= Copy Caption Assets
+
+	type												= KAsyncCopyCaptions
+
+	scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
+
+ - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
+
+    under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
+
+
+# Mercury 13.1.0 #
+
+## Add new Search plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### configuration ###
+Add the following to plugins.ini file: "Search"
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
+
+
+## Preserve Aspect Ratio accurately  ##
+
+- Issue Type: Feature
+- Issue ID: SUP-11599
+
+### configuration ###
+New mode (5) for flavorParams::AspectRatioMode field
+
+# Mercury 13.0.0 #
+
+## Fix deleting users on KMS ##
+
+- Issue Type: Bug
+- Issue ID: KMS-14633
+
+### configuration ###
+None
+
+### Deployment scripts ###
+Re-index Kuser sphinx table (php deployment/base/scripts/populateSphinxKusers.php)
+
+## Update Apache headers to support Kea Access-Control-Allow-Origin ##
+ - Issue type: Feature
+ - Issue ID : PLAT-7758
+ 
+### configuration ###
+Need to add the following section to apache config files /etc/apache2/sites-enabled/kaltura & /etc/apache2/sites-enabled/kaltura-ssl
+
+	Alias /apps/kea "/opt/kaltura/apps/kea"
+	<Directory "/opt/kaltura/apps/kea">
+	    DirectoryIndex index.php
+	    Options ExecCGI -Indexes FollowSymLinks Includes
+	    Order allow,deny
+	    Allow from all
+	    AllowOverride all
+	</Directory>
+
+### Deployment scripts ###
+None 
+ 
+#### Known Issues & Limitations ####
+None
+
+## Add Data addContent action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7669
+
+### configuration ###
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_11_addContent_data_permissions.php
+
+## Add support for Thumbnail and Thumbnail Stripes for Stitched Playlist ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7571
+
+### configuration ###
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support mapped thumbnail capture.
+
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
+
+### Deployment scripts ###
+None
+
+
+# Lynx 12.20.0 #
+
+## Add live packager delivery profiles ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7725
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerDash.template.ini
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerHds.template.ini
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerHls.template.ini
+	/opt/kaltura/app/deployment/base/scripts/init_data/07.DeliveryProfileLivePackagerMss.template.ini
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/2017_07_11_create_live_packager_delivery_profiles.php
+
+#### Known Issues & Limitations ####
+The followign modules need to be insatlled and correctly configured for this to work:
+
+- Please note that for live packaging to work you need to have the  [nginx-vod-module](https://github.com/kaltura/nginx-vod-module) correctly installed and configured to support live packaging.
+- This also requires your Kaltura live platform to work with Kaltura's [liveDvr](https://github.com/kaltura/liveDVR) 
+
+
+## Add Media-Entry ready email template ##
+
+- Issue Type: Support
+- Issue ID: SUP-8655
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_06_20_AddMediaEntryReadyTemplate.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
+
+#### Known Issues & Limitations ####
+None.
+
+## Add capture space to addFromImage and cuePoint add ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7682
+
+### configuration ###
+
+	None
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_09_allow_capture_space_to_add_cue_points_and_thumbs.php
+
+#### Known Issues & Limitations ####
+
+        None.
+
+# Lynx 12.19.0 #
+
+
+## Add polls resetVotesAction ##
+
+### configuration ###
+
+	None
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+#### Known Issues & Limitations ####
+
+        None.
+
+
+## WaterMarking - functionality extension ##
+
+- 
+: Feature
+- Issue ID: PS-3118
+
+Added abilities -
+- Position WM relatively to previous  WM's
+- Positioning expresed as % of source dims
+
+### Configuration ###
+New options in flavorParams::Watermark field
+
+### Deployment scripts ###
+None
+
+#### Known Issues & Limitations ####
+None.
+
+## FIX invalid source frame-rate setting ##
+
+- Issue Type: Bug
+- Issue ID: PS-3159
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+None
+
+#### Known Issues & Limitations ####
+None.
+
+# Lynx 12.18.0 #
+
+## support new live packages + LC flow + webcast on update or fresh install ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7535
+
+### Configuration ###
+	1. Add the following to you plugins.ini file: "PushNotification", "Queue", "RabbitMQ". 
+	   (This will require execution of install plugins and new clients tp be genrated. Instrunctions can be found in the deploymnet script part).
+
+	Please note that for webcast to work you will need to have rabbit and pub-sub-server installed and correctly configured. For refernce view:
+	1. Install rabbit_mq (for reference view, https://www.rabbitmq.com/download.html)
+	2. Update configurations/rabbit_mq.ini placeholders with the rabbit information.
+	3. Install pub-sub-server (for reference view: https://github.com/kaltura/pub-sub-server/blob/Lynx-12.18.0/pub_sub_server_deployment.md)
+
+### Deployment scripts ###
+
+	Deploy new live HD flavors + Live Language package:
+	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_latest_live_params.php
+	
+	Deploy Lecture_Capture conversion profile & flavors:
+	1. php /opt/kaltura/app/deployment/updates/scripts/2017_06_05_deploy_lecture_capture_data.php
+
+	Deploy Webcast Push notification and response profiles:
+	1. Response profiles:
+	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	   1. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/polls_response_profile.template.xml
+	   2. /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/qna_response_profiles.template.xml
+	   
+	   Run deployment script:
+	   1. 	php /opt/kaltura/app/deployment/updates/scripts/2017_05_24_deploy_webcast_related_response_profiles.php
+
+	2. Push notitifications:
+	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	   	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
+		2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
+		3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
+		4. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/public_qna_notification.template.xml
+	
+	   Run deployment script:
+		1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+		2. php /opt/kaltura/app/generator/generate.php
+		3. php /opt/kaltura/app/deployment/updates/scripts/2017_06_14_deploy_webcast_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+## eCDN parent redundency ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7371
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_06_07_alter_server_node_table_parent_id.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Polls getVote action ##
+  
+- Issue Type: Bug fix
+- Issue Id: PLAT-7502
+
+### Configuration ###
+- In base.ini add the following parameters to [cache_based_service_actions]:
+	poll_poll_getVote = "/../../plugins/poll/lib/PollActions.php"
+
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+## missing enum in quiz plugin ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Lynx 12.17.0 #
+
+## Media Repurposing ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-6960
+
+### Configuration ###
+Add to admin.ini:
+
+	moduls.MediaRepurposing.enabled = true
+	moduls.MediaRepurposing.permissionType = 2
+	moduls.MediaRepurposing.label = "Enable Media Repurposing"
+	moduls.MediaRepurposing.permissionName = FEATURE_MEDIA_REPURPOSING_PERMISSION
+	moduls.MediaRepurposing.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission.php
+	  php /opt/kaltura/app/deployment/updates/scripts/addMediaRepurposingProfiles.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add-on for ExtractMedia logic ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7436
+
+### Configuration ###
+	make sure @WEB_DIR@/tmp/bulkupload exists (if not - create it)
+	point 'shared_temp_folder' var (in configurations/local.ini) to that folder
+
+### Deployment scripts ###
+None.
+
+## Add polls support ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7333
+
+### Configuration ###
+
+
+- In local.ini add the following parameters:
+
+		[poll]
+		secret = <select a secret>
+		cache_ttl = 86400
+		
+- In base.ini add the following parameters::
+
+		[cache_based_service_actions]
+		poll_poll_vote = "/../../plugins/poll/lib/PollActions.php"
+
+- In cache.ini add the following parameters:
+		
+		* [memcacheKeys:memcacheBase]
+		  host = 127.0.0.1
+		
+		* cacheOnlyActions = memcacheKeys
+  
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+
+## ViewHistory Feature Add missing permission item ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7281
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_23_add_userentry_udpate_to_PLAYBACK_BASE_PERMISSION.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Fix FFmpeg 3.2 source aligned KF's and segfault on encryption issues ##
+
+ - Issue Type: Bug fix
+ - Issue ID: PRODIT-4352
+
+### Configuration ###
+Binaries: Provided in the PRODIT-4352
+
+Following bins/scripts should be switched -
+- ffmpeg.sh
+- ffprobe.sh
+- ismindex.sh
+- qt-faststart
+
+
+# Lynx 12.16.0 #
+
+## Add scheduleEvent->list optimization ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7230
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
+#### Known Issues & Limitations ####
+
+None.
+
+## ViewHistory Feature ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7281
+
+### Configuration ###
+- update plugins.ini:
+
+		- ViewHistory  
+- update admin.ini by adding the following permission switch:  
+				moduls.viewHistory.enabled = true  
+				moduls.viewHistory.permissionType = 2  
+				moduls.viewHistory.label = "View History"  
+				moduls.viewHistory.permissionName = VIEWHISTORY_PLUGIN_PERMISSION  
+				moduls.viewHistory.group = GROUP_ENABLE_DISABLE_FEATURES  
+		
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2017_03_21_alter_user_entry_table_extended_status_add_keys.sql
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2017_04_24_alter_user_entry_table_privacy_context_add_keys.sql
+		php /deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
+		php /deployment/base/scripts/installPlugins.php
+
+## Chunked Encoding ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7365
+ 
+Beta version, activated for the internal Kino account.
+
+### Configuration ###
+- /opt/kaltura/app/configurations/batch/workers.ini
+- /opt/kaltura/app/configurations/batch/encoder.ini
+
+### Deployment scripts ###
+
+None
+
+#### Known Issues & Limitations ####
+
+None
+
+# Lynx 12.15.0 #
+
+## Support dynamic broadcast urls ##
+
+- Issue Type: Story
+- Issue ID: PLAT-7251
+
+### Configuration ###
+- update broadcast.ini add for each dc config:
+
+		- port, rtsp_domain, rtsp_port
+
+#### Deployment Scripts ####
+
+php /opt/kaltura/app/deployment/updates/scripts/2017_04_27_clear_rtsp_broadcast_url_from_custom_data.php
+
+## Add permission for capture device to do scheduleResource->get ##
+
+ - Issue Type: Feature
+ - Issue ID: PLAT-7300
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_27_add_capture_device_permission_to_schedule_resource_get.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Lynx 12.14.0 #
+
+## Change permissions for admin_console and KalturaPartner ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7167
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_30_partner_parent_partner_packager_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add permission for capture device for scheduleEvent and scheduleResource ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7216
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_05_add_schedule_and_schedule_resource_permissions_for_capture_device.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add permission for capture device for uploadToken->get ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7253
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_04_18_add_uploadtoken_get_permission_for_capture_device.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Extract media & conversions failures when source with very high frame rate ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7120
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Support generation of Dolby Digital Plus/EAC3 audio ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-7178
+Requires custom flavor params
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Lynx 12.13.0 #
+
+## Add media-server permission get permission ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7163
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_20_add_media_server_permission_get_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Lynx 12.12.0 #
+
+## Support source playback in LC uploaded contnet ## 
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6899
+ 
+### Configuration ###
+
+- Add new permission to admin.ini: (taken from new admin.ini.temple)
+
+		moduls.lectureCapture.enabled = true
+		moduls.lectureCapture.permissionType = 2
+		moduls.lectureCapture.label = Lecture Capture
+		moduls.lectureCapture.permissionName = LECTURE_CAPTURE_USAGE
+		moduls.lectureCapture.basePermissionType = 
+		moduls.lectureCapture.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	
+None.
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Add batch thumbasset delete permission ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-6916
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_05_add_batch_thumbasset_delete_permission.php
+
+
+## User KS allow specific permission to approveReplace ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6663
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_01_add_kms_user_permission_and_role.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+# Lynx 12.11.0 #
+
+## Push notification redesig + caching optiization ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6888
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_02_06_add_send_command_permissons_to_push_notification_tempalte.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Drop folder Optimization ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6944
+
+### Configuration ###
+reduce dropfolder watcher to single for each type
+
+### Known Issues & Limitations ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_02_08_add_actions_drop_folder_permissions.php
+
+## Conditional conversion porfiles ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6786
+
+Add ability to switch the conv.prof according to source params and pre-defined conditions stored in JSON string on flavorParamsConversionProfile.
+Add GOP detection
+
+Example - JSON condition string: 
+	'[{"profileId":"11","condition":"videoGop<4 && containerFormat==mp4 && videoHeight<1080 && videoWidth<1920 && videoDar<16/9"}]'
+
+### Configuration ###
+None.
+
+### Known Issues & Limitations ###
+None.
+
+### Deployment scripts ###
+None.
+
+## Preserve Source Key Frames ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-6786
+
+Generate assets with key-frames aligned to source.
+This makes it possible to use source in ABR set along with generated assets
+
+### Configuration ###
+None.
+
+### Known Issues & Limitations ###
+None.
+
+### Deployment scripts ###
+None.
+
 # Lynx 12.10.0 #
 
 ## Add user list permissions for capture device role ##
@@ -1827,12 +2776,12 @@ None.
 - Issue Type: optimization
 
 ### Couchbase Deployment Instructions ###
-Download Couchbase server and install according to [official instructions](http://www.couchbase.com/nosql-databases/downloads#Couchbase_Server "http://www.couchbase.com/").
+Download Couchbase server and install according to [official instructions](http://www.couchbase.com/nosql-databases/downloads#Couchbase_Server "http://www.couchbase.com/") (Minimal version Couchbase server 4.0.0).
 
 #### Server Setup ####
 
- - Install Couchbase PHP extension: `pecl install couchbase`
-     - Required `php-devel` and `libcouchbase-devel`.
+ - Install Couchbase PHP extension: `pecl install couchbase-2.0.7`
+     - Required `php-devel` `gcc` `gcc-c++` `libcouchbase-devel` `libcouchbase-bin`
  - Add couchbase extension in your php.ini file.
  - Setup Couchbase server [http://@WWW_HOST@:8091](http://@WWW_HOST@:8091 "").
  - Define username and password to be used later in cache.ini configuration.

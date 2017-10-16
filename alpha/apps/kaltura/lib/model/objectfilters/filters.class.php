@@ -222,7 +222,7 @@ abstract class baseObjectFilter extends myBaseObject
 		$criteria->add ( $this->getIdFromPeer() , $id_list , Criteria::IN );
 	}
 
-	private static function getFieldAndDirection ( $field_name )
+	public static function getFieldAndDirection ( $field_name )
 	{
 		if ( $field_name[0] == "-" )
 		{

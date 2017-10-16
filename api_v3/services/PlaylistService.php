@@ -291,6 +291,7 @@ class PlaylistService extends KalturaEntryService
 	 * @param KalturaMediaEntryFilterForPlaylist $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaBaseEntryArray
+	 * @ksOptional
 	 */
 	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null, $filter = null, $pager = null )
 	{

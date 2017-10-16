@@ -416,8 +416,13 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->getElement('default_live_stream_entry_source_type')->setMultiOptions($sourceTypes);
 		
 		$this->addElement('text', 'live_stream_provision_params', array(
-			'label'			=> 'Provision parameters (JSON format)',
+			'label'			=> 'Provision parameters (JSON format):',
 			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'default_live_stream_segment_duration', array(
+				'label'			=> 'Default segment duration (Kaltura Live):',
+				'filters'		=> array('StringTrim'),
 		));
 		
 		//--------------- Host white list ----------------------------
@@ -911,7 +916,7 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addDisplayGroup(
 			array_merge(
-				array('default_live_stream_entry_source_type', 'live_stream_provision_params'),
+				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration'),
 				array('crossLine')),
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')

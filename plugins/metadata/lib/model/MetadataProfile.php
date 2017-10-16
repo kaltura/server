@@ -314,10 +314,24 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 
 	public function getMetadataFieldsKeys()
 	{
-		$metadataFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($this->id);
+		$metadataFields = MetadataProfileFieldPeer::retrieveAllActiveByMetadataProfileId($this->id);
 		$keys = array();
 		foreach ($metadataFields as $metadataField)
 			$keys[] = $metadataField->getKey();
 		return $keys;
+	}
+
+	/**
+	 * Copy current permission to the given partner.
+	 * @param int $partnerId
+	 * @return MetadataProfile
+	 */
+	public function copyToPartner($partnerId)
+	{
+		$newMetaDataProfile = $this->copy(true);
+		$key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+		$newMetaDataProfile->setXsdData(kFileSyncUtils::file_get_contents($key, true, false));
+		$newMetaDataProfile->setPartnerId($partnerId);
+		return $newMetaDataProfile;
 	}
 } // MetadataProfile

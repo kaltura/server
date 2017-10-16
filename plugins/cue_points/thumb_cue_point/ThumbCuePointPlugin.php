@@ -2,7 +2,7 @@
 /**
  * @package plugins.thumbCuePoint
  */
-class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaTypeExtender, IKalturaEventConsumers
+class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaTypeExtender, IKalturaEventConsumers, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'thumbCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -235,6 +235,9 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 		if($cuePoint->getEndTime())
 			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 	
+		$scene->addChild('title', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		$scene->addChild('description', kMrssManager::stringToSafeXml($cuePoint->getText()));
+		$scene->addChild('subType', $cuePoint->getSubType());
 		$scene->addChild('thumbAssetId', $cuePoint->getAssetId());
 		
 		return $scene;
@@ -254,6 +257,9 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 		if($cuePoint->getEndTime())
 			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 	
+		$scene->addChild('title', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		$scene->addChild('description', kMrssManager::stringToSafeXml($cuePoint->getText()));
+		$scene->addChild('subType', $cuePoint->getSubType());
 		$scene->addChild('thumbAssetId', $cuePoint->getAssetId());
 			
 		return $scene;
@@ -267,5 +273,10 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	public static function shouldCloneByProperty(entry $entry)
 	{
 		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryThumbCuePointCloneOptions::THUMB_CUE_POINTS), false);
+	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(ThumbCuePointType::THUMB));
 	}
 }

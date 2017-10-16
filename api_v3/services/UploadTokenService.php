@@ -40,9 +40,7 @@ class UploadTokenService extends KalturaBaseService
 		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb);
 		$uploadTokenMgr->saveAsNewUploadToken();
 		$uploadTokenDb = $uploadTokenMgr->getUploadToken();
-		
 		$uploadToken->fromObject($uploadTokenDb, $this->getResponseProfile());
-		
 		return $uploadToken;
 	}
 	
@@ -181,7 +179,11 @@ class UploadTokenService extends KalturaBaseService
 			else 
 				$filter->userIdEqual = -1; // no result will be returned when the user is missing
 		}
-		
+
+                // in case a filename filter was passed enforce a statusIn filter in order to limit slow db queries
+                if ($filter->fileNameEqual && $filter->statusEqual == null && $filter->statusIn == null)
+                        $filter->statusIn = implode(",", array(KalturaUploadTokenStatus::PENDING, KalturaUploadTokenStatus::PARTIAL_UPLOAD, KalturaUploadTokenStatus::FULL_UPLOAD));
+ 
 		// create the filter
 		$uploadTokenFilter = new UploadTokenFilter();
 		$filter->toObject($uploadTokenFilter);

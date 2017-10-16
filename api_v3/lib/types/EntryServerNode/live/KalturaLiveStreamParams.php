@@ -4,41 +4,54 @@
  * @subpackage objects
  */
 class KalturaLiveStreamParams extends KalturaObject {
+	
 	/**
 	 * Bit rate of the stream. (i.e. 900)
 	 * @var int
 	 */
 	public $bitrate;
+	
 	/**
 	 * flavor asset id
 	 * @var string
 	 */
 	public $flavorId;
+	
 	/**
 	 * Stream's width
 	 * @var int
 	 */
 	public $width;
+	
 	/**
 	 * Stream's height
 	 * @var int
 	 */
 	public $height;
+	
 	/**
 	 * Live stream's codec
 	 * @var string
 	 */
 	public $codec;
+	
 	/**
 	 * Live stream's farme rate
 	 * @var int
 	 */
 	public $frameRate;
+	
 	/**
 	 * Live stream's key frame interval
 	 * @var float
 	 */
 	public $keyFrameInterval;
+	
+	/**
+	 * Live stream's language  
+	 * @var string
+	 */
+	public $language;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -48,7 +61,8 @@ class KalturaLiveStreamParams extends KalturaObject {
 			"height",
 			"codec",
 			"frameRate",
-			"keyFrameInterval"
+			"keyFrameInterval",
+			"language"
 	);
 	
 	/* (non-PHPdoc)

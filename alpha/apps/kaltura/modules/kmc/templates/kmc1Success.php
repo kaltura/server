@@ -214,7 +214,7 @@ function playerAdded()
 {
 	refreshPlayerList = 1;
 	jQuery.ajax({
-		url: "<? echo url_for('kmc/getuiconfs'); ?>",
+		url: "<?php echo url_for('kmc/getuiconfs'); ?>",
 		type: "POST",
 		data: { "type": "player", "partner_id": partner_id, "ks": ks },
 		dataType: "json",
@@ -230,7 +230,7 @@ function playlistAdded()
 {
 	refreshPlaylistList = 1;
 	jQuery.ajax({
-		url: "<? echo url_for('kmc/getuiconfs'); ?>",
+		url: "<?php echo url_for('kmc/getuiconfs'); ?>",
 		type: "POST",
 		data: { "type": "playlist", "partner_id": partner_id, "ks": ks },
 		dataType: "json",
@@ -244,7 +244,7 @@ function playlistAdded()
 
 function expiredF ( )
 {
-	window.location = "<? echo $service_url; ?>/index.php/kmc/kmc";
+	window.location = "<?php echo $service_url; ?>/index.php/kmc/kmc";
 }
 
 function refreshSWF()
@@ -325,8 +325,8 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 		setDivToHide ( "kcms" );
 		current_module = 'dashboard';
 		var flashVars = {
-				'host' : "<? echo $host ?>" ,
-				'cdnhost' : "<? echo $cdn_host ?>" ,
+				'host' : "<?php echo $host ?>" ,
+				'cdnhost' : "<?php echo $cdn_host ?>" ,
 				'uid' : uid ,
 				'partnerid' : partner_id,
 				'subpid' : subp_id ,
@@ -346,9 +346,9 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				'expiredF' : 'expiredF',
 				'subNavTab' : sub_nav_tab,
 				'innerKdpVersion':'v2.7.0',
-				'firstLogin' : '<? echo ($first_login) ? "true" : "false"; ?>',
-				'visibleCT' : '<? echo $visibleCT; ?>',
-				'disableurlhashing' : '<? echo $disableurlhashing; ?>'
+				'firstLogin' : '<?php echo ($first_login) ? "true" : "false"; ?>',
+				'visibleCT' : '<?php echo $visibleCT; ?>',
+				'disableurlhashing' : '<?php echo $disableurlhashing; ?>'
 				};
 
 			var params = {
@@ -358,9 +358,9 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				bgcolor: "#1B1E1F",
 				quality: "high",
 //				wmode: "opaque" ,
-				movie: "<?php echo $flash_dir ?>/kmc/dashboard/<? echo $kmc_dashboard_version ?>/dashboard.swf"
+				movie: "<?php echo $flash_dir ?>/kmc/dashboard/<?php echo $kmc_dashboard_version ?>/dashboard.swf"
 			};
-			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/dashboard/<? echo $kmc_dashboard_version ?>/dashboard.swf",
+			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/dashboard/<?php echo $kmc_dashboard_version ?>/dashboard.swf",
 				"kcms", "100%", "100%", "9.0.0", false, flashVars , params);
 
 		// setTimeout ( "content_resize()" , 1000 );
@@ -370,8 +370,8 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 		setDivToHide ( "kcms" );
 		current_module = 'content';
 		var flashVars = {
-				'host' : "<? echo $host ?>" ,
-				'cdnhost' : "<? echo $cdn_host ?>" ,
+				'host' : "<?php echo $host ?>" ,
+				'cdnhost' : "<?php echo $cdn_host ?>" ,
 				'uid' : uid ,
 				'partnerid' : partner_id,
 				'subpid' : subp_id ,
@@ -388,10 +388,10 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				'openPlayer' : 'openPlayer' ,
 				'expiredF' : 'expiredF',
 				'subNavTab' : sub_nav_tab,
-				'innerKdpVersion':'<? echo $content_kdp_version; ?>',
-				'visibleCT' : '<? echo $visibleCT; ?>',
-				'disableurlhashing' : '<? echo $disableurlhashing; ?>',
-				email : '<? echo $email; ?>'
+				'innerKdpVersion':'<?php echo $content_kdp_version; ?>',
+				'visibleCT' : '<?php echo $visibleCT; ?>',
+				'disableurlhashing' : '<?php echo $disableurlhashing; ?>',
+				email : '<?php echo $email; ?>'
 				};
 
 			var params = {
@@ -401,9 +401,9 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				bgcolor: "#1B1E1F",
 				quality: "high",
 //				wmode: "opaque" ,
-				movie: "<?php echo $flash_dir ?>/kmc/content/<? echo $kmc_content_version ?>/content.swf?r113"
+				movie: "<?php echo $flash_dir ?>/kmc/content/<?php echo $kmc_content_version ?>/content.swf?r113"
 			};
-			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/content/<? echo $kmc_content_version ?>/content.swf?r113",
+			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/content/<?php echo $kmc_content_version ?>/content.swf?r113",
 				"kcms", "100%", "100%", "9.0.0", false, flashVars , params);
 
 		// setTimeout ( "content_resize()" , 1000 );
@@ -413,8 +413,8 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 	    setDivToHide ( "kcms" );
 		current_module = 'account';
 		var flashVars = {
-				'host' : "<? echo $host ?>" ,
-				'cdnhost' : "<? echo $cdn_host ?>" ,
+				'host' : "<?php echo $host ?>" ,
+				'cdnhost' : "<?php echo $cdn_host ?>" ,
 				'uid' : uid ,
 				'partnerid' : partner_id,
 				'subpid' : subp_id ,
@@ -438,9 +438,9 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				bgcolor: "#1B1E1F",
 				quality: "high",
 //				wmode: "opaque" ,
-				movie: "<?php echo $flash_dir ?>/kmc/account/<? echo $kmc_account_version ?>/account.swf"
+				movie: "<?php echo $flash_dir ?>/kmc/account/<?php echo $kmc_account_version ?>/account.swf"
 			};
-			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/account/<? echo $kmc_account_version ?>/account.swf",
+			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/account/<?php echo $kmc_account_version ?>/account.swf",
 				"kcms", "100%", "100%", "9.0.0", false, flashVars , params);
 
 		setTimeout ( "content_resize()" , 1000 );
@@ -451,8 +451,8 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 		setDivToHide ( "kcms" );
 		current_module = 'appstudio';
 		var flashVars = {
-				'host' : "<? echo $host ?>" ,
-				'cdnhost' : "<? echo $cdn_host ?>" ,
+				'host' : "<?php echo $host ?>" ,
+				'cdnhost' : "<?php echo $cdn_host ?>" ,
 				'uid' : uid ,
 				'partner_id' : partner_id,
 				'subp_id' : subp_id ,
@@ -469,9 +469,9 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				'devFlag' : 'false' ,
 				'uiconfid' : '48308',
 				'servicesPath' : 'index.php/partnerservices2/',
-				'serverPath' : "<? echo $service_url; ?>",
+				'serverPath' : "<?php echo $service_url; ?>",
 				'kdpUrl' : "<?php echo $flash_dir ?>/kdp/v2.7.0/kdp.swf",
-				'disableurlhashing' : '<? echo $disableurlhashing; ?>'
+				'disableurlhashing' : '<?php echo $disableurlhashing; ?>'
 				};
 
 			var params = {
@@ -481,9 +481,9 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				bgcolor: "#1B1E1F",
 				quality: "high",
 //				wmode: "opaque" ,
-				movie: "<?php echo $flash_dir ?>/kmc/appstudio/<? echo $kmc_appstudio_version ?>/applicationstudio.swf"
+				movie: "<?php echo $flash_dir ?>/kmc/appstudio/<?php echo $kmc_appstudio_version ?>/applicationstudio.swf"
 			};
-			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/appstudio/<? echo $kmc_appstudio_version ?>/applicationstudio.swf",
+			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/appstudio/<?php echo $kmc_appstudio_version ?>/applicationstudio.swf",
 				"kcms", "100%", "100%", "9.0.0", false, flashVars , params);
 
 		setTimeout ( "content_resize()" , 1000 );
@@ -494,8 +494,8 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 		setDivToHide ( "kcms" );
 		current_module = 'reports';
 		var flashVars = {
-				'host' : "<? echo $host ?>" ,
-				'cdnhost' : "<? echo $cdn_host ?>" ,
+				'host' : "<?php echo $host ?>" ,
+				'cdnhost' : "<?php echo $cdn_host ?>" ,
 				'uid' : uid ,
 				'partner_id' : partner_id,
 				'srvurl' : 'api_v3/index.php',
@@ -506,7 +506,7 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 				'ks' : ks ,
 				'widget_id' : '_' + partner_id ,
 				'devFlag' : 'false' ,
-				'serverPath' : "<? echo $service_url; ?>"
+				'serverPath' : "<?php echo $service_url; ?>"
 				};
 
 			var params = {
@@ -518,7 +518,7 @@ function loadModule ( module_name , partner_id , subp_id ,  uid  ,  ks , screen_
 //				wmode: "opaque" ,
 				movie: "<?php echo $flash_dir ?>/kmc/analytics//ReportsAndAnalytics.swf"
 			};
-			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/analytics/<? echo $kmc_rna_version ?>/ReportsAndAnalytics.swf",
+			swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/analytics/<?php echo $kmc_rna_version ?>/ReportsAndAnalytics.swf",
 				"kcms", "100%", "100%", "9.0.0", false, flashVars , params);
 
 		setTimeout ( "content_resize()" , 1000 );
@@ -565,8 +565,8 @@ function openCw ( ks ,conversion_quality )
 
 
 	var flashVars = {
-		'host' : "<? echo $host ?>" ,
-		'cdnhost' : "<? echo $cdn_host ?>" ,
+		'host' : "<?php echo $host ?>" ,
+		'cdnhost' : "<?php echo $cdn_host ?>" ,
 		'userId' : "<?php echo $uid ?>",
 		'partnerid' : "<?php echo $partner_id ?>",
 		'subPartnerId' : "<?php echo $subp_id ?>",
@@ -588,10 +588,10 @@ function openCw ( ks ,conversion_quality )
 			bgcolor: "#DBE3E9",
 			quality: "high",
 			wmode: "opaque" ,
-			movie: "<? echo $service_url; ?>/kcw/ui_conf_id/36203"
+			movie: "<?php echo $service_url; ?>/kcw/ui_conf_id/36203"
 		};
 
-		swfobject.embedSWF("<? echo $service_url; ?>/kcw/ui_conf_id/36203",  // 36201 - new CW with ability to pass params not ready for this version
+		swfobject.embedSWF("<?php echo $service_url; ?>/kcw/ui_conf_id/36203",  // 36201 - new CW with ability to pass params not ready for this version
 			"kaltura_cw", "680", "400" , "9.0.0", false, flashVars , params);
 
 		setObjectToRemove ( "kaltura_cw" );
@@ -639,13 +639,13 @@ if (false && kConf::get('www_host') == 'www.kaltura.com'){
 		}
 		else
 		{
-			<? $playlist_uiconf_list_exist = (bool)(isset($playlist_uiconf_list) && is_array($playlist_uiconf_list) && count($playlist_uiconf_list)) ?>
+			<?php $playlist_uiconf_list_exist = (bool)(isset($playlist_uiconf_list) && is_array($playlist_uiconf_list) && count($playlist_uiconf_list)) ?>
 			// override the default values from the depricated ui_conf
-			<? if ($playlist_uiconf_list_exist){ ?>
-                ui_conf_id = <? echo $playlist_uiconf_list[0]->getId();  ?>;
-                pl_width_str = <? echo $playlist_uiconf_list[0]->getWidth();  ?>;
-                pl_height_str = <? echo $playlist_uiconf_list[0]->getHeight();  ?>;
-            <? } ?>
+			<?php if ($playlist_uiconf_list_exist){ ?>
+                ui_conf_id = <?php echo $playlist_uiconf_list[0]->getId();  ?>;
+                pl_width_str = <?php echo $playlist_uiconf_list[0]->getWidth();  ?>;
+                pl_height_str = <?php echo $playlist_uiconf_list[0]->getHeight();  ?>;
+            <?php } ?>
 		}
 <?php
 }
@@ -668,7 +668,7 @@ if (false && kConf::get('www_host') == 'www.kaltura.com'){
 	pl_height = parseInt ( pl_height_str );
 	modal = kalturaInitModalBox ( null , { width:pl_width+20 , height: (pl_height + 200)  } );
 	playlist_html =
-		"<div class='title'><a href='#close' onclick='kalturaCloseModalBox(); return false;' class='closeBtn'></a><a href='<? echo $service_url; ?>/index.php/kmc/help#contentSection147' target='_blank' class='help'></a>Playlist ID: " + playlist_id + ui_conf_select + "</div>" + // third tr will have the playlist_id
+		"<div class='title'><a href='#close' onclick='kalturaCloseModalBox(); return false;' class='closeBtn'></a><a href='<?php echo $service_url; ?>/index.php/kmc/help#contentSection147' target='_blank' class='help'></a>Playlist ID: " + playlist_id + ui_conf_select + "</div>" + // third tr will have the playlist_id
 		"<div class='kplayer' style='height:" + pl_height + "px'>" + embed_code + "</div>" + // create div to hold the playlist
 		"<div class='embed_code' style='text-align:center'><textarea  id='embed_code' cols='30' rows='5' readonly='true' onclick='copyToClipboard(\"embed_code\");'>" + embed_code + "</textarea></div>" + // raw embed code
 		"<div class='buttons'><button onclick='copyToClipboard(\"embed_code\");'>Select code</div>";
@@ -776,7 +776,7 @@ function doJwPreviewEmbed(entry_id, jw_skin, jw_width, jw_height, jw_share, jw_f
 		jw_plugins.push("ltas");
 		jQuery.ajax({
 			async:		false,
-			url:		"<? echo url_for('kmc/getentryinfo'); ?>",
+			url:		"<?php echo url_for('kmc/getentryinfo'); ?>",
 			type:		"POST",
 			data:		{ "partner_id": partner_id, "ks": ks, "entryId": entry_id },
 			dataType:	"json",
@@ -851,7 +851,7 @@ function build_modal(entry_id, jw_skin, jw_width, jw_height, jw_share, jw_flashv
 
 	modal_html = 	'<div class="title">\n' +
 					' <a href="#close" onclick="kalturaCloseModalBox(); return false;" class="closeBtn"></a>' +
-					'<a href="<? echo $service_url; ?>/index.php/kmc/help#contentSection118" target="_blank"></a>\n' +
+					'<a href="<?php echo $service_url; ?>/index.php/kmc/help#contentSection118" target="_blank"></a>\n' +
 					'Entry ID: ' + entry_id + '<br style="margin-bottom:10px;"/>' + ui_conf_select + '\n</div>' +
 					showNoMix(false,"check") +
 					'<div id="player_wrap"></div>' +
@@ -898,11 +898,11 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 		width_str = '400';
 		height_str = '332';
 
-<? 	if (false && kConf::get('www_host') == 'www.kaltura.com') {		?>
+<?php 	if (false && kConf::get('www_host') == 'www.kaltura.com') {		?>
 		width_str = '400';
 		height_str = '332';
 		ui_conf_id = '48110';
-<?	}	else { ?>
+<?php	}	else { ?>
 		// check if the page is now in state where there is a selected_uiconfId
 		if(sub_nav_tab == "Playlist")
 		  selected_uiconfId = null;
@@ -924,7 +924,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 		{
 			if ( ! ui_conf_id )
 			{
-				ui_conf_id = '<? echo $player_uiconf_list[0]->getId(); ?>';
+				ui_conf_id = '<?php echo $player_uiconf_list[0]->getId(); ?>';
 			}
 
 			if ( pl_width_str )
@@ -933,7 +933,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 			}
 			else
 			{
-				width_str = '<? echo $player_uiconf_list[0]->getWidth(); ?>';
+				width_str = '<?php echo $player_uiconf_list[0]->getWidth(); ?>';
 			}
 
 			if ( pl_height_str )
@@ -942,10 +942,10 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 			}
 			else
 			{
-				height_str = '<? echo $player_uiconf_list[0]->getHeight(); ?>';
+				height_str = '<?php echo $player_uiconf_list[0]->getHeight(); ?>';
 			}
 		}
-<?	} ?>
+<?php	} ?>
 
 
 	// for now the embed code will be hard-coded
@@ -968,7 +968,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 	pl_height = parseInt ( height_str );
 	modal = kalturaInitModalBox ( null , { width:pl_width+20 , height: (pl_height + 200)  } );
 	playlist_html =
-		"<div class='title'><a href='#close' onclick='kalturaCloseModalBox(); return false;' class='closeBtn'></a><a href='<? echo $service_url; ?>/index.php/kmc/help#contentSection118' target='_blank'></a>";
+		"<div class='title'><a href='#close' onclick='kalturaCloseModalBox(); return false;' class='closeBtn'></a><a href='<?php echo $service_url; ?>/index.php/kmc/help#contentSection118' target='_blank'></a>";
 	if ( entry_id )
 		playlist_html += "Entry ID: " + entry_id + ui_conf_select ;
 	else

@@ -120,6 +120,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode)
 			{
+				//Order by primary DC first
+				//KalturaLog::debug("liveEntryServerNode->getServerType [" . $liveEntryServerNode->getServerType() . "]");
+				//if($liveEntryServerNode->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+				
 				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
 				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
 				{
@@ -342,6 +346,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				KalturaLog::debug("Failed to parse domain from original url, signed domain will not be modified");
 			}
 		}
+
+		//Remove schema from the signed token to avoid validation errors in case manifest is in http and urls are rtunined in https
+		$url = preg_replace('#^https?://#', '', $url);
 		
 		$token = md5("$livePackagerToken $url", true);
 		$token = rtrim(strtr(base64_encode($token), '+/', '-_'), '=');

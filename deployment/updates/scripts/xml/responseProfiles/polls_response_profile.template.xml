@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    
+	<session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+	<multirequest>
+
+		<request service="responseProfile" action="add" partnerId="0">
+			<responseProfile objectType="KalturaResponseProfile">
+				<type>1</type>
+				<name>pollVoteResponseProfile</name>
+				<systemName>pollVoteResponseProfile</systemName>
+				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime</fields>
+				<relatedProfiles objectType="array">
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>pollVoteResponseProfile</name>
+						<type>1</type>
+						<fields>id,objectId,createdAt,xml</fields>
+						<filter objectType="KalturaMetadataFilter">
+							<metadataObjectTypeEqual>annotationMetadata.Annotation</metadataObjectTypeEqual>
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>id</parentProperty>
+								<filterProperty>objectIdEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+				</relatedProfiles>
+			</responseProfile>
+		</request>
+
+	</multirequest>
+</xml>

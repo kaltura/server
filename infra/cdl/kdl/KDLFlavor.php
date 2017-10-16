@@ -1054,6 +1054,33 @@ $plannedDur = 0;
 			}
 		}
 
+			/*
+			 * AR Mode:5 - force target AR to be as close as possible to source 'intentional' AR
+			 * 	The source AR is checked againts 'known' AR (16:9, 4:3, 2.40:1, 2.35:1, ...)
+			 * 	if the source AR is 'close enough' to obe of the 'well-known' AR's, the asset is 
+			 *	generated with the well-known AR. Otherwise the calculated source AR is taken.
+			 *	The asset frame size is adapted to get as close as possible (4 dig percesion) to that AR.
+			 *
+			 *	This code should reside above, along with other AR processing. But this could lead to 
+			 *	behaviour change for some of the customer's that use the ARMode feature.
+			 */
+		if(isset($target->_arProcessingMode) && $target->_arProcessingMode==5){
+			$flvrVid = $this->_video;
+			list($w,$h,$d) = self::matchBestAspectRatio(round($widSrc), round($hgtSrc), $flvrVid->_width, $flvrVid->_height);
+			if($w!==false) {
+				$target->_width = $w;
+				$target->_height = $h;
+				$target->_dar = $d;
+				KalturaLog::log("AR Match: FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)");
+			}
+			else {
+				$w = round($target->_width);
+				$h = round($target->_height);
+				$d = $w/$h;
+				KalturaLog::log("AR Match: NOT FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)");
+			}
+		}
+
 		$target->_height = round($target->_height);
 		$target->_width  = round($target->_width);
 		
@@ -1079,8 +1106,8 @@ $plannedDur = 0;
 		$modVal = 16;
 		if((isset($target->_forceMult16) && $target->_forceMult16 == 0)
 		|| (($target->_width == 640 || $target->_width == 480) && $target->_height == 360) || ($target->_width == 1920 && $target->_height == 1080)){
-			$h264targets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H);
-			if(in_array($target->_id, $h264targets)) {
+			$auxTargets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H, KDLVideoTarget::H265);
+			if(in_array($target->_id, $auxTargets)) {
 				$modVal = 2;
 		}
 		else {
@@ -1187,6 +1214,69 @@ $plannedDur = 0;
 		}
 	}
 
+	/* ---------------------------
+	 * matchBestAspectRatio
+	 * 	Force target AR to be as close as possible to source 'intentional' AR
+	 * 	The source AR is checked againts 'known' AR (16:9, 4:3, 2.40:1, 2.35:1, ...)
+	 * 	if the source AR is 'close enough' to obe of the 'well-known' AR's, the asset is 
+	 *	generated with the well-known AR. Otherwise the calculated source AR is taken.
+	 *	The asset frame size is adapted to get as close as possible - 4 dig percesion, to that AR
+	 */
+	protected static function matchBestAspectRatio($srcWid, $srcHgt, $assetWid, $assetHgt, $percision=4)
+	{
+		KalturaLog::log("Input - srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt,percision:$percision");
+
+		$dar = null;
+	/**/
+		$wellKnown = array(4/3,5/4,5/3,16/9,16/8,16/10,2.4,2.39,2.35,1.85);
+		foreach($wellKnown as $idx=>$d) {
+			if(abs(($srcWid/$srcHgt)-$d)<0.01){
+				$dar = round($d,$percision);
+				break;
+			}
+		}
+		if(!isset($dar)) {
+			$darAux = round($srcWid/$srcHgt,2);
+			foreach($wellKnown as $idx=>$d) {
+				if(abs($darAux-$d)<0.01){
+					$dar = round($d,$percision);
+					break;
+				}
+			}
+		}
+
+		if(!isset($dar)) {
+			$dar = round($srcWid/$srcHgt,$percision);
+		}
+
+		if($assetHgt==0) {
+			$assetHgt = round($assetWid/$dar/2)*2;
+		}
+		if($assetWid==0) {
+			$assetWid = round($assetHgt*$dar/2)*2;
+		}
+		$assetHgt = min($assetHgt,$srcHgt);
+		$assetWid = min($assetWid,$srcWid);
+		
+		if($assetWid>$assetHgt*$dar) {
+			$assetWid = round($assetHgt*$dar/2)*2;
+		}
+		KalturaLog::log("Adjusted - srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt");
+		
+		for($w=round($assetWid/2)*2; $w>=0; $w-=2){
+			$h = round($w/$dar);
+			if($h==0) break;
+			$d = round($w/$h,$percision);
+//KalturaLog::log("$w $h $d\n");
+			if($d==$dar && $h%2==0) {
+				break;
+			}
+		}
+
+		if($d==$dar) return array($w,$h,$d);
+		else return array(false,false,false);
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetVideoBitrate
 	 * If flavor BR is higher than the source - keep the source BR
@@ -1326,8 +1416,12 @@ $plannedDur = 0;
 				 * On 'fixed/forced-frame-size' mode (flavorVid::_width/flavorVid::_height != 0),
 				 * use the calculated 'forced-dar', rather than source::dar.
 				 */
-			if(isset($flavorVid->_width) && $flavorVid->_width>0 && isset($flavorVid->_height) && $flavorVid->_height>0)
+			if(isset($flavorVid->_width) && $flavorVid->_width>0 && isset($flavorVid->_height) && $flavorVid->_height>0){
 				$dar = $flavorVid->_width/$flavorVid->_height;
+				// Handles 'truely' rotated/portrait sources - wid<hgt
+				if($sourceVid->_width<$sourceVid->_height)
+					$dar = 1/$dar;
+			}
 			else if(isset($sourceVid->_dar))
 				$dar = $sourceVid->_dar;
 			else $dar = null;
@@ -1368,6 +1462,83 @@ $plannedDur = 0;
 				}
 				$wmData->scale = "$widScale"."x$hgtScale";
 			}
+
+			/*
+			 * Apply 'source-proportional-margins' - 
+			 * the margins calculated in proportion to source dims 
+			 * (similar to same 'scale' functionality)
+			 */
+			if(isset($wmData->margins)){
+				$marginsArr = explode("x",$wmData->margins); 
+				$widMargin = trim($marginsArr[0]); 
+				$hgtMargin = trim($marginsArr[1]);
+				/*
+				 * If there is widMargin and it is source-proportional -
+				 *  claculate the correct widMargin value
+				 */
+				if($widMargin!=="") {
+					if(strchr($widMargin,'%')){
+						$widMargin = trim($widMargin,'%');
+						if(isset($srcWid)) {
+							if(isset($fixImageDar))
+								$widMargin = round($srcWid*$widMargin/(100*$fixImageDar));
+							else /**/
+								$widMargin = round($srcWid*$widMargin/100);
+						}
+						else $widMargin = 0;
+					}
+				}
+				/*
+				 * If there is hgtMargin and it is source-proportional -
+				 *  claculate the correct hgtMargin value
+				 */
+				if($hgtMargin!=="") {
+					if(strchr($hgtMargin,'%')){
+						$hgtMargin = trim($hgtMargin,'%');
+						if(isset($srcHgt)){
+								/*
+								 * An attempt to handle 'more' properly rotated ($srcWid>$srcHgt)
+								 * and anamorphic ($fixImageDar) cases.
+								 * This is not a real solution, but partial improvement
+								 */
+							if(isset($fixImageDar) && $srcWid>$srcHgt)
+								$hgtMargin = round($srcHgt*$hgtMargin*$fixImageDar/(100));
+							else /**/
+								$hgtMargin = round($srcHgt*$hgtMargin/100);
+						}
+						else $hgtMargin = 0;
+							/*
+							 * If the widMargin was not set,
+							 *  assign widMargin the hgtMargin value
+							 */
+						if($widMargin===""){
+							$widMargin = $hgtMargin;
+						}
+					}
+				}
+
+					/*
+					 * If the hgtMargin was not set and widMargin exiist 
+					 *  assign hgtMargin the widMargin value
+					 */
+				if($hgtMargin==="" && $widMargin!==""){
+						if(isset($fixImageDar))
+							$hgtMargin = round($widMargin*$fixImageDar);
+						else
+							$hgtMargin = $widMargin;
+				}
+				$wmData->margins = "$widMargin"."x$hgtMargin";
+				KalturaLog::log("srcWid($srcWid),srcHgt($srcHgt),widMargin($widMargin),hgtMargin($hgtMargin)");
+			}
+
+/*
+SRC related
+[{"imageEntry":"0_eutot9cu","margins":"1.6%x2.8%","scale":"0x10%"},  {"imageEntry":"0_eutot9cu","margins":"-1.6%x2.8%","scale":"0x10%",  "fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}, {"imageEntry":"0_eutot9cu","margins":"8%x2.8%","scale":"0x10%","fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}  ]
+
+WM HGT related
+[{"imageEntry":"0_eutot9cu","margins":"30%x30%","scale":"0x10%"},  {"imageEntry":"0_eutot9cu","margins":"-30%x30%","scale":"0x10%",  "fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}, {"imageEntry":"0_eutot9cu","margins":"145%x30%","scale":"0x10%","fade":[{"type":"in","start_time":"1","alpha":"1","duration":"0.5"},  {"type":"out","start_time":"6","alpha":"1","duration":"0.5"}]}  ]
+*/
+
 				/*
 				 * fixImageDar - to adjust WM dar/dims in case of anamorphic source
 				 */
@@ -1420,10 +1591,16 @@ $plannedDur = 0;
 		}
 		// For 'portrait' sources (rotation -90,90,270) - switch the source dims
 		if(isset($rotation) && in_array($rotation, array(-90,90,270))){
-			$aux = $adjustedHgt;
-			$adjustedHgt = $adjustedWid;
-			$adjustedWid = $aux;
-			KalturaLog::log("Adjust frame dims to rotation($rotation): width($adjustedWid),height($adjustedHgt)");
+				// For fixed-frame-size flavors, call the same func recursively 
+			if(isset($fixImageDar) && $fixImageDar!=0 && $dar!=0){
+				list($adjustedWid,$adjustedHgt,$fixImageDar) = self::adjustFrameSizeToDarAndRotation($height, $width, 1/$dar, 0);
+			}
+			else {
+				$aux = $adjustedHgt;
+				$adjustedHgt = $adjustedWid;
+				$adjustedWid = $aux;
+				KalturaLog::log("Adjust frame dims to rotation($rotation): width($adjustedWid),height($adjustedHgt)");
+			}
 		}
 		KalturaLog::log("Final: width($adjustedWid),height($adjustedHgt),fixImageDar($fixImageDar)");
 		return array($adjustedWid,$adjustedHgt,$fixImageDar);

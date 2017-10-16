@@ -191,6 +191,8 @@ class kBatchManager
 
 		if($flavorAsset->getIsOriginal())
 		{
+			kBusinessPreConvertDL::checkConditionalProfiles($flavorAsset->getentry(), $mediaInfoDb);
+		
 			KalturaLog::log("Media info is for the original flavor asset");
 			$tags = null;
 			
@@ -253,8 +255,8 @@ class kBatchManager
 		 * use the first flavorParams language to set/overwrite the flavorAsset language
 		 */
 		if(isset($flavorParams) && ($multiStreamJson=$flavorParams->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null) {
-			if(isset($multiStream->audio->languages) && count($multiStream->audio->languages)>0){
-				$lang = $multiStream->audio->languages[0];
+			if(isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages)>0){
+				$lang = $multiStreamObj->audio->languages[0];
 			}
 			else if(KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "lang")){
 				$lang = $multiStreamObj->audio->streams[0]->lang;

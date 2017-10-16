@@ -96,12 +96,16 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			if (!$remoteJobId)
 			{
 				KalturaLog::err('remote content does not exist');
-				$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$transcript->save();
+				foreach($transcripts as $transcript)
+				{
+					$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+					$transcript->save();
+				}
 				return true;     	
 			}
 			
 			$accuracyRate = null;
+			$humanVerified = null;
 			switch ($providerData->getFidelity())
 			{
 				case KalturaCielo24Fidelity::MECHANICAL:
@@ -109,9 +113,11 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 					break;
 				case KalturaCielo24Fidelity::PREMIUM:
 					$accuracyRate = self::PREMIUM_TRANSCRIPTION_ACCURACY_VALUE;
+					$humanVerified = true;
 					break;
 				case KalturaCielo24Fidelity::PROFESSIONAL:
 					$accuracyRate = self::PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE;
+					$humanVerified = true;
 					break;
 			}
 			
@@ -123,13 +129,13 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
 					{
 						$transcriptContent = $clientHelper->getRemoteTranscript($remoteJobId);
-						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true);
+						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true, $humanVerified);
 					}
 					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
 					{
 						$transcriptContent = $clientHelper->getRemoteTranscriptTokens($remoteJobId);
 						$transcriptContent = $this->normalizeJson ($transcriptContent);
-						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, "JSON", true);
+						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, "JSON", true, $humanVerified);
 					}
 					
 					KalturaLog::debug("transcript content - $transcriptContent");
@@ -188,7 +194,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		return $objects;
 	}
 	
-	private function setObjectContent($assetObject, $content, $accuracy, $format = null, $shouldSetTranscriptFileName = false)
+	private function setObjectContent($assetObject, $content, $accuracy, $format = null, $shouldSetTranscriptFileName = false, $humanVerified = null)
 	{
 		$assetObject->incrementVersion();
 		$ext = "txt";
@@ -221,6 +227,11 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			$replacements = array($assetObject->getEntryId(), $language, $ext);
 			$fileName = str_replace($patterns, $replacements, self::FILE_NAME_PATTERN);
 			$assetObject->setFileName($fileName);
+		}
+		
+		if (!is_null($humanVerified))
+		{
+			$assetObject->setHumanVerified($humanVerified);
 		}
 		
 		$assetObject->setAccuracy($accuracy);

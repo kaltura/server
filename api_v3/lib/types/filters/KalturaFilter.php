@@ -232,4 +232,23 @@ abstract class KalturaFilter extends KalturaObject
 		return -1; // no result will be returned if no puser exists
 	}
 	
+	protected function prepareKusersToPusersFilter( $kuserIdsCsv )
+	{
+		$puserIdsArr = array();
+		$kuserIdsArr = explode(',',$kuserIdsCsv);
+		$kuserArr = kuserPeer::retrieveByPKs($kuserIdsArr);
+
+		foreach($kuserArr as $kuser)
+		{
+			$puserIdsArr[] = $kuser->getPuserId();
+		}
+
+		if(!empty($puserIdsArr))
+		{
+			return implode(',',$puserIdsArr);
+		}
+
+		return -1; // no result will be returned if no puser exists
+	}
+	
 }

@@ -724,6 +724,11 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	    	
 	    return false;
 	}
+
+	public function getName()
+	{
+		return $this->getId();
+	}
 	
     /**
      * Set the asset status to a locally ready status (READY, EXPORTING) according to the required jobs to perform on the asset
@@ -761,6 +766,16 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		return assetParamsPeer::retrieveByPk($this->flavor_params_id);
 	}
 	
-	public function shouldCopyOnReplacement($v) {return true;}
+	public function shouldCopyOnReplacement() {return true;}
+	
+	private $m_media_info = null;
+	
+	public function getMediaInfo()
+	{
+		if($this->m_media_info)
+			return $this->m_media_info;
+		
+		$this->m_media_info = mediaInfoPeer::retrieveByFlavorAssetId($this->getId());
+	}
 		
 }

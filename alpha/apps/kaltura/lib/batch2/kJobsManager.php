@@ -1516,7 +1516,9 @@ class kJobsManager
 	public static function addExtractMediaJob(BatchJob $parentJob, $inputFileSyncLocalPath, $flavorAssetId)
 	{
 		$profile = null;
-		try{
+		
+		try
+		{
 			$profile = myPartnerUtils::getConversionProfile2ForEntry($parentJob->getEntryId());
 			KalturaLog::info("profile [" . $profile->getId() . "]");
 		}
@@ -1534,19 +1536,32 @@ class kJobsManager
 		$srcFileSyncDescriptor->setFileSyncLocalPath($inputFileSyncLocalPath);
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
-		
 		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
 		$extractMediaData->setCalculateComplexity($shouldCalculateComplexity);
-		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$entry = $flavorAsset->getentry();
-		if($entry && $entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
-			$extractMediaData->setExtractId3Tags(true);
+		
+		$shouldDetectGOP = null;
+		if($entry)
+		{
+			if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			{
+				$extractMediaData->setExtractId3Tags(true);
+			}
+			else if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
+			{
+				$profileLC = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), kBusinessPreConvertDL::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
+				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
+			}
+		}
+		
+		if($shouldDetectGOP === null)
+			$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
+		$extractMediaData->setDetectGOP($shouldDetectGOP);
 		
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
-		
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
 	}

@@ -608,6 +608,20 @@
 		</xs:attribute>
 	</xs:complexType>
 
+	<xs:complexType name="T_assetInfo">
+		<xs:attribute name="language" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>specifying the language of the asset.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="label" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>UI label specifications marking the language (will affect how the language is displayed on the multi audio selector on the player)
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
 	<xs:complexType name="T_stream">
 		<xs:attribute name="type" type="xs:string" use="required">
 			<xs:annotation>
@@ -718,7 +732,15 @@
 					</xs:annotation>
 				</xs:element>
 				<xs:element maxOccurs="1" minOccurs="1" ref="contentResource-extension"/>
+				<xs:element maxOccurs="1" minOccurs="1" ref="assetInfo">
+					<xs:annotation>
+						<xs:documentation>
+							Holds assetInfo elements
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 			</xs:choice>
+
 
 			<xs:element maxOccurs="unbounded" minOccurs="0" ref="content-extension"/>
 			<xs:element maxOccurs="1" minOccurs="0" ref="streams">
@@ -1112,6 +1134,25 @@
 					</contentAssets>
 				</item>
 			</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="assetInfo" type="T_assetInfo">
+		<xs:annotation>
+			<xs:documentation>Specifies updating or adding info to asset</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<contentAssets>
+							<content>
+								<assetInfo language="eng" label="English"></assetInfo>
+							</content>
+						</contentAssets>
+					</item>
+				</example>
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>

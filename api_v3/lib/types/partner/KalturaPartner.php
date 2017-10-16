@@ -139,7 +139,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @filter eq,gte,lte,in
-	 * @readonly
+	 * @requiresPermission update
 	 */
 	public $partnerPackage;
 	
@@ -293,7 +293,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * @readonly
+	 * @requiresPermission insert,update
 	 */
 	public $partnerParentId;
 	
@@ -321,7 +321,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'adultContent' , 'defConversionProfileType' , 'notify' , 'status' , 'allowQuickEdit' , 'mergeEntryLists' , 'notificationsConfig' ,
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
-		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks', 
+		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions',
 	);
 	
@@ -390,6 +390,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validatePropertyNotNull("description");
 		$this->validatePropertyMaxLength("country", 2, true);
 		$this->validatePropertyMaxLength("state", 2, true);
+		$this->validatePartnerPackageForInsert();
+		$this->validateForInsert();
 
 		$partner = new Partner();
 		$partner = parent::toObject( $partner );
@@ -418,6 +420,17 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public function getFilterDocs()
 	{
 		return array();
+	}
+
+	public function validatePartnerPackageForInsert()
+	{
+		if (!$this->partnerPackage)
+			return true;
+		if (kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			return true;
+		if (in_array($this->partnerPackage,kConf::get('allowed_partner_packages_for_all','local', array())))
+			return true;
+		throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, 'partnerPackage');
 	}
 	
 }

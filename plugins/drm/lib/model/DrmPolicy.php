@@ -16,4 +16,10 @@
 class DrmPolicy extends BaseDrmPolicy implements IBaseObject
 {
 
+	const CUSTOM_DATA_LICENSE_PARAMS = 'license_params';
+
+	public function setLicenseParams($v) {return $this->putInCustomData(self::CUSTOM_DATA_LICENSE_PARAMS, $v);}
+
+	public function getLicenseParams() {return $this->getFromCustomData(self::CUSTOM_DATA_LICENSE_PARAMS);}
+
 } // DrmPolicy

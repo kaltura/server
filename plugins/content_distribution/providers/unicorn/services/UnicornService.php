@@ -21,6 +21,7 @@ class UnicornService extends KalturaBaseService
 	 * @action notify
 	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
 	 * @param int $id distribution job id
+	 * @ksIgnored
 	 */
 	public function notifyAction($id) 
 	{

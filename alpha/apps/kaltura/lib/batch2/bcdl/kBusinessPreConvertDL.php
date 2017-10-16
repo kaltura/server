@@ -8,6 +8,10 @@ class kBusinessPreConvertDL
 	const TAG_VARIANT_A = 'watermark_a';
 	const TAG_VARIANT_B = 'watermark_b';
 	const TAG_VARIANT_PAIR_ID = 'watermark_pair_';
+	
+	public static $conditionalMapBySourceType = array (
+			EntrySourceType::LECTURE_CAPTURE => "LECTURE_CAPTURE_PROFILE",
+	);
 
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
@@ -419,6 +423,13 @@ class kBusinessPreConvertDL
 			KalturaLog::err("Flavor Params Id [$flavorParamsId] not found");
 			return null;
 		}
+		
+		//Check if the flavor we are trying to generate has source flavor, source can only be ingested, not generated.
+		if(in_array(assetParams::TAG_SOURCE, $flavorParams->getTagsArray()))
+		{
+			KalturaLog::notice("Cannot generate flavor params Id [$flavorParamsId], flavor has source tag");
+			return null;
+		}
 
 		$flavorParams->setDynamicAttributes($dynamicAttributes);
 
@@ -694,7 +705,7 @@ class kBusinessPreConvertDL
 
 				/*
 				 * For 'playset' collections (MBR & ISM) make sure that the flavor that
-				 * matches in the best way the source framee size, will be generated.
+				 * matches in the best way the source frame size, will be generated.
 				 * Optimally this procedure should be executed for EVERY tag. But this
 				 * might cause generation of unrequired flavors that might potentially
 				 * harm the entry playback.
@@ -1120,6 +1131,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if(!$entry)
 			throw new APIException(APIErrors::INVALID_ENTRY, $convertProfileJob, $entryId);
 
+
+		$mediaInfo = null;
+		if($mediaInfoId)
+			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
+		
 		$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
 		if(! $profile)
 		{
@@ -1149,10 +1165,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 
 			return false;
 		}
-
-		$mediaInfo = null;
-		if($mediaInfoId)
-			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 
 		$shouldConvert = self::shouldConvertProfileFlavors($profile, $mediaInfo, $originalFlavorAsset);
 
@@ -1866,14 +1878,43 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 */
 	protected static function setEncryptionAtRest($flavor, $flavorAsset)
 	{
-		KalturaLog::log("for asset".$flavorAsset->getId());
-		$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
+		KalturaLog::log("for asset:".$flavorAsset->getId());
+		
+		/*
+		 * Handle replacement flow - use original entry/asset enc-key, if it is already has one.
+		 * Otherwise (non-replacement) - acquire uDRM encryptionParams
+		 */
+		if(($entry=entryPeer::retrieveByPK($flavorAsset->getEntryId()))!==null
+		&& ($replacedEntryId=$entry->getReplacedEntryId())!==null) {
+
+			KalturaLog::log("Found replacedEntryId:".$replacedEntryId);
+			$replacedEntry = entryPeer::retrieveByPK($replacedEntryId);
+			if(isset($replacedEntry)){
+				$replacedAssets = assetPeer::retrieveFlavorsByEntryId($replacedEntryId);
+				foreach($replacedAssets as $replacedAsset){
+					if(($encKey=$replacedAsset->getEncryptionKey())!==null){
+						$encryptionParamsKey = $encKey;
+						KalturaLog::log("Found encKey in the replaced asset:".$replacedAsset->getId());
+						break;
+					}
+				}
+			}
+		}
+		
+		/*
+		 * For non-replacement flow - acquire uDRM encryptionParams
+		 */
+		if($encryptionParamsKey===null) {
+			$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
+			$encryptionParamsKey = $encryptionParams->key;
+		}
+		$encryptionParamsKeyId = "0000000000000000000000==";//$encryptionParams->key_id;
 		if(($commandLines=$flavor->getCommandLines())!=null) {
 				// Update the transcoding engines cmd-lines with encryption key/key_id values
 			KalturaLog::log("CommandLines Pre:".serialize($commandLines));
 			$commandLines = str_replace (
 				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				array(bin2hex(base64_decode($encryptionParamsKey)), bin2hex(base64_decode($encryptionParamsKeyId))),
 				$commandLines);
 				// Save updated cmd-lines
 			$flavor->setCommandLines($commandLines);
@@ -1884,14 +1925,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::log("Operators Pre:".($operatorsJsonStr));
 			$operatorsJsonStr = str_replace (
 				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				array(bin2hex(base64_decode($encryptionParamsKey)), bin2hex(base64_decode($encryptionParamsKeyId))),
 				$operatorsJsonStr);
 				// Save updated cmd-lines
 			$flavor->setOperators($operatorsJsonStr);
 			$flavor->save();
 		}
 			// Save encryption key on the flavorAsset obj
-		$flavorAsset->setEncryptionKey($encryptionParams->key);
+		$flavorAsset->setEncryptionKey($encryptionParamsKey);
+
 		$flavorAsset->save();
 	}
 
@@ -1984,7 +2026,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$overrideParam = $flavorParamsConversionProfile->getTwoPass();
 			if(isset($overrideParam))
 				$flavorParams->setTwoPass($overrideParam);
-			if($flavorParamsConversionProfile->getTags()!==null) $flavorParams->setTags($flavorParamsConversionProfile->getTags());
+			if($flavorParamsConversionProfile->getTags()!==null) 
+				$flavorParams->setTags($flavorParamsConversionProfile->getTags());
+			if($flavorParamsConversionProfile->getChunkedEncodeMode()!==null)
+				$flavorParams->setChunkedEncodeMode($flavorParamsConversionProfile->getChunkedEncodeMode());
 		}
 	}
 
@@ -2045,4 +2090,61 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$flavorParams->setMultiStream($jsonMultiStream);
 	}
 	
+	/*
+	 *
+	 */
+	public static function checkConditionalProfiles($entry, $mediaInfo)
+	{
+		if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
+		{
+			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
+		}
+		else 
+		{
+			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+		}
+		
+		if(!$profile) 
+		{
+			KalturaLog::log("No profile for entry(".($entry->getId())."), cannot check profile conditions ");
+			return;
+		}
+		
+		$jsonStr = $profile->getConditionalProfiles();
+		if(!isset($jsonStr))
+		{
+			KalturaLog::log("No conditionalProfiles for profile(".($profile->getId())."), entry(".($entry->getId()).")");
+			return;
+		}
+		
+		KalturaLog::log("Conditional profiles:$jsonStr");
+		KalturaLog::log("mediaInfo::maxGOP(".$mediaInfo->getMaxGOP().")");
+		
+		$medSet = new KDLMediaDataSet();
+		KDLWrap::ConvertMediainfoCdl2Mediadataset($mediaInfo,$medSet);
+		KalturaLog::log("medSet::GOP(".$medSet->_video->_gop.")");
+		$conditionalProfiles = json_decode($jsonStr);
+		
+		foreach($conditionalProfiles as $conditionalProfile)
+		{
+			KalturaLog::log("Checking condition($conditionalProfile->condition)");
+			$rv = $medSet->IsCondition($conditionalProfile->condition);
+			if($rv==true) 
+			{
+				if(isset($conditionalProfile->profileId))
+					$profId = $conditionalProfile->profileId;
+				else
+					$profId = $profile->getId();
+				
+				$entry->setConversionProfileId($profId);
+				$entry->setConversionQuality($profId);
+				$entry->save();
+				KalturaLog::log("Condition is met! Switching to profile($profId)");
+				return;
+			}
+		}
+		
+		KalturaLog::log("None of the conditions are met.");
+		return;
+	}
 }

@@ -32,7 +32,7 @@ class WebexXmlClient
 	protected function isRunningOnBackupSite()
 	{
 		$url = "{$this->url}/webex/gsbstatus.php";
-		return (trim(file_get_contents($url)) == 'TRUE');
+		return (trim(@file_get_contents($url)) == 'TRUE');
 	}
 
 	private function validateNoBackup()

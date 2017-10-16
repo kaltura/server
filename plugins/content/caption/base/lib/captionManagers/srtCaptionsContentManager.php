@@ -5,6 +5,9 @@
  */
 class srtCaptionsContentManager extends kCaptionsContentManager
 {
+
+	const SRT_TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3})( .*)?$#';
+
 	/* (non-PHPdoc)
 	 * @see kCaptionsContentManager::parse()
 	 */
@@ -61,6 +64,11 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	 */
 	public function getContent($content)
 	{
+		if (kString::beginsWith($content, "\xff\xfe"))
+		{
+			$content = iconv('utf-16', 'utf-8', substr($content, 2));
+		}
+		
 		$replace = array(
 			'/^[\d]+\s*[\r\n]+/' => '',
 			'/[\r\n]+\s*[\d]+\s*[\r\n]+/' => '',
@@ -78,4 +86,48 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new srtCaptionsContentManager();
 	}
+
+	public function buildFile($content, $clipStartTime, $clipEndTime)
+	{
+		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::SRT_TIMECODE_PATTERN);
+		return $newFileContent;
+	}
+
+
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	{
+		$startCaption = self::parseCaptionTime($matches[1]);
+		$endCaption = self::parseCaptionTime($matches[2]);
+		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
+			return null;
+		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
+		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
+		$timeLine = $this->formatSrtTimeStamp($adjustedStartTime) . ' --> ' . $this->formatSrtTimeStamp($adjustedEndTime). kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		return $timeLine;
+	}
+
+
+	/**
+	 * @param int $timeStamp
+	 * @return string
+	 */
+	private function formatSrtTimeStamp($timeInMili)
+	{
+		$seconds = $timeInMili / 1000;
+		$remainder = round($seconds - ($seconds >> 0), 3) * 1000;
+		$formatted_remainder = sprintf("%03d", $remainder);
+		return gmdate('H:i:s,', $seconds).$formatted_remainder;
+	}
+
+	/**
+	 * @param $time
+	 * @return string
+	 */
+	public function parseCaptionTime($time)
+	{
+		$time = str_replace(',','.',$time);
+		$captionTime = parent::parseCaptionTime($time);
+		return $captionTime;
+	}
+
 }

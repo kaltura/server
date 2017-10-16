@@ -34,7 +34,12 @@ class CrossKalturaEntryObjectsContainer
      * @var array<KalturaContentResource>
      */
     public $thumbAssetsContent;
-    
+
+    /**
+     * @var array<KalturaTimedThumbAsset>
+     */
+    public $timedThumbAssets;
+
     /**
      * @var array<KalturaCaptionAsset>
      */
@@ -49,7 +54,12 @@ class CrossKalturaEntryObjectsContainer
      * @var array<KalturaCuePoint>
      */
     public $cuePoints;
-    
+
+    /**
+     * @var array<KalturaThumbCuePoint>
+     */
+    public $thumbCuePoints;
+
     /**
      * Initialize all member variables
      */
@@ -60,9 +70,11 @@ class CrossKalturaEntryObjectsContainer
         $this->flavorAssets = array();
         $this->flavorAssetsContent = array();
         $this->thumbAssets = array();
+        $this->timedThumbAssets = array();		
         $this->thumbAssetsContent = array();
         $this->captionAssets = array();
         $this->captionAssetsContent = array();
         $this->cuePoints = array();
+        $this->thumbCuePoints = array();
     }
 }

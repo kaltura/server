@@ -36,6 +36,11 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		self::$userContentOnly = $contentOnly;
 	}
 
+	public static function getUserContentOnly()
+	{
+		return self::$userContentOnly;
+	}
+
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
 	 */
@@ -220,6 +225,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		if (!is_null($types))
 			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
 		$criteria->addAscendingOrderByColumn(CuePointPeer::START_TIME);
+		$criteria->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 		return CuePointPeer::doSelect($criteria, $con);
 	}
 	

@@ -132,7 +132,7 @@ class DropFolderFileService extends KalturaBaseService
 	public function deleteAction($dropFolderFileId)
 	{
 		$dbDropFolderFile = DropFolderFilePeer::retrieveByPK($dropFolderFileId);
-		
+
 		if (!$dbDropFolderFile) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFileId);
 		}
@@ -264,7 +264,7 @@ class DropFolderFileService extends KalturaBaseService
 						$existingDropFolderFile->setStatus(DropFolderFileStatus::PURGED);				
 						$existingDropFolderFile->save();
 						
-						$newDropFolderFile = $dbDropFolderFile->copy();
+						$newDropFolderFile = $dbDropFolderFile->copy(true);
 						if(	$existingDropFolderFile->getLeadDropFolderFileId() && 
 							$existingDropFolderFile->getLeadDropFolderFileId() != $existingDropFolderFile->getId())
 						{

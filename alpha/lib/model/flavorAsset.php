@@ -163,6 +163,8 @@ class flavorAsset extends exportableAsset
 		$this->setBitrate($fromAsset->getBitrate());
 		$this->setFrameRate($fromAsset->getFrameRate());
 		$this->setVideoCodecId($fromAsset->getVideoCodecId());
+		$this->setLabel($fromAsset->getLabel());
+		$this->setLanguage($fromAsset->getLanguage());
 	}
 	
 	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
@@ -292,5 +294,24 @@ class flavorAsset extends exportableAsset
 		}
 	
 		return false;
+	}
+	
+	public function getName()
+	{
+		$flavorParams = $this->getFlavorParams();
+		if ($flavorParams)
+			return $flavorParams->getName();
+		return "";
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see Baseasset::copyInto()
+ 	 */
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		/* @var $copyObj flavorasset */
+		parent::copyInto($copyObj, $deepCopy);
+		$copyObj->setLanguage($this->getLanguage());
+		$copyObj->setLabel($this->getLabel());
 	}
 }

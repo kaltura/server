@@ -59,6 +59,19 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 		return array("eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
+	public function getContentParametersKeyValueArray()
+	{
+		$contentParametersKeyValueArray = array();
+	
+		$contentParams = $this->getContentParameters();
+		foreach ($contentParams as $contentParam)
+		{
+			$contentParametersKeyValueArray[$contentParam->getKey()] = $contentParam;
+		}
+	
+		return $contentParametersKeyValueArray;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see BaseEventNotificationTemplate::preSave()
 	 */
@@ -92,6 +105,25 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 	    }
 	
 	    return true;
+	}
+	
+	public function applyDynamicValues(&$scope)
+	{
+		$notificationParameters = $this->getContentParameters();
+		foreach($notificationParameters as $notificationParameter)
+		{
+			/* @var $notificationParameter kEventNotificationParameter */
+			if(!is_null($notificationParameter->getValue()))
+				$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+		}
+			
+		$notificationParameters = $this->getUserParameters();
+		foreach($notificationParameters as $notificationParameter)
+		{
+			/* @var $notificationParameter kEventNotificationParameter */
+			if(!is_null($notificationParameter->getValue()))
+				$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+		}
 	}
 	
 } // EventNotificationTemplate

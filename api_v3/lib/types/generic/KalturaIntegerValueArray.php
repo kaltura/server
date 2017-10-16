@@ -18,7 +18,7 @@ class KalturaIntegerValueArray extends KalturaTypedArray
 		{
 			foreach($ints as $int)
 			{
-				$intObject = new KalturaStringValue();
+				$intObject = new KalturaIntegerValue();
 				
 				if($int instanceof kValue)
 				{

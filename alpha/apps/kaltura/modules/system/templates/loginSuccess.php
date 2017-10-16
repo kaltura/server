@@ -18,7 +18,7 @@ You requested <?php echo $sign_in_referer ?>
 <?php if ( $result == -1 ) { ?>
 	<tr><td colspan=2 style="color:red">Error. Please try again</td></tr>
 <?php } ?>	
-	<tr><td>Login:</td><td><input name="login" value="<?php echo $login ?>"/></td></tr>
+	<tr><td>Login:</td><td><input name="login" value="<?php echo htmlspecialchars($login) ?>"/></td></tr>
 	<tr><td>Password:</td><td><input type="password" name="pwd" value=""></td></tr>
 	<tr><td></td><td><input type="submit" name="go"/></td></tr>
 </table>

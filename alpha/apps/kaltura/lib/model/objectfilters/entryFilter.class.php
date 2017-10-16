@@ -132,8 +132,10 @@ class entryFilter extends baseObjectFilter
 			"_eq_parent_entry_id",
 			"_matchand_entitled_kusers_edit",
 			"_matchand_entitled_kusers_publish",
+			"_matchand_entitled_kusers_view",
 			"_matchor_entitled_kusers_edit",
 			"_matchor_entitled_kusers_publish",
+			"_matchor_entitled_kusers_view",
 			"_is_root",
 			"_matchand_roots",
 			"_notin_roots",
@@ -586,9 +588,23 @@ class entryFilter extends baseObjectFilter
 	}
 
 	protected function getRelativeTimeFields()
-        {
-                return array_merge(parent::getRelativeTimeFields(), self::$relative_time_fields);
-        }
+	{
+		return array_merge(parent::getRelativeTimeFields(), self::$relative_time_fields);
+	}
+	
+	public function transformFieldsToRelative()
+	{
+		foreach($this->getRelativeTimeFields() as $relativeFieldName)
+		{
+			$relativeFieldName = "_" . $relativeFieldName;
+			if($this->is_set($relativeFieldName))
+			{
+				$value = $this->getByName($relativeFieldName);
+				$value = kTime::getRelativeTime($value);
+				$this->setByName($relativeFieldName, $value);
+			}
+		}
+	}
 	
 	public function setIdEquel($v)
 	{

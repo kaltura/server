@@ -52,7 +52,20 @@ class LiveStreamService extends KalturaLiveEntryService
 			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
 		}
 	
-		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry);
+		$conversionProfileId = null;
+		if(in_array($liveStreamEntry->sourceType, array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+		{
+			$conversionProfileId = $liveStreamEntry->conversionProfileId;
+			if(!$conversionProfileId)
+			{
+				$partner = $this->getPartner();
+				if($partner)
+					$conversionProfileId = $partner->getDefaultLiveConversionProfileId();
+			}
+		}
+	
+		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId, $liveStreamEntry->templateEntryId, new LiveStreamEntry());
+		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry, $dbEntry);
 		$dbEntry->save();
 		
 		$te = new TrackEntry();
@@ -102,14 +115,27 @@ class LiveStreamService extends KalturaLiveEntryService
 				if($partner)
 					$dbEntry->setConversionProfileId($partner->getDefaultLiveConversionProfileId());
 			}
-				
-			$dbEntry->save();
-			
-			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$broadcastUrlManager->setEntryBroadcastingUrls($dbEntry);
 		}
 		
 		return $dbEntry;
+	}
+	
+	protected function getTemplateEntry($conversionProfileId, $templateEntryId)
+	{
+		if(!$templateEntryId && $conversionProfileId)
+		{
+			$conversionProfile = conversionProfile2Peer::retrieveByPk($conversionProfileId);
+			if($conversionProfile)
+				$templateEntryId = $conversionProfile->getDefaultEntryId();
+				
+		}
+		if($templateEntryId)
+		{
+			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
+			return $templateEntry;
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -336,6 +362,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @param string $id ID of the live stream
 	 * @param KalturaPlaybackProtocol $protocol protocol of the stream to test.
 	 * @return bool
+	 * @ksOptional
 	 * 
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
@@ -537,12 +564,12 @@ class LiveStreamService extends KalturaLiveEntryService
 		$password = sha1(md5(uniqid(rand(), true)));
 		$password = substr($password, rand(0, strlen($password) - 8), 8);
 		$liveEntry->setStreamPassword($password);
-		
+
 		$broadcastUrlManager = kBroadcastUrlManager::getInstance($liveEntry->getPartnerId());
 		$broadcastUrlManager->setEntryBroadcastingUrls($liveEntry);
-		
+
 		$liveEntry->save();
-	
+
 		$entry = KalturaEntryFactory::getInstanceByType($liveEntry->getType());
 		$entry->fromObject($liveEntry, $this->getResponseProfile());
 		return $entry;

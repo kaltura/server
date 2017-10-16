@@ -330,6 +330,7 @@ class UserService extends KalturaBaseUserService
 	 * @param int $expiry The requested time (in seconds) before the generated KS expires (By default, a KS expires after 24 hours).
 	 * @param string $privileges Special privileges
 	 * @return string A session KS for the user
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -357,6 +358,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $privileges Special privileges
 	 * @param string $otp the user's one-time password
 	 * @return string A session KS for the user
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -384,6 +386,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $newPassword Optional, The user's new password
 	 * @param string $newFirstName Optional, The user's new first name
 	 * @param string $newLastName Optional, The user's new last name
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -403,6 +406,7 @@ class UserService extends KalturaBaseUserService
 	 * @action resetPassword
 	 * 
 	 * @param string $email The user's email address (login email)
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -422,6 +426,7 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @param string $hashKey The hash key used to identify the user (retrieved by email)
 	 * @param string $newPassword The new password to set for the user
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -590,6 +595,40 @@ class UserService extends KalturaBaseUserService
 			
 		return $kuser->getPuserId();
 	}
-
+	
+	/**
+	 * Loges a user to the destination account as long the ks user id exists in the desc acount and the loginData id match for both accounts
+	 *
+	 * @action loginByKs
+	 * @param int $requestedPartnerId
+	 * @throws APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED
+	 *
+	 * @return KalturaSessionResponse The generated session information
+	 * 
+	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::PARTNER_CHANGE_ACCOUNT_DISABLED
+	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
+	 * @throws KalturaErrors::LOGIN_BLOCKED
+	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
+	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
+	 * @throws KalturaErrors::SERVICE_ACCESS_CONTROL_RESTRICTED
+	 * 
+	 */
+	public function loginByKsAction($requestedPartnerId)
+	{
+		$this->partnerGroup .= ",$requestedPartnerId";
+		$this->applyPartnerFilterForClass('kuser');
+		
+		$ks = parent::loginByKsImpl($this->getKs()->getOriginalString(), $requestedPartnerId);
+		
+		$res = new KalturaSessionResponse();
+		$res->ks = $ks;
+		$res->userId = $this->getKuser()->getPuserId();
+		$res->partnerId = $requestedPartnerId;
+		
+		return $res;
+	}
 
 }

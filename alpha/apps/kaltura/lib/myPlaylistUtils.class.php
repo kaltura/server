@@ -10,7 +10,12 @@ class myPlaylistUtils
 	const MAX_STITCHED_PLAYLIST_ENTRY_COUNT = 100;
 
 	const CONTEXT_DELIMITER = "context";
-	
+
+	const CAPTION_FILES_LABEL = "label";
+	const CAPTION_FILES_PATH = "path";
+	const CAPTION_FILES_ID = "captionId";
+	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
+
 	private static $user_cache = null;
 	
 	private static $isAdminKs = false;
@@ -21,7 +26,7 @@ class myPlaylistUtils
 	{
 		self::$isAdminKs = $v;
 	}
-	
+
 	/**
 	 * Playlist is an entry of type ENTRY_TYPE_PLAYLIST = 5.
 	 * Within this type there are 3 media_types to tell the difference between dynamic,static and external playslits:
@@ -567,7 +572,11 @@ class myPlaylistUtils
 			$entry_filter->attachToCriteria( $c );
 
 			// add some hard-coded criteria
-			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
+			$typeArray = array (entryType::MEDIA_CLIP, entryType::MIX, entryType::LIVE_STREAM );
+			$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
+			$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM));
+			
+			$c->addAnd ( entryPeer::TYPE , array_unique($typeArray) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 
@@ -594,6 +603,10 @@ class myPlaylistUtils
 			
 			// update total count and merge current result with the global list
 			$entry_ids_list = array_merge ( $entry_ids_list , $entry_ids_list_for_filter );
+			
+			//If the criteria had a forced order, this order must also be enforced in the playlist.
+			if($c->forcedOrderIds)
+				$entry_ids_list = array_intersect($c->forcedOrderIds, $entry_ids_list);
 		}
 		
 		if($pager)
@@ -841,8 +854,40 @@ HTML;
 			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		}
 	}
-	
-	
+
+	/**
+	 * @param $captionAsset
+	 * @param $filteredCaptionAssets
+	 * @return array
+	 * @throws Exception
+	 */
+	protected static function getCaptionFilePath($captionAsset)
+	{
+		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+
+		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
+		if ($captionFileSync)
+		{
+			$captionFullPath = $captionFileSync->getFullPath();
+			return $captionFullPath;
+		}
+		return false;
+	}
+
+	/**
+	 * @param $entryId
+	 * @return array
+	 */
+	public static function getEntryIdsCaptions($entryIds)
+	{
+		$c = new Criteria();
+		$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
+		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		$captionAssets = assetPeer::doSelect($c);
+		return $captionAssets;
+	}
+
+
 	private static function getIds ( $list )
 	{
 		$id_list  =array();
@@ -1048,9 +1093,19 @@ HTML;
 				null,
 				false, 
 				$pager);
-		
+
+		return self::getPlaylistDataFromEntries($entries, null, null);
+	}
+
+	/**
+	 * @param $entries
+	 * @return array
+	 */
+	public static function getPlaylistDataFromEntries($entries, $flavorParamsIds, $captions)
+	{
 		$entryIds = array();
 		$durations = array();
+		$captionFiles = array();
 		$mediaEntry = null;
 		$maxFlavorCount = 0;
 		foreach ($entries as $entry)
@@ -1060,8 +1115,11 @@ HTML;
 
 			// Note: choosing a reference entry that has max(flavor count) and min(int id)
 			//	the reason for the int id condition is to avoid frequent changes to the 
-			//	reference entry in case the playlist content changes 
-			$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
+			//	reference entry in case the playlist content changes
+			if ($flavorParamsIds)
+				$flavorCount = count($flavorParamsIds);
+			else
+				$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
 			if (!$mediaEntry ||
 				$flavorCount > $maxFlavorCount ||
 				($flavorCount == $maxFlavorCount && $entry->getIntId() < $mediaEntry->getIntId()))
@@ -1071,6 +1129,52 @@ HTML;
 			}
 		}
 
-		return array($entryIds, $durations, $mediaEntry);
+		$captionFiles = self::getCaptionFilesForEntryIds($entryIds, $captions);
+		return array($entryIds, $durations, $mediaEntry, $captionFiles);
+	}
+
+	protected static function getCaptionFilesForEntryIds($entryIds, $captionLanguages)
+	{
+		$captionLangsArr = explode(',', $captionLanguages);
+		$captionAssets = self::getEntryIdsCaptions($entryIds);
+		$filteredCaptionAssets = array();
+		foreach ($captionAssets as $captionAsset)
+		{
+			/** @var CaptionAsset $captionAsset */
+			if (!in_array($captionAsset->getLanguage(), $captionLangsArr))
+				continue;
+			$filePath = self::getCaptionFilePath($captionAsset);
+			if ($filePath)
+			{
+				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()]))
+					$filteredCaptionAssets[$captionAsset->getEntryId()] = array();
+				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
+					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
+				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] =
+					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $filePath, self::CAPTION_FILES_ID => $captionAsset->getId());
+			}
+		}
+		return $filteredCaptionAssets;
+	}
+
+	public static function getFirstEntryFromPlaylist($playlist)
+	{
+		$entryList = self::executePlaylist($playlist->getPartnerId(), $playlist);
+		if(empty($entryList))
+			return null;
+		return $entryList[0];
+	}
+
+	public static function buildPlaylistThumbPath($entry, $flavorAsset)
+	{
+		$partnerId = $flavorAsset->getPartnerId();
+		$subpId = $entry->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$entryVersion = $entry->getVersion();
+
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= ($entryVersion ? "/v/$entryVersion" : '');
+		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId().self::MP4_FILENAME_PARAMETER;
+		return $url;
 	}
 }

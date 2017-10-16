@@ -12,7 +12,7 @@ abstract class LiveEntry extends entry
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
-	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 10000;
+	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
@@ -157,9 +157,11 @@ abstract class LiveEntry extends entry
 		if($this->isColumnModified(entryPeer::LENGTH_IN_MSECS) && $this->getLengthInMsecs() > 0 && $this->getRecordStatus() !== RecordStatus::DISABLED && $this->getRecordedEntryId())
 		{
 			$recordedEntry = entryPeer::retrieveByPK($this->getRecordedEntryId());
-			if($recordedEntry && $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $recordedEntry->getStatus() != entryStatus::READY)
+			if($recordedEntry && $recordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			{
-				$recordedEntry->setStatus(entryStatus::READY);
+				if($recordedEntry->getStatus() != entryStatus::READY)
+					$recordedEntry->setStatus(entryStatus::READY);
+				$recordedEntry->setRecordedLengthInMsecs($this->getLengthInMsecs());
 				$recordedEntry->save();
 			}
 		}
@@ -229,7 +231,7 @@ abstract class LiveEntry extends entry
 	
 	public function setRecordedEntryId($v)
 	{
-		if($v)
+		if($v && $v != $this->getRecordedEntryId())
 			$this->incInCustomData("recorded_entry_index");
 		
 		$this->putInCustomData("recorded_entry_id", $v);
@@ -343,7 +345,7 @@ abstract class LiveEntry extends entry
 			$configurations = $this->getFromCustomData('live_stream_configurations', null, array());
 			if($configurations && $this->getPushPublishEnabled())
 			{
-				$pushPublishConfigurations = $this->getPushPublishConfigurations();
+				$pushPublishConfigurations = $this->getPushPublishPlaybackConfigurations();
 				$configurations = array_merge($configurations, $pushPublishConfigurations);
 			}
 			
@@ -669,7 +671,22 @@ abstract class LiveEntry extends entry
 
 	public function getSegmentDuration()
 	{
-		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS);
+		$partner = $this->getPartner();
+
+		if ($partner && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->getPartnerId()))
+		{
+			return LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
+		}
+
+		$segmentDuration = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, null);
+
+		if($partner && !$segmentDuration)
+			$segmentDuration = $partner->getDefaultLiveStreamSegmentDuration();
+		
+		if(!$segmentDuration)
+			$segmentDuration = LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
+		
+		return $segmentDuration;
 	}
 
 	/**
@@ -890,4 +907,18 @@ abstract class LiveEntry extends entry
 		
 		return $currentDuration;
 	}
+
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'recorded_entry_id' => $this->getRecordedEntryId(),
+			'push_publish' => $this->getPushPublishEnabled(),
+		);
+
+		elasticSearchUtils::cleanEmptyValues($body);
+
+		return array_merge(parent::getObjectParams($params), $body);
+	}
+
+
 }

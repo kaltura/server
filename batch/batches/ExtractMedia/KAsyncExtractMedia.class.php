@@ -64,6 +64,10 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		if($data->calculateComplexity)
 			$this->calculateMediaFileComplexity($mediaInfo, $mediaFile);
 		
+		if($data->detectGOP>0) {
+			$this->detectMediaFileGOP($mediaInfo, $mediaFile, $data->detectGOP);
+		}
+
 		$duration = $mediaInfo->containerDuration;
 		if(!$duration)
 			$duration = $mediaInfo->videoDuration;
@@ -184,5 +188,18 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		else
 			$data->destDataFilePath = $sharedTempSyncPointFilePath;
 	}
+
+	/*
+	 *
+	 */
+	 private function detectMediaFileGOP($mediaInfo, $mediaFile, $interval)
+	 {
+		KalturaLog::log("Detection interval($interval)");
+		list($minGOP,$maxGOP,$detectedGOP) = KFFMpegMediaParser::detectGOP((isset(self::$taskConfig->params->ffprobeCmd)? self::$taskConfig->params->ffprobeCmd: null), $mediaFile, 0, $interval);
+		KalturaLog::log("Detected - minGOP($minGOP),maxGOP($maxGOP),detectedGOP($detectedGOP)");
+		if(isset($maxGOP)){
+			$mediaInfo->maxGOP = $maxGOP;
+		}
+	 }
 }
 

@@ -57,10 +57,16 @@ class kLockBase
 	public function unlock()
 	{
 		self::safeLog("Releasing lock [{$this->key}]");
-		$this->store->delete($this->key);
-		self::safeLog("Lock released [{$this->key}]");
+		if ($this->store->delete($this->key))
+		{
+			self::safeLog("Lock released [{$this->key}]");
+			return true;
+		}
+
+		self::safeLog("Lock release failed for [{$this->key}]");
+		return false;
 	}
-	
+
 	/**
 	 * This function is required since this code can run before the autoloader
 	 *

@@ -1,13 +1,15 @@
 <?php 
+
+require_once (dirname(__FILE__) . '/safeGetInput.php');
+
 if(!isset($_GET['partnerId']))
 	die('partnerId must be supplied in query string');
 	
 if(!isset($_GET['playerVersion']))
 	die('html5 lib version must be supplied in query string');
 
-$partnerId = $_GET['partnerId'];
-
-$html5Version = $_GET['playerVersion'];
+$partnerId = safeGetInput('partnerId', INTEGER_ONLY_PATTERN);
+$html5Version = safeGetInput('playerVersion', HTML_VERSION_PATTERN);
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -305,15 +307,15 @@ $html5Version = $_GET['playerVersion'];
 		</tr>
 		<tr>
 			<td>Admin Secret:</td>
-			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? $_GET['secret'] : ''; ?>" />
+			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? safeGetInput('secret', SECRET_PATTERN) : ''; ?>" />
 		</td>
 		<tr>
 			<td>Entry Id:</td>
-			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? $_GET['entryId'] : ''; ?>" />
+			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? safeGetInput('entryId', ENTRY_ID_PATTERN) : ''; ?>" />
 		</td>
 		<tr>
         	<td>uiConf Id:</td>
-            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? $_GET['uiConfId'] : ''; ?>" />
+            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? safeGetInput('uiConfId', INTEGER_ONLY_PATTERN) : ''; ?>" />
 		</td>
 		<tr>
 			<td colspan="2">

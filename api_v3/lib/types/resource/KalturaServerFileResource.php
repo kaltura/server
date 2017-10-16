@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaServerFileResource extends KalturaDataCenterContentResource
+class KalturaServerFileResource extends KalturaGenericDataCenterContentResource
 {
 	/**
 	 * Full path to the local file 
@@ -14,7 +14,13 @@ class KalturaServerFileResource extends KalturaDataCenterContentResource
 	 */
 	public $localFilePath;
 	
-	private static $map_between_objects = array('localFilePath');
+	/**
+	 * Should keep original file (false = mv, true = cp)
+	 * @var bool
+	 */
+	public $keepOriginalFile;
+	
+	private static $map_between_objects = array('localFilePath','keepOriginalFile');
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
@@ -42,7 +48,11 @@ class KalturaServerFileResource extends KalturaDataCenterContentResource
 		if(!$object_to_fill)
 			$object_to_fill = new kLocalFileResource();
 		
-		$object_to_fill->setKeepOriginalFile(true);
+		$keepOriginalFile = true;
+		if(isset($this->keepOriginalFile) && $this->keepOriginalFile === false)
+			$keepOriginalFile = false;
+		
+		$object_to_fill->setKeepOriginalFile($keepOriginalFile);
 		$ret = parent::toObject($object_to_fill, $props_to_skip);
 		/* @var $ret kLocalFileResource */
 		

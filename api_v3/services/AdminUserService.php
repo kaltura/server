@@ -61,6 +61,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * @param string $newEmail Optional, provide only when you want to update the email
 	 * @param string $newPassword
 	 * @return KalturaAdminUser
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD
@@ -97,6 +98,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * 
 	 * @action resetPassword
 	 * @param string $email
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -124,6 +126,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * @param string $password
 	 * @param int $partnerId
 	 * @return string
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
@@ -158,6 +161,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * @action setInitialPassword
 	 * @param string $hashKey
 	 * @param string $newPassword new password to set
+	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID

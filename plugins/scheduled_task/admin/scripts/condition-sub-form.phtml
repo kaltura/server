@@ -1,0 +1,14 @@
+<fieldset id="<?php echo $this->element->getElementsBelongTo(); ?>">
+	<legend>Condition</legend>
+	<?php foreach ($this->element->getElements() as $name => $elem) {
+		if (strpos($name,'Cond_') > -1)
+			echo $elem;
+	} ?><br/>
+	
+	<input type="hidden" name="belongs" value="<?php echo $this->element->getElementsBelongTo(); ?>" />
+	<a class="remove-condition" href="javascript:;" onclick="removeCondition(this);">Remove</a>
+
+
+</fieldset>
+
+

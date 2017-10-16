@@ -34,7 +34,7 @@ class Form_Login extends Infra_Form
 			)
 		));
 		
-		$this->addElement('password', 'otp', array(
+		$this->addElement('text', 'otp', array(
 			'label'	  => 'Authenticator Code:',
 			'required'   => true,
 			'autocomplete' => 'off',

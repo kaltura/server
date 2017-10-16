@@ -191,6 +191,18 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		return parent::toInsertableObject($dbObject, $props_to_skip);
 	}
 
+	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
+	{
+		if(strpos(strtolower(kCurrentContext::$client_lang), "kmc") !== false)
+		{
+			$props_to_skip[] = 'primaryBroadcastingUrl';
+			$props_to_skip[] = 'secondaryBroadcastingUrl';
+			$props_to_skip[] = 'primaryRtspBroadcastingUrl';
+			$props_to_skip[] = 'secondaryRtspBroadcastingUrl';
+		}
+		return parent::toUpdatableObject($object_to_fill, $props_to_skip);
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaMediaEntry::toSourceType()
 	 */

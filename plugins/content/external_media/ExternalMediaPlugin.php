@@ -2,7 +2,7 @@
 /**
  * @package plugins.externalMedia
  */
-class ExternalMediaPlugin extends KalturaPlugin implements IKalturaServices, IKalturaObjectLoader, IKalturaEnumerator, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaEventConsumers
+class ExternalMediaPlugin extends KalturaPlugin implements IKalturaServices, IKalturaObjectLoader, IKalturaEnumerator, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaEventConsumers, IKalturaMrssContributor
 {
 	const PLUGIN_NAME = 'externalMedia';
 	const EXTERNAL_MEDIA_CREATED_HANDLER = 'ExternalMediaCreatedHandler';
@@ -127,4 +127,25 @@ class ExternalMediaPlugin extends KalturaPlugin implements IKalturaServices, IKa
 			
 		return null;
 	}
+	
+		/* (non-PHPdoc)
+         * @see IKalturaMrssContributor::contribute()
+         */
+        public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
+        {
+                if(!($object instanceof entry) || $object->getType() != self::getEntryTypeCoreValue(ExternalMediaEntryType::EXTERNAL_MEDIA))
+                        return;
+
+                $externalEntry = $mrss->addChild('externalEntry');
+                $externalEntry->addChild('duration', $object->getDuration());
+        }
+
+        /* (non-PHPdoc)
+         * @see IKalturaMrssContributor::getObjectFeatureType()
+         */
+        public function getObjectFeatureType()
+        {
+                return null;
+        }
+
 }

@@ -18,6 +18,8 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	const PROVISIONED = 'Provisioned';
 	
 	const PENDING = 'Pending';
+
+	const NOT_YET_PROVISIONED = 'Not yet provisioned';
 	
 	/**
 	 * @var AkamaiUniversalStreamClient
@@ -259,6 +261,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 			switch (strval($resultXML->status))
 			{
 				case self::PENDING:
+				case self::NOT_YET_PROVISIONED:
 					return new KProvisionEngineResult(KalturaBatchJobStatus::ALMOST_DONE, "Stream is still in status Pending - retry in 5 minutes");
 					break;
 				case self::PROVISIONED:

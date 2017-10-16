@@ -405,6 +405,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 {
 	const ERROR_CODE_THE_KEY_ALREADY_EXISTS_IN_THE_SERVER = 12;
 	const ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER = 13;
+	const ERROR_CODE_OPERATION_TIMEOUT_IN_THE_SERVER = 23;
 	
 	/**
 	 * @var string
@@ -447,7 +448,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			if($this->debug)
 				KalturaLog::debug("Bucket name [$this->name]");
 				
+			$connStart = microtime(true);
 			$this->bucket = $cluster->openBucket($this->name);
+			$connTook = microtime(true) - $connStart;
+			self::safeLog("connect took - {$connTook} seconds to {$config['dsn']} bucket {$this->name}");
 		}
 		catch(CouchbaseException $e)
 		{
@@ -479,24 +483,33 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doGet()
 	 */
-	protected function doGet($key)
+	protected function doGet($key, $retries = 1)
 	{
-		try
+		$couchbaseError = null;
+		do
 		{
-			$meta = $this->bucket->get($key);
-			
-			if($this->debug)
-				KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
-				
-			return $meta->value;
+			if ($this->debug)
+				KalturaLog::debug("Trying to get from couchbase. attempts left: $retries");
+			try
+			{
+				$meta = $this->bucket->get($key);
+
+				if ($this->debug)
+					KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
+
+				return $meta->value;
+			} catch (CouchbaseException $e)
+			{
+				$couchbaseError = $e;
+				if ($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+					return false;
+			}
+			$retries--;
 		}
-		catch(CouchbaseException $e)
-		{
-			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
-				return false;
-				
-			throw $e;
-		}
+		while ($retries >= 0);
+
+		KalturaLog::err("No retries left for Couchbase get operation for key [$key]");
+		throw $couchbaseError;
 	}
 	
 	/* (non-PHPdoc)
@@ -548,16 +561,36 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doSet()
 	 */
-	protected function doSet($key, $var, $expiry = 0)
+	protected function doSet($key, $var, $expiry = 0, $retries = 1)
 	{
-		if($this->debug)
+		$couchbaseError = null;
+
+		if ($this->debug)
 			KalturaLog::debug("Bucket name [$this->name] key [$key] var [" . print_r($var, true) . "]");
-			
-		$meta = $this->bucket->upsert($key, $var, array(
-			'expiry' => $expiry
-		));
-		
-		return is_null($meta->error);
+
+		do
+		{
+			if ($this->debug)
+				KalturaLog::debug("Trying to upsert to couchbase. attempts left: $retries");
+			try
+			{
+				$meta = $this->bucket->upsert($key, $var, array(
+					'expiry' => $expiry
+				));
+
+				return is_null($meta->error);
+			} catch (CouchbaseException $e)
+			{
+				KalturaLog::err($e);
+				$couchbaseError = $e;
+				if ($e->getCode() != self::ERROR_CODE_OPERATION_TIMEOUT_IN_THE_SERVER)
+					throw $e;
+			}
+			$retries--;
+		} while ($retries >= 0);
+
+		KalturaLog::err("No retries left for Couchbase upsert operation for key [$key]");
+		throw $couchbaseError;
 	}
 
 	/* (non-PHPdoc)

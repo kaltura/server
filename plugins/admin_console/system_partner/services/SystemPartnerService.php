@@ -24,17 +24,17 @@ class SystemPartnerService extends KalturaBaseService
 	 * This service gets partner id as parameter and accessable to the admin console partner only
 	 * 
 	 * @action get
-	 * @param int $partnerIdX
+	 * @param int $pId
 	 * @return KalturaPartner
 	 *
 	 * @throws APIErrors::UNKNOWN_PARTNER_ID
 	 */		
-	function getAction($partnerId)
+	function getAction($pId)
 	{		
-		$dbPartner = PartnerPeer::retrieveByPK( $partnerId );
+		$dbPartner = PartnerPeer::retrieveByPK( $pId );
 		
 		if ( ! $dbPartner )
-			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $partnerId );
+			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $pId );
 			
 		$partner = new KalturaPartner();
 		$partner->fromPartner( $dbPartner );
@@ -190,21 +190,21 @@ class SystemPartnerService extends KalturaBaseService
 	
 	/**
 	 * @action getAdminSession
-	 * @param int $partnerId
+	 * @param int $pId
 	 * @param string $userId
 	 * @return string
 	 */
-	public function getAdminSessionAction($partnerId, $userId = null)
+	public function getAdminSessionAction($pId, $userId = null)
 	{
-		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
+		$dbPartner = PartnerPeer::retrieveByPK($pId);
 		if (!$dbPartner)
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $pId);
 		
 		if (!$userId) {
 			$userId = $dbPartner->getAdminUserId();
 		}
 		
-		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
+		$kuser = kuserPeer::getKuserByPartnerAndUid($pId, $userId);
 		if (!$kuser) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		}
@@ -219,29 +219,29 @@ class SystemPartnerService extends KalturaBaseService
 	
 	/**
 	 * @action updateConfiguration
-	 * @param int $partnerId
+	 * @param int $pId
 	 * @param KalturaSystemPartnerConfiguration $configuration
 	 */
-	public function updateConfigurationAction($partnerId, KalturaSystemPartnerConfiguration $configuration)
+	public function updateConfigurationAction($pId, KalturaSystemPartnerConfiguration $configuration)
 	{
-		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
+		$dbPartner = PartnerPeer::retrieveByPK($pId);
 		if (!$dbPartner)
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $pId);
 		$configuration->toUpdatableObject($dbPartner);
 		$dbPartner->save();
-		PartnerPeer::removePartnerFromCache($partnerId);
+		PartnerPeer::removePartnerFromCache($pId);
 	}
 	
 	/**
 	 * @action getConfiguration
-	 * @param int $partnerId
+	 * @param int $pId
 	 * @return KalturaSystemPartnerConfiguration
 	 */
-	public function getConfigurationAction($partnerId)
+	public function getConfigurationAction($pId)
 	{
-		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
+		$dbPartner = PartnerPeer::retrieveByPK($pId);
 		if (!$dbPartner)
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $pId);
 			
 		$configuration = new KalturaSystemPartnerConfiguration();
 		$configuration->fromObject($dbPartner, $this->getResponseProfile());
@@ -311,18 +311,18 @@ class SystemPartnerService extends KalturaBaseService
 	 * 
 	 * @action resetUserPassword
 	 * @param string $userId
-	 * @param int $partnerId
+	 * @param int $pId
 	 * @param string $newPassword
 	 * @throws KalturaAPIException
 	 */
-	public function resetUserPasswordAction($userId, $partnerId, $newPassword)
+	public function resetUserPasswordAction($userId, $pId, $newPassword)
 	{
-		if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID)
+		if ($pId == Partner::ADMIN_CONSOLE_PARTNER_ID || $pId == Partner::BATCH_PARTNER_ID)
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER);
 		}				
 		//get loginData using userId and PartnerId 
-		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId, $userId);
+		$kuser = kuserPeer::getKuserByPartnerAndUid ($pId, $userId);
 		if (!$kuser){
 			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
 		}

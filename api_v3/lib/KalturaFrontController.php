@@ -166,7 +166,11 @@ class KalturaFrontController
 					if(intval($matches[1]) == $index)
 					{
 						$attributePath = explode(':', $matches[2]);
-						$params[$key] = str_replace($path, $this->getValueFromObject($result, $attributePath), $params[$key]);
+						$valueFromObject = $this->getValueFromObject($result, $attributePath);
+						if(!$valueFromObject)
+							KalturaLog::debug("replaceMultiRequestResults: Empty value returned from object");
+							
+						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
 					}
 				}
 			}
@@ -295,6 +299,9 @@ class KalturaFrontController
 							
 				try
 				{
+					if(isset($listOfRequests[$i]['error']))
+						throw $listOfRequests[$i]['error'];
+					
 					$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
 				}
 				catch(Exception $ex)
@@ -303,7 +310,7 @@ class KalturaFrontController
 					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
 				}
-				$cache->storeCache($currentResult, "", true);
+				$cache->storeCache($currentResult, array(), true);
 			}
 			$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);
 			
@@ -311,7 +318,14 @@ class KalturaFrontController
 			{
 				if(isset($multiRequestResultsPaths[$nextMultiRequestIndex]))
 				{
-					$listOfRequests[$nextMultiRequestIndex] = $this->replaceMultiRequestResults(kCurrentContext::$multiRequest_index, $multiRequestResultsPaths[$nextMultiRequestIndex], $listOfRequests[$nextMultiRequestIndex], $currentResult);
+					try 
+					{
+						$listOfRequests[$nextMultiRequestIndex] = $this->replaceMultiRequestResults(kCurrentContext::$multiRequest_index, $multiRequestResultsPaths[$nextMultiRequestIndex], $listOfRequests[$nextMultiRequestIndex], $currentResult);
+					}
+					catch(Exception $ex)
+					{
+						$listOfRequests[$nextMultiRequestIndex]['error'] = $ex;
+					}
 				}
 			}
 			

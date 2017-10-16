@@ -41,24 +41,30 @@ class EdgeServerNode extends DeliveryServerNode {
 	
 	public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null)
 	{
-		return $this->buildEdgeFullPath($protocol, $format, $deliveryType);
+		$playbackHost = $this->buildEdgeFullPath($protocol, $format, $deliveryType);
+		
+		if($playbackHost && $format && $format == PlaybackProtocol::APPLE_HTTP_TO_MC)
+			$playbackHost = preg_replace('/' . EdgeServerNode::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . '/',
+					EdgeServerNode::EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME , $playbackHost, 1);
+		
+		return $playbackHost;
 	}
 	
 	public function buildEdgeFullPath($protocol = 'http', $format = null, $deliveryType = null, $assetType = null)
 	{
-		$edgeFullPath = rtrim($this->getedgePath($format, $deliveryType, $assetType), "/") . "/";
+		$edgeFullPath = rtrim($this->getEdgePath($format, $deliveryType, $assetType), "/") . "/";
 		
-		if($this->parent_id)
-		{
-			$parentEdge = ServerNodePeer::retrieveByPK($this->parent_id);
-			if($parentEdge)
-				$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType, $assetType);
-		}
+		$parentIds = $this->getParentIdsArray();
+		if(!count($parentIds))
+			return $edgeFullPath;
+		
+		$parentEdge = $this->getActiveParent($parentIds);
+		$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType, $assetType);
 		
 		return $edgeFullPath;
 	}
 	
-	public function getedgePath($format, $deliveryType = null, $assetType = null)
+	public function getEdgePath($format, $deliveryType = null, $assetType = null)
 	{
 		$edgePath = $this->getPlaybackDomain();
 		
@@ -110,19 +116,22 @@ class EdgeServerNode extends DeliveryServerNode {
 	public function validateEdgeTreeRegistered()
 	{
 		/* @var $edgeServer EdgeServerNode */
-		$parentId = $this->getParentId();
-		if($parentId)
-		{
-			$parentEdge = ServerNodePeer::retrieveRegisteredServerNodeByPk($parentId);
-	
-			if(!$parentEdge)
-			{
-				return false;
-			}
-	
-			return $parentEdge->validateEdgeTreeRegistered();
-		}
-	
-		return true;
+		$parentIds = $this->getParentIdsArray();
+		if(!count($parentIds))
+			return true;
+		
+		$parentEdge = $this->getActiveParent($parentIds);
+		if(!$parentEdge)
+			return false;
+		
+		return $parentEdge->validateEdgeTreeRegistered();
 	}
+	
+	public function getActiveParent($parentIds)
+	{
+		$activeParents = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($parentIds);
+		$activeParentEdge = reset($activeParents);
+		return $activeParentEdge;
+	}
+	
 } // EdgeServer

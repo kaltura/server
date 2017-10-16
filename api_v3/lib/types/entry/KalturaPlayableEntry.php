@@ -106,4 +106,18 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 			
 		return $dbObject;
 	}
+
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($sourceObject, $responseProfile);
+		$recordedLengthInMs = $sourceObject->getRecordedLengthInMsecs();
+		if ($sourceObject->getIsRecordedEntry() && $recordedLengthInMs > 0 && myEntryUtils::shouldServeVodFromLive($sourceObject))
+		{
+			$this->msDuration = $recordedLengthInMs;
+			$this->duration = (int)round($recordedLengthInMs / 1000);
+		}
+		return $this;
+	}
+
+
 }

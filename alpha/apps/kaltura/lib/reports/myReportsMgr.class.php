@@ -17,8 +17,8 @@ class myReportsMgr
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
 	const REPORT_TYPE_USER_ENGAGEMENT = 11;
 	const REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE = 110;
-	const REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT = 12;
-	const REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE = 120;
+	const REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT = 12;
+	const REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT_TOTAL_UNIQUE = 120;
 	const REPORT_TYPE_USER_TOP_CONTENT = 13;
 	const REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE = 130;
 	const REPORT_TYPE_USER_CONTENT_DROPOFF = 14;
@@ -37,7 +37,7 @@ class myReportsMgr
 	const REPORT_TYPE_VAR_USAGE = 19;
 	const REPORT_TYPE_TOP_CREATORS = 20;
 	const REPORT_TYPE_PLATFORMS = 21;
-	const REPORT_TYPE_OPERATION_SYSTEM = 22;
+	const REPORT_TYPE_OPERATING_SYSTEM = 22;
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 	const REPORT_TYPE_TOP_PLAYBACK_CONTEXT = 25;
@@ -59,13 +59,13 @@ class myReportsMgr
 	const UNKNOWN_NAME_CLAUSE = "'Unknown'";
 
 	static $unique_total_reports = array (self::REPORT_TYPE_USER_ENGAGEMENT,
-										self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT, 
+										self::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT, 
 										self::REPORT_TYPE_USER_TOP_CONTENT,
 										self::REPORT_TYPE_USER_CONTENT_DROPOFF,
 										self::REPORT_TYPE_USER_CONTENT_INTERACTIONS);
 										
 	static $end_user_filter_get_count_reports = array (self::REPORT_TYPE_PLATFORMS,
-										self::REPORT_TYPE_OPERATION_SYSTEM, 
+										self::REPORT_TYPE_OPERATING_SYSTEM, 
 										self::REPORT_TYPE_BROWSERS,
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
@@ -689,17 +689,18 @@ class myReportsMgr
 			$link = self::getConnection();
 			$add_search_text = false;
 			
-			$has_object_ids = false;
+                        $str_object_ids = $object_ids;
 			if ($input_filter instanceof endUserReportsInputFilter) 
-				$has_object_ids = $input_filter->categories;
-			$has_object_ids = $has_object_ids || $object_ids;	
+                                $str_object_ids .=  $input_filter->categories;
+   	                
+   	        $use_index = "USE INDEX (PRIMARY)";        
 			if ( is_numeric( $report_type ))
 			{
 				$file_path = myReportsSqlFileMgr::getSqlFilePath( 
 					self::$type_map[$report_type] ,  
 					self::$flavor_map[$report_flavor] , 
 					$add_search_text , 
-					$has_object_ids ? true : false ,
+					$str_object_ids ,
 					$input_filter);
 			}
 			else
@@ -840,6 +841,7 @@ class myReportsMgr
 				{
 					$entryIds = "'" . implode("','", array_merge($escapedobjectIds, $entryIdsFromDB)) . "'";
 					$obj_ids_clause = "ev.entry_id in ( $entryIds )";
+					
 				}
 			}
 			elseif (count($entryIdsFromDB))
@@ -847,6 +849,10 @@ class myReportsMgr
 				$entryIds = "'" . implode("','", $entryIdsFromDB) . "'";
 				$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 			}
+
+			if ($entryIds && substr_count($entryIds, ",") < 10) 
+				$use_index = " ";
+
 			
 			if ($input_filter instanceof endUserReportsInputFilter && ($input_filter->userIds != null) && ($report_type == self::REPORT_TYPE_USER_USAGE || $report_type == self::REPORT_TYPE_SPECIFIC_USER_USAGE) ) {
 					$userFilter = new kuserFilter();
@@ -868,7 +874,7 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
+			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset, $use_index);
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
 			else 
@@ -892,7 +898,7 @@ class myReportsMgr
 		}
 	}
 		
-	private static $flavor_map = array ( 
+	static $flavor_map = array ( 
 		self::REPORT_FLAVOR_GRAPH => "graph" ,
 		self::REPORT_FLAVOR_TOTAL => "total" ,
 		self::REPORT_FLAVOR_TABLE => "detail" ,
@@ -900,7 +906,7 @@ class myReportsMgr
 		self::REPORT_FLAVOR_BASE_TOTAL =>"base_total",
 	);
 	
-	private static $type_map = array ( 
+	static $type_map = array ( 
 		self::REPORT_TYPE_TOP_CONTENT => "top_content" ,
 		self::REPORT_TYPE_CONTENT_DROPOFF => "content_dropoff" ,
 		self::REPORT_TYPE_CONTENT_INTERACTIONS => "content_interactions" ,
@@ -912,8 +918,8 @@ class myReportsMgr
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
 		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
-		self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
-		self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
+		self::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT => "specific_user_engagement",
+		self::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
 		self::REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_CONTENT_DROPOFF => "user_content_dropoff", 
@@ -931,7 +937,7 @@ class myReportsMgr
 		self::REPORT_TYPE_SPECIFIC_USER_USAGE => 'specific_user_usage',
 		self::REPORT_TYPE_VAR_USAGE => 'var_usage',
 		self::REPORT_TYPE_PLATFORMS => 'platforms',
-		self::REPORT_TYPE_OPERATION_SYSTEM => 'os',
+		self::REPORT_TYPE_OPERATING_SYSTEM => 'os',
 		self::REPORT_TYPE_BROWSERS => 'browsers',
 		self::REPORT_TYPE_LIVE => "live",
 		self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => "top_playback_context",
@@ -1202,7 +1208,7 @@ class myReportsMgr
 	}
 	
 	private static function getReplacedSql ( $link, $sql_content , $partner_id , reportsInputFilter $input_filter , 
-		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null , $offset = null)
+		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null , $offset = null, $use_index = null)
 	{
 		// TODO - format the search_text according to the the $input_filter
 		$search_text_match_clause = "1=1"; //self::setSearchFieldsAndText ( $input_filter );
@@ -1265,15 +1271,16 @@ class myReportsMgr
 				"{TIME_SHIFT}" , 
 				"{CAT_ID_CLAUSE}" ,
 				"{GROUP_COLUMN}" ,
+				"{USE_INDEX}"
 			);
 			
 		$values = 
 			array (
-				$partner_id ,
+				intval($partner_id) ,
 				self::intToDateTime($input_filter->from_date), 
 				self::intToDateTime($input_filter->to_date ),
-				$input_filter->from_day,
-				$input_filter->to_day,
+				intval($input_filter->from_day),
+				intval($input_filter->to_day),
 				self::intToDateId($input_filter->to_date , -7 ),
 				self::intToDateId($input_filter->to_date , -30 ),
 				self::intToDateId($input_filter->to_date , -180 ),
@@ -1285,6 +1292,7 @@ class myReportsMgr
 				$time_shift,
 				$cat_ids_str,
 				($input_filter->interval == reportInterval::MONTHS ? "month_id" : "date_id"),
+				$use_index
 			);
 				
 		if ( $input_filter->extra_map )
@@ -1313,15 +1321,12 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 		$mysql_function = 'mysqli';
-	
 		$db_config = kConf::get( "reports_db_config" );
-		
-		if($mysql_function == 'mysql') $db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
-		else $db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
+		$db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
 		
 		$error_function = $mysql_function.'_error';
 		if (!$db_selected) {
-			throw new kCoreException('Can\'t use foo : ' . $error_function($link), kCoreException::INVALID_QUERY);
+			throw new kCoreException('mysqli_select_db('. $db_config["db_name"].') failed, check settings in the reports_db_config section of configurations/local.ini', kCoreException::INVALID_QUERY);
 		}
 
 		if($mysql_function == 'mysql') $result = mysql_query($query);
@@ -1457,6 +1462,9 @@ class myReportsMgr
 		
 		$connect_function = $mysql_function.'_connect';
 		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
+		if (mysqli_connect_errno()) {
+		        throw new kCoreException('DB connection failed: '. mysqli_connect_error()."\ncheck settings in the reports_db_config section of configurations/local.ini", kCoreException::INVALID_QUERY);
+		}
 		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		
 		return $link;

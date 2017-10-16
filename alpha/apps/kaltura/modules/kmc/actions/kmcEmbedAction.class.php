@@ -16,6 +16,7 @@ class kmcEmbedAction extends kalturaAction
 		do 
 		{
 			$embed_code = trim($this->getP ( "embed_{$i}_xml" , "" ));
+			$embed_code = htmlspecialchars($embed_code);
 			$embed_code_list[$i] = $embed_code;
 			
 			if( ! $base_embed_code )

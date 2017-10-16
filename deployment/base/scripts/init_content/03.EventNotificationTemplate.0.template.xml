@@ -225,7 +225,7 @@
 		<!-- New Item Pending Moderation -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
-				<name>New Item Pending Moderation</name>
+				<name>Existing Item Pending Moderation</name>
 				<systemName>New_Item_Pending_Moderation_2</systemName>
 				<description>Email notification template to be sent when a new item is pending moderation in a specific category (channel).</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
@@ -239,7 +239,7 @@
 					</item>
 				</eventConditions>
 				<format>1</format>
-				<subject>[AppTitle] - New Item Pending Moderation</subject>
+				<subject>[AppTitle] - Existing Item Pending Moderation</subject>
 				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
@@ -617,18 +617,18 @@
 					</item>
 				</eventConditions>
 				<format>1</format>
-				<subject>[AppTitle] - Your video is ready to be played</subject>
-				<body>Your recently uploaded media: {entry_name} is ready to play: [AppEntryUrl]{entry_id}</body>
+				<subject>Entry is Ready for Publishing: {entry_name}/ ID: {entry_id} </subject>
+				<body><![CDATA[ Hello,<p>A new entry is ready for publishing:</p><p>Entry Name: {entry_name} <br>Entry ID:  {entry_id}<br>Entry Creator: {creator_name}, {creator_id}/{creator_email} </p>]]></body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
-							<email objectType="KalturaEvalStringField">
-								<code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getEmail() : ''</code>
+							<email objectType="KalturaStringValue">
+								<value>{creator_email}</value>
 							</email>
-							<name objectType="KalturaEvalStringField">
-								<code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getFirstName().' '.$scope->getObject()->getkuser()->getLastName() : ''</code>
+							<name objectType="KalturaStringValue">
+								<value>{creator_name}</value>
 							</name>
 						</item>
 					</emailRecipients>
@@ -636,26 +636,65 @@
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Sender email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Sender name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getIsTemporary()) &amp;&amp; ($scope->getObject()->getReplacedEntryId()))? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getName():$scope->getObject()->getName()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
+						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getIsTemporary()) &amp;&amp; ($scope->getObject()->getReplacedEntryId()))? $scope->getObject()->getReplacedEntryId():$scope->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_name</key>
+						<description>Entry creator name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_id</key>
+						<description>Entry creator ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getKuserId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_email</key>
+						<description>Entry creator email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getkuser()->getEmail()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_name</key>
+						<description>Account owner name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getPartnerName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_email</key>
+						<description>Account owner email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -1853,6 +1892,127 @@
 					</item>
 				</contentParameters>
 				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<!-- Media Entry Ready -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>Media Entry Ready</name>
+				<systemName>Media_Entry_Ready</systemName>
+				<description>Email notification template to be sent when a new media entry is ready.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof entry &amp;&amp; !(in_array($scope->getObject()->getType(), array(entryType::DATA, entryType::DOCUMENT))) &amp;&amp; in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == entryStatus::READY</code>
+						</field>
+					</item>
+					<item objectType="KalturaOrCondition">
+						<conditions objectType="array">
+							<item objectType="KalturaEventFieldCondition">
+								<field objectType="KalturaEvalBooleanField">
+									<code>!$scope->getObject()->getReplacedEntryId()</code>
+								</field>
+							</item>
+							<item objectType="KalturaEventFieldCondition">
+								<field objectType="KalturaEvalBooleanField">
+									<code>$scope->getObject()->getReplacedEntryId() &amp;&amp; entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getSourceType()!= EntrySourceType::RECORDED_LIVE</code>
+								</field>
+							</item>
+						</conditions>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>Entry is Ready for Publishing: {entry_name}/ ID: {entry_id} </subject>
+				<body><![CDATA[ Hello,<p>A new entry is ready for publishing:</p><p>Entry Name: {entry_name} <br>Entry ID:  {entry_id}<br>Entry Creator: {creator_name}, {creator_id}/{creator_email} </p>]]></body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+					<emailRecipients objectType="array">
+						<item objectType = "KalturaEmailNotificationRecipient">
+							<email objectType="KalturaStringValue">
+								<value>{creator_email}</value>
+							</email>
+							<name objectType="KalturaStringValue">
+								<value>{creator_name}</value>
+							</name>
+						</item>
+					</emailRecipients>
+				</to>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<description>Sender email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<description>Sender name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getIsTemporary()) &amp;&amp; ($scope->getObject()->getReplacedEntryId()))? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getName():$scope->getObject()->getName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getIsTemporary()) &amp;&amp; ($scope->getObject()->getReplacedEntryId()))? $scope->getObject()->getReplacedEntryId():$scope->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_name</key>
+						<description>Entry creator name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_id</key>
+						<description>Entry creator ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getKuserId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_email</key>
+						<description>Entry creator email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getkuser()->getEmail()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_name</key>
+						<description>Account owner name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getPartnerName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_email</key>
+						<description>Account owner email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getAdminEmail() : ''</code>
+						</value>
+					</item>
+				</contentParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">

@@ -45,23 +45,22 @@ class SyndicationFeedService extends KalturaBaseService
 	 * 
 	 * @action add
 	 * @param KalturaBaseSyndicationFeed $syndicationFeed
-	 * @return KalturaBaseSyndicationFeed 
+	 * @return KalturaBaseSyndicationFeed
+	 *
+	 * @disableRelativeTime $syndicationFeed
 	 */
 	public function addAction(KalturaBaseSyndicationFeed $syndicationFeed)
 	{
 		$syndicationFeed->validatePlaylistId();
 		$syndicationFeed->validateStorageId($this->getPartnerId());
-		
-		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
-			$syndicationFeed->validatePropertyNotNull('xslt');				
-			$syndicationFeedDB = new genericSyndicationFeed();
-			$syndicationFeedDB->incrementVersion();	
-		}else
+
+		$propertiesToValidate = $syndicationFeed->getPropertiesToValidate();
+		foreach ($propertiesToValidate as $propName => $propValue)
 		{
-			$syndicationFeedDB = new syndicationFeed();
+			$syndicationFeed->validatePropertyNotNull($propName);
 		}
 			
-		$syndicationFeed->toInsertableObject($syndicationFeedDB);
+		$syndicationFeedDB = $syndicationFeed->toInsertableObject();
 		$syndicationFeedDB->setPartnerId($this->getPartnerId());
 		$syndicationFeedDB->setStatus(KalturaSyndicationFeedStatus::ACTIVE);
 		$syndicationFeedDB->save();
@@ -137,6 +136,8 @@ class SyndicationFeedService extends KalturaBaseService
 	 * @param KalturaBaseSyndicationFeed $syndicationFeed
 	 * @return KalturaBaseSyndicationFeed
 	 * @throws KalturaErrors::INVALID_FEED_ID
+	 *
+	 * @disableRelativeTime $syndicationFeed
 	 */
 	public function updateAction($id, KalturaBaseSyndicationFeed $syndicationFeed)
 	{

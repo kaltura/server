@@ -40,7 +40,9 @@ abstract class KObjectTaskEngineBase
 			throw new Exception('Object '.get_class($object).' is not support by '.get_class($this).' engine');
 
 		$this->processObject($object);
+		
 	}
+	
 
 	/**
 	 * @param KalturaClient $client

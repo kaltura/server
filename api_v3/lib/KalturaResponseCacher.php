@@ -12,6 +12,7 @@ require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/cache/kApiCache.
 class KalturaResponseCacher extends kApiCache
 {
 	// copied from KalturaResponseType
+	const RESPONSE_TYPE_JSON = 1;
 	const RESPONSE_TYPE_XML = 2;
 	const RESPONSE_TYPE_PHP = 3;
 		
@@ -34,8 +35,8 @@ class KalturaResponseCacher extends kApiCache
 	{
 		if (!parent::init())
 			return false;
-			
-		self::handleSessionStart($this->_params);
+
+		self::handleCacheBasedServiceActions($this->_params);
 		
 		// remove parameters that do not affect the api result
 		foreach(kConf::get('v3cache_ignore_params') as $name)
@@ -160,7 +161,7 @@ class KalturaResponseCacher extends kApiCache
 			return;
 		}
 		
-		$responseMetadata = unserialize($this->_responseMetadata);
+		$responseMetadata = $this->_responseMetadata;
 		
 		if ($responseMetadata['class'])
 		{
@@ -199,6 +200,9 @@ class KalturaResponseCacher extends kApiCache
 			}
 		}
 
+		if(self::$_responsePostProcessor)
+			self::$_responsePostProcessor->processResponse($response);
+		
 		echo $response;
 		die;
 	}
@@ -239,7 +243,7 @@ class KalturaResponseCacher extends kApiCache
 				'class' => $responseClass
 			);
 						
-			$this->storeCache($response, serialize($responseMetadata), $serializeResponse);
+			$this->storeCache($response, $responseMetadata, $serializeResponse);
 		}
 		
 		if ($response instanceof kRendererBase)
@@ -249,6 +253,9 @@ class KalturaResponseCacher extends kApiCache
 		}
 		else
 		{
+			if(self::$_responsePostProcessor)
+				self::$_responsePostProcessor->processResponse($response);
+			
 			echo $response;
 			die;
 		}
@@ -300,6 +307,60 @@ class KalturaResponseCacher extends kApiCache
 		return false;
 	}
 
+	private static function isSupportedFormat($format)
+	{
+		return $format == self::RESPONSE_TYPE_XML ||
+			$format == self::RESPONSE_TYPE_PHP ||
+			$format == self::RESPONSE_TYPE_JSON ;
+	}
+
+	private static function handleCacheBasedServiceActions(&$params)
+	{
+		if (isset($params['service']) && isset($params['action']))
+		{
+			$service = $params['service'];
+			$action = $params['action'];
+			if ($service === 'session' && $action === 'start')
+				return self::handleSessionStart($params);
+			else
+			{
+				$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
+				if (!self::isSupportedFormat($format))
+					return;			// the format is unsupported at this level
+				$confActions = $path = kConf::get('cache_based_service_actions');;
+				if (is_array($confActions))
+				{
+					$actionKey = $service . '_' . $action;
+					if (array_key_exists($actionKey, $confActions))
+					{
+						$startTime = microtime(true);
+						$filePath = dirname(__FILE__).$confActions[$actionKey];
+						if ($filePath != dirname(__FILE__) &&
+							file_exists($filePath))
+						{
+							require_once($filePath);
+							$className = basename($filePath, ".php");
+							if (class_exists($className) && method_exists($className, $action))
+								$result =  $className::$action($params);
+							else
+								$result = "Could not run $className::$action since it does not exist";
+						}
+						else
+						    $result = "Failed to parse $actionKey as a valid class configuration";
+						
+						if($result === false)
+							return;
+						
+						$processingTime = microtime(true) - $startTime;
+						self::returnCacheResponseStructure($processingTime, $format, $result);
+					}
+				}
+			}
+		}
+	}
+
+
+
 	private static function handleSessionStart(&$params)
 	{
 		if (!isset($params['service']) || $params['service'] != 'session' ||
@@ -316,7 +377,7 @@ class KalturaResponseCacher extends kApiCache
 		}
 					
 		$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
-		if ($format != self::RESPONSE_TYPE_XML && $format != self::RESPONSE_TYPE_PHP)
+		if (!self::isSupportedFormat($format))
 		{
 			return;			// the format is unsupported at this level
 		}
@@ -352,12 +413,27 @@ class KalturaResponseCacher extends kApiCache
 		
 		$processingTime = microtime(true) - $startTime;
 		$cacheKey = md5("{$partnerId}_{$userId}_{$type}_{$expiry}_{$privileges}");
+		self::returnCacheResponseStructure($processingTime, $format, $result, $cacheKey);
+	}
+
+	private static function returnCacheResponseStructure($processingTime, $format, $result ,$cacheKey='noCacheKey')
+	{
 		header("X-Kaltura:cached-dispatcher,$cacheKey,$processingTime", false);
-		
+		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
+		header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
+		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
+		header("Pragma: no-cache", true);
+
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
 			header("Content-Type: text/xml");
 			echo "<xml><result>{$result}</result><executionTime>{$processingTime}</executionTime></xml>";
+			die;
+		}
+		else if ($format == self::RESPONSE_TYPE_JSON)
+		{
+			header("Content-Type: application/json");
+			echo json_encode($result);
 			die;
 		}
 		else if ($format == self::RESPONSE_TYPE_PHP)
@@ -393,5 +469,35 @@ class KalturaResponseCacher extends kApiCache
 			$curInstance->_cacheHeadersExpiry = $expiry;
 		}
 	}
-
+	
+	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
+	{
+		$result = parent::checkCache($cacheHeaderName, $cacheHeader);
+		if(!$result)
+			return $result;
+		
+		if (isset($this->_responseMetadata['responsePostProcessor']) && is_array($this->_responseMetadata['responsePostProcessor']) && !isset(self::$_responsePostProcessor))
+		{
+			$responsePostProcessor = $this->_responseMetadata['responsePostProcessor'];
+			$filePath = key($responsePostProcessor);
+			require_once $filePath;
+			$postProcessor = unserialize($responsePostProcessor[$filePath]);
+			self::$_responsePostProcessor = $postProcessor;
+		}
+		
+		return $result;
+	}
+	
+	public function storeCache($response, $responseMetadata = "", $serializeResponse = false)
+	{		
+		if(self::$_responsePostProcessor)
+		{
+			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
+			$fileName = $postProcessorClass->getFileName();
+			$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
+			$responseMetadata['responsePostProcessor'] = $responsePostProcessor;
+		}
+		
+		parent::storeCache($response, $responseMetadata, $serializeResponse);
+	}
 }

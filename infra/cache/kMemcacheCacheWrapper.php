@@ -124,7 +124,8 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 			
 			$this->reconnect();
 		}
-		
+
+		self::safeLog("There isnt an active memcahce connection");
 		return false;
 	}
 	

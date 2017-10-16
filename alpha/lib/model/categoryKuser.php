@@ -13,7 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class categoryKuser extends BasecategoryKuser implements IIndexable{
+class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticIndexable
+{
 	
 	private $old_status = null;
 
@@ -32,7 +33,13 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	const PERMISSION_NAME_FIELD_INDEX_PREFIX = "per";
 	
 	const STATUS_FIELD_PREFIX = "status";
-	
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
+
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -401,5 +408,112 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	public function getCacheInvalidationKeys()
 	{
 		return array("categoryKuser:categoryId=".strtolower($this->getCategoryId()));
+	}
+
+	/**
+	 * return the name of the elasticsearch index for this object
+	 */
+	public function getElasticIndexName()
+	{
+		return ElasticIndexMap::ELASTIC_CATEGORY_INDEX;
+	}
+
+	/**
+	 * return the name of the elasticsearch type for this object
+	 */
+	public function getElasticObjectType()
+	{
+		return ElasticIndexMap::ELASTIC_CATEGORY_TYPE;
+	}
+
+	/**
+	 * return the elasticsearch id for this object
+	 */
+	public function getElasticId()
+	{
+		return $this->getCategoryId();
+	}
+
+	/**
+	 * return the elasticsearch parent id or null if no parent
+	 */
+	public function getElasticParentId()
+	{
+		return null;
+	}
+
+	/**
+	 * get the params we index to elasticsearch for this object
+	 */
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'scripted_upsert' => true,
+			'script' => array(
+				'inline' => $this->getInlineScript(),
+				'lang' => 'painless',
+				'params' => array(
+					'kuser_id' => $this->getKuserId(),
+				)
+			),
+			'upsert' => new stdClass(),
+			'retry_on_conflict' => 10
+		);
+		return $body;
+	}
+
+	private function getInlineScript()
+	{
+		if($this->getStatus() == CategoryKuserStatus::DELETED)
+		{
+			$script = 'int idx = ctx._source.kuser_ids.indexOf(params.kuser_id); if(idx != -1) {ctx._source.kuser_ids.remove(idx);}';
+		}
+		else
+		{
+			$script = 'if(ctx._source.kuser_ids == null) {ctx._source.kuser_ids = new ArrayList(); ctx._source.kuser_ids.add(params.kuser_id);}';
+			$script .= 'else if(!ctx._source.kuser_ids.contains(params.kuser_id)) {ctx._source.kuser_ids.add(params.kuser_id);}';
+		}
+
+		return $script;
+	}
+
+	/**
+	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
+	 */
+	public function getElasticSaveMethod()
+	{
+		return ElasticMethodType::UPADTE;
+	}
+
+	/**
+	 * Index the object into elasticsearch
+	 */
+	public function indexToElastic($params = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
+	}
+
+	/**
+	 * return true if the object needs to be deleted from elastic
+	 */
+	public function shouldDeleteFromElastic()
+	{
+		return false;
+	}
+
+	/**
+  * @return partner
+  */
+        public function getPartner()
+        {
+                return PartnerPeer::retrieveByPK( $this->getPartnerId() );
+        }
+
+/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'category_kuser';
 	}
 } // categoryKuser

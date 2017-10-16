@@ -45,7 +45,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 
 	/**
 	 * The value for the case_id field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $case_id;
 
@@ -233,7 +233,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	/**
 	 * Get the [case_id] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getCaseId()
 	{
@@ -447,7 +447,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 	/**
 	 * Set the value of [case_id] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     BusinessProcessCase The current object (for fluent API support)
 	 */
 	public function setCaseId($v)
@@ -456,7 +456,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			$this->oldColumnsValues[BusinessProcessCasePeer::CASE_ID] = $this->case_id;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->case_id !== $v) {
@@ -641,7 +641,7 @@ abstract class BaseBusinessProcessCase extends BaseObject  implements Persistent
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->created_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->updated_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->case_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->case_id = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->process_id = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->template_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->server_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;

@@ -228,11 +228,19 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 * @param date $endDate
 	 * @return array<ScheduleEvent>
 	 */
-	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate)
+	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate,$scheduleEventIdToIgnore=null)
 	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
 		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
+		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
+		if($scheduleEventIdToIgnore)
+		{
+			KalturaLog::info("Ignoring  scheduleEventId {$scheduleEventIdToIgnore}");
+			$c->addAnd(ScheduleEventPeer::ID, $scheduleEventIdToIgnore, Criteria::NOT_EQUAL);
+			$c->addAnd(ScheduleEventPeer::PARENT_ID, $scheduleEventIdToIgnore, Criteria::NOT_IN);
+		}
 
 		$filter = new ScheduleEventFilter();
 		$filter->setResourceIdsIn($resourceIds);
@@ -268,6 +276,11 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
+	}
+
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("scheduleEvent:id%s", self::ID));
 	}
 	
 } // ScheduleEventPeer

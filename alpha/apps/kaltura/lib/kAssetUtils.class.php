@@ -44,17 +44,17 @@ class kAssetUtils
 	 * @params entry $entry
 	 * @return string
 	 */
-	public static function getFileName(entry $entry, flavorAsset $flavorAsset = null)
+
+	public static function getFileName(entry $entry, asset $asset = null)
 	{
 		$fileExt = "";
 		$fileBaseName = $entry->getName();
-		if ($flavorAsset)
+		if ($asset)
 		{
-			$flavorParams = $flavorAsset->getFlavorParams();
-			if ($flavorParams)
-				$fileBaseName = ($fileBaseName . " (" . $flavorParams->getName() . ")");
-
-			$fileExt = $flavorAsset->getFileExt();
+			$assetName = $asset->getName();
+			if ($assetName)
+				$fileBaseName .= " ($assetName)";
+			$fileExt = $asset->getFileExt();
 		}
 		else
 		{
@@ -66,6 +66,7 @@ class kAssetUtils
 	
 		return array($fileBaseName, $fileExt);
 	}
+	
 
 	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '')
 	{

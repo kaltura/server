@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package Core
+ * @package plugins.quiz
  * @subpackage model
  */
 class QuizUserEntry extends UserEntry{
@@ -101,6 +101,11 @@ class QuizUserEntry extends UserEntry{
 			}
 		}
 		return array($totalPoints, $userPoints);
+	}
+
+	public function checkAlreadyExists()
+	{
+		return false;
 	}
 
 }

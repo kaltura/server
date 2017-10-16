@@ -1,0 +1,79 @@
+<fieldset class="mediaRepurposing-condition">
+	<legend>Condition:</legend>
+	<?php foreach($this->element->getSubForms() as $subForm): ?>
+		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
+		<?php echo $subForm; ?>
+	<?php endforeach; ?>
+	<a class="add-cond" href="javascript:;" onclick="addCondition(this);" >+ Add condition</a>
+</fieldset>
+
+<style type="text/css">
+	#frmMediaRepurposingConfigure .mediaRepurposing-condition { display: block; padding: 10px; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-condition span.rule { font-size: 14px; font-weight: bold; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-condition label { display: block; padding: 4px 0; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-condition fieldset { min-width: 0; height: auto; margin: 6px 0; padding: 10px; border: 1px solid #CCCCCC; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-condition .remove-condition { float: right; }
+</style>
+
+<script type="text/javascript">
+
+	var condIndex = 0;
+	function addCondition(target) 
+	{
+		var chooseElem = document.getElementById("conditionType");
+		var showType = chooseElem.options[chooseElem.selectedIndex].text;
+		if (showType == 'None')
+			return alert("Please choose condition type");
+
+		var condTag = 'Cond_' + condIndex++;
+		var newCondition = createConditionByType(showType, condTag);
+
+		jQuery(target).before(newCondition.show());
+	}
+
+	function removeCondition(target) {
+		condIndex--;
+		jQuery(target).parent().remove();
+	}
+
+	function createConditionByType(type, taskTag) 
+	{
+		var condTemplate = jQuery('#MR_SearchConditionTemplate_' + type );
+		condTemplate.attr("name", "Template");
+
+		var newData = condTemplate.clone(true);
+		newData.attr("id", taskTag).attr("name", taskTag);
+		newData.find("input[id=Cond_conditionType]").val(type);
+
+		newData.find( "input,select").each(function(idx) {
+			var name = $( this ).attr("name");
+			var paramName =name.substring("Cond_".length);
+			var tag = taskTag + "::" + paramName;
+			$( this ).attr("name", paramName).attr("id", tag)
+		});
+
+		return newData;
+	}
+
+
+
+	function addCondFromObject(target, object) {
+		var condTag = 'Cond_' + condIndex++;
+		var newCondition = createConditionByType(object.conditionType, condTag);
+
+		newCondition.find( "input,select").each(function(idx) {
+			if ($( this ).attr("type") == 'hidden')
+				return;
+			var name = $( this ).attr("name");
+			var val = object[name];
+			$(this).val(val).attr('checked', val);
+		});
+
+		jQuery(target).before(newCondition.show());
+	}
+
+
+</script>
+
+
+

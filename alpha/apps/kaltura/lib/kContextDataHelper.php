@@ -137,11 +137,19 @@ class kContextDataHelper
 		return $this->streamerType;
 	}
 
+	public function setStreamerType($streamerType) {
+		$this->streamerType = $streamerType;
+	}
+
 	/**
 	 * @return string $mediaProtocol
 	 */
 	public function getMediaProtocol() {
 		return $this->mediaProtocol;
+	}
+
+	public function setMediaProtocol($protocol) {
+		 $this->mediaProtocol = $protocol;
 	}
 
 	public function buildContextDataResult(accessControlScope $scope, $flavorTags, $streamerType, $mediaProtocol, $shouldHandleRuleCodes = false)
@@ -190,7 +198,7 @@ class kContextDataHelper
 		if ($this->entry->getType() == entryType::PLAYLIST &&
 			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
 		{
-			list($entryIds, $durations, $mediaEntry) = 
+			list($entryIds, $durations, $mediaEntry, $captionFiles) =
 				myPlaylistUtils::executeStitchedPlaylist($this->entry);
 			if (!$mediaEntry)
 			{

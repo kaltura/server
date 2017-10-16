@@ -69,6 +69,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIMELIGHT_RTMP => 'DeliveryProfileLimeLightRtmp',
 			
 			DeliveryProfileType::VOD_PACKAGER_HLS => 'DeliveryProfileVodPackagerHls',
+			DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST => 'DeliveryProfileVodPackagerHlsManifest',
 			DeliveryProfileType::VOD_PACKAGER_DASH => 'DeliveryProfileVodPackagerDash',
 			DeliveryProfileType::VOD_PACKAGER_HDS => 'DeliveryProfileVodPackagerHds',
 			DeliveryProfileType::VOD_PACKAGER_MSS => 'DeliveryProfileVodPackagerMss',
@@ -143,20 +144,26 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
 	{
+		$delivery = null;
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, $streamerType);
 		
 		if ($streamerType == PlaybackProtocol::HTTP)
 		{
 			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol());
-		
 			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
-			if ($delivery)
-				return $delivery;
 			
-			// if a delivery profile wasn't found try again without forcing the request protocol  
-			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol() == 'http' ? 'https' : 'http');
+			// if a delivery profile wasn't found try again without forcing the request protocol
+			if(!$delivery)
+				$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol() == 'http' ? 'https' : 'http');
 		}
-		return self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);	
+		
+		if(!$delivery)
+			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
+		
+		if($delivery)
+			$delivery->setDynamicAttributes($deliveryAttributes);
+		
+		return $delivery;
 	}
 	
 	/**

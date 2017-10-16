@@ -1803,4 +1803,18 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData( self::HTML_PURIFIER_BASE_LIST_USAGE, $v );
 	}
+	
+	public function getDefaultLiveStreamSegmentDuration()
+	{
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->getId()))
+		{
+			return $this->getFromCustomData("default_live_stream_segment_duration", null, LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS);
+		}
+		return null;
+	}
+	
+	public function setDefaultLiveStreamSegmentDuration($v)
+	{
+		$this->putInCustomData( "default_live_stream_segment_duration", $v );
+	}
 }

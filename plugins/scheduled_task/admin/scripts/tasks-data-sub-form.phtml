@@ -1,0 +1,131 @@
+<fieldset class="mediaRepurposing-task" id="tasksDisplay">
+	<legend>Tasks:</legend>
+	<?php foreach($this->element->getSubForms() as $subForm): ?>
+		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
+		<?php echo $subForm; ?>
+	<?php endforeach; ?>
+	<a id="addTaskButtonInForm" class="add-task" style="display:none" href="javascript:;" onclick="addTask(this);" >+ Add Task</a>
+</fieldset>
+
+<style type="text/css">
+	#frmMediaRepurposingConfigure .mediaRepurposing-task { padding: 10px; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-task span.rule { font-size: 14px; font-weight: bold; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-task label { display: block; padding: 4px 0; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-task fieldset { height: auto; margin: 6px 0; padding: 10px; border: 1px solid #CCCCCC; }
+	#frmMediaRepurposingConfigure .mediaRepurposing-task .add-task { float: right; padding: 10px; }
+</style>
+
+<script type="text/javascript">
+
+	var index = 0;
+	function addTask(target) {
+		var chooseElem = document.getElementById("TaskTypeChoose");
+		var type = chooseElem.options[chooseElem.selectedIndex].value;
+		var showType = chooseElem.options[chooseElem.selectedIndex].text;
+
+		if (showType == 'NONE')
+			return alert("Please choose task");
+
+		var taskTag = 'mr_task_data_'+index;
+		var taskSubForm = createSubForm(showType);
+		var newData = createDataByType(type, taskTag);
+
+
+		addSubFormToView(target, taskSubForm, newData, taskTag);
+		
+	}
+
+	function removeTask(target) {
+		index--;
+		var belong = jQuery(target).parent().find('[name=belongs]').val();
+		jQuery("#" + belong).remove();
+		jQuery(target).parent().remove();
+	}
+
+	function addSubFormToView(target, taskForm, dataForm, taskTag)
+	{
+		jQuery(target).before(taskForm);
+		jQuery(target).before(dataForm.show());
+		//set the data section on the belonging of the last task only (as new task)
+		jQuery(target).parent().find('[name=belongs]').last().val(taskTag);
+	}
+
+	function createDataByType(type, taskTag) {
+		type = type.replace('.','');
+		var dataTemplate = jQuery('#MR_tasksDataTemplate_' + type + "-element");
+		dataTemplate.attr("name", "Template");
+
+		var newData = dataTemplate.clone(true);
+		newData.attr("id", taskTag).attr("name", taskTag);
+
+
+		newData.find( "input,select,textarea").each(function(idx) {
+			var name = $( this ).attr("name");
+			var paramName =name.substring(name.lastIndexOf("[")+1,name.lastIndexOf("]"));
+			var tag = 'TaskData_' + index + "::" + paramName;
+			$( this ).attr("name", paramName).attr("id", tag)
+		});
+		return newData;
+	}
+
+
+
+	function createSubForm(showType) {
+		<?php $subForm = new Form_MediaRepurposingTasksSubForm("REPLACE_TYPE"); ?>
+		<?php $subForm->setElementsBelongTo('mr_task_REPLACE_INDEX'); ?>
+		var template = '<?php echo str_replace(array("\n", "\r"), '', $subForm->__toString()); ?>';
+		template = template.replace(/REPLACE_INDEX/g, index++);
+		template = template.replace(/REPLACE_TYPE/g, showType);
+		return template;
+	}
+
+	function addTaskFromObject(target, object) {
+		addEmptyTaskFromObject(target, object);
+		populateTaskFromObject(object);
+
+	}
+
+	function populateTaskFromObject(object) {
+		// because we increase the index before when adding the form
+		let currentIndex = index-1;
+		let idElem = jQuery('#mr_task_' + currentIndex + "-TaskId");
+
+		//set the task Id and time to next
+		idElem.val(object.id);
+		if (object.id)
+			idElem.closest("fieldset").find('[id=removeTaskButton]').hide();
+		jQuery('#mr_task_' + currentIndex + "-taskTime").val(object.taskTimeToNext);
+
+		var taskTag = 'mr_task_data_'+currentIndex;
+		let parent = jQuery('#' + taskTag);
+
+		let fields = Object.keys(object.taskData);
+		fields.forEach(function(currentValue, index, arr) {
+			insertDataVal(parent, currentValue, object.taskData[currentValue]);
+		});
+
+	}
+
+	function addEmptyTaskFromObject(target, object) {
+		let chooseElement = jQuery('#TaskTypeChoose option[label="' + object.type + '"]');
+		var type = chooseElement.val();
+
+		var taskTag = 'mr_task_data_'+index;
+		var taskSubForm = createSubForm(object.type);
+		var newData = createDataByType(type,taskTag );
+
+		addSubFormToView(target, taskSubForm, newData, taskTag);
+	}
+
+
+	function insertDataVal(parent, tag, val) {
+		let x = parent.find("[name=" + tag + "]");
+		x.val(val).attr('checked', val);
+	}
+
+
+
+</script>
+
+
+

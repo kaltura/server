@@ -40,7 +40,7 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	 * Deleted via api
 	 */
 	const UPLOAD_TOKEN_DELETED = 5;
-	
+
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isNew())

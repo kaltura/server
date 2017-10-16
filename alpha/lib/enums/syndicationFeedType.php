@@ -11,4 +11,7 @@ interface syndicationFeedType extends BaseEnum
 	const TUBE_MOGUL = 4;
 	const KALTURA = 5;
 	const KALTURA_XSLT = 6;
+	const ROKU_DIRECT_PUBLISHER = 7;
+	const OPERA_TV_SNAP = 8;
+
 }

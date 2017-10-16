@@ -1918,7 +1918,7 @@ CREATE TABLE `server_node`
 	`tags` TEXT,
 	`host_name` VARCHAR(256)  NOT NULL,
 	`playback_host_name` VARCHAR(256),
-	`parent_id` INTEGER default 0,
+	`parent_id` VARCHAR(256),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_system_name`(`partner_id`, `status`, `system_name`),
@@ -2410,12 +2410,17 @@ CREATE TABLE `user_entry`
 	`status` INTEGER,
 	`type` INTEGER,
 	`custom_data` TEXT,
+	`extended_status` INTEGER,
+	`privacy_context` VARCHAR(255),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
+	KEY `kuser_id_entry_id`(`kuser_id`, `entry_id`, `privacy_context`),
+	KEY `kuser_id_updated_at`(`kuser_id`, `updated_at`, `privacy_context`),
+	KEY `kuser_id_extended_status_updated_at`(`kuser_id`, `extended_status`, `updated_at`, `privacy_context`),
 	INDEX `user_entry_FI_1` (`entry_id`),
 	CONSTRAINT `user_entry_FK_1`
 		FOREIGN KEY (`entry_id`)
 		REFERENCES `entry` (`id`),
-	INDEX `user_entry_FI_2` (`kuser_id`),
 	CONSTRAINT `user_entry_FK_2`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)

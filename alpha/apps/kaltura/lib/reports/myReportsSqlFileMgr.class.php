@@ -4,7 +4,8 @@ class myReportsSqlFileMgr
 	const NO_TEXT_SUFFIX = "no_text";
 	const FOR_OBJECTS_SUFFIX = "for_objects";
 	const NO_FILTER_SUFFIX = "without_filter";
-	
+	const FOR_OBJECTS_INDEX_SUFFIX = "for_objects_index";
+
 	public static function getSqlFilePath ( $type_str , $flavor_str , $add_search_text , $object_ids, $input_filter )
 	{
 		$res = self::getSqlFilePathImpl( $type_str , $flavor_str , $add_search_text , $object_ids,  $input_filter );
@@ -34,6 +35,16 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		{
 			if ( $object_ids )
 			{
+				// use entry index in case there are less than 10 entries in the filter, else use the PRIMARY index
+				if ($type_str === "top_content" && $flavor_str === "detail" && substr_count($object_ids, ",") < 10) {
+					$config = self::getFileNameMappingConfig( 
+					$type_str , 
+					$flavor_str , 
+					$add_search_text ? "" : "_" . self::FOR_OBJECTS_INDEX_SUFFIX , 
+					"", 
+					$has_filter,
+					$input_filter->getFilterBy() );	
+				} else {
 				// search again without the _object addition
 				$config = self::getFileNameMappingConfig( 
 					$type_str , 
@@ -42,7 +53,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 					"", 
 					$has_filter,
 					$input_filter->getFilterBy() );
-		
+		        }
 				if ( $config === null )
 				{
 					throw new Exception ( "cannot find mapping for [$type_str][$flavor_str]" );
@@ -154,7 +165,8 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			),
 			"top_content" => array (	
 				"detail" => "",
-				"detail_no_text" => "",	
+				"detail_no_text" => "",
+				"detail_for_objects_index" => "detail_for_objects_index",	
 				"count" => "",
 				"count_no_text" => "",
 				"graph" => "",

@@ -2408,7 +2408,7 @@ CREATE TABLE `server_node`
 	`tags` TEXT,
 	`host_name` VARCHAR(256) NOT NULL,
 	`playback_host_name` VARCHAR(256),
-	`parent_id` INTEGER default 0,
+	`parent_id` VARCHAR(256),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY partner_id_status_system_name(`partner_id`, `status`, `system_name`),
@@ -2425,9 +2425,13 @@ CREATE TABLE `user_entry`
 	`updated_at` DATETIME,
 	`status` INTEGER,
 	`type` INTEGER,
+	`extended_status` INTEGER,
+	`privacy_context` VARCHAR(255),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY (`entry_id`, `kuser_id`)
+	KEY (`entry_id`, `kuser_id`,`privacy_context`),
+	KEY `kuser_id_updated_at`(`kuser_id`, `updated_at`),
+	KEY `kuser_id_extended_status_updated_at`(`kuser_id`, `extended_status`, `updated_at`, `privacy_context`)
 )ENGINE=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
 
 
@@ -2537,7 +2541,7 @@ CREATE TABLE `business_process_case`
 	`partner_id` INTEGER  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`case_id` INTEGER,
+	`case_id` VARCHAR(64),
 	`process_id` VARCHAR(255),
 	`template_id` INTEGER,
 	`server_id` INTEGER,

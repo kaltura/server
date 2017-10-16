@@ -179,9 +179,6 @@ $aud = $target->_audio;
 			case KDLAudioTarget::MPEG2:
 				$acodec = "mp2";
 				break;
-			case KDLAudioTarget::AC3:
-				$acodec = "ac3";
-				break;
 			case KDLAudioTarget::PCM:
 				if(isset($aud->_resolution) && in_array($aud->_resolution, array(16,24,32))) {
 					$acodec = "pcm_s".$aud->_resolution."le";

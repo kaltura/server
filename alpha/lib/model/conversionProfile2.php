@@ -18,8 +18,12 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	const CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV = 4;
 	
 	const FILE_SYNC_MRSS_XSL = 1;
+	const FILE_SYNC_MEDIAINFO_XSL = 2;
+	
+	const DEFAULT_REPLACEMENT_OPTIONS = "defaultReplacementOptions";
 	
 	private $xsl;
+	private $mediaInfoXsl;
 	
 	protected $isDefault;
 		
@@ -52,6 +56,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		$valid_sub_types = array(
 			self::FILE_SYNC_MRSS_XSL,
+			self::FILE_SYNC_MEDIAINFO_XSL,
 		);
 		
 		if(! in_array($sub_type, $valid_sub_types))
@@ -65,7 +70,12 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		self::validateFileSyncSubType($sub_type);
 		if(!$version)
-			$version = $this->getVersion();
+		{
+			if($sub_type == self::FILE_SYNC_MRSS_XSL)
+				$version = $this->getVersion();
+			else
+				$version = $this->getMediaInfoXslVersion();		
+		}
 		
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::CONVERSION_PROFILE;
@@ -94,11 +104,23 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		return $this->getFromCustomData("xslVersion", null, 0);
 	}
 	
+	public function getMediaInfoXslVersion()
+	{
+		return $this->getFromCustomData("mediaInfoXslVersion", null, 0);
+	}
+	
 	public function incrementXslVersion()
 	{
 		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::CONVERSION_PROFILE, self::FILE_SYNC_MRSS_XSL);
 		
 		$this->putInCustomData("xslVersion", $newVersion);
+	}
+	
+	public function incrementMediaInfoXslVersion()
+	{
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getMediaInfoXslVersion(), FileSyncObjectType::CONVERSION_PROFILE, self::FILE_SYNC_MEDIAINFO_XSL);
+		
+		$this->putInCustomData("mediaInfoXslVersion", $newVersion);
 	}
 	
 	/**
@@ -129,6 +151,19 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		$key = $this->getSyncKey(self::FILE_SYNC_MRSS_XSL);
 		$this->xsl = kFileSyncUtils::file_get_contents($key, true, false);
 		return $this->xsl;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getMediaInfoXslTransformation()
+	{
+		if (!is_null($this->mediaInfoXsl))
+			return $this->mediaInfoXsl;
+
+		$key = $this->getSyncKey(self::FILE_SYNC_MEDIAINFO_XSL);
+		$this->mediaInfoXsl = kFileSyncUtils::file_get_contents($key, true, false);
+		return $this->mediaInfoXsl;
 	}
 
 	/* (non-PHPdoc)
@@ -319,4 +354,27 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	 */
 	public function getCollectionTags() { return $this->getFromCustomData('collectionTags', null, 'mbr,ism'); }
 	public function setCollectionTags($v) {	$this->putInCustomData('collectionTags', $v); }
+
+	/*
+	 * JSON string with array of "condition,profile-id" pairs. For example - 
+	 * 	'[{"profileId":"11","condition":"containerFormat==wmv"}]'
+	 *	For all WMV sources the conv-prof 11 will be applied (overriding the original conv.prof)"
+	 */
+	public function getConditionalProfiles() { return $this->getFromCustomData('conditionalProfiles', null, null); }
+	public function setConditionalProfiles($v) { $this->putInCustomData('conditionalProfiles', $v); }
+	
+	/*
+	 * When set, the ExtractMedia job should attempt to detect the source file GOP interval 
+	 * using the 'detectGOP' value as the max calculated period
+	 */
+	public function getDetectGOP() { return $this->getFromCustomData('detectGOP', null, 0); }
+	public function setDetectGOP($v) { $this->putInCustomData('detectGOP', $v); }
+
+	/*
+	 * When set, the replacement process should use the CP replacement options by default, if no others are passed
+	 * 
+	 */
+	public function getDefaultReplacementOptions() {return $this->getFromCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, null, 0);}
+	public function setDefaultReplacementOptions($v) {$this->putInCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, $v);}
+
 }

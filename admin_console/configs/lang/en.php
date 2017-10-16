@@ -64,10 +64,13 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::RECALCULATE_CACHE' => 'Recalculate Cache',
 	'Kaltura_Client_Enum_BatchJobType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET' => 'Parse Multi Language Caption Asset',
 	'Kaltura_Client_Enum_BatchJobType::LIVE_TO_VOD' => 'Live To Vod',
+	'Kaltura_Client_Enum_BatchJobType::CLEAR_BEACONS' => 'Clear Beacons',
+	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_VP8' => 'Convert - FFMpeg Vp8',
+	'Kaltura_Client_Enum_ConversionEngineType::CHUNKED_FFMPEG' => 'Convert - Chunked FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::ON2' => 'Convert - On2',
 	'Kaltura_Client_Enum_ConversionEngineType::MENCODER' => 'Convert - MEncoder',
 	'Kaltura_Client_Enum_ConversionEngineType::ENCODING_COM' => 'Convert - Encoding.com',
@@ -228,6 +231,7 @@ return array(
 	'Kaltura_Client_Enum_SourceType::RECORDED_LIVE' => 'Recorded Live',
 	'Kaltura_Client_Enum_SourceType::CLIP' => 'Clip',
 	'Kaltura_Client_Enum_SourceType::KALTURA_RECORDED_LIVE' => 'Kaltura recorded Live',
+	'Kaltura_Client_Enum_SourceType::LECTURE_CAPTURE' => 'Lecture Capture',
 	
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA_EDIT' => 'Data Edit',
@@ -449,7 +453,7 @@ return array(
 	'entry-investigate info entry created label' => 'Created At',
 	'entry-investigate info entry modified label' => 'Modified At',
 	'entry-investigate info entry updated label' => 'Updated At',
-	'entry-investigate info entry actions label' => 'Reconvert',
+	'entry-investigate info entry actions label' => 'Action',
 	'entry-investigate info entry boost label' => 'Boost Jobs',
 
 	'entry-investigate info entry ip1 label' => 'IP 1',
@@ -474,6 +478,7 @@ return array(
 	'entry-investigate info entry big-red-button label' => 'Big-Red-Button',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
+	'entry-investigate entry restore' => 'Restore',
 	'entry-investigate entry boostJobs' => 'Boost Jobs',
 
 	'entry-investigate entry upload support' => 'Investigate File',
@@ -617,6 +622,7 @@ return array(
 	'entry-investigate history data th' => 'Data',
 	'entry-investigate history status th' => 'Status (failure reason)',
 	'entry-investigate history status tooltip' => 'The status of this task. The task status is one of the following: Waiting, In Process, completed, Failed',
+	'entry-investigate history object th' => 'Object',
 	'entry-investigate history abort th' => 'Aborted',
 	'entry-investigate history recheck th' => 'Check Again',
 	'entry-investigate history msg th' => 'Message',
@@ -1075,6 +1081,15 @@ return array(
     'distribution-profile was removed' => 'Distribution profile was removed.' ,
     'distribution-profile was disabled' => 'Distribution profile disabled.',
     'distribution-profile was enabled' => 'Distribution profile enabled.',
+	
+	//Media Repurposing
+	'Media Repurposing list intro text' => 'Here you can manage the Media Repurposing profiles on your Kaltura video platform deployment',
+
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::ACTIVE' => 'Active',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DELETED' => 'Delete',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::SUSPENDED' => 'Suspended',
+	'Kaltura_Client_ScheduledTask_Enum_ScheduledTaskProfileStatus::DRY_RUN_ONLY' => 'Dry run only',
 
 	// Drop Folder
 	'drop folder list intro text' => 'Here you can manage the Drop Folder profiles on your Kaltura video platform deployment',
@@ -1282,6 +1297,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH" => "VOD_PACKAGER_DASH",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HDS" => "VOD_PACKAGER_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS" => "VOD_PACKAGER_HLS",
+	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST" => "VOD_PACKAGER_HLS_MANIFEST",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_MSS" => "VOD_PACKAGER_MSS",
 	
 	"Kaltura_Client_Enum_DeliveryStatus::ACTIVE" => "Active",
@@ -1316,6 +1332,7 @@ return array(
 	'Kaltura_Client_Type_UrlTokenizerCloudFront'	=> 'CloudFront Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerVnpt'        => 'Vnpt Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerCht'		=> 'CHT Tokenizer',
+	'Kaltura_Client_Type_UrlTokenizerChinaCache'		=> 'ChinaCache Tokenizer',
 	
 	'Kaltura_Client_Type_UrlRecognizer' => "default recognizer",
     

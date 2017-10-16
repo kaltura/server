@@ -1883,6 +1883,18 @@ form#frmCreateDropFolder dd,form#frmCreateDropFolder dt {
 	float: left;
 }
 
+form#frmCreateMediaRepurposing dd,form#frmCreateMediaRepurposing dt {
+	float: left;
+	right: 0px;
+}
+
+form#frmCreateMediaRepurposingFromTemplate dd,form#frmCreateMediaRepurposingFromTemplate dt {
+	right: 0px;
+	float: left;
+
+}
+
+
 #drop-folder-configure-dialog {
 	padding-top: 10px;
 }

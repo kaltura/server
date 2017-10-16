@@ -19,7 +19,7 @@ interface ReportType extends BaseEnum
 //	const WIDGETS_STATS = 8;
 //	const ADMIN_CONSOLE = 10;		// shouldn't be accessable to users through the API
    const USER_ENGAGEMENT = 11;
-   const SPEFICIC_USER_ENGAGEMENT = 12;
+   const SPECIFIC_USER_ENGAGEMENT = 12;
    const USER_TOP_CONTENT = 13;
    const USER_CONTENT_DROPOFF = 14;
    const USER_CONTENT_INTERACTIONS = 15;
@@ -30,7 +30,7 @@ interface ReportType extends BaseEnum
    const VAR_USAGE = 19;
    const TOP_CREATORS = 20;
    const PLATFORMS = 21;
-   const OPERATION_SYSTEM = 22;
+   const OPERATING_SYSTEM = 22;
    const BROWSERS = 23;
    const LIVE = 24;
    const TOP_PLAYBACK_CONTEXT = 25;

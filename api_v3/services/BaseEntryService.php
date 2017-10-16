@@ -657,6 +657,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @action flag
 	 * @param string $entryId
 	 * @param KalturaModerationFlag $moderationFlag
+	 * @ksOptional
 	 *
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
@@ -890,7 +891,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntry The cloned entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function cloneAction( $entryId, $cloneOptions=null)
+	public function cloneAction( $entryId, $cloneOptions=null )
 	{
 		// Reset criteria filters such that it will be
 		entryPeer::setUseCriteriaFilter(false);
@@ -912,6 +913,7 @@ class BaseEntryService extends KalturaEntryService
 
 		// Copy the entry into a new one based on the given partner data.
 		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreClonedOptionsArray);
+
 		return $this->getEntry($clonedEntry->getId());
 	}
 
@@ -961,7 +963,7 @@ class BaseEntryService extends KalturaEntryService
 			$accessControlScope = new accessControlScope();
 		$contextDataParams->toObject($accessControlScope);
 
-		$contextDataHelper->buildContextDataResult($accessControlScope, $contextDataParams->flavorTags, $contextDataParams->streamerType, $contextDataParams->mediaProtocol, true);
+		$contextDataHelper->buildContextDataResult($accessControlScope, kContextDataHelper::ALL_TAGS, $contextDataParams->streamerType, $contextDataParams->mediaProtocol, true);
 		if ($contextDataHelper->getDisableCache())
 			KalturaResponseCacher::disableCache();
 
@@ -973,6 +975,9 @@ class BaseEntryService extends KalturaEntryService
 				$isScheduledNow = true;
 			}
 		}
+
+		$contextDataHelper->setMediaProtocol($contextDataParams->mediaProtocol);
+		$contextDataHelper->setStreamerType($contextDataParams->streamerType);
 
 		$playbackContextDataHelper = new kPlaybackContextDataHelper();
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);

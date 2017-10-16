@@ -8,7 +8,7 @@
  notifempty
  sharedscripts
  postrotate
- service kaltura_populate restart
+ service kaltura-populate restart
  endscript
  su root kaltura
 }

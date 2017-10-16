@@ -102,6 +102,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 			KBatchBase::unimpersonate();
 				
 			$cmdLines[$k]->exec_cmd = $exec_cmd;
+			
 		}
 		return $cmdLines;
 	}

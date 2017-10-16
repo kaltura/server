@@ -190,6 +190,235 @@ class KDLMediaDataSet  {
 
 		return $tagsOut;
 	}
+
+	/**
+	 * 
+	 * @param unknown_type $condition
+	 * 
+	 * Check whether the KDLMediaDataSet object comply with provided condtion string.
+	 * The condition string can contain - 
+	 * - numbers
+	 * - signs
+	 * -- boolean operators -  '!=<>&|'
+	 * -- aritmetic operators - '/+-*'
+	 * -- brackets '()'
+	 * -- space
+	 * - 'Variables' that repsent KDLMediaDataSet fields -
+	 * -- containerFormat, containerDuration, containerBitRate, fileSize
+	 * -- videoFormat, videoDuration, videoBitRate, videoWidth, videoHeight, videoFrameRate, videoDar, videoRotation, scanType, contentAwareness, videoGop
+	 * -- audioFormat, audioDuration, audioBitRate, audioChannels, audioSampleRate, audioResolution
+	 * - Allowed codecs/formats - 
+	 * -- mp4, mxf, wmv3, mpegps, mpegts, webm, mp3
+	 * -- h264, h265, vp6, vp8, vp9, wmv3, mpeg2
+	 * -- mp3, aac, mpeg2, pcm
+	 * -- Preset conditions
+	 * --- isMbr 
+	 * --- isWeb
+	 * 
+	 * Since this funtion uses php 'eval' function, following precautions are applied to make sure that 
+	 * executed statement is harmless:
+	 * - the prepare logic interperts all the operands either into numbers or into the allowed list of strings (see above)
+	 * - the resultant interpreted condition string is tokenized with allowed signs (see above)
+	 * - the tokens must be either numbers or allowed strings (see above - 'Allowed codecs/formats'/Preset conditions.
+	 * 
+	 * Example:
+	 * - Input raw condition 
+	 * 		containerFormat==mp4 && videoHeight<1080 && videoWidth<1920 && videoDar<1.77777 && isMbr==1
+	 * - Interpreted condition, based on the source media info - 
+	 * 		mp4==mp4 && 720<1080 && 1280<1920 && 1.25<1.77777 && isMbr==1
+	 * - Result - true
+	 */
+	public function IsCondition($condition)
+	{
+		KalturaLog::log("Input condition - $condition");
+		$valsArr = array();
+			/*
+			 *  Set conatiner related fields
+			 */
+		if(isset($this->_container) && $this->_container->IsDataSet()){
+			$obj = $this->_container;
+			if($obj->IsFormatOf(array("isom","mp42","qt","quicktime","m4v"))){
+				$valsArr["containerFormat"]="mp4";
+			}
+			else if($obj->IsFormatOf(array("mxf"))){
+				$valsArr["containerFormat"]="mxf";
+			}
+			else if($obj->IsFormatOf(array("windows media"))){
+				$valsArr["containerFormat"]="wmv";
+			}
+			else if($obj->IsFormatOf(array("mpeg-ps"))){
+				$valsArr["containerFormat"]="mpegps";
+			}
+			else if($obj->IsFormatOf(array("mpeg-ts"))){
+				$valsArr["containerFormat"]="mpegts";
+			}
+			else if($obj->IsFormatOf(array("webm"))){
+				$valsArr["containerFormat"]="webm";
+			}
+			else if($obj->IsFormatOf(array("mpeg audio"."mp3"))){
+				$valsArr["containerFormat"]="mp3";
+			}
+			else {
+				$valsArr["containerFormat"]="undefined";
+			}
+			$valsArr["containerDuration"]=$obj->_duration;
+			$valsArr["containerBitRate"]=$obj->_bitRate;
+			$valsArr["fileSize"]=$obj->_fileSize;
+		}
+		else {
+			$valsArr["containerFormat"]="undefined";
+			$valsArr["containerDuration"]=0;
+			$valsArr["containerBitRate"]=0;
+			$valsArr["fileSize"]=0;
+		}
+			/*
+			 * Set video related fields
+			 */
+		if(isset($this->_video) && $this->_video->IsDataSet()){
+			$obj = $this->_video;
+			if($obj->IsFormatOf(array("avc","avc1","h264"))){
+				$valsArr["videoFormat"]="h264";
+			}
+			else if($obj->IsFormatOf(array("hev","hev1","hevc","h265"))){
+				$valsArr["videoFormat"]="h265";
+			}
+			else if($obj->IsFormatOf(array("vp6","vp6.1","vp6.2","vp6f","flv4"))){
+				$valsArr["videoFormat"]="vp6";
+			}
+			else if($obj->IsFormatOf(array("vc-1","wmv3"))){
+				$valsArr["videoFormat"]="wmv3";
+			}
+			else if($obj->IsFormatOf(array("vp8"))){
+				$valsArr["videoFormat"]="vp8";
+			}
+			else if($obj->IsFormatOf(array("vp9","v_vp9"))){
+				$valsArr["videoFormat"]="vp9";
+			}
+			else if($obj->IsFormatOf(array("mpegvideo","mpeg video"))){
+				$valsArr["videoFormat"]="mpeg2";
+			}
+			else
+				$valsArr["videoFormat"]="undefined";
+			$valsArr["videoDuration"]=$obj->_duration;
+			$valsArr["videoBitRate"]=$obj->_bitRate;
+			$valsArr["videoWidth"]=$obj->_width;
+			$valsArr["videoHeight"]=$obj->_height;
+			$valsArr["videoFrameRate"]=$obj->_frameRate;
+			$valsArr["videoDar"]=$obj->_dar;
+			$valsArr["videoRotation"]=$obj->_rotation;
+			$valsArr["scanType"]=$obj->_scanType;
+			$valsArr["contentAwareness"]=$obj->_contentAwareness;
+			$valsArr["videoGop"]=$obj->_gop;
+		}
+		else {
+			$valsArr["videoFormat"]="undefined";
+			$valsArr["videoDuration"]=0;
+			$valsArr["videoBitRate"]=0;
+			$valsArr["videoWidth"]=0;
+			$valsArr["videoHeight"]=0;
+			$valsArr["videoFrameRate"]=0;
+			$valsArr["videoDar"]=0;
+			$valsArr["videoRotation"]=0;
+			$valsArr["scanType"]=0;
+			$valsArr["contentAwareness"]=0;		
+			$valsArr["videoGop"]=0;
+		}
+			/*
+			 * Set audio related fields
+			 */
+		if(isset($this->_audio) && $this->_audio->IsDataSet()){
+			$obj = $this->_audio;
+			$valsArr["audioFormat"]=$obj->GetIdOrFormat();
+			if($obj->IsFormatOf(array("aac"))){
+				$valsArr["audioFormat"]="aac";
+			}
+			else if($obj->IsFormatOf(array("mpeg audio","mp3"))){
+				$valsArr["audioFormat"]="mp3";
+			}
+			else if($obj->IsFormatOf(array("mp2"))){
+				$valsArr["audioFormat"]="mp2";
+			}
+			else if($obj->IsFormatOf(array("pcm"))){
+				$valsArr["audioFormat"]="pcm";
+			}
+			else if($obj->IsFormatOf(array("ac3","ac-3"))){
+				$valsArr["audioFormat"]="ac3";
+			}
+			else if($obj->IsFormatOf(array("eac3","eac-3","e-ac-3"))){
+				$valsArr["audioFormat"]="eac3";
+			}
+			else
+				$valsArr["audioFormat"]="undefined";
+			$valsArr["audioDuration"]=$obj->_duration;
+			$valsArr["audioBitRate"]=$obj->_bitRate;
+			$valsArr["audioChannels"]=$obj->_channels;
+			$valsArr["audioSampleRate"]=$obj->_sampleRate;
+			$valsArr["audioResolution"]=$obj->_resolution;
+			if(isset($this->_contentStreams->audio)) {
+				$valsArr["audioStreams"]=count($this->_contentStreams->audio);
+			}
+			else 
+				$valsArr["audioStreams"]=0;
+		}
+		else {
+			$valsArr["audioFormat"]="undefined";
+			$valsArr["audioDuration"]=0;
+			$valsArr["audioBitRate"]=0;
+			$valsArr["audioChannels"]=0;
+			$valsArr["audioSamplingRate"]=0;
+			$valsArr["audioResolution"]=0;
+			$valsArr["audioStreams"]=0;			
+		}
+			/*
+			 * Check 'isWeb' and 'isMbr' presets
+			 */
+		$tagsOut = $this->ToTags(array("mbr","web"));
+		$valsArr["isWeb"] = in_array("web", $tagsOut)? 1: 0;
+		$valsArr["isMbr"] = in_array("mbr", $tagsOut)? 1: 0;
+		
+			/*
+			 * Assign the 'variables' with KDLMediaDataSet values
+			 */
+		$opsArr = array_keys($valsArr);
+		$condition = str_replace($opsArr, $valsArr, $condition);
+		KalturaLog::log("After assignment - $condition");
+
+			/*
+			 * Verify that the condition statement contains ONLY allowed strings (see decription in the func header)
+			 */
+		$containerFormats = array("mp4","mxf","wmv3","mpegps","mpegts","webm","mp3");
+		$videoCodecs = array("h264","h265","vp6","vp8","vp9","wmv3","mpeg2");
+		$audioCodecs = array("mp3","aac","mpeg2","pcm","ac3","eac3");
+		$allowedFormats = array_merge($containerFormats, $videoCodecs, $audioCodecs);
+		$allowedFormats[] = "undefined";
+		$allowedChars = ' +-*/()!=<>&|;';
+		$tok = strtok($condition, $allowedChars);
+		while ($tok !== false) {
+			if(!(is_numeric($tok)||in_array($tok,$allowedFormats))){
+				KalturaLog::log("Invalid token - $tok. Leaving");
+				return null;
+			}
+			$tok = strtok($allowedChars);
+		}
+
+			/*
+			 * Add '"' to all strings, otherwise it would be an invalid php statement.
+			 */
+		$strArr = array();
+		foreach($allowedFormats as $aux){
+			$strArr[] = "\"$aux\"";
+		}
+		$condition = str_replace($allowedFormats, $strArr, $condition).";";
+		KalturaLog::log("Final - $condition");
+		
+			/*
+			 * The precautions to ensure the harmlessness of the condition string are described in the func header.
+			 */
+		$rv = eval("return ".$condition);
+
+		KalturaLog::log("RV - ".($rv? "true":"false"));
+		return $rv;
+	}
 		
 	/* ---------------------------
 	 * ToString

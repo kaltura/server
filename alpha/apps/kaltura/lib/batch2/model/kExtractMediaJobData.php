@@ -25,6 +25,10 @@ class kExtractMediaJobData extends kConvartableJobData
 	 */
 	public $destDataFilePath;
 	
+	/**
+	 * @var int
+	 */
+	public $detectGOP;
 	
 	/**
 	 * @return the $flavorAssetId
@@ -89,4 +93,11 @@ class kExtractMediaJobData extends kConvartableJobData
 	{
 		$this->destDataFilePath = $destDataFilePath;
 	}
+
+		/*
+		 * When set, the ExtractMedia job should attempt to detect the source file GOP interval 
+		 * using the 'detectGOP' value as the max calculated period
+		 */
+	public function getDetectGOP() { return $this->detectGOP; }
+	public function setDetectGOP($v) { $this->detectGOP = $v; }
 }

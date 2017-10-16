@@ -13,6 +13,7 @@ abstract class KalturaScheduleResourceBaseFilter extends KalturaRelatedFilter
 		"idNotIn" => "_notin_id",
 		"parentIdEqual" => "_eq_parent_id",
 		"parentIdIn" => "_in_parent_id",
+		"nameEqual" => "_eq_name",
 		"systemNameEqual" => "_eq_system_name",
 		"systemNameIn" => "_in_system_name",
 		"statusEqual" => "_eq_status",
@@ -68,6 +69,11 @@ abstract class KalturaScheduleResourceBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $parentIdIn;
+
+	/**
+	 * @var string
+	 */
+	public $nameEqual;
 
 	/**
 	 * @var string

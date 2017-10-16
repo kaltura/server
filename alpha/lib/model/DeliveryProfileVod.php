@@ -24,8 +24,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$prefix = '';
 		if($this->getDynamicAttributes()->getUiConfId())
 			$prefix .= '/uiConfId/'.$this->getDynamicAttributes()->getUiConfId();
-
-		$prefix .= '/sessionId/{sessionId}';
+		$sessionId = $this->getDynamicAttributes()->getSessionId();
+		if($sessionId)
+			$prefix .= '/sessionId/'.$sessionId;
+		else
+			$prefix .= '/sessionId/{sessionId}';
 
 		return $prefix;
 	}
@@ -42,8 +45,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrl() : '';
+		$url .= $this->getDynamicAttributes()->getHasValidSequence() ? '/sequence/'.$this->getDynamicAttributes()->getSequence() : '';
 
-		if ($entry->getType() == entryType::PLAYLIST)
+		if ($entry->getType() == entryType::PLAYLIST || $this->getDynamicAttributes()->getHasValidSequence() && $flavorAsset->getType() == assetType::FLAVOR)
 		{
 			$partner = $entry->getPartner();
 			$entryVersion = $entry->getVersion();
@@ -352,6 +356,12 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				return -1;
 			}
 		}
+		
+		//Move all Dolby audio flavors to the beginning of the audio flavors list
+		if($isAudio1 == true)
+		{
+			return $this->compareAudio($flavor1['audioCodec'], $flavor2['audioCodec']);
+		}
 	
 		// if a preferred bitrate was defined place it first
 		if ($this->preferredFlavor == $flavor2)
@@ -369,6 +379,26 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			return 1;
 		}
 	
+		return -1;
+	}
+	
+	private function compareAudio($audioCodec1, $audioCodec2)
+	{
+		$dolbyAudioCodecList = array('ec-3','ac-3');
+		$audioPriority = array('ec-3' => 2, 'ac-3' => 1);
+		
+		//If both audio codec's are dolby prioritize them based on the audioPriority array
+		if(in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList) && ($audioPriority[$audioCodec2] != $audioPriority[$audioCodec1]))
+		{
+			return $audioPriority[$audioCodec2] - $audioPriority[$audioCodec1];
+		}
+		
+		if(in_array($audioCodec1, $dolbyAudioCodecList))
+			return -1;
+		
+		if(in_array($audioCodec2, $dolbyAudioCodecList))
+			return 1;
+		
 		return -1;
 	}
 	

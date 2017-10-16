@@ -57,26 +57,33 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return true;
 	}
 
+	public static function getLocalContentsByFileSync(FileSync $file_sync, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
+	{
+		$full_path = $file_sync->getFullPath();
+		$real_path = realpath( $full_path );
+		if ( file_exists ( $real_path ) )
+		{
+			$startTime = microtime(true);
+			if (!$maxlen)
+				$contents = file_get_contents( $real_path);
+			else
+				$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
+			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
+
+			return $contents;
+		}
+		else
+		{
+			KalturaLog::info("file was not found locally [$full_path]");
+			throw new kFileSyncException("Cannot find file on local disk [$full_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
+		}
+	}
+
 	public static function getContentsByFileSync ( FileSync $file_sync , $local = true , $fetch_from_remote_if_no_local = true , $strict = true )
 	{
 		if ( $local )
-		{
-			$full_path = $file_sync->getFullPath();
-			$real_path = realpath( $full_path );
-			if ( file_exists ( $real_path ) )
-			{
-				$startTime = microtime(true);
-				$contents = file_get_contents( $real_path);
-				KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
-
-				return $contents;
-			}
-			else
-			{
-				KalturaLog::info("file was not found locally [$full_path]");
-				throw new kFileSyncException("Cannot find file on local disk [$full_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
-			}
-		}
+			return self::getLocalContentsByFileSync($file_sync);
+		
 
 		if ( $fetch_from_remote_if_no_local )
 		{
@@ -1609,5 +1616,21 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			return ($fileSync->getContentMd5() == md5($contentMd5));
 		}
+	}
+
+	public static function dumpFileByFileSync( FileSync $fileSync)
+	{
+		$resolveFileSync = self::resolve($fileSync);
+		$path = $resolveFileSync->getFullPath();
+		KalturaLog::info("Resolve path [$path]");
+		kFileUtils::dumpFile($path);
+	}
+
+	public static function dumpFileByFileSyncKey( FileSyncKey $key , $strict = false )
+	{
+		KalturaLog::debug("Dumping File: key [$key], strict [$strict]");
+		list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
+		if ( $file_sync )
+			self::dumpFileByFileSync($file_sync);
 	}
 }

@@ -291,11 +291,6 @@ class ks extends kSessionBase
 		return $this->partner_id . $this->rand;
 	}
 	
-	public function getHash()
-	{
-		return $this->hash;
-	}
-	
 	public function toSecureString()
 	{
 		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);
@@ -443,7 +438,30 @@ class ks extends kSessionBase
 		{
 			return true;
 		}
-		
+
+		if ( $required_priv_name == ks::PRIVILEGE_VIEW &&
+			$this->verifyRedirectEntryId(ks::PRIVILEGE_VIEW, $required_priv_value))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public function verifyRedirectEntryId($privilegeName, $entryId)
+	{
+		$allPrivileges = explode(',', $this->privileges);
+		foreach($allPrivileges as $privilege)
+		{
+			$exPrivilege = explode(':', $privilege);
+			if ($exPrivilege[0] == $privilegeName && isset($exPrivilege[1]))
+			{
+				$privilegeObjectId = $exPrivilege[1];
+				$entry = entryPeer::retrieveByPK($privilegeObjectId);
+				if($entry && $entry->getRedirectEntryId() == $entryId)
+					return true;
+			}
+		}
 		return false;
 	}
 	
@@ -550,7 +568,15 @@ class ks extends kSessionBase
 		{
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
+			{
 				$entries[] =  $exPrivileges[1];
+				
+				$entry = entryPeer::retrieveByPKNoFilter($exPrivileges[1], null, false);
+				if($entry && $entry->getParentEntryId())
+				{
+					$entries[] = $entry->getParentEntryId();
+				}
+			}
 		}
 		
 		return $entries;
@@ -601,14 +627,17 @@ class ks extends kSessionBase
 		// foreach pair - check privileges on playlist
 		foreach($allPrivileges as $priv)
 		{
-			// extract playlist ID from pair
+			// extract RoleID from pair
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE)
 			{
-				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0)){
+				$roleId = isset($exPrivileges[1]) ? $exPrivileges[1] : null; 
+				if ($roleId && (is_numeric($roleId)) && ($roleId < 0))
+				{
 					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::INVALID_SET_ROLE);
 				}
-				return $exPrivileges[1];
+				
+				return $roleId;
 			}
 		}
 		

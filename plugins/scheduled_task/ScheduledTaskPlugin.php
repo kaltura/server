@@ -2,14 +2,16 @@
 /**
  * @package plugins.scheduledTask
  */
-class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers
+class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaAdminConsolePages, IKalturaPermissionsEnabler
 {
+
 	const PLUGIN_NAME = 'scheduledTask';
 	const PLUGIN_VERSION_MAJOR = 1;
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
 
 	const BATCH_JOB_FLOW_MANAGER = 'kScheduledTaskBatchJobFlowManager';
+	const MEDIA_REPURPOSING_HANDLER = 'MediaRepurposingHandler';
 
 	public static function getPluginName()
 	{
@@ -110,7 +112,10 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	 */
 	public static function getEventConsumers()
 	{
-		return array(self::BATCH_JOB_FLOW_MANAGER);
+		return array(
+			self::BATCH_JOB_FLOW_MANAGER,
+			self::MEDIA_REPURPOSING_HANDLER,
+		);
 	}
 
 	/**
@@ -138,5 +143,29 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BatchJobObjectType', $value);
+	}
+
+	/* (non-PHPdoc)
+ * @see IKalturaAdminConsolePages::getApplicationPages()
+ */
+	public static function getApplicationPages()
+	{
+		$pages = array();
+		$pages[] = new MediaRepurposingListAction();
+		$pages[] = new MediaRepurposingConfigureAction();
+		$pages[] = new MediaRepurposingSetStatusAction();
+		$pages[] = new MediaRepurposingLogsAction();
+		return $pages;
+	}
+
+	/* (non-PHPdoc)
+	* @see IKalturaPermissionsEnabler::permissionEnabled()
+	*/
+	public static function permissionEnabled($partnerId, $permissionName)
+	{
+		if ($permissionName == 'SCHEDULEDTASK_PLUGIN_PERMISSION')
+		{
+			MediaRepurposingHandler::enableMrPermission($partnerId);
+		}
 	}
 }

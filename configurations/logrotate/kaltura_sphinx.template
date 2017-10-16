@@ -8,7 +8,7 @@
  notifempty
  sharedscripts
  postrotate
- service kaltura_sphinx restart
+ service kaltura-sphinx restart
  endscript
  su root kaltura
 }
@@ -22,7 +22,7 @@
  notifempty
  sharedscripts
  postrotate
- service kaltura_sphinx restart
+ service kaltura-sphinx restart
  endscript
  su root kaltura
 }
