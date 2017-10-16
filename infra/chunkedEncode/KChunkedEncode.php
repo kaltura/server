@@ -144,6 +144,10 @@
 			if($duration==-1) {
 				$duration = round($this->sourceFileDt->containerDuration/1000,4);
 			}
+			if($duration<180){
+				KalturaLog::log($msgStr="ERROR: too short duration ($duration), must be at least 180sec");
+				return false;
+			}
 			$params->duration = $duration;
 
 				/*
