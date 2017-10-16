@@ -1,3 +1,26 @@
+# Mercury 13.5.0 #
+
+## Add getVolumeMap action to flavorAsset service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8113
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_11_add_flavorasset_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Mercury 13.4.0 #
 
 ## Add getVolumeMap action to media service ##

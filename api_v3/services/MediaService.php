@@ -1191,77 +1191,21 @@ class MediaService extends KalturaEntryService
 	 *
 	 * @action getVolumeMap
 	 * @param string $entryId Entry id
-	 * @param string $flavorId Flavor id
 	 * @return file
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function getVolumeMapAction($entryId, $flavorId = null)
+	function getVolumeMapAction($entryId)
 	{
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		if(!$flavorId)
-		{
-			$supportedFlavor = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
-			if (!$supportedFlavor)
-				throw new KalturaAPIException(KalturaErrors::SUPPORTED_FLAVOR_NOT_EXIST, $entryId);
-			$flavorId = $supportedFlavor->getId();
-		}
-		else
-			$supportedFlavor = $this->checkIfFlavorExistAndSupported($entryId, $flavorId);
+		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		if (!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
 
-		$packagerRetries = 3;
-		$content = null;
-		while ($packagerRetries && !$content)
-		{
-			$content = $this->retrieveLocalVolumeMapFromPackager($supportedFlavor);
-			$packagerRetries--;
-		}
-		if(!$content)
-			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED, $entryId);
-
-		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
-		return new kRendererString($content, 'text/csv');
-	}
-
-	private function retrieveLocalVolumeMapFromPackager($flavorAsset)
-	{
-		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
-		if (!$packagerVolumeMapUrlPattern)
-			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
-
-		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
-		$entry_data_path = ltrim($entry_data_path, "/");
-		if (!$entry_data_path)
-			return null;
-
-		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
-		if(!$content)
-			return false;
-
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
-	}
-
-	private static function curlLocalVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
-	{
-		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
-		kFile::closeDbConnections();
-		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
-		return $content;
-	}
-
-	private static function checkIfFlavorExistAndSupported($entryId, $flavorId)
-	{
-		$flavorAsset = assetPeer::retrieveById($flavorId);
-		if(!$flavorAsset)
-			throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $flavorId);
-
-		if(!myEntryUtils::isFlavorSupportedByPackager($flavorAsset, false))
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_IS_NOT_SUPPORTED, $entryId);
-
-		return $flavorAsset;
 	}
 
 }
