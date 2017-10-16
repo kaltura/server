@@ -63,12 +63,12 @@ class kWebVTTGenerator
 		$segmentStartTime = ($segmentIndex - 1) * $segmentDuration * 1000;
 		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
 
-		$result = "WEBVTT\n";
+		$result = "WEBVTT\r\n";
 		if ($localTimestamp != 10000)
 		{
-			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n";
+			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\r\n";
 		}
-		$result .= "\n";
+		$result .= "\r\n";
 
 		foreach ($parsedCaption as $curCaption)
 		{
@@ -116,12 +116,12 @@ class kWebVTTGenerator
 			}
 
 			// make sure the content does not contain 2 consecutive newlines
-			$content = preg_replace('/\n+/', "\n", str_replace("\r", '', $content));
+			$content = preg_replace('/\n+/', "\r\n", str_replace("\r", '', $content));
 
 			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
 				self::formatWebVTTTimeStamp($curCaption["endTime"]) .
-				$styling . "\n";
-			$result .= trim($content) . "\n\n";
+				$styling . "\r\n";
+			$result .= trim($content) . "\r\n\r\n";
 		}
 		return $result;
 	}
@@ -144,9 +144,9 @@ class kWebVTTGenerator
 		$result = implode('', $headerInfo);
 		if ($localTimestamp != 10000)
 		{
-			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n";
+			$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\r\n";
 		}
-		$result .= "\n";
+		$result .= "\r\n";
 
 		foreach ($parsedCaption as $curCaption)
 		{
@@ -162,11 +162,11 @@ class kWebVTTGenerator
 			}
 
 			// make sure the content does not contain 2 consecutive newlines
-			$content = preg_replace('/\n+/', "\n", str_replace("\r", '', $content));
+			$content = preg_replace('/\n+/', "\r\n", str_replace("\r", '', $content));
 
 			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
-				self::formatWebVTTTimeStamp($curCaption["endTime"]) ."\n";
-			$result .= trim($content) . "\n\n";
+				self::formatWebVTTTimeStamp($curCaption["endTime"]) ."\r\n";
+			$result .= trim($content) . "\r\n\r\n";
 		}
 		return $result;
 	}
