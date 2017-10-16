@@ -344,13 +344,16 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	{
 		$fieldValues = unserialize($fieldValues);
 		$value = $fieldValues[FacebookDistributionField::TAGS];
-		if (strpos($value, self::FACEBOOK_CUSTOM_DATA_DELIMITER) !== false)
+		if(!empty($value))
 		{
-			$value = explode(self::FACEBOOK_CUSTOM_DATA_DELIMITER, $value);
-		}
-		else
-		{
-			$value = array($value);
+			if (strpos($value, self::FACEBOOK_CUSTOM_DATA_DELIMITER) !== false)
+			{
+				$value = explode(self::FACEBOOK_CUSTOM_DATA_DELIMITER, $value);
+			}
+			else
+			{
+				$value = array($value);
+			}
 		}
 
 		return $value;
