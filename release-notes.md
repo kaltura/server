@@ -1,5 +1,14 @@
 # Mercury 13.5.0 #
 
+## Add permissions to eSearch service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
+
+
 ## Add getVolumeMap action to flavorAsset service ##
 
 - Issue Type: Feature
