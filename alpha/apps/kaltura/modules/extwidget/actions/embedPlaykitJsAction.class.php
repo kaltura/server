@@ -179,6 +179,7 @@ class embedPlaykitJsAction extends sfAction
 
 		$config["partnerId"] = $this->partnerId;		
 		$config["uiConfId"] = $this->uiconfId;
+		$config["plugins"] = $this->playerPlugins;
 		
 		$config = json_encode($config);		
 		if ($config === false)
@@ -272,6 +273,9 @@ class embedPlaykitJsAction extends sfAction
 		$uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
 		if (!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
+
+		$playerConfig = json_decode($uiConf->getConfig(), true);
+		$this->playerPlugins = $playerConfig["plugins"];
 		
 		//Get bundle configuration stored in conf_vars
 		$confVars = $uiConf->getConfVars();
