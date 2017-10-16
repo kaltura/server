@@ -141,7 +141,7 @@ class kKavaReportsMgr extends kKavaBase
             self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
             self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
             self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "entry_name"),
-            self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100),
+            self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
             self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "entry_name", self::REPORT_ENRICH_FUNC => "self::getEntriesNames"),
             self::REPORT_CARDINALITY_METRIC => self::EVENT_TYPE_PLAY
         ),
@@ -173,7 +173,7 @@ class kKavaReportsMgr extends kKavaBase
             self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
             self::REPORT_METRICS => array(self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME ,self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),            
             self::REPORT_DETAIL_DIM_HEADERS => array("name"),
-            self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF),    
+            self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
             self::REPORT_TOTAL_ADDITIONAL_METRICS => array(self::METRIC_UNIQUE_USERS)
         ),
         myReportsMgr::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT => array(
@@ -227,7 +227,7 @@ class kKavaReportsMgr extends kKavaBase
         ),
         myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM => array(
             self::REPORT_DIMENSION => self::DIMENSION_OS,
-            self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+            self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
             self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
             self::REPORT_DETAIL_DIM_HEADERS => array("os"),
             self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
@@ -236,7 +236,7 @@ class kKavaReportsMgr extends kKavaBase
         ),
         myReportsMgr::REPORT_TYPE_BROWSERS => array(
             self::REPORT_DIMENSION => self::DIMENSION_BROWSER,
-            self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+            self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
             self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
             self::REPORT_DETAIL_DIM_HEADERS => array("browser"),
             self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
@@ -738,7 +738,13 @@ class kKavaReportsMgr extends kKavaBase
     
    private static function getFilterIntervals($input_filter) {
        $input_filter->timeZoneOffset = round($input_filter->timeZoneOffset / 30) * 30;
-       $intervals = array(self::dateIdToInterval($input_filter->from_day, $input_filter->timeZoneOffset) . "/" .  self::dateIdToInterval($input_filter->to_day, $input_filter->timeZoneOffset, true));
+       $fromDate = self::dateIdToInterval($input_filter->from_day, $input_filter->timeZoneOffset);
+       $toDate = self::dateIdToInterval($input_filter->to_day, $input_filter->timeZoneOffset, true);
+       if (!$fromDate || !$toDate || strcmp($toDate, $fromDate) < 0)
+       {
+       	  $fromDate = $toDate = '2010-01-01T00:00:00+00:00';
+       } 
+       $intervals = array($fromDate . "/" . $toDate);
        return $intervals;  
    }
     
@@ -756,10 +762,9 @@ class kKavaReportsMgr extends kKavaBase
     
    private static function dateIdToInterval($date_id, $offset, $end_of_the_day = false) 
    {
-       if (!preg_match('/^\d+$/', substr($date_id, 0, 8)))
+       if (strlen($date_id) < 8 || !preg_match('/^\d+$/', substr($date_id, 0, 8)))
        {
-          $timestamp = $end_of_the_day ? time() : time() - 30 * 86400; 
-          $date_id = date('Ymd', $timestamp);
+          return null;
        }
 
        $year = substr($date_id, 0, 4);
