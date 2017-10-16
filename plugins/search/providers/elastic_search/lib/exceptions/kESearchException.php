@@ -10,4 +10,5 @@ class kESearchException extends kCoreException
     const SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH = 'Search type is not allowed on unified search';
     const ELASTIC_SEARCH_ENGINE_ERROR = 'Elastic search engine error';
     const MISSING_PARAMS_FOR_DELETE = 'Missing params for delete';
+    const EMPTY_SEARCH_ITEMS_NOT_ALLOWED = 'empty search items are not allowed';
 }

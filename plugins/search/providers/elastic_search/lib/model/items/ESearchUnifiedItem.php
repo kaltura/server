@@ -34,7 +34,7 @@ class ESearchUnifiedItem extends ESearchItem
 		return self::UNIFIED;
 	}
 
-	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
 		$outQuery = array();
 
