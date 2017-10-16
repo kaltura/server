@@ -1,6 +1,6 @@
 <?php
 if($argc != 3)
-	die ("Usage: drmProfileCopyBetweenAccounts <srcDrmProfileId> <targetPartnerId>" . PHP_EOL);
+	die ("Usage: " .$argv[0] . " <srcDrmProfileId> <targetPartnerId>" . PHP_EOL);
 require_once(__DIR__ . '/../bootstrap.php');
 $srcDrmProfileId = $argv[1];
 $targetPartnerId = $argv[2];
