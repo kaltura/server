@@ -432,7 +432,8 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			$handledObjectsCount = count($cuePointObjects);
 			$offset += $handledObjectsCount;
 		}
-		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT);
+		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT &&
+			$offset < kElasticSearchManager::MAX_CUE_POINTS); //remove after we move to php7
 
 		if(count($data))
 			$cuePoints['cue_points'] = $data;

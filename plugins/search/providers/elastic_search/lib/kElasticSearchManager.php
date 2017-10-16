@@ -8,6 +8,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     const CACHE_PREFIX = 'executed_elastic_cluster_';
     const MAX_LENGTH = 32766;
+    const MAX_CUE_POINTS = 5000;
+
     /**
      * @param BaseObject $object
      * @param BatchJob $raisedJob
