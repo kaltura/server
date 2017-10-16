@@ -271,6 +271,8 @@ class kKavaReportsMgr extends kKavaBase
         self::EVENT_TYPE_PLAYTHROUGH_75 => "count_plays_75",
         self::EVENT_TYPE_PLAYTHROUGH_100 => "count_plays_100",
         self::DIMENSION_DEVICE => "device",
+        self::DIMENSION_OS => "os",
+        self::DIMENSION_BROWSER => "browser",
         self::METRIC_TOTAL_ENTRIES => "unique_videos",
         self::METRIC_UNIQUE_USERS => "unique_known_users",
         self::EVENT_TYPE_REPORT_CLICKED => "count_report",
@@ -286,7 +288,29 @@ class kKavaReportsMgr extends kKavaBase
     	self::METRIC_TOTAL_ENTRIES => 'floor', 
     	self::METRIC_UNIQUE_USERS => 'floor',
     	self::DIMENSION_DEVICE => 'strtoupper',
+    	self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
+    	self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
     );
+    
+    protected static function transformBrowserName($name)
+    {
+    	$name = str_replace(array('Internet Explorer', 'Microsoft Edge'), array('IE', 'Edge'), $name);
+    	$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
+    	$name = strtoupper($name);
+    	$name = str_replace(array('(',')'), '', $name);
+    	$name = preg_replace('/[^\w]/', '_', $name);
+    	return $name;
+    }
+    
+    protected static function transformOperatingSystemName($name)
+    {
+    	$name = str_replace(array('Windows ', '.x'), array('Windows_', ''), $name);
+    	$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
+    	$name = strtoupper($name);
+    	$name = str_replace(array('(',')'), '', $name);
+    	$name = preg_replace('/[^\w]/', '_', $name);
+    	return $name;
+    }
     
     private static function getEventTypeCountAggr($event_type) {
         $count_aggr = self::$event_type_count_aggr_template;
@@ -437,14 +461,14 @@ class kKavaReportsMgr extends kKavaBase
         {
             case myReportsMgr::REPORT_TYPE_PLATFORMS:
                 if ($object_ids != NULL && count($object_ids) > 0)
-                    $res = self::getMultiGraphsByColumnName($result, $graph_metrics_to_headers, self::DIMENSION_OS);
+                    $res = self::getMultiGraphsByColumnName($result, $graph_metrics_to_headers, self::DIMENSION_OS, self::$transform_metrics[self::DIMENSION_OS]);
                 else
-                    $res = self::getMultiGraphsByDateId ($result, self::DIMENSION_DEVICE, $graph_metrics_to_headers, $input_filter->timeZoneOffset);
+                    $res = self::getMultiGraphsByDateId ($result, self::DIMENSION_DEVICE, $graph_metrics_to_headers, self::$transform_metrics[self::DIMENSION_DEVICE], $input_filter->timeZoneOffset);
                 break;
             case myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM:
             case myReportsMgr::REPORT_TYPE_BROWSERS:
                 $dimension = $report_def[self::REPORT_DIMENSION];
-                $res = self::getMultiGraphsByColumnName($result, $graph_metrics_to_headers, $dimension);     
+                $res = self::getMultiGraphsByColumnName($result, $graph_metrics_to_headers, $dimension, self::$transform_metrics[$dimension]);
                 break;
             case myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF:
             case myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF:
@@ -1010,7 +1034,7 @@ class kKavaReportsMgr extends kKavaBase
        return $graphs;
    }
    
-   public static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $tz_offset)
+   public static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
    {
        $graphs = array();
        
@@ -1025,7 +1049,7 @@ class kKavaReportsMgr extends kKavaBase
            $row_data = $row[self::DRUID_EVENT];
            
            $date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz_offset);
-           $multiline_val = $row_data[$multiline_column];
+           $multiline_val = call_user_func($transform, $row_data[$multiline_column]);
            foreach ($graph_metrics_to_headers as $column => $header)
            {
                if (isset($graphs[$header][$date]))
@@ -1040,7 +1064,7 @@ class kKavaReportsMgr extends kKavaBase
        return $graphs;
    }
    
-   public static function getMultiGraphsByColumnName ($result , $graph_metrics_to_headers, $dimension)
+   public static function getMultiGraphsByColumnName ($result , $graph_metrics_to_headers, $dimension, $transform)
    {
        $graphs = array();
        
@@ -1053,7 +1077,7 @@ class kKavaReportsMgr extends kKavaBase
        {
            $row_data = $row[self::DRUID_EVENT];
            
-           $dim_value = $row_data[$dimension];
+           $dim_value = call_user_func($transform, $row_data[$dimension]);
            
            foreach ($graph_metrics_to_headers as $column => $header)
            {
