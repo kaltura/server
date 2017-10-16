@@ -53,7 +53,7 @@ abstract class kCaptionsContentManager
 	public static function handleTextLines($line)
 	{
 		$lines = array_map('trim', preg_split('/$\R?^/m', $line));
-		$line = implode(kCaptionsContentManager::UNIX_LINE_ENDING, $lines);
+		$line = implode(kCaptionsContentManager::WINDOWS_LINE_ENDING, $lines);
 		return $line;
 	}
 
@@ -261,11 +261,11 @@ abstract class kCaptionsContentManager
 						$shouldAddBlockToNewFile = false;
 				}
 				else
-					$currentBlock .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
+					$currentBlock .= $line . kCaptionsContentManager::WINDOWS_LINE_ENDING;
 				$line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray);
 			}
 			if($shouldAddBlockToNewFile)
-				$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;;
+				$newFileContent .= $currentBlock . kCaptionsContentManager::WINDOWS_LINE_ENDING;;
 		}
 		return $newFileContent;
 	}
