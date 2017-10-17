@@ -102,7 +102,7 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 			return null;
 		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
 		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
-		$timeLine = $this->formatSrtTimeStamp($adjustedStartTime) . ' --> ' . $this->formatSrtTimeStamp($adjustedEndTime). kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		$timeLine = $this->formatSrtTimeStamp($adjustedStartTime) . ' --> ' . $this->formatSrtTimeStamp($adjustedEndTime). kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;
 	}
 
