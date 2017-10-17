@@ -1540,7 +1540,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		if (!$copyMetaData)
 		    $newEntry->copyMetaData = false;
 
-        $newEntry->setSourceType(self::getCloneSourceType($entry->getSourceType()));
+		$newEntry->setSourceType(self::getCloneSourceType($entry->getSourceType()));
 
 	    // save the entry
  		$newEntry->save();
