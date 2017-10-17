@@ -31,9 +31,7 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 			if(!isset($flavor['audioCodec']) && !isset($flavor['audioLanguageName'])) 
 				continue;
 			
-			$codec = $flavor['audioCodec'];
-			$audioLanguageName = $flavor['audioLanguageName'];
-			$codecAndLang = $codec . "_" . $audioLanguageName;
+			$codecAndLang = $flavor['audioCodec'] . "_" . $flavor['audioLanguageName'];
 			$audioFlavorsMap[$codecAndLang] = true;
 			
 			if(count($audioFlavorsMap) > 1)
