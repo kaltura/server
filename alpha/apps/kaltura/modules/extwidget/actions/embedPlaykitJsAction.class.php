@@ -95,7 +95,7 @@ class embedPlaykitJsAction extends sfAction
 	private function formatBundleContent($bundleContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $this->setUiConfInKalturaPlayer($bundleContentParts[1]);
+		$bundleContent = $this->appendUiConfToContent($bundleContentParts[1]);
 		
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
@@ -118,10 +118,16 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
-	private function setUiConfInKalturaPlayer($content)
+	private function appendUiConfToContent($content)
 	{
-		$config["config"] = array($this->playerConfig);
+		$config = array();
+		$config["config"] = $this->playerConfig;
 		$config = json_encode($config);	
+
+		if ($config === false)
+		{
+			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
+		}
 
 		$kalturaPlayerConfig = "
 		(function(){(KalturaPlayer.UiConf = KalturaPlayer.UiConf || {}) [\"" . $this->uiconfId . "\"] = $config;
