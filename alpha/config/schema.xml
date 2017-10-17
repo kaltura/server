@@ -1781,7 +1781,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_type" type="varchar" size="127" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_id" type="varchar" size="31" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
 			<reference local="kuser_id" foreign="id" />
 		</foreign-key>

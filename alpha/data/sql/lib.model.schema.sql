@@ -2055,7 +2055,6 @@ CREATE TABLE `upload_token`
 	`user_ip` VARCHAR(39)  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `int_id`(`int_id`),
 	KEY `partner_id_status`(`partner_id`, `status`),
