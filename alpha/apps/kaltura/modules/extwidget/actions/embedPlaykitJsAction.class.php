@@ -192,11 +192,8 @@ class embedPlaykitJsAction extends sfAction
 			$config[$key] = json_decode($val);
 		}
 
-
 		$config["partnerId"] = $this->partnerId;		
 		$config["uiConfId"] = $this->uiconfId;
-		
-
 		
 		$config = json_encode($config);		
 		if ($config === false)
