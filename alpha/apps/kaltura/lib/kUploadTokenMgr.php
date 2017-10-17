@@ -2,7 +2,7 @@
 class kUploadTokenMgr
 {
 	const NO_EXTENSION_IDENTIFIER = 'noext';
-	const AUTO_FINALIZE_CACHE_TTL = dateUtils::MONTH;
+	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 	
 	/**
@@ -13,17 +13,17 @@ class kUploadTokenMgr
 	/**
 	 * @var bool
 	 */
-	protected $_autoFinalize;
+	private $_autoFinalize;
 	
 	/**
 	 * @var bool
 	 */
-	protected $_finalChunk;
+	private $_finalChunk;
 	
 	/**
 	 * @var kBaseCacheWrapper
 	 */
-	protected $_autoFinalizeCache;
+	private $_autoFinalizeCache;
 	
 	/**
 	 * Construct new upload token manager for the upload token object

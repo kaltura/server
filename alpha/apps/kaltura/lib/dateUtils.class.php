@@ -9,7 +9,6 @@ class dateUtils
 	const MINUTE = 60; // in seconds
 	const HOUR = 3600; // in seconds
 	const DAY = 86400; // in seconds
-	const MONTH = 2592000; // in seconds
 	
 	// the result date fits the DB and the calendar object that comes with symfony 
 	public static function convertFromPhpDate ( $original_date , $new_format = "Y-m-d" )
