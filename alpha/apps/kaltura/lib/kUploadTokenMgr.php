@@ -430,8 +430,6 @@ class kUploadTokenMgr
 				break;
 			}
 			
-			KalturaLog::debug("Testing:: lockedFile filesize = [" . filesize($lockedFile) . "]");
-			KalturaLog::debug("Testing:: Eran filesize = [" . max(0,$chunkOffset+filesize($lockedFile)-$currentFileSize) . "] chunkOffset [$chunkOffset] filesize of nextChunk [" . filesize($lockedFile) . " currentFileSize [$currentFileSize]");
 			self::appendChunk($lockedFile, $targetFileResource);
 		}
 		
