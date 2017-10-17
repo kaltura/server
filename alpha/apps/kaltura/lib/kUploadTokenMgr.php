@@ -307,7 +307,7 @@ class kUploadTokenMgr
 	
 	private function checkIsFinalChunk($currentFileSize)
 	{
-		$cacheFileSizeValue = $this->_autoFinalizeCache->increment($this->_uploadToken->getId(), $currentFileSize);	
+		$cacheFileSizeValue = $this->_autoFinalizeCache->increment($this->_uploadToken->getId().".size", $currentFileSize);
 		if($cacheFileSizeValue >= $this->_uploadToken->getFileSize())
 		{
 			if($this->_autoFinalizeCache->add($this->_uploadToken->getId().".lock", "true", 30))
@@ -355,7 +355,7 @@ class kUploadTokenMgr
 		if($this->_autoFinalize)
 		{
 			$fileSize = filesize($uploadFilePath);
-			$this->_autoFinalizeCache->set($this->_uploadToken->getId(), $fileSize, self::AUTO_FINALIZE_CACHE_TTL);
+			$this->_autoFinalizeCache->set($this->_uploadToken->getId().".size", $fileSize, self::AUTO_FINALIZE_CACHE_TTL);
 			if($this->_uploadToken->getFileSize() == $fileSize)
 				$this->_finalChunk = true;
 		}
