@@ -49,6 +49,7 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 		{
 			$this->setId($this->calculateId());
 			$this->setDc(kDataCenterMgr::getCurrentDcId());
+			$this->addAutoFinalizeToCache();
 		}
 		parent::save($con);
 	}
