@@ -287,10 +287,24 @@ class kKavaReportsMgr extends kKavaBase
     static $transform_metrics = array(
     	self::METRIC_TOTAL_ENTRIES => 'floor', 
     	self::METRIC_UNIQUE_USERS => 'floor',
-    	self::DIMENSION_DEVICE => 'strtoupper',
+    	self::DIMENSION_DEVICE => array('kKavaReportsMgr', 'transformDeviceName'),
     	self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
     	self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
     );
+    
+    protected static function transformDeviceName($name)
+    {
+    	$name = strtoupper($name);
+    	$name = preg_replace('/[^\w]/', '_', $name);
+    	return $name;
+    }
+    
+    protected static function untransformDeviceName($name)
+    {
+    	$name = str_replace('_', ' ', $name);
+    	$name = ucfirst(strtolower($name));
+    	return $name;
+    }
     
     protected static function transformBrowserName($name)
     {
@@ -866,9 +880,12 @@ class kKavaReportsMgr extends kKavaBase
            
            switch ($report_type)
            {
+               case myReportsMgr::REPORT_TYPE_PLATFORMS:
+                   $object_ids_arr = array_map(array('kKavaReportsMgr', 'untransformDeviceName'), $object_ids_arr);
+                   // fallthrough
+           	
                case myReportsMgr::REPORT_TYPE_TOP_SYNDICATION:
                case myReportsMgr::REPORT_TYPE_MAP_OVERLAY:
-               case myReportsMgr::REPORT_TYPE_PLATFORMS:
                    $druid_filter[] = array(self::DRUID_DIMENSION => self::$reports_def[$report_type][self::REPORT_DIMENSION],
                    self::DRUID_VALUES => $object_ids_arr
                    );
