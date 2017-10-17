@@ -155,7 +155,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
 			return array();
 		}
-		$this->headerInfo[] = $header.self::WINDOWS_LINE_ENDING;
+		$this->headerInfo[] = $header.self::UNIX_LINE_ENDING;
 		// Parse text - ignore comments, ids, styles, notes, etc
 		while (($line = self::getNextValueFromArray($fileContentArray)) !== false)
 		{
@@ -171,11 +171,11 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 				while (trim($line = self::getNextValueFromArray($fileContentArray)) !== '')
 				{
 					$line = $this->handleTextLines($line);
-					$text .= $line . self::WINDOWS_LINE_ENDING;
+					$text .= $line . self::UNIX_LINE_ENDING;
 				}
 				$itemsData[] = array('startTime' => $start, 'endTime' => $stop, 'content' => array(array('text' => $text)));
 			}elseif ($foundFirstTimeCode == false)
-				$this->headerInfo[] = $line . self::WINDOWS_LINE_ENDING;
+				$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
 		};
 		if (count($this->parsingErrors) > 0)
 		{
@@ -200,7 +200,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
 		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
 		$settings = isset($matches[3]) ? trim($matches[3]) : '';
-		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime). $settings . kCaptionsContentManager::WINDOWS_LINE_ENDING;
+		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime). $settings . kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;
 	}
 
