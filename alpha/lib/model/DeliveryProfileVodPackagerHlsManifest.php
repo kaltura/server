@@ -11,7 +11,7 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
-		$this->checkIsisMultiAudioFlavorSet($flavors);
+		$this->checkIsMultiAudioFlavorSet($flavors);
 		$flavors = $this->sortFlavors($flavors);
 		
 		$flavor = VodPackagerDeliveryUtils::getVodPackagerUrl(
@@ -23,9 +23,9 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 		return array($flavor);
 	}
 	
-	private function checkIsisMultiAudioFlavorSet($flavors)
+	private function checkIsMultiAudioFlavorSet($flavors)
 	{
-		$audoFalvorMap = array();
+		$audioFlavorsMap = array();
 		foreach ($flavors as $flavor)
 		{
 			if(!isset($flavor['audioCodec']) && !isset($flavor['audioLanguageName'])) 
@@ -33,14 +33,10 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 			
 			$codec = $flavor['audioCodec'];
 			$audioLanguageName = $flavor['audioLanguageName'];
+			$codecAndLang = $codec . "_" . $audioLanguageName;
+			$audioFlavorsMap[$codecAndLang] = true;
 			
-			if(!isset($audoFalvorMap[$codec]))
-				$audoFalvorMap[$codec] = array();
-			
-			if(!isset($audoFalvorMap[$codec][$audioLanguageName]))
-				$audoFalvorMap[$codec][$audioLanguageName] = $flavor;
-			
-			if(count($audoFalvorMap) > 1)
+			if(count($audioFlavorsMap) > 1)
 			{
 				$this->isMultiAudio = true;
 				break;
