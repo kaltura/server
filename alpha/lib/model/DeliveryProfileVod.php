@@ -10,6 +10,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected $preferredFlavor = null;
 	
+	/**
+	 * @var bool
+	 */
+	protected $isMultiAudio = false;
+	
 	/** -------------------
 	 * Functionality 
 	 * --------------------*/
@@ -349,11 +354,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			if ($isAudio1)
 			{
-				return 1;
+				return !$this->isMultiAudio ? 1 : -1;
 			}
 			else 
 			{
-				return -1;
+				return !$this->isMultiAudio ? -1 : 1;
 			}
 		}
 		
