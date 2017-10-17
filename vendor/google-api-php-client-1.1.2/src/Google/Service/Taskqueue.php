@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -49,6 +47,7 @@ class Google_Service_Taskqueue extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'taskqueue/v1beta2/projects/';
     $this->version = 'v1beta2';
     $this->serviceName = 'taskqueue';

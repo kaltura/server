@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -34,6 +32,9 @@ class Google_Service_Replicapoolupdater extends Google_Service
   /** View and manage your data across Google Cloud Platform services. */
   const CLOUD_PLATFORM =
       "https://www.googleapis.com/auth/cloud-platform";
+  /** View your data across Google Cloud Platform services. */
+  const CLOUD_PLATFORM_READ_ONLY =
+      "https://www.googleapis.com/auth/cloud-platform.read-only";
   /** View and manage replica pools. */
   const REPLICAPOOL =
       "https://www.googleapis.com/auth/replicapool";
@@ -53,6 +54,7 @@ class Google_Service_Replicapoolupdater extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'replicapoolupdater/v1beta1/projects/';
     $this->version = 'v1beta1';
     $this->serviceName = 'replicapoolupdater';
@@ -132,19 +134,15 @@ class Google_Service_Replicapoolupdater extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'maxResults' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
                 'filter' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
+                'maxResults' => array(
                   'location' => 'query',
-                  'type' => 'string',
+                  'type' => 'integer',
                 ),
-                'instanceGroupManager' => array(
+                'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -168,13 +166,13 @@ class Google_Service_Replicapoolupdater extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'maxResults' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
                 'filter' => array(
                   'location' => 'query',
                   'type' => 'string',
+                ),
+                'maxResults' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
                 ),
                 'pageToken' => array(
                   'location' => 'query',
@@ -271,6 +269,33 @@ class Google_Service_Replicapoolupdater extends Google_Service
                   'required' => true,
                 ),
               ),
+            ),'list' => array(
+              'path' => '{project}/zones/{zone}/operations',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'project' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'zone' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'filter' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'maxResults' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+              ),
             ),
           )
         )
@@ -351,14 +376,12 @@ class Google_Service_Replicapoolupdater_RollingUpdates_Resource extends Google_S
    * resides.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string maxResults Optional. Maximum count of results to be
-   * returned. Maximum value is 500 and default value is 500.
    * @opt_param string filter Optional. Filter expression for filtering listed
    * resources.
+   * @opt_param string maxResults Optional. Maximum count of results to be
+   * returned. Maximum value is 500 and default value is 500.
    * @opt_param string pageToken Optional. Tag returned by a previous list request
    * truncated by maxResults. Used to continue a previous list request.
-   * @opt_param string instanceGroupManager The name of the instance group manager
-   * used for filtering.
    * @return Google_Service_Replicapoolupdater_RollingUpdateList
    */
   public function listRollingUpdates($project, $zone, $optParams = array())
@@ -378,10 +401,10 @@ class Google_Service_Replicapoolupdater_RollingUpdates_Resource extends Google_S
    * @param string $rollingUpdate The name of the update.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string maxResults Optional. Maximum count of results to be
-   * returned. Maximum value is 500 and default value is 500.
    * @opt_param string filter Optional. Filter expression for filtering listed
    * resources.
+   * @opt_param string maxResults Optional. Maximum count of results to be
+   * returned. Maximum value is 500 and default value is 500.
    * @opt_param string pageToken Optional. Tag returned by a previous list request
    * truncated by maxResults. Used to continue a previous list request.
    * @return Google_Service_Replicapoolupdater_InstanceUpdateList
@@ -476,6 +499,29 @@ class Google_Service_Replicapoolupdater_ZoneOperations_Resource extends Google_S
     $params = array('project' => $project, 'zone' => $zone, 'operation' => $operation);
     $params = array_merge($params, $optParams);
     return $this->call('get', array($params), "Google_Service_Replicapoolupdater_Operation");
+  }
+
+  /**
+   * Retrieves the list of Operation resources contained within the specified
+   * zone. (zoneOperations.listZoneOperations)
+   *
+   * @param string $project Name of the project scoping this request.
+   * @param string $zone Name of the zone scoping this request.
+   * @param array $optParams Optional parameters.
+   *
+   * @opt_param string filter Optional. Filter expression for filtering listed
+   * resources.
+   * @opt_param string maxResults Optional. Maximum count of results to be
+   * returned. Maximum value is 500 and default value is 500.
+   * @opt_param string pageToken Optional. Tag returned by a previous list request
+   * truncated by maxResults. Used to continue a previous list request.
+   * @return Google_Service_Replicapoolupdater_OperationList
+   */
+  public function listZoneOperations($project, $zone, $optParams = array())
+  {
+    $params = array('project' => $project, 'zone' => $zone);
+    $params = array_merge($params, $optParams);
+    return $this->call('list', array($params), "Google_Service_Replicapoolupdater_OperationList");
   }
 }
 
@@ -881,6 +927,61 @@ class Google_Service_Replicapoolupdater_OperationErrorErrors extends Google_Mode
   }
 }
 
+class Google_Service_Replicapoolupdater_OperationList extends Google_Collection
+{
+  protected $collection_key = 'items';
+  protected $internal_gapi_mappings = array(
+  );
+  public $id;
+  protected $itemsType = 'Google_Service_Replicapoolupdater_Operation';
+  protected $itemsDataType = 'array';
+  public $kind;
+  public $nextPageToken;
+  public $selfLink;
+
+
+  public function setId($id)
+  {
+    $this->id = $id;
+  }
+  public function getId()
+  {
+    return $this->id;
+  }
+  public function setItems($items)
+  {
+    $this->items = $items;
+  }
+  public function getItems()
+  {
+    return $this->items;
+  }
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+  public function setNextPageToken($nextPageToken)
+  {
+    $this->nextPageToken = $nextPageToken;
+  }
+  public function getNextPageToken()
+  {
+    return $this->nextPageToken;
+  }
+  public function setSelfLink($selfLink)
+  {
+    $this->selfLink = $selfLink;
+  }
+  public function getSelfLink()
+  {
+    return $this->selfLink;
+  }
+}
+
 class Google_Service_Replicapoolupdater_OperationWarnings extends Google_Collection
 {
   protected $collection_key = 'data';
@@ -944,9 +1045,8 @@ class Google_Service_Replicapoolupdater_OperationWarningsData extends Google_Mod
   }
 }
 
-class Google_Service_Replicapoolupdater_RollingUpdate extends Google_Collection
+class Google_Service_Replicapoolupdater_RollingUpdate extends Google_Model
 {
-  protected $collection_key = 'instances';
   protected $internal_gapi_mappings = array(
   );
   public $actionType;
@@ -958,8 +1058,8 @@ class Google_Service_Replicapoolupdater_RollingUpdate extends Google_Collection
   public $instanceGroup;
   public $instanceGroupManager;
   public $instanceTemplate;
-  public $instances;
   public $kind;
+  public $oldInstanceTemplate;
   protected $policyType = 'Google_Service_Replicapoolupdater_RollingUpdatePolicy';
   protected $policyDataType = '';
   public $progress;
@@ -1033,14 +1133,6 @@ class Google_Service_Replicapoolupdater_RollingUpdate extends Google_Collection
   {
     return $this->instanceTemplate;
   }
-  public function setInstances($instances)
-  {
-    $this->instances = $instances;
-  }
-  public function getInstances()
-  {
-    return $this->instances;
-  }
   public function setKind($kind)
   {
     $this->kind = $kind;
@@ -1048,6 +1140,14 @@ class Google_Service_Replicapoolupdater_RollingUpdate extends Google_Collection
   public function getKind()
   {
     return $this->kind;
+  }
+  public function setOldInstanceTemplate($oldInstanceTemplate)
+  {
+    $this->oldInstanceTemplate = $oldInstanceTemplate;
+  }
+  public function getOldInstanceTemplate()
+  {
+    return $this->oldInstanceTemplate;
   }
   public function setPolicy(Google_Service_Replicapoolupdater_RollingUpdatePolicy $policy)
   {
@@ -1208,7 +1308,6 @@ class Google_Service_Replicapoolupdater_RollingUpdatePolicy extends Google_Model
   public $maxNumConcurrentInstances;
   public $maxNumFailedInstances;
   public $minInstanceUpdateTimeSec;
-  public $sleepAfterInstanceRestartSec;
 
 
   public function setAutoPauseAfterInstances($autoPauseAfterInstances)
@@ -1250,13 +1349,5 @@ class Google_Service_Replicapoolupdater_RollingUpdatePolicy extends Google_Model
   public function getMinInstanceUpdateTimeSec()
   {
     return $this->minInstanceUpdateTimeSec;
-  }
-  public function setSleepAfterInstanceRestartSec($sleepAfterInstanceRestartSec)
-  {
-    $this->sleepAfterInstanceRestartSec = $sleepAfterInstanceRestartSec;
-  }
-  public function getSleepAfterInstanceRestartSec()
-  {
-    return $this->sleepAfterInstanceRestartSec;
   }
 }

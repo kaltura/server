@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -37,6 +35,9 @@ class Google_Service_Manager extends Google_Service
   /** View and manage your data across Google Cloud Platform services. */
   const CLOUD_PLATFORM =
       "https://www.googleapis.com/auth/cloud-platform";
+  /** View your data across Google Cloud Platform services. */
+  const CLOUD_PLATFORM_READ_ONLY =
+      "https://www.googleapis.com/auth/cloud-platform.read-only";
   /** View and manage your Google Compute Engine resources. */
   const COMPUTE =
       "https://www.googleapis.com/auth/compute";
@@ -62,6 +63,7 @@ class Google_Service_Manager extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'manager/v1beta2/projects/';
     $this->version = 'v1beta2';
     $this->serviceName = 'manager';
@@ -141,13 +143,13 @@ class Google_Service_Manager extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -209,13 +211,13 @@ class Google_Service_Manager extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -291,11 +293,11 @@ class Google_Service_Manager_Deployments_Resource extends Google_Service_Resourc
    * @param string $region
    * @param array $optParams Optional parameters.
    *
+   * @opt_param int maxResults Maximum count of results to be returned. Acceptable
+   * values are 0 to 100, inclusive. (Default: 50)
    * @opt_param string pageToken Specifies a nextPageToken returned by a previous
    * list request. This token can be used to request the next page of results from
    * a previous list request.
-   * @opt_param int maxResults Maximum count of results to be returned. Acceptable
-   * values are 0 to 100, inclusive. (Default: 50)
    * @return Google_Service_Manager_DeploymentsListResponse
    */
   public function listDeployments($projectId, $region, $optParams = array())
@@ -367,11 +369,11 @@ class Google_Service_Manager_Templates_Resource extends Google_Service_Resource
    * @param string $projectId
    * @param array $optParams Optional parameters.
    *
+   * @opt_param int maxResults Maximum count of results to be returned. Acceptable
+   * values are 0 to 100, inclusive. (Default: 50)
    * @opt_param string pageToken Specifies a nextPageToken returned by a previous
    * list request. This token can be used to request the next page of results from
    * a previous list request.
-   * @opt_param int maxResults Maximum count of results to be returned. Acceptable
-   * values are 0 to 100, inclusive. (Default: 50)
    * @return Google_Service_Manager_TemplatesListResponse
    */
   public function listTemplates($projectId, $optParams = array())
@@ -662,10 +664,6 @@ class Google_Service_Manager_Deployment extends Google_Collection
   {
     return $this->templateName;
   }
-}
-
-class Google_Service_Manager_DeploymentModules extends Google_Model
-{
 }
 
 class Google_Service_Manager_DeploymentsListResponse extends Google_Collection
@@ -1531,10 +1529,6 @@ class Google_Service_Manager_ReplicaPoolModule extends Google_Collection
   }
 }
 
-class Google_Service_Manager_ReplicaPoolModuleEnvVariables extends Google_Model
-{
-}
-
 class Google_Service_Manager_ReplicaPoolModuleStatus extends Google_Model
 {
   protected $internal_gapi_mappings = array(
@@ -1818,14 +1812,6 @@ class Google_Service_Manager_Template extends Google_Model
   {
     return $this->name;
   }
-}
-
-class Google_Service_Manager_TemplateActions extends Google_Model
-{
-}
-
-class Google_Service_Manager_TemplateModules extends Google_Model
-{
 }
 
 class Google_Service_Manager_TemplatesListResponse extends Google_Collection

@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -30,7 +28,7 @@
  */
 class Google_Service_AndroidPublisher extends Google_Service
 {
-  /** View and manage your Google Play Android Developer account. */
+  /** View and manage your Google Play Developer account. */
   const ANDROIDPUBLISHER =
       "https://www.googleapis.com/auth/androidpublisher";
 
@@ -43,6 +41,7 @@ class Google_Service_AndroidPublisher extends Google_Service
   public $edits_listings;
   public $edits_testers;
   public $edits_tracks;
+  public $entitlements;
   public $inappproducts;
   public $purchases_products;
   public $purchases_subscriptions;
@@ -56,6 +55,7 @@ class Google_Service_AndroidPublisher extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'androidpublisher/v2/applications/';
     $this->version = 'v2';
     $this->serviceName = 'androidpublisher';
@@ -900,6 +900,42 @@ class Google_Service_AndroidPublisher extends Google_Service
           )
         )
     );
+    $this->entitlements = new Google_Service_AndroidPublisher_Entitlements_Resource(
+        $this,
+        $this->serviceName,
+        'entitlements',
+        array(
+          'methods' => array(
+            'list' => array(
+              'path' => '{packageName}/entitlements',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'packageName' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'maxResults' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
+                'productId' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'startIndex' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
+                'token' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+              ),
+            ),
+          )
+        )
+    );
     $this->inappproducts = new Google_Service_AndroidPublisher_Inappproducts_Resource(
         $this,
         $this->serviceName,
@@ -963,17 +999,17 @@ class Google_Service_AndroidPublisher extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'token' => array(
+                'maxResults' => array(
                   'location' => 'query',
-                  'type' => 'string',
+                  'type' => 'integer',
                 ),
                 'startIndex' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
-                'maxResults' => array(
+                'token' => array(
                   'location' => 'query',
-                  'type' => 'integer',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -1984,6 +2020,40 @@ class Google_Service_AndroidPublisher_EditsTracks_Resource extends Google_Servic
 }
 
 /**
+ * The "entitlements" collection of methods.
+ * Typical usage is:
+ *  <code>
+ *   $androidpublisherService = new Google_Service_AndroidPublisher(...);
+ *   $entitlements = $androidpublisherService->entitlements;
+ *  </code>
+ */
+class Google_Service_AndroidPublisher_Entitlements_Resource extends Google_Service_Resource
+{
+
+  /**
+   * Lists the user's current inapp item or subscription entitlements
+   * (entitlements.listEntitlements)
+   *
+   * @param string $packageName The package name of the application the inapp
+   * product was sold in (for example, 'com.some.thing').
+   * @param array $optParams Optional parameters.
+   *
+   * @opt_param string maxResults
+   * @opt_param string productId The product id of the inapp product (for example,
+   * 'sku1'). This can be used to restrict the result set.
+   * @opt_param string startIndex
+   * @opt_param string token
+   * @return Google_Service_AndroidPublisher_EntitlementsListResponse
+   */
+  public function listEntitlements($packageName, $optParams = array())
+  {
+    $params = array('packageName' => $packageName);
+    $params = array_merge($params, $optParams);
+    return $this->call('list', array($params), "Google_Service_AndroidPublisher_EntitlementsListResponse");
+  }
+}
+
+/**
  * The "inappproducts" collection of methods.
  * Typical usage is:
  *  <code>
@@ -2067,9 +2137,9 @@ class Google_Service_AndroidPublisher_Inappproducts_Resource extends Google_Serv
    * products; for example, "com.spiffygame".
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string token
-   * @opt_param string startIndex
    * @opt_param string maxResults
+   * @opt_param string startIndex
+   * @opt_param string token
    * @return Google_Service_AndroidPublisher_InappproductsListResponse
    */
   public function listInappproducts($packageName, $optParams = array())
@@ -2514,6 +2584,89 @@ class Google_Service_AndroidPublisher_AppEdit extends Google_Model
   }
 }
 
+class Google_Service_AndroidPublisher_Entitlement extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $kind;
+  public $productId;
+  public $productType;
+  public $token;
+
+
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+  public function setProductId($productId)
+  {
+    $this->productId = $productId;
+  }
+  public function getProductId()
+  {
+    return $this->productId;
+  }
+  public function setProductType($productType)
+  {
+    $this->productType = $productType;
+  }
+  public function getProductType()
+  {
+    return $this->productType;
+  }
+  public function setToken($token)
+  {
+    $this->token = $token;
+  }
+  public function getToken()
+  {
+    return $this->token;
+  }
+}
+
+class Google_Service_AndroidPublisher_EntitlementsListResponse extends Google_Collection
+{
+  protected $collection_key = 'resources';
+  protected $internal_gapi_mappings = array(
+  );
+  protected $pageInfoType = 'Google_Service_AndroidPublisher_PageInfo';
+  protected $pageInfoDataType = '';
+  protected $resourcesType = 'Google_Service_AndroidPublisher_Entitlement';
+  protected $resourcesDataType = 'array';
+  protected $tokenPaginationType = 'Google_Service_AndroidPublisher_TokenPagination';
+  protected $tokenPaginationDataType = '';
+
+
+  public function setPageInfo(Google_Service_AndroidPublisher_PageInfo $pageInfo)
+  {
+    $this->pageInfo = $pageInfo;
+  }
+  public function getPageInfo()
+  {
+    return $this->pageInfo;
+  }
+  public function setResources($resources)
+  {
+    $this->resources = $resources;
+  }
+  public function getResources()
+  {
+    return $this->resources;
+  }
+  public function setTokenPagination(Google_Service_AndroidPublisher_TokenPagination $tokenPagination)
+  {
+    $this->tokenPagination = $tokenPagination;
+  }
+  public function getTokenPagination()
+  {
+    return $this->tokenPagination;
+  }
+}
+
 class Google_Service_AndroidPublisher_ExpansionFile extends Google_Model
 {
   protected $internal_gapi_mappings = array(
@@ -2955,14 +3108,6 @@ class Google_Service_AndroidPublisher_InAppProductListing extends Google_Model
   {
     return $this->title;
   }
-}
-
-class Google_Service_AndroidPublisher_InAppProductListings extends Google_Model
-{
-}
-
-class Google_Service_AndroidPublisher_InAppProductPrices extends Google_Model
-{
 }
 
 class Google_Service_AndroidPublisher_InappproductsBatchRequest extends Google_Collection
@@ -3436,12 +3581,43 @@ class Google_Service_AndroidPublisher_ProductPurchase extends Google_Model
   }
 }
 
-class Google_Service_AndroidPublisher_Season extends Google_Model
+class Google_Service_AndroidPublisher_Prorate extends Google_Model
 {
+  protected $internal_gapi_mappings = array(
+  );
+  protected $defaultPriceType = 'Google_Service_AndroidPublisher_Price';
+  protected $defaultPriceDataType = '';
+  protected $startType = 'Google_Service_AndroidPublisher_MonthDay';
+  protected $startDataType = '';
+
+
+  public function setDefaultPrice(Google_Service_AndroidPublisher_Price $defaultPrice)
+  {
+    $this->defaultPrice = $defaultPrice;
+  }
+  public function getDefaultPrice()
+  {
+    return $this->defaultPrice;
+  }
+  public function setStart(Google_Service_AndroidPublisher_MonthDay $start)
+  {
+    $this->start = $start;
+  }
+  public function getStart()
+  {
+    return $this->start;
+  }
+}
+
+class Google_Service_AndroidPublisher_Season extends Google_Collection
+{
+  protected $collection_key = 'prorations';
   protected $internal_gapi_mappings = array(
   );
   protected $endType = 'Google_Service_AndroidPublisher_MonthDay';
   protected $endDataType = '';
+  protected $prorationsType = 'Google_Service_AndroidPublisher_Prorate';
+  protected $prorationsDataType = 'array';
   protected $startType = 'Google_Service_AndroidPublisher_MonthDay';
   protected $startDataType = '';
 
@@ -3453,6 +3629,14 @@ class Google_Service_AndroidPublisher_Season extends Google_Model
   public function getEnd()
   {
     return $this->end;
+  }
+  public function setProrations($prorations)
+  {
+    $this->prorations = $prorations;
+  }
+  public function getProrations()
+  {
+    return $this->prorations;
   }
   public function setStart(Google_Service_AndroidPublisher_MonthDay $start)
   {
