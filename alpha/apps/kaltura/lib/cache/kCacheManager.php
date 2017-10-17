@@ -28,9 +28,11 @@ class kCacheManager
 	const CACHE_TYPE_RESPONSE_PROFILE_INVALIDATION = 'responseProfileInvalidation';
 	const CACHE_TYPE_BATCH_JOBS = 'batchJobs';
 	const CACHE_TYPE_RESOURCE_RESERVATION = 'resourceReservation';
+	const CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER = 'elasticExecutedCluster';
 	const CACHE_TYPE_CACHE_ONLY_ACTIONS = 'cacheOnlyActions';
 	const CACHE_TYPE_PLAYKIT_JS = 'playKitJs';
 	const CACHE_TYPE_PLAYKIT_JS_SOURCE_MAP = 'playKitJsSourceMap';
+	const CACHE_TYPE_REPORTS_COUNT = "reportscount";
 
 	protected static $caches = array();
 	

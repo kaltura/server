@@ -96,8 +96,11 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			if (!$remoteJobId)
 			{
 				KalturaLog::err('remote content does not exist');
-				$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$transcript->save();
+				foreach($transcripts as $transcript)
+				{
+					$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+					$transcript->save();
+				}
 				return true;     	
 			}
 			

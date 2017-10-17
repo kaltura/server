@@ -79,8 +79,7 @@ class editPendingAction extends kalturaSystemAction
 			if ( $should_save )
 			{
 				$fixed_content = $xml_doc->saveXML();
-				$content_dir =  myContentStorage::getFSContentRootPath();
-				$file_name = realpath( $content_dir . $this->entry->getDataPath( ) );
+				$file_name = realpath($this->entry->getFullDataPath());
 				
 				$res = file_put_contents( $file_name , $fixed_content ); // sync - NOTOK 
 				

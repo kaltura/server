@@ -1049,17 +1049,20 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 				'getCuePointAddArgs'
 			);
 
-			$distributedMap = empty($jobData->providerData->distributedTimedThumbAssets) ? array() : unserialize($jobData->providerData->distributedTimedThumbAssets);
-			foreach ($targetObjects->thumbCuePoints as $thumbCuePoint)
+			$distributedThumbCuePointsMap = empty($jobData->providerData->distributedThumbCuePoints) ? array() : unserialize($jobData->providerData->distributedThumbCuePoints);
+			$distributedTimedThumbAssetsMap = empty($jobData->providerData->distributedTimedThumbAssets) ? array() : unserialize($jobData->providerData->distributedTimedThumbAssets);
+			foreach ($targetObjects->thumbCuePoints as $id => $thumbCuePoint)
 			{
-				/* @var $cuePoint KalturaThumbCuePoint */
 				$thumbCuePoint->entryId = $targetEntryId;
-				if (isset($distributedMap[$thumbCuePoint->assetId]))
+				
+				//Clear cuePoint assetId only if it was previously distributed but its associated timedThumbASset was not.  
+				if(isset($distributedThumbCuePointsMap[$id])
+						&& !isset($distributedTimedThumbAssetsMap[$thumbCuePoint->assetId]))
 					$thumbCuePoint->assetId = "";
 				else
 					$thumbCuePoint->assetId = null;
-
 			}
+			
 			$targetCuePointClient = KalturaCuePointClientPlugin::get($this->targetClient);
 			$syncedObjects->thumbCuePoints = $this->syncTargetEntryObjects(
 				$targetCuePointClient->cuePoint,

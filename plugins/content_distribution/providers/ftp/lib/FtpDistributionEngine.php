@@ -3,7 +3,7 @@
  * @package plugins.ftpDistribution
  * @subpackage lib
  */
-class FtpDistributionEngine extends DistributionEngine implements 
+class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implements
 	IDistributionEngineSubmit,
 	IDistributionEngineUpdate,
 	IDistributionEngineDelete
@@ -309,26 +309,10 @@ class FtpDistributionEngine extends DistributionEngine implements
             }
         }
     }
-	
-	private function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
+
+	public function getTempDirectory()
 	{
-		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
-		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
-		{
-			file_put_contents($fileLocation, $keyContent);
-			chmod($fileLocation, 0600);
-		}
-		
-		return $fileLocation;
-	}
-    
-	private function getTempDirectoryForProfile($distributionProfileId)
-	{
-		$tempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/' . $distributionProfileId . '/';
-		if (!file_exists($tempFilePath))
-			mkdir($tempFilePath, 0777, true);
-		return $tempFilePath;
+		return self::TEMP_DIRECTORY;
 	}
     
 }

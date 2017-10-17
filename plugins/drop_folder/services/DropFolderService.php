@@ -163,7 +163,7 @@ class DropFolderService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->conversionProfileId);
 			}
 		}
-					
+
 		$dbDropFolder = $dropFolder->toUpdatableObject($dbDropFolder);
 		$dbDropFolder->save();
 	
@@ -241,7 +241,7 @@ class DropFolderService extends KalturaBaseService
 	public function getExclusiveDropFolderAction($tag, $maxTime)
 	{
 		$allocateDropFolder = kDropFolderAllocator::getDropFolder($tag, $maxTime);
-		if ($allocateDropFolder)
+		if ($allocateDropFolder && self::isValidForWatch($allocateDropFolder))
 		{
 			$dropFolder = KalturaDropFolder::getInstanceByType($allocateDropFolder->getType());
 			$dropFolder->fromObject($allocateDropFolder, $this->getResponseProfile());
@@ -254,14 +254,12 @@ class DropFolderService extends KalturaBaseService
 	 *
 	 * @action freeExclusiveDropFolder
 	 * @param int $dropFolderId
-	 * @param int $status
 	 * @param string $errorCode
 	 * @param string $errorDescription
 	 * @throws KalturaAPIException
-	 *
 	 * @return KalturaDropFolder
 	 */
-	public function freeExclusiveDropFolderAction($dropFolderId, $status, $errorCode = null, $errorDescription = null)
+	public function freeExclusiveDropFolderAction($dropFolderId, $errorCode = null, $errorDescription = null)
 	{
 		kDropFolderAllocator::freeDropFolder($dropFolderId);
 
@@ -270,7 +268,6 @@ class DropFolderService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
 
 		$dbDropFolder->setLastAccessedAt(time());
-		$dbDropFolder->setStatus($status);
 		$dbDropFolder->setErrorCode($errorCode);
 		$dbDropFolder->setErrorDescription($errorDescription);
 		$dbDropFolder->save();
@@ -280,6 +277,15 @@ class DropFolderService extends KalturaBaseService
 
 		return $dropFolder;
 	}
-	
+
+	private static function isValidForWatch(DropFolder $dropFolder)
+	{
+		$partner = PartnerPeer::retrieveByPK($dropFolder->getPartnerId());
+		if (!$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE
+			|| !$partner->getPluginEnabled(DropFolderPlugin::PLUGIN_NAME))
+			return false;
+
+		return true;
+	}
 	
 }

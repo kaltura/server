@@ -58,6 +58,8 @@ class KExternalErrors
 	const TOO_MANY_PROCESSES = 46;
 	const BUNDLE_CREATION_FAILED = 47;
 	const ENTRY_NOT_SEQUENCE = 48;
+	const INVALID_MIN_BITRATE = 49;
+	const INVALID_PARAMETER = 50;
 
 	const HTTP_STATUS_NOT_FOUND = 404;
 
@@ -84,7 +86,7 @@ class KExternalErrors
 		self::IP_COUNTRY_BLOCKED => "", // we rather not explain this error code
 		self::IMAGE_RESIZE_FAILED => "image resize failed",
 		self::DELIVERY_METHOD_NOT_ALLOWED => "Delivery method not allowed",
-		self::INVALID_MAX_BITRATE => "max bitrate is not valid",
+		self::INVALID_MAX_BITRATE => "max bitrate is not valid",		
 		self::MISSING_PARAMETER => "Request parameter [%s] is missing",
 		self::WIDGET_NOT_FOUND => "requested widget not found",
 		self::UI_CONF_NOT_FOUND => "requested ui_conf not found",
@@ -114,6 +116,8 @@ class KExternalErrors
 		self::TOO_MANY_PROCESSES => "Too many executed processes",
 		self::BUNDLE_CREATION_FAILED => "Failed to build bundle for [%s]",
 		self::ENTRY_NOT_SEQUENCE => "One or more of the sequence entry ids given is not a sequence entry",
+		self::INVALID_MIN_BITRATE => "min bitrate is not valid",
+		self::INVALID_PARAMETER => "Request parameter [%s] is invalid",
 	);
 
 	public static function dieError($errorCode, $message = null)

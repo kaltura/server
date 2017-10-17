@@ -161,6 +161,8 @@ class KalturaErrors extends APIErrors
 
 	const DYNAMIC_SEGMENT_DURATION_DISABLED = "DYNAMIC_SEGMENT_DURATION_DISABLED;;Cannot edit segment duration. Dynamic segment duration feature is disabled";
 
+	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
+
 	/**
 	 * Notification Service
 	 */
@@ -461,6 +463,8 @@ class KalturaErrors extends APIErrors
 	const STORAGE_PROFILE_RULES_NOT_FULFILLED = "STORAGE_PROFILE_RULES_NOT_FULFILLED;ID;Storage profile rules for profile id @ID@ are not fulfilled";
 	
 	const FILE_PENDING = "FILE_PENDING;;File is pending";
+
+	const FILE_TYPE_NOT_SUPPORTED = "FILE_TYPE_NOT_SUPPORTED;TYPE;File type @TYPE@ is not supported";
 	
 	/*
 	 * resetUserPassword
@@ -652,12 +656,16 @@ class KalturaErrors extends APIErrors
 	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE,USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
 	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER;;Must filter on entry ID or user ID';
 	const USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED = 'USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED;;UserEntry filter object forbidden fields used';
+	const USER_ENTRY_ALREADY_EXISTS = 'USER_ENTRY_ALREADY_EXISTS;;UserEntry for this type already exists';
+	const USER_ID_NOT_PROVIDED_OR_EMPTY = 'USER_ID_NOT_PROVIDED_OR_EMPTY;;User ID not found neither on the object or KS';
 	
 	/*
 	 * serverNode service
 	 */
 	const HOST_NAME_ALREADY_EXISTS = "HOST_NAME_ALREADY_EXISTS;HOST_NAME;Host Name [@HOST_NAME@] already exists";
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
+	const SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND = "SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND;NODE_IDS;The following parentIds where not found [@NODE_IDS@]";
+	const SERVER_NODE_PARENT_LOOP_DETECTED = "SERVER_NODE_PARENT_LOOP_DETECTED;ROUTE;ParentId loop detected on route [@ROUTE@], validate parentId tree definition";
 
 	/*
 	 * EntryServerNode service

@@ -131,6 +131,16 @@ abstract class KIndexingEngine
 		$this->lastIndexDepth = $lastIndexDepth;
 	}
 
-	
-	
+	public function initAdvancedFilter($data, $advancedFilter = null)
+	{
+		if(!$advancedFilter)
+			$advancedFilter = new KalturaIndexAdvancedFilter();
+		
+		if($data->lastIndexId)
+			$advancedFilter->indexIdGreaterThan = $data->lastIndexId;
+		if($data->lastIndexDepth)
+			$advancedFilter->depthGreaterThanEqual = $data->lastIndexDepth;
+		
+		return $advancedFilter;
+	}	
 }

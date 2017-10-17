@@ -31,6 +31,10 @@ class KalturaPlayableEntryFilter extends KalturaPlayableEntryBaseFilter
 	
 	public function __construct()
 	{
-		$this->typeIn = KalturaEntryType::MEDIA_CLIP . ',' . KalturaEntryType::MIX . ',' . KalturaEntryType::LIVE_STREAM;
+		$typeArray = array (entryType::MEDIA_CLIP, entryType::MIX, entryType::LIVE_STREAM);
+		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
+		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM));
+		
+		$this->typeIn = implode(',', array_unique($typeArray));
 	}
 }

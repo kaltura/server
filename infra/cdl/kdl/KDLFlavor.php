@@ -1054,6 +1054,33 @@ $plannedDur = 0;
 			}
 		}
 
+			/*
+			 * AR Mode:5 - force target AR to be as close as possible to source 'intentional' AR
+			 * 	The source AR is checked againts 'known' AR (16:9, 4:3, 2.40:1, 2.35:1, ...)
+			 * 	if the source AR is 'close enough' to obe of the 'well-known' AR's, the asset is 
+			 *	generated with the well-known AR. Otherwise the calculated source AR is taken.
+			 *	The asset frame size is adapted to get as close as possible (4 dig percesion) to that AR.
+			 *
+			 *	This code should reside above, along with other AR processing. But this could lead to 
+			 *	behaviour change for some of the customer's that use the ARMode feature.
+			 */
+		if(isset($target->_arProcessingMode) && $target->_arProcessingMode==5){
+			$flvrVid = $this->_video;
+			list($w,$h,$d) = self::matchBestAspectRatio(round($widSrc), round($hgtSrc), $flvrVid->_width, $flvrVid->_height);
+			if($w!==false) {
+				$target->_width = $w;
+				$target->_height = $h;
+				$target->_dar = $d;
+				KalturaLog::log("AR Match: FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)");
+			}
+			else {
+				$w = round($target->_width);
+				$h = round($target->_height);
+				$d = $w/$h;
+				KalturaLog::log("AR Match: NOT FOUND ($widSrc $hgtSrc) ($flvrVid->_width, $flvrVid->_height) ==> ($w,$h,$d)");
+			}
+		}
+
 		$target->_height = round($target->_height);
 		$target->_width  = round($target->_width);
 		
@@ -1079,8 +1106,8 @@ $plannedDur = 0;
 		$modVal = 16;
 		if((isset($target->_forceMult16) && $target->_forceMult16 == 0)
 		|| (($target->_width == 640 || $target->_width == 480) && $target->_height == 360) || ($target->_width == 1920 && $target->_height == 1080)){
-			$h264targets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H);
-			if(in_array($target->_id, $h264targets)) {
+			$auxTargets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H, KDLVideoTarget::H265);
+			if(in_array($target->_id, $auxTargets)) {
 				$modVal = 2;
 		}
 		else {
@@ -1187,6 +1214,69 @@ $plannedDur = 0;
 		}
 	}
 
+	/* ---------------------------
+	 * matchBestAspectRatio
+	 * 	Force target AR to be as close as possible to source 'intentional' AR
+	 * 	The source AR is checked againts 'known' AR (16:9, 4:3, 2.40:1, 2.35:1, ...)
+	 * 	if the source AR is 'close enough' to obe of the 'well-known' AR's, the asset is 
+	 *	generated with the well-known AR. Otherwise the calculated source AR is taken.
+	 *	The asset frame size is adapted to get as close as possible - 4 dig percesion, to that AR
+	 */
+	protected static function matchBestAspectRatio($srcWid, $srcHgt, $assetWid, $assetHgt, $percision=4)
+	{
+		KalturaLog::log("Input - srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt,percision:$percision");
+
+		$dar = null;
+	/**/
+		$wellKnown = array(4/3,5/4,5/3,16/9,16/8,16/10,2.4,2.39,2.35,1.85);
+		foreach($wellKnown as $idx=>$d) {
+			if(abs(($srcWid/$srcHgt)-$d)<0.01){
+				$dar = round($d,$percision);
+				break;
+			}
+		}
+		if(!isset($dar)) {
+			$darAux = round($srcWid/$srcHgt,2);
+			foreach($wellKnown as $idx=>$d) {
+				if(abs($darAux-$d)<0.01){
+					$dar = round($d,$percision);
+					break;
+				}
+			}
+		}
+
+		if(!isset($dar)) {
+			$dar = round($srcWid/$srcHgt,$percision);
+		}
+
+		if($assetHgt==0) {
+			$assetHgt = round($assetWid/$dar/2)*2;
+		}
+		if($assetWid==0) {
+			$assetWid = round($assetHgt*$dar/2)*2;
+		}
+		$assetHgt = min($assetHgt,$srcHgt);
+		$assetWid = min($assetWid,$srcWid);
+		
+		if($assetWid>$assetHgt*$dar) {
+			$assetWid = round($assetHgt*$dar/2)*2;
+		}
+		KalturaLog::log("Adjusted - srcWid:$srcWid,srcHgt:$srcHgt,assetWid:$assetWid,assetHgt:$assetHgt");
+		
+		for($w=round($assetWid/2)*2; $w>=0; $w-=2){
+			$h = round($w/$dar);
+			if($h==0) break;
+			$d = round($w/$h,$percision);
+//KalturaLog::log("$w $h $d\n");
+			if($d==$dar && $h%2==0) {
+				break;
+			}
+		}
+
+		if($d==$dar) return array($w,$h,$d);
+		else return array(false,false,false);
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetVideoBitrate
 	 * If flavor BR is higher than the source - keep the source BR

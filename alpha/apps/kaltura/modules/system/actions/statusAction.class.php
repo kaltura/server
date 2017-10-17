@@ -61,7 +61,7 @@ class statusAction extends kalturaSystemAction
 						break;
 					}
 					
-					$data_path = myContentStorage::getFSContentRootPath() . $entry->getDataPath();
+					$data_path = $entry->getFullDataPath();
 					$size = filesize($data_path);
 					
 					$list_type = $size > 0 ? 0 : 1;
@@ -140,7 +140,7 @@ class statusAction extends kalturaSystemAction
 						break;
 					}
 					
-					$data_path = myContentStorage::getFSContentRootPath() . $entry->getDataPath();
+					$data_path = $entry->getFullDataPath();
 					$data_dir = pathinfo( $data_path, PATHINFO_DIRNAME );
 					$archive_file = $archive_path = str_replace( "content/entry" ,  "archive" , $data_dir );
 					$archive_files = glob ( $archive_path . "/{$entry_id}.*" );

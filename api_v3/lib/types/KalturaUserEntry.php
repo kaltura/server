@@ -159,4 +159,33 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		parent::doFromObject($srcObj, $responseProfile);
 	}
 
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		$this->validatePropertyNotNull("entryId");
+		$this->validateEntryId();
+		$this->validateUserID();
+	}
+	
+	/*
+	 * @param string $userEntryID
+	 * @throw KalturaAPIException
+	 */
+	protected function validateEntryId()
+	{
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+	}
+	
+	/*
+	 * @param string $userEntryID
+	 * @throw KalturaAPIException
+	 */
+	protected function validateUserId()
+	{
+		$userId = $this->userId ? $this->userId : kCurrentContext::getCurrentKsKuserId();
+		if(!$userId || trim($userId) == '')
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED_OR_EMPTY);
+	}
 }

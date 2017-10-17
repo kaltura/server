@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor, IKalturaSearchDataContributor
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -362,4 +362,97 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			
 		return CuePointPlugin::getPluginName() . '_' . $fieldName;
 	}
+
+	/**
+	 * Return search data to be associated with the object
+	 *
+	 * @param BaseObject $object
+	 * @return ArrayObject
+	 */
+	public static function getElasticSearchData(BaseObject $object)
+	{
+		if($object instanceof entry && self::isAllowedPartner($object->getPartnerId()))
+			return self::getCuePointElasticSearchData($object);
+
+		return null;
+	}
+
+	public static function getCuePointElasticSearchData(entry $entry)
+	{
+		$indexOnEntryTypes = self::getElasticIndexOnEntryTypes();
+
+		if(!count($indexOnEntryTypes))
+			return;
+
+		$offset = 0;
+		$entryId = $entry->getId();
+		$partnerId = $entry->getPartnerId();
+		$data = array();
+		$cuePoints = null;
+		do
+		{
+			CuePointPeer::setUseCriteriaFilter(false);
+			$cuePointObjects = CuePointPeer::retrieveByEntryIdTypeAndLimit($partnerId, $entryId, self::CUE_POINT_FETCH_LIMIT, $offset, $indexOnEntryTypes);
+			CuePointPeer::setUseCriteriaFilter(true);
+
+			foreach($cuePointObjects as $cuePoint)
+			{
+				/* @var $cuePoint CuePoint */
+				$contributedData = $cuePoint->contributeElasticData();
+				if(!$contributedData)
+					continue;
+
+				if (isset($contributedData['cue_point_text']) && (strlen($contributedData['cue_point_text']) > kElasticSearchManager::MAX_LENGTH))
+					$contributedData['cue_point_text'] = substr($contributedData['cue_point_text'], 0, kElasticSearchManager::MAX_LENGTH);
+
+				$cuePointData = $contributedData;
+				$cuePointData['cue_point_type'] = $cuePoint->getType();
+				$cuePointData['cue_point_id'] = $cuePoint->getId();
+				if(!is_null($cuePoint->getStartTime()))
+					$cuePointData['cue_point_start_time'] = $cuePoint->getStartTime();
+				if(!is_null($cuePoint->getEndTime()))
+					$cuePointData['cue_point_end_time'] = $cuePoint->getEndTime();
+				//add cue point metadata - todo maybe add checkbox
+//				$metaDataPlugin = KalturaPluginManager::getPluginInstance(CuePointMetadataPlugin::PLUGIN_NAME);
+//				if($metaDataPlugin)
+//				{
+//					$cuePointElasticMetaData = $metaDataPlugin::getElasticSearchData($cuePoint);
+//
+//					if($cuePointElasticMetaData && count($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME]))
+//					{
+//						foreach ($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME] as $fieldName => $fieldValue)
+//						{
+//							$cuePointData['cue_point_metadata'][$fieldName] = $fieldValue;
+//						}
+//					}
+//				}
+				$data[] = $cuePointData;
+			}
+
+			$handledObjectsCount = count($cuePointObjects);
+			$offset += $handledObjectsCount;
+		}
+		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT &&
+			$offset < kElasticSearchManager::MAX_CUE_POINTS); //remove after we move to php7
+
+		if(count($data))
+			$cuePoints['cue_points'] = $data;
+
+		return $cuePoints;
+	}
+
+	public static function getElasticIndexOnEntryTypes()
+	{
+		$indexOnEntryTypes = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePoint');
+		foreach ($pluginInstances as $pluginInstance)
+		{
+			$currIndexOnEntryTypes = $pluginInstance::getTypesToElasticIndexOnEntry();
+
+			$indexOnEntryTypes = array_merge($indexOnEntryTypes, $currIndexOnEntryTypes);
+		}
+
+		return $indexOnEntryTypes;
+	}
+
 }

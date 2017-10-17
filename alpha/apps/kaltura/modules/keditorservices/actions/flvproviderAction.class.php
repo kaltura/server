@@ -130,8 +130,7 @@ class flvproviderAction extends sfAction
 		}
 		
 		$dataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $version); // replaced__getDataPath
-		$path = kFileSyncUtils::getReadyLocalFilePathForKey($dataKey);
-		$this->flv_streamer = new myFlvStreamer( $path, $this->timeline, $this->streamNum, $addPadding );
+		$this->flv_streamer = new myFlvStreamer( $dataKey, $this->timeline, $this->streamNum, $addPadding );
 		
 		$this->total_length = $this->flv_streamer->getTotalLength( true ); // $total_length;
 		

@@ -277,8 +277,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
         // login to server
         if ($privateKey || $publicKey) 
         {
-	       	$privateKeyFile = self::getTempFileWithContent($privateKey, 'privateKey');
-        	$publicKeyFile = self::getTempFileWithContent($publicKey, 'publicKey');
+	       	$privateKeyFile = $privateKey ? kFile::createTempFile($privateKey, 'privateKey') : null;
+        	$publicKeyFile = $publicKey ? kFile::createTempFile($publicKey, 'publicKey'): null;
         	$fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);        	
         }
         else 
@@ -313,21 +313,6 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		
 	}
 	
-	/**
-	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
-	 * @param string $fileContent
-	 * @param string $prefix
-	 * @return string path to temporary file location
-	 */
-	private static function getTempFileWithContent($fileContent, $prefix = '') 
-	{
-		if(!$fileContent)
-			return null;
-		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, $prefix);		
-		file_put_contents($fileLocation, $fileContent);
-		return $fileLocation;
-	}
 	
 	/**
 	 * Update uploading details

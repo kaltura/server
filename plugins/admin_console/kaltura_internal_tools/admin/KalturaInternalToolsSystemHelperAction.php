@@ -49,11 +49,7 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		{
 			$res = str_replace ( array ( "|" , "/") , array ( "|01" , "|02" ) , base64_encode ( serialize ( $str ) ) ) ; 
 		}
-		elseif ( $algo == "wiki_decode" )
-		{
-			$res = @unserialize ( base64_decode (str_replace ( array ( "|02" , "|01" ) , array ( "/" , "|" ) , $str ) ) ) ;
-		}
-		elseif ( $algo == "wiki_decode_no_serialize" )
+<		elseif ( $algo == "wiki_decode_no_serialize" )
 		{
 			$res = base64_decode (str_replace ( array ( "|02" , "|01" ) , array ( "/" , "|" ) , $str ) ) ;
 		}

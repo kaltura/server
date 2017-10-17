@@ -506,12 +506,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				{
 					continue;
 				}
-								
+
 				$flavorAsset = $this->getFlavorAsset($contentElement, $conversionProfileId);
 				$flavorAssetResource = $this->getResource($contentElement, $conversionProfileId);
-				if(!$flavorAssetResource)
-					continue;
-				
+
 				$assetParamsId = $flavorAsset->flavorParamsId;
 	
 				$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
@@ -520,7 +518,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					KalturaLog::info("Asset id [ $assetId]");
 					$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 				}
-			
+
+				if(isset($contentElement->streams))
+					$this->handleStreamsElement($contentElement->streams, $entry);
+
 				KalturaLog::info("assetParamsId [$assetParamsId]");
 							
 				if(is_null($assetParamsId)) // no params resource
@@ -539,6 +540,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$assetResource->resource = $flavorAssetResource;
 				$assetResource->assetParamsId = $assetParamsId;
 				$resource->resources[] = $assetResource;
+
 			}
 		}
 		
@@ -658,7 +660,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 										array $noParamsFlavorAssets, array $noParamsFlavorResources,
 										array $noParamsThumbAssets, array $noParamsThumbResources, array $pluginReplacementOptions, $keepManualThumbnails = false)
 	{
-		
+
 		KalturaLog::info("Resource is: " . print_r($resource, true));
 		
 		KBatchBase::impersonate($this->currentPartnerId);;
@@ -693,9 +695,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$advancedOptions = new KalturaEntryReplacementOptions();
 			$advancedOptions->keepManualThumbnails = 1;
 		}
-		
+
 		if($resource)
+		{
+			if ($updateEntry->streams )
+			{
+				$baseEntry = new KalturaMediaEntry();
+				$baseEntry->streams = $updateEntry->streams;
+				$updatedEntry = KBatchBase::$kClient->baseEntry->update($entryId, $baseEntry);
+			}
 			KBatchBase::$kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId, $advancedOptions); //to create a temporery entry.
+		}
+
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
@@ -1183,14 +1194,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($flavorAssetsResources as $flavorParamsId => $flavorAssetsResource)
 		{
-			if(!isset($existingflavorAssets[$flavorParamsId]))
+			$id = null;
+			if (!isset($existingflavorAssets[$flavorParamsId]))
 			{
 				KBatchBase::$kClient->flavorAsset->add($entryId, $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorAssetsResource);
-			}else{
-				KBatchBase::$kClient->flavorAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
+				$id = KBatchBase::$kClient->getMultiRequestResult()->id;
+			} else
+			{
+				$id = $existingflavorAssets[$flavorParamsId];
+				KBatchBase::$kClient->flavorAsset->update($id, $flavorAssets[$flavorParamsId]);
 			}
+			if ($flavorAssetsResource)
+				KBatchBase::$kClient->flavorAsset->setContent($id, $flavorAssetsResource);
 		}
 
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
@@ -1433,7 +1448,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$flavorAsset = new KalturaFlavorAsset(); //we create a new asset (for add)
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
 		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
-			
+		if (isset($contentElement->assetInfo))
+		{
+			$flavorAsset->language = languageCodeManager::getFullLanguageNameFromThreeCode(kXml::getXmlAttributeAsString($contentElement->assetInfo, "language"));
+			$flavorAsset->label = kXml::getXmlAttributeAsString($contentElement->assetInfo, "label");
+		}
 		return $flavorAsset;
 	}
 	
@@ -2354,7 +2373,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $bulkUploadResult;
 	}
 	
-	protected function updateObjectsResults($requestResults, $bulkUploadResults)
+	protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 	    KBatchBase::$kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");

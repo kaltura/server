@@ -32,4 +32,13 @@ class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 		
 		return $response;
 	}
+	
+	public function __construct()
+	{
+		$typeArray = array (entryType::MEDIA_CLIP, entryType::LIVE_STREAM);
+		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
+		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM));
+		
+		$this->typeIn = implode(',', array_unique($typeArray));
+	}
 }

@@ -20,6 +20,8 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	const FILE_SYNC_MRSS_XSL = 1;
 	const FILE_SYNC_MEDIAINFO_XSL = 2;
 	
+	const DEFAULT_REPLACEMENT_OPTIONS = "defaultReplacementOptions";
+	
 	private $xsl;
 	private $mediaInfoXsl;
 	
@@ -367,5 +369,12 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	 */
 	public function getDetectGOP() { return $this->getFromCustomData('detectGOP', null, 0); }
 	public function setDetectGOP($v) { $this->putInCustomData('detectGOP', $v); }
+
+	/*
+	 * When set, the replacement process should use the CP replacement options by default, if no others are passed
+	 * 
+	 */
+	public function getDefaultReplacementOptions() {return $this->getFromCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, null, 0);}
+	public function setDefaultReplacementOptions($v) {$this->putInCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, $v);}
 
 }

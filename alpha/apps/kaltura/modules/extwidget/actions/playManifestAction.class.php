@@ -49,6 +49,7 @@ class playManifestAction extends kalturaAction
 		"flavorParamIds" => 'fps',
 		"format" => 'f',
 		"maxBitrate" => 'mb',
+		"minBitrate" => 'mib',
 		"playbackContext" => 'pc',
 		"preferredBitrate" => 'pb',
 		"protocol" => 'pt',
@@ -85,6 +86,11 @@ class playManifestAction extends kalturaAction
 	 * @var int
 	 */
 	private $maxBitrate = null;
+	
+	/**
+	 * @var int
+	 */
+	private $minBitrate = null;
 	
 	/**
 	 * @var array
@@ -478,18 +484,23 @@ class playManifestAction extends kalturaAction
 	 * @param array $flavorAssets
 	 * @return array
 	 */
-	private function removeMaxBitrateFlavors($flavorAssets)
+	private function removeFlavorsByBitrate($flavorAssets)
 	{
-		if (!$this->maxBitrate)			
+		if (!($this->minBitrate || $this->maxBitrate))
 			return $flavorAssets;
-			
 		$returnedFlavors = array();		
 		foreach ($flavorAssets as $flavor)
 		{
-			if ($flavor->getBitrate() <= $this->maxBitrate)
+			//audio language assets shouldn't be filtered
+			if(!($flavor->hasTag(assetParams::TAG_ALT_AUDIO) || $flavor->hasTag(assetParams::TAG_AUDIO_ONLY)))
 			{
-				$returnedFlavors[] = $flavor;
+				$currentBitrate = $flavor->getBitrate();
+				if ($this->minBitrate && $currentBitrate < $this->minBitrate)
+					continue;
+				if($this->maxBitrate && $currentBitrate > $this->maxBitrate)
+					continue;
 			}
+			$returnedFlavors[] = $flavor;
 		}
 	
 		return $returnedFlavors;
@@ -587,7 +598,6 @@ class playManifestAction extends kalturaAction
 		$flavorAssets = $this->retrieveAssets();
 		$flavorByTags = false;
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
@@ -624,6 +634,10 @@ class playManifestAction extends kalturaAction
 				return;
 		}
 
+		$flavorAssetsFilteredByBitrate = $this->removeFlavorsByBitrate($flavorAssets);
+		if(count($flavorAssetsFilteredByBitrate))
+			$flavorAssets = $flavorAssetsFilteredByBitrate;
+		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
@@ -752,8 +766,7 @@ class playManifestAction extends kalturaAction
 		foreach($flavors as $flavorAsset)
 		{
 			/* @var $flavorAsset flavorAsset */
-			
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+			$mediaInfo = $flavorAsset->getMediaInfo();
 			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 			{
 				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 
@@ -1124,6 +1137,10 @@ class playManifestAction extends kalturaAction
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
 
+		$this->minBitrate = $this->getRequestParameter ( "minBitrate", null );
+		if(($this->minBitrate) && ((!is_numeric($this->minBitrate)) || ($this->minBitrate <= 0)))
+			KExternalErrors::dieError(KExternalErrors::INVALID_MIN_BITRATE);
+
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
@@ -1154,12 +1171,14 @@ class playManifestAction extends kalturaAction
 			case entryType::MEDIA_CLIP:
 				// VOD
 				$renderer = $this->serveVodEntry();
+				$entryType = 'vod';
 				break;
 				
 			case entryType::LIVE_STREAM:			
 			case entryType::LIVE_CHANNEL:
 				// Live stream
 				$renderer = $this->serveLiveEntry();
+				$entryType = 'live';
 				break;
 			
 			default:
@@ -1177,6 +1196,8 @@ class playManifestAction extends kalturaAction
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
 		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
+		$config->disableCaptions = $this->getRequestParameter("disableCaptions", false);
+
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{
@@ -1185,6 +1206,8 @@ class playManifestAction extends kalturaAction
 		}
 
 		$renderer->entryId = $this->entryId;
+		$renderer->partnerId = $this->entry->getPartnerId();
+		$renderer->entryType = $entryType;
 		$renderer->duration = $this->duration;
 		if ($this->deliveryProfile)
 		{
@@ -1202,7 +1225,7 @@ class playManifestAction extends kalturaAction
 		$canCacheAccessControl = false;
 		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))
 		{
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 			$renderer->forceCachingHeaders = true;
 		}
 		if (!$this->secureEntryHelper)
@@ -1218,7 +1241,7 @@ class playManifestAction extends kalturaAction
 		if (!$renderer->tokenizer && $canCacheAccessControl)
 		{
 			// Note: kApiCache::hasExtraFields is checked in kManifestRenderers
-			$renderer->cachingHeadersAge = 60;
+			$renderer->cachingHeadersAge = kConf::get('play_manifest_cache_age', 'local', 60);
 		}
 		if ($this->deliveryProfile && $this->deliveryProfile->getAdStitchingEnabled())
 			$renderer->cachingHeadersAge = 0;
@@ -1250,7 +1273,7 @@ class playManifestAction extends kalturaAction
 
 		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($mediaEntryId);
 		$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		$flavorAssets = $this->removeFlavorsByBitrate($flavorAssets);
 		$filteredFlavorAssets = $this->filterFlavorsByAssetIdOrParamsIds($flavorAssets);
 
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))

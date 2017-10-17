@@ -917,69 +917,54 @@ class BatchController extends Zend_Controller_Action
 		{
 			$partnerId = $request->getParam('partnerId', 0);
 			Infra_ClientHelper::impersonate($partnerId);
-			
-			if($submitAction == 'retry')
+
+			$errorMsg = '';
+			try 
 			{
-				$jobId = $request->getParam('actionJobId', 0);
-				$jobType = $request->getParam('actionJobType', 0);
-				try
-				{
-					$client->jobs->retryJob($jobId, $jobType);
+				switch ($submitAction) {
+					case 'retry':
+						$jobId = $request->getParam('actionJobId', 0);
+						$jobType = $request->getParam('actionJobType', 0);
+						$errorMsg = "Retry job [$jobId] error: ";
+						$client->jobs->retryJob($jobId, $jobType);
+						break;
+					
+					case 'boostEntryJobs':
+						$errorMsg = "Boost entry [$entryId] jobs error: ";
+						$client->jobs->boostEntryJobs($entryId);
+						break;
+					
+					case 'reconvertEntry':
+						$errorMsg = "Reconvert entry [$entryId] error: ";
+						$client->jobs->addConvertProfileJob($entryId);
+						break;
+					
+					case 'reconvert':
+						$flavorAssetId = $request->getParam('actionFlavorAssetId', 0);
+						$errorMsg = "Reconvert flavor [$flavorAssetId] error: ";
+						$client->flavorAsset->reconvert($flavorAssetId);
+						break;
+					
+					case 'regenerate':
+						$thumbAssetId = $request->getParam('actionFlavorAssetId', 0);
+						$errorMsg = "Regenerate thumbnail [$thumbAssetId] error: ";
+						$client->thumbAsset->regenerate($thumbAssetId);
+						break;
+
+					case 'restoreEntry':
+						$errorMsg = "Restore entry [$entryId] error: ";
+						Infra_ClientHelper::unimpersonate();
+						$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+						$adminConsolePlugin->entryAdmin->restoreDeletedEntry($entryId);
+						break;
+
+					default:
+						break;
 				}
-				catch (Exception $e)
-				{
-					$this->view->errors[] = "Retry job [$jobId] error: " . $e->getMessage();					
-				}
-			}
-			
-			if($submitAction == 'boostEntryJobs')
+			} 
+			catch (Exception $e)
 			{
-				try
-				{
-					$client->jobs->boostEntryJobs($entryId);
-				}
-				catch (Exception $e)
-				{
-					$this->view->errors[] = "Boost entry [$entryId] jobs error: " . $e->getMessage();					
-				}
-			}
-			
-			if($submitAction == 'reconvertEntry')
-			{
-				try
-				{
-					$client->jobs->addConvertProfileJob($entryId);
-				}
-				catch (Exception $e)
-				{
-					$this->view->errors[] = "Reconvert entry [$entryId] error: " . $e->getMessage();					
-				}
-			}
-			
-			if($submitAction == 'reconvert')
-			{
-				$flavorAssetId = $request->getParam('actionFlavorAssetId', 0);
-				try
-				{
-					$client->flavorAsset->reconvert($flavorAssetId);
-				}
-				catch (Exception $e)
-				{
-					$this->view->errors[] = "Reconvert flavor [$flavorAssetId] error: " . $e->getMessage();					
-				}
-			}
-			
-			if($submitAction == 'regenerate')
-			{
-				$thumbAssetId = $request->getParam('actionFlavorAssetId', 0);
-				try
-				{
-					$client->thumbAsset->regenerate($thumbAssetId);
-				}
-				catch (Exception $e)
-				{
-					$this->view->errors[] = "Regenerate thumbnail [$thumbAssetId] error: " . $e->getMessage();					
-				}
+				$this->view->errors[] = $errorMsg . $e->getMessage();
 			}
 			
 			Infra_ClientHelper::unimpersonate();

@@ -1,3 +1,331 @@
+# Mercury 13.5.0 #
+
+## Add getVolumeMap action to flavorAsset service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8113
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_11_add_flavorasset_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.4.0 #
+
+## Add getVolumeMap action to media service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7986
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_26_add_media_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add upload url domain to uploadToken API object ##
+
+- Issue Type: Task
+- Issue ID: SUP-12069
+
+### Configuration ####
+
+- Add upload domain in dc_config.ini 
+example:
+0.uploadUrl = dc0-upload.kaltura.com       
+1.uploadUrl = dc1-host-upload.kaltura.com       
+
+## Support unlimited recording duration as feature flip ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8030
+
+### Configuration ####
+
+	- Add new module to the admin-console in admin.ini
+        moduls.liveStreamUnlimitedRecording.enabled = true
+        moduls.liveStreamUnlimitedRecording.permissionType = 2
+        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording Duration
+        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING_DURATION
+        moduls.liveStreamUnlimitedRecording.basePermissionType = 2
+        moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+        moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## Add permission to restore-deleted-entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8064
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_02_update_adminconsole_entryadmin_permissions.php
+	  
+## Add co-viewers field to the KalturaBaseEntry object ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7951
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	 Index entry table to sphinx
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.3.0 #
+
+## Expose new API for login by KS ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7952
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_07_add_user_loginByKs_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.2.0 #
+
+## Add new Beacon plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7580
+
+### pre-requisite ###
+	
+* Install elasticSearch for refernce view [how to install Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html) (Tested with elasticSearch 5.5.2).
+* Install logstash for refernce view [how to install Logstah](https://www.elastic.co/guide/en/logstash/current/installing-logstash.html) (Tested with logstash 5.2.2).
+* Install RabbitMQ for refernce view [how to install RabbitMQ](https://www.rabbitmq.com/install-debian.html) (Tested with rabbitMQ 3.6.10).
+
+### configuration ###
+Enable beacon plugin:
+
+	- Enable beacon plugin:
+		1. Add the following to plugins.ini file: "Beacon"
+		2. Make sure the following plugins are enabled since they are required for beacon service to work: ElasticSearch, RabbitMQ, Queue.
+
+Configure elasticSearch Kaltura configuration:
+		  
+	- Add the following to your elastic.ini file:
+	elasticClientCurlTimeout = CURL_TIMEOUT_IN_SEC
+	
+	[beacon]
+	elasticHost = "ELASTIC_HOST"
+	elasticPort = "ELASTIC_PORT"
+	
+	- Create new beaconindes in elastic by runing: curl -XPUT '"ELASTIC_HOST":"ELASTIC_PORT"/beaconindex' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_mapping.json"
+
+Configure logstash Kaltura configuration:
+
+	- Copy configurations/logstash/kaltura_beacons.template.conf to configurations/logstash/kaltura_beacons.conf and update the folloiwng tokens:
+		@RABBIT_MQ_SERVER@ = rabbitMQ server
+		@RABBIT_MQ_PASSWORD@ = rabbitMQ server Password
+		@RABBIT_MQ_USERNAME@ = rabbitMQ server User Name
+		@RABBIT_PORT@ = rabbitMQ server port
+		@LOG_DIR@ = You main log directory
+		@ELASTIC_SEARCH_HOST@ = elasticSearch server host
+		@ELASTIC_SEARCH_PORT@ = elasticSearch server port
+		
+	- Add new symlink in /etc/logstash/conf.d/kaltura_beacons to point to /opt/kaltura/app/configurations/logstash/kaltura_beacons.conf
+
+Configure rabbitMq:
+	- Add new exchange called: beacon_exchange (Type=fanout, durable=true, Policy=ha-all)
+	- Add new queue called: beacons (x-message-ttl=86400000, durable=true, Policy=ha-all)
+	- Bind queue to exchange.
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_04_add_beacon_service_permissions.php
+
+## Add new ElasticSearch plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### configuration ###
+Add the following to plugins.ini file: "ElasticSearch"
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. create configurations/elastic.ini from configurations/elastic.ini.template and update placeholders with the elastic cluster information.
+
+## Add user permission for kclip attributes ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7929
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_24_add_kClip_Attribute_user_permission.php
+
+## Add create recorded entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7827
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_06_live_stream_add_create_recording_across_dc.php
+
+
+## Add new batch job for handling copy caption assets ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-7889
+
+### Configuration ###
+ - The batch.ini has been changed, make sure to add the following to your batch.ini:
+
+	enabledWorkers.KAsyncCopyCaptions					= 1
+
+ - The workers.ini has been change, make sure to add the following to your workers.ini:
+
+	[KAsyncCopyCaptions : JobHandlerWorker]
+
+	id													= 650
+
+	friendlyName										= Copy Caption Assets
+
+	type												= KAsyncCopyCaptions
+
+	scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
+
+ - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
+
+    under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
+
+
+# Mercury 13.1.0 #
+
+## Add new Search plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### configuration ###
+Add the following to plugins.ini file: "Search"
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
+
+
+## Preserve Aspect Ratio accurately  ##
+
+- Issue Type: Feature
+- Issue ID: SUP-11599
+
+### configuration ###
+New mode (5) for flavorParams::AspectRatioMode field
+
+# Mercury 13.0.0 #
+
+## Fix deleting users on KMS ##
+
+- Issue Type: Bug
+- Issue ID: KMS-14633
+
+### configuration ###
+None
+
+### Deployment scripts ###
+Re-index Kuser sphinx table (php deployment/base/scripts/populateSphinxKusers.php)
+
+## Update Apache headers to support Kea Access-Control-Allow-Origin ##
+ - Issue type: Feature
+ - Issue ID : PLAT-7758
+ 
+### configuration ###
+Need to add the following section to apache config files /etc/apache2/sites-enabled/kaltura & /etc/apache2/sites-enabled/kaltura-ssl
+
+	Alias /apps/kea "/opt/kaltura/apps/kea"
+	<Directory "/opt/kaltura/apps/kea">
+	    DirectoryIndex index.php
+	    Options ExecCGI -Indexes FollowSymLinks Includes
+	    Order allow,deny
+	    Allow from all
+	    AllowOverride all
+	</Directory>
+
+### Deployment scripts ###
+None 
+ 
+#### Known Issues & Limitations ####
+None
+
+## Add Data addContent action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7669
+
+### configuration ###
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_07_11_addContent_data_permissions.php
+
+## Add support for Thumbnail and Thumbnail Stripes for Stitched Playlist ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7571
+
+### configuration ###
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support mapped thumbnail capture.
+
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
+
+### Deployment scripts ###
+None
+
+
 # Lynx 12.20.0 #
 
 ## Add live packager delivery profiles ##

@@ -334,7 +334,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	public $operationAttributes;
 	
 	/**
-	 * list of user ids that are entitled to edit the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
+	 * list of user ids that are entitled to edit the entry (no server enforcement) The difference between entitledUsersEdit, entitledUsersPublish and entitledUsersView is applicative only
 	 * 
 	 * @var string
 	 * @filter matchand,matchor
@@ -342,12 +342,20 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	public $entitledUsersEdit;
 		
 	/**
-	 * list of user ids that are entitled to publish the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
+	 * list of user ids that are entitled to publish the entry (no server enforcement) The difference between entitledUsersEdit, entitledUsersPublish and entitledUsersView is applicative only
 	 * 
 	 * @var string
 	 * @filter matchand,matchor
 	 */
 	public $entitledUsersPublish;
+	
+	/**
+	 * list of user ids that are entitled to view the entry (no server enforcement) The difference between entitledUsersEdit, entitledUsersPublish and entitledUsersView is applicative only
+	 * 
+	 * @var string
+	 * @filter matchand,matchor
+	 */
+	public $entitledUsersView;
 
 	/**
 	 * Comma seperated string of the capabilities of the entry. Any capability needed can be added to this list.
@@ -416,6 +424,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish",
+	 	"entitledUsersView" => "entitledPusersView",
 	 	"operationAttributes",
 		"capabilities",
 		"templateEntryId",
@@ -639,6 +648,17 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 			}
 		}
 		
+		if(!$this->isNull('entitledUsersView'))
+		{
+			$entitledPusersView = explode(',', $this->entitledUsersView);
+	
+			foreach ($entitledPusersView as $puserId)
+			{
+				$puserId = trim($puserId);
+				kuserPeer::createKuserForPartner($partnerId, $puserId);
+			}
+		}
+		
 	}
 
 	/* (non-PHPdoc)
@@ -671,6 +691,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		/* @var $sourceObject entry */
 		$this->validateUsers();
 		$this->validateCategories();
+		$this->validateParentEntryId();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
 //		if($this->referenceId)

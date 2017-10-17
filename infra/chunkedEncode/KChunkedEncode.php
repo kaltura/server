@@ -14,8 +14,7 @@
 		public $params = null;			// Additional encoding parameters, evaluated from the cmd-line
 		public $setup = null;
 		
-		public $chunkDataArr = array();	// Chunk design, processing and resultant data
-		public $chunkDataIdx = 0;		// ...
+		protected $chunkDataArr = array();	// Chunk design, processing and resultant data
 
 		public $sourceFileDt = null;	// Source file mediaInfo
 		public $mergedFileDt = null;	// Generated file mediaInfo
@@ -145,6 +144,10 @@
 			if($duration==-1) {
 				$duration = round($this->sourceFileDt->containerDuration/1000,4);
 			}
+			if($duration<180){
+				KalturaLog::log($msgStr="ERROR: too short duration ($duration), must be at least 180sec");
+				return false;
+			}
 			$params->duration = $duration;
 
 				/*
@@ -169,14 +172,14 @@
 				 * Generate the pre-planned chunk params (start, frames, ...)
 				 */
 			$start = $this->setup->startFrom;
-			$this->chunkDataIdx=round($start/$this->setup->chunkDuration);
+//			$this->chunkDataIdx=round($start/$this->setup->chunkDuration);
 			$finish = $this->setup->startFrom+$params->duration;
 			$duration = $this->setup->chunkDuration+$this->calcChunkDrift();
-			$idx = $this->chunkDataIdx;
+			$idx = 0;
 
 			while($finish>$start) {
-				$chunkData = new KChunkData($start, $duration);
-				if($idx>$this->chunkDataIdx) {
+				$chunkData = new KChunkData($idx, $start, $duration);
+				if($idx>0) {
 					$this->chunkDataArr[$idx-1]->calcGapToNext($chunkData, $params->frameDuration);
 				}
 				$this->chunkDataArr[$idx++] = $chunkData;
@@ -203,34 +206,28 @@
 				$this->refFileDt = $this->getMediaData($this->setup->ref);
 			}
 
-KalturaLog::log("cmdLine:$this->cmdLine");
-   ;
+			KalturaLog::log("cmdLine:$this->cmdLine");
 			return true;
 		}
 		
 		/********************
 		 *
 		 */
-		public function GetNext()
+		public function GetChunk($idx)
 		{
-			$setup = $this->setup;
-			$chunkIdx = $this->chunkDataIdx++;
-			if($chunkIdx>=count($this->chunkDataArr)) {
-				KalturaLog::log("Finish!!!");
+			if($idx>count($this->chunkDataArr)-1) {
+				KalturaLog::log("Bad index ($idx), max allowed".(count($this->chunkDataArr)-1)."!!!");
 				return null;
 			}
-			$finish = $setup->startFrom+$this->params->duration;
-			$start = $this->chunkDataArr[$chunkIdx]->start;
-			KalturaLog::log(" chunk($chunkIdx), start($start), finish($finish)");
-			return array($start,$chunkIdx);
+			return $this->chunkDataArr[$idx];
 		}
 		
 		/********************
-		 * Returns count of yet-to-be-processed chunks
+		 *
 		 */
-		public function PendingChunksCount()
+		public function GetMaxChunks()
 		{
-			return (count($this->chunkDataArr)-$this->chunkDataIdx);
+			return count($this->chunkDataArr);
 		}
 		
 		/********************
@@ -371,7 +368,6 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 			KalturaLog::log("start($start), chunkIdx($chunkIdx), chunkFilename($chunkFilename) :".date("Y-m-d H:i:s"));
 			$setup = $this->setup;
 			$chunkWithOverlap = $setup->chunkDuration + $setup->chunkOverlap;
-//			$cmdLine = "time $setup->ffmpegBin ".self::adjustCmdLine($this->cmdLine, $this->setup, $start, $chunkWithOverlap);
 			
 			{
 				$cmdLine = $this->cmdLine." -t $chunkWithOverlap";
@@ -455,7 +451,7 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
 			$mergeCmd.= " -i $vidConcatStr";
-			$mergeCmd.= "$audioInputParams -map 0:v -c:v copy $audioCopyParams $params->formatParams -f $params->format -copyts -y $mergedFilename";
+			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams $params->formatParams -f $params->format -copyts -y $mergedFilename";
 			KalturaLog::log("mergeCmd:\n$mergeCmd ".date("Y-m-d H:i:s"));
 			return $mergeCmd;
 		}
@@ -492,7 +488,7 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 		}
 
 		/********************
-		 * rv  - PID, 0(dry), -1(error), null(no audio)
+		 * rv  - null(no audio)
 		 */
 		public function BuildAudioCommandLine()
 		{
@@ -514,23 +510,43 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 			}
 
 			/*
-			 * Generate audio stream
+			 * Generate audio cmd line
 			 */
-			$cmdLine = null;
+			 
+			 /*
+			  * 'amerge' does not work properly with source side 'async'
+			  * The code below removes 'async' this case
+			  */
+			$asyncStr = "-async 1";
+			if(isset($params->audioFilters)){
+				$filterStr = "-filter_complex ".end($params->audioFilters);
+				if(strstr($filterStr,"amerge")!==false){
+					$asyncStr = null;
+				}
+			}
+			else 
+				$filterStr = null;
+			
+			$setup = $this->setup;
+			$cmdLine = $setup->ffmpegBin;
+			if(isset($asyncStr))
+				$cmdLine.= " $asyncStr";
+			if(isset($setup->startFrom))
+				$cmdLine.= " -ss $setup->startFrom";
+			$cmdLine.= " -i $params->source";
+			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
-			$cmdLine.= " -map 0:a:0 -vn";
+			if(isset($filterStr))
+				$cmdLine.= " $filterStr";
+			$cmdLine.= " -map 0:a:0";
 			if(isset($params->abitrate)) $cmdLine.= " -b:a ".$params->abitrate."k";
 			if(isset($params->ar)) $cmdLine.= " -ar ".$params->ar;
 			if(isset($params->ac)) $cmdLine.= " -ac ".$params->ac;
 			if(isset($params->volume)) $cmdLine.= " -vol ".$params->volume;
-			if(isset($params->audioFilters))
-				$cmdLine.= " -filter_complex ". end($params->audioFilters);
-				
-			$setup = $this->setup;
 			$durStr = null;
 			if($setup->duration!=-1) $durStr = " -t ".$setup->duration;
 			$cmdLine.= "$durStr -f $this->chunkFileFormat -y ".$this->getSessionName("audio");
-			$cmdLine = "$setup->ffmpegBin -ss $setup->startFrom -async 1 -i $params->source $cmdLine";
+			
 			KalturaLog::log("cmdLine:$cmdLine");
 			return $cmdLine;
 		}
@@ -622,12 +638,9 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 		 * updateChunkFileStatData
 		 *	Retrieve chunk stat data and update the chunks data array
 		 */
-		public function updateChunkFileStatData($idx)
+		public function updateChunkFileStatData($idx, $stat)
 		{
-			$chunkFileName = $this->getChunkName($idx);
-			$stat = new KChunkFramesStat($chunkFileName, $this->setup->ffprobeBin, $this->setup->ffmpegBin);
 			$this->chunkDataArr[$idx]->stat = $stat;
-			return $stat;
 		}
 		
 		/********************
@@ -853,11 +866,11 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 				case "-vf":
 				case "-af":
 				case "-filter_complex":
+					$val = ltrim($val,'-');
 					if(isset($this->$val))
 						$arr = $this->$val;
 					else
 						$arr = array();
-					$val = ltrim($val,'-');
 					$arr[$idx] = $cmdLineArr[$idx+1];
 					$this->$val = $arr;
 					break;
@@ -940,15 +953,15 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 				else if($mode=='audio' && preg_match("/\b(pan|amix|amerge)\b/", $filter)==1) { 
 					$filterArrOut[$idx] = $filter;
 				}
-				else if($mode=='video' && preg_match("/\b(scale|fade|crop|overlay|rotate)\b/", $filter)==1) { 
+				else if($mode=='video' && preg_match("/\b(scale|fade|crop|overlay|rotate|yadif|subtitles)\b/", $filter)==1) { 
 					$filterArrOut[$idx] = $filter;
 				}
 				else
 					$skipArr[$idx] = 1;
 			}
-			if(count($filterArrOut)==0)
+			if(count($filterArrOut)==0){
 				return null;
-			
+			}
 			foreach($skipArr as $idx=>$val) {
 				if($idx>0 && key_exists($idx-1,$filterArrOut)){
 					$filter = $filterArrOut[$idx-1];
@@ -967,6 +980,7 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 	 * Preset and processing chunk data
 	 */
 	class KChunkData {
+		public $index = 0;
 		public $start = 0;		// Chunks start timing
 		public $duration = 0;	// Chunk duration
 		public $frames = 0;		// Frame count
@@ -979,7 +993,8 @@ KalturaLog::log("cmdLine:$this->cmdLine");
 		/********************
 		 * 
 		 */
-		public function __construct($start=null, $finish=null, $frames=null, $gap=null) {
+		public function __construct($index=null, $start=null, $finish=null, $frames=null, $gap=null) {
+			$this->index = $index;
 			$this->start = $start;
 			$this->duration = $finish;
 			$this->frames = $frames;

@@ -350,6 +350,10 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		}
 		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+		if (isset(KBatchBase::$taskConfig->params->mrss->curlTimeout))
+		{
+			curl_setopt($ch, CURLOPT_TIMEOUT, KBatchBase::$taskConfig->params->mrss->curlTimeout);
+		}
 		
 		$res = curl_exec($ch);
 		curl_close ($ch);

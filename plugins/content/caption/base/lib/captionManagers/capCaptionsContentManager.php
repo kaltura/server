@@ -42,10 +42,10 @@ class capCaptionsContentManager extends kCaptionsContentManager
 		return floor(min(1000 * $frames / self::FRAME_RATE, 999));
 	}
 	
-	protected function decodeTimestamp($ts)
+	protected function decodeTimestamp($ts, $hoursBase)
 	{
 		$unpacked = unpack('Chour/Cmin/Csec/Cframe', $ts);
-		return (($unpacked['hour'] - 1) * 3600 + $unpacked['min'] * 60 + $unpacked['sec']) * 1000 + $this->framesToMS($unpacked['frame']);
+		return (($unpacked['hour'] - $hoursBase) * 3600 + $unpacked['min'] * 60 + $unpacked['sec']) * 1000 + $this->framesToMS($unpacked['frame']);
 	}	
 	
 	public function parse($content)
@@ -84,16 +84,21 @@ class capCaptionsContentManager extends kCaptionsContentManager
 				$pos += $length;
 				continue;
 			}
+			
+			if (is_null($last))
+			{
+				$hoursBase = ord($content[$pos + self::START_TIME_OFFSET]);
+			}
 
 			// get timestamps
-			$startTime = $this->decodeTimestamp(substr($content, $pos + self::START_TIME_OFFSET, self::TIMESTAMP_SIZE));
+			$startTime = $this->decodeTimestamp(substr($content, $pos + self::START_TIME_OFFSET, self::TIMESTAMP_SIZE), $hoursBase);
 			if (!is_null($last) && $last['endTime'] > $startTime)
 			{
 				$itemsData[count($itemsData) - 1]['endTime'] = $startTime;
 			}
 			if (($flags & self::FLAG_HAS_END_TIME) != 0)	// has end time
 			{
-				$endTime = $this->decodeTimestamp(substr($content, $pos + self::END_TIME_OFFSET, self::TIMESTAMP_SIZE));
+				$endTime = $this->decodeTimestamp(substr($content, $pos + self::END_TIME_OFFSET, self::TIMESTAMP_SIZE), $hoursBase);
 			}
 			else
 			{
@@ -117,7 +122,7 @@ class capCaptionsContentManager extends kCaptionsContentManager
 				{
 					$text .= self::$SPECIAL_CHARS[$curChOrd];
 				}
-				else if ($curChOrd <= 0x14 || $curChOrd >= 0xc0)	// styles
+				else if ($curChOrd < 0x20 || $curChOrd >= 0xc0)	// styles
 				{
 					continue;
 				}
@@ -165,4 +170,13 @@ class capCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new capCaptionsContentManager();
 	}
+
+	public function buildFile($content, $clipStartTime, $clipEndTime)
+	{
+	}
+
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	{
+	}
+
 }
