@@ -427,12 +427,26 @@ class KalturaEntryService extends KalturaBaseService
 			entryStatus::NO_CONTENT,
 		);
 		
+		$entryUpdated = false;
 		if(in_array($dbEntry->getStatus(), $lowerStatuses))
 		{
 			$dbEntry->setStatus(entryStatus::IMPORT);
-			$dbEntry->save();
+			$entryUpdated = true;
 		}
-			
+		
+		if($dbEntry->getMediaType() == null && $dbEntry->getType() == entryType::MEDIA_CLIP)
+		{
+			$mediaType = $resource->getMediaType();
+			if($mediaType)
+			{
+				$dbEntry->setMediaType($mediaType);
+				$entryUpdated = true;
+			}
+		}
+		
+		if($entryUpdated)
+			$dbEntry->save();
+		
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
