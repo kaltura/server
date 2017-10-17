@@ -108,6 +108,17 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$bundleContent = $this->getIfarmEmbedCode($bundleContent);
 		}
+		else
+		{
+			$config["plugins"] = $this->playerPlugins;
+			$config = json_encode($config);	
+
+			$plugins = "
+			var kalturaPlayerPlugins = $config;
+			";
+			$bundleContent .= $plugins;
+		}
+		
 		
 		$protocol = infraRequestUtils::getProtocol();
 		$host = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'api');
