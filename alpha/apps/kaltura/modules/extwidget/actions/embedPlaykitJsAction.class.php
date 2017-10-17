@@ -110,13 +110,13 @@ class embedPlaykitJsAction extends sfAction
 		}
 		else
 		{
-			$config["plugins"] = $this->playerPlugins;
+			$config["uiConf"] = $this->playerConfig;
 			$config = json_encode($config);	
 
-			$plugins = "
-			var kalturaPlayerPlugins = $config;
+			$kalturaPlayerConfig = "
+			var kalturaPlayerConfig = $config;
 			";
-			$bundleContent .= $plugins;
+			$bundleContent .= $kalturaPlayerConfig;
 		}
 		
 		
@@ -188,9 +188,11 @@ class embedPlaykitJsAction extends sfAction
 			$config[$key] = json_decode($val);
 		}
 
+
 		$config["partnerId"] = $this->partnerId;		
 		$config["uiConfId"] = $this->uiconfId;
-		$config["plugins"] = $this->playerPlugins;
+		$config["uiConf"] = $this->playerConfig;
+
 		
 		$config = json_encode($config);		
 		if ($config === false)
@@ -285,8 +287,7 @@ class embedPlaykitJsAction extends sfAction
 		if (!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 
-		$playerConfig = json_decode($uiConf->getConfig(), true);
-		$this->playerPlugins = $playerConfig["plugins"];
+		$this->playerConfig = json_decode($uiConf->getConfig(), true);
 		
 		//Get bundle configuration stored in conf_vars
 		$confVars = $uiConf->getConfVars();
