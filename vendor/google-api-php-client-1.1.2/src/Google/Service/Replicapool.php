@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -34,6 +32,9 @@ class Google_Service_Replicapool extends Google_Service
   /** View and manage your data across Google Cloud Platform services. */
   const CLOUD_PLATFORM =
       "https://www.googleapis.com/auth/cloud-platform";
+  /** View your data across Google Cloud Platform services. */
+  const CLOUD_PLATFORM_READ_ONLY =
+      "https://www.googleapis.com/auth/cloud-platform.read-only";
   /** View and manage your Google Compute Engine resources. */
   const COMPUTE =
       "https://www.googleapis.com/auth/compute";
@@ -53,6 +54,7 @@ class Google_Service_Replicapool extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'replicapool/v1beta2/projects/';
     $this->version = 'v1beta2';
     $this->serviceName = 'replicapool';
@@ -181,13 +183,13 @@ class Google_Service_Replicapool extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'recreateInstances' => array(
@@ -323,13 +325,13 @@ class Google_Service_Replicapool extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -461,10 +463,10 @@ class Google_Service_Replicapool_InstanceGroupManagers_Resource extends Google_S
    *
    * @opt_param string filter Optional. Filter expression for filtering listed
    * resources.
-   * @opt_param string pageToken Optional. Tag returned by a previous list request
-   * truncated by maxResults. Used to continue a previous list request.
    * @opt_param string maxResults Optional. Maximum count of results to be
    * returned. Maximum value is 500 and default value is 500.
+   * @opt_param string pageToken Optional. Tag returned by a previous list request
+   * truncated by maxResults. Used to continue a previous list request.
    * @return Google_Service_Replicapool_InstanceGroupManagerList
    */
   public function listInstanceGroupManagers($project, $zone, $optParams = array())
@@ -595,10 +597,10 @@ class Google_Service_Replicapool_ZoneOperations_Resource extends Google_Service_
    *
    * @opt_param string filter Optional. Filter expression for filtering listed
    * resources.
-   * @opt_param string pageToken Optional. Tag returned by a previous list request
-   * truncated by maxResults. Used to continue a previous list request.
    * @opt_param string maxResults Optional. Maximum count of results to be
    * returned. Maximum value is 500 and default value is 500.
+   * @opt_param string pageToken Optional. Tag returned by a previous list request
+   * truncated by maxResults. Used to continue a previous list request.
    * @return Google_Service_Replicapool_OperationList
    */
   public function listZoneOperations($project, $zone, $optParams = array())
@@ -617,6 +619,8 @@ class Google_Service_Replicapool_InstanceGroupManager extends Google_Collection
   protected $collection_key = 'targetPools';
   protected $internal_gapi_mappings = array(
   );
+  protected $autoHealingPoliciesType = 'Google_Service_Replicapool_ReplicaPoolAutoHealingPolicy';
+  protected $autoHealingPoliciesDataType = 'array';
   public $baseInstanceName;
   public $creationTimestamp;
   public $currentSize;
@@ -632,6 +636,14 @@ class Google_Service_Replicapool_InstanceGroupManager extends Google_Collection
   public $targetSize;
 
 
+  public function setAutoHealingPolicies($autoHealingPolicies)
+  {
+    $this->autoHealingPolicies = $autoHealingPolicies;
+  }
+  public function getAutoHealingPolicies()
+  {
+    return $this->autoHealingPolicies;
+  }
   public function setBaseInstanceName($baseInstanceName)
   {
     $this->baseInstanceName = $baseInstanceName;
@@ -1269,5 +1281,31 @@ class Google_Service_Replicapool_OperationWarningsData extends Google_Model
   public function getValue()
   {
     return $this->value;
+  }
+}
+
+class Google_Service_Replicapool_ReplicaPoolAutoHealingPolicy extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $actionType;
+  public $healthCheck;
+
+
+  public function setActionType($actionType)
+  {
+    $this->actionType = $actionType;
+  }
+  public function getActionType()
+  {
+    return $this->actionType;
+  }
+  public function setHealthCheck($healthCheck)
+  {
+    $this->healthCheck = $healthCheck;
+  }
+  public function getHealthCheck()
+  {
+    return $this->healthCheck;
   }
 }

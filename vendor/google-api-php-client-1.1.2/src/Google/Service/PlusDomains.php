@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -36,7 +34,7 @@ class Google_Service_PlusDomains extends Google_Service
   /** Manage your circles and add people and pages. People and pages you add to your circles will be notified. Others may see this information publicly. People you add to circles can use Hangouts with you.. */
   const PLUS_CIRCLES_WRITE =
       "https://www.googleapis.com/auth/plus.circles.write";
-  /** Know your basic profile info and list of people in your circles.. */
+  /** Know the list of people in your circles, your age range, and language. */
   const PLUS_LOGIN =
       "https://www.googleapis.com/auth/plus.login";
   /** Know who you are on Google. */
@@ -77,6 +75,7 @@ class Google_Service_PlusDomains extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'plusDomains/v1/';
     $this->version = 'v1';
     $this->serviceName = 'plusDomains';
@@ -125,13 +124,13 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -153,13 +152,13 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -181,12 +180,12 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'userId' => array(
+                'email' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
                 ),
-                'email' => array(
+                'userId' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
@@ -221,13 +220,13 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -259,12 +258,12 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'userId' => array(
+                'email' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
                 ),
-                'email' => array(
+                'userId' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
@@ -319,6 +318,10 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'maxResults' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -326,10 +329,6 @@ class Google_Service_PlusDomains extends Google_Service
                 'sortOrder' => array(
                   'location' => 'query',
                   'type' => 'string',
-                ),
-                'maxResults' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
                 ),
               ),
             ),
@@ -391,6 +390,10 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'maxResults' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
                 'orderBy' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -398,10 +401,6 @@ class Google_Service_PlusDomains extends Google_Service
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
-                ),
-                'maxResults' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
                 ),
               ),
             ),'listByActivity' => array(
@@ -418,13 +417,13 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'listByCircle' => array(
@@ -436,13 +435,13 @@ class Google_Service_PlusDomains extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -507,12 +506,12 @@ class Google_Service_PlusDomains_Activities_Resource extends Google_Service_Reso
    * @param string $collection The collection of activities to list.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken The continuation token, which is used to page
-   * through large result sets. To get the next page of results, set this
-   * parameter to the value of "nextPageToken" from the previous response.
    * @opt_param string maxResults The maximum number of activities to include in
    * the response, which is used for paging. For any response, the actual number
    * returned might be less than the specified maxResults.
+   * @opt_param string pageToken The continuation token, which is used to page
+   * through large result sets. To get the next page of results, set this
+   * parameter to the value of "nextPageToken" from the previous response.
    * @return Google_Service_PlusDomains_ActivityFeed
    */
   public function listActivities($userId, $collection, $optParams = array())
@@ -542,12 +541,12 @@ class Google_Service_PlusDomains_Audiences_Resource extends Google_Service_Resou
    * value "me" can be used to indicate the authenticated user.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken The continuation token, which is used to page
-   * through large result sets. To get the next page of results, set this
-   * parameter to the value of "nextPageToken" from the previous response.
    * @opt_param string maxResults The maximum number of circles to include in the
    * response, which is used for paging. For any response, the actual number
    * returned might be less than the specified maxResults.
+   * @opt_param string pageToken The continuation token, which is used to page
+   * through large result sets. To get the next page of results, set this
+   * parameter to the value of "nextPageToken" from the previous response.
    * @return Google_Service_PlusDomains_AudiencesFeed
    */
   public function listAudiences($userId, $optParams = array())
@@ -576,9 +575,9 @@ class Google_Service_PlusDomains_Circles_Resource extends Google_Service_Resourc
    * @param string $circleId The ID of the circle to add the person to.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string userId IDs of the people to add to the circle. Optional,
-   * can be repeated.
    * @opt_param string email Email of the people to add to the circle. Optional,
+   * can be repeated.
+   * @opt_param string userId IDs of the people to add to the circle. Optional,
    * can be repeated.
    * @return Google_Service_PlusDomains_Circle
    */
@@ -626,12 +625,12 @@ class Google_Service_PlusDomains_Circles_Resource extends Google_Service_Resourc
    * value "me" can be used to indicate the authenticated user.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken The continuation token, which is used to page
-   * through large result sets. To get the next page of results, set this
-   * parameter to the value of "nextPageToken" from the previous response.
    * @opt_param string maxResults The maximum number of circles to include in the
    * response, which is used for paging. For any response, the actual number
    * returned might be less than the specified maxResults.
+   * @opt_param string pageToken The continuation token, which is used to page
+   * through large result sets. To get the next page of results, set this
+   * parameter to the value of "nextPageToken" from the previous response.
    * @return Google_Service_PlusDomains_CircleFeed
    */
   public function listCircles($userId, $optParams = array())
@@ -676,10 +675,10 @@ class Google_Service_PlusDomains_Circles_Resource extends Google_Service_Resourc
    * @param string $circleId The ID of the circle to remove the person from.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string userId IDs of the people to remove from the circle.
-   * Optional, can be repeated.
    * @opt_param string email Email of the people to add to the circle. Optional,
    * can be repeated.
+   * @opt_param string userId IDs of the people to remove from the circle.
+   * Optional, can be repeated.
    */
   public function removePeople($circleId, $optParams = array())
   {
@@ -750,13 +749,13 @@ class Google_Service_PlusDomains_Comments_Resource extends Google_Service_Resour
    * @param string $activityId The ID of the activity to get comments for.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string maxResults The maximum number of comments to include in the
+   * response, which is used for paging. For any response, the actual number
+   * returned might be less than the specified maxResults.
    * @opt_param string pageToken The continuation token, which is used to page
    * through large result sets. To get the next page of results, set this
    * parameter to the value of "nextPageToken" from the previous response.
    * @opt_param string sortOrder The order in which to sort the list of comments.
-   * @opt_param string maxResults The maximum number of comments to include in the
-   * response, which is used for paging. For any response, the actual number
-   * returned might be less than the specified maxResults.
    * @return Google_Service_PlusDomains_CommentFeed
    */
   public function listComments($activityId, $optParams = array())
@@ -832,13 +831,13 @@ class Google_Service_PlusDomains_People_Resource extends Google_Service_Resource
    * @param string $collection The collection of people to list.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string maxResults The maximum number of people to include in the
+   * response, which is used for paging. For any response, the actual number
+   * returned might be less than the specified maxResults.
    * @opt_param string orderBy The order to return people in.
    * @opt_param string pageToken The continuation token, which is used to page
    * through large result sets. To get the next page of results, set this
    * parameter to the value of "nextPageToken" from the previous response.
-   * @opt_param string maxResults The maximum number of people to include in the
-   * response, which is used for paging. For any response, the actual number
-   * returned might be less than the specified maxResults.
    * @return Google_Service_PlusDomains_PeopleFeed
    */
   public function listPeople($userId, $collection, $optParams = array())
@@ -857,12 +856,12 @@ class Google_Service_PlusDomains_People_Resource extends Google_Service_Resource
    * @param string $collection The collection of people to list.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken The continuation token, which is used to page
-   * through large result sets. To get the next page of results, set this
-   * parameter to the value of "nextPageToken" from the previous response.
    * @opt_param string maxResults The maximum number of people to include in the
    * response, which is used for paging. For any response, the actual number
    * returned might be less than the specified maxResults.
+   * @opt_param string pageToken The continuation token, which is used to page
+   * through large result sets. To get the next page of results, set this
+   * parameter to the value of "nextPageToken" from the previous response.
    * @return Google_Service_PlusDomains_PeopleFeed
    */
   public function listByActivity($activityId, $collection, $optParams = array())
@@ -878,12 +877,12 @@ class Google_Service_PlusDomains_People_Resource extends Google_Service_Resource
    * @param string $circleId The ID of the circle to get the members of.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken The continuation token, which is used to page
-   * through large result sets. To get the next page of results, set this
-   * parameter to the value of "nextPageToken" from the previous response.
    * @opt_param string maxResults The maximum number of people to include in the
    * response, which is used for paging. For any response, the actual number
    * returned might be less than the specified maxResults.
+   * @opt_param string pageToken The continuation token, which is used to page
+   * through large result sets. To get the next page of results, set this
+   * parameter to the value of "nextPageToken" from the previous response.
    * @return Google_Service_PlusDomains_PeopleFeed
    */
   public function listByCircle($circleId, $optParams = array())
@@ -1140,6 +1139,8 @@ class Google_Service_PlusDomains_ActivityActor extends Google_Model
 {
   protected $internal_gapi_mappings = array(
   );
+  protected $clientSpecificActorInfoType = 'Google_Service_PlusDomains_ActivityActorClientSpecificActorInfo';
+  protected $clientSpecificActorInfoDataType = '';
   public $displayName;
   public $id;
   protected $imageType = 'Google_Service_PlusDomains_ActivityActorImage';
@@ -1147,8 +1148,18 @@ class Google_Service_PlusDomains_ActivityActor extends Google_Model
   protected $nameType = 'Google_Service_PlusDomains_ActivityActorName';
   protected $nameDataType = '';
   public $url;
+  protected $verificationType = 'Google_Service_PlusDomains_ActivityActorVerification';
+  protected $verificationDataType = '';
 
 
+  public function setClientSpecificActorInfo(Google_Service_PlusDomains_ActivityActorClientSpecificActorInfo $clientSpecificActorInfo)
+  {
+    $this->clientSpecificActorInfo = $clientSpecificActorInfo;
+  }
+  public function getClientSpecificActorInfo()
+  {
+    return $this->clientSpecificActorInfo;
+  }
   public function setDisplayName($displayName)
   {
     $this->displayName = $displayName;
@@ -1188,6 +1199,49 @@ class Google_Service_PlusDomains_ActivityActor extends Google_Model
   public function getUrl()
   {
     return $this->url;
+  }
+  public function setVerification(Google_Service_PlusDomains_ActivityActorVerification $verification)
+  {
+    $this->verification = $verification;
+  }
+  public function getVerification()
+  {
+    return $this->verification;
+  }
+}
+
+class Google_Service_PlusDomains_ActivityActorClientSpecificActorInfo extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  protected $youtubeActorInfoType = 'Google_Service_PlusDomains_ActivityActorClientSpecificActorInfoYoutubeActorInfo';
+  protected $youtubeActorInfoDataType = '';
+
+
+  public function setYoutubeActorInfo(Google_Service_PlusDomains_ActivityActorClientSpecificActorInfoYoutubeActorInfo $youtubeActorInfo)
+  {
+    $this->youtubeActorInfo = $youtubeActorInfo;
+  }
+  public function getYoutubeActorInfo()
+  {
+    return $this->youtubeActorInfo;
+  }
+}
+
+class Google_Service_PlusDomains_ActivityActorClientSpecificActorInfoYoutubeActorInfo extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $channelId;
+
+
+  public function setChannelId($channelId)
+  {
+    $this->channelId = $channelId;
+  }
+  public function getChannelId()
+  {
+    return $this->channelId;
   }
 }
 
@@ -1231,6 +1285,23 @@ class Google_Service_PlusDomains_ActivityActorName extends Google_Model
   public function getGivenName()
   {
     return $this->givenName;
+  }
+}
+
+class Google_Service_PlusDomains_ActivityActorVerification extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $adHocVerified;
+
+
+  public function setAdHocVerified($adHocVerified)
+  {
+    $this->adHocVerified = $adHocVerified;
+  }
+  public function getAdHocVerified()
+  {
+    return $this->adHocVerified;
   }
 }
 
@@ -1443,13 +1514,25 @@ class Google_Service_PlusDomains_ActivityObjectActor extends Google_Model
 {
   protected $internal_gapi_mappings = array(
   );
+  protected $clientSpecificActorInfoType = 'Google_Service_PlusDomains_ActivityObjectActorClientSpecificActorInfo';
+  protected $clientSpecificActorInfoDataType = '';
   public $displayName;
   public $id;
   protected $imageType = 'Google_Service_PlusDomains_ActivityObjectActorImage';
   protected $imageDataType = '';
   public $url;
+  protected $verificationType = 'Google_Service_PlusDomains_ActivityObjectActorVerification';
+  protected $verificationDataType = '';
 
 
+  public function setClientSpecificActorInfo(Google_Service_PlusDomains_ActivityObjectActorClientSpecificActorInfo $clientSpecificActorInfo)
+  {
+    $this->clientSpecificActorInfo = $clientSpecificActorInfo;
+  }
+  public function getClientSpecificActorInfo()
+  {
+    return $this->clientSpecificActorInfo;
+  }
   public function setDisplayName($displayName)
   {
     $this->displayName = $displayName;
@@ -1482,6 +1565,49 @@ class Google_Service_PlusDomains_ActivityObjectActor extends Google_Model
   {
     return $this->url;
   }
+  public function setVerification(Google_Service_PlusDomains_ActivityObjectActorVerification $verification)
+  {
+    $this->verification = $verification;
+  }
+  public function getVerification()
+  {
+    return $this->verification;
+  }
+}
+
+class Google_Service_PlusDomains_ActivityObjectActorClientSpecificActorInfo extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  protected $youtubeActorInfoType = 'Google_Service_PlusDomains_ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo';
+  protected $youtubeActorInfoDataType = '';
+
+
+  public function setYoutubeActorInfo(Google_Service_PlusDomains_ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo $youtubeActorInfo)
+  {
+    $this->youtubeActorInfo = $youtubeActorInfo;
+  }
+  public function getYoutubeActorInfo()
+  {
+    return $this->youtubeActorInfo;
+  }
+}
+
+class Google_Service_PlusDomains_ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $channelId;
+
+
+  public function setChannelId($channelId)
+  {
+    $this->channelId = $channelId;
+  }
+  public function getChannelId()
+  {
+    return $this->channelId;
+  }
 }
 
 class Google_Service_PlusDomains_ActivityObjectActorImage extends Google_Model
@@ -1498,6 +1624,23 @@ class Google_Service_PlusDomains_ActivityObjectActorImage extends Google_Model
   public function getUrl()
   {
     return $this->url;
+  }
+}
+
+class Google_Service_PlusDomains_ActivityObjectActorVerification extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $adHocVerified;
+
+
+  public function setAdHocVerified($adHocVerified)
+  {
+    $this->adHocVerified = $adHocVerified;
+  }
+  public function getAdHocVerified()
+  {
+    return $this->adHocVerified;
   }
 }
 
@@ -2360,13 +2503,25 @@ class Google_Service_PlusDomains_CommentActor extends Google_Model
 {
   protected $internal_gapi_mappings = array(
   );
+  protected $clientSpecificActorInfoType = 'Google_Service_PlusDomains_CommentActorClientSpecificActorInfo';
+  protected $clientSpecificActorInfoDataType = '';
   public $displayName;
   public $id;
   protected $imageType = 'Google_Service_PlusDomains_CommentActorImage';
   protected $imageDataType = '';
   public $url;
+  protected $verificationType = 'Google_Service_PlusDomains_CommentActorVerification';
+  protected $verificationDataType = '';
 
 
+  public function setClientSpecificActorInfo(Google_Service_PlusDomains_CommentActorClientSpecificActorInfo $clientSpecificActorInfo)
+  {
+    $this->clientSpecificActorInfo = $clientSpecificActorInfo;
+  }
+  public function getClientSpecificActorInfo()
+  {
+    return $this->clientSpecificActorInfo;
+  }
   public function setDisplayName($displayName)
   {
     $this->displayName = $displayName;
@@ -2399,6 +2554,49 @@ class Google_Service_PlusDomains_CommentActor extends Google_Model
   {
     return $this->url;
   }
+  public function setVerification(Google_Service_PlusDomains_CommentActorVerification $verification)
+  {
+    $this->verification = $verification;
+  }
+  public function getVerification()
+  {
+    return $this->verification;
+  }
+}
+
+class Google_Service_PlusDomains_CommentActorClientSpecificActorInfo extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  protected $youtubeActorInfoType = 'Google_Service_PlusDomains_CommentActorClientSpecificActorInfoYoutubeActorInfo';
+  protected $youtubeActorInfoDataType = '';
+
+
+  public function setYoutubeActorInfo(Google_Service_PlusDomains_CommentActorClientSpecificActorInfoYoutubeActorInfo $youtubeActorInfo)
+  {
+    $this->youtubeActorInfo = $youtubeActorInfo;
+  }
+  public function getYoutubeActorInfo()
+  {
+    return $this->youtubeActorInfo;
+  }
+}
+
+class Google_Service_PlusDomains_CommentActorClientSpecificActorInfoYoutubeActorInfo extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $channelId;
+
+
+  public function setChannelId($channelId)
+  {
+    $this->channelId = $channelId;
+  }
+  public function getChannelId()
+  {
+    return $this->channelId;
+  }
 }
 
 class Google_Service_PlusDomains_CommentActorImage extends Google_Model
@@ -2415,6 +2613,23 @@ class Google_Service_PlusDomains_CommentActorImage extends Google_Model
   public function getUrl()
   {
     return $this->url;
+  }
+}
+
+class Google_Service_PlusDomains_CommentActorVerification extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $adHocVerified;
+
+
+  public function setAdHocVerified($adHocVerified)
+  {
+    $this->adHocVerified = $adHocVerified;
+  }
+  public function getAdHocVerified()
+  {
+    return $this->adHocVerified;
   }
 }
 
