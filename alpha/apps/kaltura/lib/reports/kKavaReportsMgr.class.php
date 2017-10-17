@@ -279,7 +279,8 @@ class kKavaReportsMgr extends kKavaBase
         self::EVENT_TYPE_DOWNLOAD_CLICKED => "count_download",
         self::EVENT_TYPE_SHARE_CLICKED => "count_viral",
         self::EVENT_TYPE_EDIT_CLICKED => "count_edit",
-        self::METRIC_PLAYTHROUGH_RATIO => "play_through_ratio"
+        self::METRIC_PLAYTHROUGH_RATIO => "play_through_ratio",
+        self::DIMENSION_LOCATION_COUNTRY => "country",
     );
     
     static $headers_to_metrics = array();
@@ -290,6 +291,7 @@ class kKavaReportsMgr extends kKavaBase
     	self::DIMENSION_DEVICE => array('kKavaReportsMgr', 'transformDeviceName'),
     	self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
     	self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
+    	self::DIMENSION_LOCATION_COUNTRY => array('kKavaCountryCodes', 'toShortName'),
     );
     
     protected static function transformDeviceName($name)
