@@ -1721,27 +1721,27 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	    return $newEntry;
  	} 	
 
- 	private static function getCloneSourceType($originSourceType)
-    {
-        $targetSourceType = $originSourceType;
-        switch ($originSourceType)
-        {
-            case EntrySourceType::FILE:
-            case EntrySourceType::WEBCAM:
-            case EntrySourceType::URL:
-            case EntrySourceType::RECORDED_LIVE:
-            case EntrySourceType::CLIP:
-            case EntrySourceType::KALTURA_RECORDED_LIVE:
-            case EntrySourceType::LECTURE_CAPTURE:
-            case EntrySourceType::SEARCH_PROVIDER:
-                $targetSourceType = EntrySourceType::CLIP;
-                break;
-            default:
-                break;
-        }
+	private static function getCloneSourceType($originSourceType)
+	{
+		$targetSourceType = $originSourceType;
+		switch ($originSourceType)
+		{
+			case EntrySourceType::FILE:
+			case EntrySourceType::WEBCAM:
+			case EntrySourceType::URL:
+			case EntrySourceType::RECORDED_LIVE:
+			case EntrySourceType::CLIP:
+			case EntrySourceType::KALTURA_RECORDED_LIVE:
+			case EntrySourceType::LECTURE_CAPTURE:
+			case EntrySourceType::SEARCH_PROVIDER:
+				$targetSourceType = EntrySourceType::CLIP;
+				break;
+			default:
+				break;
+		}
 
-        return $targetSourceType;
-    }
+		return $targetSourceType;
+	}
 
  	/*
  	 * re-index to search index, and recalculate fields.
