@@ -3398,15 +3398,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return null;
 	}
 	
-	public function setSourceType($value)
+	public function setSourceType($value , $forceSet = false)
 	{
 		if ($value != EntrySourceType::SEARCH_PROVIDER)
-			$this->setSource($value);
-	}
+			$this->setSource($value , $forceSet);
+    }
 	
-	public function setSource($v)
+	public function setSource($v , $forceSet=false)
 	{
-		if(!in_array($this->getSource(), array(EntrySourceType::KALTURA_RECORDED_LIVE, EntrySourceType::LECTURE_CAPTURE)) || $v == EntrySourceType::RECORDED_LIVE)
+		if($forceSet || !in_array($this->getSource(), array(EntrySourceType::KALTURA_RECORDED_LIVE, EntrySourceType::LECTURE_CAPTURE)) || $v == EntrySourceType::RECORDED_LIVE)
 			parent::setSource($v);
 	}
 	
