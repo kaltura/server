@@ -10,6 +10,8 @@
  */ 
 class UploadToken extends BaseUploadToken implements IBaseObject
 {
+	private $autoFinalize = null;
+	
 	/**
 	 * Token created but no upload has been started yet
 	 */
@@ -47,6 +49,9 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 		{
 			$this->setId($this->calculateId());
 			$this->setDc(kDataCenterMgr::getCurrentDcId());
+			
+			if($this->autoFinalize)
+				$this->addAutoFinalizeToCache();
 		}
 		parent::save($con);
 	}
@@ -95,5 +100,29 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	public function getCacheInvalidationKeys()
 	{
 		return array("uploadToken:id=".strtolower($this->getId()));
+	}
+
+	public function setAutoFinalize($v)
+	{
+		$this->autoFinalize = $v;
+	}
+	
+	public function getAutoFinalize()
+	{
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+		if (!$cache)
+			throw new kUploadTokenException("Cache instance required for AutoFinalize functionality Could not initiated", kUploadTokenException::UPLOAD_TOKEN_AUTO_FINALIZE_CACHE_NOT_INITIALIZED);
+		
+		return $cache->get($this->getId());
+	}
+	
+	private function addAutoFinalizeToCache()
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+		if (!$cache)
+			throw new kUploadTokenException("Cache instance required for AutoFinalize functionality Could not initiated", kUploadTokenException::UPLOAD_TOKEN_AUTO_FINALIZE_CACHE_NOT_INITIALIZED);
+		
+		$cache->add($this->getId(), true);
 	}
 }
