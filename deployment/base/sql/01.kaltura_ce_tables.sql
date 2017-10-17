@@ -2111,6 +2111,7 @@ CREATE TABLE IF NOT EXISTS `upload_token` (
   `dc` int(11) DEFAULT NULL,
   `object_type` varchar(127) DEFAULT NULL,
   `object_id` varchar(31) DEFAULT NULL,
+  `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `int_id` (`int_id`),
   KEY `partner_id_status` (`partner_id`,`status`),
