@@ -3770,7 +3770,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'puser_id' => $this->getPuserId(),
 			'creator_puser_id' => $this->getCreatorPuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => $this->getName(),
+			'name' => elasticSearchUtils::formatSearchTerm($this->getName()),
 			'description' => $this->getDescription(),
 			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
@@ -3798,6 +3798,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'group_id' => $this->getGroupId(),
 			'partner_sort_value' => $this->getPartnerSortValue(),
 			'redirect_entry_id' => $this->getRedirectEntryId(),
+			'views' => $this->getViews(),
+			'votes' => $this->getVotes(),
 		);
 
 		$this->addCategoriesToObjectParams($body);

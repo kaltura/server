@@ -65,6 +65,9 @@
 			"raw" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
+			},
+			"keyword" : {
+			  "type" : "keyword"
 			}
 		  }
 		},
@@ -170,6 +173,12 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"length_in_msecs": {
+		  "type" : "long"
+		},
+		"views": {
+		  "type" : "long"
+		},
+		"votes": {
 		  "type" : "long"
 		},
 		"recorded_entry_id": {
