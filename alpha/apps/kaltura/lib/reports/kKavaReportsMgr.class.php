@@ -255,7 +255,7 @@ class kKavaReportsMgr extends kKavaBase
             self::REPORT_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
             self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
             self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "name"),
-            self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self:: METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+            self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self:: METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
             self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "name", self::REPORT_ENRICH_FUNC => "self::getCategoriesNames")
         )
     );
@@ -954,7 +954,7 @@ class kKavaReportsMgr extends kKavaBase
        $order_type = $order_dir === "+" ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
        $report_def[self::DRUID_METRIC] = array(self::DRUID_TYPE => $order_type,
                                                self::DRUID_METRIC => $order_by);
-       $report_def[self::DRUID_THRESHOLD] = $page_size;
+       $report_def[self::DRUID_THRESHOLD] = min(self::MAX_RESULT_SIZE, $page_size * 3);		// Note: using a larger threshold since topN is approximate
              
        return $report_def;
    }
