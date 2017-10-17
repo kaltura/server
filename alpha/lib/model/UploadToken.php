@@ -40,6 +40,8 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	 * Deleted via api
 	 */
 	const UPLOAD_TOKEN_DELETED = 5;
+	
+	const CUSTOM_DATA_AUTO_FINALIZE = 'auto_finalize';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -95,5 +97,15 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	public function getCacheInvalidationKeys()
 	{
 		return array("uploadToken:id=".strtolower($this->getId()));
+	}
+
+	public function setAutoFinalize($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_AUTO_FINALIZE, $v);
+	}
+	
+	public function getAutoFinalize()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_AUTO_FINALIZE, null, false);
 	}
 }
