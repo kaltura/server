@@ -403,16 +403,6 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [config] column value.
-	 * 
-	 * @return     string
-	 */
-	 public function getConfig()
-	 {
-		 return $this->config;
-	 }
-
-	/**
 	 * Get the [use_cdn] column value.
 	 * 
 	 * @return     int

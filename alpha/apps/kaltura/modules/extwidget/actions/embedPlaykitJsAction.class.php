@@ -26,6 +26,7 @@ class embedPlaykitJsAction extends sfAction
 	private $sourceMapLoader = null;
 	private $cacheVersion = null;
 	private $playKitVersion = null;
+	private $playerConfig = null;
 	private $regenerate = false;
 	
 	public function execute()
@@ -94,7 +95,7 @@ class embedPlaykitJsAction extends sfAction
 	private function formatBundleContent($bundleContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $bundleContentParts[1];
+		$bundleContent = $this->setUiConfInKalturaPlayer($bundleContentParts[1]);
 		
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
@@ -108,17 +109,6 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$bundleContent = $this->getIfarmEmbedCode($bundleContent);
 		}
-		else
-		{
-			$config["uiConf"] = $this->playerConfig;
-			$config = json_encode($config);	
-
-			$kalturaPlayerConfig = "
-			var kalturaPlayerConfig = $config;
-			";
-			$bundleContent .= $kalturaPlayerConfig;
-		}
-		
 		
 		$protocol = infraRequestUtils::getProtocol();
 		$host = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'api');
@@ -126,6 +116,20 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = str_replace("//# sourceMappingURL=$this->bundle_name.min.js.map", "//# sourceMappingURL=$sourceMapLoaderURL", $bundleContent);
 		
 		return $bundleContent;
+	}
+
+	private function setUiConfInKalturaPlayer($content)
+	{
+		$config["config"] = array($this->playerConfig);
+		$config = json_encode($config);	
+
+		$kalturaPlayerConfig = "
+		(function(){(KalturaPlayer.UiConf = KalturaPlayer.UiConf || {}) [\"" . $this->uiconfId . "\"] = $config;
+		})();";
+
+		$content .= $kalturaPlayerConfig;
+
+		return $content;
 	}
 	
 	private function sendHeaders($content)
@@ -191,7 +195,7 @@ class embedPlaykitJsAction extends sfAction
 
 		$config["partnerId"] = $this->partnerId;		
 		$config["uiConfId"] = $this->uiconfId;
-		$config["uiConf"] = $this->playerConfig;
+		
 
 		
 		$config = json_encode($config);		
