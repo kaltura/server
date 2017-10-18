@@ -659,12 +659,26 @@ class kKavaReportsMgr extends kKavaBase
 	        $page_size = count($dimension_ids);
 	        $threshold = $page_size; 
 	        
-	        $druid_filter = array(
-	        	array(self::DRUID_DIMENSION => self::$reports_def[$report_type][self::REPORT_DIMENSION],
-	        		self::DRUID_VALUES => $dimension_ids
-	        	),
-	        );
-	        self::addEndUserReportsDruidFilters($input_filter, $druid_filter);
+	        if ($dimension == self::DIMENSION_ENTRY_ID)
+	        {
+	        	// when the dimension is entry id, we can use a more minimal filter that does not
+	        	// contain the dimensions dependent on entry id - categories + playback type
+	        	// the partner id filter is retained since otherwise sending a bogus event 
+	        	// with non-matching entryId + partnerId will open access to the entry
+		        $druid_filter = array(
+		        	array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
+		        		self::DRUID_VALUES => array($partner_id)
+		        	),
+		        	array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
+		        		self::DRUID_VALUES => $dimension_ids
+		        	),
+		        );
+		        self::addEndUserReportsDruidFilters($input_filter, $druid_filter);
+	        }
+	        else
+	        {
+	        	$druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $dimension_ids);
+	        }
         }
                 
         $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
@@ -909,6 +923,7 @@ class kKavaReportsMgr extends kKavaBase
 	   				self::DRUID_VALUES => explode(',', $input_filter->application)
 	   		);
 	   	}
+	   	
 	   	if ($input_filter->userIds != null) {
 	   		$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_USER_ID,
 	   				self::DRUID_VALUES => explode(",", $input_filter->userIds)
