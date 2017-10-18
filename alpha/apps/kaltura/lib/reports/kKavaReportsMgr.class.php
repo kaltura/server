@@ -594,7 +594,7 @@ class kKavaReportsMgr extends kKavaBase
         $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
         
         if (!$object_ids &&
-        	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_APPLICATION, self::DIMENSION_DEVICE)))
+        	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)))
         {
         	// get the topN objects first, otherwise the returned metrics can be inaccurate
         	$query = self::getTopReport($partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
@@ -633,10 +633,6 @@ class kKavaReportsMgr extends kKavaBase
 	        $threshold = $page_size; 
 	        
 	        $druid_filter = array(
-	        	array(
-	        		self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
-	        		self::DRUID_VALUES => array($report_type == myReportsMgr::REPORT_TYPE_LIVE ? self::PLAYBACK_TYPE_LIVE : self::PLAYBACK_TYPE_VOD)
-	        	),
 	        	array(self::DRUID_DIMENSION => self::$reports_def[$report_type][self::REPORT_DIMENSION],
 	        		self::DRUID_VALUES => $dimension_ids
 	        	),
@@ -855,9 +851,11 @@ class kKavaReportsMgr extends kKavaBase
    private static function getDruidFilter($partner_id, $report_type, $input_filter, $object_ids) 
    {
        $druid_filter = array();
-       $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
-           self::DRUID_VALUES => array($report_type == myReportsMgr::REPORT_TYPE_LIVE ? 
-           		self::PLAYBACK_TYPE_LIVE : self::PLAYBACK_TYPE_VOD));
+       $druid_filter[] = array(
+           self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+           self::DRUID_VALUES => $report_type == myReportsMgr::REPORT_TYPE_LIVE ? 
+       			array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR) : 
+       			array(self::PLAYBACK_TYPE_VOD));
        
        if ($input_filter instanceof endUserReportsInputFilter)
        {
