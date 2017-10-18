@@ -10,7 +10,11 @@ class myPlaylistUtils
 	const MAX_STITCHED_PLAYLIST_ENTRY_COUNT = 100;
 
 	const CONTEXT_DELIMITER = "context";
-	
+
+	const CAPTION_FILES_LABEL = "label";
+	const CAPTION_FILES_PATH = "path";
+	const CAPTION_FILES_ID = "captionId";
+
 	private static $user_cache = null;
 	
 	private static $isAdminKs = false;
@@ -1141,7 +1145,8 @@ HTML;
 					$filteredCaptionAssets[$captionAsset->getEntryId()] = array();
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
 					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
-				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array($captionAsset->getLabel(), $filePath);
+				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] =
+					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $filePath, self::CAPTION_FILES_ID => $captionAsset->getId());
 			}
 		}
 		return $filteredCaptionAssets;

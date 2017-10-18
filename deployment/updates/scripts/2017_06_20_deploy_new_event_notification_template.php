@@ -8,4 +8,10 @@ $script = realpath(dirname(__FILE__) . "/../../../tests/standAloneClient/exec.ph
 
 $newTemplateUpdate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2017_06_20_AddMediaEntryReadyTemplate.xml");
 
+if(!file_exists($newTemplateUpdate) || !file_exists($script))
+{
+	KalturaLog::err("Missing update script file");
+	return;
+}
+
 passthru("php $script $newTemplateUpdate");

@@ -231,7 +231,7 @@ abstract class LiveEntry extends entry
 	
 	public function setRecordedEntryId($v)
 	{
-		if($v)
+		if($v && $v != $this->getRecordedEntryId())
 			$this->incInCustomData("recorded_entry_index");
 		
 		$this->putInCustomData("recorded_entry_id", $v);

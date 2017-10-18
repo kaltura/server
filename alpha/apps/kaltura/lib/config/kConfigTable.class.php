@@ -265,7 +265,7 @@ class kConfigTable
 	
 	private function addComment ( $line )
 	{
-		if ( $this->comment ) $this->commnet .= "\n";
+		if ( $this->comment ) $this->comment .= "\n";
 		$this->comment .= $line;
 	}
 	

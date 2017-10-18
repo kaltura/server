@@ -81,8 +81,10 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		// Test input
 		// - Test file type
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
-		if(!is_null($errorMsg))
+		if(!is_null($errorMsg)){
 			$this->data->engineMessage = $errorMsg;
+			throw new KOperationEngineException($errorMsg);
+		}
 		
 		// Test password required
 		if($this->testPasswordRequired($realInFilePath)) {
