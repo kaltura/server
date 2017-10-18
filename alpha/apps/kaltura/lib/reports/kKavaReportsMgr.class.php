@@ -212,7 +212,7 @@ class kKavaReportsMgr extends kKavaBase
         ),
         myReportsMgr::REPORT_TYPE_APPLICATIONS => array(
             self::REPORT_DIMENSION => self::DIMENSION_APPLICATION,
-            self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION),
+            self::REPORT_METRICS => array(),
             self::REPORT_DETAIL_DIM_HEADERS => array("name"),
             self::REPORT_GRAPH_METRICS => array("application"),
         ),
@@ -440,10 +440,15 @@ class kKavaReportsMgr extends kKavaBase
     {
         self::init();
         $start = microtime(true);
-        $intervals = self::getFilterIntervals($input_filter);
+        $intervals = self::getFilterIntervals($report_type, $input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         $dimension = self::getDimension($report_type, $object_ids);
         $metrics = self::getMetrics($report_type);
+        if (!$metrics)
+        {
+            throw new Exception("unsupported query - report has no metrics");
+        }
+        
         $report_def = self::$reports_def[$report_type];
         if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_GRANULARITY, $report_def))
             $granularity = $report_def[self::REPORT_DRILLDOWN_GRANULARITY];
@@ -504,10 +509,15 @@ class kKavaReportsMgr extends kKavaBase
     {
         self::init();
         $start = microtime (true);
-        $intervals = self::getFilterIntervals($input_filter);
+        $intervals = self::getFilterIntervals($report_type, $input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         $dimension = self::getDimension($report_type, $object_ids);
         $metrics = self::getMetrics($report_type);
+        if (!$metrics)
+        {
+            throw new Exception("unsupported query - report has no metrics");
+        }
+        
         $granularity = self::DRUID_GRANULARITY_ALL;
         $report_def = self::$reports_def[$report_type];
         if (array_key_exists(self::REPORT_TOTAL_ADDITIONAL_METRICS, $report_def))
@@ -556,21 +566,42 @@ class kKavaReportsMgr extends kKavaBase
         $start = microtime (true);
         $total_count = null;
         
+        $report_def = self::$reports_def[$report_type];
+        $intervals = self::getFilterIntervals($report_type, $input_filter);
+        $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
+        $dimension = self::getDimension($report_type, $object_ids);
+        $metrics = self::getMetrics($report_type);
+        
+        if (!$metrics)
+        {
+        	$query = self::getSearchReport($partner_id, $intervals, array($dimension), $druid_filter);
+        	$result = self::runQuery($query);
+        	$rows = $result[0][self::DRUID_RESULT];
+        	$data = array();
+        	foreach ($rows as $row)
+        	{
+        		$data[] = array($row[self::DRUID_VALUE]);
+        	}
+        	return array($report_def[self::REPORT_DETAIL_DIM_HEADERS], $data, count($data));
+        }
+
+        // pager
         if (!$page_size || $page_size < 0) 
             $page_size = 10;
         
         if (!$page_index || $page_index < 0) 
             $page_index = 1;
         
-            if ($page_index * $page_size > self::MAX_RESULT_SIZE) 
+        if ($page_index * $page_size > self::MAX_RESULT_SIZE) 
         {
             throw new Exception("result limit is " . self::MAX_RESULT_SIZE . " rows");
         }
         
-        $report_def = self::$reports_def[$report_type];
+        // order by
         $order_by_dir = "-";
-        if (!$order_by) {
-            $order_by = $report_def[self::REPORT_METRICS][0];
+        if (!$order_by) 
+        {
+            $order_by = reset($metrics);
         }
         else
         {
@@ -585,11 +616,6 @@ class kKavaReportsMgr extends kKavaBase
                 throw new Exception("Order by parameter is not a valid column");
                 
         }
-
-        $intervals = self::getFilterIntervals($input_filter);
-        $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
-        $dimension = self::getDimension($report_type, $object_ids);
-        $metrics = self::getMetrics($report_type);
         
         // Note: using a larger threshold since topN is approximate
         $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
@@ -670,16 +696,18 @@ class kKavaReportsMgr extends kKavaBase
 				{
 					$end = microtime(true);
 					KalturaLog::log("getTable took [" . ($end - $start) . "]");
-					return array (array() , array() , 0);
+					return array(array(), array(), 0);
 				}
+			}
+			else
+			{
+				$total_count = 0;
 			}
 		}
                 
         $dimension_ids = array();
         
         $dimension_headers = $report_def[self::REPORT_DETAIL_DIM_HEADERS];
-        $report_metrics = ($report_type == myReportsMgr::REPORT_TYPE_APPLICATIONS) ?
-            array() : $report_def[self::REPORT_METRICS];
         $dimension = $report_def[self::REPORT_DIMENSION];
         if ($object_ids)
         {
@@ -691,7 +719,7 @@ class kKavaReportsMgr extends kKavaBase
         
         $headers = $dimension_headers;
         
-        foreach ($report_metrics as $column)
+        foreach ($metrics as $column)
         {
             $headers[] = self::$metrics_to_headers[$column];
         }
@@ -704,7 +732,7 @@ class kKavaReportsMgr extends kKavaBase
             $row_data = array();
             $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
             
-            foreach ($report_metrics as $column)
+            foreach ($metrics as $column)
             {
                 $row_data[] = $row[$column];
             }
@@ -790,7 +818,15 @@ class kKavaReportsMgr extends kKavaBase
       return  $granularity_def;
    }
     
-   private static function getFilterIntervals($input_filter) {
+   private static function getFilterIntervals($report_type, $input_filter) {
+       if ($report_type == myReportsMgr::REPORT_TYPE_APPLICATIONS)
+       {
+       	  // the applications report does not depend on from_day/to_day, use the last 30 days
+       	  $input_filter->from_day = date('Ymd', time() - 30 * 86400);
+       	  $input_filter->to_day = date('Ymd', time());
+       	  $input_filter->timeZoneOffset = 0;
+       }   	
+   	
        $input_filter->timeZoneOffset = round($input_filter->timeZoneOffset / 30) * 30;
        $fromDate = self::dateIdToInterval($input_filter->from_day, $input_filter->timeZoneOffset);
        $toDate = self::dateIdToInterval($input_filter->to_day, $input_filter->timeZoneOffset, true);
@@ -1038,6 +1074,20 @@ class kKavaReportsMgr extends kKavaBase
                                                self::DRUID_METRIC => $order_by);
        $report_def[self::DRUID_THRESHOLD] = $threshold;
              
+       return $report_def;
+   }
+   
+   private static function getSearchReport($partner_id, $intervals, $dimensions, $filter) 
+   {
+       $report_def = self::getBaseReportDef($partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
+       $report_def[self::DRUID_QUERY_TYPE] = self::DRUID_SEARCH;
+       $report_def[self::DRUID_SEARCH_DIMENSIONS] = $dimensions;
+       $report_def[self::DRUID_QUERY] = array(
+	       self::DRUID_TYPE => self::DRUID_CONTAINS,
+	       self::DRUID_CASE_SENSITIVE => true,
+	       self::DRUID_VALUE => ""
+       );
+        
        return $report_def;
    }
    

@@ -59,6 +59,11 @@ class kDruidBase
 	const DRUID_COLUMNS = 'columns';
 	const DRUID_LIMIT_SPEC = 'limitSpec';
 	const DRUID_TRUE = 'true';
+	const DRUID_SEARCH = 'search';
+	const DRUID_SEARCH_DIMENSIONS = 'searchDimensions';
+	const DRUID_QUERY = 'query';
+	const DRUID_CONTAINS = 'contains';
+	const DRUID_CASE_SENSITIVE = 'case_sensitive';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
