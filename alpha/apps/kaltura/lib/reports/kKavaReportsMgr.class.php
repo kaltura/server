@@ -362,8 +362,8 @@ class kKavaReportsMgr extends kKavaBase
         
         self::$metrics_def[self::METRIC_TOTAL_PLAY_TIME] = array(self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME_SEC),
             self::DRUID_POST_AGGR => array(self::METRIC_TOTAL_PLAY_TIME));
-        self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY),
-            self::DRUID_POST_AGGR => array(self::METRIC_AVG_PLAY_TIME, self::METRIC_TOTAL_PLAY_TIME));
+        self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
+            self::DRUID_POST_AGGR => array(self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME));
         self::$metrics_def[self::METRIC_PLAYER_IMPRESSION_RATIO] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
             self::DRUID_POST_AGGR => array(self::METRIC_PLAYER_IMPRESSION_RATIO));
         self::$metrics_def[self::METRIC_AVG_DROP_OFF] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_PLAYTHROUGH),
