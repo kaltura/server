@@ -664,6 +664,7 @@ class kKavaReportsMgr extends kKavaBase
 	        		self::DRUID_VALUES => $dimension_ids
 	        	),
 	        );
+	        self::addEndUserReportsDruidFilters($input_filter, $druid_filter);
         }
                 
         $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
@@ -883,6 +884,38 @@ class kKavaReportsMgr extends kKavaBase
        return $date->format('YmdH');
    }
    
+   private static function addEndUserReportsDruidFilters($input_filter, &$druid_filter)
+   {
+   		if (!($input_filter instanceof endUserReportsInputFilter))
+   		{
+   			return;
+   		}
+   	
+   		if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
+	   	{
+	   		 
+	   		if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
+	   			$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+	   		else
+	   			$category_ids = self::getPlaybackContextCategoriesIds($partner_id, $input_filter->playbackContext ?
+	   					$input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
+	   		 
+	   		$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
+	   				self::DRUID_VALUES => $category_ids);
+	   	}
+	   	 
+	   	if ($input_filter->application) {
+	   		$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
+	   				self::DRUID_VALUES => explode(',', $input_filter->application)
+	   		);
+	   	}
+	   	if ($input_filter->userIds != null) {
+	   		$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_USER_ID,
+	   				self::DRUID_VALUES => explode(",", $input_filter->userIds)
+	   		);
+	   	}
+   }
+   
    private static function getDruidFilter($partner_id, $report_type, $input_filter, $object_ids) 
    {
        $druid_filter = array();
@@ -892,32 +925,7 @@ class kKavaReportsMgr extends kKavaBase
        			array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR) : 
        			array(self::PLAYBACK_TYPE_VOD));
        
-       if ($input_filter instanceof endUserReportsInputFilter)
-       {
-           if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
-           {
-               
-               if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
-                   $category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-               else
-                   $category_ids = self::getPlaybackContextCategoriesIds($partner_id, $input_filter->playbackContext ? 
-                       $input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
-                       
-               $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
-                                       self::DRUID_VALUES => $category_ids);
-           }
-           
-           if ($input_filter->application) {
-               $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
-                   self::DRUID_VALUES => explode(',', $input_filter->application)
-               );
-           }
-           if ($input_filter->userIds != null) {
-               $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_USER_ID,
-                   self::DRUID_VALUES => explode(",", $input_filter->userIds)
-               );
-           }
-       }
+       self::addEndUserReportsDruidFilters($input_filter, $druid_filter);
        
        if ($input_filter->categories)
        {
