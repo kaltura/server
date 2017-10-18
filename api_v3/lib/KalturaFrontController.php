@@ -120,7 +120,6 @@ class KalturaFrontController
 			}
 			catch (Error $ex) 
 			{
-				KalturaLog::debug("Inside Error catch");
 				$success = false;
 				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex, $this->service, $this->action);
