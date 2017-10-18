@@ -44,8 +44,14 @@ class kReportManager
 			$port = $dbConfig["port"];
 			$user = $dbConfig["user"];
 			$password = $dbConfig["password"];
-			$dbName = $dbConfig["db_name"];
-			$this->_pdo = new PDO("mysql:host={$host};port={$port};dbname={$dbName};charset=latin1;",$user, $password);
+			$dbName = $dbConfig["charset"];
+			$charset = isset($dbConfig["charset"]) ? $dbConfig["charset"] : null;
+			
+			$pdoString = "mysql:host={$host};port={$port};dbname={$dbName};";
+			if($charset)
+				$pdoString .= "charset={$charset};";
+			
+			$this->_pdo = new PDO($pdoString,$user, $password);
 			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 	}
