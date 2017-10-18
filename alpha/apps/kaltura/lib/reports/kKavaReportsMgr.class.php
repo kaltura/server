@@ -589,6 +589,7 @@ class kKavaReportsMgr extends kKavaBase
         $intervals = self::getFilterIntervals($input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         $dimension = self::getDimension($report_type, $object_ids);
+        $metrics = self::getMetrics($report_type);
         
         // Note: using a larger threshold since topN is approximate
         $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
@@ -597,7 +598,7 @@ class kKavaReportsMgr extends kKavaBase
         	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)))
         {
         	// get the topN objects first, otherwise the returned metrics can be inaccurate
-        	$query = self::getTopReport($partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+        	$query = self::getTopReport($partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold, $metrics);
 	        $result = self::runQuery($query);
 	        if (!$result)
 	        {
@@ -638,9 +639,7 @@ class kKavaReportsMgr extends kKavaBase
 	        	),
 	        );
         }
-        
-        $metrics = self::getMetrics($report_type);
-        
+                
         $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         $result = self::runQuery($query);
         if (!$result)
@@ -952,7 +951,7 @@ class kKavaReportsMgr extends kKavaBase
        return $druid_filter;
    } 
    
-   private static function getBaseReportDef($partner_id, $intervals, $metrics, $filter, $granularity) {
+   private static function getBaseReportDef($partner_id, $intervals, $metrics, $filter, $granularity, $filterMetrics = null) {
        $client_tag = kCurrentContext::$client_lang;
      
        if (kConf::hasParam('kava_top_priority_client_tags')) {
@@ -969,9 +968,10 @@ class kKavaReportsMgr extends kKavaBase
        $report_def[self::DRUID_DATASOURCE] = self::HISTORICAL_DATASOURCE;
        $report_def[self::DRUID_INTERVALS] = $intervals;
        $report_def[self::DRUID_GRANULARITY] = $granularity;
+       
+       // aggregations
        $report_def[self::DRUID_AGGR] = array();
        $report_def[self::DRUID_POST_AGGR] = array();
-       $event_types = array();
        foreach ($metrics as $metric)
        {
            if (!array_key_exists($metric, self::$metrics_def))
@@ -982,11 +982,6 @@ class kKavaReportsMgr extends kKavaBase
                     continue;
                    
                 $report_def[self::DRUID_AGGR][] = self::$aggregations_def[$aggr];
-                if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE]))
-                    $event_types[] = self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE];
-                else if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUES]))
-                    $event_types = array_merge($event_types, self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUES]);
-                   
            }
            if (array_key_exists(self::DRUID_POST_AGGR, $metric_aggr))
            {
@@ -998,10 +993,34 @@ class kKavaReportsMgr extends kKavaBase
            } 
        }
        
+       // event types
+       $event_types = array();
+       if (!$filterMetrics)
+       {
+       		$filterMetrics = $metrics;
+       }
+       foreach ($filterMetrics as $metric)
+       {
+       		if (!array_key_exists($metric, self::$metrics_def))
+       			continue;
+       	  
+         	$metric_aggr = self::$metrics_def[$metric];
+         	foreach ($metric_aggr[self::DRUID_AGGR] as $aggr) {
+           		if (in_array(self::$aggregations_def[$aggr], $report_def[self::DRUID_AGGR]))
+       	    		continue;
+       		 
+           		if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE]))
+           			$event_types[] = self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE];
+           		else if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUES]))
+           			$event_types = array_merge($event_types, self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUES]);
+         	}
+       }
+       	 
        if (count($event_types))
             $filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
                 self::DRUID_VALUES => array_values(array_unique($event_types)));
        
+       // filter
        $filter_def = self::buildFilter($filter);
        $report_def[self::DRUID_FILTER] = array(self::DRUID_TYPE => "and",
            self::DRUID_FIELDS => $filter_def);
@@ -1009,9 +1028,9 @@ class kKavaReportsMgr extends kKavaBase
        return $report_def;
    }
   
-   private static function getTopReport($partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold) 
+   private static function getTopReport($partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filterMetrics = null) 
    {
-       $report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL);
+       $report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filterMetrics);
        $report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TOPN;
        $report_def[self::DRUID_DIMENSION] = $dimensions;
        $order_type = $order_dir === "+" ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
