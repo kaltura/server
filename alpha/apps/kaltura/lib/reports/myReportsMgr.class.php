@@ -1465,7 +1465,11 @@ class myReportsMgr
 		if (mysqli_connect_errno()) {
 		        throw new kCoreException('DB connection failed: '. mysqli_connect_error()."\ncheck settings in the reports_db_config section of configurations/local.ini", kCoreException::INVALID_QUERY);
 		}
-		mysqli_set_charset($link, "latin1");
+		
+		$charset = isset($dbConfig["charset"]) ? $dbConfig["charset"] : null;
+		if($charset)
+			mysqli_set_charset($link, $charset);
+		
 		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		
 		return $link;
