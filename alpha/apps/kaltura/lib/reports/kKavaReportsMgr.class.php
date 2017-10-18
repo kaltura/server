@@ -554,7 +554,7 @@ class kKavaReportsMgr extends kKavaBase
     {
         self::init();
         $start = microtime (true);
-        $total_count = 0;
+        $total_count = null;
         
         if (!$page_size || $page_size < 0) 
             $page_size = 10;
@@ -585,120 +585,163 @@ class kKavaReportsMgr extends kKavaBase
                 throw new Exception("Order by parameter is not a valid column");
                 
         }
-        
-        $granularity = self::DRUID_GRANULARITY_ALL;
+
         $intervals = self::getFilterIntervals($input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         $dimension = self::getDimension($report_type, $object_ids);
+        
+        // Note: using a larger threshold since topN is approximate
+        $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
+        
+        if (!$object_ids &&
+        	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_APPLICATION, self::DIMENSION_DEVICE)))
+        {
+        	// get the topN objects first, otherwise the returned metrics can be inaccurate
+        	$query = self::getTopReport($partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+	        $result = self::runQuery($query);
+	        if (!$result)
+	        {
+	        	return array(array(), array(), 0);
+	        }
+	        
+	        $rows = $result[0][self::DRUID_RESULT];
+	        $rows_count = count($rows);
+
+	        $rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);
+	        if (!$rows)
+	        {
+	        	return array(array(), array(), $rows_count);
+	        }
+
+	        if ($page_index * $page_size > $rows_count)
+	        {
+	        	$total_count = $rows_count;
+	        }
+	        else if ((!($input_filter instanceof endUserReportsInputFilter)) || in_array($report_type, myReportsMgr::$end_user_filter_get_count_reports) )
+	        {
+                $total_count = self::getTotalTableCount($partner_id ,$report_type ,$input_filter, $intervals, $druid_filter, $dimension, $object_ids);
+	        }
+	         
+	        $dimension_ids = array();
+	        foreach ($rows as $row)
+	        {
+	        	$dimension_ids[] = $row[$dimension];
+	        }
+	        
+	        $page_index = 1;
+	        $page_size = count($dimension_ids);
+	        $threshold = $page_size; 
+	        
+	        $druid_filter = array(
+	        	array(
+	        		self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+	        		self::DRUID_VALUES => array($report_type == myReportsMgr::REPORT_TYPE_LIVE ? self::PLAYBACK_TYPE_LIVE : self::PLAYBACK_TYPE_VOD)
+	        	),
+	        	array(self::DRUID_DIMENSION => self::$reports_def[$report_type][self::REPORT_DIMENSION],
+	        		self::DRUID_VALUES => $dimension_ids
+	        	),
+	        );
+        }
+        
         $metrics = self::getMetrics($report_type);
         
-        $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $page_size * $page_index);
+        $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         $result = self::runQuery($query);
-        if (count($result) > 0)
+        if (!$result)
         {
-            $report_str = myReportsMgr::$type_map[$report_type];
-            $rows = $result[0][self::DRUID_RESULT];
-            $rows_count = count($rows);
+        	return array(array(), array(), 0);
+        }
+
+        $rows = $result[0][self::DRUID_RESULT];
+        $rows_count = count($rows);
+        
+        $rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);    
+        if (!$rows)
+        {
+        	return array(array(), array(), $rows_count);
+        }
+		
+		if (is_null($total_count))
+		{
+			if ($page_index * $page_size > $rows_count)
+			{
+				$total_count = $rows_count;
+			}
+			else if ((!($input_filter instanceof endUserReportsInputFilter)) || in_array($report_type, myReportsMgr::$end_user_filter_get_count_reports) )
+			{
+				$total_count = self::getTotalTableCount($partner_id ,$report_type ,$input_filter, $intervals, $druid_filter, $dimension, $object_ids);
+				
+				if ($total_count <= 0)
+				{
+					$end = microtime(true);
+					KalturaLog::log("getTable took [" . ($end - $start) . "]");
+					return array (array() , array() , 0);
+				}
+			}
+		}
+                
+        $dimension_ids = array();
+        
+        $dimension_headers = $report_def[self::REPORT_DETAIL_DIM_HEADERS];
+        $report_metrics = ($report_type == myReportsMgr::REPORT_TYPE_APPLICATIONS) ?
+            array() : $report_def[self::REPORT_METRICS];
+        $dimension = $report_def[self::REPORT_DIMENSION];
+        if ($object_ids)
+        {
+            if (array_key_exists(self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS, $report_def))
+                $dimension_headers = $report_def[self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS];
+            if (array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
+                $dimension = $report_def[self::REPORT_DRILLDOWN_DIMENSION];
+        }
+        
+        $headers = $dimension_headers;
+        
+        foreach ($report_metrics as $column)
+        {
+            $headers[] = self::$metrics_to_headers[$column];
+        }
+        
+        $data = array();
+        
+        foreach ($rows as $row)
+        {
+            $dimension_ids[] = $row[$dimension];
+            $row_data = array();
+            $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
             
-            if ($page_index * $page_size > $rows_count)
+            foreach ($report_metrics as $column)
             {
-                $total_count = $rows_count;
+                $row_data[] = $row[$column];
             }
+            $data[] = $row_data;
             
-            $rows = array_slice($rows, ($page_index -1) * $page_size, $page_size);    
-            if ($rows)
-            {
-                $dimension_ids = array();
-               
-                $dimension_headers = $report_def[self::REPORT_DETAIL_DIM_HEADERS];
-                $report_metrics = ($report_type == myReportsMgr::REPORT_TYPE_APPLICATIONS) ?
-                    array() : $report_def[self::REPORT_METRICS];
-                $dimension = $report_def[self::REPORT_DIMENSION];
-                if ($object_ids)
-                {
-                    if (array_key_exists(self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS, $report_def))
-                        $dimension_headers = $report_def[self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS];
-                        if (array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
-                            $dimension = $report_def[self::REPORT_DRILLDOWN_DIMENSION];
+        }
+        
+        foreach (self::$transform_metrics as $metric => $func) {
+            $field_index = array_search(self::$metrics_to_headers[$metric], $headers);
+            if (false !== $field_index) {
+                $rows_count = count($data);
+                for ($i = 0; $i < $rows_count; $i++) {
+                    $data[$i][$field_index] = call_user_func($func, $data[$i][$field_index]);
                 }
-                
-                $headers = $dimension_headers;
-                
-                foreach ($report_metrics as $column)
-                {
-                    $headers[] = self::$metrics_to_headers[$column];
-                }
-                
-                $data = array();
-                
-                foreach ($rows as $row)
-                {
-                    $dimension_ids[] = $row[$dimension];
-                    $row_data = array();
-                    $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
-                    
-                    foreach ($report_metrics as $column)
-                    {
-                        $row_data[] = $row[$column];
-                    }
-                    $data[] = $row_data;
-                    
-                }
-                
-                foreach (self::$transform_metrics as $metric => $func) {
-                    $field_index = array_search(self::$metrics_to_headers[$metric], $headers);
-                    if (false !== $field_index) {
-                        $rows_count = count($data);
-                        for ($i = 0; $i < $rows_count; $i++) {
-                            $data[$i][$field_index] = call_user_func($func, $data[$i][$field_index]);
-                        }
-                    }
-                }
-                
-                if (array_key_exists(self::REPORT_ENRICH_DEF, $report_def)) {
-                    $enrich_func = $report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FUNC];
-                    $entities = call_user_func($enrich_func, $dimension_ids, $partner_id);
-                    $enrich_field = array_search($report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD], $headers);
-                    if (!$enrich_field) {
-                        $enrich_field = 0;
-                    }
-                    
-                    $rows_count = count($data);
-                    for ($i = 0; $i < $rows_count; $i++) {
-                        $data[$i][$enrich_field] = $entities[$data[$i][$enrich_field]];
-                    }
-                    
-                }
-                
-                // since the query limit is $page_index * page_size we can set result count as total count in case limit is bigger than result count 
-                // and don't count the cardinality query
-                if ($total_count == 0) 
-                {
-                    if ((!($input_filter instanceof endUserReportsInputFilter)) || in_array($report_type, myReportsMgr::$end_user_filter_get_count_reports) )
-                    {
-                        $total_count = self::getTotalTableCount($partner_id ,$report_type ,$input_filter, $intervals, $druid_filter, $dimension, $object_ids);
-                        
-                        if ($total_count <= 0)
-                        {
-                            $end = microtime(true);
-                            KalturaLog::log("getTable took [" . ($end - $start) . "]");
-                            return array (array() , array() , 0);
-                        }
-                    }
-                    
-                }
-                $res = array ($headers, $data, $total_count);
-            }
-            else
-            {
-                $res =  array (array(), array(), $total_count);
             }
         }
         
-        else
-        {
-            $res =  array (array(), array(), 0);
+        if (array_key_exists(self::REPORT_ENRICH_DEF, $report_def)) {
+            $enrich_func = $report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FUNC];
+            $entities = call_user_func($enrich_func, $dimension_ids, $partner_id);
+            $enrich_field = array_search($report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD], $headers);
+            if (!$enrich_field) {
+                $enrich_field = 0;
+            }
+            
+            $rows_count = count($data);
+            for ($i = 0; $i < $rows_count; $i++) {
+                $data[$i][$enrich_field] = $entities[$data[$i][$enrich_field]];
+            }
         }
+		
+        $res = array ($headers, $data, $total_count);
         
         $end = microtime(true);
         KalturaLog::log("getTable took [" . ($end - $start) . "]");
@@ -904,6 +947,10 @@ class kKavaReportsMgr extends kKavaBase
            );
        }
        
+       $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
+               self::DRUID_VALUES => array($partner_id)
+           );         
+       
        return $druid_filter;
    } 
    
@@ -958,14 +1005,13 @@ class kKavaReportsMgr extends kKavaBase
                 self::DRUID_VALUES => array_values(array_unique($event_types)));
        
        $filter_def = self::buildFilter($filter);
-       $filter_def[]= array(self::DRUID_TYPE => self::DRUID_SELECTOR_FILTER, self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID, self::DRUID_VALUE => $partner_id);
        $report_def[self::DRUID_FILTER] = array(self::DRUID_TYPE => "and",
            self::DRUID_FIELDS => $filter_def);
        
        return $report_def;
    }
   
-   private static function getTopReport($partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $page_size = 10) 
+   private static function getTopReport($partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold) 
    {
        $report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL);
        $report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TOPN;
@@ -973,7 +1019,7 @@ class kKavaReportsMgr extends kKavaBase
        $order_type = $order_dir === "+" ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
        $report_def[self::DRUID_METRIC] = array(self::DRUID_TYPE => $order_type,
                                                self::DRUID_METRIC => $order_by);
-       $report_def[self::DRUID_THRESHOLD] = min(self::MAX_RESULT_SIZE, $page_size * 3);		// Note: using a larger threshold since topN is approximate
+       $report_def[self::DRUID_THRESHOLD] = $threshold;
              
        return $report_def;
    }
