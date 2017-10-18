@@ -1064,10 +1064,8 @@ class kKavaReportsMgr extends kKavaBase
        			continue;
        	  
          	$metric_aggr = self::$metrics_def[$metric];
-         	foreach ($metric_aggr[self::DRUID_AGGR] as $aggr) {
-           		if (in_array(self::$aggregations_def[$aggr], $report_def[self::DRUID_AGGR]))
-       	    		continue;
-       		 
+         	foreach ($metric_aggr[self::DRUID_AGGR] as $aggr) 
+         	{
            		if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE]))
            			$event_types[] = self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE];
            		else if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUES]))
@@ -1249,7 +1247,6 @@ class kKavaReportsMgr extends kKavaBase
    
    public static function getGraphsByColumnName($result, $graph_metrics_to_headers, $type_str)
    {
-       $graphs = array();
        $graph = array();
        $row = $result[0];
        if (isset($row))
@@ -1260,9 +1257,14 @@ class kKavaReportsMgr extends kKavaBase
                $graph[$header] = $row_data[$column];
            }
        }
+       else
+       {
+   			$graph = array_combine(
+   				array_values($graph_metrics_to_headers),
+       			array_fill(0, count($graph_metrics_to_headers), 0));
+       }
        
-       $graphs[$type_str] = $graph;
-       return $graphs;
+       return array($type_str => $graph);
    }
    
    
