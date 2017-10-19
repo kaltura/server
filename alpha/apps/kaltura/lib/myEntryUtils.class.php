@@ -1542,6 +1542,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		$newEntry->setSourceType(self::getCloneSourceType($entry->getSourceType()),true);
 
+	    $quizData = $entry->getFromCustomData( QuizPlugin::QUIZ_DATA );
+	    if ($quizData)
+	    {
+		    $newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
+		    $newEntry->addCapability(QuizPlugin::getCapatabilityCoreValue());
+	    }
+	    
 	    // save the entry
  		$newEntry->save();
  		 		
