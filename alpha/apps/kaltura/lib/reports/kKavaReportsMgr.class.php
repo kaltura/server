@@ -669,16 +669,20 @@ class kKavaReportsMgr extends kKavaBase
 		        	array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
 		        		self::DRUID_VALUES => array($partner_id)
 		        	),
-		        	array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
-		        		self::DRUID_VALUES => $dimension_ids
-		        	),
 		        );
 		        self::addEndUserReportsDruidFilters($input_filter, $druid_filter);
 	        }
 	        else
 	        {
-	        	$druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $dimension_ids);
+	        	// Note: not passing $dimension_ids as $object_ids since in some reports $object_ids
+	        	//		filters by entries, and not by $dimension
+	        	$druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, null);
 	        }
+	        
+	        $druid_filter[] = array(
+	        	self::DRUID_DIMENSION => $dimension,
+	        	self::DRUID_VALUES => $dimension_ids
+	        );
         }
                 
         $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
