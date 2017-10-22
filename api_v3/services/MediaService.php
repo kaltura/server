@@ -1157,20 +1157,33 @@ class MediaService extends KalturaEntryService
 		}
 		return false;
 	}
-
+	
+	private static function getRelatedResourceEntryId($originalResourceEntryId,$dbEntry,$relatedEntry)
+	{
+		if($originalResourceEntryId == $dbEntry->getSourceEntryId() &&  $relatedEntry->getSourceEntryId() )
+		{
+			return $relatedEntry->getSourceEntryId();
+		}
+		if($originalResourceEntryId == $dbEntry->getRootEntryId())
+		{
+			return $relatedEntry->getRootEntryId();
+		}
+		
+		return $relatedEntry->getId();
+	}
+	
+	
 	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
 	{
+		$originalResourceEntryId = $resource->resource->entryId;
 		$relatedEntries = myEntryUtils::getRelatedEntries($dbEntry);
-		$shouldUseRootEntryId = false;
-		if ($resource->resource->entryId == $dbEntry->getRootEntryId() )
-			$shouldUseRootEntryId = true;
+		
 		foreach ($relatedEntries as $relatedEntry)
 		{
-			if($shouldUseRootEntryId)
-				$resource->resource->entryId = $relatedEntry->getRootEntryId();
-			else
-				$resource->resource->entryId = $relatedEntry->getId();
-			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [". $resource->resource->entryId ."]");
+			if ($relatedEntry->getType() == entryType::DOCUMENT)
+				continue;
+			$resource->resource->entryId = self::getRelatedResourceEntryId($originalResourceEntryId, $dbEntry, $relatedEntry);
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [" . $resource->resource->entryId . "]");
 			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
 		}
 	}
