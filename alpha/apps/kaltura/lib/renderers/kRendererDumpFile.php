@@ -3,6 +3,7 @@
 require_once(dirname(__file__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__file__) . '/kRendererBase.php');
 
+require_once(dirname(__file__) . '/../../../../../infra/storage/kEncryptFileUtils.php');
 /*
  * @package server-infra
  * @subpackage renderers
@@ -30,7 +31,7 @@ class kRendererDumpFile implements kRendererBase
 		$this->maxAge = $maxAge;
 		$this->lastModified = $lastModified;
 		$this->key = $key;
-
+		
 		$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
 		if ($limitFileSize)
 		{
@@ -40,13 +41,19 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			clearstatcache();
-			$this->fileSize = kFileUtils::fileSize($filePath, $key);
+			if ($key)
+				$this->fileSize = kEncryptFileUtils::fileSize($filePath, $key);
+			else
+				$this->fileSize = kFileBase::fileSize($filePath);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
 		
 		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
 		{
-			$this->fileData = kFileUtils::getFileContent($this->filePath, 0, $limitFileSize, $key);
+			if ($key)
+				$this->fileData = kEncryptFileUtils::getEncryptedFileContent($this->filePath, $key, 0, $limitFileSize);
+			else
+				$this->fileData = kFileBase::getFileContent($this->filePath, 0, $limitFileSize);
 		}
 	}
 	
@@ -95,7 +102,10 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
-			echo kFileUtils::getFileContent($this->filePath, $rangeFrom, $rangeFrom + $rangeLength, $this->key);
+			if ($this->key)
+				echo kEncryptFileUtils::getEncryptedFileContent($this->filePath, $this->key, $rangeFrom, $rangeFrom + $rangeLength);
+			else
+				echo kFileBase::getFileContent($this->filePath, $rangeFrom, $rangeFrom + $rangeLength);
 		}
 	}
 }

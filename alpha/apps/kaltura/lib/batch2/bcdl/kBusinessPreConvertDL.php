@@ -289,7 +289,7 @@ class kBusinessPreConvertDL
 			return false;
 		}
 
-		$srcPath = $fileSync->getFullPath();
+		$srcPath = $fileSync->isEncrypted() ? $fileSync->createTempClear() : $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!file_exists($tempDir))
@@ -365,6 +365,7 @@ class kBusinessPreConvertDL
 				$errDescription = "Crop failed";
 				return false;
 			}
+			$fileSync->deleteTempClear();
 			return $destPath;
 		}
 		catch(Exception $ex)

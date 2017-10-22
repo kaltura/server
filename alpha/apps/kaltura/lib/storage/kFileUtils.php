@@ -3,6 +3,7 @@
  * @package infra
  * @subpackage Storage
  */
+
 class kFileUtils extends kFile
 {
 
@@ -252,44 +253,6 @@ class kFileUtils extends kFile
 		curl_close($ch);
 		
 		KExternalErrors::dieGracefully();
-	}
-
-	public static function getEncryptedFileContent($fileName, $key, $from_byte = 0, $len = 0)
-	{
-		KalturaLog::debug("Getting encrypted file content from [$fileName] with [$key] and limits [$from_byte] [$len]");
-		$data = parent::getFileContent($fileName);
-		$plainData = kFileSyncUtils::decryptData($data, $key);
-		$len = min($len,0);
-		if (!$from_byte && !$len)
-			return $plainData;
-		return substr($plainData, $from_byte, $len);
-	}
-
-	public static function setEncryptedFileContent($fileName, $key, $content)
-	{
-		$encryptedData = kFileSyncUtils::encryptData($content, $key);
-		parent::setFileContent($fileName, $encryptedData);
-	}
-	
-	public static function encryptFile($fileName, $key)
-	{
-		$data = parent::getFileContent($fileName);
-		self::setEncryptedFileContent($fileName, $key, $data);
-	}
-
-	public static function getFileContent($fileName, $from_byte = 0, $to_byte = -1, $key = null)
-	{
-		if ($key)
-			return self::getEncryptedFileContent($fileName, $key, $from_byte, $to_byte - $from_byte);
-		return parent::getFileContent($fileName, $from_byte, $to_byte);
-	}
-
-	static public function fileSize($filename, $key = null)
-	{
-		if (!$key)
-			return parent::fileSize($filename);
-		$data = self::getFileContent($filename, 0, -1, $key);
-		return strlen($data);
 	}
 
 	static public function addEncryptToFileName($fileName)

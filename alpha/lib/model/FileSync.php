@@ -67,7 +67,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$realPath = realpath( $this->getFileRoot() . $this->getFilePath() );
 		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
 		$plainData = file_get_contents( $realPath);
-		$cryptData = kFileSyncUtils::encryptData($plainData, $key);
+		$cryptData = kEncryptFileUtils::encryptData($plainData, $key);
 		file_put_contents( $realPath, $cryptData);
 	}
 
@@ -80,16 +80,15 @@ class FileSync extends BaseFileSync implements IBaseObject
 		KalturaLog::debug("Decrypting content of fileSync " . $this->id . ". key is: [$key]");
 		$realPath = realpath( $this->getFileRoot() . $this->getFilePath() );
 		$cryptData = file_get_contents( $realPath);
-		$plainData = kFileSyncUtils::decryptData($cryptData, $key);
+		$plainData = kEncryptFileUtils::decryptData($cryptData, $key);
 		return $plainData;
 	}
 
 	public function shouldEncryptFile()
 	{
-
 		//check for partner configuration
-//		if(!$this->getPartnerId() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_CONTENT_ENCRYPTION, $this->getPartnerId()))
-//			return false;
+		if(!$this->getPartnerId() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_CONTENT_ENCRYPTION, $this->getPartnerId()))
+			return false;
 		
 		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
 		$fileTypeToEncrypt = kConf::get('image_file_ext');

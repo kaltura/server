@@ -930,7 +930,7 @@ class myEntryUtils
 			KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$entryKey]");
 			kFile::moveFile($finalThumbPath, $encryptedPath);
 			$finalThumbPath = $encryptedPath;
-			kFileUtils::encryptFile($finalThumbPath, $entryKey);
+			kEncryptFileUtils::encryptFile($finalThumbPath, $entryKey);
 		}
 				
 		return $finalThumbPath;
