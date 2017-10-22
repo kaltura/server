@@ -7,7 +7,6 @@ define('MAX_ITEMS', 2000);
 
 function getPartnerUpdates($updatedAt)
 {
-	// get the partners
 	$c = new Criteria();
 	$c->addSelectColumn(PartnerPeer::ID);
 	$c->addSelectColumn(PartnerPeer::STATUS);
@@ -36,9 +35,46 @@ function getPartnerUpdates($updatedAt)
 	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
 }
 
-function getEntryUpdates($updatedAt)
+function getLiveUpdates($updatedAt)
 {
-	// get the partners
+	// must query sphinx, can be too heavy for the db when the interval is large
+	$filter = new entryFilter();
+	$filter->setTypeEquel(entryType::LIVE_STREAM);
+	$filter->set('_gte_updated_at', $updatedAt);
+	$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+	
+	$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+	$c->addSelectColumn(entryPeer::ID);
+	$c->addSelectColumn(entryPeer::STATUS);
+	$c->addSelectColumn(entryPeer::UPDATED_AT);
+	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
+	$c->setLimit(MAX_ITEMS);
+	$c->setMaxRecords(MAX_ITEMS);
+	
+	$filter->attachToCriteria($c);
+	
+	entryPeer::setUseCriteriaFilter(false);
+	$c->applyFilters();
+	$stmt = entryPeer::doSelectStmt($c);
+	entryPeer::setUseCriteriaFilter(true);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	$maxUpdatedAt = 0;
+	$result = array();
+	foreach ($rows as $row)
+	{
+		$id = $row['ID'];
+		$status = $row['STATUS'];
+		$result[$id] = $status != entryStatus::DELETED ? '1' : '';
+		$updatedAt = new DateTime($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+	}
+
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+}
+
+function getDurationUpdates($updatedAt)
+{
 	$c = new Criteria();
 	$c->addSelectColumn(entryPeer::ID);
 	$c->addSelectColumn(entryPeer::STATUS);
@@ -130,21 +166,19 @@ if (!kConf::hasParam('analytics_sync_secret') ||
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
-switch ($requestType)
+$requestHandlers = array(
+	'partner' => 'getPartnerUpdates',
+	'live' => 'getLiveUpdates',
+	'duration' => 'getDurationUpdates',
+	'categoryEntry' => 'getCategoryEntryUpdates',
+);
+
+if (isset($requestHandlers[$requestType]))
 {
-case 'partner':
-	$result = getPartnerUpdates($updatedAt);
-	break;
-	
-case 'entry':
-	$result = getEntryUpdates($updatedAt);
-	break;
-	
-case 'categoryEntry':
-	$result = getCategoryEntryUpdates($updatedAt);
-	break;
-	
-default:
+	$result = call_user_func($requestHandlers[$requestType], $updatedAt);
+}
+else
+{
 	$result = array('error' => 'bad request');
 }
 
