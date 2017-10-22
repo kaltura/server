@@ -5,6 +5,9 @@
  */
 class kFileUtils extends kFile
 {
+
+	const ENCRYPT = '_ENCRYPT';
+
 	public static function pollFileExists($file_name)
 	{
 		$nfs_file_tries = 0;
@@ -45,7 +48,7 @@ class kFileUtils extends kFile
 		return false;
 	}
 
-	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null)
+	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null, $key = null)
 	{
 		self::closeDbConnections();
 		
@@ -55,12 +58,12 @@ class kFileUtils extends kFile
 		if(! file_exists($filePath))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
-		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified);
+		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified, $key);
 	}
 	
-	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
+	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0, $key = null)
 	{
-		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size);
+		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size, $key);
 		
 		$renderer->output();
 		
@@ -250,4 +253,58 @@ class kFileUtils extends kFile
 		
 		KExternalErrors::dieGracefully();
 	}
+
+	public static function getEncryptedFileContent($fileName, $key, $from_byte = 0, $len = 0)
+	{
+		KalturaLog::debug("Getting encrypted file content from [$fileName] with [$key] and limits [$from_byte] [$len]");
+		$data = parent::getFileContent($fileName);
+		$plainData = kFileSyncUtils::decryptData($data, $key);
+		$len = min($len,0);
+		if (!$from_byte && !$len)
+			return $plainData;
+		return substr($plainData, $from_byte, $len);
+	}
+
+	public static function setEncryptedFileContent($fileName, $key, $content)
+	{
+		$encryptedData = kFileSyncUtils::encryptData($content, $key);
+		parent::setFileContent($fileName, $encryptedData);
+	}
+	
+	public static function encryptFile($fileName, $key)
+	{
+		$data = parent::getFileContent($fileName);
+		self::setEncryptedFileContent($fileName, $key, $data);
+	}
+
+	public static function getFileContent($fileName, $from_byte = 0, $to_byte = -1, $key = null)
+	{
+		if ($key)
+			return self::getEncryptedFileContent($fileName, $key, $from_byte, $to_byte - $from_byte);
+		return parent::getFileContent($fileName, $from_byte, $to_byte);
+	}
+
+	static public function fileSize($filename, $key = null)
+	{
+		if (!$key)
+			return parent::fileSize($filename);
+		$data = self::getFileContent($filename, 0, -1, $key);
+		return strlen($data);
+	}
+
+	static public function addEncryptToFileName($fileName)
+	{
+		$typeLen = strlen(pathinfo($fileName, PATHINFO_EXTENSION)) + 1;
+		$pos = strlen($fileName) - $typeLen;
+		return substr($fileName, 0, $pos) . self::ENCRYPT . substr($fileName, $pos);
+	}
+
+	static public function isFileEncrypt($fileName)
+	{
+		$pos = strpos($fileName, self::ENCRYPT);
+		$PrefixLen = strlen(pathinfo($fileName, PATHINFO_EXTENSION)) + 1 + strlen(self::ENCRYPT);
+		return (($pos+$PrefixLen) == strlen($fileName));
+	}
+
+
 }

@@ -69,7 +69,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			else
 				$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
 			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
-
+			if ($file_sync->isEncrypted())
+			{
+				$key = $file_sync->getKey();
+				$contents = self::decryptData($contents, $key);
+			}
 			return $contents;
 		}
 		else
@@ -233,7 +237,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		// place the content there
 		file_put_contents ( $fullPath , $content );
 		self::setPermissions($fullPath);
-
+		self::encryptByKey($key);
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
 	}
 
@@ -503,6 +507,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			self::setPermissions($targetFullPath);
 			if(!$existsFileSync)
 				self::createSyncFileForKey($rootPath, $filePath, $target_key, $strict, false, $cacheOnly);
+			self::encryptByKey($target_key);
 		}
 		else
 		{
@@ -997,7 +1002,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
-			$path = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
+			$path = $parent_file_sync->getFullPath();
 			KalturaLog::info("path [$path]");
 			return $path;
 		}
@@ -1633,4 +1638,27 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( $file_sync )
 			self::dumpFileByFileSync($file_sync);
 	}
+
+
+	public static function encryptByKey(FileSyncKey $key)
+	{
+		$fileSync = self::getOriginFileSyncForKey($key);
+		return $fileSync->encrypt();
+	}
+
+	public static function encryptData($plainText, $key)
+	{
+		$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
+		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+		return mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $plainText, MCRYPT_MODE_ECB, $iv);
+	}
+
+	public static function decryptData($cryptText, $key)
+	{
+		$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
+		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+		$decryptText = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $cryptText, MCRYPT_MODE_ECB, $iv);
+		return trim($decryptText);
+	}
+
 }

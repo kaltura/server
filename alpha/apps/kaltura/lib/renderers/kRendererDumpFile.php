@@ -19,16 +19,18 @@ class kRendererDumpFile implements kRendererBase
 	protected $maxAge;
 	protected $xSendFileAllowed;
 	protected $lastModified;
+	protected $key;
 	
 	public $partnerId;
 
-	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null)
+	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null)
 	{
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
 		$this->maxAge = $maxAge;
 		$this->lastModified = $lastModified;
-		
+		$this->key = $key;
+
 		$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
 		if ($limitFileSize)
 		{
@@ -38,13 +40,13 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			clearstatcache();
-			$this->fileSize = kFile::fileSize($filePath);
+			$this->fileSize = kFileUtils::fileSize($filePath, $key);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
 		
 		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
 		{
-			 $this->fileData = file_get_contents($this->filePath, false , null , -1, $limitFileSize);
+			$this->fileData = kFileUtils::getFileContent($this->filePath, 0, $limitFileSize, $key);
 		}
 	}
 	
@@ -63,7 +65,6 @@ class kRendererDumpFile implements kRendererBase
 			header("HTTP/1.1 304 Not Modified");
 			return;
 		}
-		
 		$useXsendFile = false;
 		$rangeLength = null;
 		if (!$this->fileData && $this->xSendFileAllowed && in_array('mod_xsendfile', apache_get_modules()))
@@ -94,7 +95,7 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
-			infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
+			echo kFileUtils::getFileContent($this->filePath, $rangeFrom, $rangeFrom + $rangeLength, $this->key);
 		}
 	}
 }

@@ -738,9 +738,11 @@ class myEntryUtils
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 			return $finalThumbPath;
 		}
-		
+
+		$fileSync = null;
 		if($orig_image_path === null || !file_exists($orig_image_path))
 		{
+			$fileSync = self::getLocalImageFileSyncByEntry($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
 		
@@ -862,6 +864,12 @@ class myEntryUtils
 								    
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 
+			if ($fileSync && $fileSync->isEncrypted())
+			{
+				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
+				KalturaLog::debug("Creating Clear file at [$orig_image_path] for image conversion");
+			}
+
 			kFile::fullMkdir($processingThumbPath);
 			if ($crop_provider)
 			{
@@ -881,6 +889,9 @@ class myEntryUtils
 
 				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 			}
+
+			if ($fileSync && $fileSync->isEncrypted())
+				$fileSync->deleteTempClear();
 			
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
@@ -911,6 +922,16 @@ class myEntryUtils
 		
 		if ($cache)
 			$cache->delete($cacheLockKey);
+
+		if ($fileSync && $fileSync->isEncrypted())
+		{
+			$entryKey = $entry->getGeneralEncryptionKey();
+			$encryptedPath = kFileUtils::addEncryptToFileName($finalThumbPath);
+			KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$entryKey]");
+			kFile::moveFile($finalThumbPath, $encryptedPath);
+			$finalThumbPath = $encryptedPath;
+			kFileUtils::encryptFile($finalThumbPath, $entryKey);
+		}
 				
 		return $finalThumbPath;
 	}
@@ -1153,6 +1174,14 @@ class myEntryUtils
 			$videoRotation = $mediaInfo->getVideoRotation();
 
 		return $videoRotation;
+	}
+
+	public static function getLocalImageFileSyncByEntry( $entry, $version = null )
+	{
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$entry_image_key = $entry->getSyncKey($sub_type, $version);
+		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $entry_image_key);
+		return $file_sync;
 	}
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )

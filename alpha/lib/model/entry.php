@@ -3892,4 +3892,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return $this->getCreatedAt(null) > (time() - dateUtils::DAY * 7);
 	}
+	
+	public function getGeneralEncryptionKey()
+	{
+		return $this->id . "_GENERAL_" . kConf::get("encryption_salt_key");
+	}
 }
