@@ -57,7 +57,7 @@ def processFileMatchAny(inputFile, pattern, prefix):
 	block = ''
 	for curLine in inputFile:
 		if isLineLogStart(curLine):
-			if pattern in block:
+			if match(pattern, block):
 				print prefix + block.rstrip().replace('\n', '\n' + prefix)
 			block = curLine
 		else:
