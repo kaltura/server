@@ -1921,6 +1921,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$childCopy = self::copyEntry($child, $toPartner, $cloneOptions);
 				$childCopy->setParentEntryId($newEntry->getId());
+				$childCopy->setSourceEntryId($child->getId());
 				$childCopy->save();
 			}
 		}
