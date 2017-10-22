@@ -325,7 +325,30 @@ class uiConfDeployment
 		$file_content = file_get_contents($file_path);
 		return $file_content;
 	}
-	
+
+	/**
+	 * @param $sync_key
+	 */
+	private static function setPermissionAndOwner($sync_key)
+	{
+		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
+		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
+
+		$ret = null;
+		chmod($localPath, 0640);
+
+		if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
+		{
+			$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
+			passthru("chown $user_group $localPath", $ret);
+			if ($ret !== 0 && $ret !== 127)
+			{
+				KalturaLog::debug("chown [$user_group] failed on path [$localPath] returned value [$ret]");
+				exit(1);
+			}
+		}
+	}
+
 	/**
 	 *
 	 * Not in use!
@@ -351,29 +374,20 @@ class uiConfDeployment
 	public static function addUiConfThroughPropel(uiConf $pe_conf)
 	{
 		global $skipAddUiconf;
-		if($skipAddUiconf) return rand(1000,1200); // return just any number if the no-create flag is on
-		
+		if ($skipAddUiconf) return rand(1000, 1200); // return just any number if the no-create flag is on
+
 		$pe_conf->save();
-		
-		if($pe_conf->getConfFile())
+
+		if ($pe_conf->getConfFile())
 		{
 			$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
-			$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
-			$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
-		
-			$ret = null;
-			chmod($localPath, 0640);
-	
-			if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
-				return $pe_conf->getId();
-			
-			$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
-			passthru("chown $user_group $localPath", $ret);
-			if($ret !== 0 && $ret !== 127)
-			{
-				KalturaLog::debug("chown [$user_group] failed on path [$localPath] returned value [$ret]");
-				exit(1);
-			}
+			self::setPermissionAndOwner($sync_key);
+		}
+
+		if ($pe_conf->getConfig())
+		{
+			$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_CONFIG);
+			self::setPermissionAndOwner($sync_key);
 		}
 
 		return $pe_conf->getId();

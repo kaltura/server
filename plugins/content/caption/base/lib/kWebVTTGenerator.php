@@ -123,6 +123,7 @@ class kWebVTTGenerator
 				$styling . "\n";
 			$result .= trim($content) . "\n\n";
 		}
+		$result .="\n\n\n";
 		return $result;
 	}
 
@@ -168,6 +169,7 @@ class kWebVTTGenerator
 				self::formatWebVTTTimeStamp($curCaption["endTime"]) ."\n";
 			$result .= trim($content) . "\n\n";
 		}
+		$result .="\n\n\n";
 		return $result;
 	}
 }

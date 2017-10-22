@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -49,6 +47,7 @@ class Google_Service_Reseller extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'apps/reseller/v1/';
     $this->version = 'v1';
     $this->serviceName = 'reseller';
@@ -225,11 +224,11 @@ class Google_Service_Reseller extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
+                'customerId' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'customerId' => array(
+                'customerNamePrefix' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -237,7 +236,7 @@ class Google_Service_Reseller extends Google_Service
                   'location' => 'query',
                   'type' => 'integer',
                 ),
-                'customerNamePrefix' => array(
+                'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -314,7 +313,7 @@ class Google_Service_Reseller_Customers_Resource extends Google_Service_Resource
    *
    * @opt_param string customerAuthToken An auth token needed for inserting a
    * customer for which domain already exists. Can be generated at
-   * https://www.google.com/a/cpanel//TransferToken. Optional.
+   * https://admin.google.com/TransferToken. Optional.
    * @return Google_Service_Reseller_Customer
    */
   public function insert(Google_Service_Reseller_Customer $postBody, $optParams = array())
@@ -498,11 +497,11 @@ class Google_Service_Reseller_Subscriptions_Resource extends Google_Service_Reso
    * @opt_param string customerAuthToken An auth token needed if the customer is
    * not a resold customer of this reseller. Can be generated at
    * https://www.google.com/a/cpanel/customer-domain/TransferToken.Optional.
-   * @opt_param string pageToken Token to specify next page in the list
    * @opt_param string customerId Id of the Customer
-   * @opt_param string maxResults Maximum number of results to return
    * @opt_param string customerNamePrefix Prefix of the customer's domain name by
    * which the subscriptions should be filtered. Optional
+   * @opt_param string maxResults Maximum number of results to return
+   * @opt_param string pageToken Token to specify next page in the list
    * @return Google_Service_Reseller_Subscriptions
    */
   public function listSubscriptions($optParams = array())
@@ -697,6 +696,7 @@ class Google_Service_Reseller_Customer extends Google_Model
   );
   public $alternateEmail;
   public $customerDomain;
+  public $customerDomainVerified;
   public $customerId;
   public $kind;
   public $phoneNumber;
@@ -720,6 +720,14 @@ class Google_Service_Reseller_Customer extends Google_Model
   public function getCustomerDomain()
   {
     return $this->customerDomain;
+  }
+  public function setCustomerDomainVerified($customerDomainVerified)
+  {
+    $this->customerDomainVerified = $customerDomainVerified;
+  }
+  public function getCustomerDomainVerified()
+  {
+    return $this->customerDomainVerified;
   }
   public function setCustomerId($customerId)
   {
@@ -833,8 +841,9 @@ class Google_Service_Reseller_Seats extends Google_Model
   }
 }
 
-class Google_Service_Reseller_Subscription extends Google_Model
+class Google_Service_Reseller_Subscription extends Google_Collection
 {
+  protected $collection_key = 'suspensionReasons';
   protected $internal_gapi_mappings = array(
   );
   public $billingMethod;
@@ -852,6 +861,7 @@ class Google_Service_Reseller_Subscription extends Google_Model
   public $skuId;
   public $status;
   public $subscriptionId;
+  public $suspensionReasons;
   protected $transferInfoType = 'Google_Service_Reseller_SubscriptionTransferInfo';
   protected $transferInfoDataType = '';
   protected $trialSettingsType = 'Google_Service_Reseller_SubscriptionTrialSettings';
@@ -953,6 +963,14 @@ class Google_Service_Reseller_Subscription extends Google_Model
   public function getSubscriptionId()
   {
     return $this->subscriptionId;
+  }
+  public function setSuspensionReasons($suspensionReasons)
+  {
+    $this->suspensionReasons = $suspensionReasons;
+  }
+  public function getSuspensionReasons()
+  {
+    return $this->suspensionReasons;
   }
   public function setTransferInfo(Google_Service_Reseller_SubscriptionTransferInfo $transferInfo)
   {

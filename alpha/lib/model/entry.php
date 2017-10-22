@@ -720,9 +720,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	// return the full path on the disk
 	public function getFullDataPath( $version = NULL )
 	{
-		$path = myContentStorage::getFSContentRootPath() . $this->getDataPath();
-		if ( file_exists( $path )) return $path;
-		return $path;
+		return myContentStorage::getFSContentRootPath() . $this->getDataPath($version);
 	}
 	
 	/**
@@ -946,7 +944,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
 			if ( $from_cache ) return $this->data_content;
-			$content_path = myContentStorage::getFSContentRootPath();
 			$version = $this->desired_version;
 			if ( ! $version || $version == -1 ) $version = null;
 			
@@ -3401,15 +3398,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return null;
 	}
 	
-	public function setSourceType($value)
+	public function setSourceType($value , $forceSet = false)
 	{
 		if ($value != EntrySourceType::SEARCH_PROVIDER)
-			$this->setSource($value);
-	}
+			$this->setSource($value , $forceSet);
+    }
 	
-	public function setSource($v)
+	public function setSource($v , $forceSet=false)
 	{
-		if(!in_array($this->getSource(), array(EntrySourceType::KALTURA_RECORDED_LIVE, EntrySourceType::LECTURE_CAPTURE)) || $v == EntrySourceType::RECORDED_LIVE)
+		if($forceSet || !in_array($this->getSource(), array(EntrySourceType::KALTURA_RECORDED_LIVE, EntrySourceType::LECTURE_CAPTURE)) || $v == EntrySourceType::RECORDED_LIVE)
 			parent::setSource($v);
 	}
 	
@@ -3773,7 +3770,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'puser_id' => $this->getPuserId(),
 			'creator_puser_id' => $this->getCreatorPuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => $this->getName(),
+			'name' => elasticSearchUtils::formatSearchTerm($this->getName()),
 			'description' => $this->getDescription(),
 			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
@@ -3801,6 +3798,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'group_id' => $this->getGroupId(),
 			'partner_sort_value' => $this->getPartnerSortValue(),
 			'redirect_entry_id' => $this->getRedirectEntryId(),
+			'views' => $this->getViews(),
+			'votes' => $this->getVotes(),
 		);
 
 		$this->addCategoriesToObjectParams($body);

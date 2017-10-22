@@ -87,6 +87,8 @@ class ESearchService extends KalturaBaseService
 	private function initSearchActionParams(KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
 		$searchOperator = $searchParams->searchOperator;
+		if(!$searchOperator)
+			throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_OPERATOR_NOT_ALLOWED);
 
 		if (!$searchOperator->operator)
 			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
@@ -138,6 +140,8 @@ class ESearchService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data['fieldName'], $data['itemType']);
 			case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH:
 				throw new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH, $data['itemType']);
+			case kESearchException::EMPTY_SEARCH_ITEMS_NOT_ALLOWED:
+				throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_ITEMS_NOT_ALLOWED);
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);
 		}

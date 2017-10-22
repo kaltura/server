@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -36,6 +34,9 @@ class Google_Service_Appsactivity extends Google_Service
   /** View and manage the files in your Google Drive. */
   const DRIVE =
       "https://www.googleapis.com/auth/drive";
+  /** View and manage metadata of files in your Google Drive. */
+  const DRIVE_METADATA =
+      "https://www.googleapis.com/auth/drive.metadata";
   /** View metadata for files in your Google Drive. */
   const DRIVE_METADATA_READONLY =
       "https://www.googleapis.com/auth/drive.metadata.readonly";
@@ -54,6 +55,7 @@ class Google_Service_Appsactivity extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'appsactivity/v1/';
     $this->version = 'v1';
     $this->serviceName = 'appsactivity';
@@ -72,6 +74,14 @@ class Google_Service_Appsactivity extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
+                'drive.fileId' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'groupingStrategy' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'pageSize' => array(
                   'location' => 'query',
                   'type' => 'integer',
@@ -80,19 +90,11 @@ class Google_Service_Appsactivity extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'userId' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'groupingStrategy' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'drive.fileId' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'source' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'userId' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -128,17 +130,17 @@ class Google_Service_Appsactivity_Activities_Resource extends Google_Service_Res
    *
    * @opt_param string drive.ancestorId Identifies the Drive folder containing the
    * items for which to return activities.
+   * @opt_param string drive.fileId Identifies the Drive item to return activities
+   * for.
+   * @opt_param string groupingStrategy Indicates the strategy to use when
+   * grouping singleEvents items in the associated combinedEvent object.
    * @opt_param int pageSize The maximum number of events to return on a page. The
    * response includes a continuation token if there are more events.
    * @opt_param string pageToken A token to retrieve a specific page of results.
-   * @opt_param string userId Indicates the user to return activity for. Use the
-   * special value me to indicate the currently authenticated user.
-   * @opt_param string groupingStrategy Indicates the strategy to use when
-   * grouping singleEvents items in the associated combinedEvent object.
-   * @opt_param string drive.fileId Identifies the Drive item to return activities
-   * for.
    * @opt_param string source The Google service from which to return activities.
    * Possible values of source are: - drive.google.com
+   * @opt_param string userId Indicates the user to return activity for. Use the
+   * special value me to indicate the currently authenticated user.
    * @return Google_Service_Appsactivity_ListActivitiesResponse
    */
   public function listActivities($optParams = array())

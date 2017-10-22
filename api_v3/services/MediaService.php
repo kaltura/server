@@ -1157,20 +1157,33 @@ class MediaService extends KalturaEntryService
 		}
 		return false;
 	}
-
+	
+	private static function getRelatedResourceEntryId($originalResourceEntryId,$dbEntry,$relatedEntry)
+	{
+		if($originalResourceEntryId == $dbEntry->getSourceEntryId() &&  $relatedEntry->getSourceEntryId() )
+		{
+			return $relatedEntry->getSourceEntryId();
+		}
+		if($originalResourceEntryId == $dbEntry->getRootEntryId())
+		{
+			return $relatedEntry->getRootEntryId();
+		}
+		
+		return $relatedEntry->getId();
+	}
+	
+	
 	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
 	{
+		$originalResourceEntryId = $resource->resource->entryId;
 		$relatedEntries = myEntryUtils::getRelatedEntries($dbEntry);
-		$shouldUseRootEntryId = false;
-		if ($resource->resource->entryId == $dbEntry->getRootEntryId() )
-			$shouldUseRootEntryId = true;
+		
 		foreach ($relatedEntries as $relatedEntry)
 		{
-			if($shouldUseRootEntryId)
-				$resource->resource->entryId = $relatedEntry->getRootEntryId();
-			else
-				$resource->resource->entryId = $relatedEntry->getId();
-			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [". $resource->resource->entryId ."]");
+			if ($relatedEntry->getType() == entryType::DOCUMENT)
+				continue;
+			$resource->resource->entryId = self::getRelatedResourceEntryId($originalResourceEntryId, $dbEntry, $relatedEntry);
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [" . $resource->resource->entryId . "]");
 			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
 		}
 	}
@@ -1200,52 +1213,12 @@ class MediaService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$supportedFlavor = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
-		if(!$supportedFlavor)
-			throw new KalturaAPIException(KalturaErrors::SUPPORTED_FLAVOR_NOT_EXIST, $entryId);
-		$supportedFlavorId = $supportedFlavor->getId();
+		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		if (!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
 
-		$packagerRetries = 3;
-		$content = null;
-		while ($packagerRetries && !$content)
-		{
-			$content = $this->retrieveLocalVolumeMapFromPackager($supportedFlavor);
-			$packagerRetries--;
-		}
-		if(!$content)
-			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED, $entryId);
-
-		header("Content-Disposition: attachment; filename=".$entryId.'_'.$supportedFlavorId."_volumeMap.csv");
-		return new kRendererString($content, 'text/csv');
-	}
-
-	private function retrieveLocalVolumeMapFromPackager($flavorAsset)
-	{
-		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
-		if (!$packagerVolumeMapUrlPattern)
-			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
-
-		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
-		$entry_data_path = ltrim($entry_data_path, "/");
-		if (!$entry_data_path)
-			return null;
-
-
-		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
-		if(!$content)
-			return false;
-
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
 	}
-
-	private static function curlLocalVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
-	{
-		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
-		kFile::closeDbConnections();
-		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
-		return $content;
-	}
-
 
 }

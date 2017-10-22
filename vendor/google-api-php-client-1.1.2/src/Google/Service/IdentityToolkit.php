@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -43,6 +41,7 @@ class Google_Service_IdentityToolkit extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'identitytoolkit/v3/relyingparty/';
     $this->version = 'v3';
     $this->serviceName = 'identitytoolkit';
@@ -73,8 +72,16 @@ class Google_Service_IdentityToolkit extends Google_Service
               'path' => 'getOobConfirmationCode',
               'httpMethod' => 'POST',
               'parameters' => array(),
+            ),'getProjectConfig' => array(
+              'path' => 'getProjectConfig',
+              'httpMethod' => 'GET',
+              'parameters' => array(),
             ),'getPublicKeys' => array(
               'path' => 'publicKeys',
+              'httpMethod' => 'GET',
+              'parameters' => array(),
+            ),'getRecaptchaParam' => array(
+              'path' => 'getRecaptchaParam',
               'httpMethod' => 'GET',
               'parameters' => array(),
             ),'resetPassword' => array(
@@ -85,12 +92,20 @@ class Google_Service_IdentityToolkit extends Google_Service
               'path' => 'setAccountInfo',
               'httpMethod' => 'POST',
               'parameters' => array(),
+            ),'signOutUser' => array(
+              'path' => 'signOutUser',
+              'httpMethod' => 'POST',
+              'parameters' => array(),
             ),'uploadAccount' => array(
               'path' => 'uploadAccount',
               'httpMethod' => 'POST',
               'parameters' => array(),
             ),'verifyAssertion' => array(
               'path' => 'verifyAssertion',
+              'httpMethod' => 'POST',
+              'parameters' => array(),
+            ),'verifyCustomToken' => array(
+              'path' => 'verifyCustomToken',
               'httpMethod' => 'POST',
               'parameters' => array(),
             ),'verifyPassword' => array(
@@ -189,6 +204,19 @@ class Google_Service_IdentityToolkit_Relyingparty_Resource extends Google_Servic
   }
 
   /**
+   * Get project configuration. (relyingparty.getProjectConfig)
+   *
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyGetProjectConfigResponse
+   */
+  public function getProjectConfig($optParams = array())
+  {
+    $params = array();
+    $params = array_merge($params, $optParams);
+    return $this->call('getProjectConfig', array($params), "Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyGetProjectConfigResponse");
+  }
+
+  /**
    * Get token signing public key. (relyingparty.getPublicKeys)
    *
    * @param array $optParams Optional parameters.
@@ -199,6 +227,19 @@ class Google_Service_IdentityToolkit_Relyingparty_Resource extends Google_Servic
     $params = array();
     $params = array_merge($params, $optParams);
     return $this->call('getPublicKeys', array($params), "Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyGetPublicKeysResponse");
+  }
+
+  /**
+   * Get recaptcha secure param. (relyingparty.getRecaptchaParam)
+   *
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_IdentityToolkit_GetRecaptchaParamResponse
+   */
+  public function getRecaptchaParam($optParams = array())
+  {
+    $params = array();
+    $params = array_merge($params, $optParams);
+    return $this->call('getRecaptchaParam', array($params), "Google_Service_IdentityToolkit_GetRecaptchaParamResponse");
   }
 
   /**
@@ -230,6 +271,20 @@ class Google_Service_IdentityToolkit_Relyingparty_Resource extends Google_Servic
   }
 
   /**
+   * Sign out user. (relyingparty.signOutUser)
+   *
+   * @param Google_IdentitytoolkitRelyingpartySignOutUserRequest $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySignOutUserResponse
+   */
+  public function signOutUser(Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySignOutUserRequest $postBody, $optParams = array())
+  {
+    $params = array('postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('signOutUser', array($params), "Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySignOutUserResponse");
+  }
+
+  /**
    * Batch upload existing user accounts. (relyingparty.uploadAccount)
    *
    * @param Google_IdentitytoolkitRelyingpartyUploadAccountRequest $postBody
@@ -258,6 +313,20 @@ class Google_Service_IdentityToolkit_Relyingparty_Resource extends Google_Servic
   }
 
   /**
+   * Verifies the developer asserted ID token. (relyingparty.verifyCustomToken)
+   *
+   * @param Google_IdentitytoolkitRelyingpartyVerifyCustomTokenRequest $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_IdentityToolkit_VerifyCustomTokenResponse
+   */
+  public function verifyCustomToken(Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyCustomTokenRequest $postBody, $optParams = array())
+  {
+    $params = array('postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('verifyCustomToken', array($params), "Google_Service_IdentityToolkit_VerifyCustomTokenResponse");
+  }
+
+  /**
    * Verifies the user entered password. (relyingparty.verifyPassword)
    *
    * @param Google_IdentitytoolkitRelyingpartyVerifyPasswordRequest $postBody
@@ -275,18 +344,29 @@ class Google_Service_IdentityToolkit_Relyingparty_Resource extends Google_Servic
 
 
 
-class Google_Service_IdentityToolkit_CreateAuthUriResponse extends Google_Model
+class Google_Service_IdentityToolkit_CreateAuthUriResponse extends Google_Collection
 {
+  protected $collection_key = 'allProviders';
   protected $internal_gapi_mappings = array(
   );
+  public $allProviders;
   public $authUri;
   public $captchaRequired;
   public $forExistingProvider;
   public $kind;
   public $providerId;
   public $registered;
+  public $sessionId;
 
 
+  public function setAllProviders($allProviders)
+  {
+    $this->allProviders = $allProviders;
+  }
+  public function getAllProviders()
+  {
+    return $this->allProviders;
+  }
   public function setAuthUri($authUri)
   {
     $this->authUri = $authUri;
@@ -334,6 +414,14 @@ class Google_Service_IdentityToolkit_CreateAuthUriResponse extends Google_Model
   public function getRegistered()
   {
     return $this->registered;
+  }
+  public function setSessionId($sessionId)
+  {
+    $this->sessionId = $sessionId;
+  }
+  public function getSessionId()
+  {
+    return $this->sessionId;
   }
 }
 
@@ -423,10 +511,19 @@ class Google_Service_IdentityToolkit_GetOobConfirmationCodeResponse extends Goog
 {
   protected $internal_gapi_mappings = array(
   );
+  public $email;
   public $kind;
   public $oobCode;
 
 
+  public function setEmail($email)
+  {
+    $this->email = $email;
+  }
+  public function getEmail()
+  {
+    return $this->email;
+  }
   public function setKind($kind)
   {
     $this->kind = $kind;
@@ -445,6 +542,41 @@ class Google_Service_IdentityToolkit_GetOobConfirmationCodeResponse extends Goog
   }
 }
 
+class Google_Service_IdentityToolkit_GetRecaptchaParamResponse extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $kind;
+  public $recaptchaSiteKey;
+  public $recaptchaStoken;
+
+
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+  public function setRecaptchaSiteKey($recaptchaSiteKey)
+  {
+    $this->recaptchaSiteKey = $recaptchaSiteKey;
+  }
+  public function getRecaptchaSiteKey()
+  {
+    return $this->recaptchaSiteKey;
+  }
+  public function setRecaptchaStoken($recaptchaStoken)
+  {
+    $this->recaptchaStoken = $recaptchaStoken;
+  }
+  public function getRecaptchaStoken()
+  {
+    return $this->recaptchaStoken;
+  }
+}
+
 class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyCreateAuthUriRequest extends Google_Model
 {
   protected $internal_gapi_mappings = array(
@@ -454,6 +586,8 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyCreateAuthUriReq
   public $context;
   public $continueUri;
   public $identifier;
+  public $oauthConsumerKey;
+  public $oauthScope;
   public $openidRealm;
   public $otaApp;
   public $providerId;
@@ -499,6 +633,22 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyCreateAuthUriReq
   {
     return $this->identifier;
   }
+  public function setOauthConsumerKey($oauthConsumerKey)
+  {
+    $this->oauthConsumerKey = $oauthConsumerKey;
+  }
+  public function getOauthConsumerKey()
+  {
+    return $this->oauthConsumerKey;
+  }
+  public function setOauthScope($oauthScope)
+  {
+    $this->oauthScope = $oauthScope;
+  }
+  public function getOauthScope()
+  {
+    return $this->oauthScope;
+  }
   public function setOpenidRealm($openidRealm)
   {
     $this->openidRealm = $openidRealm;
@@ -529,9 +679,18 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyDeleteAccountReq
 {
   protected $internal_gapi_mappings = array(
   );
+  public $delegatedProjectNumber;
   public $localId;
 
 
+  public function setDelegatedProjectNumber($delegatedProjectNumber)
+  {
+    $this->delegatedProjectNumber = $delegatedProjectNumber;
+  }
+  public function getDelegatedProjectNumber()
+  {
+    return $this->delegatedProjectNumber;
+  }
   public function setLocalId($localId)
   {
     $this->localId = $localId;
@@ -546,10 +705,19 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyDownloadAccountR
 {
   protected $internal_gapi_mappings = array(
   );
+  public $delegatedProjectNumber;
   public $maxResults;
   public $nextPageToken;
 
 
+  public function setDelegatedProjectNumber($delegatedProjectNumber)
+  {
+    $this->delegatedProjectNumber = $delegatedProjectNumber;
+  }
+  public function getDelegatedProjectNumber()
+  {
+    return $this->delegatedProjectNumber;
+  }
   public function setMaxResults($maxResults)
   {
     $this->maxResults = $maxResults;
@@ -604,8 +772,50 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyGetAccountInfoRe
   }
 }
 
-class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyGetPublicKeysResponse extends Google_Model
+class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyGetProjectConfigResponse extends Google_Collection
 {
+  protected $collection_key = 'idpConfig';
+  protected $internal_gapi_mappings = array(
+  );
+  public $allowPasswordUser;
+  public $apiKey;
+  protected $idpConfigType = 'Google_Service_IdentityToolkit_IdpConfig';
+  protected $idpConfigDataType = 'array';
+  public $projectId;
+
+
+  public function setAllowPasswordUser($allowPasswordUser)
+  {
+    $this->allowPasswordUser = $allowPasswordUser;
+  }
+  public function getAllowPasswordUser()
+  {
+    return $this->allowPasswordUser;
+  }
+  public function setApiKey($apiKey)
+  {
+    $this->apiKey = $apiKey;
+  }
+  public function getApiKey()
+  {
+    return $this->apiKey;
+  }
+  public function setIdpConfig($idpConfig)
+  {
+    $this->idpConfig = $idpConfig;
+  }
+  public function getIdpConfig()
+  {
+    return $this->idpConfig;
+  }
+  public function setProjectId($projectId)
+  {
+    $this->projectId = $projectId;
+  }
+  public function getProjectId()
+  {
+    return $this->projectId;
+  }
 }
 
 class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyResetPasswordRequest extends Google_Model
@@ -659,15 +869,20 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySetAccountInfoRe
   );
   public $captchaChallenge;
   public $captchaResponse;
+  public $delegatedProjectNumber;
+  public $disableUser;
   public $displayName;
   public $email;
   public $emailVerified;
   public $idToken;
+  public $instanceId;
   public $localId;
   public $oobCode;
   public $password;
+  public $photoUrl;
   public $provider;
   public $upgradeToFederatedLogin;
+  public $validSince;
 
 
   public function setCaptchaChallenge($captchaChallenge)
@@ -685,6 +900,22 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySetAccountInfoRe
   public function getCaptchaResponse()
   {
     return $this->captchaResponse;
+  }
+  public function setDelegatedProjectNumber($delegatedProjectNumber)
+  {
+    $this->delegatedProjectNumber = $delegatedProjectNumber;
+  }
+  public function getDelegatedProjectNumber()
+  {
+    return $this->delegatedProjectNumber;
+  }
+  public function setDisableUser($disableUser)
+  {
+    $this->disableUser = $disableUser;
+  }
+  public function getDisableUser()
+  {
+    return $this->disableUser;
   }
   public function setDisplayName($displayName)
   {
@@ -718,6 +949,14 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySetAccountInfoRe
   {
     return $this->idToken;
   }
+  public function setInstanceId($instanceId)
+  {
+    $this->instanceId = $instanceId;
+  }
+  public function getInstanceId()
+  {
+    return $this->instanceId;
+  }
   public function setLocalId($localId)
   {
     $this->localId = $localId;
@@ -742,6 +981,14 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySetAccountInfoRe
   {
     return $this->password;
   }
+  public function setPhotoUrl($photoUrl)
+  {
+    $this->photoUrl = $photoUrl;
+  }
+  public function getPhotoUrl()
+  {
+    return $this->photoUrl;
+  }
   public function setProvider($provider)
   {
     $this->provider = $provider;
@@ -758,6 +1005,57 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySetAccountInfoRe
   {
     return $this->upgradeToFederatedLogin;
   }
+  public function setValidSince($validSince)
+  {
+    $this->validSince = $validSince;
+  }
+  public function getValidSince()
+  {
+    return $this->validSince;
+  }
+}
+
+class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySignOutUserRequest extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $instanceId;
+  public $localId;
+
+
+  public function setInstanceId($instanceId)
+  {
+    $this->instanceId = $instanceId;
+  }
+  public function getInstanceId()
+  {
+    return $this->instanceId;
+  }
+  public function setLocalId($localId)
+  {
+    $this->localId = $localId;
+  }
+  public function getLocalId()
+  {
+    return $this->localId;
+  }
+}
+
+class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartySignOutUserResponse extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $localId;
+
+
+  public function setLocalId($localId)
+  {
+    $this->localId = $localId;
+  }
+  public function getLocalId()
+  {
+    return $this->localId;
+  }
 }
 
 class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyUploadAccountRequest extends Google_Collection
@@ -765,6 +1063,7 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyUploadAccountReq
   protected $collection_key = 'users';
   protected $internal_gapi_mappings = array(
   );
+  public $delegatedProjectNumber;
   public $hashAlgorithm;
   public $memoryCost;
   public $rounds;
@@ -774,6 +1073,14 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyUploadAccountReq
   protected $usersDataType = 'array';
 
 
+  public function setDelegatedProjectNumber($delegatedProjectNumber)
+  {
+    $this->delegatedProjectNumber = $delegatedProjectNumber;
+  }
+  public function getDelegatedProjectNumber()
+  {
+    return $this->delegatedProjectNumber;
+  }
   public function setHashAlgorithm($hashAlgorithm)
   {
     $this->hashAlgorithm = $hashAlgorithm;
@@ -828,11 +1135,31 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyAssertionR
 {
   protected $internal_gapi_mappings = array(
   );
+  public $delegatedProjectNumber;
+  public $instanceId;
   public $pendingIdToken;
   public $postBody;
   public $requestUri;
+  public $returnRefreshToken;
+  public $sessionId;
 
 
+  public function setDelegatedProjectNumber($delegatedProjectNumber)
+  {
+    $this->delegatedProjectNumber = $delegatedProjectNumber;
+  }
+  public function getDelegatedProjectNumber()
+  {
+    return $this->delegatedProjectNumber;
+  }
+  public function setInstanceId($instanceId)
+  {
+    $this->instanceId = $instanceId;
+  }
+  public function getInstanceId()
+  {
+    return $this->instanceId;
+  }
   public function setPendingIdToken($pendingIdToken)
   {
     $this->pendingIdToken = $pendingIdToken;
@@ -857,6 +1184,48 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyAssertionR
   {
     return $this->requestUri;
   }
+  public function setReturnRefreshToken($returnRefreshToken)
+  {
+    $this->returnRefreshToken = $returnRefreshToken;
+  }
+  public function getReturnRefreshToken()
+  {
+    return $this->returnRefreshToken;
+  }
+  public function setSessionId($sessionId)
+  {
+    $this->sessionId = $sessionId;
+  }
+  public function getSessionId()
+  {
+    return $this->sessionId;
+  }
+}
+
+class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyCustomTokenRequest extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $instanceId;
+  public $token;
+
+
+  public function setInstanceId($instanceId)
+  {
+    $this->instanceId = $instanceId;
+  }
+  public function getInstanceId()
+  {
+    return $this->instanceId;
+  }
+  public function setToken($token)
+  {
+    $this->token = $token;
+  }
+  public function getToken()
+  {
+    return $this->token;
+  }
 }
 
 class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyPasswordRequest extends Google_Model
@@ -865,7 +1234,9 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyPasswordRe
   );
   public $captchaChallenge;
   public $captchaResponse;
+  public $delegatedProjectNumber;
   public $email;
+  public $instanceId;
   public $password;
   public $pendingIdToken;
 
@@ -886,6 +1257,14 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyPasswordRe
   {
     return $this->captchaResponse;
   }
+  public function setDelegatedProjectNumber($delegatedProjectNumber)
+  {
+    $this->delegatedProjectNumber = $delegatedProjectNumber;
+  }
+  public function getDelegatedProjectNumber()
+  {
+    return $this->delegatedProjectNumber;
+  }
   public function setEmail($email)
   {
     $this->email = $email;
@@ -893,6 +1272,14 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyPasswordRe
   public function getEmail()
   {
     return $this->email;
+  }
+  public function setInstanceId($instanceId)
+  {
+    $this->instanceId = $instanceId;
+  }
+  public function getInstanceId()
+  {
+    return $this->instanceId;
   }
   public function setPassword($password)
   {
@@ -909,6 +1296,50 @@ class Google_Service_IdentityToolkit_IdentitytoolkitRelyingpartyVerifyPasswordRe
   public function getPendingIdToken()
   {
     return $this->pendingIdToken;
+  }
+}
+
+class Google_Service_IdentityToolkit_IdpConfig extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $clientId;
+  public $enabled;
+  public $experimentPercent;
+  public $provider;
+
+
+  public function setClientId($clientId)
+  {
+    $this->clientId = $clientId;
+  }
+  public function getClientId()
+  {
+    return $this->clientId;
+  }
+  public function setEnabled($enabled)
+  {
+    $this->enabled = $enabled;
+  }
+  public function getEnabled()
+  {
+    return $this->enabled;
+  }
+  public function setExperimentPercent($experimentPercent)
+  {
+    $this->experimentPercent = $experimentPercent;
+  }
+  public function getExperimentPercent()
+  {
+    return $this->experimentPercent;
+  }
+  public function setProvider($provider)
+  {
+    $this->provider = $provider;
+  }
+  public function getProvider()
+  {
+    return $this->provider;
   }
 }
 
@@ -1027,6 +1458,8 @@ class Google_Service_IdentityToolkit_SetAccountInfoResponse extends Google_Colle
   public $email;
   public $idToken;
   public $kind;
+  public $newEmail;
+  public $photoUrl;
   protected $providerUserInfoType = 'Google_Service_IdentityToolkit_SetAccountInfoResponseProviderUserInfo';
   protected $providerUserInfoDataType = 'array';
 
@@ -1062,6 +1495,22 @@ class Google_Service_IdentityToolkit_SetAccountInfoResponse extends Google_Colle
   public function getKind()
   {
     return $this->kind;
+  }
+  public function setNewEmail($newEmail)
+  {
+    $this->newEmail = $newEmail;
+  }
+  public function getNewEmail()
+  {
+    return $this->newEmail;
+  }
+  public function setPhotoUrl($photoUrl)
+  {
+    $this->photoUrl = $photoUrl;
+  }
+  public function getPhotoUrl()
+  {
+    return $this->photoUrl;
   }
   public function setProviderUserInfo($providerUserInfo)
   {
@@ -1167,6 +1616,7 @@ class Google_Service_IdentityToolkit_UserInfo extends Google_Collection
   protected $collection_key = 'providerUserInfo';
   protected $internal_gapi_mappings = array(
   );
+  public $disabled;
   public $displayName;
   public $email;
   public $emailVerified;
@@ -1177,9 +1627,18 @@ class Google_Service_IdentityToolkit_UserInfo extends Google_Collection
   protected $providerUserInfoType = 'Google_Service_IdentityToolkit_UserInfoProviderUserInfo';
   protected $providerUserInfoDataType = 'array';
   public $salt;
+  public $validSince;
   public $version;
 
 
+  public function setDisabled($disabled)
+  {
+    $this->disabled = $disabled;
+  }
+  public function getDisabled()
+  {
+    return $this->disabled;
+  }
   public function setDisplayName($displayName)
   {
     $this->displayName = $displayName;
@@ -1252,6 +1711,14 @@ class Google_Service_IdentityToolkit_UserInfo extends Google_Collection
   {
     return $this->salt;
   }
+  public function setValidSince($validSince)
+  {
+    $this->validSince = $validSince;
+  }
+  public function getValidSince()
+  {
+    return $this->validSince;
+  }
   public function setVersion($version)
   {
     $this->version = $version;
@@ -1267,6 +1734,7 @@ class Google_Service_IdentityToolkit_UserInfoProviderUserInfo extends Google_Mod
   protected $internal_gapi_mappings = array(
   );
   public $displayName;
+  public $email;
   public $federatedId;
   public $photoUrl;
   public $providerId;
@@ -1279,6 +1747,14 @@ class Google_Service_IdentityToolkit_UserInfoProviderUserInfo extends Google_Mod
   public function getDisplayName()
   {
     return $this->displayName;
+  }
+  public function setEmail($email)
+  {
+    $this->email = $email;
+  }
+  public function getEmail()
+  {
+    return $this->email;
   }
   public function setFederatedId($federatedId)
   {
@@ -1330,7 +1806,11 @@ class Google_Service_IdentityToolkit_VerifyAssertionResponse extends Google_Coll
   public $lastName;
   public $localId;
   public $needConfirmation;
+  public $needEmail;
   public $nickName;
+  public $oauthAccessToken;
+  public $oauthAuthorizationCode;
+  public $oauthExpireIn;
   public $oauthRequestToken;
   public $oauthScope;
   public $originalEmail;
@@ -1492,6 +1972,14 @@ class Google_Service_IdentityToolkit_VerifyAssertionResponse extends Google_Coll
   {
     return $this->needConfirmation;
   }
+  public function setNeedEmail($needEmail)
+  {
+    $this->needEmail = $needEmail;
+  }
+  public function getNeedEmail()
+  {
+    return $this->needEmail;
+  }
   public function setNickName($nickName)
   {
     $this->nickName = $nickName;
@@ -1499,6 +1987,30 @@ class Google_Service_IdentityToolkit_VerifyAssertionResponse extends Google_Coll
   public function getNickName()
   {
     return $this->nickName;
+  }
+  public function setOauthAccessToken($oauthAccessToken)
+  {
+    $this->oauthAccessToken = $oauthAccessToken;
+  }
+  public function getOauthAccessToken()
+  {
+    return $this->oauthAccessToken;
+  }
+  public function setOauthAuthorizationCode($oauthAuthorizationCode)
+  {
+    $this->oauthAuthorizationCode = $oauthAuthorizationCode;
+  }
+  public function getOauthAuthorizationCode()
+  {
+    return $this->oauthAuthorizationCode;
+  }
+  public function setOauthExpireIn($oauthExpireIn)
+  {
+    $this->oauthExpireIn = $oauthExpireIn;
+  }
+  public function getOauthExpireIn()
+  {
+    return $this->oauthExpireIn;
   }
   public function setOauthRequestToken($oauthRequestToken)
   {
@@ -1558,6 +2070,32 @@ class Google_Service_IdentityToolkit_VerifyAssertionResponse extends Google_Coll
   }
 }
 
+class Google_Service_IdentityToolkit_VerifyCustomTokenResponse extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $idToken;
+  public $kind;
+
+
+  public function setIdToken($idToken)
+  {
+    $this->idToken = $idToken;
+  }
+  public function getIdToken()
+  {
+    return $this->idToken;
+  }
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+}
+
 class Google_Service_IdentityToolkit_VerifyPasswordResponse extends Google_Model
 {
   protected $internal_gapi_mappings = array(
@@ -1567,6 +2105,9 @@ class Google_Service_IdentityToolkit_VerifyPasswordResponse extends Google_Model
   public $idToken;
   public $kind;
   public $localId;
+  public $oauthAccessToken;
+  public $oauthAuthorizationCode;
+  public $oauthExpireIn;
   public $photoUrl;
   public $registered;
 
@@ -1610,6 +2151,30 @@ class Google_Service_IdentityToolkit_VerifyPasswordResponse extends Google_Model
   public function getLocalId()
   {
     return $this->localId;
+  }
+  public function setOauthAccessToken($oauthAccessToken)
+  {
+    $this->oauthAccessToken = $oauthAccessToken;
+  }
+  public function getOauthAccessToken()
+  {
+    return $this->oauthAccessToken;
+  }
+  public function setOauthAuthorizationCode($oauthAuthorizationCode)
+  {
+    $this->oauthAuthorizationCode = $oauthAuthorizationCode;
+  }
+  public function getOauthAuthorizationCode()
+  {
+    return $this->oauthAuthorizationCode;
+  }
+  public function setOauthExpireIn($oauthExpireIn)
+  {
+    $this->oauthExpireIn = $oauthExpireIn;
+  }
+  public function getOauthExpireIn()
+  {
+    return $this->oauthExpireIn;
   }
   public function setPhotoUrl($photoUrl)
   {

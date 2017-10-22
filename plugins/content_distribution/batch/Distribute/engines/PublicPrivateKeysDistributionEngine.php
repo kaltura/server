@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage Scheduler.Distribute
  */
-abstract class SftpDistributionEngine extends DistributionEngine
+abstract class PublicPrivateKeysDistributionEngine extends DistributionEngine
 {
 	
 	abstract function getTempDirectory();
@@ -30,7 +30,7 @@ abstract class SftpDistributionEngine extends DistributionEngine
 	{
 		$tempFilePath = $this->tempDirectory . '/' . $this->getTempDirectory() . '/' . $distributionProfileId . '/';
 		if (!file_exists($tempFilePath))		
-			mkdir($tempFilePath, 0777, true);
+			kFile::fullMkfileDir($tempFilePath);
 		return $tempFilePath;
 	}
 

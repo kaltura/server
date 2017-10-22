@@ -29,6 +29,12 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
          */
         public function run($jobs = null)
         {
+			$pidFileName = isset(KBatchBase::$taskConfig->params->tempDirectoryPath)? KBatchBase::$taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
+			$pidFileName.= '/chunked_encode_scheduler.pid';
+			if($this->lockSchedulerProcessId($pidFileName,get_class($this))==false){
+				return("Duplicate Chunk Schedulers");
+			}
+
 				/*
 				 * 'chunkedEncodeMemcacheHost' and 'chunkedEncodeMemcachePort'
 				 * are mandatory
@@ -73,6 +79,39 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 			}
         }
 
+        /*************
+         * 
+         */
+		private static function lockSchedulerProcessId($fileName, $processName)
+		{
+			KalturaLog::log("pidFilename($fileName), processName($processName)");
+			$myPid = getmypid();
+			KalturaLog::log("myPid:$myPid");
+			if(!file_exists($fileName)){
+				file_put_contents($fileName, $myPid);
+				KalturaLog::log("Locking process ($processName,pid:$myPid) in file ($fileName)");
+				return true;
+			}
+			if(file_exists($fileName)){
+				$lockPid = (int)file_get_contents($fileName);
+				if($lockPid==0) {
+					KalturaLog::log("Don't lock process ($processName,pid:$myPid). Allow duplicates.");
+					return true;
+				}
+				$output = shell_exec("pgrep -f $processName");
+				$pidArr = explode("\n", $output);
+				foreach($pidArr as $pid) {
+					$pid = trim($pid);
+					if($pid==$lockPid) {
+						$output = shell_exec("kill -9 $lockPid");
+						KalturaLog::log("Killed running process ($processName, pid:$pid)");
+					}
+				}
+			}
+			file_put_contents($fileName, $myPid);
+			KalturaLog::log("Locking process ($processName,pid:$myPid) in file ($fileName)");
+			return true;
+		}
 
 }
 

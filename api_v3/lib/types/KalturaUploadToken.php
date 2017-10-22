@@ -82,6 +82,13 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 */
 	public $uploadUrl;
 	
+	/**
+	 * autoFinalize - Should the upload be finalized once the file size on disk matches the file size reproted when adding the upload token.
+	 * @var KalturaNullableBoolean
+	 * @insertonly
+	 */
+	public $autoFinalize;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -93,6 +100,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"uploadedFileSize",
 		"createdAt",
 		"updatedAt",
+		"autoFinalize",
 	);
 
 	/* (non-PHPdoc)
@@ -119,5 +127,20 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		
+		//If autoFinalize flag was set check file size also provided
+		if(isset($this->autoFinalize) && $this->autoFinalize == KalturaNullableBoolean::TRUE_VALUE)
+		{
+			if(!isset($this->fileSize))
+				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_MISSING_FILE_SIZE);
+		}
 	}
 }

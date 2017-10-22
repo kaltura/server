@@ -1317,7 +1317,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setTotalRank(0);
 	}
 
-	public static function copyEntryData(entry $entry, entry $targetEntry, $copyFlavors = true)
+	public static function copyEntryData(entry $entry, entry $targetEntry, $copyFlavors = true, $copyCaptions = true)
 	{
 		// for any type that does not require assets:
 		$shouldCopyDataForNonClip = true;
@@ -1394,16 +1394,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset, $copyFlavors))
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions))
 			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
 	}
 
-	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset))
+			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset)
+			|| ( !$copyCaptions && $sourceAsset instanceof captionAsset))
 			return false;
 		return true;
 	}
@@ -1431,10 +1432,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		$copyUsers = true;
 		$copyCategories = true;
-	    $copyChildren = false;
-	    $copyAccessControl = true;
-	    $copyMetaData = true;
-	    $copyFlavors  = true;
+		$copyChildren = false;
+		$copyAccessControl = true;
+		$copyMetaData = true;
+		$copyFlavors  = true;
+		$copyCaptions  = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1466,6 +1468,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if ($currentOption == BaseEntryCloneOptions::FLAVORS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 			{
 				$copyFlavors = false;
+			}
+			if ($currentOption == BaseEntryCloneOptions::CAPTIONS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyCaptions = false;
 			}
 		}
 
@@ -1534,6 +1540,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		if (!$copyMetaData)
 		    $newEntry->copyMetaData = false;
 
+		$newEntry->setSourceType(self::getCloneSourceType($entry->getSourceType()),true);
+
+	    $quizData = $entry->getFromCustomData( QuizPlugin::QUIZ_DATA );
+	    if ($quizData)
+	    {
+		    $newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
+		    $newEntry->addCapability(QuizPlugin::getCapatabilityCoreValue());
+	    }
+
 	    // save the entry
  		$newEntry->save();
  		 		
@@ -1547,7 +1562,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
 		} else {
-			self::copyEntryData( $entry, $newEntry, $copyFlavors );
+			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
 
  	    //if entry is a static playlist, link between it and its new child entries
@@ -1712,7 +1727,29 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	    }
 	    return $newEntry;
  	} 	
- 	
+
+	private static function getCloneSourceType($originSourceType)
+	{
+		$targetSourceType = $originSourceType;
+		switch ($originSourceType)
+		{
+			case EntrySourceType::FILE:
+			case EntrySourceType::WEBCAM:
+			case EntrySourceType::URL:
+			case EntrySourceType::RECORDED_LIVE:
+			case EntrySourceType::CLIP:
+			case EntrySourceType::KALTURA_RECORDED_LIVE:
+			case EntrySourceType::LECTURE_CAPTURE:
+			case EntrySourceType::SEARCH_PROVIDER:
+				$targetSourceType = EntrySourceType::CLIP;
+				break;
+			default:
+				break;
+		}
+
+		return $targetSourceType;
+	}
+
  	/*
  	 * re-index to search index, and recalculate fields.
  	 */
@@ -1884,6 +1921,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$childCopy = self::copyEntry($child, $toPartner, $cloneOptions);
 				$childCopy->setParentEntryId($newEntry->getId());
+				$childCopy->setSourceEntryId($child->getId());
 				$childCopy->save();
 			}
 		}
@@ -1922,10 +1960,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	public static function getFlavorSupportedByPackagerForVolumeMap($entryId)
 	{
-		//look for the lowest bitrate flavor
 		$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
-
-		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+		if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
 		{
 			// look for the lowest bitrate flavor the packager can parse
 			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
@@ -1933,10 +1969,59 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				//retrieve original ready
 				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
-				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+				if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
 					return null;
 			}
 		}
 		return $flavorAsset;
 	}
+
+	public static function getVolumeMapContent($flavorAsset)
+	{
+		$flavorId = $flavorAsset->getId();
+		$entryId = $flavorAsset->getEntryId();
+
+		$packagerRetries = 3;
+		$content = null;
+		while ($packagerRetries && !$content)
+		{
+			$content = self::retrieveLocalVolumeMapFromPackager($flavorAsset);
+			$packagerRetries--;
+		}
+		if(!$content)
+			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+
+		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
+		return new kRendererString($content, 'text/csv');
+	}
+
+
+	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
+	{
+		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
+		if (!$packagerVolumeMapUrlPattern)
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
+		if (!$entry_data_path)
+			return null;
+
+		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
+		if(!$content)
+			return false;
+
+		return $content;
+	}
+
+	private static function curlLocalVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
+	{
+		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
+		kFile::closeDbConnections();
+		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
+		return $content;
+	}
+
+
 }

@@ -93,7 +93,7 @@ class setRoughcutThumbnailAction extends defKeditorservicesAction
 		kFile::fullMkdir ( $path );
 		myFileConverter::createImageThumbnail( $bigThumbPath , $path );
 		
-		$roughcutPath = myContentStorage::getFSContentRootPath() . $entry->getDataPath();
+		$roughcutPath = $entry->getFullDataPath();
 		$xml_doc = new KDOMDocument();
 		$xml_doc->load( $roughcutPath );
 		
