@@ -39,7 +39,7 @@ class PdfGenerator extends FPDF
                                 $unit='mm', $size='A4')
     {
 
-        $this->FPDF($orientation,$unit,$size);
+        parent::__construct($orientation,$unit,$size);
 
         if (isset($sig) && is_string($sig))
         {
