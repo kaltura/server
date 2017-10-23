@@ -450,6 +450,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		
 		$query[self::DRUID_GRANULARITY] = self::getGranularityAll();
 		$queryResult = self::runQuery($query);
+		KalturaLog::log("Druid returned [" . count($queryResult) . "] rows");
 	
 		// format the results
 		$result = array();

@@ -472,6 +472,7 @@ class kKavaReportsMgr extends kKavaBase
         }
         
         $result = self::runQuery($query);
+        KalturaLog::log("Druid returned [" . count($result) . "] rows");
         
         $graph_metrics = $report_def[self::REPORT_GRAPH_METRICS];
         foreach ($graph_metrics as $column)
@@ -576,11 +577,16 @@ class kKavaReportsMgr extends kKavaBase
         {
         	$query = self::getSearchReport($partner_id, $intervals, array($dimension), $druid_filter);
         	$result = self::runQuery($query);
-        	$rows = $result[0][self::DRUID_RESULT];
+        	        	 
         	$data = array();
-        	foreach ($rows as $row)
+        	if ($result)
         	{
-        		$data[] = array($row[self::DRUID_VALUE]);
+	        	$rows = $result[0][self::DRUID_RESULT];
+	        	KalturaLog::log("Druid returned [" . count($rows) . "] rows");
+	        	foreach ($rows as $row)
+	        	{
+	        		$data[] = array($row[self::DRUID_VALUE]);
+	        	}
         	}
         	return array($report_def[self::REPORT_DETAIL_DIM_HEADERS], $data, count($data));
         }
@@ -633,7 +639,8 @@ class kKavaReportsMgr extends kKavaBase
 	        
 	        $rows = $result[0][self::DRUID_RESULT];
 	        $rows_count = count($rows);
-
+	        KalturaLog::log("Druid returned [$rows_count] rows");
+	         
 	        $rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);
 	        if (!$rows)
 	        {
@@ -694,6 +701,7 @@ class kKavaReportsMgr extends kKavaBase
 
         $rows = $result[0][self::DRUID_RESULT];
         $rows_count = count($rows);
+        KalturaLog::log("Druid returned [$rows_count] rows");
         
         $rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);    
         if (!$rows)

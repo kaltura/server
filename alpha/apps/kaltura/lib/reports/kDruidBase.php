@@ -203,13 +203,17 @@ class kDruidBase
 			return array();
 		}
 		$result = reset($result);
-		return $result[self::DRUID_RESULT];
+		$result = $result[self::DRUID_RESULT];
+		KalturaLog::log("Druid returned [" . count($result) . "] rows");
+		return $result;
 	}
 	
 	protected static function runGranularityPeriodQuery($query, $period)
 	{
 		$query[self::DRUID_GRANULARITY] = self::getGranularityPeriod($period);
-		return self::runQuery($query);
+		$result = self::runQuery($query);
+		KalturaLog::log("Druid returned [" . count($result) . "] rows");
+		return $result;
 	}
 	
 	protected static function runQuery($content) 
