@@ -88,7 +88,7 @@ class DocumentsService extends KalturaEntryService
 		}
 			
 		$dbEntry = $this->prepareEntryForInsert($documentEntry);
-		$dbEntry->setSource(KalturaSourceType::FILE);
+		$dbEntry->setSource(EntrySourceType::FILE);
 		$dbEntry->setSourceLink("file:$entryFullPath");
 		$dbEntry->save();
 	

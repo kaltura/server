@@ -49,15 +49,12 @@ class FileSync extends BaseFileSync implements IBaseObject
 		{
 			if ($this->getEncryptionKey()) 
 			{
+				//the file will not be encrypted so we delete the old encryption key
 				$this->setEncryptionKey(null);
 				$this->save();
 			}
 			return;
 		}
-
-		if ($this->getEncryptionKey())
-			return;
-			
 
 		$this->setEncryptionKey($this->getObjectId());
 		$this->save();
@@ -91,8 +88,13 @@ class FileSync extends BaseFileSync implements IBaseObject
 			return false;
 		
 		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
-		$fileTypeToEncrypt = kConf::get('image_file_ext');
-		return in_array($type, $fileTypeToEncrypt);
+
+		//$fileTypeToEncrypt = kConf::get('image_file_ext');
+		//$fileTypeToEncrypt = array_merge($fileTypeToEncrypt, array('pdf','doc'));
+
+		$fileTypeNotToEncrypt = kConf::get('video_file_ext');
+		return !in_array($type, $fileTypeNotToEncrypt);
+
 	}
 
 

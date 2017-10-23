@@ -889,7 +889,7 @@ class ThumbAssetService extends KalturaAssetService
 		$tmpPath = $fileSync->createTempClear();
 		list($width, $height, $type, $attr) = getimagesize($tmpPath);
 		$fileSize = kFileBase::fileSize($tmpPath);
-		$fileSync->deleteTempClear();
+		$fileSync->deleteTempClear(); // unlink the $tmpPath
 		
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
