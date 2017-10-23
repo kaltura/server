@@ -2,7 +2,6 @@
 
 require_once(dirname(__file__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__file__) . '/kRendererBase.php');
-
 require_once(dirname(__file__) . '/../../../../../infra/storage/kEncryptFileUtils.php');
 /*
  * @package server-infra
