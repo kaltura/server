@@ -1,3 +1,23 @@
+# Mercury 13.6.0 #
+
+## Fix typo in admin console ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+	- Edit admin.ini
+        'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment' change to 'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy collaboration'
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Mercury 13.5.0 #
 
 ## Add permissions to eSearch service ##
