@@ -18,8 +18,8 @@ class googleoauth2Action extends oauth2Action
 	public function execute()
 	{
 		// add google client library to include path
-		set_include_path(get_include_path().PATH_SEPARATOR.KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/');
-		require_once 'Google_Client.php';
+		set_include_path(get_include_path().PATH_SEPARATOR.KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google');
+		require_once 'Client.php';
 
 		$ks    = $this->getRequestParameter('ks');
 		$state = $this->getRequestParameter('state');
