@@ -385,7 +385,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	}
 
 	/**
-	 * Sey recorded video to live entry
+	 * Set recorded video to live entry
 	 *
 	 * @action setRecordedContent
 	 * @param string $entryId Live entry id
@@ -485,9 +485,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 	}
 
 	/**
-	 * @action createRecordedEntry
 	 * Create recorded entry id if it doesn't exist and make sure it happens on the DC that the live entry was created on.
-	 *
+	 * @action createRecordedEntry
 	 * @param string $entryId Live entry id
 	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
 	 * @param KalturaEntryServerNodeStatus $liveEntryStatus the status KalturaEntryServerNodeStatus::PLAYABLE | KalturaEntryServerNodeStatus::BROADCASTING
