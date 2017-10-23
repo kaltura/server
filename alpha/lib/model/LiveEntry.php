@@ -19,7 +19,8 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
 	const CUSTOM_DATA_SEGMENT_DURATION = 'segmentDuration';
 	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
-	const CUSTOM_DATA_EXPLICIT_LIVE_STATUS = "explicit_live_status";
+	const CUSTOM_DATA_VIEW_MODE = "view_mode";
+	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -457,7 +458,7 @@ abstract class LiveEntry extends entry
 		{
 			$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
 			$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-			if ($this->getExplicitLiveStatus() == ExplicitLiveStatus::PREVIEW && !$isAdmin && !$isUserAllowedPreview)
+			if ($this->getViewMode() == ViewMode::PREVIEW && !$isAdmin && !$isUserAllowedPreview)
 				return false;
 		}
 
@@ -932,15 +933,24 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData(self::CUSTOM_DATA_EXPLICIT_LIVE, $v);
 	}
 
-	public function getExplicitLiveStatus()
+	public function getViewMode()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_EXPLICIT_LIVE_STATUS, null, ExplicitLiveStatus::PREVIEW);
+		return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE, null, ViewMode::PREVIEW);
 	}
 
-	public function setExplicitLiveStatus($v)
+	public function setViewMode($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_EXPLICIT_LIVE_STATUS, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
 	}
 
+	public function getRecordingStatus()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_STATUS, null, RecordingStatus::ACTIVE);
+	}
+
+	public function setRecordingStatus($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
+	}
 
 }

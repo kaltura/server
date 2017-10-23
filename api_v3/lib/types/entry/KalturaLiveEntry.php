@@ -116,9 +116,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public $explicitLive;
 
 	/**
-	 * @var KalturaExplicitLiveStatus
+	 * @var KalturaViewMode
 	 */
-	public $explicitLiveStatus;
+	public $viewMode;
+
+	/**
+	 * @var KalturaRecordingStatus
+	 */
+	public $recordingStatus;
 
 	private static $map_between_objects = array
 	(
@@ -138,7 +143,8 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"liveStatus",
 		"segmentDuration",
 		"explicitLive",
-		"explicitLiveStatus",
+		"viewMode",
+		"recordingStatus",
 	);
 	
 	/* (non-PHPdoc)
