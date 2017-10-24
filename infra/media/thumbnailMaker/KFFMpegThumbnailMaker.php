@@ -83,8 +83,16 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		return $rv? false: true;
 	}
 	
-	protected function getCommand($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $vidDur = null)
+	protected function getCommand($position = null, $width = null, $height = null, $params = array())
 	{
+		$frameCount = $params['frameCount']; 
+		$targetType = $params['targetType']; 
+		$vidDur = 	$params['vidDur'];
+		$scanType = $params['scanType'];
+		if(isset($scanType) && $scanType==1)
+			$scanType = " -deinterlace";
+		else $scanType = null;
+
 		$dimensions = (is_null($width) || is_null($height)) ? '' : ("-s ". $width ."x" . $height);
 		
 		//In case the video length is less than 30 sec to the seek in the decoding phase and not in the muxing phase (related to SUP-2172)
@@ -101,9 +109,9 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		
 		$cmdArr = array();
 			// '-noautorotate' to adjust to ffm2.7.2 that automatically normalizes rotated sources
-		$cmdArr[] = "$this->cmdPath $position_str -noautorotate -i $this->srcPath -an -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
+		$cmdArr[] = "$this->cmdPath $position_str -noautorotate -i $this->srcPath -an$scanType -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
-		$cmdArr[] = "$this->cmdPath -noautorotate -i $this->srcPath $position_str -an -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
+		$cmdArr[] = "$this->cmdPath -noautorotate -i $this->srcPath $position_str -an$scanType -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
 		return $cmdArr;
 		
