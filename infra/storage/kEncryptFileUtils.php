@@ -25,7 +25,7 @@ class kEncryptFileUtils
 
     public static function getEncryptedFileContent($fileName, $key, $from_byte = 0, $len = 0)
     {
-        $data = kFile::getFileContent($fileName);
+        $data = kFileBase::getFileContent($fileName);
         $plainData = self::decryptData($data, $key);
         $len = min($len,0);
         if (!$from_byte && !$len)
@@ -36,12 +36,12 @@ class kEncryptFileUtils
     public static function setEncryptedFileContent($fileName, $key, $content)
     {
         $encryptedData = self::encryptData($content, $key);
-        kFile::setFileContent($fileName, $encryptedData);
+        kFileBase::setFileContent($fileName, $encryptedData);
     }
 
     public static function encryptFile($fileName, $key)
     {
-        $data = kFile::getFileContent($fileName);
+        $data = kFileBase::getFileContent($fileName);
         self::setEncryptedFileContent($fileName, $key, $data);
     }
 

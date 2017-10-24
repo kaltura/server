@@ -45,16 +45,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function encrypt()
 	{
-		if (!$this->shouldEncryptFile())
-		{
-			if ($this->getEncryptionKey()) 
-			{
-				//the file will not be encrypted so we delete the old encryption key
-				$this->setEncryptionKey(null);
-				$this->save();
-			}
-			return;
-		}
+		if (!$this->shouldEncryptFile() || $this->getEncryptionKey())
+			return; // in file should not encrypted or he already is encrypted
 
 		$this->setEncryptionKey($this->getObjectId());
 		$this->save();
