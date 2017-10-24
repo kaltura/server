@@ -315,6 +315,7 @@ class kBusinessPreConvertDL
 			{
 				/* @var $srcAsset flavorAsset */
 				$dar = null;
+				$params = array();
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
 				if($mediaInfo)
 					$dar = $mediaInfo->getVideoDar();
