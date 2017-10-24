@@ -295,7 +295,6 @@ class kBusinessPreConvertDL
 		if(!file_exists($tempDir))
 			mkdir($tempDir, 0700, true);
 		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
-		$logPath = $destPath . '.log';
 
 		if(!file_exists($srcPath))
 		{
