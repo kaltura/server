@@ -3098,11 +3098,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return sprintf('%u', crc32($this->getId()));
 	}
-	
+
 	/*
 	 * get all categoryEntry objects from categoryEntryPeer
 	 * to make search query shorter and to solve search problem when category tree is big.
- 	 *
+	 *
 	 *	lets say entry belong to 2 categories with these full_ids
 	 * 	111>222>333
 	 *	111>444
@@ -3119,43 +3119,57 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 * so why do we need p111?
 	 * If baseEntry->list with filter categoriesMatchOr= xxxxx you need to search for match p111s2
 	 */
-	public function getCategoriesEntryIds()
+	private static function getCategoriesByEntry($entryId)
 	{
-		$allCategoriesEntry = categoryEntryPeer::selectByEntryId($this->getId());
-		
+
+		$allCategoriesEntry = categoryEntryPeer::selectByEntryId($entryId);
 		$categoriesEntryStringIndex = array();
 		foreach($allCategoriesEntry as $categoryEntry)
 		{
 			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() .
 				self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
-			
+
 			//index all category's parents - for easier searchs on entry->list with filter of categoriesMatchOr
 			$categoryFullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryEntry->getCategoryFullIds());
-			
+
 			foreach($categoryFullIds as $categoryId)
 			{
 				if(!trim($categoryId))
 					continue;
-					
+
 				if($categoryId != $categoryEntry->getCategoryId())
 				{
 					//parent category
 					$categoriesEntryStringIndex[] = self::CATEGORY_PARENT_SEARCH_PERFIX . $categoryId .
 						self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
 				}
-				
+
 				//parent category or category itself
 				$categoriesEntryStringIndex[] = self::CATEGORY_OR_PARENT_SEARCH_PERFIX . $categoryId .
-						self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
+					self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
 			}
-				
+
 			if($categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE || $categoryEntry->getStatus() == CategoryEntryStatus::PENDING)
 				$categoriesEntryStringIndex[] = $categoryEntry->getCategoryId();
 		}
-		
-		$categoriesEntryStringIndex = array_unique($categoriesEntryStringIndex);
-		
-		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $categoriesEntryStringIndex);
+		return array_unique($categoriesEntryStringIndex);
+	}
+
+
+	/*
+	 * 1. Get all direct entry categories
+	 * 2. In case of child entry - get all parent categories also.
+	 */
+	public function getCategoriesEntryIds()
+	{
+		$entryCategories = self::getCategoriesByEntry ($this->getId());
+		if($this->getParentEntryId() != $this->getId())
+		{
+			$parentEntryId = $this->getParentEntryId();
+			$parentEntryCategories = self::getCategoriesByEntry($parentEntryId);
+			$entryCategories = array_unique (array_merge ($entryCategories , $parentEntryCategories));
+		}
+		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $entryCategories);
 	}
 	
 	/*
