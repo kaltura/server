@@ -3,6 +3,8 @@
  * @package Core
  * @subpackage externalWidgets
  */
+require_once(dirname(__file__) . '/../kExtWidgetUtils.php');
+
 class serveIsmAction extends sfAction
 {
 	/**
