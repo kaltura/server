@@ -22,10 +22,8 @@ class YouTubeDistributionGoogleClientHelper
 			return self::$_googleClient;
 
 		// add google client library to include path
-		set_include_path(get_include_path().PATH_SEPARATOR.KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google');
-		require_once 'autoload.php';
-		require_once 'Client.php';
-
+		set_include_path(get_include_path().PATH_SEPARATOR.KALTURA_ROOT_PATH.'/vendor/google-api-php-client/src/');
+		require_once 'Google_Client.php';
 
 		$client = new Google_Client();
 		$client->setClientId($clientId);
