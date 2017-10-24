@@ -146,6 +146,7 @@ class googleoauth2Action extends oauth2Action
 			$this->ksError = true;
 			return;
 		}
+
 		$appId = isset($stateObject->ytid) ? $stateObject->ytid : null;
 		$subId = isset($stateObject->subid) ? $stateObject->subid : null;
 		$partner = $this->getPartner($limitedKs->partner_id);
