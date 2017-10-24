@@ -194,6 +194,12 @@ class kEventsManager
 				$multiDeferredEvent = self::popNextDeferredEvent(self::$multiDeferredEvents);
 				self::raiseEvent($multiDeferredEvent);
 			}
+			//in case the multi deferred events raise a deferred event
+			while (count(self::$deferredEvents))
+			{
+				$deferredEvent = self::popNextDeferredEvent(self::$deferredEvents);
+				self::raiseEvent($deferredEvent);
+			}
 		}
 		
 		KalturaLog::log("finished flushing deferred events");
