@@ -16,18 +16,35 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = null, $vidDur = null)
+	public function createThumnail($position = null, $width = null, $height = null, $params = array())
 	{
-		if(!isset($frameCount))
-			$frameCount = 1;
-		if(!isset($targetType))
-			$targetType = "image2";
-		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar], vidDur[$vidDur]");
+		if(!array_key_exists('frameCount', $params)){
+			$params['frameCount'] = 1; 
+		}
+		
+		if(!array_key_exists ('targetType', $params)){
+			$params['targetType'] = "image2"; 
+		}
+		
+		if(!array_key_exists ('dar', $params)){
+			$params['dar'] = null;
+		}
+		
+		if(!array_key_exists ('vidDur', $params)){
+			$params['vidDur'] = null;
+		}
+		
+		if(!array_key_exists ('scanType', $params)){
+			$params['scanType'] = null;
+		}
+		
+		KalturaLog::debug("position[$position], width[$width], height[$height], params[".serialize($params)."]");
+		$dar = $params['dar'];
 		if(isset($dar) && $dar>0 && isset($height)){
-			$width = floor(round($height*$dar)  /2) * 2;
+			$width = floor(round($height*$dar) /2) * 2;
 		}
 		// TODO - calculate the width and height according to dar
-		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType, $vidDur);
+		$cmdArr = $this->getCommand($position, $width, $height, $params);
 
 		$cmd= $cmdArr[0];
 		$rv = null;
