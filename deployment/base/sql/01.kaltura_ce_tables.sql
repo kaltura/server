@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `access_control` (
   `prv_restrict_length` int(11) DEFAULT NULL,
   `kdir_restrict_type` tinyint(4) DEFAULT NULL,
   `custom_data` text,
-  `rules` text,
+  `rules` mediumtext,
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`,`deleted_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
