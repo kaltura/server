@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaPushNotificationTemplate">
+				<name>EXPLICIT_LIVE_PUSH_NOTIFICATIONS</name>
+				<systemName>EXPLICIT_LIVE_PUSH_NOTIFICATIONS</systemName>
+				<description>Push notification template used by the explicit live feature</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>11</eventType> <!-- EventNotificationEventType::OBJECT_UPDATED -->
+				<eventObjectType>1</eventObjectType>
+
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventObjectChangedCondition">
+						<description>Entry view mode or recording status changes</description>
+						<modifiedColumns>{modified_columns}</modifiedColumns>
+					</item>
+				</eventConditions>
+				<queueNameParameters objectType="array">
+					<item objectType="KalturaPushEventNotificationParameter">
+						<key>entryId</key>
+						<description></description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntryId()</code>
+						</value>
+					</item>
+				</queueNameParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationArrayParameter">
+						<key>modified_columns</key>
+						<description>KalturaLiveEntry columns that will trigger the event</description>
+						<allowedValues objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>viewMode</value>
+								<description>viewMode</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>recordingStatus</value>
+								<description>recordingStatus</description>
+							</item>
+						</allowedValues>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>

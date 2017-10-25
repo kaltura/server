@@ -139,6 +139,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$port = $this->getValueByField($mediaServerConfig, $portField, $port);
 		
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
+		KalturaLog::debug("@@NA mediaServerPortConfig [".print_r($mediaServerPortConfig,true)."] protocol [$protocol] format [$format]");
 		if($mediaServerPortConfig)
 		{
 			$portField = $protocol . ($format ? "-$format" : "");
