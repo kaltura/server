@@ -187,7 +187,7 @@ class ESearchMetadataItem extends ESearchItem
 		$metadataMultiMatch = kESearchQueryManager::getMultiMatchQuery($searchItem, 'metadata.value_text', false);
 
 		if(ctype_digit($searchItem->getSearchTerm()))//add metadata.value_int
-			$metadataMultiMatch['multi_match']['fields'][] = 'metadata.value_int^3';
+			$metadataMultiMatch['bool']['should'][0]['multi_match']['fields'][] = 'metadata.value_int^3';
 
 		if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
