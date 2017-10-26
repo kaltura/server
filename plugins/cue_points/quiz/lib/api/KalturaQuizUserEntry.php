@@ -76,4 +76,14 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		parent::validateForInsert($propertiesToSkip);
 	}
 
+	protected function validateEntryId()
+	{
+		return null;
+	}
+
+	protected function validateUserId()
+	{
+		return null;
+	}
+
 }
