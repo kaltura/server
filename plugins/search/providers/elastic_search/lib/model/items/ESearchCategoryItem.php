@@ -102,6 +102,7 @@ class ESearchCategoryItem extends ESearchItem
 	public static function createSingleItemSearchQuery($categorySearchItem, &$categoryQuery, $allowedSearchTypes)
 	{
 		$categorySearchItem->validateItemInput();
+		$categorySearchItem->translateSearchTerm();
 		switch ($categorySearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
@@ -129,5 +130,22 @@ class ESearchCategoryItem extends ESearchItem
 		$allowedSearchTypes = self::getAllowedSearchTypesForField();
 		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
 		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
+	}
+
+	protected function translateSearchTerm()
+	{
+		$fieldName = $this->getFieldName();
+		switch ($fieldName)
+		{
+			case ESearchCategoryFieldName::CATEGORY_PRIVACY:
+				$this->setSearchTerm(category::formatPrivacy($this->getSearchTerm(), kCategoryElasticEntitlement::$partnerId));
+				break;
+			case ESearchCategoryFieldName::CATEGORY_PRIVACY_CONTEXT:
+			case ESearchCategoryFieldName::CATEGORY_PRIVACY_CONTEXTS:
+				$this->setSearchTerm(kEntitlementUtils::getPartnerPrefix(kCategoryElasticEntitlement::$partnerId).$this->getSearchTerm());
+				break;
+			default:
+				return;
+		}
 	}
 }
