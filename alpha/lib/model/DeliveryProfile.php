@@ -279,6 +279,15 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $renderer;
 	}
 	
+	protected function getAudioCodec($flavor)
+	{
+		$mediaInfoObj = $flavor->getMediaInfo();
+		if(!$mediaInfoObj)
+			return null;
+		
+		return $mediaInfoObj->getAudioCodecId();
+	}
+	
 	protected function getAudioLanguage($flavor) 
 	{
 		$lang = $flavor->getLanguage();
@@ -287,7 +296,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLanguageName = null;
 
 		if(!isset($lang)) { //for backward compatibility
-			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+			$mediaInfoObj = $flavor->getMediaInfo();
 			if (!$mediaInfoObj)
 				return null;
 
@@ -332,23 +341,37 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLanguage = null;
 		$audioLanguageName = null;
 		$audioLabel = null;
-		if ($flavor) {
-			if (is_callable(array($flavor, 'getFileExt'))) {
+		$audioCodec = null;
+		if ($flavor) 
+		{
+			if (is_callable(array($flavor, 'getFileExt'))) 
+			{
 				$ext = $flavor->getFileExt();
 			}
+			
 			//Extract the audio language code from flavor
-			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
-				if(is_callable(array($flavor, 'getLabel'))) {
+			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) 
+			{
+				if(is_callable(array($flavor, 'getLabel'))) 
+				{
 					$audioLabel = $flavor->getLabel();
 				}
+				
 				$audioLanguageData = $this->getAudioLanguage($flavor);
-				if (!$audioLanguageData) {
+				
+				if (!$audioLanguageData) 
+				{
 					$audioLanguage = 'und';
 					$audioLanguageName = 'Undefined';
 				}
-				else {
+				else 
+				{
 					list($audioLanguage, $audioLanguageName) = $audioLanguageData;
 				}
+				
+				$audioCodec = $this->getAudioCodec($flavor);
+				if(!$audioCodec)
+					$audioCodec = "und";
 			}
 		}
 		if (!$ext)
@@ -373,6 +396,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'audioLanguage' => $audioLanguage,
 				'audioLanguageName' => $audioLanguageName,
 				'audioLabel' => $audioLabel,
+				'audioCodec' => $audioCodec,
 			);
 	}
 	

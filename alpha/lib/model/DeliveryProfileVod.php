@@ -10,6 +10,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected $preferredFlavor = null;
 	
+	/**
+	 * @var bool
+	 */
+	protected $isMultiAudio = false;
+	
 	/** -------------------
 	 * Functionality 
 	 * --------------------*/
@@ -341,7 +346,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function flavorCmpFunction ($flavor1, $flavor2)
 	{
-		// move the audio flavors to the end
+		// move the audio flavors to the end unless we have multi audio stream which in this case they should be at the beginning
 		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
 		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
 		
@@ -349,12 +354,18 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			if ($isAudio1)
 			{
-				return 1;
+				return $this->isMultiAudio ? -1 : 1;
 			}
 			else 
 			{
-				return -1;
+				return $this->isMultiAudio ? 1 : -1;
 			}
+		}
+		
+		//Move all Dolby audio flavors to the beginning of the audio flavors list
+		if($isAudio1 == true)
+		{
+			return $this->compareAudio($flavor1['audioCodec'], $flavor2['audioCodec']);
 		}
 	
 		// if a preferred bitrate was defined place it first
@@ -373,6 +384,26 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			return 1;
 		}
 	
+		return -1;
+	}
+	
+	private function compareAudio($audioCodec1, $audioCodec2)
+	{
+		$dolbyAudioCodecList = array('ec-3','ac-3');
+		$audioPriority = array('ec-3' => 2, 'ac-3' => 1);
+		
+		//If both audio codec's are dolby prioritize them based on the audioPriority array
+		if(in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList) && ($audioPriority[$audioCodec2] != $audioPriority[$audioCodec1]))
+		{
+			return $audioPriority[$audioCodec2] - $audioPriority[$audioCodec1];
+		}
+		
+		if(in_array($audioCodec1, $dolbyAudioCodecList))
+			return -1;
+		
+		if(in_array($audioCodec2, $dolbyAudioCodecList))
+			return 1;
+		
 		return -1;
 	}
 	

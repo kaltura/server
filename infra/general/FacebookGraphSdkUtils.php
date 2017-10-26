@@ -223,15 +223,16 @@ class FacebookGraphSdkUtils
 	 * @param $videoId
 	 * @param $filePath
 	 * @param $locale
+	 * @param $tempDirectory
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale)
+	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale, $tempDirectory)
 	{
 		if (!file_exists($filePath))
 			throw new Exception("Captions file given does not exist: ".$filePath);
 		//create file name in format: filename.locale.srt
-		$newFilePath = basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
+		$newFilePath = $tempDirectory.'/'.basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
 		copy($filePath, $newFilePath);
 		$data = array (
 			'captions_file' => new FacebookCaptionsFile($newFilePath),
@@ -419,8 +420,35 @@ class FacebookGraphSdkUtils
 			throw new Exception("Failed to ".($isDelete? "delete " : "update ").$subCategory." video ".$videoId);
 	}
 
+	public static function updateTags($appId, $appSecret, $accessToken, $tags, $videoId)
+	{
+		$fb = self::createFacebookInstance($appId, $appSecret);
+		foreach ($tags as $tag)
+		{
+			$data = array('tag_uid' => $tag);
+			try
+			{
+				$response = $fb->post("/" . $videoId . "/tags", $data, $accessToken);
+			}
+			catch (Facebook\Exceptions\FacebookResponseException  $e)
+			{
+				$errCode = $e->getCode();
+				if($errCode == FacebookConstants::FACEBOOK_USER_ALREADY_TAGGED_ERROR)
+				{
+					continue;
+				}
+
+				throw $e;
+			}
+
+			$graphNode = $response->getGraphNode();
+			if ($graphNode['success'] != 1)
+				throw new Exception("Failed to add tag " . $tag . " to video id " . $videoId);
+		}
+	}
+
 	/**
-	 * Retuns a new Facebook client using teh facebook sdk using the arguments
+	 * Retuns a new Facebook client using the facebook sdk using the arguments
 	 * @param string $appId
 	 * @param string $appSecret
 	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
@@ -442,7 +470,7 @@ class FacebookConstants
 {
 	const MAX_VIDEO_SIZE = 1750000000; //bytes
 	const MAX_VIDEO_DURATION = 2700000; //milliseconds
-	const FACEBOOK_SDK_VERSION = 'v2.4';
+	const FACEBOOK_SDK_VERSION = 'v2.5';
 	const FACEBOOK_MIN_POSTPONE_POST_IN_SECONDS = 600; // 10 minutes
 	const FACEBOOK_MAX_POSTPONE_POST_IN_SECONDS = 15552000; // 6 months
 
@@ -455,6 +483,7 @@ class FacebookConstants
 	const FACEBOOK_PARTNER_ID_REQUEST_PARAM = 'partner_id';
 	const FACEBOOK_NEXT_ACTION_REQUEST_PARAM = 'next_action';
 	const FACEBOOK_KS_REQUEST_PARAM = 'ks';
+	const FACEBOOK_USER_ALREADY_TAGGED_ERROR = 355;
 }
 
 class FacebookCaptionsFile extends \Facebook\FileUpload\FacebookFile

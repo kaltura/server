@@ -16,6 +16,8 @@ abstract class kBaseSearch
 
     public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager = null, ESearchOrderBy $order = null);
 
+    public abstract function getPeerName();
+
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $eSearchOperator->getOperator());
@@ -89,6 +91,8 @@ abstract class kBaseSearch
                 )
             )
         );
+        //return only the object id
+        $this->query['body']['_source'] = false;
     }
 
     protected function applyElasticSearchConditions($conditions)

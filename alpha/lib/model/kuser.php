@@ -1327,6 +1327,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
 			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId())
 		);
+
+		elasticSearchUtils::cleanEmptyValues($body);
+
 		return $body;
 	}
 

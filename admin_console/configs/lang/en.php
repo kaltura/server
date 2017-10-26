@@ -64,6 +64,8 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::RECALCULATE_CACHE' => 'Recalculate Cache',
 	'Kaltura_Client_Enum_BatchJobType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET' => 'Parse Multi Language Caption Asset',
 	'Kaltura_Client_Enum_BatchJobType::LIVE_TO_VOD' => 'Live To Vod',
+	'Kaltura_Client_Enum_BatchJobType::CLEAR_BEACONS' => 'Clear Beacons',
+	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -451,7 +453,7 @@ return array(
 	'entry-investigate info entry created label' => 'Created At',
 	'entry-investigate info entry modified label' => 'Modified At',
 	'entry-investigate info entry updated label' => 'Updated At',
-	'entry-investigate info entry actions label' => 'Reconvert',
+	'entry-investigate info entry actions label' => 'Action',
 	'entry-investigate info entry boost label' => 'Boost Jobs',
 
 	'entry-investigate info entry ip1 label' => 'IP 1',
@@ -476,6 +478,7 @@ return array(
 	'entry-investigate info entry big-red-button label' => 'Big-Red-Button',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
+	'entry-investigate entry restore' => 'Restore',
 	'entry-investigate entry boostJobs' => 'Boost Jobs',
 
 	'entry-investigate entry upload support' => 'Investigate File',
@@ -1294,6 +1297,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH" => "VOD_PACKAGER_DASH",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HDS" => "VOD_PACKAGER_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS" => "VOD_PACKAGER_HLS",
+	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST" => "VOD_PACKAGER_HLS_MANIFEST",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_MSS" => "VOD_PACKAGER_MSS",
 	
 	"Kaltura_Client_Enum_DeliveryStatus::ACTIVE" => "Active",

@@ -720,9 +720,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	// return the full path on the disk
 	public function getFullDataPath( $version = NULL )
 	{
-		$path = myContentStorage::getFSContentRootPath() . $this->getDataPath();
-		if ( file_exists( $path )) return $path;
-		return $path;
+		return myContentStorage::getFSContentRootPath() . $this->getDataPath($version);
 	}
 	
 	/**
@@ -946,7 +944,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
 			if ( $from_cache ) return $this->data_content;
-			$content_path = myContentStorage::getFSContentRootPath();
 			$version = $this->desired_version;
 			if ( ! $version || $version == -1 ) $version = null;
 			
@@ -1796,7 +1793,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setRecordedEntrySegmentCount ( $v )	{	$this->putInCustomData ( "recordedEntrySegmentCount" , $v );	}
 	public function getRecordedEntrySegmentCount(  )		{	return $this->getFromCustomData( "recordedEntrySegmentCount", null, 0 );	}
-	
+
+	public function setTempTrimEntry ($v)	    { $this->putInCustomData ( "tempTrimEntry" , $v );	}
+	public function getTempTrimEntry ()		{	return $this->getFromCustomData( "tempTrimEntry", null, false );	}
+
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
@@ -1833,7 +1833,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setReachedMaxRecordingDuration ( $v )	{	$this->putInCustomData ( "reachedMaxRecordingDuration" , (bool) $v );	}
 	public function getReachedMaxRecordingDuration() 	{	return (bool) $this->getFromCustomData( "reachedMaxRecordingDuration" ,null, false );	}
-		
+
+
 	public function getParentEntry()
 	{
 		if(!$this->getParentEntryId())
@@ -1947,9 +1948,51 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return array_keys($this->getEntitledUserPuserEditArray());
 	}
 	
+	public function getEntitledKusersView()
+	{
+		return implode(',', array_keys($this->getEntitledPusersViewArray()));
+	}
+
+	public function getEntitledKusersViewArray()
+	{
+		return array_keys($this->getEntitledPusersViewArray());
+	}
+	
 	public function getEntitledPusersEdit()
 	{
 		return implode(',', $this->getEntitledUserPuserEditArray());
+	}
+	
+	public function setEntitledPusersView($v)
+	{
+		$entitledUserPuserView = array();
+		
+		$v = trim($v);
+		if($v == '')
+		{
+			$this->putInCustomData ( "entitledUserPuserView" , serialize($entitledUserPuserView) );
+			return;
+		}
+		
+		$entitledPusersView = explode(',',$v);
+				
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		foreach ($entitledPusersView as $puserId)
+		{
+			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
+
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
+			if (!$kuser)
+				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
+			
+			$entitledUserPuserView[$kuser->getId()] = $kuser->getPuserId();
+		}
+				
+		$this->putInCustomData ( "entitledUserPuserView" , serialize($entitledUserPuserView) );
 	}
 	
 	public function isOwnerActionsAllowed($kuserId)
@@ -1962,9 +2005,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return in_array($ownerKuserId, $kuserKGroupIds);
 	}
 	
-	public function isEntitledKuserEdit($kuserId)
+	
+	private function isEntitledKuser ($kuserId, $entitledKuserArray)
 	{
-		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
 		if(in_array(trim($kuserId), $entitledKuserArray))
 			return true;
 
@@ -1974,6 +2017,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				return true;
 
 		return $this->isOwnerActionsAllowed($kuserId);
+	}
+	
+	public function isEntitledKuserEdit($kuserId)
+	{
+		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
+		
+		return $this->isEntitledKuser($kuserId, $entitledKuserArray);
+	}
+	
+	public function isEntitledKuserView($kuserId)
+	{
+		$entitledKuserArray = array_keys($this->getEntitledPusersViewArray());
+
+		return $this->isEntitledKuser($kuserId, $entitledKuserArray);
 	}
 
 	private function getEntitledUserPuserEditArray()
@@ -2027,6 +2084,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return unserialize($entitledUserPuserPublish);
 	}
 	
+	private function getEntitledPusersViewArray()
+	{
+		$entitledUserPuserView = $this->getFromCustomData( "entitledUserPuserView", null, 0 );
+		if (!$entitledUserPuserView)
+			return array();
+		
+		return unserialize($entitledUserPuserView);
+	}
+	
 	public function getEntitledKusersPublish()
 	{
 		return implode(',', array_keys($this->getEntitledPusersPublishArray()));
@@ -2044,6 +2110,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getEntitledPusersPublish()
 	{
 		return implode(',', $this->getEntitledPusersPublishArray());
+	}
+	
+	public function getEntitledPusersView()
+	{
+		return implode(',', $this->getEntitledPusersViewArray());
 	}
 	
 	public function isEntitledKuserPublish($kuserId, $useUserGroups = true)
@@ -3199,8 +3270,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		$entitledKusersPublish = explode(',', $this->getEntitledKusersPublish());
 		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
+		$entitledKusersView = explode(',', $this->getEntitledKusersView());
 		
-		$entitledKusersNoPrivacyContext = array_merge($entitledKusersPublish, $entitledKusersEdit);
+		$entitledKusersNoPrivacyContext = array_merge($entitledKusersPublish, $entitledKusersEdit, $entitledKusersView);
 		$entitledKusersNoPrivacyContext[] = $this->getKuserId();
 		
 		foreach ($entitledKusersNoPrivacyContext as $key => $value)
@@ -3326,15 +3398,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return null;
 	}
 	
-	public function setSourceType($value)
+	public function setSourceType($value , $forceSet = false)
 	{
 		if ($value != EntrySourceType::SEARCH_PROVIDER)
-			$this->setSource($value);
-	}
+			$this->setSource($value , $forceSet);
+    }
 	
-	public function setSource($v)
+	public function setSource($v , $forceSet=false)
 	{
-		if(!in_array($this->getSource(), array(EntrySourceType::KALTURA_RECORDED_LIVE, EntrySourceType::LECTURE_CAPTURE)) || $v == EntrySourceType::RECORDED_LIVE)
+		if($forceSet || !in_array($this->getSource(), array(EntrySourceType::KALTURA_RECORDED_LIVE, EntrySourceType::LECTURE_CAPTURE)) || $v == EntrySourceType::RECORDED_LIVE)
 			parent::setSource($v);
 	}
 	
@@ -3692,11 +3764,13 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'status' => $this->getStatus(),
 			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
 			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
+			'entitled_pusers_edit' => array_values($this->getEntitledUserPuserEditArray()),
+			'entitled_pusers_publish' => array_values($this->getEntitledPusersPublishArray()),
 			'kuser_id' => $this->getKuserId(),
 			'puser_id' => $this->getPuserId(),
 			'creator_puser_id' => $this->getCreatorPuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => $this->getName(),
+			'name' => elasticSearchUtils::formatSearchTerm($this->getName()),
 			'description' => $this->getDescription(),
 			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
@@ -3724,13 +3798,17 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'group_id' => $this->getGroupId(),
 			'partner_sort_value' => $this->getPartnerSortValue(),
 			'redirect_entry_id' => $this->getRedirectEntryId(),
+			'views' => $this->getViews(),
+			'votes' => $this->getVotes(),
 		);
 
 		$this->addCategoriesToObjectParams($body);
 		
 		if($this->getParentEntryId())
 			$this->addParentEntryToObjectParams($body);
-		
+
+		elasticSearchUtils::cleanEmptyValues($body);
+
 		return $body;
 	}
 
@@ -3760,7 +3838,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entry_id' => $parentEntry->getId(),
 			'partner_id' => $parentEntry->getPartnerId(),
 			'status' => $parentEntry->getStatus(),
-			'partner_status' => "p{$parentEntry->getPartnerId()}s{$parentEntry->getStatus()}",
+			'partner_status' => elasticSearchUtils::formatPartnerStatus($parentEntry->getPartnerId(), $parentEntry->getStatus()),
 			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),
 			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
 			'kuser_id' => $parentEntry->getKuserId(),
@@ -3775,7 +3853,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$categoryIds = $this->getAllCategoriesIds(true);
 		$body['category_ids'] = $categoryIds;
 		$body['active_category_ids'] = $this->getAllCategoriesIds(false);
-		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);;
+		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);
 	}
 
 	public function getTagsArr()
@@ -3808,5 +3886,10 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function getElasticObjectName()
 	{
 		return 'entry';
+	}
+	
+	public function isInsideDeleteGracePeriod()
+	{
+		return $this->getCreatedAt(null) > (time() - dateUtils::DAY * 7);
 	}
 }

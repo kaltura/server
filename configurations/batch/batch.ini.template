@@ -65,6 +65,7 @@ enabledWorkers.KAsyncIntegrateCloser				= 1
 enabledWorkers.KAsyncClearCuePoints					= 1
 enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 enabledWorkers.KAsyncLiveToVod      				= 1
+enabledWorkers.KAsyncCopyCaptions					= 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -778,3 +779,10 @@ params.skipSourceValidation             = 1
 id													= 640
 type												= KAsyncLiveToVod
 scriptPath											= batches/LiveToVod/KAsyncLiveToVodExe.php
+
+[KAsyncCopyCaptions : JobHandlerWorker]
+id													= 650
+friendlyName										= Copy Caption Assets
+type												= KAsyncCopyCaptions
+scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
+

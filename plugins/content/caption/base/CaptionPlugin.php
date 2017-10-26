@@ -9,6 +9,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	const KS_PRIVILEGE_CAPTION = 'caption';
 
 	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
+	const COPY_CAPTIONS_FLOW_MANAGER_CLASS = 'kCopyCaptionsFlowManager';
 
        const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
@@ -193,6 +194,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		return array(
 			self::MULTI_CAPTION_FLOW_MANAGER_CLASS,
+			self::COPY_CAPTIONS_FLOW_MANAGER_CLASS,
 		);
 	}
 
@@ -232,12 +234,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET))
 			return new KalturaParseMultiLanguageCaptionAssetJobData();
-
-		if ($baseClass == 'KalturaESearchItemData' && $enumValue == 'caption')
-			return new KalturaESearchCaptionItemData();
-		if ($baseClass == 'ESearchItemData' && $enumValue == 'caption_assets')
-			return new ESearchCaptionItemData();
-
 
 		return null;
 	}
@@ -481,6 +477,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	 */
 	public static function getManifestEditors ($config)
 	{
+		if($config->disableCaptions)
+			return array();
+
 		$contributors = array();
 
 		switch ($config->format)

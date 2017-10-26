@@ -347,16 +347,20 @@ class myEntryUtils
 				$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
 				if($recordedEntry)
 				{
-					if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+					//If entry is pending for recording to finish for more than 7 days than it will probably never happen 
+					if($recordedEntry->isInsideDeleteGracePeriod())
 					{
-						KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
-						throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getId());
-					}
-					
-					if(myEntryUtils::shouldServeVodFromLive($recordedEntry))
-					{
-						KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, entry still beeing handled by recordign engien");
-						throw new KalturaAPIException(KalturaErrors::RECORDING_FLOW_NOT_COMPLETE, $entry->getId());
+						if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
+						{
+							KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
+							throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getId());
+						}
+						
+						if(myEntryUtils::shouldServeVodFromLive($recordedEntry))
+						{
+							KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, entry still beeing handled by recordign engien");
+							throw new KalturaAPIException(KalturaErrors::RECORDING_FLOW_NOT_COMPLETE, $entry->getId());
+						}
 					}
 				}	
 			}
@@ -365,7 +369,7 @@ class myEntryUtils
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
-			if(myEntryUtils::shouldServeVodFromLive($entry, false))
+			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false))
 			{
 				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
@@ -385,8 +389,8 @@ class myEntryUtils
 			}
 		}
 
-		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
-		
+		KalturaLog::log("delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
+
 		kJobsManager::abortEntryJobs($entry->getId());
 		
 		$media_type = $entry->getMediaType();
@@ -942,7 +946,7 @@ class myEntryUtils
 		if (!$firstEntry)
 			return false;
 
-		$flavorAsset = self::getFlavorSupportedByPackager($firstEntry->getId());
+		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($firstEntry->getId());
 		if(!$flavorAsset)
 			return false;
 
@@ -1039,7 +1043,7 @@ class myEntryUtils
 		if (!$packagerCaptureUrl)
 			return false;
 
-		$flavorAsset = self::getFlavorSupportedByPackager($entry->getId());
+		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
 		if(!$flavorAsset)
 			return false;
 
@@ -1058,7 +1062,7 @@ class myEntryUtils
 	}
 
 
-	private static function getFlavorSupportedByPackager($entryId)
+	private static function getFlavorSupportedByPackagerForThumbCapture($entryId)
 	{
 		//look for the highest bitrate flavor tagged with thumbsource
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
@@ -1078,14 +1082,25 @@ class myEntryUtils
 		return $flavorAsset;
 	}
 
-	public static function isFlavorSupportedByPackager($flavorAsset)
+	public static function isFlavorSupportedByPackager($flavorAsset, $excludeAudioFlavors = true)
 	{
-		//filter audio flavors and encrypted flavors
-		if( !$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0) || $flavorAsset->getEncryptionKey())
+		if($flavorAsset->getEncryptionKey())
 			return false;
+		if($excludeAudioFlavors)
+		{
+			if (!$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0))
+				return false;
+		}
 
-		$supportedContainerFormats = array(assetParams::CONTAINER_FORMAT_MP42, assetParams::CONTAINER_FORMAT_ISOM);
-		if(($flavorAsset->hasTag(flavorParams::TAG_WEB) && in_array($flavorAsset->getContainerFormat(), $supportedContainerFormats)))
+		if($flavorAsset->hasTag(flavorParams::TAG_WEB) && self::isSupportedContainerFormat($flavorAsset))
+			return true;
+		return false;
+	}
+
+	public static function isSupportedContainerFormat($flavorAsset){
+		if ($flavorAsset->getContainerFormat() == assetParams::CONTAINER_FORMAT_MP42)
+			return true;
+		if (strpos($flavorAsset->getContainerFormat(), assetParams::CONTAINER_FORMAT_ISOM) !== false)
 			return true;
 		return false;
 	}
@@ -1302,7 +1317,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setTotalRank(0);
 	}
 
-	public static function copyEntryData(entry $entry, entry $targetEntry)
+	public static function copyEntryData(entry $entry, entry $targetEntry, $copyFlavors = true, $copyCaptions = true)
 	{
 		// for any type that does not require assets:
 		$shouldCopyDataForNonClip = true;
@@ -1379,14 +1394,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset))
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions))
+			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
+			}
 	}
 
-	private static function shouldCopyAsset($sourceAsset)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-		if ($sourceAsset instanceof timedThumbAsset)
+			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset)
+			|| ( !$copyCaptions && $sourceAsset instanceof captionAsset))
 			return false;
 		return true;
 	}
@@ -1414,8 +1432,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		$copyUsers = true;
 		$copyCategories = true;
-	    $copyChildren = false;
-	    $copyAccessControl = true;
+		$copyChildren = false;
+		$copyAccessControl = true;
+		$copyMetaData = true;
+		$copyFlavors  = true;
+		$copyCaptions  = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($cloneOptions as $cloneOption)
@@ -1440,6 +1461,18 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$copyAccessControl = false;
 			}
+			if ($currentOption == BaseEntryCloneOptions::METADATA && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyMetaData = false;
+			}
+			if ($currentOption == BaseEntryCloneOptions::FLAVORS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyFlavors = false;
+			}
+			if ($currentOption == BaseEntryCloneOptions::CAPTIONS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyCaptions = false;
+			}
 		}
 
  		$newEntry = $entry->copy();
@@ -1447,8 +1480,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
 		$newEntry->setCategoriesIds(null);
-		
- 		if ($toPartner instanceof Partner)
+
+	    if (!$copyFlavors)
+		    $newEntry->setStatus(entryStatus::NO_CONTENT);
+
+	    if ($toPartner instanceof Partner)
  		{
  			$newEntry->setPartnerId($toPartner->getId());
  			$newEntry->setSubpId($toPartner->getId() * 100);
@@ -1456,17 +1492,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 				$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
  		}
  		
- 		$newKuser = null;
+		$kuserForNewEntry = null;
 		if ($copyUsers)
- 		{
- 			// copy the kuser (if the same puser id exists its kuser will be used)
- 			kuserPeer::setUseCriteriaFilter(false);
- 			$kuser = $entry->getKuser();
- 			$newKuser = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
- 			$newEntry->setKuserId($newKuser->getId());
- 			$newEntry->setCreatorKuserId($newKuser->getId());
- 			kuserPeer::setUseCriteriaFilter(true);
- 		} 		
+		{
+			// copy the kuser (if the same puser id exists its kuser will be used)
+			kuserPeer::setUseCriteriaFilter(false);
+			$kuser = $entry->getKuser();
+			$kuserForNewEntry = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
+			kuserPeer::setUseCriteriaFilter(true);
+		}
+		else
+			$kuserForNewEntry = kCurrentContext::getCurrentKsKuser();
+
+		if($kuserForNewEntry)
+		{
+			$newEntry->setKuserId($kuserForNewEntry->getId());
+			$newEntry->setCreatorKuserId($kuserForNewEntry->getId());
+		}
  		
  		// copy the kshow
  		kshowPeer::setUseCriteriaFilter(false);
@@ -1477,8 +1519,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  			$newKshow->setIntId(null);
  			$newKshow->setPartnerId($toPartner->getId());
  			$newKshow->setSubpId($toPartner->getId() * 100);
- 			if ($newKuser) {
- 				$newKshow->setProducerId($newKuser->getId());
+ 			if ($kuserForNewEntry) {
+ 				$newKshow->setProducerId($kuserForNewEntry->getId());
  			}
  			$newKshow->save();
  			
@@ -1494,8 +1536,20 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$oldPartnerId = $defaultCategoryFilter->get(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
- 		
- 		// save the entry
+
+ 		if (!$copyMetaData)
+		    $newEntry->copyMetaData = false;
+
+		$newEntry->setSourceType(self::getCloneSourceType($entry->getSourceType()),true);
+
+	    $quizData = $entry->getFromCustomData( QuizPlugin::QUIZ_DATA );
+	    if ($quizData)
+	    {
+		    $newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
+		    $newEntry->addCapability(QuizPlugin::getCapatabilityCoreValue());
+	    }
+
+	    // save the entry
  		$newEntry->save();
  		 		
  		// restore the original partner id in the default category criteria filter
@@ -1508,7 +1562,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
 		} else {
-			self::copyEntryData( $entry, $newEntry );
+			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
 
  	    //if entry is a static playlist, link between it and its new child entries
@@ -1665,9 +1719,37 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	    {
 		    self::cloneFamilyEntries($entry, $toPartner, $cloneOptions, $newEntry);
 	    }
+
+	    if($newEntry->getPartnerId() == $newEntry->getPartnerId())
+	    {
+		    $newEntry->setRootEntryId($entry->getId());
+		    $newEntry->save();
+	    }
 	    return $newEntry;
  	} 	
- 	
+
+	private static function getCloneSourceType($originSourceType)
+	{
+		$targetSourceType = $originSourceType;
+		switch ($originSourceType)
+		{
+			case EntrySourceType::FILE:
+			case EntrySourceType::WEBCAM:
+			case EntrySourceType::URL:
+			case EntrySourceType::RECORDED_LIVE:
+			case EntrySourceType::CLIP:
+			case EntrySourceType::KALTURA_RECORDED_LIVE:
+			case EntrySourceType::LECTURE_CAPTURE:
+			case EntrySourceType::SEARCH_PROVIDER:
+				$targetSourceType = EntrySourceType::CLIP;
+				break;
+			default:
+				break;
+		}
+
+		return $targetSourceType;
+	}
+
  	/*
  	 * re-index to search index, and recalculate fields.
  	 */
@@ -1839,11 +1921,106 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$childCopy = self::copyEntry($child, $toPartner, $cloneOptions);
 				$childCopy->setParentEntryId($newEntry->getId());
+				$childCopy->setSourceEntryId($child->getId());
 				$childCopy->save();
 			}
 		}
 		$entry->setInClone(false);
 		$entry->save();
+	}
+
+	public static function wasEntryClipped(entry $entry, array $modifiedColumns)
+	{
+		if (in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
+			&& $entry->isCustomDataModified('operationAttributes')
+			&& $entry->isCustomDataModified('sourceEntryId'))
+			{
+				//clip case
+				if(!$entry->getReplacedEntryId())
+				return true;
+				//trim case
+				if($entry->getTempTrimEntry())
+				return true;
+			}
+		return false;
+	}
+	public static function getRelatedEntries($entry)
+	{
+		/* @var $entry entry */
+		if (!$entry->getParentEntryId())
+			return entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getId(), $entry->getPartnerId());
+		$relatedEntries = array(entryPeer::retrieveByPK($entry->getParentEntryId()));
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entry->getParentEntryId(), $entry->getPartnerId());
+		foreach($childEntries as $childEntry)
+			if ($childEntry->getId() != $entry->getId())
+				$relatedEntries[] = $childEntry;
+		return $relatedEntries;
+	}
+
+
+	public static function getFlavorSupportedByPackagerForVolumeMap($entryId)
+	{
+		$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
+		if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+		{
+			// look for the lowest bitrate flavor the packager can parse
+			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
+			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+			{
+				//retrieve original ready
+				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+				if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+					return null;
+			}
+		}
+		return $flavorAsset;
+	}
+
+	public static function getVolumeMapContent($flavorAsset)
+	{
+		$flavorId = $flavorAsset->getId();
+		$entryId = $flavorAsset->getEntryId();
+
+		$packagerRetries = 3;
+		$content = null;
+		while ($packagerRetries && !$content)
+		{
+			$content = self::retrieveLocalVolumeMapFromPackager($flavorAsset);
+			$packagerRetries--;
+		}
+		if(!$content)
+			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+
+		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
+		return new kRendererString($content, 'text/csv');
+	}
+
+
+	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
+	{
+		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
+		if (!$packagerVolumeMapUrlPattern)
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
+		if (!$entry_data_path)
+			return null;
+
+		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
+		if(!$content)
+			return false;
+
+		return $content;
+	}
+
+	private static function curlLocalVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
+	{
+		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
+		kFile::closeDbConnections();
+		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
+		return $content;
 	}
 
 

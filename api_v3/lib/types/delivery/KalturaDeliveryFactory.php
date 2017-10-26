@@ -38,6 +38,7 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileGenericSilverLight();
 			case KalturaDeliveryProfileType::GENERIC_RTMP:
 				return new KalturaDeliveryProfileGenericRtmp();
+			case KalturaDeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST:
 			case KalturaDeliveryProfileType::VOD_PACKAGER_HLS:
 				return new KalturaDeliveryProfileVodPackagerHls();
 			case KalturaDeliveryProfileType::VOD_PACKAGER_DASH:

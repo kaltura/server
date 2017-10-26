@@ -18,17 +18,13 @@ class helperAction extends kalturaSystemAction
 		$this->forceSystemAuthentication();
 		$secret = "";
 		$str = $this->getP ( "str" );
-		$algo = $this->getP ( "algo" , "wiki_decode" );
+		$algo = $this->getP ( "algo" , "wiki_decode_no_serialize" );
 		$res = "";
 		$key = null;
 		
 		if ( $algo == "wiki_encode" )
 		{
 			$res = str_replace ( array ( "|" , "/") , array ( "|01" , "|02" ) , base64_encode ( serialize ( $str ) ) ) ; 
-		}
-		elseif ( $algo == "wiki_decode" )
-		{
-			$res = @unserialize ( base64_decode (str_replace ( array ( "|02" , "|01" ) , array ( "/" , "|" ) , $str ) ) ) ;
 		}
 		elseif ( $algo == "wiki_decode_no_serialize" )
 		{

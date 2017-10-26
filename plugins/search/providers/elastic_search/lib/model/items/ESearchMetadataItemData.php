@@ -17,6 +17,11 @@ class ESearchMetadataItemData extends ESearchItemData
 	protected $metadataProfileId;
 
 	/**
+	 * @var int
+	 */
+	protected $metadataFieldId;
+
+	/**
 	 * @var string
 	 */
 	protected $valueText;
@@ -28,7 +33,7 @@ class ESearchMetadataItemData extends ESearchItemData
 
 	public function getType()
 	{
-		return 'metadata';
+		return ESearchItemDataType::METADATA;
 	}
 
 	/**
@@ -61,6 +66,22 @@ class ESearchMetadataItemData extends ESearchItemData
 	public function setMetadataProfileId($metadataProfileId)
 	{
 		$this->metadataProfileId = $metadataProfileId;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMetadataFieldId()
+	{
+		return $this->metadataFieldId;
+	}
+
+	/**
+	 * @param int $metadataFieldId
+	 */
+	public function setMetadataFieldId($metadataFieldId)
+	{
+		$this->metadataFieldId = $metadataFieldId;
 	}
 
 	/**
@@ -99,6 +120,7 @@ class ESearchMetadataItemData extends ESearchItemData
 	{
 		$this->setXpath($objectResult['_source']['xpath']);
 		$this->setMetadataProfileId($objectResult['_source']['metadata_profile_id']);
+		$this->setMetadataFieldId($objectResult['_source']['metadata_field_id']);
 		if(isset($objectResult['_source']['value_text']))
 			$this->setValueText(implode(',',$objectResult['_source']['value_text']));
 		if(isset($objectResult['_source']['value_int']))

@@ -93,6 +93,7 @@ class KDLWrap
 	 */
 	private function generateTargetFlavors(mediaInfo $cdlMediaInfo=null, $cdlFlavorList)
 	{
+
 		$mediaSet = new KDLMediaDataSet();
 		if($cdlMediaInfo!=null) {
 			self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
@@ -105,6 +106,7 @@ class KDLWrap
 			 */
 		$isForWideVine = false;
 		foreach($cdlFlavorList as $cdlFlavor) {
+
 			$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
 			if ($kdlFlavor->_errors)
 			{
@@ -138,30 +140,64 @@ class KDLWrap
 			else
 				$this->_rv = true;
 		}
-		foreach ($trgList as $trg){
-			KalturaLog::log("...T-->".$trg->ToString());
-				/*
-				 *  NOT COMMITED, to check with KDLFalvor
-				 *
-			if($trg->IsValid()==false && ($trg->_flags & KDLFlavor::MissingContentNonComplyFlagBit)) {
-				continue;
-			}
-			*/
+
+		foreach ($trgList as $trg)
+		{
+			KalturaLog::log("...T-->" . $trg->ToString());
+			/*
+			 *  NOT COMMITED, to check with KDLFalvor
+			 *
+		if($trg->IsValid()==false && ($trg->_flags & KDLFlavor::MissingContentNonComplyFlagBit)) {
+			continue;
+		}
+		*/
 			/*
 			 * Handle Chunked-Encode cases
 			 */
-			if($trg->_cdlObject->getChunkedEncodeMode()==1)	{
+			if ($trg->_cdlObject->getChunkedEncodeMode() == 1)
+			{
 				$tmpTrans = clone $trg->_transcoders[0];
-				if($tmpTrans->_id==KDLTranscoders::FFMPEG) {
-					$tmpTrans->_id=conversionEngineType::CHUNKED_FFMPEG;
-					array_unshift($trg->_transcoders,$tmpTrans);
+				if ($tmpTrans->_id == KDLTranscoders::FFMPEG)
+				{
+					$tmpTrans->_id = conversionEngineType::CHUNKED_FFMPEG;
+					array_unshift($trg->_transcoders, $tmpTrans);
 				}
 			}
 
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
-			
+			// Handle audio streams for ffmpeg command in case we are handling trimming a source with flavor_params -1
+			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
+			// and replace it with the language mapping for the correct audio streams
+			// if only audio streams exist without video we ignore the video mapping
+			if (($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID) && !is_null($cdlMediaInfo))
+			{
+				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
+				$command = null;
+				if ($contentStreams != null && isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
+				{
+					if (isset($contentStreams['video']))
+						$command .= '-map v ';
+
+					$command .= '-map a ';
+					foreach ($contentStreams['audio'] as $audioStream)
+					{
+						if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
+							$command .= "-metadata:s:0:{$audioStream['id']} language={$audioStream['audioLanguage']} ";
+					}
+				}
+				
+				$cmdLines = $cdlFlvrOut->getCommandLines();
+				foreach ($cmdLines as $key => $cmdLine)
+				{
+					if (($key == conversionEngineType::FFMPEG || $key == conversionEngineType::FFMPEG_AUX) && $command != null)
+						$cmdLines[$key] = str_replace('-map_metadata -1', $command, $cmdLine);
+				}
+				$cdlFlvrOut->setCommandLines($cmdLines);
+			}
 			$this->_targetList[] = $cdlFlvrOut;
 		}
+
+
 		return $this;
 	}
 

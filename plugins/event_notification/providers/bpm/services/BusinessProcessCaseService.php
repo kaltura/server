@@ -116,9 +116,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 		$filename .= $businessProcessStartNotificationTemplateId . '_';
 		$filename .= $caseId . '.jpg';
 		
-		$url = $provider->getCaseDiagram($caseId, $filename);
-		
-		KCurlWrapper::getDataFromFile($url, $filename);
+		$provider->getCaseDiagram($caseId, $filename);
 		$mimeType = kFile::mimeType($filename);			
 		return $this->dumpFile($filename, $mimeType);
 	}

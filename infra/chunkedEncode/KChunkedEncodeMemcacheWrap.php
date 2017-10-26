@@ -69,45 +69,11 @@ ini_set("memory_limit","512M");
 		}
 		
 		/* ---------------------------
-		 * initilize
-		 */
-		protected function initialize()
-		{
-				/*
-				 * Get the global /read/write indexes,
-				 * if don't exist - create them w/out expiry time
-				 */
-			$this->fetchReadWriteIndexes($writeIndex, $readIndex);
-			$writeIndexKeyName = $this->getWriteIndexKeyName();
-			if(!isset($writeIndex)){
-				$writeIndex = 0;
-				if($this->set($writeIndexKeyName,$writeIndex,0)===false) {
-					KalturaLog::log("Failed to create WR index ($writeIndexKeyName)");
-					return false;
-				}
-			}
-			$this->writeIndex = $writeIndex;
-			KalturaLog::log("Current WR index value ($writeIndexKeyName:$writeIndex)");
-			
-			$readIndexKeyName = $this->getReadIndexKeyName();
-			if(!isset($readIndex)){
-				$readIndex = 1;
-				if($this->set($readIndexKeyName,$readIndex,0)===false) {
-					KalturaLog::log("Failed to create RD index ($readIndexKeyName)");
-					return false;
-				}
-			}
-			$this->readIndex = $readIndex;
-			KalturaLog::log("Current RD index value ($readIndexKeyName:$readIndex)");
-			return true;
-		}
-		
-		/* ---------------------------
 		 * SaveJob
 		 *	Store job to memcache storage
 		 */
-		 public function SaveJob($job)
-		 {
+		public function SaveJob($job)
+		{
 			$key = $this->getJobKeyName($job->keyIdx);
 			$str = serialize($job);
 			if($this->set($key, $str, $this->expiry)===false){
@@ -118,7 +84,7 @@ ini_set("memory_limit","512M");
 			$str = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $str);
 			KalturaLog::log("Session($job->session) - Set job $key($str)");
 			return true;
-		 }
+		}
 		 
 		/* ---------------------------
 		 * AddJob
@@ -133,8 +99,8 @@ ini_set("memory_limit","512M");
 		 * FetchJob
 		 *	Get job from memcache storage
 		 */
-		 public function FetchJob($keyIdx)
-		 {
+		public function FetchJob($keyIdx)
+		{
 			$key = $this->getJobKeyName($keyIdx);
 			if(($jobStr=$this->get($key))===false){
 				KalturaLog::log("Job($keyIdx) - Failed to get job ($keyIdx)");
@@ -143,7 +109,7 @@ ini_set("memory_limit","512M");
 			$job = unserialize($jobStr);
 //			KalturaLog::log("Session($job->session) - Fetched job ($jobStr)");
 			return $job;
-		 }
+		}
 		 
 		/* ---------------------------
 		 * DeleteJob
@@ -185,6 +151,40 @@ ini_set("memory_limit","512M");
 					$sessions[$job->session] = 1;
 			}
 			return $sessions;
+		}
+		
+		/* ---------------------------
+		 * initilize
+		 */
+		protected function initialize()
+		{
+				/*
+				 * Get the global /read/write indexes,
+				 * if don't exist - create them w/out expiry time
+				 */
+			$this->fetchReadWriteIndexes($writeIndex, $readIndex);
+			$writeIndexKeyName = $this->getWriteIndexKeyName();
+			if(!isset($writeIndex)){
+				$writeIndex = 0;
+				if($this->set($writeIndexKeyName,$writeIndex,0)===false) {
+					KalturaLog::log("Failed to create WR index ($writeIndexKeyName)");
+					return false;
+				}
+			}
+			$this->writeIndex = $writeIndex;
+			KalturaLog::log("Current WR index value ($writeIndexKeyName:$writeIndex)");
+			
+			$readIndexKeyName = $this->getReadIndexKeyName();
+			if(!isset($readIndex)){
+				$readIndex = 1;
+				if($this->set($readIndexKeyName,$readIndex,0)===false) {
+					KalturaLog::log("Failed to create RD index ($readIndexKeyName)");
+					return false;
+				}
+			}
+			$this->readIndex = $readIndex;
+			KalturaLog::log("Current RD index value ($readIndexKeyName:$readIndex)");
+			return true;
 		}
 		
 		/* ---------------------------
@@ -535,15 +535,14 @@ ini_set("memory_limit","512M");
 			$logName.= "/$job->session"."_$job->id"."_$job->keyIdx".".log";
 			{
 				$cmdLine = 'php -r "';
-//				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
+				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
 				/********************************************************
 				 * The bellow includes to be removed for production
 				 ********************************************************
-				 */
+				 
 				{
 					$cmdLine.= 'require_once \'/opt/kaltura/app/alpha/scripts/bootstrap.php\';';
 					$cmdLine.= 'require_once \'/opt/kaltura/app/batch/client/KalturaTypes.php\';';
-//					$dirName = "/web/content/shared/tmp/qualityTest/TestBench.10";
 					$dirName = "/opt/kaltura/app/infra/chunkedEncode";
 					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
 					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncode.php\';';
@@ -552,12 +551,14 @@ ini_set("memory_limit","512M");
 					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeDistrExecInterface.php\';';
 					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
 				}
-				
-				$cmdLine.= ' KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
+				*/
+				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
 				$cmdLine.= '\''.($this->memcacheConfig['host']).'\',';
 				$cmdLine.= '\''.($this->memcacheConfig['port']).'\',';
 				$cmdLine.= '\''.($this->storeToken).'\',';
-				$cmdLine.= $job->keyIdx.');"';
+				$cmdLine.= $job->keyIdx.');';
+				$cmdLine.= 'if(\$rv==false) exit(1);';
+				$cmdLine.= '"';
 			}
 			$tmp_ce_process_file = $this->tmpFolder."/tmp_ce_".$job->session."_".$job->keyIdx.".log";
 			$cmdLine.= " > $logName 2>&1 & echo $! > $tmp_ce_process_file";

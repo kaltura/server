@@ -281,7 +281,7 @@ class KCurlWrapper
 		if (KCurlHeaderResponse::isError($httpCode))
 		{
 			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
-			if ($destFilePath)
+			if ($destFilePath && file_exists($destFilePath))
 				unlink($destFilePath);
 			$res = false;
 		}

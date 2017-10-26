@@ -293,4 +293,72 @@ class KalturaBaseUserService extends KalturaBaseService
 			$this->validateApiAccessControl($loginData->getLastLoginPartnerId());
 		}
 	}
+	
+	public function loginByKsImpl($ks, $destPartnerId)
+	{
+		$ksObj = kSessionUtils::crackKs($ks);
+		if($ksObj->partner_id == $destPartnerId)
+			return $ks;
+		
+		if(!$ksObj->user || $ksObj->user == '')
+			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $ksObj->user);
+		
+		if($ksObj->getPrivilegeByName(kSessionBase::PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT))
+			throw new KalturaAPIException(APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED);
+		
+		try 
+		{
+			$adminKuser = UserLoginDataPeer::userLoginByKs($ks, $destPartnerId, true);
+		}
+		catch (kUserException $e) 
+		{
+			$code = $e->getCode();
+			if ($code == kUserException::USER_NOT_FOUND) 
+			{
+				throw new KalturaAPIException(APIErrors::ADMIN_KUSER_NOT_FOUND);
+			}
+			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) 
+			{
+				throw new KalturaAPIException(APIErrors::LOGIN_DATA_NOT_FOUND);
+			}
+			else if ($code == kUserException::LOGIN_RETRIES_EXCEEDED) 
+			{
+				throw new KalturaAPIException(APIErrors::LOGIN_RETRIES_EXCEEDED);
+			}
+			else if ($code == kUserException::LOGIN_BLOCKED) 
+			{
+				throw new KalturaAPIException(APIErrors::LOGIN_BLOCKED);
+			}
+			else if ($code == kUserException::USER_IS_BLOCKED) 
+			{
+				throw new KalturaAPIException(APIErrors::USER_IS_BLOCKED);
+			}
+			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
+		}
+		
+		if (!$adminKuser || !$adminKuser->getIsAdmin()) 
+		{
+			throw new KalturaAPIException(APIErrors::ADMIN_KUSER_NOT_FOUND);
+		}
+		
+		if ($destPartnerId != $adminKuser->getPartnerId()) 
+		{
+			throw new KalturaAPIException(APIErrors::UNKNOWN_PARTNER_ID, $destPartnerId);
+		}
+		
+		$partner = PartnerPeer::retrieveByPK($adminKuser->getPartnerId());
+		if (!$partner)
+		{
+			throw new KalturaAPIException(APIErrors::UNKNOWN_PARTNER_ID, $adminKuser->getPartnerId());
+		}
+		
+		if(!$partner->validateApiAccessControl())
+		{
+			throw new KalturaAPIException(APIErrors::SERVICE_ACCESS_CONTROL_RESTRICTED, $this->serviceName);
+		}
+		
+		
+		kSessionUtils::createKSessionNoValidations ( $partner->getId() ,  $adminKuser->getPuserId() , $ks , dateUtils::DAY , SessionType::ADMIN , "" , $ksObj->getPrivileges() );
+		return $ks;
+	}
 }

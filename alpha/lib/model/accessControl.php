@@ -196,19 +196,17 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	{
 		$serializedRulesArray = serialize($rules);
 		
-		if(strlen($serializedRulesArray) > myCustomData::MAX_TEXT_FIELD_SIZE)
+		if(strlen($serializedRulesArray) > myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
 		{
 			$this->setRulesArrayCompressed(true);
 			$serializedRulesArray = gzcompress($serializedRulesArray);
+			if(strlen(utf8_encode($serializedRulesArray)) > myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
+				throw new kCoreException('Exceeded max size allowed for access control', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
+				
 		}
 		else 
 		{
 			$this->setRulesArrayCompressed(false);
-		}
-		
-		if(strlen($serializedRulesArray) > myCustomData::MAX_TEXT_FIELD_SIZE)
-		{
-			throw new kCoreException('Exceeded max size allowed for access control', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
 		}
 		
 		$this->setRules($serializedRulesArray);

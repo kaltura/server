@@ -122,7 +122,7 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
             return "KDLOperatorrm";
         if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return "KalturaDrmProfile";
-        if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
+        if($baseClass == 'DrmProfile' && $enumValue == DrmProviderType::CENC)
             return "DrmProfile";
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return 'Kaltura_Client_Drm_Type_DrmProfile';

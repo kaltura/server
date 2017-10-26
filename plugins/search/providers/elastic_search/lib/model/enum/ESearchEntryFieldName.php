@@ -17,8 +17,8 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_REFERENCE_ID = 'reference_id';
 	const ENTRY_CONVERSION_PROFILE_ID = 'conversion_profile_id';
 	const ENTRY_REDIRECT_ENTRY_ID = 'redirect_entry_id';
-	const ENTRY_ENTITLED_USER_EDIT = 'entitled_kusers_edit';
-	const ENTRY_ENTITLED_USER_PUBLISH = 'entitled_kusers_publish';
+	const ENTRY_ENTITLED_USER_EDIT = 'entitled_pusers_edit';
+	const ENTRY_ENTITLED_USER_PUBLISH = 'entitled_pusers_publish';
 	const ENTRY_TEMPLATE_ENTRY_ID = 'template_entry_id';
 	const ENTRY_DISPLAY_IN_SEARCH = 'display_in_search';
 	const ENTRY_PARENT_ENTRY_ID = 'parent_id';
@@ -32,4 +32,10 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_MODERATION_STATUS = 'moderation_status';
 	const ENTRY_TYPE = 'entry_type';
 	const ENTRY_CATEGORIES = 'categories';
+	const ENTRY_ADMIN_TAGS = 'admin_tags';
+	const ENTRY_CREDIT = 'credit';
+	const ENTRY_SITE_URL = 'site_url';
+	const ENTRY_ACCESS_CONTROL_ID = 'access_control_id';
+	const ENTRY_VOTES = 'votes';
+	const ENTRY_VIEWS = 'views';
 }

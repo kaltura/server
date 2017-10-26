@@ -766,8 +766,7 @@ class playManifestAction extends kalturaAction
 		foreach($flavors as $flavorAsset)
 		{
 			/* @var $flavorAsset flavorAsset */
-			
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+			$mediaInfo = $flavorAsset->getMediaInfo();
 			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 			{
 				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 
@@ -1197,6 +1196,8 @@ class playManifestAction extends kalturaAction
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
 		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
+		$config->disableCaptions = $this->getRequestParameter("disableCaptions", false);
+
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{

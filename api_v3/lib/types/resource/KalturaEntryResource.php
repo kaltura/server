@@ -75,7 +75,7 @@ class KalturaEntryResource extends KalturaContentResource
 		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
 			return parent::validateEntry($dbEntry);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */

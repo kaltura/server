@@ -68,7 +68,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
                     'filter' => array(
                         array(
                             'term' => array(
-                                'partner_status' => 'p'.kEntryElasticEntitlement::$partnerId.'s'.CategoryStatus::ACTIVE
+                                'partner_status' => elasticSearchUtils::formatPartnerStatus(kEntryElasticEntitlement::$partnerId, CategoryStatus::ACTIVE)
                             )
                         ),
                         array(
@@ -119,10 +119,13 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
             $privacyContexts = explode(',', $privacyContext);
             $privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, kEntryElasticEntitlement::$partnerId );
         }
+
+        $privacyContexts = array_map('elasticSearchUtils::formatSearchTerm', $privacyContexts);
         $body['query']['bool']['filter'][] = array('terms' => array('privacy_contexts' => $privacyContexts));
 
         if($privacy) //privacy is an array
         {
+            $privacy = array_map('elasticSearchUtils::formatSearchTerm', $privacy);
             $body['query']['bool']['filter'][] = array('terms' => array('privacy' => $privacy));
         }
 

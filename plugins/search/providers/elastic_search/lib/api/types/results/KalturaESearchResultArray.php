@@ -6,6 +6,11 @@
 class KalturaESearchResultArray extends KalturaTypedArray
 {
 
+	public function __construct()
+	{
+		return parent::__construct("KalturaESearchResult");
+	}
+
 	protected static function populateArray($outputArray, $objectType, $sourceArray, $responseProfile)
 	{
 		foreach ( $sourceArray as $obj )
@@ -16,4 +21,5 @@ class KalturaESearchResultArray extends KalturaTypedArray
 		}
 		return $outputArray;
 	}
+
 }

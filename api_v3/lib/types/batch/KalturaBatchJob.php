@@ -412,7 +412,11 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaLiveToVodJobData();
 				break;
 
-			default:			
+			case 'kCopyCaptionsJobData':
+				$this->data = new KalturaCopyCaptionsJobData();
+				break;
+
+			default:
 				if($dbData instanceof kBulkUploadJobData)
 				{
 					$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $dbBatchJob->getJobSubType());
@@ -641,7 +645,12 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				if(is_null($this->data))
 					$this->data = new KalturaLiveToVodJobData();
  				break;
-				
+
+			case KalturaBatchJobType::COPY_CAPTIONS:
+				$dbData = new kCopyCaptionsJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaCopyCaptionsJobData();
+				break;
 			default:
 				$dbData = KalturaPluginManager::loadObject('kJobData', $dbBatchJob->getJobType());
 				if(is_null($this->data)) {

@@ -9,7 +9,7 @@ class kWebVTTGenerator
 	 * @param int $timeStamp
 	 * @return string
 	 */
-	protected static function formatWebVTTTimeStamp($timeStamp)
+	public static function formatWebVTTTimeStamp($timeStamp)
 	{
 		$millis = $timeStamp % 1000;
 		$timeStamp = (int)($timeStamp / 1000);
@@ -123,6 +123,7 @@ class kWebVTTGenerator
 				$styling . "\n";
 			$result .= trim($content) . "\n\n";
 		}
+		$result .="\n\n\n";
 		return $result;
 	}
 
@@ -168,6 +169,7 @@ class kWebVTTGenerator
 				self::formatWebVTTTimeStamp($curCaption["endTime"]) ."\n";
 			$result .= trim($content) . "\n\n";
 		}
+		$result .="\n\n\n";
 		return $result;
 	}
 }

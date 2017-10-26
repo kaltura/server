@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor, IKalturaObjectLoader
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -399,37 +399,41 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			{
 				/* @var $cuePoint CuePoint */
 				$contributedData = $cuePoint->contributeElasticData();
-				if (isset($contributedData['cue_point_text']))
-					$contributedData['cue_point_text']= substr($contributedData['cue_point_text'], 0 , kElasticSearchManager::MAX_LENGTH);
 				if(!$contributedData)
 					continue;
+
+				if (isset($contributedData['cue_point_text']) && (strlen($contributedData['cue_point_text']) > kElasticSearchManager::MAX_LENGTH))
+					$contributedData['cue_point_text'] = substr($contributedData['cue_point_text'], 0, kElasticSearchManager::MAX_LENGTH);
 
 				$cuePointData = $contributedData;
 				$cuePointData['cue_point_type'] = $cuePoint->getType();
 				$cuePointData['cue_point_id'] = $cuePoint->getId();
-				$cuePointData['cue_point_start_time'] = $cuePoint->getStartTime();
-				$cuePointData['cue_point_end_time'] = $cuePoint->getEndTime();
-				//add cue point metadata
-				$metaDataPlugin = KalturaPluginManager::getPluginInstance(CuePointMetadataPlugin::PLUGIN_NAME);
-				if($metaDataPlugin)
-				{
-					$cuePointElasticMetaData = $metaDataPlugin::getElasticSearchData($cuePoint);
-
-					if($cuePointElasticMetaData && count($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME]))
-					{
-						foreach ($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME] as $fieldName => $fieldValue)
-						{
-							$cuePointData['cue_point_metadata'][$fieldName] = $fieldValue;
-						}
-					}
-				}
+				if(!is_null($cuePoint->getStartTime()))
+					$cuePointData['cue_point_start_time'] = $cuePoint->getStartTime();
+				if(!is_null($cuePoint->getEndTime()))
+					$cuePointData['cue_point_end_time'] = $cuePoint->getEndTime();
+				//add cue point metadata - todo maybe add checkbox
+//				$metaDataPlugin = KalturaPluginManager::getPluginInstance(CuePointMetadataPlugin::PLUGIN_NAME);
+//				if($metaDataPlugin)
+//				{
+//					$cuePointElasticMetaData = $metaDataPlugin::getElasticSearchData($cuePoint);
+//
+//					if($cuePointElasticMetaData && count($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME]))
+//					{
+//						foreach ($cuePointElasticMetaData[kMetadataManager::ELASTIC_DATA_FIELD_NAME] as $fieldName => $fieldValue)
+//						{
+//							$cuePointData['cue_point_metadata'][$fieldName] = $fieldValue;
+//						}
+//					}
+//				}
 				$data[] = $cuePointData;
 			}
 
 			$handledObjectsCount = count($cuePointObjects);
 			$offset += $handledObjectsCount;
 		}
-		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT);
+		while ($handledObjectsCount == self::CUE_POINT_FETCH_LIMIT &&
+			$offset < kElasticSearchManager::MAX_CUE_POINTS); //remove after we move to php7
 
 		if(count($data))
 			$cuePoints['cue_points'] = $data;
@@ -450,18 +454,5 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 
 		return $indexOnEntryTypes;
 	}
-
-	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
-	{
-		if ($baseClass == 'KalturaESearchItemData' && $enumValue == 'cue_points')
-			return new KalturaESearchCuePointItemData();
-		if ($baseClass == 'ESearchItemData' && $enumValue == 'cue_points')
-			return new ESearchCuePointItemData();
-	}
-
-	public static function getObjectClass($baseClass, $enumValue)
-	{
-	}
-
 
 }

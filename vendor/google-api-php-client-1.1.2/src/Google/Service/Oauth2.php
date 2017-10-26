@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -30,7 +28,7 @@
  */
 class Google_Service_Oauth2 extends Google_Service
 {
-  /** Know your basic profile info and list of people in your circles.. */
+  /** Know the list of people in your circles, your age range, and language. */
   const PLUS_LOGIN =
       "https://www.googleapis.com/auth/plus.login";
   /** Know who you are on Google. */
@@ -55,6 +53,7 @@ class Google_Service_Oauth2 extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = '';
     $this->version = 'v2';
     $this->serviceName = 'oauth2';

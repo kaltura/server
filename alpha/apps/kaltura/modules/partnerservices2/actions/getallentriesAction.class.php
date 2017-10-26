@@ -266,9 +266,7 @@ $this->benchmarkStart( "list_type_roughcut" );
 			if ( $entry->getType() == entryType::MIX ) //&& $kshow->getHasRoughcut() )
 			{
 				$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
-				$roughcut_file_name = kFileSyncUtils::getReadyLocalFilePathForKey ( $sync_key );
-
-				$entry_data_from_roughcut = myFlvStreamer::getAllAssetsData ( $roughcut_file_name );
+				$entry_data_from_roughcut = myFlvStreamer::getAllAssetsData ( $sync_key );
 
 				$final_id_list = array();
 				foreach ( $entry_data_from_roughcut as $data )

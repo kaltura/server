@@ -20,10 +20,22 @@ class KalturaESearchCaptionItemData extends KalturaESearchItemData {
 	 */
 	public $endsAt;
 
+	/**
+	 * @var string
+	 */
+	public $language;
+
+	/**
+	 * @var string
+	 */
+	public $captionAssetId;
+
 	private static $map_between_objects = array(
 		'line',
 		'startsAt',
 		'endsAt',
+		'language',
+		'captionAssetId',
 	);
 
 	protected function getMapBetweenObjects()

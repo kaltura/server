@@ -3,14 +3,6 @@
  * @package plugins.elasticSearch
  * @subpackage lib
  */
-
-
-function build_sorter($objectsOrder) {
-	return function ($a, $b) use ($objectsOrder) {
-		return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
-	};
-}
-
 class elasticSearchUtils
 {
     /**
@@ -65,75 +57,6 @@ class elasticSearchUtils
         return null;
     }
 
-	private static function getElasticResultAsArray($elasticResults)
-	{
-		$objectData = array();
-		$objectOrder = array();
-		$objectCount = 0;
-		foreach ($elasticResults['hits']['hits'] as $key => $elasticObject)
-		{
-			$itemData = array();
-			if (isset($elasticObject['inner_hits']))
-			{
-				foreach ($elasticObject['inner_hits'] as $objectType => $hits)
-				{
-					foreach ($hits['hits']['hits'] as $objectResult)
-					{
-						$itemResults = self::getItemResults($objectResult, $objectType);
-						foreach ($itemResults as $itemResult)
-						{
-							$currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
-							if ($currItemData)
-							{
-								$currItemData->loadFromElasticHits($itemResult);
-								$itemData[] = $currItemData;
-							}
-						}
-					}
-				}
-			}
-			$objectData[$elasticObject['_id']] = $itemData;
-			$objectOrder[$elasticObject['_id']] = $key;
-		}
-		if(isset($elasticResults['hits']['total']))
-			$objectCount = $elasticResults['hits']['total'];
-		return array($objectData, $objectOrder, $objectCount);
-	}
-
-	private static function getCoreESearchResults($coreObjects, $objectsData, $objectsOrder)
-	{
-		$resultsObjects = array();
-		usort($coreObjects, build_sorter($objectsOrder));
-		foreach ($coreObjects as $coreObject)
-		{
-			$resultObj = new ESearchResult();
-			$resultObj->setObject($coreObject);
-			$resultObj->setItemData($objectsData[$coreObject->getId()]);
-			$resultsObjects[] = $resultObj;
-		}
-		return $resultsObjects;
-	}
-
-	public static function transformElasticToCoreObject($elasticResults, $peerName)
-	{
-		list($objectData, $objectOrder, $objectCount) = elasticSearchUtils::getElasticResultAsArray($elasticResults);
-		$objects = $peerName::retrieveByPKs(array_keys($objectData));
-		$coreResults = elasticSearchUtils::getCoreESearchResults($objects, $objectData, $objectOrder);
-		return array($coreResults, $objectCount);
-	}
-
-	protected static function getItemResults($objectResult, $objectType)
-	{
-		switch ($objectType)
-		{
-			case 'caption_assets':
-				return $objectResult['inner_hits']['caption_assets.lines']['hits']['hits'];
-			case 'metadata':
-			case 'cue_points':
-				return array($objectResult);
-		}
-	}
-
 	public static function formatPartnerStatus($partnerId, $status)
 	{
 		return sprintf("p%ss%s", $partnerId, $status);
@@ -147,6 +70,26 @@ class elasticSearchUtils
 		$term = strtolower($term);
 		$term = trim($term);
 		return $term;
+	}
+
+	public static function isMaster($elasticClient, $elasticHostName)
+	{
+		$masterInfo = $elasticClient->getMasterInfo();
+		if(isset($masterInfo[0]['node']) && $masterInfo[0]['node'] == $elasticHostName)
+			return true;
+
+		return false;
+	}
+
+	public static function cleanEmptyValues(&$body)
+	{
+		foreach ($body as $key => $value)
+		{
+			if(is_null($value) || $value === '')
+				unset($body[$key]);
+			if(is_array($value) && ( count($value) == 0 || ( (count($value) == 1 && (isset($value[0])) && $value[0] === '' ) ) ))
+				unset($body[$key]);
+		}
 	}
 
 }

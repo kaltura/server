@@ -303,17 +303,18 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 
 	private function validateRecurringEventForInsert()
 	{
-		if ($this->isNull('duration') && !$this->isNull('endDate'))
+		if (($this->isNull('duration') || $this->duration < 1) && !$this->isNull('endDate'))
 		{
 			$this->duration = $this->endDate - $this->startDate;
 		}
-		else if($this->isNull('endDate') && !$this->isNull('duration'))
+		else if($this->isNull('endDate') && !$this->isNull('duration') && $this->duration >0)
 		{
 			$this->endDate = $this->startDate + $this->duration;
 		}
 
 		$this->validatePropertyNotNull('recurrence');
 		$this->validatePropertyNotNull('duration');
+
 	}
 
 	/* (non-PHPdoc)

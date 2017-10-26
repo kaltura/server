@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -51,6 +49,7 @@ class Google_Service_Fitness extends Google_Service
 
   public $users_dataSources;
   public $users_dataSources_datasets;
+  public $users_dataset;
   public $users_sessions;
   
 
@@ -62,6 +61,7 @@ class Google_Service_Fitness extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'fitness/v1/users/';
     $this->version = 'v1';
     $this->serviceName = 'fitness';
@@ -77,6 +77,21 @@ class Google_Service_Fitness extends Google_Service
               'httpMethod' => 'POST',
               'parameters' => array(
                 'userId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'delete' => array(
+              'path' => '{userId}/dataSources/{dataSourceId}',
+              'httpMethod' => 'DELETE',
+              'parameters' => array(
+                'userId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'dataSourceId' => array(
                   'location' => 'path',
                   'type' => 'string',
                   'required' => true,
@@ -171,11 +186,11 @@ class Google_Service_Fitness extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'modifiedTimeMillis' => array(
+                'currentTimeMillis' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'currentTimeMillis' => array(
+                'modifiedTimeMillis' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -236,6 +251,26 @@ class Google_Service_Fitness extends Google_Service
           )
         )
     );
+    $this->users_dataset = new Google_Service_Fitness_UsersDataset_Resource(
+        $this,
+        $this->serviceName,
+        'dataset',
+        array(
+          'methods' => array(
+            'aggregate' => array(
+              'path' => '{userId}/dataset:aggregate',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'userId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),
+          )
+        )
+    );
     $this->users_sessions = new Google_Service_Fitness_UsersSessions_Resource(
         $this,
         $this->serviceName,
@@ -270,10 +305,6 @@ class Google_Service_Fitness extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'endTime' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -281,6 +312,10 @@ class Google_Service_Fitness extends Google_Service
                 'includeDeleted' => array(
                   'location' => 'query',
                   'type' => 'boolean',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
                 'startTime' => array(
                   'location' => 'query',
@@ -358,6 +393,23 @@ class Google_Service_Fitness_UsersDataSources_Resource extends Google_Service_Re
     $params = array('userId' => $userId, 'postBody' => $postBody);
     $params = array_merge($params, $optParams);
     return $this->call('create', array($params), "Google_Service_Fitness_DataSource");
+  }
+
+  /**
+   * Delete the data source if there are no datapoints associated with it
+   * (dataSources.delete)
+   *
+   * @param string $userId Retrieve a data source for the person identified. Use
+   * me to indicate the authenticated user. Only me is supported at this time.
+   * @param string $dataSourceId The data stream ID of the data source to delete.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_Fitness_DataSource
+   */
+  public function delete($userId, $dataSourceId, $optParams = array())
+  {
+    $params = array('userId' => $userId, 'dataSourceId' => $dataSourceId);
+    $params = array_merge($params, $optParams);
+    return $this->call('delete', array($params), "Google_Service_Fitness_DataSource");
   }
 
   /**
@@ -474,10 +526,10 @@ class Google_Service_Fitness_UsersDataSourcesDatasets_Resource extends Google_Se
    * where startTime and endTime are 64 bit integers.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string modifiedTimeMillis When the operation was performed on the
-   * client.
    * @opt_param string currentTimeMillis The client's current time in milliseconds
    * since epoch.
+   * @opt_param string modifiedTimeMillis When the operation was performed on the
+   * client.
    */
   public function delete($userId, $dataSourceId, $datasetId, $optParams = array())
   {
@@ -550,6 +602,36 @@ class Google_Service_Fitness_UsersDataSourcesDatasets_Resource extends Google_Se
   }
 }
 /**
+ * The "dataset" collection of methods.
+ * Typical usage is:
+ *  <code>
+ *   $fitnessService = new Google_Service_Fitness(...);
+ *   $dataset = $fitnessService->dataset;
+ *  </code>
+ */
+class Google_Service_Fitness_UsersDataset_Resource extends Google_Service_Resource
+{
+
+  /**
+   * Aggregates data of a certain type or stream into buckets divided by a given
+   * type of boundary. Multiple data sets of multiple types and from multiple
+   * sources can be aggreated into exactly one bucket type per request.
+   * (dataset.aggregate)
+   *
+   * @param string $userId Aggregate data for the person identified. Use me to
+   * indicate the authenticated user. Only me is supported at this time.
+   * @param Google_AggregateRequest $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_Fitness_AggregateResponse
+   */
+  public function aggregate($userId, Google_Service_Fitness_AggregateRequest $postBody, $optParams = array())
+  {
+    $params = array('userId' => $userId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('aggregate', array($params), "Google_Service_Fitness_AggregateResponse");
+  }
+}
+/**
  * The "sessions" collection of methods.
  * Typical usage is:
  *  <code>
@@ -585,14 +667,14 @@ class Google_Service_Fitness_UsersSessions_Resource extends Google_Service_Resou
    * indicate the authenticated user. Only me is supported at this time.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken The continuation token, which is used to page
-   * through large result sets. To get the next page of results, set this
-   * parameter to the value of nextPageToken from the previous response.
    * @opt_param string endTime An RFC3339 timestamp. Only sessions ending between
    * the start and end times will be included in the response.
    * @opt_param bool includeDeleted If true, deleted sessions will be returned.
    * When set to true, sessions returned in this response will only have an ID and
    * will not have any other fields.
+   * @opt_param string pageToken The continuation token, which is used to page
+   * through large result sets. To get the next page of results, set this
+   * parameter to the value of nextPageToken from the previous response.
    * @opt_param string startTime An RFC3339 timestamp. Only sessions ending
    * between the start and end times will be included in the response.
    * @return Google_Service_Fitness_ListSessionsResponse
@@ -627,6 +709,193 @@ class Google_Service_Fitness_UsersSessions_Resource extends Google_Service_Resou
 
 
 
+
+class Google_Service_Fitness_AggregateBucket extends Google_Collection
+{
+  protected $collection_key = 'dataset';
+  protected $internal_gapi_mappings = array(
+  );
+  public $activity;
+  protected $datasetType = 'Google_Service_Fitness_Dataset';
+  protected $datasetDataType = 'array';
+  public $endTimeMillis;
+  protected $sessionType = 'Google_Service_Fitness_Session';
+  protected $sessionDataType = '';
+  public $startTimeMillis;
+  public $type;
+
+
+  public function setActivity($activity)
+  {
+    $this->activity = $activity;
+  }
+  public function getActivity()
+  {
+    return $this->activity;
+  }
+  public function setDataset($dataset)
+  {
+    $this->dataset = $dataset;
+  }
+  public function getDataset()
+  {
+    return $this->dataset;
+  }
+  public function setEndTimeMillis($endTimeMillis)
+  {
+    $this->endTimeMillis = $endTimeMillis;
+  }
+  public function getEndTimeMillis()
+  {
+    return $this->endTimeMillis;
+  }
+  public function setSession(Google_Service_Fitness_Session $session)
+  {
+    $this->session = $session;
+  }
+  public function getSession()
+  {
+    return $this->session;
+  }
+  public function setStartTimeMillis($startTimeMillis)
+  {
+    $this->startTimeMillis = $startTimeMillis;
+  }
+  public function getStartTimeMillis()
+  {
+    return $this->startTimeMillis;
+  }
+  public function setType($type)
+  {
+    $this->type = $type;
+  }
+  public function getType()
+  {
+    return $this->type;
+  }
+}
+
+class Google_Service_Fitness_AggregateBy extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $dataSourceId;
+  public $dataTypeName;
+
+
+  public function setDataSourceId($dataSourceId)
+  {
+    $this->dataSourceId = $dataSourceId;
+  }
+  public function getDataSourceId()
+  {
+    return $this->dataSourceId;
+  }
+  public function setDataTypeName($dataTypeName)
+  {
+    $this->dataTypeName = $dataTypeName;
+  }
+  public function getDataTypeName()
+  {
+    return $this->dataTypeName;
+  }
+}
+
+class Google_Service_Fitness_AggregateRequest extends Google_Collection
+{
+  protected $collection_key = 'aggregateBy';
+  protected $internal_gapi_mappings = array(
+  );
+  protected $aggregateByType = 'Google_Service_Fitness_AggregateBy';
+  protected $aggregateByDataType = 'array';
+  protected $bucketByActivitySegmentType = 'Google_Service_Fitness_BucketByActivity';
+  protected $bucketByActivitySegmentDataType = '';
+  protected $bucketByActivityTypeType = 'Google_Service_Fitness_BucketByActivity';
+  protected $bucketByActivityTypeDataType = '';
+  protected $bucketBySessionType = 'Google_Service_Fitness_BucketBySession';
+  protected $bucketBySessionDataType = '';
+  protected $bucketByTimeType = 'Google_Service_Fitness_BucketByTime';
+  protected $bucketByTimeDataType = '';
+  public $endTimeMillis;
+  public $startTimeMillis;
+
+
+  public function setAggregateBy($aggregateBy)
+  {
+    $this->aggregateBy = $aggregateBy;
+  }
+  public function getAggregateBy()
+  {
+    return $this->aggregateBy;
+  }
+  public function setBucketByActivitySegment(Google_Service_Fitness_BucketByActivity $bucketByActivitySegment)
+  {
+    $this->bucketByActivitySegment = $bucketByActivitySegment;
+  }
+  public function getBucketByActivitySegment()
+  {
+    return $this->bucketByActivitySegment;
+  }
+  public function setBucketByActivityType(Google_Service_Fitness_BucketByActivity $bucketByActivityType)
+  {
+    $this->bucketByActivityType = $bucketByActivityType;
+  }
+  public function getBucketByActivityType()
+  {
+    return $this->bucketByActivityType;
+  }
+  public function setBucketBySession(Google_Service_Fitness_BucketBySession $bucketBySession)
+  {
+    $this->bucketBySession = $bucketBySession;
+  }
+  public function getBucketBySession()
+  {
+    return $this->bucketBySession;
+  }
+  public function setBucketByTime(Google_Service_Fitness_BucketByTime $bucketByTime)
+  {
+    $this->bucketByTime = $bucketByTime;
+  }
+  public function getBucketByTime()
+  {
+    return $this->bucketByTime;
+  }
+  public function setEndTimeMillis($endTimeMillis)
+  {
+    $this->endTimeMillis = $endTimeMillis;
+  }
+  public function getEndTimeMillis()
+  {
+    return $this->endTimeMillis;
+  }
+  public function setStartTimeMillis($startTimeMillis)
+  {
+    $this->startTimeMillis = $startTimeMillis;
+  }
+  public function getStartTimeMillis()
+  {
+    return $this->startTimeMillis;
+  }
+}
+
+class Google_Service_Fitness_AggregateResponse extends Google_Collection
+{
+  protected $collection_key = 'bucket';
+  protected $internal_gapi_mappings = array(
+  );
+  protected $bucketType = 'Google_Service_Fitness_AggregateBucket';
+  protected $bucketDataType = 'array';
+
+
+  public function setBucket($bucket)
+  {
+    $this->bucket = $bucket;
+  }
+  public function getBucket()
+  {
+    return $this->bucket;
+  }
+}
 
 class Google_Service_Fitness_Application extends Google_Model
 {
@@ -669,6 +938,66 @@ class Google_Service_Fitness_Application extends Google_Model
   public function getVersion()
   {
     return $this->version;
+  }
+}
+
+class Google_Service_Fitness_BucketByActivity extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $activityDataSourceId;
+  public $minDurationMillis;
+
+
+  public function setActivityDataSourceId($activityDataSourceId)
+  {
+    $this->activityDataSourceId = $activityDataSourceId;
+  }
+  public function getActivityDataSourceId()
+  {
+    return $this->activityDataSourceId;
+  }
+  public function setMinDurationMillis($minDurationMillis)
+  {
+    $this->minDurationMillis = $minDurationMillis;
+  }
+  public function getMinDurationMillis()
+  {
+    return $this->minDurationMillis;
+  }
+}
+
+class Google_Service_Fitness_BucketBySession extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $minDurationMillis;
+
+
+  public function setMinDurationMillis($minDurationMillis)
+  {
+    $this->minDurationMillis = $minDurationMillis;
+  }
+  public function getMinDurationMillis()
+  {
+    return $this->minDurationMillis;
+  }
+}
+
+class Google_Service_Fitness_BucketByTime extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $durationMillis;
+
+
+  public function setDurationMillis($durationMillis)
+  {
+    $this->durationMillis = $durationMillis;
+  }
+  public function getDurationMillis()
+  {
+    return $this->durationMillis;
   }
 }
 
@@ -1056,10 +1385,28 @@ class Google_Service_Fitness_ListSessionsResponse extends Google_Collection
   }
 }
 
+class Google_Service_Fitness_MapValue extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $fpVal;
+
+
+  public function setFpVal($fpVal)
+  {
+    $this->fpVal = $fpVal;
+  }
+  public function getFpVal()
+  {
+    return $this->fpVal;
+  }
+}
+
 class Google_Service_Fitness_Session extends Google_Model
 {
   protected $internal_gapi_mappings = array(
   );
+  public $activeTimeMillis;
   public $activityType;
   protected $applicationType = 'Google_Service_Fitness_Application';
   protected $applicationDataType = '';
@@ -1071,6 +1418,14 @@ class Google_Service_Fitness_Session extends Google_Model
   public $startTimeMillis;
 
 
+  public function setActiveTimeMillis($activeTimeMillis)
+  {
+    $this->activeTimeMillis = $activeTimeMillis;
+  }
+  public function getActiveTimeMillis()
+  {
+    return $this->activeTimeMillis;
+  }
   public function setActivityType($activityType)
   {
     $this->activityType = $activityType;
@@ -1137,12 +1492,16 @@ class Google_Service_Fitness_Session extends Google_Model
   }
 }
 
-class Google_Service_Fitness_Value extends Google_Model
+class Google_Service_Fitness_Value extends Google_Collection
 {
+  protected $collection_key = 'mapVal';
   protected $internal_gapi_mappings = array(
   );
   public $fpVal;
   public $intVal;
+  protected $mapValType = 'Google_Service_Fitness_ValueMapValEntry';
+  protected $mapValDataType = 'array';
+  public $stringVal;
 
 
   public function setFpVal($fpVal)
@@ -1160,5 +1519,48 @@ class Google_Service_Fitness_Value extends Google_Model
   public function getIntVal()
   {
     return $this->intVal;
+  }
+  public function setMapVal($mapVal)
+  {
+    $this->mapVal = $mapVal;
+  }
+  public function getMapVal()
+  {
+    return $this->mapVal;
+  }
+  public function setStringVal($stringVal)
+  {
+    $this->stringVal = $stringVal;
+  }
+  public function getStringVal()
+  {
+    return $this->stringVal;
+  }
+}
+
+class Google_Service_Fitness_ValueMapValEntry extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $key;
+  protected $valueType = 'Google_Service_Fitness_MapValue';
+  protected $valueDataType = '';
+
+
+  public function setKey($key)
+  {
+    $this->key = $key;
+  }
+  public function getKey()
+  {
+    return $this->key;
+  }
+  public function setValue(Google_Service_Fitness_MapValue $value)
+  {
+    $this->value = $value;
+  }
+  public function getValue()
+  {
+    return $this->value;
   }
 }
