@@ -78,11 +78,13 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 
 	protected function validateEntryId()
 	{
+		//do nothing - already validating in QuizPlugin::isQuiz
 		return null;
 	}
 
 	protected function validateUserId()
 	{
+		//do nothing
 		return null;
 	}
 
