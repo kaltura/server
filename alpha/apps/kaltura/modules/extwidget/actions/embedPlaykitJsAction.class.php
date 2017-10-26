@@ -67,10 +67,18 @@ class embedPlaykitJsAction extends sfAction
 					try 
 					{
 						$content = json_decode($content, true);
-						$sourceMapContent = base64_decode($content['sourceMap']);
-						$bundleContent = time() . "," . base64_decode($content['bundle']);
-						$context->bundleCache->set($context->bundle_name, $bundleContent);
-						$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
+						if($content['bundle'])
+						{
+							$sourceMapContent = base64_decode($content['sourceMap']);
+							$bundleContent = time() . "," . base64_decode($content['bundle']);
+							$context->bundleCache->set($context->bundle_name, $bundleContent);
+							$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
+						}
+						else
+						{
+							KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+						}
+						
 					} 
 					catch (Exception $ex) 
 					{
