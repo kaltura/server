@@ -196,7 +196,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	{
 		$serializedRulesArray = serialize($rules);
 		
-		if(strlen($serializedRulesArray) > myCustomData::MAX_TEXT_FIELD_SIZE)
+		if(strlen($serializedRulesArray) > myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
 		{
 			$this->setRulesArrayCompressed(true);
 			$serializedRulesArray = gzcompress($serializedRulesArray);
