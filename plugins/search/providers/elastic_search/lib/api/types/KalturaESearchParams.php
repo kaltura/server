@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchParams extends KalturaObject
+class KalturaESearchParams extends KalturaESearchObject
 {
 	/**
 	 * @var KalturaESearchOperator
