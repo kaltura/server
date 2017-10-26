@@ -677,7 +677,7 @@ class kKavaReportsMgr extends kKavaBase
 		        		self::DRUID_VALUES => array($partner_id)
 		        	),
 		        );
-		        self::addEndUserReportsDruidFilters($input_filter, $druid_filter);
+		        self::addEndUserReportsDruidFilters($partner_id, $input_filter, $druid_filter);
 	        }
 	        else
 	        {
@@ -910,7 +910,7 @@ class kKavaReportsMgr extends kKavaBase
        return $date->format('YmdH');
    }
    
-   private static function addEndUserReportsDruidFilters($input_filter, &$druid_filter)
+   private static function addEndUserReportsDruidFilters($partner_id, $input_filter, &$druid_filter)
    {
    		if (!($input_filter instanceof endUserReportsInputFilter))
    		{
@@ -952,7 +952,7 @@ class kKavaReportsMgr extends kKavaBase
        			array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR) : 
        			array(self::PLAYBACK_TYPE_VOD));
        
-       self::addEndUserReportsDruidFilters($input_filter, $druid_filter);
+       self::addEndUserReportsDruidFilters($partner_id, $input_filter, $druid_filter);
        
        if ($input_filter->categories)
        {
