@@ -82,17 +82,7 @@
 		},
 		"tags" : {
 		  "type" : "text",
-		  "analyzer" : "kaltura_text",
-		  "fields": {
-			"ngrams" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_ngrams"
-			},
-			"raw" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			}
-		  }
+		  "analyzer" : "kaltura_keyword"
 		},
 		"status" : {
 		  "type" : "text",
