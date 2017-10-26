@@ -185,7 +185,16 @@ class kConvertJobData extends kConvartableJobData
 		$flavorParamsId = $this->getFlavorParamsOutput()->getFlavorParamsId();
 		$isBulkupload = ($batchJob->getBulkJobId() !== null);
 		$readiness = null;
-
+		
+			/*
+			 * Raise urgency/priority of copy jobs
+			 * since copy jobs are very short
+			 */
+		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
+		if(isset($flavorParams) && $flavorParams->getVideoCodec()==flavorParams::VIDEO_CODEC_COPY){
+			return BatchJobUrgencyType::REQUIRED_REGULAR_UPLOAD;
+		}
+		
 		if($this->priority == 0)
 			self::calculatePriority($batchJob);
 
