@@ -104,6 +104,7 @@ class elasticClient
 		curl_setopt($this->ch, CURLOPT_URL, $cmd);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true); //TRUE to return the transfer as a string of the return value of curl_exec() instead of outputting it out directly
 		curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, $method); // PUT/GET/POST/DELETE
+		curl_setopt($this->ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 		if ($body)
 			curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($body));
 		
