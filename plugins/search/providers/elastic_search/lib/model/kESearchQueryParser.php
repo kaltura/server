@@ -28,8 +28,8 @@ class kESearchQueryParser
 	 */
 	public static function buildKESearchParamsFromKESearchQuery($kEsearchQuery)
 	{
-		$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSerachQuery);
 		$kESearchParams = new KalturaESearchParams();
+		$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSerachQuery);
 		$kESearchParams->searchOperator = self::createKESearchParams($parsedQuery);
 		return $kESearchParams;
 	}
@@ -121,6 +121,7 @@ class kESearchQueryParser
 			{
 				if (!$levelOperand)
 				{
+					$match = strtoupper($match);
 					$levelOperand = in_array($match, array(self::AND_OPERAND, self::OR_OPERAND)) ? $match : null;
 				} elseif ($levelOperand != $match && $match != self::NOT_OPERAND)
 					throw new kESearchException('Un-matching query operand', kESearchException::UNMATCHING_QUERY_OPERAND);
