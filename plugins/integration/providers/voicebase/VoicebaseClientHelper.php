@@ -79,6 +79,11 @@ class VoicebaseClientHelper
 		$urlOptions = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postParams);
 
 		$curlResult = $this->sendAPICall($params, $urlOptions);
+		if ($curlResult->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
+		{
+			$action = $params["action"];
+			throw new Exception("VoiceBase $action failed. Message: [" . $curlResult->statusMessage . "]");
+		}
 	
 		return true;
 	}
@@ -115,12 +120,6 @@ class VoicebaseClientHelper
 			
 		}
 		
-		if ($result->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
-		{
-			$action = $params["action"];
-			throw new Exception("VoiceBase $action failed. Message: [" . $result->statusMessage . "]");
-		}
-		
 		KalturaLog::debug('result is - ' . var_dump($result));
 		curl_close($ch);
 		
@@ -139,7 +138,14 @@ class VoicebaseClientHelper
 		);
 		$options = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postFields);
 	
-		return $this->sendAPICall($params, $options);
+		$result = $this->sendAPICall($params, $options);
+		if ($result->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
+		{
+			$action = $params["action"];
+			throw new Exception("VoiceBase $action failed. Message: [" . $result->statusMessage . "]");
+		}
+	
+		return $result;
 	}
 	
 	public function getRemoteTranscripts($entryId, array $formats)
