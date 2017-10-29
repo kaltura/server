@@ -336,16 +336,16 @@ class kMetadataManager
 		}
 		
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
+		$xmlString = kFileSyncUtils::file_get_contents($key);
 		
 		try{
 			$xml = new KDOMDocument();
-			$xml->load($xmlPath);
+			$xml->loadXML($xmlString);
 			$xPath = new DOMXPath($xml);
 		}
 		catch (Exception $ex)
 		{
-			KalturaLog::err('Could not load metadata xml [' . $xmlPath . '] - ' . $ex->getMessage());
+			KalturaLog::err('Could not load metadata xml [' . kFileSyncUtils::getLocalFilePathForKey($key) . '] - ' . $ex->getMessage());
 			return '';
 		}
 					
