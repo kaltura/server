@@ -1,3 +1,41 @@
+# Mercury 13.6.0 #
+
+## Increase ACL rules size column ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-8164
+
+### Configuration ###
+
+		None.
+
+### Deployment scripts ###
+
+		mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_10_20_alter_access_control_table_rules.sql
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
+## Fix typo in admin console ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+	- Edit admin.ini
+        'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment' change to 'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy collaboration'
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Mercury 13.5.0 #
 
 ## Add permissions to eSearch service ##

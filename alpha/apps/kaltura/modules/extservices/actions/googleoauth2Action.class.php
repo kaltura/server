@@ -1,5 +1,4 @@
 <?php
-
 require_once 'oauth2Action.class.php';
 
 /**
@@ -154,7 +153,6 @@ class googleoauth2Action extends oauth2Action
 		$client = $this->getGoogleClient($appId);
 		$redirect = $this->getController()->genUrl('extservices/googleoauth2', true);
 		$client->setRedirectUri($redirect);
-
 		try
 		{
 			$code = $this->getRequestParameter('code');

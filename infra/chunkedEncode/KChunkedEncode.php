@@ -81,6 +81,7 @@
 				 * Check for supported codecs/formats
 				 */
 			if($this->verifySupport($msgStr)!=true){
+				KalturaLog::log($msgStr);
 				return false;
 			}
 				/*
@@ -144,7 +145,7 @@
 			if($duration==-1) {
 				$duration = round($this->sourceFileDt->containerDuration/1000,4);
 			}
-			if($duration<180){
+/**/		if($duration<180){
 				KalturaLog::log($msgStr="ERROR: too short duration ($duration), must be at least 180sec");
 				return false;
 			}
@@ -176,7 +177,13 @@
 			$finish = $this->setup->startFrom+$params->duration;
 			$duration = $this->setup->chunkDuration+$this->calcChunkDrift();
 			$idx = 0;
-
+				/*
+				 * Handle Subs(SRT) file splitting, if it is required
+				 */
+			if(isset($this->params->videoFilters->subsFilename)){
+				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
+				$subsArr = array();
+			}
 			while($finish>$start) {
 				$chunkData = new KChunkData($idx, $start, $duration);
 				if($idx>0) {
@@ -184,6 +191,18 @@
 				}
 				$this->chunkDataArr[$idx++] = $chunkData;
 		
+					/*
+					 * SRT splitting
+					 */
+				if(isset($subsFileHd)){
+					$chunkSrtFile = $this->getChunkName($chunkData->index,"srt");
+					if(file_exists($chunkSrtFile))
+						unlink($chunkSrtFile);
+					KSrtText::SplitSrtFile($subsFileHd, $chunkSrtFile, $start, $duration, $subsArr);
+					KalturaLog::log("$chunkSrtFile, $start, $duration");
+
+				}
+
 				$start += $this->setup->chunkDuration+$this->calcChunkDrift();
 				$delta = $start-$idx*$this->setup->chunkDuration;
 				$duration = $this->setup->chunkDuration+$this->calcChunkDrift();
@@ -258,11 +277,11 @@
 */			
 				/*
 				 * WV session fail with chunked encoding. Detect chunks by very large GOP value
-				 */
+					***** Disable this check, WV related flavors can disable chunks via conv-prof 
 			if($params->gop>100){
-				KalturaLog::log($msgStr="UNSUPPORTED: WV conversion detected (larg GOP=$params->gop). Currently chunked encoding does not work with WV.");
+				KalturaLog::log($msgStr="UNSUPPORTED: WV conversion detected (large GOP=$params->gop). Currently chunked encoding does not work with WV.");
 				return false;
-			}
+			}*/
 
 			return true;
 		}
@@ -336,8 +355,8 @@
 			}
 			
 			$cmdLineArr[] = "-map 0:v:0 -flags -global_header";
-			if(isset($params->videoFilters))
-				$cmdLineArr[] = "-filter_complex ". end($params->videoFilters);
+			if(isset($params->videoFilters->filterStr))
+				$cmdLineArr[] = "-filter_complex ".($params->videoFilters->filterStr);
 			if($params->vcodec=='libx264')
 				$cmdLineArr[] = "-bsf h264_mp4toannexb";
 			if($toAddFps)
@@ -359,6 +378,70 @@
 			KalturaLog::log("cmdLine:$this->cmdLine");
 		}
 
+		/********************
+		 * adjustTimeRelatedFilters
+		 *	Handles WM and Subs that require per chunk adjustments
+		 */
+		protected function adjustTimeRelatedFilters($cmdLine, $chunkIdx, $start, $chunkWithOverlap)
+		{
+			KalturaLog::log("$start, $chunkWithOverlap");
+			if(!isset($this->params->videoFilters->filterGraph)){
+				return $cmdLine;
+			}
+			$cmdLineArr = explode(' ',$cmdLine);
+			if(($filterIdx=array_search("-filter_complex", $cmdLineArr))===false){
+				return $cmdLine;
+			}
+			$filterGraphBase = $this->params->videoFilters->filterGraph;
+			
+			$toImplode = false;
+
+				/*
+				 * Handle WM fade in's/out's
+				 */
+			if(isset($this->params->videoFilters->fadeFilters)){
+				$filterGraph = clone $filterGraphBase;
+				$filterGraph->entities = array();
+				$filterGraphBase->LoopEntities($filterGraphBase,'iterFuncClone', $filterGraph);
+
+				$fadeArr = array();
+				$fadeArr = self::filterOutFadeFilters($this->params->videoFilters->fadeFilters, $start, $chunkWithOverlap);
+				foreach($fadeArr as $idx=>$fade) {
+					if(isset($fade))
+						continue;
+					$fade = $this->params->videoFilters->fadeFilters[$idx];
+					$chainIdx = $fade->_chain->id;
+					if(!array_key_exists($chainIdx,  $filterGraph->entities))
+						continue;
+					$filterGraph->RemoveChain($filterGraph->entities[$chainIdx]);
+				}
+				$adjustedFilterStr = $filterGraph->CompoundString();
+			}
+			
+				/*
+				 * Handle Subs/SRT - change original file name to splitted 
+				 */
+			if(isset($this->params->videoFilters->subsFilename)){
+				$adjustedSubsFilename = $this->getChunkName($chunkIdx,"srt");
+				if(isset($adjustedFilterStr)){
+					$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename, 
+											$adjustedSubsFilename, $adjustedFilterStr);
+				}
+				else {
+					$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename,
+											$adjustedSubsFilename, $cmdLineArr[$filterIdx+1]);
+				}
+			}
+			
+			if(isset($adjustedFilterStr)) {
+				KalturaLog::log($adjustedFilterStr);
+				$cmdLineArr[$filterIdx+1] = '\''.$adjustedFilterStr.'\'';
+				$cmdLine = implode(' ',$cmdLineArr);
+			}
+			
+			return $cmdLine;
+		}
+		
 		/********************
 		 * 
 		 */
@@ -386,6 +469,9 @@
 				}
 			
 				$cmdLine = " -threads ".$this->params->threadsDec.$cmdLine;
+				
+				$cmdLine = $this->adjustTimeRelatedFilters($cmdLine, $chunkIdx, $start, $chunkWithOverlap);
+				KalturaLog::log($cmdLine);
 			}
 			$cmdLine = "$setup->ffmpegBin $cmdLine";
 
@@ -519,7 +605,7 @@
 			  */
 			$asyncStr = "-async 1";
 			if(isset($params->audioFilters)){
-				$filterStr = "-filter_complex ".end($params->audioFilters);
+				$filterStr = "-filter_complex ".($params->audioFilters);
 				if(strstr($filterStr,"amerge")!==false){
 					$asyncStr = null;
 				}
@@ -673,28 +759,33 @@
 			}
 			return $name;
 		}
-		
+
 		/********************
 		 * mode: base, fix, [0...n]
 		 */
 		public function getChunkName($chunkIdx, $mode=null)
 		{
-			$name = $this->setup->output."_$this->chunkEncodeToken"."_$chunkIdx.$this->videoChunkPostfix";
+			$name = $this->setup->output."_$this->chunkEncodeToken"."_$chunkIdx.";
 			switch($mode){
 			case null;
-				$name.= $chunkIdx;
+				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;
 			case "fix";
-				$name.= $chunkIdx.".fix";
+				$name.= "$this->videoChunkPostfix".$chunkIdx.".fix";
 				break;
 			case "base":
+				$name.= "$this->videoChunkPostfix";
+				break;
+			case "srt";
+				$name.= "srt";
 				break;
 			default:
-				$name.= $mode;
+				$name.= "$this->videoChunkPostfix".$mode;
 				break;
 			}
 			return $name;
 		}
+
 
 		/********************
 		 *
@@ -706,6 +797,44 @@
 			$medPrsr = new KMediaInfoMediaParser($fileName);
 			$m=$medPrsr->getMediaInfo();
 			return $m;
+		}
+
+		/********************
+		 *
+		 */
+		protected static function filterOutFadeFilters($filters, $start, $dur)
+		{
+			$arr = array();
+			
+			foreach($filters as $fade){
+				KalturaLog::log("chunk(start:$start, dur:$dur),fade($fade->start_time,$fade->duration)");
+				if(!isset($fade->start_time)){
+					$arr[] = $fade;
+					continue;
+				}
+					// The whole 'fade' contained inside the current single chunk
+				if($start<=$fade->start_time && $start+$dur>=$fade->start_time){
+					$arr[] = $fade;
+					continue;
+				}
+					// The 'fade' start contained inside the current chunk
+				if($start<=$fade->start_time && $start+$dur>=$fade->start_time){
+					$arr[] = $fade;
+					continue;
+				}
+					// The 'fade' end contained inside the current chunk
+				if(isset($fade->duration)) {
+					if($start<=$fade->start_time+$fade->duration && $start+$dur>=$fade->start_time+$fade->duration){
+						$arr[] = $fade;
+						continue;
+					}
+				}
+				
+				$arr[] = null;
+					
+			}
+			KalturaLog::log(print_r($arr,1));
+			return $arr;
 		}
 	}
 	
@@ -907,11 +1036,38 @@
 			if(isset($this->filter_complex) && count($this->filter_complex)>0) {
 				foreach($this->filter_complex as $idx=>$val){
 					$filterStr = self::adjustFilters($cmdLineArr[$idx+1], 'video');
-					if(isset($filterStr))
-						$this->videoFilters[$idx] = $filterStr;
+					if(isset($filterStr)) {
+						$this->videoFilters->filterStr = $filterStr;
+					}
 					$filterStr = self::adjustFilters($cmdLineArr[$idx+1], 'audio');
 					if(isset($filterStr))
-						$this->audioFilters[$idx] = $filterStr;
+						$this->audioFilters = $filterStr;
+				}
+				if(isset($this->videoFilters->filterStr)){
+						/*
+						 * Check and prepare for 'fade' filters
+						 */
+					$filterStr = trim($this->videoFilters->filterStr,'\'');
+					$filterGraph = new KFFmpegFilterGraph();
+					$filterGraph->Parse($filterStr);
+					$this->videoFilters->filterGraph = $filterGraph;
+					$stam = new stdClass();
+					$filterGraph->LoopFilters(null,'iterFuncFadeFilters', $stam);
+					if(isset($stam->filters)){
+						$this->videoFilters->fadeFilters = $stam->filters;
+					}
+
+						/*
+						 * Check and prepare for 'subs' filter
+						 */
+					$stam = new stdClass();
+					$filterGraph->LoopFilters(null,'iterFuncSubsFilters', $stam);
+					if(isset($stam->filters)){
+						$subsFilter = $stam->filters[0];
+						$paramArr=explode(':',$subsFilter->_paramStr);
+						list($str,$fileName)=explode('=',$paramArr[0]);
+						$this->videoFilters->subsFilename =  $fileName;
+					}
 				}
 			}
 				/*
@@ -973,7 +1129,7 @@
 			}
 			$filterStr = "'".implode(';',$filterArrOut)."'";
 			return $filterStr;
-		}
+		}		
 	}
 	
 	/********************
@@ -1002,7 +1158,7 @@
 		}
 		
 		/********************
-		 * 
+		 * calcGapToNext
 		 */
 		public function calcGapToNext($nextChunk, $frameDuration)
 		{
@@ -1011,3 +1167,29 @@
 		}
 	}
 	
+		/********************
+		 * iterFuncFadeFilters
+		 *	FilterGraph iteration helper func
+		 */
+	function iterFuncFadeFilters($entity, $obj)
+	{
+		KalturaLog::log("Name:".$entity->name);
+		if($entity->name=='fade')
+			$obj->filters[] = $entity;
+		return null;
+	}
+		
+		/********************
+		 * iterFuncSubsFilters
+		 *	FilterGraph iteration helper func
+		 */
+	function iterFuncSubsFilters($entity, $obj)
+	{
+		KalturaLog::log("Name:".$entity->name);
+		if($entity->name=='subtitles')
+			$obj->filters[] = $entity;
+		return null;
+	}
+		
+	
+

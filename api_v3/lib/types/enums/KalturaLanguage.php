@@ -550,6 +550,9 @@ class KalturaLanguage extends KalturaStringEnum
 	const XSV = 'Sudovian';
 	const ZAI = 'Zapotec Isthmus';
 	const YUE = 'Cantonese';
-
-	const UN = 'Undefined';
+	const HKK = 'Hokkien';
+	const TEO = 'Teo Chew';
+	const HNN = 'Hainanese';
+	const HAK = 'Hakka';
+	const UN  = 'Undefined';
 }

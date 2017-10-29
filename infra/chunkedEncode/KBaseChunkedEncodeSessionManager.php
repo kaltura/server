@@ -237,10 +237,14 @@
 					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
 				}
 				$cnt = $chunker->GetMaxChunks();
-				$userAvg 	= round($userAcc/$cnt,3);
-				$systemAvg 	= round($systemAcc/$cnt,3);
-				$elapsedAvg = round($elapsedAcc/$cnt,3);
-				$cpuAvg 	= round($cpuAcc/$cnt,3);
+				if($cnt>0) {
+					$userAvg 	= round($userAcc/$cnt,3);
+					$systemAvg 	= round($systemAcc/$cnt,3);
+					$elapsedAvg = round($elapsedAcc/$cnt,3);
+					$cpuAvg 	= round($cpuAcc/$cnt,3);
+				}
+				else
+					$userAvg = $systemAvg = $elapsedAvg = $cpuAvg = 0;
 			}
 			
 //			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));

@@ -274,6 +274,17 @@ class KDLMediaDataSet  {
 			/*
 			 * Set video related fields
 			 */
+		$valsArr["videoFormat"]="undefined";
+		$valsArr["videoDuration"]=0;
+		$valsArr["videoBitRate"]=0;
+		$valsArr["videoWidth"]=0;
+		$valsArr["videoHeight"]=0;
+		$valsArr["videoFrameRate"]=0;
+		$valsArr["videoDar"]=0;
+		$valsArr["videoRotation"]=0;
+		$valsArr["scanType"]=0;
+		$valsArr["contentAwareness"]=0;		
+		$valsArr["videoGop"]=0;
 		if(isset($this->_video) && $this->_video->IsDataSet()){
 			$obj = $this->_video;
 			if($obj->IsFormatOf(array("avc","avc1","h264"))){
@@ -309,19 +320,6 @@ class KDLMediaDataSet  {
 			$valsArr["scanType"]=$obj->_scanType;
 			$valsArr["contentAwareness"]=$obj->_contentAwareness;
 			$valsArr["videoGop"]=$obj->_gop;
-		}
-		else {
-			$valsArr["videoFormat"]="undefined";
-			$valsArr["videoDuration"]=0;
-			$valsArr["videoBitRate"]=0;
-			$valsArr["videoWidth"]=0;
-			$valsArr["videoHeight"]=0;
-			$valsArr["videoFrameRate"]=0;
-			$valsArr["videoDar"]=0;
-			$valsArr["videoRotation"]=0;
-			$valsArr["scanType"]=0;
-			$valsArr["contentAwareness"]=0;		
-			$valsArr["videoGop"]=0;
 		}
 			/*
 			 * Set audio related fields

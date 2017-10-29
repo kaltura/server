@@ -567,7 +567,17 @@
 			},
 			"cue_point_tags" : {
 			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
 			},
 			"cue_point_start_time" : {
 			  "type" : "long"
