@@ -58,11 +58,10 @@ class embedPlaykitJsAction extends sfAction
 		if(!$context->regenerate)
 		{
 			$bundleContent = $context->bundleCache->get($context->bundle_name);
-		}
-		
-		if ($bundleContent && !$context->regenerate) 
-		{
-			return $bundleContent;
+			if ($bundleContent) 
+			{
+				return $bundleContent;
+			}
 		}
 
 		//build bundle and save in memcache
@@ -81,7 +80,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$content = json_decode($content, true);
-		if($content && !$content['bundle'])
+		if(!$content || !$content['bundle'])
 		{
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 		}
