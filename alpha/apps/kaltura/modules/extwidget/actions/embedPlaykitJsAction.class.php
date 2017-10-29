@@ -26,6 +26,7 @@ class embedPlaykitJsAction extends sfAction
 	private $cacheVersion = null;
 	private $playKitVersion = null;
 	private $playerConfig = null;
+	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
 	
 	public function execute()
@@ -134,7 +135,7 @@ class embedPlaykitJsAction extends sfAction
 		// Support Etag and 304
 		if (
 			(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
-				$_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($lastModified)) ||
+				$_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($lastModified)) &&
 			(isset($_SERVER['HTTP_IF_NONE_MATCH']) && @trim($_SERVER['HTTP_IF_NONE_MATCH']) == $this->getOutputHash($content))
 		) {
 			infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
@@ -161,7 +162,11 @@ class embedPlaykitJsAction extends sfAction
 	private function getLastModified($content)
 	{
 		$contentParts = explode(",", $content, 2);
-		return $contentParts[0];
+		$lastModified = $contentParts[0];
+		
+		if($this->uiConfUpdatedAt > $lastModified)
+			$lastModified = $this->uiConfUpdatedAt;
+		return $lastModified;
 	}
 	
 	private function getOutputHash($o)
@@ -286,6 +291,7 @@ class embedPlaykitJsAction extends sfAction
 		if (!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 		$this->playerConfig = json_decode($uiConf->getConfig(), true);
+		$this->uiConfUpdatedAt = $uiConf->getUpdatedAt();
 		
 		//Get bundle configuration stored in conf_vars
 		$confVars = $uiConf->getConfVars();
