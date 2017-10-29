@@ -165,7 +165,8 @@ class kMetadataManager
 		$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
 		
-		$xPaths = kXsd::findXpathsByAppInfo($xsdPath, self::APP_INFO_SEARCH, 'true');
+		$xmlString = kFileSyncUtils::file_get_contents($key);
+		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'true', false);
 		
 		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
 		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfile->getId());
@@ -227,7 +228,7 @@ class kMetadataManager
 		}
 	
 		// set none searchable existing fields
-		$xPaths = kXsd::findXpathsByAppInfo($xsdPath, self::APP_INFO_SEARCH, 'false');
+		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'false', false);
 		foreach($profileFields as $profileField)
 		{
 			$xPath = $profileField->getXpath();

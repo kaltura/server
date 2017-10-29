@@ -40,19 +40,13 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			clearstatcache();
-			if ($key)
-				$this->fileSize = kEncryptFileUtils::fileSize($filePath, $key);
-			else
-				$this->fileSize = kFileBase::fileSize($filePath);
+			$this->fileSize = kEncryptFileUtils::fileSize($filePath, $key);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
 		
 		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
 		{
-			if ($key)
-				$this->fileData = kEncryptFileUtils::getEncryptedFileContent($this->filePath, $key, 0, $limitFileSize);
-			else
-				$this->fileData = kFileBase::getFileContent($this->filePath, 0, $limitFileSize);
+			$this->fileData = kEncryptFileUtils::getEncryptedFileContent($this->filePath, $key, 0, $limitFileSize);
 		}
 	}
 	
@@ -101,10 +95,7 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
-			if ($this->key)
-				echo kEncryptFileUtils::getEncryptedFileContent($this->filePath, $this->key, $rangeFrom, $rangeFrom + $rangeLength);
-			else
-				echo kFileBase::getFileContent($this->filePath, $rangeFrom, $rangeFrom + $rangeLength);
+			echo kEncryptFileUtils::getEncryptedFileContent($this->filePath, $this->key, $rangeFrom, $rangeFrom + $rangeLength);
 		}
 	}
 }

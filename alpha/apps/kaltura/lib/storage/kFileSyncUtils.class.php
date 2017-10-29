@@ -238,7 +238,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		file_put_contents ( $fullPath , $content );
 		self::setPermissions($fullPath);
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
-		self::encryptByKey($key);
+		self::encryptByFileSyncKey($key);
 	}
 
 	protected static function setPermissions($filePath)
@@ -507,7 +507,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			self::setPermissions($targetFullPath);
 			if(!$existsFileSync)
 				self::createSyncFileForKey($rootPath, $filePath, $target_key, $strict, false, $cacheOnly);
-			self::encryptByKey($target_key);
+			self::encryptByFileSyncKey($target_key);
 		}
 		else
 		{
@@ -1639,7 +1639,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			self::dumpFileByFileSync($file_sync);
 	}
 	
-	public static function encryptByKey(FileSyncKey $key)
+	public static function encryptByFileSyncKey(FileSyncKey $key)
 	{
 		$fileSync = self::getLocalFileSyncForKey($key);
 		return $fileSync->encrypt();

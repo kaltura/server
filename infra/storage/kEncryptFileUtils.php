@@ -23,8 +23,10 @@ class kEncryptFileUtils
         return trim($decryptText);
     }
 
-    public static function getEncryptedFileContent($fileName, $key, $from_byte = 0, $len = 0)
+    public static function getEncryptedFileContent($fileName, $key = null, $from_byte = 0, $len = 0)
     {
+        if (!$key)
+            return kFileBase::getFileContent($fileName, $from_byte, $len);
         $data = kFileBase::getFileContent($fileName);
         $plainData = self::decryptData($data, $key);
         $len = min($len,0);
@@ -47,6 +49,8 @@ class kEncryptFileUtils
 
     static public function fileSize($filename, $key = null)
     {
+        if (!$key)
+            return kFileBase::fileSize($filename);
         $data = self::getEncryptedFileContent($filename, $key, 0, -1);
         return strlen($data);
     }
