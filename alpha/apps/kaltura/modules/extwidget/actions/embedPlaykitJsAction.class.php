@@ -27,6 +27,7 @@ class embedPlaykitJsAction extends sfAction
 	private $cacheVersion = null;
 	private $playKitVersion = null;
 	private $playerConfig = null;
+	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
 	
 	public function execute()
@@ -172,11 +173,19 @@ class embedPlaykitJsAction extends sfAction
 		header("Access-Control-Allow-Origin: *");
 		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 	}
-
+	
 	private function getLastModified($content)
 	{
 		$contentParts = explode(",", $content, 2);
-		return $contentParts[0];
+		$bundleCreatedAt = $contentParts[0];
+		if($this->uiConfUpdatedAt > $bundleCreatedAt)
+		{
+			return $this->uiConfUpdatedAt;
+		}
+		else
+		{
+			return $bundleCreatedAt;
+		}
 	}
 	
 	private function getOutputHash($o)
@@ -302,8 +311,8 @@ class embedPlaykitJsAction extends sfAction
 		$uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
 		if (!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
-
 		$this->playerConfig = json_decode($uiConf->getConfig(), true);
+		$this->uiConfUpdatedAt = $uiConf->getUpdatedAt();
 		
 		//Get bundle configuration stored in conf_vars
 		$confVars = $uiConf->getConfVars();
