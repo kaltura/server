@@ -167,7 +167,7 @@ class embedPlaykitJsAction extends sfAction
 		header("Etag: " . $this->getOutputHash($content));
 		// always set cross orgin headers:
 		header("Access-Control-Allow-Origin: *");
-		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified[0]);
+		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 	}
 	
 	private function getOutputHash($o)
