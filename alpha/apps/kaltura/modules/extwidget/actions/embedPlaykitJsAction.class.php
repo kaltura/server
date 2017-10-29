@@ -177,15 +177,12 @@ class embedPlaykitJsAction extends sfAction
 	private function getLastModified($content)
 	{
 		$contentParts = explode(",", $content, 2);
-		$bundleCreatedAt = $contentParts[0];
-		if($this->uiConfUpdatedAt > $bundleCreatedAt)
-		{
-			return $this->uiConfUpdatedAt;
-		}
-		else
-		{
-			return $bundleCreatedAt;
-		}
+		$lastModified = $contentParts[0];
+		
+		if($this->uiConfUpdatedAt > $lastModified)
+			$lastModified = $this->uiConfUpdatedAt;
+
+		return $lastModified;
 	}
 	
 	private function getOutputHash($o)
