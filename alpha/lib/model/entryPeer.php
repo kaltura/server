@@ -345,7 +345,6 @@ class entryPeer extends BaseentryPeer
 	
 	public static function retrieveChildEntriesByEntryIdAndPartnerId ($parentId, $partnerId)
 	{
-		$disableEntitlements = false;
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		
 		$filter = new entryFilter();
@@ -355,14 +354,10 @@ class entryPeer extends BaseentryPeer
 		$filter->attachToCriteria($c);
 
 		$parentEntry = entryPeer::retrieveByPK($parentId);
-		if($parentEntry){
-			$disableEntitlements = true;
+		if($parentEntry)
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-		}
-
 		$res = self::doSelect($c);
-
-		if($disableEntitlements)
+		if($parentEntry)
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		return $res;
 	}
