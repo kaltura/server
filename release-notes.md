@@ -1,5 +1,27 @@
 # Mercury 13.6.0 #
 
+## Add V3 studio permission ##
+
+- Issue Type: feature
+- Issue ID: PLAT-8174
+
+### Configuration ###
+	-Add new module to the admin-console in admin.ini
+        moduls.V3Studio.enabled = true
+	moduls.V3Studio.permissionType = 2
+	moduls.V3Studio.label = "Enable V3 Studio"
+	moduls.V3Studio.permissionName = FEATURE_V3_STUDIO_PERMISSION
+	moduls.V3Studio.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+		None.
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
 ## Increase ACL rules size column ##
 
 - Issue Type: Bug
