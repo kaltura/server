@@ -39,11 +39,13 @@ class embedPlaykitJsAction extends sfAction
 			$bundleContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
 
+		$lastModified = $this->getLastModified($bundleContent);
+
 		//Format bundle contnet
 		$bundleContent = $this->formatBundleContent($bundleContent);
 
 		// send cache headers
-		$this->sendHeaders($bundleContent);
+		$this->sendHeaders($bundleContent, $lastModified);
 		
 		echo($bundleContent);
 		
@@ -78,28 +80,22 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 		}
 
-		try 
+		$content = json_decode($content, true);
+		if($content && !$content['bundle'])
 		{
-			$content = json_decode($content, true);
-			if(!$content['bundle'])
-			{
-				KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
-			}
-
-			$sourceMapContent = base64_decode($content['sourceMap']);
-			$bundleContent = time() . "," . base64_decode($content['bundle']);
-			$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
-			if(!$bundleSaved)
-			{
-				KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
-			}
-
-			return $bundleContent;
-		} 
-		catch (Exception $ex) 
-		{
-			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 		}
+
+		$sourceMapContent = base64_decode($content['sourceMap']);
+		$bundleContent = time() . "," . base64_decode($content['bundle']);
+		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
+		if(!$bundleSaved)
+		{
+			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
+		}
+
+		return $bundleContent;
+		
 	}
 	
 	private function formatBundleContent($bundleContent)
@@ -148,11 +144,9 @@ class embedPlaykitJsAction extends sfAction
 		return $content;
 	}
 	
-	private function sendHeaders($content)
+	private function sendHeaders($content, $lastModified)
 	{
 		$max_age = 60 * 10;
-		$contentParts = explode(",", $content, 2);
-		$lastModified = $contentParts[0];
 		// Support Etag and 304
 		if (
 			(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
@@ -178,6 +172,12 @@ class embedPlaykitJsAction extends sfAction
 		// always set cross orgin headers:
 		header("Access-Control-Allow-Origin: *");
 		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
+	}
+
+	private function getLastModified($content)
+	{
+		$contentParts = explode(",", $content, 2);
+		return $contentParts[0];
 	}
 	
 	private function getOutputHash($o)
