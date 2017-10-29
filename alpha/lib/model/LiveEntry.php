@@ -945,7 +945,7 @@ abstract class LiveEntry extends entry
 
 	public function getRecordingStatus()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_STATUS, null, RecordingStatus::ACTIVE);
+		return $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_STATUS, null, RecordingStatus::STOPPED);
 	}
 
 	public function setRecordingStatus($v)
