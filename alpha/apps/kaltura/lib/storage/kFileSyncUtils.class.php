@@ -839,7 +839,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getOriginFileSyncForKey ( FileSyncKey $key , $strict = true )
 	{
-		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		$c->addAnd ( FileSyncPeer::ORIGINAL , 1 );
 

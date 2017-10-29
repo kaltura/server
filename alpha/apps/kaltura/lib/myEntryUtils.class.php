@@ -46,13 +46,14 @@ class myEntryUtils
 		$fileSyncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($fileLocation, $fileSyncKey);
 
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
-		$ext = pathinfo($finalPath, PATHINFO_EXTENSION);		
-		$thumbAsset->setFileExt($ext);				
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($fileSyncKey);
+		$filePath = $fileSync->isEncrypted() ? $fileSync->createTempClear() : $fileSync->getFullPath();
+		$thumbAsset->setFileExt(pathinfo($filePath, PATHINFO_EXTENSION));
+		list($width, $height, $type, $attr) = getimagesize($filePath);
 		$thumbAsset->setWidth($width);
 		$thumbAsset->setHeight($height);
-		$thumbAsset->setSize(filesize($finalPath));
+		$thumbAsset->setSize(filesize($filePath));
+		$fileSync->deleteTempClear(); // unlink the $tmpPath if exist
 		
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
