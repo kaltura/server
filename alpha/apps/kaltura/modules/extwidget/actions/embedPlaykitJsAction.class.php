@@ -53,7 +53,11 @@ class embedPlaykitJsAction extends sfAction
 	public static function buildBundleLocked($context)
 	{
 		//if bundle not exists or explicitly should be regenerated build it
-		$bundleContent = $context->bundleCache->get($context->bundle_name);
+		if(!$context->regenerate)
+		{
+			$bundleContent = $context->bundleCache->get($context->bundle_name);
+		}
+		
 		if ($bundleContent && !$context->regenerate) 
 		{
 			return $bundleContent;
@@ -84,14 +88,17 @@ class embedPlaykitJsAction extends sfAction
 
 			$sourceMapContent = base64_decode($content['sourceMap']);
 			$bundleContent = time() . "," . base64_decode($content['bundle']);
-			$context->bundleCache->set($context->bundle_name, $bundleContent);
+			$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
+			if(!$bundleSaved)
+			{
+				KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
+			}
 
 			return $bundleContent;
 		} 
 		catch (Exception $ex) 
 		{
-			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
-			return $bundleContent;
+			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
 	}
 	
