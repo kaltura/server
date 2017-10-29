@@ -29,9 +29,39 @@ class kESearchQueryParser
 	public static function buildKESearchParamsFromKESearchQuery($kEsearchQuery)
 	{
 		$kESearchParams = new KalturaESearchParams();
-		$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSerachQuery);
-		$kESearchParams->searchOperator = self::createKESearchParams($parsedQuery);
+		if (self::isFreeTextQuery($kEsearchQuery->eSerachQuery))
+			$kESearchParams->searchOperator = self::createSimpleUnifiedSearchParam($kEsearchQuery->eSerachQuery);
+		else{
+			$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSerachQuery);
+			$kESearchParams->searchOperator = self::createKESearchParams($parsedQuery);
+		}
 		return $kESearchParams;
+	}
+
+	/**
+	 * @param $eSearchQuery
+	 * @return bool
+	 */
+	private static function isFreeTextQuery($eSearchQuery)
+	{
+		$aValid = array('_');
+		return ctype_alnum(str_replace($aValid, '', $eSearchQuery));
+	}
+
+	/**
+	 * @param $eSearchQuery
+	 * @return KalturaESearchOperator
+	 */
+	private static function createSimpleUnifiedSearchParam($eSearchQuery)
+	{
+		$kESearchObject = new KalturaESearchOperator();
+		$kSearchItems = new KalturaESearchBaseItemArray();
+		$kSearchItem = new KalturaESearchUnifiedItem();
+		$kSearchItem->searchTerm = $eSearchQuery;
+		$kSearchItems[] = $kSearchItem;
+		$kESearchObject->searchItems = $kSearchItems;
+
+		return $kESearchObject;
 	}
 
 	/**
