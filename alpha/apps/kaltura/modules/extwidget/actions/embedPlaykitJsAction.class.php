@@ -200,7 +200,7 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
 		}
-		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME);		
+		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());		
 		//enable passing nested config options
 		foreach ($config as $key=>$val)
 		{

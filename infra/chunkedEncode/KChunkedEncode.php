@@ -255,7 +255,7 @@
 		protected function verifySupport(&$msgStr)
 		{
 			$params = $this->params;
-			if(strstr($params->vcodec, "x264")===false) {
+			if(!in_array($params->vcodec, array("libx264","libx265"))){
 				KalturaLog::log($msgStr="UNSUPPORTED: video codec ($params->vcodec)");
 				return false;
 			}
@@ -344,13 +344,25 @@
 				 * 2-pass transcoding does not need it.
 				 */
 			if($params->passes==1) {
-				if(($key=array_search("-x264opts", $cmdLineArr))!==false) {
-					if(strstr($cmdLineArr[$key+1],"zones")===false) {
-						$cmdLineArr[$key+1] = $cmdLineArr[$key+1].":zones=0,10,q=12";
+				if($params->vcodec=='libx264'){
+					if(($key=array_search("-x264opts", $cmdLineArr))!==false) {
+						if(strstr($cmdLineArr[$key+1],"zones")===false) {
+							$cmdLineArr[$key+1] = $cmdLineArr[$key+1].":zones=0,10,q=12";
+						}
+					}
+					else {
+						$cmdLineArr[] = "-x264opts zones=0,10,q=12";
 					}
 				}
-				else {
-					$cmdLineArr[] = "-x264opts zones=0,10,q=12";
+				else if($params->vcodec=='libx265'){
+					if(($key=array_search("-x265-params", $cmdLineArr))!==false) {
+						if(strstr($cmdLineArr[$key+1],"zones")===false) {
+							$cmdLineArr[$key+1] = $cmdLineArr[$key+1].":zones=0,10,q=12";
+						}
+					}
+					else {
+						$cmdLineArr[] = "-x265-params zones=0,10,q=12";
+					}
 				}
 			}
 			
@@ -537,7 +549,16 @@
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
 			$mergeCmd.= " -i $vidConcatStr";
-			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams $params->formatParams -f $params->format -copyts -y $mergedFilename";
+			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
+			if(isset($params->formatParams))
+				$mergeCmd.= " ".$params->formatParams;
+			$mergeCmd.= " -f $params->format -copyts";
+
+			if(($key=array_search("-tag:v", $params->cmdLineArr))!==false) {
+				$mergeCmd.= " -tag:v ".$params->cmdLineArr[$key+1];
+			}
+
+			$mergeCmd.= " -y $mergedFilename";
 			KalturaLog::log("mergeCmd:\n$mergeCmd ".date("Y-m-d H:i:s"));
 			return $mergeCmd;
 		}
