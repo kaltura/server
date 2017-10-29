@@ -53,7 +53,8 @@ class embedPlaykitJsAction extends sfAction
 	public static function buildBundleLocked($context)
 	{
 		//if bundle not exists or explicitly should be regenerated build it
-		if (!$context->bundleCache->get($context->bundle_name) || $context->regenerate) 
+		$bundleContent = $context->bundleCache->get($context->bundle_name);
+		if (!$bundleContent || $context->regenerate) 
 		{
 			//build bundle and save in memcache
 			$config = str_replace("\"", "'", json_encode($context->bundleConfig));
@@ -78,26 +79,23 @@ class embedPlaykitJsAction extends sfAction
 						{
 							KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 						}
-						
 					} 
 					catch (Exception $ex) 
 					{
 						KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 					}
-					
 				} 
 				else 
 				{
 					KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 				}
-				
-				return $bundleContent;
 			} 
 			else 
 			{
 				KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 			}
 		}
+		return $bundleContent;
 	}
 	
 	private function formatBundleContent($bundleContent)
@@ -175,7 +173,7 @@ class embedPlaykitJsAction extends sfAction
 		header("Etag: " . $this->getOutputHash($content));
 		// always set cross orgin headers:
 		header("Access-Control-Allow-Origin: *");
-		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified[0]);
+		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 	}
 	
 	private function getOutputHash($o)
