@@ -38,12 +38,12 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$bundleContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
-		
-		// send cache headers
-		$this->sendHeaders($bundleContent);
-		
+
 		//Format bundle contnet
 		$bundleContent = $this->formatBundleContent($bundleContent);
+
+		// send cache headers
+		$this->sendHeaders($bundleContent);
 		
 		echo($bundleContent);
 		
@@ -54,48 +54,45 @@ class embedPlaykitJsAction extends sfAction
 	{
 		//if bundle not exists or explicitly should be regenerated build it
 		$bundleContent = $context->bundleCache->get($context->bundle_name);
-		if (!$bundleContent || $context->regenerate) 
+		if ($bundleContent && !$context->regenerate) 
 		{
-			//build bundle and save in memcache
-			$config = str_replace("\"", "'", json_encode($context->bundleConfig));
-			if ($config) 
-			{
-				$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
-				$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'));
-				
-				if ($content) 
-				{
-					try 
-					{
-						$content = json_decode($content, true);
-						if($content['bundle'])
-						{
-							$sourceMapContent = base64_decode($content['sourceMap']);
-							$bundleContent = time() . "," . base64_decode($content['bundle']);
-							$context->bundleCache->set($context->bundle_name, $bundleContent);
-							$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
-						}
-						else
-						{
-							KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
-						}
-					} 
-					catch (Exception $ex) 
-					{
-						KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
-					}
-				} 
-				else 
-				{
-					KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
-				}
-			} 
-			else 
+			return $bundleContent;
+		}
+
+		//build bundle and save in memcache
+		$config = str_replace("\"", "'", json_encode($context->bundleConfig));
+		if(!$config)
+		{
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+		}
+
+		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
+		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'));
+
+		if (!$content) 
+		{
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+		}
+
+		try 
+		{
+			$content = json_decode($content, true);
+			if(!$content['bundle'])
 			{
 				KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
 			}
+
+			$sourceMapContent = base64_decode($content['sourceMap']);
+			$bundleContent = time() . "," . base64_decode($content['bundle']);
+			$context->bundleCache->set($context->bundle_name, $bundleContent);
+
+			return $bundleContent;
+		} 
+		catch (Exception $ex) 
+		{
+			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
+			return $bundleContent;
 		}
-		return $bundleContent;
 	}
 	
 	private function formatBundleContent($bundleContent)
