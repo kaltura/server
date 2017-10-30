@@ -199,7 +199,7 @@ ini_set("memory_limit","512M");
 		 * fetchReadWriteIndexes
 		 *	
 		 */
-		protected function fetchReadWriteIndexes(&$writeIndex, &$readIndex)
+		public function fetchReadWriteIndexes(&$writeIndex, &$readIndex)
 		{
 			$writeIndexKeyName = $this->getWriteIndexKeyName();
 			if(($writeIndex=$this->get($writeIndexKeyName))===false){
