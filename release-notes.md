@@ -1,5 +1,20 @@
 # Mercury 13.6.0 #
 
+## Set Entry status to "preconvert" instead of "ready" (for specific partners) when uploading flv files from webcam  ##
+ - Issue Type: Task
+- Issue ID: SUP-11270
+
+### Configuration ###
+	-Added the following to local.ini in server-saas-config:
+	[preconvert_webcam_flv_allowed_partners]
+	Add specific partner to allow this change to affect him (e.g. 0 = @PARTNER_NUMBER@)
+       
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+		
 ## Add V3 studio permission ##
 
 - Issue Type: feature
