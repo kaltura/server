@@ -82,7 +82,7 @@ ini_set("memory_limit","512M");
 				}
 			}
 			else {
-				$str = KSrtText::printEmpty($fileName);
+				$str = KSrtText::emptyToString($fileName);
 				file_put_contents($fileName, "$str", FILE_APPEND);
 			}
 		}
