@@ -138,7 +138,12 @@ class myInsertEntryHelper
 			if(file_exists($entry_fullPath))
 			{
 				// webcam should be preconvert until REALLY ready
-				$entry_status = entryStatus::READY;
+				if (kConf::hasParam('preconvert_webcam_flv_allowed_partners') &&
+					in_array($this->partner_id, kConf::get('preconvert_webcam_flv_allowed_partners')))
+					$entry_status = entryStatus::PRECONVERT;
+				else
+					$entry_status = entryStatus::READY;
+
 				$ext = "flv";
 				
 				//echo "myInsertEtryHelper:: [$entry_fullPath]";
