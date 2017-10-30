@@ -132,8 +132,6 @@ class embedPlaykitJsAction extends sfAction
 	private function sendHeaders($content, $lastModified)
 	{
 		$max_age = 60 * 10;
-		$lastModified = new DateTime($lastModified);
-		$lastModified = $lastModified->format('U');
 		// Support Etag and 304
 		if (
 			(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
@@ -293,7 +291,9 @@ class embedPlaykitJsAction extends sfAction
 		if (!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 		$this->playerConfig = json_decode($uiConf->getConfig(), true);
-		$this->uiConfUpdatedAt = $uiConf->getUpdatedAt();
+		$this->uiConfUpdatedAt  = str_replace("-", "/", $uiConf->getUpdatedAt());
+		$this->uiConfUpdatedAt = new DateTime($this->uiConfUpdatedAt);
+		$this->uiConfUpdatedAt = $this->uiConfUpdatedAt->format('U');
 		
 		//Get bundle configuration stored in conf_vars
 		$confVars = $uiConf->getConfVars();
