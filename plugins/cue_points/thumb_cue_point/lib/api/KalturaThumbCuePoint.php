@@ -62,7 +62,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 			$object_to_fill = new ThumbCuePoint();
 
 		if(strlen ($this->title) > self::MAX_TITLE_LEN)
-			$this->title = Kstring::alignUtf8String($this->title, self::MAX_TITLE_LEN);
+			$this->title = KString::alignUtf8String($this->title, self::MAX_TITLE_LEN);
 
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
