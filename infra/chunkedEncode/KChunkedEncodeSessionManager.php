@@ -250,22 +250,42 @@
 		 */
 		protected function detectErrors()
 		{
+			$writeIndex = $readIndex = null;
+			if($this->storeManager->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+				KalturaLog::log("ERROR: Missing write or read index ");
+				return false;
+			}
+			
 			$this->videoJobs->sumJobsStates();
 			$this->audioJobs->sumJobsStates();
 
 			foreach($this->videoJobs->jobs as $idx=>$job) {
-				if($job->startTime==0 || $job->state==$job::STATE_RETRY|| $job->state==$job::STATE_SUCCESS)
+				if($job->state==$job::STATE_SUCCESS)
 					continue;
+				if($job->startTime==0 || $job->state==$job::STATE_RETRY){
+						/*
+						 * Check for 'job skip' condition
+						 * when scheduler skips over a valid job in the queue
+						 */
+					if($job->keyIdx<$readIndex-2) {
+						KalturaLog::log("Potential 'job skip' case - jobId:$job->id,state: $job->state,jobKeyIdx:$job->keyIdx,rdIdx:$readIndex");
+						$job = $this->storeManager->FetchJob($job->keyIdx);
+						if($job===false || ($job->startTime==0 || $job->state==$job::STATE_RETRY)){
+							$this->retryVideoJob($job);
+							KalturaLog::log("Retry chunk ($job->id) - skipped by the chunk job scheduler (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$readIndex)");
+						}
+					}
+					continue;
+				}
 				$elapsed = time()-$job->startTime;
 				if($elapsed>$this->maxExecutionTime) {
 					if(!array_key_exists($job->id, $this->videoJobs->failed)){
-						$job->state = $job::STATE_RETRY;
-						$this->storeManager->SaveJob($job);
-						$this->videoJobs->failed[$job->id] = $job->keyIdx;
-						KalturaLog::log("Chunk ($job->id) failed on execution timeout ($elapsed sec, maxExecutionTime:$this->maxExecutionTime");
+						$this->retryVideoJob($job);
+						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$this->maxExecutionTime");
 					}
 				}
 			}
+			return true;
 		}
 
 		/* ---------------------------
@@ -318,7 +338,12 @@
 				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
 				return false;			
 			}
-			$this->detectErrors();
+			if($this->detectErrors()===false){
+				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED could not get RD/WR indexes!");
+				$this->returnMessages[] = $msgStr;
+				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
+				return false;			
+			}
 
 			$videoStats = $this->videoJobs->states;
 			$audioStats = $this->audioJobs->states;
@@ -508,6 +533,16 @@
 				return false;
 			}
 			return $job;
+		}
+		
+		/* ---------------------------
+		 * retryVideoJob
+		 */
+		protected function retryVideoJob($job)
+		{
+			$job->state = $job::STATE_RETRY;
+			$this->storeManager->SaveJob($job);
+			$this->videoJobs->failed[$job->id] = $job->keyIdx;
 		}
 		
 		/********************
