@@ -343,9 +343,9 @@
 			 * Print statuses to log
 			 */
 			{
-				$msgStr = "Session($this->name) - states: ";
-				$msgStr.= "pn:$pending,rn:$running,su:$succeed,fa:$failed,w/q:$loaded, ";
-				$msgStr.= "left:$left,elap:".($this->getElapsed())."sec";
+				$msgStr = "Session($this->name)-stats: ";
+				$msgStr.= "rn:$running,pn:$pending,su:$succeed,fa:$failed,left:$left, ";
+				$msgStr.= "v.ld:$loaded, elap:".($this->getElapsed())."sec";
 				if(count($this->videoJobs->failed)>0) $msgStr.= ", failedJobs:".serialize($this->videoJobs->failed);
 				KalturaLog::log($msgStr);
 			}
