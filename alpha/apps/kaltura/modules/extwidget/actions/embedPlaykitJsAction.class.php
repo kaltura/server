@@ -132,7 +132,8 @@ class embedPlaykitJsAction extends sfAction
 	private function sendHeaders($content, $lastModified)
 	{
 		$max_age = 60 * 10;
-		$lastModified = (new DateTime($lastModified))->format('U');
+		$lastModified = new DateTime($lastModified);
+		$lastModified = $lastModified->format('U');
 		// Support Etag and 304
 		if (
 			(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
