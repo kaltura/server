@@ -291,9 +291,7 @@ class embedPlaykitJsAction extends sfAction
 		if (!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 		$this->playerConfig = json_decode($uiConf->getConfig(), true);
-		$this->uiConfUpdatedAt  = str_replace("-", "/", $uiConf->getUpdatedAt());
-		$this->uiConfUpdatedAt = new DateTime($this->uiConfUpdatedAt);
-		$this->uiConfUpdatedAt = $this->uiConfUpdatedAt->format('U');
+		$this->uiConfUpdatedAt  = $uiConf->getUpdatedAt(null);
 		
 		//Get bundle configuration stored in conf_vars
 		$confVars = $uiConf->getConfVars();
