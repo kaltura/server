@@ -408,8 +408,6 @@ abstract class BaseCuePointPeer {
 		{
 			$cacheKey = null;
 			CuePointPeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			if ($criteria instanceof KalturaCriteria)
-				$criteria->setRecordsCount($criteriaForSelect->getRecordsCount());
 			CuePointPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
