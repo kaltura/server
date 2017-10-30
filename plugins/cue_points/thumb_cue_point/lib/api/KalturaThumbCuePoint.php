@@ -5,6 +5,8 @@
  */
 class KalturaThumbCuePoint extends KalturaCuePoint
 {
+	const MAX_TITLE_LEN = 255;
+
 	/**
 	 * @var string
 	 */
@@ -58,9 +60,14 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	{
 		if(is_null($object_to_fill))
 			$object_to_fill = new ThumbCuePoint();
-			
+
+		if(strlen ($this->title) > self::MAX_TITLE_LEN)
+			$this->title = Kstring::alignUtf8String($this->title, self::MAX_TITLE_LEN);
+
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
+
+
 	
 	/* (non-PHPdoc)
 	 * @see KalturaCuePoint::validateForInsert()
