@@ -134,7 +134,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			
 		$list = CuePointPeer::doSelect($c);
 		
-		return array($list, $c->getRecordsCount());
+		return array($list, count($list));
 	}
 	
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
