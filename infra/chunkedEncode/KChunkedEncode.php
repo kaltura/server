@@ -294,9 +294,17 @@
 		protected function buildTemplateVideoCommandLine() 
 		{
 			$params = $this->params;
-
 			$cmdLineArr = $params->cmdLineArr;
 
+			/*
+			 * 'Open' symbolic links into full real path's
+			 * to allow inter-server access via shared storage
+			 */
+			$srcIndexes = array_keys($cmdLineArr,'-i');
+			foreach($srcIndexes as $idx) {
+				$cmdLineArr[$idx+1] = realpath($cmdLineArr[$idx+1]);
+			}
+			
 			$toAddFps = false;
 			$toAddGop = false;
 			if(($key=array_search("-g", $cmdLineArr))!==false) {
