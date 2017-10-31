@@ -180,14 +180,14 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
 		$c = clone $criteria;
+		if (!($c instanceof KalturaCriteria))
+			return parent::doSelect($c, $con);
 
-		if ($c instanceof KalturaCriteria)
-		{
-			$c->applyFilters();
-			$criteria->setRecordsCount($c->getRecordsCount());
-		}
-
-		return parent::doSelect($c, $con);
+		// only in case of KalturaCriteria
+		$c->applyFilters();
+		$list =  parent::doSelect($c, $con);
+		$criteria->setRecordsCount($c->getRecordsCount());
+		return $list;
 	}
 
 	/**
