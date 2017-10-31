@@ -312,7 +312,7 @@ class kJobsManager
 		if($fileSync)
 		{
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
-				$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());
+				$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 			$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($entry->getId()));
 			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());			
 			$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());		
@@ -487,12 +487,12 @@ class kJobsManager
 			{
 				if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 				{
-					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)	
-						$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());							
+					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
+						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);						
 				}
 				else
 				{
-					$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFilePath());
+					$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 				}
 				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
