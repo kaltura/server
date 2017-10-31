@@ -2884,4 +2884,17 @@ class kFlowHelper
 			return false;
 	}
 
+	public static function handleLiveEntryChanged(LiveStreamEntry $liveEntry)
+	{
+		if ($liveEntry->getRecordedEntryId() == RecordingStatus::ACTIVE)
+		{
+			$liveEntry->setRedirectEntryId(null);
+		}
+		else if ($liveEntry->getRecordedEntryId())
+		{
+			$liveEntry->setRedirectEntryId($liveEntry->getRecordedEntryId());
+		}
+		$liveEntry->save();
+	}
+
 }

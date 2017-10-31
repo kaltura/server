@@ -19,13 +19,16 @@
 				<systemName>EXPLICIT_LIVE_PUSH_NOTIFICATIONS</systemName>
 				<description>Push notification template used by the explicit live feature</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>11</eventType> <!-- EventNotificationEventType::OBJECT_UPDATED -->
-				<eventObjectType>1</eventObjectType>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>38</eventObjectType><!-- EventNotificationEventObjectType::LIVE_STREAM -->
 
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventObjectChangedCondition">
 						<description>Entry view mode or recording status changes</description>
-						<modifiedColumns>{modified_columns}</modifiedColumns>
+						<modifiedColumns>view_mode,recording_status</modifiedColumns>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getType()</code>
+						</field>
 					</item>
 				</eventConditions>
 				<queueNameParameters objectType="array">
@@ -33,26 +36,12 @@
 						<key>entryId</key>
 						<description></description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getEntryId()</code>
+							<code>$scope->getObject()->getId()</code>
 						</value>
 					</item>
 				</queueNameParameters>
-				<userParameters objectType="array">
-					<item objectType="KalturaEventNotificationArrayParameter">
-						<key>modified_columns</key>
-						<description>KalturaLiveEntry columns that will trigger the event</description>
-						<allowedValues objectType="array">
-							<item objectType="KalturaStringValue">
-								<value>viewMode</value>
-								<description>viewMode</description>
-							</item>
-							<item objectType="KalturaStringValue">
-								<value>recordingStatus</value>
-								<description>recordingStatus</description>
-							</item>
-						</allowedValues>
-					</item>
-				</userParameters>
+				<apiObjectType>KalturaLiveStreamEntry</apiObjectType>
+				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">

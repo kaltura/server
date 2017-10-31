@@ -181,11 +181,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions->shouldCopyEntitlement = true;
 		}
 
-		if (PermissionPeer::isValidForPartner(KalturaPermissionName::FEATURE_EXPLICIT_LIVE_IS_DEFAULT, kCurrentContext::getCurrentPartnerId()) && !isset($this->explicitLive))
-		{
-			$this->explicitLive = true;
-		}
-
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
 	
