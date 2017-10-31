@@ -133,6 +133,7 @@ class ESearchService extends KalturaBaseService
 	{
 		$code = $exception->getCode();
 		$data = $exception->getData();
+		$code = $exception->getMessage();
 		switch ($code)
 		{
 			case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD:
@@ -153,6 +154,8 @@ class ESearchService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaESearchErrors::CONSECUTIVE_OPERANDS_MISMATCH);
 			case kESearchException::INVALID_FIELD_NAME:
 				throw new KalturaAPIException(KalturaESearchErrors::INVALID_FIELD_NAME, $data['fieldName']);
+			case kESearchException::INVALID_METADATA_FORMAT:
+				throw new kESearchException(KalturaESearchErrors::INVALID_METADATA_FORMAT);
 			case kESearchException::INVALID_METADATA_FIELD:
 				throw new kESearchException(KalturaESearchErrors::INVALID_METADATA_FIELD, $data['fieldName']);
 			case kESearchException::INVALID_MIXED_SERACH_TYPES:

@@ -1,5 +1,18 @@
 <?php
 
+/***
+ * eSearchQuery parser will take a string-like query and will transform it to an eSearchParams object so it can be used for eSearch queries.
+ * The process:
+ * 1. Parse a string query and validate its format - will return an tree-like array representing the eSearchParams format
+ * 2. Create an eSearchParams objects from the tree-like array - traversing the array and creating the eSearchParams items as we go.
+ * Example string query contains valid complex objects:
+ *      NOT (~entry_id"0_xafasda" And ^entry_tags:"my tags")
+ *      OR (_metadata:"{xpath:demo,METADATA_PROFILE_ID:1214,term:myTerm,metadata_Field_Id:123"})
+ *      OR (entry_length_in_msecs:"[get 20 ; lt 100]'
+ *          AND entry_description )
+ *      OR _all:"find this in all"
+ */
+
 /**
  * @package plugins.elasticSearch
  * @subpackage model
@@ -13,9 +26,11 @@ class kESearchQueryParser
 	const PARTIAL = '~';
 	const XPATH = 'XPATH';
 	const METADATA_PROFILE_ID = 'METADATA_PROFILE_ID';
+	const METADATA_FIELD_ID = 'METADATA_FIELD_ID';
 	const TERM = 'TERM';
 	const RANGE_ITEM_MIN_LENGTH = 3;
-	const RANGE_CODE_LENGTH = 3;
+	const RANGE_CODE_MAX_LENGTH = 3;
+	const RANGE_CODE_MIN_LENGTH = 2;
 	const LESS_THAN = 'LT';
 	const LESS_THAN_OR_EQUAL = 'LTE';
 	const GREATER_THAN = 'GT';
@@ -29,9 +44,11 @@ class kESearchQueryParser
 	public static function buildKESearchParamsFromKESearchQuery($kEsearchQuery)
 	{
 		$kESearchParams = new KalturaESearchParams();
+		// in case of a free text query (wihtout fields or brackets or special commands - a simple unified search object will be created
 		if (self::isFreeTextQuery($kEsearchQuery->eSerachQuery))
 			$kESearchParams->searchOperator = self::createSimpleUnifiedSearchParam($kEsearchQuery->eSerachQuery);
-		else{
+		else
+		{
 			$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSerachQuery);
 			$kESearchParams->searchOperator = self::createKESearchParams($parsedQuery);
 		}
@@ -65,6 +82,11 @@ class kESearchQueryParser
 	}
 
 	/**
+	 * parseKESearchQuery Flow - recursive method to create an tree-like array by levels for the string query.
+	 * 1. locate 1st level brackets ( ) example: id and ( tags and ( day and year ))) - will find the outer brackets only
+	 * 2. accumulate tokens to string in order to handle the different parts without the inner brackets parts.
+	 * 3. handle the accumulated part (before / in the middle / after the brackets)
+	 *
 	 * @param string $query
 	 * @return array
 	 * @throws kESearchException
@@ -74,7 +96,7 @@ class kESearchQueryParser
 		KalturaLog::debug("Parsing $query");
 		//remove starting and trailing whitespaces
 		$currentQuery = trim($query);
-		// find next level inner queries within ( ) brackets
+		// find next level inner queries within ( ) brackets - TODO add informative Example and description
 		$innerQueriesMatcher = '~("|\').*?\1(*SKIP)(*FAIL)|\((?:[^()]|(?R))*\)~';
 		preg_match_all($innerQueriesMatcher, $currentQuery, $innerQueries);
 
@@ -91,6 +113,8 @@ class kESearchQueryParser
 			//Iterate and get tokens until finding an inner query
 			if ($currentQuery[$cursorLocation] == '(')
 			{
+				//extract method
+				//handle accumulated text until opening brackets
 				if ($partialQuery)
 				{
 					self::handlePartialQueryAndAddToResult($partialQuery, $shouldBeOperand, $eSearchQueryResult, $levelOperand);
@@ -122,6 +146,12 @@ class kESearchQueryParser
 	}
 
 	/**
+	 * handlePartialQueryAndAddToResult will handle any simple string with/without operands ( e.g. "id and tags and year )
+	 * 1. trim the outer whitespaces and after every : (but not within quotes)
+	 * 2. split words by whitespaces and iterate them one by one and:
+	 *      a. validating OPERANDS order (keeping to by the level in the query)
+	 *      b. splitting field and value by : and setting it in the right place in the tree like array
+	 *
 	 * @param $partialQuery
 	 * @param $shouldBeOperand
 	 * @param $eSearchQueryResult
@@ -149,9 +179,9 @@ class kESearchQueryParser
 				$shouldBeOperand = true;
 			} else
 			{
+				$match = strtoupper($match);
 				if (!$levelOperand)
 				{
-					$match = strtoupper($match);
 					$levelOperand = in_array($match, array(self::AND_OPERAND, self::OR_OPERAND)) ? $match : null;
 				} elseif ($levelOperand != $match && $match != self::NOT_OPERAND)
 					throw new kESearchException('Un-matching query operand', kESearchException::UNMATCHING_QUERY_OPERAND);
@@ -163,8 +193,13 @@ class kESearchQueryParser
 		}
 	}
 
-	//build KalturaESearchParams tree from a tree-like array representing a query
 	/**
+	 * build KalturaESearchParams tree from a tree-like array representing a query by traversing the array in recursive way we will be able to build the result correctly
+	 * 1. in case we a single item ( e.g. fieldName without any value - we will create a searchQueryItem with type EXIST
+	 * 2. in case we have 2 items ( e.g. fieldName:value) we will create a searchQueryItem with types accordingly (PARTIAL/RANGE/EXACT_MATCH/STARTS_WITH) to the identifiers
+	 *      ~fieldNamme = PARTIAL , ~fieldNamme = STARTS_WITH , fieldName:"[ $rangeType$ $rangeValue$]" = RANGE , default = EXACT_MATCH
+	 * 3. in case we have more than 2 items we need to go deeper and create and eSearchOperator object to hold more than 1 eSearchObject so we will recurse.
+	 *
 	 * @param $queryItemArray
 	 * @return KalturaESearchCaptionItem|KalturaESearchCategoryItem|KalturaESearchCuePointItem|KalturaESearchEntryItem|KalturaESearchMetadataItem|KalturaESearchOperator|KalturaESearchUserItem|null
 	 * @throws kESearchException
@@ -186,6 +221,12 @@ class kESearchQueryParser
 		return $kSearchItem;
 	}
 
+	/**
+	 * create a simple eSearchItem according to the different types and setting the type (EXACT_MATCH/PARTIAL/STARTS_WITH/RANGE) and term value accordingly.
+	 * @param $fieldName
+	 * @param null $fieldValue
+	 * @return KalturaESearchCaptionItem|KalturaESearchCategoryItem|KalturaESearchCuePointItem|KalturaESearchEntryItem|KalturaESearchMetadataItem|KalturaESearchUserItem|null
+	 */
 	private static function CreateKESearchItem($fieldName, $fieldValue = null)
 	{
 		KalturaLog::debug("Creating Search Item for field [$fieldName] and value [$fieldValue]");
@@ -197,7 +238,7 @@ class kESearchQueryParser
 
 		if ($kSearchItem)
 		{
-			if (!$fieldValue)
+			if (is_null($fieldValue))
 				$kSearchItem->itemType = KalturaESearchItemType::EXISTS;
 			else
 				self::handleAndSetTypeAndValue($kSearchItem, $fieldName, $fieldValue, $isPartial, $isStartsWith);
@@ -226,6 +267,8 @@ class kESearchQueryParser
 	}
 
 	/**
+	 * Handle setting the type and value - in case we create a metaData item we need to parse the value as json and handle the different fields
+	 *
 	 * @param $kSearchItem
 	 * @param $fieldName
 	 * @param $fieldValue
@@ -249,10 +292,13 @@ class kESearchQueryParser
 	 */
 	private static function handleMetaDataItem(KalturaESearchMetadataItem $kSearchItem, $fieldName, $fieldValue, $isPartial, $isStartsWith)
 	{
+		$fieldValue = preg_replace('/(?<!")(?<!\w)(\w+)(?!")(?!\w)/', '"$1"', $fieldValue); //fix to json format.
 		$valueItems = json_decode($fieldValue);
+		if (!$valueItems)
+			throw new kESearchException('Illegal metadata format [use json format - {xpath:value, metadata_profile_id:value, term:value}]', kESearchException::INVALID_METADATA_FORMAT);
 		foreach ($valueItems as $key => $value)
 		{
-			if (!in_array(strtoupper($key), array(self::XPATH, self::METADATA_PROFILE_ID, self::TERM)))
+			if (!in_array(strtoupper($key), array(self::XPATH, self::METADATA_PROFILE_ID, self::TERM, self::METADATA_FIELD_ID)))
 			{
 				$data = array();
 				$data['fieldName'] = $key;
@@ -266,6 +312,9 @@ class kESearchQueryParser
 					break;
 				case self::METADATA_PROFILE_ID:
 					$kSearchItem->metadataProfileId = $value;
+					break;
+				case self::METADATA_FIELD_ID:
+					$kSearchItem->metadataFieldId = $value;
 					break;
 				case self::TERM:
 				{
@@ -408,8 +457,17 @@ class kESearchQueryParser
 		if (strlen($rangeItem) < self::RANGE_ITEM_MIN_LENGTH)
 			return false;
 
-		$commandPart = substr($rangeItem, 0, self::RANGE_CODE_LENGTH);
-		$numberPart = substr($rangeItem, self::RANGE_CODE_LENGTH);
+		$commandPart = substr($rangeItem, 0, self::RANGE_CODE_MAX_LENGTH);
+		if (in_array(strtoupper($commandPart), array(self::LESS_THAN_OR_EQUAL, self::GREATER_THAN_OR_EQUAL)))
+			$numberPart = substr($rangeItem, self::RANGE_CODE_MAX_LENGTH);
+		else
+		{
+			$commandPart = substr($rangeItem, 0, self::RANGE_CODE_MIN_LENGTH);
+			if (!in_array(strtoupper($commandPart), array(self::LESS_THAN, self::GREATER_THAN)))
+				return false;
+			$numberPart = substr($rangeItem, self::RANGE_CODE_MIN_LENGTH);
+		}
+
 		if (!is_numeric($numberPart))
 			return false;
 
@@ -501,7 +559,7 @@ class kESearchQueryParser
 			if ($innerObject)
 			{
 				$innerObjectArray = new KalturaESearchBaseItemArray();
-				$innerObjectArray[]= $innerObject;
+				$innerObjectArray[] = $innerObject;
 				$kSearchItem->searchItems = $innerObjectArray;
 			}
 		} else
@@ -519,6 +577,12 @@ class kESearchQueryParser
 	}
 
 	/**
+	 * Create an eSearchOperator object to hold all the items of the same level ( allowed is the same AND/OR OperatorType for all item on the same level but NOT operator is allowed)
+	 * 1. get the level operator and create the KSearchOperatorObject container
+	 * 2. iterate through the level queryItemsArray and create the objects:
+	 *  a. in case we create a not operator we will recurse to the createKESearchParams method since we need to create a deeper level in the tree
+	 *  b. we will ignore the other operands in the same level (since they were already verified)
+	 *     and we will call createKESearchParams for the items (which can be simple types or hold a deeper level for query commmands.
 	 * @param $queryItemArray
 	 * @return KalturaESearchOperator
 	 */
@@ -536,7 +600,7 @@ class kESearchQueryParser
 				if ($innerObject)
 				{
 					$kNotItemInnerObject = new KalturaESearchBaseItemArray();
-					$kNotItemInnerObject[]= $innerObject;
+					$kNotItemInnerObject[] = $innerObject;
 					$kNotItem->searchItems = $kNotItemInnerObject;
 				}
 				$innerObjects[] = $kNotItem;
