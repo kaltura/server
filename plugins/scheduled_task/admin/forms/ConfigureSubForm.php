@@ -66,10 +66,8 @@ class ConfigureSubForm extends Zend_Form_SubForm
 		return null;
 	}
 
-	protected function addStringElement($name, $prefix) {
-		if ($name == 'message')
-			return $this->addStringAreaElement($name, $prefix);
-
+	protected function addStringElement($name, $prefix)
+	{
 		$params = array('required' => false, 'value'=>	'N/A',);
 		$this->addElementByStrType('text', $name, "$prefix$name", $params);
 	}

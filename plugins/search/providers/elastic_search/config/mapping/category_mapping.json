@@ -99,6 +99,138 @@
 			"raw" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english"
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"armenian" : {
+			  "type" : "text",
+			  "analyzer" : "armenian"
+			},
+			"basque" : {
+			  "type" : "text",
+			  "analyzer" : "basque"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"bulgarian" : {
+			  "type" : "text",
+			  "analyzer" : "bulgarian"
+			},
+			"catalan" : {
+			  "type" : "text",
+			  "analyzer" : "catalan"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"czech" : {
+			  "type" : "text",
+			  "analyzer" : "czech"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"galician" : {
+			  "type" : "text",
+			  "analyzer" : "galician"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"hungarian" : {
+			  "type" : "text",
+			  "analyzer" : "hungarian"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"irish" : {
+			  "type" : "text",
+			  "analyzer" : "irish"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"latvian" : {
+			  "type" : "text",
+			  "analyzer" : "latvian"
+			},
+			"lithuanian" : {
+			  "type" : "text",
+			  "analyzer" : "lithuanian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"persian" : {
+			  "type" : "text",
+			  "analyzer" : "persian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"romanian" : {
+			  "type" : "text",
+			  "analyzer" : "romanian"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"sorani" : {
+			  "type" : "text",
+			  "analyzer" : "sorani"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
 			}
 		  }
 		},
@@ -157,6 +289,138 @@
 			"raw" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english"
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"armenian" : {
+			  "type" : "text",
+			  "analyzer" : "armenian"
+			},
+			"basque" : {
+			  "type" : "text",
+			  "analyzer" : "basque"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"bulgarian" : {
+			  "type" : "text",
+			  "analyzer" : "bulgarian"
+			},
+			"catalan" : {
+			  "type" : "text",
+			  "analyzer" : "catalan"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"czech" : {
+			  "type" : "text",
+			  "analyzer" : "czech"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"galician" : {
+			  "type" : "text",
+			  "analyzer" : "galician"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"hungarian" : {
+			  "type" : "text",
+			  "analyzer" : "hungarian"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"irish" : {
+			  "type" : "text",
+			  "analyzer" : "irish"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"latvian" : {
+			  "type" : "text",
+			  "analyzer" : "latvian"
+			},
+			"lithuanian" : {
+			  "type" : "text",
+			  "analyzer" : "lithuanian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"persian" : {
+			  "type" : "text",
+			  "analyzer" : "persian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"romanian" : {
+			  "type" : "text",
+			  "analyzer" : "romanian"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"sorani" : {
+			  "type" : "text",
+			  "analyzer" : "sorani"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
 			}
 		  }
 		},

@@ -19,7 +19,7 @@ class KalturaESearchErrors extends KalturaErrors
     const INVALID_FIELD_NAME= 'INVALID_FIELD_NAME;FIELD_NAME;Illegal query field name [@FIELD_NAME@]';
     const INVALID_METADATA_FORMAT = 'INVALID_METADATA_FORMAT;;Invalid metadate format';
     const INVALID_METADATA_FIELD = 'INVALID METADATA FIELD;FIELD_NAME;Illegal metadata field name [@FIELD_NAME@]. allowed only [xpath, metadata_profile_id, term]';
-    const INVALID_MIXED_SERACH_TYPES = 'INVALID_MIXED_SERACH_TYPES;FIELD_NAME;FIELD_VALUE;Illegal mixed search item types. [@FIELD_NAME@] [@FIELD_VALUE@] can\'t be set to starts-with-search / partial-search and range-search simultaneously';
+    const INVALID_MIXED_SEARCH_TYPES = 'INVALID_MIXED_SEARCH_TYPES ;FIELD_NAME;FIELD_VALUE;Illegal mixed search item types. [@FIELD_NAME@] [@FIELD_VALUE@] can\'t be set to starts-with-search / partial-search and range-search simultaneously';
 
 
 

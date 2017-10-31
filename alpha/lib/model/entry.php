@@ -2270,14 +2270,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function updateImageDimensions ( )
 	{
-		$dataPath = kFileSyncUtils::getReadyLocalFilePathForKey($this->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA));
-		list ( $width , $height ) = $arr = myFileConverter::getImageDimensions( $dataPath );
+		$data = kFileSyncUtils::file_get_contents($this->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA));
+		list ($width, $height) = myFileConverter::getImageDimensionsFromString($data);
 		if ( $width )
 		{
 			$this->putInCustomData( "height" , $height );
 			$this->putInCustomData( "width" , $width );
 		}
-		return $arr;
+		return array($width, $height);
 	}
 	
 	public function updateVideoDimensions ( )
@@ -3891,5 +3891,15 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function isInsideDeleteGracePeriod()
 	{
 		return $this->getCreatedAt(null) > (time() - dateUtils::DAY * 7);
+	}
+	
+	public function getGeneralEncryptionKey()
+	{
+		return $this->id . "_GENERAL_ENTRY_KEY";
+	}
+
+	public function getEncryptionIv()
+	{
+		return kConf::get("encryption_iv");
 	}
 }

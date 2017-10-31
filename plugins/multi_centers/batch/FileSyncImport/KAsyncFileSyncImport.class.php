@@ -529,7 +529,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				continue;
 			}
 				
-			if (!file_put_contents($filePath, $data))
+			if (!kFileBase::safeFilePutContents($filePath, $data))
 			{
 				KalturaLog::err("failed to write file $filePath");
 				continue;
