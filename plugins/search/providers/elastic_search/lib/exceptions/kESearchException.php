@@ -11,4 +11,15 @@ class kESearchException extends kCoreException
     const ELASTIC_SEARCH_ENGINE_ERROR = 'Elastic search engine error';
     const MISSING_PARAMS_FOR_DELETE = 'Missing params for delete';
     const EMPTY_SEARCH_ITEMS_NOT_ALLOWED = 'empty search items are not allowed';
+
+    //Query parsing errors
+    const MISSING_QUERY_OPERAND = 'Missing operand [AND / OR / NOT]';
+    const UNMATCHING_BRACKETS = 'Unmatching brackets';
+    const UNMATCHING_QUERY_OPERAND = 'Unmatching query operand. use same operand between brackets';
+    const CONSECUTIVE_OPERANDS_MISMATCH = 'Illegal consecutive operands';
+    const INVALID_FIELD_NAME= 'Illegal query field name';
+    const INVALID_METADATA_FORMAT= 'Invalid metadata format';
+    const INVALID_METADATA_FIELD = 'Illegal metadata field name. allowed only [xpath, metadata_profile_id, term]';
+    const INVALID_MIXED_SERACH_TYPES = "Illegal mixed search item types";
+
 }
