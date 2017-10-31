@@ -143,13 +143,16 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 		}
 	
 		$key = $genericProviderAction->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_VALIDATOR);
-		if(kFileSyncUtils::fileSync_exists($key))
+		
+		list ($fileSync , $local) = kFileSyncUtils::getReadyFileSyncForKey( $key , true , false  );
+		if($fileSync)
 		{
-			$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
-			if($xsdPath && !$xml->schemaValidate($xsdPath))	
+			/* @var $fileSync FileSync */
+			$xsdPath = $fileSync->getFullPath();
+			if($xsdPath && !$xml->schemaValidate($xsdPath, $fileSync->getKey()))	
 			{
 				KalturaLog::err("Inavlid XML:\n" . $xml->saveXML());
-				KalturaLog::err("Schema [$xsdPath]:\n" . file_get_contents($xsdPath));	
+				KalturaLog::err("Schema [$xsdPath]:\n" . $fileSync->decrypt());	
 				return;
 			}
 		}

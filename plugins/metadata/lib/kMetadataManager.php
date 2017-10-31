@@ -163,8 +163,6 @@ class kMetadataManager
 	public static function parseProfileSearchFields($partnerId, MetadataProfile $metadataProfile)
 	{
 		$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
-		
 		$xmlString = kFileSyncUtils::file_get_contents($key);
 		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'true', false);
 		

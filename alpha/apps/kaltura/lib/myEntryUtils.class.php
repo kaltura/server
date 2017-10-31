@@ -47,18 +47,17 @@ class myEntryUtils
 		kFileSyncUtils::moveFromFile($fileLocation, $fileSyncKey);
 
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($fileSyncKey);
-		$filePath = $fileSync->isEncrypted() ? $fileSync->createTempClear() : $fileSync->getFullPath();
-		$thumbAsset->setFileExt(pathinfo($filePath, PATHINFO_EXTENSION));
-		list($width, $height, $type, $attr) = getimagesize($filePath);
+
+		$data = kFileSyncUtils::getLocalContentsByFileSync($fileSync);
+		list($width, $height, $type, $attr) = getimagesizefromstring($data);
+		$thumbAsset->setFileExt($fileSync->getFileExt());
 		$thumbAsset->setWidth($width);
 		$thumbAsset->setHeight($height);
-		$thumbAsset->setSize(filesize($filePath));
-		$fileSync->deleteTempClear(); // unlink the $tmpPath if exist
-		
+		$thumbAsset->setSize(strlen($data));
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
-		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);		
-		
+
+		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $entry);
 	}
 	

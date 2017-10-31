@@ -883,13 +883,12 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->save();
 		
 		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
 
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
-		$filePath = $fileSync->isEncrypted() ? $fileSync->createTempClear() : $fileSync->getFullPath();
-		list($width, $height, $type, $attr) = getimagesize($filePath);
-		$fileSize = kFileBase::fileSize($filePath);
-		$fileSync->deleteTempClear(); // unlink the $tmpPath if exist
+		//extract the data before moving the file in case of encryption
+		list($width, $height, $type, $attr) = getimagesize($fileData["tmp_name"]);
+		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
+
+		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
 		
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);

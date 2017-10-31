@@ -43,6 +43,14 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $file_sync;
 	}
 
+	public function getKey ()
+	{
+		$key = $this->getEncryptionKey();
+		if (!$key)
+			return null;
+		return $key . kConf::get("encryption_salt_key");
+	}
+
 	public function encrypt()
 	{
 		if (!$this->shouldEncryptFile())
@@ -235,7 +243,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getEncryptionKey () { return $this->getFromCustomData("encryptionKey"); }
 	private function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
-	public function getKey () {return $this->getEncryptionKey() .  kConf::get("encryption_salt_key");}
+
 
 }
 

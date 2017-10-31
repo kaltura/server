@@ -11,20 +11,20 @@ class KDOMDocument extends DOMDocument
 		parent::__construct($version, $encoding);
 	}
 
-	public function load ( $filename , $options = 0 )
+	public function load ( $filename , $options = 0 , $key = null)
 	{
 		if(!file_exists($filename) || !filesize($filename))
 			throw new Exception('Empty file supplied as input');
 			
-		return parent::loadXML(file_get_contents($filename), $options);
+		return parent::loadXML(kEncryptFileUtils::getEncryptedFileContent($filename, $key), $options);
 	}
 
-	public function schemaValidate ( $filename )
+	public function schemaValidate ( $filename , $key = null)
 	{
 		if(!file_exists($filename) || !filesize($filename))
 			throw new Exception('Empty file supplied as input');
 		
-		return parent::schemaValidateSource(file_get_contents($filename));
+		return parent::schemaValidateSource(kEncryptFileUtils::getEncryptedFileContent($filename, $key));
 	}
 
 }
