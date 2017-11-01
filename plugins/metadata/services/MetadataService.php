@@ -407,7 +407,7 @@ class MetadataService extends KalturaBaseService
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
 			$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
-			if(!count($objectIds))
+			if(count($objectIds))
 				$applyPartnerFilter = false;
 		}
 		elseif($filter->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
