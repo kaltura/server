@@ -50,11 +50,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function saveToElastic(IElasticIndexable $object ,$params = null)
     {
-        KalturaLog::debug('Saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
-
         if(kConf::get('disableElastic', 'elastic', true))
             return true;
 
+        KalturaLog::debug('Saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
         $cmd = $this->getElasticSaveParams($object, $params);
 
         if(!$cmd)
