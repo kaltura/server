@@ -380,22 +380,22 @@ class MetadataService extends KalturaBaseService
 			return $response;
 		}
 		
-		$this->objectIdEqual = null;
-		$this->objectIdIn = implode(',', $objectIds);
+		$filter->objectIdEqual = null;
+		$filter->objectIdIn = implode(',', $objectIds);
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 
-	private function validateObjectIdFiltered(KalturaMetadataFilter $filter)
+	private function validateObjectIdFiltered(KalturaMetadataFilter &$filter)
 	{
 		$objectIds = null;
-		if ($this->objectIdEqual)
+		if ($filter->objectIdEqual)
 		{
-			$objectIds = array($this->objectIdEqual);
+			$objectIds = array($filter->objectIdEqual);
 		}
-		else if ($this->objectIdIn)
+		else if ($filter->objectIdIn)
 		{
-			$objectIds = explode(',', $this->objectIdIn);
+			$objectIds = explode(',', $filter->objectIdIn);
 		}
 		
 		if(!$objectIds && kConf::hasParam('metadata_list_without_object_filtering_partners') &&
@@ -413,9 +413,8 @@ class MetadataService extends KalturaBaseService
 		elseif($filter->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{
 			$kusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds);
-			if(!count($kusers))
-				$objectIds = array();
-			else
+			$objectIds = array();
+			if(count($kusers))
 			{
 				foreach($kusers as $kuser)
 					$objectIds[] = $kuser->getId();
@@ -424,9 +423,8 @@ class MetadataService extends KalturaBaseService
 		elseif($this->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
 			$categories = categoryPeer::retrieveByPKs($objectIds);
-			if(!count($categories))
-				$objectIds = array();
-			else
+			$objectIds = array();
+			if(count($categories))
 			{
 				foreach($categories as $category)
 					$objectIds[] = $category->getId();
