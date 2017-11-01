@@ -289,7 +289,8 @@ class CategoryService extends KalturaBaseService
 	 * @action move
 	 * @param string $categoryIds
 	 * @param int $targetCategoryParentId
-	 * @return KalturaCategoryListResponse
+	 * @throws KalturaAPIException
+	 * @return bool
 	 */
 	function moveAction($categoryIds, $targetCategoryParentId)
 	{
@@ -335,6 +336,7 @@ class CategoryService extends KalturaBaseService
 			$dbCategory->save();		
 		}
 		
+		return true;
 	}
 	/**
 	 * Unlock categories
