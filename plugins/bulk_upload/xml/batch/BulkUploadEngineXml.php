@@ -509,9 +509,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 				$flavorAsset = $this->getFlavorAsset($contentElement, $conversionProfileId);
 				$flavorAssetResource = $this->getResource($contentElement, $conversionProfileId);
-				if(!$flavorAssetResource)
-					continue;
-				
+
 				$assetParamsId = $flavorAsset->flavorParamsId;
 	
 				$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
@@ -1196,14 +1194,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($flavorAssetsResources as $flavorParamsId => $flavorAssetsResource)
 		{
-			if(!isset($existingflavorAssets[$flavorParamsId]))
+			$id = null;
+			if (!isset($existingflavorAssets[$flavorParamsId]))
 			{
 				KBatchBase::$kClient->flavorAsset->add($entryId, $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorAssetsResource);
-			}else{
-				KBatchBase::$kClient->flavorAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
+				$id = KBatchBase::$kClient->getMultiRequestResult()->id;
+			} else
+			{
+				$id = $existingflavorAssets[$flavorParamsId];
+				KBatchBase::$kClient->flavorAsset->update($id, $flavorAssets[$flavorParamsId]);
 			}
+			if ($flavorAssetsResource)
+				KBatchBase::$kClient->flavorAsset->setContent($id, $flavorAssetsResource);
 		}
 
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
@@ -1446,7 +1448,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$flavorAsset = new KalturaFlavorAsset(); //we create a new asset (for add)
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
 		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
-			
+		if (isset($contentElement->assetInfo))
+		{
+			$flavorAsset->language = languageCodeManager::getFullLanguageNameFromThreeCode(kXml::getXmlAttributeAsString($contentElement->assetInfo, "language"));
+			$flavorAsset->label = kXml::getXmlAttributeAsString($contentElement->assetInfo, "label");
+		}
 		return $flavorAsset;
 	}
 	
@@ -2367,7 +2373,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $bulkUploadResult;
 	}
 	
-	protected function updateObjectsResults($requestResults, $bulkUploadResults)
+	protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 	    KBatchBase::$kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");

@@ -161,6 +161,8 @@ class KalturaErrors extends APIErrors
 
 	const DYNAMIC_SEGMENT_DURATION_DISABLED = "DYNAMIC_SEGMENT_DURATION_DISABLED;;Cannot edit segment duration. Dynamic segment duration feature is disabled";
 
+	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
+
 	/**
 	 * Notification Service
 	 */
@@ -393,6 +395,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE = "UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE;;Failed to match expected file size";
 
 	const UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD = "UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD;;Upload token is restricted due to the file type";
+	
+	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
 
 	/*
 	 * Partenrs service
@@ -655,7 +659,7 @@ class KalturaErrors extends APIErrors
 	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER;;Must filter on entry ID or user ID';
 	const USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED = 'USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED;;UserEntry filter object forbidden fields used';
 	const USER_ENTRY_ALREADY_EXISTS = 'USER_ENTRY_ALREADY_EXISTS;;UserEntry for this type already exists';
-	const USER_ID_NOT_PROVIDED = 'USER_ID_NOT_PROVIDED;;User ID not found neither on the object or KS';
+	const USER_ID_NOT_PROVIDED_OR_EMPTY = 'USER_ID_NOT_PROVIDED_OR_EMPTY;;User ID not found neither on the object or KS';
 	
 	/*
 	 * serverNode service

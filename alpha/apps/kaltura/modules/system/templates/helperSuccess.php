@@ -5,7 +5,6 @@
 <form method="post">
 	Algorithm:
 	<ul style='list-style:none; margin:10px; padding: 5px;'>
-		<li><input type="radio" id="algo" name="algo" value="wiki_decode" <?php echo $algo == "wiki_decode" ? "checked='checked'" : "" ; ?> >Wiki Decode</li>
 		<li><input type="radio" id="algo" name="algo" value="wiki_decode_no_serialize" <?php echo $algo == "wiki_decode_no_serialize" ? "checked='checked'" : "" ; ?> >Wiki Decode (No unserialize)</li>
 		<li><input type="radio" id="algo" name="algo" value="base64_encode" <?php echo $algo == "base64_encode" ? "checked='checked'" : "" ; ?> >Base64 Encode </li>
 		<li><input type="radio" id="algo" name="algo" value="base64_decode" <?php echo $algo == "base64_decode" ? "checked='checked'" : "" ; ?> >Base64 Decode </li>

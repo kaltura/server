@@ -65,6 +65,9 @@
 			"raw" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
+			},
+			"keyword" : {
+			  "type" : "keyword"
 			}
 		  }
 		},
@@ -143,7 +146,17 @@
 		},
 		"tags" : {
 		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			}
+		  }
 		},
 		"reference_id": {
 		  "type" : "text",
@@ -170,6 +183,12 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"length_in_msecs": {
+		  "type" : "long"
+		},
+		"views": {
+		  "type" : "long"
+		},
+		"votes": {
 		  "type" : "long"
 		},
 		"recorded_entry_id": {
@@ -522,7 +541,7 @@
 			  "type" : "text",
 			  "analyzer" : "kaltura_text",
 			  "fields": {
-				"kaltura_ngrams" : {
+				"ngrams" : {
 				  "type" : "text",
 				  "analyzer" : "kaltura_ngrams"
 				},
@@ -548,7 +567,17 @@
 			},
 			"cue_point_tags" : {
 			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_keyword"
+				}
+			  }
 			},
 			"cue_point_start_time" : {
 			  "type" : "long"

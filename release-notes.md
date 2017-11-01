@@ -1,3 +1,210 @@
+# Mercury 13.6.0 #
+
+## Set Entry status to "preconvert" instead of "ready" (for specific partners) when uploading flv files from webcam  ##
+ - Issue Type: Task
+- Issue ID: SUP-11270
+
+### Configuration ###
+	-Added the following to local.ini in server-saas-config:
+	[preconvert_webcam_flv_allowed_partners]
+	Add specific partner to allow this change to affect him (e.g. 0 = @PARTNER_NUMBER@)
+       
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+		
+## Add V3 studio permission ##
+
+- Issue Type: feature
+- Issue ID: PLAT-8174
+
+### Configuration ###
+	-Add new module to the admin-console in admin.ini
+        moduls.V3Studio.enabled = true
+	moduls.V3Studio.permissionType = 2
+	moduls.V3Studio.label = "Enable V3 Studio"
+	moduls.V3Studio.permissionName = FEATURE_V3_STUDIO_PERMISSION
+	moduls.V3Studio.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+		None.
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
+## Increase ACL rules size column ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-8164
+
+### Configuration ###
+
+		None.
+
+### Deployment scripts ###
+
+		mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_10_20_alter_access_control_table_rules.sql
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
+## Fix typo in admin console ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+	- Edit admin.ini
+        'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment' change to 'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy collaboration'
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Mercury 13.5.0 #
+
+## Add permissions to eSearch service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
+
+
+## Add getVolumeMap action to flavorAsset service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8113
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_11_add_flavorasset_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.4.0 #
+
+## Add getVolumeMap action to media service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7986
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_26_add_media_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add upload url domain to uploadToken API object ##
+
+- Issue Type: Task
+- Issue ID: SUP-12069
+
+### Configuration ####
+
+- Add upload domain in dc_config.ini 
+example:
+0.uploadUrl = dc0-upload.kaltura.com       
+1.uploadUrl = dc1-host-upload.kaltura.com       
+
+## Support unlimited recording duration as feature flip ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8030
+
+### Configuration ####
+
+	- Add new module to the admin-console in admin.ini
+        moduls.liveStreamUnlimitedRecording.enabled = true
+        moduls.liveStreamUnlimitedRecording.permissionType = 2
+        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording Duration
+        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING_DURATION
+        moduls.liveStreamUnlimitedRecording.basePermissionType = 2
+        moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+        moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## Add permission to restore-deleted-entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8064
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_02_update_adminconsole_entryadmin_permissions.php
+	  
+## Add co-viewers field to the KalturaBaseEntry object ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7951
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	 Index entry table to sphinx
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.3.0 #
+
+## Expose new API for login by KS ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7952
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_07_add_user_loginByKs_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Mercury 13.2.0 #
 
 ## Add new Beacon plugin ##

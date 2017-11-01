@@ -36,4 +36,6 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_CREDIT = 'credit';
 	const ENTRY_SITE_URL = 'site_url';
 	const ENTRY_ACCESS_CONTROL_ID = 'access_control_id';
+	const ENTRY_VOTES = 'votes';
+	const ENTRY_VIEWS = 'views';
 }

@@ -96,4 +96,8 @@ class ScheduleResourcePeer extends BaseScheduleResourcePeer implements IRelatedO
 	{
 		return false;
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("scheduleResource:id=%s", self::ID));		
+	}
 } // ScheduleResourcePeer

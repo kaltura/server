@@ -131,7 +131,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 				if ($recordedEntry->getSourceType() !== EntrySourceType::RECORDED_LIVE)
 				{
 					$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
-					$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 					$recordedEntry->save();
 				}
 				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
@@ -290,6 +289,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
 			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
+			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
@@ -385,7 +385,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	}
 
 	/**
-	 * Sey recorded video to live entry
+	 * Set recorded video to live entry
 	 *
 	 * @action setRecordedContent
 	 * @param string $entryId Live entry id
@@ -469,12 +469,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			return;
 		}
 
-		if (!$recordedEntry->getConversionProfileId())
-		{
-			$recordedEntry->setConversionProfileId($dbLiveEntry->getConversionProfileId());
-			$recordedEntry->save();
-		}
-
 		//In case conversion profile was changed we need to fetch passed streamed assets as well
 		$dbAsset = assetPeer::retrieveByEntryIdAndParamsNoFilter($dbLiveEntry->getId(), $flavorParamsId);
 		if (!$dbAsset)
@@ -491,9 +485,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 	}
 
 	/**
-	 * @action createRecordedEntry
 	 * Create recorded entry id if it doesn't exist and make sure it happens on the DC that the live entry was created on.
-	 *
+	 * @action createRecordedEntry
 	 * @param string $entryId Live entry id
 	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
 	 * @param KalturaEntryServerNodeStatus $liveEntryStatus the status KalturaEntryServerNodeStatus::PLAYABLE | KalturaEntryServerNodeStatus::BROADCASTING

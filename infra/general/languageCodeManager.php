@@ -63,6 +63,14 @@ class languageCodeManager
         return self::getObjectFromTwoCode($val);
     }
 
+    public static function getFullLanguageNameFromThreeCode($codeT)
+    {
+        if(!self::isAlreadyLoaded())
+            self::loadLanguageCodeMap();
+        $languageObj = self::getObjectFromThreeCode($codeT);
+        return !is_null($languageObj) ? $languageObj[self::KALTURA_NAME] : $codeT;
+    }
+
     public static function getObjectFromKalturaName($kalturaName)
     {
         if(!self::isAlreadyLoaded())
@@ -722,6 +730,11 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"XSV",null,null ,"xsv","Sudovian","S\xc5\xab"."daviskai");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"ZAI",null,null ,"zai","Zapotec	 Isthmus","Diidxaz\xc3\xa1'");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"YUE","yue","yue","yue","Cantonese","Cantonese","Cantonese");
+        //Adding language that are not part of ISO-639
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"HKK","hkk","hkk","hkk","Hokkien","Hokkien","Hokkien");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"TEO","teo","teo","teo","Teo Chew","Teo Chew","Teo Chew");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"HNN","hnn","hnn","hnn","Hainanese","Hainanese","Hainanese");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"HAK","hak","hak","hak","Hakka","Hakka","Hakka");
 
         $result = "<?php\n\n".self::assignArrayToVar($tmpArrKeyCode ,'arrayISO639');
         $result .= self::assignArrayToVar($tmpArrThreeCodeT, 'arrayISO639_T');

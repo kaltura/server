@@ -98,4 +98,9 @@ class kLocalFileResource extends kContentResource
 	public function attachCreatedObject(BaseObject $object)
 	{
 	}
+	
+	public function getMediaType()
+	{
+		return null;
+	}
 }

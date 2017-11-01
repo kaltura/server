@@ -245,7 +245,7 @@ class kFile
 		return $results;
 	}
 	
-	static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1)
+	static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1, $mode = 'r')
 	{
 		$file_name = self::fixPath($file_name);
 		
@@ -253,7 +253,7 @@ class kFile
 		{
 			if(! file_exists($file_name))
 				return NULL;
-			$fh = fopen($file_name, 'r');
+			$fh = fopen($file_name, $mode);
 			
 			if($fh == NULL)
 				return NULL;
@@ -301,6 +301,11 @@ class kFile
 		}
 		fclose($fh);
 	}
+
+	static public function appendToFile($file_name , $str)
+	{
+		file_put_contents($file_name, $str, FILE_APPEND);
+	}
 	
 	static public function fixPath($file_name)
 	{
@@ -310,11 +315,11 @@ class kFile
 	}
 	
 	/**
-	 * 
 	 * creates a dirctory using the specified path
-	 * @param unknown_type $path
-	 * @param unknown_type $rights
-	 * @param unknown_type $recursive
+	 * @param string $path
+	 * @param int $rights
+	 * @param bool $recursive
+	 * @return bool true on success or false on failure.
 	 */
 	public static function fullMkfileDir ($path, $rights = 0777, $recursive = true)
 	{		
@@ -330,9 +335,10 @@ class kFile
 	/**
 	 * 
 	 * creates a dirctory using the dirname of the specified path
-	 * @param unknown_type $path
-	 * @param unknown_type $rights
-	 * @param unknown_type $recursive
+	 * @param string $path
+	 * @param int $rights
+	 * @param bool $recursive
+	 * @return bool true on success or false on failure.
 	 */
 	public static function fullMkdir($path, $rights = 0755, $recursive = true)
 	{
@@ -718,9 +724,29 @@ class kFile
 		}
 		if($mode)
 		{
-			chmod($filePath, $mode);
+			self::chmod($filePath, $mode);
 		}
 		return true;
+	}
+
+	public static function chmod($filePath, $mode)
+	{
+		chmod($filePath, $mode);
+	}
+	
+	/**
+	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
+	 * @param string $fileContent
+	 * @param string $prefix
+	 * @param integer $permission
+	 * @return string path to temporary file location
+	 */
+	public static function createTempFile($fileContent, $prefix = '' , $permission = null)
+	{
+		$tempDirectory = sys_get_temp_dir();
+		$fileLocation = tempnam($tempDirectory, $prefix);
+		if (self::safeFilePutContents($fileLocation, $fileContent, $permission))
+			return $fileLocation;
 	}
 	
 }

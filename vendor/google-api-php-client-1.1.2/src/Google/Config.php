@@ -58,6 +58,10 @@ class Google_Config
         'Google_IO_Abstract' => array(
           'request_timeout_seconds' => 100,
         ),
+        'Google_IO_Curl' => array(
+          'disable_proxy_workaround' => false,
+          'options' => null,
+        ),
         'Google_Logger_Abstract' => array(
           'level' => 'debug',
           'log_format' => "[%datetime%] %level%: %message% %context%\n",
@@ -380,8 +384,8 @@ class Google_Config
   /**
    * Set the hd (hosted domain) parameter streamlines the login process for
    * Google Apps hosted accounts. By including the domain of the user, you
-   * restrict sign-in to accounts at that domain. 
-   * 
+   * restrict sign-in to accounts at that domain.
+   *
    * This should not be used to ensure security on your application - check
    * the hd values within an id token (@see Google_Auth_LoginTicket) after sign
    * in to ensure that the user is from the domain you were expecting.

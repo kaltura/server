@@ -352,8 +352,14 @@ class entryPeer extends BaseentryPeer
 		$filter->setPartnerSearchScope($partnerId);
 		$filter->setDisplayInSearchEquel(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$filter->attachToCriteria($c);
-		
-		return self::doSelect($c);
+
+		$parentEntry = entryPeer::retrieveByPK($parentId);
+		if($parentEntry)
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		$res = self::doSelect($c);
+		if($parentEntry)
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		return $res;
 	}
 
 	public static function setFilterdCategoriesIds($filteredCategoriesIds)

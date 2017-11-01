@@ -129,7 +129,7 @@ class MediaService extends KalturaEntryService
      */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null, $advancedOptions = null)
     {
-    	if($advancedOptions)
+	    if($advancedOptions)
     	{
     		$dbEntry->setReplacementOptions($advancedOptions->toObject());
     		$dbEntry->save();
@@ -150,17 +150,6 @@ class MediaService extends KalturaEntryService
 		else
 		{
 			$kResource = $resource->toObject();
-			if ( ($kResource instanceof kOperationResource ) && ($this->isResourceKClip($kResource)) ) {
-				$internalResource = $kResource->getResource();
-				if ($dbEntry->getIsTrimDisabled()
-					&& $internalResource instanceof kFileSyncResource
-					&& $dbEntry->getId() == $internalResource->getOriginEntryId()
-				)
-				{
-					throw new KalturaAPIException(KalturaErrors::ENTRY_CANNOT_BE_TRIMMED);
-				}
-			}
-
 			$tempMediaEntry = new KalturaMediaEntry();
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
@@ -709,7 +698,7 @@ class MediaService extends KalturaEntryService
 	function getAction($entryId, $version = -1)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType() instanceof KalturaMediaEntry)))
+		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType()) instanceof KalturaMediaEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		return $this->getEntry($entryId, $version);
@@ -1168,16 +1157,33 @@ class MediaService extends KalturaEntryService
 		}
 		return false;
 	}
-
+	
+	private static function getRelatedResourceEntryId($originalResourceEntryId,$dbEntry,$relatedEntry)
+	{
+		if($originalResourceEntryId == $dbEntry->getSourceEntryId() &&  $relatedEntry->getSourceEntryId() )
+		{
+			return $relatedEntry->getSourceEntryId();
+		}
+		if($originalResourceEntryId == $dbEntry->getRootEntryId())
+		{
+			return $relatedEntry->getRootEntryId();
+		}
+		
+		return $relatedEntry->getId();
+	}
+	
+	
 	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
 	{
-		if (!isset($resource->resource->entryId))
-			return;
+		$originalResourceEntryId = $resource->resource->entryId;
 		$relatedEntries = myEntryUtils::getRelatedEntries($dbEntry);
+		
 		foreach ($relatedEntries as $relatedEntry)
 		{
-			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry");
-			$resource->resource->entryId = $relatedEntry->getId();
+			if ($relatedEntry->getType() == entryType::DOCUMENT)
+				continue;
+			$resource->resource->entryId = self::getRelatedResourceEntryId($originalResourceEntryId, $dbEntry, $relatedEntry);
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [" . $resource->resource->entryId . "]");
 			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
 		}
 	}
@@ -1193,6 +1199,26 @@ class MediaService extends KalturaEntryService
 			&& $resource->operationAttributes[0] instanceof KalturaClipAttributes);
 	}
 
+	/**
+	 * Get volume map by entry id
+	 *
+	 * @action getVolumeMap
+	 * @param string $entryId Entry id
+	 * @return file
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getVolumeMapAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		if (!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
+		return $content;
+	}
 
 }

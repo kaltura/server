@@ -88,4 +88,5 @@ class KalturaOperationResource extends KalturaContentResource
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
 }

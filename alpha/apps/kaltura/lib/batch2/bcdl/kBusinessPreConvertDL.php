@@ -1878,14 +1878,43 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 */
 	protected static function setEncryptionAtRest($flavor, $flavorAsset)
 	{
-		KalturaLog::log("for asset".$flavorAsset->getId());
-		$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
+		KalturaLog::log("for asset:".$flavorAsset->getId());
+		
+		/*
+		 * Handle replacement flow - use original entry/asset enc-key, if it is already has one.
+		 * Otherwise (non-replacement) - acquire uDRM encryptionParams
+		 */
+		if(($entry=entryPeer::retrieveByPK($flavorAsset->getEntryId()))!==null
+		&& ($replacedEntryId=$entry->getReplacedEntryId())!==null) {
+
+			KalturaLog::log("Found replacedEntryId:".$replacedEntryId);
+			$replacedEntry = entryPeer::retrieveByPK($replacedEntryId);
+			if(isset($replacedEntry)){
+				$replacedAssets = assetPeer::retrieveFlavorsByEntryId($replacedEntryId);
+				foreach($replacedAssets as $replacedAsset){
+					if(($encKey=$replacedAsset->getEncryptionKey())!==null){
+						$encryptionParamsKey = $encKey;
+						KalturaLog::log("Found encKey in the replaced asset:".$replacedAsset->getId());
+						break;
+					}
+				}
+			}
+		}
+		
+		/*
+		 * For non-replacement flow - acquire uDRM encryptionParams
+		 */
+		if($encryptionParamsKey===null) {
+			$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
+			$encryptionParamsKey = $encryptionParams->key;
+		}
+		$encryptionParamsKeyId = "0000000000000000000000==";//$encryptionParams->key_id;
 		if(($commandLines=$flavor->getCommandLines())!=null) {
 				// Update the transcoding engines cmd-lines with encryption key/key_id values
 			KalturaLog::log("CommandLines Pre:".serialize($commandLines));
 			$commandLines = str_replace (
 				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				array(bin2hex(base64_decode($encryptionParamsKey)), bin2hex(base64_decode($encryptionParamsKeyId))),
 				$commandLines);
 				// Save updated cmd-lines
 			$flavor->setCommandLines($commandLines);
@@ -1896,14 +1925,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::log("Operators Pre:".($operatorsJsonStr));
 			$operatorsJsonStr = str_replace (
 				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				array(bin2hex(base64_decode($encryptionParamsKey)), bin2hex(base64_decode($encryptionParamsKeyId))),
 				$operatorsJsonStr);
 				// Save updated cmd-lines
 			$flavor->setOperators($operatorsJsonStr);
 			$flavor->save();
 		}
 			// Save encryption key on the flavorAsset obj
-		$flavorAsset->setEncryptionKey($encryptionParams->key);
+		$flavorAsset->setEncryptionKey($encryptionParamsKey);
+
 		$flavorAsset->save();
 	}
 

@@ -37,6 +37,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	 */
 	const MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY = 3;
 
+	const DEFAULT_CHUNK_SIZE_BYTE = 1048576; // 1024 * 1024
+
 	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 5;
 
 	public function configure()
@@ -257,37 +259,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			
 			$client->setDefer(true);
 			$request = $youtube->videos->insert("status,snippet", $video);
-			
-			$chunkSizeBytes = 1 * 1024 * 1024;
-			$media = new Google_Http_MediaFileUpload($client, $request, 'video/*', null, true, $chunkSizeBytes);
+
+			$media = new Google_Http_MediaFileUpload($client, $request, 'video/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
 			$media->setFileSize(filesize($videoPath));
-	
-			$ingestedVideo = false;
-			$handle = fopen($videoPath, "rb");
-			while (!$ingestedVideo && !feof($handle)) 
-			{
-				$chunk = fread($handle, $chunkSizeBytes);
-				$numOfTries = 0;
-				while (true) 
-				{
-					try
-					{
-						$ingestedVideo = $media->nextChunk($chunk);
-						break;
-					} catch (Google_IO_Exception $e)
-					{
-						KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
-						$numOfTries++;
-						if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
-						{
-							throw new kTemporaryException($e->getMessage(), $e->getCode());
-						}
-					}
-				}
-			}
-			/* @var $ingestedVideo Google_Service_YouTube_Video */
-	
-			fclose($handle);
+			$ingestedVideo = self::uploadInChunks($media,$videoPath, self::DEFAULT_CHUNK_SIZE_BYTE);
 			$client->setDefer(false);
 	
 			$data->remoteId = $ingestedVideo->getId();
@@ -339,7 +314,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$youtube = new Google_Service_YouTube($client);
 
 		$listResponse = $youtube->videos->listVideos('snippet,status', array('id' => $data->entryDistribution->remoteId));
-		$video = reset($listResponse->getItems());
+		$items = $listResponse->getItems();
+		$video = reset($items);
 		
 //		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
 //		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
@@ -498,22 +474,13 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$caption = new Google_Service_YouTube_Caption();
 		$caption->setId($captionInfo->remoteId);
 		$caption->setSnippet($captionSnippet);
-		
-		$chunkSizeBytes = 1 * 1024 * 1024;
+
 		$youtube->getClient()->setDefer(true);
 		$captionUpdateRequest = $youtube->captions->update('snippet', $caption);
 
-		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $captionUpdateRequest, '*/*', null, true, $chunkSizeBytes);
+		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $captionUpdateRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
 		$media->setFileSize(filesize($captionInfo->filePath));
-
-		$updatedCaption = false;
-		$handle = fopen($captionInfo->filePath, "rb");
-		while (!$updatedCaption && !feof($handle))
-		{
-			$chunk = fread($handle, $chunkSizeBytes);
-			$updatedCaption = $media->nextChunk($chunk);
-		}
-		fclose($handle);
+		self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
 
 		$youtube->getClient()->setDefer(false);
 		
@@ -539,23 +506,14 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 		$caption = new Google_Service_YouTube_Caption();
 		$caption->setSnippet($captionSnippet);
-	
-		$chunkSizeBytes = 1 * 1024 * 1024;
+
 		$youtube->getClient()->setDefer(true);
 		$insertRequest = $youtube->captions->insert('snippet', $caption);
 	
-		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, $chunkSizeBytes);
+		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
 		$media->setFileSize(filesize($captionInfo->filePath));
-	
-		$ingestedCaption = false;
-		$handle = fopen($captionInfo->filePath, "rb");
-		while (!$ingestedCaption && !feof($handle)) 
-		{
-			$chunk = fread($handle, $chunkSizeBytes);
-			$ingestedCaption = $media->nextChunk($chunk);
-		}
-	
-		fclose($handle);
+		$ingestedCaption = self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
+
 		$youtube->getClient()->setDefer(false);
 		
 		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
@@ -640,5 +598,59 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			}
 		}
 	}
-	
+
+	/**
+	 * @param Google_Http_MediaFileUpload $media
+	 * @param String $filePath
+	 * @param Integer $chunkSizeBytes
+	 * @throw kTemporaryException
+	 * @return Google_Service_YouTube_Video
+	 */
+	private static function uploadInChunks($media, $filePath , $chunkSizeBytes = self::DEFAULT_CHUNK_SIZE_BYTE)
+	{
+		$ingestedVideo = false;
+		$currentByte = 0;
+		$size = kFile::fileSize($filePath);
+		while (!$ingestedVideo && $currentByte < $size)
+		{
+			$chunk = kFile::getFileContent($filePath, $currentByte, $currentByte + $chunkSizeBytes, 'rb');
+			if (!$chunk)
+				throw new Exception("Cannot get chunk from file [$filePath] starting from [$currentByte]");
+			$ingestedVideo = self::uploadChunk($media, $chunk);
+			$currentByte += $chunkSizeBytes;
+		}
+		return $ingestedVideo;
+
+	}
+
+	/**
+	 * @param Google_Http_MediaFileUpload $media
+	 * @param String $chunk
+	 * @throws kTemporaryException
+	 * @return Google_Service_YouTube_Video
+	 */
+	private static function uploadChunk($media, $chunk)
+	{
+		$numOfTries = 0;
+		$ingestedVideo = false;
+		while (true)
+		{
+			try
+			{
+				$ingestedVideo = $media->nextChunk($chunk);
+				break;
+			}
+			catch (Google_IO_Exception $e)
+			{
+				KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
+				$numOfTries++;
+				if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
+					throw new kTemporaryException($e->getMessage(), $e->getCode());
+			}
+		}
+		return $ingestedVideo;
+
+	}
+
+
 }

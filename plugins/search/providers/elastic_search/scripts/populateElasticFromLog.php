@@ -1,6 +1,5 @@
 <?php
 set_time_limit(0);
-ini_set("memory_limit","700M");
 chdir(dirname(__FILE__));
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../../../'));
@@ -78,6 +77,22 @@ $elasticClient = new elasticClient($elasticServer, $elasticPort); //take the ser
 
 while(true)
 {
+
+    if(!elasticSearchUtils::isMaster($elasticClient, $hostname))
+    {
+        KalturaLog::log('elastic server ['.$hostname.'] is not the master , sleeping for 30 seconds');
+        sleep(30);
+        //update the last log ids
+        $serverLastLogs = SphinxLogServerPeer::retrieveByServer($elasticCluster, $sphinxLogReadConn);
+        foreach($serverLastLogs as $serverLastLog)
+        {
+            $lastLogs[$serverLastLog->getDc()] = $serverLastLog;
+            $handledRecords[$serverLastLog->getDc()] = array();
+        }
+        SphinxLogServerPeer::clearInstancePool();
+        continue;
+    }
+
     $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
 
     while(!count($elasticLogs))
@@ -85,13 +100,6 @@ while(true)
         $skipExecutedUpdates = true;
         sleep(1);
         $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
-    }
-
-    if(!elasticSearchUtils::isMaster($elasticClient, $hostname))
-    {
-        KalturaLog::log('elastic server ['.$hostname.'] is not the master , sleeping for 30 seconds');
-        sleep(30);
-        continue;
     }
 
     $ping = $elasticClient->ping();
@@ -165,6 +173,7 @@ while(true)
     }
     
     SphinxLogPeer::clearInstancePool();
+    kMemoryManager::clearMemory();
 }
 
 KalturaLog::log('Done');

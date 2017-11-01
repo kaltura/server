@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -58,6 +56,7 @@ class Google_Service_AdExchangeSeller extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'adexchangeseller/v2.0/';
     $this->version = 'v2.0';
     $this->serviceName = 'adexchangeseller';
@@ -82,13 +81,13 @@ class Google_Service_AdExchangeSeller extends Google_Service
               'path' => 'accounts',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -110,13 +109,13 @@ class Google_Service_AdExchangeSeller extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -187,13 +186,13 @@ class Google_Service_AdExchangeSeller extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -300,7 +299,12 @@ class Google_Service_AdExchangeSeller extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'sort' => array(
+                'dimension' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                  'repeated' => true,
+                ),
+                'filter' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
@@ -309,16 +313,16 @@ class Google_Service_AdExchangeSeller extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
+                'maxResults' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
                 'metric' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
                 ),
-                'maxResults' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
-                'filter' => array(
+                'sort' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
@@ -326,11 +330,6 @@ class Google_Service_AdExchangeSeller extends Google_Service
                 'startIndex' => array(
                   'location' => 'query',
                   'type' => 'integer',
-                ),
-                'dimension' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                  'repeated' => true,
                 ),
               ),
             ),
@@ -361,11 +360,11 @@ class Google_Service_AdExchangeSeller extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'startIndex' => array(
+                'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
-                'maxResults' => array(
+                'startIndex' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
@@ -379,13 +378,13 @@ class Google_Service_AdExchangeSeller extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -412,13 +411,13 @@ class Google_Service_AdExchangeSeller extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -461,11 +460,11 @@ class Google_Service_AdExchangeSeller_Accounts_Resource extends Google_Service_R
    *
    * @param array $optParams Optional parameters.
    *
+   * @opt_param int maxResults The maximum number of accounts to include in the
+   * response, used for paging.
    * @opt_param string pageToken A continuation token, used to page through
    * accounts. To retrieve the next page, set this parameter to the value of
    * "nextPageToken" from the previous response.
-   * @opt_param int maxResults The maximum number of accounts to include in the
-   * response, used for paging.
    * @return Google_Service_AdExchangeSeller_Accounts
    */
   public function listAccounts($optParams = array())
@@ -494,11 +493,11 @@ class Google_Service_AdExchangeSeller_AccountsAdclients_Resource extends Google_
    * @param string $accountId Account to which the ad client belongs.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string maxResults The maximum number of ad clients to include in
+   * the response, used for paging.
    * @opt_param string pageToken A continuation token, used to page through ad
    * clients. To retrieve the next page, set this parameter to the value of
    * "nextPageToken" from the previous response.
-   * @opt_param string maxResults The maximum number of ad clients to include in
-   * the response, used for paging.
    * @return Google_Service_AdExchangeSeller_AdClients
    */
   public function listAccountsAdclients($accountId, $optParams = array())
@@ -573,11 +572,11 @@ class Google_Service_AdExchangeSeller_AccountsCustomchannels_Resource extends Go
    * @param string $adClientId Ad client for which to list custom channels.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string maxResults The maximum number of custom channels to include
+   * in the response, used for paging.
    * @opt_param string pageToken A continuation token, used to page through custom
    * channels. To retrieve the next page, set this parameter to the value of
    * "nextPageToken" from the previous response.
-   * @opt_param string maxResults The maximum number of custom channels to include
-   * in the response, used for paging.
    * @return Google_Service_AdExchangeSeller_CustomChannels
    */
   public function listAccountsCustomchannels($accountId, $adClientId, $optParams = array())
@@ -716,17 +715,17 @@ class Google_Service_AdExchangeSeller_AccountsReports_Resource extends Google_Se
    * format, inclusive.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string dimension Dimensions to base the report on.
+   * @opt_param string filter Filters to be run on the report.
+   * @opt_param string locale Optional locale to use for translating report output
+   * to a local language. Defaults to "en_US" if not specified.
+   * @opt_param string maxResults The maximum number of rows of report data to
+   * return.
+   * @opt_param string metric Numeric columns to include in the report.
    * @opt_param string sort The name of a dimension or metric to sort the
    * resulting report on, optionally prefixed with "+" to sort ascending or "-" to
    * sort descending. If no prefix is specified, the column is sorted ascending.
-   * @opt_param string locale Optional locale to use for translating report output
-   * to a local language. Defaults to "en_US" if not specified.
-   * @opt_param string metric Numeric columns to include in the report.
-   * @opt_param string maxResults The maximum number of rows of report data to
-   * return.
-   * @opt_param string filter Filters to be run on the report.
    * @opt_param string startIndex Index of the first row of report data to return.
-   * @opt_param string dimension Dimensions to base the report on.
    * @return Google_Service_AdExchangeSeller_Report
    */
   public function generate($accountId, $startDate, $endDate, $optParams = array())
@@ -758,9 +757,9 @@ class Google_Service_AdExchangeSeller_AccountsReportsSaved_Resource extends Goog
    *
    * @opt_param string locale Optional locale to use for translating report output
    * to a local language. Defaults to "en_US" if not specified.
-   * @opt_param int startIndex Index of the first row of report data to return.
    * @opt_param int maxResults The maximum number of rows of report data to
    * return.
+   * @opt_param int startIndex Index of the first row of report data to return.
    * @return Google_Service_AdExchangeSeller_Report
    */
   public function generate($accountId, $savedReportId, $optParams = array())
@@ -777,11 +776,11 @@ class Google_Service_AdExchangeSeller_AccountsReportsSaved_Resource extends Goog
    * @param string $accountId Account owning the saved reports.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param int maxResults The maximum number of saved reports to include in
+   * the response, used for paging.
    * @opt_param string pageToken A continuation token, used to page through saved
    * reports. To retrieve the next page, set this parameter to the value of
    * "nextPageToken" from the previous response.
-   * @opt_param int maxResults The maximum number of saved reports to include in
-   * the response, used for paging.
    * @return Google_Service_AdExchangeSeller_SavedReports
    */
   public function listAccountsReportsSaved($accountId, $optParams = array())
@@ -810,11 +809,11 @@ class Google_Service_AdExchangeSeller_AccountsUrlchannels_Resource extends Googl
    * @param string $adClientId Ad client for which to list URL channels.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string maxResults The maximum number of URL channels to include in
+   * the response, used for paging.
    * @opt_param string pageToken A continuation token, used to page through URL
    * channels. To retrieve the next page, set this parameter to the value of
    * "nextPageToken" from the previous response.
-   * @opt_param string maxResults The maximum number of URL channels to include in
-   * the response, used for paging.
    * @return Google_Service_AdExchangeSeller_UrlChannels
    */
   public function listAccountsUrlchannels($accountId, $adClientId, $optParams = array())

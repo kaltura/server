@@ -80,4 +80,8 @@ class ScheduleResource extends BaseScheduleResource implements IRelatedObject {
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FULL_PARENT_IDS, null, array());
 	}
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("scheduleResource:id=".strtolower($this->getId()));
+	}
 } // ScheduleResource

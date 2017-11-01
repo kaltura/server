@@ -15,9 +15,15 @@ class KalturaESearchMetadataItem extends KalturaESearchItem
 	 */
 	public $metadataProfileId;
 
+	/**
+	 * @var int
+	 */
+	public $metadataFieldId;
+
 	private static $map_between_objects = array(
 		'xpath',
 		'metadataProfileId',
+		'metadataFieldId',
 	);
 
 	private static $map_dynamic_enum = array();

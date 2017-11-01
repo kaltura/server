@@ -199,6 +199,7 @@ index kaltura_entry:kaltura_base
 	rt_field	 = creator_puser_id
 	rt_field	 = entitled_kusers_publish
 	rt_field	 = entitled_kusers_edit
+	rt_field	 = entitled_kusers_view
 	rt_field	 = entitled_kusers
 	rt_field	 = privacy_by_contexts
 	rt_field     = sphinx_match_optimizations

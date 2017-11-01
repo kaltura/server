@@ -48,11 +48,11 @@ class ESearchOperator extends ESearchItem
 		$this->searchItems = $searchItems;
 	}
 
-	public static function createSearchQuery(array $eSearchCaptionItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
 	{
-		if (!count($eSearchCaptionItemsArr))
+		if (!$eSearchItemsArr || !count($eSearchItemsArr))
 		{
-			return array();
+			throw new kESearchException('empty search items are not allowed', kESearchException::EMPTY_SEARCH_ITEMS_NOT_ALLOWED);
 		}
 		switch ($eSearchOperatorType)
 		{
@@ -70,7 +70,7 @@ class ESearchOperator extends ESearchItem
 				return null;
 		}
 		
-		$categorizedSearchItems = self::getCategorizedSearchItems($eSearchCaptionItemsArr);
+		$categorizedSearchItems = self::getCategorizedSearchItems($eSearchItemsArr);
 		$outQuery = self::createSearchQueryForItems($categorizedSearchItems, $boolOperator, $eSearchOperatorType);
 
 		return $outQuery;

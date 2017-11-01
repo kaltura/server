@@ -37,4 +37,17 @@ class kUploadedFileTokenResource extends kLocalFileResource
 	{
 		$this->token = $token;
 	}
+	
+	public function getMediaType()
+	{
+		$dbUploadToken = UploadTokenPeer::retrieveByPK($this->token);
+		if(is_null($dbUploadToken))
+			return null;
+		
+		$fileName = $dbUploadToken->getFileName();
+		if(!$fileName)
+			return null;
+		
+		return myFileUploadService::getMediaTypeFromFileExt(pathinfo($fileName, PATHINFO_EXTENSION));
+	}
 }

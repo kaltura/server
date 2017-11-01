@@ -10,6 +10,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected $preferredFlavor = null;
 	
+	/**
+	 * @var bool
+	 */
+	protected $isMultiAudio = false;
+	
 	/** -------------------
 	 * Functionality 
 	 * --------------------*/
@@ -341,7 +346,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function flavorCmpFunction ($flavor1, $flavor2)
 	{
-		// move the audio flavors to the end
+		// move the audio flavors to the end unless we have multi audio stream which in this case they should be at the beginning
 		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
 		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
 		
@@ -349,11 +354,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			if ($isAudio1)
 			{
-				return 1;
+				return $this->isMultiAudio ? -1 : 1;
 			}
 			else 
 			{
-				return -1;
+				return $this->isMultiAudio ? 1 : -1;
 			}
 		}
 		

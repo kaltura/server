@@ -7,7 +7,7 @@
  * @subpackage api.objects
  */
 
-class KalturaOptionalAnswersArray extends KalturaAssociativeArray {
+class KalturaOptionalAnswersArray extends KalturaTypedArray {
 
 	public function __construct()
 	{

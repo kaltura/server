@@ -16,6 +16,11 @@ class KalturaESearchMetadataItemData extends KalturaESearchItemData
 	public $metadataProfileId;
 
 	/**
+	 * @var int
+	 */
+	public $metadataFieldId;
+
+	/**
 	 * @var string
 	 */
 	public $valueText;
@@ -28,6 +33,7 @@ class KalturaESearchMetadataItemData extends KalturaESearchItemData
 	private static $map_between_objects = array(
 		'xpath',
 		'metadataProfileId',
+		'metadataFieldId',
 		'valueText',
 		'valueInt',
 	);

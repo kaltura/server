@@ -1383,7 +1383,7 @@ CREATE TABLE `access_control`
 	`prv_restrict_length` INTEGER,
 	`kdir_restrict_type` TINYINT,
 	`custom_data` TEXT,
-	`rules` TEXT,
+	`rules` MEDIUMTEXT,
 	PRIMARY KEY (`id`)
 )Type=InnoDB;
 

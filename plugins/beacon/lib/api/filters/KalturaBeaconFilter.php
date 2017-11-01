@@ -59,9 +59,6 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 	{
 		$range = array();
 		
-		$range[kBeacon::FIELD_CREATED_AT][kESearchQueryManager::GTE_KEY] = $this->createdAtGreaterThanOrEqual;
-		$range[kBeacon::FIELD_CREATED_AT][kESearchQueryManager::LTE_KEY] = $this->createdAtLessThanOrEqual;
-		
 		$range[kBeacon::FIELD_UPDATED_AT][kESearchQueryManager::GTE_KEY] = $this->updatedAtGreaterThanOrEqual;
 		$range[kBeacon::FIELD_UPDATED_AT][kESearchQueryManager::LTE_KEY] = $this->updatedAtLessThanOrEqual;
 		
@@ -82,6 +79,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 			if (!$order || !isset($orderByMap[$order]))
 				continue;
 			
+			$order = $orderByMap[$order];
 			list ($field_name, $ascending) = baseObjectFilter::getFieldAndDirection($order);
 			$orderObject[$field_name] = $ascending;
 		}
