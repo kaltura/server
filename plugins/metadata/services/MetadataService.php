@@ -398,7 +398,7 @@ class MetadataService extends KalturaBaseService
 			$objectIds = explode(',', $filter->objectIdIn);
 		}
 		
-		if(!$objectIds && kConf::hasParam('metadata_list_without_object_filtering_partners') &&
+		if(empty($objectIds) && kConf::hasParam('metadata_list_without_object_filtering_partners') &&
 			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
 			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
