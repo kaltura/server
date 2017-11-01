@@ -98,7 +98,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("entryServerNode:entryId%s", self::ENTRY_ID), array("entryServerNode:id=%s", self::ID));		
+		return array(array("entryServerNode:id=%s", self::ID), array("entryServerNode:entryId%s", self::ENTRY_ID));		
 	}
 
 	public static function retrievePlayableByEntryId($entryId)

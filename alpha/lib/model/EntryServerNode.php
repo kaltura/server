@@ -19,7 +19,7 @@ abstract class EntryServerNode extends BaseEntryServerNode {
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("entryServerNode:entryId".strtolower($this->getEntryId()), "entryServerNode:id=".strtolower($this->getId()));
+		return array("entryServerNode:id=".strtolower($this->getId()), "entryServerNode:entryId".strtolower($this->getEntryId()));
 	}
 	
 	protected function addTrackEntryInfo($trackEventType, $description)
