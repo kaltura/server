@@ -133,7 +133,6 @@ class ESearchService extends KalturaBaseService
 	{
 		$code = $exception->getCode();
 		$data = $exception->getData();
-		$code = $exception->getMessage();
 		switch ($code)
 		{
 			case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD:
