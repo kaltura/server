@@ -79,4 +79,8 @@ class ScheduleEventResource extends BaseScheduleEventResource implements IRelate
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FULL_PARENT_IDS, null, array());
 	}
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("scheduleEventResource:eventId=".strtolower($this->getEventId()));
+	}
 } // ScheduleEventResource
