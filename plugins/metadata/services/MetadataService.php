@@ -403,21 +403,38 @@ class MetadataService extends KalturaBaseService
 			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 		
+		$applyPartnerFilter = true;
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
 			$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
-			if(count($objectIds))
-				$this->applyPartnerFilterForClass('Metadata');
-			
+			if(!count($objectIds))
+				$applyPartnerFilter = false;
 		}
 		elseif($filter->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{
-			$objectIds = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds);
+			$kusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds);
+			if(!count($kusers))
+				$objectIds = array();
+			else
+			{
+				foreach($kusers as $kuser)
+					$objectIds[] = $kuser->getId();
+			}
 		}
 		elseif($this->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
-			$objectIds = categoryPeer::retrieveByPKs($objectIds);
+			$categories = categoryPeer::retrieveByPKs($objectIds);
+			if(!count($categories))
+				$objectIds = array();
+			else
+			{
+				foreach($categories as $category)
+					$objectIds[] = $category->getId();
+			}
 		}
+		
+		if($applyPartnerFilter)
+			$this->applyPartnerFilterForClass('Metadata');
 		
 		return $objectIds;
 	}
