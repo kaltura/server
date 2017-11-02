@@ -507,7 +507,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		if ($shouldCreateRecordedEntry && (!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
 			in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) &&
-			$dbLiveEntry->getRecordStatus() && (!$dbLiveEntry->getExplicitLive() || $dbLiveEntry->getRecordingStatus() == RecordingStatus::ACTIVE)
+			$dbLiveEntry->getRecordStatus() && ($dbLiveEntry->getRecordingStatus() == RecordingStatus::ACTIVE)
 		)
 		{
 			KalturaLog::info("Checking if recorded entry needs to be created for entry ".$dbLiveEntry->getId());

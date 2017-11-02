@@ -586,13 +586,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				return true;
 			}
-			
-		if($object instanceof FileSync
-			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_DELETED)
-		{
-			return true;
-		}
 
 		if ($object instanceof LiveEntry)
 		{
