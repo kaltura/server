@@ -372,7 +372,7 @@ class MetadataService extends KalturaBaseService
 			$pager = new KalturaFilterPager ();
 		
 		$objectIds = $this->validateObjectIdFiltered($filter);
-		if(!count($objectIds))
+		if(!count($objectIds) && $filter->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT)
 		{
 			$response = new KalturaMetadataListResponse();
 			$response->objects = new KalturaMetadataArray();
