@@ -49,14 +49,16 @@ class myEntryUtils
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($fileSyncKey);
 
 		$data = kFileSyncUtils::getLocalContentsByFileSync($fileSync);
-		list($width, $height, $type, $attr) = getimagesizefromstring($data);
+		$image = imagecreatefromstring($data);
+		$thumbAsset->setWidth(imagesx($image));
+		$thumbAsset->setHeight(imagesy($image));
+		imagedestroy($image);
+
 		$thumbAsset->setFileExt($fileSync->getFileExt());
-		$thumbAsset->setWidth($width);
-		$thumbAsset->setHeight($height);
 		$thumbAsset->setSize(strlen($data));
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
-
+		
 		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $entry);
 	}
