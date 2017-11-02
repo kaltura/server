@@ -156,9 +156,9 @@ class kKavaReportsMgr extends kKavaBase
             self::REPORT_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
             self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
             self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "country"),
-            self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_CITY,
+            self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_REGION,
             self::REPORT_DRILLDOWN_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),           
-            self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("object_id","location")
+            self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("object_id","location_name")
         ),
         myReportsMgr::REPORT_TYPE_TOP_SYNDICATION => array(
             self::REPORT_DIMENSION => self::DIMENSION_DOMAIN,
@@ -281,6 +281,7 @@ class kKavaReportsMgr extends kKavaBase
         self::EVENT_TYPE_EDIT_CLICKED => "count_edit",
         self::METRIC_PLAYTHROUGH_RATIO => "play_through_ratio",
         self::DIMENSION_LOCATION_COUNTRY => "country",
+        self::DIMENSION_LOCATION_REGION => "location_name",
     );
     
     static $headers_to_metrics = array();
@@ -292,6 +293,7 @@ class kKavaReportsMgr extends kKavaBase
     	self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
     	self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
     	self::DIMENSION_LOCATION_COUNTRY => array('kKavaCountryCodes', 'toShortName'),
+    	self::DIMENSION_LOCATION_REGION => 'strtoupper',
     );
     
     protected static function transformDeviceName($name)
