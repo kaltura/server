@@ -422,7 +422,7 @@ class MetadataService extends KalturaBaseService
 					$objectIds[] = $kuser->getId();
 			}
 		}
-		elseif($this->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
+		elseif($filter->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
 			$categories = array();
 			if($objectIds)
