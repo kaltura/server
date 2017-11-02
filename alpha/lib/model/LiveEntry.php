@@ -944,7 +944,10 @@ abstract class LiveEntry extends entry
 
 	public function getViewMode()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE, null, ViewMode::PREVIEW);
+		if ($this->getExplicitLive())
+			return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE, null, ViewMode::PREVIEW);
+		else
+			return ViewMode::ALLOW_ALL;
 	}
 
 	public function setViewMode($v)
@@ -954,7 +957,15 @@ abstract class LiveEntry extends entry
 
 	public function getRecordingStatus()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_STATUS, null, RecordingStatus::STOPPED);
+		if ($this->getExplicitLive())
+			return $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_STATUS, null, RecordingStatus::STOPPED);
+		else
+		{
+			if ($this->getRecordStatus() == RecordStatus::DISABLED)
+				return RecordingStatus::DISABLED;
+			else
+				return RecordingStatus::ACTIVE;
+		}
 	}
 
 	public function setRecordingStatus($v)
