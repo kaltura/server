@@ -281,6 +281,7 @@ class kBusinessPreConvertDL
 	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription, $rotate=null)
 	{
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 
 		if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
@@ -289,7 +290,7 @@ class kBusinessPreConvertDL
 			return false;
 		}
 
-		$srcPath = $fileSync->isEncrypted() ? $fileSync->createTempClear() : $fileSync->getFullPath();
+		$srcPath = $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!file_exists($tempDir))
@@ -357,14 +358,16 @@ class kBusinessPreConvertDL
 			$density = $destThumbParamsOutput->getDensity();
 			$stripProfiles = $destThumbParamsOutput->getStripProfiles();
 
+			if ($srcAsset->getType() == assetType::THUMBNAIL && $fileSync->isEncrypted())
+				$srcPath = $fileSync->createTempClear();
 			$cropper = new KImageMagickCropper($srcPath, $destPath, kConf::get('bin_path_imagemagick'), true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $rotate, $stripProfiles);
+			$fileSync->deleteTempClear();
 			if(!$cropped || !file_exists($destPath))
 			{
 				$errDescription = "Crop failed";
 				return false;
 			}
-			$fileSync->deleteTempClear();
 			return $destPath;
 		}
 		catch(Exception $ex)

@@ -744,7 +744,7 @@ class myEntryUtils
 		$fileSync = null;
 		if($orig_image_path === null || !file_exists($orig_image_path))
 		{
-			$fileSync = self::getLocalImageFileSyncByEntry($entry, $version);
+			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
 		
@@ -1178,12 +1178,12 @@ class myEntryUtils
 		return $videoRotation;
 	}
 
-	public static function getLocalImageFileSyncByEntry( $entry, $version = null )
+	public static function getEntryLocalImageFileSync(entry $entry, $version = null)
 	{
 		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
-		$entry_image_key = $entry->getSyncKey($sub_type, $version);
-		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $entry_image_key);
-		return $file_sync;
+		$entryImageKey = $entry->getSyncKey($sub_type, $version);
+		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey);
+		return ($local ? $file_sync : null);
 	}
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )
