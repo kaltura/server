@@ -206,6 +206,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaEntryServerNodeStatus::PLAYABLE, $shouldCreateRecordedEntry = true)
 	{
+		kApiCache::disableConditionalCache();
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
