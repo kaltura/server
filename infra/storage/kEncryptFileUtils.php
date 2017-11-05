@@ -6,21 +6,17 @@
  */
 require_once(dirname(__file__) . '/kFileBase.php');
 
-class kEncryptFileUtils 
+class kEncryptFileUtils
 {
+    CONST ENCRYPT_METHOD = "AES-256-CBC";
     public static function encryptData($plainText, $key)
     {
-        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        return mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $plainText, MCRYPT_MODE_ECB, $iv);
+        return openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key);
     }
 
     public static function decryptData($cryptText, $key)
     {
-        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        $decryptText = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $cryptText, MCRYPT_MODE_ECB, $iv);
-        return trim($decryptText);
+        return openssl_decrypt($cryptText, self::ENCRYPT_METHOD, $key);
     }
 
     public static function getEncryptedFileContent($fileName, $key = null, $from_byte = 0, $len = 0)

@@ -105,7 +105,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function setFileSizeFromPath ($filePath)
 	{
-		$this->setFileSize(kFile::fileSize($filePath));
+		$fileSize = kEncryptFileUtils::fileSize($filePath, $this->getKey());
+		$this->setFileSize($fileSize);
 	}
 
 	private function getClearTempPath()
