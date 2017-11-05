@@ -51,12 +51,17 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $key . kConf::get("encryption_salt_key");
 	}
 
+	private function generateKey()
+	{
+		return implode("_", array($this->getObjectId(), $this->getObjectType(), $this->getObjectSubType()));
+	}
+
 	public function encrypt()
 	{
 		if (!$this->shouldEncryptFile())
 			return;
 
-		$this->setEncryptionKey($this->getObjectId());
+		$this->setEncryptionKey($this->generateKey());
 		$this->save();
 
 		$key = $this->getKey();

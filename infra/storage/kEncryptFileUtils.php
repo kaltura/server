@@ -11,12 +11,18 @@ class kEncryptFileUtils
     CONST ENCRYPT_METHOD = "AES-256-CBC";
     public static function encryptData($plainText, $key)
     {
-        return openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key);
+        $ivLength = openssl_cipher_iv_length(self::ENCRYPT_METHOD);
+        $iv = openssl_random_pseudo_bytes($ivLength);
+        $encryptedData =  openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key, 0 , $iv);
+        return base64_encode($iv.$encryptedData);
     }
 
-    public static function decryptData($cryptText, $key)
+    public static function decryptData($cipherText, $key)
     {
-        return openssl_decrypt($cryptText, self::ENCRYPT_METHOD, $key);
+        $cipherText = base64_decode($cipherText);
+        $ivLength = openssl_cipher_iv_length(self::ENCRYPT_METHOD);
+        $iv = substr($cipherText, 0, $ivLength);
+        return openssl_decrypt(substr($cipherText, $ivLength), self::ENCRYPT_METHOD, $key, 0, $iv);
     }
 
     public static function getEncryptedFileContent($fileName, $key = null, $from_byte = 0, $len = 0)
