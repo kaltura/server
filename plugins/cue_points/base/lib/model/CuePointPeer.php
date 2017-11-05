@@ -281,7 +281,8 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
 		$criteria->setLimit($limit);
 		$criteria->setOffset($offset);
-		
+		$criteria->dontCount();
+
 		if(count($types))
 			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
 		
