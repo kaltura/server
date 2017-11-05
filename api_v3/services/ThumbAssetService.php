@@ -532,7 +532,8 @@ class ThumbAssetService extends KalturaAssetService
 			header("Content-Disposition: attachment; filename=\"$fileName\"");
 			
 		$mimeType = kFile::mimeType($tempThumbPath);
-		return $this->dumpFile($tempThumbPath, $mimeType, $entry->getGeneralEncryptionKey());
+		$key = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
+		return $this->dumpFile($tempThumbPath, $mimeType, $key);
 	}
 	
 	/**
