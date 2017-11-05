@@ -525,13 +525,14 @@ class ThumbAssetService extends KalturaAssetService
 			$filePath, 
 			$thumbParams->density, 
 			$thumbParams->stripProfiles, 
-			null);
+			null, null,
+			$fileSync);
 		
 		if($options && $options->download)
 			header("Content-Disposition: attachment; filename=\"$fileName\"");
 			
 		$mimeType = kFile::mimeType($tempThumbPath);
-		return $this->dumpFile($tempThumbPath, $mimeType); 
+		return $this->dumpFile($tempThumbPath, $mimeType, $entry->getGeneralEncryptionKey());
 	}
 	
 	/**

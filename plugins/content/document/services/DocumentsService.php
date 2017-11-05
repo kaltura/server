@@ -521,7 +521,7 @@ class DocumentsService extends KalturaEntryService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			return $this->dumpFile($filePath, $mimeType);
+			return $this->dumpFile($filePath, $mimeType, $fileSync->getKey());
 		}
 		else
 		{

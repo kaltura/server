@@ -1007,6 +1007,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 
+
 	/**
 	 * @param FileSyncKey $key
 	 * @param $file_root
@@ -1386,6 +1387,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$firstLink->setFileRoot($fileSync->getFileRoot());
 			$firstLink->setFilePath($fileSync->getFilePath());
 			$firstLink->setFileType($fileSync->getFileType());
+			$firstLink->setEncryptionKey($fileSync->getEncryptionKey());
 			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
 			$firstLink->setIsDir($fileSync->getIsDir());
 			if (!is_null($fileSync->getOriginalDc()))

@@ -247,7 +247,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function setContentMd5 ($v) { $this->putInCustomData("contentMd5", $v);  }
 
 	public function getEncryptionKey () { return $this->getFromCustomData("encryptionKey"); }
-	private function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
+	public function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
 
 

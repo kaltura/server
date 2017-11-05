@@ -42,20 +42,19 @@ class myEntryUtils
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$thumbAsset->incrementVersion();
 		$thumbAsset->save();
+
+		//getting the data for the thumbnail before moving to SyncKey in case of encryption
+		list($width, $height, $type, $attr) = getimagesize($fileLocation);
+		$ext = pathinfo($fileLocation, PATHINFO_EXTENSION);
+		$size = filesize($fileLocation);
 		
 		$fileSyncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($fileLocation, $fileSyncKey);
 
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($fileSyncKey);
-
-		$data = kFileSyncUtils::getLocalContentsByFileSync($fileSync);
-		$image = imagecreatefromstring($data);
-		$thumbAsset->setWidth(imagesx($image));
-		$thumbAsset->setHeight(imagesy($image));
-		imagedestroy($image);
-
-		$thumbAsset->setFileExt($fileSync->getFileExt());
-		$thumbAsset->setSize(strlen($data));
+		$thumbAsset->setWidth($width);
+		$thumbAsset->setHeight($height);
+		$thumbAsset->setFileExt($ext);
+		$thumbAsset->setSize($size);
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
 		
@@ -687,7 +686,7 @@ class myEntryUtils
 	
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -740,9 +739,11 @@ class myEntryUtils
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 			return $finalThumbPath;
 		}
-
-		$fileSync = null;
-		if($orig_image_path === null || !file_exists($orig_image_path))
+		
+		if ($fileSync)
+			$orig_image_path = $fileSync->getFullPath();
+		
+		if ($orig_image_path === null || !file_exists($orig_image_path))
 		{
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
