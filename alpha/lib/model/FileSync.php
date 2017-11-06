@@ -93,7 +93,13 @@ class FileSync extends BaseFileSync implements IBaseObject
 		//check for partner configuration
 		if(!$this->getPartnerId() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_CONTENT_ENCRYPTION, $this->getPartnerId()))
 			return false;
-		
+
+		//check fileSync type
+		$excludeObjectTypes = array(FileSyncObjectType::BATCHJOB);
+		if (in_array($this->object_type, $excludeObjectTypes))
+			return false;
+
+		//check the file extension
 		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
 		$fileTypeNotToEncrypt = kConf::get('video_file_ext');
 		if (in_array($type, $fileTypeNotToEncrypt))
