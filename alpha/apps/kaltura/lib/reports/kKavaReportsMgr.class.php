@@ -31,6 +31,7 @@ class kKavaReportsMgr extends kKavaBase
     
     const CLIENT_TAG_PRIORITY = 5;
     const MAX_RESULT_SIZE = 12000;
+    const MIN_THRESHOLD = 500;
     
     static $aggregations_def = array();
     static $metrics_def = array();
@@ -602,7 +603,14 @@ class kKavaReportsMgr extends kKavaBase
         
         if ($page_index * $page_size > self::MAX_RESULT_SIZE) 
         {
-            throw new Exception("result limit is " . self::MAX_RESULT_SIZE . " rows");
+        	if ($page_index == 1)
+        	{
+        		$page_size = self::MAX_RESULT_SIZE;
+        	}
+        	else
+        	{
+            	throw new Exception("result limit is " . self::MAX_RESULT_SIZE . " rows");
+        	}
         }
         
         // order by
@@ -626,7 +634,7 @@ class kKavaReportsMgr extends kKavaBase
         }
         
         // Note: using a larger threshold since topN is approximate
-        $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
+        $threshold = max(self::MIN_THRESHOLD, min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2));
         
         if (!$object_ids &&
         	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)))
@@ -649,7 +657,7 @@ class kKavaReportsMgr extends kKavaBase
 	        	return array(array(), array(), $rows_count);
 	        }
 
-	        if ($page_index * $page_size > $rows_count)
+	        if ($threshold > $rows_count)
 	        {
 	        	$total_count = $rows_count;
 	        }
@@ -713,7 +721,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		if (is_null($total_count))
 		{
-			if ($page_index * $page_size > $rows_count)
+			if ($threshold > $rows_count)
 			{
 				$total_count = $rows_count;
 			}
@@ -807,28 +815,44 @@ class kKavaReportsMgr extends kKavaBase
    {
       // choose a timezone from - http://joda-time.sourceforge.net/timezones.html
       // prefer a timezone relative to GMT, so that it won't be affected by DST
-      $timezone_name = null;
-      if ($timezone_offset % 60 == 0)
-      {
-         $offset_hours = intval($timezone_offset / 60);
-         if ($offset_hours >= -14 && $offset_hours < 0)
-         {
-            $timezone_name = 'Etc/GMT' . $offset_hours;
-         }
-         else if ($offset_hours > 0 && $offset_hours <= 12)
-         {
-            $timezone_name = 'Etc/GMT+' . $offset_hours;
-         }
-         else if ($offset_hours == 0)
-         {
-            $timezone_name = 'Etc/GMT';
-         }
-      }
+   	$nonRoundTimezones = array(
+   		570  => 'Pacific/Marquesas',
+   		270  => 'America/Caracas',
+   		210  => 'America/St_Johns',
+   		-210 => 'Asia/Tehran',
+   		-270 => 'Asia/Kabul',
+   		-330 => 'Asia/Colombo',
+   		-345 => 'Asia/Kathmandu',
+   		-390 => 'Asia/Rangoon',
+   		-525 => 'Australia/Eucla',
+   		-570 => 'Australia/Adelaide',
+   		-630 => 'Australia/Lord_Howe',
+   		-690 => 'Pacific/Norfolk',
+   		-765 => 'Pacific/Chatham',
+   	);
    	
-      if (!$timezone_name)
-      {
-         $timezone_name = timezone_name_from_abbr("", $timezone_offset * 60 * -1, 0);
-      }
+   	if (isset($nonRoundTimezones[$timezone_offset]))
+   	{
+   		$timezone_name = $nonRoundTimezones[$timezone_offset];
+   	}
+   	else 
+   	{
+   		$timezone_offset = min(max($timezone_offset, -12 * 60), 14 * 60);
+   		$offset_hours = round($timezone_offset / 60);
+   		if ($offset_hours < 0)
+   		{
+   			$timezone_name = 'Etc/GMT' . $offset_hours;
+   		}
+   		else if ($offset_hours > 0)
+   		{
+   			$timezone_name = 'Etc/GMT+' . $offset_hours;
+   		}
+   		else
+   		{
+   			$timezone_name = 'Etc/GMT';
+   		}
+   	}
+   	
       switch ($granularity)
       {
         case self::DRUID_GRANULARITY_DAY:
@@ -1285,52 +1309,61 @@ class kKavaReportsMgr extends kKavaBase
    private static function getEntriesNames($ids, $partner_id)
    {
        $c = KalturaCriteria::create(entryPeer::OM_CLASS);
+       
+       $c->addSelectColumn(entryPeer::ID);
+       $c->addSelectColumn(entryPeer::NAME);
+        
        $c->add(entryPeer::PARTNER_ID, $partner_id);
        $c->add(entryPeer::ID, $ids, Criteria::IN);
        
        entryPeer::setUseCriteriaFilter (false);
-       $entries = entryPeer::doSelect($c);
+       $stmt = entryPeer::doSelectStmt($c);
+       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
        entryPeer::setUseCriteriaFilter (true);
             
-       if (!$entries) return null;
        $entries_names = array();
-       foreach ($entries  as $entry)
+       foreach ($rows as $row)
        {
-           $entries_names[$entry->getId()] = $entry->getName();
+       	  $id = $row['ID'];
+       	  $name = $row['NAME'];
+       	  $entries_names[$id] = $name;
        }
        return $entries_names;
-
-       
    }
 
    private static function getCategoriesNames($ids, $partner_id)
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+       $c->addSelectColumn(categoryPeer::ID);
+       $c->addSelectColumn(categoryPeer::NAME);
+        
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
        $c->add(categoryPeer::ID, $ids, Criteria::IN);
        
        categoryPeer::setUseCriteriaFilter (false);
-       $categories = categoryPeer::doSelect($c);
+       $stmt = categoryPeer::doSelectStmt($c);
+       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
        categoryPeer::setUseCriteriaFilter (true);
        
-       
-       if (!$categories) return null;
        $categories_names = array();
-       foreach ($categories as $category)
+       foreach ($rows as $row)
        {
-           $categories_names[$category->getId()] = $category->getName();
+       	  $id = $row['ID'];
+       	  $name = $row['NAME'];
+       	  $categories_names[$id] = $name;
        }
        return $categories_names;
-       
-       
    }
    
    private static function getCategoriesIds($categories, $partner_id)
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+       $c->addSelectColumn(categoryPeer::ID);
+        
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
        $c->add(categoryPeer::FULL_NAME, $categories, Criteria::IN);
-       $c->addSelectColumn(categoryPeer::ID);
                        
        $stmt = categoryPeer::doSelectStmt($c);
        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
