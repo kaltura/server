@@ -89,6 +89,7 @@ class embedPlaykitJsAction extends sfAction
 		$sourceMapContent = base64_decode($content['sourceMap']);
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
+		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
