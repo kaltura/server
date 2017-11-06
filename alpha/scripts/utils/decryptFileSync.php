@@ -2,7 +2,7 @@
 if($argc < 2)
 	die ('Usage: php ' . __FILE__ . " <FILE_SYNC_ID> [decrypt]" . PHP_EOL);
 require_once(__DIR__ . '/../bootstrap.php');
-$maxSize = 100000;
+$maxSize = 10000;
 
 $fileSyncId = $argv[1];
 $fs = FileSyncPeer::retrieveByPK($fileSyncId);
@@ -21,7 +21,7 @@ if (isset($argv[2]) && $argv[2] == 'decrypt')
 	$realPath = realpath($fs->getFullPath());
 	echo "Decrypt the original file in path [$realPath]" . PHP_EOL;
 	kFileBase::setFileContent( $realPath, $plainData);
-	$fs->putInCustomData("encryptionKey", null);
+	$fs->setEncryptionKey(null);
 	$fs->save();
 }
 

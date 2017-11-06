@@ -258,7 +258,7 @@ class kDataCenterMgr
 		else
 		{
 			KalturaLog::log("Serving file from [".$resolvedPath."]");
-			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getKey());
+			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getEncryptionKey(), $file_sync_resolved->getIv());
 		}
 		
 	}

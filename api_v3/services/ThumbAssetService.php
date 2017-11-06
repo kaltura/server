@@ -533,7 +533,8 @@ class ThumbAssetService extends KalturaAssetService
 			
 		$mimeType = kFile::mimeType($tempThumbPath);
 		$key = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
-		return $this->dumpFile($tempThumbPath, $mimeType, $key);
+		$iv = $key ? $entry->getEncryptionIv() : null;
+		return $this->dumpFile($tempThumbPath, $mimeType, $key, $iv);
 	}
 	
 	/**

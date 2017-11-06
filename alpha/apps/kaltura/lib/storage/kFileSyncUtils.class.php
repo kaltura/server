@@ -71,8 +71,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
 			if ($file_sync->isEncrypted())
 			{
-				$key = $file_sync->getKey();
-				$contents = kEncryptFileUtils::decryptData($contents, $key);
+				$key = $file_sync->getEncryptionKey();
+				$iv = $file_sync->getIv();
+				$contents = kEncryptFileUtils::decryptData($contents, $key,$iv);
 			}
 			return $contents;
 		}

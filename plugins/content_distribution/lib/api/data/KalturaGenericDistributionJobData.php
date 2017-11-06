@@ -149,7 +149,7 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 		{
 			/* @var $fileSync FileSync */
 			$xsdPath = $fileSync->getFullPath();
-			if($xsdPath && !$xml->schemaValidate($xsdPath, $fileSync->getKey()))	
+			if($xsdPath && !$xml->schemaValidate($xsdPath, $fileSync->getEncryptionKey(), $fileSync->getIv()))
 			{
 				KalturaLog::err("Inavlid XML:\n" . $xml->saveXML());
 				KalturaLog::err("Schema [$xsdPath]:\n" . $fileSync->decrypt());	

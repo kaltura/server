@@ -3895,6 +3895,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 	
 	public function getGeneralEncryptionKey()
 	{
-		return $this->id . "_GENERAL_" . kConf::get("encryption_salt_key");
+		return $this->id . "_GENERAL_ENTRY_KEY";
+	}
+
+	public function getEncryptionIv()
+	{
+		return kConf::get("encryption_iv");
 	}
 }

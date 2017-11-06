@@ -256,9 +256,9 @@ class KAsyncConvert extends KJobHandlerWorker
 
 	private function createTempClearFile($path, $key)
 	{
-		$key .= kConf::get("encryption_salt_key");
-		KalturaLog::debug("Final Key is: [$key] for path [$path]");
-		$plainData = kEncryptFileUtils::getEncryptedFileContent($path, $key);
+		$iv = kConf::get("encryption_iv");
+		KalturaLog::debug("Key is: [$key] iv: [$iv] for path [$path]");
+		$plainData = kEncryptFileUtils::getEncryptedFileContent($path, $key, $iv);
 		$type = pathinfo($path, PATHINFO_EXTENSION);
 		$tempPath =  sys_get_temp_dir(). "/". $key . ".$type";
 		kFileBase::setFileContent($tempPath, $plainData);

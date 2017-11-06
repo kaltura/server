@@ -480,7 +480,8 @@ class thumbnailAction extends sfAction
 		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
 		
 		$entryKey = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
-		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified, $entryKey);
+		$entryIv = $entryKey ? $entry->getEncryptionIv() : null;
+		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified, $entryKey, $entryIv);
 		$renderer->partnerId = $entry->getPartnerId();
 		
 		if ($cache)

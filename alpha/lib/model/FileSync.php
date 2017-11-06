@@ -43,14 +43,6 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $file_sync;
 	}
 
-	public function getKey ()
-	{
-		$key = $this->getEncryptionKey();
-		if (!$key)
-			return null;
-		return $key . kConf::get("encryption_salt_key");
-	}
-
 	private function generateKey()
 	{
 		return implode("_", array($this->getObjectId(), $this->getObjectType(), $this->getObjectSubType()));
@@ -64,11 +56,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$this->setEncryptionKey($this->generateKey());
 		$this->save();
 
-		$key = $this->getKey();
+		$key = $this->getEncryptionKey();
 		$realPath = realpath($this->getFullPath());
 		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
 		$plainData = kFileBase::getFileContent( $realPath);
-		$cryptData = kEncryptFileUtils::encryptData($plainData, $key);
+		$cryptData = kEncryptFileUtils::encryptData($plainData, $key, $this->getIv());
 		kFileBase::setFileContent( $realPath, $cryptData);
 	}
 
@@ -82,9 +74,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 			return $fileData;
 		}
 
-		$key = $this->getKey();
+		$key = $this->getEncryptionKey();
 		KalturaLog::debug("Decrypting content of fileSync " . $this->id . ". key is: [$key]");
-		$plainData = kEncryptFileUtils::decryptData($fileData, $key);
+		$plainData = kEncryptFileUtils::decryptData($fileData, $key, $this->getIv());
 		return $plainData;
 	}
 
@@ -112,18 +104,19 @@ class FileSync extends BaseFileSync implements IBaseObject
 		}
 		return true;
 	}
-
+	
 
 	public function setFileSizeFromPath ($filePath)
 	{
-		$fileSize = kEncryptFileUtils::fileSize($filePath, $this->getKey());
+		
+		$fileSize = kEncryptFileUtils::fileSize($filePath, $this->getEncryptionKey(), $this->getIv());
 		$this->setFileSize($fileSize);
 	}
 
 	private function getClearTempPath()
 	{
 		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
-		return sys_get_temp_dir(). "/". $this->getKey() . ".$type";
+		return sys_get_temp_dir(). "/". $this->getEncryptionKey() . ".$type";
 	}
 	
 	public function getFullPath ()
@@ -255,6 +248,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getEncryptionKey () { return $this->getFromCustomData("encryptionKey"); }
 	public function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
+	public function getIv() {return kConf::get("encryption_iv");}
 
 
 }

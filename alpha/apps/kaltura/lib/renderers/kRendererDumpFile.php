@@ -20,16 +20,18 @@ class kRendererDumpFile implements kRendererBase
 	protected $xSendFileAllowed;
 	protected $lastModified;
 	protected $key;
+	protected $iv;
 	
 	public $partnerId;
 
-	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null)
+	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null)
 	{
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
 		$this->maxAge = $maxAge;
 		$this->lastModified = $lastModified;
 		$this->key = $key;
+		$this->iv = $iv;
 		
 		$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
 		if ($limitFileSize)
@@ -40,13 +42,13 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			clearstatcache();
-			$this->fileSize = kEncryptFileUtils::fileSize($filePath, $key);
+			$this->fileSize = kEncryptFileUtils::fileSize($filePath, $key, $iv);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
 		
 		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
 		{
-			$this->fileData = kEncryptFileUtils::getEncryptedFileContent($this->filePath, $key, 0, $limitFileSize);
+			$this->fileData = kEncryptFileUtils::getEncryptedFileContent($this->filePath, $key, $iv, 0, $limitFileSize);
 		}
 	}
 	
@@ -95,7 +97,7 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
-			echo kEncryptFileUtils::getEncryptedFileContent($this->filePath, $this->key, $rangeFrom, $rangeFrom + $rangeLength);
+			echo kEncryptFileUtils::getEncryptedFileContent($this->filePath, $this->key, $this->iv, $rangeFrom, $rangeFrom + $rangeLength);
 		}
 	}
 }

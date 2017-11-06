@@ -8,52 +8,53 @@ require_once(dirname(__file__) . '/kFileBase.php');
 
 class kEncryptFileUtils
 {
+    //iv length should be 16
     CONST ENCRYPT_METHOD = "AES-256-CBC";
-    public static function encryptData($plainText, $key)
+    public static function encryptData($plainText, $key, $iv)
     {
-        $ivLength = openssl_cipher_iv_length(self::ENCRYPT_METHOD);
-        $iv = openssl_random_pseudo_bytes($ivLength);
+        //$ivLength = openssl_cipher_iv_length(self::ENCRYPT_METHOD);
+        //$iv = openssl_random_pseudo_bytes($ivLength);
         $encryptedData =  openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key, 0 , $iv);
-        return base64_encode($iv.$encryptedData);
+        return base64_encode($encryptedData);
     }
 
-    public static function decryptData($cipherText, $key)
+    public static function decryptData($cipherText, $key, $iv)
     {
         $cipherText = base64_decode($cipherText);
-        $ivLength = openssl_cipher_iv_length(self::ENCRYPT_METHOD);
-        $iv = substr($cipherText, 0, $ivLength);
-        return openssl_decrypt(substr($cipherText, $ivLength), self::ENCRYPT_METHOD, $key, 0, $iv);
+        //$ivLength = openssl_cipher_iv_length(self::ENCRYPT_METHOD);
+       // $iv = substr($cipherText, 0, $ivLength);
+        return openssl_decrypt($cipherText, self::ENCRYPT_METHOD, $key, 0, $iv);
     }
 
-    public static function getEncryptedFileContent($fileName, $key = null, $from_byte = 0, $len = 0)
+    public static function getEncryptedFileContent($fileName, $key = null, $iv = null, $from_byte = 0, $len = 0)
     {
         if (!$key)
             return kFileBase::getFileContent($fileName, $from_byte, $len);
         $data = kFileBase::getFileContent($fileName);
-        $plainData = self::decryptData($data, $key);
+        $plainData = self::decryptData($data, $key, $iv);
         $len = min($len,0);
         if (!$from_byte && !$len)
             return $plainData;
         return substr($plainData, $from_byte, $len);
     }
 
-    public static function setEncryptedFileContent($fileName, $key, $content)
+    public static function setEncryptedFileContent($fileName, $key, $iv, $content)
     {
-        $encryptedData = self::encryptData($content, $key);
+        $encryptedData = self::encryptData($content, $key, $iv);
         kFileBase::setFileContent($fileName, $encryptedData);
     }
 
-    public static function encryptFile($fileName, $key)
+    public static function encryptFile($fileName, $key, $iv)
     {
         $data = kFileBase::getFileContent($fileName);
-        self::setEncryptedFileContent($fileName, $key, $data);
+        self::setEncryptedFileContent($fileName, $key, $iv, $data);
     }
 
-    static public function fileSize($filename, $key = null)
+    static public function fileSize($filename, $key = null, $iv = null)
     {
         if (!$key)
             return kFileBase::fileSize($filename);
-        $data = self::getEncryptedFileContent($filename, $key, 0, -1);
+        $data = self::getEncryptedFileContent($filename, $key, $iv, 0, -1);
         return strlen($data);
     }
 }
