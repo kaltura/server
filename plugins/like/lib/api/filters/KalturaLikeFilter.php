@@ -26,7 +26,13 @@ class KalturaLikeFilter extends KalturaLikeBaseFilter
 		if($this->entryIdEqual)
 				$c->add(kvotePeer::ENTRY_ID, $this->entryIdEqual);
 		if($this->userIdEqual)
-				$c->add(kvotePeer::KUSER_ID, $this->userIdEqual);
+		{
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $filter->userIdEqual);
+			if($kuser)
+				$c->add(kvotePeer::KUSER_ID, $kuser->getId());
+			else
+				$c->add(kvotePeer::PUSER_ID, $this->userIdEqual);
+		}
 		if($this->createdAtGreaterThanOrEqual)
 			$c->add(kvotePeer::CREATED_AT,$this->createdAtGreaterThanOrEqual, Criteria::GREATER_EQUAL);
 		if($this->createdAtLessThanOrEqual)
