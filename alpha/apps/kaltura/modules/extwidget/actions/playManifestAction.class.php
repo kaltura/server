@@ -188,7 +188,9 @@ class playManifestAction extends kalturaAction
 		{
 			return;
 		}
-		
+
+		myPartnerUtils::addPartnerToCriteria ('entry' ,kCurrentContext::getCurrentPartnerId(), true);
+
 		// enforce entitlement
 		kEntitlementUtils::initEntitlementEnforcement();
 		
