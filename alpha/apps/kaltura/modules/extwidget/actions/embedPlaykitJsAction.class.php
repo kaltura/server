@@ -149,7 +149,7 @@ class embedPlaykitJsAction extends sfAction
 	private function appendEnvConfigToContent($content)
 	{
 
-		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$protocol = infraRequestUtils::getProtocol();
 
 		// The default Kaltura service url:
 		$serviceUrl = requestUtils::getApiCdnHost().'/api_v3';
