@@ -69,7 +69,7 @@ class embedPlaykitJsAction extends sfAction
 		$config = str_replace("\"", "'", json_encode($context->bundleConfig));
 		if(!$config)
 		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " wrong config object");
 		}
 
 		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
@@ -77,13 +77,13 @@ class embedPlaykitJsAction extends sfAction
 
 		if (!$content) 
 		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " failed to get content from bundle builder");
 		}
 
 		$content = json_decode($content, true);
 		if(!$content || !$content['bundle'])
 		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
 		}
 
 		$sourceMapContent = base64_decode($content['sourceMap']);
