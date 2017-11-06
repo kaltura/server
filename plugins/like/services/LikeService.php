@@ -135,14 +135,8 @@ class LikeService extends KalturaBaseService
 		{			
 			if($filter->entryIdEqual && !entryPeer::retrieveByPK($filter->entryIdEqual))			
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);			
-			if($filter->userIdEqual)
-			{
-				$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $filter->userIdEqual);
-				if(!$kuser)
-					throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
-				
-				$filter->userIdEqual = $kuser->getId();
-			}
+			if($filter->userIdEqual && !kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $filter->userIdEqual))
+				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);			
 		}
 		
 		if(!$pager)
