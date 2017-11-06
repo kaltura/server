@@ -46,23 +46,16 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		if (!$externalEntryExists)
 		{
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
-			if(!$uploadSuccess)
-				throw new Exception("upload failed");
 		}
 		elseif($shouldReplaceRemoteMedia == true)
 		{
 			$this->clientHelper->deleteRemoteFile($entryId);
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
-			if(!$uploadSuccess)
-				throw new Exception("upload failed");
+			
 		}
 		elseif($fileLocation)
 		{
 			$result = $this->clientHelper->updateRemoteTranscript($entryId, $fileLocation, $callBackUrl);
-			if ($result->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
-			{
-				throw new Exception("VoiceBase remote transcript update failed. Message: [" . $result->statusMessage . "]");
-			}
 		}	
 		else
 		{
