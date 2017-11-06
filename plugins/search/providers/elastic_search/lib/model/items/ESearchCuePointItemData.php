@@ -49,6 +49,11 @@ class ESearchCuePointItemData extends ESearchItemData
 	/**
 	 * @string
 	 **/
+	protected $question;
+
+	/**
+	 * @string
+	 **/
 	protected $answers;
 
 	/**
@@ -192,6 +197,22 @@ class ESearchCuePointItemData extends ESearchItemData
 	/**
 	 * @return mixed
 	 */
+	public function getQuestion()
+	{
+		return $this->question;
+	}
+
+	/**
+	 * @param mixed $question
+	 */
+	public function setQuestion($question)
+	{
+		$this->question = $question;
+	}
+
+	/**
+	 * @return mixed
+	 */
 	public function getAnswers()
 	{
 		return $this->answers;
@@ -255,6 +276,8 @@ class ESearchCuePointItemData extends ESearchItemData
 			$this->tags = $objectResult['_source']['cue_point_tags'];
 		if (isset($objectResult['_source']['cue_point_sub_type']))
 			$this->subType = $objectResult['_source']['cue_point_sub_type'];
+		if (isset($objectResult['_source']['cue_point_question']))
+			$this->question = $objectResult['_source']['cue_point_question'];
 		if (isset($objectResult['_source']['cue_point_answers']))
 			$this->answers = $objectResult['_source']['cue_point_answers'];
 		if (isset($objectResult['_source']['cue_point_hint']))

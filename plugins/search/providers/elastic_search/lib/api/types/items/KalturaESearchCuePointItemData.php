@@ -49,6 +49,11 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	/**
 	 * @var string
 	 **/
+	public $question;
+
+	/**
+	 * @var string
+	 **/
 	public $answers;
 
 	/**
@@ -71,6 +76,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 		'startTime',
 		'endTime',
 		'subType',
+		'question',
 		'answers',
 		'hint',
 		'explanation',

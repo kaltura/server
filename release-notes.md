@@ -1,3 +1,78 @@
+# Mercury 13.6.0 #
+
+## Set Entry status to "preconvert" instead of "ready" (for specific partners) when uploading flv files from webcam  ##
+ - Issue Type: Task
+- Issue ID: SUP-11270
+
+### Configuration ###
+	-Added the following to local.ini in server-saas-config:
+	[preconvert_webcam_flv_allowed_partners]
+	Add specific partner to allow this change to affect him (e.g. 0 = @PARTNER_NUMBER@)
+       
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+		
+## Add V3 studio permission ##
+
+- Issue Type: feature
+- Issue ID: PLAT-8174
+
+### Configuration ###
+	-Add new module to the admin-console in admin.ini
+        moduls.V3Studio.enabled = true
+	moduls.V3Studio.permissionType = 2
+	moduls.V3Studio.label = "Enable V3 Studio"
+	moduls.V3Studio.permissionName = FEATURE_V3_STUDIO_PERMISSION
+	moduls.V3Studio.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+		None.
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
+## Increase ACL rules size column ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-8164
+
+### Configuration ###
+
+		None.
+
+### Deployment scripts ###
+
+		mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_10_20_alter_access_control_table_rules.sql
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
+## Fix typo in admin console ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+	- Edit admin.ini
+        'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment' change to 'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy collaboration'
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Mercury 13.5.0 #
 
 ## Add permissions to eSearch service ##

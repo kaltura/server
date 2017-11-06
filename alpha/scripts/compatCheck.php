@@ -32,6 +32,7 @@ $PS2_TESTED_XML_ACTIONS = array(
 		'partnerservices2.listkshows',
 		'partnerservices2.listplaylists',
 		'extwidget.embediframejs',
+		'extwidget.embedplaykitjs'
 		);
 
 $PS2_TESTED_BIN_ACTIONS = array(

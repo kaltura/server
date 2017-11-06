@@ -126,6 +126,6 @@ class ServerNodePeer extends BaseServerNodePeer {
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("serverNode:id%s", self::ID));		
+		return array(array("serverNode:id%s", self::ID), array("serverNode:hostName=%s", self::HOST_NAME));		
 	}
 } // ServerNodePeer

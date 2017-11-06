@@ -426,10 +426,24 @@ class FacebookGraphSdkUtils
 		foreach ($tags as $tag)
 		{
 			$data = array('tag_uid' => $tag);
-			$response = $fb->post("/" . $videoId . "/tags", $data, $accessToken);
+			try
+			{
+				$response = $fb->post("/" . $videoId . "/tags", $data, $accessToken);
+			}
+			catch (Facebook\Exceptions\FacebookResponseException  $e)
+			{
+				$errCode = $e->getCode();
+				if($errCode == FacebookConstants::FACEBOOK_USER_ALREADY_TAGGED_ERROR)
+				{
+					continue;
+				}
+
+				throw $e;
+			}
+
 			$graphNode = $response->getGraphNode();
 			if ($graphNode['success'] != 1)
-				throw new Exception("Failed to add tag ".$tag." to video id ".$videoId);
+				throw new Exception("Failed to add tag " . $tag . " to video id " . $videoId);
 		}
 	}
 
@@ -469,6 +483,7 @@ class FacebookConstants
 	const FACEBOOK_PARTNER_ID_REQUEST_PARAM = 'partner_id';
 	const FACEBOOK_NEXT_ACTION_REQUEST_PARAM = 'next_action';
 	const FACEBOOK_KS_REQUEST_PARAM = 'ks';
+	const FACEBOOK_USER_ALREADY_TAGGED_ERROR = 355;
 }
 
 class FacebookCaptionsFile extends \Facebook\FileUpload\FacebookFile

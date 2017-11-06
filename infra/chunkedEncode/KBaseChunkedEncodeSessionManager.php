@@ -13,7 +13,7 @@
 		protected $name = null;	
 		protected $chunker = null;
 
-		protected $maxFailures = 3;		// Max allowed job failures (if more, get out w/out retry)
+		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
 		protected $maxRetries = 10;		// Max retries per failed job
 		protected $maxExecutionTime = 3600;	// In seconds 
 		
@@ -237,10 +237,14 @@
 					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
 				}
 				$cnt = $chunker->GetMaxChunks();
-				$userAvg 	= round($userAcc/$cnt,3);
-				$systemAvg 	= round($systemAcc/$cnt,3);
-				$elapsedAvg = round($elapsedAcc/$cnt,3);
-				$cpuAvg 	= round($cpuAcc/$cnt,3);
+				if($cnt>0) {
+					$userAvg 	= round($userAcc/$cnt,3);
+					$systemAvg 	= round($systemAcc/$cnt,3);
+					$elapsedAvg = round($elapsedAcc/$cnt,3);
+					$cpuAvg 	= round($cpuAcc/$cnt,3);
+				}
+				else
+					$userAvg = $systemAvg = $elapsedAvg = $cpuAvg = 0;
 			}
 			
 //			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));

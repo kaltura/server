@@ -452,5 +452,13 @@ class kString
 	{
 	    return preg_replace('/[^A-Za-z0-9\-._~!$()*+,;=:@]/', '_', $url);
 	}
+
+	public static function alignUtf8String($str, $maxLen)
+	{
+		if (mb_detect_encoding($str, 'UTF-8', true))
+			return mb_strcut($str, 0, $maxLen, "UTF-8");
+		else
+			return $str;
+	}
 	
 }

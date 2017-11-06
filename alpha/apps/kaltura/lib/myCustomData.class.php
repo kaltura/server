@@ -2,7 +2,8 @@
 class myCustomData
 {
 	// max custom_data size for later storing as a varchar column in the db, leaving a bit of spare space if we will actually hit this limit
-	const MAX_TEXT_FIELD_SIZE = 65000; 
+	const MAX_TEXT_FIELD_SIZE = 65000;
+	const MAX_MEDIUM_TEXT_FIELD_SIZE = 16770000;
 	
 	private $data;
 	

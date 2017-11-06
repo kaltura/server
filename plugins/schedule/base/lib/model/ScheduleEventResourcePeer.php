@@ -88,4 +88,8 @@ class ScheduleEventResourcePeer extends BaseScheduleEventResourcePeer implements
 		return ScheduleEventResourcePeer::doSelect($criteria);
 	}
 
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("scheduleEventResource:eventId=%s", self::EVENT_ID));		
+	}
 } // ScheduleEventResourcePeer
