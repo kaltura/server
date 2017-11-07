@@ -120,9 +120,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				}
 				else if ($object instanceof KalturaBaseEntry)
 				{
-					$idAndName = new stdClass;
-					$idAndName->id = $object->id;
-					$idAndName->name = $object->name;
+					$idAndName = array('id' => $object->id, 'name' => $object->name);
 					if (array_key_exists($object->userId, $objectsData))
 					{
 						$objectsData[$object->userId][] = $idAndName;

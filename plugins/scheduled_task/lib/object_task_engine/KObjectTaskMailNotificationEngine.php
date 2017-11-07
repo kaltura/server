@@ -17,8 +17,10 @@ class KObjectTaskMailNotificationEngine
 		{
 			foreach($entriesIdsAndNames as $entryIdAndName)
 			{
-				$readyLink = $link ? " - ".str_replace(self::ENTRY_ID_PLACE_HOLDER, $entryIdAndName->id, $link) : '';
-				$body.="\tName:$entryIdAndName->name Id:$entryIdAndName->id $readyLink".PHP_EOL;
+				$id = $entryIdAndName['id'];
+				$name = $entryIdAndName['name'];
+				$readyLink = $link ? " - ".str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
+				$body.="\t$name Id:$id $readyLink".PHP_EOL;
 				$cnt++;
 			}
 		}
@@ -39,13 +41,17 @@ class KObjectTaskMailNotificationEngine
 	private static function getUserObjectsBody($objectsData, $link)
 	{
 		$body =  "Execute for entries:" . PHP_EOL;
+		$cnt = 0;
 		foreach($objectsData as $entryIdAndName)
 		{
-			$readyLink = $link ? " - ".str_replace(self::ENTRY_ID_PLACE_HOLDER, $entryIdAndName->id, $link) : '';
-			$body.="\tName:$entryIdAndName->name Id:$entryIdAndName->id $readyLink".PHP_EOL;
+			$id = $entryIdAndName['id'];
+			$name = $entryIdAndName['name'];
+			$readyLink = $link ? " - ".str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
+			$body.="\t$name Id:$id $readyLink".PHP_EOL;
+			$cnt++;
 		}
 
-		$body .= "Total count of affected object: ".count($entryIdAndName);
+		$body .= "Total count of affected object: ".$cnt;
 		return $body;
 	}
 
