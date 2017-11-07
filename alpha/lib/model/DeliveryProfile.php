@@ -372,6 +372,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				$audioCodec = $this->getAudioCodec($flavor);
 				if(!$audioCodec)
 					$audioCodec = "und";
+				
+				$isDefaultAudio = $this->isDefaultAudio($audioLanguage, $audioLanguageName, $audioLabel);
 			}
 		}
 		if (!$ext)
@@ -397,7 +399,20 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'audioLanguageName' => $audioLanguageName,
 				'audioLabel' => $audioLabel,
 				'audioCodec' => $audioCodec,
+				'defaultAudio' => $isDefaultAudio,
 			);
+	}
+	
+	protected function isDefaultAudio($audioLanguage = null, $audioLanguageName = null, $audioLabel = null)
+	{
+		$isDefaultAudio = false;
+		
+		if(	($audioLanguage && $audioLanguage != 'und' && $audioLanguage == $this->params->getDefaultAudioLanguage()) ||
+			($audioLanguageName && $audioLanguageName != 'Undefined' && $audioLanguageName == $this->params->getDefaultAudioLanguage()) ||
+			$audioLabel && $audioLabel == $this->params->getDefaultAudioLanguage() )
+			$isDefaultAudio = true;
+		
+		return $isDefaultAudio;
 	}
 	
 	public function getCacheInvalidationKeys()

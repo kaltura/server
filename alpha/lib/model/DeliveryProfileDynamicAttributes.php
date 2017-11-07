@@ -175,6 +175,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var bool
 	 */
 	protected  $hasValidSequence = false;
+	
+	/**
+	 * @var string
+	 */
+	protected  $defaultAudioLanguage = null;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -680,6 +685,22 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getDefaultAudioLanguage()
+	{
+		return $this->defaultAudioLanguage;
+	}
+
+	/**
+	 * @param string $defaultAudioTrack
+	 */
+	public function setDefaultAudioLanguage($defaultAudioLanguage)
+	{
+		$this->defaultAudioLanguage = $defaultAudioLanguage;
+	}
+
+	/**
 	 * 
 	 * @param int $storageId
 	 * @param string $entryId
@@ -730,6 +751,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
 		$this->sequence = $newObj->getSequence();
 		$this->hasValidSequence = $newObj->getHasValidSequence();
+		$this->defaultAudioTrack = $newObj->getDefaultAudioLanguage();
 	}
 }
 
