@@ -431,8 +431,8 @@ class entryPeer extends BaseentryPeer
 			$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
 
-		//set filter here to prevent the call for entryPeer::retrieveByPKNoFilter inside getDisableEntitlementForEntry
-		//to remove partner id from default criteria
+		//we need to set the filter before getDisableEntitlementForEntry since otherwise the partner criteria will not be added to $c,
+		//it will be added to some other criteria object which will get disposed once setFilter is called
 		self::$s_criteria_filter->setFilter($c);
 
 		if($ks && count($ks->getDisableEntitlementForEntry()))
