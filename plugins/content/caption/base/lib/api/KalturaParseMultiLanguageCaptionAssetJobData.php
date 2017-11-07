@@ -20,11 +20,17 @@ class KalturaParseMultiLanguageCaptionAssetJobData extends KalturaJobData
      */
     public $fileLocation;
 
+    /**
+     * @var string
+     */
+    public $fileEncryptionKey;
+
     private static $map_between_objects = array
     (
         "multiLanaguageCaptionAssetId",
         "entryId",
         "fileLocation",
+        "fileEncryptionKey",
     );
 
     /* (non-PHPdoc)

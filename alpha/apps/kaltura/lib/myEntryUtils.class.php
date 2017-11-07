@@ -928,15 +928,19 @@ class myEntryUtils
 
 		if ($fileSync && $fileSync->isEncrypted())
 		{
-			$entryKey = $entry->getGeneralEncryptionKey();
-			$encryptedPath = kFileUtils::addEncryptToFileName($finalThumbPath);
-			KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$entryKey]");
-			kFile::moveFile($finalThumbPath, $encryptedPath);
-			$finalThumbPath = $encryptedPath;
-			kEncryptFileUtils::encryptFile($finalThumbPath, $entryKey, $entry->getEncryptionIv());
+			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
 				
 		return $finalThumbPath;
+	}
+	
+	private static function encryptThumb($thumbPath, $key, $iv)
+	{
+		$encryptedPath = kFileUtils::addEncryptToFileName($thumbPath);
+		KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$key] and iv [$iv]");
+		kFile::moveFile($thumbPath, $encryptedPath);
+		kEncryptFileUtils::encryptFile($encryptedPath, $key, $iv);
+		return $encryptedPath;
 	}
 
 

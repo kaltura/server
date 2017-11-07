@@ -131,7 +131,8 @@ class flvclipperAction extends kalturaAction
 			$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
 
 			$entryKey = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
-			kFileUtils::dumpFile($tempThumbPath, null, strpos($tempThumbPath, "_NOCACHE_") === false ? null : 0, 0, $entryKey);
+			$iv = $entryKey ? $entry->getEncryptionIv() : null;
+			kFileUtils::dumpFile($tempThumbPath, null, strpos($tempThumbPath, "_NOCACHE_") === false ? null : 0, 0, $entryKey, $iv);
 		}
 
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ks_str, $referrer, ContextType::PLAY);
