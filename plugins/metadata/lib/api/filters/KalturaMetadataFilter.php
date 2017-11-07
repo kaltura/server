@@ -36,77 +36,13 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
-	 */
-	public function toObject($object_to_fill = null, $props_to_skip = array()) 
-	{
-		if($this->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
-		{
-			if ($this->objectIdEqual)
-			{
-				$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->objectIdEqual);
-				if($kuser)				
-					$this->objectIdEqual = $kuser->getId();
-			}
-				
-			if ($this->objectIdIn)
-			{
-				$kusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), explode(',', $this->objectIdIn));
-				
-				$kusersIds = array();
-				foreach($kusers as $kuser)				
-					$kusersIds[] = $kuser->getId();
-				
-				$this->objectIdIn = implode(',', $kusersIds);
-			}
-		}
-		
-		return parent::toObject($object_to_fill, $props_to_skip);
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if (kEntitlementUtils::getEntitlementEnforcement() && (is_null($this->objectIdIn) && is_null($this->objectIdEqual))&& kConf::hasParam('metadata_list_without_object_filtering_partners') &&
-        !in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')))
-			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
-
 		if (!$this->metadataObjectTypeEqual)
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_TYPE);
-				
-		if ($this->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
-		{
-			if ($this->objectIdEqual)
-			{
-				$categoryIds = array($this->objectIdEqual);
-			}
-			else if ($this->objectIdIn)
-			{
-				$categoryIds = explode(',', $this->objectIdIn);
-			}
-			
-			if($categoryIds)
-			{
-				$categories = categoryPeer::retrieveByPKs($categoryIds);
-				if(!count($categories))
-				{
-					$response = new KalturaMetadataListResponse();
-					$response->objects = new KalturaMetadataArray();
-					$response->totalCount = 0;
-					return $response;
-				}
-				
-				$categoryIds = array();
-				foreach($categories as $category)
-					$categoryIds[] = $category->getId();
-				
-				$this->objectIdEqual = null;
-				$this->objectIdIn = implode(',', $categoryIds);
-			}
-		}
-	
+		
 		$metadataFilter = $this->toObject();
 
 		$c = KalturaCriteria::create(MetadataPeer::OM_CLASS);

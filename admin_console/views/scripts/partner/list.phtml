@@ -1,4 +1,6 @@
 <?php $this->headScript()->appendFile($this->baseUrl('js/assignDeliveryProfile.js'));?>
+<?php $this->headScript()->appendFile($this->baseUrl('js/assignESearchLanguage.js'));?>v
+
 
 <p><?php echo $this->translate('partner-list intro text'); ?></p>
 <?php echo $this->form; ?>
@@ -494,7 +496,6 @@ function assignDeliveryProfile(format, currentDps, type)
 			url
 		);
 }
-
 <?php
 
 // add javascript "pluginControllerUrl variable to be used by plugins javascript code
@@ -510,4 +511,36 @@ foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
 echo $pluginActionJavascriptStr;
 
 ?>
+</script>
+
+<script type="text/javascript">
+	function assignSearchLanguage()
+	{
+		var partnerId = $("#id")[0].value;
+
+		var url = '<?php echo $this->url(array('controller' => 'search', 'action' => 'assign-search-language')); ?>';
+		url += '/partnerId/' + partnerId;
+		var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
+
+		dialogDiv.dialog({
+			bgiframe: true,
+			modal: true,
+			resizable: false,
+			width: 750,
+			title: '<?php echo $this->translate('Edit ESearch Languages: Partner id '); ?>' + partnerId,
+			height: 400,
+			buttons: {
+				'<?php echo $this->translate('OK'); ?>': function() {
+					okSearchLanguageButtonPressed();
+					jQuery(this).dialog('close').remove();
+				},
+			},
+			close: function() {
+				$(this).dialog('close').remove();
+			}
+		});
+		dialogDiv.load(
+			url
+		);
+	}
 </script>

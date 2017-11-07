@@ -31,6 +31,7 @@ class kKavaReportsMgr extends kKavaBase
     
     const CLIENT_TAG_PRIORITY = 5;
     const MAX_RESULT_SIZE = 12000;
+    const MIN_THRESHOLD = 500;
     
     static $aggregations_def = array();
     static $metrics_def = array();
@@ -156,9 +157,9 @@ class kKavaReportsMgr extends kKavaBase
             self::REPORT_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
             self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
             self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "country"),
-            self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_CITY,
+            self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_REGION,
             self::REPORT_DRILLDOWN_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),           
-            self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("object_id","location")
+            self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("object_id","location_name")
         ),
         myReportsMgr::REPORT_TYPE_TOP_SYNDICATION => array(
             self::REPORT_DIMENSION => self::DIMENSION_DOMAIN,
@@ -281,6 +282,7 @@ class kKavaReportsMgr extends kKavaBase
         self::EVENT_TYPE_EDIT_CLICKED => "count_edit",
         self::METRIC_PLAYTHROUGH_RATIO => "play_through_ratio",
         self::DIMENSION_LOCATION_COUNTRY => "country",
+        self::DIMENSION_LOCATION_REGION => "location_name",
     );
     
     static $headers_to_metrics = array();
@@ -292,6 +294,16 @@ class kKavaReportsMgr extends kKavaBase
     	self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
     	self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
     	self::DIMENSION_LOCATION_COUNTRY => array('kKavaCountryCodes', 'toShortName'),
+    	self::DIMENSION_LOCATION_REGION => 'strtoupper',
+    );
+    
+    static $non_linear_metrics = array(
+    	self::METRIC_AVG_PLAY_TIME => true,
+    	self::METRIC_PLAYER_IMPRESSION_RATIO => true,
+    	self::METRIC_PLAYTHROUGH_RATIO => true,
+    	self::METRIC_AVG_DROP_OFF => true,
+    	self::METRIC_TOTAL_ENTRIES => true,
+    	self::METRIC_UNIQUE_USERS => true,	
     );
     
     protected static function transformDeviceName($name)
@@ -600,7 +612,14 @@ class kKavaReportsMgr extends kKavaBase
         
         if ($page_index * $page_size > self::MAX_RESULT_SIZE) 
         {
-            throw new Exception("result limit is " . self::MAX_RESULT_SIZE . " rows");
+        	if ($page_index == 1)
+        	{
+        		$page_size = self::MAX_RESULT_SIZE;
+        	}
+        	else
+        	{
+            	throw new Exception("result limit is " . self::MAX_RESULT_SIZE . " rows");
+        	}
         }
         
         // order by
@@ -624,9 +643,24 @@ class kKavaReportsMgr extends kKavaBase
         }
         
         // Note: using a larger threshold since topN is approximate
-        $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
+        $threshold = max(self::MIN_THRESHOLD, min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2));
         
-        if (!$object_ids &&
+        if (isset(self::$non_linear_metrics[$order_by]))
+        {
+        	// topN works badly for non-linear metrics like avg drop off, since taking the topN per segment
+        	// does not necessarily yield the combined topN
+        	$threshold = $page_size * $page_index;
+        	
+        	$query = self::getGroupByReport($partner_id, $intervals, self::DRUID_GRANULARITY_ALL, array($dimension), $metrics, $druid_filter);
+        	$query[self::DRUID_LIMIT_SPEC] = self::getDefaultLimitSpec(
+        			$threshold,
+        			array(self::getOrderByColumnSpec(
+        					$order_by,
+        					$order_by_dir == '+' ? self::DRUID_ASCENDING : self::DRUID_DESCENDING,
+        					self::DRUID_NUMERIC)
+        			));
+        }
+        else if (!$object_ids &&
         	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)))
         {
         	// get the topN objects first, otherwise the returned metrics can be inaccurate
@@ -647,7 +681,7 @@ class kKavaReportsMgr extends kKavaBase
 	        	return array(array(), array(), $rows_count);
 	        }
 
-	        if ($page_index * $page_size > $rows_count)
+	        if ($threshold > $rows_count)
 	        {
 	        	$total_count = $rows_count;
 	        }
@@ -662,6 +696,7 @@ class kKavaReportsMgr extends kKavaBase
 	        	$dimension_ids[] = $row[$dimension];
 	        }
 	        
+	        // issue a second topN query
 	        $page_index = 1;
 	        $page_size = count($dimension_ids);
 	        $threshold = $page_size; 
@@ -690,16 +725,29 @@ class kKavaReportsMgr extends kKavaBase
 	        	self::DRUID_DIMENSION => $dimension,
 	        	self::DRUID_VALUES => $dimension_ids
 	        );
+
+        	$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+        }
+        else
+        {
+        	$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         }
                 
-        $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         $result = self::runQuery($query);
         if (!$result)
         {
         	return array(array(), array(), 0);
         }
 
-        $rows = $result[0][self::DRUID_RESULT];
+        if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+        {
+        	$rows = $result;
+        }
+        else
+        {
+        	$rows = $result[0][self::DRUID_RESULT];
+        }
+        
         $rows_count = count($rows);
         KalturaLog::log("Druid returned [$rows_count] rows");
         
@@ -711,7 +759,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		if (is_null($total_count))
 		{
-			if ($page_index * $page_size > $rows_count)
+			if ($threshold > $rows_count)
 			{
 				$total_count = $rows_count;
 			}
@@ -755,6 +803,11 @@ class kKavaReportsMgr extends kKavaBase
         
         foreach ($rows as $row)
         {
+        	if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+        	{
+        		$row = $row[self::DRUID_EVENT];
+        	}
+        	
             $dimension_ids[] = $row[$dimension];
             $row_data = array();
             $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
@@ -805,28 +858,44 @@ class kKavaReportsMgr extends kKavaBase
    {
       // choose a timezone from - http://joda-time.sourceforge.net/timezones.html
       // prefer a timezone relative to GMT, so that it won't be affected by DST
-      $timezone_name = null;
-      if ($timezone_offset % 60 == 0)
-      {
-         $offset_hours = intval($timezone_offset / 60);
-         if ($offset_hours >= -14 && $offset_hours < 0)
-         {
-            $timezone_name = 'Etc/GMT' . $offset_hours;
-         }
-         else if ($offset_hours > 0 && $offset_hours <= 12)
-         {
-            $timezone_name = 'Etc/GMT+' . $offset_hours;
-         }
-         else if ($offset_hours == 0)
-         {
-            $timezone_name = 'Etc/GMT';
-         }
-      }
+   	$nonRoundTimezones = array(
+   		570  => 'Pacific/Marquesas',
+   		270  => 'America/Caracas',
+   		210  => 'America/St_Johns',
+   		-210 => 'Asia/Tehran',
+   		-270 => 'Asia/Kabul',
+   		-330 => 'Asia/Colombo',
+   		-345 => 'Asia/Kathmandu',
+   		-390 => 'Asia/Rangoon',
+   		-525 => 'Australia/Eucla',
+   		-570 => 'Australia/Adelaide',
+   		-630 => 'Australia/Lord_Howe',
+   		-690 => 'Pacific/Norfolk',
+   		-765 => 'Pacific/Chatham',
+   	);
    	
-      if (!$timezone_name)
-      {
-         $timezone_name = timezone_name_from_abbr("", $timezone_offset * 60 * -1, 0);
-      }
+   	if (isset($nonRoundTimezones[$timezone_offset]))
+   	{
+   		$timezone_name = $nonRoundTimezones[$timezone_offset];
+   	}
+   	else 
+   	{
+   		$timezone_offset = min(max($timezone_offset, -12 * 60), 14 * 60);
+   		$offset_hours = round($timezone_offset / 60);
+   		if ($offset_hours < 0)
+   		{
+   			$timezone_name = 'Etc/GMT' . $offset_hours;
+   		}
+   		else if ($offset_hours > 0)
+   		{
+   			$timezone_name = 'Etc/GMT+' . $offset_hours;
+   		}
+   		else
+   		{
+   			$timezone_name = 'Etc/GMT';
+   		}
+   	}
+   	
       switch ($granularity)
       {
         case self::DRUID_GRANULARITY_DAY:
@@ -1283,52 +1352,61 @@ class kKavaReportsMgr extends kKavaBase
    private static function getEntriesNames($ids, $partner_id)
    {
        $c = KalturaCriteria::create(entryPeer::OM_CLASS);
+       
+       $c->addSelectColumn(entryPeer::ID);
+       $c->addSelectColumn(entryPeer::NAME);
+        
        $c->add(entryPeer::PARTNER_ID, $partner_id);
        $c->add(entryPeer::ID, $ids, Criteria::IN);
        
        entryPeer::setUseCriteriaFilter (false);
-       $entries = entryPeer::doSelect($c);
+       $stmt = entryPeer::doSelectStmt($c);
+       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
        entryPeer::setUseCriteriaFilter (true);
             
-       if (!$entries) return null;
        $entries_names = array();
-       foreach ($entries  as $entry)
+       foreach ($rows as $row)
        {
-           $entries_names[$entry->getId()] = $entry->getName();
+       	  $id = $row['ID'];
+       	  $name = $row['NAME'];
+       	  $entries_names[$id] = $name;
        }
        return $entries_names;
-
-       
    }
 
    private static function getCategoriesNames($ids, $partner_id)
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+       $c->addSelectColumn(categoryPeer::ID);
+       $c->addSelectColumn(categoryPeer::NAME);
+        
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
        $c->add(categoryPeer::ID, $ids, Criteria::IN);
        
        categoryPeer::setUseCriteriaFilter (false);
-       $categories = categoryPeer::doSelect($c);
+       $stmt = categoryPeer::doSelectStmt($c);
+       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
        categoryPeer::setUseCriteriaFilter (true);
        
-       
-       if (!$categories) return null;
        $categories_names = array();
-       foreach ($categories as $category)
+       foreach ($rows as $row)
        {
-           $categories_names[$category->getId()] = $category->getName();
+       	  $id = $row['ID'];
+       	  $name = $row['NAME'];
+       	  $categories_names[$id] = $name;
        }
        return $categories_names;
-       
-       
    }
    
    private static function getCategoriesIds($categories, $partner_id)
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+       $c->addSelectColumn(categoryPeer::ID);
+        
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
        $c->add(categoryPeer::FULL_NAME, $categories, Criteria::IN);
-       $c->addSelectColumn(categoryPeer::ID);
                        
        $stmt = categoryPeer::doSelectStmt($c);
        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);

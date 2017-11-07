@@ -8,11 +8,11 @@ class KalturaESearchQuery extends KalturaESearchObject
 	/**
 	 * @var string
 	 */
-	public $eSerachQuery;
+	public $eSearchQuery;
 
 	private static $mapBetweenObjects = array
 	(
-		"eSerachQuery",
+		"eSearchQuery",
 	);
 
 	public function getMapBetweenObjects()
