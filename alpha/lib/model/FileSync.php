@@ -43,15 +43,110 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $file_sync;
 	}
 
+	private function generateKey()
+	{
+		return implode("_", array($this->getObjectId(), $this->getObjectType(), $this->getObjectSubType()));
+	}
+
+	public function encrypt()
+	{
+		if (!$this->shouldEncryptFile())
+			return;
+
+		$this->setEncryptionKey($this->generateKey());
+		$this->save();
+
+		$key = $this->getEncryptionKey();
+		$realPath = realpath($this->getFullPath());
+		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
+		$plainData = kFileBase::getFileContent( $realPath);
+		$cryptData = kEncryptFileUtils::encryptData($plainData, $key, $this->getIv());
+		kFileBase::setFileContent( $realPath, $cryptData);
+	}
+
+	public function decrypt()
+	{
+		$realPath = realpath($this->getFullPath());
+		$fileData = kFileBase::getFileContent( $realPath);
+		if (!$this->isEncrypted()) 
+		{
+			KalturaLog::info("File of fileSyncId [$this->id] in path $realPath is not encrypted");
+			return $fileData;
+		}
+
+		$key = $this->getEncryptionKey();
+		KalturaLog::debug("Decrypting content of fileSync " . $this->id . ". key is: [$key]");
+		$plainData = kEncryptFileUtils::decryptData($fileData, $key, $this->getIv());
+		return $plainData;
+	}
+
+	public function shouldEncryptFile()
+	{
+
+		//check for partner configuration
+		if(!$this->getPartnerId() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_CONTENT_ENCRYPTION, $this->getPartnerId()))
+			return false;
+
+		//check fileSync type
+		$excludeObjectTypes = array(FileSyncObjectType::BATCHJOB);
+		if (in_array($this->object_type, $excludeObjectTypes))
+			return false;
+
+		//check the file extension and size
+		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
+		$fileTypeNotToEncrypt = kConf::get('video_file_ext');
+		if (in_array($type, $fileTypeNotToEncrypt))
+			return false;
+
+		$maxFileSize = kConf::get('max_file_size_for_encryption');
+		if (filesize($this->getFullPath()) > $maxFileSize)
+			return false;
+
+
+		if ($this->getEncryptionKey())
+		{
+			KalturaLog::info("File of fileSyncId [$this->id] already has key and should not be encrypt again");
+			return false;
+		}
+		return true;
+	}
+	
+
 	public function setFileSizeFromPath ($filePath)
 	{
-		$this->setFileSize(kFile::fileSize($filePath));
+		
+		$fileSize = kEncryptFileUtils::fileSize($filePath, $this->getEncryptionKey(), $this->getIv());
+		$this->setFileSize($fileSize);
+	}
+
+	private function getClearTempPath()
+	{
+		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
+		return sys_get_temp_dir(). "/". $this->getEncryptionKey() . ".$type";
 	}
 	
 	public function getFullPath ()
 	{
 		return $this->getFileRoot() . $this->getFilePath();
 	}
+
+	public function createTempClear()
+	{
+		$plainData = $this->decrypt();
+		$tempPath = $this->getClearTempPath();
+		KalturaLog::info("Creating new file for syncId [$this->id] on [$tempPath]");
+		if (!file_exists($tempPath))
+			kFileBase::setFileContent( $tempPath, $plainData);
+		return $tempPath;
+	}
+
+	public function deleteTempClear()
+	{
+		$tempPath = $this->getClearTempPath();
+		if (file_exists($tempPath))
+			unlink($tempPath);
+	}
+
 	
 	public function getFileExt()
 	{
@@ -155,7 +250,13 @@ class FileSync extends BaseFileSync implements IBaseObject
 	
 	public function getContentMd5 () { return $this->getFromCustomData("contentMd5"); }
 	public function setContentMd5 ($v) { $this->putInCustomData("contentMd5", $v);  }
-	
+
+	public function getEncryptionKey () { return $this->getFromCustomData("encryptionKey"); }
+	public function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
+	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
+	public function getIv() {return kConf::get("encryption_iv");}
+
+
 }
 
 

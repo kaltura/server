@@ -185,6 +185,8 @@ class Form_PartnerConfiguration extends Infra_Form
 
 
 		$this->addElement('hidden', 'e_search_languages', array(
+			'label'		=> 'e_search_languages',
+			'decorators'	=> array('ViewHelper'),
 		));
 
 		$this->addElement('button', 'editESearchLanguages', array(
@@ -889,7 +891,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									 $permissionNames[self::SECURITY_OPTIONS],
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));
-		$this->addDisplayGroup(array_merge(array('editESearchLanguages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
+		$this->addDisplayGroup(array_merge(array('editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));

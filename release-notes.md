@@ -18,6 +18,20 @@
 
 	None.
 			
+## eSearch Languages support  ##
+ - Issue Type: Task
+- Issue ID: KMS-14857
+
+### Configuration ###
+	-Add the following to Admin.ini:
+	access.search.all = SYSTEM_ADMIN_PUBLISHER_USAGE
+       
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
 # Mercury 13.6.0 #
 
 ## Set Entry status to "preconvert" instead of "ready" (for specific partners) when uploading flv files from webcam  ##

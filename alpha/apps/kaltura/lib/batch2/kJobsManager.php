@@ -312,7 +312,7 @@ class kJobsManager
 		if($fileSync)
 		{
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
-				$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());
+				$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 			$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($entry->getId()));
 			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());			
 			$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());		
@@ -487,12 +487,12 @@ class kJobsManager
 			{
 				if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 				{
-					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)	
-						$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());							
+					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
+						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);						
 				}
 				else
 				{
-					$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFilePath());
+					$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 				}
 				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
@@ -1534,6 +1534,7 @@ class kJobsManager
 		$extractMediaData = new kExtractMediaJobData();
 		$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 		$srcFileSyncDescriptor->setFileSyncLocalPath($inputFileSyncLocalPath);
+		$srcFileSyncDescriptor->setFileEncryptionKey(self::getEncryptionKeyForAssetId($flavorAssetId));
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
 		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
@@ -1564,6 +1565,16 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
+	}
+
+	private static function getEncryptionKeyForAssetId($flavorAssetId)
+	{
+		$asset = assetPeer::retrieveById($flavorAssetId);
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
+		if ($fileSync && $fileSync->isEncrypted())
+			return $fileSync->getEncryptionKey();
+		return null;
 	}
 	
 	public static function addNotificationJob(BatchJob $parentJob = null, $entryId, $partnerId, $notificationType, $sendType, $puserId, $objectId, $notificationData)
