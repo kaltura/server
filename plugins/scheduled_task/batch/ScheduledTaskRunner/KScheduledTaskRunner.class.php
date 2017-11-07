@@ -78,7 +78,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		else
 			$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
 
-		$objectsIds = array();
+		$objectsData = array();
 		$errorObjectsIds = array();
 		$isMediaRepurposingProfile = $this->isMediaRepurposingProfile($profile);
 		if ($isMediaRepurposingProfile)
@@ -95,7 +95,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$result = ScheduledTaskBatchHelper::query($this->getClient(), $profile, $pager);
 				$this->unimpersonate();
 			}
-			catch(Exception $ex)
+			catch (Exception $ex)
 			{
 				$this->unimpersonate();
 				throw $ex;
@@ -107,35 +107,45 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$this->suspendProfile($profile);
 				break;
 			}
+
 			if (!count($result->objects))
 				break;
 
-			foreach($result->objects as $object)
+			foreach ($result->objects as $object)
 			{
 				$error = $this->processObject($profile, $object);
-
-				if ($error) {
+				if ($error)
+				{
 					$errorObjectsIds[] = $object->id;
-				} else {
-					if (array_key_exists($object->userId, $objectsIds))
-						$objectsIds[$object->userId][] = $object->id;
+				}
+				else if ($object instanceof KalturaBaseEntry)
+				{
+					$idAndName = new stdClass;
+					$idAndName->id = $object->id;
+					$idAndName->name = $object->name;
+					if (array_key_exists($object->userId, $objectsData))
+					{
+						$objectsData[$object->userId][] = $idAndName;
+					}
 					else
-						$objectsIds[$object->userId] = array($object->id);
-				} 
-
-				if ($isMediaRepurposingProfile)
-					$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
+					{
+						$objectsData[$object->userId] = array($idAndName);
+					}
+				}
 			}
+
+			if ($isMediaRepurposingProfile)
+				$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
+
 			if (!$isMediaRepurposingProfile)
 				$pager->pageIndex++;
+
 		}
-		
-		if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
+
+		if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsData))
 		{
-			KObjectTaskMailNotificationEngine::sendMailNotification($profile->objectTasks[0], $objectsIds, $profile->id, $profile->partnerId);
+			KObjectTaskMailNotificationEngine::sendMailNotification($profile->objectTasks[0], $objectsData, $profile->id, $profile->partnerId);
 		}
-
-
 	}
 
 	/**
@@ -362,9 +372,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $profile->objectFilter->advancedSearch->items[0];
 	}
 
-	
-
-
 	private function getPartnerMail($partnerId)
 	{
 		$client = $this->getClient();
@@ -374,7 +381,8 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $res->adminEmail;
 	}
 
-	private function updateMetadataStatusForMediaRepurposing(KalturaScheduledTaskProfile $profile, $object, $error) {
+	private function updateMetadataStatusForMediaRepurposing(KalturaScheduledTaskProfile $profile, $object, $error)
+	{
 		$metadataProfileId = self::getMrAdvancedSearchFilter($profile)->metadataProfileId;
 
 		self::impersonate($object->partnerId);
@@ -389,21 +397,25 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $xml, $error);
 		}
 
-		try {
+		try
+		{
 			$xml = $xml ? $xml->asXML(): null;
 			if ($metadata && $metadata->id)
 				$result = $metadataPlugin->metadata->update($metadata->id, $xml);
 			else
 				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml);
 
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
 				return null; //delete entry should get exception when update metadata for deleted entry
-			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage());
+
+			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage(),
+				KalturaBatchJobAppErrors::MEDIA_REPURPOSING_FAILED, null);
 		}
 		
 		self::unimpersonate();
 		return $result->id;
 	}
-
 }
