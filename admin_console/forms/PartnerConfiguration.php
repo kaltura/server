@@ -185,14 +185,12 @@ class Form_PartnerConfiguration extends Infra_Form
 
 
 		$this->addElement('hidden', 'e_search_languages', array(
-//			'label'		=> 'esearch Languages',
-//			'use_hidden_element'	=> true,
 		));
 
 		$this->addElement('button', 'editESearchLanguages', array(
 		'label'		=> 'Add Languages',
 		'decorators'	=> array('ViewHelper'),
-	));
+		));
 
 		$this->getElement('editESearchLanguages')->setAttrib('onClick', 'addESearchLanguage()');
 
@@ -554,7 +552,6 @@ class Form_PartnerConfiguration extends Infra_Form
 	  		$displayGroup->removeDecorator('DtDdWrapper');
 		}
 		//creating divs for left right dividing
-//		$this->setDisplayColumn('generalInformation',  'passwordSecurity', true);
 		$this->setDisplayColumn('generalInformation',  'elasticSearch', true);
 		$this->setDisplayColumn('accountPackagesService', 'enableDisableFeatures', false);
 				
