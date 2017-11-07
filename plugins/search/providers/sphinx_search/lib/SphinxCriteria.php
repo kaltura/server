@@ -990,8 +990,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		if(!$this->doCount)
 		{
-			KalturaLog::log("doCountOnPeer for sphinx criteria is disabled, returning 0");
-			return 0;
+			KalturaLog::log("doCountOnPeer for sphinx criteria is disabled $objectClass");
+			//return 0;
 		}
 
 
