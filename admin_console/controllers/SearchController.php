@@ -15,7 +15,7 @@ class SearchController extends Zend_Controller_Action
 		$options = $this->getSupportedESearchLanguages();
 		$selected = $this->getESearchLanguages($client, $partnerId);
 
-		$this->view->possibleValues = array_keys(array_diff_key($options, $selected));
+		$this->view->possibleValues = array_values(array_diff($options, $selected));
 		$this->view->selectedValues = $selected;
 
 	}
@@ -38,40 +38,40 @@ class SearchController extends Zend_Controller_Action
 	protected function getSupportedESearchLanguages()
 	{
 		$langMap = array(
-			'English' => 'english',
-			'Arabic' => 'arabic',
-			'Basque' => 'basque',
-			'Brazilian' => 'brazilian',
-			'Bulgarian' => 'bulgarian',
-			'Catalan' => 'catalan',
-			'Chinese' => 'cjk',
-			'Korean' => 'cjk',
-			'Japanese' => 'cjk',
-			'Czech' => 'czech',
-			'Danish' => 'danish',
-			'Dutch' => 'dutch',
-			'Finnish' => 'finnish',
-			'French' => 'french',
-			'Galician' => 'galician',
-			'German' => 'german',
-			'Greek' => 'greek',
-			'Hindi' => 'hindi',
-			'Hungarian' => 'hungarian',
-			'Indonesian' => 'indonesian',
-			'Irish' => 'irish',
-			'Italian' => 'italian',
-			'Latvian' => 'latvian',
-			'Lithuanian' => 'lithuanian',
-			'Norwegian' => 'norwegian',
-			'Persian' => 'persian',
-			'Prtuguese' => 'portuguese',
-			'Romanian' => 'romanian',
-			'Russian' => 'russian',
-			'Sorani' => 'sorani',
-			'Spanish' => 'spanish',
-			'Swedish' => 'swedish',
-			'Turkish' => 'turkish',
-			'Thai' => 'thai',
+			'English',
+			'Arabic',
+			'Basque',
+			'Brazilian',
+			'Bulgarian',
+			'Catalan',
+			'Chinese',
+			'Korean',
+			'Japanese',
+			'Czech',
+			'Danish',
+			'Dutch',
+			'Finnish',
+			'French',
+			'Galician',
+			'German',
+			'Greek',
+			'Hindi',
+			'Hungarian',
+			'Indonesian',
+			'Irish',
+			'Italian',
+			'Latvian',
+			'Lithuanian',
+			'Norwegian',
+			'Persian',
+			'Prtuguese',
+			'Romanian',
+			'Russian',
+			'Sorani',
+			'Spanish',
+			'Swedish',
+			'Turkish',
+			'Thai'
 		);
 
 		return $langMap;
