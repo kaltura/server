@@ -13,6 +13,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const GROUP_ACCESS_CONTROL = 'GROUP_ACCESS_CONTROL';
     const THUMBNAIL_CONFIGURATION = 'THUMBNAIL_CONFIGURATION';
     const SECURITY_OPTIONS = 'GROUP_SECURITY_OPTIONS';
+	const ELASTIC_OPTIONS = 'GROUP_ELASTIC_OPTIONS';
    	
     protected $limitSubForms = array();
     
@@ -42,6 +43,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_ACCESS_CONTROL] = array();
 		$permissionNames[self::THUMBNAIL_CONFIGURATION] = array();
 		$permissionNames[self::SECURITY_OPTIONS] = array();
+		$permissionNames[self::ELASTIC_OPTIONS] = array();
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -178,9 +180,20 @@ class Form_PartnerConfiguration extends Infra_Form
 				'label'		=> 'Add',
 				'decorators'	=> array('ViewHelper'),
 		));
-		
+
 		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
-		
+
+
+		$this->addElement('hidden', 'e_search_languages', array(
+		));
+
+		$this->addElement('button', 'editESearchLanguages', array(
+		'label'		=> 'Add Languages',
+		'decorators'	=> array('ViewHelper'),
+		));
+
+		$this->getElement('editESearchLanguages')->setAttrib('onClick', 'addESearchLanguage()');
+
 		$this->addElement('checkbox', 'checkbox_cache_flavor_version', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
@@ -499,6 +512,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);
 			ksort($permissionNames[self::GROUP_NOTIFICATION_CONFIG]);
 			ksort($permissionNames[self::SECURITY_OPTIONS]);
+			ksort($permissionNames[self::ELASTIC_OPTIONS]);
 			$this->addAllDisplayGroups($permissionNames);
 		}
 		
@@ -538,7 +552,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	  		$displayGroup->removeDecorator('DtDdWrapper');
 		}
 		//creating divs for left right dividing
-		$this->setDisplayColumn('generalInformation',  'passwordSecurity', true);
+		$this->setDisplayColumn('generalInformation',  'elasticSearch', true);
 		$this->setDisplayColumn('accountPackagesService', 'enableDisableFeatures', false);
 				
 		//---------------- Display DisplayGroups according to Permissions ---------------
@@ -618,7 +632,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	private function handlePermissions()
 	{
 		//permissions groups
-		$configureAccountsTechData = array('publisherSpecificDeliverySettings', 'remoteStorageAccountPolicy', 'advancedNotificationSettings', 'publisherSpecificIngestionSettings', 'passwordSecurity'); //EAGLE PRD group 1
+		$configureAccountsTechData = array('publisherSpecificDeliverySettings', 'remoteStorageAccountPolicy', 'advancedNotificationSettings', 'publisherSpecificIngestionSettings', 'passwordSecurity','elasticSearch'); //EAGLE PRD group 1
 		$configureGeneralInformation = array('generalInformation'); // EAGLE PRD group 2
 		$configureAccountsGroup = array('groupAssociation'); // EAGLE PRD group 3
 		$configureAccountPackagesService = array('accountPackagesService'); // EAGLE PRD group 4
@@ -871,9 +885,11 @@ class Form_PartnerConfiguration extends Infra_Form
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
 									 'num_prev_pass_to_keep',
-									 'pass_replace_freq'), 
-									 $permissionNames[self::SECURITY_OPTIONS]),
+									 'pass_replace_freq'),
+									 $permissionNames[self::SECURITY_OPTIONS],
+									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));
+		$this->addDisplayGroup(array_merge(array('editESearchLanguages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
