@@ -297,6 +297,15 @@ class kKavaReportsMgr extends kKavaBase
     	self::DIMENSION_LOCATION_REGION => 'strtoupper',
     );
     
+    static $non_linear_metrics = array(
+    	self::METRIC_AVG_PLAY_TIME => true,
+    	self::METRIC_PLAYER_IMPRESSION_RATIO => true,
+    	self::METRIC_PLAYTHROUGH_RATIO => true,
+    	self::METRIC_AVG_DROP_OFF => true,
+    	self::METRIC_TOTAL_ENTRIES => true,
+    	self::METRIC_UNIQUE_USERS => true,	
+    );
+    
     protected static function transformDeviceName($name)
     {
     	$name = strtoupper($name);
@@ -636,7 +645,22 @@ class kKavaReportsMgr extends kKavaBase
         // Note: using a larger threshold since topN is approximate
         $threshold = max(self::MIN_THRESHOLD, min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2));
         
-        if (!$object_ids &&
+        if (isset(self::$non_linear_metrics[$order_by]))
+        {
+        	// topN works badly for non-linear metrics like avg drop off, since taking the topN per segment
+        	// does not necessarily yield the combined topN
+        	$threshold = $page_size * $page_index;
+        	
+        	$query = self::getGroupByReport($partner_id, $intervals, self::DRUID_GRANULARITY_ALL, array($dimension), $metrics, $druid_filter);
+        	$query[self::DRUID_LIMIT_SPEC] = self::getDefaultLimitSpec(
+        			$threshold,
+        			array(self::getOrderByColumnSpec(
+        					$order_by,
+        					$order_by_dir == '+' ? self::DRUID_ASCENDING : self::DRUID_DESCENDING,
+        					self::DRUID_NUMERIC)
+        			));
+        }
+        else if (!$object_ids &&
         	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)))
         {
         	// get the topN objects first, otherwise the returned metrics can be inaccurate
@@ -672,6 +696,7 @@ class kKavaReportsMgr extends kKavaBase
 	        	$dimension_ids[] = $row[$dimension];
 	        }
 	        
+	        // issue a second topN query
 	        $page_index = 1;
 	        $page_size = count($dimension_ids);
 	        $threshold = $page_size; 
@@ -700,16 +725,29 @@ class kKavaReportsMgr extends kKavaBase
 	        	self::DRUID_DIMENSION => $dimension,
 	        	self::DRUID_VALUES => $dimension_ids
 	        );
+
+        	$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+        }
+        else
+        {
+        	$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         }
                 
-        $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         $result = self::runQuery($query);
         if (!$result)
         {
         	return array(array(), array(), 0);
         }
 
-        $rows = $result[0][self::DRUID_RESULT];
+        if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+        {
+        	$rows = $result;
+        }
+        else
+        {
+        	$rows = $result[0][self::DRUID_RESULT];
+        }
+        
         $rows_count = count($rows);
         KalturaLog::log("Druid returned [$rows_count] rows");
         
@@ -765,6 +803,11 @@ class kKavaReportsMgr extends kKavaBase
         
         foreach ($rows as $row)
         {
+        	if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+        	{
+        		$row = $row[self::DRUID_EVENT];
+        	}
+        	
             $dimension_ids[] = $row[$dimension];
             $row_data = array();
             $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
