@@ -587,11 +587,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return true;
 			}
 
-		if ($object instanceof LiveEntry)
-		{
-			return true;
-		}
-
 		return false;
 	}
 
@@ -680,13 +675,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$entry->setStatus(entryStatus::PENDING); // we change the entry to pending
 				$entry->save();
 			}
-		}
-
-		if ($object instanceof LiveEntry &&
-			$object->isCustomDataModified(LiveEntry::CUSTOM_DATA_RECORDING_STATUS))
-		{
-			kFlowHelper::handleLiveEntryChanged($object);
-			return true;
 		}
 
 		return true;

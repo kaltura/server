@@ -206,6 +206,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaEntryServerNodeStatus::PLAYABLE, $shouldCreateRecordedEntry = true)
 	{
+		kApiCache::disableConditionalCache();
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
@@ -215,9 +216,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 
 		// setRedirectEntryId to null in all cases, even for broadcasting...
-		$dbLiveEntry->setRedirectEntryId(null);
-		$dbLiveEntry->save();
+		if ($dbLiveEntry->getViewMode() == ViewMode::ALLOW_ALL)
+			$dbLiveEntry->setRedirectEntryId(null);
 
+		$dbLiveEntry->save();
 		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
 	}
 

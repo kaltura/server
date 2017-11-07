@@ -68,7 +68,7 @@ function createEmailNotification()
 	$eventConditions = array();
 	
 	$liveStatusField = new kEvalBooleanField();
-	$liveStatusField->setCode('$scope->getEvent()->getObject() instanceof LiveEntry && !$scope->getEvent()->getObject()->canPlayLive() && $scope->getEvent()->getObject()->isCustomDataModified(null, \'mediaServers\')');
+	$liveStatusField->setCode('$scope->getEvent()->getObject() instanceof LiveEntry && !$scope->getEvent()->getObject()->isCurrentlyLive() && $scope->getEvent()->getObject()->isCustomDataModified(null, \'mediaServers\')');
 	$liveStatusCondition = new kEventFieldCondition();
 	$liveStatusCondition->setDescription('Live Status Modified');
 	$liveStatusCondition->setField($liveStatusField);
