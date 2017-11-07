@@ -693,7 +693,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @param string $defaultAudioTrack
+	 * @param string $defaultAudioLanguage
 	 */
 	public function setDefaultAudioLanguage($defaultAudioLanguage)
 	{
@@ -751,7 +751,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
 		$this->sequence = $newObj->getSequence();
 		$this->hasValidSequence = $newObj->getHasValidSequence();
-		$this->defaultAudioTrack = $newObj->getDefaultAudioLanguage();
+		$this->defaultAudioLanguage = $newObj->getDefaultAudioLanguage();
 	}
 }
 
