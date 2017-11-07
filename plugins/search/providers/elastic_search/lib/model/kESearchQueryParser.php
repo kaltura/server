@@ -45,11 +45,11 @@ class kESearchQueryParser
 	{
 		$kESearchParams = new KalturaESearchParams();
 		// in case of a free text query (wihtout fields or brackets or special commands - a simple unified search object will be created
-		if (self::isFreeTextQuery($kEsearchQuery->eSerachQuery))
-			$kESearchParams->searchOperator = self::createSimpleUnifiedSearchParam($kEsearchQuery->eSerachQuery);
+		if (self::isFreeTextQuery($kEsearchQuery->eSearchQuery))
+			$kESearchParams->searchOperator = self::createSimpleUnifiedSearchParam($kEsearchQuery->eSearchQuery);
 		else
 		{
-			$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSerachQuery);
+			$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSearchQuery);
 			$kESearchParams->searchOperator = self::createKESearchParams($parsedQuery);
 		}
 		return $kESearchParams;
@@ -74,6 +74,7 @@ class kESearchQueryParser
 		$kESearchObject = new KalturaESearchOperator();
 		$kSearchItems = new KalturaESearchBaseItemArray();
 		$kSearchItem = new KalturaESearchUnifiedItem();
+		$kSearchItem->itemType =  KalturaESearchItemType::EXACT_MATCH;
 		$kSearchItem->searchTerm = $eSearchQuery;
 		$kSearchItems[] = $kSearchItem;
 		$kESearchObject->searchItems = $kSearchItems;
@@ -341,7 +342,7 @@ class kESearchQueryParser
 			$data = array();
 			$data['fieldName'] = $fieldName;
 			$data['fieldValue'] = $fieldValue;
-			throw new kESearchException("Illegal mixed search item types [$fieldName:$fieldValue]", kESearchException::INVALID_MIXED_SERACH_TYPES, $data);
+			throw new kESearchException("Illegal mixed search item types [$fieldName:$fieldValue]", kESearchException::INVALID_MIXED_SEARCH_TYPES, $data);
 		}
 
 		if ($rangeObject)
