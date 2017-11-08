@@ -5,13 +5,16 @@
  */
 class elasticSearchUtils
 {
+	const UNDERSCORE_FIELD_DELIMITER ='_';
+	const DOT_FIELD_DELIMITER = '.';
     /**
      * return the analyzed language field name
      * @param $language
      * @param $fieldName
+	 * @param $delimiter
      * @return null|string
      */
-    public static function getAnalyzedFieldName($language, $fieldName)
+    public static function getAnalyzedFieldName($language, $fieldName, $delimiter)
     {
         $fieldMap = array(
             'english' => 'english',
@@ -52,7 +55,7 @@ class elasticSearchUtils
 
         $language = strtolower($language);
         if(isset($fieldMap[$language]))
-            return $fieldName.'_'.$fieldMap[$language];
+            return $fieldName.$delimiter.$fieldMap[$language];
 
         return null;
     }

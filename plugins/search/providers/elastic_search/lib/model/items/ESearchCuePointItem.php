@@ -32,6 +32,8 @@ class ESearchCuePointItem extends ESearchItem
 		'cue_points.cue_point_explanation' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 	);
 
+	private static $multiLanguageFields = array();
+
 	/**
 	 * @return ESearchEntryFieldName
 	 */
@@ -74,7 +76,7 @@ class ESearchCuePointItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$innerHitsConfig = kConf::get('innerHits', 'elastic');
 		$innerHitsSize = isset($innerHitsConfig['cuePointsInnerHitsSize']) ? $innerHitsConfig['cuePointsInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
@@ -83,12 +85,12 @@ class ESearchCuePointItem extends ESearchItem
 		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $cuePointSearchItem)
 		{
-			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes);
+			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes, $queryAttributes);
 		}
 		return array($cuePointQuery);
 	}
 
-	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointQuery, $allowedSearchTypes)
+	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$cuePointSearchItem->validateItemInput();
 		switch ($cuePointSearchItem->getItemType())
@@ -99,7 +101,7 @@ class ESearchCuePointItem extends ESearchItem
 				break;
 			case ESearchItemType::PARTIAL:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getMultiMatchQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), false);
+					kESearchQueryManager::getMultiMatchQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
@@ -127,4 +129,18 @@ class ESearchCuePointItem extends ESearchItem
 		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
 		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
+
+	public function shouldAddLanguageSearch()
+	{
+		if(in_array($this->getFieldName(), self::$multiLanguageFields))
+			return true;
+
+		return false;
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+
+	}
+
 }

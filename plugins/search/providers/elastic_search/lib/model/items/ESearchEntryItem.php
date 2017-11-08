@@ -50,6 +50,11 @@ class ESearchEntryItem extends ESearchItem
 		'access_control_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 	);
 
+	private static $multiLanguageFields = array(
+		ESearchEntryFieldName::ENTRY_NAME,
+		ESearchEntryFieldName::ENTRY_DESCRIPTION,
+	);
+
 	/**
 	 * @return ESearchEntryFieldName
 	 */
@@ -92,18 +97,18 @@ class ESearchEntryItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$entryQuery = array();
 		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $entrySearchItem)
 		{
-			self::getSingleItemSearchQuery($entrySearchItem, $entryQuery, $allowedSearchTypes);
+			self::getSingleItemSearchQuery($entrySearchItem, $entryQuery, $allowedSearchTypes, $queryAttributes);
 		}
 		return $entryQuery;
 	}
 
-	public static function getSingleItemSearchQuery($entrySearchItem, &$entryQuery, $allowedSearchTypes)
+	public static function getSingleItemSearchQuery($entrySearchItem, &$entryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$entrySearchItem->validateItemInput();
 		switch ($entrySearchItem->getItemType())
@@ -112,7 +117,7 @@ class ESearchEntryItem extends ESearchItem
 				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$entryQuery[] = kESearchQueryManager::getMultiMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), false);
+				$entryQuery[] = kESearchQueryManager::getMultiMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$entryQuery[] = kESearchQueryManager::getPrefixQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes);
@@ -134,5 +139,18 @@ class ESearchEntryItem extends ESearchItem
 		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
 		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
-	
+
+	public function shouldAddLanguageSearch()
+	{
+		if(in_array($this->getFieldName(), self::$multiLanguageFields))
+			return true;
+
+		return false;
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+		return elasticSearchUtils::DOT_FIELD_DELIMITER;
+	}
+
 }

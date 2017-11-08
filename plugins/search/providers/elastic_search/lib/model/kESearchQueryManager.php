@@ -37,7 +37,7 @@ class kESearchQueryManager
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
 
-	public static function getMultiMatchQuery($searchItem, $fieldName, $shouldAddLanguageFields = false)
+	public static function getMultiMatchQuery($searchItem, $fieldName, &$queryAttributes)
 	{
 		$multiMatch = array();
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::QUERY_KEY] = $searchItem->getSearchTerm();
@@ -47,8 +47,16 @@ class kESearchQueryManager
 		);
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::TYPE_KEY] = self::MOST_FIELDS;
 
-		if($shouldAddLanguageFields)
-			$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $fieldName.'_*^2';
+		if($searchItem->shouldAddLanguageSearch())
+		{
+			$languages = $queryAttributes->getPartnerLanguages();
+			foreach ($languages as $language)
+			{
+				$mappingLanguageField = elasticSearchUtils::getAnalyzedFieldName($language, $fieldName, $searchItem->getItemMappingFieldsDelimiter());
+				if($mappingLanguageField)
+					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^2';
+			}
+		}
 
 		$trigramFieldName = $fieldName.'.'.self::NGRAMS_FIELD_SUFFIX;
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][1][self::MATCH_KEY][$trigramFieldName][self::QUERY_KEY] = $searchItem->getSearchTerm();

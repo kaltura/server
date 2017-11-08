@@ -48,7 +48,7 @@ class ESearchOperator extends ESearchItem
 		$this->searchItems = $searchItems;
 	}
 
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		if (!$eSearchItemsArr || !count($eSearchItemsArr))
 		{
@@ -71,7 +71,7 @@ class ESearchOperator extends ESearchItem
 		}
 		
 		$categorizedSearchItems = self::getCategorizedSearchItems($eSearchItemsArr);
-		$outQuery = self::createSearchQueryForItems($categorizedSearchItems, $boolOperator, $eSearchOperatorType);
+		$outQuery = self::createSearchQueryForItems($categorizedSearchItems, $boolOperator, $queryAttributes, $eSearchOperatorType);
 
 		return $outQuery;
 	}
@@ -107,7 +107,7 @@ class ESearchOperator extends ESearchItem
 		return $allCategorizedSearchItems;
 	}
 
-	private static function createSearchQueryForItems($categorizedSearchItems, $boolOperator, $eSearchOperatorType)
+	private static function createSearchQueryForItems($categorizedSearchItems, $boolOperator, &$queryAttributes, $eSearchOperatorType)
 	{
 		$outQuery = array();
 		foreach ($categorizedSearchItems as $categorizedSearchItem)
@@ -121,7 +121,7 @@ class ESearchOperator extends ESearchItem
 				$operatorType = $categorizedSearchItem['operatorType'];
 			}
 			
-			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $operatorType);
+			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $queryAttributes, $operatorType);
 
 			foreach ($subQuery as $key => $value)
 			{
@@ -141,6 +141,16 @@ class ESearchOperator extends ESearchItem
 	public function getType()
 	{
 		return 'operator';
+	}
+
+	public function shouldAddLanguageSearch()
+	{
+
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+
 	}
 
 }
