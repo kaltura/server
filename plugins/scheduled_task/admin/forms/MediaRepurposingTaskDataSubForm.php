@@ -7,6 +7,7 @@ class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 {	
 	
 	private $ignore = array('relatedObjects', 'type', 'stopProcessingOnError');
+	private $areaStringFields = array('message', 'footer');
 	private $prefix = "";
 
 	private $type;
@@ -44,7 +45,13 @@ class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 				$this->setDefault($tag, $object->$propertyName);
 			}
 		}
+	}
 
+	protected function addStringElement($name, $prefix) {
+		if (in_array($name,$this->areaStringFields))
+			return $this->addStringAreaElement($name, $prefix);
+
+		return parent::addStringElement($name, $prefix);
 	}
 	
 }
