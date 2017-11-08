@@ -82,6 +82,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function shouldEncryptFile()
 	{
+
 		//check for partner configuration
 		if(!$this->getPartnerId() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_CONTENT_ENCRYPTION, $this->getPartnerId()))
 			return false;
@@ -91,11 +92,16 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if (in_array($this->object_type, $excludeObjectTypes))
 			return false;
 
-		//check the file extension
+		//check the file extension and size
 		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
 		$fileTypeNotToEncrypt = kConf::get('video_file_ext');
 		if (in_array($type, $fileTypeNotToEncrypt))
 			return false;
+
+		$maxFileSize = kConf::get('max_file_size_for_encryption');
+		if (filesize($this->getFullPath()) > $maxFileSize)
+			return false;
+
 
 		if ($this->getEncryptionKey())
 		{
