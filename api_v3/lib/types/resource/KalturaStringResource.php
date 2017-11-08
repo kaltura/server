@@ -31,7 +31,7 @@ class KalturaStringResource extends KalturaContentResource
 		if(!$object_to_fill)
 			$object_to_fill = new kLocalFileResource();
 		
-		file_put_contents($fname = tempnam(myContentStorage::getFSUploadsPath(), "KFR"), $this->content);
+		kFileBase::setFileContent($fname = tempnam(myContentStorage::getFSUploadsPath(), "KFR"), $this->content);
 		$object_to_fill->setLocalFilePath($fname);
 		$object_to_fill->setSourceType(entry::ENTRY_MEDIA_SOURCE_TEXT);
 		

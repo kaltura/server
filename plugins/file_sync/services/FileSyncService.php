@@ -73,6 +73,7 @@ class FileSyncService extends KalturaBaseService
 
 		$fileSync->toUpdatableObject($dbFileSync);
 		$dbFileSync->save();
+		$dbFileSync->encrypt();
 		
 		$fileSync = new KalturaFileSync();
 		$fileSync->fromObject($dbFileSync, $this->getResponseProfile());

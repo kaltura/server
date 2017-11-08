@@ -88,7 +88,7 @@ class DocumentsService extends KalturaEntryService
 		}
 			
 		$dbEntry = $this->prepareEntryForInsert($documentEntry);
-		$dbEntry->setSource(KalturaSourceType::FILE);
+		$dbEntry->setSource(EntrySourceType::FILE);
 		$dbEntry->setSourceLink("file:$entryFullPath");
 		$dbEntry->save();
 	
@@ -521,7 +521,9 @@ class DocumentsService extends KalturaEntryService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			return $this->dumpFile($filePath, $mimeType);
+			$key = $fileSync->isEncrypted() ? $fileSync->getEncryptionKey() : null;
+			$iv = $key ? $fileSync->getIv() : null;
+			return $this->dumpFile($filePath, $mimeType, $key, $iv);
 		}
 		else
 		{
