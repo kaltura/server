@@ -639,7 +639,11 @@ class kKavaReportsMgr extends kKavaBase
                 $order_by = self::$headers_to_metrics[$order_by];
             else 
                 throw new Exception("Order by parameter is not a valid column");
-                
+               
+            if (!in_array($order_by, $metrics))
+            {
+            	throw new Exception("Order by parameter is not one of the report metrics");
+            }
         }
         
         // Note: using a larger threshold since topN is approximate
