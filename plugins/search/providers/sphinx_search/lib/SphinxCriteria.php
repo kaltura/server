@@ -988,6 +988,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if (!$this->sphinxSkipped)
 			return $this->recordsCount;
 		
+		if(!$this->doCount)
+		{
+			KalturaLog::log("doCountOnPeer for sphinx criteria is disabled, returning 0");
+			return 0;
+		}
+
+
 		$c = clone $this;
 		$c->setLimit(null);
 		$c->setOffset(null);
