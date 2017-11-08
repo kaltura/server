@@ -256,35 +256,7 @@ class serveFlavorAction extends kalturaAction
 				}
 				else
 				{
-					// don't have a flavor for this entry in the desired flavor params,
-					// choose the one with the closest bitrate
-					$flavor = reset($groupedFlavors[$entryId]);
-					foreach ($groupedFlavors[$entryId] as $curFlavor)
-					{
-						// first priority - matching tags
-						if ($flavor->getTags() == $referenceFlavor->getTags())
-						{
-							if ($curFlavor->getTags() != $referenceFlavor->getTags())
-							{
-								continue;
-							}
-						}
-						else
-						{
-							if ($curFlavor->getTags() == $referenceFlavor->getTags())
-							{
-								$flavor = $curFlavor;
-								continue;
-							}
-						}
-
-						// second priority - bitrate
-						if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
-							abs($flavor->getBitrate() - $referenceFlavor->getBitrate()))
-						{
-							$flavor = $curFlavor;
-						}
-					}
+					$flavor = $this->getBestMatchFlavor($groupedFlavors, $entryId, $referenceFlavor);
 				}
 
 				if ($flavor->getEntryId() == $origEntry->getId())
@@ -730,6 +702,64 @@ class serveFlavorAction extends kalturaAction
 			$flavorParamId = $asset->getFlavorParamsId();
 		}
 		return array($flavorParamId, $asset);
+	}
+
+	/**
+	 * Flavor matching logic:
+	 * 1. A flavor with more matching tags should be preferred over one with less matching tags (number of matching tags desc)
+	 * 2. A flavor with less non-matching tags should be preferred (number of non-matching tags asc)
+	 * 3. A flavor with a closer bitrate should be preferred
+	 * @param $groupedFlavors
+	 * @param $entryId
+	 * @param $referenceFlavor
+	 * @return mixed
+	 */
+	protected function getBestMatchFlavor($groupedFlavors, $entryId, $referenceFlavor)
+	{
+		$flavor = reset($groupedFlavors[$entryId]);
+		$matchingTags = count(array_intersect($flavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+		$nonMatchingTags = count(array_diff($flavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+
+		foreach ($groupedFlavors[$entryId] as $curFlavor)
+		{
+			$currMatchingTags = count(array_intersect($curFlavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+			$currNonMatchingTags = count(array_diff($curFlavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+
+			if ($currMatchingTags < $matchingTags)
+				continue;
+
+			if ($currMatchingTags > $matchingTags)
+			{
+				$flavor = $curFlavor;
+				$matchingTags = $currMatchingTags;
+				$nonMatchingTags = $currNonMatchingTags;
+				continue;
+			}
+
+			if ($currNonMatchingTags > $nonMatchingTags)
+				continue;
+
+			if ($currNonMatchingTags < $nonMatchingTags)
+			{
+				$flavor = $curFlavor;
+				$matchingTags = $currMatchingTags;
+				$nonMatchingTags = $currNonMatchingTags;
+				continue;
+			}
+
+			if ($currNonMatchingTags == $nonMatchingTags && $currMatchingTags == $matchingTags)
+			{
+				if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
+					abs($flavor->getBitrate() - $referenceFlavor->getBitrate())
+				)
+				{
+					$flavor = $curFlavor;
+					$matchingTags = $currMatchingTags;
+					$nonMatchingTags = $currNonMatchingTags;
+				}
+			}
+		}
+		return $flavor;
 	}
 
 }
