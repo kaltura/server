@@ -48,7 +48,7 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 			else
 			{
 				$res = $this->sendData($drmType, $partnerId, AdminApiActionType::GET);
-				$adminApiForm->populate($res);
+				$adminApiForm->populateJson($res);
 			}
 		}
 		catch(Exception $e)

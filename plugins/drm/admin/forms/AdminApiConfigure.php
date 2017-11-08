@@ -53,7 +53,7 @@ class Form_AdminApiConfigure extends Infra_Form
 
 	}
 	
-	public function populate($res)
+	public function populateJson($res)
 	{
 		$values = json_decode($res, true);
 		if (json_last_error() == JSON_ERROR_NONE)
