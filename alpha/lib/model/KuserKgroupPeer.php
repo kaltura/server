@@ -99,7 +99,36 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 
 		return self::$kgroupIdsByKuserId[$kuserId];
 	}
-	
+
+	/**
+	 * @param $kuserId
+	 * @param $partnerId
+	 * @return array|mixed
+	 */
+	public static function retrieveKgroupIdsByKuserIdAndPartnerId($kuserId, $partnerId)
+	{
+		if (isset(self::$kgroupIdsByKuserId[$kuserId])){
+			return self::$kgroupIdsByKuserId[$kuserId];
+		}
+
+		$c = new Criteria();
+		$c->add(KuserKgroupPeer::KUSER_ID, array($kuserId), Criteria::IN);
+		$c->addAnd ( KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
+		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, $partnerId, Criteria::EQUAL );
+		self::setUseCriteriaFilter(false);
+		$kuserKgroups = KuserKgroupPeer::doSelect($c);
+		self::setUseCriteriaFilter(true);
+
+		$kgroupIds = array();
+		foreach ($kuserKgroups as $kuserKgroup){
+			/* @var $kuserKgroup KuserKgroup */
+			$kgroupIds[] = $kuserKgroup->getKgroupId();
+		}
+
+		self::$kgroupIdsByKuserId[$kuserId] = $kgroupIds;
+		return $kgroupIds;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
