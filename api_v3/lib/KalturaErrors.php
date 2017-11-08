@@ -36,8 +36,11 @@ class KalturaErrors extends APIErrors
 	const ACTION_NOT_SPECIFIED = "ACTION_NOT_SPECIFIED;;Action name was not specified, please specify one";
 
 	// ACTION_NAME - action name, SERVICE_NAME - service name
+	const ACTION_BLOCKED = "ACTION_BLOCKED;ACTION_NAME,SERVICE_NAME;Action \"@ACTION_NAME@\" in service \"@SERVICE_NAME@\" is blocked";
+	
+	// ACTION_NAME - action name, SERVICE_NAME - service name
 	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS;ACTION_NAME,SERVICE_NAME;Action \"@ACTION_NAME@\" does not exists for service \"@SERVICE_NAME@\"";
-
+	
 	// ACTION_NAME - action name
 	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN;ACTION_NAME;Action \"@ACTION_NAME@\" is forbidden for use";
 
