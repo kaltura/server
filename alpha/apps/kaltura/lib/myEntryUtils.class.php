@@ -739,7 +739,8 @@ class myEntryUtils
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 			return $finalThumbPath;
 		}
-		
+
+		/* @var  $fileSync FileSync*/
 		if ($fileSync)
 			$orig_image_path = $fileSync->getFullPath();
 		
@@ -867,7 +868,8 @@ class myEntryUtils
 								    
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 
-			if ($fileSync && $fileSync->isEncrypted())
+			$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
+			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
 			{
 				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
 				KalturaLog::debug("Creating Clear file at [$orig_image_path] for image conversion");
@@ -893,8 +895,14 @@ class myEntryUtils
 				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 			}
 
-			if ($fileSync && $fileSync->isEncrypted())
+
+			if ($isEncryptionNeeded)
+			{
 				$fileSync->deleteTempClear();
+				if (self::isTempFile($orig_image_path))
+					unlink($orig_image_path);
+			}
+
 			
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
@@ -909,7 +917,6 @@ class myEntryUtils
 					
 				imagecopy($im, $srcIm, $w * $vid_slice, 0, 0, 0, $w, $h);
 				imagedestroy($srcIm);
-					
 				++$vid_slice;
 			}
 		}
@@ -926,12 +933,17 @@ class myEntryUtils
 		if ($cache)
 			$cache->delete($cacheLockKey);
 
-		if ($fileSync && $fileSync->isEncrypted())
+		if ($isEncryptionNeeded)
 		{
 			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
 				
 		return $finalThumbPath;
+	}
+
+	private static function isTempFile($filePath)
+	{
+		return kString::endsWith($filePath, self::TEMP_FILE_POSTFIX);
 	}
 	
 	private static function encryptThumb($thumbPath, $key, $iv)
