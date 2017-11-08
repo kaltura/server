@@ -27,7 +27,9 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 
 		$c =  KalturaCriteria::create(KuserKgroupPeer::OM_CLASS);
 		$c->addAnd ( KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
-		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId(), Criteria::EQUAL );
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if($partnerId)
+			$c->addAnd ( KuserKgroupPeer::PARTNER_ID, $partnerId, Criteria::EQUAL );
 		self::$s_criteria_filter->setFilter($c);
 	}
 
@@ -113,11 +115,8 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 
 		$c = new Criteria();
 		$c->add(KuserKgroupPeer::KUSER_ID, array($kuserId), Criteria::IN);
-		$c->addAnd ( KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
 		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, $partnerId, Criteria::EQUAL );
-		self::setUseCriteriaFilter(false);
 		$kuserKgroups = KuserKgroupPeer::doSelect($c);
-		self::setUseCriteriaFilter(true);
 
 		$kgroupIds = array();
 		foreach ($kuserKgroups as $kuserKgroup){
