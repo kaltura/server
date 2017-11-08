@@ -216,9 +216,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 
 		// setRedirectEntryId to null in all cases, even for broadcasting...
-		$dbLiveEntry->setRedirectEntryId(null);
-		$dbLiveEntry->save();
+		if ($dbLiveEntry->getViewMode() == ViewMode::ALLOW_ALL)
+			$dbLiveEntry->setRedirectEntryId(null);
 
+		$dbLiveEntry->save();
 		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
 	}
 
@@ -508,7 +509,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		if ($shouldCreateRecordedEntry && (!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
 			in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) &&
-			$dbLiveEntry->getRecordStatus()
+			$dbLiveEntry->getRecordStatus() && ($dbLiveEntry->getRecordingStatus() == RecordingStatus::ACTIVE)
 		)
 		{
 			KalturaLog::info("Checking if recorded entry needs to be created for entry ".$dbLiveEntry->getId());

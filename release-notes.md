@@ -1,5 +1,23 @@
 # Mercury 13.7.0 #
 
+## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
+- Issue Type: Feature
+- Issue ID: PLAT-7977
+
+### Deployment scripts ###
+
+	Deploy Explicit Live Push notification:
+	1. Push notitifications:
+	   First replacae all tokens from in the XML file below and remove ".template" from the fle name:
+	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
+	
+	   Run deployment script:
+		1. php /opt/kaltura/appdeployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+			
 ## eSearch Languages support  ##
  - Issue Type: Task
 - Issue ID: KMS-14857
