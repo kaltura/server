@@ -974,20 +974,4 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
 	}
 
-	public function preSave(PropelPDO $con = null)
-	{
-		if($this->customDataValueHasChanged(self::CUSTOM_DATA_VIEW_MODE))
-		{
-			if ($this->getViewMode() == ViewMode::ALLOW_ALL && ($this->getLiveStatus() != KalturaEntryServerNodeStatus::STOPPED))
-			{
-				$this->setRedirectEntryId(null);
-			}
-			else
-			{
-				$this->setRedirectEntryId($this->getRecordedEntryId());
-			}
-		}
-		return parent::preSave($con);
-	}
-
 }
