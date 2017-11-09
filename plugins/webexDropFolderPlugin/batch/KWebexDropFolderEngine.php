@@ -7,6 +7,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	const ZERO_DATE = '12/31/1971 00:00:01';
 	
 	const ARF_FORMAT = 'ARF';
+	
+	const MAX_QUERY_DATE_RANGE_DAYS = 25; //Maximum querying date range is 28 days we define it as less than that
 
 	private static $unsupported_file_formats = array('WARF');
 	
@@ -163,14 +165,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	 */
 	protected function purgeFiles ($dropFolderFilesMap)
 	{
-		$createTimeEnd = strtotime ("now");
-		$createTimeStart = self::ZERO_DATE;
-		if ($this->dropFolder->deleteFromTimestamp)
+		$createTimeEnd = date('m/j/Y H:i:s');
+		$createTimeStart = date('m/j/Y H:i:s', strtotime('-3 week'));
+		if ($this->dropFolder->deleteFromTimestamp && $this->dropFolder->deleteFromTimestamp > (time()-self::MAX_QUERY_DATE_RANGE_DAYS*86400) )
 		{
 			$createTimeStart = date('m/j/Y H:i:s',$this->dropFolder->deleteFromTimestamp);
 		}
 		
-		$fileList = $this->listRecordings($createTimeStart, date('m/j/Y H:i:s',$createTimeEnd));
+		$fileList = $this->listRecordings($createTimeStart, $createTimeEnd);
 		KalturaLog::info("Files to delete: " . count($fileList));
 		
 		foreach ($fileList as $file)
