@@ -256,7 +256,7 @@ class serveFlavorAction extends kalturaAction
 				}
 				else
 				{
-					$flavor = $this->getBestMatchFlavor($groupedFlavors, $entryId, $referenceFlavor);
+					$flavor = $this->getBestMatchFlavor($groupedFlavors[$entryId], $referenceFlavor);
 				}
 
 				if ($flavor->getEntryId() == $origEntry->getId())
@@ -710,17 +710,16 @@ class serveFlavorAction extends kalturaAction
 	 * 2. A flavor with less non-matching tags should be preferred (number of non-matching tags asc)
 	 * 3. A flavor with a closer bitrate should be preferred
 	 * @param $groupedFlavors
-	 * @param $entryId
 	 * @param $referenceFlavor
 	 * @return mixed
 	 */
-	protected function getBestMatchFlavor($groupedFlavors, $entryId, $referenceFlavor)
+	protected function getBestMatchFlavor($groupedFlavors, $referenceFlavor)
 	{
-		$flavor = reset($groupedFlavors[$entryId]);
+		$flavor = reset($groupedFlavors);
 		$matchingTags = count(array_intersect($flavor->getTagsArray(), $referenceFlavor->getTagsArray()));
 		$nonMatchingTags = count(array_diff($flavor->getTagsArray(), $referenceFlavor->getTagsArray()));
 
-		foreach ($groupedFlavors[$entryId] as $curFlavor)
+		foreach ($groupedFlavors as $curFlavor)
 		{
 			$currMatchingTags = count(array_intersect($curFlavor->getTagsArray(), $referenceFlavor->getTagsArray()));
 			$currNonMatchingTags = count(array_diff($curFlavor->getTagsArray(), $referenceFlavor->getTagsArray()));
@@ -747,16 +746,14 @@ class serveFlavorAction extends kalturaAction
 				continue;
 			}
 
-			if ($currNonMatchingTags == $nonMatchingTags && $currMatchingTags == $matchingTags)
+			// case both flavors have the same matching and nonmatching tags - compare bitrates
+			if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
+				abs($flavor->getBitrate() - $referenceFlavor->getBitrate())
+			)
 			{
-				if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
-					abs($flavor->getBitrate() - $referenceFlavor->getBitrate())
-				)
-				{
-					$flavor = $curFlavor;
-					$matchingTags = $currMatchingTags;
-					$nonMatchingTags = $currNonMatchingTags;
-				}
+				$flavor = $curFlavor;
+				$matchingTags = $currMatchingTags;
+				$nonMatchingTags = $currNonMatchingTags;
 			}
 		}
 		return $flavor;
