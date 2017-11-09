@@ -29,9 +29,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$endTime = null;
 		if ($this->dropFolder->incremental)
 		{
-			$startTime = ($this->dropFolder->lastFileTimestamp ? date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp - 3600) :  self::ZERO_DATE);
+			$startTime = time()-self::MAX_QUERY_DATE_RANGE_DAYS*86400;
+			if ($this->dropFolder->lastFileTimestamp && $this->dropFolder->lastFileTimestamp > (time()-self::MAX_QUERY_DATE_RANGE_DAYS*86400) )
+				$startTime = $this->dropFolder->lastFileTimestamp;
+			
+			$startTime = date('m/j/Y H:i:s', $startTime);
 			$endTime = (date('m/j/Y H:i:s', time()+86400));
 		}
+		
 		$physicalFiles = $this->listRecordings($startTime, $endTime);
 		KalturaLog::info('Recordings fetched: '.print_r($physicalFiles, true) );
 		
