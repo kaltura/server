@@ -12,7 +12,7 @@
 	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
 	
 	   Run deployment script:
-		1. php /opt/kaltura/appdeployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
+		1. php /opt/kaltura/app/deployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
 	
 #### Known Issues & Limitations ####
 
