@@ -50,6 +50,19 @@ class ESearchEntryItem extends ESearchItem
 		'access_control_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 	);
 
+	protected static $field_boost_values = array(
+		'_id' => 100,
+		'name' => 100,
+		'description' => 100,
+		'tags' => 100,
+		'puser_id' => 50,
+		'creator_puser_id' => 50,
+		'entitled_pusers_edit' => 50,
+		'entitled_pusers_publish' => 50,
+		'display_in_search' => 10,
+		'admin_tags' => 100,
+	);
+
 	private static $multiLanguageFields = array(
 		ESearchEntryFieldName::ENTRY_NAME,
 		ESearchEntryFieldName::ENTRY_DESCRIPTION,

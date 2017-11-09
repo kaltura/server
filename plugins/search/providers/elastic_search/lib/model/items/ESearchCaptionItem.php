@@ -18,6 +18,10 @@ class ESearchCaptionItem extends ESearchItem
 		ESearchCaptionFieldName::CAPTION_CONTENT,
 	);
 
+	protected static $field_boost_values = array(
+		'caption_assets.lines.content' => 10,
+	);
+
 	/**
 	 * @var string
 	 */

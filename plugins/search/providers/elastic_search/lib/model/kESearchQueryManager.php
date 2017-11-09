@@ -37,13 +37,23 @@ class kESearchQueryManager
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
 
+
+	/**
+	 * @param ESearchItem $searchItem
+	 * @param string $fieldName
+	 * @param $queryAttributes
+	 * @return array
+	 */
 	public static function getMultiMatchQuery($searchItem, $fieldName, &$queryAttributes)
 	{
 		$multiMatch = array();
+		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
+		$rawBoostFactor = 3 * $fieldBoostFactor;
+		$multiMatchFileBoostFactor = 2 * $fieldBoostFactor;
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::QUERY_KEY] = $searchItem->getSearchTerm();
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY] = array(
-			$fieldName.'.'.self::RAW_FIELD_SUFFIX.'^3',
-			$fieldName.'^2',
+			$fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor,
+			$fieldName.'^'.$multiMatchFileBoostFactor,
 		);
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::TYPE_KEY] = self::MOST_FIELDS;
 
@@ -54,7 +64,7 @@ class kESearchQueryManager
 			{
 				$mappingLanguageField = elasticSearchUtils::getAnalyzedFieldName($language, $fieldName, $searchItem->getItemMappingFieldsDelimiter());
 				if($mappingLanguageField)
-					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^2';
+					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^'.$multiMatchFileBoostFactor;
 			}
 		}
 
