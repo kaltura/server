@@ -166,7 +166,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	protected function purgeFiles ($dropFolderFilesMap)
 	{
 		$createTimeEnd = date('m/j/Y H:i:s');
-		$createTimeStart = date('m/j/Y H:i:s', strtotime('-3 week'));
+		$createTimeStart = date('m/j/Y H:i:s', time()-self::MAX_QUERY_DATE_RANGE_DAYS*86400);
 		if ($this->dropFolder->deleteFromTimestamp && $this->dropFolder->deleteFromTimestamp > (time()-self::MAX_QUERY_DATE_RANGE_DAYS*86400) )
 		{
 			$createTimeStart = date('m/j/Y H:i:s',$this->dropFolder->deleteFromTimestamp);
