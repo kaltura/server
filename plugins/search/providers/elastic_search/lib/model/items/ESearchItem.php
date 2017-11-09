@@ -77,6 +77,10 @@ abstract class ESearchItem extends BaseObject
 		return array();
 	}
 
-	abstract public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null);
+	abstract public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null);
+
+	abstract public function shouldAddLanguageSearch();
+
+	abstract public function getItemMappingFieldsDelimiter();
 
 }

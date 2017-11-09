@@ -14,6 +14,10 @@ class ESearchCaptionItem extends ESearchItem
 		'caption_assets.lines.end_time' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 	);
 
+	private static $multiLanguageFields = array(
+		ESearchCaptionFieldName::CAPTION_CONTENT,
+	);
+
 	/**
 	 * @var string
 	 */
@@ -66,7 +70,7 @@ class ESearchCaptionItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$innerHitsConfig = kConf::get('innerHits', 'elastic');
 		$innerHitsSize = isset($innerHitsConfig['captionInnerHitsSize']) ? $innerHitsConfig['captionInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
@@ -75,13 +79,13 @@ class ESearchCaptionItem extends ESearchItem
 		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $eSearchCaptionItem)
 		{
-			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes);
+			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
 		}
 		
 		return array($captionQuery);
 	}
 
-	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionQuery, $allowedSearchTypes)
+	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$eSearchCaptionItem->validateItemInput();
 		switch ($eSearchCaptionItem->getItemType())
@@ -92,7 +96,7 @@ class ESearchCaptionItem extends ESearchItem
 				break;
 			case ESearchItemType::PARTIAL:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getMultiMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), true);
+					kESearchQueryManager::getMultiMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
@@ -119,6 +123,19 @@ class ESearchCaptionItem extends ESearchItem
 		$allowedSearchTypes = self::getAllowedSearchTypesForField();
 		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
 		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
+	}
+
+	public function shouldAddLanguageSearch()
+	{
+		if(in_array($this->getFieldName(), self::$multiLanguageFields))
+			return true;
+
+		return false;
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+		return elasticSearchUtils::UNDERSCORE_FIELD_DELIMITER;
 	}
 
 }
