@@ -56,13 +56,15 @@ class kESearchQueryParser
 	}
 
 	/**
+	 * Check if entire query is a only alphanumeric chars so we can create a simple unified search
 	 * @param $eSearchQuery
 	 * @return bool
 	 */
 	private static function isFreeTextQuery($eSearchQuery)
 	{
-		$aValid = array('_');
-		return ctype_alnum(str_replace($aValid, '', $eSearchQuery));
+		$aValid = array('_',' ');
+		$query = str_replace($aValid, 'A', $eSearchQuery);
+		return ctype_alnum(str_replace($aValid, '', $query));
 	}
 
 	/**
