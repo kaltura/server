@@ -454,12 +454,12 @@ abstract class LiveEntry extends entry
 	 */
 	public function isCurrentlyLive($currentDcOnly = false)
 	{
-		if ($this->getExplicitLive())
+		if ($this->getViewMode() == ViewMode::PREVIEW)
 		{
 			$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
 			$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
 			$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-			if ($this->getViewMode() == ViewMode::PREVIEW && !$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+			if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
 				return false;
 		}
 
@@ -978,7 +978,7 @@ abstract class LiveEntry extends entry
 	{
 		if($this->customDataValueHasChanged(self::CUSTOM_DATA_VIEW_MODE))
 		{
-			if ($this->getViewMode() == ViewMode::ALLOW_ALL)
+			if ($this->getViewMode() == ViewMode::ALLOW_ALL && ($this->getLiveStatus() != KalturaEntryServerNodeStatus::STOPPED))
 			{
 				$this->setRedirectEntryId(null);
 			}
