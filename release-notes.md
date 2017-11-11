@@ -1,5 +1,26 @@
 # Mercury 13.7.0 #
+## File Encryption ##
+- Issue Type: Task
+- Issue ID: PLAT-7961
 
+### Configuration ###
+	-Add the following to Admin.ini:
+	moduls.FileEncryption.enabled = true
+	moduls.FileEncryption.permissionType = 2
+	moduls.FileEncryption.label = "Enable File Encryption"
+	moduls.FileEncryption.permissionName = FEATURE_CONTENT_ENCRYPTION
+	moduls.FileEncryption.group = GROUP_ENABLE_DISABLE_FEATURES
+	
+	-Add to local.ini:
+	encryption_iv = @DEFAULT_IV_16B@
+	Change the placeholder for 16 characters string 
+       
+### Deployment scripts ###
+	None.
+
+#### Known Issues & Limitations ####
+	None.
+	
 ## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
 - Issue Type: Feature
 - Issue ID: PLAT-7977
