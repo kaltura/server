@@ -1214,6 +1214,13 @@ class kJobsManager
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{
+		if(kFile::isFileTypeText($inputFileSyncLocalPath))
+		{
+			KalturaLog::notice('Source of type text will not be converted');
+			$entry->setStatus(entryStatus::ERROR_CONVERTING);
+			$entry->save();
+			return null;
+		}
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);
