@@ -379,7 +379,11 @@ class MetadataService extends KalturaBaseService
 			{
 				$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
 				if(count($objectIds))
-					$applyPartnerFilter = false;	
+				{
+					$applyPartnerFilter = false;
+					$filter->objectIdEqual = null;
+					$filter->objectIdIn = implode(",", $objectIds);
+				}
 			}
 		}
 		
