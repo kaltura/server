@@ -44,7 +44,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_TYPE);
 		
 		$objectIds = $this->validateObjectIdFiltered();
-		if(!count($objectIds) && $this->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT)
+		if(!count($objectIds) && $this->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT && $this->partnerNotInExcludeList())
 		{
 			$response = new KalturaMetadataListResponse();
 			$response->objects = new KalturaMetadataArray();
@@ -88,8 +88,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		$objectIds = $this->getObjectIdsFiltered();
 		
 		if(($this->metadataObjectTypeEqual == MetadataObjectType::ENTRY || kEntitlementUtils::getEntitlementEnforcement()) && 
-			empty($objectIds) && kConf::hasParam('metadata_list_without_object_filtering_partners') &&
-			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
+			empty($objectIds) && $this->partnerNotInExcludeList() &&
 			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 		
@@ -99,20 +98,26 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		}
 		elseif($this->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{
-			$kusers = $objectIds ? kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds) : array();
+			$kusers = !empty($objectIds) ? kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds) : array();
 			$objectIds = array();
 			foreach($kusers as $kuser)
 				$objectIds[] = $kuser->getId();
 		}
 		elseif($this->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
-			$categories = $objectIds ? categoryPeer::retrieveByPKs($objectIds) : array();
+			$categories = !empty($objectIds) ? categoryPeer::retrieveByPKs($objectIds) : array();
 			$objectIds = array();
 			foreach($categories as $category)
 					$objectIds[] = $category->getId();
 		}
 		
 		return $objectIds;
+	}
+	
+	private function partnerNotInExcludeList()
+	{
+		return kConf::hasParam('metadata_list_without_object_filtering_partners') &&
+			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners'));
 	}
 	
 	public function getObjectIdsFiltered()

@@ -366,10 +366,10 @@ class MetadataService extends KalturaBaseService
 	function listAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
-			$filter = new KalturaMetadataFilter;
+			$filter = new KalturaMetadataFilter();
 			
 		if (! $pager)
-			$pager = new KalturaFilterPager ();
+			$pager = new KalturaFilterPager();
 		
 		$applyPartnerFilter = true;
 		if($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
