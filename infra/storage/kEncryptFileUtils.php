@@ -10,10 +10,11 @@ class kEncryptFileUtils
 {
     //iv length should be 16
     CONST ENCRYPT_METHOD = "AES-256-CBC";
+    const OPENSSL_RAW_DATA = 1;
     public static function encryptData($plainText, $key, $iv)
     {
         $iv = substr($iv,0, openssl_cipher_iv_length(self::ENCRYPT_METHOD));
-        $encryptedData =  openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key, 0 , $iv);
+        $encryptedData =  openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key, self::OPENSSL_RAW_DATA , $iv);
         return base64_encode($encryptedData);
     }
 
@@ -21,15 +22,14 @@ class kEncryptFileUtils
     {
         $cipherText = base64_decode($cipherText);
         $iv = substr($iv,0, openssl_cipher_iv_length(self::ENCRYPT_METHOD));
-        return openssl_decrypt($cipherText, self::ENCRYPT_METHOD, $key, 0, $iv);
+        return openssl_decrypt($cipherText, self::ENCRYPT_METHOD, $key, self::OPENSSL_RAW_DATA, $iv);
     }
 
     public static function getEncryptedFileContent($fileName, $key = null, $iv = null, $from_byte = 0, $len = 0)
     {
         if (!$key)
             return kFileBase::getFileContent($fileName, $from_byte, $len);
-        if (!self::checkFileSizeForEncryption($fileName))
-            return null;
+
         $data = kFileBase::getFileContent($fileName);
         $plainData = self::decryptData($data, $key, $iv);
         $len = min($len,0);
@@ -46,8 +46,6 @@ class kEncryptFileUtils
 
     public static function encryptFile($fileName, $key, $iv)
     {
-        if (!self::checkFileSizeForEncryption($fileName))
-            return false;
         $data = kFileBase::getFileContent($fileName);
         self::setEncryptedFileContent($fileName, $key, $iv, $data);
         return true;
@@ -60,11 +58,6 @@ class kEncryptFileUtils
         $data = self::getEncryptedFileContent($filename, $key, $iv, 0, -1);
         return strlen($data);
     }
-    
-    private static function checkFileSizeForEncryption($filename)
-    {
-        $maxFileSize = kConf::get('max_file_size_for_encryption');
-        return (kFileBase::fileSize($filename) < $maxFileSize);
-    }
+
     
 }

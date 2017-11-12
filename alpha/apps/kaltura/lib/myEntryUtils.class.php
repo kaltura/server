@@ -749,6 +749,7 @@ class myEntryUtils
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
+		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
 		
 		
 		// remark added so ffmpeg will try to load the thumbnail from the original source
@@ -867,8 +868,7 @@ class myEntryUtils
 			}
 								    
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-
-			$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
+			
 			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
 			{
 				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
@@ -935,7 +935,9 @@ class myEntryUtils
 
 		if ($isEncryptionNeeded)
 		{
-			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
+			$maxFileSize = kConf::get('max_file_size_for_encryption', 'local', FileSync::MAX_FILE_SIZE_FOR_ENCRYPTION);
+			if (filesize($finalThumbPath) < $maxFileSize)
+				$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
 				
 		return $finalThumbPath;
