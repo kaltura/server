@@ -27,7 +27,9 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 
 		$c =  KalturaCriteria::create(KuserKgroupPeer::OM_CLASS);
 		$c->addAnd ( KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
-		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId(), Criteria::EQUAL );
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if($partnerId)
+			$c->addAnd ( KuserKgroupPeer::PARTNER_ID, $partnerId, Criteria::EQUAL );
 		self::$s_criteria_filter->setFilter($c);
 	}
 
@@ -99,7 +101,33 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 
 		return self::$kgroupIdsByKuserId[$kuserId];
 	}
-	
+
+	/**
+	 * @param $kuserId
+	 * @param $partnerId
+	 * @return array|mixed
+	 */
+	public static function retrieveKgroupIdsByKuserIdAndPartnerId($kuserId, $partnerId)
+	{
+		if (isset(self::$kgroupIdsByKuserId[$kuserId])){
+			return self::$kgroupIdsByKuserId[$kuserId];
+		}
+
+		$c = new Criteria();
+		$c->add(KuserKgroupPeer::KUSER_ID, array($kuserId), Criteria::IN);
+		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, $partnerId, Criteria::EQUAL );
+		$kuserKgroups = KuserKgroupPeer::doSelect($c);
+
+		$kgroupIds = array();
+		foreach ($kuserKgroups as $kuserKgroup){
+			/* @var $kuserKgroup KuserKgroup */
+			$kgroupIds[] = $kuserKgroup->getKgroupId();
+		}
+
+		self::$kgroupIdsByKuserId[$kuserId] = $kgroupIds;
+		return $kgroupIds;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */

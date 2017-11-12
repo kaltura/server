@@ -647,7 +647,9 @@ class kKavaReportsMgr extends kKavaBase
         }
         
         // Note: using a larger threshold since topN is approximate
-        $threshold = max(self::MIN_THRESHOLD, min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2));
+        $intervalDays = intval((self::dateIdToUnixtime($input_filter->to_day) - self::dateIdToUnixtime($input_filter->from_day)) / 86400) + 1;
+        $threshold = max($intervalDays * 30, $page_size * $page_index * 2);		// 30 ~ 10000 / 365, i.e. an interval of 1Y gets a minimum threshold of 10000
+        $threshold = max(self::MIN_THRESHOLD, min(self::MAX_RESULT_SIZE, $threshold));
         
         if (isset(self::$non_linear_metrics[$order_by]))
         {
@@ -949,10 +951,15 @@ class kKavaReportsMgr extends kKavaBase
    private static function getMetrics($report_type) {
        return self::$reports_def[$report_type][self::REPORT_METRICS];
    }
+   
+   private static function isDateIdValid($date_id)
+   {
+       return strlen($date_id) >= 8 && preg_match('/^\d+$/', substr($date_id, 0, 8));
+   }
     
    private static function dateIdToInterval($date_id, $offset, $end_of_the_day = false) 
    {
-       if (strlen($date_id) < 8 || !preg_match('/^\d+$/', substr($date_id, 0, 8)))
+       if (!self::isDateIdValid($date_id))
        {
           return null;
        }
@@ -966,6 +973,19 @@ class kKavaReportsMgr extends kKavaBase
        
        return "$year-$month-$day$time$timezone_offset";
        
+   }
+   
+   private static function dateIdToUnixtime($date_id)
+   {
+       if (!self::isDateIdValid($date_id))
+       {
+           return null;
+       }
+   	
+       $year = substr($date_id, 0, 4);
+       $month = substr($date_id, 4, 2);
+       $day = substr($date_id, 6, 2);
+       return gmmktime(0, 0, 0, $month, $day, $year);
    }
    
    // shift date by tz offset
