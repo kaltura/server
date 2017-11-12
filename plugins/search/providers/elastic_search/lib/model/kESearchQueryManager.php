@@ -83,16 +83,21 @@ class kESearchQueryManager
 	{
 		$exactMatch = array();
 		$queryType = self::TERM_KEY;
+		$termKey = self::VALUE_KEY;
 		$fieldSuffix = '';
 
+
 		if (in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
+		{
 			$queryType = self::MATCH_PHRASE_KEY;
+			$termKey = self::QUERY_KEY;
+		}
 
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
 		$exactMatch[$queryType] = array
 			( $fieldName . $fieldSuffix => array
-				(self::QUERY_KEY => $searchTerm, self::BOOST_KEY => $fieldBoostFactor)
+				($termKey => $searchTerm, self::BOOST_KEY => $fieldBoostFactor)
 			);
 
 		return $exactMatch;
