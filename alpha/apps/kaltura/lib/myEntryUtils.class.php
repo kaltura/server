@@ -42,22 +42,23 @@ class myEntryUtils
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$thumbAsset->incrementVersion();
 		$thumbAsset->save();
+
+		//getting the data for the thumbnail before moving to SyncKey in case of encryption
+		list($width, $height, $type, $attr) = getimagesize($fileLocation);
+		$ext = pathinfo($fileLocation, PATHINFO_EXTENSION);
+		$size = filesize($fileLocation);
 		
 		$fileSyncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($fileLocation, $fileSyncKey);
 
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
-		$ext = pathinfo($finalPath, PATHINFO_EXTENSION);		
-		$thumbAsset->setFileExt($ext);				
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
 		$thumbAsset->setWidth($width);
 		$thumbAsset->setHeight($height);
-		$thumbAsset->setSize(filesize($finalPath));
-		
+		$thumbAsset->setFileExt($ext);
+		$thumbAsset->setSize($size);
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
-		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);		
 		
+		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $entry);
 	}
 	
@@ -685,7 +686,7 @@ class myEntryUtils
 	
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -738,9 +739,14 @@ class myEntryUtils
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 			return $finalThumbPath;
 		}
+
+		/* @var  $fileSync FileSync*/
+		if ($fileSync)
+			$orig_image_path = $fileSync->getFullPath();
 		
-		if($orig_image_path === null || !file_exists($orig_image_path))
+		if ($orig_image_path === null || !file_exists($orig_image_path))
 		{
+			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
 		
@@ -862,6 +868,13 @@ class myEntryUtils
 								    
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 
+			$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
+			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
+			{
+				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
+				KalturaLog::debug("Creating Clear file at [$orig_image_path] for image conversion");
+			}
+
 			kFile::fullMkdir($processingThumbPath);
 			if ($crop_provider)
 			{
@@ -881,6 +894,15 @@ class myEntryUtils
 
 				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 			}
+
+
+			if ($isEncryptionNeeded)
+			{
+				$fileSync->deleteTempClear();
+				if (self::isTempFile($orig_image_path))
+					unlink($orig_image_path);
+			}
+
 			
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
@@ -895,7 +917,6 @@ class myEntryUtils
 					
 				imagecopy($im, $srcIm, $w * $vid_slice, 0, 0, 0, $w, $h);
 				imagedestroy($srcIm);
-					
 				++$vid_slice;
 			}
 		}
@@ -911,8 +932,28 @@ class myEntryUtils
 		
 		if ($cache)
 			$cache->delete($cacheLockKey);
+
+		if ($isEncryptionNeeded)
+		{
+			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
+		}
 				
 		return $finalThumbPath;
+	}
+
+	private static function isTempFile($filePath)
+	{
+		return kString::endsWith($filePath, self::TEMP_FILE_POSTFIX);
+	}
+	
+	private static function encryptThumb($thumbPath, $key, $iv)
+	{
+		if (!kEncryptFileUtils::encryptFile($thumbPath, $key, $iv))
+			return $thumbPath;
+		$encryptedPath = kFileUtils::addEncryptToFileName($thumbPath);
+		kFile::moveFile($thumbPath, $encryptedPath);
+		KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$key] and iv [$iv]");
+		return $encryptedPath;
 	}
 
 
@@ -1153,6 +1194,14 @@ class myEntryUtils
 			$videoRotation = $mediaInfo->getVideoRotation();
 
 		return $videoRotation;
+	}
+
+	public static function getEntryLocalImageFileSync(entry $entry, $version = null)
+	{
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$entryImageKey = $entry->getSyncKey($sub_type, $version);
+		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey);
+		return ($local ? $file_sync : null);
 	}
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )

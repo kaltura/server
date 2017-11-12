@@ -586,7 +586,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				return true;
 			}
-			
+
 		return false;
 	}
 
@@ -676,7 +676,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$entry->save();
 			}
 		}
-		
+
 		return true;
 	}
 

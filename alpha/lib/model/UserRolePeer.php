@@ -109,7 +109,7 @@ class UserRolePeer extends BaseUserRolePeer
 	public static function getByNameAndPartnerId($roleName, $partnerId)
 	{
 		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$c->addAnd(UserRolePeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN);
 		$c->addAnd(UserRolePeer::NAME, $roleName, Criteria::EQUAL);
 		$c->addAnd(UserRolePeer::STATUS, UserRoleStatus::DELETED, Criteria::NOT_EQUAL);
 		UserRolePeer::setUseCriteriaFilter(false);

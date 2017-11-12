@@ -354,6 +354,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
  * @var int
  */
 	public $defaultLiveStreamSegmentDuration;
+
+	/**
+	 * @var string
+	 */
+	public $eSearchLanguages;
 	
 	
 	private static $map_between_objects = array
@@ -423,7 +428,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	    "timeAlignedRenditions",
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
-		"defaultLiveStreamSegmentDuration"
+		"defaultLiveStreamSegmentDuration",
+		"eSearchLanguages"
 	);
 
 	public function getMapBetweenObjects()
@@ -458,6 +464,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		if($this->liveDeliveryProfileIds) {
 			$this->liveDeliveryProfileIds = json_encode($this->liveDeliveryProfileIds);
+		}
+		if($this->eSearchLanguages) {
+			$this->eSearchLanguages = json_encode($this->eSearchLanguages);
 		}
 	}
 	
@@ -518,7 +527,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		} else {
 			$object_to_fill->setLiveDeliveryProfileIds(json_decode($this->liveDeliveryProfileIds, true));
 		}
-		
+
+		if(empty($this->eSearchLanguages)) {
+			$object_to_fill->setESearchLanguages(array());
+		} else {
+			$object_to_fill->setESearchLanguages(json_decode($this->eSearchLanguages, true));
+		}
+
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{
 		    $parentPartnerDb = PartnerPeer::retrieveByPK($this->partnerParentId);

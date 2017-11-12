@@ -157,8 +157,8 @@ class ESearchService extends KalturaBaseService
 				throw new kESearchException(KalturaESearchErrors::INVALID_METADATA_FORMAT);
 			case kESearchException::INVALID_METADATA_FIELD:
 				throw new kESearchException(KalturaESearchErrors::INVALID_METADATA_FIELD, $data['fieldName']);
-			case kESearchException::INVALID_MIXED_SERACH_TYPES:
-				throw new kESearchException(KalturaESearchErrors::INVALID_MIXED_SERACH_TYPES, $data['fieldName'], $data['fieldValue']);
+			case kESearchException::INVALID_MIXED_SEARCH_TYPES:
+				throw new kESearchException(KalturaESearchErrors::INVALID_MIXED_SEARCH_TYPES, $data['fieldName'], $data['fieldValue']);
 
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);

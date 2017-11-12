@@ -431,6 +431,10 @@ class entryPeer extends BaseentryPeer
 			$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
 
+		//we need to set the filter before getDisableEntitlementForEntry since otherwise the partner criteria will not be added to $c,
+		//it will be added to some other criteria object which will get disposed once setFilter is called
+		self::$s_criteria_filter->setFilter($c);
+
 		if($ks && count($ks->getDisableEntitlementForEntry()))
 		{
 			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::IN);
@@ -449,7 +453,6 @@ class entryPeer extends BaseentryPeer
 		if($critEntitled)
 			$c->addAnd ($critEntitled);
 
-		self::$s_criteria_filter->setFilter($c);
 	}
 
 	public static function getDefaultCriteriaFilter()

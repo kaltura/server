@@ -9,6 +9,11 @@ class kFileSyncDescriptor
 	 * @var string
 	 */
 	private $fileSyncLocalPath;
+
+	/**
+	 * @var string
+	 */
+	private $fileEncryptionKey;
 	
 	/**
 	 * @var string
@@ -20,13 +25,21 @@ class kFileSyncDescriptor
 	 * @var int
 	 */
 	private $fileSyncObjectSubType;
-	
+
 	/**
 	 * @return the $fileSyncLocalPath
 	 */
 	public function getFileSyncLocalPath() 
 	{
 		return $this->fileSyncLocalPath;
+	}
+
+	/**
+	 * @return string $fileEncryptionKey
+	 */
+	public function getFileEncryptionKey()
+	{
+		return $this->fileEncryptionKey;
 	}
 
 	/**
@@ -43,6 +56,14 @@ class kFileSyncDescriptor
 	public function setFileSyncLocalPath($fileSyncLocalPath) 
 	{
 		$this->fileSyncLocalPath = $fileSyncLocalPath;
+	}
+
+	/**
+	 * @param string $fileEncryptionKey
+	 */
+	public function setFileEncryptionKey($fileEncryptionKey)
+	{
+		$this->fileEncryptionKey = $fileEncryptionKey;
 	}
 
 	/**
@@ -66,4 +87,11 @@ class kFileSyncDescriptor
 	public function setFileSyncObjectSubType($fileSyncObjectSubType) {
 		$this->fileSyncObjectSubType = $fileSyncObjectSubType;
 	}	
+	
+	public function setPathAndKeyByFileSync(FileSync $fileSync)
+	{
+		$this->fileSyncLocalPath = $fileSync->getFullPath();
+		if ($fileSync->isEncrypted())
+			$this->fileEncryptionKey = $fileSync->getEncryptionKey();
+	}
 }

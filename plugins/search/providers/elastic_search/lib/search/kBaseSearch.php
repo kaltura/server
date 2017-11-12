@@ -8,10 +8,12 @@ abstract class kBaseSearch
 {
     protected $elasticClient;
     protected $query;
+    protected $queryAttributes;
 
     public function __construct()
     {
         $this->elasticClient = new elasticClient();
+        $this->queryAttributes = new ESearchQueryAttributes();
     }
 
     public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager = null, ESearchOrderBy $order = null);
@@ -20,7 +22,7 @@ abstract class kBaseSearch
 
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
-        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $eSearchOperator->getOperator());
+        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->applyElasticSearchConditions($subQuery);
         KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
         $result = $this->elasticClient->search($this->query);
@@ -30,6 +32,7 @@ abstract class kBaseSearch
     protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
+        $this->initQueryAttributes($partnerId);
         $this->initBasePartnerFilter($partnerId, $statuses);
         $this->initPager($pager);
         $this->initOrderBy($order);
@@ -98,6 +101,27 @@ abstract class kBaseSearch
     protected function applyElasticSearchConditions($conditions)
     {
         $this->query['body']['query']['bool']['must'] = array($conditions);
+    }
+
+    protected function initQueryAttributes($partnerId)
+    {
+        $this->initPartnerLanguages($partnerId);
+    }
+
+    protected function initPartnerLanguages($partnerId)
+    {
+        $partner = PartnerPeer::retrieveByPK($partnerId);
+        if(!$partner)
+            return;
+
+        $partnerLanguages = $partner->getESearchLanguages();
+        if(!count($partnerLanguages))
+        {
+            //if no languages are set for partner - set the default to english
+            $partnerLanguages = array('english');
+        }
+
+        $this->queryAttributes->setPartnerLanguages($partnerLanguages);
     }
 
 }
