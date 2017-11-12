@@ -49,11 +49,11 @@ class kESearchQueryManager
 		$multiMatch = array();
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
 		$rawBoostFactor = 3 * $fieldBoostFactor;
-		$multiMatchFileBoostFactor = 2 * $fieldBoostFactor;
+		$multiMatchFieldBoostFactor = 2 * $fieldBoostFactor;
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::QUERY_KEY] = $searchItem->getSearchTerm();
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY] = array(
 			$fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor,
-			$fieldName.'^'.$multiMatchFileBoostFactor,
+			$fieldName.'^'.$multiMatchFieldBoostFactor,
 		);
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::TYPE_KEY] = self::MOST_FIELDS;
 
@@ -64,7 +64,7 @@ class kESearchQueryManager
 			{
 				$mappingLanguageField = elasticSearchUtils::getAnalyzedFieldName($language, $fieldName, $searchItem->getItemMappingFieldsDelimiter());
 				if($mappingLanguageField)
-					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^'.$multiMatchFileBoostFactor;
+					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^'.$multiMatchFieldBoostFactor;
 			}
 		}
 
