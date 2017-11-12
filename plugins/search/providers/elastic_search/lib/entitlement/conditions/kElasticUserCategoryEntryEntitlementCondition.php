@@ -98,6 +98,8 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
             )
         );
 
+        $body['_source'] = false;
+
         if(kEntryElasticEntitlement::$entryInSomeCategoryNoPC)
         {
             $body['query']['bool']['filter'][1]['bool']['should'][] = array(
@@ -126,7 +128,7 @@ class kElasticUserCategoryEntryEntitlementCondition extends kElasticBaseEntitlem
         if($privacy) //privacy is an array
         {
             $privacy = array_map('elasticSearchUtils::formatSearchTerm', $privacy);
-            $body['query']['bool']['filter'][] = array('terms' => array('privacy' => $privacy));
+            $body['query']['bool']['filter'][1]['bool']['should'][] = array('terms' => array('privacy' => $privacy));
         }
 
         $params['body'] = $body;
