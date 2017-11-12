@@ -373,7 +373,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				if(!$audioCodec)
 					$audioCodec = "und";
 				
-				$isDefaultAudio = $this->isDefaultAudio($audioLanguage, $audioLanguageName, $audioLabel);
+				if($this->params->getDefaultAudioLanguage())
+					$isDefaultAudio = $this->isDefaultAudio($audioLanguage, $audioLanguageName, $audioLabel);
+				else
+					$isDefaultAudio = $flavor->getIsDefault();
 			}
 		}
 		if (!$ext)
