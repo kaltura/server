@@ -28,8 +28,7 @@ class kEncryptFileUtils
     {
         if (!$key)
             return kFileBase::getFileContent($fileName, $from_byte, $len);
-        if (!self::checkFileSizeForEncryption($fileName))
-            return null;
+
         $data = kFileBase::getFileContent($fileName);
         $plainData = self::decryptData($data, $key, $iv);
         $len = min($len,0);
@@ -46,8 +45,6 @@ class kEncryptFileUtils
 
     public static function encryptFile($fileName, $key, $iv)
     {
-        if (!self::checkFileSizeForEncryption($fileName))
-            return false;
         $data = kFileBase::getFileContent($fileName);
         self::setEncryptedFileContent($fileName, $key, $iv, $data);
         return true;
@@ -60,11 +57,6 @@ class kEncryptFileUtils
         $data = self::getEncryptedFileContent($filename, $key, $iv, 0, -1);
         return strlen($data);
     }
-    
-    private static function checkFileSizeForEncryption($filename)
-    {
-        $maxFileSize = kConf::get('max_file_size_for_encryption');
-        return (kFileBase::fileSize($filename) < $maxFileSize);
-    }
+
     
 }
