@@ -5,6 +5,8 @@
  */
 class kESearchQueryManager
 {
+	const BOOST_KEY = 'boost';
+	const VALUE_KEY = 'value';
 	const BODY_KEY = 'body';
 	const BOOL_KEY = 'bool';
 	const SHOULD_KEY = 'should';
@@ -87,7 +89,12 @@ class kESearchQueryManager
 			$queryType = self::MATCH_PHRASE_KEY;
 
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
-		$exactMatch[$queryType] = array( $fieldName . $fieldSuffix => $searchTerm);
+		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
+		$exactMatch[$queryType] = array
+			( $fieldName . $fieldSuffix => array
+				(self::QUERY_KEY => $searchTerm, self::BOOST_KEY => $fieldBoostFactor)
+			);
+
 		return $exactMatch;
 	}
 
@@ -101,7 +108,11 @@ class kESearchQueryManager
 			$fieldSuffix = '.'.self::RAW_FIELD_SUFFIX;
 
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
-		$prefixQuery[$queryType] = array( $fieldName . $fieldSuffix => $searchTerm);
+		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
+		$prefixQuery[$queryType] = array
+			( $fieldName . $fieldSuffix => array
+				(self::VALUE_KEY=> $searchTerm, self::BOOST_KEY => $fieldBoostFactor)
+			);
 
 		return $prefixQuery;
 	}
