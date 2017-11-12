@@ -501,16 +501,26 @@ class kJobsManager
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}
-			
+
+
+
+
 		// creates convert data
 		$convertData = new kConvertJobData();
 		$convertData->setSrcFileSyncs($srcFileSyncs);
+		$sourcePath = $convertData->getSrcFileSyncLocalPath();
+		if(kFile::isFileTypeText($sourcePath))
+		{
+			KalturaLog::err("Source file is of type text for flavor id [$flavorAssetId]");
+			return null;
+		}
+
 		$convertData->setMediaInfoId($mediaInfoId);
 		$convertData->setFlavorParamsOutputId($flavor->getId());
 		$convertData->setFlavorAssetId($flavorAssetId);
 		$convertData->setConversionProfileId($conversionProfileId);
 		$convertData->setPriority($priority);
-		
+
 		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
 		if(!$dbCurrentConversionEngine)
 			return null;
