@@ -200,7 +200,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
 		}
 
-		if ($this->getViewMode() == ViewMode::ALLOW_ALL && ($dbObject->getLiveStatus() != KalturaEntryServerNodeStatus::STOPPED))
+		if ($dbObject->getViewMode() == ViewMode::ALLOW_ALL && ($dbObject->getLiveStatus() != KalturaEntryServerNodeStatus::STOPPED))
 		{
 			$this->redirectEntryId = null;
 		}
