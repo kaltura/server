@@ -504,7 +504,7 @@ class kFile extends kFileBase
 			$fileBrief = shell_exec('file -b ' . $realPath);
 			if(kString::beginsWith($fileBrief,self::MO_PATTERN))
 				$fileType = 'application/mo';
-			else if(strpos($fileBrief,self::TEXT)!== false)
+			else if(strpos($fileBrief,"ASCII text")!== false)
 				$fileType = self::TEXT;
 		}
 		return $fileType;
