@@ -454,12 +454,12 @@ abstract class LiveEntry extends entry
 	 */
 	public function isCurrentlyLive($currentDcOnly = false)
 	{
-		if ($this->getExplicitLive())
+		if ($this->getViewMode() == ViewMode::PREVIEW)
 		{
 			$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
 			$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
 			$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-			if ($this->getViewMode() == ViewMode::PREVIEW && !$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+			if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
 				return false;
 		}
 
@@ -972,22 +972,6 @@ abstract class LiveEntry extends entry
 	public function setRecordingStatus($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
-	}
-
-	public function preSave(PropelPDO $con = null)
-	{
-		if($this->customDataValueHasChanged(self::CUSTOM_DATA_VIEW_MODE))
-		{
-			if ($this->getViewMode() == ViewMode::ALLOW_ALL)
-			{
-				$this->setRedirectEntryId(null);
-			}
-			else
-			{
-				$this->setRedirectEntryId($this->getRecordedEntryId());
-			}
-		}
-		return parent::preSave($con);
 	}
 
 }
