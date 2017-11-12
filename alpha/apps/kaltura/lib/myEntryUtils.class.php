@@ -948,10 +948,11 @@ class myEntryUtils
 	
 	private static function encryptThumb($thumbPath, $key, $iv)
 	{
+		if (!kEncryptFileUtils::encryptFile($thumbPath, $key, $iv))
+			return $thumbPath;
 		$encryptedPath = kFileUtils::addEncryptToFileName($thumbPath);
-		KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$key] and iv [$iv]");
 		kFile::moveFile($thumbPath, $encryptedPath);
-		kEncryptFileUtils::encryptFile($encryptedPath, $key, $iv);
+		KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$key] and iv [$iv]");
 		return $encryptedPath;
 	}
 
