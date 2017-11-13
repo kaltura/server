@@ -5,6 +5,10 @@
  */
 abstract class ESearchItem extends BaseObject
 {
+	/**
+	 * @var array
+	 */
+	protected static $field_boost_values = array();
 
 	/**
 	 * @var ESearchItemType
@@ -77,6 +81,25 @@ abstract class ESearchItem extends BaseObject
 		return array();
 	}
 
-	abstract public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null);
+	abstract public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null);
 
+	abstract public function shouldAddLanguageSearch();
+
+	abstract public function getItemMappingFieldsDelimiter();
+
+
+	/**
+	 * @param $fieldName
+	 * @return int
+	 */
+	public static function getFieldBoostFactor($fieldName)
+	{
+		$result = 1;
+		if(array_key_exists($fieldName, static::$field_boost_values))
+		{
+			$result = static::$field_boost_values[$fieldName];
+		}
+
+		return $result;
+	}
 }

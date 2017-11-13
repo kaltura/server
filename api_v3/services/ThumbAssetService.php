@@ -525,13 +525,16 @@ class ThumbAssetService extends KalturaAssetService
 			$filePath, 
 			$thumbParams->density, 
 			$thumbParams->stripProfiles, 
-			null);
+			null, null,
+			$fileSync);
 		
 		if($options && $options->download)
 			header("Content-Disposition: attachment; filename=\"$fileName\"");
 			
 		$mimeType = kFile::mimeType($tempThumbPath);
-		return $this->dumpFile($tempThumbPath, $mimeType); 
+		$key = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
+		$iv = $key ? $entry->getEncryptionIv() : null;
+		return $this->dumpFile($tempThumbPath, $mimeType, $key, $iv);
 	}
 	
 	/**
@@ -883,17 +886,19 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->save();
 		
 		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+
+		//extract the data before moving the file in case of encryption
+		list($width, $height, $type, $attr) = getimagesize($fileData["tmp_name"]);
+		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
+
 		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
-		
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
 		
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
-		$dbThumbAsset->setSize(filesize($finalPath));
+		$dbThumbAsset->setSize($fileSize);
 		$dbThumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
-		
+
 		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
     		
  		//If the thums has the default tag or the entry is in no content and this is the first thumb

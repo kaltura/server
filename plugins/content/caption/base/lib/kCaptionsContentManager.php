@@ -134,7 +134,7 @@ abstract class kCaptionsContentManager
 		}
 	}
 	
-	public static function addParseMultiLanguageCaptionAssetJob($captionAsset, $fileLocation)
+	public static function addParseMultiLanguageCaptionAssetJob($captionAsset, $fileLocation, $key = null)
 	{
 		$batchJob = new BatchJob();
 
@@ -145,6 +145,7 @@ abstract class kCaptionsContentManager
 		$jobData->setMultiLanaguageCaptionAssetId($id);
 		$jobData->setEntryId($entryId);
 		$jobData->setFileLocation($fileLocation);
+		$jobData->setFileEncryptionKey($key);
 
 		$jobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);

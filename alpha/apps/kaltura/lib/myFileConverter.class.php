@@ -532,6 +532,15 @@ class myFileConverter
 		@list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
 		return array ( $sourcewidth , $sourceheight );
 	}
+
+	public static function getImageDimensionsFromString($imgStr)
+	{
+		$image = imagecreatefromstring($imgStr);
+		$width = imagesx($image);
+		$height = imagesy($image);
+		imagedestroy($image);
+		return array($width, $height);
+	}
 	
 	public static function createLogFileName ( $source_file , $plain_log_file_name = false )
 	{
