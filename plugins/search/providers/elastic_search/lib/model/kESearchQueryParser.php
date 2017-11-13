@@ -64,7 +64,7 @@ class kESearchQueryParser
 	{
 		$aValid = array('_',' ');
 		$query = str_replace($aValid, 'A', $eSearchQuery);
-		return ctype_alnum(str_replace($aValid, '', $query));
+		return preg_match('/^[\p{L}\p{N} -]+$/u', $query);
 	}
 
 	/**
