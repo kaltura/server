@@ -60,8 +60,6 @@ class ESearchEntryItem extends ESearchItem
 		'creator_puser_id' => 50,
 		'entitled_pusers_edit' => 50,
 		'entitled_pusers_publish' => 50,
-		'display_in_search' => 10,
-		'admin_tags' => 100,
 	);
 
 	private static $multiLanguageFields = array(
