@@ -116,8 +116,8 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 	private function partnerNotInExcludeList()
 	{
 		return kConf::hasParam('metadata_list_without_object_filtering_partners') &&
-			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners') && 
-				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID);
+			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
+				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID;
 	}
 	
 	public function getObjectIdsFiltered()
