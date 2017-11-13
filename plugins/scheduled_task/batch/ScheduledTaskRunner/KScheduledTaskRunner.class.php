@@ -130,10 +130,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 						$objectsData[$object->userId] = array($idAndName);
 					}
 				}
-			}
 
-			if ($isMediaRepurposingProfile)
-				$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
+				if ($isMediaRepurposingProfile)
+					$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
+			}
 
 			if (!$isMediaRepurposingProfile)
 				$pager->pageIndex++;
