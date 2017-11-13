@@ -93,7 +93,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		
 		if ($this->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
-			$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
+			$objectIds = !empty($objectIds) ? entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId()) : array();
 		}
 		elseif($this->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{
