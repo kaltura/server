@@ -142,9 +142,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return $entry;
 	}
 
-	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true)
+	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true, $flavorParamsId = null)
 	{
-		$flavorParamsId = $dbAsset->getFlavorParamsId();
+		if ($dbAsset)
+			$flavorParamsId = $dbAsset->getFlavorParamsId();
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
 
 		// is first chunk
@@ -163,7 +164,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset->setFlavorParamsId($flavorParams->getId());
 		$recordedAsset->setFromAssetParams($flavorParams);
 		$recordedAsset->incrementVersion();
-		if ($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
+		if ($dbAsset && $dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 		{
 			$recordedAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
 		}
@@ -484,7 +485,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
 		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
-		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile);
+		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile, $flavorParamsId);
 	}
 
 	/**
