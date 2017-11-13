@@ -502,9 +502,6 @@ class kJobsManager
 			}
 		}
 
-
-
-
 		// creates convert data
 		$convertData = new kConvertJobData();
 		$convertData->setSrcFileSyncs($srcFileSyncs);
