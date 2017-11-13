@@ -92,7 +92,11 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 		
-		if($this->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
+		if ($this->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
+		{
+			$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
+		}
+		elseif($this->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{
 			$kusers = !empty($objectIds) ? kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds) : array();
 			$objectIds = array();
