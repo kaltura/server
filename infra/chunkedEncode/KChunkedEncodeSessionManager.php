@@ -531,6 +531,16 @@
 			if($job->state==$job::STATE_PENDING || $job->state==$job::STATE_RUNNING) {
 				return true;
 			}
+			$logStr = "Job dump:".serialize($job);
+			$logFilename = $this->chunker->getChunkName($job->id,".log");
+			if(file_exists($logFilename)) {
+				$fHd = fopen($logFilename,"r");
+				$fileSz = filesize($logFilename);
+				if($fileSz>5000)
+					fseek($fHd,$fileSz-5000);
+				$logStr.= "\nLog dump:\n".fread($fHd, 5000);
+			}
+			KalturaLog::log($logStr);
 			if(isset($job->attempt) && $job->attempt>$this->maxRetries){
 				KalturaLog::log("FAILED - job id($job->id) exeeded retry limit ($job->attempt, max:$this->maxRetries)");
 				return false;
