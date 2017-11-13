@@ -1156,6 +1156,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
 		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
+		$this->deliveryAttributes->setDefaultAudioLanguage($this->getRequestParameter("defaultAudioLang"));
 
 		if ( in_array($this->deliveryAttributes->getFormat(), array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::AKAMAI_HDS)) )
 			$this->deliveryAttributes->setSequence($this->getRequestParameter("sequence"));

@@ -101,6 +101,13 @@ class KalturaFlavorAsset extends KalturaAsset
 	 */
 	public $label;
 	
+	/**
+	 * Is default flavor asset of the entry (This field will be taken into account selectign which audio flavor will be selected as default)
+	 *
+	 * @var KalturaNullableBoolean
+	 */
+	public $isDefault;
+	
 	private static $map_between_objects = array
 	(
 		"flavorParamsId",
@@ -115,6 +122,7 @@ class KalturaFlavorAsset extends KalturaAsset
 		"status",
 		"language",
 		"label",
+		"isDefault" => "default",
 	);
 	
 	public function getMapBetweenObjects ( )

@@ -160,6 +160,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			list($audioLanguage, $audioLanguageName) = $audioLanguageData;
 			$flavor['audioLanguage'] = $audioLanguage;
 			$flavor['audioLanguageName'] =  $audioLanguageName;
+			$flavor['defaultAudio'] = $this->isDefaultAudio($audioLanguage, $audioLanguageName);
 		}
 	}
 	
@@ -202,9 +203,29 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
 	public function compareFlavors($a, $b) 
 	{
-	    if ($a['bitrate'] == $b['bitrate']) {
+		$isAudio1 = isset($a['audioLanguage']) && isset($a['audioLanguageName']);
+		$isAudio2 = isset($b['audioLanguage']) && isset($b['audioLanguageName']);
+		
+		if ($isAudio1 != $isAudio2)
+		{
+			return $isAudio1 ? -1 : 1;
+		}
+		
+		//Move all Dolby audio flavors to the beginning of the audio flavors list
+		if($isAudio1 == true)
+		{
+			if(isset($flavor1['defaultAudio']) && $flavor1['defaultAudio'] == true)
+				return -1;
+			
+			if(isset($flavor2['defaultAudio']) && $flavor2['defaultAudio'] == true)
+				return 1;
+		}
+		
+	    if ($a['bitrate'] == $b['bitrate']) 
+	    {
 	        return ($a['index'] < $b['index']) ? -1 : 1;
 	    }
+	    
 	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
 	}
 
