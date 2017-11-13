@@ -196,9 +196,11 @@ class KAsyncConvert extends KJobHandlerWorker
 			$actualFileSyncLocalPath = null;
 			$key = null;
 			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
-			if($srcFileSyncDescriptor) {
-				$key = $srcFileSyncDescriptor->fileEncryptionKey;
+			if($srcFileSyncDescriptor)
+			{
 				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+				if (is_file($actualFileSyncLocalPath))
+					$key = $srcFileSyncDescriptor->fileEncryptionKey;
 			}
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
