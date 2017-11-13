@@ -32,6 +32,15 @@ class ESearchCuePointItem extends ESearchItem
 		'cue_points.cue_point_explanation' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 	);
 
+	protected static $field_boost_values = array(
+		'cue_points.cue_point_id' => 50,
+		'cue_points.cue_point_name' => 50,
+		'cue_points.cue_point_text' => 50,
+		'cue_points.cue_point_tags' => 50,
+		'cue_points.cue_point_question' => 50,
+		'cue_points.cue_point_answers' => 50,
+	);
+
 	private static $multiLanguageFields = array();
 
 	/**

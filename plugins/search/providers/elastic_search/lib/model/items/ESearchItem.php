@@ -5,6 +5,10 @@
  */
 abstract class ESearchItem extends BaseObject
 {
+	/**
+	 * @var array
+	 */
+	protected static $field_boost_values = array();
 
 	/**
 	 * @var ESearchItemType
@@ -83,4 +87,19 @@ abstract class ESearchItem extends BaseObject
 
 	abstract public function getItemMappingFieldsDelimiter();
 
+
+	/**
+	 * @param $fieldName
+	 * @return int
+	 */
+	public static function getFieldBoostFactor($fieldName)
+	{
+		$result = 1;
+		if(array_key_exists($fieldName, static::$field_boost_values))
+		{
+			$result = static::$field_boost_values[$fieldName];
+		}
+
+		return $result;
+	}
 }
