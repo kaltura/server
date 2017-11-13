@@ -3,7 +3,10 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-abstract class KalturaESearchItem extends KalturaESearchBaseItem {
+abstract class KalturaESearchItem extends KalturaESearchBaseItem
+{
+
+	const MAX_SEARCH_TERM_LENGTH = 128;
 
 	/**
 	 * @var string
@@ -37,6 +40,12 @@ abstract class KalturaESearchItem extends KalturaESearchBaseItem {
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
+		if(strlen($this->searchTerm) > kESearchQueryManager::MAX_SEARCH_TERM_LENGTH)
+		{
+			$this->searchTerm = substr($this->searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH);
+			KalturaLog::log("Search term exceeded maximum allowed length, setting search term to [$this->searchTerm]");
+		}
+
 		$dynamicEnumMap = $this->getDynamicEnumMap();
 		if(isset($dynamicEnumMap[$this->getItemFieldName()]))
 		{
