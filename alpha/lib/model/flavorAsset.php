@@ -187,8 +187,8 @@ class flavorAsset extends exportableAsset
 	public function getLabel()  {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LABEL); }
 	public function setLabel($v){$this->putInCustomData(self::CUSTOM_DATA_FIELD_LABEL, $v);}
 	
-	public function getIsDefault()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, null, false);}
-	public function setIsDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
+	public function getDefault()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, null, false);}
+	public function setDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
 
 	/**
 	 * @param int $type

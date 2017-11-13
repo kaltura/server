@@ -122,7 +122,7 @@ class KalturaFlavorAsset extends KalturaAsset
 		"status",
 		"language",
 		"label",
-		"isDefault",
+		"isDefault" => "default",
 	);
 	
 	public function getMapBetweenObjects ( )
