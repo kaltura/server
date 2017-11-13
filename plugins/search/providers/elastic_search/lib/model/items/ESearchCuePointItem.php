@@ -33,11 +33,10 @@ class ESearchCuePointItem extends ESearchItem
 	);
 
 	protected static $field_boost_values = array(
-		'cue_points.cue_point_type' => 100,
-		'cue_points.cue_point_id' => 100,
-		'cue_points.cue_point_name' => 100,
-		'cue_points.cue_point_text' => 100,
-		'cue_points.cue_point_tags' => 100,
+		'cue_points.cue_point_id' => 50,
+		'cue_points.cue_point_name' => 50,
+		'cue_points.cue_point_text' => 50,
+		'cue_points.cue_point_tags' => 50,
 		'cue_points.cue_point_question' => 50,
 		'cue_points.cue_point_answers' => 50,
 	);

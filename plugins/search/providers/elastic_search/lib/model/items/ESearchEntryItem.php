@@ -55,6 +55,7 @@ class ESearchEntryItem extends ESearchItem
 		'name' => 100,
 		'description' => 100,
 		'tags' => 100,
+		'reference_id' => 100,
 		'puser_id' => 50,
 		'creator_puser_id' => 50,
 		'entitled_pusers_edit' => 50,
