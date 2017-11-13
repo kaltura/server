@@ -1,3 +1,72 @@
+# Mercury 13.7.0 #
+## File Encryption ##
+- Issue Type: Task
+- Issue ID: PLAT-7961
+
+### Configuration ###
+	-Add the following to Admin.ini:
+	moduls.FileEncryption.enabled = true
+	moduls.FileEncryption.permissionType = 2
+	moduls.FileEncryption.label = "Enable File Encryption"
+	moduls.FileEncryption.permissionName = FEATURE_CONTENT_ENCRYPTION
+	moduls.FileEncryption.group = GROUP_ENABLE_DISABLE_FEATURES
+	
+	-Add to local.ini:
+	encryption_iv = @DEFAULT_IV_16B@
+	Change the placeholder for 16 characters string 
+       
+### Deployment scripts ###
+	None.
+
+#### Known Issues & Limitations ####
+	None.
+	
+## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
+- Issue Type: Feature
+- Issue ID: PLAT-7977
+
+### Deployment scripts ###
+
+	Deploy Explicit Live Push notification:
+	1. Push notitifications:
+	   First replacae all tokens from in the XML file below and remove ".template" from the fle name:
+	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
+	
+	   Run deployment script:
+		1. php /opt/kaltura/app/deployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+			
+## eSearch Languages support  ##
+ - Issue Type: Task
+- Issue ID: KMS-14857
+
+### Configuration ###
+	-Add the following to Admin.ini:
+	access.search.all = SYSTEM_ADMIN_PUBLISHER_USAGE
+       
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
+## add consumer for asset custom data changes  ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8242
+
+### Configuration ###
+	-Add the following to base.ini:
+	event_consumers[] = kAssetPropertiesManager
+
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
 # Mercury 13.6.0 #
 
 ## Set Entry status to "preconvert" instead of "ready" (for specific partners) when uploading flv files from webcam  ##
