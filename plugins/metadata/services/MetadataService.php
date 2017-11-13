@@ -372,7 +372,10 @@ class MetadataService extends KalturaBaseService
 			$pager = new KalturaFilterPager ();
 		
 		$objectIds = $this->validateObjectIdFiltered($filter);
-		if(!count($objectIds) && $filter->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT)
+		if(!count($objectIds) && $filter->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT &&
+			kConf::hasParam('metadata_list_without_object_filtering_partners') && 
+			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
+			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 		{
 			$response = new KalturaMetadataListResponse();
 			$response->objects = new KalturaMetadataArray();
@@ -388,7 +391,7 @@ class MetadataService extends KalturaBaseService
 
 	private function validateObjectIdFiltered(KalturaMetadataFilter &$filter)
 	{
-		$objectIds = null;
+		$objectIds = array();
 		if ($filter->objectIdEqual)
 		{
 			$objectIds = array($filter->objectIdEqual);
@@ -398,7 +401,8 @@ class MetadataService extends KalturaBaseService
 			$objectIds = explode(',', $filter->objectIdIn);
 		}
 		
-		if($filter->metadataObjectTypeEqual != MetadataObjectType::ENTRY && kEntitlementUtils::getEntitlementEnforcement() && empty($objectIds) && kConf::hasParam('metadata_list_without_object_filtering_partners') &&
+		if( ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY || kEntitlementUtils::getEntitlementEnforcement()) && 
+			empty($objectIds) && kConf::hasParam('metadata_list_without_object_filtering_partners') &&
 			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
 			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
@@ -406,15 +410,13 @@ class MetadataService extends KalturaBaseService
 		$applyPartnerFilter = true;
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
-			$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
+			$objectIds = count($objectIds) ? entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId()) : array();
 			if(count($objectIds))
 				$applyPartnerFilter = false;
 		}
 		elseif($filter->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{
-			$kusers = array();
-			if($objectIds)
-				$kusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds);
+			$kusers = count($objectIds) ? kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds) : array();
 			$objectIds = array();
 			if(count($kusers))
 			{
@@ -424,9 +426,7 @@ class MetadataService extends KalturaBaseService
 		}
 		elseif($filter->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
-			$categories = array();
-			if($objectIds)
-				$categories = categoryPeer::retrieveByPKs($objectIds);
+			$categories = count($objectIds) ? categoryPeer::retrieveByPKs($objectIds) : array();
 			$objectIds = array();
 			if(count($categories))
 			{
