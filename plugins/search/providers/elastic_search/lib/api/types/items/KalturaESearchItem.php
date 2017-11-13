@@ -40,7 +40,7 @@ abstract class KalturaESearchItem extends KalturaESearchBaseItem
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
-		if(strlen($this->searchTerm) > kESearchQueryManager::MAX_SEARCH_TERM_LENGTH)
+		if(strlen($this->searchTerm) > self::MAX_SEARCH_TERM_LENGTH)
 		{
 			$this->searchTerm = substr($this->searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH);
 			KalturaLog::log("Search term exceeded maximum allowed length, setting search term to [$this->searchTerm]");
