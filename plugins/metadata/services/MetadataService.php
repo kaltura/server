@@ -416,7 +416,7 @@ class MetadataService extends KalturaBaseService
 		}
 		elseif($filter->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{
-			$kusers = count($objectIds) ? kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds): array();
+			$kusers = count($objectIds) ? kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds) : array();
 			$objectIds = array();
 			if(count($kusers))
 			{
