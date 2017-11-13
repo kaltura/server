@@ -64,7 +64,7 @@ class kFileUtils extends kFile
 	
 	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0, $key = null, $iv = null)
 	{
-		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size, $key, $iv);
+		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size, null, $key, $iv);
 		
 		$renderer->output();
 		
