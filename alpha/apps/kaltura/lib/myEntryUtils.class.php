@@ -772,6 +772,11 @@ class myEntryUtils
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
+		// limit creation of more than XX Imagemagick processes
+		if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
+			trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
+			KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+								    
 		$flavorAssetId = null;
 		$packagerRetries = 3;
 
@@ -857,16 +862,6 @@ class myEntryUtils
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 			
-			// limit creation of more than XX Imagemagick processes
-			if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
-				trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
-			{
-				if ($cache)
-					$cache->delete($cacheLockKey);
-				
-				KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
-			}
-								    
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			
 			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
