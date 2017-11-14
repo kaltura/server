@@ -4,7 +4,7 @@
  *
  * @package Scheduler
  */
-abstract class kbatchbase implements IKalturaLogger
+abstract class KBatchBase implements IKalturaLogger
 {
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
 	
