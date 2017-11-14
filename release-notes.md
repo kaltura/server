@@ -66,6 +66,20 @@
 #### Known Issues & Limitations ####
 		None.
 
+## add consumer for asset custom data changes  ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8242
+
+### Configuration ###
+	-Add the following to base.ini:
+	event_consumers[] = kAssetPropertiesManager
+
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
 # Mercury 13.6.0 #
 
 ## Set Entry status to "preconvert" instead of "ready" (for specific partners) when uploading flv files from webcam  ##
