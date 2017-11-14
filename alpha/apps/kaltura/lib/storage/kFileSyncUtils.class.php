@@ -969,7 +969,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
-			$pathArr = array($parent_file_sync->getFileRoot() , $parent_file_sync->getFilePath());
+			$pathArr = array($parent_file_sync->getFullPath());
 			return $pathArr;
 		}
 
@@ -1630,7 +1630,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$resolveFileSync = self::resolve($fileSync);
 		$path = $resolveFileSync->getFullPath();
 		KalturaLog::info("Resolve path [$path]");
-		kFileUtils::dumpFile($path);
+		kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv());
 	}
 
 	public static function dumpFileByFileSyncKey( FileSyncKey $key , $strict = false )
@@ -1645,6 +1645,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		$fileSync = self::getLocalFileSyncForKey($key);
 		return $fileSync->encrypt();
+	}
+
+	public static function getResolveLocalFileSyncForKey(FileSyncKey $key)
+	{
+		$fileSync = self::getLocalFileSyncForKey($key);
+		return self::resolve($fileSync);
 	}
 
 }

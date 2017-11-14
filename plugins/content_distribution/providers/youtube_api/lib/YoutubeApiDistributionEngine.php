@@ -511,8 +511,21 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$insertRequest = $youtube->captions->insert('snippet', $caption);
 	
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
-		$media->setFileSize(filesize($captionInfo->filePath));
-		$ingestedCaption = self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
+
+		if ($captionInfo->encryptionKey)
+		{
+			$tempPath = kbatchbase::createTempClearFile($captionInfo->filePath, $captionInfo->encryptionKey);
+			KalturaLog::info("Create temporary clear file [$tempPath] from original file path [$captionInfo->filePath] with key [$captionInfo->encryptionKey]");
+			$media->setFileSize(filesize($tempPath));
+			$ingestedCaption = self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
+			unlink($tempPath);
+		}
+			else
+		{
+			$media->setFileSize(filesize($captionInfo->filePath));
+			$ingestedCaption = self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
+		}
+
 
 		$youtube->getClient()->setDefer(false);
 		

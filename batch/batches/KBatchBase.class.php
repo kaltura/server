@@ -4,7 +4,7 @@
  *
  * @package Scheduler
  */
-abstract class KBatchBase implements IKalturaLogger
+abstract class kbatchbase implements IKalturaLogger
 {
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
 	
@@ -635,5 +635,16 @@ abstract class KBatchBase implements IKalturaLogger
 	function log($message)
 	{
 		KalturaLog::log($message);
+	}
+
+	public static function createTempClearFile($path, $key)
+	{
+		$iv = kConf::get("encryption_iv");
+		KalturaLog::debug("Key is: [$key] iv: [$iv] for path [$path]");
+		$plainData = kEncryptFileUtils::getEncryptedFileContent($path, $key, $iv);
+		$type = pathinfo($path, PATHINFO_EXTENSION);
+		$tempPath =  sys_get_temp_dir(). "/". $key . ".$type";
+		kFileBase::setFileContent($tempPath, $plainData);
+		return $tempPath;
 	}
 }
