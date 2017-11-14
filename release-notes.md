@@ -1,4 +1,17 @@
 # Mercury 13.7.0 #
+## New FFMPEG version ##
+- Issue Type: Security fix
+- Issue ID: Plat-8231
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+- New ffmpeg is located at nyStorage/web/content/shared/bin/ffmpeg-3.2-bin-p4-hls-local-path.tar.gz
+
+#### Known Issues & Limitations ####
+	None
+
 ## File Encryption ##
 - Issue Type: Task
 - Issue ID: PLAT-7961
