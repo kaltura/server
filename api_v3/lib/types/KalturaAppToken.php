@@ -73,6 +73,7 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	 * User id of KS (Kaltura Session) that created using the current token
 	 * 
 	 * @var string
+	 * @filter eq
 	 */
 	public $sessionUserId;
 
@@ -93,7 +94,13 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	 * @var KalturaAppTokenHashType
 	 */
 	public $hashType;
-	
+
+	/**
+	 *
+	 * @var string
+	 */
+	public $description;
+
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -108,6 +115,7 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 		"sessionDuration",
 		"sessionPrivileges",
 		'hashType',
+		'description'
 	);
 	
 	/* (non-PHPdoc)
@@ -140,14 +148,25 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 		{
 			$this->sessionDuration = $partner->getKsMaxExpiryInSeconds();
 		}
-		
+
+		//if user doesn't exists - create it
+		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->sessionUserId );
+		if(!$kuser)
+		{
+			if(!preg_match(kuser::PUSER_ID_REGEXP, $this->sessionUserId))
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'sessionUserId');
+
+			$kuser = kuserPeer::createKuserForPartner($partnerId, $this->sessionUserId);
+		}
+
 		$dbAppToken = parent::toInsertableObject($dbAppToken, $skip);
 		
 		/* @var $dbAppToken AppToken */
 		$dbAppToken->setPartnerId($partnerId);
 		$dbAppToken->setToken(bin2hex(openssl_random_pseudo_bytes(16)));
 		$dbAppToken->setStatus(AppTokenStatus::ACTIVE);
-		
+		$dbAppToken->setKuserId($kuser->getId());
+
 		return $dbAppToken;
 	}
 	

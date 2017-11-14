@@ -2449,6 +2449,7 @@ CREATE TABLE `app_token`
 	`session_privileges` TEXT,
 	`token` TEXT,
 	`custom_data` TEXT,
+	`kuser_id` INTEGER,
 	PRIMARY KEY (`id`)
 )Type=InnoDB;
 
