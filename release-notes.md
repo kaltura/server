@@ -7,7 +7,7 @@
 	None
 
 ### Deployment scripts ###
-- New ffmpeg is located at nyStorage/web/content/shared/bin/ffmpeg-3.2-bin-p4-hls-local-path.tar.gz
+- See the PLAT-8231 for link to the patched ffmpeg bins
 
 #### Known Issues & Limitations ####
 	None
