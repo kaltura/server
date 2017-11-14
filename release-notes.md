@@ -1,6 +1,6 @@
 # Mercury 13.7.0 #
 ## New FFMPEG version ##
-- Issue Type: Security fix
+- Issue Type: Task
 - Issue ID: Plat-8231
 
 ### Configuration ###
