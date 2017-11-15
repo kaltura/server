@@ -102,12 +102,22 @@ ini_set("memory_limit","512M");
 		public function FetchJob($keyIdx)
 		{
 			$key = $this->getJobKeyName($keyIdx);
-			if(($jobStr=$this->get($key))===false){
+			/*
+			 * 10 attempts to get the job object
+			 */
+			$maxTries = 10;
+			for($try=0; $try<$maxTries; $try++) {
+				if(($jobStr=$this->get($key))!==false){
+					break;
+				}
+				sleep(0.3);
+				KalturaLog::log("Attempt($try) to fetch job ($keyIdx)");
+			}
+			if($try==$maxTries){
 				KalturaLog::log("Job($keyIdx) - Failed to get job ($keyIdx)");
 				return false;
 			}
 			$job = unserialize($jobStr);
-//			KalturaLog::log("Session($job->session) - Fetched job ($jobStr)");
 			return $job;
 		}
 		 
@@ -411,24 +421,16 @@ ini_set("memory_limit","512M");
 		{
 			$writeIndex = null;
 			$readIndex = null;
-			$readIndexTmp = null;
 			
-			$semaphoreToken = rand();
+				// semaphore token - process-id + hostname + rand
+			$semaphoreToken = getmypid().".".gethostname().".".rand();
 			while(true) {
-				if($this->fetchReadWriteIndexes($writeIndex, $readIndexTmp)===false){
+				if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
 					KalturaLog::log("ERROR: Missing write or read index ");
 					return false;
 				}
 					/*
-					 * In case that the 'next' job is inaccessible, try to skip the inaccessible job
-					 * by locally increasing the 'readIndex'.
-					 * If the next job is accessible, the readIndex will be updated accordingly.
-					 */
-				if(!isset($readIndex) || $readIndex<$readIndexTmp)
-					$readIndex = $readIndexTmp;
-
-					/*
-					 * Stop fetching attempts if there are no unread objects
+					 * Stop fetching if there are no unread objects
 					 */
 				if($readIndex>=$writeIndex+1) 
 					break;
@@ -441,25 +443,30 @@ ini_set("memory_limit","512M");
 					 */
 				$semaphoreKey = $this->getSemaphoreKeyName($readIndex);
 				$rv = $this->lock($semaphoreKey, $semaphoreToken, 0);
-				if($rv!==true)
+				if($rv!==true){
+					if($this->setReadIndex($readIndex+1)===false)
+						return false;
+					KalturaLog::log("Unable to lock readIndex($readIndex), skipping to the next ");
 					continue;
-
+				}
+				
 					/*
 					 * Try to fetch the job object from the memcache storage
 					 * If failed - delete the sempahore (unlock) and try the next one
 					 */
-				$job = $this->FetchJob($readIndex);
-				if($job!==false && $this->set($this->getReadIndexKeyName(),($readIndex+1),0)!==false) {
+				$job = $this->FetchJob($readIndex); 
+				if($job!==false) {
 					return $job;
 				}
 				else {
 					$this->delete($semaphoreKey);
-					KalturaLog::log("Unable to access job ($readIndex), increase the index locally and skip to next");
-					$readIndex++;
+					KalturaLog::log("Unable to access job ($readIndex), skip to next");
+					if($this->setReadIndex($readIndex+1)===false)
+						return false;
 				}
 			}
 			
-			return false;
+			return null;
 		}
 			
 		/* ---------------------------
@@ -484,8 +491,12 @@ ini_set("memory_limit","512M");
 				 * If there are no pending jobs - wait and retry
 				 */
 			$job = $this->FetchNextJob();
-			if($job===false){
+			if($job===null){
 				KalturaLog::log("Running:$running - No pending jobs");
+				return false;
+			}
+			else if($job===false){
+				KalturaLog::log("Failed to fetch next job");
 				return false;
 			}
 
@@ -598,6 +609,7 @@ ini_set("memory_limit","512M");
 			
 			$job->startTime = time();
 			$job->process = getmypid();
+			$job->hostname = gethostname();
 			$job->state = $job::STATE_RUNNING;
 			$storeManager->SaveJob($job);
 			
@@ -629,7 +641,24 @@ ini_set("memory_limit","512M");
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);
 		}
-		
+
+		/* ---------------------------
+		 *
+		 */
+		protected function setReadIndex($readIndex)
+		{
+			$maxTry=10;
+			for($try=0; $try<$maxTry; $try++) {
+				$rv = $this->set($this->getReadIndexKeyName(),$readIndex,0);
+				if($rv!==false){
+					return $rv;
+				}
+				KalturaLog::log("Attempt($try) to set RD($readIndex)");
+				sleep(0.3);
+			}
+			return false;
+		}
+
 	}
 	/*****************************
 	 * End of KChunkedEncodeMemcacheScheduler

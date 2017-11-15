@@ -1,0 +1,53 @@
+<style>
+	.mySelect {
+		width: 275px;
+		height: 200px;
+	}
+	.language-select {
+		width: 100%;
+		border: 1px solid gray;
+	}
+	.language-select TD{
+		border-width: 0;
+	}
+</style>
+<div>
+	<table class="language-select">
+		<tr>
+			<td align="center">
+				<h3>Options</h3>
+				<select name="possibleValues" id="possibleValues" size="5" class="mySelect" multiple>
+					<?php foreach($this->possibleValues as $option) : ?>
+						<option value="<?php echo $option ?>"><?php echo $option ?></option>
+					<?php endforeach; ?>
+				</select>
+			</td>
+			<td align="center">
+				<input type="button" id="unselect" value="&lt; unselect" /><br>
+				<input type="button" id="select"   value="select    &gt;" /><br>
+			</td>
+			<td align="center">
+				<h3>Selected</h3>
+				<select name="selectedValues" id="selectedValues" size="5" class="mySelect" >
+					<?php foreach($this->selectedValues as $option) : ?>
+						<option value="<?php echo $option; ?>"><?php echo $option; ?></option>
+					<?php endforeach; ?>
+				</select>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<script type="text/javascript">
+
+	jQuery("#unselect").on("click", function () {
+		var selectedItem = $("#selectedValues option:selected");
+		$("#possibleValues").append(selectedItem);
+	});
+
+	jQuery("#select").on("click",function () {
+		var selectedItem = $("#possibleValues option:selected");
+		$("#selectedValues").append(selectedItem);
+	});
+
+</script>

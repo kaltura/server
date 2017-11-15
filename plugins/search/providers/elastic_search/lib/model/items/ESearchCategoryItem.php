@@ -45,6 +45,11 @@ class ESearchCategoryItem extends ESearchItem
 		'updated_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 	);
 
+	private static $multiLanguageFields = array(
+		ESearchCategoryFieldName::CATEGORY_NAME,
+		ESearchCategoryFieldName::CATEGORY_DESCRIPTION,
+	);
+
 	/**
 	 * @return ESearchCategoryFieldName
 	 */
@@ -87,19 +92,19 @@ class ESearchCategoryItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 	
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$categoryQuery = array();
 
 		$allowedSearchTypes = ESearchCategoryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $categorySearchItem)
 		{
-			self::createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes);
+			self::createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes, $queryAttributes);
 		}
 		return $categoryQuery;
 	}
 	
-	public static function createSingleItemSearchQuery($categorySearchItem, &$categoryQuery, $allowedSearchTypes)
+	public static function createSingleItemSearchQuery($categorySearchItem, &$categoryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$categorySearchItem->validateItemInput();
 		$categorySearchItem->translateSearchTerm();
@@ -109,7 +114,7 @@ class ESearchCategoryItem extends ESearchItem
 				$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$categoryQuery[] = kESearchQueryManager::getMultiMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), false);
+				$categoryQuery[] = kESearchQueryManager::getMultiMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$categoryQuery[] = kESearchQueryManager::getPrefixQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes);
@@ -148,4 +153,18 @@ class ESearchCategoryItem extends ESearchItem
 				return;
 		}
 	}
+
+	public function shouldAddLanguageSearch()
+	{
+		if(in_array($this->getFieldName(), self::$multiLanguageFields))
+			return true;
+
+		return false;
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+		return elasticSearchUtils::DOT_FIELD_DELIMITER;
+	}
+
 }

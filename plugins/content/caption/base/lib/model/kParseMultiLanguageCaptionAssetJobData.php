@@ -21,6 +21,11 @@ class kParseMultiLanguageCaptionAssetJobData extends kJobData
 	private $fileLocation;
 
 	/**
+	 * @var string
+	 */
+	private $fileEncryptionKey;
+
+	/**
      * @return string $multiLanaguageCaptionAssetId
      */
 	public function getMultiLanaguageCaptionAssetId()
@@ -66,6 +71,22 @@ class kParseMultiLanguageCaptionAssetJobData extends kJobData
 	public function setFileLocation($fileLocation)
 	{
 		$this->fileLocation = $fileLocation;
+	}
+
+	/**
+	 * @return string $fileEncryptionKey
+	 */
+	public function getFileEncryptionKey()
+	{
+		return $this->fileEncryptionKey;
+	}
+
+	/**
+	 * @param string $fileEncryptionKey
+	 */
+	public function setFileEncryptionKey($fileEncryptionKey)
+	{
+		$this->fileEncryptionKey = $fileEncryptionKey;
 	}
 }
 

@@ -2883,5 +2883,4 @@ class kFlowHelper
 		else 
 			return false;
 	}
-
 }

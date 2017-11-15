@@ -227,6 +227,9 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 
 				case EventNotificationEventObjectType::CATEGORYENTRY:
 					return 'categoryEntry';
+
+				case EventNotificationEventObjectType::LIVE_STREAM:
+					return 'LiveStreamEntry';
 			}
 		}
 		

@@ -69,7 +69,7 @@ class embedPlaykitJsAction extends sfAction
 		$config = str_replace("\"", "'", json_encode($context->bundleConfig));
 		if(!$config)
 		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " wrong config object");
 		}
 
 		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
@@ -77,18 +77,19 @@ class embedPlaykitJsAction extends sfAction
 
 		if (!$content) 
 		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " failed to get content from bundle builder");
 		}
 
 		$content = json_decode($content, true);
 		if(!$content || !$content['bundle'])
 		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config);
+			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
 		}
 
 		$sourceMapContent = base64_decode($content['sourceMap']);
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
+		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
@@ -102,6 +103,7 @@ class embedPlaykitJsAction extends sfAction
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
 		$bundleContent = $this->appendUiConfToContent($bundleContentParts[1]);
+		$bundleContent = $this->appendEnvConfigToContent($bundleContent);
 		
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
@@ -142,6 +144,66 @@ class embedPlaykitJsAction extends sfAction
 		$content .= $kalturaPlayerConfig;
 
 		return $content;
+	}
+
+	private function appendEnvConfigToContent($content)
+	{
+
+		$protocol = infraRequestUtils::getProtocol();
+
+		// The default Kaltura service url:
+		$serviceUrl = requestUtils::getApiCdnHost().'/api_v3';
+		// Default Kaltura CDN url:
+		$cdnUrl = requestUtils::getCdnHost($protocol);
+		// Default Stats URL
+		$statsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"stats_host_https") : $this->buildUrl($protocol,"stats_host");
+		// Default Live Stats URL
+		$liveStatsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"live_stats_host_https") : $this->buildUrl($protocol,"live_stats_host");
+		// Default Kaltura Analytics URL
+		$analyticsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"analytics_host_https") : $this->buildUrl($protocol,"analytics_host");
+		// Get Kaltura Supported API Features
+		$apiFeatures = $this->getFromConfig('features');
+
+		$envConfig = array(
+			"ServiceUrl" => $serviceUrl,
+			"CDNUrl" => $cdnUrl,
+			"StatsServiceUrl" => $statsServiceUrl,
+			"LiveStatsServiceUrl" => $liveStatsServiceUrl,
+			"AnalyticsServiceUrl" => $analyticsServiceUrl,
+			"ApiFeatures" => $apiFeatures
+		);
+
+		$envConfig = json_encode($envConfig);	
+		
+		if ($envConfig !== false)
+		{
+			$kalturaPlayerEnvConfig = "
+			(function(){KalturaPlayer.EnvConfig = $envConfig;
+			})();";
+			return $content . $kalturaPlayerEnvConfig;
+		}
+
+		return $content;
+	}
+
+	private function getFromConfig($key)
+	{
+		if( kConf::hasParam($key) ) {
+			return kConf::get($key);
+		}
+		return '';
+	}
+
+	private function buildUrl($protocol, $key)
+	{
+		$configValue = $this->getFromConfig($key);
+		$port = (($_SERVER['SERVER_PORT']) != '80' && $_SERVER['SERVER_PORT'] != '443')?':'.$_SERVER['SERVER_PORT']:'';
+		if( $key && $configValue)
+		{
+			return $protocol . '://' . $configValue . $port;
+		}
+
+		return '';
 	}
 	
 	private function sendHeaders($content, $lastModified)
