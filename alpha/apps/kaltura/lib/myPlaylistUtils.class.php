@@ -1082,7 +1082,7 @@ HTML;
 	    }
 	}
 	
-	public static function executeStitchedPlaylist(entry $playlist)
+	public static function executeStitchedPlaylist(entry $playlist, $captionLanguages = null)
 	{
 		$pager = new kFilterPager();
 		$pager->setPageIndex(1);
@@ -1094,7 +1094,28 @@ HTML;
 				false, 
 				$pager);
 
-		return self::getPlaylistDataFromEntries($entries, null, null);
+		return self::getPlaylistDataFromEntries($entries, null, $captionLanguages);
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return array
+	 */
+	public static function retrieveAllPlaylistCaptionLanguages(entry $entry)
+	{
+		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
+		$captionLanguages = array();
+		foreach ($entryIds as $entryId)
+		{
+			$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+			foreach ($captionAssets as $captionAsset)
+			{
+				/* @var $captionAsset CaptionAsset */
+				if (!in_array($captionAsset->getLanguage(), $captionLanguages))
+					array_push($captionLanguages, $captionAsset->getLanguage());
+			}
+		}
+		return $captionLanguages;
 	}
 
 	/**

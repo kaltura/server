@@ -149,7 +149,7 @@ class serveFlavorAction extends kalturaAction
 		return $mediaSet;
 	}
 	
-	protected function servePlaylist($entry)
+	protected function servePlaylist($entry, $captionLanguages)
 	{
 		// allow only manual playlist
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
@@ -165,9 +165,8 @@ class serveFlavorAction extends kalturaAction
 			$entry->setDesiredVersion($version);
 		}
 		
-		list($entryIds, $durations, $referenceEntry, $captionFiles) =
-			myPlaylistUtils::executeStitchedPlaylist($entry);
-		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null, null, null);
+		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry, $captionLanguages);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null, $captionFiles, $captionLanguages);
 	}
 
 	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds, $captionFiles, $captionLanguages)
@@ -392,7 +391,7 @@ class serveFlavorAction extends kalturaAction
 			{
 				list($flavorParamId, $asset) = $this->getFlavorAssetAndParamIds($flavorId);
 				myPartnerUtils::enforceDelivery($entry, $asset);
-				$this->servePlaylist($entry);
+				$this->servePlaylist($entry, $captionLanguages);
 			}
 			if ($sequence  && $isInternalIp)
 			{
