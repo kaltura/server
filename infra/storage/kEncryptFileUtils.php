@@ -28,11 +28,11 @@ class kEncryptFileUtils
     public static function getEncryptedFileContent($fileName, $key = null, $iv = null, $from_byte = 0, $len = 0)
     {
         if (!$key)
-            return kFileBase::getFileContent($fileName, $from_byte, $len);
+            return kFileBase::getFileContent($fileName, $from_byte, $from_byte + $len);
 
         $data = kFileBase::getFileContent($fileName);
         $plainData = self::decryptData($data, $key, $iv);
-        $len = min($len,0);
+        $len = max($len,0);
         if (!$from_byte && !$len)
             return $plainData;
         return substr($plainData, $from_byte, $len);
