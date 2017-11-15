@@ -24,6 +24,7 @@ abstract class kBaseSearch
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->applyElasticSearchConditions($subQuery);
+		$this->addGlobalHighlights();
         KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
         $result = $this->elasticClient->search($this->query);
         return $result;
@@ -97,6 +98,19 @@ abstract class kBaseSearch
         //return only the object id
         $this->query['body']['_source'] = false;
     }
+
+    protected function addGlobalHighlights()
+	{
+		$fieldsToHighlight = $this->queryAttributes->getFieldsToHighlight();
+		if(!empty($fieldsToHighlight))
+		{
+			$this->query['body']['highlight']["type"] = "unified";
+			$innerHitsConfig = kConf::get('highlights', 'elastic');
+			$innerHitsSize = isset($innerHitsConfig['maxNumberOfFragments']) ? $innerHitsConfig['maxNumberOfFragments'] : 5;
+			$this->query['body']['highlight']['number_of_fragments'] = $innerHitsSize;
+			$this->query['body']['highlight']['fields'] = $fieldsToHighlight;
+		}
+	}
 
     protected function applyElasticSearchConditions($conditions)
     {

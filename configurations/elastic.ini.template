@@ -13,3 +13,6 @@ metadataInnerHitsSize = 10
 [beacon]
 elasticHost = @BEACONS_ELASTIC_HOST@
 elasticPort = @BEACONS_ELASTIC_PORT@
+
+[highlights]
+maxNumberOfFragments = 7
