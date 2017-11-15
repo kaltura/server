@@ -500,7 +500,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				$c = new Criteria();
 				if ($entry->getType() == entryType::PLAYLIST)
 				{
-					list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
+					$entryIds = array();
+					$entries = myPlaylistUtils::retrieveStitchedPlaylistEntries($entry);
+					foreach ($entries as $playlistEntry)
+						$entryIds[] = $playlistEntry->getId();
 					$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
 				}
 				else

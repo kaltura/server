@@ -1084,17 +1084,22 @@ HTML;
 	
 	public static function executeStitchedPlaylist(entry $playlist, $captionLanguages = null)
 	{
+		$entries = self::retrieveStitchedPlaylistEntries($playlist);
+		return self::getPlaylistDataFromEntries($entries, null, $captionLanguages);
+	}
+
+	public static function retrieveStitchedPlaylistEntries(entry $playlist)
+	{
 		$pager = new kFilterPager();
 		$pager->setPageIndex(1);
 		$pager->setPageSize(self::MAX_STITCHED_PLAYLIST_ENTRY_COUNT);
 		$entries = self::executePlaylist(
-				$playlist->getPartnerId(),
-				$playlist,
-				null,
-				false, 
-				$pager);
-
-		return self::getPlaylistDataFromEntries($entries, null, $captionLanguages);
+			$playlist->getPartnerId(),
+			$playlist,
+			null,
+			false,
+			$pager);
+		return $entries;
 	}
 
 	/**
@@ -1103,7 +1108,10 @@ HTML;
 	 */
 	public static function retrieveAllPlaylistCaptionLanguages(entry $entry)
 	{
-		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
+		$entryIds = array();
+		$entries = myPlaylistUtils::retrieveStitchedPlaylistEntries($entry);
+		foreach ($entries as $playlistEntry)
+			$entryIds[] = $playlistEntry->getId();
 		$captionLanguages = array();
 		foreach ($entryIds as $entryId)
 		{

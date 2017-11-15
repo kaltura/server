@@ -233,10 +233,6 @@ class serveFlavorAction extends kalturaAction
 			$flavorParamIds = $referenceEntryFlavorParamsIds;
 		}
 
-		$requestFlavorParam = $this->getRequestParameter("flavorParamIds");
-		if($requestFlavorParam == '0')
-			$flavorParamIds = array($requestFlavorParam);
-
 		if (!$flavorParamIds)
 		{
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
@@ -245,29 +241,38 @@ class serveFlavorAction extends kalturaAction
 		// build the sequences
 		$storeCache = true;
 		$sequences = array();
-		if (!$requestFlavorParam == '0') {
-			foreach ($flavorParamIds as $flavorParamsId) {
+		if ($this->getRequestParameter("flavorParamIds") || !$this->getRequestParameter("captions") || !($origEntry->getType() == entryType::PLAYLIST)) {
+			foreach ($flavorParamIds as $flavorParamsId)
+			{
 				$referenceFlavor = $groupedFlavors[$referenceEntry->getId()][$flavorParamsId];
 				$origEntryFlavor = $referenceFlavor;
 				// build the clips of the current sequence
 				$clips = array();
-				foreach ($entryIds as $entryId) {
-					if (isset($groupedFlavors[$entryId][$flavorParamsId])) {
+				foreach ($entryIds as $entryId)
+				{
+					if (isset($groupedFlavors[$entryId][$flavorParamsId]))
+					{
 						$flavor = $groupedFlavors[$entryId][$flavorParamsId];
-					} else {
+					}
+					else
+					{
 						$flavor = $this->getBestMatchFlavor($groupedFlavors[$entryId], $referenceFlavor);
 					}
 
-					if ($flavor->getEntryId() == $origEntry->getId()) {
+					if ($flavor->getEntryId() == $origEntry->getId())
+					{
 						$origEntryFlavor = $flavor;
 					}
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
-					if ($fileSync) {
+					if ($fileSync)
+					{
 						$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
 						$path = $this->getFileSyncFullPath($resolvedFileSync);
-					} else {
+					}
+					else
+					{
 						error_log('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
 						$path = '';
 						$storeCache = false;

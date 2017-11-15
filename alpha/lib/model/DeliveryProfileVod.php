@@ -60,7 +60,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			
 			$url .= ($entryVersion ? "/v/$entryVersion" : '') .
 				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '');
-			if($flavorAsset->getFlavorParamsId() != '0')
+			if(!($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
 				$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
 		}
 		else
