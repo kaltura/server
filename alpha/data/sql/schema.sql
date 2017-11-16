@@ -2450,7 +2450,9 @@ CREATE TABLE `app_token`
 	`token` TEXT,
 	`custom_data` TEXT,
 	`kuser_id` INTEGER,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id`),
+	KEY `int_id`(`int_id`),
+	KEY `kuser_id`(`kuser_id`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------

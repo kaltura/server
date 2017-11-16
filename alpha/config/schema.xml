@@ -2150,7 +2150,9 @@
 		<column name="token" type="longvarchar"/>
 		<column name="custom_data" type="longvarchar"/>
 		<column name="kuser_id" type="integer"/>
-
+		<index name="kuser_id">
+			<index-column name="kuser_id" />
+		</index>
 	</table>
     <table skipSql="false" abstract="false" name="entry_server_node" deletable="true">
         <column primaryKey="true" required="true" autoIncrement="true" lazyLoad="false" name="id" type="bigint" size="20"/>
