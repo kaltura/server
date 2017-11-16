@@ -87,7 +87,6 @@ abstract class ESearchItem extends BaseObject
 
 	abstract public function getItemMappingFieldsDelimiter();
 
-
 	/**
 	 * @param $fieldName
 	 * @return int
@@ -102,4 +101,6 @@ abstract class ESearchItem extends BaseObject
 
 		return $result;
 	}
+
+
 }

@@ -5,7 +5,6 @@
  */
 class ESearchParams extends BaseObject
 {
-
 	/**
 	 * @var ESearchOperator
 	 */
@@ -20,6 +19,11 @@ class ESearchParams extends BaseObject
 	 * @var ESearchOrderBy
 	 */
 	protected $orderBy;
+
+	/**
+	 * @var bool
+	 */
+	protected $useHighlight;
 
 	/**
 	 * @return ESearchOperator
@@ -67,6 +71,22 @@ class ESearchParams extends BaseObject
 	public function setOrderBy($orderBy)
 	{
 		$this->orderBy = $orderBy;
+	}
+
+	/**
+	 * @return $useHighlight
+	 */
+	public function getUseHighlight()
+	{
+		return $this->useHighlight;
+	}
+
+	/**
+	 * @param bool $useHighlight
+	 */
+	public function setUseHighlight($useHighlight)
+	{
+		$this->useHighlight = $useHighlight;
 	}
 
 }

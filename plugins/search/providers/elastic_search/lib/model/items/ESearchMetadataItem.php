@@ -127,7 +127,10 @@ class ESearchMetadataItem extends ESearchItem
 			self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
-		$metadataQuery['nested']['inner_hits']['highlight']['fields'] = $queryAttributes ->getFieldsToHighlight();
+		$highlight = kBaseSearch::addHighlightSection('metadata', $queryAttributes);
+		if(isset($highlight))
+			$metadataQuery['nested']['inner_hits']['highlight'] = $highlight;
+
 		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_GLOBAL_SCOPE);
 		return array($metadataQuery);
 	}

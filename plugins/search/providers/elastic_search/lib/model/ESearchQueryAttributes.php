@@ -20,6 +20,8 @@ class ESearchQueryAttributes
 
 	private $highlightScope = self::HIGHLIGHT_GLOBAL_SCOPE;
 
+	private $useHighlight = true;
+
 	/**
 	 * @param string $scope should be one of the scopes globals
 	 */
@@ -70,4 +72,13 @@ class ESearchQueryAttributes
 		$this->partnerLanguages = $partnerLanguages;
 	}
 
+	public function setUseHighlight($useHighlight)
+	{
+		$this->useHighlight = $useHighlight;
+	}
+
+	public function getUseHighlight()
+	{
+		return $this->useHighlight;
+	}
 }

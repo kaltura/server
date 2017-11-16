@@ -111,15 +111,19 @@ class ESearchService extends KalturaBaseService
 		if ($order)
 			$coreOrder = $order->toObject();
 
-		return array($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+		$useHighlight = $searchParams->useHighlight;
+		if(empty($useHighlight)) // we use highlight by default
+			$useHighlight = true;
+
+		return array($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder, $useHighlight);
 	}
 
 	private function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
 		try
 		{
-			list($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchParams, $pager);
-			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+			list($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder, $useHighlight) = $this->initSearchActionParams($searchParams, $pager);
+			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder, $useHighlight);
 		} catch (kESearchException $e)
 		{
 			$this->handleSearchException($e);

@@ -16,7 +16,7 @@ abstract class kBaseSearch
         $this->queryAttributes = new ESearchQueryAttributes();
     }
 
-    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager = null, ESearchOrderBy $order = null);
+    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager = null, ESearchOrderBy $order = null, $useHighlight);
 
     public abstract function getPeerName();
 
@@ -30,10 +30,10 @@ abstract class kBaseSearch
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null)
+    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
-        $this->initQueryAttributes($partnerId);
+        $this->initQueryAttributes($partnerId, $useHighlight);
         $this->initBasePartnerFilter($partnerId, $statuses);
         $this->initPager($pager);
         $this->initOrderBy($order);
@@ -101,15 +101,35 @@ abstract class kBaseSearch
 
     protected function addGlobalHighlights()
 	{
-		$fieldsToHighlight = $this->queryAttributes->getFieldsToHighlight();
-		if(!empty($fieldsToHighlight))
+		$highlight = self::addHighlightSection('global', $this->queryAttributes);
+		if(isset($highlight))
 		{
-			$this->query['body']['highlight']["type"] = "unified";
-			$innerHitsConfig = kConf::get('highlights', 'elastic');
-			$innerHitsSize = isset($innerHitsConfig['maxNumberOfFragments']) ? $innerHitsConfig['maxNumberOfFragments'] : 5;
-			$this->query['body']['highlight']['number_of_fragments'] = $innerHitsSize;
-			$this->query['body']['highlight']['fields'] = $fieldsToHighlight;
+			$this->query['body']['highlight'] = $highlight;
 		}
+	}
+
+
+	/**
+	 * @param string $highlightScope
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @return array|null
+	 */
+	public static function addHighlightSection($highlightScope, $queryAttributes)
+	{
+		$highlight = null;
+		$fieldsToHighlight = $queryAttributes->getFieldsToHighlight();
+		if(!empty($fieldsToHighlight) && $queryAttributes->getUseHighlight())
+		{
+			$highlight = array();
+			$highlight["type"] = "unified";
+			$configurationName = $highlightScope."MaxNumberOfFragments";
+			$innerHitsConfig = kConf::get('highlights', 'elastic');
+			$innerHitsSize = isset($innerHitsConfig[$configurationName]) ? $innerHitsConfig[$configurationName] : 5;
+			$highlight['number_of_fragments'] = $innerHitsSize;
+			$highlight['fields'] = $fieldsToHighlight;
+		}
+
+		return $highlight;
 	}
 
     protected function applyElasticSearchConditions($conditions)
@@ -117,9 +137,10 @@ abstract class kBaseSearch
         $this->query['body']['query']['bool']['must'] = array($conditions);
     }
 
-    protected function initQueryAttributes($partnerId)
+    protected function initQueryAttributes($partnerId, $useHighlight)
     {
         $this->initPartnerLanguages($partnerId);
+        $this->queryAttributes->setUseHighlight($useHighlight);
     }
 
     protected function initPartnerLanguages($partnerId)

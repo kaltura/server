@@ -98,7 +98,10 @@ class ESearchCuePointItem extends ESearchItem
 			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
-		$cuePointQuery['nested']['inner_hits']['highlight']['fields'] = $queryAttributes ->getFieldsToHighlight();
+		$highlight = kBaseSearch::addHighlightSection('cuepoint', $queryAttributes);
+		if(isset($highlight))
+			$cuePointQuery['nested']['inner_hits']['highlight'] = $highlight;
+
 		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_GLOBAL_SCOPE);
 		return array($cuePointQuery);
 	}
