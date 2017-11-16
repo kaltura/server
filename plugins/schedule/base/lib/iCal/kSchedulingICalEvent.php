@@ -296,17 +296,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 		if ($event->getScheduleEventType() == ScheduleEventType::LIVE_STREAM)
 		{
-			$event = entryPeer::retrieveByPK($event->templateEntryId);
-			if ($event->getType() == entryType::LIVE_STREAM)
+			$entry = entryPeer::retrieveByPK($event->templateEntryId);
+			if ( $entry && $entry->getType() == entryType::LIVE_STREAM)
 			{
 				/* @var $event LiveStreamEntry */
-				$object->setField('x-kaltura-primary-rtmp-endpoint', $event->getPrimaryBroadcastingUrl());
-				$object->setField('x-kaltura-secondary-rtmp-endpoint', $event->getSecondaryBroadcastingUrl());
-				$object->setField('x-kaltura-primary-rtsp-endpoint', $event->getPrimaryRtspBroadcastingUrl());
-				$object->setField('x-kaltura-secondary-rtsp-endpoint', $event->getSecondaryRtspBroadcastingUrl());
-				$object->setField('x-kaltura-live-stream-name', $event->getStreamName());
-				$object->setField('x-kaltura-live-stream-username', $event->getStreamUsername());
-				$object->setField('x-kaltura-live-stream-password', $event->getStreamPassword());
+				$object->setField('x-kaltura-primary-rtmp-endpoint', $entry->getPrimaryBroadcastingUrl());
+				$object->setField('x-kaltura-secondary-rtmp-endpoint', $entry->getSecondaryBroadcastingUrl());
+				$object->setField('x-kaltura-primary-rtsp-endpoint', $entry->getPrimaryRtspBroadcastingUrl());
+				$object->setField('x-kaltura-secondary-rtsp-endpoint', $entry->getSecondaryRtspBroadcastingUrl());
+				$object->setField('x-kaltura-live-stream-name', $entry->getStreamName());
+				$object->setField('x-kaltura-live-stream-username', $entry->getStreamUsername());
+				$object->setField('x-kaltura-live-stream-password', $entry->getStreamPassword());
 			}
 
 		}
