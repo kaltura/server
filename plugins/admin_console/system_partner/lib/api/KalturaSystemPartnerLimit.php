@@ -42,6 +42,14 @@ class KalturaSystemPartnerLimit extends KalturaObject
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$limit->max = $partner->getMaxLoginAttempts();
 				break;
+
+			case KalturaSystemPartnerLimitType::REACH_CREDIT:
+				$limit->max = $partner->getReachCredit();
+				break;
+
+			case KalturaSystemPartnerLimitType::REACH_OVERCHARGE:
+				$limit->max = $partner->getReachAllowedOvercharged();
+				break;
 		}
 		
 		return $limit;
@@ -93,6 +101,14 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$partner->setMaxLoginAttempts($this->max);
+				break;
+
+			case KalturaSystemPartnerLimitType::REACH_CREDIT:
+				$partner->setReachCredit($this->max);
+				break;
+
+			case KalturaSystemPartnerLimitType::REACH_OVERCHARGE:
+				$partner->setReachAllowedOvercharged($this->max);
 				break;
 		}
 	} 
