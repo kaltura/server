@@ -1768,4 +1768,16 @@ class kJobsManager
 		
 		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
 	}
+
+	protected static function getFileContainer(FileSyncKey $syncKey)
+	{
+		$fileContainer = new FileContainer();
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey( $syncKey , false );
+		if ($fileSync)
+		{
+			$fileContainer->filePath = $fileSync->getFullPath();
+			$fileContainer->encryptionKey = $fileSync->getEncryptionKey();
+		}
+		return $fileContainer;
+	}
 }

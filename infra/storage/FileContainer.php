@@ -1,9 +1,9 @@
 <?php
 /**
- * @package api
- * @subpackage objects
+ * @package infra
+ * @subpackage Storage
  */
-class KalturaFile extends KalturaObject
+class FileContainer
 {
 	/**
 	 * @var string
@@ -19,7 +19,6 @@ class KalturaFile extends KalturaObject
 	 * @var int
 	 */
 	public $fileSize;
-
-
+	
 }
 ?>

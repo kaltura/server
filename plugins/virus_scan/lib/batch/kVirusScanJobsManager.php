@@ -11,12 +11,12 @@ class kVirusScanJobsManager extends kJobsManager
 	 * @param int $scanProfileId
 	 * @return BatchJob
 	 */
-	public static function addVirusScanJob(BatchJob $parentJob = null, $partnerId, $entryId, $flavorAssetId, $syncKey, $virusScanEngine, $virusFoundAction)
+	public static function addVirusScanJob(BatchJob $parentJob = null, $partnerId, $entryId, $flavorAssetId,FileSyncKey $syncKey, $virusScanEngine, $virusFoundAction)
 	{
 		$jobType = VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN);
 		
  		$jobData = new kVirusScanJobData();
- 		$jobData->setFileData(self::getFileData($syncKey));
+ 		$jobData->setFileContainer(self::getFileContainer($syncKey));
  		$jobData->setFlavorAssetId($flavorAssetId);
  		$jobData->setVirusFoundAction($virusFoundAction);
 
@@ -38,12 +38,5 @@ class kVirusScanJobsManager extends kJobsManager
 		return self::addJob($batchJob, $jobData, $jobType, $virusScanEngine);
 	}
 
-	private static function getFileData(FileSyncKey $syncKey)
-	{
-		$fileData = new KalturaFile();
-		$file_sync = kFileSyncUtils::getLocalFileSyncForKey( $syncKey , false );
-		$fileData->filePath = $file_sync->getFullPath();
-		$fileData->encryptionKey = $file_sync->getEncryptionKey();
-		return $fileData;
-	}
+
 }

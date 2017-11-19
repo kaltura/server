@@ -6,9 +6,9 @@
 class kVirusScanJobData extends kJobData
 {
 	/**
-	 * @var KalturaFile
+	 * @var FileContainer
 	 */
-	private $fileData;
+	private $fileContainer;
 	
 	/**
 	 * @var string
@@ -26,11 +26,11 @@ class kVirusScanJobData extends kJobData
 	private $virusFoundAction;
 	
 	/**
-	 * @return KalturaFile $fileData
+	 * @return FileContainer $fileData
 	 */
-	public function getFileData()
+	public function getFileContainer()
 	{
-		return $this->fileData;
+		return $this->fileContainer;
 	}
 
 	/**
@@ -58,11 +58,11 @@ class kVirusScanJobData extends kJobData
 	}
 
 	/**
-	 * @param KalturaFile $fileData
+	 * @param FileContainer $fileContainer
 	 */
-	public function setFileData($fileData)
+	public function setFileContainer($fileContainer)
 	{
-		$this->fileData = $fileData;
+		$this->fileContainer = $fileContainer;
 	}
 
 	/**
