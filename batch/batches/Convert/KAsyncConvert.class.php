@@ -209,9 +209,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			else
 			{
 				$tempClearPath = self::createTempClearFile($actualFileSyncLocalPath, $key);
-				KalturaLog::info("Create temporary clear file [$tempClearPath]");
 				$isDone = $this->operationEngine->operate($operator, $tempClearPath);
-				KalturaLog::info("Delete temporary clear file [$tempClearPath]");
 				unlink($tempClearPath);
 			}
 			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed

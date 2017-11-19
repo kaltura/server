@@ -514,8 +514,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 		if ($captionInfo->encryptionKey)
 		{
-			$tempPath = kbatchbase::createTempClearFile($captionInfo->filePath, $captionInfo->encryptionKey);
-			KalturaLog::info("Create temporary clear file [$tempPath] from original file path [$captionInfo->filePath] with key [$captionInfo->encryptionKey]");
+			$tempPath = KBatchBase::createTempClearFile($captionInfo->filePath, $captionInfo->encryptionKey);
 			$media->setFileSize(filesize($tempPath));
 			$ingestedCaption = self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
 			unlink($tempPath);

@@ -637,13 +637,17 @@ abstract class KBatchBase implements IKalturaLogger
 		KalturaLog::log($message);
 	}
 
+	/**
+	 * @param string $path path to encrypted file 
+	 * @param string $key
+	 * @return string the new temp clear file path
+	 */
 	public static function createTempClearFile($path, $key)
 	{
 		$iv = kConf::get("encryption_iv");
-		KalturaLog::debug("Creating tempFile with Key is: [$key] iv: [$iv] for path [$path]");
+		$tempPath =  sys_get_temp_dir(). "/$key." . pathinfo($path, PATHINFO_EXTENSION);
+		KalturaLog::info("Creating tempFile with Key is: [$key] iv: [$iv] for path [$path] at [$tempPath]");
 		$plainData = kEncryptFileUtils::getEncryptedFileContent($path, $key, $iv);
-		$type = pathinfo($path, PATHINFO_EXTENSION);
-		$tempPath =  sys_get_temp_dir(). "/". $key . ".$type";
 		kFileBase::setFileContent($tempPath, $plainData);
 		return $tempPath;
 	}
