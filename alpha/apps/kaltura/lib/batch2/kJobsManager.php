@@ -1775,8 +1775,8 @@ class kJobsManager
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey( $syncKey , false );
 		if ($fileSync)
 		{
-			$fileContainer->filePath = $fileSync->getFullPath();
-			$fileContainer->encryptionKey = $fileSync->getEncryptionKey();
+			$fileContainer->setFilePath($fileSync->getFullPath());
+			$fileContainer->setEncryptionKey($fileSync->getEncryptionKey());
 		}
 		return $fileContainer;
 	}

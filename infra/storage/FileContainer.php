@@ -8,17 +8,64 @@ class FileContainer
 	/**
 	 * @var string
 	 */
-	public $filePath;
+	private $filePath;
 
 	/**
 	 * @var string
 	 */
-	public $encryptionKey;
+	private $encryptionKey;
 
 	/**
 	 * @var int
 	 */
-	public $fileSize;
-	
+	private $fileSize;
+
+	/**
+	 * @return string filePath
+	 */
+	public function getFilePath()
+	{
+		return $this->filePath;
+	}
+
+	/**
+	 * @return string $encryptionKey
+	 */
+	public function getEncryptionKey()
+	{
+		return $this->encryptionKey;
+	}
+
+	/**
+	 * @return int $fileData
+	 */
+	public function getFileSize()
+	{
+		return $this->fileSize;
+	}
+
+	/**
+	 * @param string $filePath
+	 */
+	public function setFilePath($filePath)
+	{
+		$this->filePath = $filePath;
+	}
+
+	/**
+	 * @param string $encryptionKey
+	 */
+	public function setEncryptionKey($encryptionKey)
+	{
+		$this->encryptionKey = $encryptionKey;
+	}
+
+	/**
+	 * @param int $fileSize
+	 */
+	public function setFileSize($fileSize)
+	{
+		$this->fileSize = $fileSize;
+	}
 }
 ?>

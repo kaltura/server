@@ -7,7 +7,7 @@ class KalturaVirusScanJobData extends KalturaJobData
 {
 	
 	/**
-	 * @var FileContainer
+	 * @var KalturaFileContainer
 	 */
 	public $fileContainer;
 	
