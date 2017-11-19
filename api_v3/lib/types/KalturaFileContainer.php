@@ -32,5 +32,11 @@ class KalturaFileContainer extends KalturaObject
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
+	public function toObject ()
+	{
+		$src = new FileContainer();
+		return parent::toObject($src);
+	}
+
 }
 ?>

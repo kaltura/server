@@ -53,12 +53,10 @@ class KAsyncVirusScan extends KJobHandlerWorker
 				$data->scanResult = $engine->execute($data->fileContainer->filePath, $cleanIfInfected, $output, $errorDescription);
 			else
 			{
-				KalturaLog::info("asdf - 1 - $key");
-//				$tempPath = self::createTempClearFile($data->fileData->filePath, $key);
-//				KalturaLog::info("Creating tempClear file at [$tempPath]");
-//				$data->scanResult = $engine->execute($tempPath, $cleanIfInfected, $output, $errorDescription);
-//				unlink($tempPath);
-
+				$tempPath = self::createTempClearFile($data->fileContainer->filePath, $key);
+				KalturaLog::info("Creating tempClear file at [$tempPath]");
+				$data->scanResult = $engine->execute($tempPath, $cleanIfInfected, $output, $errorDescription);
+				unlink($tempPath);
 			}
 
 			if (!$output) {
