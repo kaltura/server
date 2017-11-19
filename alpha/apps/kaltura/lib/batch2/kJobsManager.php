@@ -1772,7 +1772,7 @@ class kJobsManager
 	protected static function getFileContainer(FileSyncKey $syncKey)
 	{
 		$fileContainer = new FileContainer();
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey( $syncKey , false );
+		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
 		if ($fileSync)
 		{
 			$fileContainer->setFilePath($fileSync->getFullPath());
