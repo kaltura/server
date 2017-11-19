@@ -156,9 +156,9 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 	
 	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData) {
 		$captionInfo = new KalturaYouTubeApiCaptionDistributionInfo ();
-		$file_sync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
-		$captionInfo->filePath = $file_sync->getFullPath();
-		$captionInfo->encryptionKey = $file_sync->getEncryptionKey();
+		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
+		$captionInfo->filePath = $fileSync->getFullPath();
+		$captionInfo->encryptionKey = $fileSync->getEncryptionKey();
 		$captionInfo->assetId = $asset->getId();
 		$captionInfo->version = $asset->getVersion();
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */

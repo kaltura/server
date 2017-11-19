@@ -969,7 +969,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
-			$pathArr = array($parent_file_sync->getFullPath());
+			$pathArr = array($parent_file_sync->getFileRoot() , $parent_file_sync->getFilePath());
 			return $pathArr;
 		}
 
