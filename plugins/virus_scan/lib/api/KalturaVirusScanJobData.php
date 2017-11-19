@@ -5,10 +5,11 @@
  */
 class KalturaVirusScanJobData extends KalturaJobData
 {
+	
 	/**
-	 * @var string
+	 * @var KalturaFile
 	 */
-	public $srcFilePath;
+	public $fileData;
 	
 	/**
 	 * @var string
@@ -28,7 +29,6 @@ class KalturaVirusScanJobData extends KalturaJobData
 	
 	private static $map_between_objects = array
 	(
-		"srcFilePath" ,
 		"flavorAssetId" ,
 		"scanResult" ,
 		"virusFoundAction",
@@ -56,5 +56,11 @@ class KalturaVirusScanJobData extends KalturaJobData
 	public function fromSubType($subType)
 	{
 		return kPluginableEnumsManager::coreToApi('VirusScanEngineType', $subType);
+	}
+
+	public function doFromObject($src)
+	{
+		//fileData is always API of KalturaFile
+		$this->fileData = $src->getFileData();;
 	}
 }
