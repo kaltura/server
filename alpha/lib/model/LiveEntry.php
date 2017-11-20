@@ -954,8 +954,9 @@ abstract class LiveEntry extends entry
 
 	public function setViewMode($v)
 	{
+		if ($v != $this->getViewMode())
+			$this->setLastChangedViewMode(time());
 		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
-		$this->setLastChangedViewMode(time());
 	}
 
 	public function getRecordingStatus()
