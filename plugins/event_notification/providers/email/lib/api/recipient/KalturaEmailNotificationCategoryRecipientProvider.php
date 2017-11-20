@@ -12,6 +12,12 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 	 * @var KalturaStringValue
 	 */
 	public $categoryId;
+
+    /**
+     * The IDs of the categories whose subscribers should receive the email notification.
+     * @var KalturaStringValue
+     */
+    public $categoryIds;
 	
 	/**
 	 * 
@@ -21,6 +27,7 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 
 	private static $map_between_objects = array(
 		'categoryId',
+		'categoryIds',
 		'categoryUserFilter',
 	);
 	

@@ -13,6 +13,12 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	 */
 	protected $categoryId;
 
+    /**
+     * ID of the category to whose subscribers the email should be sent
+     * @var kStringValue
+     */
+    protected $categoryIds;
+
 	/**
 	 * Additional filter
 	 * @var categoryKuserFilter
@@ -32,6 +38,20 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	public function setCategoryId($category_id) {
 		$this->categoryId = $category_id;
 	}
+
+    /**
+     * @return kStringValue
+     */
+    public function getCategoryIds() {
+        return $this->categoryIds;
+    }
+
+    /**
+     * @param kStringValue $category_id
+     */
+    public function setCategoryIds($category_ids) {
+        $this->categoryIds = $category_ids;
+    }
 	
 	
 	/* (non-PHPdoc)
@@ -46,16 +66,33 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 		
 		if ($this->categoryId instanceof kStringField)
 			$this->categoryId->setScope($scope);
+
+        if ($this->categoryIds instanceof kStringField)
+            $this->categoryIds->setScope($scope);
 		
 		$implicitCategoryId = $this->categoryId->getValue();
-		
+		$implicitCategoryIds = $this->categoryIds->getValue();
+
+		if ($implicitCategoryIds)
+        {
+            $implicitCategoryIds .= ",$implicitCategoryId";
+        }
+
 		$categoryUserFilter = new categoryKuserFilter();
 		$categoryUserFilter->set('_matchor_permission_names', PermissionName::CATEGORY_SUBSCRIBE);
 		if ($this->categoryUserFilter)
 		{
 			$categoryUserFilter = $this->categoryUserFilter;
 		}
-		$categoryUserFilter->setCategoryIdEqual($implicitCategoryId);
+
+		if ($implicitCategoryIds)
+        {
+            $categoryUserFilter->set('_in_category_id', $implicitCategoryIds);
+        }
+        else
+        {
+            $categoryUserFilter->setCategoryIdEqual($implicitCategoryId);
+        }
 		$ret->setCategoryUserFilter($categoryUserFilter);
 		
 		return $ret;
