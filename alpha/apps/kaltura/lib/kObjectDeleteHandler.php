@@ -138,7 +138,7 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 		$filter->setUserIdEqual($kuser->getPuserId());
 		
 		$c = new Criteria();
-		$c->add(categoryKuserPeer::PUSER_ID, $kuser->getPuserId());
+		$c->add(categoryKuserPeer::KUSER_ID, $kuser->getKuserId());
 		if(categoryKuserPeer::doSelectOne($c)) {
 			kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 		}
