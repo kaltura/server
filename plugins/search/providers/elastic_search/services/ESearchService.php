@@ -108,15 +108,15 @@ class ESearchService extends KalturaBaseService
 		if ($order)
 			$coreOrder = $order->toObject();
 
-		return array($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+		return array($coreSearchOperator, $objectStatusesArr, $searchParams->objectId,  $kPager, $coreOrder);
 	}
 
 	private function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
 		try
 		{
-			list($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchParams, $pager);
-			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+			list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder) = $this->initSearchActionParams($searchParams, $pager);
+			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder);
 		} catch (kESearchException $e)
 		{
 			$this->handleSearchException($e);

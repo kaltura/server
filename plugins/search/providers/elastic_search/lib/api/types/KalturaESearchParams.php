@@ -16,6 +16,11 @@ class KalturaESearchParams extends KalturaObject
 	public $objectStatuses;
 
 	/**
+	 * @var string
+	 */
+	public $objectId;
+
+	/**
 	 * @var KalturaESearchOrderBy
 	 */
 	public $orderBy;
@@ -25,6 +30,7 @@ class KalturaESearchParams extends KalturaObject
 	(
 		"searchOperator",
 		"objectStatuses",
+		"objectId",
 		"orderBy",
 	);
 
