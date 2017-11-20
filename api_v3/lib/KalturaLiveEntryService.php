@@ -474,9 +474,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		//In case conversion profile was changed we need to fetch passed streamed assets as well
 		$dbAsset = assetPeer::retrieveByEntryIdAndParamsNoFilter($dbLiveEntry->getId(), $flavorParamsId);
-		$flavorParamConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParamsId, $dbLiveEntry->getConversionProfileId());
-		if (!$dbAsset && !$flavorParamConversionProfile)
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+		if (!$dbAsset)
+		{
+			$flavorParamConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParamsId, $dbLiveEntry->getConversionProfileId());
+			if (!$flavorParamConversionProfile)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+		}
 
 		$kResource = $resource->toObject();
 		/* @var $kResource kLocalFileResource */
