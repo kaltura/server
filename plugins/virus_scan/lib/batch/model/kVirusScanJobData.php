@@ -6,9 +6,9 @@
 class kVirusScanJobData extends kJobData
 {
 	/**
-	 * @var string
+	 * @var FileContainer
 	 */
-	private $srcFilePath;
+	private $fileContainer;
 	
 	/**
 	 * @var string
@@ -26,11 +26,11 @@ class kVirusScanJobData extends kJobData
 	private $virusFoundAction;
 	
 	/**
-	 * @return the $srcFilePath
+	 * @return FileContainer $fileData
 	 */
-	public function getSrcFilePath()
+	public function getFileContainer()
 	{
-		return $this->srcFilePath;
+		return $this->fileContainer;
 	}
 
 	/**
@@ -58,11 +58,11 @@ class kVirusScanJobData extends kJobData
 	}
 
 	/**
-	 * @param $srcFilePath the $srcFilePath to set
+	 * @param FileContainer $fileContainer
 	 */
-	public function setSrcFilePath($srcFilePath)
+	public function setFileContainer($fileContainer)
 	{
-		$this->srcFilePath = $srcFilePath;
+		$this->fileContainer = $fileContainer;
 	}
 
 	/**
