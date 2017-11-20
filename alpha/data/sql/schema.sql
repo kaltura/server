@@ -2449,10 +2449,7 @@ CREATE TABLE `app_token`
 	`session_privileges` TEXT,
 	`token` TEXT,
 	`custom_data` TEXT,
-	`kuser_id` INTEGER,
-	PRIMARY KEY (`id`),
-	KEY `int_id`(`int_id`),
-	KEY `kuser_id`(`kuser_id`)
+	PRIMARY KEY (`id`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------

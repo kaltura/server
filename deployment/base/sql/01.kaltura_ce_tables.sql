@@ -2451,10 +2451,8 @@ CREATE TABLE app_token
 	session_privileges TEXT,
 	token TEXT,
 	custom_data TEXT,
-  kuser_id INTEGER,
 	PRIMARY KEY (id),
-  KEY int_id_index (int_id),
-  KEY kuser_id (kuser_id)
+	KEY int_id_index (int_id)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE entry_server_node

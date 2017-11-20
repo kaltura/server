@@ -51,7 +51,6 @@ class AppTokenTableMap extends TableMap {
 		$this->addColumn('SESSION_PRIVILEGES', 'SessionPrivileges', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('TOKEN', 'Token', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 
