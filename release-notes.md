@@ -1,3 +1,18 @@
+# Mercury 13.8.0 #
+## Allow webcast to update liveStream parameters ##
+- Issue Type: Task
+- Issue ID: NO-PLAT
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "WEbcast producer device role" LIVE_STREAM_UPDATE realrun
+
+#### Known Issues & Limitations ####
+	None
+
+
 # Mercury 13.7.0 #
 ## New FFMPEG version ##
 - Issue Type: Task
