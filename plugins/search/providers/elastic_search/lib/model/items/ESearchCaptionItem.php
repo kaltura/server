@@ -7,6 +7,7 @@ class ESearchCaptionItem extends ESearchItem
 {
 
 	const DEFAULT_INNER_HITS_SIZE = 10;
+	const INNER_HITS_CONFIG_KEY = 'captionInnerHitsSize';
 
 	private static $allowed_search_types_for_field = array(
 		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
@@ -76,8 +77,7 @@ class ESearchCaptionItem extends ESearchItem
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsSize = isset($innerHitsConfig['captionInnerHitsSize']) ? $innerHitsConfig['captionInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
+		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$captionQuery['nested']['path'] = 'caption_assets.lines';
 		$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize);
 		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();

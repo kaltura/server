@@ -30,7 +30,7 @@ class kESearchCoreAdapter
 	public static function transformElasticToCoreObject($elasticResults, $peerName)
 	{
 		list($objectData, $objectOrder, $objectCount, $objectHighlight) = self::getElasticResultAsArray($elasticResults);
-		$objects = $peerName::retrieveByPKs(array_keys($objectData));
+		$objects = $peerName::retrieveByPKsNoFilter(array_keys($objectData));
 		$coreResults = self::getCoreESearchResults($objects, $objectData, $objectOrder, $objectHighlight);
 		return array($coreResults, $objectCount);
 	}

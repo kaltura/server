@@ -24,25 +24,25 @@ class kEntrySearch extends kBaseSearch
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(),kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
     {
 	    kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
-        $this->initQuery($entriesStatus, $pager, $order, $useHighlight);
+        $this->initQuery($entriesStatus, $objectId, $pager, $order, $useHighlight);
         $this->initEntitlement();
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_ENTRY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
         $statuses = $this->initEntryStatuses($statuses);
-        parent::initQuery($statuses, $pager, $order, $useHighlight);
+        parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
     }
 
     protected function initEntryStatuses($statuses)

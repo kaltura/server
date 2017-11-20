@@ -6,6 +6,7 @@
 class ESearchCuePointItem extends ESearchItem
 {
 	const DEFAULT_INNER_HITS_SIZE = 10;
+	const INNER_HITS_CONFIG_KEY = 'cuePointsInnerHitsSize';
 
 	/**
 	 * @var ESearchCuePointFieldName
@@ -87,8 +88,7 @@ class ESearchCuePointItem extends ESearchItem
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsSize = isset($innerHitsConfig['cuePointsInnerHitsSize']) ? $innerHitsConfig['cuePointsInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
+		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$cuePointQuery['nested']['path'] = 'cue_points';
 		$cuePointQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();

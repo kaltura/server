@@ -13,7 +13,7 @@ class kCategorySearch extends kBaseSearch
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
     {
         kCategoryElasticEntitlement::init();
         if (!count($statuses))
@@ -23,14 +23,14 @@ class kCategorySearch extends kBaseSearch
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
         );
 
-        parent::initQuery($statuses, $pager, $order, $useHighlight);
+        parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
     }
 
     function getPeerName()

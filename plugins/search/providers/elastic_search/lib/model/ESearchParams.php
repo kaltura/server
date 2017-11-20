@@ -16,6 +16,11 @@ class ESearchParams extends BaseObject
 	protected $objectStatuses;
 
 	/**
+	 * @var string
+	 */
+	protected $objectId;
+
+	/**
 	 * @var ESearchOrderBy
 	 */
 	protected $orderBy;
@@ -55,6 +60,22 @@ class ESearchParams extends BaseObject
 	public function setObjectStatuses($objectStatuses)
 	{
 		$this->objectStatuses = $objectStatuses;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getObjectId()
+	{
+		return $this->objectId;
+	}
+
+	/**
+	 * @param string $objectId
+	 */
+	public function setObjectId($objectId)
+	{
+		$this->objectId = $objectId;
 	}
 
 	/**

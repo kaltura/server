@@ -1,4 +1,46 @@
+# Mercury 13.8.0 #
+
+## Add new app token capabilities ##
+- Issue Type: Task
+- Issue ID: PLAT-8200
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php deployment/updates/sql/2017_11_12_alter_app_token_table_add_kuser_id_column.sql
+
+#### Known Issues & Limitations ####
+	None
+
+## Allow webcast to update liveStream parameters ##
+- Issue Type: Task
+- Issue ID: NO-PLAT
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "WEbcast producer device role" LIVE_STREAM_UPDATE realrun
+
+#### Known Issues & Limitations ####
+	None
+
+
 # Mercury 13.7.0 #
+## New FFMPEG version ##
+- Issue Type: Task
+- Issue ID: Plat-8231
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+- See the PLAT-8231 for link to the patched ffmpeg bins
+
+#### Known Issues & Limitations ####
+	None
+
 ## File Encryption ##
 - Issue Type: Task
 - Issue ID: PLAT-7961
@@ -47,6 +89,20 @@
 	-Add the following to Admin.ini:
 	access.search.all = SYSTEM_ADMIN_PUBLISHER_USAGE
        
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
+## add consumer for asset custom data changes  ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8242
+
+### Configuration ###
+	-Add the following to base.ini:
+	event_consumers[] = kAssetPropertiesManager
+
 ### Deployment scripts ###
 		None.
 

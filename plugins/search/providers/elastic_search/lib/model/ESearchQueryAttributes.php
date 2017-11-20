@@ -14,10 +14,15 @@ class ESearchQueryAttributes
 	protected $partnerLanguages;
 
 	/**
+	 * @var int
+	 */
+	protected $overrideInnerHitsSize;
+
+	/**
 	 * @var array
 	 */
 	private $fieldsToHighlight = array(self::HIGHLIGHT_GLOBAL_SCOPE => array(), self::HIGHLIGHT_INNER_SCOPE => array());
-
+	
 	private $highlightScope = self::HIGHLIGHT_GLOBAL_SCOPE;
 
 	private $useHighlight = true;
@@ -70,6 +75,22 @@ class ESearchQueryAttributes
 	public function setPartnerLanguages($partnerLanguages)
 	{
 		$this->partnerLanguages = $partnerLanguages;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getOverrideInnerHitsSize()
+	{
+		return $this->overrideInnerHitsSize;
+	}
+
+	/**
+	 * @param int $overrideInnerHitsSize
+	 */
+	public function setOverrideInnerHitsSize($overrideInnerHitsSize)
+	{
+		$this->overrideInnerHitsSize = $overrideInnerHitsSize;
 	}
 
 	public function setUseHighlight($useHighlight)

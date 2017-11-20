@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchParams extends KalturaESearchObject
+class KalturaESearchParams extends KalturaObject
 {
 	/**
 	 * @var KalturaESearchOperator
@@ -14,6 +14,11 @@ class KalturaESearchParams extends KalturaESearchObject
 	 * @var string
 	 */
 	public $objectStatuses;
+
+	/**
+	 * @var string
+	 */
+	public $objectId;
 
 	/**
 	 * @var KalturaESearchOrderBy
@@ -29,6 +34,7 @@ class KalturaESearchParams extends KalturaESearchObject
 	(
 		"searchOperator",
 		"objectStatuses",
+		"objectId",
 		"orderBy",
 		"useHighlight",
 	);

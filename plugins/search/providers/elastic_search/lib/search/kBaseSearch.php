@@ -16,7 +16,7 @@ abstract class kBaseSearch
         $this->queryAttributes = new ESearchQueryAttributes();
     }
 
-    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager = null, ESearchOrderBy $order = null, $useHighlight);
+    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight);
 
     public abstract function getPeerName();
 
@@ -30,11 +30,11 @@ abstract class kBaseSearch
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
-        $this->initQueryAttributes($partnerId, $useHighlight);
-        $this->initBasePartnerFilter($partnerId, $statuses);
+        $this->initQueryAttributes($partnerId, $objectId, $useHighlight);
+        $this->initBaseFilter($partnerId, $statuses, $objectId);
         $this->initPager($pager);
         $this->initOrderBy($order);
     }
@@ -44,7 +44,7 @@ abstract class kBaseSearch
         if($pager)
         {
             $this->query['from'] = $pager->calcOffset();
-            $this->query['size'] = $pager->getPageSize();
+            $this->query['size'] = $pager->calcPageSize();
         }
     }
 
@@ -76,7 +76,7 @@ abstract class kBaseSearch
         }
     }
 
-    protected function initBasePartnerFilter($partnerId, array $statuses)
+    protected function initBaseFilter($partnerId, array $statuses, $objectId)
     {
         $partnerStatus = array();
         foreach ($statuses as $status)
@@ -95,6 +95,14 @@ abstract class kBaseSearch
                 )
             )
         );
+
+        if($objectId)
+        {
+            $this->query['body']['query']['bool']['filter'][] = array(
+                'term' => array('_id' => elasticSearchUtils::formatSearchTerm($objectId))
+            );
+        }
+
         //return only the object id
         $this->query['body']['_source'] = false;
     }
@@ -138,10 +146,11 @@ abstract class kBaseSearch
         $this->query['body']['query']['bool']['must'] = array($conditions);
     }
 
-    protected function initQueryAttributes($partnerId, $useHighlight)
+    protected function initQueryAttributes($partnerId, $objectId, $useHighlight)
     {
         $this->initPartnerLanguages($partnerId);
         $this->queryAttributes->setUseHighlight($useHighlight);
+        $this->initOverrideInnerHits($objectId);
     }
 
     protected function initPartnerLanguages($partnerId)
@@ -158,6 +167,16 @@ abstract class kBaseSearch
         }
 
         $this->queryAttributes->setPartnerLanguages($partnerLanguages);
+    }
+
+    protected function initOverrideInnerHits($objectId)
+    {
+        if(!$objectId)
+            return;
+
+        $innerHitsConfig = kConf::get('innerHits', 'elastic');
+        $overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
+        $this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
     }
 
 }

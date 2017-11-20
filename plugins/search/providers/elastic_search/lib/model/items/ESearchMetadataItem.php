@@ -6,6 +6,7 @@
 class ESearchMetadataItem extends ESearchItem
 {
 	const DEFAULT_INNER_HITS_SIZE = 10;
+	const INNER_HITS_CONFIG_KEY = 'metadataInnerHitsSize';
 
 	private static $allowed_search_types_for_field = array(
 		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
@@ -116,8 +117,7 @@ class ESearchMetadataItem extends ESearchItem
 	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsSize = isset($innerHitsConfig['metadataInnerHitsSize']) ? $innerHitsConfig['metadataInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
+		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$metadataQuery['nested']['path'] = 'metadata';
 		$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchMetadataItem::getAllowedSearchTypesForField();

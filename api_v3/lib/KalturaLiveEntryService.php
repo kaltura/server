@@ -216,8 +216,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 
 		// setRedirectEntryId to null in all cases, even for broadcasting...
-		if ($dbLiveEntry->getViewMode() == ViewMode::ALLOW_ALL)
-			$dbLiveEntry->setRedirectEntryId(null);
+		$dbLiveEntry->setRedirectEntryId(null);
 
 		$dbLiveEntry->save();
 		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
