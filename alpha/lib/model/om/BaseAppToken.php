@@ -104,12 +104,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
-	 * The value for the kuser_id field.
-	 * @var        int
-	 */
-	protected $kuser_id;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -382,16 +376,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
-	}
-
-	/**
-	 * Get the [kuser_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getKuserId()
-	{
-		return $this->kuser_id;
 	}
 
 	/**
@@ -795,29 +779,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
-	 * Set the value of [kuser_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     AppToken The current object (for fluent API support)
-	 */
-	public function setKuserId($v)
-	{
-		if(!isset($this->oldColumnsValues[AppTokenPeer::KUSER_ID]))
-			$this->oldColumnsValues[AppTokenPeer::KUSER_ID] = $this->kuser_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->kuser_id !== $v) {
-			$this->kuser_id = $v;
-			$this->modifiedColumns[] = AppTokenPeer::KUSER_ID;
-		}
-
-		return $this;
-	} // setKuserId()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -866,7 +827,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 			$this->session_privileges = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->token = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->kuser_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -876,7 +836,7 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 15; // 15 = AppTokenPeer::NUM_COLUMNS - AppTokenPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 14; // 14 = AppTokenPeer::NUM_COLUMNS - AppTokenPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating AppToken object", $e);
@@ -1433,9 +1393,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 			case 13:
 				return $this->getCustomData();
 				break;
-			case 14:
-				return $this->getKuserId();
-				break;
 			default:
 				return null;
 				break;
@@ -1471,7 +1428,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 			$keys[11] => $this->getSessionPrivileges(),
 			$keys[12] => $this->getToken(),
 			$keys[13] => $this->getCustomData(),
-			$keys[14] => $this->getKuserId(),
 		);
 		return $result;
 	}
@@ -1545,9 +1501,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 			case 13:
 				$this->setCustomData($value);
 				break;
-			case 14:
-				$this->setKuserId($value);
-				break;
 		} // switch()
 	}
 
@@ -1586,7 +1539,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[11], $arr)) $this->setSessionPrivileges($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setToken($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setKuserId($arr[$keys[14]]);
 	}
 
 	/**
@@ -1612,7 +1564,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(AppTokenPeer::SESSION_PRIVILEGES)) $criteria->add(AppTokenPeer::SESSION_PRIVILEGES, $this->session_privileges);
 		if ($this->isColumnModified(AppTokenPeer::TOKEN)) $criteria->add(AppTokenPeer::TOKEN, $this->token);
 		if ($this->isColumnModified(AppTokenPeer::CUSTOM_DATA)) $criteria->add(AppTokenPeer::CUSTOM_DATA, $this->custom_data);
-		if ($this->isColumnModified(AppTokenPeer::KUSER_ID)) $criteria->add(AppTokenPeer::KUSER_ID, $this->kuser_id);
 
 		return $criteria;
 	}
@@ -1716,8 +1667,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 		$copyObj->setToken($this->token);
 
 		$copyObj->setCustomData($this->custom_data);
-
-		$copyObj->setKuserId($this->kuser_id);
 
 
 		$copyObj->setNew(true);
@@ -1835,10 +1784,6 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 	{
 		$customData = $this->getCustomDataObj( );
 		
-		$customDataOldValue = $customData->get($name, $namespace);
-		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
-			return;
-				
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
@@ -1846,7 +1791,7 @@ abstract class BaseAppToken extends BaseObject  implements Persistent {
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
 		
 		$customData->put ( $name , $value , $namespace );
 	}

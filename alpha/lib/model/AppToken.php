@@ -15,7 +15,6 @@
 class AppToken extends BaseAppToken
 {
 	const CUSTOM_DATA_FIELD_HASH_FUNCTION = 'hashType';
-	const CUSTOM_DATA_FIELD_DESCRIPTION = 'description';
 
 	private function calculateId()
 	{
@@ -24,13 +23,13 @@ class AppToken extends BaseAppToken
 		{
 			$id = $dc["id"] . '_' . kString::generateStringId();
 			$existingObject = AppTokenPeer::retrieveByPkNoFilter($id);
-
+			
 			if ($existingObject)
 				KalturaLog::log("ID [$id] already exists");
 			else
 				return $id;
 		}
-
+		
 		throw new Exception("Could not find unique id for AppToken");
 	}
 
@@ -42,17 +41,17 @@ class AppToken extends BaseAppToken
 		$this->setId($this->calculateId());
 		return parent::preInsert($con);
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see BaseAppToken::preUpdate()
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		if ($this->isColumnModified(AppTokenPeer::STATUS) && $this->getStatus() == AppTokenStatus::DELETED)
+		if($this->isColumnModified(AppTokenPeer::STATUS) && $this->getStatus() == AppTokenStatus::DELETED)
 		{
 			$this->setDeleted(time());
 		}
-
+		
 		return parent::preUpdate($con);
 	}
 
@@ -60,11 +59,11 @@ class AppToken extends BaseAppToken
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, $hashFunction);
 	}
-
+	
 	public function getHashType()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, null, "SHA1");
-
+		
 	}
 
 	public function calcHash()
@@ -72,15 +71,4 @@ class AppToken extends BaseAppToken
 		$hashFunction = $this->getHashType();
 		return hash($hashFunction, kCurrentContext::$ks . $this->getToken());
 	}
-
-	public function setDescription($description)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_DESCRIPTION, $description);
-	}
-
-	public function getDescription()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DESCRIPTION);
-
-	}
-}// AppToken
+} // AppToken
