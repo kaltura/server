@@ -21,6 +21,7 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
+	const CUSTOM_DATA_LAST_CHANGED_VIEW_MODE = "view_mode";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -954,6 +955,7 @@ abstract class LiveEntry extends entry
 	public function setViewMode($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
+		$this->setLastChangedViewMode(time());
 	}
 
 	public function getRecordingStatus()
@@ -973,5 +975,16 @@ abstract class LiveEntry extends entry
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
 	}
+
+	public function getLastChangedViewMode()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_CHANGED_VIEW_MODE, null, 0);
+	}
+
+	public function setLastChangedViewMode($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_LAST_CHANGED_VIEW_MODE, $v);
+	}
+
 
 }

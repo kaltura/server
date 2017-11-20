@@ -125,6 +125,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $recordingStatus;
 
+	/**
+	 * When the last time that viewMode was changed
+	 *
+	 * @var time
+	 * @readonly
+	 */
+	public $lastChangedViewMode;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -145,6 +153,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"explicitLive",
 		"viewMode",
 		"recordingStatus",
+		"lastChangedViewMode",
 	);
 	
 	/* (non-PHPdoc)
