@@ -122,6 +122,7 @@ abstract class kBaseSearch
 		{
 			$highlight = array();
 			$highlight["type"] = "unified";
+			$highlight["order"] = "score";
 			$configurationName = $highlightScope."MaxNumberOfFragments";
 			$innerHitsConfig = kConf::get('highlights', 'elastic');
 			$innerHitsSize = isset($innerHitsConfig[$configurationName]) ? $innerHitsConfig[$configurationName] : 5;

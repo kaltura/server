@@ -10,6 +10,11 @@ abstract class KalturaESearchResult extends KalturaObject
      */
     public $object;
 
+	/**
+	 * @var string
+	 */
+	public $highlight;
+
     /**
      * @var KalturaESearchItemDataResultArray
      */
@@ -17,6 +22,7 @@ abstract class KalturaESearchResult extends KalturaObject
 
     private static $map_between_objects = array(
         'object',
+		'highlight',
         'itemsData',
     );
 

@@ -112,7 +112,7 @@ class ESearchService extends KalturaBaseService
 			$coreOrder = $order->toObject();
 
 		$useHighlight = $searchParams->useHighlight;
-		if(empty($useHighlight)) // we use highlight by default
+		if(is_null($useHighlight)) // we use highlight by default
 			$useHighlight = true;
 
 		return array($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder, $useHighlight);
