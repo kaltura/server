@@ -1,4 +1,18 @@
 # Mercury 13.8.0 #
+
+## Add new app token capabilities ##
+- Issue Type: Task
+- Issue ID: PLAT-8200
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php deployment/updates/sql/2017_11_12_alter_app_token_table_add_kuser_id_column.sql
+
+#### Known Issues & Limitations ####
+	None
+
 ## Allow webcast to update liveStream parameters ##
 - Issue Type: Task
 - Issue ID: NO-PLAT
