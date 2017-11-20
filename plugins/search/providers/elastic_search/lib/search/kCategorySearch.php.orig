@@ -1,0 +1,53 @@
+<?php
+/**
+ * @package plugins.elasticSearch
+ * @subpackage lib.search
+ */
+
+class kCategorySearch extends kBaseSearch
+{
+    const PEER_NAME = 'categoryPeer';
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+<<<<<<< HEAD
+    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+=======
+    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+>>>>>>> origin/Mercury-13.8.0
+    {
+        kCategoryElasticEntitlement::init();
+        if (!count($statuses))
+            $statuses = array(CategoryStatus::ACTIVE);
+        $this->initQuery($statuses, $pager, $order, $useHighlight);
+        $result = $this->execSearch($eSearchOperator);
+        return $result;
+    }
+
+<<<<<<< HEAD
+    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+=======
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+>>>>>>> origin/Mercury-13.8.0
+    {
+        $this->query = array(
+            'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,
+            'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
+        );
+
+<<<<<<< HEAD
+        parent::initQuery($statuses, $pager, $order, $useHighlight);
+=======
+        parent::initQuery($statuses, $objectId, $pager, $order);
+>>>>>>> origin/Mercury-13.8.0
+    }
+
+    function getPeerName()
+    {
+        return self::PEER_NAME;
+    }
+
+}
