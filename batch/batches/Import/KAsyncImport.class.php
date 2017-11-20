@@ -337,7 +337,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			// check the file size only if its first or second retry
-			// in case it failed few times, taks the file as is
+			// in case it failed few times, take the file as is
 			if($fileSize)
 			{
 				clearstatcache();
