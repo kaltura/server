@@ -29,7 +29,7 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
-		
+		$flavors = $this->sortFlavors($flavors);
 		$flavor = VodPackagerDeliveryUtils::getVodPackagerUrl(
 				$flavors, 
 				$this->getUrl(), 
