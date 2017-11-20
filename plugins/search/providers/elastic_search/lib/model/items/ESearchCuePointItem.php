@@ -87,16 +87,35 @@ class ESearchCuePointItem extends ESearchItem
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
+		$cuePointFinalQuery = array();
 		$innerHitsConfig = kConf::get('innerHits', 'elastic');
 		$innerHitsSize = isset($innerHitsConfig['cuePointsInnerHitsSize']) ? $innerHitsConfig['cuePointsInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
-		$cuePointQuery['nested']['path'] = 'cue_points';
-		$cuePointQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();
-		foreach ($eSearchItemsArr as $cuePointSearchItem)
+
+		//don't group to a single query if the operator is AND
+		if($boolOperator == 'must')
 		{
-			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes, $queryAttributes);
+			foreach ($eSearchItemsArr as $cuePointSearchItem)
+			{
+				$cuePointQuery = null;
+				$cuePointQuery['nested']['path'] = 'cue_points';
+				$cuePointQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
+				self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes, $queryAttributes);
+				$cuePointFinalQuery[] = $cuePointQuery;
+			}
 		}
-		return array($cuePointQuery);
+		else
+		{
+			$cuePointQuery['nested']['path'] = 'cue_points';
+			$cuePointQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
+			foreach ($eSearchItemsArr as $cuePointSearchItem)
+			{
+				self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes, $queryAttributes);
+			}
+			$cuePointFinalQuery[] = $cuePointQuery;
+		}
+
+		return $cuePointFinalQuery;
 	}
 
 	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointQuery, $allowedSearchTypes, &$queryAttributes)

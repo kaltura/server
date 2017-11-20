@@ -108,17 +108,34 @@ class ESearchMetadataItem extends ESearchItem
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
+		$metadataFinalQuery = array();
 		$innerHitsConfig = kConf::get('innerHits', 'elastic');
 		$innerHitsSize = isset($innerHitsConfig['metadataInnerHitsSize']) ? $innerHitsConfig['metadataInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
-		$metadataQuery['nested']['path'] = 'metadata';
-		$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchMetadataItem::getAllowedSearchTypesForField();
 
-		foreach ($eSearchItemsArr as $metadataESearchItem)
+		//don't group to a single query if the operator is AND
+		if($boolOperator == 'must')
 		{
-			self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes, $queryAttributes);
+			foreach ($eSearchItemsArr as $metadataESearchItem)
+			{
+				$metadataQuery = null;
+				$metadataQuery['nested']['path'] = 'metadata';
+				$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
+				self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes, $queryAttributes);
+				$metadataFinalQuery[] = $metadataQuery;
+			}
 		}
-		return array($metadataQuery);
+		else
+		{
+			$metadataQuery['nested']['path'] = 'metadata';
+			$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
+			foreach ($eSearchItemsArr as $metadataESearchItem)
+			{
+				self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes, $queryAttributes);
+			}
+			$metadataFinalQuery[] = $metadataQuery;
+		}
+		return $metadataFinalQuery;
 	}
 
 	public static function createSingleItemSearchQuery($metadataESearchItem, $boolOperator, &$metadataQuery, $allowedSearchTypes, &$queryAttributes)
@@ -166,18 +183,18 @@ class ESearchMetadataItem extends ESearchItem
 		else if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
 			$metadataExactMatch['bool']['must'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
-
-			if($searchItem->getXpath())
-				$metadataExactMatch['bool']['must'][] = self::getXPathQuery($searchItem);
-
-			if($searchItem->getMetadataProfileId())
-				$metadataExactMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
-
-			if($searchItem->getMetadataFieldId())
-				$metadataExactMatch['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
 		}
 		else
 			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+
+		if($searchItem->getXpath())
+			$metadataExactMatch['bool']['must'][] = self::getXPathQuery($searchItem);
+
+		if($searchItem->getMetadataProfileId())
+			$metadataExactMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+
+		if($searchItem->getMetadataFieldId())
+			$metadataExactMatch['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
 
 		return $metadataExactMatch;
 	}

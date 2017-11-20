@@ -76,17 +76,35 @@ class ESearchCaptionItem extends ESearchItem
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
+		$captionFinalQuery = array();
 		$innerHitsConfig = kConf::get('innerHits', 'elastic');
 		$innerHitsSize = isset($innerHitsConfig['captionInnerHitsSize']) ? $innerHitsConfig['captionInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
-		$captionQuery['nested']['path'] = 'caption_assets.lines';
-		$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize);
 		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();
-		foreach ($eSearchItemsArr as $eSearchCaptionItem)
+
+		//don't group to a single query if the operator is AND
+		if($boolOperator == 'must')
 		{
-			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
+			foreach ($eSearchItemsArr as $eSearchCaptionItem)
+			{
+				$captionQuery = null;
+				$captionQuery['nested']['path'] = 'caption_assets.lines';
+				$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize);
+				self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
+				$captionFinalQuery[] = $captionQuery;
+			}
 		}
-		
-		return array($captionQuery);
+		else
+		{
+			$captionQuery['nested']['path'] = 'caption_assets.lines';
+			$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize);
+			foreach ($eSearchItemsArr as $eSearchCaptionItem)
+			{
+				self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
+			}
+			$captionFinalQuery[] = $captionQuery;
+		}
+
+		return $captionFinalQuery;
 	}
 
 	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionQuery, $allowedSearchTypes, &$queryAttributes)
