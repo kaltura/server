@@ -13,17 +13,17 @@ class kCategorySearch extends kBaseSearch
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
     {
         kCategoryElasticEntitlement::init();
         if (!count($statuses))
             $statuses = array(CategoryStatus::ACTIVE);
-        $this->initQuery($statuses, $pager, $order, $useHighlight);
+        $this->initQuery($statuses, $objectId, $pager, $order, $useHighlight);
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,

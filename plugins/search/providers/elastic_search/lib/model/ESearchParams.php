@@ -95,7 +95,7 @@ class ESearchParams extends BaseObject
 	}
 
 	/**
-	 * @return $useHighlight
+	 * @return bool
 	 */
 	public function getUseHighlight()
 	{

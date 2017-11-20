@@ -16,7 +16,7 @@ abstract class kBaseSearch
         $this->queryAttributes = new ESearchQueryAttributes();
     }
 
-    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight);
+    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true);
 
     public abstract function getPeerName();
 
@@ -30,7 +30,7 @@ abstract class kBaseSearch
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
         $this->initQueryAttributes($partnerId, $objectId, $useHighlight);
