@@ -42,7 +42,7 @@ class kString
 
 	public static function endsWith( $str, $desired_suffix )
 	{
-		return ( substr( $str, strlen( $str ) - strlen( $desired_suffix ) ) === $desired_suffix );
+		return ( substr( $str, -strlen( $desired_suffix ) ) === $desired_suffix );
 	}
 
 

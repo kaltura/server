@@ -18,6 +18,10 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
 	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
 	const CUSTOM_DATA_SEGMENT_DURATION = 'segmentDuration';
+	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
+	const CUSTOM_DATA_VIEW_MODE = "view_mode";
+	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
+
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
@@ -448,8 +452,17 @@ abstract class LiveEntry extends entry
 	/**
 	 * @return boolean
 	 */
-	public function hasMediaServer($currentDcOnly = false)
+	public function isCurrentlyLive($currentDcOnly = false)
 	{
+		if ($this->getViewMode() == ViewMode::PREVIEW)
+		{
+			$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
+			$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
+			$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+			if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+				return false;
+		}
+
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
 		if(!count($liveEntryServerNodes))
 			return false;
@@ -703,7 +716,7 @@ abstract class LiveEntry extends entry
 	public function getDynamicAttributes()
 	{
 		$dynamicAttributes = array(
-				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
+				LiveEntry::IS_LIVE => intval($this->isCurrentlyLive()),
 				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
 
@@ -920,5 +933,45 @@ abstract class LiveEntry extends entry
 		return array_merge(parent::getObjectParams($params), $body);
 	}
 
+	public function getExplicitLive()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXPLICIT_LIVE, null, false);
+	}
+
+	public function setExplicitLive($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_EXPLICIT_LIVE, $v);
+	}
+
+	public function getViewMode()
+	{
+		if ($this->getExplicitLive())
+			return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE, null, ViewMode::PREVIEW);
+		else
+			return ViewMode::ALLOW_ALL;
+	}
+
+	public function setViewMode($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
+	}
+
+	public function getRecordingStatus()
+	{
+		if ($this->getExplicitLive())
+			return $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_STATUS, null, RecordingStatus::STOPPED);
+		else
+		{
+			if ($this->getRecordStatus() == RecordStatus::DISABLED)
+				return RecordingStatus::DISABLED;
+			else
+				return RecordingStatus::ACTIVE;
+		}
+	}
+
+	public function setRecordingStatus($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
+	}
 
 }

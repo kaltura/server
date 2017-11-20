@@ -342,6 +342,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLanguageName = null;
 		$audioLabel = null;
 		$audioCodec = null;
+		$isDefaultAudio = false;
 		if ($flavor) 
 		{
 			if (is_callable(array($flavor, 'getFileExt'))) 
@@ -372,6 +373,15 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				$audioCodec = $this->getAudioCodec($flavor);
 				if(!$audioCodec)
 					$audioCodec = "und";
+				
+				if($this->params->getDefaultAudioLanguage())
+				{
+					$isDefaultAudio = $this->isDefaultAudio($audioLanguage, $audioLanguageName, $audioLabel);
+				}
+				elseif(is_callable(array($flavor, 'getDefault')))
+				{
+					$isDefaultAudio = $flavor->getDefault();
+				}
 			}
 		}
 		if (!$ext)
@@ -397,7 +407,20 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'audioLanguageName' => $audioLanguageName,
 				'audioLabel' => $audioLabel,
 				'audioCodec' => $audioCodec,
+				'defaultAudio' => $isDefaultAudio,
 			);
+	}
+	
+	protected function isDefaultAudio($audioLanguage = null, $audioLanguageName = null, $audioLabel = null)
+	{
+		$isDefaultAudio = false;
+		
+		if(	($audioLanguage && $audioLanguage != 'und' && $audioLanguage == $this->params->getDefaultAudioLanguage()) ||
+			($audioLanguageName && $audioLanguageName != 'Undefined' && $audioLanguageName == $this->params->getDefaultAudioLanguage()) ||
+			$audioLabel && $audioLabel == $this->params->getDefaultAudioLanguage() )
+			$isDefaultAudio = true;
+		
+		return $isDefaultAudio;
 	}
 	
 	public function getCacheInvalidationKeys()

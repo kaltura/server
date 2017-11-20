@@ -84,8 +84,10 @@
 			if(!isset($this->chunkDuration)) {
 				if($params->height>480)
 					$this->chunkDuration = self::DefaultChunkDuration;
-				else
+				else if($params->height>360)
 					$this->chunkDuration = 2*self::DefaultChunkDuration;
+				else
+					$this->chunkDuration = 3*self::DefaultChunkDuration;
 			}
 
 			if($this->concurrentMin>$this->concurrent)
@@ -297,10 +299,14 @@
 		 */
 		public function parseLogFile($logFileName)
 		{
+			if(!file_exists($logFileName))
+				return;
 			$fp = fopen($logFileName, 'r');
+			if($fp==null)
+				return;
 			$line = fgets($fp);
 			$logLines = null;
-			$logLines = $this->readLastLines($fp, 300);							
+			$logLines = self::readLastLines($fp, 300);							
 			$logLines[] = $line;
 			fclose($fp);
 			foreach($logLines as $line){
@@ -338,7 +344,7 @@
 		/********************
 		 *
 		 */
-		private function readLastLines($fp, $length)
+		private static function readLastLines($fp, $length)
 		{
 			fseek($fp, -$length, SEEK_END);
 			$lines=array();

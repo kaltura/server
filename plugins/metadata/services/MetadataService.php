@@ -366,79 +366,27 @@ class MetadataService extends KalturaBaseService
 	function listAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
-			$filter = new KalturaMetadataFilter;
+			$filter = new KalturaMetadataFilter();
 			
 		if (! $pager)
-			$pager = new KalturaFilterPager ();
-		
-		$objectIds = $this->validateObjectIdFiltered($filter);
-		if(!count($objectIds) && $filter->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT)
-		{
-			$response = new KalturaMetadataListResponse();
-			$response->objects = new KalturaMetadataArray();
-			$response->totalCount = 0;
-			return $response;
-		}
-		
-		$filter->objectIdEqual = null;
-		$filter->objectIdIn = implode(',', $objectIds);
-		return $filter->getListResponse($pager, $this->getResponseProfile());
-	}
-	
-
-	private function validateObjectIdFiltered(KalturaMetadataFilter &$filter)
-	{
-		$objectIds = null;
-		if ($filter->objectIdEqual)
-		{
-			$objectIds = array($filter->objectIdEqual);
-		}
-		else if ($filter->objectIdIn)
-		{
-			$objectIds = explode(',', $filter->objectIdIn);
-		}
-		
-		if($filter->metadataObjectTypeEqual != MetadataObjectType::ENTRY && kEntitlementUtils::getEntitlementEnforcement() && empty($objectIds) && kConf::hasParam('metadata_list_without_object_filtering_partners') &&
-			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
-			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
-			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
+			$pager = new KalturaFilterPager();
 		
 		$applyPartnerFilter = true;
-		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
+		if($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
-			$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
-			if(count($objectIds))
-				$applyPartnerFilter = false;
-		}
-		elseif($filter->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
-		{
-			$kusers = array();
-			if($objectIds)
-				$kusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds);
-			$objectIds = array();
-			if(count($kusers))
+			$objectIds = $filter->getObjectIdsFiltered();
+			if(!empty($objectIds))
 			{
-				foreach($kusers as $kuser)
-					$objectIds[] = $kuser->getId();
-			}
-		}
-		elseif($filter->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
-		{
-			$categories = array();
-			if($objectIds)
-				$categories = categoryPeer::retrieveByPKs($objectIds);
-			$objectIds = array();
-			if(count($categories))
-			{
-				foreach($categories as $category)
-					$objectIds[] = $category->getId();
+				$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
+				if(count($objectIds))
+					$applyPartnerFilter = false;
 			}
 		}
 		
 		if($applyPartnerFilter)
 			$this->applyPartnerFilterForClass('Metadata');
 		
-		return $objectIds;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**
