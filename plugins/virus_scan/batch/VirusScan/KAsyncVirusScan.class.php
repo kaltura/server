@@ -48,16 +48,8 @@ class KAsyncVirusScan extends KJobHandlerWorker
 			$output = null;
 			
 			// execute scan
-			$key = $data->fileContainer->encryptionKey;
-			if (!$key)
-				$data->scanResult = $engine->execute($data->fileContainer->filePath, $cleanIfInfected, $output, $errorDescription);
-			else
-			{
-				$tempPath = self::createTempClearFile($data->fileContainer->filePath, $key);
-				$data->scanResult = $engine->execute($tempPath, $cleanIfInfected, $output, $errorDescription);
-				unlink($tempPath);
-			}
-
+			$data->scanResult = $engine->execute($data->srcFilePath, $cleanIfInfected, $output, $errorDescription);
+			
 			if (!$output) {
 				KalturaLog::notice('Virus scan engine ['.get_class($engine).'] did not return any log for file ['.$data->srcFilePath.']');
 				$output = 'Virus scan engine ['.get_class($engine).'] did not return any log';
