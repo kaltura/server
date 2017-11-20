@@ -22,7 +22,8 @@ class ReportService extends KalturaBaseService
         KalturaReportType::OPERATING_SYSTEM,
         KalturaReportType::BROWSERS,
         KalturaReportType::LIVE,
-        KalturaReportType::TOP_PLAYBACK_CONTEXT
+        KalturaReportType::TOP_PLAYBACK_CONTEXT,
+        KalturaReportType::VPAAS_USAGE
     );
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -201,17 +202,25 @@ class ReportService extends KalturaBaseService
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		try {
-			$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType ,
-			$reportInputFilter->toReportsInputFilter() ,
-			$dimension ,
-			$objectIds ,
-			$pager->pageSize , $pager->pageIndex , $order );
+			$reportsMgrClass = $this->getReportsManagerClass($reportType);
+
+			$report = call_user_func(array($reportsMgrClass, "getUrlForReportAsCsv"), $this->getPartnerId(),
+				$reportTitle,
+				$reportText,
+				$headers,
+				$reportType,
+				$reportInputFilter->toReportsInputFilter(),
+				$dimension,
+				$objectIds,
+				$pager->pageSize,
+				$pager->pageIndex,
+				$order);
 		}
 		catch(Exception $e){
 			$code = $e->getCode();
 			if ($code == kCoreException::SEARCH_TOO_GENERAL)
 					throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
-			}
+		}
 
 		if ((infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS))
 			$report = str_replace("http://","https://",$report);

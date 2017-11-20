@@ -29,6 +29,7 @@ class kDruidBase
 	const DRUID_GRANULARITY_ALL = 'all';
 	const DRUID_GRANULARITY_DAY = 'day';
 	const DRUID_GRANULARITY_HOUR = 'hour';
+	const DRUID_GRANULARITY_MONTH = 'month';
 	const DRUID_DATASOURCE = 'dataSource';
 	const DRUID_INTERVALS = 'intervals';
 	const DRUID_FIELDS = 'fields';

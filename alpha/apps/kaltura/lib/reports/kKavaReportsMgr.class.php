@@ -29,8 +29,14 @@ class kKavaReportsMgr extends kKavaBase
     const REPORT_DRILLDOWN_DETAIL_DIM_HEADERS = "report_drilldown_deatil_dimensions_headers";
     const REPORT_CARDINALITY_METRIC = "report_caredinality_metric";
     
+    const REPORT_LEGACY = "report_legacy";
+    const REPORT_LEGACY_MAPPING = "legacy_mapping";
+    const REPORT_LEGACY_JOIN_FIELD = "join_field";
+    
+    
     const CLIENT_TAG_PRIORITY = 5;
     const MAX_RESULT_SIZE = 12000;
+    const MAX_CSV_RESULT_SIZE = 60000;
     
     static $aggregations_def = array();
     static $metrics_def = array();
@@ -257,7 +263,24 @@ class kKavaReportsMgr extends kKavaBase
             self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "name"),
             self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self:: METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
             self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "name", self::REPORT_ENRICH_FUNC => "self::getCategoriesNames")
+        ),
+        
+        myReportsMgr::REPORT_TYPE_VPAAS_USAGE => array(
+            self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
+            self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+            self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_MONTH,
+            self::REPORT_LEGACY => array(self::REPORT_LEGACY_MAPPING => array("total_plays" => "count_plays"),
+                                                          self::REPORT_LEGACY_JOIN_FIELD => "month_id"),
+        ),
+        
+        myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE => array(
+            self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
+            self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY,  self::EVENT_TYPE_PLAYER_IMPRESSION),
+            self::REPORT_LEGACY => array(self::REPORT_LEGACY_MAPPING => array("count loads" => "count_loads",
+                                                                                                                      "count plays" => "count_plays"),
+                                                          self::REPORT_LEGACY_JOIN_FIELD =>"id"),
         )
+        
     );
      
     static $metrics_to_headers = array(self::EVENT_TYPE_PLAY => "count_plays",
@@ -294,6 +317,12 @@ class kKavaReportsMgr extends kKavaBase
     	self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
     	self::DIMENSION_LOCATION_COUNTRY => array('kKavaCountryCodes', 'toShortName'),
     	self::DIMENSION_LOCATION_REGION => 'strtoupper',
+    );
+    
+    static $transform_time_dimensions = array(
+        self::DRUID_GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
+        self::DRUID_GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
+        self::DRUID_GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId')
     );
     
     protected static function transformDeviceName($name)
@@ -459,17 +488,17 @@ class kKavaReportsMgr extends kKavaBase
         else
             $granularity = self::DRUID_GRANULARITY_DAY;
             
-        $granularity = self::getGranularityDef($granularity, $input_filter->timeZoneOffset);
+        $granularity_def = self::getGranularityDef($granularity, $input_filter->timeZoneOffset);
         
         switch ($report_type) 
         { 
             case myReportsMgr::REPORT_TYPE_PLATFORMS:
             case myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM:
             case myReportsMgr::REPORT_TYPE_BROWSERS:
-                $query = self::getGroupByReport($partner_id, $intervals, $granularity, array($dimension), $metrics, $druid_filter);
+                $query = self::getGroupByReport($partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
                 break;
             default:
-                $query = self::getTimeSeriesReport($partner_id, $intervals, $granularity, $metrics, $druid_filter);
+                $query = self::getTimeSeriesReport($partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
                 
         }
         
@@ -499,7 +528,7 @@ class kKavaReportsMgr extends kKavaBase
                 $res = self::getGraphsByColumnName($result, $graph_metrics_to_headers, myReportsMgr::$type_map[$report_type]);
                 break;
             default:
-                $res = self::getGraphsByDateId ($result ,$graph_metrics_to_headers, $input_filter->timeZoneOffset, $report_type == myReportsMgr::REPORT_TYPE_LIVE);    
+                $res = self::getGraphsByDateId ($result ,$graph_metrics_to_headers, $input_filter->timeZoneOffset, self::$transform_time_dimensions[$granularity]);    
         }
                
         $end = microtime(true);
@@ -563,7 +592,7 @@ class kKavaReportsMgr extends kKavaBase
     
     
     public static function getTable($partner_id ,$report_type ,reportsInputFilter $input_filter,
-        $page_size, $page_index, $order_by, $object_ids = null)
+        $page_size, $page_index, $order_by, $object_ids = null, $isCsv = false)
     {
         self::init();
         $start = microtime (true);
@@ -575,6 +604,70 @@ class kKavaReportsMgr extends kKavaBase
         $dimension = self::getDimension($report_type, $object_ids);
         $metrics = self::getMetrics($report_type);
         
+        if (array_key_exists(self::REPORT_LEGACY, $report_def))
+        {
+            //get the report from the legacy dwh
+            list ( $header , $data , $totalCount ) = myReportsMgr::getTable($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids, null);
+          
+            switch ($report_type) {
+                case myReportsMgr::REPORT_TYPE_VPAAS_USAGE:
+                    $granularity = $report_def[self::REPORT_GRANULARITY];
+                    $granularity_def = self::getGranularityDef($granularity, $input_filter->timeZoneOffset);
+                    $query = self::getTimeSeriesReport($partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
+                    $result = self::runQuery($query);
+                    foreach ($metrics as $column)
+                    {
+                        $report_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
+                    }
+                    $res = self::getGraphsByDateId ($result ,$report_metrics_to_headers, $input_filter->timeZoneOffset, self::$transform_time_dimensions[$granularity]);
+                    $mapping = array_keys($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_MAPPING]);
+                    foreach ($mapping as $legacy_field => $druid_field)
+                    {
+                        $field_index = array_search($legacy_field, $header);
+                        $replace_by_field = $druid_field;
+                        break;
+                    }
+                    $key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $header);
+                    if (false !== $field_index) {
+                        $rows_count = count($data);
+                        for ($i = 0; $i < $rows_count; $i++) {
+                            $data[$i][$field_index] = $res[$replace_by_field][$data[$i][$key_index]];
+                        }
+                    }
+                    break;
+                case myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE:
+                    $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $metrics[0], "-", count(explode(",", $object_ids)));
+                    $result = self::runQuery($query);
+                    $key_field = $report_def[self::REPORT_DIMENSION];
+                    $rows = $result[0][self::DRUID_RESULT];
+                    $rows_by_key = array();
+                    foreach ($rows as $row)
+                    {
+                        $rows_by_key[$row[$key_field]] = $row;
+                    }
+                    $mapping = $report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_MAPPING];
+                    $mapping_by_index = array();
+                    foreach ($mapping as $legacy_field => $druid_field)
+                    {
+                        $field_index = array_search($legacy_field, $header);
+                        $mapping_by_index[$field_index] = self::$headers_to_metrics[$druid_field];
+                    }
+                    $key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $header);
+                    
+                    $rows_count = count($data);
+                    for ($i = 0; $i < $rows_count; $i++) {
+                            foreach ($mapping_by_index as $index => $druid_field)
+                                if (isset($rows_by_key[$data[$i][$key_index]]))
+                                    $data[$i][$index] = $rows_by_key[$data[$i][$key_index]][$druid_field];
+                                else 
+                                    $data[$i][$index]  = 0;
+                    }
+                    break;
+            }
+            $res = array ($headers, $data, $total_count);
+            return $res;           
+        }
+      
         if (!$metrics)
         {
         	$query = self::getSearchReport($partner_id, $intervals, array($dimension), $druid_filter);
@@ -599,10 +692,11 @@ class kKavaReportsMgr extends kKavaBase
         
         if (!$page_index || $page_index < 0) 
             $page_index = 1;
-        
-        if ($page_index * $page_size > self::MAX_RESULT_SIZE) 
+
+        $max_result_size = $isCsv ? self::MAX_CSV_RESULT_SIZE : self::MAX_RESULT_SIZE;
+        if ($page_index * $page_size > $max_result_size)
         {
-            throw new Exception("result limit is " . self::MAX_RESULT_SIZE . " rows");
+            throw new Exception("result limit is " . $max_result_size . " rows");
         }
         
         // order by
@@ -629,7 +723,7 @@ class kKavaReportsMgr extends kKavaBase
         $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
         
         if (!$object_ids &&
-        	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)))
+        	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) && !$isCsv)
         {
         	// get the topN objects first, otherwise the returned metrics can be inaccurate
         	$query = self::getTopReport($partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold, $metrics);
@@ -695,6 +789,10 @@ class kKavaReportsMgr extends kKavaBase
         }
                 
         $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+        if ($isCsv && isset($query[self::DRUID_CONTEXT]) && isset($query[self::DRUID_CONTEXT][self::DRUID_PRIORITY]))
+        {
+            $query[self::DRUID_CONTEXT][self::DRUID_PRIORITY] = 0;
+        }
         $result = self::runQuery($query);
         if (!$result)
         {
@@ -841,6 +939,11 @@ class kKavaReportsMgr extends kKavaBase
                                     self::DRUID_GRANULARITY_PERIOD => "PT1H",
                                     self::DRUID_TIMEZONE => $timezone_name);
             break;
+        case self::DRUID_GRANULARITY_MONTH:
+            $granularity_def = array(self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
+            self::DRUID_GRANULARITY_PERIOD => "P1M",
+            self::DRUID_TIMEZONE => $timezone_name);
+            break;
         default:
             $granularity_def = self::DRUID_GRANULARITY_ALL;
       }
@@ -903,6 +1006,14 @@ class kKavaReportsMgr extends kKavaBase
        $date = new DateTime($timestamp);
        $date->modify((12 * 60 - $offset) . " minute");		// adding 12H in order to round to the nearest day
        return $date->format('Ymd');
+   }
+   
+   // shift date by tz offset
+   private static function timestampToMonthId($timestamp, $offset)
+   {
+       $date = new DateTime($timestamp);
+       $date->modify((12 * 60 - $offset) . " minute");		// adding 12H in order to round to the nearest day
+       return $date->format('Ym');
    }
    
    // hours are returned from druid query with the right offset so no need to change it
@@ -1001,6 +1112,7 @@ class kKavaReportsMgr extends kKavaBase
            	
                case myReportsMgr::REPORT_TYPE_TOP_SYNDICATION:
                case myReportsMgr::REPORT_TYPE_MAP_OVERLAY:
+               case myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE:    
                    $druid_filter[] = array(self::DRUID_DIMENSION => self::$reports_def[$report_type][self::REPORT_DIMENSION],
                    self::DRUID_VALUES => $object_ids_arr
                    );
@@ -1017,6 +1129,7 @@ class kKavaReportsMgr extends kKavaBase
            );
        }
        
+       if ($report_type != myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE)
        $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
                self::DRUID_VALUES => array($partner_id)
            );         
@@ -1180,7 +1293,7 @@ class kKavaReportsMgr extends kKavaBase
        return $report_def;
    }
    
-   public static function getGraphsByDateId ($result, $graph_metrics_to_headers, $tz_offset, $is_hourly = false)
+   public static function getGraphsByDateId($result, $graph_metrics_to_headers, $tz_offset, $transform)
    {
        $graphs = array();
        
@@ -1193,11 +1306,8 @@ class kKavaReportsMgr extends kKavaBase
        {
            $row_data = $row[self::DRUID_RESULT];
            
-           if ($is_hourly)
-               $date = self::timestampToHourId($row[self::DRUID_TIMESTAMP]);
-           else
-               $date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz_offset);
-         
+           $date = call_user_func($transform, $row[self::DRUID_TIMESTAMP], $tz_offset);
+      
            foreach ($graph_metrics_to_headers as $column => $header)
            {
                $graphs[$header][$date] = $row_data[$column];
@@ -1412,5 +1522,89 @@ class kKavaReportsMgr extends kKavaBase
        
        return $total_count;
    }
+
+
+    /**
+     * will store the content of the report on disk and return the Url for the file
+     *
+     * @param string $partner_id
+     * @param string $report_title
+     * @param string $report_text
+     * @param string $headers
+     * @param int $report_type
+     * @param reportsInputFilter $input_filter
+     * @param string  $dimension
+     * @param string $object_ids
+     * @param int $page_size
+     * @param int $page_index
+     * @param string $order_by
+     */
+    public static function getUrlForReportAsCsv ( $partner_id ,
+                                                  $report_title , $report_text , $headers ,
+                                                  $report_type ,
+                                                  reportsInputFilter $input_filter ,
+                                                  $dimension = null ,
+                                                  $object_ids = null ,
+                                                  $page_size =10, $page_index =0, $order_by )
+    {
+        list ( $file_path , $file_name ) = myReportsMgr::createFileName ( $partner_id , $report_type , $input_filter , $dimension , $object_ids ,$page_size , $page_index , $order_by );
+        $csv = new myCsvWrapper ();
+
+        $arr = array();
+
+        if (!in_array($report_type, myReportsMgr::$reports_without_graph))
+        {
+            $arr = self::getGraph( $partner_id ,
+                $report_type ,
+                $input_filter ,
+                $dimension ,
+                $object_ids );
+        }
+
+
+        if (!in_array($report_type, myReportsMgr::$reports_without_totals))
+            list ( $total_header , $total_data ) = self::getTotal( $partner_id ,
+                $report_type ,
+                $input_filter , $object_ids );
+
+
+        if ($page_size < self::MAX_CSV_RESULT_SIZE)
+        {
+            if (!in_array($report_type, myReportsMgr::$reports_without_table))
+            {
+                list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+                    $report_type ,
+                    $input_filter ,
+                    $page_size , $page_index ,
+                    $order_by ,  $object_ids, true );
+
+                if ($input_filter instanceof endUserReportsInputFilter)
+                {
+                    $table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+                }
+
+            }
+
+            $csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
+                $report_type , $input_filter , $dimension ,
+                $arr , $total_header , $total_data , $table_header , $table_data , $table_total_count, $csv);
+
+            $data = $csv->getData();
+
+            // return URLwq
+            if ( ! file_exists (dirname ( $file_path ) ))
+                kFile::fullMkfileDir( dirname ( $file_path ) , 0777 );
+            //adding BOM for fixing problem in open .csv file with special chars using excel.
+            $BOM = "\xEF\xBB\xBF";
+            file_put_contents ( $file_path, $BOM . $data );
+        }
+        else
+        {
+            throw new kCoreException("Exceeded max query size: " . self::MAX_CSV_RESULT_SIZE ,kCoreException::SEARCH_TOO_GENERAL);
+        }
+
+        $url = myReportsMgr::createUrl($partner_id, $file_name);
+        return $url;
+    }
    
 }
