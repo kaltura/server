@@ -3,6 +3,29 @@
 	"number_of_shards" : 6,
 	"number_of_replicas" : 0,
 	"analysis": {
+	  "filter":{
+		"english_stop": {
+		  "type":       "stop",
+		  "stopwords":  "_english_"
+		},
+		"english_stemmer": {
+		  "type":       "stemmer",
+		  "language":   "english"
+		},
+		"english_possessive_stemmer": {
+		  "type":       "stemmer",
+		  "language":   "possessive_english"
+		},
+		"kaltura_english_synonym_filter": {
+		  "type": "synonym",
+		  "format": "wordnet",
+		  "synonyms_path": "analysis/wn_s.pl"
+		},
+		"kaltura_unique_token_filter": {
+		  "type": "unique",
+		  "only_on_same_position": true
+		}
+	  },
 	  "char_filter": {
 		"kaltura_whitespace_filter": {
 		  "type": "pattern_replace",
@@ -44,6 +67,17 @@
 		"kaltura_text" : {
 		  "tokenizer" : "standard",
 		  "filter" : ["standard", "lowercase", "asciifolding"]
+		},
+		"kaltura_english_synonym": {
+		  "tokenizer":  "standard",
+		  "filter": [
+			"english_possessive_stemmer",
+			"lowercase",
+			"english_stop",
+			"english_stemmer",
+			"kaltura_english_synonym_filter",
+			"kaltura_unique_token_filter"
+		  ]
 		}
 	  }
 	}
@@ -71,7 +105,14 @@
 			},
 			"english" : {
 			  "type" : "text",
-			  "analyzer": "english"
+			  "analyzer": "english",
+			  "fields": {
+				"synonym": {
+				  "type": "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "english"
+				}
+			  }
 			},
 			"arabic" : {
 			  "type" : "text",
@@ -217,7 +258,14 @@
 			},
 			"english" : {
 			  "type" : "text",
-			  "analyzer": "english"
+			  "analyzer": "english",
+			  "fields": {
+				"synonym": {
+				  "type": "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "english"
+				}
+			  }
 			},
 			"arabic" : {
 			  "type" : "text",
@@ -596,7 +644,14 @@
 				},
 				"content_english" : {
 				  "type" : "text",
-				  "analyzer": "english"
+				  "analyzer": "english",
+				  "fields":{
+					"synonym" : {
+					  "type" : "text",
+					  "analyzer": "kaltura_english_synonym",
+					  "search_analyzer": "english"
+					}
+				  }
 				},
 				"content_arabic" : {
 				  "type" : "text",

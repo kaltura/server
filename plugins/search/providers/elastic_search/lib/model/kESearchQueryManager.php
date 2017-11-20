@@ -38,20 +38,17 @@ class kESearchQueryManager
 	const MATCH_PHRASE_KEY = 'match_phrase';
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
+	const RAW_FIELD_BOOST_FACTOR = 4;
+	const LANGUAGE_FIELD_BOOST_FACTOR = 3;
+	const MATCH_FIELD_BOOST_FACTOR = 2;
 
-
-	/**
-	 * @param ESearchItem $searchItem
-	 * @param string $fieldName
-	 * @param $queryAttributes
-	 * @return array
-	 */
 	public static function getMultiMatchQuery($searchItem, $fieldName, &$queryAttributes)
 	{
 		$multiMatch = array();
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
-		$rawBoostFactor = 3 * $fieldBoostFactor;
-		$multiMatchFieldBoostFactor = 2 * $fieldBoostFactor;
+		$rawBoostFactor = self::RAW_FIELD_BOOST_FACTOR * $fieldBoostFactor;
+		$multiMatchFieldBoostFactor = self::MATCH_FIELD_BOOST_FACTOR * $fieldBoostFactor;
+
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::QUERY_KEY] = $searchItem->getSearchTerm();
 		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY] = array(
 			$fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor,
@@ -66,7 +63,13 @@ class kESearchQueryManager
 			{
 				$mappingLanguageField = elasticSearchUtils::getAnalyzedFieldName($language, $fieldName, $searchItem->getItemMappingFieldsDelimiter());
 				if($mappingLanguageField)
-					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^'.$multiMatchFieldBoostFactor;
+				{
+					$languageFieldBoostFactor = self::LANGUAGE_FIELD_BOOST_FACTOR * $fieldBoostFactor;
+					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^'.$languageFieldBoostFactor;
+					$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
+					if($synonymField)
+						$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $synonymField; //don't boost
+				}
 			}
 		}
 
@@ -83,22 +86,24 @@ class kESearchQueryManager
 	{
 		$exactMatch = array();
 		$queryType = self::TERM_KEY;
-		$termKey = self::VALUE_KEY;
+		$searchValuePath = self::VALUE_KEY;
 		$fieldSuffix = '';
-
 
 		if (in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 		{
 			$queryType = self::MATCH_PHRASE_KEY;
-			$termKey = self::QUERY_KEY;
+			$searchValuePath = self::QUERY_KEY;
 		}
 
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
 		$exactMatch[$queryType] = array
-			( $fieldName . $fieldSuffix => array
-				($termKey => $searchTerm, self::BOOST_KEY => $fieldBoostFactor)
-			);
+		(
+			$fieldName . $fieldSuffix => array(
+				$searchValuePath => $searchTerm,
+				self::BOOST_KEY => $fieldBoostFactor
+			)
+		);
 
 		return $exactMatch;
 	}
@@ -115,9 +120,13 @@ class kESearchQueryManager
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
 		$prefixQuery[$queryType] = array
-			( $fieldName . $fieldSuffix => array
-				(self::VALUE_KEY=> $searchTerm, self::BOOST_KEY => $fieldBoostFactor)
-			);
+		(
+			$fieldName . $fieldSuffix => array
+			(
+				self::VALUE_KEY => $searchTerm,
+				self::BOOST_KEY => $fieldBoostFactor
+			)
+		);
 
 		return $prefixQuery;
 	}

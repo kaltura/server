@@ -7,6 +7,7 @@ class elasticSearchUtils
 {
 	const UNDERSCORE_FIELD_DELIMITER ='_';
 	const DOT_FIELD_DELIMITER = '.';
+
     /**
      * return the analyzed language field name
      * @param $language
@@ -59,6 +60,17 @@ class elasticSearchUtils
 
         return null;
     }
+
+	public static function getSynonymFieldName($language, $fieldName, $delimiter)
+	{
+		$fieldMap = array(
+			'english' => 'synonym',
+		);
+
+		$language = strtolower($language);
+		if(isset($fieldMap[$language]))
+			return $fieldName.$delimiter.$fieldMap[$language];
+	}
 
 	public static function formatPartnerStatus($partnerId, $status)
 	{
