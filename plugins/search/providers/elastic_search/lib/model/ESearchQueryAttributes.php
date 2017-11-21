@@ -11,6 +11,11 @@ class ESearchQueryAttributes
 	protected $partnerLanguages;
 
 	/**
+	 * @var int
+	 */
+	protected $overrideInnerHitsSize;
+
+	/**
 	 * @return array
 	 */
 	public function getPartnerLanguages()
@@ -24,6 +29,22 @@ class ESearchQueryAttributes
 	public function setPartnerLanguages($partnerLanguages)
 	{
 		$this->partnerLanguages = $partnerLanguages;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getOverrideInnerHitsSize()
+	{
+		return $this->overrideInnerHitsSize;
+	}
+
+	/**
+	 * @param int $overrideInnerHitsSize
+	 */
+	public function setOverrideInnerHitsSize($overrideInnerHitsSize)
+	{
+		$this->overrideInnerHitsSize = $overrideInnerHitsSize;
 	}
 
 }

@@ -501,16 +501,23 @@ class kJobsManager
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}
-			
+
 		// creates convert data
 		$convertData = new kConvertJobData();
 		$convertData->setSrcFileSyncs($srcFileSyncs);
+		$sourcePath = $convertData->getSrcFileSyncLocalPath();
+		if(kFile::isFileTypeText($sourcePath))
+		{
+			KalturaLog::err("Source file is of type text for flavor id [$flavorAssetId]");
+			return null;
+		}
+
 		$convertData->setMediaInfoId($mediaInfoId);
 		$convertData->setFlavorParamsOutputId($flavor->getId());
 		$convertData->setFlavorAssetId($flavorAssetId);
 		$convertData->setConversionProfileId($conversionProfileId);
 		$convertData->setPriority($priority);
-		
+
 		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
 		if(!$dbCurrentConversionEngine)
 			return null;
@@ -1214,6 +1221,13 @@ class kJobsManager
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{
+		if(kFile::isFileTypeText($inputFileSyncLocalPath))
+		{
+			KalturaLog::notice('Source of type text will not be converted');
+			$entry->setStatus(entryStatus::ERROR_CONVERTING);
+			$entry->save();
+			return null;
+		}
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);
@@ -1767,5 +1781,17 @@ class kJobsManager
 		$job->setData($jobData);
 		
 		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
+	}
+
+	protected static function getFileContainer(FileSyncKey $syncKey)
+	{
+		$fileContainer = new FileContainer();
+		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
+		if ($fileSync)
+		{
+			$fileContainer->setFilePath($fileSync->getFullPath());
+			$fileContainer->setEncryptionKey($fileSync->getEncryptionKey());
+		}
+		return $fileContainer;
 	}
 }

@@ -142,9 +142,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return $entry;
 	}
 
-	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true)
+	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true, $flavorParamsId = null)
 	{
-		$flavorParamsId = $dbAsset->getFlavorParamsId();
+		if ($dbAsset)
+			$flavorParamsId = $dbAsset->getFlavorParamsId();
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
 
 		// is first chunk
@@ -163,7 +164,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset->setFlavorParamsId($flavorParams->getId());
 		$recordedAsset->setFromAssetParams($flavorParams);
 		$recordedAsset->incrementVersion();
-		if ($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
+		if ($dbAsset && $dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 		{
 			$recordedAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
 		}
@@ -216,8 +217,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 
 		// setRedirectEntryId to null in all cases, even for broadcasting...
-		if ($dbLiveEntry->getViewMode() == ViewMode::ALLOW_ALL)
-			$dbLiveEntry->setRedirectEntryId(null);
+		$dbLiveEntry->setRedirectEntryId(null);
 
 		$dbLiveEntry->save();
 		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
@@ -474,7 +474,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 		//In case conversion profile was changed we need to fetch passed streamed assets as well
 		$dbAsset = assetPeer::retrieveByEntryIdAndParamsNoFilter($dbLiveEntry->getId(), $flavorParamsId);
 		if (!$dbAsset)
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+		{
+			$flavorParamConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParamsId, $dbLiveEntry->getConversionProfileId());
+			if (!$flavorParamConversionProfile)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+		}
 
 		$kResource = $resource->toObject();
 		/* @var $kResource kLocalFileResource */
@@ -483,7 +487,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
 		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
-		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile);
+		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile, $flavorParamsId);
 	}
 
 	/**

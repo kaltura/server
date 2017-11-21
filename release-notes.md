@@ -1,13 +1,43 @@
+# Mercury 13.8.0 #
+
+## Add new app token capabilities ##
+- Issue Type: Task
+- Issue ID: PLAT-8200
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	 mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2017_11_12_alter_app_token_table_add_kuser_id_column.sql
+
+#### Known Issues & Limitations ####
+	None
+
+## Permissions for webcast live dashboard ##
+- Issue Type: Task
+- Issue ID: NO-PLAT
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "WEbcast producer device role" LIVE_STREAM_UPDATE realrun
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_21_allow_webcast_to_list_beacons_and_conversionprofileassetparams.php
+
+#### Known Issues & Limitations ####
+	None
+
+
 # Mercury 13.7.0 #
 ## New FFMPEG version ##
-- Issue Type: Security fix
+- Issue Type: Task
 - Issue ID: Plat-8231
 
 ### Configuration ###
 	None
 
 ### Deployment scripts ###
-- New ffmpeg is located at nyStorage/web/content/shared/bin/ffmpeg-3.2-bin-p4-hls-local-path.tar.gz
+- See the PLAT-8231 for link to the patched ffmpeg bins
 
 #### Known Issues & Limitations ####
 	None
@@ -60,6 +90,20 @@
 	-Add the following to Admin.ini:
 	access.search.all = SYSTEM_ADMIN_PUBLISHER_USAGE
        
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
+## add consumer for asset custom data changes  ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8242
+
+### Configuration ###
+	-Add the following to base.ini:
+	event_consumers[] = kAssetPropertiesManager
+
 ### Deployment scripts ###
 		None.
 

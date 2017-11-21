@@ -102,4 +102,18 @@ abstract class ESearchItem extends BaseObject
 
 		return $result;
 	}
+
+	protected static function initializeInnerHitsSize($queryAttributes)
+	{
+		$overrideInnerHitsSize = $queryAttributes->getOverrideInnerHitsSize();
+		if($overrideInnerHitsSize)
+			return $overrideInnerHitsSize;
+
+		$innerHitsConfig = kConf::get('innerHits', 'elastic');
+		$innerHitsConfigKey = static::INNER_HITS_CONFIG_KEY;
+		$innerHitsSize = isset($innerHitsConfig[$innerHitsConfigKey]) ? $innerHitsConfig[$innerHitsConfigKey] : static::DEFAULT_INNER_HITS_SIZE;
+
+		return $innerHitsSize;
+	}
+
 }

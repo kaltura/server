@@ -60,13 +60,17 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			
 			$url .= ($entryVersion ? "/v/$entryVersion" : '') .
 				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '');
-			$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
+			if(!($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+				$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
 		}
 		else
 		{
 			$url .= $this->getFlavorVersionString($flavorAsset);
 			$url .= '/flavorId/' . $flavorAsset->getId();
 		}
+
+		if (($entry->getType() == entryType::PLAYLIST) && ($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+			$url .= '/captions/' . $flavorAsset->getLanguage();
 
 		$url .= $this->params->getUrlParams();
 		return $url;

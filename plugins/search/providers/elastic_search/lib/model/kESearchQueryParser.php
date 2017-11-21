@@ -37,22 +37,22 @@ class kESearchQueryParser
 	const GREATER_THAN_OR_EQUAL = 'GTE';
 
 	/**
-	 * @param KalturaESearchQuery $kEsearchQuery
+	 * @param $eSearchQuery
 	 * @return KalturaESearchParams
 	 * @throws kESearchException
 	 */
-	public static function buildKESearchParamsFromKESearchQuery($kEsearchQuery)
+	public static function buildKESearchParamsFromKESearchQuery($eSearchQuery)
 	{
-		$kESearchParams = new KalturaESearchParams();
 		// in case of a free text query (wihtout fields or brackets or special commands - a simple unified search object will be created
-		if (self::isFreeTextQuery($kEsearchQuery->eSearchQuery))
-			$kESearchParams->searchOperator = self::createSimpleUnifiedSearchParam($kEsearchQuery->eSearchQuery);
+		$searchItem = null;
+		if (self::isFreeTextQuery($eSearchQuery))
+			$searchItem = self::createSimpleUnifiedSearchParam($eSearchQuery);
 		else
 		{
-			$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSearchQuery);
-			$kESearchParams->searchOperator = self::createKESearchParams($parsedQuery);
+			$parsedQuery = self::parseKESearchQuery($eSearchQuery);
+			$searchItem = self::createKESearchParams($parsedQuery);
 		}
-		return $kESearchParams;
+		return $searchItem;
 	}
 
 	/**
@@ -73,15 +73,11 @@ class kESearchQueryParser
 	 */
 	private static function createSimpleUnifiedSearchParam($eSearchQuery)
 	{
-		$kESearchObject = new KalturaESearchOperator();
-		$kSearchItems = new KalturaESearchBaseItemArray();
 		$kSearchItem = new KalturaESearchUnifiedItem();
 		$kSearchItem->itemType =  KalturaESearchItemType::EXACT_MATCH;
 		$kSearchItem->searchTerm = $eSearchQuery;
-		$kSearchItems[] = $kSearchItem;
-		$kESearchObject->searchItems = $kSearchItems;
 
-		return $kESearchObject;
+		return $kSearchItem;
 	}
 
 	/**
