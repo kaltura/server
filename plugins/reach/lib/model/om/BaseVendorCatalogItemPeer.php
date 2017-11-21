@@ -254,7 +254,7 @@ abstract class BaseVendorCatalogItemPeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     VendorCatalogItem
+	 * @return     CatalogItem
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -609,10 +609,10 @@ abstract class BaseVendorCatalogItemPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      VendorCatalogItem $value A VendorCatalogItem object.
+	 * @param      CatalogItem $value A VendorCatalogItem object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(VendorCatalogItem $obj, $key = null)
+	public static function addInstanceToPool(CatalogItem $obj, $key = null)
 	{
 		if ( Propel::isInstancePoolingEnabled() )
 		{
@@ -644,7 +644,7 @@ abstract class BaseVendorCatalogItemPeer {
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof VendorCatalogItem) {
+			if (is_object($value) && $value instanceof CatalogItem) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
@@ -665,7 +665,7 @@ abstract class BaseVendorCatalogItemPeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     VendorCatalogItem Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     CatalogItem Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -937,7 +937,7 @@ abstract class BaseVendorCatalogItemPeer {
 			VendorCatalogItemPeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof VendorCatalogItem) { // it's a model object
+		} elseif ($values instanceof CatalogItem) { // it's a model object
 			// invalidate the cache for this single object
 			VendorCatalogItemPeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
@@ -978,12 +978,12 @@ abstract class BaseVendorCatalogItemPeer {
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      VendorCatalogItem $obj The object to validate.
+	 * @param      CatalogItem $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(VendorCatalogItem $obj, $cols = null)
+	public static function doValidate(CatalogItem $obj, $cols = null)
 	{
 		$columns = array();
 
@@ -1013,7 +1013,7 @@ abstract class BaseVendorCatalogItemPeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     VendorCatalogItem
+	 * @return     CatalogItem
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{

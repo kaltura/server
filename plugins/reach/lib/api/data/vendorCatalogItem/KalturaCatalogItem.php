@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaVendorCatalogItem extends KalturaObject
+class KalturaCatalogItem extends KalturaObject
 {
 	/**
 	 * @var int
@@ -14,12 +14,14 @@ class KalturaVendorCatalogItem extends KalturaObject
 	
 	/**
 	 * @var int
+	 * @readonly
 	 * @filter eq,in
 	 */
 	public $partnerId;
 	
 	/**
 	 * @var int
+	 * @filter eq,in
 	 */
 	public $vendorPartnerId;
 	
@@ -48,51 +50,40 @@ class KalturaVendorCatalogItem extends KalturaObject
 	public $updatedAt;
 	
 	/**
-	 * @var KalturaVendorCatalogItemStatus
+	 * @var KalturaCatalogItemStatus
+	 * @readonly
+	 * @filter eq,in
 	 */
 	public $status;
 	
 	/**
 	 * @var KalturaNullableBoolean
+	 * @filter eq
 	 */
 	public $isPublic;
 	
 	/**
 	 * @var KalturaVendorServiceType
+	 * @filter eq,in
 	 */
 	public $serviceType;
 	
 	/**
 	 * @var KalturaVendorServiceFeature
+	 * @filter eq,in
 	 */
 	public $serviceFeature;
 	
 	/**
 	 * @var KalturaVendorServiceTurnAroundTime
+	 * @filter eq,in
 	 */
 	public $turnAroundTime;
 	
-	
 	/**
-	 * @var KalturaLanguageArray
+	 * @var KalturaCatalogItemPricing
 	 */
-	public $sourceLanguages;
-	
-	/**
-	 * @var KalturaLanguageArray
-	 */
-	public $targetLanguages;
-	
-	/**
-	 * @var KalturaVendorCatalogItemPriceFunction
-	 */
-	public $priceFunction;
-	
-	/**
-	 * @var KalturaVendorCatalogItemOutputFormat
-	 */
-	public $outoutFormat;
-	
+	public $pricing;
 	
 	private static $map_between_objects = array
 	(
@@ -108,10 +99,7 @@ class KalturaVendorCatalogItem extends KalturaObject
 		'serviceType',
 		'serviceFeature',
 		'turnAroundTime',
-		'sourceLanguages',
-		'targetLanguages',
-		'priceFunction',
-		'outoutFormat',
+		'pricing',
 	);
 	
 	/* (non-PHPdoc)
@@ -128,14 +116,15 @@ class KalturaVendorCatalogItem extends KalturaObject
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
-			$object_to_fill = new VendorCatalogItem();
+			$object_to_fill = new CatalogItem();
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "serviceFeature", "turnAroundTime", "priceFunction"));
+		$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "serviceFeature", "turnAroundTime", "pricing"));
+		$this->validateVendorPartnerId();
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
@@ -147,5 +136,16 @@ class KalturaVendorCatalogItem extends KalturaObject
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	private function validateVendorPartnerId()
+	{
+		$vendorPartner = PartnerPeer::retrieveByPK($this->vendorPartnerId);
+		
+		if(!$vendorPartner)
+			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PARTNER_ID_NOT_FOUND, $this->vendorPartnerId);
+		
+		if($vendorPartner->getType() != KalturaPartnerType::VENDOR)
+			throw new KalturaAPIException(KalturaReachErrors::PARTNER_NOT_VENDOR, $this->vendorPartnerId);
 	}
 }

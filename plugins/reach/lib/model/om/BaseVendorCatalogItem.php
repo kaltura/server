@@ -320,7 +320,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
@@ -343,7 +343,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [name] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setName($v)
 	{
@@ -366,7 +366,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [system_name] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setSystemName($v)
 	{
@@ -390,7 +390,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -439,7 +439,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
@@ -487,7 +487,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [status] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setStatus($v)
 	{
@@ -510,7 +510,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [partner_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setPartnerId($v)
 	{
@@ -533,7 +533,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [vendor_partner_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setVendorPartnerId($v)
 	{
@@ -556,7 +556,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [service_type] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setServiceType($v)
 	{
@@ -579,7 +579,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [service_feature] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setServiceFeature($v)
 	{
@@ -602,7 +602,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [turn_around_time] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setTurnAroundTime($v)
 	{
@@ -625,7 +625,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     CatalogItem The current object (for fluent API support)
 	 */
 	public function setCustomData($v)
 	{
@@ -1528,7 +1528,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     VendorCatalogItem Clone of current object.
+	 * @return     CatalogItem Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1544,16 +1544,16 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     VendorCatalogItem Clone of current object.
+	 * @var     CatalogItem Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      VendorCatalogItem $copiedFrom Clone of current object.
+	 * @param      CatalogItem $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(VendorCatalogItem $copiedFrom)
+	public function setCopiedFrom(CatalogItem $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}

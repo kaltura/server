@@ -30,7 +30,7 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		$dbVendorCatalogItem = $vendorCatalogItem->toInsertableObject();
 		
-		/* @var $dbVendorCatalogItem VendorCatalogItem */
+		/* @var $dbVendorCatalogItem CatalogItem */
 		$dbVendorCatalogItem->setPartnerId($this->getPartnerId());
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::ACTIVE);
 		$dbVendorCatalogItem->save();
@@ -38,4 +38,25 @@ class VendorCatalogItemService extends KalturaBaseService
 		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
 		return $vendorCatalogItem;
 	}
+	
+	/**
+	 * Retrieve specifc catalog item by id
+	 *
+	 * @action get
+	 * @param int $id
+	 * @return KalturaVendorCatalogItem
+	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
+	 */
+	function getAction($id)
+	{
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
+		if(!$dbVendorCatalogItem)
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
+		
+		$vendorCatalogItem = new KalturaVendorCatalogItem();
+		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
+		return $vendorCatalogItem;
+	}
+	
+
 }
