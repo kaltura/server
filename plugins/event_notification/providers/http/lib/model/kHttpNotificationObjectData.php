@@ -57,9 +57,7 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 		if(strpos($this->code, ';') !== false)
 			throw new kCoreException("Evaluated code may be simple value only");
 
-		KalturaLog::debug("AAAAAA code - " . $this->code);
 		$object = eval("return {$this->code};");
-		KalturaLog::debug("AAAAAA object - " . print_r($object, true));
 
 		if(is_object($object))
 			$this->coreObject = serialize($object);
