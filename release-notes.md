@@ -8,7 +8,7 @@
 	None
 
 ### Deployment scripts ###
-	php deployment/updates/sql/2017_11_12_alter_app_token_table_add_kuser_id_column.sql
+	 mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2017_11_12_alter_app_token_table_add_kuser_id_column.sql
 
 #### Known Issues & Limitations ####
 	None
