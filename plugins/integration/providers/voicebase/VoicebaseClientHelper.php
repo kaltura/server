@@ -70,9 +70,11 @@ class VoicebaseClientHelper
 						"lang" => $spokenLanguage
 						);
 
-		$params = array_merge($params, $this->additionalParams["uploadMedia"]);
+		if (isset($this->additionalParams["uploadMedia"]))
+        {
+            $params = array_merge($params, $this->additionalParams["uploadMedia"]);
+        }
 
-	
 		$postParams = array("mediaURL" => $flavorUrl);
 		if($fileLocation)
 		{
@@ -137,6 +139,12 @@ class VoicebaseClientHelper
 	public function updateRemoteTranscript($entryId, $transcriptContent, $callBack)
 	{
 		$params = array("action" => "updateTranscript", "externalID" => $entryId);
+
+        if (isset($this->additionalParams["updateTranscript"]))
+        {
+            $params = array_merge($params, $this->additionalParams["updateTranscript"]);
+        }
+
 		$updateTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 
 		$transcriptContent = $this->getFile($transcriptContent);
