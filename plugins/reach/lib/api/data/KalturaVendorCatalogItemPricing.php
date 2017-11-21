@@ -5,7 +5,6 @@
  */
 class KalturaVendorCatalogItemPricing extends KalturaObject
 {
-	
 	/**
 	 * @var int
 	 */
@@ -27,7 +26,7 @@ class KalturaVendorCatalogItemPricing extends KalturaObject
  	 */
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	/* (non-PHPdoc)
@@ -37,7 +36,7 @@ class KalturaVendorCatalogItemPricing extends KalturaObject
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kCatalogItemPricing();
+			$dbObject = new kVendorCatalogItemPricing();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);

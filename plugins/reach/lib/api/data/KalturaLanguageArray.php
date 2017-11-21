@@ -21,7 +21,7 @@ class KalturaLanguageArray extends KalturaTypedArray
 			foreach($arr as $item)
 			{
 				$arrayObject = new KalturaLanguageItem();
-				$arrayObject->languages = $item;
+				$arrayObject->language = $item;
 				$newArr[] = $arrayObject;
 			}
 		}

@@ -15,8 +15,8 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		//if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
-		//	throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
+		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 	}
 	
 	/**
@@ -35,6 +35,8 @@ class VendorCatalogItemService extends KalturaBaseService
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::ACTIVE);
 		$dbVendorCatalogItem->save();
 		
+		// return the saved object
+		$vendorCatalogItem = KalturaVendorCatalogItem::getInstance($dbVendorCatalogItem, $this->getResponseProfile());
 		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
 		return $vendorCatalogItem;
 	}
@@ -53,8 +55,27 @@ class VendorCatalogItemService extends KalturaBaseService
 		if(!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
-		$vendorCatalogItem = new KalturaVendorCatalogItem();
+		$vendorCatalogItem = KalturaVendorCatalogItem::getInstance($dbVendorCatalogItem, $this->getResponseProfile());
 		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
 		return $vendorCatalogItem;
+	}
+	
+	/**
+	 * List KalturaVendroCatalogItem objects
+	 *
+	 * @action list
+	 * @param KalturaVendorCatalogItemFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaVendorCatalogItemListResponse
+	 */
+	public function listAction(KalturaVendorCatalogItemFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaVendorCatalogItemFilter();
+		
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+		
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 }

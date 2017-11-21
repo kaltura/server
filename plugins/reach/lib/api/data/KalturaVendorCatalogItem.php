@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaVendorCatalogItem extends KalturaObject
+abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
 	/**
 	 * @var int
@@ -60,7 +60,7 @@ class KalturaVendorCatalogItem extends KalturaObject
 	 * @var KalturaNullableBoolean
 	 * @filter eq
 	 */
-	public $isPublic;
+	public $isDefault;
 	
 	/**
 	 * @var KalturaVendorServiceType
@@ -69,37 +69,15 @@ class KalturaVendorCatalogItem extends KalturaObject
 	public $serviceType;
 	
 	/**
-	 * @var KalturaVendorServiceFeature
-	 * @filter eq,in
-	 */
-	public $serviceFeature;
-	
-	/**
 	 * @var KalturaVendorServiceTurnAroundTime
 	 * @filter eq,in
 	 */
 	public $turnAroundTime;
 	
-	
-	/**
-	 * @var KalturaLanguageArray
-	 */
-	public $sourceLanguages;
-	
-	/**
-	 * @var KalturaLanguageArray
-	 */
-	public $targetLanguages;
-	
 	/**
 	 * @var KalturaVendorCatalogItemPricing
 	 */
-	public $priceFunction;
-	
-	/**
-	 * @var KalturaVendorCatalogItemOutputFormat
-	 */
-	public $outoutFormat;
+	public $pricing;
 	
 	
 	private static $map_between_objects = array
@@ -112,15 +90,13 @@ class KalturaVendorCatalogItem extends KalturaObject
 		'createdAt',
 		'updatedAt',
 		'status',
-		'isPublic',
+		'isDefault',
 		'serviceType',
-		'serviceFeature',
 		'turnAroundTime',
-		'sourceLanguages',
-		'targetLanguages',
 		'pricing',
-		'outoutFormat',
 	);
+	
+	abstract protected function getServiceFeature();
 	
 	/* (non-PHPdoc)
 	 * @see KalturaCuePoint::getMapBetweenObjects()
@@ -131,8 +107,8 @@ class KalturaVendorCatalogItem extends KalturaObject
 	}
 	
 	/* (non-PHPdoc)
- * @see KalturaObject::toInsertableObject()
- */
+ 	 * @see KalturaObject::toInsertableObject()
+ 	 */
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
@@ -167,5 +143,34 @@ class KalturaVendorCatalogItem extends KalturaObject
 	
 		if($vendorPartner->getType() != KalturaPartnerType::VENDOR)
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_NOT_VENDOR, $this->vendorPartnerId);
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see IApiObjectFactory::getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)
+ 	 */
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$object = null;
+		/* @var $sourceObject VendorCatalogItem */
+		switch($sourceObject->getServiceFeature())
+		{
+			case VendorServiceFeature::CAPTIONS:
+				$object = new KalturaVendorCaptionsCatalogItem();
+				break;
+			
+			case VendorServiceFeature::TRANSLATION:
+				$object = new KalturaVendorTranslationCatalogItem();
+				break;
+
+			default:
+				$object = KalturaPluginManager::loadObject('KalturaScheduleResource', $sourceObject->getType());
+				if(!$object)
+				{
+					return null;
+				}
+		}
+		
+		$object->fromObject($sourceObject, $responseProfile);
+		return $object;
 	}
 }
