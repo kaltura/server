@@ -15,8 +15,8 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
+		//if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
+		//	throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 	}
 	
 	/**
@@ -35,6 +35,25 @@ class VendorCatalogItemService extends KalturaBaseService
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::ACTIVE);
 		$dbVendorCatalogItem->save();
 		
+		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
+		return $vendorCatalogItem;
+	}
+	
+	/**
+	 * Retrieve specifc catalog item by id
+	 *
+	 * @action get
+	 * @param int $id
+	 * @return KalturaVendorCatalogItem
+	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
+	 */
+	function getAction($id)
+	{
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
+		if(!$dbVendorCatalogItem)
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
+		
+		$vendorCatalogItem = new KalturaVendorCatalogItem();
 		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
 		return $vendorCatalogItem;
 	}

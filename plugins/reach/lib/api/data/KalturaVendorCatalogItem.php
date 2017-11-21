@@ -14,12 +14,14 @@ class KalturaVendorCatalogItem extends KalturaObject
 	
 	/**
 	 * @var int
+	 * @readonly
 	 * @filter eq,in
 	 */
 	public $partnerId;
 	
 	/**
 	 * @var int
+	 * @filter eq,in
 	 */
 	public $vendorPartnerId;
 	
@@ -49,26 +51,32 @@ class KalturaVendorCatalogItem extends KalturaObject
 	
 	/**
 	 * @var KalturaVendorCatalogItemStatus
+	 * @readonly
+	 * @filter eq,in
 	 */
 	public $status;
 	
 	/**
 	 * @var KalturaNullableBoolean
+	 * @filter eq
 	 */
 	public $isPublic;
 	
 	/**
 	 * @var KalturaVendorServiceType
+	 * @filter eq,in
 	 */
 	public $serviceType;
 	
 	/**
 	 * @var KalturaVendorServiceFeature
+	 * @filter eq,in
 	 */
 	public $serviceFeature;
 	
 	/**
 	 * @var KalturaVendorServiceTurnAroundTime
+	 * @filter eq,in
 	 */
 	public $turnAroundTime;
 	
@@ -84,7 +92,7 @@ class KalturaVendorCatalogItem extends KalturaObject
 	public $targetLanguages;
 	
 	/**
-	 * @var KalturaVendorCatalogItemPriceFunction
+	 * @var KalturaVendorCatalogItemPricing
 	 */
 	public $priceFunction;
 	
@@ -110,7 +118,7 @@ class KalturaVendorCatalogItem extends KalturaObject
 		'turnAroundTime',
 		'sourceLanguages',
 		'targetLanguages',
-		'priceFunction',
+		'pricing',
 		'outoutFormat',
 	);
 	
@@ -135,7 +143,8 @@ class KalturaVendorCatalogItem extends KalturaObject
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "serviceFeature", "turnAroundTime", "priceFunction"));
+		$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "serviceFeature", "turnAroundTime", "pricing"));
+		$this->validateVendorPartnerId();
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
@@ -147,5 +156,16 @@ class KalturaVendorCatalogItem extends KalturaObject
 	public function getFilterDocs()
 	{
 		return array();
+	}
+
+	private function validateVendorPartnerId()
+	{
+		$vendorPartner = PartnerPeer::retrieveByPK($this->vendorPartnerId);
+		
+		if(!$vendorPartner)
+			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PARTNER_ID_NOT_FOUND, $this->vendorPartnerId);
+	
+		if($vendorPartner->getType() != KalturaPartnerType::VENDOR)
+			throw new KalturaAPIException(KalturaReachErrors::PARTNER_NOT_VENDOR, $this->vendorPartnerId);
 	}
 }

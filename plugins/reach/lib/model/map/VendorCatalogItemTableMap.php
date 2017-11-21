@@ -42,11 +42,12 @@ class VendorCatalogItemTableMap extends TableMap {
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 256, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
-		$this->addColumn('STATUS', 'Status', 'INTEGER', true, null, null);
+		$this->addColumn('IS_DEFAULT', 'IsDefault', 'TINYINT', false, null, 0);
+		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('VENDOR_PARTNER_ID', 'VendorPartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('SERVICE_TYPE', 'ServiceType', 'INTEGER', true, null, null);
-		$this->addColumn('SERVICE_FEATURE', 'ServiceFeature', 'INTEGER', true, null, null);
+		$this->addColumn('SERVICE_TYPE', 'ServiceType', 'TINYINT', true, null, null);
+		$this->addColumn('SERVICE_FEATURE', 'ServiceFeature', 'TINYINT', true, null, null);
 		$this->addColumn('TURN_AROUND_TIME', 'TurnAroundTime', 'INTEGER', true, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
