@@ -90,9 +90,11 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			
 			$thumbPath = $this->createUniqFileName($rootPath);
 			
-			if ($capturePath)
+			if ($capturePath || !$data->fileContainer->encryptionKey)
 			{
-				$cropped = $this->crop($capturePath ,$thumbPath, $thumbParamsOutput);
+				//if generate the thumb here or the file is not encrypt just crop
+				$srcPath = $capturePath ? $capturePath : $mediaFile;
+				$cropped = $this->crop($srcPath ,$thumbPath, $thumbParamsOutput);
 			}
 			else 
 			{
