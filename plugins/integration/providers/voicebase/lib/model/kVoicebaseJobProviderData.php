@@ -228,6 +228,7 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
     {
         $partnerOptions = VoicebasePlugin::getPartnerVoicebaseOptions(kCurrentContext::getCurrentPartnerId());
 
-        $this->setAdditionalParameters($partnerOptions->defaultParams);
+        if($partnerOptions->defaultParams)
+            $this->setAdditionalParameters($partnerOptions->defaultParams);
     }
 }

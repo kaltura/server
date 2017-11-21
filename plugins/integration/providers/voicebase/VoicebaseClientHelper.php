@@ -16,7 +16,7 @@ class VoicebaseClientHelper
      * @var array
      * Property contains additional parameters to be dispatched to VoiceBase, grouped by action name.
      */
-	private $additionalParams;
+	private $additionalParams = array();
 	
 	public function __construct($apiKey, $apiPassword, $additionalParams = null)
 	{
