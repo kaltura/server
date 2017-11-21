@@ -30,18 +30,12 @@ class KalturaESearchMetadataItemData extends KalturaESearchItemData
 	 */
 	public $valueInt;
 
-	/**
-	 * @var string
-	 **/
-	public $highlight;
-
 	private static $map_between_objects = array(
 		'xpath',
 		'metadataProfileId',
 		'metadataFieldId',
 		'valueText',
 		'valueInt',
-		'highlight',
 	);
 
 	protected function getMapBetweenObjects()

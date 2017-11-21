@@ -87,7 +87,7 @@ class ESearchCaptionItem extends ESearchItem
 			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
-		$highlight = kBaseSearch::addHighlightSection('caption', $queryAttributes);
+		$highlight = kBaseSearch::getHighlightSection('caption', $queryAttributes);
 		if(isset($highlight))
 			$captionQuery['nested']['inner_hits']['highlight'] = $highlight;
 

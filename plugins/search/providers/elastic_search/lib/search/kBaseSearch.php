@@ -109,7 +109,7 @@ abstract class kBaseSearch
 
     protected function addGlobalHighlights()
 	{
-		$highlight = self::addHighlightSection('global', $this->queryAttributes);
+		$highlight = self::getHighlightSection('global', $this->queryAttributes);
 		if(isset($highlight))
 		{
 			$this->query['body']['highlight'] = $highlight;
@@ -122,7 +122,7 @@ abstract class kBaseSearch
 	 * @param ESearchQueryAttributes $queryAttributes
 	 * @return array|null
 	 */
-	public static function addHighlightSection($highlightScope, $queryAttributes)
+	public static function getHighlightSection($highlightScope, $queryAttributes)
 	{
 		$highlight = null;
 		$fieldsToHighlight = $queryAttributes->getFieldsToHighlight();
@@ -133,8 +133,9 @@ abstract class kBaseSearch
 			$highlight["order"] = "score";
 			$configurationName = $highlightScope."MaxNumberOfFragments";
 			$innerHitsConfig = kConf::get('highlights', 'elastic');
-			$innerHitsSize = isset($innerHitsConfig[$configurationName]) ? $innerHitsConfig[$configurationName] : 5;
-			$highlight['number_of_fragments'] = $innerHitsSize;
+			if(isset($innerHitsConfig[$configurationName]))
+				$highlight['number_of_fragments'] = $innerHitsConfig[$configurationName];
+
 			$highlight['fields'] = $fieldsToHighlight;
 		}
 
