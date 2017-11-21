@@ -13,7 +13,7 @@
 #### Known Issues & Limitations ####
 	None
 
-## Allow webcast to update liveStream parameters ##
+## Permissions for webcast live dashboard ##
 - Issue Type: Task
 - Issue ID: NO-PLAT
 
@@ -22,6 +22,7 @@
 
 ### Deployment scripts ###
 	php alpha/scripts/utils/permissions/addPermissionToRole.php null "WEbcast producer device role" LIVE_STREAM_UPDATE realrun
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_21_allow_webcast_to_list_beacons_and_conversionprofileassetparams.php
 
 #### Known Issues & Limitations ####
 	None
