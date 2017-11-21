@@ -24,7 +24,7 @@ abstract class kBaseSearch
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->applyElasticSearchConditions($subQuery);
-		$this->addGlobalHighlights();
+        $this->addGlobalHighlights();
         KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
         $result = $this->elasticClient->search($this->query);
         return $result;
@@ -109,6 +109,7 @@ abstract class kBaseSearch
 
     protected function addGlobalHighlights()
 	{
+		$this->queryAttributes->setScopeToGlobal();
 		$highlight = self::getHighlightSection('global', $this->queryAttributes);
 		if(isset($highlight))
 		{

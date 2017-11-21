@@ -110,14 +110,23 @@ class ESearchEntryItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$entryQuery = array();
 		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
+		$queryAttributes->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $entrySearchItem)
 		{
 			self::getSingleItemSearchQuery($entrySearchItem, $entryQuery, $allowedSearchTypes, $queryAttributes);
 		}
+
 		return $entryQuery;
 	}
 

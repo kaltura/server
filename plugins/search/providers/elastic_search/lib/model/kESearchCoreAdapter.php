@@ -49,7 +49,8 @@ class kESearchCoreAdapter
 			
 			$objectData[$elasticObject[self::ID_KEY]] = $itemData;
 			$objectOrder[$elasticObject[self::ID_KEY]] = $key;
-			$objectHighlight[$elasticObject[self::ID_KEY]] = self::pruneHighlight($elasticObject[self::HIGHLIGHT_KEY]);
+			if(array_key_exists(self::HIGHLIGHT_KEY, $elasticObject))
+				$objectHighlight[$elasticObject[self::ID_KEY]] = self::pruneHighlight($elasticObject[self::HIGHLIGHT_KEY]);
 		}
 		
 		if(isset($elasticResults[self::HITS_KEY][self::TOTAL_KEY]))
@@ -73,10 +74,14 @@ class kESearchCoreAdapter
 				if($itemsDataResult)
 					$itemsData[] = $itemsDataResult;
 			}
+
 			$resultObj->setItemsData($itemsData);
-			$resultObj->setHighlight($objectHighlight[$coreObject->getId()]);
+			if(array_key_exists($coreObject->getId(), $objectHighlight))
+				$resultObj->setHighlight($objectHighlight[$coreObject->getId()]);
+
 			$resultsObjects[] = $resultObj;
 		}
+
 		return $resultsObjects;
 	}
 
@@ -92,7 +97,9 @@ class kESearchCoreAdapter
 				$currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
 				if ($currItemData)
 				{
-					$itemResult[self::HIGHLIGHT_KEY] = self::pruneHighlight($itemResult[self::HIGHLIGHT_KEY]);
+					if(array_key_exists(self::HIGHLIGHT_KEY, $itemResult))
+						$itemResult[self::HIGHLIGHT_KEY] = self::pruneHighlight($itemResult[self::HIGHLIGHT_KEY]);
+
 					$currItemData->loadFromElasticHits($itemResult);
 					$itemData[$objectType][self::ITEMS_KEY][] = $currItemData;
 				}

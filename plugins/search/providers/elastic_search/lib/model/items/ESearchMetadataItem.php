@@ -121,7 +121,7 @@ class ESearchMetadataItem extends ESearchItem
 		$metadataQuery['nested']['path'] = 'metadata';
 		$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchMetadataItem::getAllowedSearchTypesForField();
-		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_INNER_SCOPE);
+		$queryAttributes->setScopeToInner();
 		foreach ($eSearchItemsArr as $metadataESearchItem)
 		{
 			self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes, $queryAttributes);
@@ -131,7 +131,6 @@ class ESearchMetadataItem extends ESearchItem
 		if(isset($highlight))
 			$metadataQuery['nested']['inner_hits']['highlight'] = $highlight;
 
-		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_GLOBAL_SCOPE);
 		return array($metadataQuery);
 	}
 
@@ -198,7 +197,7 @@ class ESearchMetadataItem extends ESearchItem
 		}
 		else
 		{
-			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
 		}
 
 		return $metadataExactMatch;

@@ -86,13 +86,20 @@ class ESearchCuePointItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$cuePointQuery['nested']['path'] = 'cue_points';
 		$cuePointQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();
-		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_INNER_SCOPE);
+		$queryAttributes->setScopeToInner();
 		foreach ($eSearchItemsArr as $cuePointSearchItem)
 		{
 			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes, $queryAttributes);
@@ -102,7 +109,6 @@ class ESearchCuePointItem extends ESearchItem
 		if(isset($highlight))
 			$cuePointQuery['nested']['inner_hits']['highlight'] = $highlight;
 
-		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_GLOBAL_SCOPE);
 		return array($cuePointQuery);
 	}
 

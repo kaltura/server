@@ -5,8 +5,8 @@
  */
 class ESearchQueryAttributes
 {
-	const HIGHLIGHT_GLOBAL_SCOPE = "global";
-	const HIGHLIGHT_INNER_SCOPE = "inner";
+	const GLOBAL_SCOPE = "global";
+	const INNER_SCOPE = "inner";
 
 	/**
 	 * @var array
@@ -21,25 +21,21 @@ class ESearchQueryAttributes
 	/**
 	 * @var array
 	 */
-	private $fieldsToHighlight = array(self::HIGHLIGHT_GLOBAL_SCOPE => array(), self::HIGHLIGHT_INNER_SCOPE => array());
+	private $fieldsToHighlight = array(self::GLOBAL_SCOPE => array(), self::INNER_SCOPE => array());
 	
-	private $highlightScope = self::HIGHLIGHT_GLOBAL_SCOPE;
+	private $scope = self::GLOBAL_SCOPE;
 
 	private $useHighlight = true;
 
-	/**
-	 * @param string $scope should be one of the scopes globals
-	 */
-	public function setHighlightScope($scope)
+	public function setScopeToInner()
 	{
-		if($this->highlightScope != $scope)
-		{
-			$this->highlightScope = $scope;
-			if($scope == self::HIGHLIGHT_GLOBAL_SCOPE) //if we changed from inner to global we need to clear the inner values;
-			{
-				$this->fieldsToHighlight[self::HIGHLIGHT_INNER_SCOPE] = array();
-			}
-		}
+		$this->scope = self::INNER_SCOPE;
+		$this->fieldsToHighlight[self::INNER_SCOPE] = array();
+	}
+
+	public function setScopeToGlobal()
+	{
+		$this->scope = self::GLOBAL_SCOPE;
 	}
 
 	/**
@@ -47,7 +43,7 @@ class ESearchQueryAttributes
 	 */
 	public function getFieldsToHighlight()
 	{
-		return $this->fieldsToHighlight[$this->highlightScope];
+		return $this->fieldsToHighlight[$this->scope];
 	}
 
 	/**
@@ -55,9 +51,9 @@ class ESearchQueryAttributes
 	 */
 	public function addFieldToHighlight($field)
 	{
-		if(!array_key_exists($field ,$this->fieldsToHighlight[$this->highlightScope]))
+		if(!array_key_exists($field ,$this->fieldsToHighlight[$this->scope]))
 		{
-			$this->fieldsToHighlight[$this->highlightScope][$field] = new stdClass();
+			$this->fieldsToHighlight[$this->scope][$field] = new stdClass();
 		}
 	}
 

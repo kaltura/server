@@ -75,13 +75,20 @@ class ESearchCaptionItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$captionQuery['nested']['path'] = 'caption_assets.lines';
 		$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize);
 		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();
-		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_INNER_SCOPE);
+		$queryAttributes->setScopeToInner();
 		foreach ($eSearchItemsArr as $eSearchCaptionItem)
 		{
 			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
@@ -91,7 +98,6 @@ class ESearchCaptionItem extends ESearchItem
 		if(isset($highlight))
 			$captionQuery['nested']['inner_hits']['highlight'] = $highlight;
 
-		$queryAttributes->setHighlightScope(ESearchQueryAttributes::HIGHLIGHT_GLOBAL_SCOPE);
 		return array($captionQuery);
 	}
 
