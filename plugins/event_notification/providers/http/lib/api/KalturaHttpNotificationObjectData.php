@@ -30,6 +30,18 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	 * @var string
 	 */
 	public $code;
+
+	/**
+	 * prefix for sent string
+	 * @var string
+	 */
+	public $dataStringPrefix;
+
+	/**
+	 * postfix for sent string
+	 * @var string
+	 */
+	public $dataStringPostfix;
 	
 	/**
 	 * Serialized object, protected on purpose, used by getData
@@ -44,6 +56,8 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		'format',
 		'ignoreNull',
 		'code',
+		'dataStringPrefix',
+		'dataStringPostfix',
 	);
 
 	/* (non-PHPdoc)
@@ -84,6 +98,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	public function getData(kHttpNotificationDispatchJobData $jobData = null)
 	{
 		$coreObject = unserialize($this->coreObject);
+
 		$apiObject = new $this->apiObjectType;
 		/* @var $apiObject KalturaObject */
 		$apiObject->fromObject($coreObject);
@@ -97,7 +112,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		$notification->templateId = $httpNotificationTemplate->getId();
 		$notification->templateName = $httpNotificationTemplate->getName();
 		$notification->templateSystemName = $httpNotificationTemplate->getSystemName();
-		$notification->eventType = $httpNotificationTemplate->getEventType();;
+		$notification->eventType = $httpNotificationTemplate->getEventType();
 
 		$data = '';
 		switch ($this->format)
@@ -115,6 +130,18 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
 				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
 				$data = $serializer->serialize($notification);
+
+				if($this->dataStringPrefix != "" && $this->dataStringPostfix != "")
+				{
+					$tempData = trim($data, "{}");
+					$tempData = $this->dataStringPrefix . $tempData . $this->dataStringPostfix;
+					if(!is_null(json_decode($tempData)))
+					{
+						KalturaLog::debug("adding pre/post fix");
+						$data = $tempData;
+					}
+				}
+
 				if (!$httpNotificationTemplate->getUrlEncode())
 					return $data;
 				

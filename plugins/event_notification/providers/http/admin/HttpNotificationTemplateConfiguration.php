@@ -23,6 +23,8 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 					$object->data->apiObjectType = $properties['objectType'];
 					$object->data->format = $properties['objectFormat'];
 					$object->data->code = $properties['object'];
+					$object->data->dataStringPrefix = $properties['dataStringPrefix'];
+					$object->data->dataStringPostfix = $properties['dataStringPostfix'];
 					break;
 					
 				case 'map':
@@ -70,6 +72,9 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			$this->getElement('objectType')->setValue($object->data->apiObjectType);
 			$this->getElement('objectFormat')->setValue($object->data->format);
 			$this->getElement('object')->setValue($object->data->code);
+
+			$this->getElement('dataStringPrefix')->setValue($object->data->dataStringPrefix);
+			$this->getElement('dataStringPostfix')->setValue($object->data->dataStringPostfix);
 		}
 	}
 	
@@ -123,7 +128,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 				Kaltura_Client_Enum_ResponseType::RESPONSE_TYPE_PHP => 'PHP',
 			),
 		));
-			
+	
 		$this->addDisplayGroup(array('object', 'objectType', 'objectFormat'), 
 			'frmObject', 
 			array(
@@ -140,5 +145,24 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			array(
 				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmFreeText'))),
 		));
+
+		$this->addElement('text', 'dataStringPrefix', array(
+			'label'                 => 'Data String Prefix:',
+			'size'                  => 60,
+			'filters'               => array('StringTrim'),
+		));
+
+		$this->addElement('text', 'dataStringPostfix', array(
+			'label'                 => 'Data String Postfix:',
+			'size'                  => 60,
+			'filters'               => array('StringTrim'),
+		));
+
+		$this->addDisplayGroup(array('dataStringPrefix','dataStringPostfix'),
+			'prePostFixObject',
+			array(
+				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'prePostFixObject'))),
+		));
+
 	}
 }

@@ -84,11 +84,13 @@ jQuery(document).ready(function() {
 	jQuery('#dataType').change(function(){
 
 		jQuery('#frmObject').hide();
+		jQuery('#prePostFixObject').hide();
 		jQuery('#frmFreeText').hide();
 		
 		switch(jQuery(this).val()){
 			case 'object':
 				jQuery('#frmObject').show();
+				jQuery('#prePostFixObject').show();
 				break;
 
 			case 'text':

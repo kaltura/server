@@ -37,6 +37,18 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	 */
 	protected $coreObject;
 
+	/**
+	 * prefix for sent string
+	 * @var string
+	 */
+	public $dataStringPrefix;
+
+	/**
+	 * postfix for sent string
+	 * @var string
+	 */
+	public $dataStringPostfix;
+
 	/* (non-PHPdoc)
 	 * @see kHttpNotificationData::setScope()
 	 */
@@ -44,8 +56,11 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	{
 		if(strpos($this->code, ';') !== false)
 			throw new kCoreException("Evaluated code may be simple value only");
-			
+
+		KalturaLog::debug("AAAAAA code - " . $this->code);
 		$object = eval("return {$this->code};");
+		KalturaLog::debug("AAAAAA object - " . print_r($object, true));
+
 		if(is_object($object))
 			$this->coreObject = serialize($object);
 	}
@@ -120,5 +135,37 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	public function setCode($code)
 	{
 		$this->code = $code;
+	}
+
+	/**
+	 * @return string $dataStringPrefix
+	 */
+	public function getDataStringPrefix()
+	{
+	        return $this->dataStringPrefix;
+	}
+
+	/**
+	 * @param string $dataStringPrefix
+	 */
+	public function setDataStringPrefix($dataStringPrefix)
+	{
+	        $this->dataStringPrefix = $dataStringPrefix;
+	}
+
+	/**
+	 * @return string $dataStringPostfix
+	 */
+	public function getDataStringPostfix()
+	{
+	        return $this->dataStringPostfix;
+	}
+
+	/**
+	 * @param string $dataStringPostfix
+	 */
+	public function setDataStringPostfix($dataStringPostfix)
+	{
+	        $this->dataStringPostfix = $dataStringPostfix;
 	}
 }
