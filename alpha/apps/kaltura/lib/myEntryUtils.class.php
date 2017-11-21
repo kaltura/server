@@ -785,6 +785,7 @@ class myEntryUtils
 
 		while($count--)
 		{
+			$packagerCropThumb = false;
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -831,9 +832,11 @@ class myEntryUtils
 
 					if($multi && $packagerRetries)
 					{
-						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 						if(!$success)
 							$packagerRetries--;
+						else
+							$packagerCropThumb = true;
 					}
 
 					if (!$success)
@@ -871,24 +874,33 @@ class myEntryUtils
 			}
 
 			kFile::fullMkdir($processingThumbPath);
-			if ($crop_provider)
+			if ($packagerCropThumb)
 			{
-				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
+				$convertedImagePath = $processingThumbPath;
 			}
 			else
 			{
-				if (!file_exists($orig_image_path) || !filesize($orig_image_path))
-					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
-					
-				$imageSizeArray = getimagesize($orig_image_path);
-				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
+				if ($crop_provider)
 				{
-					$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
-					$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
+					$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
 				}
+				else
+				{
+					if (!file_exists($orig_image_path) || !filesize($orig_image_path))
+						KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 
-				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
+					$imageSizeArray = getimagesize($orig_image_path);
+					if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
+					{
+						$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
+						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
+					}
+
+					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
+				}
 			}
+
+
 
 
 			if ($isEncryptionNeeded)
@@ -906,7 +918,7 @@ class myEntryUtils
 			
 			if ($multi)
 			{
-				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
+				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($convertedImagePath);
 				if (!$im)
 					$im = imagecreatetruecolor($w * $vid_slices, $h);
 					
@@ -964,17 +976,17 @@ class myEntryUtils
 	}
 
 
-	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = myFileConverter::DEFAULT_THUMBNAIL_WIDTH, $height = myFileConverter::DEFAULT_THUMBNAIL_HEIGHT)
 	{
 		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
 		if(in_array($entry->getType(), $mappedThumbEntryTypes))
-			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 
-		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 	}
 
 
-	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
 		$packagerCaptureUrl = kConf::get('packager_mapped_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
@@ -995,7 +1007,7 @@ class myEntryUtils
 
 		$flavorUrl = myPlaylistUtils::buildPlaylistThumbPath($entry, $flavorAsset);
 
-		$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+		$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 		if(!$success)
 			return false;
 
@@ -1003,7 +1015,7 @@ class myEntryUtils
 	}
 
 
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath)
+	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height)
 	{
 		$packagerThumbCapture = str_replace(
 		array ( "{url}", "{offset}" ),
@@ -1075,7 +1087,7 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	public static function captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
 		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
@@ -1092,7 +1104,7 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-		$success = self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+		$success = self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 		if(!$success)
 			return false;
 
