@@ -53,5 +53,26 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		
 		return parent::OM_CLASS;
 	}
+	
+	public static function retrieveBySystemName ($systemName, $excludeId = null, $partnerIds = null, PropelPDO $con = null)
+	{
+		$criteria = new Criteria ( VendorCatalogItemPeer::DATABASE_NAME );
+		$criteria->add ( VendorCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE );
+		$criteria->add ( VendorCatalogItemPeer::SYSTEM_NAME, $systemName );
+		if ($excludeId)
+			$criteria->add( VendorCatalogItemPeer::ID, $excludeId, Criteria::NOT_EQUAL);
+		
+		// use the partner ids list if given
+		if (!$partnerIds)
+		{
+			$partnerIds = array (kCurrentContext::getCurrentPartnerId());
+		}
+		
+		$criteria->add(VendorCatalogItemPeer::PARTNER_ID, $partnerIds, Criteria::IN);
+		
+		$criteria->addDescendingOrderByColumn(VendorCatalogItemPeer::PARTNER_ID);
+		
+		return VendorCatalogItemPeer::doSelectOne($criteria);
+	}
 
 } // VendorCatalogItemPeer
