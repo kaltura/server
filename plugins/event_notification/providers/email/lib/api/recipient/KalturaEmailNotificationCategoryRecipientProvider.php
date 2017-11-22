@@ -13,14 +13,14 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 	 */
 	public $categoryId;
 
-    /**
-     * The IDs of the categories whose subscribers should receive the email notification.
-     * @var KalturaStringValue
-     */
-    public $categoryIds;
+	/**
+	 * The IDs of the categories whose subscribers should receive the email notification.
+	 * @var KalturaStringValue
+	 */
+	public $categoryIds;
 	
 	/**
-	 * 
+	 *
 	 * @var KalturaCategoryUserProviderFilter
 	 */
 	public $categoryUserFilter;
@@ -96,25 +96,25 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 			$this->categoryId->fromObject($dbObject->getCategoryId());
 		}
 
-        $categoryIdsFieldType = get_class($dbObject->getCategoryIds());
-        KalturaLog::info("Retrieving API object for categoryIds field of type [$categoryIdsFieldType]");
-        switch ($categoryIdsFieldType)
-        {
-            case 'kEvalStringField':
-                $this->categoryIds = new KalturaEvalStringField();
-                break;
-            case 'kStringValue':
-                $this->categoryIds = new KalturaStringValue();
-                break;
-	        default:
-                $this->categoryIds = KalturaPluginManager::loadObject('KalturaStringValue', $categoryIdFieldType);
-                break;
-        }
+		$categoryIdsFieldType = get_class($dbObject->getCategoryIds());
+		KalturaLog::info("Retrieving API object for categoryIds field of type [$categoryIdsFieldType]");
+		switch ($categoryIdsFieldType)
+		{
+			case 'kEvalStringField':
+				$this->categoryIds = new KalturaEvalStringField();
+				break;
+			case 'kStringValue':
+				$this->categoryIds = new KalturaStringValue();
+				break;
+			default:
+				$this->categoryIds = KalturaPluginManager::loadObject('KalturaStringValue', $categoryIdFieldType);
+				break;
+		}
 
-        if ($this->categoryIds)
-        {
-            $this->categoryIds->fromObject($dbObject->getCategoryIds());
-        }
+		if ($this->categoryIds)
+		{
+			$this->categoryIds->fromObject($dbObject->getCategoryIds());
+		}
 
 		if ($dbObject->getCategoryUserFilter())
 		{
