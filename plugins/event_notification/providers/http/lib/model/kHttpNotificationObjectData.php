@@ -41,13 +41,13 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	 * prefix for sent string
 	 * @var string
 	 */
-	public $dataStringPrefix;
+	protected $dataStringPrefix;
 
 	/**
 	 * postfix for sent string
 	 * @var string
 	 */
-	public $dataStringPostfix;
+	protected $dataStringPostfix;
 
 	/* (non-PHPdoc)
 	 * @see kHttpNotificationData::setScope()

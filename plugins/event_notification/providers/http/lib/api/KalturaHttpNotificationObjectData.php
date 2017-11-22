@@ -131,13 +131,12 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
 				$data = $serializer->serialize($notification);
 
-				if($this->dataStringPrefix != "" && $this->dataStringPostfix != "")
+				if($this->dataStringPrefix && $this->dataStringPostfix)
 				{
-					$tempData = trim($data, "{}");
-					$tempData = $this->dataStringPrefix . $tempData . $this->dataStringPostfix;
+					$tempData = preg_replace(array("/^{/", "/}$/"), array($this->dataStringPrefix, $this->dataStringPostfix), $data);
 					if(!is_null(json_decode($tempData)))
 					{
-						KalturaLog::debug("adding pre/post fix");
+						KalturaLog::info("adding pre/post fix");
 						$data = $tempData;
 					}
 				}
