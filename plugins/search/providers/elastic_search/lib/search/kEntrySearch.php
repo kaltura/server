@@ -42,7 +42,9 @@ class kEntrySearch extends kBaseSearch
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
         $statuses = $this->initEntryStatuses($statuses);
+        $this->initDisplayInSearch($objectId);
         parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
+
     }
 
     protected function initEntryStatuses($statuses)
@@ -110,6 +112,21 @@ class kEntrySearch extends kBaseSearch
     function getPeerName()
     {
         return self::PEER_NAME;
+    }
+
+    protected function initDisplayInSearch($objectId)
+    {
+        if($objectId)
+            return;
+
+        //add display in search to filter
+        $this->query['body']['query']['bool']['filter'][] = array(
+            'bool' => array(
+                'must_not' => array(
+                    'term' => array('display_in_search' => EntryDisplayInSearchType::SYSTEM)
+                )
+            )
+        );
     }
 
 }

@@ -84,17 +84,9 @@ abstract class kBaseSearch
             $partnerStatus[] = elasticSearchUtils::formatPartnerStatus($partnerId, $status);
         }
 
-        $this->query['body'] = array(
-            'query' => array(
-                'bool' => array(
-                    'filter' => array(
-                        array(
-                            'terms' => array('partner_status' => $partnerStatus)
-                        )
-                    )
-                )
-            )
-        );
+        $this->query['body']['query']['bool']['filter'][] = array(
+			'terms' => array('partner_status' => $partnerStatus)
+		);
 
         if($objectId)
         {
@@ -102,17 +94,6 @@ abstract class kBaseSearch
                 'term' => array('_id' => elasticSearchUtils::formatSearchTerm($objectId))
             );
         }
-		else
-		{
-			//add display in search to filter
-			$this->query['body']['query']['bool']['filter'][] = array(
-				'bool' => array(
-					'must_not' => array(
-						'term' => array('display_in_search' => EntryDisplayInSearchType::SYSTEM)
-					)
-				)
-			);
-		}
 
         //return only the object id
         $this->query['body']['_source'] = false;
