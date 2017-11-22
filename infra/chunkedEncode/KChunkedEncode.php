@@ -260,7 +260,7 @@
 				return false;
 			}
 
-			if(strstr($params->acodec, "aac")===false) {
+			if(isset($params->acodec) && strstr($params->acodec, "aac")===false) {
 				KalturaLog::log($msgStr="UNSUPPORTED: audio codec ($params->acodec)");
 				return false;
 			}
@@ -517,7 +517,6 @@
 		 */
 		public function BuildMergeCommandLine()
 		{
-			$audioFilename = $this->getSessionName("audio");
 			$mergedFilename= $this->getSessionName();
 			
 			$vidConcatStr = "concat:'";
@@ -533,12 +532,13 @@
 			$setup = $this->setup;
 			$params = $this->params;
 			$audioInputParams = null;
-			if(isset($audioFilename)) {
+			if(isset($params->acodec)) {
+				$audioFilename = $this->getSessionName("audio");
 				if($setup->duration!=-1){
 					$fileDt = self::getMediaData($audioFilename);
-					if(isset($fileDt) && round($fileDt->containerDuration,4)>$this->params->duration) {
-						$audioInputParams = " -t ".$this->params->duration;
-						KalturaLog::log("cut input audio to ".$this->params->duration);
+					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
+						$audioInputParams = " -t ".$params->duration;
+						KalturaLog::log("cut input audio to ".$params->duration);
 					}
 				}
 				if($this->chunkFileFormat=="mpegts")
@@ -823,7 +823,8 @@
 		{
 			if(!file_exists($fileName))
 				return null;
-			$medPrsr = new KMediaInfoMediaParser($fileName);
+				// mediaInfo does not function correctly on some LOOONG sources
+			$medPrsr = new KFFMpegMediaParser($fileName);//new KMediaInfoMediaParser($fileName);
 			$m=$medPrsr->getMediaInfo();
 			return $m;
 		}
@@ -1103,7 +1104,7 @@
 				 *
 				 */
 			$formatParamsArr = array();
-			$formatParamsNamesArr = array("-movflags", "-min_frag_duration");
+			$formatParamsNamesArr = array("-movflags", "-min_frag_duration", "-encryption_scheme", "-encryption_key", "-encryption_kid");
 			foreach($formatParamsNamesArr as $formatParamName){
 				if(($key=array_search($formatParamName, $cmdLineArr))!==false) {
 					$formatParamsArr[] = $cmdLineArr[$key];
