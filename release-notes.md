@@ -1,3 +1,14 @@
+# Mercury 13.8.0 #
+
+## Email Notification - dispatch to multiple category subscribers ## 
+- Issue Type: Feature
+- Issue ID: TR-1693
+
+### Deployment script ### 
+    cd /opt/kaltura/app/tests/standAloneClient
+    php exec.php entryChangesSubscriberNotifications.xml    
+
+
 # Mercury 13.7.0 #
 
 ## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
