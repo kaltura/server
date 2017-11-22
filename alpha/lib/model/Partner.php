@@ -760,6 +760,16 @@ class Partner extends BasePartner
 	{
 		return $this->getFromCustomData('live_delivery_profile_ids', null, array());
 	}
+
+	public function getESearchLanguages()
+	{
+		return $this->getFromCustomData('e_search_languages', null,  array());
+	}
+
+	public function setESearchLanguages($params)
+	{
+		$this->putInCustomData('e_search_languages', $params);
+	}
 	
 	public function getEmbedCodeTypes()
 	{

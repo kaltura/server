@@ -37,32 +37,34 @@ class kESearchQueryParser
 	const GREATER_THAN_OR_EQUAL = 'GTE';
 
 	/**
-	 * @param KalturaESearchQuery $kEsearchQuery
+	 * @param $eSearchQuery
 	 * @return KalturaESearchParams
 	 * @throws kESearchException
 	 */
-	public static function buildKESearchParamsFromKESearchQuery($kEsearchQuery)
+	public static function buildKESearchParamsFromKESearchQuery($eSearchQuery)
 	{
-		$kESearchParams = new KalturaESearchParams();
 		// in case of a free text query (wihtout fields or brackets or special commands - a simple unified search object will be created
-		if (self::isFreeTextQuery($kEsearchQuery->eSerachQuery))
-			$kESearchParams->searchOperator = self::createSimpleUnifiedSearchParam($kEsearchQuery->eSerachQuery);
+		$searchItem = null;
+		if (self::isFreeTextQuery($eSearchQuery))
+			$searchItem = self::createSimpleUnifiedSearchParam($eSearchQuery);
 		else
 		{
-			$parsedQuery = self::parseKESearchQuery($kEsearchQuery->eSerachQuery);
-			$kESearchParams->searchOperator = self::createKESearchParams($parsedQuery);
+			$parsedQuery = self::parseKESearchQuery($eSearchQuery);
+			$searchItem = self::createKESearchParams($parsedQuery);
 		}
-		return $kESearchParams;
+		return $searchItem;
 	}
 
 	/**
+	 * Check if entire query is a only alphanumeric chars so we can create a simple unified search
 	 * @param $eSearchQuery
 	 * @return bool
 	 */
 	private static function isFreeTextQuery($eSearchQuery)
 	{
-		$aValid = array('_');
-		return ctype_alnum(str_replace($aValid, '', $eSearchQuery));
+		$aValid = array('_',' ');
+		$query = str_replace($aValid, 'A', $eSearchQuery);
+		return preg_match('/^[\p{L}\p{N} -]+$/u', $query);
 	}
 
 	/**
@@ -71,14 +73,11 @@ class kESearchQueryParser
 	 */
 	private static function createSimpleUnifiedSearchParam($eSearchQuery)
 	{
-		$kESearchObject = new KalturaESearchOperator();
-		$kSearchItems = new KalturaESearchBaseItemArray();
 		$kSearchItem = new KalturaESearchUnifiedItem();
+		$kSearchItem->itemType =  KalturaESearchItemType::EXACT_MATCH;
 		$kSearchItem->searchTerm = $eSearchQuery;
-		$kSearchItems[] = $kSearchItem;
-		$kESearchObject->searchItems = $kSearchItems;
 
-		return $kESearchObject;
+		return $kSearchItem;
 	}
 
 	/**
@@ -341,7 +340,7 @@ class kESearchQueryParser
 			$data = array();
 			$data['fieldName'] = $fieldName;
 			$data['fieldValue'] = $fieldValue;
-			throw new kESearchException("Illegal mixed search item types [$fieldName:$fieldValue]", kESearchException::INVALID_MIXED_SERACH_TYPES, $data);
+			throw new kESearchException("Illegal mixed search item types [$fieldName:$fieldValue]", kESearchException::INVALID_MIXED_SEARCH_TYPES, $data);
 		}
 
 		if ($rangeObject)

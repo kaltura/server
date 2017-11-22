@@ -27,7 +27,10 @@
 
 		protected $returnStatus = null;	// KChunkedEncodeReturnStatus
 		protected $returnMessages = array();
-		
+
+		protected $concurrencyHistogram = array();
+		protected $concurrencyAccum = 0;
+
 		/********************
 		 *
 		 */
@@ -99,8 +102,10 @@
 			}
 			$this->videoCmdLines = $videoCmdLines;
 			
-			$audioCmdLine = $chunker->BuildAudioCommandLine();
-			$this->audioCmdLines = array($audioCmdLine);
+			$cmdLine = $chunker->BuildAudioCommandLine();
+			$logFilename = $chunker->getSessionName("audio").".log";
+			$cmdLine = "time $cmdLine > $logFilename 2>&1";
+			$this->audioCmdLines = array($cmdLine);
 			
 			$this->SerializeSession();
 			return true;
@@ -170,6 +175,9 @@
 				$process = $this->executeCmdline($mergeCmd, $concatFilenameLog);
 				if($process==false) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt)!");
+					$logTail = self::getLogTail($concatFilenameLog);
+					if(isset($logTail))
+						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
 					continue;
 				}
@@ -178,6 +186,9 @@
 				$execData = new KProcessExecutionData($process, $concatFilenameLog);
 				if($execData->exitCode!=0) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt, exitCode:$execData->exitCode)!");
+					$logTail = self::getLogTail($concatFilenameLog);
+					if(isset($logTail))
+						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
 					continue;
 				}
@@ -214,7 +225,7 @@
 			$fileDtMrg = $chunker->mergedFileDt;
 			if(isset($fileDtMrg)){
 				KalturaLog::log("merged:".print_r($fileDtMrg,1));
-				$msgStr.= ",file dur(v:".round($fileDtMrg->videoDuration/1000,4).",a:".round($fileDtMrg->audioDuration/1000,4).")";
+				$msgStr.= "file dur(v:".round($fileDtMrg->videoDuration/1000,4).",a:".round($fileDtMrg->audioDuration/1000,4).")";
 			}
 			if(isset($sessionData->refFileDt)) {
 				$fileDtRef = $sessionData->refFileDt;
@@ -245,9 +256,28 @@
 				}
 				else
 					$userAvg = $systemAvg = $elapsedAvg = $cpuAvg = 0;
+
 			}
 			
 //			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));
+
+			if(isset($this->concurrencyHistogram) && count($this->concurrencyHistogram)>0){
+				ksort($this->concurrencyHistogram);
+				$ttlStr = "Concurrency";
+				$tmStr = "Concurrency";
+				$concurSum = 0;
+				$tmSum = 0;
+				foreach($this->concurrencyHistogram as $concur=>$tm){
+					$ttlStr.=",$concur";
+					$tmStr.= ",$tm";
+					$concurSum+= ($concur*$tm);
+					$tmSum+= $tm;
+				}
+				KalturaLog::log($ttlStr);
+				KalturaLog::log($tmStr);
+				$concurrencyLevel = (round(($concurSum/$tmSum),2));
+			}
+
 			KalturaLog::log("***********************************************************");
 			KalturaLog::log("* Session Summary (".date("Y-m-d H:i:s").")");
 			KalturaLog::log("* ");
@@ -308,7 +338,11 @@
 			$lasted = $this->finishTime - $this->createTime;
 				
 			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::OK) {
-				$msgStr = "RESULT:Success"."  Lasted:".gmdate('H:i:s',$lasted)."/".($lasted)."secs";
+				$msgStr = "RESULT:Success"."  Lasted:".gmdate('H:i:s',$lasted)."/".($lasted)."s";
+				if(isset($concurrencyLevel)) {
+					$val = end($this->concurrencyHistogram);
+					$msgStr.= ", concurrency:$concurrencyLevel(max:".key($this->concurrencyHistogram).",".round($val/1000,2)."s)";
+				}
 			}
 			else {
 				$msgStr = $sessionData->getErrorMessage();
@@ -316,7 +350,7 @@
 			}
 			KalturaLog::log($msgStr);
 			KalturaLog::log("***********************************************************");
-			
+
 			$this->SerializeSession();
 		}
 		
@@ -382,6 +416,23 @@
 			file_put_contents($this->chunker->getSessionName("session"), serialize($this));
 		}
 		
+		/********************
+		 * 
+		 */
+		protected static function getLogTail($logFilename, $size=5000)
+		{
+			$logTail = null;
+			if(file_exists($logFilename)) {
+				$fHd = fopen($logFilename,"r");
+				$fileSz = filesize($logFilename);
+				if($fileSz>$size)
+					fseek($fHd,$fileSz-$size);
+				$logTail = fread($fHd, $size);
+				fclose($fHd);
+			}
+			return $logTail;
+		}
+	
 		/********************
 		 *
 		 */

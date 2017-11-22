@@ -17,6 +17,11 @@ class ESearchResult extends BaseObject
 	protected $itemsData;
 
 	/**
+	 * @var string
+	 */
+	protected $highlight;
+
+	/**
 	 * @return BaseObject
 	 */
 	public function getObject()
@@ -48,5 +53,20 @@ class ESearchResult extends BaseObject
 		$this->itemsData = $itemsData;
 	}
 
+	/**
+	 * @param string
+	 */
+	public function setHighlight($highlight)
+	{
+		$this->highlight = $highlight;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getHighlight()
+	{
+		return $this->highlight;
+	}
 
 }

@@ -188,7 +188,9 @@ class playManifestAction extends kalturaAction
 		{
 			return;
 		}
-		
+
+		myPartnerUtils::addPartnerToCriteria ('entry' ,kCurrentContext::getCurrentPartnerId(), true);
+
 		// enforce entitlement
 		kEntitlementUtils::initEntitlementEnforcement();
 		
@@ -998,7 +1000,7 @@ class playManifestAction extends kalturaAction
 
 		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes) && !$this->deliveryAttributes->getServeVodFromLive())
  		{
- 			if (!$this->entry->hasMediaServer())
+ 			if (!$this->entry->isCurrentlyLive())
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
  			
  			kApiCache::setExpiry(120);
@@ -1154,6 +1156,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
 		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
+		$this->deliveryAttributes->setDefaultAudioLanguage($this->getRequestParameter("defaultAudioLang"));
 
 		if ( in_array($this->deliveryAttributes->getFormat(), array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::AKAMAI_HDS)) )
 			$this->deliveryAttributes->setSequence($this->getRequestParameter("sequence"));

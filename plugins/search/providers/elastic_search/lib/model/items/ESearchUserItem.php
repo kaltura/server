@@ -30,6 +30,8 @@ class ESearchUserItem extends ESearchItem
 		'created_at' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 	);
 
+	private static $multiLanguageFields = array();
+
 	/**
 	 * @return ESearchUserFieldName
 	 */
@@ -72,38 +74,61 @@ class ESearchUserItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$userQuery = array();
 		$allowedSearchTypes = ESearchUserItem::getAllowedSearchTypesForField();
+		$queryAttributes->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $userSearchItem)
 		{
-			self::getSingleItemSearchQuery($userSearchItem, $userQuery, $allowedSearchTypes);
+			self::getSingleItemSearchQuery($userSearchItem, $userQuery, $allowedSearchTypes, $queryAttributes);
 		}
+
 		return $userQuery;
 	}
 
-	private static function getSingleItemSearchQuery($userSearchItem, &$userQuery, $allowedSearchTypes)
+	private static function getSingleItemSearchQuery($userSearchItem, &$userQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		switch ($userSearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$userQuery[] = kESearchQueryManager::getExactMatchQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				$userQuery[] = kESearchQueryManager::getExactMatchQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$userQuery[] = kESearchQueryManager::getMultiMatchQuery($userSearchItem, $userSearchItem->getFieldName(), false);
+				$userQuery[] = kESearchQueryManager::getMultiMatchQuery($userSearchItem, $userSearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$userQuery[] = kESearchQueryManager::getPrefixQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				$userQuery[] = kESearchQueryManager::getPrefixQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$userQuery[] = kESearchQueryManager::getExistsQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				$userQuery[] = kESearchQueryManager::getExistsQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$userQuery[] = kESearchQueryManager::getRangeQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes);
+				$userQuery[] = kESearchQueryManager::getRangeQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$userSearchItem->getItemType()."]");
 		}
 	}
+
+	public function shouldAddLanguageSearch()
+	{
+		if(in_array($this->getFieldName(), self::$multiLanguageFields))
+			return true;
+
+		return false;
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+
+	}
+
 }

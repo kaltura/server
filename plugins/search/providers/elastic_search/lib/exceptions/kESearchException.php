@@ -20,6 +20,6 @@ class kESearchException extends kCoreException
     const INVALID_FIELD_NAME= 'Illegal query field name';
     const INVALID_METADATA_FORMAT= 'Invalid metadata format';
     const INVALID_METADATA_FIELD = 'Illegal metadata field name. allowed only [xpath, metadata_profile_id, term]';
-    const INVALID_MIXED_SERACH_TYPES = "Illegal mixed search item types";
+    const INVALID_MIXED_SEARCH_TYPES = "Illegal mixed search item types";
 
 }

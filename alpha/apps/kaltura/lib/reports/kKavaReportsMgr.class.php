@@ -16,7 +16,7 @@ class kKavaReportsMgr extends kKavaBase
 
     const REPORT_DIMENSION = "report_dimension";
     const REPORT_METRICS = "report_metrics";
-    const REPORT_DETAIL_DIM_HEADERS = "report_deatil_dimensions_headers";
+    const REPORT_DETAIL_DIM_HEADERS = "report_detail_dimensions_headers";
     const REPORT_GRAPH_METRICS = "report_graph_metrics";
     const REPORT_ENRICH_DEF = "report_enrich_definition";
     const REPORT_GRANULARITY = "report_granularity";
@@ -27,7 +27,7 @@ class kKavaReportsMgr extends kKavaBase
     const REPORT_DRILLDOWN_DIMENSION = "report_drilldown_dimension";
     const REPORT_DRILLDOWN_METRICS = "report_drilldown_metrics";
     const REPORT_DRILLDOWN_DETAIL_DIM_HEADERS = "report_drilldown_deatil_dimensions_headers";
-    const REPORT_CARDINALITY_METRIC = "report_caredinality_metric";
+    const REPORT_CARDINALITY_METRIC = "report_cardinality_metric";
     
     const REPORT_LEGACY = "report_legacy";
     const REPORT_LEGACY_MAPPING = "legacy_mapping";
@@ -37,6 +37,7 @@ class kKavaReportsMgr extends kKavaBase
     const CLIENT_TAG_PRIORITY = 5;
     const MAX_RESULT_SIZE = 12000;
     const MAX_CSV_RESULT_SIZE = 60000;
+    const MIN_THRESHOLD = 500;
     
     static $aggregations_def = array();
     static $metrics_def = array();
@@ -325,10 +326,19 @@ class kKavaReportsMgr extends kKavaBase
         self::DRUID_GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId')
     );
     
-    static $granularityMapping = array(
+    static $granularity_mapping = array(
         self::DRUID_GRANULARITY_DAY => 'P1D',
         self::DRUID_GRANULARITY_MONTH => 'P1M',
         self::DRUID_GRANULARITY_HOUR => 'PT1H',
+    );
+
+   static $non_linear_metrics = array(
+    	self::METRIC_AVG_PLAY_TIME => true,
+    	self::METRIC_PLAYER_IMPRESSION_RATIO => true,
+    	self::METRIC_PLAYTHROUGH_RATIO => true,
+    	self::METRIC_AVG_DROP_OFF => true,
+    	self::METRIC_TOTAL_ENTRIES => true,
+    	self::METRIC_UNIQUE_USERS => true,	
     );
     
     protected static function transformDeviceName($name)
@@ -617,6 +627,9 @@ class kKavaReportsMgr extends kKavaBase
           
             switch ($report_type) {
                 case myReportsMgr::REPORT_TYPE_VPAAS_USAGE:
+                    if ($object_ids)
+                        throw new Exception("objectIds filter is not supported for this report");
+                        
                     $data = self::getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $input_filter->timeZoneOffset);
                     break;
                 case myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE:
@@ -655,7 +668,14 @@ class kKavaReportsMgr extends kKavaBase
         $max_result_size = $isCsv ? self::MAX_CSV_RESULT_SIZE : self::MAX_RESULT_SIZE;
         if ($page_index * $page_size > $max_result_size)
         {
-            throw new Exception("result limit is " . $max_result_size . " rows");
+        	if ($page_index == 1 && !isCsv)
+        	{
+        	    $page_size = $max_result_size;
+        	}
+        	else
+        	{
+        	    throw new Exception("result limit is " . $max_result_size. " rows");
+        	}
         }
         
         // order by
@@ -675,13 +695,34 @@ class kKavaReportsMgr extends kKavaBase
                 $order_by = self::$headers_to_metrics[$order_by];
             else 
                 throw new Exception("Order by parameter is not a valid column");
-                
+               
+            if (!in_array($order_by, $metrics))
+            {
+            	throw new Exception("Order by parameter is not one of the report metrics");
+            }
         }
         
         // Note: using a larger threshold since topN is approximate
-        $threshold = min(self::MAX_RESULT_SIZE, $page_size * $page_index * 2);
+        $intervalDays = intval((self::dateIdToUnixtime($input_filter->to_day) - self::dateIdToUnixtime($input_filter->from_day)) / 86400) + 1;
+        $threshold = max($intervalDays * 30, $page_size * $page_index * 2);		// 30 ~ 10000 / 365, i.e. an interval of 1Y gets a minimum threshold of 10000
+        $threshold = max(self::MIN_THRESHOLD, min($max_result_size, $threshold));
         
-        if (!$object_ids &&
+        if (isset(self::$non_linear_metrics[$order_by]))
+        {
+        	// topN works badly for non-linear metrics like avg drop off, since taking the topN per segment
+        	// does not necessarily yield the combined topN
+        	$threshold = $page_size * $page_index;
+        	
+        	$query = self::getGroupByReport($partner_id, $intervals, self::DRUID_GRANULARITY_ALL, array($dimension), $metrics, $druid_filter);
+        	$query[self::DRUID_LIMIT_SPEC] = self::getDefaultLimitSpec(
+        			$threshold,
+        			array(self::getOrderByColumnSpec(
+        					$order_by,
+        					$order_by_dir == '+' ? self::DRUID_ASCENDING : self::DRUID_DESCENDING,
+        					self::DRUID_NUMERIC)
+        			));
+        }
+        else if (!$object_ids &&
         	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) && !$isCsv)
         {
         	// get the topN objects first, otherwise the returned metrics can be inaccurate
@@ -702,7 +743,7 @@ class kKavaReportsMgr extends kKavaBase
 	        	return array(array(), array(), $rows_count);
 	        }
 
-	        if ($page_index * $page_size > $rows_count)
+	        if ($threshold > $rows_count)
 	        {
 	        	$total_count = $rows_count;
 	        }
@@ -717,6 +758,7 @@ class kKavaReportsMgr extends kKavaBase
 	        	$dimension_ids[] = $row[$dimension];
 	        }
 	        
+	        // issue a second topN query
 	        $page_index = 1;
 	        $page_size = count($dimension_ids);
 	        $threshold = $page_size; 
@@ -745,23 +787,37 @@ class kKavaReportsMgr extends kKavaBase
 	        	self::DRUID_DIMENSION => $dimension,
 	        	self::DRUID_VALUES => $dimension_ids
 	        );
+
+        	$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+        }
+        else
+        {
+        	$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         }
                 
-        $query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
         if ($isCsv && isset($query[self::DRUID_CONTEXT][self::DRUID_PRIORITY]))
         {
             $query[self::DRUID_CONTEXT][self::DRUID_PRIORITY] = 0;
         }
+        
         $result = self::runQuery($query);
         if (!$result)
         {
         	return array(array(), array(), 0);
         }
 
-        $rows = $result[0][self::DRUID_RESULT];
+        if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+        {
+        	$rows = $result;
+        }
+        else
+        {
+        	$rows = $result[0][self::DRUID_RESULT];
+        }
         
         // set to null to free memory as we dont need this var anymore
         $result = null;
+        
         $rows_count = count($rows);
         KalturaLog::log("Druid returned [$rows_count] rows");
         
@@ -773,7 +829,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		if (is_null($total_count))
 		{
-			if ($page_index * $page_size > $rows_count)
+			if ($threshold > $rows_count)
 			{
 				$total_count = $rows_count;
 			}
@@ -817,6 +873,11 @@ class kKavaReportsMgr extends kKavaBase
         
         foreach ($rows as $row)
         {
+        	if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+        	{
+        		$row = $row[self::DRUID_EVENT];
+        	}
+        	
             $dimension_ids[] = $row[$dimension];
             $row_data = array();
             $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
@@ -870,42 +931,58 @@ class kKavaReportsMgr extends kKavaBase
    {
       // choose a timezone from - http://joda-time.sourceforge.net/timezones.html
       // prefer a timezone relative to GMT, so that it won't be affected by DST
-      $timezone_name = null;
-      if ($timezone_offset % 60 == 0)
-      {
-         $offset_hours = intval($timezone_offset / 60);
-         if ($offset_hours >= -14 && $offset_hours < 0)
-         {
-            $timezone_name = 'Etc/GMT' . $offset_hours;
-         }
-         else if ($offset_hours > 0 && $offset_hours <= 12)
-         {
-            $timezone_name = 'Etc/GMT+' . $offset_hours;
-         }
-         else if ($offset_hours == 0)
-         {
-            $timezone_name = 'Etc/GMT';
-         }
-      }
+   	    $nonRoundTimezones = array(
+   		   570  => 'Pacific/Marquesas',
+   	       270  => 'America/Caracas',
+   		   210  => 'America/St_Johns',
+   		   -210 => 'Asia/Tehran',
+   		   -270 => 'Asia/Kabul',
+   		   -330 => 'Asia/Colombo',
+   		   -345 => 'Asia/Kathmandu',
+   		   -390 => 'Asia/Rangoon',
+   		   -525 => 'Australia/Eucla',
+   		   -570 => 'Australia/Adelaide',
+   		   -630 => 'Australia/Lord_Howe',
+   		   -690 => 'Pacific/Norfolk',
+   		   -765 => 'Pacific/Chatham',
+   	    );
    	
-      if (!$timezone_name)
-      {
-         $timezone_name = timezone_name_from_abbr("", $timezone_offset * 60 * -1, 0);
-      }
+   	    if (isset($nonRoundTimezones[$timezone_offset]))
+   	    {
+   		   $timezone_name = $nonRoundTimezones[$timezone_offset];
+   	    }
+   	    else 
+   	    {
+   		   $timezone_offset = min(max($timezone_offset, -12 * 60), 14 * 60);
+   		   $offset_hours = round($timezone_offset / 60);
+   		   if ($offset_hours < 0)
+   		   {
+   			  $timezone_name = 'Etc/GMT' . $offset_hours;
+   		   }
+   		   else if ($offset_hours > 0)
+   		   {
+   			  $timezone_name = 'Etc/GMT+' . $offset_hours;
+   		   }
+   		   else
+   		   {
+   			  $timezone_name = 'Etc/GMT';
+   		   }
+   	    }
+   	
       
-      if (isset(self::$granularityMapping[$granularity]))
-      {
-          $granularity_def = array(self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
-              self::DRUID_GRANULARITY_PERIOD => self::$granularityMapping[$granularity],
+        if (isset(self::$granularity_mapping[$granularity]))
+        {
+            $granularity_def = array(self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
+                self::DRUID_GRANULARITY_PERIOD => self::$granularity_mapping[$granularity],
               self::DRUID_TIMEZONE => $timezone_name
-          );
-      }
-      else
-      {
-          $granularity_def = self::DRUID_GRANULARITY_ALL;
-      }
-      return  $granularity_def;
-   }
+            );
+        }
+        else
+        {
+            $granularity_def = self::DRUID_GRANULARITY_ALL;
+        }
+        return  $granularity_def;
+  }
     
    private static function getFilterIntervals($report_type, $input_filter) {
        if ($report_type == myReportsMgr::REPORT_TYPE_APPLICATIONS)
@@ -938,10 +1015,15 @@ class kKavaReportsMgr extends kKavaBase
    private static function getMetrics($report_type) {
        return self::$reports_def[$report_type][self::REPORT_METRICS];
    }
+   
+   private static function isDateIdValid($date_id)
+   {
+       return strlen($date_id) >= 8 && preg_match('/^\d+$/', substr($date_id, 0, 8));
+   }
     
    private static function dateIdToInterval($date_id, $offset, $end_of_the_day = false) 
    {
-       if (strlen($date_id) < 8 || !preg_match('/^\d+$/', substr($date_id, 0, 8)))
+       if (!self::isDateIdValid($date_id))
        {
           return null;
        }
@@ -955,6 +1037,19 @@ class kKavaReportsMgr extends kKavaBase
        
        return "$year-$month-$day$time$timezone_offset";
        
+   }
+   
+   private static function dateIdToUnixtime($date_id)
+   {
+       if (!self::isDateIdValid($date_id))
+       {
+           return null;
+       }
+   	
+       $year = substr($date_id, 0, 4);
+       $month = substr($date_id, 4, 2);
+       $day = substr($date_id, 6, 2);
+       return gmmktime(0, 0, 0, $month, $day, $year);
    }
    
    // shift date by tz offset
@@ -1352,49 +1447,59 @@ class kKavaReportsMgr extends kKavaBase
    private static function getEntriesNames($ids, $partner_id)
    {
        $c = KalturaCriteria::create(entryPeer::OM_CLASS);
+       
+       $c->addSelectColumn(entryPeer::ID);
+       $c->addSelectColumn(entryPeer::NAME);
+        
        $c->add(entryPeer::PARTNER_ID, $partner_id);
        $c->add(entryPeer::ID, $ids, Criteria::IN);
        
        entryPeer::setUseCriteriaFilter (false);
-       $entries = entryPeer::doSelect($c);
+       $stmt = entryPeer::doSelectStmt($c);
+       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
        entryPeer::setUseCriteriaFilter (true);
             
-       if (!$entries) return null;
        $entries_names = array();
-       foreach ($entries  as $entry)
+       foreach ($rows as $row)
        {
-           $entries_names[$entry->getId()] = $entry->getName();
+       	  $id = $row['ID'];
+       	  $name = $row['NAME'];
+       	  $entries_names[$id] = $name;
        }
        return $entries_names;
-
-       
    }
 
    private static function getCategoriesNames($ids, $partner_id)
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+       $c->addSelectColumn(categoryPeer::ID);
+       $c->addSelectColumn(categoryPeer::NAME);
+        
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
        $c->add(categoryPeer::ID, $ids, Criteria::IN);
        
        categoryPeer::setUseCriteriaFilter (false);
-       $categories = categoryPeer::doSelect($c);
+       $stmt = categoryPeer::doSelectStmt($c);
+       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
        categoryPeer::setUseCriteriaFilter (true);
        
-       
-       if (!$categories) return null;
        $categories_names = array();
-       foreach ($categories as $category)
+       foreach ($rows as $row)
        {
-           $categories_names[$category->getId()] = $category->getName();
+       	  $id = $row['ID'];
+       	  $name = $row['NAME'];
+       	  $categories_names[$id] = $name;
        }
        return $categories_names;
-       
-       
    }
    
    private static function getCategoriesIds($categories, $partner_id)
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+       $c->addSelectColumn(categoryPeer::ID);
+        
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
        $c->add(categoryPeer::FULL_NAME, explode(",", $categories), Criteria::IN);
        $c->addSelectColumn(categoryPeer::ID);

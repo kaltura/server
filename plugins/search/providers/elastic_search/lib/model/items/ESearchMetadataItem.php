@@ -6,6 +6,7 @@
 class ESearchMetadataItem extends ESearchItem
 {
 	const DEFAULT_INNER_HITS_SIZE = 10;
+	const INNER_HITS_CONFIG_KEY = 'metadataInnerHitsSize';
 
 	private static $allowed_search_types_for_field = array(
 		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
@@ -106,44 +107,56 @@ class ESearchMetadataItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsSize = isset($innerHitsConfig['metadataInnerHitsSize']) ? $innerHitsConfig['metadataInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
+		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$metadataQuery['nested']['path'] = 'metadata';
 		$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
 		$allowedSearchTypes = ESearchMetadataItem::getAllowedSearchTypesForField();
-
+		$queryAttributes->setScopeToInner();
 		foreach ($eSearchItemsArr as $metadataESearchItem)
 		{
-			self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes);
+			self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes, $queryAttributes);
 		}
+
+		$highlight = kBaseSearch::getHighlightSection('metadata', $queryAttributes);
+		if(isset($highlight))
+			$metadataQuery['nested']['inner_hits']['highlight'] = $highlight;
+
 		return array($metadataQuery);
 	}
 
-	public static function createSingleItemSearchQuery($metadataESearchItem, $boolOperator, &$metadataQuery, $allowedSearchTypes)
+	public static function createSingleItemSearchQuery($metadataESearchItem, $boolOperator, &$metadataQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		switch ($metadataESearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataExactMatchQuery($metadataESearchItem, $allowedSearchTypes);
+					self::getMetadataExactMatchQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataMultiMatchQuery($metadataESearchItem);
+					self::getMetadataMultiMatchQuery($metadataESearchItem, $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataPrefixQuery($metadataESearchItem, $allowedSearchTypes);
+					self::getMetadataPrefixQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataExistQuery($metadataESearchItem, $allowedSearchTypes);
+					self::getMetadataExistQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
 				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataRangeQuery($metadataESearchItem, $allowedSearchTypes);
+					self::getMetadataRangeQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$metadataESearchItem->getItemType()."]");
@@ -154,18 +167,24 @@ class ESearchMetadataItem extends ESearchItem
 
 	}
 
-	protected static function getMetadataExactMatchQuery($searchItem, $allowedSearchTypes)
+	/**
+	 * @param $searchItem
+	 * @param $allowedSearchTypes
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @return array
+	 */
+	protected static function getMetadataExactMatchQuery($searchItem, $allowedSearchTypes, &$queryAttributes)
 	{
 		$metadataExactMatch = array();
 		if(ctype_digit($searchItem->getSearchTerm()))
 		{
-			$metadataExactMatch['bool']['should'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
-			$metadataExactMatch['bool']['should'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
+			$metadataExactMatch['bool']['should'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+			$metadataExactMatch['bool']['should'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_int', $allowedSearchTypes, $queryAttributes);
 			$metadataExactMatch['bool']['minimum_should_match'] = 1;
 		}
 		else if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
-			$metadataExactMatch['bool']['must'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+			$metadataExactMatch['bool']['must'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
 
 			if($searchItem->getXpath())
 				$metadataExactMatch['bool']['must'][] = self::getXPathQuery($searchItem);
@@ -177,14 +196,21 @@ class ESearchMetadataItem extends ESearchItem
 				$metadataExactMatch['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
 		}
 		else
-			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+		{
+			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+		}
 
 		return $metadataExactMatch;
 	}
 
-	protected static function getMetadataMultiMatchQuery($searchItem)
+	/**
+	 * @param $searchItem
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @return array|null
+	 */
+	protected static function getMetadataMultiMatchQuery($searchItem, &$queryAttributes)
 	{
-		$metadataMultiMatch = kESearchQueryManager::getMultiMatchQuery($searchItem, 'metadata.value_text', false);
+		$metadataMultiMatch = kESearchQueryManager::getMultiMatchQuery($searchItem, 'metadata.value_text', $queryAttributes);
 
 		if(ctype_digit($searchItem->getSearchTerm()))//add metadata.value_int
 			$metadataMultiMatch['bool']['should'][0]['multi_match']['fields'][] = 'metadata.value_int^3';
@@ -209,7 +235,13 @@ class ESearchMetadataItem extends ESearchItem
 		return $metadataMultiMatch;
 	}
 
-	protected static function getMetadataPrefixQuery($searchItem, $allowedSearchTypes)
+	/**
+	 * @param $searchItem
+	 * @param $allowedSearchTypes
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @return array|null
+	 */
+	protected static function getMetadataPrefixQuery($searchItem, $allowedSearchTypes, &$queryAttributes)
 	{
 		$metaDataPrefix = kESearchQueryManager::getPrefixQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
 
@@ -233,7 +265,13 @@ class ESearchMetadataItem extends ESearchItem
 		return $metaDataPrefix;
 	}
 
-	protected static function getMetadataExistQuery($searchItem, $allowedSearchTypes)
+	/**
+	 * @param $searchItem
+	 * @param $allowedSearchTypes
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @return array
+	 */
+	protected static function getMetadataExistQuery($searchItem, $allowedSearchTypes, &$queryAttributes)
 	{
 		$metadataExist = array();
 
@@ -253,6 +291,11 @@ class ESearchMetadataItem extends ESearchItem
 		return $metadataExist;
 	}
 
+	/**
+	 * @param $searchItem
+	 * @param ESearchQueryAttributes $allowedSearchTypes
+	 * @return array|null
+	 */
 	protected static function getMetadataRangeQuery($searchItem, $allowedSearchTypes)
 	{
 		$metadataRange = kESearchQueryManager::getRangeQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
@@ -307,6 +350,16 @@ class ESearchMetadataItem extends ESearchItem
 		);
 
 		return $metadataFieldIdQuery;
+	}
+
+	public function shouldAddLanguageSearch()
+	{
+		return false;
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+
 	}
 
 }

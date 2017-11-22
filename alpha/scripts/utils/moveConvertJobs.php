@@ -100,7 +100,7 @@ function moveJob(BatchJob $job, BatchJobLock $jobLock, $sourceDc, $targetDc)
 	}
 	
 	// update batch job
-	$srcFileSync->setFileSyncLocalPath($sourceFileSyncs[$targetDc]->getFullPath());
+	$srcFileSync->setPathAndKeyByFileSync($sourceFileSyncs[$targetDc]);
 	$srcFileSync->setFileSyncRemoteUrl($sourceFileSyncs[$targetDc]->getExternalUrl($sourceAsset->getEntryId()));
 	$jobData->setSrcFileSyncs(array($srcFileSync));
 	$job->setData($jobData);

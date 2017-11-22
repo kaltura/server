@@ -194,12 +194,24 @@ class KAsyncConvert extends KJobHandlerWorker
 		try
 		{
 			$actualFileSyncLocalPath = null;
+			$key = null;
 			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
 			if($srcFileSyncDescriptor)
+			{
 				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+				if (is_file($actualFileSyncLocalPath))
+					$key = $srcFileSyncDescriptor->fileEncryptionKey;
+			}
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
-			$isDone = $this->operationEngine->operate($operator, $actualFileSyncLocalPath);
+			if (!$key)
+				$isDone = $this->operationEngine->operate($operator, $actualFileSyncLocalPath);
+			else
+			{
+				$tempClearPath = self::createTempClearFile($actualFileSyncLocalPath, $key);
+				$isDone = $this->operationEngine->operate($operator, $tempClearPath);
+				unlink($tempClearPath);
+			}
 			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed
 			
 			$this->stopMonitor();
@@ -241,6 +253,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			throw $e;
 		}
 	}
+	
 
 	protected function getOperator(KalturaConvartableJobData $data)
 	{

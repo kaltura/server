@@ -3,6 +3,29 @@
 	"number_of_shards" : 6,
 	"number_of_replicas" : 0,
 	"analysis": {
+	  "filter":{
+		"english_stop": {
+		  "type":       "stop",
+		  "stopwords":  "_english_"
+		},
+		"english_stemmer": {
+		  "type":       "stemmer",
+		  "language":   "english"
+		},
+		"english_possessive_stemmer": {
+		  "type":       "stemmer",
+		  "language":   "possessive_english"
+		},
+		"kaltura_english_synonym_filter": {
+		  "type": "synonym",
+		  "format": "wordnet",
+		  "synonyms_path": "analysis/wn_s.pl"
+		},
+		"kaltura_unique_token_filter": {
+		  "type": "unique",
+		  "only_on_same_position": true
+		}
+	  },
 	  "char_filter": {
 		"kaltura_whitespace_filter": {
 		  "type": "pattern_replace",
@@ -19,6 +42,10 @@
 			"letter",
 			"digit"
 		  ]
+		},
+		"kaltura_category_name_tokenizer" : {
+		  "type": "pattern",
+		  "pattern": ">"
 		}
 	  },
 	  "analyzer": {
@@ -44,6 +71,28 @@
 		"kaltura_text" : {
 		  "tokenizer" : "standard",
 		  "filter" : ["standard", "lowercase", "asciifolding"]
+		},
+		"kaltura_english_synonym": {
+		  "tokenizer":  "standard",
+		  "filter": [
+			"english_possessive_stemmer",
+			"lowercase",
+			"english_stop",
+			"english_stemmer",
+			"kaltura_english_synonym_filter",
+			"kaltura_unique_token_filter"
+		  ]
+		},
+		"kaltura_category_name_analyzer": {
+		  "tokenizer": "kaltura_category_name_tokenizer",
+		  "char_filter": [
+			"kaltura_whitespace_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"trim",
+			"asciifolding"
+		  ]
 		}
 	  }
 	}
@@ -68,6 +117,145 @@
 			},
 			"keyword" : {
 			  "type" : "keyword"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english",
+			  "fields": {
+				"synonym": {
+				  "type": "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "english"
+				}
+			  }
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"armenian" : {
+			  "type" : "text",
+			  "analyzer" : "armenian"
+			},
+			"basque" : {
+			  "type" : "text",
+			  "analyzer" : "basque"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"bulgarian" : {
+			  "type" : "text",
+			  "analyzer" : "bulgarian"
+			},
+			"catalan" : {
+			  "type" : "text",
+			  "analyzer" : "catalan"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"czech" : {
+			  "type" : "text",
+			  "analyzer" : "czech"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"galician" : {
+			  "type" : "text",
+			  "analyzer" : "galician"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"hungarian" : {
+			  "type" : "text",
+			  "analyzer" : "hungarian"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"irish" : {
+			  "type" : "text",
+			  "analyzer" : "irish"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"latvian" : {
+			  "type" : "text",
+			  "analyzer" : "latvian"
+			},
+			"lithuanian" : {
+			  "type" : "text",
+			  "analyzer" : "lithuanian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"persian" : {
+			  "type" : "text",
+			  "analyzer" : "persian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"romanian" : {
+			  "type" : "text",
+			  "analyzer" : "romanian"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"sorani" : {
+			  "type" : "text",
+			  "analyzer" : "sorani"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
 			}
 		  }
 		},
@@ -82,6 +270,145 @@
 			"raw" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english",
+			  "fields": {
+				"synonym": {
+				  "type": "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "english"
+				}
+			  }
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"armenian" : {
+			  "type" : "text",
+			  "analyzer" : "armenian"
+			},
+			"basque" : {
+			  "type" : "text",
+			  "analyzer" : "basque"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"bulgarian" : {
+			  "type" : "text",
+			  "analyzer" : "bulgarian"
+			},
+			"catalan" : {
+			  "type" : "text",
+			  "analyzer" : "catalan"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"czech" : {
+			  "type" : "text",
+			  "analyzer" : "czech"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"galician" : {
+			  "type" : "text",
+			  "analyzer" : "galician"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"hungarian" : {
+			  "type" : "text",
+			  "analyzer" : "hungarian"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"irish" : {
+			  "type" : "text",
+			  "analyzer" : "irish"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"latvian" : {
+			  "type" : "text",
+			  "analyzer" : "latvian"
+			},
+			"lithuanian" : {
+			  "type" : "text",
+			  "analyzer" : "lithuanian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"persian" : {
+			  "type" : "text",
+			  "analyzer" : "persian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"romanian" : {
+			  "type" : "text",
+			  "analyzer" : "romanian"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"sorani" : {
+			  "type" : "text",
+			  "analyzer" : "sorani"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
 			}
 		  }
 		},
@@ -138,7 +465,14 @@
 		},
 		"categories" : {
 		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "analyzer" : "kaltura_keyword",
+		  "fields": {
+			"name" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_category_name_analyzer",
+			  "search_analyzer": "kaltura_keyword"
+			}
+		  }
 		},
 		"active_category_ids" : {
 		  "type" : "text",
@@ -332,7 +666,14 @@
 				},
 				"content_english" : {
 				  "type" : "text",
-				  "analyzer": "english"
+				  "analyzer": "english",
+				  "fields":{
+					"synonym" : {
+					  "type" : "text",
+					  "analyzer": "kaltura_english_synonym",
+					  "search_analyzer": "english"
+					}
+				  }
 				},
 				"content_arabic" : {
 				  "type" : "text",
