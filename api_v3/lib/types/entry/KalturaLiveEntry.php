@@ -111,7 +111,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public $segmentDuration;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $explicitLive;
 
