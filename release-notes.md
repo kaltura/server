@@ -1,4 +1,12 @@
-# Mercury 13.8.0 #
+# Mercury 13.8.0 # 
+
+## Email Notification - dispatch to multiple category subscribers ## 
+- Issue Type: Feature
+- Issue ID: TR-1693
+
+### Deployment script ### 
+    cd /opt/kaltura/app/tests/standAloneClient
+    php exec.php entryChangesSubscriberNotifications.xml    
 
 ## Add new app token capabilities ##
 - Issue Type: Task
@@ -26,7 +34,6 @@
 
 #### Known Issues & Limitations ####
 	None
-
 
 # Mercury 13.7.0 #
 ## New FFMPEG version ##

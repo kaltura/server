@@ -14,7 +14,7 @@
 		<!-- Entry Ready -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
-				<name>Entry Ready In Category</name>
+				<name>Entry Ready In Category - Notify Subscribers</name>
 				<systemName>Entry_Ready_In_Category</systemName>
 				<description>Email notification template to be sent to all category subscribers of categories the entry belongs <to></to> when a new entry is ready.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
@@ -38,7 +38,7 @@
 						<code>implode(',', $scope->getObject()->getAllCategoriesIds())</code>
 					</categoryIds>
 					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
-						<permissionNamesMatchOr>CATEGORY_MODERATE</permissionNamesMatchOr>
+						<permissionNamesMatchOr>CATEGORY_SUBSCRIBE</permissionNamesMatchOr>
 					</categoryUserFilter>
 				</bcc>
 				<contentParameters objectType="array">
@@ -77,5 +77,68 @@
 			<id>{1:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
+
+		<multirequest>
+			<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="{prompt:Target Partner ID:}">
+				<template objectType="KalturaEmailNotificationTemplate">
+					<name>Entry Content Replaced - Notify Category Subscribers</name>
+					<systemName>Entry_Content_Replaced_Notify_Category_Subscribers</systemName>
+					<description>Email notification template to be sent to category subscribers when an entry content replaced successfully.</description>
+					<automaticDispatchEnabled>1</automaticDispatchEnabled>
+					<eventType>12</eventType> <!-- EventNotificationEventType::OBJECT_REPLACED -->
+					<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+					<format>1</format>
+					<subject>Your media was replaced successfully</subject>
+					<body>Your recently replaced media: "{entry_name}", is ready for playback.</body>
+					<fromEmail>{from_email}</fromEmail>
+					<fromName>{from_name}</fromName>
+					<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
+						<categoryIds objectType="KalturaEvalStringField">
+							<code>implode(',', $scope->getObject()->getAllCategoriesIds())</code>
+						</categoryIds>
+						<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
+							<permissionNamesMatchOr>CATEGORY_SUBSCRIBE</permissionNamesMatchOr>
+						</categoryUserFilter>
+					</bcc>
+					<contentParameters objectType="array">
+						<item objectType="KalturaEventNotificationParameter">
+							<key>from_email</key>
+							<value objectType="KalturaEvalStringField">
+								<code>kConf::get("partner_notification_email")</code>
+							</value>
+						</item>
+						<item objectType="KalturaEventNotificationParameter">
+							<key>from_name</key>
+							<value objectType="KalturaEvalStringField">
+								<code>kConf::get("partner_notification_name")</code>
+							</value>
+						</item>
+						<item objectType="KalturaEventNotificationParameter">
+							<key>entry_id</key>
+							<value objectType="KalturaEvalStringField">
+								<code>$scope->getObject()->getId()</code>
+							</value>
+						</item>
+						<item objectType="KalturaEventNotificationParameter">
+							<key>entry_name</key>
+							<value objectType="KalturaEvalStringField">
+								<code>$scope->getObject()->getName()</code>
+							</value>
+						</item>
+						<item objectType="KalturaEventNotificationParameter">
+							<key>user_id</key>
+							<description>User ID</description>
+							<value objectType="KalturaEvalStringField">
+								<code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+							</value>
+						</item>
+					</contentParameters>
+				</template>
+			</request>
+			<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+				<id>{1:result:id}</id>
+				<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+			</request>
+		</multirequest>
 	</multirequest>
 </xml>
