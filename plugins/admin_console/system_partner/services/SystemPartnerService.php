@@ -100,13 +100,15 @@ class SystemPartnerService extends KalturaBaseService
 		
 			$inputFilter->timeZoneOffset = $usageFilter->timezoneOffset;
 	
-			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
-				null , 
-				myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE , 
-				$inputFilter ,
-				$pager->pageSize , 0 , // pageIndex is 0 because we are using specific ids 
-				null  , // order by  
-				implode("," , $partnerIds ) );
+			$reportsMgrClass = kConf::hasParam("druid_url") ? "kKavaReportsMgr" : "myReportsMgr";
+			
+			list ( $reportHeader, $reportData, $totalCountNoNeeded) = call_user_func(array($reportsMgrClass, "getTable"), null ,
+			    myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE ,
+			    $inputFilter ,
+			    $pager->pageSize , 0 ,
+			    null ,  
+			    implode("," , $partnerIds ) );
+			
 			
 			$unsortedItems = array();
 			foreach ( $reportData as $line )
