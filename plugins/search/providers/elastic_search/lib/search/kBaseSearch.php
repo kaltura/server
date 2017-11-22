@@ -102,6 +102,17 @@ abstract class kBaseSearch
                 'term' => array('_id' => elasticSearchUtils::formatSearchTerm($objectId))
             );
         }
+		else
+		{
+			//add display in search to filter
+			$this->query['body']['query']['bool']['filter'][] = array(
+				'bool' => array(
+					'must_not' => array(
+						'term' => array('display_in_search' => EntryDisplayInSearchType::SYSTEM)
+					)
+				)
+			);
+		}
 
         //return only the object id
         $this->query['body']['_source'] = false;
