@@ -106,7 +106,7 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
             case 'kStringValue':
                 $this->categoryIds = new KalturaStringValue();
                 break;
-            default:
+	        default:
                 $this->categoryIds = KalturaPluginManager::loadObject('KalturaStringValue', $categoryIdFieldType);
                 break;
         }
