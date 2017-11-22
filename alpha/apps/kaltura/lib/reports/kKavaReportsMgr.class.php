@@ -1390,7 +1390,7 @@ class kKavaReportsMgr extends kKavaBase
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
-       $c->add(categoryPeer::FULL_NAME, $categories, Criteria::IN);
+       $c->add(categoryPeer::FULL_NAME, explode(",", $categories), Criteria::IN);
        $c->addSelectColumn(categoryPeer::ID);
                        
        $stmt = categoryPeer::doSelectStmt($c);
