@@ -5,8 +5,11 @@
  */
 class KalturaVendorCaptionsCatalogItemFilter extends KalturaVendorCaptionsCatalogItemBaseFilter
 {
-	protected function getListResponseType()
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return KalturaVendorServiceFeature::CAPTIONS;
+		if(!$type)
+			$type = KalturaVendorServiceFeature::CAPTIONS;
+		
+		return parent::getTypeListResponse($pager, $responseProfile, $type);
 	}
 }

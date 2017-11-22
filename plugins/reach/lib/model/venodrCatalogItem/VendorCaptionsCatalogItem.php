@@ -9,7 +9,7 @@
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
+ *ac
  * @package plugins.reach
  * @subpackage model
  */
@@ -20,17 +20,17 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::CAPTIONS);
 	}
 	
-	const CUSTOM_DATA_SOURCE_LANGUAGES = "source_languages";
+	const CUSTOM_DATA_SOURCE_LANGUAGE = "source_language";
 	const CUSTOM_DATA_OUTPUT_FORMAT = "output_format";
 	const CUSTOM_DATA_ENABLE_SPEAKER_ID = "enable_speaker_id";
 	const CUSTOM_DATA_FIXED_PRICE_ADDONS = "fixed_price_addons";
 	
-	public function setSourceLanguages($sourceLanguages)
+	public function setSourceLanguage($sourceLanguage)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGES, serialize($sourceLanguages));
+		$this->putInCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGE, $sourceLanguage);
 	}
 	
-	public function setOutPutFormat($outPutFormat)
+	public function setOutputFormat($outPutFormat)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_OUTPUT_FORMAT, $outPutFormat);
 	}
@@ -45,17 +45,12 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		$this->putInCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS, $fixedPriceAddons);
 	}
 	
-	public function getSourceLanguages()
+	public function getSourceLanguage()
 	{
-		$languages = $this->getFromCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGES);
-		
-		if($languages)
-			$languages = unserialize($languages);
-		
-		return $languages;
+		return $this->getFromCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGE);
 	}
 	
-	public function getOutPutFormat()
+	public function getOutputFormat()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_OUTPUT_FORMAT);
 	}

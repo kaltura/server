@@ -11,7 +11,7 @@
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="partner_id" 			type="integer" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="vendor_partner_id" 	type="integer" />
 		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="service_type"			type="tinyint" />
-		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="service_feature"		type="tinyint" />
+		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="service_feature"		type="tinyint" inheritance="single" />
 		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="turn_around_time"		type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" 			type="longvarchar" />
 		<index name="partner_id_status_index">

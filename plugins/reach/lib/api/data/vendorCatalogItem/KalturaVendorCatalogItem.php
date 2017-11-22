@@ -151,7 +151,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$object = null;
-		/* @var $sourceObject VendorCatalogItem */
 		switch($sourceObject->getServiceFeature())
 		{
 			case VendorServiceFeature::CAPTIONS:
@@ -161,15 +160,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			case VendorServiceFeature::TRANSLATION:
 				$object = new KalturaVendorTranslationCatalogItem();
 				break;
-
-			default:
-				$object = KalturaPluginManager::loadObject('KalturaScheduleResource', $sourceObject->getType());
-				if(!$object)
-				{
-					return null;
-				}
+				
 		}
 		
+		KalturaLog::debug("Here!!!!!");
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
 	}

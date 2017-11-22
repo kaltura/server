@@ -3,40 +3,21 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
+class KalturaVendorTranslationCatalogItem extends KalturaVendorCaptionsCatalogItem
 {
 	/**
-	 * @var KalturaLanguageArray
+	 * @var KalturaLanguage
 	 */
-	public $sourceLanguages;
-	
-	/**
-	 * @var KalturaVendorCatalogItemOutputFormat
-	 */
-	public $outPutFormat;
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $enableSpeakerId;
-	
-	/**
-	 * @var int
-	 */
-	public $fixedPriceAddons;
-	
+	public $targetLanguage;
 	
 	private static $map_between_objects = array
 	(
-		'sourceLanguages',
-		'outPutFormat',
-		'enableSpeakerId',
-		'fixedPriceAddons'
+		'targetLanguage',
 	);
 	
 	protected function getServiceFeature()
 	{
-		return KalturaVendorServiceFeature::CAPTIONS;
+		return KalturaVendorServiceFeature::TRANSLATION;
 	}
 	
 	/* (non-PHPdoc)
@@ -53,14 +34,27 @@ class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
-			$object_to_fill = new VendorCaptionsCatalogItem();
+			$object_to_fill = new VendorTranslationCatalogItem();
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("sourceLanguages", "outPutFormat"));
+		$this->validatePropertyNotNull(array("targetLanguage"));
 		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+  	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+  	 */
+	public function toObject($sourceObject = null, $propertiesToSkip = array())
+	{
+		if(is_null($sourceObject))
+		{
+			$sourceObject = new VendorTranslationCatalogItem();
+		}
+		
+		return parent::toObject($sourceObject, $propertiesToSkip);
 	}
 }

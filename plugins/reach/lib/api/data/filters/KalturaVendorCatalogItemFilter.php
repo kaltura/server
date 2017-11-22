@@ -7,18 +7,16 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 {
 	protected function getCoreFilter()
 	{
-		return array();
+		return new VendorCatalogItemFilter();
 	}
 	
-	protected function getListResponseType()
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return null;
+		return $this->doGetListResponse($pager, $responseProfile, $type);
 	}
 	
-	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	public function doGetListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		$type = $this->getListResponseType();
-		
 		$c = new Criteria();
 		if($type)
 		{
@@ -40,11 +38,17 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 			$totalCount = VendorCatalogItemPeer::doCount($c);
 		}
 		
-		return array();
-		
 		$response = new KalturaVendorCatalogItemListResponse();
 		$response->objects = KalturaVendroCatalogItemArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
 		return $response;
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see KalturaRelatedFilter::getListResponse()
+ 	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		return $this->getTypeListResponse($pager, $responseProfile);
 	}
 }

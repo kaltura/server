@@ -15,8 +15,8 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
+//		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
+//			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 	}
 	
 	/**
@@ -31,7 +31,7 @@ class VendorCatalogItemService extends KalturaBaseService
 		$dbVendorCatalogItem = $vendorCatalogItem->toInsertableObject();
 		
 		/* @var $dbVendorCatalogItem VendorCatalogItem */
-		$dbVendorCatalogItem->setPartnerId($this->getPartnerId());
+		$dbVendorCatalogItem->setPartnerId($this->impersonatedPartnerId);
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::ACTIVE);
 		$dbVendorCatalogItem->save();
 		
@@ -76,6 +76,6 @@ class VendorCatalogItemService extends KalturaBaseService
 		if(!$pager)
 			$pager = new KalturaFilterPager();
 		
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile());
 	}
 }
