@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<!-- script will ask for username / password interactively -->
+	</session>
+	<multirequest>
+		<!-- Entry Ready -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>Entry Ready In Category</name>
+				<systemName>Entry_Ready_In_Category</systemName>
+				<description>Email notification template to be sent to all category subscribers of categories the entry belongs <to></to> when a new entry is ready.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status changed to ready, See:KalturaEntryStatus:/api_v3/testmeDoc/?object=KalturaEntryStatus</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == entryStatus::READY</code>
+						</field>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>[AppTitle] - Your video is ready to be played</subject>
+				<body>Your recently uploaded media: {entry_name} is ready to play: [AppEntryUrl]{entry_id}</body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
+					<categoryIds objectType="KalturaEvalStringField">
+						<code>implode(',', $scope->getObject()->getAllCategoriesIds())</code>
+					</categoryIds>
+					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
+						<permissionNamesMatchOr>CATEGORY_MODERATE</permissionNamesMatchOr>
+					</categoryUserFilter>
+				</bcc>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getId()</code>
+						</value>
+					</item>
+				</contentParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>

@@ -74,7 +74,7 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 		parent::doFromObject($dbObject, $responseProfile);
 		/* @var $dbObject kEmailNotificationCategoryRecipientProvider */
 		$categoryIdFieldType = get_class($dbObject->getCategoryId());
-		KalturaLog::info("Retrieving API object for categoryId fild of type [$categoryIdFieldType]");
+		KalturaLog::info("Retrieving API object for categoryId field of type [$categoryIdFieldType]");
 		switch ($categoryIdFieldType)
 		{
 			case 'kObjectIdField':
@@ -95,7 +95,27 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 		{
 			$this->categoryId->fromObject($dbObject->getCategoryId());
 		}
-		
+
+        $categoryIdsFieldType = get_class($dbObject->getCategoryIds());
+        KalturaLog::info("Retrieving API object for categoryIds field of type [$categoryIdsFieldType]");
+        switch ($categoryIdsFieldType)
+        {
+            case 'kEvalStringField':
+                $this->categoryIds = new KalturaEvalStringField();
+                break;
+            case 'kStringValue':
+                $this->categoryIds = new KalturaStringValue();
+                break;
+            default:
+                $this->categoryIds = KalturaPluginManager::loadObject('KalturaStringValue', $categoryIdFieldType);
+                break;
+        }
+
+        if ($this->categoryIds)
+        {
+            $this->categoryIds->fromObject($dbObject->getCategoryIds());
+        }
+
 		if ($dbObject->getCategoryUserFilter())
 		{
 			$this->categoryUserFilter = new KalturaCategoryUserProviderFilter();

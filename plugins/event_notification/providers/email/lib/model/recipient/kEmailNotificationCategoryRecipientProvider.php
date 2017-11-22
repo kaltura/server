@@ -57,23 +57,31 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	/* (non-PHPdoc)
 	 * @see kEmailNotificationRecipientProvider::getScopedProviderJobData()
 	 */
-	public function getScopedProviderJobData(kScope $scope = null) 
-	{
-		$ret = new kEmailNotificationCategoryRecipientJobData();
-		
-		if(!$this->categoryId)
-			return $ret;
-		
-		if ($this->categoryId instanceof kStringField)
-			$this->categoryId->setScope($scope);
+	public function getScopedProviderJobData(kScope $scope = null)
+    {
+        $ret = new kEmailNotificationCategoryRecipientJobData();
 
-        if ($this->categoryIds instanceof kStringField)
+        if (!$this->categoryId && !$this->categoryIds)
+        {
+            return $ret;
+        }
+
+        $implicitCategoryId = null;
+        if ($this->categoryId && $this->categoryId instanceof kStringField)
+        {
+            $this->categoryId->setScope($scope);
+            $implicitCategoryId = $this->categoryId->getValue();
+        }
+
+        $implicitCategoryIds = null;
+        if ($this->categoryIds && $this->categoryIds instanceof kStringField)
+        {
+
             $this->categoryIds->setScope($scope);
-		
-		$implicitCategoryId = $this->categoryId->getValue();
-		$implicitCategoryIds = $this->categoryIds->getValue();
+            $implicitCategoryIds = $this->categoryIds->getValue();
+        }
 
-		if ($implicitCategoryIds)
+        if ($implicitCategoryIds && $implicitCategoryId)
         {
             $implicitCategoryIds .= ",$implicitCategoryId";
         }
