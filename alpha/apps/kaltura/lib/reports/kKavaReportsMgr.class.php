@@ -617,10 +617,10 @@ class kKavaReportsMgr extends kKavaBase
           
             switch ($report_type) {
                 case myReportsMgr::REPORT_TYPE_VPAAS_USAGE:
-                    $data = getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $input_filter->timeZoneOffset);
+                    $data = self::getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $input_filter->timeZoneOffset);
                     break;
                 case myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE:
-                    $data = getAdminConsoleReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $dimension, $druid_filter, $object_ids);
+                    $data = self::getAdminConsoleReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $dimension, $druid_filter, $object_ids);
                     break;
             }
             $res = array ($headers, $data, $total_count);
@@ -759,6 +759,9 @@ class kKavaReportsMgr extends kKavaBase
         }
 
         $rows = $result[0][self::DRUID_RESULT];
+        
+        // set to null to free memory as we dont need this var anymore
+        $result = null;
         $rows_count = count($rows);
         KalturaLog::log("Druid returned [$rows_count] rows");
         
@@ -825,6 +828,9 @@ class kKavaReportsMgr extends kKavaBase
             $data[] = $row_data;
             
         }
+        
+        // set to null to free memory as we dont need this var anymore
+        $rows = null;
         
         foreach (self::$transform_metrics as $metric => $func) {
             $field_index = array_search(self::$metrics_to_headers[$metric], $headers);
@@ -1599,7 +1605,7 @@ class kKavaReportsMgr extends kKavaBase
         $key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $headers);
         if (false !== $legacy_field_index) {
             foreach ($data as &$row) {
-                $row[$legacy_field_index] = $druid_result[$druid_field][$row[$key_index]];
+                $row[$legacy_field_index] = isset($druid_result[$druid_field][$row[$key_index]]) ? $druid_result[$druid_field][$row[$key_index]] : 0;
             }
         }
         return $data;
