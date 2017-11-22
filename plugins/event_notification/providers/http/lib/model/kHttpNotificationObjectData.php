@@ -38,16 +38,10 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	protected $coreObject;
 
 	/**
-	 * prefix for sent string
-	 * @var string
+	 * An array of pattern-replacement pairs used for data string regex replacements
+	 * @var array
 	 */
-	protected $dataStringPrefix;
-
-	/**
-	 * postfix for sent string
-	 * @var string
-	 */
-	protected $dataStringPostfix;
+	protected $dataStringReplacements;
 
 	/* (non-PHPdoc)
 	 * @see kHttpNotificationData::setScope()
@@ -136,34 +130,18 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	}
 
 	/**
-	 * @return string $dataStringPrefix
+	 * @return string $dataStringReplacements
 	 */
-	public function getDataStringPrefix()
+	public function getDataStringReplacements()
 	{
-	        return $this->dataStringPrefix;
+	        return $this->dataStringReplacements;
 	}
 
 	/**
-	 * @param string $dataStringPrefix
+	 * @param string $dataStringReplacements
 	 */
-	public function setDataStringPrefix($dataStringPrefix)
+	public function setDataStringReplacements($dataStringReplacements)
 	{
-	        $this->dataStringPrefix = $dataStringPrefix;
-	}
-
-	/**
-	 * @return string $dataStringPostfix
-	 */
-	public function getDataStringPostfix()
-	{
-	        return $this->dataStringPostfix;
-	}
-
-	/**
-	 * @param string $dataStringPostfix
-	 */
-	public function setDataStringPostfix($dataStringPostfix)
-	{
-	        $this->dataStringPostfix = $dataStringPostfix;
+	        $this->dataStringReplacements = $dataStringReplacements;
 	}
 }

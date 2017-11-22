@@ -32,17 +32,11 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	public $code;
 
 	/**
-	 * prefix for sent string
-	 * @var string
+	 * An array of pattern-replacement pairs used for data string regex replacements
+	 * @var KalturaKeyValueArray
 	 */
-	public $dataStringPrefix;
+	public $dataStringReplacements;
 
-	/**
-	 * postfix for sent string
-	 * @var string
-	 */
-	public $dataStringPostfix;
-	
 	/**
 	 * Serialized object, protected on purpose, used by getData
 	 * @see KalturaHttpNotificationObjectData::getData()
@@ -56,8 +50,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		'format',
 		'ignoreNull',
 		'code',
-		'dataStringPrefix',
-		'dataStringPostfix',
+		'dataStringReplacements',
 	);
 
 	/* (non-PHPdoc)
@@ -131,16 +124,20 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
 				$data = $serializer->serialize($notification);
 
-				if($this->dataStringPrefix && $this->dataStringPostfix)
+				if($this->dataStringReplacements)
 				{
-					$tempData = preg_replace(array("/^{/", "/}$/"), array($this->dataStringPrefix, $this->dataStringPostfix), $data);
-					if(!is_null(json_decode($tempData)))
+					KalturaLog::info("replacing data string");
+					$patterns = array();
+					$replacements = array();
+					foreach($this->dataStringReplacements->toArray() as $dataStringReplacement)
 					{
-						KalturaLog::info("adding pre/post fix");
-						$data = $tempData;
+						$patterns[] = "/" . $dataStringReplacement->key . "/";
+						$replacements[] = $dataStringReplacement->value;
 					}
-				}
 
+					if(!empty($patterns))
+						$data = preg_replace($patterns, $replacements, $data);
+				}
 				if (!$httpNotificationTemplate->getUrlEncode())
 					return $data;
 				
