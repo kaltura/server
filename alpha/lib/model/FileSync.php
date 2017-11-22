@@ -20,6 +20,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	const FILE_SYNC_STATUS_READY = 2;
 	const FILE_SYNC_STATUS_DELETED = 3;
 	const FILE_SYNC_STATUS_PURGED = 4;
+
+	const MAX_FILE_SIZE_FOR_ENCRYPTION = 3000000; // as 3MB
 	
 	private $statusMap = array (
 		self::FILE_SYNC_STATUS_ERROR => "Error",
@@ -93,12 +95,12 @@ class FileSync extends BaseFileSync implements IBaseObject
 			return false;
 
 		//check the file extension and size
-		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
-		$fileTypeNotToEncrypt = kConf::get('video_file_ext');
-		if (in_array($type, $fileTypeNotToEncrypt))
+		$fileTypeNotToEncrypt = array_merge(kConf::get('video_file_ext'), kConf::get('audio_file_ext'));
+		$fileTypeNotToEncrypt[] = 'log';
+		if (in_array($this->getFileExt(), $fileTypeNotToEncrypt))
 			return false;
 
-		$maxFileSize = kConf::get('max_file_size_for_encryption');
+		$maxFileSize = kConf::get('max_file_size_for_encryption', 'local', self::MAX_FILE_SIZE_FOR_ENCRYPTION);
 		if (filesize($this->getFullPath()) > $maxFileSize)
 			return false;
 

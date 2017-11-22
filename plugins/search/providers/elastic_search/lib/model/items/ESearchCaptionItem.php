@@ -7,6 +7,7 @@ class ESearchCaptionItem extends ESearchItem
 {
 
 	const DEFAULT_INNER_HITS_SIZE = 10;
+	const INNER_HITS_CONFIG_KEY = 'captionInnerHitsSize';
 
 	private static $allowed_search_types_for_field = array(
 		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
@@ -16,6 +17,10 @@ class ESearchCaptionItem extends ESearchItem
 
 	private static $multiLanguageFields = array(
 		ESearchCaptionFieldName::CAPTION_CONTENT,
+	);
+
+	protected static $field_boost_values = array(
+		'caption_assets.lines.content' => 10,
 	);
 
 	/**
@@ -70,18 +75,29 @@ class ESearchCaptionItem extends ESearchItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsSize = isset($innerHitsConfig['captionInnerHitsSize']) ? $innerHitsConfig['captionInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
+		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$captionQuery['nested']['path'] = 'caption_assets.lines';
 		$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize);
 		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();
+		$queryAttributes->setScopeToInner();
 		foreach ($eSearchItemsArr as $eSearchCaptionItem)
 		{
 			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
 		}
-		
+
+		$highlight = kBaseSearch::getHighlightSection('caption', $queryAttributes);
+		if(isset($highlight))
+			$captionQuery['nested']['inner_hits']['highlight'] = $highlight;
+
 		return array($captionQuery);
 	}
 
@@ -92,7 +108,7 @@ class ESearchCaptionItem extends ESearchItem
 		{
 			case ESearchItemType::EXACT_MATCH:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
@@ -100,15 +116,15 @@ class ESearchCaptionItem extends ESearchItem
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExistsQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getExistsQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$eSearchCaptionItem->getItemType()."]");

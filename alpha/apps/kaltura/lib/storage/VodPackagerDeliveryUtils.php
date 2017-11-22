@@ -44,7 +44,7 @@ class VodPackagerDeliveryUtils
 		
 		if (($entry->getType() == entryType::PLAYLIST && strpos($middlePart, '/') === false) || ($params->getHasValidSequence()))
 		{
-			$captionLanguages = self::getCaptionLangauges($entry->getId());
+			$captionLanguages = self::getCaptionLanguages($entry);
 			if (!empty($captionLanguages))
 			{
 				$postfix = '/captions/'.$captionLanguages.$postfix;
@@ -113,17 +113,22 @@ class VodPackagerDeliveryUtils
 	}
 
 	/**
-	 * @param string $entryId
+	 * @param entry $entry
 	 * @return string
 	 */
-	protected static function getCaptionLangauges($entryId)
+	protected static function getCaptionLanguages(entry $entry)
 	{
-		$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		$entryId = $entry->getId();
 		$captionLanguages = array();
-		foreach ($captionAssets as $captionAsset)
+		if ($entry->getType() == entryType::PLAYLIST)
+			$captionLanguages = myPlaylistUtils::retrieveAllPlaylistCaptionLanguages($entry);
+		else
 		{
-			/** @var captionAsset $captionAsset */
-			$captionLanguages[] = $captionAsset->getLanguage();
+			$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+			foreach ($captionAssets as $captionAsset) {
+				/** @var captionAsset $captionAsset */
+				$captionLanguages[] = $captionAsset->getLanguage();
+			}
 		}
 		return implode(',', $captionLanguages);
 	}

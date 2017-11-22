@@ -60,13 +60,17 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			
 			$url .= ($entryVersion ? "/v/$entryVersion" : '') .
 				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '');
-			$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
+			if(!($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+				$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
 		}
 		else
 		{
 			$url .= $this->getFlavorVersionString($flavorAsset);
 			$url .= '/flavorId/' . $flavorAsset->getId();
 		}
+
+		if (($entry->getType() == entryType::PLAYLIST) && ($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+			$url .= '/captions/' . $flavorAsset->getLanguage();
 
 		$url .= $this->params->getUrlParams();
 		return $url;
@@ -365,7 +369,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		//Move all Dolby audio flavors to the beginning of the audio flavors list
 		if($isAudio1 == true)
 		{
-			return $this->compareAudio($flavor1['audioCodec'], $flavor2['audioCodec']);
+			return $this->compareAudio($flavor1, $flavor2);
 		}
 	
 		// if a preferred bitrate was defined place it first
@@ -387,10 +391,31 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return -1;
 	}
 	
-	private function compareAudio($audioCodec1, $audioCodec2)
+	private function compareAudio($flavor1, $flavor2)
 	{
+		$audioCodec1 = $flavor1['audioCodec'];
+		$audioCodec2 = $flavor2['audioCodec'];
+		
+		$isDefault1 = $flavor1['defaultAudio'];
+		$isDefault2 = $flavor2['defaultAudio'];
+		
 		$dolbyAudioCodecList = array('ec-3','ac-3');
 		$audioPriority = array('ec-3' => 2, 'ac-3' => 1);
+		
+		if($isDefault1 != $isDefault2)
+		{
+			if($isDefault1 && !in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList)) 
+			{
+				return 1;
+			}
+			
+			if($isDefault2 && !in_array($audioCodec2, $dolbyAudioCodecList) && in_array($audioCodec1, $dolbyAudioCodecList))
+			{
+				return -1;
+			}
+			
+			return $isDefault1 ? -1 : 1;
+		}
 		
 		//If both audio codec's are dolby prioritize them based on the audioPriority array
 		if(in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList) && ($audioPriority[$audioCodec2] != $audioPriority[$audioCodec1]))

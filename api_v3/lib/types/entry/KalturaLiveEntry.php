@@ -111,7 +111,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public $segmentDuration;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $explicitLive;
 
@@ -198,6 +198,15 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		{
 			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
+		}
+
+		if ($dbObject->getViewMode() == ViewMode::ALLOW_ALL && in_array($dbObject->getLiveStatus(),array(KalturaEntryServerNodeStatus::PLAYABLE, KalturaEntryServerNodeStatus::BROADCASTING)))
+		{
+			$this->redirectEntryId = null;
+		}
+		else
+		{
+			$this->redirectEntryId = $this->recordedEntryId;
 		}
 	}
 

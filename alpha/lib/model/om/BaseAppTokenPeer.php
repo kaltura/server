@@ -26,7 +26,7 @@ abstract class BaseAppTokenPeer {
 	const TM_CLASS = 'AppTokenTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 14;
+	const NUM_COLUMNS = 15;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -73,6 +73,9 @@ abstract class BaseAppTokenPeer {
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'app_token.CUSTOM_DATA';
 
+	/** the column name for the KUSER_ID field */
+	const KUSER_ID = 'app_token.KUSER_ID';
+
 	/**
 	 * An identiy map to hold any loaded instances of AppToken objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -89,11 +92,11 @@ abstract class BaseAppTokenPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Status', 'Expiry', 'SessionType', 'SessionUserId', 'SessionDuration', 'SessionPrivileges', 'Token', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'createdAt', 'updatedAt', 'deletedAt', 'status', 'expiry', 'sessionType', 'sessionUserId', 'sessionDuration', 'sessionPrivileges', 'token', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::STATUS, self::EXPIRY, self::SESSION_TYPE, self::SESSION_USER_ID, self::SESSION_DURATION, self::SESSION_PRIVILEGES, self::TOKEN, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'created_at', 'updated_at', 'deleted_at', 'status', 'expiry', 'session_type', 'session_user_id', 'session_duration', 'session_privileges', 'token', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Status', 'Expiry', 'SessionType', 'SessionUserId', 'SessionDuration', 'SessionPrivileges', 'Token', 'CustomData', 'KuserId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'createdAt', 'updatedAt', 'deletedAt', 'status', 'expiry', 'sessionType', 'sessionUserId', 'sessionDuration', 'sessionPrivileges', 'token', 'customData', 'kuserId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::STATUS, self::EXPIRY, self::SESSION_TYPE, self::SESSION_USER_ID, self::SESSION_DURATION, self::SESSION_PRIVILEGES, self::TOKEN, self::CUSTOM_DATA, self::KUSER_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'created_at', 'updated_at', 'deleted_at', 'status', 'expiry', 'session_type', 'session_user_id', 'session_duration', 'session_privileges', 'token', 'custom_data', 'kuser_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
 	);
 
 	/**
@@ -103,11 +106,11 @@ abstract class BaseAppTokenPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'DeletedAt' => 5, 'Status' => 6, 'Expiry' => 7, 'SessionType' => 8, 'SessionUserId' => 9, 'SessionDuration' => 10, 'SessionPrivileges' => 11, 'Token' => 12, 'CustomData' => 13, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'deletedAt' => 5, 'status' => 6, 'expiry' => 7, 'sessionType' => 8, 'sessionUserId' => 9, 'sessionDuration' => 10, 'sessionPrivileges' => 11, 'token' => 12, 'customData' => 13, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::DELETED_AT => 5, self::STATUS => 6, self::EXPIRY => 7, self::SESSION_TYPE => 8, self::SESSION_USER_ID => 9, self::SESSION_DURATION => 10, self::SESSION_PRIVILEGES => 11, self::TOKEN => 12, self::CUSTOM_DATA => 13, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'created_at' => 3, 'updated_at' => 4, 'deleted_at' => 5, 'status' => 6, 'expiry' => 7, 'session_type' => 8, 'session_user_id' => 9, 'session_duration' => 10, 'session_privileges' => 11, 'token' => 12, 'custom_data' => 13, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'DeletedAt' => 5, 'Status' => 6, 'Expiry' => 7, 'SessionType' => 8, 'SessionUserId' => 9, 'SessionDuration' => 10, 'SessionPrivileges' => 11, 'Token' => 12, 'CustomData' => 13, 'KuserId' => 14, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'deletedAt' => 5, 'status' => 6, 'expiry' => 7, 'sessionType' => 8, 'sessionUserId' => 9, 'sessionDuration' => 10, 'sessionPrivileges' => 11, 'token' => 12, 'customData' => 13, 'kuserId' => 14, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::DELETED_AT => 5, self::STATUS => 6, self::EXPIRY => 7, self::SESSION_TYPE => 8, self::SESSION_USER_ID => 9, self::SESSION_DURATION => 10, self::SESSION_PRIVILEGES => 11, self::TOKEN => 12, self::CUSTOM_DATA => 13, self::KUSER_ID => 14, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'created_at' => 3, 'updated_at' => 4, 'deleted_at' => 5, 'status' => 6, 'expiry' => 7, 'session_type' => 8, 'session_user_id' => 9, 'session_duration' => 10, 'session_privileges' => 11, 'token' => 12, 'custom_data' => 13, 'kuser_id' => 14, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
 	);
 
 	/**
@@ -191,6 +194,7 @@ abstract class BaseAppTokenPeer {
 		$criteria->addSelectColumn(AppTokenPeer::SESSION_PRIVILEGES);
 		$criteria->addSelectColumn(AppTokenPeer::TOKEN);
 		$criteria->addSelectColumn(AppTokenPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(AppTokenPeer::KUSER_ID);
 	}
 
 	/**
@@ -505,7 +509,7 @@ abstract class BaseAppTokenPeer {
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
 			}
-			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
 			{
 				// all is allowed - don't add anything to the criteria
 			}

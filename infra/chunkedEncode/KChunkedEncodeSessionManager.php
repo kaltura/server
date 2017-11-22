@@ -30,6 +30,7 @@
 		public $finishTime = 0;
 
 		public $process = 0;		// Linux process id
+		public $hostname = 0;
 		
 		/* ---------------------------
 		 *
@@ -117,6 +118,83 @@
 			}
 			return true;
 		}
+		
+		/* ---------------------------
+		 * detectErrors
+		 */
+		public function detectErrors($manager, $maxExecutionTime)
+		{
+			$writeIndex = $readIndex = null;
+			if($manager->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+				KalturaLog::log("ERROR: Missing write or read index ");
+				return false;
+			}
+			
+			$this->sumJobsStates();
+
+			foreach($this->jobs as $idx=>$job) {
+				if($job->state==$job::STATE_SUCCESS)
+					continue;
+				if($job->startTime==0 || $job->state==$job::STATE_RETRY){
+						/*
+						 * Check for 'job skip' condition
+						 * when scheduler skips over a valid job in the queue
+						 */
+					if($job->keyIdx<$readIndex-1) {
+						KalturaLog::log("Potential 'job skip' case - jobId:$job->id,state: $job->state,jobKeyIdx:$job->keyIdx,rdIdx:$readIndex");
+
+						/*
+						 * Try 10 attempts to re-fetch the 'skipped' job -
+						 * in order to give the sceduler an opportunity to update the job status
+						 */
+						$maxTry=10;
+						for($try=0; $try<$maxTry; $try++) {
+							$job = $manager->FetchJob($job->keyIdx);
+							if($job===false || !(($job->startTime==0 || $job->state==$job::STATE_RETRY))){
+								break;
+							}
+							KalturaLog::log("Attempt($try) to refetch job ($job->id)");
+							sleep(1);
+						}
+						/*
+						 * If failed to refetch - push the job into the jobs queue
+						 */
+						if($job===false) {
+							$job = $this->jobs[$idx];
+							KalturaLog::log("Retry chunk ($job->id) - failed to fetch job (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$readIndex)");
+							$this->retryJob($manager, $this->jobs[$idx]);
+						}
+						/*
+						 * if the job still 'skipped' - push the job into the jobs queue
+						 */
+						else if($try==$maxTry) {
+							KalturaLog::log("Retry chunk ($job->id) - skipped by the chunk job scheduler (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$readIndex)");
+							$this->retryJob($manager, $job);
+						}
+					}
+					continue;
+				}
+				$elapsed = time()-$job->startTime;
+				if($elapsed>$maxExecutionTime) {
+					if(!array_key_exists($job->id, $this->failed)){
+						$this->retryJob($manager, $job);
+						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$maxExecutionTime");
+					}
+				}
+			}
+			return true;
+		}
+
+		/* ---------------------------
+		 * retryJob
+		 */
+		protected function retryJob($manager, $job)
+		{
+			$job->state = $job::STATE_RETRY;
+			$manager->SaveJob($job);
+			$this->failed[$job->id] = $job->keyIdx;
+		}
+		
 	}
 	/*****************************
 	 * End of KChunkedEncodeJobsContainer
@@ -204,12 +282,30 @@
 		public function GenerateContent()
 		{
 			$this->addAudioJobs();
-			
+				/*
+				 * Concurrency statistics calcs 
+				 */
+			$this->concurrencyHistogram = array();
+			$this->concurrencyAccum = 0;
+			$curr = microtime(true);
 			while(1) {
 				$rv=$this->processVideoJobs();
 				if($rv!==null)
 					break;
 				sleep(2);
+				$tm = microtime(true);
+				
+				$running = $this->videoJobs->states[KChunkedEncodeJobData::STATE_RUNNING]
+						 + $this->audioJobs->states[KChunkedEncodeJobData::STATE_RUNNING];
+				$elapsed = round(($tm-$curr)*1000);
+				if(!array_key_exists($running, $this->concurrencyHistogram)){
+					$this->concurrencyHistogram[$running] = $elapsed;
+				}
+				else {
+					$this->concurrencyHistogram[$running]+= $elapsed;
+				}
+				$this->concurrencyAccum+=($running*$elapsed);
+				$curr = $tm;
 			}
 			return $rv;
 		}
@@ -249,43 +345,10 @@
 		 * detectErrors
 		 */
 		protected function detectErrors()
-		{
-			$writeIndex = $readIndex = null;
-			if($this->storeManager->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
-				KalturaLog::log("ERROR: Missing write or read index ");
+		{		
+			if($this->videoJobs->detectErrors($this->storeManager, $this->maxExecutionTime)!=true)
 				return false;
-			}
-			
-			$this->videoJobs->sumJobsStates();
-			$this->audioJobs->sumJobsStates();
-
-			foreach($this->videoJobs->jobs as $idx=>$job) {
-				if($job->state==$job::STATE_SUCCESS)
-					continue;
-				if($job->startTime==0 || $job->state==$job::STATE_RETRY){
-						/*
-						 * Check for 'job skip' condition
-						 * when scheduler skips over a valid job in the queue
-						 */
-					if($job->keyIdx<$readIndex-2) {
-						KalturaLog::log("Potential 'job skip' case - jobId:$job->id,state: $job->state,jobKeyIdx:$job->keyIdx,rdIdx:$readIndex");
-						$job = $this->storeManager->FetchJob($job->keyIdx);
-						if($job===false || ($job->startTime==0 || $job->state==$job::STATE_RETRY)){
-							$this->retryVideoJob($job);
-							KalturaLog::log("Retry chunk ($job->id) - skipped by the chunk job scheduler (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$readIndex)");
-						}
-					}
-					continue;
-				}
-				$elapsed = time()-$job->startTime;
-				if($elapsed>$this->maxExecutionTime) {
-					if(!array_key_exists($job->id, $this->videoJobs->failed)){
-						$this->retryVideoJob($job);
-						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$this->maxExecutionTime");
-					}
-				}
-			}
-			return true;
+			return $this->audioJobs->detectErrors($this->storeManager, $this->maxExecutionTime);
 		}
 
 		/* ---------------------------
@@ -365,12 +428,13 @@
 
 			
 			/*
-			 * Print statuses to log
+			 * Log statuses
 			 */
 			{
 				$msgStr = "Session($this->name)-stats: ";
-				$msgStr.= "rn:$running,pn:$pending,su:$succeed,fa:$failed,left:$left, ";
-				$msgStr.= "v.ld:$loaded, elap:".($this->getElapsed())."sec";
+				$msgStr.= "rn:$running,pn:$pending,su:$succeed,fa:$failed,lf:$left, ";
+				$msgStr.= "vi.ld:$loaded, el:".($this->getElapsed())."s";
+				$msgStr.= ", conc:".round($this->concurrencyAccum/(microtime(true)-$this->createTime)/1000,2);
 				if(count($this->videoJobs->failed)>0) $msgStr.= ", failedJobs:".serialize($this->videoJobs->failed);
 				KalturaLog::log($msgStr);
 			}
@@ -467,6 +531,15 @@
 			if($job->state==$job::STATE_PENDING || $job->state==$job::STATE_RUNNING) {
 				return true;
 			}
+			KalturaLog::log("Job dump:".serialize($job));
+			if(array_key_exists($job->id, $this->audioJobs->jobs) && $this->audioJobs->jobs[$job->id]->process==$job->process)
+				$logFilename = $this->chunker->getSessionName("audio").".log";		
+			else 
+				$logFilename = $this->chunker->getChunkName($job->id,".log");
+			$logTail = self::getLogTail($logFilename);
+			if(isset($logTail))
+				KalturaLog::log("Log dump:\n".$logTail);
+
 			if(isset($job->attempt) && $job->attempt>$this->maxRetries){
 				KalturaLog::log("FAILED - job id($job->id) exeeded retry limit ($job->attempt, max:$this->maxRetries)");
 				return false;
@@ -533,16 +606,6 @@
 				return false;
 			}
 			return $job;
-		}
-		
-		/* ---------------------------
-		 * retryVideoJob
-		 */
-		protected function retryVideoJob($job)
-		{
-			$job->state = $job::STATE_RETRY;
-			$this->storeManager->SaveJob($job);
-			$this->videoJobs->failed[$job->id] = $job->keyIdx;
 		}
 		
 		/********************

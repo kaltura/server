@@ -196,9 +196,11 @@ class KAsyncConvert extends KJobHandlerWorker
 			$actualFileSyncLocalPath = null;
 			$key = null;
 			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
-			if($srcFileSyncDescriptor) {
-				$key = $srcFileSyncDescriptor->fileEncryptionKey;
+			if($srcFileSyncDescriptor)
+			{
 				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+				if (is_file($actualFileSyncLocalPath))
+					$key = $srcFileSyncDescriptor->fileEncryptionKey;
 			}
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
@@ -206,10 +208,8 @@ class KAsyncConvert extends KJobHandlerWorker
 				$isDone = $this->operationEngine->operate($operator, $actualFileSyncLocalPath);
 			else
 			{
-				$tempClearPath = $this->createTempClearFile($actualFileSyncLocalPath, $key);
-				KalturaLog::info("Create temporary clear file [$tempClearPath]");
+				$tempClearPath = self::createTempClearFile($actualFileSyncLocalPath, $key);
 				$isDone = $this->operationEngine->operate($operator, $tempClearPath);
-				KalturaLog::info("Delete temporary clear file [$tempClearPath]");
 				unlink($tempClearPath);
 			}
 			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed
@@ -253,17 +253,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			throw $e;
 		}
 	}
-
-	private function createTempClearFile($path, $key)
-	{
-		$iv = kConf::get("encryption_iv");
-		KalturaLog::debug("Key is: [$key] iv: [$iv] for path [$path]");
-		$plainData = kEncryptFileUtils::getEncryptedFileContent($path, $key, $iv);
-		$type = pathinfo($path, PATHINFO_EXTENSION);
-		$tempPath =  sys_get_temp_dir(). "/". $key . ".$type";
-		kFileBase::setFileContent($tempPath, $plainData);
-		return $tempPath;
-	}
+	
 
 	protected function getOperator(KalturaConvartableJobData $data)
 	{

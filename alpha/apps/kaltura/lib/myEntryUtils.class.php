@@ -749,6 +749,7 @@ class myEntryUtils
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
+		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
 		
 		
 		// remark added so ffmpeg will try to load the thumbnail from the original source
@@ -771,6 +772,11 @@ class myEntryUtils
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
+		// limit creation of more than XX Imagemagick processes
+		if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
+			trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
+			KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+								    
 		$flavorAssetId = null;
 		$packagerRetries = 3;
 
@@ -856,19 +862,8 @@ class myEntryUtils
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 			
-			// limit creation of more than XX Imagemagick processes
-			if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
-				trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
-			{
-				if ($cache)
-					$cache->delete($cacheLockKey);
-				
-				KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
-			}
-								    
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-
-			$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
+			
 			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
 			{
 				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
@@ -935,7 +930,9 @@ class myEntryUtils
 
 		if ($isEncryptionNeeded)
 		{
-			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
+			$maxFileSize = kConf::get('max_file_size_for_encryption', 'local', FileSync::MAX_FILE_SIZE_FOR_ENCRYPTION);
+			if (filesize($finalThumbPath) < $maxFileSize)
+				$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
 				
 		return $finalThumbPath;
@@ -948,10 +945,11 @@ class myEntryUtils
 	
 	private static function encryptThumb($thumbPath, $key, $iv)
 	{
+		if (!kEncryptFileUtils::encryptFile($thumbPath, $key, $iv))
+			return $thumbPath;
 		$encryptedPath = kFileUtils::addEncryptToFileName($thumbPath);
-		KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$key] and iv [$iv]");
 		kFile::moveFile($thumbPath, $encryptedPath);
-		kEncryptFileUtils::encryptFile($encryptedPath, $key, $iv);
+		KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$key] and iv [$iv]");
 		return $encryptedPath;
 	}
 
@@ -1199,7 +1197,7 @@ class myEntryUtils
 	{
 		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
 		$entryImageKey = $entry->getSyncKey($sub_type, $version);
-		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey);
+		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey, false, false);
 		return ($local ? $file_sync : null);
 	}
 	

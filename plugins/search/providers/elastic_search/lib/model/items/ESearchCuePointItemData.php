@@ -284,7 +284,7 @@ class ESearchCuePointItemData extends ESearchItemData
 			$this->hint = $objectResult['_source']['cue_point_hint'];
 		if (isset($objectResult['_source']['cue_point_explanation']))
 			$this->explanation = $objectResult['_source']['cue_point_explanation'];
+
+		$this->setHighlight($objectResult['highlight']);
 	}
-
-
 }
