@@ -82,11 +82,6 @@ class ESearchCategoryItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function getType()
-	{
-		return 'category';
-	}
-
 	public static function getAllowedSearchTypesForField()
 	{
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
@@ -136,13 +131,6 @@ class ESearchCategoryItem extends ESearchItem
 			default:
 				KalturaLog::log("Undefined item type[".$categorySearchItem->getItemType()."]");
 		}
-	}
-
-	protected function validateItemInput()
-	{
-		$allowedSearchTypes = self::getAllowedSearchTypesForField();
-		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
-		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
 
 	protected function translateSearchTerm()

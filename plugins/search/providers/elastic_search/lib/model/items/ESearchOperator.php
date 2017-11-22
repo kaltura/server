@@ -138,11 +138,6 @@ class ESearchOperator extends ESearchItem
 		return $outQuery;
 	}
 
-	public function getType()
-	{
-		return 'operator';
-	}
-
 	public function shouldAddLanguageSearch()
 	{
 
