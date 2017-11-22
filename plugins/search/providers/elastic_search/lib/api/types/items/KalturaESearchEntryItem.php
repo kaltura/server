@@ -18,6 +18,7 @@ class KalturaESearchEntryItem extends KalturaESearchItem
 	private static $map_dynamic_enum = array(
 		KalturaESearchEntryFieldName::ENTRY_TYPE => 'KalturaEntryType',
 		KalturaESearchEntryFieldName::ENTRY_SOURCE_TYPE => 'KalturaSourceType',
+		KalturaESearchEntryFieldName::ENTRY_EXTERNAL_SOURCE_TYPE => 'KalturaExternalMediaSourceType'
 	);
 
 	protected function getMapBetweenObjects()

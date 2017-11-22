@@ -39,4 +39,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_VOTES = 'votes';
 	const ENTRY_VIEWS = 'views';
 	const ENTRY_CATEGORY_NAME = 'categories.name';
+	const ENTRY_EXTERNAL_SOURCE_TYPE = 'external_source_type';
 }
