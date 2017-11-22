@@ -66,7 +66,6 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	 **/
 	public $explanation;
 
-
 	private static $map_between_objects = array(
 		'cuePointType',
 		'id',
