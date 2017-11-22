@@ -62,12 +62,12 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 	 */
 	public $replaceMediaContent;
 
-    /**
-     * additional parameters to send to VoiceBase
-     * @var string
-     * @readonly
-     */
-    public $additionalParameters;
+	/**
+	 * additional parameters to send to VoiceBase
+	 * @var string
+	 * @readonly
+	 */
+	public $additionalParameters;
 	
 	private static $map_between_objects = array
 	(
@@ -80,7 +80,7 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 		"spokenLanguage",
 		"fileLocation",
 		"replaceMediaContent",
-        "additionalParameters",
+		"additionalParameters",
 	);
 	
 	/* (non-PHPdoc)

@@ -189,46 +189,46 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	}
 
 	/**
- * @return bool
- */
-    public function getReplaceMediaContent()
-    {
-        return $this->replaceMediaContent;
-    }
+	 * @return bool
+	 */
+	public function getReplaceMediaContent()
+	{
+		return $this->replaceMediaContent;
+	}
 
-    /**
-     * @param bool $replaceMediaContent
-     */
-    public function setReplaceMediaContent($replaceMediaContent)
-    {
-        $this->replaceMediaContent = $replaceMediaContent;
-    }
+	/**
+	 * @param bool $replaceMediaContent
+	 */
+	public function setReplaceMediaContent($replaceMediaContent)
+	{
+		$this->replaceMediaContent = $replaceMediaContent;
+	}
 
-    /**
-     * @return string
-     */
-    public function getAdditionalParameters()
-    {
-        return $this->additionalParameters;
-    }
+	/**
+	 * @return string
+	 */
+	public function getAdditionalParameters()
+	{
+		return $this->additionalParameters;
+	}
 
-    /**
-     * @param string $additionalParameters
-     */
-    public function setAdditionalParameters($additionalParams)
-    {
-        $this->additionalParameters = $additionalParams;
-    }
+	/**
+	 * @param string $additionalParameters
+	 */
+	public function setAdditionalParameters($additionalParams)
+	{
+		$this->additionalParameters = $additionalParams;
+	}
 
-    /**
-     * kVoicebaseJobProviderData constructor.
-     * The VoiceBase job provider data must include the partner's additional params.
-     */
-    public function __construct()
-    {
-        $partnerOptions = VoicebasePlugin::getPartnerVoicebaseOptions(kCurrentContext::getCurrentPartnerId());
+	/**
+	 * kVoicebaseJobProviderData constructor.
+	 * The VoiceBase job provider data must include the partner's additional params.
+	 */
+	public function __construct()
+	{
+		$partnerOptions = VoicebasePlugin::getPartnerVoicebaseOptions(kCurrentContext::getCurrentPartnerId());
 
-        if($partnerOptions->defaultParams)
-            $this->setAdditionalParameters($partnerOptions->defaultParams);
-    }
+		if($partnerOptions->defaultParams)
+			$this->setAdditionalParameters($partnerOptions->defaultParams);
+	}
 }

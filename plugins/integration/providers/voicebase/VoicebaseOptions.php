@@ -19,10 +19,10 @@ class VoicebaseOptions
 	 */
 	public $transformDfxp;
 
-    /**
-     * @var string
-     * json string containing default parameters to be set on individual VoiceBase actions
-     */
+	/**
+	 * @var string
+	 * json string containing default parameters to be set on individual VoiceBase actions
+	 */
 	public $defaultParams;
 	
 	function __construct($apiKey, $apiPassword)

@@ -31,9 +31,9 @@ class VoicebaseClientHelper
 		$this->baseEndpointUrl = $url;
 
 		if ($additionalParams)
-        {
-            $this->additionalParams = $additionalParams;
-        }
+		{
+			$this->additionalParams = $additionalParams;
+		}
 	}
 	
 	public function checkExistingExternalContent($entryId)
@@ -140,10 +140,10 @@ class VoicebaseClientHelper
 	{
 		$params = array("action" => "updateTranscript", "externalID" => $entryId);
 
-        if (isset($this->additionalParams["updateTranscript"]))
-        {
-            $params = array_merge($params, $this->additionalParams["updateTranscript"]);
-        }
+		if (isset($this->additionalParams["updateTranscript"]))
+		{
+			$params = array_merge($params, $this->additionalParams["updateTranscript"]);
+		}
 
 		$updateTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 

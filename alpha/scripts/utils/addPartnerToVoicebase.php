@@ -3,7 +3,7 @@ require_once(__dir__ . '/../bootstrap.php');
 
 if($argc < 4)
 {
-    die("Usage: php " . basename(__FILE__) . " [partner id] [apiKey] [apiPassword] <[transformDfxp]> <[defaultParameters]>" . PHP_EOL);
+	die("Usage: php " . basename(__FILE__) . " [partner id] [apiKey] [apiPassword] <[transformDfxp]> <[defaultParameters]>" . PHP_EOL);
 }
 
 $partnerId = $argv[1];
