@@ -12,6 +12,9 @@ class myPartnerUtils
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const BLOCKING_DAYS_GRACE = 7;
+
+	const END_OF_FREE_TRIAL_DAY = 30;
+	const FREE_TRIAL_PARTNER_DELETION_DAY = 60;
 	
 	
 	private static $s_current_partner_id = null;
@@ -1831,4 +1834,23 @@ class myPartnerUtils
 		}
 		return null;
 	}
+
+	public static function handleDayInFreeTrial(Partner $partner)
+	{
+		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());
+		KalturaLog::debug("partnerId [{$partner->getId()}] is currently at the [$dayInFreeTrial] day of free trial");
+
+		if ($dayInFreeTrial == self::END_OF_FREE_TRIAL_DAY)
+			$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
+
+		if ($dayInFreeTrial == self::FREE_TRIAL_PARTNER_DELETION_DAY)
+			$partner->setStatus(Partner::PARTNER_STATUS_DELETED);
+
+		$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
+		if (in_array($dayInFreeTrial, $freeTrialUpdatesDays))
+			$partner->setLastFreeTrailNotificationDay($dayInFreeTrial);
+
+		$partner->save();
+	}
+
 }

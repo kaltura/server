@@ -119,5 +119,15 @@ class dateUtils
 
 
 	}
+
+
+	public static function diffInDays ($date1, $date2)
+	{
+		$date1 = new DateTime($date1);
+		$date2 = new DateTime($date2);
+		$diff = $date2->diff($date1)->format("%a");
+		return $diff;
+	}
+
 }
 ?>

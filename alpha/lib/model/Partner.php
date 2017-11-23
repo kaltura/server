@@ -1011,6 +1011,7 @@ class Partner extends BasePartner
     public function setPrimaryBroadcastUrl($v)			{$this->putInCustomData('primary_broadcast_url', $v);}
 	public function setSecondaryBroadcastUrl($v)		{$this->putInCustomData('secondary_broadcast_url', $v);}
 	public function setLiveStreamPlaybackUrlConfigurations($v)		{$this->putInCustomData('live_stream_playback_url_configurations', $v);}
+	public function setLastFreeTrailNotificationDay($v)	{$this->putInCustomData('last_free_trail_notification_day', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -1055,7 +1056,7 @@ class Partner extends BasePartner
 	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
 	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
 	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
-
+	public function getLastFreeTrailNotificationDay()	{return $this->getFromCustomData('last_free_trail_notification_day');}
 
     public function setLiveStreamBroadcastUrlConfigurations($key, $value)
     {
