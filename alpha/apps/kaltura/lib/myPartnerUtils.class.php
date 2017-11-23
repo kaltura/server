@@ -1090,7 +1090,7 @@ class myPartnerUtils
 		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
 
 		$newFreeTrial = false;
-		if(date("Y-m-d") > kConf::get('new_free_trial_start_date'))
+		if(dateUtils::today() > kConf::get('new_free_trial_start_date'))
 			$newFreeTrial = true;
 		
 		$report_date = date('Y-m').'-01';
