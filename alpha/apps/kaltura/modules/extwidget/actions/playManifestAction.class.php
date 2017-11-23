@@ -145,7 +145,7 @@ class playManifestAction extends kalturaAction
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Initialization functions
 
-	protected function initEntry()  
+	protected function initPartnerByEntry()
 	{
 		$this->entryId = $this->getRequestParameter ( "entryId", null );
 
@@ -157,22 +157,22 @@ class playManifestAction extends kalturaAction
 		$urlToken = $this->getRequestParameter("kt");
 		if ($urlToken)
 		{
-			if ($_SERVER["REQUEST_METHOD"] != "GET" ||			// don't allow tokens in post requests since the token protects only the URI and not the post parameters 
+			if ($_SERVER["REQUEST_METHOD"] != "GET" ||			// don't allow tokens in post requests since the token protects only the URI and not the post parameters
 				!self::validateKalturaToken($_SERVER["REQUEST_URI"], $urlToken))
 				KExternalErrors::dieError(KExternalErrors::INVALID_TOKEN);
 		}
-		
+
 		// initalize the context
 		$ksStr = $this->getRequestParameter("ks");
 		if($ksStr && !$urlToken)
 		{
-			try 
+			try
 			{
 				kCurrentContext::initKsPartnerUser($ksStr);
 			}
 			catch (Exception $ex)
 			{
-				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
+				KExternalErrors::dieError(KExternalErrors::INVALID_KS);
 			}
 		}
 		else
@@ -182,7 +182,7 @@ class playManifestAction extends kalturaAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 		}
-		
+
 		// no need for any further check if a token was used
 		if ($urlToken)
 		{
@@ -193,7 +193,10 @@ class playManifestAction extends kalturaAction
 
 		// enforce entitlement
 		kEntitlementUtils::initEntitlementEnforcement();
-		
+	}
+
+	protected function initEntry()  
+	{
 		if(!$this->entry)
 		{
 			$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
@@ -1148,28 +1151,29 @@ class playManifestAction extends kalturaAction
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 
+		$this->initPartnerByEntry();
+
 		$deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
 		$deliveryProfileIds = $this->getRequestParameter( "deliveryProfileIds", null );
 		if(!is_null($deliveryProfileIds))
 		{
+			$deliveryProfileIds = explode(",", $deliveryProfileIds);
 			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
-			$deliveryIds = array();
 			$deliveryIdsMap = $partner->getDeliveryProfileIds();
-			foreach($deliveryIdsMap as $format => $deliveriesByFormat) {
-				if($this->deliveryAttributes->getFormat() == $format) {
-					if (is_array($deliveriesByFormat))
-						$deliveryIds = array_merge($deliveryIds, $deliveriesByFormat);
-					else
-						$deliveryIds[] = $deliveriesByFormat;
-				}
-			}
-
-			foreach($deliveryIds as $deliveryId)
+			if(array_key_exists($this->deliveryAttributes->getFormat(), $deliveryIdsMap))
 			{
-				if(in_array($deliveryProfileIds, $deliveryId))
-				{
-					$deliveryProfileId = $deliveryId;
-					break;
+				$deliveryIds = array();
+				$deliveriesByFormat = $deliveryIdsMap[$this->deliveryAttributes->getFormat()];
+				if (is_array($deliveriesByFormat))
+					$deliveryIds = array_merge($deliveryIds, $deliveriesByFormat);
+				else
+					$deliveryIds[] = $deliveriesByFormat;
+
+				foreach ($deliveryIds as $deliveryId) {
+					if (in_array($deliveryId, $deliveryProfileIds)) {
+						$deliveryProfileId = $deliveryId;
+						break;
+					}
 				}
 			}
 		}
