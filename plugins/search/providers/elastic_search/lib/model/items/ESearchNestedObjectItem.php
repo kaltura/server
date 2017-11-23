@@ -26,6 +26,10 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		$finalQuery = array();
 		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$allowedSearchTypes = static::getAllowedSearchTypesForField();
+
+		// must_not was already set in a higher level of the query inside ESearchOperator
+		if($boolOperator == 'must_not')
+			$boolOperator = 'must';
 		
 		//don't group to a single query if the operator is AND
 		if($boolOperator == 'must')
