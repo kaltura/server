@@ -227,7 +227,7 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	 */
 	protected static function getMetadataPrefixQuery($searchItem, $allowedSearchTypes, &$queryAttributes)
 	{
-		$metaDataPrefix = kESearchQueryManager::getPrefixQuery($searchItem, 'metadata.value_text', $allowedSearchTypes);
+		$metaDataPrefix = kESearchQueryManager::getPrefixQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
 
 		if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
@@ -259,8 +259,8 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	{
 		$metadataExist = array();
 
-		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_text', $allowedSearchTypes);
-		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_int', $allowedSearchTypes);
+		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_int', $allowedSearchTypes, $queryAttributes);
 		$metadataExist['bool']['minimum_should_match'] = 1;
 
 		if($searchItem->getXpath())
@@ -280,9 +280,9 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	 * @param ESearchQueryAttributes $allowedSearchTypes
 	 * @return array|null
 	 */
-	protected static function getMetadataRangeQuery($searchItem, $allowedSearchTypes)
+	protected static function getMetadataRangeQuery($searchItem, $allowedSearchTypes, &$queryAttributes)
 	{
-		$metadataRange = kESearchQueryManager::getRangeQuery($searchItem, 'metadata.value_int', $allowedSearchTypes);
+		$metadataRange = kESearchQueryManager::getRangeQuery($searchItem, 'metadata.value_int', $allowedSearchTypes, $queryAttributes);
 
 		if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
@@ -300,6 +300,7 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 			if($searchItem->getMetadataFieldId())
 				$metadataRange['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
 		}
+
 		return $metadataRange;
 	}
 
@@ -349,6 +350,7 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 			$data['fieldName'] = $fieldName;
 			throw new kESearchException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $fieldName.']', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data);
 		}
+
 		$this->validateEmptySearchTerm('metadata.value', $this->getSearchTerm());
 	}
 
