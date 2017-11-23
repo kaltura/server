@@ -1,5 +1,15 @@
 # Mercury 13.8.0 # 
 
+## eSearch - Increase Inner Hits size ##
+- Issue Type: Task
+- Issue ID: PLAT-7890
+
+### Configuration ###
+	- Add the following to your elastic.ini file in innerHits section:
+    	innerHitsWithObjectId = 100
+### Deployment scripts ###
+	None
+
 ## Email Notification - dispatch to multiple category subscribers ## 
 - Issue Type: Feature
 - Issue ID: TR-1693
