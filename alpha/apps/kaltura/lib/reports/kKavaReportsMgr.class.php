@@ -38,6 +38,7 @@ class kKavaReportsMgr extends kKavaBase
     const MAX_RESULT_SIZE = 12000;
     const MAX_CSV_RESULT_SIZE = 60000;
     const MIN_THRESHOLD = 500;
+    const ENRICH_CHUNK_SIZE = 10000;
     
     static $aggregations_def = array();
     static $metrics_def = array();
@@ -869,16 +870,13 @@ class kKavaReportsMgr extends kKavaBase
             $headers[] = self::$metrics_to_headers[$column];
         }
         
-        $data = array();
-        
-        foreach ($rows as $row)
+        foreach ($rows as $index => $row)
         {
         	if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
         	{
         		$row = $row[self::DRUID_EVENT];
         	}
         	
-            $dimension_ids[] = $row[$dimension];
             $row_data = array();
             $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
             
@@ -886,10 +884,10 @@ class kKavaReportsMgr extends kKavaBase
             {
                 $row_data[] = $row[$column];
             }
-            $data[] = $row_data;
-            
+            $rows[$index] = $row_data;
         }
-        
+	    $data = $rows;
+       
         // set to null to free memory as we dont need this var anymore
         $rows = null;
         
@@ -904,17 +902,25 @@ class kKavaReportsMgr extends kKavaBase
         }
         
         if (array_key_exists(self::REPORT_ENRICH_DEF, $report_def)) {
+
             $enrich_func = $report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FUNC];
-            $entities = call_user_func($enrich_func, $dimension_ids, $partner_id);
             $enrich_field = array_search($report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD], $headers);
             if (!$enrich_field) {
                 $enrich_field = 0;
             }
-            
             $rows_count = count($data);
-            for ($i = 0; $i < $rows_count; $i++) {
-                $data[$i][$enrich_field] = $entities[$data[$i][$enrich_field]];
-            }
+
+	        $current_row = 0;
+	        while ($current_row < $rows_count)
+            {
+                $limit = min($current_row + self::ENRICH_CHUNK_SIZE, $rows_count);
+                $dimension_ids = array_map('reset', array_slice($data, $current_row, $limit - $current_row));
+                $entities = call_user_func($enrich_func, $dimension_ids, $partner_id);
+            
+                for (; $current_row < $limit; $current_row++) {
+                    $data[$current_row][$enrich_field] = $entities[$data[$current_row][$enrich_field]];
+                }
+    	    }
         }
 		
         $res = array ($headers, $data, $total_count);
@@ -1585,6 +1591,55 @@ class kKavaReportsMgr extends kKavaBase
        return $total_count;
    }
 
+   static function getCsvData( $partner_id ,
+                                                  $report_title , $report_text , $headers ,
+                                                  $report_type ,
+                                                  reportsInputFilter $input_filter ,
+                                                  $dimension = null ,
+                                                  $object_ids = null ,
+                                                  $page_size =10, $page_index =0, $order_by )
+   {
+	   $csv = new myCsvWrapper ();
+        
+	   $arr = array();
+
+        if (!in_array($report_type, myReportsMgr::$reports_without_graph))
+        {
+            $arr = self::getGraph( $partner_id ,
+                $report_type ,
+                $input_filter ,
+                $dimension ,
+                $object_ids );
+        }
+
+
+        if (!in_array($report_type, myReportsMgr::$reports_without_totals))
+            list ( $total_header , $total_data ) = self::getTotal( $partner_id ,
+                $report_type ,
+                $input_filter , $object_ids );
+
+
+        if ($page_size > self::MAX_CSV_RESULT_SIZE)
+        {
+            throw new kCoreException("Exceeded max query size: " . self::MAX_CSV_RESULT_SIZE ,kCoreException::SEARCH_TOO_GENERAL);
+        }
+
+        if (!in_array($report_type, myReportsMgr::$reports_without_table))
+        {
+            list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+                $report_type ,
+                $input_filter ,
+                $page_size , $page_index ,
+                $order_by ,  $object_ids, true );
+        }
+
+        $csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
+            $report_type , $input_filter , $dimension ,
+            $arr , $total_header , $total_data , $table_header , $table_data , $table_total_count, $csv);
+
+        return $csv->getData();
+
+   }
 
     /**
      * will store the content of the report on disk and return the Url for the file
@@ -1610,51 +1665,23 @@ class kKavaReportsMgr extends kKavaBase
                                                   $page_size =10, $page_index =0, $order_by )
     {
         list ( $file_path , $file_name ) = myReportsMgr::createFileName ( $partner_id , $report_type , $input_filter , $dimension , $object_ids ,$page_size , $page_index , $order_by );
-        $csv = new myCsvWrapper ();
 
-        $arr = array();
-
-        if (!in_array($report_type, myReportsMgr::$reports_without_graph))
-        {
-            $arr = self::getGraph( $partner_id ,
-                $report_type ,
-                $input_filter ,
-                $dimension ,
-                $object_ids );
-        }
-
-
-        if (!in_array($report_type, myReportsMgr::$reports_without_totals))
-            list ( $total_header , $total_data ) = self::getTotal( $partner_id ,
-                $report_type ,
-                $input_filter , $object_ids );
-
-
-        if ($page_size > self::MAX_CSV_RESULT_SIZE)
-        {
-            throw new kCoreException("Exceeded max query size: " . self::MAX_CSV_RESULT_SIZE ,kCoreException::SEARCH_TOO_GENERAL);
-        }
-            
-        if (!in_array($report_type, myReportsMgr::$reports_without_table))
-        {
-            list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
-                $report_type ,
-                $input_filter ,
-                $page_size , $page_index ,
-                $order_by ,  $object_ids, true );
-        }
-
-        $csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
-            $report_type , $input_filter , $dimension ,
-            $arr , $total_header , $total_data , $table_header , $table_data , $table_total_count, $csv);
-
-        $data = $csv->getData();
+	      $data = self::getCsvData( $partner_id ,
+                                                  $report_title , $report_text , $headers ,
+                                                  $report_type ,
+                                                  $input_filter ,
+                                                  $dimension ,
+                                                  $object_ids  ,
+                                                  $page_size, $page_index , $order_by );
 
         // return URLwq
         kFile::fullMkfileDir( dirname ( $file_path ) , 0777 );
         //adding BOM for fixing problem in open .csv file with special chars using excel.
         $BOM = "\xEF\xBB\xBF";
-        file_put_contents ( $file_path, $BOM . $data );
+        $f = @fopen($file_path, 'w');
+	    fwrite($f, $BOM);
+        fwrite($f, $data);
+        fclose($f);
 
         $url = myReportsMgr::createUrl($partner_id, $file_name);
         return $url;
