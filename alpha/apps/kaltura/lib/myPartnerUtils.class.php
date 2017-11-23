@@ -1088,6 +1088,10 @@ class myPartnerUtils
 		
 		$packages = new PartnerPackages();
 		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
+
+		$newFreeTrial = false;
+		if(date("Y-m-d") > kConf::get('new_free_trial_start_date'))
+			$newFreeTrial = true;
 		
 		$report_date = date('Y-m').'-01';
         // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
@@ -1115,8 +1119,11 @@ class myPartnerUtils
 			/* prepare mail job, and set EightyPercentWarning() to true/date */
 			$partner->setEightyPercentWarning(time());
 			$partner->setUsageLimitWarning(0);
-			$body_params = array ( $partner->getAdminName(), $partnerPackage['cycle_bw'], $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
-			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $body_params);
+			if(!$newFreeTrial)
+			{
+				$body_params = array ( $partner->getAdminName(), $partnerPackage['cycle_bw'], $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
+				myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $body_params);
+			}
 		}
 		elseif ($percent >= 80 &&
 			$percent < 100 &&
@@ -1137,14 +1144,22 @@ class myPartnerUtils
 		elseif ($percent >= 100 &&
 				!$partner->getUsageLimitWarning())
 		{
-			KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning");
-				
 			/* prepare mail job, and set getUsageLimitWarning() date */
 			$partner->setUsageLimitWarning(time());
 			// if ($partnerPackage['cycle_fee'] == 0) - script always works on free partners anyway
+			if(!$newFreeTrial)
 			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning");
 				$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
 				myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_LIMIT_WARNING_1, $partner, $body_params);
+			}
+			else
+			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 100% - blocking partner");
+				if($should_block_delete_partner)
+				{
+					$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
+				}
 			}
 		}
 		elseif ($percent >= 100 &&
@@ -1166,7 +1181,8 @@ class myPartnerUtils
 		}
 		elseif ($percent >= 120 &&
 				$partnerPackage['cycle_fee'] != 0 &&
-				$partner->getUsageLimitWarning() <= $block_notification_grace)
+				$partner->getUsageLimitWarning() <= $block_notification_grace &&
+				!$newFreeTrial)
 		{
 			$body_params = array ( $partner->getAdminName(), round($totalUsageGB, 2) );
 			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PAID_PACKAGE_SUGGEST_UPGRADE, $partner, $body_params);
@@ -1175,7 +1191,8 @@ class myPartnerUtils
 				$partnerPackage['cycle_fee'] == 0 &&
 				$partner->getUsageLimitWarning() > 0 &&
 				$partner->getUsageLimitWarning() <= $delete_grace &&
-				$partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK)
+				$partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK &&
+				!$newFreeTrial)
 		{
 			KalturaLog::debug("partner ". $partner->getId() ." reached 100% a month ago - deleting partner");
 				
