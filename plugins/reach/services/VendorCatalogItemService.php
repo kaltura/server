@@ -115,7 +115,7 @@ class VendorCatalogItemService extends KalturaBaseService
 	 * @return KalturaVendorCatalogItem
 	 *
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
-	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME,
+	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME
 	 */
 	function updateStatusAction($id, $status)
 	{
