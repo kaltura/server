@@ -1148,7 +1148,33 @@ class playManifestAction extends kalturaAction
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 
-		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
+		$deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
+		$deliveryProfileIds = $this->getRequestParameter( "deliveryProfileIds", null );
+		if(!is_null($deliveryProfileIds))
+		{
+			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+			$deliveryIds = array();
+			$deliveryIdsMap = $partner->getDeliveryProfileIds();
+			foreach($deliveryIdsMap as $format => $deliveriesByFormat) {
+				if($this->deliveryAttributes->getFormat() == $format) {
+					if (is_array($deliveriesByFormat))
+						$deliveryIds = array_merge($deliveryIds, $deliveriesByFormat);
+					else
+						$deliveryIds[] = $deliveriesByFormat;
+				}
+			}
+
+			foreach($deliveryIds as $deliveryId)
+			{
+				if(in_array($deliveryProfileIds, $deliveryId))
+				{
+					$deliveryProfileId = $deliveryId;
+					break;
+				}
+			}
+		}
+
+		$this->deliveryProfileId = $deliveryProfileId;
 		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
 
 		// Initialize
