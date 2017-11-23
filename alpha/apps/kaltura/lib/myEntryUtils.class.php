@@ -878,9 +878,10 @@ class myEntryUtils
 			kFile::fullMkdir($processingThumbPath);
 			if ($packagerCropThumb && $shouldCropInPackager)
 			{
-				$convertedImagePath = $processingThumbPath;
+				$convertedImagePath = $orig_image_path;
+				KalturaLog::debug("Image was resize in the packager -  setting path [$convertedImagePath]");
 			}
-			else
+			else //need to crop the image
 			{
 				if ($crop_provider)
 				{
@@ -912,7 +913,6 @@ class myEntryUtils
 					unlink($orig_image_path);
 			}
 
-			
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
