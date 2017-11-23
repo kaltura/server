@@ -8,6 +8,22 @@
     cd /opt/kaltura/app/tests/standAloneClient
     php exec.php entryChangesSubscriberNotifications.xml    
 
+## Add eSearch highlight ##
+- Issue Type: Task
+- Issue ID: PLAT-8090
+
+### Configuration ###
+	Configure elasticSearch Kaltura configuration:
+	- Add the following to your elastic.ini file:
+	[highlights]
+	globalMaxNumberOfFragments = 7
+	cuepointMaxNumberOfFragments = 8
+### Deployment scripts ###
+	None
+
+#### Known Issues & Limitations ####
+	None
+
 ## Add new app token capabilities ##
 - Issue Type: Task
 - Issue ID: PLAT-8200
