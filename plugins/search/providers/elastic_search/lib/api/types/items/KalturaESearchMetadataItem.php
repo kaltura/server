@@ -40,12 +40,6 @@ class KalturaESearchMetadataItem extends KalturaESearchItem
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
-	public function validateForUsage($sourceObject, $propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull("searchTerm");
-		return parent::validateForUsage($sourceObject, $propertiesToSkip);
-	}
-
 	protected function getItemFieldName()
 	{
 		return null;

@@ -3,10 +3,12 @@
  * @package plugins.elasticSearch
  * @subpackage model.items
  */
-class ESearchMetadataItem extends ESearchItem
+class ESearchMetadataItem extends ESearchNestedObjectItem
 {
-	const DEFAULT_INNER_HITS_SIZE = 10;
+
 	const INNER_HITS_CONFIG_KEY = 'metadataInnerHitsSize';
+	const NESTED_QUERY_PATH = 'metadata';
+	const HIGHLIGHT_CONFIG_KEY = 'metadataMaxNumberOfFragments';
 
 	private static $allowed_search_types_for_field = array(
 		'metadata.value_text' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
@@ -47,11 +49,6 @@ class ESearchMetadataItem extends ESearchItem
 	public function setSearchTerm($searchTerm)
 	{
 		$this->searchTerm = $searchTerm;
-	}
-
-	public function getType()
-	{
-		return 'metadata';
 	}
 
 	/**
@@ -117,25 +114,12 @@ class ESearchMetadataItem extends ESearchItem
 	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
-		$metadataQuery['nested']['path'] = 'metadata';
-		$metadataQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
-		$allowedSearchTypes = ESearchMetadataItem::getAllowedSearchTypesForField();
-		$queryAttributes->setScopeToInner();
-		foreach ($eSearchItemsArr as $metadataESearchItem)
-		{
-			self::createSingleItemSearchQuery($metadataESearchItem, $boolOperator, $metadataQuery, $allowedSearchTypes, $queryAttributes);
-		}
-
-		$highlight = kBaseSearch::getHighlightSection('metadata', $queryAttributes);
-		if(isset($highlight))
-			$metadataQuery['nested']['inner_hits']['highlight'] = $highlight;
-
-		return array($metadataQuery);
+		return self::createNestedQueryForItems($eSearchItemsArr, $boolOperator, $queryAttributes);
 	}
 
 	public static function createSingleItemSearchQuery($metadataESearchItem, $boolOperator, &$metadataQuery, $allowedSearchTypes, &$queryAttributes)
 	{
+		$metadataESearchItem->validateItemInput();
 		switch ($metadataESearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
@@ -185,20 +169,20 @@ class ESearchMetadataItem extends ESearchItem
 		else if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
 			$metadataExactMatch['bool']['must'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
-
-			if($searchItem->getXpath())
-				$metadataExactMatch['bool']['must'][] = self::getXPathQuery($searchItem);
-
-			if($searchItem->getMetadataProfileId())
-				$metadataExactMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
-
-			if($searchItem->getMetadataFieldId())
-				$metadataExactMatch['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
 		}
 		else
 		{
 			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
 		}
+
+		if($searchItem->getXpath())
+			$metadataExactMatch['bool']['must'][] = self::getXPathQuery($searchItem);
+
+		if($searchItem->getMetadataProfileId())
+			$metadataExactMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+
+		if($searchItem->getMetadataFieldId())
+			$metadataExactMatch['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
 
 		return $metadataExactMatch;
 	}
@@ -350,6 +334,22 @@ class ESearchMetadataItem extends ESearchItem
 		);
 
 		return $metadataFieldIdQuery;
+	}
+
+	protected function validateItemInput()
+	{
+		$allowedSearchTypes = self::getAllowedSearchTypesForField();
+		$allowedOnValueText = in_array($this->getItemType(), $allowedSearchTypes['metadata.value_text']);
+		$allowedOnValueInt = in_array($this->getItemType(), $allowedSearchTypes['metadata.value_int']);
+		if(!$allowedOnValueText && !$allowedOnValueInt)
+		{
+			$data = array();
+			$fieldName = 'metadata.value';
+			$data['itemType'] = $this->getItemType();
+			$data['fieldName'] = $fieldName;
+			throw new kESearchException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $fieldName.']', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data);
+		}
+		$this->validateEmptySearchTerm('metadata.value', $this->getSearchTerm());
 	}
 
 	public function shouldAddLanguageSearch()

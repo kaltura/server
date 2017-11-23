@@ -267,9 +267,13 @@ class ESearchCuePointItemData extends ESearchItemData
 	{
 		$this->cuePointType = $objectResult['_source']['cue_point_type'];
 		$this->id = $objectResult['_source']['cue_point_id'];
-		$this->name = $objectResult['_source']['cue_point_name'];
-		$this->startTime = $objectResult['_source']['cue_point_start_time'];
-		$this->endTime = $objectResult['_source']['cue_point_end_time'];
+
+		if (isset($objectResult['_source']['cue_point_name']))
+			$this->name = $objectResult['_source']['cue_point_name'];
+		if (isset($objectResult['_source']['cue_point_start_time']))
+			$this->startTime = $objectResult['_source']['cue_point_start_time'];
+		if (isset($objectResult['_source']['cue_point_end_time']))
+			$this->endTime = $objectResult['_source']['cue_point_end_time'];
 		if (isset($objectResult['_source']['cue_point_text']))
 			$this->text = $objectResult['_source']['cue_point_text'];
 		if (isset($objectResult['_source']['cue_point_tags']))

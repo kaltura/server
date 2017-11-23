@@ -64,11 +64,6 @@ class ESearchUserItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function getType()
-	{
-		return 'user';
-	}
-
 	public static function getAllowedSearchTypesForField()
 	{
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
@@ -96,6 +91,7 @@ class ESearchUserItem extends ESearchItem
 
 	private static function getSingleItemSearchQuery($userSearchItem, &$userQuery, $allowedSearchTypes, &$queryAttributes)
 	{
+		$userSearchItem->validateItemInput();
 		switch ($userSearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
