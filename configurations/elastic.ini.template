@@ -14,3 +14,7 @@ innerHitsWithObjectId = 100
 [beacon]
 elasticHost = @BEACONS_ELASTIC_HOST@
 elasticPort = @BEACONS_ELASTIC_PORT@
+
+[highlights]
+globalMaxNumberOfFragments = 7
+cuepointMaxNumberOfFragments = 8

@@ -3,11 +3,12 @@
  * @package plugins.elasticSearch
  * @subpackage model.items
  */
-class ESearchCaptionItem extends ESearchItem
+class ESearchCaptionItem extends ESearchNestedObjectItem
 {
 
-	const DEFAULT_INNER_HITS_SIZE = 10;
 	const INNER_HITS_CONFIG_KEY = 'captionInnerHitsSize';
+	const NESTED_QUERY_PATH = 'caption_assets.lines';
+	const HIGHLIGHT_CONFIG_KEY = 'captionMaxNumberOfFragments';
 
 	private static $allowed_search_types_for_field = array(
 		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
@@ -65,28 +66,21 @@ class ESearchCaptionItem extends ESearchItem
 		$this->fieldName = $fieldName;
 	}
 
-	public function getType()
-	{
-		return 'caption';
-	}
-
 	public static function getAllowedSearchTypesForField()
 	{
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
-		$captionQuery['nested']['path'] = 'caption_assets.lines';
-		$captionQuery['nested']['inner_hits'] = array('size' => $innerHitsSize);
-		$allowedSearchTypes = ESearchCaptionItem::getAllowedSearchTypesForField();
-		foreach ($eSearchItemsArr as $eSearchCaptionItem)
-		{
-			self::createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, $captionQuery, $allowedSearchTypes, $queryAttributes);
-		}
-		
-		return array($captionQuery);
+		return self::createNestedQueryForItems($eSearchItemsArr, $boolOperator, $queryAttributes);
 	}
 
 	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionQuery, $allowedSearchTypes, &$queryAttributes)
@@ -96,7 +90,7 @@ class ESearchCaptionItem extends ESearchItem
 		{
 			case ESearchItemType::EXACT_MATCH:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
@@ -104,15 +98,15 @@ class ESearchCaptionItem extends ESearchItem
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExistsQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getExistsQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
 				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$eSearchCaptionItem->getItemType()."]");
@@ -120,13 +114,6 @@ class ESearchCaptionItem extends ESearchItem
 
 		if($boolOperator == 'should')
 			$captionQuery['nested']['query']['bool']['minimum_should_match'] = 1;
-	}
-
-	protected function validateItemInput()
-	{
-		$allowedSearchTypes = self::getAllowedSearchTypesForField();
-		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
-		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
 
 	public function shouldAddLanguageSearch()

@@ -123,8 +123,11 @@ class ESearchMetadataItemData extends ESearchItemData
 		$this->setMetadataFieldId($objectResult['_source']['metadata_field_id']);
 		if(isset($objectResult['_source']['value_text']))
 			$this->setValueText(implode(',',$objectResult['_source']['value_text']));
+
 		if(isset($objectResult['_source']['value_int']))
 			$this->setValueInt($objectResult['_source']['value_int']);
+
+		$this->setHighlight($objectResult['highlight']);
 	}
 	
 }

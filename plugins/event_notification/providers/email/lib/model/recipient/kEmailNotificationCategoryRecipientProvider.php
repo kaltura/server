@@ -14,6 +14,12 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	protected $categoryId;
 
 	/**
+	 * ID of the category to whose subscribers the email should be sent
+	 * @var kStringValue
+	 */
+	protected $categoryIds;
+
+	/**
 	 * Additional filter
 	 * @var categoryKuserFilter
 	 */
@@ -32,34 +38,74 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	public function setCategoryId($category_id) {
 		$this->categoryId = $category_id;
 	}
+
+	/**
+	 * @return kStringValue
+	 */
+	public function getCategoryIds() {
+		return $this->categoryIds;
+	}
+
+	/**
+	 * @param kStringValue $category_id
+	 */
+	public function setCategoryIds($category_ids) {
+		$this->categoryIds = $category_ids;
+	}
 	
 	
 	/* (non-PHPdoc)
 	 * @see kEmailNotificationRecipientProvider::getScopedProviderJobData()
 	 */
-	public function getScopedProviderJobData(kScope $scope = null) 
-	{
+	public function getScopedProviderJobData(kScope $scope = null)
+    {
 		$ret = new kEmailNotificationCategoryRecipientJobData();
-		
-		if(!$this->categoryId)
+
+		if (!$this->categoryId && !$this->categoryIds)
+		{
 			return $ret;
-		
-		if ($this->categoryId instanceof kStringField)
+		}
+
+		$implicitCategoryId = null;
+		if ($this->categoryId && $this->categoryId instanceof kStringField)
+		{
 			$this->categoryId->setScope($scope);
-		
-		$implicitCategoryId = $this->categoryId->getValue();
-		
+			$implicitCategoryId = $this->categoryId->getValue();
+		}
+
+		$implicitCategoryIds = null;
+		if ($this->categoryIds && $this->categoryIds instanceof kStringField)
+		{
+
+			$this->categoryIds->setScope($scope);
+			$implicitCategoryIds = $this->categoryIds->getValue();
+		}
+
+		if ($implicitCategoryIds && $implicitCategoryId)
+		{
+			$implicitCategoryIds .= ",$implicitCategoryId";
+		}
+
 		$categoryUserFilter = new categoryKuserFilter();
 		$categoryUserFilter->set('_matchor_permission_names', PermissionName::CATEGORY_SUBSCRIBE);
 		if ($this->categoryUserFilter)
 		{
 			$categoryUserFilter = $this->categoryUserFilter;
 		}
-		$categoryUserFilter->setCategoryIdEqual($implicitCategoryId);
+
+		if ($implicitCategoryIds)
+		{
+			$categoryUserFilter->set('_in_category_id', $implicitCategoryIds);
+		}
+		else
+		{
+			$categoryUserFilter->setCategoryIdEqual($implicitCategoryId);
+		}
 		$ret->setCategoryUserFilter($categoryUserFilter);
 		
 		return $ret;
 	}
+
 	/**
 	 * @return categoryKuserFilter
 	 */

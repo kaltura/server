@@ -25,6 +25,10 @@ class KalturaESearchParams extends KalturaObject
 	 */
 	public $orderBy;
 
+	/**
+	 * @var bool
+	 */
+	public $useHighlight;
 
 	private static $mapBetweenObjects = array
 	(
@@ -32,6 +36,7 @@ class KalturaESearchParams extends KalturaObject
 		"objectStatuses",
 		"objectId",
 		"orderBy",
+		"useHighlight",
 	);
 
 	public function getMapBetweenObjects()

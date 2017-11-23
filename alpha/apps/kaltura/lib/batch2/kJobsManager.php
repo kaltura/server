@@ -773,7 +773,6 @@ class kJobsManager
 				throw new kCoreException("Source file not found for thumbnail capture [$thumbAssetId]", kCoreException::SOURCE_FILE_NOT_FOUND);
 			}
 		}
-		$localPath = $fileSync->getFullPath();
 		$remoteUrl = $fileSync->getExternalUrl($entryId);
 		
 		// creates convert data
@@ -781,7 +780,7 @@ class kJobsManager
 		$data->setThumbAssetId($thumbAssetId);
 		$data->setSrcAssetId($srcAssetId);
 		$data->setSrcAssetType($srcAssetType);
-		$data->setSrcFileSyncLocalPath($localPath);
+		$data->setFileContainer(self::getFileContainerByFileSync($fileSync));
 		$data->setSrcFileSyncRemoteUrl($remoteUrl);
 		$data->setThumbParamsOutputId($thumbParams->getId());
 	
@@ -1785,12 +1784,19 @@ class kJobsManager
 
 	protected static function getFileContainer(FileSyncKey $syncKey)
 	{
-		$fileContainer = new FileContainer();
+
 		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
+		return self::getFileContainerByFileSync($fileSync);
+	}
+
+	protected static function getFileContainerByFileSync(FileSync $fileSync)
+	{
+		$fileContainer = new FileContainer();
 		if ($fileSync)
 		{
 			$fileContainer->setFilePath($fileSync->getFullPath());
 			$fileContainer->setEncryptionKey($fileSync->getEncryptionKey());
+			$fileContainer->setFileSize($fileSync->getFileSize());
 		}
 		return $fileContainer;
 	}

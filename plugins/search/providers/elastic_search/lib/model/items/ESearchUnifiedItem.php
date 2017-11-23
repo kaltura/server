@@ -7,7 +7,7 @@ class ESearchUnifiedItem extends ESearchItem
 {
 
 	const UNIFIED = 'unified';
-	
+
 	/**
 	 * @var string
 	 */
@@ -27,11 +27,6 @@ class ESearchUnifiedItem extends ESearchItem
 	public function setSearchTerm($searchTerm)
 	{
 		$this->searchTerm = $searchTerm;
-	}
-
-	public function getType()
-	{
-		return self::UNIFIED;
 	}
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
