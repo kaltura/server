@@ -145,7 +145,7 @@ class playManifestAction extends kalturaAction
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Initialization functions
 
-	protected function initPartnerByEntry()
+	private function initPartnerByEntry()
 	{
 		$this->entryId = $this->getRequestParameter ( "entryId", null );
 
@@ -195,7 +195,7 @@ class playManifestAction extends kalturaAction
 		kEntitlementUtils::initEntitlementEnforcement();
 	}
 
-	protected function initEntry()  
+	private function initEntry()
 	{
 		if(!$this->entry)
 		{
@@ -1155,19 +1155,18 @@ class playManifestAction extends kalturaAction
 
 		$deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
 		$deliveryProfileIds = $this->getRequestParameter( "deliveryProfileIds", null );
-		if(!is_null($deliveryProfileIds))
+		if($deliveryProfileIds)
 		{
 			$deliveryProfileIds = explode(",", $deliveryProfileIds);
 			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
 			$deliveryIdsMap = $partner->getDeliveryProfileIds();
 			if(array_key_exists($this->deliveryAttributes->getFormat(), $deliveryIdsMap))
 			{
-				$deliveryIds = array();
 				$deliveriesByFormat = $deliveryIdsMap[$this->deliveryAttributes->getFormat()];
 				if (is_array($deliveriesByFormat))
-					$deliveryIds = array_merge($deliveryIds, $deliveriesByFormat);
+					$deliveryIds = $deliveriesByFormat;
 				else
-					$deliveryIds[] = $deliveriesByFormat;
+					$deliveryIds = array($deliveriesByFormat);
 
 				foreach ($deliveryIds as $deliveryId) {
 					if (in_array($deliveryId, $deliveryProfileIds)) {
