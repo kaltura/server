@@ -87,17 +87,9 @@ abstract class kBaseSearch
             $partnerStatus[] = elasticSearchUtils::formatPartnerStatus($partnerId, $status);
         }
 
-        $this->query['body'] = array(
-            'query' => array(
-                'bool' => array(
-                    'filter' => array(
-                        array(
-                            'terms' => array('partner_status' => $partnerStatus)
-                        )
-                    )
-                )
-            )
-        );
+		$this->query['body']['query']['bool']['filter'][] = array(
+			'terms' => array('partner_status' => $partnerStatus)
+		);
 
         if($objectId)
         {
