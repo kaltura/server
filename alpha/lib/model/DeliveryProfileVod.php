@@ -350,6 +350,27 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function flavorCmpFunction ($flavor1, $flavor2)
 	{
+		// move the caption flavors to the end
+		$isFlavor1Caption = $flavor1['type'] == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
+		$isFlavor2Caption = $flavor2['type'] == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
+		
+		if($isFlavor1Caption != $isFlavor2Caption)
+		{
+			if ($isFlavor1Caption)
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		
+		if($isFlavor1Caption)
+		{
+			return $flavor1['index'] - $flavor2['index'];
+		}
+		
 		// move the audio flavors to the end unless we have multi audio stream which in this case they should be at the beginning
 		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
 		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
