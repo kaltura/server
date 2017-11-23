@@ -1848,7 +1848,7 @@ class myPartnerUtils
 
 		$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
 		if (in_array($dayInFreeTrial, $freeTrialUpdatesDays))
-			$partner->setLastFreeTrailNotificationDay($dayInFreeTrial);
+			$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
 
 		$partner->save();
 	}
