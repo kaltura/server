@@ -786,9 +786,7 @@ class myEntryUtils
 
 		while($count--)
 		{
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			$shouldCropInPackager = self::shouldCropInPackager(array($density, $quality, $forceRotation));
-			$packagerCropThumb = false;
+			$thumbCaptureByPackager = false;
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -838,7 +836,7 @@ class myEntryUtils
 						if(!$success)
 							$packagerRetries--;
 						else
-							$packagerCropThumb = true;
+							$thumbCaptureByPackager = true;
 					}
 
 					if (!$success)
@@ -876,7 +874,10 @@ class myEntryUtils
 			}
 
 			kFile::fullMkdir($processingThumbPath);
-			if ($packagerCropThumb && $shouldCropInPackager)
+
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+			$shouldBeCaptureByPackagerOnly = self::canBeHandleByPackager(array($density, $quality, $forceRotation));
+			if ($thumbCaptureByPackager && $shouldBeCaptureByPackagerOnly)
 			{
 				$convertedImagePath = $orig_image_path;
 				KalturaLog::debug("Image was resize in the packager -  setting path [$convertedImagePath]");
@@ -2089,7 +2090,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $content;
 	}
 
-	private static function shouldCropInPackager($params)
+	private static function canBeHandleByPackager($params)
 	{
 		//check if all null or 0
 		return (count(array_filter($params)) == 0);
