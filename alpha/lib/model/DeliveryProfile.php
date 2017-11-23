@@ -45,10 +45,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		foreach ($flavors as &$currFlavor)
 		{
-			if(array_key_exists('index', $currFlavor))
-				unset($currFlavor['index']);
-			if(array_key_exists('type', $currFlavor))
-				unset($currFlavor['type']);
+			unset($currFlavor['index']);
+			unset($currFlavor['type']);
 		}
 	}
 	

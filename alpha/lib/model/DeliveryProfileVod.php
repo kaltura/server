@@ -346,10 +346,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function flavorCmpFunction ($flavor1, $flavor2)
 	{
-		// move the audio flavors to the end unless we have multi audio stream which in this case they should be at the beginning
-		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
-		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
-		
+		// move the caption flavors to the end
 		$isFlavor1Caption = $flavor1['type'] == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
 		$isFlavor2Caption = $flavor2['type'] == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
 		
@@ -369,6 +366,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			return $flavor1['index'] - $flavor2['index'];
 		}
+		
+		// move the audio flavors to the end unless we have multi audio stream which in this case they should be at the beginning
+		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
+		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
 		
 		if ($isAudio1 != $isAudio2)
 		{
@@ -480,7 +481,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			}
 		}
 			
-		uasort($flavors, array($this,'flavorCmpFunction'));		
+		uasort($flavors, array($this,'flavorCmpFunction'));	
 		return $flavors;
 	}
 
