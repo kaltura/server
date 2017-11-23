@@ -783,8 +783,11 @@ class myEntryUtils
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
 
+
 		while($count--)
 		{
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+			$shouldCropInPackager = self::shouldCropInPackager(array($density, $quality, $forceRotation));
 			$packagerCropThumb = false;
 			if (
 				// need to create a thumb if either:
@@ -829,7 +832,6 @@ class myEntryUtils
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-
 					if($multi && $packagerRetries)
 					{
 						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
@@ -865,7 +867,7 @@ class myEntryUtils
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 			
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+
 			
 			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
 			{
@@ -874,7 +876,7 @@ class myEntryUtils
 			}
 
 			kFile::fullMkdir($processingThumbPath);
-			if ($packagerCropThumb)
+			if ($packagerCropThumb && $shouldCropInPackager)
 			{
 				$convertedImagePath = $processingThumbPath;
 			}
@@ -976,7 +978,7 @@ class myEntryUtils
 	}
 
 
-	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = myFileConverter::DEFAULT_THUMBNAIL_WIDTH, $height = myFileConverter::DEFAULT_THUMBNAIL_HEIGHT)
+	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null)
 	{
 		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
 		if(in_array($entry->getType(), $mappedThumbEntryTypes))
@@ -1015,11 +1017,17 @@ class myEntryUtils
 	}
 
 
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height)
+	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null)
 	{
+		$offset = floor($calc_vid_sec*1000);
+		if ($width)
+			$offset .= "-w$width";
+		if ($height)
+			$offset .= "-h$height";
+
 		$packagerThumbCapture = str_replace(
 		array ( "{url}", "{offset}" ),
-		array ( $url , floor($calc_vid_sec*1000)  ) ,
+		array ( $url , $offset  ) ,
 		$packagerCaptureUrl );
 
 		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
@@ -1092,6 +1100,8 @@ class myEntryUtils
 		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
 			return false;
+
+		KalturaLog::info($packagerCaptureUrl);
 
 		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
 		if(!$flavorAsset)
@@ -2079,6 +2089,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		kFile::closeDbConnections();
 		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
 		return $content;
+	}
+
+	private static function shouldCropInPackager($params)
+	{
+		//check if all null or 0
+		return (count(array_filter($params)) == 0);
 	}
 
 
