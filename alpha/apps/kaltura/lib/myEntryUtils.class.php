@@ -811,7 +811,7 @@ class myEntryUtils
 				{
 					$calc_vid_sec = ($entry->getPartner() && $entry->getPartner()->getDefThumbOffset()) ? $entry->getPartner()->getDefThumbOffset() : 3;
 				}
-				else // default thumbnail wasnt created yet
+				else // default thumbnail was not created yet
 				{
 					$calc_vid_sec = $entry->getBestThumbOffset();
 				}
@@ -821,7 +821,7 @@ class myEntryUtils
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
 	
-				// if we already captured the frame at that second, dont recapture, just use the existing file
+				// if we already captured the frame at that second, do not recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
 					// creating the thumbnail is a very heavy operation
@@ -1100,8 +1100,6 @@ class myEntryUtils
 		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
 			return false;
-
-		KalturaLog::info($packagerCaptureUrl);
 
 		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
 		if(!$flavorAsset)
