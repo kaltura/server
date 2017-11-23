@@ -6,6 +6,9 @@
 
 abstract class kBaseSearch
 {
+
+	const GLOBAL_HIGHLIGHT_CONFIG = 'globalMaxNumberOfFragments';
+
     protected $elasticClient;
     protected $query;
     protected $queryAttributes;
@@ -84,17 +87,9 @@ abstract class kBaseSearch
             $partnerStatus[] = elasticSearchUtils::formatPartnerStatus($partnerId, $status);
         }
 
-        $this->query['body'] = array(
-            'query' => array(
-                'bool' => array(
-                    'filter' => array(
-                        array(
-                            'terms' => array('partner_status' => $partnerStatus)
-                        )
-                    )
-                )
-            )
-        );
+		$this->query['body']['query']['bool']['filter'][] = array(
+			'terms' => array('partner_status' => $partnerStatus)
+		);
 
         if($objectId)
         {
@@ -110,20 +105,14 @@ abstract class kBaseSearch
     protected function addGlobalHighlights()
 	{
 		$this->queryAttributes->setScopeToGlobal();
-		$highlight = self::getHighlightSection('global', $this->queryAttributes);
+		$highlight = self::getHighlightSection(self::GLOBAL_HIGHLIGHT_CONFIG, $this->queryAttributes);
 		if(isset($highlight))
 		{
 			$this->query['body']['highlight'] = $highlight;
 		}
 	}
 
-
-	/**
-	 * @param string $highlightScope
-	 * @param ESearchQueryAttributes $queryAttributes
-	 * @return array|null
-	 */
-	public static function getHighlightSection($highlightScope, $queryAttributes)
+	public static function getHighlightSection($configKey, $queryAttributes)
 	{
 		$highlight = null;
 		$fieldsToHighlight = $queryAttributes->getFieldsToHighlight();
@@ -132,10 +121,9 @@ abstract class kBaseSearch
 			$highlight = array();
 			$highlight["type"] = "unified";
 			$highlight["order"] = "score";
-			$configurationName = $highlightScope."MaxNumberOfFragments";
-			$innerHitsConfig = kConf::get('highlights', 'elastic');
-			if(isset($innerHitsConfig[$configurationName]))
-				$highlight['number_of_fragments'] = $innerHitsConfig[$configurationName];
+			$HighlightConfig = kConf::get('highlights', 'elastic');
+			if(isset($HighlightConfig[$configKey]))
+				$highlight['number_of_fragments'] = $HighlightConfig[$configKey];
 
 			$highlight['fields'] = $fieldsToHighlight;
 		}

@@ -32,7 +32,6 @@ class ESearchEntryItem extends ESearchItem
 		'entitled_kusers_edit' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'entitled_kusers_publish' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'template_entry_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
-		'display_in_search' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'parent_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 		'media_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 		'source_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
@@ -49,6 +48,7 @@ class ESearchEntryItem extends ESearchItem
 		'site_url' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'access_control_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'categories.name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
+		'external_source_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 	);
 
 	protected static $field_boost_values = array(
@@ -100,11 +100,6 @@ class ESearchEntryItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function getType()
-	{
-		return 'entry';
-	}
-
 	public static function getAllowedSearchTypesForField()
 	{
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
@@ -153,13 +148,6 @@ class ESearchEntryItem extends ESearchItem
 			default:
 				KalturaLog::log("Undefined item type[".$entrySearchItem->getItemType()."]");
 		}
-	}
-	
-	protected function validateItemInput()
-	{
-		$allowedSearchTypes = self::getAllowedSearchTypesForField();
-		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
-		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
 
 	public function shouldAddLanguageSearch()

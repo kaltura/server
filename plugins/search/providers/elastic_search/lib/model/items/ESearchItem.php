@@ -74,7 +74,12 @@ abstract class ESearchItem extends BaseObject
 		}
 	}
 
-	abstract public function getType();
+	protected function validateItemInput()
+	{
+		$allowedSearchTypes = static::getAllowedSearchTypesForField();
+		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
+		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
+	}
 
 	public static function getAllowedSearchTypesForField()
 	{

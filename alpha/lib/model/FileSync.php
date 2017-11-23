@@ -95,9 +95,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 			return false;
 
 		//check the file extension and size
-		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
-		$fileTypeNotToEncrypt = kConf::get('video_file_ext');
-		if (in_array($type, $fileTypeNotToEncrypt))
+		$fileTypeNotToEncrypt = array_merge(kConf::get('video_file_ext'), kConf::get('audio_file_ext'));
+		$fileTypeNotToEncrypt[] = 'log';
+		if (in_array($this->getFileExt(), $fileTypeNotToEncrypt))
 			return false;
 
 		$maxFileSize = kConf::get('max_file_size_for_encryption', 'local', self::MAX_FILE_SIZE_FOR_ENCRYPTION);

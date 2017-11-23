@@ -56,16 +56,13 @@ class MediaRepurposingListAction extends KalturaApplicationPlugin implements IKa
 
 		$action->view->filterForm = $mediaRepurposingFilterForm;
 		$action->view->paginator = $paginator;
-
-		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingConfigure'), null, true);
-
-
+		
 		$createMediaRepurposingForm = new Form_CreateMediaRepurposing();
-		$createMediaRepurposingForm->setAction($actionUrl);
+		$createMediaRepurposingForm->getElement("newPartnerId")->setValue($partnerId);
 		$action->view->newMediaRepurposingForm = $createMediaRepurposingForm;
 
 		$createMediaRepurposingFormFromTemplate = new Form_CreateMediaRepurposingFromTemplate();
-		$createMediaRepurposingFormFromTemplate->setAction($actionUrl);
+		$createMediaRepurposingFormFromTemplate->getElement("newPartnerIdTemplate")->setValue($partnerId);
 		$action->view->newMediaRepurposingFormFromTemplate = $createMediaRepurposingFormFromTemplate;
 
 		$action->view->getDryRunLogForm = new Form_GetDryRunLog();

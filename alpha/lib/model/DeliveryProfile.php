@@ -29,16 +29,25 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	public function serve()
 	{
 		$flavors = $this->buildServeFlavors();
-		
 		if(!$flavors)
 			return null;
 		
+		$this->removeInternalUseFlavorAttr($flavors);
 		if($this->params->getEdgeServerIds() && count($this->getDynamicAttributes()->getEdgeServerIds()))
 			$this->applyFlavorsDomainPrefix($flavors);
 		
 		$renderer = $this->getRenderer($flavors);
 		
 		return $renderer;
+	}
+	
+	private function removeInternalUseFlavorAttr(&$flavors)
+	{
+		foreach ($flavors as &$currFlavor)
+		{
+			unset($currFlavor['index']);
+			unset($currFlavor['type']);
+		}
 	}
 	
 	/**
@@ -343,8 +352,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLabel = null;
 		$audioCodec = null;
 		$isDefaultAudio = false;
+		$type = null;
 		if ($flavor) 
 		{
+			$type = $flavor->getType();
+			
 			if (is_callable(array($flavor, 'getFileExt'))) 
 			{
 				$ext = $flavor->getFileExt();
@@ -408,6 +420,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'audioLabel' => $audioLabel,
 				'audioCodec' => $audioCodec,
 				'defaultAudio' => $isDefaultAudio,
+				'type' => $type,
 			);
 	}
 	
