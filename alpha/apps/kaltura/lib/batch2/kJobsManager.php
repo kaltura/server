@@ -463,6 +463,7 @@ class kJobsManager
 		}
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$srcFileSyncs = array();
+		$localFileSync=null;
 		
 		foreach ($srcSyncKeys as $srcSyncKey) 
 		{		
@@ -488,7 +489,10 @@ class kJobsManager
 				if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 				{
 					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
-						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);						
+					{
+						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
+						$localFileSync = $fileSync;
+					}
 				}
 				else
 				{
@@ -506,7 +510,16 @@ class kJobsManager
 		$convertData = new kConvertJobData();
 		$convertData->setSrcFileSyncs($srcFileSyncs);
 		$sourcePath = $convertData->getSrcFileSyncLocalPath();
-		if(kFile::isFileTypeText($sourcePath))
+
+		/* @var $srcFileSyncs FileSyncKey*/
+		if($localFileSync && $localFileSync->isEncrypted())
+			$sourcePath = $localFileSync->createTempClear();
+
+		$isTextFileInput = kFile::isFileTypeText($sourcePath);
+		if(localFileSync && $localFileSync->isEncrypted())
+			unlink($sourcePath);
+
+		if($isTextFileInput)
 		{
 			KalturaLog::err("Source file is of type text for flavor id [$flavorAssetId]");
 			return null;
@@ -1212,21 +1225,37 @@ class kJobsManager
 	}
 	
 	/**
-	 * @param BatchJob $batchJob
+	 * @param BatchJob $parentJob
 	 * @param entry $entry
 	 * @param string $flavorAssetId
 	 * @param string $inputFileSyncLocalPath
+	 * @param FileSync $localFileSync
 	 * @return BatchJob
 	 */
-	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
+	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId,$inputFileSyncLocalPath, $localFileSync)
 	{
-		if(kFile::isFileTypeText($inputFileSyncLocalPath))
+		$isEncrypted=false;
+		if($localFileSync && $localFileSync->isEncrypted())
+		{
+			$isEncrypted = true;
+			$filePath = $localFileSync->createTempClear();
+		}
+		else
+			$filePath = $inputFileSyncLocalPath;
+
+		$isFileTypeText = kFile::isFileTypeText($filePath);
+
+		if ($isEncrypted)
+			unlink($filePath);
+
+		if($isFileTypeText)
 		{
 			KalturaLog::notice('Source of type text will not be converted');
 			$entry->setStatus(entryStatus::ERROR_CONVERTING);
 			$entry->save();
 			return null;
 		}
+
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);

@@ -337,8 +337,8 @@ class JobsService extends KalturaBaseService
 			throw new KalturaAPIException(APIErrors::NO_FILES_RECEIVED);
 			
 		$inputFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		
-		$batchJob = kJobsManager::addConvertProfileJob(null, $entry, $flavorAsset->getId(), $inputFileSyncLocalPath);
+		$localFileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
+		$batchJob = kJobsManager::addConvertProfileJob(null, $entry, $flavorAsset->getId(), $inputFileSyncLocalPath, $localFileSync);
 		if(!$batchJob)
 			throw new KalturaAPIException(APIErrors::UNABLE_TO_CONVERT_ENTRY);
 		

@@ -506,14 +506,17 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 							// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
 							$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 							$fs = $fsArr[0];
+							$localFileSync=null;
 							if ($fs && $fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 							{
 								$path = $fs->getFilePath();
-							} else
+							}
+							else
 							{
 								$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+								$localFileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
 							}
-							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path , $localFileSync );
 						}
 					}
 

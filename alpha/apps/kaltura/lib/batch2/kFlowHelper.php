@@ -1734,10 +1734,10 @@ class kFlowHelper
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 				{
 					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-
+					$localFileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
 					$entry = $dbBatchJob->getEntry();
 					if($entry)
-						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $path);
+						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $path , $localFileSync);
 				}
 				$currentFlavorAsset = null;
 			}

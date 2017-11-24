@@ -1105,8 +1105,8 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
-		
-		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $srcFilePath);
+		$localFileSync =  kFileSyncUtils::getLocalFileSyncForKey($srcSyncKey);
+		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $srcFilePath, $localFileSync);
 		if(!$job)
 			return null;
 			
