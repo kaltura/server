@@ -25,11 +25,11 @@ class KAsyncImport extends KJobHandlerWorker
 	const  HEADERS_TIMEOUT=30;
 	public static function  progressWatchDog($resource,$download_size, $downloaded, $upload_size, $uploaded)
 	{
-		if(self::$downloadedSoFar < $download_size)
+		if(self::$downloadedSoFar < $downloaded)
 		{
 			$time = time() - self::$startTime + self::IMPORT_TIMEOUT;
-			curl_setopt($ch, CURLOPT_TIMEOUT, $time);
-			self::$downloadedSoFar = $download_size;
+			curl_setopt($resource, CURLOPT_TIMEOUT, $time);
+			self::$downloadedSoFar = $downloaded;
 		}
 	}
 
@@ -60,22 +60,20 @@ class KAsyncImport extends KJobHandlerWorker
 	/* Will download $sourceUrl to $localPath and will monitor progress with watchDog*/
 	private function curlExec($sourceUrl,$localPath)
 	{
-		self::$startTime 		= time();
+		self::$startTime		= time();
 		self::$downloadedSoFar	= 0;
-		$progressCallBack = null;
-
-		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-		$protocol = $curlWrapper->getSourceUrlProtocol($sourceUrl);
-		if($protocol == KCurlWrapper::HTTP_PROTOCOL_HTTP)
+		$progressCallBack		= null;
+		$curlWrapper			= new KCurlWrapper(self::$taskConfig->params);
+		$protocol			= $curlWrapper->getSourceUrlProtocol($sourceUrl);
+		if($protocol			== KCurlWrapper::HTTP_PROTOCOL_HTTP)
 		{
 			$curlWrapper->setTimeout(self::IMPORT_TIMEOUT);
-			$progressCallBack = array('KAsyncImport', 'progressWatchDog');
+			$progressCallBack 	= array('KAsyncImport', 'progressWatchDog');
 		}
-		$res = $curlWrapper->exec($sourceUrl, $localPath,$progressCallBack);
-
-		$responseStatusCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		KalturaLog::debug("Curl results: [$res] responseStatusCode [$responseStatusCode]");
+		$res				= $curlWrapper->exec($sourceUrl, $localPath,$progressCallBack);
+		$responseStatusCode		= $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
 		$curlWrapper->close();
+		KalturaLog::debug("Curl results: [$res] responseStatusCode [$responseStatusCode]");
 		return array($res,$responseStatusCode);
 	}
 

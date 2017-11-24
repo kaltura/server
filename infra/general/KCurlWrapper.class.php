@@ -533,13 +533,13 @@ class KCurlWrapper
 			$url_parts = parse_url( $sourceUrl );
 			if ( isset ( $url_parts["scheme"] ) )
 			{
-				if ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
-				{
-					$protocol = self::HTTP_PROTOCOL_FTP;
-				}
-				elseif ( in_array ($url_parts["scheme"], array ('http', 'https')) && isset ($url_parts['user']) )
+				if (in_array ($url_parts["scheme"], array ('http', 'https')))
 				{
 					$protocol = self::HTTP_PROTOCOL_HTTP;
+				}
+				elseif ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
+				{
+					$protocol = self::HTTP_PROTOCOL_FTP;
 				}
 			}
 		}
@@ -553,13 +553,28 @@ class KCurlWrapper
 
 	public function setSourceUrlAndprotocol($sourceUrl)
 	{
-		$this->protocol =  $this->getSourceUrlProtocol($sourceUrl);
-		if($this->protocol==self::HTTP_PROTOCOL_HTTP)
+		$sourceUrl = trim($sourceUrl);
+		try
 		{
-			curl_setopt ($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+			$url_parts = parse_url( $sourceUrl );
+			if ( isset ( $url_parts["scheme"] ) )
+			{
+				if ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
+					$this->protocol = self::HTTP_PROTOCOL_FTP;
+
+				if ( in_array ($url_parts["scheme"], array ('http', 'https')) && isset ($url_parts['user']) )
+				{
+					curl_setopt ($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+				}
+			}
+
+		}
+		catch ( Exception $exception )
+		{
+			throw new Exception($exception->getMessage());
 		}
 		KalturaLog::info("Setting source URL to [$sourceUrl]");
-		
+
 		$sourceUrl = self::encodeUrl($sourceUrl);
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 	}
