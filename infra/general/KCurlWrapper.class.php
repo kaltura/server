@@ -493,7 +493,7 @@ class KCurlWrapper
 	/**
 	 * @param string $sourceUrl
 	 * @param string $destFile
-	 * @param functon pointer
+	 * @param function pointer
 	 * @return boolean
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
