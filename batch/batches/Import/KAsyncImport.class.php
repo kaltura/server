@@ -61,7 +61,7 @@ class KAsyncImport extends KJobHandlerWorker
 	private function curlExec($sourceUrl,$localPath)
 	{
 		self::$startTime		= time();
-		self::$downloadedSoFar	= 0;
+		self::$downloadedSoFar		= 0;
 		$progressCallBack		= null;
 		$curlWrapper			= new KCurlWrapper(self::$taskConfig->params);
 		$protocol			= $curlWrapper->getSourceUrlProtocol($sourceUrl);
