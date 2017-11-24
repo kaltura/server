@@ -62,10 +62,18 @@ class KAsyncImport extends KJobHandlerWorker
 	{
 		self::$startTime 		= time();
 		self::$downloadedSoFar	= 0;
+		$progressCallBack = null;
+
 		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-		$curlWrapper->setTimeout(self::IMPORT_TIMEOUT);
-		$res = $curlWrapper->exec($sourceUrl, $localPath ,array('KAsyncImport','progressWatchDog'));
-q		$responseStatusCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+		$protocol = $curlWrapper->getSourceUrlProtocol($sourceUrl);
+		if($protocol == KCurlWrapper::HTTP_PROTOCOL_HTTP)
+		{
+			$curlWrapper->setTimeout(self::IMPORT_TIMEOUT);
+			$progressCallBack = array('KAsyncImport', 'progressWatchDog');
+		}
+		$res = $curlWrapper->exec($sourceUrl, $localPath,$progressCallBack);
+
+		$responseStatusCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
 		KalturaLog::debug("Curl results: [$res] responseStatusCode [$responseStatusCode]");
 		$curlWrapper->close();
 		return array($res,$responseStatusCode);
