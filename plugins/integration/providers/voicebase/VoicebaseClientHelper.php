@@ -71,9 +71,9 @@ class VoicebaseClientHelper
 						);
 
 		if (isset($this->additionalParams["uploadMedia"]))
-        {
-            $params = array_merge($params, $this->additionalParams["uploadMedia"]);
-        }
+		{
+			$params = array_merge($params, $this->additionalParams["uploadMedia"]);
+		}
 
 		$postParams = array("mediaURL" => $flavorUrl);
 		if($fileLocation)
