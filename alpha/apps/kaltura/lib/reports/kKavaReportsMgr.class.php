@@ -1003,17 +1003,18 @@ class kKavaReportsMgr extends kKavaBase
 			$dimension = array($dimension);
 		}
 
-		reset($dimension);
+		$first_dim = reset($dimension);
 		$row_mapping = array();
 		foreach ($dimension_headers as $dim_header)
 		{
 			if (in_array($dim_header, $enriched_fields))
 			{
-				$row_mapping[] = null;		// a placeholder that will be replaced during enrichment
+				$row_mapping[] = $first_dim;		// a placeholder that will be replaced during enrichment
 			}
 			else
 			{
-				$row_mapping[] = current($dimension);
+				$current_dim = current($dimension);
+				$row_mapping[] = $current_dim ? $current_dim : $first_dim;
 				next($dimension);
 			}
 		}
