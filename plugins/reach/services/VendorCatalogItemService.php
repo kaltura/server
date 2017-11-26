@@ -33,6 +33,8 @@ class VendorCatalogItemService extends KalturaBaseService
 				return $this->partnerGroup . ',0';
 			case 'listTemplates':
 				return '0';
+			case 'listByPartner':
+				return $this->partnerGroup . ',0';
 		}
 		
 		return $this->partnerGroup;
