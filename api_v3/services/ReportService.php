@@ -267,8 +267,6 @@ class ReportService extends KalturaBaseService
 		if (is_null($dbReport))
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
 			
-		$query = $dbReport->getQuery();
-		
 		$this->addPartnerIdToParams($params);
 		
 		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
@@ -289,20 +287,29 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getCsvAction($id, KalturaKeyValueArray $params = null)
 	{
-		$dbReport = ReportPeer::retrieveByPK($id);
-		if (is_null($dbReport))
-			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-			
-		$query = $dbReport->getQuery();
-		
 		$this->addPartnerIdToParams($params);
 		
-		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
-		
 		ini_set( "memory_limit","512M" );
-
-		$kReportsManager = new kReportManager($dbReport);
-		list($columns, $rows) = $kReportsManager->execute($execParams);
+		
+		if (kConf::hasParam("druid_url"))
+		{
+			$customReports = kConf::getMap('custom_reports');
+			if (!isset($customReports[$id]))
+				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+			
+			list($columns, $rows) = kKavaReportsMgr::customReport($id, $params->toObjectsArray());
+		}
+		else 
+		{
+			$dbReport = ReportPeer::retrieveByPK($id);
+			if (is_null($dbReport))
+				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+				
+			$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
+			
+			$kReportsManager = new kReportManager($dbReport);
+			list($columns, $rows) = $kReportsManager->execute($execParams);
+		}
 		
 		$fileName = array('Report', $id, $this->getPartnerId());
 		foreach($params as $param)

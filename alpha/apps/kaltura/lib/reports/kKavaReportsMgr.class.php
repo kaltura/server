@@ -26,7 +26,7 @@ class kKavaReportsMgr extends kKavaBase
     const REPORT_DRILLDOWN_GRANULARITY = "report_drilldown_granularity";
     const REPORT_DRILLDOWN_DIMENSION = "report_drilldown_dimension";
     const REPORT_DRILLDOWN_METRICS = "report_drilldown_metrics";
-    const REPORT_DRILLDOWN_DETAIL_DIM_HEADERS = "report_drilldown_deatil_dimensions_headers";
+    const REPORT_DRILLDOWN_DETAIL_DIM_HEADERS = "report_drilldown_detail_dimensions_headers";
     const REPORT_CARDINALITY_METRIC = "report_cardinality_metric";
     
     const REPORT_LEGACY = "report_legacy";
@@ -37,6 +37,7 @@ class kKavaReportsMgr extends kKavaBase
     const CLIENT_TAG_PRIORITY = 5;
     const MAX_RESULT_SIZE = 12000;
     const MAX_CSV_RESULT_SIZE = 60000;
+    const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
     const MIN_THRESHOLD = 500;
     const ENRICH_CHUNK_SIZE = 10000;
     
@@ -136,6 +137,8 @@ class kKavaReportsMgr extends kKavaBase
         self::EVENT_TYPE_REPORT_CLICKED
     );
     
+    static $custom_reports = null; 
+    
     static $reports_def = array(
         myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
             self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
@@ -222,7 +225,6 @@ class kKavaReportsMgr extends kKavaBase
             self::REPORT_DIMENSION => self::DIMENSION_APPLICATION,
             self::REPORT_METRICS => array(),
             self::REPORT_DETAIL_DIM_HEADERS => array("name"),
-            self::REPORT_GRAPH_METRICS => array("application"),
         ),
         myReportsMgr::REPORT_TYPE_PLATFORMS => array(
             self::REPORT_DIMENSION => self::DIMENSION_DEVICE,
@@ -333,13 +335,17 @@ class kKavaReportsMgr extends kKavaBase
         self::DRUID_GRANULARITY_HOUR => 'PT1H',
     );
 
-   static $non_linear_metrics = array(
+    static $non_linear_metrics = array(
     	self::METRIC_AVG_PLAY_TIME => true,
     	self::METRIC_PLAYER_IMPRESSION_RATIO => true,
     	self::METRIC_PLAYTHROUGH_RATIO => true,
     	self::METRIC_AVG_DROP_OFF => true,
     	self::METRIC_TOTAL_ENTRIES => true,
     	self::METRIC_UNIQUE_USERS => true,	
+    );
+   
+    static $multi_value_dimensions = array(
+    	self::DIMENSION_CATEGORIES
     );
     
     protected static function transformDeviceName($name)
@@ -488,16 +494,15 @@ class kKavaReportsMgr extends kKavaBase
     {
         self::init();
         $start = microtime(true);
-        $intervals = self::getFilterIntervals($report_type, $input_filter);
-        $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
-        $dimension = self::getDimension($report_type, $object_ids);
-        $metrics = self::getMetrics($report_type);
-        if (!$metrics)
+        $report_def = self::getReportDef($report_type);
+        if (!isset($report_def[self::REPORT_GRAPH_METRICS]))
         {
             throw new Exception("unsupported query - report has no metrics");
         }
+        $metrics = $report_def[self::REPORT_GRAPH_METRICS];
+        $intervals = self::getFilterIntervals($report_type, $input_filter);
+        $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
         
-        $report_def = self::$reports_def[$report_type];
         if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_GRANULARITY, $report_def))
             $granularity = $report_def[self::REPORT_DRILLDOWN_GRANULARITY];
         else if (array_key_exists(self::REPORT_GRANULARITY, $report_def))
@@ -512,7 +517,8 @@ class kKavaReportsMgr extends kKavaBase
             case myReportsMgr::REPORT_TYPE_PLATFORMS:
             case myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM:
             case myReportsMgr::REPORT_TYPE_BROWSERS:
-                $query = self::getGroupByReport($partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
+        		$dimension = self::getDimension($report_def, $object_ids);
+            	$query = self::getGroupByReport($partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
                 break;
             default:
                 $query = self::getTimeSeriesReport($partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
@@ -522,8 +528,7 @@ class kKavaReportsMgr extends kKavaBase
         $result = self::runQuery($query);
         KalturaLog::log("Druid returned [" . count($result) . "] rows");
         
-        $graph_metrics = $report_def[self::REPORT_GRAPH_METRICS];
-        foreach ($graph_metrics as $column)
+        foreach ($metrics as $column)
         {
             $graph_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
         }
@@ -558,17 +563,16 @@ class kKavaReportsMgr extends kKavaBase
     {
         self::init();
         $start = microtime (true);
+        $report_def = self::getReportDef($report_type);
         $intervals = self::getFilterIntervals($report_type, $input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
-        $dimension = self::getDimension($report_type, $object_ids);
-        $metrics = self::getMetrics($report_type);
+        $metrics = self::getMetrics($report_def);
         if (!$metrics)
         {
             throw new Exception("unsupported query - report has no metrics");
         }
         
         $granularity = self::DRUID_GRANULARITY_ALL;
-        $report_def = self::$reports_def[$report_type];
         if (array_key_exists(self::REPORT_TOTAL_ADDITIONAL_METRICS, $report_def))
             $metrics = array_merge($report_def[self::REPORT_TOTAL_ADDITIONAL_METRICS], $metrics);
         $query = self::getTimeSeriesReport($partner_id, $intervals, $granularity, $metrics, $druid_filter);
@@ -607,6 +611,107 @@ class kKavaReportsMgr extends kKavaBase
         return $res;
     }
     
+    private static function graphToTable($graphs)
+    {
+    	// get the union of all dates
+    	$dates = array();
+    	foreach ($graphs as $graph)
+    	{
+    		foreach ($graph as $date => $value)
+    		{
+    			$dates[$date] = true;
+    		}
+    	}
+    	ksort($dates);
+    	 
+    	// build the table
+    	$header = array_keys($graphs);
+    	$data = array();
+    	foreach (array_keys($dates) as $date)
+    	{
+    		$row = array($date);
+    		foreach ($header as $column)
+    		{
+    			$row[] = isset($graphs[$column][$date]) ? $graphs[$column][$date] : 0;
+    		}
+    		$data[] = $row;
+    	}
+    	
+    	return array(array_merge(array('date_id'), $header), $data);
+    }
+    
+    public static function customReport($id, $params)
+    {
+    	self::$custom_reports = kConf::getMap('custom_reports');    	
+    	$report_def = self::$custom_reports[$id];
+    	
+    	// build the filter
+    	$input_filter = new reportsInputFilter();
+        foreach ($report_def['filter'] as $field => $value)
+        {
+        	if (is_string($value) && $value[0] == ':')
+        	{
+        		$paramName = substr($value, 1);
+        		if (!isset($params[$paramName]))
+        		{
+        			throw new Exception("missing parameter $paramName");
+        		}
+        		$value = $params[$paramName];
+        	}
+        	$input_filter->$field = $value;
+        }
+        
+        $partner_id = $params['partner_id'];
+        $report_type = -$id;		// negative report types are used to identify custom reports
+        
+        if (isset($report_def[self::REPORT_GRAPH_METRICS]))
+        {
+        	// graph report
+        	$graphs = self::getGraph($partner_id, $report_type, $input_filter);
+			list($header, $data) = self::graphToTable($graphs);
+        }
+        else if (isset($report_def[self::REPORT_DIMENSION]))
+        {
+        	// table report
+	        list($header, $data, $totalCount) = self::getTable(
+	        	$partner_id,
+	        	$report_type,
+	        	$input_filter,
+	        	self::MAX_CUSTOM_REPORT_RESULT_SIZE,
+	        	1, 
+	        	$report_def['order_by'], 
+	        	null,
+	        	true);
+        }
+        else
+        {
+        	// total report
+        	list($header, $data) = self::getTotal(
+        		$partner_id, 
+        		$report_type, 
+        		$input_filter, 
+        		null);
+        }
+        
+        if (isset($report_def['header']))
+        {
+        	$header = explode(',', $report_def['header']);
+        }
+        
+        return array($header, $data);
+    }
+    
+    private static function getReportDef($report_type)
+    {
+    	if ($report_type >= 0)
+    	{
+    		return self::$reports_def[$report_type];
+    	}
+    	else
+    	{
+    		return self::$custom_reports[-$report_type];
+    	}
+    }
     
     public static function getTable($partner_id ,$report_type ,reportsInputFilter $input_filter,
         $page_size, $page_index, $order_by, $object_ids = null, $isCsv = false)
@@ -615,11 +720,11 @@ class kKavaReportsMgr extends kKavaBase
         $start = microtime (true);
         $total_count = null;
         
-        $report_def = self::$reports_def[$report_type];
+        $report_def = self::getReportDef($report_type);
         $intervals = self::getFilterIntervals($report_type, $input_filter);
         $druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
-        $dimension = self::getDimension($report_type, $object_ids);
-        $metrics = self::getMetrics($report_type);
+        $dimension = self::getDimension($report_def, $object_ids);
+        $metrics = self::getMetrics($report_def);
         
         if (array_key_exists(self::REPORT_LEGACY, $report_def))
         {
@@ -666,7 +771,8 @@ class kKavaReportsMgr extends kKavaBase
         if (!$page_index || $page_index < 0) 
             $page_index = 1;
 
-        $max_result_size = $isCsv ? self::MAX_CSV_RESULT_SIZE : self::MAX_RESULT_SIZE;
+        // Note: max size is already validated externally when $isCsv is true
+        $max_result_size = $isCsv ? PHP_INT_MAX : self::MAX_RESULT_SIZE;
         if ($page_index * $page_size > $max_result_size)
         {
         	if ($page_index == 1 && !isCsv)
@@ -708,13 +814,20 @@ class kKavaReportsMgr extends kKavaBase
         $threshold = max($intervalDays * 30, $page_size * $page_index * 2);		// 30 ~ 10000 / 365, i.e. an interval of 1Y gets a minimum threshold of 10000
         $threshold = max(self::MIN_THRESHOLD, min($max_result_size, $threshold));
         
-        if (isset(self::$non_linear_metrics[$order_by]))
+        if (isset(self::$non_linear_metrics[$order_by]) ||
+        	is_array($dimension))
         {
         	// topN works badly for non-linear metrics like avg drop off, since taking the topN per segment
         	// does not necessarily yield the combined topN
         	$threshold = $page_size * $page_index;
         	
-        	$query = self::getGroupByReport($partner_id, $intervals, self::DRUID_GRANULARITY_ALL, array($dimension), $metrics, $druid_filter);
+        	$query = self::getGroupByReport(
+        		$partner_id, 
+        		$intervals, 
+        		self::DRUID_GRANULARITY_ALL, 
+        		is_array($dimension) ? $dimension : array($dimension), 
+        		$metrics, 
+        		$druid_filter);
         	$query[self::DRUID_LIMIT_SPEC] = self::getDefaultLimitSpec(
         			$threshold,
         			array(self::getOrderByColumnSpec(
@@ -724,7 +837,9 @@ class kKavaReportsMgr extends kKavaBase
         			));
         }
         else if (!$object_ids &&
-        	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) && !$isCsv)
+        	!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) &&
+        	!self::getFilterValues($druid_filter, $dimension) && 
+        	!$isCsv)
         {
         	// get the topN objects first, otherwise the returned metrics can be inaccurate
         	$query = self::getTopReport($partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold, $metrics);
@@ -851,8 +966,6 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
                 
-        $dimension_ids = array();
-        
         $dimension_headers = $report_def[self::REPORT_DETAIL_DIM_HEADERS];
         $dimension = $report_def[self::REPORT_DIMENSION];
         if ($object_ids)
@@ -867,9 +980,49 @@ class kKavaReportsMgr extends kKavaBase
         
         foreach ($metrics as $column)
         {
-            $headers[] = self::$metrics_to_headers[$column];
+        	$headers[] = self::$metrics_to_headers[$column];
         }
         
+        // build the row mapping
+        if (isset($report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD]))
+        {
+        	$enriched_fields = $report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD];
+        	if (!is_array($enriched_fields))
+        	{
+        		$enriched_fields = array($enriched_fields);
+        	}
+        }
+        else
+        {
+        	$enriched_fields = array();
+        }
+        
+        if (!is_array($dimension))
+        {
+        	$dimension = array($dimension);
+        }
+        
+        reset($dimension);
+        $row_mapping = array();
+        foreach ($dimension_headers as $dim_header)
+        {
+        	if (in_array($dim_header, $enriched_fields))
+        	{
+        		$row_mapping[] = null;		// a placeholder that will be replaced during enrichment
+        	}
+        	else 
+        	{
+        		$row_mapping[] = current($dimension);
+        		next($dimension);
+        	}
+        }
+
+        foreach ($metrics as $column)
+        {
+        	$row_mapping[] = $column;
+        }
+
+        // map the rows
         foreach ($rows as $index => $row)
         {
         	if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
@@ -877,12 +1030,10 @@ class kKavaReportsMgr extends kKavaBase
         		$row = $row[self::DRUID_EVENT];
         	}
         	
-            $row_data = array();
-            $row_data = array_fill(0, count($dimension_headers), $row[$dimension]);
-            
-            foreach ($metrics as $column)
+        	$row_data = array();
+            foreach ($row_mapping as $column)
             {
-                $row_data[] = $row[$column];
+                $row_data[] = $column ? $row[$column] : null;
             }
             $rows[$index] = $row_data;
         }
@@ -901,13 +1052,15 @@ class kKavaReportsMgr extends kKavaBase
             }
         }
         
-        if (array_key_exists(self::REPORT_ENRICH_DEF, $report_def)) {
-
+        if ($enriched_fields) {
             $enrich_func = $report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FUNC];
-            $enrich_field = array_search($report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD], $headers);
-            if (!$enrich_field) {
-                $enrich_field = 0;
+            
+            $enriched_indexes = array();
+            foreach ($enriched_fields as $field)
+            {
+            	$enriched_indexes[] = array_search($field, $headers);
             }
+            
             $rows_count = count($data);
 
 	        $current_row = 0;
@@ -918,7 +1071,10 @@ class kKavaReportsMgr extends kKavaBase
                 $entities = call_user_func($enrich_func, $dimension_ids, $partner_id);
             
                 for (; $current_row < $limit; $current_row++) {
-                    $data[$current_row][$enrich_field] = $entities[$data[$current_row][$enrich_field]];
+                	$entity = $entities[reset($data[$current_row])];
+                	foreach ($enriched_indexes as $index => $enrich_field) {
+	               		$data[$current_row][$enrich_field] = is_array($entity) ? $entity[$index] : $entity;
+                	}
                 }
     	    }
         }
@@ -1010,16 +1166,15 @@ class kKavaReportsMgr extends kKavaBase
        return $intervals;  
    }
     
-   private static function getDimension($report_type, $object_ids) {
-       $report_def = self::$reports_def[$report_type];
+   private static function getDimension($report_def, $object_ids) {
        if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
            return $report_def[self::REPORT_DRILLDOWN_DIMENSION];
        
            return $report_def[self::REPORT_DIMENSION];        
    }
     
-   private static function getMetrics($report_type) {
-       return self::$reports_def[$report_type][self::REPORT_METRICS];
+   private static function getMetrics($report_def) {
+       return $report_def[self::REPORT_METRICS];
    }
    
    private static function isDateIdValid($date_id)
@@ -1133,6 +1288,20 @@ class kKavaReportsMgr extends kKavaBase
            );
        }
        
+       if ($input_filter->categoriesIds)
+       {
+           $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
+               self::DRUID_VALUES => explode(',', $input_filter->categoriesIds)
+           );
+       }
+
+       if ($input_filter->countries)
+       {
+       	   $druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
+       		   self::DRUID_VALUES => explode(',', $input_filter->countries)
+           );
+       }
+        
        $entry_ids_from_db = array();
        if ($input_filter->keywords)
        {
@@ -1269,10 +1438,42 @@ class kKavaReportsMgr extends kKavaBase
        
        return $report_def;
    }
-  
+
+   private static function getFilterValues($filter, $dimension)
+   {
+   		foreach ($filter as $cur_filter)
+   		{
+   			if ($cur_filter[self::DRUID_DIMENSION] == $dimension)
+   			{
+   				return $cur_filter[self::DRUID_VALUES];
+   			}
+   		}
+   		
+   		return null;
+   }
+   
    private static function getTopReport($partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filterMetrics = null) 
    {
        $report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filterMetrics);
+       
+       if (in_array($dimensions, self::$multi_value_dimensions))
+       {
+       		$values = self::getFilterValues($filter, $dimensions);
+       		if ($values)
+       		{
+	       		// use a list filtered dimension, otherwise we may get values that don't match the filter 
+       			$dimensions = array(
+       					self::DRUID_TYPE => self::DRUID_LIST_FILTERED,
+       					self::DRUID_DELEGATE => array(
+       							self::DRUID_TYPE => self::DRUID_DEFAULT,
+       							self::DRUID_DIMENSION => $dimensions,
+       							self::DRUID_OUTPUT_NAME => $dimensions,
+       					),
+       					self::DRUID_VALUES => $values,
+       			);
+       		}
+       }
+       
        $report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TOPN;
        $report_def[self::DRUID_DIMENSION] = $dimensions;
        $order_type = $order_dir === "+" ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
@@ -1337,7 +1538,7 @@ class kKavaReportsMgr extends kKavaBase
        
        $report_def[self::DRUID_AGGR][] = array(self::DRUID_TYPE => self::DRUID_CARDINALITY,
                                                self::DRUID_NAME => self::METRIC_TOTAL_COUNT,
-                                               self::DRUID_FIELDS => array($dimension));
+                                               self::DRUID_FIELDS => is_array($dimension) ? $dimension : array($dimension));
       
        return $report_def;
    }
@@ -1474,7 +1675,44 @@ class kKavaReportsMgr extends kKavaBase
        }
        return $entries_names;
    }
-
+   
+   private static function getQuotedEntriesNames($ids, $partner_id)
+   {
+   	   $result = self::getEntriesNames($ids, $partner_id);
+   	   foreach ($result as &$name)
+   	   {
+   	   	   $name = '"' . $name . '"';
+   	   }
+   	   return $result;
+   }
+   
+   private static function getEntriesUserIdsAndNames($ids, $partner_id)
+   {
+       $c = KalturaCriteria::create(entryPeer::OM_CLASS);
+       
+       $c->addSelectColumn(entryPeer::ID);
+       $c->addSelectColumn(entryPeer::NAME);
+       $c->addSelectColumn(entryPeer::PUSER_ID);
+        
+       $c->add(entryPeer::PARTNER_ID, $partner_id);
+       $c->add(entryPeer::ID, $ids, Criteria::IN);
+       
+       entryPeer::setUseCriteriaFilter (false);
+       $stmt = entryPeer::doSelectStmt($c);
+       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+       entryPeer::setUseCriteriaFilter (true);
+            
+       $result = array();
+       foreach ($rows as $row)
+       {
+       	  $id = $row['ID'];
+       	  $puserId = $row['PUSER_ID'];
+       	  $name = $row['NAME'];
+       	  $result[$id] = array($puserId, '"' . $name . '"');
+       }
+       return $result;
+   }
+   
    private static function getCategoriesNames($ids, $partner_id)
    {
        $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
@@ -1508,11 +1746,12 @@ class kKavaReportsMgr extends kKavaBase
         
        $c->add(categoryPeer::PARTNER_ID, $partner_id);
        $c->add(categoryPeer::FULL_NAME, explode(",", $categories), Criteria::IN);
-       $c->addSelectColumn(categoryPeer::ID);
-                       
+       
+       KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
        $stmt = categoryPeer::doSelectStmt($c);
        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-       
+       KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+        
        if (count($rows))
        {
            $category_ids = array();
@@ -1619,7 +1858,7 @@ class kKavaReportsMgr extends kKavaBase
                 $input_filter , $object_ids );
 
 
-        if ($page_size > self::MAX_CSV_RESULT_SIZE)
+        if ($page_index * $page_size > self::MAX_CSV_RESULT_SIZE)
         {
             throw new kCoreException("Exceeded max query size: " . self::MAX_CSV_RESULT_SIZE ,kCoreException::SEARCH_TOO_GENERAL);
         }
