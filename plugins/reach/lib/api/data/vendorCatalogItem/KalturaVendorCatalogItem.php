@@ -50,13 +50,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public $updatedAt;
 	
 	/**
-	 * @var KalturaVendorCatalogItemStatus
-	 * @readonly
-	 * @filter eq,in
-	 */
-	public $status;
-	
-	/**
 	 * @var KalturaNullableBoolean
 	 * @filter eq
 	 */
@@ -89,7 +82,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'systemName',
 		'createdAt',
 		'updatedAt',
-		'status',
 		'isDefault',
 		'serviceType',
 		'turnAroundTime',
@@ -119,7 +111,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "serviceFeature", "turnAroundTime", "pricing"));
+		$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
 		$this->validateVendorPartnerId();
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -163,7 +155,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				
 		}
 		
-		KalturaLog::debug("Here!!!!!");
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
 	}

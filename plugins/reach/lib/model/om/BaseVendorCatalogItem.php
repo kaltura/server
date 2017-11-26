@@ -57,12 +57,6 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	protected $is_default;
 
 	/**
-	 * The value for the status field.
-	 * @var        int
-	 */
-	protected $status;
-
-	/**
 	 * The value for the partner_id field.
 	 * @var        int
 	 */
@@ -282,16 +276,6 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	public function getIsDefault()
 	{
 		return $this->is_default;
-	}
-
-	/**
-	 * Get the [status] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getStatus()
-	{
-		return $this->status;
 	}
 
 	/**
@@ -545,29 +529,6 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	} // setIsDefault()
 
 	/**
-	 * Set the value of [status] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setStatus($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::STATUS]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::STATUS] = $this->status;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->status !== $v) {
-			$this->status = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::STATUS;
-		}
-
-		return $this;
-	} // setStatus()
-
-	/**
 	 * Set the value of [partner_id] column.
 	 * 
 	 * @param      int $v new value
@@ -747,13 +708,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->is_default = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->partner_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->vendor_partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->service_type = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->service_feature = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->turn_around_time = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->partner_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->vendor_partner_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->service_type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->service_feature = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->turn_around_time = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -763,7 +723,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 13; // 13 = VendorCatalogItemPeer::NUM_COLUMNS - VendorCatalogItemPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = VendorCatalogItemPeer::NUM_COLUMNS - VendorCatalogItemPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating VendorCatalogItem object", $e);
@@ -1302,24 +1262,21 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 				return $this->getIsDefault();
 				break;
 			case 6:
-				return $this->getStatus();
-				break;
-			case 7:
 				return $this->getPartnerId();
 				break;
-			case 8:
+			case 7:
 				return $this->getVendorPartnerId();
 				break;
-			case 9:
+			case 8:
 				return $this->getServiceType();
 				break;
-			case 10:
+			case 9:
 				return $this->getServiceFeature();
 				break;
-			case 11:
+			case 10:
 				return $this->getTurnAroundTime();
 				break;
-			case 12:
+			case 11:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1349,13 +1306,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 			$keys[3] => $this->getCreatedAt(),
 			$keys[4] => $this->getUpdatedAt(),
 			$keys[5] => $this->getIsDefault(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getPartnerId(),
-			$keys[8] => $this->getVendorPartnerId(),
-			$keys[9] => $this->getServiceType(),
-			$keys[10] => $this->getServiceFeature(),
-			$keys[11] => $this->getTurnAroundTime(),
-			$keys[12] => $this->getCustomData(),
+			$keys[6] => $this->getPartnerId(),
+			$keys[7] => $this->getVendorPartnerId(),
+			$keys[8] => $this->getServiceType(),
+			$keys[9] => $this->getServiceFeature(),
+			$keys[10] => $this->getTurnAroundTime(),
+			$keys[11] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1406,24 +1362,21 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 				$this->setIsDefault($value);
 				break;
 			case 6:
-				$this->setStatus($value);
-				break;
-			case 7:
 				$this->setPartnerId($value);
 				break;
-			case 8:
+			case 7:
 				$this->setVendorPartnerId($value);
 				break;
-			case 9:
+			case 8:
 				$this->setServiceType($value);
 				break;
-			case 10:
+			case 9:
 				$this->setServiceFeature($value);
 				break;
-			case 11:
+			case 10:
 				$this->setTurnAroundTime($value);
 				break;
-			case 12:
+			case 11:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1456,13 +1409,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setIsDefault($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setPartnerId($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setVendorPartnerId($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setServiceType($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setServiceFeature($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setTurnAroundTime($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
+		if (array_key_exists($keys[6], $arr)) $this->setPartnerId($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setVendorPartnerId($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setServiceType($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setServiceFeature($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setTurnAroundTime($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
 	}
 
 	/**
@@ -1480,7 +1432,6 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(VendorCatalogItemPeer::CREATED_AT)) $criteria->add(VendorCatalogItemPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(VendorCatalogItemPeer::UPDATED_AT)) $criteria->add(VendorCatalogItemPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(VendorCatalogItemPeer::IS_DEFAULT)) $criteria->add(VendorCatalogItemPeer::IS_DEFAULT, $this->is_default);
-		if ($this->isColumnModified(VendorCatalogItemPeer::STATUS)) $criteria->add(VendorCatalogItemPeer::STATUS, $this->status);
 		if ($this->isColumnModified(VendorCatalogItemPeer::PARTNER_ID)) $criteria->add(VendorCatalogItemPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(VendorCatalogItemPeer::VENDOR_PARTNER_ID)) $criteria->add(VendorCatalogItemPeer::VENDOR_PARTNER_ID, $this->vendor_partner_id);
 		if ($this->isColumnModified(VendorCatalogItemPeer::SERVICE_TYPE)) $criteria->add(VendorCatalogItemPeer::SERVICE_TYPE, $this->service_type);
@@ -1574,8 +1525,6 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setIsDefault($this->is_default);
-
-		$copyObj->setStatus($this->status);
 
 		$copyObj->setPartnerId($this->partner_id);
 

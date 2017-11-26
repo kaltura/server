@@ -18,8 +18,6 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
-		"statusEqual" => "_eq_status",
-		"statusIn" => "_in_status",
 		"isDefaultEqual" => "_eq_is_default",
 		"serviceTypeEqual" => "_eq_service_type",
 		"serviceTypeIn" => "_in_service_type",
@@ -96,16 +94,6 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
-
-	/**
-	 * @var KalturaVendorCatalogItemStatus
-	 */
-	public $statusEqual;
-
-	/**
-	 * @var string
-	 */
-	public $statusIn;
 
 	/**
 	 * @var KalturaNullableBoolean

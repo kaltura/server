@@ -1,77 +1,56 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'vendor_catalog_item' table.
+ * Base static class for performing query and update operations on the 'partner_catalog_item' table.
  *
  * 
  *
  * @package plugins.reach
  * @subpackage model.om
  */
-abstract class BaseVendorCatalogItemPeer {
+abstract class BasePartnerCatalogItemPeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'vendor_catalog_item';
+	const TABLE_NAME = 'partner_catalog_item';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'VendorCatalogItem';
+	const OM_CLASS = 'PartnerCatalogItem';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'plugins.reach.VendorCatalogItem';
+	const CLASS_DEFAULT = 'plugins.reach.PartnerCatalogItem';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'VendorCatalogItemTableMap';
+	const TM_CLASS = 'PartnerCatalogItemTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 12;
+	const NUM_COLUMNS = 5;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'vendor_catalog_item.ID';
-
-	/** the column name for the NAME field */
-	const NAME = 'vendor_catalog_item.NAME';
-
-	/** the column name for the SYSTEM_NAME field */
-	const SYSTEM_NAME = 'vendor_catalog_item.SYSTEM_NAME';
-
-	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'vendor_catalog_item.CREATED_AT';
-
-	/** the column name for the UPDATED_AT field */
-	const UPDATED_AT = 'vendor_catalog_item.UPDATED_AT';
-
-	/** the column name for the IS_DEFAULT field */
-	const IS_DEFAULT = 'vendor_catalog_item.IS_DEFAULT';
+	const ID = 'partner_catalog_item.ID';
 
 	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'vendor_catalog_item.PARTNER_ID';
+	const PARTNER_ID = 'partner_catalog_item.PARTNER_ID';
 
-	/** the column name for the VENDOR_PARTNER_ID field */
-	const VENDOR_PARTNER_ID = 'vendor_catalog_item.VENDOR_PARTNER_ID';
+	/** the column name for the CREATED_AT field */
+	const CREATED_AT = 'partner_catalog_item.CREATED_AT';
 
-	/** the column name for the SERVICE_TYPE field */
-	const SERVICE_TYPE = 'vendor_catalog_item.SERVICE_TYPE';
+	/** the column name for the STATUS field */
+	const STATUS = 'partner_catalog_item.STATUS';
 
-	/** the column name for the SERVICE_FEATURE field */
-	const SERVICE_FEATURE = 'vendor_catalog_item.SERVICE_FEATURE';
-
-	/** the column name for the TURN_AROUND_TIME field */
-	const TURN_AROUND_TIME = 'vendor_catalog_item.TURN_AROUND_TIME';
-
-	/** the column name for the CUSTOM_DATA field */
-	const CUSTOM_DATA = 'vendor_catalog_item.CUSTOM_DATA';
+	/** the column name for the VENDOR_CATALOG_ITEM_ID field */
+	const VENDOR_CATALOG_ITEM_ID = 'partner_catalog_item.VENDOR_CATALOG_ITEM_ID';
 
 	/**
-	 * An identiy map to hold any loaded instances of VendorCatalogItem objects.
+	 * An identiy map to hold any loaded instances of PartnerCatalogItem objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array VendorCatalogItem[]
+	 * @var        array PartnerCatalogItem[]
 	 */
 	public static $instances = array();
 
@@ -83,11 +62,11 @@ abstract class BaseVendorCatalogItemPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'SystemName', 'CreatedAt', 'UpdatedAt', 'IsDefault', 'PartnerId', 'VendorPartnerId', 'ServiceType', 'ServiceFeature', 'TurnAroundTime', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'systemName', 'createdAt', 'updatedAt', 'isDefault', 'partnerId', 'vendorPartnerId', 'serviceType', 'serviceFeature', 'turnAroundTime', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::SYSTEM_NAME, self::CREATED_AT, self::UPDATED_AT, self::IS_DEFAULT, self::PARTNER_ID, self::VENDOR_PARTNER_ID, self::SERVICE_TYPE, self::SERVICE_FEATURE, self::TURN_AROUND_TIME, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'system_name', 'created_at', 'updated_at', 'is_default', 'partner_id', 'vendor_partner_id', 'service_type', 'service_feature', 'turn_around_time', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'CreatedAt', 'Status', 'VendorCatalogItemId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'createdAt', 'status', 'vendorCatalogItemId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::CREATED_AT, self::STATUS, self::VENDOR_CATALOG_ITEM_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'created_at', 'status', 'vendor_catalog_item_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -97,11 +76,11 @@ abstract class BaseVendorCatalogItemPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'SystemName' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'IsDefault' => 5, 'PartnerId' => 6, 'VendorPartnerId' => 7, 'ServiceType' => 8, 'ServiceFeature' => 9, 'TurnAroundTime' => 10, 'CustomData' => 11, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'systemName' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'isDefault' => 5, 'partnerId' => 6, 'vendorPartnerId' => 7, 'serviceType' => 8, 'serviceFeature' => 9, 'turnAroundTime' => 10, 'customData' => 11, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::SYSTEM_NAME => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::IS_DEFAULT => 5, self::PARTNER_ID => 6, self::VENDOR_PARTNER_ID => 7, self::SERVICE_TYPE => 8, self::SERVICE_FEATURE => 9, self::TURN_AROUND_TIME => 10, self::CUSTOM_DATA => 11, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'system_name' => 2, 'created_at' => 3, 'updated_at' => 4, 'is_default' => 5, 'partner_id' => 6, 'vendor_partner_id' => 7, 'service_type' => 8, 'service_feature' => 9, 'turn_around_time' => 10, 'custom_data' => 11, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'CreatedAt' => 2, 'Status' => 3, 'VendorCatalogItemId' => 4, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'createdAt' => 2, 'status' => 3, 'vendorCatalogItemId' => 4, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::CREATED_AT => 2, self::STATUS => 3, self::VENDOR_CATALOG_ITEM_ID => 4, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'created_at' => 2, 'status' => 3, 'vendor_catalog_item_id' => 4, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -150,12 +129,12 @@ abstract class BaseVendorCatalogItemPeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. VendorCatalogItemPeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. PartnerCatalogItemPeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(VendorCatalogItemPeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(PartnerCatalogItemPeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -171,18 +150,11 @@ abstract class BaseVendorCatalogItemPeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(VendorCatalogItemPeer::ID);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::NAME);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::SYSTEM_NAME);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::CREATED_AT);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::UPDATED_AT);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::IS_DEFAULT);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::PARTNER_ID);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::VENDOR_PARTNER_ID);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::SERVICE_TYPE);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::SERVICE_FEATURE);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::TURN_AROUND_TIME);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(PartnerCatalogItemPeer::ID);
+		$criteria->addSelectColumn(PartnerCatalogItemPeer::PARTNER_ID);
+		$criteria->addSelectColumn(PartnerCatalogItemPeer::CREATED_AT);
+		$criteria->addSelectColumn(PartnerCatalogItemPeer::STATUS);
+		$criteria->addSelectColumn(PartnerCatalogItemPeer::VENDOR_CATALOG_ITEM_ID);
 	}
 
 	/**
@@ -201,27 +173,27 @@ abstract class BaseVendorCatalogItemPeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(VendorCatalogItemPeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(PartnerCatalogItemPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			VendorCatalogItemPeer::addSelectColumns($criteria);
+			PartnerCatalogItemPeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		VendorCatalogItemPeer::attachCriteriaFilter($criteria);
+		PartnerCatalogItemPeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'VendorCatalogItemPeer', 
+			'PartnerCatalogItemPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
@@ -230,7 +202,7 @@ abstract class BaseVendorCatalogItemPeer {
 		}
 		
 		// select the connection for the query
-		$con = VendorCatalogItemPeer::alternativeCon ($con, $queryDB);
+		$con = PartnerCatalogItemPeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -254,7 +226,7 @@ abstract class BaseVendorCatalogItemPeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     VendorCatalogItem
+	 * @return     PartnerCatalogItem
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -262,7 +234,7 @@ abstract class BaseVendorCatalogItemPeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = VendorCatalogItemPeer::doSelect($critcopy, $con);
+		$objects = PartnerCatalogItemPeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -304,10 +276,10 @@ abstract class BaseVendorCatalogItemPeer {
 	{
 		foreach ($queryResult as $curIndex => $curObject)
 		{
-			$objFromPool = VendorCatalogItemPeer::getInstanceFromPool($curObject->getPrimaryKey());
+			$objFromPool = PartnerCatalogItemPeer::getInstanceFromPool($curObject->getPrimaryKey());
 			if ($objFromPool === null)
 			{
-				VendorCatalogItemPeer::addInstanceToPool($curObject);
+				PartnerCatalogItemPeer::addInstanceToPool($curObject);
 			}
 			else
 			{
@@ -329,7 +301,7 @@ abstract class BaseVendorCatalogItemPeer {
 			{  
 				foreach ($queryResult as $curResult)
 				{
-					VendorCatalogItemPeer::addInstanceToPool($curResult);
+					PartnerCatalogItemPeer::addInstanceToPool($curResult);
 				}
 			}
 		}
@@ -346,27 +318,27 @@ abstract class BaseVendorCatalogItemPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = VendorCatalogItemPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = PartnerCatalogItemPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'VendorCatalogItemPeer', 
+			'PartnerCatalogItemPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			$cacheKey = null;
-			VendorCatalogItemPeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			VendorCatalogItemPeer::updateInstancePool($cachedResult);
+			PartnerCatalogItemPeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			PartnerCatalogItemPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
-		$con = VendorCatalogItemPeer::alternativeCon($con, $queryDB);
+		$con = PartnerCatalogItemPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = VendorCatalogItemPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = PartnerCatalogItemPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
@@ -377,9 +349,9 @@ abstract class BaseVendorCatalogItemPeer {
 			$cacheKey = null;
 		}
 		
-		VendorCatalogItemPeer::filterSelectResults($queryResult, $criteria);
+		PartnerCatalogItemPeer::filterSelectResults($queryResult, $criteria);
 		
-		VendorCatalogItemPeer::addInstancesToPool($queryResult);
+		PartnerCatalogItemPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
 
@@ -403,7 +375,7 @@ abstract class BaseVendorCatalogItemPeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -415,7 +387,7 @@ abstract class BaseVendorCatalogItemPeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = VendorCatalogItemPeer::getCriteriaFilter();
+		$criteria_filter = PartnerCatalogItemPeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -429,12 +401,12 @@ abstract class BaseVendorCatalogItemPeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			VendorCatalogItemPeer::setDefaultCriteriaFilter();
+			PartnerCatalogItemPeer::setDefaultCriteriaFilter();
 		
-		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('VendorCatalogItem');
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('PartnerCatalogItem');
 		if ($partnerCriteria)
 		{
-			call_user_func_array(array('VendorCatalogItemPeer','addPartnerToCriteria'), $partnerCriteria);
+			call_user_func_array(array('PartnerCatalogItemPeer','addPartnerToCriteria'), $partnerCriteria);
 		}
 		
 		return self::$s_criteria_filter;
@@ -461,7 +433,7 @@ abstract class BaseVendorCatalogItemPeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		VendorCatalogItemPeer::getCriteriaFilter()->applyFilter($criteria);
+		PartnerCatalogItemPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
@@ -543,10 +515,10 @@ abstract class BaseVendorCatalogItemPeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		VendorCatalogItemPeer::attachCriteriaFilter($criteria);
+		PartnerCatalogItemPeer::attachCriteriaFilter($criteria);
 		
 		// select the connection for the query
-		$con = VendorCatalogItemPeer::alternativeCon ( $con );
+		$con = PartnerCatalogItemPeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -560,20 +532,20 @@ abstract class BaseVendorCatalogItemPeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				VendorCatalogItemPeer::addSelectColumns($criteria);
+				PartnerCatalogItemPeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			VendorCatalogItemPeer::addSelectColumns($criteria);
+			PartnerCatalogItemPeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		VendorCatalogItemPeer::attachCriteriaFilter($criteria);
+		PartnerCatalogItemPeer::attachCriteriaFilter($criteria);
 
 		return $criteria;
 	}
@@ -593,9 +565,9 @@ abstract class BaseVendorCatalogItemPeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = VendorCatalogItemPeer::alternativeCon($con);
+		$con = PartnerCatalogItemPeer::alternativeCon($con);
 		
-		$criteria = VendorCatalogItemPeer::prepareCriteriaForSelect($criteria);
+		$criteria = PartnerCatalogItemPeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -609,10 +581,10 @@ abstract class BaseVendorCatalogItemPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      VendorCatalogItem $value A VendorCatalogItem object.
+	 * @param      PartnerCatalogItem $value A PartnerCatalogItem object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(VendorCatalogItem $obj, $key = null)
+	public static function addInstanceToPool(PartnerCatalogItem $obj, $key = null)
 	{
 		if ( Propel::isInstancePoolingEnabled() )
 		{
@@ -626,7 +598,7 @@ abstract class BaseVendorCatalogItemPeer {
 				)
 			{
 				self::$instances[$key] = $obj;
-				kMemoryManager::registerPeer('VendorCatalogItemPeer');
+				kMemoryManager::registerPeer('PartnerCatalogItemPeer');
 			}
 		}
 	}
@@ -639,18 +611,18 @@ abstract class BaseVendorCatalogItemPeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A VendorCatalogItem object or a primary key value.
+	 * @param      mixed $value A PartnerCatalogItem object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof VendorCatalogItem) {
+			if (is_object($value) && $value instanceof PartnerCatalogItem) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or VendorCatalogItem object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or PartnerCatalogItem object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -665,7 +637,7 @@ abstract class BaseVendorCatalogItemPeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     VendorCatalogItem Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     PartnerCatalogItem Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -693,7 +665,7 @@ abstract class BaseVendorCatalogItemPeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to vendor_catalog_item
+	 * Method to invalidate the instance pool of all tables related to partner_catalog_item
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -730,18 +702,17 @@ abstract class BaseVendorCatalogItemPeer {
 	{
 		$results = array();
 	
+		// set the class once to avoid overhead in the loop
+		$cls = PartnerCatalogItemPeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = VendorCatalogItemPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = VendorCatalogItemPeer::getInstanceFromPool($key))) {
+			$key = PartnerCatalogItemPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = PartnerCatalogItemPeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
 				$results[] = $obj;
 			} else {
-				// class must be set each time from the record row
-				$cls = VendorCatalogItemPeer::getOMClass($row, 0);
-				$cls = substr('.'.$cls, strrpos('.'.$cls, '.') + 1);
 				$obj = new $cls();
 				$obj->hydrate($row);
 				$results[] = $obj;
@@ -767,39 +738,33 @@ abstract class BaseVendorCatalogItemPeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseVendorCatalogItemPeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseVendorCatalogItemPeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BasePartnerCatalogItemPeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BasePartnerCatalogItemPeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new VendorCatalogItemTableMap());
+	    $dbMap->addTableObject(new PartnerCatalogItemTableMap());
 	  }
 	}
 
 	/**
-	 * The returned Class will contain objects of the default type or
-	 * objects that inherit from the default.
+	 * The class that the Peer will make instances of.
 	 *
-	 * @param      array $row PropelPDO result row.
-	 * @param      int $colnum Column to examine for OM class information (first is 0).
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * If $withPrefix is true, the returned path
+	 * uses a dot-path notation which is tranalted into a path
+	 * relative to a location on the PHP include_path.
+	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
+	 *
+	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @return     string path.to.ClassName
 	 */
-	public static function getOMClass($row, $colnum)
+	public static function getOMClass($withPrefix = true)
 	{
-		try {
-
-			$omClass = $row[$colnum + 9];
-			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
-
-		} catch (Exception $e) {
-			throw new PropelException('Unable to get OM class.', $e);
-		}
-		return $omClass;
+		return $withPrefix ? PartnerCatalogItemPeer::CLASS_DEFAULT : PartnerCatalogItemPeer::OM_CLASS;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a VendorCatalogItem or Criteria object.
+	 * Method perform an INSERT on the database, given a PartnerCatalogItem or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or VendorCatalogItem object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or PartnerCatalogItem object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -808,17 +773,17 @@ abstract class BaseVendorCatalogItemPeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from VendorCatalogItem object
+			$criteria = $values->buildCriteria(); // build Criteria from PartnerCatalogItem object
 		}
 
-		if ($criteria->containsKey(VendorCatalogItemPeer::ID) && $criteria->keyContainsValue(VendorCatalogItemPeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.VendorCatalogItemPeer::ID.')');
+		if ($criteria->containsKey(PartnerCatalogItemPeer::ID) && $criteria->keyContainsValue(PartnerCatalogItemPeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.PartnerCatalogItemPeer::ID.')');
 		}
 
 
@@ -840,9 +805,9 @@ abstract class BaseVendorCatalogItemPeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a VendorCatalogItem or Criteria object.
+	 * Method perform an UPDATE on the database, given a PartnerCatalogItem or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or VendorCatalogItem object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or PartnerCatalogItem object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -851,7 +816,7 @@ abstract class BaseVendorCatalogItemPeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -859,10 +824,10 @@ abstract class BaseVendorCatalogItemPeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(VendorCatalogItemPeer::ID);
-			$selectCriteria->add(VendorCatalogItemPeer::ID, $criteria->remove(VendorCatalogItemPeer::ID), $comparison);
+			$comparison = $criteria->getComparison(PartnerCatalogItemPeer::ID);
+			$selectCriteria->add(PartnerCatalogItemPeer::ID, $criteria->remove(PartnerCatalogItemPeer::ID), $comparison);
 
-		} else { // $values is VendorCatalogItem object
+		} else { // $values is PartnerCatalogItem object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -892,26 +857,26 @@ abstract class BaseVendorCatalogItemPeer {
 	}
 
 	/**
-	 * Method to DELETE all rows from the vendor_catalog_item table.
+	 * Method to DELETE all rows from the partner_catalog_item table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(VendorCatalogItemPeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(PartnerCatalogItemPeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			VendorCatalogItemPeer::clearInstancePool();
-			VendorCatalogItemPeer::clearRelatedInstancePool();
+			PartnerCatalogItemPeer::clearInstancePool();
+			PartnerCatalogItemPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -921,9 +886,9 @@ abstract class BaseVendorCatalogItemPeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a VendorCatalogItem or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a PartnerCatalogItem or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or VendorCatalogItem object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or PartnerCatalogItem object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -934,27 +899,27 @@ abstract class BaseVendorCatalogItemPeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			VendorCatalogItemPeer::clearInstancePool();
+			PartnerCatalogItemPeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof VendorCatalogItem) { // it's a model object
+		} elseif ($values instanceof PartnerCatalogItem) { // it's a model object
 			// invalidate the cache for this single object
-			VendorCatalogItemPeer::removeInstanceFromPool($values);
+			PartnerCatalogItemPeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(VendorCatalogItemPeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(PartnerCatalogItemPeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				VendorCatalogItemPeer::removeInstanceFromPool($singleval);
+				PartnerCatalogItemPeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -969,7 +934,7 @@ abstract class BaseVendorCatalogItemPeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			VendorCatalogItemPeer::clearRelatedInstancePool();
+			PartnerCatalogItemPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -979,24 +944,24 @@ abstract class BaseVendorCatalogItemPeer {
 	}
 
 	/**
-	 * Validates all modified columns of given VendorCatalogItem object.
+	 * Validates all modified columns of given PartnerCatalogItem object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      VendorCatalogItem $obj The object to validate.
+	 * @param      PartnerCatalogItem $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(VendorCatalogItem $obj, $cols = null)
+	public static function doValidate(PartnerCatalogItem $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(VendorCatalogItemPeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(VendorCatalogItemPeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(PartnerCatalogItemPeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(PartnerCatalogItemPeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -1012,7 +977,7 @@ abstract class BaseVendorCatalogItemPeer {
 
 		}
 
-		return BasePeer::doValidate(VendorCatalogItemPeer::DATABASE_NAME, VendorCatalogItemPeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(PartnerCatalogItemPeer::DATABASE_NAME, PartnerCatalogItemPeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -1020,19 +985,19 @@ abstract class BaseVendorCatalogItemPeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     VendorCatalogItem
+	 * @return     PartnerCatalogItem
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = VendorCatalogItemPeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = PartnerCatalogItemPeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(VendorCatalogItemPeer::DATABASE_NAME);
-		$criteria->add(VendorCatalogItemPeer::ID, $pk);
+		$criteria = new Criteria(PartnerCatalogItemPeer::DATABASE_NAME);
+		$criteria->add(PartnerCatalogItemPeer::ID, $pk);
 
-		$v = VendorCatalogItemPeer::doSelect($criteria, $con);
+		$v = PartnerCatalogItemPeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -1051,16 +1016,16 @@ abstract class BaseVendorCatalogItemPeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(VendorCatalogItemPeer::DATABASE_NAME);
-			$criteria->add(VendorCatalogItemPeer::ID, $pks, Criteria::IN);
-			$objs = VendorCatalogItemPeer::doSelect($criteria, $con);
+			$criteria = new Criteria(PartnerCatalogItemPeer::DATABASE_NAME);
+			$criteria->add(PartnerCatalogItemPeer::ID, $pks, Criteria::IN);
+			$objs = PartnerCatalogItemPeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BaseVendorCatalogItemPeer
+} // BasePartnerCatalogItemPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseVendorCatalogItemPeer::buildTableMap();
+BasePartnerCatalogItemPeer::buildTableMap();
 
