@@ -343,15 +343,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds();
 		}
 
-		if(count($partnersDeliveryProfileIdsByUserOrder))
+		if(isset( $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()]))
 		{
-			if(isset( $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()]))
-			{
-				$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
-				array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
-				uasort($deliveries, array($cmp, "compare"));
-			}
+			$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
+			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
+			uasort($deliveries, array($cmp, "compare"));
 		}
+
 		return $deliveries;
 	}
 
