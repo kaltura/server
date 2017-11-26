@@ -58,7 +58,7 @@ class KAsyncImport extends KJobHandlerWorker
 	}
 
 	/* Will download $sourceUrl to $localPath and will monitor progress with watchDog*/
-	private function myCurlExec($sourceUrl,$localPath)
+	private function curlExec($sourceUrl,$localPath)
 	{
 		self::$startTime 		= time();
 		self::$downloadedSoFar	= 0;
@@ -172,7 +172,7 @@ q		$responseStatusCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 
-			list($res,$responseStatusCode) = $this->myCurlExec($sourceUrl, $data->destFileLocalPath);
+			list($res,$responseStatusCode) = $this->curlExec($sourceUrl, $data->destFileLocalPath);
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{
 				if(!$resumeOffset && file_exists($data->destFileLocalPath))
