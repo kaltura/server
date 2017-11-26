@@ -63,7 +63,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		$results = VendorCatalogItemPeer::doSelect($criteria);
 		
 		$response = new KalturaVendorCatalogItemListResponse();
-		$response->objects = KalturaVendroCatalogItemArray::fromDbArray($results, $this->getResponseProfile());
+		$response->objects = KalturaVendroCatalogItemArray::fromDbArray($results, $responseProfile);
 		$response->totalCount = $count;
 		return $response;
 	}

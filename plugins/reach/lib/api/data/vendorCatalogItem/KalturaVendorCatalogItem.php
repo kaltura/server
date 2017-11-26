@@ -50,6 +50,13 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public $updatedAt;
 	
 	/**
+	 * @var KalturaVendorCatalogItemStatus
+	 * @readonly
+	 * @filter eq,in
+	 */
+	public $status;
+	
+	/**
 	 * @var KalturaNullableBoolean
 	 * @filter eq
 	 */
@@ -82,6 +89,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'systemName',
 		'createdAt',
 		'updatedAt',
+		'status',
 		'isDefault',
 		'serviceType',
 		'turnAroundTime',

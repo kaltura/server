@@ -6,9 +6,9 @@
 class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 {
 	/**
-	 * @var KalturaLanguage
+	 * @var KalturaLanguageArray
 	 */
-	public $sourceLanguage;
+	public $sourceLanguages;
 	
 	/**
 	 * @var KalturaVendorCatalogItemOutputFormat
@@ -28,7 +28,7 @@ class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 	
 	private static $map_between_objects = array
 	(
-		'sourceLanguage',
+		'sourceLanguages',
 		'outputFormat',
 		'enableSpeakerId',
 		'fixedPriceAddons'
@@ -60,7 +60,7 @@ class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("sourceLanguage", "outputFormat"));
+		$this->validatePropertyNotNull(array("sourceLanguages", "outputFormat"));
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	

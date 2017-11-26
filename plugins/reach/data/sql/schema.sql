@@ -18,6 +18,7 @@ CREATE TABLE `vendor_catalog_item`
 	`created_at` DATETIME  NOT NULL,
 	`updated_at` DATETIME  NOT NULL,
 	`is_default` TINYINT default 0,
+	`status` TINYINT  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
 	`vendor_partner_id` INTEGER  NOT NULL,
 	`service_type` TINYINT  NOT NULL,
@@ -28,24 +29,6 @@ CREATE TABLE `vendor_catalog_item`
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `status_service_type_index`(`status`, `service_type`),
 	KEY `status_service_type_service_feature_index`(`status`, `service_type`, `service_feature`)
-)Type=InnoDB;
-
-#-----------------------------------------------------------------------------
-#-- partner_catalog_item
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `partner_catalog_item`;
-
-
-CREATE TABLE `partner_catalog_item`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`partner_id` INTEGER  NOT NULL,
-	`created_at` DATETIME  NOT NULL,
-	`status` TINYINT  NOT NULL,
-	`vendor_catalog_item_id` INTEGER  NOT NULL,
-	PRIMARY KEY (`id`),
-	KEY `partner_id`(`partner_id`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

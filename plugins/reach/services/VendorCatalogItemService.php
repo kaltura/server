@@ -19,16 +19,23 @@ class VendorCatalogItemService extends KalturaBaseService
 //			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
 		$this->applyPartnerFilterForClass('vendorCatalogItem');
-		$this->applyPartnerFilterForClass('partnerCatalogItem');
 	}
 	
-	protected function globalPartnerAllowed($actionName)
+	/* (non-PHPdoc)
+ 	 * @see KalturaBaseService::partnerGroup()
+ 	 */
+	protected function partnerGroup($peer = null)
 	{
-		if ($actionName === 'list') {
-			return true;
+		
+		switch ($this->actionName)
+		{
+			case 'clone':
+				return $this->partnerGroup . ',0';
+			case 'listTemplates':
+				return '0';
 		}
 		
-		return parent::globalPartnerAllowed($actionName);
+		return $this->partnerGroup;
 	}
 	
 	/**
@@ -118,6 +125,42 @@ class VendorCatalogItemService extends KalturaBaseService
 	}
 	
 	/**
+	 * Update vedor catalog item status by id
+	 *
+	 * @action updateStatus
+	 * @param int $id
+	 * @param KalturaVendorCatalogItemStatus $status
+	 * @return KalturaVendorCatalogItem
+	 *
+	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
+	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME
+	 */
+	function updateStatusAction($id, $status)
+	{
+		// get the object
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
+		if (!$dbVendorCatalogItem)
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
+		
+		if($status == KalturaVendorCatalogItemStatus::ACTIVE)
+		{
+			//Check uniqueness of new object's system name
+			$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($dbVendorCatalogItem->getSystemName());
+			if (count($systemNameTemplates))
+				throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $dbVendorCatalogItem->getSystemName());
+		}
+		
+		// save the object
+		$dbVendorCatalogItem->setStatus($status);
+		$dbVendorCatalogItem->save();
+		
+		// return the saved object
+		$vendorCatalogItem = KalturaVendorCatalogItem::getInstance($dbVendorCatalogItem, $this->getResponseProfile());
+		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
+		return $vendorCatalogItem;
+	}
+	
+	/**
 	 * Delete vedor catalog item object
 	 *
 	 * @action delete
@@ -131,73 +174,78 @@ class VendorCatalogItemService extends KalturaBaseService
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
 		if (!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
-
-		$dbVendorCatalogItem->delete();
+		
+		// set the object status to deleted
+		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::DELETED);
+		$dbVendorCatalogItem->save();
 	}
 	
 	/**
-	 * Action assigns vendor catalog item to specific partner
-	 * @action assignToPartner
+	 * This action assigning various bvendor cataog items to a specifc account.
 	 *
-	 * @param int $vendorCatalogItemId
+	 * @action clone
+	 * @param int $id source catalog item to clone
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
+	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME
+	 * 
+	 * @return KalturaVendorCatalogItem
 	 */
-	
-	public function assignToPartnerAction ($vendorCatalogItemId) 
+	public function assignToPartnerAction($id)
 	{
-		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
-		if(!$dbVendorCatalogItem)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $vendorCatalogItemId);
+		// get the object
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
+		if (!$dbVendorCatalogItem)
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
-		/* @var $dbPartnerCatalogItem PartnerCatalogItem */
-		$dbPartnerCatalogItem = new PartnerCatalogItem();
-		$dbPartnerCatalogItem->setVendorCatalogItemId($vendorCatalogItemId);
-		$dbPartnerCatalogItem->setPartnerId(kCurrentContext::$partner_id);
-		$dbPartnerCatalogItem->setStatus(PartnerCatalogItemStatus::ACTIVE);
-		$dbPartnerCatalogItem->save();
+		//Check uniqueness of new object's system name
+		$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($dbVendorCatalogItem->getSystemName());
+		if (count($systemNameTemplates))
+			throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $dbVendorCatalogItem->getSystemName());
+		
+		
+		// copy into new db object
+		$newDbVendorCatalogItem = $dbVendorCatalogItem->copy();
+		$newDbVendorCatalogItem->setPartnerId($this->impersonatedPartnerId);
+		$newDbVendorCatalogItem->save();
+		
 		
 		// return the saved object
-		$partnerCatalogItem = new KalturaPartnerCatalogItem();
-		$partnerCatalogItem->fromObject($dbPartnerCatalogItem, $this->getResponseProfile());
-		return $partnerCatalogItem;
+		$vendorCatalogItem = KalturaVendorCatalogItem::getInstance($newDbVendorCatalogItem, $this->getResponseProfile());
+		$vendorCatalogItem->fromObject($newDbVendorCatalogItem, $this->getResponseProfile());
+		return $vendorCatalogItem;
 	}
 	
 	/**
-	 * Action removes vendor catalog item from partner
-	 * @action remobveFromPartner
+	 * Action lists the basic vendor catalog items.
+	 * @action listTemplates
 	 *
-	 * @param int $id
-	 * @throws KalturaReachErrors::PARTNER_CATALOG_ITEM_NOT_FOUND
+	 * @param KalturaVendorCatalogItemFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaVendorCatalogItemListResponse
 	 */
-	public function removeFromPartnerAction ($id)
+	public function listTemplatesAction (KalturaVendorCatalogItemFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByPK($id);
-		if(!$dbPartnerCatalogItem)
-			throw new KalturaAPIException(KalturaReachErrors::PARTNER_CATALOG_ITEM_NOT_FOUND, $id);
+		if (!$filter)
+			$filter = new KalturaVendorCatalogItemFilter();
 		
-		$dbPartnerCatalogItem->setStatus(PartnerCatalogItemStatus::DISABLED);
-		$dbPartnerCatalogItem->save();
+		if (!$pager)
+			$pager = new KalturaFilterPager();
 		
-		// return the saved object
-		$partnerCatalogItem = new KalturaPartnerCatalogItem();
-		$partnerCatalogItem->fromObject($dbPartnerCatalogItem, $this->getResponseProfile());
-		return $partnerCatalogItem;
+		return $filter->getTypeListTemplatesResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**
 	 * @action listByPartner
 	 * @param KalturaPartnerFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * 
-	 * @return KalturaPartnerCatalogItemListResponse
+	 * @return KalturaVendorCatalogItemListResponse
 	 */
-	
 	public function listByPartnerAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		$c = new Criteria();
 		
-		if (!is_null($filter))
-		{
+		if (!is_null($filter)) {
+			
 			$partnerFilter = new partnerFilter();
 			$filter->toObject($partnerFilter);
 			$partnerFilter->set('_gt_id', -1);
@@ -207,28 +255,27 @@ class VendorCatalogItemService extends KalturaBaseService
 			$partnerCriteria->setLimit(1000);
 			$partnerCriteria->clearSelectColumns();
 			$partnerCriteria->addSelectColumn(PartnerPeer::ID);
-			$stmt = PartnerPeer::doSelectStmt($partnerCriteria);
+			$stmt = VendorCatalogItemPeer::doSelectStmt($partnerCriteria);
 			
-			if($stmt->rowCount() < 1000) // otherwise, it's probably all partners
+			if ($stmt->rowCount() < 1000) // otherwise, it's probably all partners
 			{
 				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-				$c->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerIds, Criteria::IN);
+				$c->add(VendorCatalogItemPeer::PARTNER_ID, $partnerIds, Criteria::IN);
 			}
 		}
 		
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
 		
-		$c->addDescendingOrderByColumn(PartnerCatalogItemPeer::CREATED_AT);
+		$c->addDescendingOrderByColumn(VendorCatalogItemPeer::CREATED_AT);
 		
-		$totalCount = PartnerCatalogItemPeer::doCount($c);
+		$totalCount = VendorCatalogItemPeer::doCount($c);
 		$pager->attachToCriteria($c);
-		$list = PartnerCatalogItemPeer::doSelect($c);
-		$newList = KalturaPartnerCatalogItemArray::fromDbArray($list, $this->getResponseProfile());
+		$list = VendorCatalogItemPeer::doSelect($c);
 		
-		$response = new KalturaPartnerCatalogItemListResponse();
+		$response = new KalturaVendorCatalogItemListResponse();
+		$response->objects = KalturaVendroCatalogItemArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $totalCount;
-		$response->objects = $newList;
 		return $response;
 	}
 }

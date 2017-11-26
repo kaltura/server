@@ -24,49 +24,15 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::CAPTIONS => self::CAPTIONS_OM_CLASS,
 	);
 	
-	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
+	public static function setDefaultCriteriaFilter ()
 	{
-		$criteriaFilter = self::getCriteriaFilter();
-		$criteria = $criteriaFilter->getFilter();
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
 		
-		if(!$partnerGroup)
-		{
-			$globalOrDefault = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
-			$globalOrDefault->addOr($criteria->getNewCriterion(self::IS_DEFAULT, 1));
-			$criteria->add($globalOrDefault);	
-		}
-		else
-		{
-			// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
-			$partners = explode(',', trim($partnerGroup));
-			$hasPartnerZero = false;
-			foreach($partners as $index => &$p)
-			{
-				trim($p); // make sure there are not leading or trailing spaces
-				if($p == 0)
-				{
-					unset($partners[$index]);
-					$hasPartnerZero = true;
-				}
-			}
-			
-			// add the partner_id to the partner_group
-			$partners[] = strval($partnerId);
-			$partners = array_unique($partners);
-			
-			$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
-			
-			if($hasPartnerZero)
-			{
-				$defaultAndGlobal = $criteria->getNewCriterion(self::PARTNER_ID, 0);
-				$defaultAndGlobal->addAnd($criteria->getNewCriterion(self::IS_DEFAULT, 1));
-				$criterion->addOr($defaultAndGlobal);
-			}
-			
-			$criteria->addAnd($criterion);
-		}
+		$c = KalturaCriteria::create(VendorCatalogItemPeer::OM_CLASS);
+		$c->addAnd ( VendorCatalogItemPeer::STATUS, VendorCatalogItemStatus::DELETED, Criteria::NOT_EQUAL);
 		
-		$criteriaFilter->enable();
+		self::$s_criteria_filter->setFilter($c);
 	}
 	
 	/**
@@ -102,6 +68,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	public static function retrieveBySystemName ($systemName, $excludeId = null, $partnerIds = null, PropelPDO $con = null)
 	{
 		$criteria = new Criteria ( VendorCatalogItemPeer::DATABASE_NAME );
+		$criteria->add ( VendorCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE );
 		$criteria->add ( VendorCatalogItemPeer::SYSTEM_NAME, $systemName );
 		if ($excludeId)
 			$criteria->add( VendorCatalogItemPeer::ID, $excludeId, Criteria::NOT_EQUAL);

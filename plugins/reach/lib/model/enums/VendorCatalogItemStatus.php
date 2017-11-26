@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage model.enum
  */ 
-interface PartnerCatalogItemStatus extends BaseEnum
+interface VendorCatalogItemStatus extends BaseEnum
 {
 	const DISABLED 	= 1;
 	const ACTIVE 	= 2;

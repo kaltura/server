@@ -43,6 +43,7 @@ class VendorCatalogItemTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
 		$this->addColumn('IS_DEFAULT', 'IsDefault', 'TINYINT', false, null, 0);
+		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('VENDOR_PARTNER_ID', 'VendorPartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('SERVICE_TYPE', 'ServiceType', 'TINYINT', true, null, null);

@@ -20,14 +20,14 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::CAPTIONS);
 	}
 	
-	const CUSTOM_DATA_SOURCE_LANGUAGE = "source_language";
+	const CUSTOM_DATA_SOURCE_LANGUAGES = "source_languages";
 	const CUSTOM_DATA_OUTPUT_FORMAT = "output_format";
 	const CUSTOM_DATA_ENABLE_SPEAKER_ID = "enable_speaker_id";
 	const CUSTOM_DATA_FIXED_PRICE_ADDONS = "fixed_price_addons";
 	
-	public function setSourceLanguage($sourceLanguage)
+	public function setSourceLanguages($sourceLanguages)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGE, $sourceLanguage);
+		$this->putInCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGES, serialize($sourceLanguages));
 	}
 	
 	public function setOutputFormat($outPutFormat)
@@ -45,9 +45,12 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		$this->putInCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS, $fixedPriceAddons);
 	}
 	
-	public function getSourceLanguage()
+	public function getSourceLanguages()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGE);
+		$languages = $this->getFromCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGES);
+		if($languages)
+			$languages = unserialize($languages);
+		return $languages;
 	}
 	
 	public function getOutputFormat()

@@ -20,16 +20,16 @@ class VendorTranslationCatalogItem extends VendorCaptionsCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::TRANSLATION);
 	}
 	
-	const CUSTOM_DATA_TARGET_LANGUAGE = "target_language";
+	const CUSTOM_DATA_TARGET_LANGUAGES = "target_languages";
 	
-	public function setTargetLanguage($targetLanguage)
+	public function setTargetLanguages($targetLanguages)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_TARGET_LANGUAGE, $targetLanguage);
+		$this->putInCustomData(self::CUSTOM_DATA_TARGET_LANGUAGES, $targetLanguages);
 	}
 	
-	public function getTargetLanguage()
+	public function getTargetLanguages()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_TARGET_LANGUAGE);
+		return $this->getFromCustomData(self::CUSTOM_DATA_TARGET_LANGUAGES);
 	}
 
 } // VendorTranslationCatalogItem

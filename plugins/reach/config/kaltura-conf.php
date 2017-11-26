@@ -29,8 +29,5 @@ return array (
     'VendorCatalogItemTableMap' => 'lib/model/map/VendorCatalogItemTableMap.php',
     'VendorCatalogItemPeer' => 'lib/model/VendorCatalogItemPeer.php',
     'VendorCatalogItem' => 'lib/model/VendorCatalogItem.php',
-    'PartnerCatalogItemTableMap' => 'lib/model/map/PartnerCatalogItemTableMap.php',
-    'PartnerCatalogItemPeer' => 'lib/model/PartnerCatalogItemPeer.php',
-    'PartnerCatalogItem' => 'lib/model/PartnerCatalogItem.php',
   ),
 );
