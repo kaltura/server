@@ -18,7 +18,7 @@ class VendorCatalogItemService extends KalturaBaseService
 //		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 //			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
-		if($this->actionName != 'listTemplates')
+		if(!in_array($this->actionName, array('listTemplates', 'clone')))
 			$this->applyPartnerFilterForClass('vendorCatalogItem');
 	}
 	
@@ -30,7 +30,7 @@ class VendorCatalogItemService extends KalturaBaseService
 		switch ($this->actionName)
 		{
 			case 'clone':
-				return $this->partnerGroup . ',0';
+				return '0';
 			case 'listTemplates':
 				return '0';
 			case 'listByPartner':

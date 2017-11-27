@@ -69,6 +69,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 				
 				// add the partner_id to the partner_group
 				$partners[] = strval($partnerId);
+				$partners = array_unique($partners);
 				
 				$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
 				
