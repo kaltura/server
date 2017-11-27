@@ -1389,16 +1389,16 @@ class kJobsManager
 	 * @param string $entryId
 	 * @param int $partnerId
 	 * @param StorageProfile $externalStorage
-	 * @param SyncFile $fileSync
-	 * @param string $srcFileSyncLocalPath
+	 * @param FileSync $fileSync
+	 * @param FileSync $srcFileSync
 	 * @param bool $force
 	 * 
 	 * @return BatchJob
 	 */
-	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null)
+	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, FileSync $srcFileSync, $force = false, $dc = null)
 	{
 		$netStorageExportData = kStorageExportJobData::getInstance($externalStorage->getProtocol());
-		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSyncLocalPath);
+		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSync);
 				
 		$batchJob = null;
 		if($parentJob)

@@ -116,11 +116,10 @@ while ($moreEntries)
     	{
     		$fileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $storageProfile);
 
-    		$dcFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+			$srcFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
     		
-    		/* @var $dcFileSync FileSync */
-    		$srcFileSyncLocalPath = $dcFileSync->getFileRoot() . $dcFileSync->getFilePath();
-    		kJobsManager::addStorageExportJob(null, $entry->getId(), $partnerId, $storageProfile, $fileSync, $srcFileSyncLocalPath, true, $dcFileSync->getDc());
+    		/* @var $srcFileSync FileSync */
+    		kJobsManager::addStorageExportJob(null, $entry->getId(), $partnerId, $storageProfile, $fileSync, $srcFileSync, true, $srcFileSync->getDc());
     	}
     		
     	echo $entry->getId() . " - " . count($keys) . " keys exported\n\n";

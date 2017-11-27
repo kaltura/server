@@ -124,9 +124,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage, $fileSync->getIsDir());
 		
-		$parent_file_sync = kFileSyncUtils::resolve($fileSync);
-		$srcFileSyncPath = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
-		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSyncPath, $force, $fileSync->getDc());
+		$srcFileSync = kFileSyncUtils::resolve($fileSync);
+		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
 		return true;
 	}
 	
