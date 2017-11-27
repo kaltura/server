@@ -219,8 +219,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		if($deliveryAttributes->getRequestedDeliveryProfileIds())
 			$deliveryIds = $deliveryAttributes->getRequestedDeliveryProfileIds();
 		else
-			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
+			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))
 		{
@@ -333,7 +333,16 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = DeliveryProfilePeer::doSelect($c);
 
 		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-		$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds();
+
+		if($isLive)
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partner->getLiveDeliveryProfileIds();
+		}
+		else
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds();
+		}
+
 		$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
 		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
 		uasort($deliveries, array($cmp, "compare"));
