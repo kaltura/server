@@ -216,8 +216,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		if($deliveryAttributes->getDeliveryProfileId())
-			$deliveryIds = array($deliveryAttributes->getDeliveryProfileId());
+		if($deliveryAttributes->getRequestedDeliveryProfileIds())
+			$deliveryIds = $deliveryAttributes->getRequestedDeliveryProfileIds();
 		else
 			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
@@ -333,7 +333,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = DeliveryProfilePeer::doSelect($c);
 
 		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
+		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partner->getDeliveryProfileIds()[$deliveryAttributes->getFormat()]);
 		uasort($deliveries, array($cmp, "compare"));
 
 		return $deliveries;
@@ -404,21 +404,23 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			return null;
 		}
 
-		$deliveryProfileId = $deliveryAttributes->getDeliveryProfileId();
-		if($deliveryProfileId)
+		$RequestedDeliveryProfileId = $deliveryAttributes->getRequestedDeliveryProfileIds();
+		if($RequestedDeliveryProfileId)
 		{
-			if(in_array($deliveryProfileId, $deliveryIds[$streamerType]))
-				$deliveryIds = array($streamerType => array($deliveryProfileId));
+			$intersectDeliveryProfileIds = array_intersect($deliveryIds[$streamerType], $RequestedDeliveryProfileId);
+			if(count($intersectDeliveryProfileIds))
+				$deliveryIds = array($streamerType => $intersectDeliveryProfileIds);
 			else
 			{
-				KalturaLog::err('Requested delivery profile id ['. $deliveryProfileId."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
+				KalturaLog::err('Requested delivery profile ids ['. implode("|", $intersectDeliveryProfileIds)."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
 				return null;
 			}
 		}
 
+		$deliveryIds = $deliveryIds[$streamerType];
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 		
-		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
+		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::info("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());

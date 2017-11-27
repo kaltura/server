@@ -123,9 +123,9 @@ class playManifestAction extends kalturaAction
 	private $deliveryAttributes = null;
 
 	/**
-	 * @var int
+	 * @var array
 	 */
-	private $deliveryProfileId = null;
+	private $requestedDeliveryProfileIds = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -749,10 +749,10 @@ class playManifestAction extends kalturaAction
 
 	private function shouldIncludeStorageProfile($storageProfile)
 	{
-		if($this->deliveryProfileId)
+		if($this->requestedDeliveryProfileIds)
 		{
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			return isset($deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]) && in_array($this->deliveryProfileId, $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]);
+			return isset($deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]) && count(array_intersect($this->requestedDeliveryProfileIds, $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]));
 		}
 
 		return true;
@@ -1147,9 +1147,17 @@ class playManifestAction extends kalturaAction
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
+		$requestedDeliveryProfileIds = null;
+		$requestDeliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null);
+		if($requestDeliveryProfileId)
+			$requestedDeliveryProfileIds = array($requestDeliveryProfileId);
 
-		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
-		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
+		$requestDeliveryProfileId = $this->getRequestParameter( "deliveryProfileIds", null);
+		if($requestDeliveryProfileId)
+			$requestedDeliveryProfileIds =  explode(',', $requestDeliveryProfileId);
+
+		$this->requestedDeliveryProfileIds = $requestedDeliveryProfileIds;
+		$this->deliveryAttributes->setRequestedDeliveryProfileIds($this->requestedDeliveryProfileIds);
 
 		// Initialize
 		$this->initEntry();
