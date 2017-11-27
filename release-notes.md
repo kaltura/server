@@ -1,5 +1,21 @@
 # Mercury 13.8.0 # 
 
+## Add Recorded Entry replaced HTTP template ##
+
+- Issue Type: Support
+- Issue ID: SUP-12533
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_11_27_recordedEntryReplaced.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_11_27_deploy_recorded_entry_replaced_http_notification.php
+
+#### Known Issues & Limitations ####
+None.
+
 ## eSearch - Increase Inner Hits size ##
 - Issue Type: Task
 - Issue ID: PLAT-7890
