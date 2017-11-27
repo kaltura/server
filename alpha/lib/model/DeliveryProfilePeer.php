@@ -333,7 +333,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = DeliveryProfilePeer::doSelect($c);
 
 		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-		$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds()[$deliveryAttributes->getFormat()];
+		$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds();
+		$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
 		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
 		uasort($deliveries, array($cmp, "compare"));
 
