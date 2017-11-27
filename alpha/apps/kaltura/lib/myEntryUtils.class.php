@@ -904,16 +904,6 @@ class myEntryUtils
 				}
 			}
 
-
-
-
-			if ($isEncryptionNeeded)
-			{
-				$fileSync->deleteTempClear();
-				if (self::isTempFile($orig_image_path))
-					unlink($orig_image_path);
-			}
-
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
@@ -928,6 +918,13 @@ class myEntryUtils
 				imagecopy($im, $srcIm, $w * $vid_slice, 0, 0, 0, $w, $h);
 				imagedestroy($srcIm);
 				++$vid_slice;
+			}
+			
+			if ($isEncryptionNeeded)
+			{
+				$fileSync->deleteTempClear();
+				if (self::isTempFile($orig_image_path))
+					unlink($orig_image_path);
 			}
 		}
 		
