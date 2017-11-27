@@ -18,7 +18,8 @@ class VendorCatalogItemService extends KalturaBaseService
 //		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 //			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
-		$this->applyPartnerFilterForClass('vendorCatalogItem');
+		if($this->actionName != 'listTemplates')
+			$this->applyPartnerFilterForClass('vendorCatalogItem');
 	}
 	
 	/* (non-PHPdoc)
@@ -26,7 +27,6 @@ class VendorCatalogItemService extends KalturaBaseService
  	 */
 	protected function partnerGroup($peer = null)
 	{
-		
 		switch ($this->actionName)
 		{
 			case 'clone':
