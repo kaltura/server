@@ -752,7 +752,8 @@ class playManifestAction extends kalturaAction
 		if($this->requestedDeliveryProfileIds)
 		{
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			return isset($deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]) && count(array_intersect($this->requestedDeliveryProfileIds, $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]));
+			$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()];
+			return isset($storageStreamerTypeDeliveryProfileIds) && count(array_intersect($this->requestedDeliveryProfileIds, $storageStreamerTypeDeliveryProfileIds));
 		}
 
 		return true;
@@ -1147,16 +1148,21 @@ class playManifestAction extends kalturaAction
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
-		$requestedDeliveryProfileIds = null;
-		$requestDeliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null);
-		if($requestDeliveryProfileId)
-			$requestedDeliveryProfileIds = array($requestDeliveryProfileId);
 
-		$requestDeliveryProfileId = $this->getRequestParameter( "deliveryProfileIds", null);
-		if($requestDeliveryProfileId)
-			$requestedDeliveryProfileIds =  explode(',', $requestDeliveryProfileId);
+		$requestDeliveryProfileIds = $this->getRequestParameter( "deliveryProfileIds", null);
+		if($requestDeliveryProfileIds)
+		{
+			$this->requestedDeliveryProfileIds = explode(',', $requestDeliveryProfileIds);
+		}
+		else
+		{
+			$requestDeliveryProfileIds = $this->getRequestParameter( "deliveryProfileId", null);
+			if($requestDeliveryProfileIds)
+			{
+				$this->requestedDeliveryProfileIds = array($requestDeliveryProfileIds);
+			}
+		}
 
-		$this->requestedDeliveryProfileIds = $requestedDeliveryProfileIds;
 		$this->deliveryAttributes->setRequestedDeliveryProfileIds($this->requestedDeliveryProfileIds);
 
 		// Initialize

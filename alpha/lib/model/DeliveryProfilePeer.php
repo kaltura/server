@@ -333,7 +333,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = DeliveryProfilePeer::doSelect($c);
 
 		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partner->getDeliveryProfileIds()[$deliveryAttributes->getFormat()]);
+		$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds()[$deliveryAttributes->getFormat()];
+		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
 		uasort($deliveries, array($cmp, "compare"));
 
 		return $deliveries;
@@ -404,12 +405,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			return null;
 		}
 
-		$RequestedDeliveryProfileId = $deliveryAttributes->getRequestedDeliveryProfileIds();
-		if($RequestedDeliveryProfileId)
+		$deliveryIds = $deliveryIds[$streamerType];
+		$requestedDeliveryProfileIds = $deliveryAttributes->getRequestedDeliveryProfileIds();
+		if($requestedDeliveryProfileIds)
 		{
-			$intersectDeliveryProfileIds = array_intersect($deliveryIds[$streamerType], $RequestedDeliveryProfileId);
+			$intersectDeliveryProfileIds = array_intersect($deliveryIds, $requestedDeliveryProfileIds);
 			if(count($intersectDeliveryProfileIds))
-				$deliveryIds = array($streamerType => $intersectDeliveryProfileIds);
+				$deliveryIds = $intersectDeliveryProfileIds;
 			else
 			{
 				KalturaLog::err('Requested delivery profile ids ['. implode("|", $intersectDeliveryProfileIds)."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
@@ -417,9 +419,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			}
 		}
 
-		$deliveryIds = $deliveryIds[$streamerType];
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
