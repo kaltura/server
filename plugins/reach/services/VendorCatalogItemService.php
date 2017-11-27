@@ -193,7 +193,7 @@ class VendorCatalogItemService extends KalturaBaseService
 	 * 
 	 * @return KalturaVendorCatalogItem
 	 */
-	public function assignToPartnerAction($id)
+	public function cloneAction($id)
 	{
 		// get the object
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
