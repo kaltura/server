@@ -137,7 +137,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 			foreach($this->filters as $filter)
 			{
 				$filterXml = $filtersXml->addChild("filter");
-				$entryFilter = new entryFilter();
+				$entryFilter = new mediaEntryFilterForPlaylist();
 				$filter->toObject($entryFilter);
 				$fields = $entryFilter->fields;
 				foreach($fields as $field => $value)
@@ -160,7 +160,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 		$this->filters = new KalturaMediaEntryFilterForPlaylistArray();
 		foreach($listOfFilters as $entryFilterXml)
 		{
-			$entryFilter = new entryFilter();
+			$entryFilter = new mediaEntryFilterForPlaylist();
 			$entryFilter->fillObjectFromXml($entryFilterXml, "_"); 
 			$filter = new KalturaMediaEntryFilterForPlaylist();
 			$filter->fromObject($entryFilter);

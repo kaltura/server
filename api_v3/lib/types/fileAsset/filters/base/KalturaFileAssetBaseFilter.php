@@ -41,7 +41,7 @@ abstract class KalturaFileAssetBaseFilter extends KalturaRelatedFilter
 	}
 
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $idEqual;
 
