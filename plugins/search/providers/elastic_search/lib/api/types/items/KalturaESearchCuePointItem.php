@@ -11,8 +11,14 @@ class KalturaESearchCuePointItem extends KalturaESearchItem
 	 */
 	public $fieldName;
 
+	/**
+	 * @var KalturaCuePointType
+	 */
+	public $cuePointType;
+
 	private static $map_between_objects = array(
-		'fieldName'
+		'fieldName',
+		'cuePointType',
 	);
 
 	private static $map_dynamic_enum = array(

@@ -1,23 +1,23 @@
 <?php
 /**
  * @package plugins.elasticSearch
- * @subpackage lib.search
+ * @subpackage model.search
  */
 
-class kUserSearch extends kBaseSearch
+class kCategorySearch extends kBaseSearch
 {
-    const PEER_NAME = 'kuserPeer';
+    const PEER_NAME = 'categoryPeer';
 
     public function __construct()
     {
         parent::__construct();
     }
-    
+
     public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
     {
-        kUserElasticEntitlement::init();
+        kCategoryElasticEntitlement::init();
         if (!count($statuses))
-            $statuses = array(KuserStatus::ACTIVE);
+            $statuses = array(CategoryStatus::ACTIVE);
         $this->initQuery($statuses, $objectId, $pager, $order, $useHighlight);
         $result = $this->execSearch($eSearchOperator);
         return $result;
@@ -26,8 +26,8 @@ class kUserSearch extends kBaseSearch
     protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
     {
         $this->query = array(
-            'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
-            'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE
+            'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,
+            'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
         );
 
         parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
@@ -37,4 +37,5 @@ class kUserSearch extends kBaseSearch
     {
         return self::PEER_NAME;
     }
+
 }

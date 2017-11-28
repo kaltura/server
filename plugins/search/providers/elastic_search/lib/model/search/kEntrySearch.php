@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.elasticSearch
- * @subpackage lib.search
+ * @subpackage model.search
  */
 class kEntrySearch extends kBaseSearch
 {
@@ -107,15 +107,11 @@ class kEntrySearch extends kBaseSearch
     {
         if($objectId)
             return;
-
-        //add display in search to filter
-        $this->query['body']['query']['bool']['filter'][] = array(
-            'bool' => array(
-                'must_not' => array(
-                    'term' => array('display_in_search' => EntryDisplayInSearchType::SYSTEM)
-                )
-            )
-        );
+    
+        $displayInSearchQuery = new kESearchTermQuery('display_in_search', EntryDisplayInSearchType::SYSTEM);
+        $displayInSearchBoolQuery = new kESearchBoolQuery();
+        $displayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
+        $this->mainBoolQuery->addToFilter($displayInSearchBoolQuery);
     }
 
 }

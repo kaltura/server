@@ -7,6 +7,8 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 {
 
 	const DEFAULT_INNER_HITS_SIZE = 10;
+	const DEFAULT_GROUP_NAME = 'default_group';
+	const QUERY_NAME_DELIMITER = '#DEL#';
 
 	protected static function initializeInnerHitsSize($queryAttributes)
 	{
@@ -23,45 +25,96 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 
 	protected static function createNestedQueryForItems($eSearchItemsArr, $boolOperator, &$queryAttributes)
 	{
-		$finalQuery = array();
 		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
 		$allowedSearchTypes = static::getAllowedSearchTypesForField();
 
 		// must_not was already set in a higher level of the query inside ESearchOperator
 		if($boolOperator == 'must_not')
 			$boolOperator = 'must';
-		
+
 		//don't group to a single query if the operator is AND
 		if($boolOperator == 'must')
-		{
-			foreach ($eSearchItemsArr as $eSearchItem)
-			{
-				$nestedQuery = null;
-				$nestedQuery['nested']['path'] = static::NESTED_QUERY_PATH;
-				$nestedQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
-				$queryAttributes->setScopeToInner();
-				static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $nestedQuery, $allowedSearchTypes, $queryAttributes);
-				$highlight = kBaseSearch::getHighlightSection(static::HIGHLIGHT_CONFIG_KEY, $queryAttributes);
-				if(isset($highlight))
-					$nestedQuery['nested']['inner_hits']['highlight'] = $highlight;
-				$finalQuery[] = $nestedQuery;
-			}
-		}
+			$finalQuery = static::createNestedQueries($eSearchItemsArr, $innerHitsSize,$queryAttributes,$boolOperator,$allowedSearchTypes);
 		else
+			$finalQuery = static::createGroupedNestedQueries($eSearchItemsArr, $innerHitsSize, $queryAttributes, $boolOperator, $allowedSearchTypes);
+
+		return $finalQuery;
+	}
+
+	protected static function createNestedQueries($eSearchItemsArr, $innerHitsSize, &$queryAttributes, $boolOperator, $allowedSearchTypes)
+	{
+		$finalQuery = array();
+		foreach ($eSearchItemsArr as $eSearchItem)
 		{
-			$nestedQuery['nested']['path'] = static::NESTED_QUERY_PATH;;
-			$nestedQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
+			$nestedQuery = new kESearchNestedQuery();
+			$nestedQuery->setPath(static::NESTED_QUERY_PATH);
+			$nestedQuery->setInnerHitsSize($innerHitsSize);
+			$nestedQuery->setInnerHitsSource(true);
+			if($eSearchItem->getNestedQueryName())
+				$nestedQuery->setInnerHitsName($eSearchItem->getNestedQueryName());
 			$queryAttributes->setScopeToInner();
-			foreach ($eSearchItemsArr as $eSearchItem)
-			{
-				static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $nestedQuery, $allowedSearchTypes, $queryAttributes);
-			}
+			$boolQuery = new kESearchBoolQuery();
+			static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
 			$highlight = kBaseSearch::getHighlightSection(static::HIGHLIGHT_CONFIG_KEY, $queryAttributes);
 			if(isset($highlight))
-				$nestedQuery['nested']['inner_hits']['highlight'] = $highlight;
+				$nestedQuery->setHighlight($highlight);
+			$nestedQuery->setQuery($boolQuery);
 			$finalQuery[] = $nestedQuery;
 		}
 		return $finalQuery;
+	}
+
+	protected static function createGroupedNestedQueries($eSearchItemsArr, $innerHitsSize, &$queryAttributes, $boolOperator, $allowedSearchTypes, $name = null)
+	{
+		$finalQuery = array();
+		$groupedItems = self::groupItemsByQueryName($eSearchItemsArr);
+
+		foreach ($groupedItems as $name => $items)
+		{
+			$nestedQuery = self::createGroupedNestedQuery($items, $innerHitsSize, $queryAttributes, $boolOperator, $allowedSearchTypes, $name);
+			$finalQuery[] = $nestedQuery[0];
+		}
+		return $finalQuery;
+	}
+
+	protected static function createGroupedNestedQuery($eSearchItemsArr, $innerHitsSize, &$queryAttributes, $boolOperator, $allowedSearchTypes, $groupQueryName = null)
+	{
+		$finalQuery = array();
+		$nestedQuery = new kESearchNestedQuery();
+		$nestedQuery->setPath(static::NESTED_QUERY_PATH);
+		$nestedQuery->setInnerHitsSize($innerHitsSize);
+		$nestedQuery->setInnerHitsSource(true);
+		if($groupQueryName)
+			$nestedQuery->setInnerHitsName($groupQueryName);
+		$queryAttributes->setScopeToInner();
+		$boolQuery = new kESearchBoolQuery();
+		foreach ($eSearchItemsArr as $eSearchItem)
+		{
+			static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
+		}
+		$highlight = kBaseSearch::getHighlightSection(static::HIGHLIGHT_CONFIG_KEY, $queryAttributes);
+		if(isset($highlight))
+			$nestedQuery->setHighlight($highlight);
+		$nestedQuery->setQuery($boolQuery);
+		$finalQuery[] = $nestedQuery;
+
+		return $finalQuery;
+	}
+
+	abstract public function getNestedQueryName();
+
+	protected static function groupItemsByQueryName($eSearchItemsArr)
+	{
+		$groupedItems = array();
+		foreach ($eSearchItemsArr as $item)
+		{
+			$nestedQueryName = $item->getNestedQueryName();
+			if($nestedQueryName)
+				$groupedItems[$nestedQueryName][] = $item;
+			else
+				$groupedItems[self::DEFAULT_GROUP_NAME][] = $item;
+		}
+		return $groupedItems;
 	}
 
 }
