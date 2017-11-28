@@ -149,10 +149,10 @@ class DeliveryProfileDynamicAttributes {
 	protected $sessionId;
 
 	/**
-	 * request a specific delivery profile id
-	 * @var int
+	 * request a specific delivery profile ids
+	 * @var array
 	 */
-	protected $deliveryProfileId = null;
+	protected $requestedDeliveryProfileIds = null;
 	
 	/**
 	 * List of flavor params ids swhich should be enfroced due to an access control action
@@ -309,17 +309,17 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @return int $deliveryProfileId
+	 * @return array requestedDeliveryProfileIds
 	 */
-	public function getDeliveryProfileId() {
-		return $this->deliveryProfileId;
+	public function getRequestedDeliveryProfileIds() {
+		return $this->requestedDeliveryProfileIds;
 	}
 
 	/**
-	 * @param $deliveryProfileId
+	 * @param $requestedDeliveryProfileIds
 	 */
-	public function setDeliveryProfileId($deliveryProfileId) {
-		$this->deliveryProfileId = $deliveryProfileId;
+	public function setRequestedDeliveryProfileIds($requestedDeliveryProfileIds) {
+		$this->requestedDeliveryProfileIds = $requestedDeliveryProfileIds;
 	}
 
 	/**
@@ -745,7 +745,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->serveVodFromLive = $newObj->getServeVodFromLive();
 		$this->serveLiveAsVodEntryId = $newObj->getServeLiveAsVodEntryId();
 		$this->urlParams = $newObj->getUrlParams();
-		$this->deliveryProfileId = $newObj->getDeliveryProfileId();
+		$this->requestedDeliveryProfileIds = $newObj->getRequestedDeliveryProfileIds();
 		$this->sessionId = $newObj->getSessionId();
 		$this->aclFlavorParamsIds = $newObj->getAclFlavorParamsIds();
 		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
