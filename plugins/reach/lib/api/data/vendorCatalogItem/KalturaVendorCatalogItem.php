@@ -69,6 +69,12 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public $serviceType;
 	
 	/**
+	 * @var KalturaVendorServiceFeature
+	 * @filter eq,in
+	 */
+	public $serviceFeature;
+	
+	/**
 	 * @var KalturaVendorServiceTurnAroundTime
 	 * @filter eq,in
 	 */
@@ -92,6 +98,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'status',
 		'isDefault',
 		'serviceType',
+		'serviceFeature',
 		'turnAroundTime',
 		'pricing',
 	);
