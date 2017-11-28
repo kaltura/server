@@ -1894,6 +1894,14 @@ form#frmCreateMediaRepurposingFromTemplate dd,form#frmCreateMediaRepurposingFrom
 
 }
 
+form#frmCreateCatalogItem {
+	margin-left: 20px;
+}
+
+form#frmCreateCatalogItem dd,form#frmCreateCatalogItem dt {
+	float: left;
+}
+
 
 #drop-folder-configure-dialog {
 	padding-top: 10px;
@@ -1929,6 +1937,45 @@ form#frmCreateMediaRepurposingFromTemplate dd,form#frmCreateMediaRepurposingFrom
 }
 
 #drop-folder-configure-dialog select {
+	min-width: 338px;
+	height: 24px;
+	padding: 1px;
+}
+
+#catalog-item-configure-dialog {
+	padding-top: 10px;
+}
+
+#catalog-item-configure-dialog label {
+	padding: 0;
+}
+
+#catalog-item-configure-dialog dl {
+	margin-top: 15px;
+}
+
+#catalog-item-configure-dialog dl p {
+	width: 333px;
+	padding: 3px;
+	margin-top: 5px;
+	border: solid 1px #ccc;
+	background: #f0f0f0;
+}
+
+#catalog-item-configure-dialog dt {
+	margin: 10px 0 5px;
+}
+
+#catalog-item-configure-dialog dd input {
+	width: 333px;
+	height: 22px;
+}
+
+#catalog-item-configure-dialog dd input#max_bulk_size {
+	width: 150px;
+}
+
+#catalog-item-configure-dialog select {
 	min-width: 338px;
 	height: 24px;
 	padding: 1px;
@@ -2393,9 +2440,9 @@ form#frmCreateDrmProfile dd,form#frmCreateDrmProfile dt {
 	float: left;
 }
 
-form#frmAdminApi dd,dt,form#frmAdminApi dt {
-	float: left;
-}
+/*form#frmAdminApi dd,dt,form#frmAdminApi dt {*/
+	/*float: left;*/
+/*}*/
 
 #drm-profile-configure-dialog {
 	padding-top: 10px;
