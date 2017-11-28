@@ -5,37 +5,37 @@
  */
 class kESearchQueryManager
 {
-	//const BOOST_KEY = 'boost';
-	//const VALUE_KEY = 'value';
+	const BOOST_KEY = 'boost';
+	const VALUE_KEY = 'value';
 	const BODY_KEY = 'body';
-	//const BOOL_KEY = 'bool';
-	//const SHOULD_KEY = 'should';
+	const BOOL_KEY = 'bool';
+	const SHOULD_KEY = 'should';
 	const FILTER_KEY = 'filter';
-	//const MULTI_MATCH_KEY = 'multi_match';
+	const MULTI_MATCH_KEY = 'multi_match';
 	const QUERY_KEY = 'query';
-	//const FIELDS_KEY = 'fields';
-	//const TYPE_KEY = 'type';
-	//const MOST_FIELDS = 'most_fields';
-	//const MATCH_KEY = 'match';
+	const FIELDS_KEY = 'fields';
+	const TYPE_KEY = 'type';
+	const MOST_FIELDS = 'most_fields';
+	const MATCH_KEY = 'match';
 	const SORT_KEY = 'sort';
 	const MUST_KEY = 'must';
-	//const MINIMUM_SHOULD_MATCH_KEY = 'minimum_should_match';
-	//const PREFIX_KEY = 'prefix';
-	//const TERM_KEY = 'term';
+	const MINIMUM_SHOULD_MATCH_KEY = 'minimum_should_match';
+	const PREFIX_KEY = 'prefix';
+	const TERM_KEY = 'term';
 	const TERMS_KEY = 'terms';
 	const RANGE_KEY = 'range';
 	const ORDER_KEY = 'order';
 	const ORDER_ASC_KEY = 'asc';
 	const ORDER_DESC_KEY = 'desc';
-	//const GT_KEY = 'gt';
+	const GT_KEY = 'gt';
 	const GTE_KEY = 'gte';
-	//const LT_KEY = 'lt';
+	const LT_KEY = 'lt';
 	const LTE_KEY = 'lte';
-	//const EXISTS_KEY = 'exists';
-	//const FIELD_KEY = 'field';
+	const EXISTS_KEY = 'exists';
+	const FIELD_KEY = 'field';
 	const NGRAMS_FIELD_SUFFIX = 'ngrams';
 	const RAW_FIELD_SUFFIX = 'raw';
-	//const MATCH_PHRASE_KEY = 'match_phrase';
+	const MATCH_PHRASE_KEY = 'match_phrase';
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
 	const RAW_FIELD_BOOST_FACTOR = 4;
