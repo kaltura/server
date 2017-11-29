@@ -7,6 +7,20 @@
 
 <script type="text/javascript">
 
+	$('fieldset[id^="SourceLanguageTemplate"]').hide();
+	populateConditions();
+
+	function populateConditions() {
+		var data = jQuery('#AdvanceSearch').val();
+		if (!data)
+			return;
+		var arr = JSON.parse(data);
+		var ts = $( ".add-source-langeuage" );
+		for (var i = 0, len = arr.length; i < len; i++)
+			addSourceLanguageFromObject(ts, arr[i]);
+	}
+
+
 	jQuery(function() {
 		<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');

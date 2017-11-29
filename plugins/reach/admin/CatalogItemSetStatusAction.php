@@ -24,10 +24,11 @@ class CatalogItemSetStatusAction extends KalturaApplicationPlugin
 		$action->getHelper('layout')->disableLayout();
 		$catalogItemId = $this->_getParam('catalogItemId');
 		$newStatus = $this->_getParam('catalogItemStatus');
+		$partnerId = $this->_getParam('partnerId');
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
-
+		Infra_ClientHelper::impersonate($partnerId);
 		try
 		{
 			if  ( $newStatus == Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED )
@@ -40,5 +41,6 @@ class CatalogItemSetStatusAction extends KalturaApplicationPlugin
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			echo $action->getHelper('json')->sendJson($e->getMessage(), false);
 		}
+		Infra_ClientHelper::unimpersonate();
 	}
 }

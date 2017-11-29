@@ -37,7 +37,7 @@
 				<td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
 				<td>
-					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
+					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $catalogItem->partnerId; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configureCatalogItem" ><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED): ?>
@@ -89,6 +89,7 @@
 	var templates = <?php echo json_encode($this->templates); ?>;
 	var templatesByServiceFeature = [];
 	var templatesByServiceType = [];
+
 	function switchTemplatesBoxForServiceFeature() {
 		var filteredTemplates = [];
 		jQuery('#cloneTemplateId').find('option').remove();
@@ -140,30 +141,32 @@
 		}
 	}
 
-	function enable(catalogItemId)
+	function enable(catalogItemId, partnerId)
 	{
 		changeStatus(
 			catalogItemId,
 
 			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE; ?>,
+			partnerId,
 			function() {
 				alert('<?php echo $this->translate('Catalog Item enabled');?>');
 			}
 		);
 	}
 
-	function disable(catalogItemId)
+	function disable(catalogItemId,partnerId)
 	{
 		changeStatus(
 			catalogItemId,
 			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED; ?>,
+			partnerId,
 			function() {
 				alert('<?php echo $this->translate('Catalog Item disabled');?>');
 			}
 		);
 	}
 
-	function remove(catalogItemId)
+	function remove(catalogItemId,partnerId)
 	{
 		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Catalog Item ?'); ?>');
 		if (ok)
@@ -171,6 +174,7 @@
 			changeStatus(
 				catalogItemId,
 				<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED; ?>,
+				partnerId,
 				function() {
 					alert('<?php echo $this->translate('Catalog Item removed');?>');
 				}
@@ -178,26 +182,29 @@
 		}
 	}
 
-	function changeStatus(catalogItemId, status, callback)
+	function changeStatus(catalogItemId, status, partnerId, callback)
 	{
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID', 'catalogItemStatus' => 'STATUS')); ?>';
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID','partnerId' => 'PARTNERID', 'catalogItemStatus' => 'STATUS')); ?>';
 		url = url.replace('STATUS', status);
 		url = url.replace('CATALOGITEMID', catalogItemId);
+		url = url.replace('PARTNERID', partnerId);
 		jQuery.ajax({
 			url: url,
 			dataType: 'json',
 			success: function(result) {
 				if (result != 'ok')
-					this.error();
-
-				if (callback && (typeof callback == 'function'))
+					this.error(result);
+				else
 				{
-					callback.apply(this);
+					if (callback && (typeof callback == 'function'))
+					{
+						callback.apply(this);
+					}
 				}
 				jQuery('#frmPaginator1').submit();
 			},
-			error: function() {
-				alert('<?php echo $this->translate('an error occured'); ?>');
+			error: function(result) {
+				alert(result);
 			}
 		});
 	}
@@ -234,7 +241,7 @@
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + catalogItemIdStr;
 
 		jQuery('#catalog-item-configure-dialog').remove();
-		dialogDiv = jQuery('<div id="catalog-item-configure-dialog1"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+		dialogDiv = jQuery('<div id="catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 
 		dialogDiv.dialog({
 			bgiframe: true,
@@ -339,6 +346,7 @@
 				'<?php echo $this->translate('Save'); ?>': function() {
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
+					loadSourceLangeuages();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -360,6 +368,15 @@
 				});
 			}
 		);
+	}
+
+	function loadSourceLangeuages() {
+		//remove all template field
+		$('dd[id^="sourceLanguageTemplate_"]').remove();
+		$('fieldset[id^="MR_SearchConditionTemplate"]').remove();
+
+		convertDates();
+		setConditionData();
 	}
 
 	function loadCatalogItemSuccess(html) {

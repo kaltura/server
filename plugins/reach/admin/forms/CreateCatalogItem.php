@@ -16,12 +16,12 @@ class Form_CreateCatalogItem extends Infra_Form
 
 		$this->addElement('text', 'newPartnerId', array(
 			'label' => 'Publisher ID:',
-			'onkeypress' => "return supressFormSubmit(event)",
+//			'onkeypress' => "return supressFormSubmit(event)",
 			'filters' => array('StringTrim'),
 		));
 
 		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('cloneTemplateServiceFeature', array(
-			'enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemType',
+			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature',
 			'label'			=> 'Service Feature:',
 			'onchange'		=> "switchTemplatesBoxForServiceFeature()",
 			'filters'		=> array('StringTrim'),

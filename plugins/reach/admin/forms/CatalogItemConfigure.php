@@ -62,9 +62,11 @@ class Form_CatalogItemConfigure extends Infra_Form
 			'placement' => 'prepend',
 		));
 
-		$catalogItemForView = new Kaltura_Form_Element_EnumSelect('catalogItemTypeForView', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemType'));
-		$catalogItemForView->setLabel('Type:');
+		$catalogItemForView = new Kaltura_Form_Element_EnumSelect('serviceFeature', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature'));
+		$catalogItemForView->setLabel('Service Feature:');
 		$catalogItemForView->setValue($this->catalogItemType);
+		$catalogItemForView->setRequired(true);
+		$catalogItemForView->setAttrib('disabled','disabled');
 		$this->addElement($catalogItemForView);
 
 		$isDefault = new Kaltura_Form_Element_EnumSelect('isDefault', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 	'excludes' => array (
@@ -91,7 +93,13 @@ class Form_CatalogItemConfigure extends Infra_Form
 		$sourceLanguage  ->setRequired(true);
 		$this->addElement($sourceLanguage  );
 
-		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorCatalogItemType::TRANSLATION)
+		$sourceLanguagesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+		$sourceLanguagesSubForm->addDecorator('ViewScript', array(
+			'viewScript' => 'conditions-sub-form.phtml',
+		));
+		$this->addSubForm($sourceLanguagesSubForm, 'SourceLanguages');
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 		{
 			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
 			$targetLanguage->setLabel('Target Language:');
@@ -144,7 +152,9 @@ class Form_CatalogItemConfigure extends Infra_Form
 			}
 		}
 
-		$this->setDefault('catalogItemTypeForView', $object->type);
+		$this->setDefault('serviceFeature', $object->serviceFeature);
+//		$this->addDistributionAssetRules($distributionProfile->optionalAssetDistributionRules, $distributionProfile->requiredAssetDistributionRules);
+
 	}
 
 	/**

@@ -30,16 +30,18 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$request = $action->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
+		$partnerId = $this->_getParam('filter_input');
 
 		// init filter
-		$catalogItemProfileFilter = $this->getCatalogItemProfileFilterFromRequest($request);
+		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+//		$catalogItemProfileFilter = $this->getCatalogItemProfileFilterFromRequest($request);
 		$catalogItemProfileFilter->orderBy = "-createdAt";
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listAction", null, $catalogItemProfileFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listAction", $partnerId, $catalogItemProfileFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
@@ -57,8 +59,8 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigure'), null, true);
 		$createProfileForm->setAction($actionUrl);
 
-		if ($catalogItemProfileFilter && isset($catalogItemProfileFilter->partnerIdEqual))
-			$createProfileForm->getElement("newPartnerId")->setValue($catalogItemProfileFilter->partnerIdEqual);
+		if ($partnerId)
+			$createProfileForm->getElement("newPartnerId")->setValue($partnerId);
 
 		$action->view->newCatalogItemFolderForm = $createProfileForm;
 
@@ -74,7 +76,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 			$obj->id = $template->id;
 			$obj->systemName = $template->systemName;
 			$obj->serviceFeature = $template->serviceFeature; // Caption or Translation
-			$obj->serviceFeature = "CAPTIONS"; // Caption or Translation
+//			$obj->serviceFeature = "CAPTIONS"; // Caption or Translation
 			$obj->serviceType = $template->serviceType; // Human Or machine
 			$obj->turnAroundTime = $template->turnAroundTime; // TurnAroundTime
 			$obj->name = $template->name;

@@ -91,9 +91,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					if ($form->isValid($formData))
 					{
 						$form->populate($formData);
-						if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::CAPTIONS)
+						if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
 							$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-						elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::TRANSLATION)
+						elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 							$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
 
 						$form->resetUnUpdatebleAttributes($catalogItem);
@@ -103,9 +103,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					} else
 					{
 						$form->populate($formData);
-						if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::CAPTIONS)
+						if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
 							$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-						elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::TRANSLATION)
+						elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 							$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
 
 					}
@@ -118,9 +118,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				$formData = $request->getPost();
 				if ($request->isPost() && $form->isValid($request->getPost()))
 				{
-					if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::CAPTIONS)
+					if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
 						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-					elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::TRANSLATION)
+					elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
 
 					$form->populate($formData);
@@ -131,7 +131,7 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				} else
 				{
 					$form->getElement('partnerId')->setValue($partnerId);
-					$form->getElement('type')->setValue($catalogItemType);
+					$form->getElement('serviceFeature')->setValue($catalogItemType);
 				}
 			}
 		} catch (Exception $e)
@@ -143,9 +143,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 			{
 				$formData = $request->getPost();
 				$form->populate($formData);
-				if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::CAPTIONS)
+				if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorCatalogItemType::TRANSLATION)
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
 			}
 		}

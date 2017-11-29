@@ -1402,8 +1402,8 @@ return array(
     'Kaltura_Client_Enum_ContainerFormat::WMV' => 'WMV',
     'Kaltura_Client_Enum_ContainerFormat::WVM' => 'WVM',
 
-	'Kaltura_Client_Reach_Enum_VendorCatalogItemType::CAPTIONS' => 'CAPTIONS',
-	'Kaltura_Client_Reach_Enum_VendorCatalogItemType::TRANSLATION' => 'TRANSLATION',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS' => 'CAPTIONS',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT' => 'BEST_EFFORT',
