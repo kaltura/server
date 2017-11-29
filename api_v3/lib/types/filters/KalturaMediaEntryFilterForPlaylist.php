@@ -8,6 +8,7 @@ class KalturaMediaEntryFilterForPlaylist extends KalturaMediaEntryFilter
 	static private $map_between_objects = array
 	(
 		"limit" => "_limit",
+		"name" => "_name",
 	);
 
 	static private $order_by_map = array
@@ -30,4 +31,11 @@ class KalturaMediaEntryFilterForPlaylist extends KalturaMediaEntryFilter
 	 * @var int
 	 */
 	public $limit;
+
+	/**
+	 *
+	 *
+	 * @var string
+	 */
+	public $name;
 }

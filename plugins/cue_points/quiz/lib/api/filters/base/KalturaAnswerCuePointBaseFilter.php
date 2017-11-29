@@ -37,12 +37,11 @@ abstract class KalturaAnswerCuePointBaseFilter extends KalturaCuePointFilter
 	 * @var string
 	 */
 	public $parentIdIn;
-	
+
 	/**
 	 * @var string
 	 */
 	public $quizUserEntryIdEqual;
-	
 
 	/**
 	 * @var string
