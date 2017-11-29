@@ -104,7 +104,7 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		foreach($transformList->objects as $object)
 		{
 			/* @var $object KalturaMetadata */
-			$xslStr = $data->srcXsl;
+			$xslStr = kEncryptFileUtils::getEncryptedFileContent($data->srcXsl->filePath, $data->srcXsl->encryptionKey, self::getIV());
 			$xml = kXsd::transformXmlData($object->xml, $data->destXsdPath, $xslStr);
 			if($xml)
 			{
