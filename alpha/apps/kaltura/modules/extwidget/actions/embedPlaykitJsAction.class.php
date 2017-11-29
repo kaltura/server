@@ -13,7 +13,8 @@ class embedPlaykitJsAction extends sfAction
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
-	
+	const PLAYER_CONFIG_NS = "window.__kalturaplayerdata";
+
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
 	private $eTagHash = null;
@@ -102,9 +103,7 @@ class embedPlaykitJsAction extends sfAction
 	private function formatBundleContent($bundleContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $this->appendUiConfToContent($bundleContentParts[1]);
-		$bundleContent = $this->appendEnvConfigToContent($bundleContent);
-		
+		$bundleContent = $this->appendConfig($bundleContentParts[1]);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 		
@@ -126,22 +125,28 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
+	private function appendConfig($content)
+	{
+		//append global namespace container to payload
+		$confNS = self::PLAYER_CONFIG_NS;
+	    $content .= "
+	    $confNS = ($confNS || {});";
+	    $content = $this->appendUiConfToContent($content);
+	    $content = $this->appendEnvConfigToContent($content);
+	    return $content;
+	}
+
 	private function appendUiConfToContent($content)
 	{
-		$config = array();
-		$config["config"] = $this->playerConfig;
-		$config = json_encode($config);	
+		$config = json_encode($this->playerConfig);
 
 		if ($config === false)
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
 
-		$kalturaPlayerConfig = "
-		(function(){(KalturaPlayer.UiConf = KalturaPlayer.UiConf || {}) [\"" . $this->uiconfId . "\"] = $config;
-		})();";
-
-		$content .= $kalturaPlayerConfig;
+		$confNS = self::PLAYER_CONFIG_NS;
+		$content .= "$confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$config;";
 
 		return $content;
 	}
@@ -177,10 +182,8 @@ class embedPlaykitJsAction extends sfAction
 		
 		if ($envConfig !== false)
 		{
-			$kalturaPlayerEnvConfig = "
-			(function(){KalturaPlayer.EnvConfig = $envConfig;
-			})();";
-			return $content . $kalturaPlayerEnvConfig;
+			$confNS = self::PLAYER_CONFIG_NS;
+			$content .= "$confNS.EnvConfig = $envConfig;";
 		}
 
 		return $content;
