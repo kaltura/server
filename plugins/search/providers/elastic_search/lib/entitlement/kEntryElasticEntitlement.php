@@ -18,6 +18,13 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
     public static $parentEntitlement = false;
     public static $entryInSomeCategoryNoPC = false; //active + pending
     
+    protected static $entitlementContributors = array(
+        'kElasticEntryDisableEntitlementContributor',
+        'kElasticPublicEntriesEntitlementContributor',
+        'kElasticUserCategoryEntryEntitlementContributor',
+        'kElasticUserEntitlementContributor',
+    );
+
     protected static function initialize()
     {
         parent::initialize();
