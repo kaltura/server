@@ -42,7 +42,7 @@ class myBatchPartnerUsage extends myBatchBase
 					if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 					{
 						myPartnerUtils::doPartnerUsage($partner, true);
-						if(dateUtils::today() >= kConf::get('new_free_trial_start_date'))
+						if($partner->getCreatedAt() >= kConf::get('new_free_trial_start_date'))
 							myPartnerUtils::handleDayInFreeTrial($partner);
 					}
 					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
