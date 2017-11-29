@@ -8,6 +8,7 @@ class embedPlaykitJsAction extends sfAction
 {
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
+	const VERSION_PARAM_NAME = "version";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const CONFIG_PARAM_NAME = "config";	
 	const REGENERATE_PARAM_NAME = "regenerate";
@@ -320,19 +321,43 @@ class embedPlaykitJsAction extends sfAction
                     </html >';
 		return $htmlDoc;
 	}
+
+	private function toAssociativeArray($input)
+	{
+		if (!function_exists("array_column"))
+		{
+			function array_column($array,$column_name)
+			{
+				return array_map(function($element) use($column_name){return $element[$column_name];}, $array);
+			}
+		}
+		$chunks = array_chunk(preg_split('/(=|,)/', $input), 2);
+		$result = array_combine(array_column($chunks, 0), array_column($chunks, 1));
+		return $result;
+	}
+
+	private function mergeVersionParamIntoConfig()
+	{
+		//Get version from QS
+		$version = $this->getRequestParameter(self::VERSION_PARAM_NAME);
+		if ($version && strpos($version, '=')) {
+			$versionArr = $this->toAssociativeArray($version);
+			$this->bundleConfig = array_merge($this->bundleConfig, $versionArr);
+		}
+	}
 	
-	private function setLatestOrBetaVersionNumber($confVars)
+	private function setLatestOrBetaVersionNumber()
 	{
 		//if latest/beta version required set version number in config obj
-		$isLatestVersionRequired = strpos($confVars, "{latest}") !== false;
-		$isBetaVersionRequired = strpos($confVars, "{beta}") !== false;
-		
+		$isLatestVersionRequired = strpos($this->bundleConfig, "{latest}") !== false;
+		$isBetaVersionRequired = strpos($this->bundleConfig, "{beta}") !== false;
+
 		if ($isLatestVersionRequired || $isBetaVersionRequired) {
 			$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
 			$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
 			
 			$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
-			$betatVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
+			$betaVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
 			
 			foreach ($this->bundleConfig as $key => $val) 
 			{
@@ -341,9 +366,9 @@ class embedPlaykitJsAction extends sfAction
 					$this->bundleConfig[$key] = $latestVersionMap[$key];
 				}
 				
-				if ($val == "{beta}" && $betatVersionMap != null) 
+				if ($val == "{beta}" && $betaVersionMap != null)
 				{
-					$this->bundleConfig[$key] = $betatVersionMap[$key];
+					$this->bundleConfig[$key] = $betaVersionMap[$key];
 				}
 			}
 		}
@@ -409,7 +434,8 @@ class embedPlaykitJsAction extends sfAction
 		}
 		
 		$this->bundleConfig = json_decode($confVars, true);
-		$this->setLatestOrBetaVersionNumber($confVars);
+		$this->mergeVersionParamIntoConfig();
+		$this->setLatestOrBetaVersionNumber();
 		
 		$this->setBundleName();
 	}
