@@ -461,13 +461,13 @@ class kXsd
 	 * @param string $xslPath
 	 * @return bool:string false if failed, xml text if succeed
 	 */
-	public static function transformXmlData($xml, $xsdPath, $xslPath)
+	public static function transformXmlData($xml, $xsdPath, $xslStr)
 	{
 		$from = new KDOMDocument();
 		$from->loadXML($xml);
 		
 		$xsl = new KDOMDocument();
-		$xsl->load($xslPath);
+		$xsl->loadXML($xslStr);
 		
 		$proc = new XSLTProcessor;
 		$proc->importStyleSheet($xsl);
