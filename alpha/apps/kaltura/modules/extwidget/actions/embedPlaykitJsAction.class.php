@@ -350,8 +350,8 @@ class embedPlaykitJsAction extends sfAction
 	{
 		//if latest/beta version required set version number in config obj
 		$isLatestVersionRequired = strpos($this->bundleConfig, "{latest}") !== false;
-		$isBetaVersionRequired = strpos($this->bundleConfig, "{beta}") !== false;
-
+		$isBetaVersionRequired = strpos($this->bundleConfig, "{beta}") !== false;	
+		
 		if ($isLatestVersionRequired || $isBetaVersionRequired) {
 			$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
 			$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
