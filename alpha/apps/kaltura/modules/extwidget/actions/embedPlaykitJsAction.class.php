@@ -8,7 +8,7 @@ class embedPlaykitJsAction extends sfAction
 {
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
-	const VERSION_PARAM_NAME = "version";
+	const VERSIONS_PARAM_NAME = "versions";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const CONFIG_PARAM_NAME = "config";	
 	const REGENERATE_PARAM_NAME = "regenerate";
@@ -324,25 +324,27 @@ class embedPlaykitJsAction extends sfAction
 
 	private function toAssociativeArray($input)
 	{
-		if (!function_exists("array_column"))
+		$configs = explode(",", $input);
+		$arr = array();
+		foreach($configs as $conf)
 		{
-			function array_column($array,$column_name)
-			{
-				return array_map(function($element) use($column_name){return $element[$column_name];}, $array);
-			}
+			$obj = explode("=", $conf);
+			$key = $obj[0];
+			$value = $obj[1];
+			$arr[$key] = $value;
 		}
-		$chunks = array_chunk(preg_split('/(=|,)/', $input), 2);
-		$result = array_combine(array_column($chunks, 0), array_column($chunks, 1));
-		return $result;
+		return $arr;
 	}
 
-	private function mergeVersionParamIntoConfig()
+	private function mergeVersionsParamIntoConfig()
 	{
 		//Get version from QS
-		$version = $this->getRequestParameter(self::VERSION_PARAM_NAME);
-		if ($version && strpos($version, '=')) {
-			$versionArr = $this->toAssociativeArray($version);
-			$this->bundleConfig = array_merge($this->bundleConfig, $versionArr);
+		$versions = $this->getRequestParameter(self::VERSIONS_PARAM_NAME);
+		$pattern = '/[^?&,]+=[^?&,]+(?>,[^,?&]+=[^,?&]+)*/'; // key value object
+		preg_match($pattern, $versions, $matches);
+		if ($versions && strlen($matches[0]) === strlen($versions)) { // the whole versions string matches the pattern
+			$versionsArr = $this->toAssociativeArray($versions);
+			$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
 		}
 	}
 	
@@ -434,7 +436,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 		
 		$this->bundleConfig = json_decode($confVars, true);
-		$this->mergeVersionParamIntoConfig();
+		$this->mergeVersionsParamIntoConfig();
 		$this->setLatestOrBetaVersionNumber();
 		
 		$this->setBundleName();
