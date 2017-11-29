@@ -21,9 +21,7 @@ class KalturaESearchCuePointItem extends KalturaESearchItem
 		'cuePointType',
 	);
 
-	private static $map_dynamic_enum = array(
-		KalturaESearchCuePointFieldName::CUE_POINT_TYPE  => 'KalturaCuePointType'
-	);
+	private static $map_dynamic_enum = array();
 
 	protected function getMapBetweenObjects()
 	{
