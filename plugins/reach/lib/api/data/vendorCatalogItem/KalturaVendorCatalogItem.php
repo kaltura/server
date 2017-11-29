@@ -15,7 +15,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
 	 */
 	public $partnerId;
 	

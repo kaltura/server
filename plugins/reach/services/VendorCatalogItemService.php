@@ -15,8 +15,8 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-//		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
-//			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
+		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
 		if(!in_array($this->actionName, array('listTemplates', 'clone')))
 			$this->applyPartnerFilterForClass('vendorCatalogItem');
@@ -33,7 +33,7 @@ class VendorCatalogItemService extends KalturaBaseService
 				return '0';
 			case 'listTemplates':
 				return '0';
-			case 'listByPartner':
+			case 'list':
 				return $this->partnerGroup . ',0';
 		}
 		
@@ -235,50 +235,5 @@ class VendorCatalogItemService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 		
 		return $filter->getTypeListTemplatesResponse($pager, $this->getResponseProfile());
-	}
-	
-	/**
-	 * @action listByPartner
-	 * @param KalturaPartnerFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaVendorCatalogItemListResponse
-	 */
-	public function listByPartnerAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$c = new Criteria();
-		
-		if (!is_null($filter)) {
-			
-			$partnerFilter = new partnerFilter();
-			$filter->toObject($partnerFilter);
-			$partnerFilter->set('_gt_id', -1);
-			
-			$partnerCriteria = new Criteria();
-			$partnerFilter->attachToCriteria($partnerCriteria);
-			$partnerCriteria->setLimit(1000);
-			$partnerCriteria->clearSelectColumns();
-			$partnerCriteria->addSelectColumn(PartnerPeer::ID);
-			$stmt = VendorCatalogItemPeer::doSelectStmt($partnerCriteria);
-			
-			if ($stmt->rowCount() < 1000) // otherwise, it's probably all partners
-			{
-				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-				$c->add(VendorCatalogItemPeer::PARTNER_ID, $partnerIds, Criteria::IN);
-			}
-		}
-		
-		if (is_null($pager))
-			$pager = new KalturaFilterPager();
-		
-		$c->addDescendingOrderByColumn(VendorCatalogItemPeer::CREATED_AT);
-		
-		$totalCount = VendorCatalogItemPeer::doCount($c);
-		$pager->attachToCriteria($c);
-		$list = VendorCatalogItemPeer::doSelect($c);
-		
-		$response = new KalturaVendorCatalogItemListResponse();
-		$response->objects = KalturaVendroCatalogItemArray::fromDbArray($list, $this->getResponseProfile());
-		$response->totalCount = $totalCount;
-		return $response;
 	}
 }
