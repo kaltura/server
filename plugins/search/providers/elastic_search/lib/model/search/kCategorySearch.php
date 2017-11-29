@@ -7,6 +7,7 @@
 class kCategorySearch extends kBaseSearch
 {
     const PEER_NAME = 'categoryPeer';
+    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKs';
 
     public function __construct()
     {
@@ -36,6 +37,11 @@ class kCategorySearch extends kBaseSearch
     function getPeerName()
     {
         return self::PEER_NAME;
+    }
+
+    public function getPeerRetrieveFunctionName()
+    {
+        return self::PEER_RETRIEVE_FUNCTION_NAME;
     }
 
 }

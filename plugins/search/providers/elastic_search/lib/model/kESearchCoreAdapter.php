@@ -27,10 +27,10 @@ class kESearchCoreAdapter
 		'cue_points' => ESearchItemDataType::CUE_POINTS
 	);
 
-	public static function transformElasticToCoreObject($elasticResults, $peerName)
+	public static function transformElasticToCoreObject($elasticResults, $peerName, $peerRetrieveFunctionName)
 	{
 		list($objectData, $objectOrder, $objectCount, $objectHighlight) = self::getElasticResultAsArray($elasticResults);
-		$objects = $peerName::retrieveByPKsNoFilter(array_keys($objectData));
+		$objects = $peerName::$peerRetrieveFunctionName(array_keys($objectData));
 		$coreResults = self::getCoreESearchResults($objects, $objectData, $objectOrder, $objectHighlight);
 		return array($coreResults, $objectCount);
 	}

@@ -7,6 +7,7 @@ class kEntrySearch extends kBaseSearch
 {
 
     const PEER_NAME = 'entryPeer';
+    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKsNoFilter';
 
     protected $isInitialized;
     private $entryEntitlementQuery;
@@ -104,9 +105,14 @@ class kEntrySearch extends kBaseSearch
         $this->isInitialized = true;
     }
 
-    function getPeerName()
+    public function getPeerName()
     {
         return self::PEER_NAME;
+    }
+
+    public function getPeerRetrieveFunctionName()
+    {
+        return self::PEER_RETRIEVE_FUNCTION_NAME;
     }
 
     protected function initDisplayInSearch($objectId)

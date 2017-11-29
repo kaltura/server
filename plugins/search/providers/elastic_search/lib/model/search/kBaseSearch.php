@@ -25,6 +25,8 @@ abstract class kBaseSearch
 
     public abstract function getPeerName();
 
+	public abstract function getPeerRetrieveFunctionName();
+
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
