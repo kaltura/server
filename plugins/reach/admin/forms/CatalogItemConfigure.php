@@ -16,7 +16,6 @@ class Form_CatalogItemConfigure extends Infra_Form
 		parent::__construct();
 	}
 
-
 	public function init()
 	{
 		$this->setAttrib('id', 'frmCatalogItemConfigure');
@@ -40,6 +39,13 @@ class Form_CatalogItemConfigure extends Infra_Form
 			'filters' 		=> array('StringTrim'),
 			'placement' => 'prepend',
 			'readonly'		=> true,
+		));
+
+		$this->addElement('text', 'vendorPartnerId', array(
+			'label' 		=> 'Vendor Partner ID:',
+			'required'		=> true,
+			'filters'		=> array('StringTrim'),
+			'placement' => 'prepend',
 		));
 
 		$this->addElement('text', 'name', array(
@@ -152,6 +158,5 @@ class Form_CatalogItemConfigure extends Infra_Form
 		$catalogItem->partnerId = null;
 		$catalogItem->createdAt = null;
 		$catalogItem->updatedAt = null;
-		$catalogItem->serviceType = null;
 	}
 }

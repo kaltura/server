@@ -73,7 +73,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 			$obj = new stdClass();
 			$obj->id = $template->id;
 			$obj->systemName = $template->systemName;
-//			$obj->serviceFeature = $template->serviceFeature; // Caption or Translation
+			$obj->serviceFeature = $template->serviceFeature; // Caption or Translation
 			$obj->serviceFeature = "CAPTIONS"; // Caption or Translation
 			$obj->serviceType = $template->serviceType; // Human Or machine
 			$obj->turnAroundTime = $template->turnAroundTime; // TurnAroundTime

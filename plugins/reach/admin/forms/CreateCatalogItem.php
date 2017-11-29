@@ -63,7 +63,7 @@ class Form_CreateCatalogItem extends Infra_Form
 		$this->addElement('button', 'newCatalogItem', array(
 			'ignore' => true,
 			'label' => 'Create New',
-			'onclick' => "addNewCatalogItem($('#newPartnerId').val(), $('#newCatalogItemType').val())",
+			'onclick' => "addNewCatalogItem($('#newPartnerId').val(), $('#cloneTemplateServiceFeature').val())",
 			'decorators' => array('ViewHelper'),
 		));
 	}

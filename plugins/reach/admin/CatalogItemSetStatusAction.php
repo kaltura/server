@@ -28,13 +28,6 @@ class CatalogItemSetStatusAction extends KalturaApplicationPlugin
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
-//		$catalogItem = CatalogItemUtils::getCatalogItemById($catalogItemId);
-//		if ($catalogItem )
-//		{
-//			$class = get_class($catalogItem);
-//			$updatedCatalogItem = new $class();
-//			$updatedCatalogItem->status = $newStatus;
-//		}
 		try
 		{
 			if  ( $newStatus == Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED )

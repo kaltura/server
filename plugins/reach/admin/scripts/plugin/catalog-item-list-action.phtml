@@ -9,6 +9,7 @@
 			<th><?php echo $this->translate('Status'); ?></th>
 			<th><?php echo $this->translate('Name'); ?></th>
 			<th><?php echo $this->translate('Publisher ID'); ?></th>
+			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
 			<th><?php echo $this->translate('Type'); ?></th>
 			<th><?php echo $this->translate('System Name'); ?></th>
 			<th><?php echo $this->translate('Creation Date'); ?></th>
@@ -30,6 +31,7 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
 				<td><?php echo $catalogItem->name; ?></td>
 				<td><?php echo $catalogItem->partnerId; ?></td>
+				<td><?php echo $catalogItem->vendorPartnerId; ?></td>
 				<td><?php $a= $catalogItem->getKalturaObjectType(); $a = str_replace('KalturaVendor', '', $a); $a = str_replace('CatalogItem', '', $a); echo $a ?></td>
 				<td><?php echo $catalogItem->systemName; ?></td>
 				<td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
@@ -208,10 +210,10 @@
 			return;
 		}
 
-//		if(!catalogItemType || catalogItemType.length){
-//			alert('<?php //echo $this->translate('Catalog item type not supplied'); ?>//');
-//			return;
-//		}
+		if(!catalogItemType || !catalogItemType.length || catalogItemType == 'NONE'){
+			alert('<?php echo $this->translate('Catalog item type not supplied'); ?>');
+			return;
+		}
 
 		var paramsStr = '/new_partner_id/' + partnerId + '/new_catalog_item_type/' + catalogItemType;
 
@@ -231,7 +233,7 @@
 
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + catalogItemIdStr;
 
-		jQuery('#catalog-item-configure-dialog1').remove();
+		jQuery('#catalog-item-configure-dialog').remove();
 		dialogDiv = jQuery('<div id="catalog-item-configure-dialog1"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 
 		dialogDiv.dialog({
@@ -243,8 +245,6 @@
 			title: '<?php echo $this->translate('Catalog Item'); ?>',
 			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function() {
-					jQuery('.ui-widget-overlay').css('z-index', 1003 );
-					jQuery('#loader').show();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -280,18 +280,18 @@
 			return;
 		}
 
-		var paramsStr1 = '/new_partner_id/' + partnerId + '/clone_template_id1/' + cloneTemplateId;
+		var paramsStr1 = '/new_partner_id/' + partnerId + '/clone_template_id/' + cloneTemplateId;
 
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + paramsStr1;
 
-		jQuery('#clone-dialog').remove();
-		dialogDiv = jQuery('<div id="clone-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+		jQuery('#catalog-item-configure-dialog').remove();
+		dialogDiv = jQuery('<div id="catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 
 		dialogDiv.dialog({
 			bgiframe: true,
 			modal: true,
 			resizable: false,
-			width: 900,
+			width: 600,
 			height: 600,
 			title: '<?php echo $this->translate('Catalog Item Template Setup Configuration'); ?>',
 			buttons: {
@@ -299,7 +299,6 @@
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
-					jQuery(this).find('#frmEventNotificationTemplateConfig').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
 					jQuery(this).dialog('close');
@@ -364,30 +363,24 @@
 	}
 
 	function loadCatalogItemSuccess(html) {
-
-			jQuery('.ui-widget-overlay').css('z-index', 1003 );
-			jQuery('#loader').hide();
-			jQuery('#frmCatalogItemConfigure').replaceWith(html);
-			jQuery('#frmCatalogItemConfigure').ajaxForm({
-				success: loadCatalogItemSuccess,
-				iframe: true
-			});
+		if (jQuery(html).filter('#frmCatalogItemConfigure').hasClass('valid'))
+		{
+			dialogDiv.dialog('close');
+			if (jQuery('#frmPaginator1').length){
+				jQuery('#frmPaginator1').submit();
+			}
+			else {
+				jQuery('#frmPartnerIdFilter').submit();
+			}
 		}
-//		if (jQuery(html).filter('#frmCatalogItemConfigure').hasClass('valid'))
-//		{
-//			dialogDiv.dialog('close');
-//			if (jQuery('#frmPaginator1').length){
-//				jQuery('#frmPaginator1').submit();
-//			}
-//			else {
-//				jQuery('#frmPartnerIdFilter').submit();
-//			}
-//		}
-//		jQuery('#frmCatalogItemConfigure').replaceWith(html);
-//		jQuery('#frmCatalogItemConfigure').ajaxForm({
-//			success: loadCatalogItemSuccess,
-//			iframe: true
-//		});
+		jQuery('.ui-widget-overlay').css('z-index', 1000 );
+		jQuery('#loader').hide();
+		jQuery('#frmCatalogItemConfigure').replaceWith(html);
+		jQuery('#frmCatalogItemConfigure').ajaxForm({
+			success: loadCatalogItemSuccess,
+			iframe: true
+		});
+	}
 
 	function replaceCatalogPricingForm() {
 
@@ -407,8 +400,6 @@
 	}
 
 	jQuery('#catalogItemPricing-objectType').change(replaceCatalogPricingForm);
-
-
 
 
 </script>

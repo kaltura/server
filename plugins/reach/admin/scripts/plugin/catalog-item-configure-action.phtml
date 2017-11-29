@@ -1,21 +1,17 @@
+
 <?php if($this->errMessage): ?>
 	<div class="error"><?php echo $this->errMessage ?></div><br/>
 <?php endif; ?>
 
-<?php
-$this->form->setAction($this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction')));
-echo $this->form;
-?>
+<?php echo $this->form ?>
 
 <script type="text/javascript">
 
 	jQuery(function() {
 		<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
-		jQuery('#frmPaginator1').submit();
+		jQuery('#frmCatalogItemConfigure').submit();
 		<?php endif; ?>
 	});
 
 </script>
-
-
