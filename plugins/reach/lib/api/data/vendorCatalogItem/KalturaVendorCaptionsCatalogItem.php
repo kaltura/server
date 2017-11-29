@@ -11,9 +11,9 @@ class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 	public $sourceLanguages;
 	
 	/**
-	 * @var KalturaVendorCatalogItemOutputFormat
+	 * @var KalturaOutputFormatArray
 	 */
-	public $outputFormat;
+	public $outputFormats;
 
 	/**
 	 * @var KalturaNullableBoolean

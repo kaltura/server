@@ -10,8 +10,6 @@ class VendorCatalogItemFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",
-			"_eq_partner_id",
-			"_in_partner_id",
 			"_eq_vendor_partner_id",
 			"_in_vendor_partner_id",
 			"_gte_created_at",

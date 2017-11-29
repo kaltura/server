@@ -10,8 +10,6 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
-		"partnerIdEqual" => "_eq_partner_id",
-		"partnerIdIn" => "_in_partner_id",
 		"vendorPartnerIdEqual" => "_eq_vendor_partner_id",
 		"vendorPartnerIdIn" => "_in_vendor_partner_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -54,16 +52,6 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $idIn;
-
-	/**
-	 * @var int
-	 */
-	public $partnerIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $partnerIdIn;
 
 	/**
 	 * @var int

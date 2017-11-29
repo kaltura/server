@@ -21,7 +21,7 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 	}
 	
 	const CUSTOM_DATA_SOURCE_LANGUAGES = "source_languages";
-	const CUSTOM_DATA_OUTPUT_FORMAT = "output_format";
+	const CUSTOM_DATA_OUTPUT_FORMATS = "output_formats";
 	const CUSTOM_DATA_ENABLE_SPEAKER_ID = "enable_speaker_id";
 	const CUSTOM_DATA_FIXED_PRICE_ADDONS = "fixed_price_addons";
 	
@@ -30,9 +30,9 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		$this->putInCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGES, serialize($sourceLanguages));
 	}
 	
-	public function setOutputFormat($outPutFormat)
+	public function setOutputFormats($outPutFormats)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_OUTPUT_FORMAT, $outPutFormat);
+		$this->putInCustomData(self::CUSTOM_DATA_OUTPUT_FORMATS, serialize($outPutFormats));
 	}
 	
 	public function setEnableSpeakerId($enableSpeakerId)
@@ -53,9 +53,12 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		return $languages;
 	}
 	
-	public function getOutputFormat()
+	public function getOutputFormats()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_OUTPUT_FORMAT);
+		$outputFormats = $this->getFromCustomData(self::CUSTOM_DATA_OUTPUT_FORMATS);
+		if($outputFormats)
+			$outputFormats = unserialize($outputFormats);
+		return $outputFormats;
 	}
 	
 	public function getEnableSpeakerId()
