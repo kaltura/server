@@ -151,6 +151,7 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 					return;
 				}
 				
+				$sourceEntryId = $sourceEntry->getId();
 				$captionAssets = assetPeer::retrieveByEntryId($sourceEntryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 				if(!count($captionAssets))
 				{
