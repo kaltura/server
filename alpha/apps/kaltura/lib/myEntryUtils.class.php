@@ -817,7 +817,7 @@ class myEntryUtils
 					$calc_vid_sec = $entry->getBestThumbOffset();
 				}
 					
-				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}_dimension_{$width}_{$height}";
+				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
@@ -836,7 +836,7 @@ class myEntryUtils
 					if($multi && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldBeCaptureByPackagerOnly ? array($width, $height) : array(null, null);
-						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
 						if(!$success)
 							$packagerRetries--;
 						else
@@ -2094,8 +2094,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		//check if all null or 0
 		$canBeHandle = (count(array_filter($params)) == 0);
 		// check if only one dimension is given or type 5 (stretches to the exact dimensions)
-		$validDimension = ($type == 5) || (count(array_filter($dimension)) == 1);
-		return ($canBeHandle && $validDimension);
+		$positiveDimension = array_filter($dimension, function ($v) {return $v > 0;});
+		$validDimension = ($type == 5) || (count($positiveDimension) == 1);
+		//return ($canBeHandle && $validDimension);
+		return false;
 	}
 
 
