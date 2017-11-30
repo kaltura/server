@@ -787,6 +787,9 @@ class myEntryUtils
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+			$cropParams = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+			$shouldBeCaptureByPackagerOnly = self::canBeHandleByPackagerAlone($cropParams, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -814,7 +817,7 @@ class myEntryUtils
 					$calc_vid_sec = $entry->getBestThumbOffset();
 				}
 					
-				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
+				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}_dimension_{$width}_{$height}";
 				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
@@ -832,7 +835,8 @@ class myEntryUtils
 					$success = false;
 					if($multi && $packagerRetries)
 					{
-						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
+						list($picWidth, $picHeight) = $shouldBeCaptureByPackagerOnly ? array($width, $height) : array(null, null);
+						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
 						if(!$success)
 							$packagerRetries--;
 						else
@@ -875,8 +879,6 @@ class myEntryUtils
 
 			kFile::fullMkdir($processingThumbPath);
 
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			$shouldBeCaptureByPackagerOnly = self::canBeHandleByPackager(array($density, $quality, $forceRotation));
 			if ($thumbCaptureByPackager && $shouldBeCaptureByPackagerOnly)
 			{
 				$convertedImagePath = $orig_image_path;
@@ -919,7 +921,7 @@ class myEntryUtils
 				imagedestroy($srcIm);
 				++$vid_slice;
 			}
-			
+
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
@@ -2087,10 +2089,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $content;
 	}
 
-	private static function canBeHandleByPackager($params)
+	private static function canBeHandleByPackagerAlone($params, $type, $dimension)
 	{
 		//check if all null or 0
-		return (count(array_filter($params)) == 0);
+		$canBeHandle = (count(array_filter($params)) == 0);
+		// check if only one dimension is given or type 5 (stretches to the exact dimensions)
+		$validDimension = ($type == 5) || (count(array_filter($dimension)) == 1);
+		return ($canBeHandle && $validDimension);
 	}
 
 
