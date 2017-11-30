@@ -340,11 +340,13 @@ class embedPlaykitJsAction extends sfAction
 	{
 		//Get version from QS
 		$versions = $this->getRequestParameter(self::VERSIONS_PARAM_NAME);
-		$pattern = '/[^?&,]+=[^?&,]+(?>,[^,?&]+=[^,?&]+)*/'; // key value object
-		preg_match($pattern, $versions, $matches);
-		if ($versions && strlen($matches[0]) === strlen($versions)) { // the whole versions string matches the pattern
-			$versionsArr = $this->toAssociativeArray($versions);
-			$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
+		if ($versions) {
+			$pattern = '/[^?&,]+=[^?&,]+(?>,[^,?&]+=[^,?&]+)*/'; // key value object
+			$success = preg_match($pattern, $versions, $matches);
+			if ($success && strlen($matches[0]) === strlen($versions)) { // the whole versions string matches the pattern
+				$versionsArr = $this->toAssociativeArray($versions);
+				$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
+			}
 		}
 	}
 	
