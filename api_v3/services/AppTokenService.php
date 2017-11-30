@@ -109,7 +109,21 @@ class AppTokenService extends KalturaBaseService
 		
 		if(!$pager)
 			$pager = new KalturaFilterPager();
-		
+
+
+		if ($filter->sessionUserIdEqual)
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid ($this->getPartnerId() , $filter->sessionUserIdEqual );
+			if($kuser)
+				$this->kUserIdEqual = $kuser->getId();
+			else
+			{
+				$response = new KalturaAppTokenListResponse();
+				$response->totalCount = 0;
+				return $response;
+			}
+		}
+
 		$c = new Criteria();
 		$appTokenFilter = $filter->toObject();
 		$appTokenFilter->attachToCriteria($c);

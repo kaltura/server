@@ -6,9 +6,9 @@
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
-	 * @var string
+	 * @var KalturaFileContainer
 	 */
-	public $srcFileSyncLocalPath;
+	public $fileContainer;
 	
 	/**
 	 * The translated path as used by the scheduler
@@ -48,7 +48,7 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 	
 	private static $map_between_objects = array
 	(
-		"srcFileSyncLocalPath" ,
+		"fileContainer" ,
 		"actualSrcFileSyncLocalPath" ,
 		"srcFileSyncRemoteUrl" ,
 		"thumbParamsOutputId" ,

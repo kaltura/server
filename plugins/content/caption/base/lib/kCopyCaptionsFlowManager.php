@@ -128,6 +128,14 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 				KalturaLog::debug("Didn't copy captions for entry [{$destEntry->getId()}] because source entry [" . $sourceEntryId . "] wasn't found");
 				return;
 			}
+			
+			$captionAssets = assetPeer::retrieveByEntryId($sourceEntryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+			if(!count($captionAssets))
+			{
+				KalturaLog::debug("No captions found on source entry [" . $sourceEntryId . "], no need to run copy captions job");
+				return;
+			}
+			
 			$jobData->setOffset(0);
 			$jobData->setDuration($sourceEntry->getLengthInMsecs());
 			$jobData->setFullCopy(true);
@@ -140,6 +148,14 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 				if (is_null($sourceEntry))
 				{
 					KalturaLog::info("Didn't copy captions for entry [{$destEntry->getId()}] because source entry [" . $destEntry->getSourceEntryId() . "] wasn't found");
+					return;
+				}
+				
+				$sourceEntryId = $sourceEntry->getId();
+				$captionAssets = assetPeer::retrieveByEntryId($sourceEntryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+				if(!count($captionAssets))
+				{
+					KalturaLog::debug("No captions found on source entry [" . $sourceEntryId . "], no need to run copy captions job");
 					return;
 				}
 

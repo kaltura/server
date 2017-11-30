@@ -11,8 +11,14 @@ class VoicebaseClientHelper
 	
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;
+
+    /**
+     * @var array
+     * Property contains additional parameters to be dispatched to VoiceBase, grouped by action name.
+     */
+	private $additionalParams = array();
 	
-	public function __construct($apiKey, $apiPassword)
+	public function __construct($apiKey, $apiPassword, $additionalParams = null)
 	{
 		$voicebaseParamsMap = kConf::get('voicebase','integration');
 		$this->supportedLanguages = $voicebaseParamsMap['languages'];
@@ -23,6 +29,11 @@ class VoicebaseClientHelper
 		
 		$url = $this->addUrlParams($url, $params, true);
 		$this->baseEndpointUrl = $url;
+
+		if ($additionalParams)
+		{
+			$this->additionalParams = $additionalParams;
+		}
 	}
 	
 	public function checkExistingExternalContent($entryId)
@@ -58,7 +69,12 @@ class VoicebaseClientHelper
 						"externalID" => $entryId, 
 						"lang" => $spokenLanguage
 						);
-	
+
+		if (isset($this->additionalParams["uploadMedia"]))
+		{
+			$params = array_merge($params, $this->additionalParams["uploadMedia"]);
+		}
+
 		$postParams = array("mediaURL" => $flavorUrl);
 		if($fileLocation)
 		{
@@ -123,6 +139,12 @@ class VoicebaseClientHelper
 	public function updateRemoteTranscript($entryId, $transcriptContent, $callBack)
 	{
 		$params = array("action" => "updateTranscript", "externalID" => $entryId);
+
+		if (isset($this->additionalParams["updateTranscript"]))
+		{
+			$params = array_merge($params, $this->additionalParams["updateTranscript"]);
+		}
+
 		$updateTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 
 		$transcriptContent = $this->getFile($transcriptContent);

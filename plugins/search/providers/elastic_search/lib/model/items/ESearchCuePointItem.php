@@ -3,9 +3,12 @@
  * @package plugins.elasticSearch
  * @subpackage model.items
  */
-class ESearchCuePointItem extends ESearchItem
+class ESearchCuePointItem extends ESearchNestedObjectItem
 {
-	const DEFAULT_INNER_HITS_SIZE = 10;
+
+	const INNER_HITS_CONFIG_KEY = 'cuePointsInnerHitsSize';
+	const NESTED_QUERY_PATH = 'cue_points';
+	const HIGHLIGHT_CONFIG_KEY = 'cuepointMaxNumberOfFragments';
 
 	/**
 	 * @var ESearchCuePointFieldName
@@ -75,28 +78,21 @@ class ESearchCuePointItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function getType()
-	{
-		return 'cuepoint';
-	}
-
 	public static function getAllowedSearchTypesForField()
 	{
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
+	/**
+	 * @param $eSearchItemsArr
+	 * @param $boolOperator
+	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param null $eSearchOperatorType
+	 * @return array
+	 */
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsSize = isset($innerHitsConfig['cuePointsInnerHitsSize']) ? $innerHitsConfig['cuePointsInnerHitsSize'] : self::DEFAULT_INNER_HITS_SIZE;
-		$cuePointQuery['nested']['path'] = 'cue_points';
-		$cuePointQuery['nested']['inner_hits'] = array('size' => $innerHitsSize, '_source' => true);
-		$allowedSearchTypes = ESearchCuePointItem::getAllowedSearchTypesForField();
-		foreach ($eSearchItemsArr as $cuePointSearchItem)
-		{
-			self::createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, $cuePointQuery, $allowedSearchTypes, $queryAttributes);
-		}
-		return array($cuePointQuery);
+		return self::createNestedQueryForItems($eSearchItemsArr, $boolOperator, $queryAttributes);
 	}
 
 	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointQuery, $allowedSearchTypes, &$queryAttributes)
@@ -106,7 +102,7 @@ class ESearchCuePointItem extends ESearchItem
 		{
 			case ESearchItemType::EXACT_MATCH:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExactMatchQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getExactMatchQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
@@ -114,15 +110,15 @@ class ESearchCuePointItem extends ESearchItem
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getPrefixQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getPrefixQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExistsQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getExistsQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
 				$cuePointQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getRangeQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes);
+					kESearchQueryManager::getRangeQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$cuePointSearchItem->getItemType()."]");
@@ -130,13 +126,6 @@ class ESearchCuePointItem extends ESearchItem
 
 		if($boolOperator == 'should')
 			$cuePointQuery['nested']['query']['bool']['minimum_should_match'] = 1;
-	}
-
-	protected function validateItemInput()
-	{
-		$allowedSearchTypes = self::getAllowedSearchTypesForField();
-		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
-		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
 	}
 
 	public function shouldAddLanguageSearch()

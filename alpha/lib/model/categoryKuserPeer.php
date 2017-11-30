@@ -225,6 +225,9 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		
 		$c =  KalturaCriteria::create(categoryKuserPeer::OM_CLASS); 
 		$c->addAnd ( categoryKuserPeer::STATUS, array(CategoryKuserStatus::DELETED), Criteria::NOT_IN);
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if($partnerId)
+			$c->add(categoryKuserPeer::PARTNER_ID,$partnerId);
 
 		self::$s_criteria_filter->setFilter($c);
 	}

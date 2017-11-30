@@ -310,20 +310,27 @@ class KDLMediaDataSet  {
 			}
 			else
 				$valsArr["videoFormat"]="undefined";
-			$valsArr["videoDuration"]=$obj->_duration;
-			$valsArr["videoBitRate"]=$obj->_bitRate;
-			$valsArr["videoWidth"]=$obj->_width;
-			$valsArr["videoHeight"]=$obj->_height;
-			$valsArr["videoFrameRate"]=$obj->_frameRate;
-			$valsArr["videoDar"]=$obj->_dar;
-			$valsArr["videoRotation"]=$obj->_rotation;
-			$valsArr["scanType"]=$obj->_scanType;
-			$valsArr["contentAwareness"]=$obj->_contentAwareness;
-			$valsArr["videoGop"]=$obj->_gop;
+			if(isset($obj->_duration))	$valsArr["videoDuration"]=$obj->_duration;
+			if(isset($obj->_bitRate))	$valsArr["videoBitRate"]=$obj->_bitRate;
+			if(isset($obj->_width))		$valsArr["videoWidth"]=$obj->_width;
+			if(isset($obj->_height))	$valsArr["videoHeight"]=$obj->_height;
+			if(isset($obj->_frameRate))	$valsArr["videoFrameRate"]=$obj->_frameRate;
+			if(isset($obj->_dar))		$valsArr["videoDar"]=$obj->_dar;
+			if(isset($obj->_rotation))	$valsArr["videoRotation"]=$obj->_rotation;
+			if(isset($obj->_scanType))	$valsArr["scanType"]=$obj->_scanType;
+			if(isset($obj->_contentAwareness)) $valsArr["contentAwareness"]=$obj->_contentAwareness;
+			if(isset($obj->_gop))		$valsArr["videoGop"]=$obj->_gop;
 		}
 			/*
 			 * Set audio related fields
 			 */
+                $valsArr["audioFormat"]="undefined";
+                $valsArr["audioDuration"]=0;
+                $valsArr["audioBitRate"]=0;
+                $valsArr["audioChannels"]=0;
+                $valsArr["audioSamplingRate"]=0;
+                $valsArr["audioResolution"]=0;
+                $valsArr["audioStreams"]=0;
 		if(isset($this->_audio) && $this->_audio->IsDataSet()){
 			$obj = $this->_audio;
 			$valsArr["audioFormat"]=$obj->GetIdOrFormat();
@@ -347,25 +354,16 @@ class KDLMediaDataSet  {
 			}
 			else
 				$valsArr["audioFormat"]="undefined";
-			$valsArr["audioDuration"]=$obj->_duration;
-			$valsArr["audioBitRate"]=$obj->_bitRate;
-			$valsArr["audioChannels"]=$obj->_channels;
-			$valsArr["audioSampleRate"]=$obj->_sampleRate;
-			$valsArr["audioResolution"]=$obj->_resolution;
+			if(isset($obj->_duration))	$valsArr["audioDuration"]=$obj->_duration;
+			if(isset($obj->_bitRate))	$valsArr["audioBitRate"]=$obj->_bitRate;
+			if(isset($obj->_channels))	$valsArr["audioChannels"]=$obj->_channels;
+			if(isset($obj->_sampleRate))	$valsArr["audioSampleRate"]=$obj->_sampleRate;
+			if(isset($obj->_resolution))	$valsArr["audioResolution"]=$obj->_resolution;
 			if(isset($this->_contentStreams->audio)) {
 				$valsArr["audioStreams"]=count($this->_contentStreams->audio);
 			}
 			else 
 				$valsArr["audioStreams"]=0;
-		}
-		else {
-			$valsArr["audioFormat"]="undefined";
-			$valsArr["audioDuration"]=0;
-			$valsArr["audioBitRate"]=0;
-			$valsArr["audioChannels"]=0;
-			$valsArr["audioSamplingRate"]=0;
-			$valsArr["audioResolution"]=0;
-			$valsArr["audioStreams"]=0;			
 		}
 			/*
 			 * Check 'isWeb' and 'isMbr' presets

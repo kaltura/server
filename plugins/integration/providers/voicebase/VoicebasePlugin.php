@@ -122,9 +122,9 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 		return kPluginableEnumsManager::apiToCore('TranscriptProviderType', $value);
 	}
 	
-	public static function getClientHelper($apiKey, $apiPassword)
+	public static function getClientHelper($apiKey, $apiPassword, $additionalParams = null)
 	{
-		return new VoicebaseClientHelper($apiKey, $apiPassword);
+		return new VoicebaseClientHelper($apiKey, $apiPassword, $additionalParams);
 	}
 	
 	/**

@@ -24,25 +24,27 @@ class kEntrySearch extends kBaseSearch
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(),kPager $pager = null, ESearchOrderBy $order = null)
+    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight= true)
     {
 	    kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
-        $this->initQuery($entriesStatus, $pager, $order);
+        $this->initQuery($entriesStatus, $objectId, $pager, $order, $useHighlight);
         $this->initEntitlement();
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_ENTRY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
         $statuses = $this->initEntryStatuses($statuses);
-        parent::initQuery($statuses, $pager, $order);
+        $this->initDisplayInSearch($objectId);
+        parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
+
     }
 
     protected function initEntryStatuses($statuses)
@@ -75,34 +77,23 @@ class kEntrySearch extends kBaseSearch
 
         if(kEntryElasticEntitlement::$parentEntitlement)
         {
-            //create parent entry part
-            $this->query['body']['query']['bool']['filter'][1]['bool']['should'][0]['bool']['filter'] = array(
-                array(
-                    'exists' => array(
-                        'field'=> 'parent_id'
-                    )
-                )
-            );
+            $entitlementQueryPath = &$this->query['body']['query']['bool']['filter'][];
+            //Validate that parent entry property exist
+            $entitlementQueryPath['bool']['should'][0]['bool']['filter'][]['exists']['field'] = 'parent_id';
 
             //assign by reference to create name alias
-            $this->parentEntryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool']['should'][0]['bool'];
+            $this->parentEntryEntitlementQuery = &$entitlementQueryPath['bool']['should'][0]['bool'];
 
-            //create entry part
-            $this->query['body']['query']['bool']['filter'][1]['bool']['should'][1]['bool']['must_not'] = array(
-                array(
-                    'exists' => array(
-                        'field'=> 'parent_id'
-                    )
-                )
-            );
+            //Validate that parent entry property does not exist
+            $entitlementQueryPath['bool']['should'][1]['bool']['must_not'][]['exists']['field'] = 'parent_id';
             //assign by reference to create name alias
-            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool']['should'][1]['bool'];
-            $this->query['body']['query']['bool']['filter'][1]['bool']['minimum_should_match'] = 1;
+            $this->entryEntitlementQuery = &$entitlementQueryPath['bool']['should'][1]['bool'];
+            $entitlementQueryPath['bool']['minimum_should_match'] = 1;
         }
         else
         {
             //entry query - assign by reference to create name alias
-            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][1]['bool'];
+            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][]['bool'];
         }
         $this->isInitialized = true;
     }
@@ -110,6 +101,21 @@ class kEntrySearch extends kBaseSearch
     function getPeerName()
     {
         return self::PEER_NAME;
+    }
+
+    protected function initDisplayInSearch($objectId)
+    {
+        if($objectId)
+            return;
+
+        //add display in search to filter
+        $this->query['body']['query']['bool']['filter'][] = array(
+            'bool' => array(
+                'must_not' => array(
+                    'term' => array('display_in_search' => EntryDisplayInSearchType::SYSTEM)
+                )
+            )
+        );
     }
 
 }

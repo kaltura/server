@@ -6,9 +6,9 @@
 class kCaptureThumbJobData extends kJobData
 {
 	/**
-	 * @var string
+	 * @var FileContainer
 	 */
-	private $srcFileSyncLocalPath;
+	private $fileContainer;
 	
 	/**
 	 * The translated path as used by the scheduler
@@ -117,11 +117,11 @@ class kCaptureThumbJobData extends kJobData
 	}
 
 	/**
-	 * @return the $srcFileSyncLocalPath
+	 * @return FileContainer $fileContainer
 	 */
-	public function getSrcFileSyncLocalPath()
+	public function getFileContainer()
 	{
-		return $this->srcFileSyncLocalPath;
+		return $this->fileContainer;
 	}
 	
 	/**
@@ -149,11 +149,11 @@ class kCaptureThumbJobData extends kJobData
 	}
 
 	/**
-	 * @param $srcFileSyncLocalPath the $srcFileSyncLocalPath to set
+	 * @param FileContainer $fileContainer
 	 */
-	public function setSrcFileSyncLocalPath($srcFileSyncLocalPath)
+	public function setFileContainer($fileContainer)
 	{
-		$this->srcFileSyncLocalPath = $srcFileSyncLocalPath;
+		$this->fileContainer = $fileContainer;
 	}
 
 	/**

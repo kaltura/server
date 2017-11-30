@@ -41,11 +41,6 @@ class kElasticUserEntitlementCondition extends kElasticBaseEntitlementCondition
             ),
             array(
                 'term' => array(
-                    "{$fieldPrefix}creator_kuser_id" => $params['kuserId']
-                )
-            ),
-            array(
-                'term' => array(
                     "{$fieldPrefix}kuser_id" => $params['kuserId']
                 )
             )

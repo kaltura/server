@@ -60,13 +60,17 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			
 			$url .= ($entryVersion ? "/v/$entryVersion" : '') .
 				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '');
-			$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
+			if(!($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+				$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
 		}
 		else
 		{
 			$url .= $this->getFlavorVersionString($flavorAsset);
 			$url .= '/flavorId/' . $flavorAsset->getId();
 		}
+
+		if (($entry->getType() == entryType::PLAYLIST) && ($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+			$url .= '/captions/' . $flavorAsset->getLanguage();
 
 		$url .= $this->params->getUrlParams();
 		return $url;
@@ -356,7 +360,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			{
 				return 1;
 			}
-			else 
+			else
 			{
 				return -1;
 			}
@@ -455,13 +459,6 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function sortFlavors($flavors)
 	{
-		$i = 0;
-		foreach ($flavors as &$currFlavor)
-		{
-			$currFlavor['index'] = $i;
-			$i++;
-		}
-		
 		$this->preferredFlavor = null;
 		$minBitrateDiff = PHP_INT_MAX;
 	
@@ -480,8 +477,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				}
 			}
 		}
-			
-		uasort($flavors, array($this,'flavorCmpFunction'));	
+	
+		uasort($flavors, array($this,'flavorCmpFunction'));
+	
 		return $flavors;
 	}
 

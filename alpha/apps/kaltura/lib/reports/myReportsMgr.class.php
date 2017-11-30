@@ -569,7 +569,7 @@ class myReportsMgr
 
 // -------------------------------------------- private -----------------------------------------------// 	
 
-	private static function createUrl ($partner_id, $file_name)
+	static function createUrl ($partner_id, $file_name)
 	{
 		$ksStr = "";
 		$partner = PartnerPeer::retrieveByPK ( $partner_id );
@@ -591,7 +591,7 @@ class myReportsMgr
 		return $url;
 	}
 	
-	private static function createFileName ( $partner_id )
+	static function createFileName ( $partner_id )
 	{
 	$args = func_get_args();
 		$file_name = uniqid();
@@ -941,7 +941,7 @@ class myReportsMgr
 		self::REPORT_TYPE_BROWSERS => 'browsers',
 		self::REPORT_TYPE_LIVE => "live",
 		self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => "top_playback_context",
-		self::REPORT_TYPE_VPAAS_USAGE => "vpaas_usage",
+	    self::REPORT_TYPE_VPAAS_USAGE=> "vpaas_usage",
 	
 	);
 	
@@ -1495,8 +1495,10 @@ class reportsInputFilter
 	public $search_in_admin_tags;
 	public $extra_map;
 	public $categories;
+	public $categoriesIds;
 	public $timeZoneOffset;
 	public $interval;
+	public $countries;
 	
 	public function getFilterBy() {
 		return "";
