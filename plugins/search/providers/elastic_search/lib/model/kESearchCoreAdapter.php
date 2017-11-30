@@ -50,7 +50,7 @@ class kESearchCoreAdapter
 			$objectData[$elasticObject[self::ID_KEY]] = $itemData;
 			$objectOrder[$elasticObject[self::ID_KEY]] = $key;
 			if(array_key_exists(self::HIGHLIGHT_KEY, $elasticObject))
-				$objectHighlight[$elasticObject[self::ID_KEY]] = self::pruneHighlight($elasticObject[self::HIGHLIGHT_KEY]);
+				$objectHighlight[$elasticObject[self::ID_KEY]] = self::elasticHighlightToCoreHighlight($elasticObject[self::HIGHLIGHT_KEY]);
 		}
 		
 		if(isset($elasticResults[self::HITS_KEY][self::TOTAL_KEY]))
@@ -98,7 +98,7 @@ class kESearchCoreAdapter
 				if ($currItemData)
 				{
 					if(array_key_exists(self::HIGHLIGHT_KEY, $itemResult))
-						$itemResult[self::HIGHLIGHT_KEY] = self::pruneHighlight($itemResult[self::HIGHLIGHT_KEY]);
+						$itemResult[self::HIGHLIGHT_KEY] = self::elasticHighlightToCoreHighlight($itemResult[self::HIGHLIGHT_KEY]);
 
 					$currItemData->loadFromElasticHits($itemResult);
 					$itemData[$objectType][self::ITEMS_KEY][] = $currItemData;
@@ -145,12 +145,20 @@ class kESearchCoreAdapter
 		}
 	}
 
-	private static function pruneHighlight($highlight)
+	private static function elasticHighlightToCoreHighlight($eHighlight)
 	{
-		if(isset($highlight))
+		if(isset($eHighlight))
 		{
-			$keys = array_keys($highlight);
-			return $highlight[$keys[0]][0];
+			$result = array();
+			foreach ($eHighlight as $key => $value)
+			{
+				$resultType = new ESearchHighlight();
+				$resultType->setFieldName($key);
+				$resultType->setHits($value);
+				$result[] = $resultType;
+			}
+
+			return $result;
 		}
 
 		return null;
