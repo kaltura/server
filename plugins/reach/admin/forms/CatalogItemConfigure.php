@@ -87,40 +87,31 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$turnAroundTimeForView ->setRequired(true);
 		$turnAroundTimeForView ->setValue(Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT);
 		$this->addElement($turnAroundTimeForView );
-
-//		$sourceLanguage = new Kaltura_Form_Element_EnumSelect('sourceLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
-//		$sourceLanguage  ->setLabel('Source Language:');
-//		$sourceLanguage  ->setRequired(true);
-//		$this->addElement($sourceLanguage);
+		
+		$this->addLine("Pricing Line");
+		$this->addTitle('Pricing:');
+		$pricingSubFor = new Form_VendorCatalogItemPricing();
+		$this->addSubForm($pricingSubFor, "pricing");
 
 		$this->addLine("Languages Line");
-
 		$this->addTitle('Source Languages:');
-
 		$sourceLanguagesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$sourceLanguagesSubForm->addDecorator('ViewScript', array(
 			'viewScript' => 'source-languages-sub-form.phtml',
 		));
 		$this->addSubForm($sourceLanguagesSubForm, 'SourceLanguages_');
-		$innerSourceLanguagesSubForm = new Form_SourceLanguagesSubForm('Kaltura_Client_Type_LanguageItem');
+		$innerSourceLanguagesSubForm = new Form_SourceLanguagesSubForm('Kaltura_Client_Reach_Type_LanguageItem');
 		$this->addSubForm($innerSourceLanguagesSubForm , "SourceLanguageTemplate");
 
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 		{
-//			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
-//			$targetLanguage->setLabel('Target Language:');
-//			$targetLanguage->setRequired(true);
-//			$this->addElement($targetLanguage);
-
 			$this->addTitle('Target Languages:');
-
 			$targetLanguagesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 			$targetLanguagesSubForm->addDecorator('ViewScript', array(
 				'viewScript' => 'target-languages-sub-form.phtml',
 			));
 			$this->addSubForm($targetLanguagesSubForm, 'TargetLanguages_');
-
-			$innerTargetLanguagesSubForm = new Form_TargetLanguagesSubForm('Kaltura_Client_Type_LanguageItem');
+			$innerTargetLanguagesSubForm = new Form_TargetLanguagesSubForm('Kaltura_Client_Reach_Type_LanguageItem');
 			$this->addSubForm($innerTargetLanguagesSubForm , "TargetLanguageTemplate");
 		}
 
@@ -174,7 +165,9 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		}
 
 		$this->setDefault('serviceFeature', $object->serviceFeature);
+		$this->getSubForm("pricing")->populateFromObject($object->pricing);
 		$this->populateSourceLanguages($object);
+		
 	}
 
 	private function populateSourceLanguages($object)
@@ -205,11 +198,12 @@ class Form_CatalogItemConfigure extends ConfigureForm
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
+		
 		$languages = $properties['SourceLanguages'];
 		$languagesArray = array();
 		foreach (json_decode($languages) as $language)
 		{
-			$languageItem = new Kaltura_Client_Type_LanguageItem();
+			$languageItem = new Kaltura_Client_Reach_Type_LanguageItem();
 			$languageItem->language = $language->language;
 			$languagesArray[] = $languageItem;
 		}
@@ -221,7 +215,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$languagesArray = array();
 			foreach (json_decode($languages) as $language)
 			{
-				$languageItem = new Kaltura_Client_Type_LanguageItem();
+				$languageItem = new Kaltura_Client_Reach_Type_LanguageItem();
 				$languageItem->language = $language->language;
 				$languagesArray[] = $languageItem;
 			}

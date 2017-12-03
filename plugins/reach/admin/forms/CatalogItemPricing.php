@@ -3,70 +3,38 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_CatalogItemPricing extends Zend_Form_SubForm
+class Form_VendorCatalogItemPricing extends Zend_Form_SubForm
 {
 	public function init()
 	{
  		$this->setLegend("Catalog Item Pricing");
  		$this->setName("catalogItemPricing");
-
- 		$this->addElement('select', 'objectType', array(
- 				'label'			=> 'Catalog Pricing Type:',
- 				'filters'		=> array('StringTrim'),
- 				'multiOptions'  => array(),
- 		));
-		$this->addElement('text', 'PricePerUnit', array(
-			'label'			=> 'Price Per Unit:',
-			'filters'		=> array('StringTrim'),
-		));		
 		
-		$this->addElement('text', 'PriceFunction', array(
-				'label'			=> 'Price Function:',
-				'filters'		=> array('StringTrim'),
+		$this->addElement('text', 'pricePerUnit', array(
+			'label'			=> '*Price Per Unit:',
+			'required'		=> true,
+			'validators'	=> array('Int'),
 		));
+		
+		$priceFunction = new Kaltura_Form_Element_EnumSelect('priceFunction', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction'));
+		$priceFunction->setRequired(true);
+		$priceFunction->setLabel("Price Function:");
+		$priceFunction->setValue(Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE);
+		$this->addElements(array($priceFunction));
 	}
 	
-	public function updateCatalogItemPricingOptions(array $options) {
-		$this->getElement("objectType")->setAttrib('catalogItemPricingOptions', $options);
-	}
 	
-	
-	public function populateFromObject($recognizer, $add_underscore = false)
+	public function populateFromObject($pricing)
 	{
-		$this->getElement("objectType")->setValue(get_class($recognizer));
-		
-		if(is_null($recognizer))
-			return;
-		
-		$props = $recognizer;
-		if(is_object($recognizer))
-			$props = get_object_vars($recognizer);
-		
-		foreach($props as $prop => $value)
-		{
-			if($add_underscore)
-			{
-				$pattern = '/(.)([A-Z])/';
-				$replacement = '\1_\2';
-				$prop = strtolower(preg_replace($pattern, $replacement, $prop));
-			}
-			$this->setDefault($prop, $value);
-		}
+		$this->setDefault('pricePerUnit',  $pricing->pricePerUnit);
+		$this->setDefault('priceFunction',  $pricing->priceFunction);
 	}
 	
-	public function getObject($properties) {
-		$objectClass = $properties["objectType"];
-		if($objectClass == "Null") 
-			return KalturaNull::getInstance();
-		
-		$object = new $objectClass();
-	
-		foreach($properties as $prop => $value) {
-			if($prop == "objectType")
-				continue;
-			$object->$prop = $value;
-		}
-	
-		return $object;
+	public function getObject($properties) 
+	{
+		$pricingObject = new Kaltura_Client_Reach_Type_VendorCatalogItemPricing();
+		$pricingObject->pricePerUnit = $properties['pricePerUnit'];
+		$pricingObject->priceFunction = $properties['priceFunction'];
+		return $pricingObject;
 	}
 }
