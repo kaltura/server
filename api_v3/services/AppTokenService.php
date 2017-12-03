@@ -115,7 +115,7 @@ class AppTokenService extends KalturaBaseService
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid ($this->getPartnerId() , $filter->sessionUserIdEqual );
 			if($kuser)
-				$this->kUserIdEqual = $kuser->getId();
+				$filter->sessionUserIdEqual = $kuser->getId();
 			else
 			{
 				$response = new KalturaAppTokenListResponse();

@@ -5,13 +5,12 @@
 abstract class KExportEngine
 {
 	/**
-	 * @var KalturaStorageExportJobData
+	 * @var KalturaStorageJobData
 	 */
 	protected $data;
 	
 	/**
-	 * @param KalturaStorageExportJobData $data
-	 * @param int $jobSubType
+	 * @param KalturaStorageJobData $data
 	 */
 	public function __construct(KalturaStorageJobData $data)
 	{

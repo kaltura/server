@@ -193,25 +193,12 @@ class KAsyncConvert extends KJobHandlerWorker
 		$operator = $this->getOperator($data);
 		try
 		{
-			$actualFileSyncLocalPath = null;
-			$key = null;
-			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
-			if($srcFileSyncDescriptor)
-			{
-				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
-				if (is_file($actualFileSyncLocalPath))
-					$key = $srcFileSyncDescriptor->fileEncryptionKey;
-			}
+			list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
+
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
-			if (!$key)
-				$isDone = $this->operationEngine->operate($operator, $actualFileSyncLocalPath);
-			else
-			{
-				$tempClearPath = self::createTempClearFile($actualFileSyncLocalPath, $key);
-				$isDone = $this->operationEngine->operate($operator, $tempClearPath);
-				unlink($tempClearPath);
-			}
+			$isDone = $this->operate($operator, $actualFileSyncLocalPath, null, $key);
+
 			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed
 			
 			$this->stopMonitor();
@@ -376,5 +363,32 @@ class KAsyncConvert extends KJobHandlerWorker
 				$destFileSync->fileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($destFileSync->fileSyncLocalPath);
 			}					
 		}
+	}
+
+	protected static function getFirstFilePathAndKey($srcFileSyncs)
+	{
+		$actualFileSyncLocalPath = null;
+		$key = null;
+		$srcFileSyncDescriptor = reset($srcFileSyncs);
+		if($srcFileSyncDescriptor)
+		{
+			$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			if (is_file($actualFileSyncLocalPath))
+				$key = $srcFileSyncDescriptor->fileEncryptionKey;
+		}
+		return array($actualFileSyncLocalPath, $key);
+	}
+
+	protected function operate($operator = null, $filePath, $configFilePath = null, $key = null)
+	{
+		if (!$key)
+			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
+		else
+		{
+			$tempClearPath = self::createTempClearFile($filePath, $key);
+			$res = $this->operationEngine->operate($operator, $tempClearPath, $configFilePath);
+			unlink($tempClearPath);
+		}
+		return $res;
 	}
 }

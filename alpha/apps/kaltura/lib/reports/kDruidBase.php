@@ -65,6 +65,9 @@ class kDruidBase
 	const DRUID_QUERY = 'query';
 	const DRUID_CONTAINS = 'contains';
 	const DRUID_CASE_SENSITIVE = 'case_sensitive';
+	const DRUID_OUTPUT_NAME = 'outputName';
+	const DRUID_LIST_FILTERED = 'listFiltered';
+	const DRUID_DELEGATE = 'delegate';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';

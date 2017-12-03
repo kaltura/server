@@ -38,8 +38,9 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$callBackUrl = $data->callbackNotificationUrl;
 	
 		KalturaLog::debug('callback is - ' . $callBackUrl);
-	
-		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword);
+
+		$additionalParameters = json_decode($providerData->additionalParameters, true);
+		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword, $additionalParameters);
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId);
 	
 		$externalEntryExists = $this->clientHelper->checkExistingExternalContent($entryId);

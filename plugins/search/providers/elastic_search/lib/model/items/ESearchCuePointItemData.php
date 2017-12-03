@@ -265,7 +265,12 @@ class ESearchCuePointItemData extends ESearchItemData
 
 	public function loadFromElasticHits($objectResult)
 	{
-		$this->cuePointType = $objectResult['_source']['cue_point_type'];
+		if(isset($objectResult['_source']['cue_point_type']))
+		{
+			$apiCuePointType = kPluginableEnumsManager::coreToApi('CuePointType', $objectResult['_source']['cue_point_type']);
+			$this->cuePointType = $apiCuePointType;
+		}
+
 		$this->id = $objectResult['_source']['cue_point_id'];
 
 		if (isset($objectResult['_source']['cue_point_name']))

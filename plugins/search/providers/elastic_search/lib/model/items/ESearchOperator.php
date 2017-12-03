@@ -57,13 +57,13 @@ class ESearchOperator extends ESearchItem
 		switch ($eSearchOperatorType)
 		{
 			case ESearchOperatorType::AND_OP:
-				$boolOperator = 'must';
+				$boolOperator = kESearchBoolQuery::MUST_KEY;
 				break;
 			case ESearchOperatorType::OR_OP:
-				$boolOperator = 'should';
+				$boolOperator = kESearchBoolQuery::SHOULD_KEY;
 				break;
 			case ESearchOperatorType::NOT_OP:
-				$boolOperator = 'must_not';
+				$boolOperator = kESearchBoolQuery::MUST_NOT_KEY;
 				break;
 			default:
 				KalturaLog::crit('unknown operator type');
@@ -109,7 +109,7 @@ class ESearchOperator extends ESearchItem
 
 	private static function createSearchQueryForItems($categorizedSearchItems, $boolOperator, &$queryAttributes, $eSearchOperatorType)
 	{
-		$outQuery = array();
+		$outQuery = new kESearchBoolQuery();
 		foreach ($categorizedSearchItems as $categorizedSearchItem)
 		{
 			$itemClassName = $categorizedSearchItem['className'];
@@ -120,21 +120,21 @@ class ESearchOperator extends ESearchItem
 				$itemSearchItems = $itemSearchItems->getSearchItems();
 				$operatorType = $categorizedSearchItem['operatorType'];
 			}
-			
+
 			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $queryAttributes, $operatorType);
 
-			foreach ($subQuery as $key => $value)
+			if($itemClassName == get_class())
+				$outQuery->addByOperatorType($boolOperator, $subQuery);
+			else
 			{
-				if($itemClassName == get_class())
-					$outQuery['bool'][$boolOperator][] = $subQuery;
-				else
-					$outQuery['bool'][$boolOperator][] = $value;
+				foreach ($subQuery as $key => $value)
+				{
+						$outQuery->addByOperatorType($boolOperator, $value);
+				}
 			}
+
 		}
 
-		if($eSearchOperatorType == ESearchOperatorType::OR_OP && count($outQuery['bool'][$boolOperator]))
-			$outQuery['bool']['minimum_should_match'] = 1;
-		
 		return $outQuery;
 	}
 

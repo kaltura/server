@@ -10,6 +10,8 @@ abstract class kBaseElasticEntitlement
     public static $partnerId;
     public static $ks;
 
+    protected static $entitlementContributors = array();
+
     public static function init()
     {
         if(!self::$isInitialized)
@@ -21,5 +23,10 @@ abstract class kBaseElasticEntitlement
         self::$ks = ks::fromSecureString(kCurrentContext::$ks);
         self::$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
     }
-    
+
+    public static function getEntitlementContributors()
+    {
+        return static::$entitlementContributors;
+    }
+
 }

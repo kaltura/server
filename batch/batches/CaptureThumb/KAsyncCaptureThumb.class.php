@@ -76,12 +76,15 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			if($data->srcAssetType == KalturaAssetType::FLAVOR)
 			{
 				$capturePath = $this->createUniqFileName($rootPath);
-				list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
+				list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
 				
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, self::$taskConfig->params->FFMpegCmd);
 				$videoOffset = max(0 ,min($thumbParamsOutput->videoOffset, $mediaInfoVidDur-1));
-				$created = $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, null ,null, $mediaInfoDar, $mediaInfoVidDur);
+				$params['dar'] = $mediaInfoDar;
+				$params['vidDur'] = $mediaInfoVidDur;
+				$params['scanType'] = $mediaInfoScanType;
+				$created = $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, $params);
 				if(!$created || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
 				
@@ -181,6 +184,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		$mediaInfoHeight = null;
 		$mediaInfoDar = null;
 		$mediaInfoVidDur = null;
+		$mediaInfoScanType = null;
 		$mediaInfoFilter = new KalturaMediaInfoFilter();
 		$mediaInfoFilter->flavorAssetIdEqual = $srcAssetId;
 		$this->impersonate($partnerId);
@@ -193,6 +197,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$mediaInfoWidth = $mediaInfo->videoWidth;
 			$mediaInfoHeight = $mediaInfo->videoHeight;
 			$mediaInfoDar = $mediaInfo->videoDar;
+			$mediaInfoScanType = $mediaInfo->scanType;
 
 			if($mediaInfo->videoDuration)
 				$mediaInfoVidDur = $mediaInfo->videoDuration/1000;
@@ -201,7 +206,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			else if($mediaInfo->audioDuration)
 				$mediaInfoVidDur = $mediaInfo->audioDuration/1000;
 		}
-		return array($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur);
+		return array($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType);
 	}
 	
 	private function createUniqFileName($rootPath)

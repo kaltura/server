@@ -126,7 +126,7 @@ class ESearchService extends KalturaBaseService
 			$this->handleSearchException($e);
 		}
 
-		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName());
+		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName(), $coreSearchObject->getPeerRetrieveFunctionName());
 		return array($coreResults, $objectCount);
 	}
 

@@ -1495,8 +1495,10 @@ class reportsInputFilter
 	public $search_in_admin_tags;
 	public $extra_map;
 	public $categories;
+	public $categoriesIds;
 	public $timeZoneOffset;
 	public $interval;
+	public $countries;
 	
 	public function getFilterBy() {
 		return "";

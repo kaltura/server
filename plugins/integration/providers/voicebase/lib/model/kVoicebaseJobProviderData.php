@@ -53,7 +53,13 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	 * @var bool
 	 */
 	private $replaceMediaContent;
-	
+
+    /**
+     * additional parameters to send to VoiceBase
+     * @var string
+     */
+    private $additionalParameters;
+
 	/**
 	 * @return string
 	 */
@@ -181,7 +187,7 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	{
 		$this->fileLocation = $fileLocation;
 	}
-	
+
 	/**
 	 * @return bool
 	 */
@@ -189,12 +195,40 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->replaceMediaContent;
 	}
-	
+
 	/**
 	 * @param bool $replaceMediaContent
 	 */
 	public function setReplaceMediaContent($replaceMediaContent)
 	{
 		$this->replaceMediaContent = $replaceMediaContent;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdditionalParameters()
+	{
+		return $this->additionalParameters;
+	}
+
+	/**
+	 * @param string $additionalParameters
+	 */
+	public function setAdditionalParameters($additionalParams)
+	{
+		$this->additionalParameters = $additionalParams;
+	}
+
+	/**
+	 * kVoicebaseJobProviderData constructor.
+	 * The VoiceBase job provider data must include the partner's additional params.
+	 */
+	public function __construct()
+	{
+		$partnerOptions = VoicebasePlugin::getPartnerVoicebaseOptions(kCurrentContext::getCurrentPartnerId());
+
+		if($partnerOptions->defaultParams)
+			$this->setAdditionalParameters($partnerOptions->defaultParams);
 	}
 }

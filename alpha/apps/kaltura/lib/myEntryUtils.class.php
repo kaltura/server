@@ -783,6 +783,7 @@ class myEntryUtils
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
 
+
 		while($count--)
 		{
 			if (
@@ -807,7 +808,7 @@ class myEntryUtils
 				{
 					$calc_vid_sec = ($entry->getPartner() && $entry->getPartner()->getDefThumbOffset()) ? $entry->getPartner()->getDefThumbOffset() : 3;
 				}
-				else // default thumbnail wasnt created yet
+				else // default thumbnail was not created yet
 				{
 					$calc_vid_sec = $entry->getBestThumbOffset();
 				}
@@ -817,7 +818,7 @@ class myEntryUtils
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
 	
-				// if we already captured the frame at that second, dont recapture, just use the existing file
+				// if we already captured the frame at that second, do not recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
 					// creating the thumbnail is a very heavy operation
@@ -828,7 +829,6 @@ class myEntryUtils
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-
 					if($multi && $packagerRetries)
 					{
 						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
@@ -871,6 +871,7 @@ class myEntryUtils
 			}
 
 			kFile::fullMkdir($processingThumbPath);
+
 			if ($crop_provider)
 			{
 				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
@@ -879,7 +880,7 @@ class myEntryUtils
 			{
 				if (!file_exists($orig_image_path) || !filesize($orig_image_path))
 					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
-					
+
 				$imageSizeArray = getimagesize($orig_image_path);
 				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
 				{
@@ -891,14 +892,6 @@ class myEntryUtils
 			}
 
 
-			if ($isEncryptionNeeded)
-			{
-				$fileSync->deleteTempClear();
-				if (self::isTempFile($orig_image_path))
-					unlink($orig_image_path);
-			}
-
-			
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
@@ -913,6 +906,13 @@ class myEntryUtils
 				imagecopy($im, $srcIm, $w * $vid_slice, 0, 0, 0, $w, $h);
 				imagedestroy($srcIm);
 				++$vid_slice;
+			}
+
+			if ($isEncryptionNeeded)
+			{
+				$fileSync->deleteTempClear();
+				if (self::isTempFile($orig_image_path))
+					unlink($orig_image_path);
 			}
 		}
 		
@@ -964,17 +964,17 @@ class myEntryUtils
 	}
 
 
-	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null)
 	{
 		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
 		if(in_array($entry->getType(), $mappedThumbEntryTypes))
-			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 
-		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 	}
 
 
-	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
 		$packagerCaptureUrl = kConf::get('packager_mapped_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
@@ -995,7 +995,7 @@ class myEntryUtils
 
 		$flavorUrl = myPlaylistUtils::buildPlaylistThumbPath($entry, $flavorAsset);
 
-		$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+		$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 		if(!$success)
 			return false;
 
@@ -1003,11 +1003,17 @@ class myEntryUtils
 	}
 
 
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath)
+	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null)
 	{
+		$offset = floor($calc_vid_sec*1000);
+		if ($width)
+			$offset .= "-w$width";
+		if ($height)
+			$offset .= "-h$height";
+
 		$packagerThumbCapture = str_replace(
 		array ( "{url}", "{offset}" ),
-		array ( $url , floor($calc_vid_sec*1000)  ) ,
+		array ( $url , $offset  ) ,
 		$packagerCaptureUrl );
 
 		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
@@ -1075,7 +1081,7 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId)
+	public static function captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
 		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
@@ -1092,7 +1098,7 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-		$success = self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath);
+		$success = self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 		if(!$success)
 			return false;
 
@@ -2068,6 +2074,5 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
 		return $content;
 	}
-
 
 }

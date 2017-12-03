@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Recorded Entry Content Replaced</name>
+				<systemName>Recorded_Entry_Content_Replaced</systemName>
+				<description>Email notification template to be sent when an entry content replaced successfully.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>12</eventType> <!-- EventNotificationEventType::OBJECT_REPLACED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaFieldMatchCondition">
+						<description>source_type_recorded_live</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getSourceType()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>36</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+						<code>$scope->getObject()->getId()</code>
+					</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_status</key>
+						<description>Entry status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getStatus()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_reference_id</key>
+						<description>Entry reference ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getReferenceID()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>
+                
