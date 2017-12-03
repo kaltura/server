@@ -1110,10 +1110,9 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
-
+		
 		$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS;
-		return kJobsManager::addPostConvertJob($convertProfileJob, $postConvertAssetType, $srcFileSyncLocalPath, $originalFlavorAsset->getId(), null, true, $offset);
+		return kJobsManager::addPostConvertJob($convertProfileJob, $postConvertAssetType, $srcSyncKey, $originalFlavorAsset->getId(), null, true, $offset);
 	}
 
 	/**

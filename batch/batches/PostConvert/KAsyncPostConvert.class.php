@@ -57,8 +57,13 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		{
 			$srcFileSyncDescriptor = reset($data->srcFileSyncs);
 			$mediaFile = null;
-			if($srcFileSyncDescriptor)
+			$key = null;
+			if($srcFileSyncDescriptor) 
+			{
 				$mediaFile = trim($srcFileSyncDescriptor->fileSyncLocalPath);
+				$key = $srcFileSyncDescriptor->fileEncryptionKey;
+			}
+				
 			
 			if(!$data->flavorParamsOutput || !$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 			{
@@ -83,7 +88,15 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			if($engine)
 			{
 				KalturaLog::info("Media info engine [" . get_class($engine) . "]");
-				$mediaInfo = $engine->getMediaInfo();
+				if (!$key)
+					$mediaInfo = $engine->getMediaInfo();
+				else 
+				{
+					$tempClearPath = self::createTempClearFile($mediaFile, $key);
+					$engine->setFilePath($tempClearPath);
+					$mediaInfo = $engine->getMediaInfo();
+					unlink($tempClearPath);
+				}
 			}
 			else
 			{

@@ -772,7 +772,7 @@ class kFlowHelper
 		$nextJob = self::createNextJob($flavorParamsOutput, $dbBatchJob, $data, $syncKey); //todo validate sync key
 		if(!$nextJob)
 		{
-			self::handleOperatorsProcessingFinished($flavorAsset, $flavorParamsOutput, $entry, $dbBatchJob, $data, $rootBatchJob);
+			self::handleOperatorsProcessingFinished($flavorAsset, $flavorParamsOutput, $entry, $dbBatchJob, $data, $rootBatchJob, $syncKey);
 		}
 		// this logic decide when a thumbnail should be created
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
@@ -840,7 +840,7 @@ class kFlowHelper
 
 		return $nextJob;
 	}
-	private static function handleOperatorsProcessingFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, entry $entry, BatchJob $dbBatchJob, kConvertJobData $data, $rootBatchJob = null)
+	private static function handleOperatorsProcessingFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, entry $entry, BatchJob $dbBatchJob, kConvertJobData $data, $rootBatchJob = null, $syncKey = null)
 	{
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
@@ -886,7 +886,7 @@ class kFlowHelper
 			if($flavorAsset->getIsOriginal())
 				$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE;
 
-			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
+			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $syncKey, $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
 		}
 		else // no need to run post convert
 		{
@@ -1363,7 +1363,7 @@ class kFlowHelper
 
 			// creating post convert job (without thumb)
 			$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
-			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId(), file_exists($thumbPath), $offset);
+			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $syncKey, $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId(), file_exists($thumbPath), $offset);
 
 			$finalFlavors[] = $flavor;
 			$addedFlavorParamsOutputsIds[] = $flavor->getFlavorParamsOutputId();
