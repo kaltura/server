@@ -119,9 +119,8 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 			if($entry->getConversionQuality() > 0)
 			{
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				$localFileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
-				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path,$localFileSync);
+				$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
+				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $fileSync);
 			}
 			else
 			{
