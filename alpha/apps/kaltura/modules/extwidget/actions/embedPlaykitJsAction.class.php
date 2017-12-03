@@ -150,11 +150,11 @@ class embedPlaykitJsAction extends sfAction
 		// Default Kaltura CDN url:
 		$cdnUrl = requestUtils::getCdnHost($protocol);
 		// Default Stats URL
-		$statsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"stats_host_https") : $this->buildUrl($protocol,"stats_host");
+		$statsServiceUrl = $this->buildUrl($protocol,"stats_host");
 		// Default Live Stats URL
-		$liveStatsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"live_stats_host_https") : $this->buildUrl($protocol,"live_stats_host");
+		$liveStatsServiceUrl = $this->buildUrl($protocol,"live_stats_host");
 		// Default Kaltura Analytics URL
-		$analyticsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"analytics_host_https") : $this->buildUrl($protocol,"analytics_host");
+		$analyticsServiceUrl = $this->buildUrl($protocol,"analytics_host");
 		// Get Kaltura Supported API Features
 		$apiFeatures = $this->getFromConfig('features');
 
@@ -179,6 +179,10 @@ class embedPlaykitJsAction extends sfAction
 
 	private function buildUrl($protocol, $key)
 	{
+	    if ($protocol == "https")
+	    {
+	        $key .= "_https";
+	    }
 		$configValue = $this->getFromConfig($key);
 		$port = (($_SERVER['SERVER_PORT']) != '80' && $_SERVER['SERVER_PORT'] != '443')?':'.$_SERVER['SERVER_PORT']:'';
 		if( $key && $configValue)
