@@ -47,7 +47,7 @@ class kElasticUserCategoryEntryEntitlementContributor implements IKalturaESearch
 		$entryQuery->addToShould($condition);
 	}
 
-	protected static function getUserCategories($kuserId, $privacyContext = null, $privacy = null)
+	private static function getUserCategories($kuserId, $privacyContext = null, $privacy = null)
 	{
 		$params = array(
 			'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,

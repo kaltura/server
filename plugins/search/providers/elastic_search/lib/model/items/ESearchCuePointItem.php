@@ -172,11 +172,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		$cuePointExactMatch = kESearchQueryManager::getExactMatchQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 		if($cuePointSearchItem->getCuePointType())
 		{
-			$cuePointTypeQuery = new kESearchTermQuery('cue_points.cue_point_type', $cuePointSearchItem->getCuePointType());
-			$boolQuery = new kESearchBoolQuery();
-			$boolQuery->addToFilter($cuePointTypeQuery);
-			$boolQuery->addToMust($cuePointExactMatch);
-			$cuePointExactMatch = $boolQuery;
+			$cuePointExactMatch = self::addFilterByTypeToQuery($cuePointSearchItem->getCuePointType(), $cuePointExactMatch);
 		}
 
 		return $cuePointExactMatch;
@@ -199,11 +195,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		$cuePointPrefix = kESearchQueryManager::getPrefixQuery($cuePointSearchItem, $fieldName, $allowedSearchTypes, $queryAttributes);
 		if($cuePointSearchItem->getCuePointType())
 		{
-			$cuePointTypeQuery = new kESearchTermQuery('cue_points.cue_point_type', $cuePointSearchItem->getCuePointType());
-			$boolQuery = new kESearchBoolQuery();
-			$boolQuery->addToFilter($cuePointTypeQuery);
-			$boolQuery->addToMust($cuePointPrefix);
-			$cuePointPrefix = $boolQuery;
+			$cuePointPrefix = self::addFilterByTypeToQuery($cuePointSearchItem->getCuePointType(), $cuePointPrefix);
 		}
 
 		return $cuePointPrefix;
@@ -214,11 +206,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		$cuePointExists = kESearchQueryManager::getExistsQuery($cuePointSearchItem, $fieldName, $allowedSearchTypes, $queryAttributes);
 		if($cuePointSearchItem->getCuePointType())
 		{
-			$cuePointTypeQuery = new kESearchTermQuery('cue_points.cue_point_type', $cuePointSearchItem->getCuePointType());
-			$boolQuery = new kESearchBoolQuery();
-			$boolQuery->addToFilter($cuePointTypeQuery);
-			$boolQuery->addToMust($cuePointExists);
-			$cuePointExists = $boolQuery;
+			$cuePointExists = self::addFilterByTypeToQuery($cuePointSearchItem->getCuePointType(), $cuePointExists);
 		}
 
 		return $cuePointExists;
@@ -229,14 +217,19 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		$cuePointRange = kESearchQueryManager::getRangeQuery($cuePointSearchItem, $fieldName, $allowedSearchTypes, $queryAttributes);
 		if($cuePointSearchItem->getCuePointType())
 		{
-			$cuePointTypeQuery = new kESearchTermQuery('cue_points.cue_point_type', $cuePointSearchItem->getCuePointType());
-			$boolQuery = new kESearchBoolQuery();
-			$boolQuery->addToFilter($cuePointTypeQuery);
-			$boolQuery->addToMust($cuePointRange);
-			$cuePointRange = $boolQuery;
+			$cuePointRange = self::addFilterByTypeToQuery($cuePointSearchItem->getCuePointType(), $cuePointRange);
 		}
 
 		return $cuePointRange;
+	}
+
+	private static function addFilterByTypeToQuery($cuePointType, &$query)
+	{
+		$cuePointTypeQuery = new kESearchTermQuery('cue_points.cue_point_type', $cuePointType);
+		$boolQuery = new kESearchBoolQuery();
+		$boolQuery->addToFilter($cuePointTypeQuery);
+		$boolQuery->addToMust($query);
+		return $boolQuery;
 	}
 
 }
