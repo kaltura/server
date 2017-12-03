@@ -324,8 +324,12 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/sd/$segmentDuration/";
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
-		$livePackagerUrl .= "t/$secureToken/"; 
-		
+		$livePackagerUrl .= "t/$secureToken/";
+
+		$entry = $this->getDynamicAttributes()->getEntry();
+		if ($entry->getExplicitLive() &&  (!$entry->canViewExplicitLive()))
+			$livePackagerUrl .= 'type/user/';
+
 		KalturaLog::debug("Live Packager base stream Url [$livePackagerUrl]");
 		return $livePackagerUrl;
 	}
