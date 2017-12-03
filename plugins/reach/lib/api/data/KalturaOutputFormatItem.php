@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage object
+ * @package plugins.reach
+ * @subpackage api.objects
  */
 class KalturaOutputFormatItem extends KalturaObject
 {

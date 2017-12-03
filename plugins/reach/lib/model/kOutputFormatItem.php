@@ -4,7 +4,7 @@
 /**
  * Catalog Item pricing calac definition
  *
- * @package Core
+ * @package plugins.reach
  * @subpackage model
  *
  */
@@ -16,7 +16,7 @@ class kOutputFormatItem
 	protected $outputFormat;
 	
 	/**
-	 * @return the $language
+	 * @return the $outputFormat
 	 */
 	public function getOutputFormat()
 	{
@@ -24,7 +24,7 @@ class kOutputFormatItem
 	}
 	
 	/**
-	 * @param string $language
+	 * @param int $outputFormat
 	 */
 	public function setOutputFormat($outputFormat)
 	{
