@@ -13,7 +13,6 @@ class embedPlaykitJsAction extends sfAction
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
-	const PLAYER_CONFIG_NS = "window.__kalturaplayerdata";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -127,33 +126,23 @@ class embedPlaykitJsAction extends sfAction
 
 	private function appendConfig($content)
 	{
-		//append global namespace container to payload
-		$confNS = self::PLAYER_CONFIG_NS;
+	    $uiConf = $this->playerConfig;
+	    $uiConf["env"] = $this->getEnvConfig();
+	    $uiConfJson = json_encode($uiConf);
+	    if ($uiConfJson === false)
+	    {
+	        KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
+	    }
+	    $confNS = "window.__kalturaplayerdata";
 	    $content .= "
-	    $confNS = ($confNS || {});";
-	    $content = $this->appendUiConfToContent($content);
-	    $content = $this->appendEnvConfigToContent($content);
+	    $confNS = ($confNS || {});
+	    $confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
+	    ";
 	    return $content;
 	}
 
-	private function appendUiConfToContent($content)
+	private function getEnvConfig()
 	{
-		$config = json_encode($this->playerConfig);
-
-		if ($config === false)
-		{
-			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
-		}
-
-		$confNS = self::PLAYER_CONFIG_NS;
-		$content .= "$confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$config;";
-
-		return $content;
-	}
-
-	private function appendEnvConfigToContent($content)
-	{
-
 		$protocol = infraRequestUtils::getProtocol();
 
 		// The default Kaltura service url:
@@ -177,16 +166,7 @@ class embedPlaykitJsAction extends sfAction
 			"AnalyticsServiceUrl" => $analyticsServiceUrl,
 			"ApiFeatures" => $apiFeatures
 		);
-
-		$envConfig = json_encode($envConfig);	
-		
-		if ($envConfig !== false)
-		{
-			$confNS = self::PLAYER_CONFIG_NS;
-			$content .= "$confNS.EnvConfig = $envConfig;";
-		}
-
-		return $content;
+		return $envConfig;
 	}
 
 	private function getFromConfig($key)
