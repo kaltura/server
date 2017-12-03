@@ -17,16 +17,14 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 	
 	public function getTypeListTemplatesResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return $this->doGetTypeListResponse($pager, $responseProfile, $type);
+		return $this->doGetTypeListTemplatesResponse($pager, $responseProfile, $type);
 	}
 	
 	public function doGetListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
 		$c = new Criteria();
 		if($type)
-		{
 			$c->add(VendorCatalogItemPeer::SERVICE_TYPE, $type);
-		}
 		
 		$filter = $this->toObject();
 		$filter->attachToCriteria($c);
@@ -49,12 +47,13 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		return $response;
 	}
 	
-	public function doGetTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	public function doGetTypeListTemplatesResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		$coreFilter = new VendorCatalogItemFilter();
-		$this->toObject($coreFilter);
-		
 		$criteria = new Criteria();
+		if($type)
+			$criteria->add(VendorCatalogItemPeer::SERVICE_FEATURE, $type);
+		
+		$coreFilter = $this->toObject();
 		$coreFilter->attachToCriteria($criteria);
 		$criteria->add(VendorCatalogItemPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
 		$count = VendorCatalogItemPeer::doCount($criteria);

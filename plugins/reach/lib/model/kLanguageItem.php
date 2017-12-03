@@ -4,7 +4,7 @@
 /**
  * Catalog Item pricing calac definition
  *
- * @package Core
+ * @package plugins.reach
  * @subpackage model
  *
  */

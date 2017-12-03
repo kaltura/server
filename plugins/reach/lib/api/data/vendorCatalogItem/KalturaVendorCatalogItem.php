@@ -69,6 +69,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	
 	/**
 	 * @var KalturaVendorServiceFeature
+	 * @readonly
 	 * @filter eq,in
 	 */
 	public $serviceFeature;
@@ -125,9 +126,23 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
-		$this->validateVendorPartnerId();
+		$this->validate();
 		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validate($sourceObject);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	private function validate(VendorCatalogItem $sourceObject = null)
+	{
+		if(!$sourceObject) //Source object will be null on insert
+			$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
+		
+		$this->validateVendorPartnerId($sourceObject);
+		$this->validateSystemName($sourceObject);
 	}
 	
 	public function getExtraFilters()
@@ -140,15 +155,31 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		return array();
 	}
 
-	private function validateVendorPartnerId()
+	private function validateVendorPartnerId(VendorCatalogItem $sourceObject = null)
 	{
-		$vendorPartner = PartnerPeer::retrieveByPK($this->vendorPartnerId);
+		// In case this is update and vendor partner id was not sent don't run validation
+		if($sourceObject && !$this->isNull('vendorPartnerId') && $sourceObject->getVendorPartnerId() == $this->vendorPartnerId) 
+			return;
 		
+		$vendorPartner = PartnerPeer::retrieveByPK($this->vendorPartnerId);
 		if(!$vendorPartner)
 			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PARTNER_ID_NOT_FOUND, $this->vendorPartnerId);
 	
 		if($vendorPartner->getType() != KalturaPartnerType::VENDOR)
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_NOT_VENDOR, $this->vendorPartnerId);
+	}
+	
+	private function validateSystemName (VendorCatalogItem $sourceObject = null)
+	{
+		$this->validatePropertyMinLength('systemName', 3, true);
+		
+		$id = $sourceObject ? $sourceObject->getId() : null;
+		if(trim($this->systemName) && !$this->isNull('systemName'))
+		{
+			$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($this->systemName, $id);
+			if (count($systemNameTemplates))
+				throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $this->systemName);
+		}
 	}
 	
 	/* (non-PHPdoc)
