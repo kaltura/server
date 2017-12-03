@@ -489,9 +489,7 @@ class kJobsManager
 				if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 				{
 					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
-					{
 						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
-					}
 				}
 				else
 				{
