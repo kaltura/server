@@ -3,10 +3,10 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_SourceLanguagesSubForm extends ConfigureSubForm
+class Form_TargetLanguagesSubForm extends ConfigureSubForm
 {
 	private $ignore = array('relatedObjects', 'type', 'gs');
-	private $prefix = "SourceLanguage_";
+	private $prefix = "TargetLanguage_";
 
 	private $type;
 
@@ -18,11 +18,11 @@ class Form_SourceLanguagesSubForm extends ConfigureSubForm
 
 	public function init()
 	{
-		$this->setAttrib('id', 'frmSourceLanguagesSubForm');
+		$this->setAttrib('id', 'frmTargetLanguagesSubForm');
 		$this->setMethod('post');
 
 		$this->addDecorator('ViewScript', array(
-			'viewScript' => 'source-language-sub-form.phtml',
+			'viewScript' => 'target-language-sub-form.phtml',
 		));
 
 		$obj = new $this->type();

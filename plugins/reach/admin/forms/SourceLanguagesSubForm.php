@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.schedule_task
+ * @package plugins.reach
  * @subpackage Admin
  */
-class Form_AdvanceSearchSubForm extends ConfigureSubForm
+class Form_SourceLanguagesSubForm extends ConfigureSubForm
 {
 	private $ignore = array('relatedObjects', 'type', 'gs');
-	private $prefix = "sourceLanguage_";
+	private $prefix = "SourceLanguage_";
 
 	private $type;
 
@@ -18,16 +18,22 @@ class Form_AdvanceSearchSubForm extends ConfigureSubForm
 
 	public function init()
 	{
-		$this->setAttrib('id', 'frmAdvanceSearchSubForm');
+		$this->setAttrib('id', 'frmSourceLanguagesSubForm');
 		$this->setMethod('post');
 
 		$this->addDecorator('ViewScript', array(
-			'viewScript' => 'condition-sub-form.phtml',
+			'viewScript' => 'source-language-sub-form.phtml',
 		));
 
 		$obj = new $this->type();
-		$this->addStringElement("MetadataProfileId", $this->prefix);
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
 	}
-	
+
+
+	public function isValid($data)
+	{
+		if ($data['SourceLanguages'])
+			return true;
+		else return false;
+	}
 }

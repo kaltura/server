@@ -8,18 +8,23 @@
 <script type="text/javascript">
 
 	$('fieldset[id^="SourceLanguageTemplate"]').hide();
-	populateConditions();
+	populateConditions("SourceLanguages", "add-source-language");
 
-	function populateConditions() {
-		var data = jQuery('#AdvanceSearch').val();
+	$('fieldset[id^="TargetLanguageTemplate"]').hide();
+	populateConditions("TargetLanguages", "add-target-language");
+
+	function populateConditions(name, file ) {
+		var data = jQuery('#'+name).val();
 		if (!data)
 			return;
 		var arr = JSON.parse(data);
-		var ts = $( ".add-source-langeuage" );
+		var ts = $( "." + file );
 		for (var i = 0, len = arr.length; i < len; i++)
-			addSourceLanguageFromObject(ts, arr[i]);
+			if ( name == 'SourceLanguages')
+				addSourceLanguageFromObject(ts, arr[i]);
+			else
+				addTargetLanguageFromObject(ts, arr[i]);
 	}
-
 
 	jQuery(function() {
 		<?php if ($this->formValid): ?>

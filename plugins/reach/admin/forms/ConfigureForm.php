@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.schedule_task
+ * @package plugins.reach
  * @subpackage Admin
  */
 

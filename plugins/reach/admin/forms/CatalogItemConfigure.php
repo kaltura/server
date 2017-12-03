@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_CatalogItemConfigure extends Infra_Form
+class Form_CatalogItemConfigure extends ConfigureForm
 {
 	protected $newPartnerId;
 	protected $catalogItemType;
@@ -65,7 +65,7 @@ class Form_CatalogItemConfigure extends Infra_Form
 		$catalogItemForView = new Kaltura_Form_Element_EnumSelect('serviceFeature', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature'));
 		$catalogItemForView->setLabel('Service Feature:');
 		$catalogItemForView->setValue($this->catalogItemType);
-		$catalogItemForView->setRequired(true);
+//		$catalogItemForView->setRequired(true);
 		$catalogItemForView->setAttrib('disabled','disabled');
 		$this->addElement($catalogItemForView);
 
@@ -88,24 +88,43 @@ class Form_CatalogItemConfigure extends Infra_Form
 		$turnAroundTimeForView ->setValue(Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT);
 		$this->addElement($turnAroundTimeForView );
 
-		$sourceLanguage = new Kaltura_Form_Element_EnumSelect('sourceLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
-		$sourceLanguage  ->setLabel('Source Language:');
-		$sourceLanguage  ->setRequired(true);
-		$this->addElement($sourceLanguage  );
+//		$sourceLanguage = new Kaltura_Form_Element_EnumSelect('sourceLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
+//		$sourceLanguage  ->setLabel('Source Language:');
+//		$sourceLanguage  ->setRequired(true);
+//		$this->addElement($sourceLanguage);
+
+		$this->addLine("Languages Line");
+
+		$this->addTitle('Source Languages:');
 
 		$sourceLanguagesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$sourceLanguagesSubForm->addDecorator('ViewScript', array(
-			'viewScript' => 'conditions-sub-form.phtml',
+			'viewScript' => 'source-languages-sub-form.phtml',
 		));
-		$this->addSubForm($sourceLanguagesSubForm, 'SourceLanguages');
+		$this->addSubForm($sourceLanguagesSubForm, 'SourceLanguages_');
+		$innerSourceLanguagesSubForm = new Form_SourceLanguagesSubForm('Kaltura_Client_Type_LanguageItem');
+		$this->addSubForm($innerSourceLanguagesSubForm , "SourceLanguageTemplate");
 
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 		{
-			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
-			$targetLanguage->setLabel('Target Language:');
-			$targetLanguage->setRequired(true);
-			$this->addElement($targetLanguage);
+//			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
+//			$targetLanguage->setLabel('Target Language:');
+//			$targetLanguage->setRequired(true);
+//			$this->addElement($targetLanguage);
+
+			$this->addTitle('Target Languages:');
+
+			$targetLanguagesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+			$targetLanguagesSubForm->addDecorator('ViewScript', array(
+				'viewScript' => 'target-languages-sub-form.phtml',
+			));
+			$this->addSubForm($targetLanguagesSubForm, 'TargetLanguages_');
+
+			$innerTargetLanguagesSubForm = new Form_TargetLanguagesSubForm('Kaltura_Client_Type_LanguageItem');
+			$this->addSubForm($innerTargetLanguagesSubForm , "TargetLanguageTemplate");
 		}
+
+		$this->addLine("OutPutFormats");
 
 		$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'));
 		$outputFormat ->setLabel('Output Format:');
@@ -130,6 +149,8 @@ class Form_CatalogItemConfigure extends Infra_Form
 			'decorators'    => array('ViewHelper'),
 			'value'			=> $this->catalogItemType,
 		));
+
+
 	}
 
 	public function populateFromObject($object, $add_underscore = true)
@@ -153,8 +174,19 @@ class Form_CatalogItemConfigure extends Infra_Form
 		}
 
 		$this->setDefault('serviceFeature', $object->serviceFeature);
-//		$this->addDistributionAssetRules($distributionProfile->optionalAssetDistributionRules, $distributionProfile->requiredAssetDistributionRules);
+		$this->populateSourceLanguages($object);
+	}
 
+	private function populateSourceLanguages($object)
+	{
+		$sourceLanguages = array();
+		foreach ($object->sourceLanguages as $sourceLanguage)
+		{
+			$newLanguage = array();
+			$newLanguage['language'] = $sourceLanguage->language;
+			$sourceLanguages[] = $newLanguage;
+		}
+		$this->setDefault('SourceLanguages',  json_encode($sourceLanguages));
 	}
 
 	/**
@@ -168,5 +200,34 @@ class Form_CatalogItemConfigure extends Infra_Form
 		$catalogItem->partnerId = null;
 		$catalogItem->createdAt = null;
 		$catalogItem->updatedAt = null;
+	}
+
+	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
+	{
+		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
+		$languages = $properties['SourceLanguages'];
+		$languagesArray = array();
+		foreach (json_decode($languages) as $language)
+		{
+			$languageItem = new Kaltura_Client_Type_LanguageItem();
+			$languageItem->language = $language->language;
+			$languagesArray[] = $languageItem;
+		}
+		$object->sourceLanguages = $languagesArray;
+
+		if ($properties['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		{
+			$languages = $properties['TargetLanguages'];
+			$languagesArray = array();
+			foreach (json_decode($languages) as $language)
+			{
+				$languageItem = new Kaltura_Client_Type_LanguageItem();
+				$languageItem->language = $language->language;
+				$languagesArray[] = $languageItem;
+			}
+			$object->targetLanguages = $languagesArray;
+		}
+
+		return $object;
 	}
 }
