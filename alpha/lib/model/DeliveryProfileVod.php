@@ -459,6 +459,13 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function sortFlavors($flavors)
 	{
+		$i = 0;
+		foreach ($flavors as &$currFlavor)
+		{
+			$currFlavor['index'] = $i;
+			$i++;
+		}
+		
 		$this->preferredFlavor = null;
 		$minBitrateDiff = PHP_INT_MAX;
 	
