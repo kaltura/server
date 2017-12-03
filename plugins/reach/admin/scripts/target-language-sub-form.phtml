@@ -1,0 +1,13 @@
+<fieldset id="<?php echo $this->element->getElementsBelongTo(); ?>">
+	<?php foreach ($this->element->getElements() as $name => $elem) {
+		if (strpos($name,'SourceLanguage_') > -1)
+			echo $elem;
+	} ?>
+	
+	<input type="hidden" name="belongs" value="<?php echo $this->element->getElementsBelongTo(); ?>" />
+	<a class="remove-source-language" href="javascript:;" onclick="removeSourceLanguage(this);">Remove</a>
+
+
+</fieldset>
+
+

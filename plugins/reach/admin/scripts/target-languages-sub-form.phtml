@@ -1,19 +1,23 @@
+<dd id="test">
 <fieldset class="source-language">
 	<legend>SourceLanguage:</legend>
+	<a class="source-langeuage" href="javascript:;" onclick="addSourceLanguage(this);" >+ Add Source Language</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
 		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
 		<?php echo $subForm; ?>
 	<?php endforeach; ?>
-	<a class="add-source-langeuage" href="javascript:;" onclick="addSourceLanguage(this);" >+ Add Source Language</a>
+	<style type="text/css">
+		#frmCatalogItemConfigure .source-language{ display:block; padding: 10px; min-width: 500px; }
+		#frmCatalogItemConfigure .source-language span.rule { font-size: 14px; font-weight: bold; }
+		#frmCatalogItemConfigure .source-language label { padding: 4px 0; }
+		#frmCatalogItemConfigure .source-language fieldset { min-width: 0; height: auto; margin: 10px 0; padding: 5px; border: 1px solid #CCCCCC; }
+		#frmCatalogItemConfigure .source-language .remove-source-language { padding: 5px; float: right; }
+		#frmCatalogItemConfigure .source-language dd { display: inline; }
+		#frmCatalogItemConfigure .source-language dt { display: inline; }
+	</style>
 </fieldset>
+</dd>
 
-<style type="text/css">
-	#frmCatalogItemConfigure .source-language{ display: block; padding: 10px; }
-	#frmCatalogItemConfigure .source-language span.rule { font-size: 14px; font-weight: bold; }
-	#frmCatalogItemConfigure .source-language label { display: block; padding: 4px 0; }
-	#frmCatalogItemConfigure .source-language fieldset { min-width: 0; height: auto; margin: 6px 0; padding: 10px; border: 1px solid #CCCCCC; }
-	#frmCatalogItemConfigure .source-language .remove-condition { float: right; }
-</style>
 
 <script type="text/javascript">
 
@@ -22,17 +26,17 @@
 	{
 		var sourceLanguageTag = 'SourceLanguage_' + condIndex++;
 		var newSourceLanguage = createSourceLanguage(sourceLanguageTag);
-		jQuery(target).before(newSourceLanguage.show());
+		jQuery(target).after(newSourceLanguage.show());
 	}
 
-	function removeCondition(target) {
+	function removeSourceLanguage(target) {
 		condIndex--;
 		jQuery(target).parent().remove();
 	}
 
 	function createSourceLanguage(taskTag)
 	{
-		var condTemplate = jQuery('#sourceLanguageTemplate' );
+		var condTemplate = jQuery('#SourceLanguageTemplate' );
 		condTemplate.attr("name", "Template");
 
 		var newData = condTemplate.clone(true);
@@ -52,9 +56,9 @@
 
 	function addSourceLanguageFromObject(target, object) {
 		var condTag = 'SourceLanguage_' + condIndex++;
-		var newCondition = createSourceLanguage(condTag);
+		var newSourceLanguage = createSourceLanguage(condTag);
 
-		newCondition.find( "input,select").each(function(idx) {
+		newSourceLanguage.find( "input,select").each(function(idx) {
 			if ($( this ).attr("type") == 'hidden')
 				return;
 			var name = $( this ).attr("name");
@@ -62,7 +66,7 @@
 			$(this).val(val).attr('checked', val);
 		});
 
-		jQuery(target).before(newCondition.show());
+		jQuery(target).after(newSourceLanguage.show());
 	}
 
 

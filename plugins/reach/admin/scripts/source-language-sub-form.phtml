@@ -1,5 +1,5 @@
 <fieldset id="<?php echo $this->element->getElementsBelongTo(); ?>">
-	<legend>Condition</legend>
+	<legend>SourceLanguage</legend>
 	<?php foreach ($this->element->getElements() as $name => $elem) {
 		if (strpos($name,'SourceLanguage_') > -1)
 			echo $elem;
