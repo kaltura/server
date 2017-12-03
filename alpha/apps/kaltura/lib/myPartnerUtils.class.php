@@ -13,7 +13,7 @@ class myPartnerUtils
 	
 	const BLOCKING_DAYS_GRACE = 7;
 
-	const END_OF_FREE_TRIAL_DAY = 30;
+	const FREE_TRIAL_END_DAY = 30;
 	const FREE_TRIAL_PARTNER_DELETION_DAY = 60;
 	
 	private static $s_current_partner_id = null;
@@ -1864,7 +1864,7 @@ class myPartnerUtils
 		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());
 		KalturaLog::debug("partner [{$partner->getId()}] is currently at the [$dayInFreeTrial] day of free trial");
 
-		if (($dayInFreeTrial >= self::END_OF_FREE_TRIAL_DAY) && ($dayInFreeTrial < self::FREE_TRIAL_PARTNER_DELETION_DAY))
+		if (($dayInFreeTrial >= self::FREE_TRIAL_END_DAY) && ($dayInFreeTrial < self::FREE_TRIAL_PARTNER_DELETION_DAY))
 		{
 			KalturaLog::debug('Partner ['.$partner->getId().'] reached to end of free trial day. Blocking content.');
 			$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
@@ -1877,7 +1877,9 @@ class myPartnerUtils
 		}
 
 		$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
-		if (in_array($dayInFreeTrial, $freeTrialUpdatesDays))
+		$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
+		KalturaLog::debug('closest day ['.$closestUpdatesDay.']');
+		if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
 		{
 			KalturaLog::debug('Partner ['.$partner->getId().'] reached to one of the Marketo lead sync days.');
 			$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
@@ -1885,6 +1887,24 @@ class myPartnerUtils
 
 		$partner->save();
 	}
+
+	/**
+	 * retrieve the closest (lowest) notification day compering today
+	 *
+	 * @param int $search
+	 * @param array $arr
+	 * @return int
+	 */
+	public static function getClosestDay($search, $arr) {
+		$closest = 0;
+		foreach ($arr as $item)
+		{
+			if (($item <= $search) && (abs($search - $closest) > abs($item - $search)))
+				$closest = $item;
+		}
+		return $closest;
+	}
+
 
 	/**
 	 * save in partner's custom data the number of objects from different type that were created
@@ -1898,13 +1918,13 @@ class myPartnerUtils
 		KalturaLog::log('Saving the number of entries, categories and metadata objects exist on partner ['.$fromPartner->getId().'] on partner ['.$toPartner->getId().']');
 		$fromPartnerId = $fromPartner->getId();
 
-		$categoriesNum = self::getCategoriesForPartner($fromPartnerId);
+		$categoriesNum = self::getCategoriesNumForPartner($fromPartnerId);
 		$toPartner->setTemplateCategoriesNum($categoriesNum);
 
-		$entriesNum = self::getEntriesForPartner($fromPartnerId);
+		$entriesNum = self::getEntriesNumForPartner($fromPartnerId);
 		$toPartner->setTemplateEntriesNum($entriesNum);
 
-		$metadataNum = self::getMetadataObjectsForPartner($fromPartnerId);
+		$metadataNum = self::getMetadataObjectsNumForPartner($fromPartnerId);
 		$toPartner->setTemplateCustomMetadataNum($metadataNum);
 
 		$toPartner->save();
@@ -1917,7 +1937,7 @@ class myPartnerUtils
 	 * @param bool $onlyActive
 	 * @return int $categoriesNum
 	 */
-	public static function getCategoriesForPartner($partnerId, $onlyActive = true)
+	public static function getCategoriesNumForPartner($partnerId, $onlyActive = true)
 	{
 		categoryPeer::setUseCriteriaFilter(false);
 		$c = new Criteria();
@@ -1936,7 +1956,7 @@ class myPartnerUtils
 	 * @param bool $onlyReady
 	 * @return int $entriesNum
 	 */
-	public static function getEntriesForPartner($partnerId, $onlyReady = true)
+	public static function getEntriesNumForPartner($partnerId, $onlyReady = true)
 	{
 		entryPeer::setUseCriteriaFilter(false);
 		$c = new Criteria();
@@ -1955,7 +1975,7 @@ class myPartnerUtils
 	 * @param bool $onlyValid
 	 * @return int $metadataNum
 	 */
-	public static function getMetadataObjectsForPartner($partnerId, $onlyValid = true)
+	public static function getMetadataObjectsNumForPartner($partnerId, $onlyValid = true)
 	{
 		MetadataPeer::setUseCriteriaFilter(false);
 		$c = new Criteria();
@@ -1977,7 +1997,7 @@ class myPartnerUtils
 	public static function getNumOfCategoriesCreatedByPartner ($partner)
 	{
 		$partnerId = $partner->getId();
-		$categories = self::getCategoriesForPartner($partnerId, false);
+		$categories = self::getCategoriesNumForPartner($partnerId, false);
 		$partnerCategories = $categories - $partner->getTemplateCategoriesNum();
 		return $partnerCategories;
 	}
@@ -1992,7 +2012,7 @@ class myPartnerUtils
 	public static function getNumOfEntriesCreatedByPartner ($partner)
 	{
 		$partnerId = $partner->getId();
-		$entries = self::getEntriesForPartner($partnerId, false);
+		$entries = self::getEntriesNumForPartner($partnerId, false);
 		$partnerEntries = $entries - $partner->getTemplateEntriesNum();
 		return $partnerEntries;
 	}
@@ -2007,27 +2027,11 @@ class myPartnerUtils
 	public static function getNumOfMetadataObjectsCreatedByPartner ($partner)
 	{
 		$partnerId = $partner->getId();
-		$MetadataObjects = self::getMetadataObjectsForPartner($partnerId, false);
+		$MetadataObjects = self::getMetadataObjectsNumForPartner($partnerId, false);
 		$partnerMetadata = $MetadataObjects - $partner->getTemplateCustomMetadataNum();
 		return $partnerMetadata;
 	}
 
-	/**
-	 * calculate the number of entries that were changed after creation
-	 *
-	 * @param partner $partner
-	 * @return int $entriesNum
-	 */
-	public static function getNumOfEntriesChangedByPartner ($partner)
-	{
-		entryPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
-		$c->addAnd(entryPeer::PARTNER_ID, $partner->getId());
-		$c->addAnd(entryPeer::CREATED_AT, entryPeer::UPDATED_AT, Criteria::NOT_EQUAL);
-		$entriesNum = entryPeer::doCount($c);
-		entryPeer::setUseCriteriaFilter(true);
-		return $entriesNum;
-	}
 
 	/**
 	 * calculate the partner percent usage
@@ -2044,5 +2048,23 @@ class myPartnerUtils
 		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
 		$percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
 		return $percent;
+	}
+
+
+	/**
+	 *  calculate the number of entries that were changed after creation
+	 *
+	 * @param entry $entry
+	 */
+	public static function increaseEntriesChangedNum($entry)
+	{
+		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE)
+		{
+			$entriesNum = $partner->getEntriesChangedByPartnerNum() + 1;
+			$partner->setEntriesChangedByPartnerNum($entriesNum);
+			$partner->save();
+		}
+
 	}
 }
