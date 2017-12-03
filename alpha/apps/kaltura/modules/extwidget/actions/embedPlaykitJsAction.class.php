@@ -159,12 +159,12 @@ class embedPlaykitJsAction extends sfAction
 		$apiFeatures = $this->getFromConfig('features');
 
 		$envConfig = array(
-			"ServiceUrl" => $serviceUrl,
-			"CDNUrl" => $cdnUrl,
-			"StatsServiceUrl" => $statsServiceUrl,
-			"LiveStatsServiceUrl" => $liveStatsServiceUrl,
-			"AnalyticsServiceUrl" => $analyticsServiceUrl,
-			"ApiFeatures" => $apiFeatures
+			"serviceUrl" => $serviceUrl,
+			"cdnUrl" => $cdnUrl,
+			"statsServiceUrl" => $statsServiceUrl,
+			"liveStatsServiceUrl" => $liveStatsServiceUrl,
+			"analyticsServiceUrl" => $analyticsServiceUrl,
+			"apiFeatures" => $apiFeatures
 		);
 		return $envConfig;
 	}
