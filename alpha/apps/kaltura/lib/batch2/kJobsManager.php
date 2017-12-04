@@ -501,16 +501,23 @@ class kJobsManager
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}
-			
+
 		// creates convert data
 		$convertData = new kConvertJobData();
 		$convertData->setSrcFileSyncs($srcFileSyncs);
+		$sourcePath = $convertData->getSrcFileSyncLocalPath();
+		if(kFile::isFileTypeText($sourcePath))
+		{
+			KalturaLog::err("Source file is of type text for flavor id [$flavorAssetId]");
+			return null;
+		}
+
 		$convertData->setMediaInfoId($mediaInfoId);
 		$convertData->setFlavorParamsOutputId($flavor->getId());
 		$convertData->setFlavorAssetId($flavorAssetId);
 		$convertData->setConversionProfileId($conversionProfileId);
 		$convertData->setPriority($priority);
-		
+
 		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
 		if(!$dbCurrentConversionEngine)
 			return null;
@@ -766,7 +773,6 @@ class kJobsManager
 				throw new kCoreException("Source file not found for thumbnail capture [$thumbAssetId]", kCoreException::SOURCE_FILE_NOT_FOUND);
 			}
 		}
-		$localPath = $fileSync->getFullPath();
 		$remoteUrl = $fileSync->getExternalUrl($entryId);
 		
 		// creates convert data
@@ -774,7 +780,7 @@ class kJobsManager
 		$data->setThumbAssetId($thumbAssetId);
 		$data->setSrcAssetId($srcAssetId);
 		$data->setSrcAssetType($srcAssetType);
-		$data->setSrcFileSyncLocalPath($localPath);
+		$data->setFileContainer(self::getFileContainerByFileSync($fileSync));
 		$data->setSrcFileSyncRemoteUrl($remoteUrl);
 		$data->setThumbParamsOutputId($thumbParams->getId());
 	
@@ -1214,6 +1220,13 @@ class kJobsManager
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{
+		if(kFile::isFileTypeText($inputFileSyncLocalPath))
+		{
+			KalturaLog::notice('Source of type text will not be converted');
+			$entry->setStatus(entryStatus::ERROR_CONVERTING);
+			$entry->save();
+			return null;
+		}
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);
@@ -1767,5 +1780,24 @@ class kJobsManager
 		$job->setData($jobData);
 		
 		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
+	}
+
+	protected static function getFileContainer(FileSyncKey $syncKey)
+	{
+
+		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
+		return self::getFileContainerByFileSync($fileSync);
+	}
+
+	protected static function getFileContainerByFileSync(FileSync $fileSync)
+	{
+		$fileContainer = new FileContainer();
+		if ($fileSync)
+		{
+			$fileContainer->setFilePath($fileSync->getFullPath());
+			$fileContainer->setEncryptionKey($fileSync->getEncryptionKey());
+			$fileContainer->setFileSize($fileSync->getFileSize());
+		}
+		return $fileContainer;
 	}
 }

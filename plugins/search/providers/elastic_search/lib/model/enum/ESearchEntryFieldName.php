@@ -10,17 +10,16 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_DESCRIPTION = 'description';
 	const ENTRY_TAGS = 'tags';
 	const ENTRY_CATEGORY_IDS = 'category_ids';
-	const ENTRY_USER_ID = 'puser_id';
-	const ENTRY_CREATOR_ID = 'creator_puser_id';
+	const ENTRY_USER_ID = 'kuser_id';
+	const ENTRY_CREATOR_ID = 'creator_kuser_id';
 	const ENTRY_START_DATE = 'start_date';
 	const ENTRY_END_DATE = 'end_date';
 	const ENTRY_REFERENCE_ID = 'reference_id';
 	const ENTRY_CONVERSION_PROFILE_ID = 'conversion_profile_id';
 	const ENTRY_REDIRECT_ENTRY_ID = 'redirect_entry_id';
-	const ENTRY_ENTITLED_USER_EDIT = 'entitled_pusers_edit';
-	const ENTRY_ENTITLED_USER_PUBLISH = 'entitled_pusers_publish';
+	const ENTRY_ENTITLED_USER_EDIT = 'entitled_kusers_edit';
+	const ENTRY_ENTITLED_USER_PUBLISH = 'entitled_kusers_publish';
 	const ENTRY_TEMPLATE_ENTRY_ID = 'template_entry_id';
-	const ENTRY_DISPLAY_IN_SEARCH = 'display_in_search';
 	const ENTRY_PARENT_ENTRY_ID = 'parent_id';
 	const ENTRY_MEDIA_TYPE = 'media_type';
 	const ENTRY_SOURCE_TYPE = 'source_type';
@@ -38,4 +37,6 @@ interface ESearchEntryFieldName extends BaseEnum
 	const ENTRY_ACCESS_CONTROL_ID = 'access_control_id';
 	const ENTRY_VOTES = 'votes';
 	const ENTRY_VIEWS = 'views';
+	const ENTRY_CATEGORY_NAME = 'categories.name';
+	const ENTRY_EXTERNAL_SOURCE_TYPE = 'external_source_type';
 }

@@ -29,6 +29,7 @@ class kDruidBase
 	const DRUID_GRANULARITY_ALL = 'all';
 	const DRUID_GRANULARITY_DAY = 'day';
 	const DRUID_GRANULARITY_HOUR = 'hour';
+	const DRUID_GRANULARITY_MONTH = 'month';
 	const DRUID_DATASOURCE = 'dataSource';
 	const DRUID_INTERVALS = 'intervals';
 	const DRUID_FIELDS = 'fields';
@@ -64,6 +65,9 @@ class kDruidBase
 	const DRUID_QUERY = 'query';
 	const DRUID_CONTAINS = 'contains';
 	const DRUID_CASE_SENSITIVE = 'case_sensitive';
+	const DRUID_OUTPUT_NAME = 'outputName';
+	const DRUID_LIST_FILTERED = 'listFiltered';
+	const DRUID_DELEGATE = 'delegate';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';

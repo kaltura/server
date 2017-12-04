@@ -337,7 +337,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			// check the file size only if its first or second retry
-			// in case it failed few times, taks the file as is
+			// in case it failed few times, take the file as is
 			if($fileSize)
 			{
 				clearstatcache();
@@ -345,9 +345,9 @@ class KAsyncImport extends KJobHandlerWorker
 				if($actualFileSize < $fileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
-					$job = $this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
-					self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-					return $job;
+					$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
+					$e->setResetJobExecutionAttempts(true);
+					throw $e;
 				}
 			}
 

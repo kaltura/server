@@ -493,20 +493,38 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				$contributor = new WebVttCaptionsManifestEditor();
 				$contributor->captions = array();
-				//retrieve the current working partner's captions according to the entryId
+
+				//retrieve the current working partner's captions according to the entryId,
+				//if the entry type is playlist return all the captions for the inner entries
+				$entry = entryPeer::retrieveByPK($config->entryId);
 				$c = new Criteria();
-				$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
+				if ($entry->getType() == entryType::PLAYLIST)
+				{
+					$entryIds = array();
+					$entries = myPlaylistUtils::retrieveStitchedPlaylistEntries($entry);
+					foreach ($entries as $playlistEntry)
+						$entryIds[] = $playlistEntry->getId();
+					$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
+				}
+				else
+					$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 				$captionAssets = assetPeer::doSelect($c);
+
 				if (!count($captionAssets))
 					return array();
+				$captionLanguages = array();
 
 				foreach ($captionAssets as $captionAsset)
 				{
+					if (($entry->getType() == entryType::PLAYLIST) && (in_array($captionAsset->getLanguage(), $captionLanguages)))
+						continue;
+					$captionLanguages[] = $captionAsset->getLanguage();
+
 					/* @var $captionAsset CaptionAsset */
 					$captionAssetObj = array();
 
-					if (($captionAsset->getContainerFormat() == CaptionType::WEBVTT) || $config->hasSequence)
+					if (($captionAsset->getContainerFormat() == CaptionType::WEBVTT) || $config->hasSequence || ($entry->getType() == entryType::PLAYLIST))
 					{
 						// pass null as storageId in order to support any storage profile and not the one selected by the current video flavors
 						$url = $captionAsset->getExternalUrl(null);

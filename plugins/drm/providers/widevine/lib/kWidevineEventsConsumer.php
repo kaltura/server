@@ -43,7 +43,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	{
 		try 
 		{	
-			$hasActiveFlavors = $this->hasWidevineFlavorAssetsWithSameWvAssetIdInOtherEntries($object->getWidevineAssetId(), $object->getEntryId());
+			$hasActiveFlavors = $this->hasWidevineFlavorAssetsWithSameWvAssetIdInOtherEntries($object);
 			if(!$hasActiveFlavors)
 				$this->addWidevineRepositoryModifySyncJob($object->getEntryId(), $object->getPartnerId(), array($object), time(), time(), false);
 		}
@@ -168,14 +168,15 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		return assetPeer::doSelect($c);		
 	}
 	
-	private function hasWidevineFlavorAssetsWithSameWvAssetIdInOtherEntries($wvAssetId, $entryId)
+	private function hasWidevineFlavorAssetsWithSameWvAssetIdInOtherEntries($asset)
 	{
 		$entryFilter = new entryFilter();
+		$wvAssetId = $asset->getWidevineAssetId();
 		$entryFilter->fields['_like_plugins_data'] = WidevinePlugin::getWidevineAssetIdSearchData($wvAssetId);
-		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$entryFilter->setPartnerSearchScope($asset->getPartnerId());
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);				
 		$entryFilter->attachToCriteria($c);	
-		$c->add(entryPeer::ID, $entryId, Criteria::NOT_EQUAL);
+		$c->add(entryPeer::ID, $asset->getEntryId(), Criteria::NOT_EQUAL);
 		$c->applyFilters();
 		$entriesCount = $c->getRecordsCount();
 		if($entriesCount)

@@ -6,6 +6,9 @@
 
 abstract class kBaseSearch
 {
+
+	const GLOBAL_HIGHLIGHT_CONFIG = 'globalMaxNumberOfFragments';
+
     protected $elasticClient;
     protected $query;
     protected $queryAttributes;
@@ -16,7 +19,7 @@ abstract class kBaseSearch
         $this->queryAttributes = new ESearchQueryAttributes();
     }
 
-    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(),kPager $pager = null, ESearchOrderBy $order = null);
+    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true);
 
     public abstract function getPeerName();
 
@@ -24,16 +27,17 @@ abstract class kBaseSearch
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->applyElasticSearchConditions($subQuery);
+        $this->addGlobalHighlights();
         KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
         $result = $this->elasticClient->search($this->query);
         return $result;
     }
 
-    protected function initQuery(array $statuses, kPager $pager = null, ESearchOrderBy $order = null)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
-        $this->initQueryAttributes($partnerId);
-        $this->initBasePartnerFilter($partnerId, $statuses);
+        $this->initQueryAttributes($partnerId, $objectId, $useHighlight);
+        $this->initBaseFilter($partnerId, $statuses, $objectId);
         $this->initPager($pager);
         $this->initOrderBy($order);
     }
@@ -43,7 +47,7 @@ abstract class kBaseSearch
         if($pager)
         {
             $this->query['from'] = $pager->calcOffset();
-            $this->query['size'] = $pager->getPageSize();
+            $this->query['size'] = $pager->calcPageSize();
         }
     }
 
@@ -75,7 +79,7 @@ abstract class kBaseSearch
         }
     }
 
-    protected function initBasePartnerFilter($partnerId, array $statuses)
+    protected function initBaseFilter($partnerId, array $statuses, $objectId)
     {
         $partnerStatus = array();
         foreach ($statuses as $status)
@@ -83,29 +87,60 @@ abstract class kBaseSearch
             $partnerStatus[] = elasticSearchUtils::formatPartnerStatus($partnerId, $status);
         }
 
-        $this->query['body'] = array(
-            'query' => array(
-                'bool' => array(
-                    'filter' => array(
-                        array(
-                            'terms' => array('partner_status' => $partnerStatus)
-                        )
-                    )
-                )
-            )
-        );
+		$this->query['body']['query']['bool']['filter'][] = array(
+			'terms' => array('partner_status' => $partnerStatus)
+		);
+
+        if($objectId)
+        {
+            $this->query['body']['query']['bool']['filter'][] = array(
+                'term' => array('_id' => elasticSearchUtils::formatSearchTerm($objectId))
+            );
+        }
+
         //return only the object id
         $this->query['body']['_source'] = false;
     }
+
+    protected function addGlobalHighlights()
+	{
+		$this->queryAttributes->setScopeToGlobal();
+		$highlight = self::getHighlightSection(self::GLOBAL_HIGHLIGHT_CONFIG, $this->queryAttributes);
+		if(isset($highlight))
+		{
+			$this->query['body']['highlight'] = $highlight;
+		}
+	}
+
+	public static function getHighlightSection($configKey, $queryAttributes)
+	{
+		$highlight = null;
+		$fieldsToHighlight = $queryAttributes->getFieldsToHighlight();
+		if(!empty($fieldsToHighlight) && $queryAttributes->getUseHighlight())
+		{
+			$highlight = array();
+			$highlight["type"] = "unified";
+			$highlight["order"] = "score";
+			$HighlightConfig = kConf::get('highlights', 'elastic');
+			if(isset($HighlightConfig[$configKey]))
+				$highlight['number_of_fragments'] = $HighlightConfig[$configKey];
+
+			$highlight['fields'] = $fieldsToHighlight;
+		}
+
+		return $highlight;
+	}
 
     protected function applyElasticSearchConditions($conditions)
     {
         $this->query['body']['query']['bool']['must'] = array($conditions);
     }
 
-    protected function initQueryAttributes($partnerId)
+    protected function initQueryAttributes($partnerId, $objectId, $useHighlight)
     {
         $this->initPartnerLanguages($partnerId);
+        $this->queryAttributes->setUseHighlight($useHighlight);
+        $this->initOverrideInnerHits($objectId);
     }
 
     protected function initPartnerLanguages($partnerId)
@@ -122,6 +157,16 @@ abstract class kBaseSearch
         }
 
         $this->queryAttributes->setPartnerLanguages($partnerLanguages);
+    }
+
+    protected function initOverrideInnerHits($objectId)
+    {
+        if(!$objectId)
+            return;
+
+        $innerHitsConfig = kConf::get('innerHits', 'elastic');
+        $overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
+        $this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
     }
 
 }

@@ -123,9 +123,9 @@ class playManifestAction extends kalturaAction
 	private $deliveryAttributes = null;
 
 	/**
-	 * @var int
+	 * @var array
 	 */
-	private $deliveryProfileId = null;
+	private $requestedDeliveryProfileIds = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -749,10 +749,11 @@ class playManifestAction extends kalturaAction
 
 	private function shouldIncludeStorageProfile($storageProfile)
 	{
-		if($this->deliveryProfileId)
+		if($this->requestedDeliveryProfileIds)
 		{
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			return isset($deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]) && in_array($this->deliveryProfileId, $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]);
+			$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()];
+			return isset($storageStreamerTypeDeliveryProfileIds) && count(array_intersect($this->requestedDeliveryProfileIds, $storageStreamerTypeDeliveryProfileIds));
 		}
 
 		return true;
@@ -1148,8 +1149,21 @@ class playManifestAction extends kalturaAction
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 
-		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
-		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
+		$requestDeliveryProfileIds = $this->getRequestParameter( "deliveryProfileIds", null);
+		if($requestDeliveryProfileIds)
+		{
+			$this->requestedDeliveryProfileIds = explode(',', $requestDeliveryProfileIds);
+		}
+		else
+		{
+			$requestDeliveryProfileIds = $this->getRequestParameter( "deliveryProfileId", null);
+			if($requestDeliveryProfileIds)
+			{
+				$this->requestedDeliveryProfileIds = array($requestDeliveryProfileIds);
+			}
+		}
+
+		$this->deliveryAttributes->setRequestedDeliveryProfileIds($this->requestedDeliveryProfileIds);
 
 		// Initialize
 		$this->initEntry();

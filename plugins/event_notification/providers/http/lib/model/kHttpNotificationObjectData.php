@@ -37,6 +37,12 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	 */
 	protected $coreObject;
 
+	/**
+	 * An array of pattern-replacement pairs used for data string regex replacements
+	 * @var array
+	 */
+	protected $dataStringReplacements;
+
 	/* (non-PHPdoc)
 	 * @see kHttpNotificationData::setScope()
 	 */
@@ -44,8 +50,9 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	{
 		if(strpos($this->code, ';') !== false)
 			throw new kCoreException("Evaluated code may be simple value only");
-			
+
 		$object = eval("return {$this->code};");
+
 		if(is_object($object))
 			$this->coreObject = serialize($object);
 	}
@@ -120,5 +127,21 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	public function setCode($code)
 	{
 		$this->code = $code;
+	}
+
+	/**
+	 * @return string $dataStringReplacements
+	 */
+	public function getDataStringReplacements()
+	{
+	        return $this->dataStringReplacements;
+	}
+
+	/**
+	 * @param string $dataStringReplacements
+	 */
+	public function setDataStringReplacements($dataStringReplacements)
+	{
+	        $this->dataStringReplacements = $dataStringReplacements;
 	}
 }

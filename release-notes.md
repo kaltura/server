@@ -1,3 +1,92 @@
+# Mercury 13.8.0 # 
+
+## Add Recorded Entry replaced HTTP template ##
+
+- Issue Type: Support
+- Issue ID: SUP-12533
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_11_27_recordedEntryReplaced.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_11_27_deploy_recorded_entry_replaced_http_notification.php
+
+#### Known Issues & Limitations ####
+None.
+
+## eSearch - Increase Inner Hits size ##
+- Issue Type: Task
+- Issue ID: PLAT-7890
+
+### Configuration ###
+	- Add the following to your elastic.ini file in innerHits section:
+    	innerHitsWithObjectId = 100
+### Deployment scripts ###
+	None
+
+## Email Notification - dispatch to multiple category subscribers ## 
+- Issue Type: Feature
+- Issue ID: TR-1693
+
+### Deployment script ### 
+    cd /opt/kaltura/app/tests/standAloneClient
+    php exec.php entryChangesSubscriberNotifications.xml    
+
+## Add eSearch highlight ##
+- Issue Type: Task
+- Issue ID: PLAT-8090
+
+### Configuration ###
+	Configure elasticSearch Kaltura configuration:
+	- Add the following to your elastic.ini file:
+	[highlights]
+	globalMaxNumberOfFragments = 7
+	cuepointMaxNumberOfFragments = 8
+### Deployment scripts ###
+	None
+
+#### Known Issues & Limitations ####
+	None
+
+## Add new app token capabilities ##
+- Issue Type: Task
+- Issue ID: PLAT-8200
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	 mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2017_11_12_alter_app_token_table_add_kuser_id_column.sql
+
+#### Known Issues & Limitations ####
+	None
+
+## Permissions for webcast live dashboard ##
+- Issue Type: Task
+- Issue ID: NO-PLAT
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "WEbcast producer device role" LIVE_STREAM_UPDATE realrun
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_21_allow_webcast_to_list_beacons_and_conversionprofileassetparams.php
+
+#### Known Issues & Limitations ####
+	None
+
+## Add permission to pushnotificationstemplate->register for media_server ##
+- Issue Type: Task
+- Issue ID: PLAT-7977
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	 php deployment/updates/scripts/add_permissions/2017_11_23_add_push_notification_register_permission_to_media_server.php
+
 # Mercury 13.7.0 #
 ## New FFMPEG version ##
 - Issue Type: Task

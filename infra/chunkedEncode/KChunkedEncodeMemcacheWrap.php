@@ -626,7 +626,7 @@ ini_set("memory_limit","512M");
 				$job->state = $job::STATE_FAIL;
 				$storeManager->SaveJob($job);
 					$storeManager->SaveJob($job);
-					$rvStr = "FAILED -";
+					$rvStr = "FAILED - rv($rv),";
 			}
 			else {
 				if(isset($outFilename)) {

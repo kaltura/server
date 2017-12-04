@@ -102,8 +102,10 @@
 			}
 			$this->videoCmdLines = $videoCmdLines;
 			
-			$audioCmdLine = $chunker->BuildAudioCommandLine();
-			$this->audioCmdLines = array($audioCmdLine);
+			$cmdLine = $chunker->BuildAudioCommandLine();
+			$logFilename = $chunker->getSessionName("audio").".log";
+			$cmdLine = "time $cmdLine > $logFilename 2>&1";
+			$this->audioCmdLines = array($cmdLine);
 			
 			$this->SerializeSession();
 			return true;
@@ -173,6 +175,9 @@
 				$process = $this->executeCmdline($mergeCmd, $concatFilenameLog);
 				if($process==false) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt)!");
+					$logTail = self::getLogTail($concatFilenameLog);
+					if(isset($logTail))
+						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
 					continue;
 				}
@@ -181,6 +186,9 @@
 				$execData = new KProcessExecutionData($process, $concatFilenameLog);
 				if($execData->exitCode!=0) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt, exitCode:$execData->exitCode)!");
+					$logTail = self::getLogTail($concatFilenameLog);
+					if(isset($logTail))
+						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
 					continue;
 				}
@@ -408,6 +416,23 @@
 			file_put_contents($this->chunker->getSessionName("session"), serialize($this));
 		}
 		
+		/********************
+		 * 
+		 */
+		protected static function getLogTail($logFilename, $size=5000)
+		{
+			$logTail = null;
+			if(file_exists($logFilename)) {
+				$fHd = fopen($logFilename,"r");
+				$fileSz = filesize($logFilename);
+				if($fileSz>$size)
+					fseek($fHd,$fileSz-$size);
+				$logTail = fread($fHd, $size);
+				fclose($fHd);
+			}
+			return $logTail;
+		}
+	
 		/********************
 		 *
 		 */
