@@ -4,7 +4,7 @@
  * @subpackage lib.entitlement
  */
 
-class kElasticUserCategoryEntryEntitlementContributor implements IKalturaESearchEntryEntitlementContributor
+class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEntryEntitlementDecorator
 {
 	const MAX_CATEGORIES = 1024;
 

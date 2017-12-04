@@ -4,7 +4,7 @@
  * @subpackage lib.entitlement
  */
 
-class kElasticEntryDisableEntitlementContributor implements IKalturaESearchEntryEntitlementContributor
+class kElasticEntryDisableEntitlementDecorator implements IKalturaESearchEntryEntitlementDecorator
 {
 	public static function shouldContribute()
 	{
