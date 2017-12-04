@@ -1,9 +1,7 @@
 <?php
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
-	const USER_TYPE_ADMIN = 'admin';
-	const USER_TYPE_USER = 'user';
-
+	
 	/**
 	 * @var kLiveStreamConfiguration
 	 */
@@ -325,17 +323,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		}
 		
 		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/sd/$segmentDuration/";
-		$entry = $this->getDynamicAttributes()->getEntry();
-		if ($entry->getExplicitLive())
-		{
-			$userType = self::USER_TYPE_ADMIN;
-		 	if (!$entry->canViewExplicitLive())
-				$userType = self::USER_TYPE_USER;
-			$livePackagerUrl .= "type/$userType/";
-		}
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
-		$livePackagerUrl .= "t/$secureToken/";
-
+		$livePackagerUrl .= "t/$secureToken/"; 
+		
 		KalturaLog::debug("Live Packager base stream Url [$livePackagerUrl]");
 		return $livePackagerUrl;
 	}
