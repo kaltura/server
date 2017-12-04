@@ -505,8 +505,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 							// For URL typed sync - assume remote and sent the fileSync to use the relative file path.
 							// For the other types - just send the syncKey
 							$fileSync = reset(kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false));
-							if ($fileSync && !$fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-								$fileSync = null;
 							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $fileSync);
 						}
 					}
