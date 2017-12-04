@@ -28,6 +28,8 @@ class KalturaESearchMetadataItem extends KalturaESearchItem
 
 	private static $map_dynamic_enum = array();
 
+	private static $map_field_enum = array();
+
 	protected function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -48,6 +50,11 @@ class KalturaESearchMetadataItem extends KalturaESearchItem
 	protected function getDynamicEnumMap()
 	{
 		return self::$map_dynamic_enum;
+	}
+
+	protected function getFieldEnumMap()
+	{
+		return self::$map_field_enum;
 	}
 
 }

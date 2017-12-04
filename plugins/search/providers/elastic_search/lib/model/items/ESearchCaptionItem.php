@@ -17,7 +17,7 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 	);
 
 	private static $multiLanguageFields = array(
-		ESearchCaptionFieldName::CAPTION_CONTENT,
+		ESearchCaptionFieldName::CONTENT,
 	);
 
 	protected static $field_boost_values = array(

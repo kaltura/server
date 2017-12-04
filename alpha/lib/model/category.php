@@ -1956,7 +1956,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	 */
 	public function getElasticSaveMethod()
 	{
-		return ElasticMethodType::UPADTE;
+		return ElasticMethodType::UPDATE;
 	}
 
 	/**

@@ -23,6 +23,20 @@ class KalturaESearchCuePointItem extends KalturaESearchItem
 
 	private static $map_dynamic_enum = array();
 
+	private static $map_field_enum = array(
+		KalturaESearchCuePointFieldName::ANSWERS => ESearchCuePointFieldName::ANSWERS,
+		KalturaESearchCuePointFieldName::END_TIME => ESearchCuePointFieldName::END_TIME,
+		KalturaESearchCuePointFieldName::EXPLANATION => ESearchCuePointFieldName::EXPLANATION,
+		KalturaESearchCuePointFieldName::HINT => ESearchCuePointFieldName::HINT,
+		KalturaESearchCuePointFieldName::ID => ESearchCuePointFieldName::ID,
+		KalturaESearchCuePointFieldName::NAME => ESearchCuePointFieldName::NAME,
+		KalturaESearchCuePointFieldName::QUESTION => ESearchCuePointFieldName::QUESTION,
+		KalturaESearchCuePointFieldName::START_TIME => ESearchCuePointFieldName::START_TIME,
+		KalturaESearchCuePointFieldName::TAGS => ESearchCuePointFieldName::TAGS,
+		KalturaESearchCuePointFieldName::TEXT => ESearchCuePointFieldName::TEXT,
+		KalturaESearchCuePointFieldName::SUB_TYPE => ESearchCuePointFieldName::SUB_TYPE,
+	);
+
 	protected function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -44,6 +58,11 @@ class KalturaESearchCuePointItem extends KalturaESearchItem
 	protected function getDynamicEnumMap()
 	{
 		return self::$map_dynamic_enum;
+	}
+
+	protected function getFieldEnumMap()
+	{
+		return self::$map_field_enum;
 	}
 
 }

@@ -38,6 +38,8 @@ abstract class KalturaESearchItem extends KalturaESearchBaseItem
 
 	abstract protected function getDynamicEnumMap();
 
+	abstract protected function getFieldEnumMap();
+
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if(strlen($this->searchTerm) > self::MAX_SEARCH_TERM_LENGTH)
@@ -64,6 +66,15 @@ abstract class KalturaESearchItem extends KalturaESearchBaseItem
 
 		}
 
+		$fieldEnumMap = $this->getFieldEnumMap();
+		if(isset($fieldEnumMap[$this->getItemFieldName()]))
+		{
+			$coreFieldName = $fieldEnumMap[$this->getItemFieldName()];
+			$object_to_fill->setFieldName($coreFieldName);
+			$props_to_skip[] = 'fieldName';
+		}
+
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
 }

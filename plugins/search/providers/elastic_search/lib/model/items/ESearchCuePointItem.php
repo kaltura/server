@@ -51,7 +51,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	private static $multiLanguageFields = array();
 
 	/**
-	 * @return ESearchEntryFieldName
+	 * @return ESearchCuePointFieldName
 	 */
 	public function getFieldName()
 	{
@@ -59,7 +59,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	}
 
 	/**
-	 * @param ESearchEntryFieldName $fieldName
+	 * @param ESearchCuePointFieldName $fieldName
 	 */
 	public function setFieldName($fieldName)
 	{

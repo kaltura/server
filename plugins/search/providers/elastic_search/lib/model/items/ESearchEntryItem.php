@@ -49,6 +49,7 @@ class ESearchEntryItem extends ESearchItem
 		'access_control_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'categories.name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
 		'external_source_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
+		'is_quiz' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 	);
 
 	protected static $field_boost_values = array(
@@ -64,8 +65,8 @@ class ESearchEntryItem extends ESearchItem
 	);
 
 	private static $multiLanguageFields = array(
-		ESearchEntryFieldName::ENTRY_NAME,
-		ESearchEntryFieldName::ENTRY_DESCRIPTION,
+		ESearchEntryFieldName::NAME,
+		ESearchEntryFieldName::DESCRIPTION,
 	);
 
 	/**

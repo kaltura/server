@@ -8,6 +8,8 @@ class KalturaESearchUnifiedItem extends KalturaESearchItem
 
 	private static $map_dynamic_enum = array();
 
+	private static $map_field_enum = array();
+
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
@@ -24,4 +26,10 @@ class KalturaESearchUnifiedItem extends KalturaESearchItem
 	{
 		return self::$map_dynamic_enum;
 	}
+
+	protected function getFieldEnumMap()
+	{
+		return self::$map_field_enum;
+	}
+
 }

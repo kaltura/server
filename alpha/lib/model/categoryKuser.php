@@ -484,7 +484,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	 */
 	public function getElasticSaveMethod()
 	{
-		return ElasticMethodType::UPADTE;
+		return ElasticMethodType::UPDATE;
 	}
 
 	/**
