@@ -3,19 +3,19 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaEsearchHighlightArray extends KalturaTypedArray
+class KalturaESearchHighlightArray extends KalturaTypedArray
 {
 	public function __construct()
 	{
-		return parent::__construct("KalturaEsearchHighlight");
+		return parent::__construct("KalturaESearchHighlight");
 	}
 
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$newArr = new KalturaEsearchHighlightArray();
+		$newArr = new KalturaESearchHighlightArray();
 		foreach ( $arr as $obj )
 		{
-			$nObj = new KalturaEsearchHighlight();
+			$nObj = new KalturaESearchHighlight();
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
