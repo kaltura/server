@@ -662,10 +662,9 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
 			if(!$fileSync)
 				return true;
-
-			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			if($srcFileSyncLocalPath)
-				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
+			
+			if(kFileSyncUtils::getLocalFilePathForKey($syncKey))
+				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $syncKey, $object->getId(), null, $entry->getCreateThumb(), $offset);
 		}
 		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 		{

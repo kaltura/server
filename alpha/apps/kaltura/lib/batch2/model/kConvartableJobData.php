@@ -151,21 +151,21 @@ class kConvartableJobData extends kJobData
 	}
 
 	/**
-	 * @param $srcFileSyncLocalPath the $srcFileSyncLocalPath to set
+	 * @param FileSync $fileSync
 	 */
-	public function setSrcFileSyncLocalPath($srcFileSyncLocalPath)
+	public function setSrcFileSyncLocalPath($fileSync)
 	{
 		$srcDescriptor = (is_array($this->srcFileSyncs) && count($this->srcFileSyncs) ? reset($this->srcFileSyncs) : null);
 		
 		if(!$srcDescriptor)
 		{
 			$srcDescriptor = new kSourceFileSyncDescriptor();
-			$srcDescriptor->setFileSyncLocalPath($srcFileSyncLocalPath);	
+			$srcDescriptor->setPathAndKeyByFileSync($fileSync);
 			$this->srcFileSyncs = array($srcDescriptor);
 		}
 		else
 		{
-			$srcDescriptor->setFileSyncLocalPath($srcFileSyncLocalPath);	
+			$srcDescriptor->setPathAndKeyByFileSync($fileSync);
 		}	
 	}
 

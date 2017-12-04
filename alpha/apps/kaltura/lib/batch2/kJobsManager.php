@@ -804,7 +804,7 @@ class kJobsManager
 	/**
 	 * @param BatchJob $parentJob
 	 * @param int $postConvertAssetType
-	 * @param string $srcFileSyncLocalPath
+	 * @param FileSyncKey $fileSyncKey
 	 * @param int $flavorAssetId
 	 * @param int $flavorParamsOutputId
 	 * @param bool $createThumb
@@ -812,11 +812,11 @@ class kJobsManager
 	 * @param string $customData
 	 * @return BatchJob
 	 */
-	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
+	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $fileSyncKey, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setPostConvertAssetType($postConvertAssetType);
-		$postConvertData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
+		$postConvertData->setSrcFileSyncLocalPath(kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey));
 		$postConvertData->setFlavorParamsOutputId($flavorParamsOutputId);
 		$postConvertData->setFlavorAssetId($flavorAssetId);
 		$postConvertData->setThumbOffset($thumbOffset);
