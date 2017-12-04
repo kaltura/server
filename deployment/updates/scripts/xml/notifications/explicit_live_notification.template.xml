@@ -25,7 +25,7 @@
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventObjectChangedCondition">
 						<description>Entry view mode or recording status changes</description>
-						<modifiedColumns>view_mode,recording_status</modifiedColumns>
+						<modifiedColumns>{view_mode,recording_status}</modifiedColumns>
 						<field objectType="KalturaEvalStringField">
 							<code>$scope->getObject()->getType()</code>
 						</field>
