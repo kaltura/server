@@ -448,7 +448,17 @@ abstract class LiveEntry extends entry
 		KalturaLog::info("media servers hostnames: " . print_r($hostnames,true));
 		return $hostnames;
 	}
-	
+
+	public function canViewExplicitLive()
+	{
+		$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
+		$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
+		$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+			return false;
+		return true;
+	}
+
 	/**
 	 * @return boolean
 	 */
@@ -456,10 +466,7 @@ abstract class LiveEntry extends entry
 	{
 		if ($this->getViewMode() == ViewMode::PREVIEW)
 		{
-			$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
-			$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
-			$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-			if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+			if (!$this->canViewExplicitLive())
 				return false;
 		}
 
