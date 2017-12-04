@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.elasticSearch
- * @subpackage model
+ * @subpackage model.search
  */
 class kESearchQueryManager
 {
@@ -49,19 +49,17 @@ class kESearchQueryManager
 	 * @param ESearchQueryAttributes $queryAttributes
 	 * @return array
 	 */
-	public static function getMultiMatchQuery($searchItem, $fieldName, &$queryAttributes)
+	public static function getPartialQuery($searchItem, $fieldName, &$queryAttributes)
 	{
-		$multiMatch = array();
+		$partialQuery = new kESearchBoolQuery();
+
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
 		$rawBoostFactor = self::RAW_FIELD_BOOST_FACTOR * $fieldBoostFactor;
 		$multiMatchFieldBoostFactor = self::MATCH_FIELD_BOOST_FACTOR * $fieldBoostFactor;
-
-		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::QUERY_KEY] = $searchItem->getSearchTerm();
-		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY] = array(
-			$fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor,
-			$fieldName.'^'.$multiMatchFieldBoostFactor,
-		);
-		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::TYPE_KEY] = self::MOST_FIELDS;
+		$multiMatchQuery = new kESearchMultiMatchQuery();
+		$multiMatchQuery->setQuery($searchItem->getSearchTerm());
+		$multiMatchQuery->addToFields($fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor);
+		$multiMatchQuery->addToFields($fieldName.'^'.$multiMatchFieldBoostFactor);
 		$queryAttributes->addFieldToHighlight($fieldName.'.'.self::RAW_FIELD_SUFFIX);
 		$queryAttributes->addFieldToHighlight($fieldName);
 
@@ -74,70 +72,54 @@ class kESearchQueryManager
 				if($mappingLanguageField)
 				{
 					$languageFieldBoostFactor = self::LANGUAGE_FIELD_BOOST_FACTOR * $fieldBoostFactor;
-					$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $mappingLanguageField.'^'.$languageFieldBoostFactor;
-					$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
+					$multiMatchQuery->addToFields($mappingLanguageField.'^'.$languageFieldBoostFactor);
 					$queryAttributes->addFieldToHighlight($mappingLanguageField);
+					$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
+					
 					if($synonymField)
-						$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][0][self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $synonymField; //don't boost
+						$multiMatchQuery->addToFields($synonymField);//don't boost
 				}
 			}
 		}
+		$partialQuery->addToShould($multiMatchQuery);
 
 		$trigramFieldName = $fieldName.'.'.self::NGRAMS_FIELD_SUFFIX;
-		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][1][self::MATCH_KEY][$trigramFieldName][self::QUERY_KEY] = $searchItem->getSearchTerm();
+		$matchQuery = new kESearchMatchQuery($trigramFieldName, $searchItem->getSearchTerm());
 		$trigramPercentage = kConf::get('ngramPercentage', 'elastic', self::DEFAULT_TRIGRAM_PERCENTAGE);
-		$multiMatch[self::BOOL_KEY][self::SHOULD_KEY][1][self::MATCH_KEY][$trigramFieldName][self::MINIMUM_SHOULD_MATCH_KEY] = "$trigramPercentage%";
-		$multiMatch[self::BOOL_KEY][self::MINIMUM_SHOULD_MATCH_KEY] = 1;
+		$matchQuery->setMinimumShouldMatch("$trigramPercentage%");
 		$queryAttributes->addFieldToHighlight($trigramFieldName);
-		return $multiMatch;
+		$partialQuery->addToShould($matchQuery);
+
+		return $partialQuery;
 	}
 
 	public static function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)
 	{
-		$exactMatch = array();
-		$queryType = self::TERM_KEY;
-		$searchValuePath = self::VALUE_KEY;
-		$fieldSuffix = '';
-
-		if (in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
-		{
-			$queryType = self::MATCH_PHRASE_KEY;
-			$searchValuePath = self::QUERY_KEY;
-		}
-
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
-		$exactMatch[$queryType] = array
-		(
-			$fieldName . $fieldSuffix => array(
-				$searchValuePath => $searchTerm,
-				self::BOOST_KEY => $fieldBoostFactor
-			)
-		);
+		$fieldSuffix = '';
+		$queryObject = 'kESearchTermQuery';
 
+		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
+			$queryObject = 'kESearchMatchPhraseQuery';
+		
+		$exactMatch = new $queryObject($fieldName, $searchTerm);
+		$exactMatch->setBoostFactor($fieldBoostFactor);
 		$queryAttributes->addFieldToHighlight($fieldName . $fieldSuffix);
+
 		return $exactMatch;
 	}
 
 	public static function getPrefixQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)
 	{
-		$prefixQuery = array();
-		$queryType = self::PREFIX_KEY;
 		$fieldSuffix = '';
-
 		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 			$fieldSuffix = '.'.self::RAW_FIELD_SUFFIX;
 
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
-		$prefixQuery[$queryType] = array
-		(
-			$fieldName . $fieldSuffix => array
-			(
-				self::VALUE_KEY => $searchTerm,
-				self::BOOST_KEY => $fieldBoostFactor
-			)
-		);
+		$prefixQuery = new kESearchPrefixQuery($fieldName . $fieldSuffix, $searchTerm);
+		$prefixQuery->setBoostFactor($fieldBoostFactor);
 		$queryAttributes->addFieldToHighlight($fieldName . $fieldSuffix);
 		return $prefixQuery;
 	}
@@ -147,31 +129,16 @@ class kESearchQueryManager
 		$rangeObject = $searchItem->getRange();
 		if(!$rangeObject)
 			return null;
-		/**@var $rangeObject ESearchRange*/
-		$rangeSubQuery = array();
-		$rangeQuery =  array();
-		$queryType = self::RANGE_KEY;
-		if(is_numeric($rangeObject->getGreaterThan()))
-			$rangeSubQuery[self::GT_KEY] = $rangeObject->getGreaterThan();
-		if(is_numeric($rangeObject->getGreaterThanOrEqual()))
-			$rangeSubQuery[self::GTE_KEY] = $rangeObject->getGreaterThanOrEqual();
-		if(is_numeric($rangeObject->getLessThan()))
-			$rangeSubQuery[self::LT_KEY] = $rangeObject->getLessThan();
-		if(is_numeric($rangeObject->getLessThanOrEqual()))
-			$rangeSubQuery[self::LTE_KEY] = $rangeObject->getLessThanOrEqual();
-
-		$rangeQuery[$queryType][$fieldName] = $rangeSubQuery;
+		$rangeQuery = new kESearchRangeQuery($rangeObject, $fieldName);
 		$queryAttributes->addFieldToHighlight($fieldName);
 		return $rangeQuery;
 	}
 
 	public static function getExistsQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)
 	{
-		$ExistsQuery = array();
-		$queryType = self::EXISTS_KEY;
-		$ExistsQuery[$queryType][self::FIELD_KEY] = $fieldName;
+		$existsQuery = new kESearchExistsQuery($fieldName);
 		$queryAttributes->addFieldToHighlight($fieldName);
-		return $ExistsQuery;
+		return $existsQuery;
 	}
 
 }

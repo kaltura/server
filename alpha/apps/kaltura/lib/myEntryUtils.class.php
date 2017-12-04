@@ -786,10 +786,6 @@ class myEntryUtils
 
 		while($count--)
 		{
-			$thumbCaptureByPackager = false;
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			$cropParams = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldBeCaptureByPackagerOnly = self::canBeHandleByPackagerAlone($cropParams, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -817,7 +813,7 @@ class myEntryUtils
 					$calc_vid_sec = $entry->getBestThumbOffset();
 				}
 					
-				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}_dimension_{$width}_{$height}";
+				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
@@ -835,12 +831,9 @@ class myEntryUtils
 					$success = false;
 					if($multi && $packagerRetries)
 					{
-						list($picWidth, $picHeight) = $shouldBeCaptureByPackagerOnly ? array($width, $height) : array(null, null);
-						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
 						if(!$success)
 							$packagerRetries--;
-						else
-							$thumbCaptureByPackager = true;
 					}
 
 					if (!$success)
@@ -869,7 +862,7 @@ class myEntryUtils
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 			
-
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			
 			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
 			{
@@ -879,32 +872,25 @@ class myEntryUtils
 
 			kFile::fullMkdir($processingThumbPath);
 
-			if ($thumbCaptureByPackager && $shouldBeCaptureByPackagerOnly)
+			if ($crop_provider)
 			{
-				$convertedImagePath = $orig_image_path;
-				KalturaLog::debug("Image was resize in the packager -  setting path [$convertedImagePath]");
+				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
 			}
-			else //need to crop the image
+			else
 			{
-				if ($crop_provider)
-				{
-					$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
-				}
-				else
-				{
-					if (!file_exists($orig_image_path) || !filesize($orig_image_path))
-						KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
+				if (!file_exists($orig_image_path) || !filesize($orig_image_path))
+					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 
-					$imageSizeArray = getimagesize($orig_image_path);
-					if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
-					{
-						$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
-						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
-					}
-
-					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
+				$imageSizeArray = getimagesize($orig_image_path);
+				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
+				{
+					$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
+					$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
 				}
+
+				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 			}
+
 
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
@@ -913,7 +899,7 @@ class myEntryUtils
 			
 			if ($multi)
 			{
-				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($convertedImagePath);
+				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
 				if (!$im)
 					$im = imagecreatetruecolor($w * $vid_slices, $h);
 					
@@ -2088,15 +2074,5 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
 		return $content;
 	}
-
-	private static function canBeHandleByPackagerAlone($params, $type, $dimension)
-	{
-		//check if all null or 0
-		$canBeHandle = (count(array_filter($params)) == 0);
-		// check if only one dimension is given or type 5 (stretches to the exact dimensions)
-		$validDimension = ($type == 5) || (count(array_filter($dimension)) == 1);
-		return ($canBeHandle && $validDimension);
-	}
-
 
 }

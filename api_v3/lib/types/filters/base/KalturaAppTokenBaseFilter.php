@@ -16,7 +16,7 @@ abstract class KalturaAppTokenBaseFilter extends KalturaFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
-		"kUserIdEqual" => "_eq_kuser_id",
+		"sessionUserIdEqual" => "_eq_kuser_id",
 	);
 
 	static private $order_by_map = array

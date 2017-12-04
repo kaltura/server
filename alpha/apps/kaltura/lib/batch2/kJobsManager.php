@@ -804,7 +804,7 @@ class kJobsManager
 	/**
 	 * @param BatchJob $parentJob
 	 * @param int $postConvertAssetType
-	 * @param string $srcFileSyncLocalPath
+	 * @param FileSyncKey $fileSyncKey
 	 * @param int $flavorAssetId
 	 * @param int $flavorParamsOutputId
 	 * @param bool $createThumb
@@ -812,11 +812,11 @@ class kJobsManager
 	 * @param string $customData
 	 * @return BatchJob
 	 */
-	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
+	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $fileSyncKey, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setPostConvertAssetType($postConvertAssetType);
-		$postConvertData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
+		$postConvertData->setSrcFileSyncLocalPath(kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey));
 		$postConvertData->setFlavorParamsOutputId($flavorParamsOutputId);
 		$postConvertData->setFlavorAssetId($flavorAssetId);
 		$postConvertData->setThumbOffset($thumbOffset);
@@ -1389,16 +1389,16 @@ class kJobsManager
 	 * @param string $entryId
 	 * @param int $partnerId
 	 * @param StorageProfile $externalStorage
-	 * @param SyncFile $fileSync
-	 * @param string $srcFileSyncLocalPath
+	 * @param FileSync $fileSync
+	 * @param FileSync $srcFileSync
 	 * @param bool $force
 	 * 
 	 * @return BatchJob
 	 */
-	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null)
+	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, FileSync $srcFileSync, $force = false, $dc = null)
 	{
 		$netStorageExportData = kStorageExportJobData::getInstance($externalStorage->getProtocol());
-		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSyncLocalPath);
+		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSync);
 				
 		$batchJob = null;
 		if($parentJob)
@@ -1782,7 +1782,7 @@ class kJobsManager
 		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
 	}
 
-	protected static function getFileContainer(FileSyncKey $syncKey)
+	public static function getFileContainer(FileSyncKey $syncKey)
 	{
 
 		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);

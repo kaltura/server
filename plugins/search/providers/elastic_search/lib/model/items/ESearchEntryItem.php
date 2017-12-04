@@ -134,7 +134,7 @@ class ESearchEntryItem extends ESearchItem
 				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$entryQuery[] = kESearchQueryManager::getMultiMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $queryAttributes);
+				$entryQuery[] = kESearchQueryManager::getPartialQuery($entrySearchItem, $entrySearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$entryQuery[] = kESearchQueryManager::getPrefixQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);

@@ -117,7 +117,7 @@ class ESearchCategoryItem extends ESearchItem
 				$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$categoryQuery[] = kESearchQueryManager::getMultiMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $queryAttributes);
+				$categoryQuery[] = kESearchQueryManager::getPartialQuery($categorySearchItem, $categorySearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$categoryQuery[] = kESearchQueryManager::getPrefixQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);

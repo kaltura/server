@@ -45,6 +45,11 @@ class KalturaStorageJobData extends KalturaJobData
 	 */   	
     public $srcFileSyncLocalPath;
 
+	/**
+	 * @var string
+	 */
+	public $srcFileEncryptionKey;
+
 
 	/**
 	 * @var string
@@ -64,6 +69,7 @@ class KalturaStorageJobData extends KalturaJobData
 	    "serverPassword" ,
 	    "ftpPassiveMode" ,
 	    "srcFileSyncLocalPath" ,
+		"srcFileEncryptionKey" ,
 		"srcFileSyncId" ,
 		"destFileSyncStoredPath",
 		"serverPrivateKey",

@@ -83,37 +83,31 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		return self::createNestedQueryForItems($eSearchItemsArr, $boolOperator, $queryAttributes);
 	}
 
-	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionQuery, $allowedSearchTypes, &$queryAttributes)
+	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionBoolQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$eSearchCaptionItem->validateItemInput();
 		switch ($eSearchCaptionItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getMultiMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $queryAttributes);
+				$query = kESearchQueryManager::getPartialQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getExistsQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getExistsQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$captionQuery['nested']['query']['bool'][$boolOperator][] =
-					kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$eSearchCaptionItem->getItemType()."]");
 		}
 
-		if($boolOperator == 'should')
-			$captionQuery['nested']['query']['bool']['minimum_should_match'] = 1;
+		$captionBoolQuery->addByOperatorType($boolOperator, $query);
 	}
 
 	public function shouldAddLanguageSearch()
@@ -129,4 +123,8 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		return elasticSearchUtils::UNDERSCORE_FIELD_DELIMITER;
 	}
 
+	public function getNestedQueryName()
+	{
+		return ESearchItemDataType::CAPTION.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME;
+	}
 }

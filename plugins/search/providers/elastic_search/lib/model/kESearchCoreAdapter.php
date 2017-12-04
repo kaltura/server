@@ -22,15 +22,15 @@ class kESearchCoreAdapter
 	const HIGHLIGHT_KEY = 'highlight';
 
 	private static $innerHitsObjectType = array(
-		'caption_assets.lines' => ESearchItemDataType::CAPTION,
+		'caption' => ESearchItemDataType::CAPTION,
 		'metadata' => ESearchItemDataType::METADATA,
 		'cue_points' => ESearchItemDataType::CUE_POINTS
 	);
 
-	public static function transformElasticToCoreObject($elasticResults, $peerName)
+	public static function transformElasticToCoreObject($elasticResults, $peerName, $peerRetrieveFunctionName)
 	{
 		list($objectData, $objectOrder, $objectCount, $objectHighlight) = self::getElasticResultAsArray($elasticResults);
-		$objects = $peerName::retrieveByPKsNoFilter(array_keys($objectData));
+		$objects = $peerName::$peerRetrieveFunctionName(array_keys($objectData));
 		$coreResults = self::getCoreESearchResults($objects, $objectData, $objectOrder, $objectHighlight);
 		return array($coreResults, $objectCount);
 	}
@@ -89,9 +89,13 @@ class kESearchCoreAdapter
 	{
 		foreach ($elasticObject[self::INNER_HITS_KEY] as $innerHitsKey => $hits)
 		{
-			$objectType = self::getInnerHitsObjectType($innerHitsKey);
-			$itemData[$objectType] = array();
-			$itemData[$objectType][self::TOTAL_COUNT_KEY] = self::getInnerHitsTotalCountForObject($hits, $objectType);
+			list($objectType, $objectSubType) = self::getInnerHitsObjectType($innerHitsKey);
+			$itemsType = $objectType;
+			if($objectSubType)
+				$itemsType = "$itemsType::$objectSubType";
+
+			$itemData[$itemsType] = array();
+			$itemData[$itemsType][self::TOTAL_COUNT_KEY] = self::getInnerHitsTotalCountForObject($hits, $objectType);
 			foreach ($hits[self::HITS_KEY][self::HITS_KEY] as $itemResult)
 			{
 				$currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
@@ -101,7 +105,7 @@ class kESearchCoreAdapter
 						$itemResult[self::HIGHLIGHT_KEY] = self::elasticHighlightToCoreHighlight($itemResult[self::HIGHLIGHT_KEY]);
 
 					$currItemData->loadFromElasticHits($itemResult);
-					$itemData[$objectType][self::ITEMS_KEY][] = $currItemData;
+					$itemData[$itemsType][self::ITEMS_KEY][] = $currItemData;
 				}
 			}
 		}
@@ -109,11 +113,15 @@ class kESearchCoreAdapter
 
 	private static function getInnerHitsObjectType($innerHitsKey)
 	{
-		if(isset(self::$innerHitsObjectType[$innerHitsKey]))
-			return self::$innerHitsObjectType[$innerHitsKey];
+		$queryNames = explode(ESearchNestedObjectItem::QUERY_NAME_DELIMITER, $innerHitsKey);
+		$objectType = $queryNames[0];
+		$objectSubType = ($queryNames[1] != ESearchNestedObjectItem::DEFAULT_GROUP_NAME) ? $queryNames[1] : null;
+
+		if(isset(self::$innerHitsObjectType[$objectType]))
+			return array(self::$innerHitsObjectType[$objectType], $objectSubType);
 
 		KalturaLog::err('Unsupported inner object key in elastic results['.$innerHitsKey.']');
-		return $innerHitsKey;
+		return array($objectType, $objectSubType);
 	}
 
 	private static function getItemsDataResult($objectType, $values)
