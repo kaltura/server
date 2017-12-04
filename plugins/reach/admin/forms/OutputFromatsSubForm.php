@@ -3,10 +3,10 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_SourceLanguagesSubForm extends ConfigureSubForm
+class Form_OutputFormatsSubForm extends ConfigureSubForm
 {
 	private $ignore = array('relatedObjects', 'type', 'gs');
-	private $prefix = "SourceLanguage_";
+	private $prefix = "OutputFormat_";
 
 	private $type;
 
@@ -18,11 +18,11 @@ class Form_SourceLanguagesSubForm extends ConfigureSubForm
 
 	public function init()
 	{
-		$this->setAttrib('id', 'frmSourceLanguagesSubForm');
+		$this->setAttrib('id', 'frmOutputFormatsSubForm');
 		$this->setMethod('post');
 
 		$this->addDecorator('ViewScript', array(
-			'viewScript' => 'source-language-sub-form.phtml',
+			'viewScript' => 'output-format-sub-form.phtml',
 		));
 
 		$obj = new $this->type();
@@ -31,7 +31,7 @@ class Form_SourceLanguagesSubForm extends ConfigureSubForm
 
 	public function isValid($data)
 	{
-		if ($data['SourceLanguages'])
+		if ($data['OutputFormats'])
 			return true;
 		else return false;
 	}

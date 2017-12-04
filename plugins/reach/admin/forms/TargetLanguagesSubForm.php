@@ -28,5 +28,11 @@ class Form_TargetLanguagesSubForm extends ConfigureSubForm
 		$obj = new $this->type();
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
 	}
-	
+
+	public function isValid($data)
+	{
+		if ($data['TargetLanguages'])
+			return true;
+		else return false;
+	}
 }

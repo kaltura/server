@@ -236,8 +236,6 @@
 
 		var catalogItemIdStr = '/catalog_item_id/' + catalogItemId;
 
-//		loadCatalogItem(catalogItemIdStr);
-
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + catalogItemIdStr;
 
 		jQuery('#catalog-item-configure-dialog').remove();
@@ -254,6 +252,7 @@
 				'<?php echo $this->translate('Save'); ?>': function() {
 					loadSourceLanguages();
 					loadTargetLanguages();
+					loadOutputFormats();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -309,6 +308,7 @@
 					jQuery('#loader').show();
 					loadSourceLanguages();
 					loadTargetLanguages();
+					loadOutputFormats();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -352,6 +352,7 @@
 					jQuery('#loader').show();
 					loadSourceLanguages();
 					loadTargetLanguages();
+					loadOutputFormats();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -375,18 +376,33 @@
 		);
 	}
 
+	function loadOutputFormats() {
+		//remove all template field
+		$('fieldset[id^="OutputFormatTemplate"]').remove();
+		setOutputFormatData();
+	}
+
 	function loadTargetLanguages() {
 		//remove all template field
 		$('fieldset[id^="TargetLanguageTemplate"]').remove();
-
 		setTargetLanguageData();
 	}
 
 	function loadSourceLanguages() {
 		//remove all template field
 		$('fieldset[id^="SourceLanguageTemplate"]').remove();
-
 		setSourceLanguageData();
+	}
+
+
+	function setOutputFormatData() {
+		var conditions = [];
+		var currentIndex = 0;
+		while (jQuery('#OutputFormat_' + currentIndex.toString()).length > 0) {
+			conditions.push(buildOutputFormatsParams(currentIndex));
+			currentIndex++;
+		}
+		jQuery('#OutputFormats').val(JSON.stringify(conditions));
 	}
 
 	function setSourceLanguageData() {
@@ -409,6 +425,22 @@
 		jQuery('#TargetLanguages').val(JSON.stringify(conditions));
 	}
 
+
+	function buildOutputFormatsParams(index) {
+		var cond = {};
+		jQuery('#OutputFormat_' + index).find('input,select').each(function(idx) {
+			var type = $( this ).attr("type");
+			var name = $( this ).attr("name");
+			var val = $( this ).val();
+			if (type == 'hidden')
+				return;
+			cond[name] = val;
+			$(this).remove();
+		});
+		return cond;
+	}
+
+
 	function buildSourceLanguageParams(index) {
 		var cond = {};
 		jQuery('#SourceLanguage_' + index).find('input,select').each(function(idx) {
@@ -417,7 +449,6 @@
 			var val = $( this ).val();
 			if (type == 'hidden')
 				return;
-			alert( type + ' ' + name + ' ' + val);
 			cond[name] = val;
 			$(this).remove();
 		});

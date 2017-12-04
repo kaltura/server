@@ -21,22 +21,22 @@
 
 <script type="text/javascript">
 
-	var condIndex = 0;
+	var targetIndex = 0;
 	function addTargetLanguage(target)
 	{
-		var targetLanguageTag = 'TargetLanguage_' + condIndex++;
+		var targetLanguageTag = 'TargetLanguage_' + targetIndex++;
 		var newTargetLanguage = createTargetLanguage(targetLanguageTag);
 		jQuery(target).after(newTargetLanguage.show());
 	}
 
 	function removeTargetLanguage(target) {
-		condIndex--;
+		targetIndex--;
 		jQuery(target).parent().remove();
 	}
 
 	function createTargetLanguage(taskTag)
 	{
-		var condTemplate = jQuery('#TargetLanguageTemplate' );
+		var condTemplate = jQuery('#TargetLanguageTemplate');
 		condTemplate.attr("name", "Template");
 
 		var newData = condTemplate.clone(true);
@@ -53,7 +53,7 @@
 	}
 
 	function addTargetLanguageFromObject(target, object) {
-		var condTag = 'TargetLanguage_' + condIndex++;
+		var condTag = 'TargetLanguage_' + targetIndex++;
 		var newTargetLanguage = createTargetLanguage(condTag);
 
 		newTargetLanguage.find( "input,select").each(function(idx) {
@@ -66,7 +66,6 @@
 
 		jQuery(target).after(newTargetLanguage.show());
 	}
-
 
 </script>
 

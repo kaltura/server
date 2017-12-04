@@ -1,0 +1,70 @@
+<dd id="test">
+<fieldset class="output-format">
+	<legend>OutputFormat:</legend>
+	<a class="add-output-format" href="javascript:;" onclick="addOutputFormat(this);" >+ Add Output Format</a>
+	<?php foreach($this->element->getSubForms() as $subForm): ?>
+		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
+		<?php echo $subForm; ?>
+	<?php endforeach; ?>
+	<style type="text/css">
+		#frmCatalogItemConfigure .output-format{ display:block; padding: 10px; min-width: 500px; }
+		#frmCatalogItemConfigure .output-format span.rule { font-size: 14px; font-weight: bold; }
+		#frmCatalogItemConfigure .output-format label { padding: 4px 0; }
+		#frmCatalogItemConfigure .output-format fieldset { min-width: 0; height: auto; margin: 10px 0; padding: 5px; border: 1px solid #CCCCCC; }
+		#frmCatalogItemConfigure .output-format .remove-output-format { padding: 5px; float: right; }
+		#frmCatalogItemConfigure .output-format dd { display: inline; }
+		#frmCatalogItemConfigure .output-format dt { display: inline; }
+	</style>
+</fieldset>
+</dd>
+
+
+<script type="text/javascript">
+
+	var formatIndex = 0;
+	function addOutputFormat(target)
+	{
+		var outputFormatTag = 'OutputFormat_' + formatIndex++;
+		var newOutputFormat = createOutputFormat(outputFormatTag);
+		jQuery(target).after(newOutputFormat.show());
+	}
+
+	function removeOutputFormat(target) {
+		formatIndex--;
+		jQuery(target).parent().remove();
+	}
+
+	function createOutputFormat(taskTag)
+	{
+		var formatTemplate = jQuery('#OutputFormatTemplate');
+		formatTemplate.attr("name", "Template");
+
+		var newData = formatTemplate.clone(true);
+		newData.attr("id", taskTag).attr("name", taskTag);
+
+		newData.find( "input,select").each(function(idx) {
+			var name = $( this ).attr("name");
+			var paramName =name.substring("OutputFormat_".length);
+			var tag = taskTag + "::" + paramName;
+			$( this ).attr("name", paramName).attr("id", tag)
+		});
+
+		return newData;
+	}
+
+	function addOutputFormatFromObject(target, object) {
+		var condTag = 'OutputFormat_' + formatIndex++;
+		var newOutputFormat = createOutputFormat(condTag);
+
+		newOutputFormat.find( "input,select").each(function(idx) {
+			if ($( this ).attr("type") == 'hidden')
+				return;
+			var name = $( this ).attr("name");
+			var val = object[name];
+			$(this).val(val).attr('checked', val);
+		});
+
+		jQuery(target).after(newOutputFormat.show());
+	}
+
+</script>

@@ -1,6 +1,5 @@
 <dd id="test">
 <fieldset class="source-language">
-<!--	<legend>SourceLanguage:</legend>-->
 	<a class="add-source-language" href="javascript:;" onclick="addSourceLanguage(this);" >+ Add Source Language</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
 		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
@@ -51,8 +50,6 @@
 
 		return newData;
 	}
-
-
 
 	function addSourceLanguageFromObject(target, object) {
 		var condTag = 'SourceLanguage_' + condIndex++;
