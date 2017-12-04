@@ -786,6 +786,10 @@ class myEntryUtils
 
 		while($count--)
 		{
+			$thumbCaptureByPackager = false;
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+			$cropParams = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+			$shouldBeCaptureByPackagerOnly = self::canBeHandleByPackagerAlone($cropParams, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -831,9 +835,13 @@ class myEntryUtils
 					$success = false;
 					if($multi && $packagerRetries)
 					{
-						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId);
+						list($picWidth, $picHeight) = $shouldBeCaptureByPackagerOnly ? array($width, $height) : array(null, null);
+						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerOnly [$shouldBeCaptureByPackagerOnly]");
 						if(!$success)
 							$packagerRetries--;
+						else
+							$thumbCaptureByPackager = true;
 					}
 
 					if (!$success)
@@ -861,9 +869,7 @@ class myEntryUtils
 
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
-			
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			
+
 			if (!self::isTempFile($orig_image_path) && $isEncryptionNeeded)
 			{
 				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
@@ -872,24 +878,33 @@ class myEntryUtils
 
 			kFile::fullMkdir($processingThumbPath);
 
-			if ($crop_provider)
+			if ($thumbCaptureByPackager && $shouldBeCaptureByPackagerOnly)
 			{
-				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
+				$convertedImagePath = $orig_image_path;
+				KalturaLog::debug("Image was resize in the packager -  setting path [$convertedImagePath]");
 			}
-			else
+			else //need to crop the image
 			{
-				if (!file_exists($orig_image_path) || !filesize($orig_image_path))
-					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
-
-				$imageSizeArray = getimagesize($orig_image_path);
-				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
+				if ($crop_provider)
 				{
-					$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
-					$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
+					$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
 				}
+				else
+				{
+					if (!file_exists($orig_image_path) || !filesize($orig_image_path))
+						KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 
-				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
+					$imageSizeArray = getimagesize($orig_image_path);
+					if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
+					{
+						$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
+						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
+					}
+
+					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
+				}
 			}
+
 
 
 			// die if resize operation failed
@@ -908,10 +923,13 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
+			if ($thumbCaptureByPackager && $shouldBeCaptureByPackagerOnly)
+				unlink($convertedImagePath);
+
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
-				if (self::isTempFile($orig_image_path))
+				if (self::isTempFile($orig_image_path) && file_exists($orig_image_path))
 					unlink($orig_image_path);
 			}
 		}
@@ -2073,6 +2091,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		kFile::closeDbConnections();
 		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
 		return $content;
+	}
+
+	private static function canBeHandleByPackagerAlone($params, $type, $dimension)
+	{
+		//check if all null or 0
+		$canBeHandle = (count(array_filter($params)) == 0);
+		// check if only one dimension is given or type 5 (stretches to the exact dimensions)
+		$positiveDimension = array_filter($dimension, function ($v) {return $v > 0;});
+		$validDimension = ($type == 5) || (count($positiveDimension) == 1);
+		return ($canBeHandle && $validDimension);
 	}
 
 }
