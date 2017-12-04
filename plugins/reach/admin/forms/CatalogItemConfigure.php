@@ -87,11 +87,14 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$turnAroundTimeForView ->setRequired(true);
 		$turnAroundTimeForView ->setValue(Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT);
 		$this->addElement($turnAroundTimeForView );
+		
+		$this->addLine("Pricing Line");
+		$this->addTitle('Pricing:');
+		$pricingSubFor = new Form_VendorCatalogItemPricing();
+		$this->addSubForm($pricingSubFor, "pricing");
 
 		$this->addLine("Languages Line");
-
 		$this->addTitle('Source Languages:');
-
 		$sourceLanguagesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$sourceLanguagesSubForm->addDecorator('ViewScript', array(
 			'viewScript' => 'source-languages-sub-form.phtml',
@@ -103,13 +106,11 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 		{
 			$this->addTitle('Target Languages:');
-
 			$targetLanguagesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 			$targetLanguagesSubForm->addDecorator('ViewScript', array(
 				'viewScript' => 'target-languages-sub-form.phtml',
 			));
 			$this->addSubForm($targetLanguagesSubForm, 'TargetLanguages_');
-
 			$innerTargetLanguagesSubForm = new Form_TargetLanguagesSubForm('Kaltura_Client_Reach_Type_LanguageItem');
 			$this->addSubForm($innerTargetLanguagesSubForm , "TargetLanguageTemplate");
 		}
@@ -171,6 +172,9 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$this->setDefault('serviceFeature', $object->serviceFeature);
 		$this->populateLanguages($object);
 		$this->populateOutputFormats($object);
+		$this->getSubForm("pricing")->populateFromObject($object->pricing);
+		$this->populateSourceLanguages($object);
+		
 	}
 
 	private function populateLanguages($object)
@@ -223,6 +227,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
+		
 		$languages = $properties['SourceLanguages'];
 		$languagesArray = array();
 		foreach (json_decode($languages) as $language)
