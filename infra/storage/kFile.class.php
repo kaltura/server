@@ -512,12 +512,8 @@ class kFile extends kFileBase
 
 	public static function isFileTypeText($filePath)
 	{
-		$isText=false;
-		$fileType=self::findFileTypeByFileCmd($filePath);
-		if($fileType==self::TEXT)
-			$isText=true;
-
-		return $isText;
+		$fileType = self::findFileTypeByFileCmd($filePath);
+		return ($fileType == self::TEXT);
 	}
 	
 
