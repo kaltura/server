@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.elasticSearch
- * @subpackage model
+ * @subpackage model.search
  */
 class ESearchQueryAttributes
 {
