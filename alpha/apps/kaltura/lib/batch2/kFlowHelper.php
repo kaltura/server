@@ -1733,11 +1733,10 @@ class kFlowHelper
 				$syncKey = $currentFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 				{
-					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-
 					$entry = $dbBatchJob->getEntry();
+					$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
 					if($entry)
-						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $path);
+						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $fileSync);
 				}
 				$currentFlavorAsset = null;
 			}

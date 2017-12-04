@@ -493,9 +493,10 @@ class KCurlWrapper
 	/**
 	 * @param string $sourceUrl
 	 * @param string $destFile
+	 * @param functon pointer
 	 * @return boolean
 	 */
-	public function exec($sourceUrl, $destFile = null)
+	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
 	{
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
@@ -509,7 +510,11 @@ class KCurlWrapper
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, $returnTransfer);
 		if (!is_null($destFd))
 			curl_setopt($this->ch, CURLOPT_FILE, $destFd);
-
+		if($progressCallBack)
+		{
+			curl_setopt($this->ch, CURLOPT_NOPROGRESS, false);
+			curl_setopt($this->ch, CURLOPT_PROGRESSFUNCTION, $progressCallBack);
+		}
 		$ret = curl_exec($this->ch);
 
 		if (!is_null($destFd)) {
