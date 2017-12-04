@@ -788,8 +788,8 @@ class myEntryUtils
 		{
 			$thumbCaptureByPackager = false;
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			$cropParams = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldBeCaptureByPackagerOnly = self::canBeHandleByPackagerAlone($cropParams, $type, array($width, $height));
+			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+			$shouldResizeByPackager = self::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -835,13 +835,14 @@ class myEntryUtils
 					$success = false;
 					if($multi && $packagerRetries)
 					{
-						list($picWidth, $picHeight) = $shouldBeCaptureByPackagerOnly ? array($width, $height) : array(null, null);
-						$success = self::captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
-						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerOnly [$shouldBeCaptureByPackagerOnly]");
+						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
+						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
+						$success = self::captureThumbUsingPackager($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						$packagerResizeFullPath = $destPath . self::TEMP_FILE_POSTFIX;
+						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
 						if(!$success)
 							$packagerRetries--;
-						else
-							$thumbCaptureByPackager = true;
+						$thumbCaptureByPackager = $success;
 					}
 
 					if (!$success)
@@ -878,10 +879,11 @@ class myEntryUtils
 
 			kFile::fullMkdir($processingThumbPath);
 
-			if ($thumbCaptureByPackager && $shouldBeCaptureByPackagerOnly)
+			if ($thumbCaptureByPackager && $shouldResizeByPackager)
 			{
-				$convertedImagePath = $orig_image_path;
-				KalturaLog::debug("Image was resize in the packager -  setting path [$convertedImagePath]");
+				$processingThumbPath = $packagerResizeFullPath;
+				$convertedImagePath = $packagerResizeFullPath;
+				KalturaLog::debug("Image was resize in the packager -  setting path [$processingThumbPath]");
 			}
 			else //need to crop the image
 			{
@@ -923,8 +925,8 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldBeCaptureByPackagerOnly)
-				unlink($convertedImagePath);
+			if ($thumbCaptureByPackager && $shouldResizeByPackager)
+				unlink($packagerResizeFullPath);
 
 			if ($isEncryptionNeeded)
 			{
@@ -2093,7 +2095,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $content;
 	}
 
-	private static function canBeHandleByPackagerAlone($params, $type, $dimension)
+	private static function shouldResizeByPackager($params, $type, $dimension)
 	{
 		//check if all null or 0
 		$canBeHandle = (count(array_filter($params)) == 0);
