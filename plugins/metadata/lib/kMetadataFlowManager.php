@@ -44,7 +44,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 	
 	protected function updatedTransformMetadataPending(BatchJob $dbBatchJob, kTransformMetadataJobData $data)
 	{
-		if($data->getSrcXslPath())
+		if($data->getSrcXsl())
 		{
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($data->getMetadataProfileId());
 			if($metadataProfile)
@@ -59,7 +59,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 	
 	protected function updatedTransformMetadataFinished(BatchJob $dbBatchJob, kTransformMetadataJobData $data)
 	{
-		if($data->getSrcXslPath())
+		if($data->getSrcXsl())
 		{
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($data->getMetadataProfileId());
 			if($metadataProfile)
@@ -81,7 +81,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		if(!$metadataProfile)
 			return $dbBatchJob;
 	
-		if($data->getSrcXslPath())
+		if($data->getSrcXsl())
 		{
 			$metadataProfile->setStatus(MetadataProfile::STATUS_DEPRECATED);
 			$metadataProfile->save();

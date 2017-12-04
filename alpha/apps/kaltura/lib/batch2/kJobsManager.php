@@ -1782,7 +1782,7 @@ class kJobsManager
 		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
 	}
 
-	protected static function getFileContainer(FileSyncKey $syncKey)
+	public static function getFileContainer(FileSyncKey $syncKey)
 	{
 
 		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
