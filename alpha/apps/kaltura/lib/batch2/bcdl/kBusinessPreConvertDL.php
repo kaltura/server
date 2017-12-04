@@ -314,14 +314,15 @@ class kBusinessPreConvertDL
 			if($srcAsset->getType() == assetType::FLAVOR)
 			{
 				/* @var $srcAsset flavorAsset */
-				$dar = null;
+				$params = array();
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
-				if($mediaInfo)
-					$dar = $mediaInfo->getVideoDar();
-
+				if($mediaInfo){
+					$params['dar'] = $mediaInfo->getVideoDar();
+					$params['scanType'] = $mediaInfo->getScanType();
+				}
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
-				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), null, null, $dar);
+				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), $params);
 				if(!$created || !file_exists($destPath))
 				{
 					$errDescription = "Thumbnail not captured";
