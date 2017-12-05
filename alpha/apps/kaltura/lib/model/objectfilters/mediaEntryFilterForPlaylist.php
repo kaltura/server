@@ -16,6 +16,6 @@ class mediaEntryFilterForPlaylist extends entryFilter
 		) , NULL );
 
 		$this->fields = array_merge($this->fields , $extendedFields);
-		$this->fieldsToIgnoreInFinalCriteria = array_merge($this->fieldsToIgnoreInFinalCriteria , $extendedFields);
+		$this->addFieldToIgnoreInFinalCriteria(self::NAME);
 	}
 }
