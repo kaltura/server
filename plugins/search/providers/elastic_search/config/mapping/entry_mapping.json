@@ -102,6 +102,9 @@
 	  "_source" : {
 		"enabled" : true
 	  },
+	  "_all": {
+		"enabled": false
+	  },
 	  "properties" : {
 		"name" : {
 		  "type" : "text",

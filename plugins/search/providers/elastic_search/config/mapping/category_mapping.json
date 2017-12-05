@@ -53,6 +53,9 @@
 	  "_source" : {
 		"enabled" : true
 	  },
+	  "_all": {
+		"enabled": false
+	  },
 	  "properties" : {
 		"partner_id" : {
 		  "type" : "text",

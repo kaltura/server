@@ -5,9 +5,8 @@
  */
 abstract class KalturaESearchItemData extends KalturaObject
 {
-
 	/**
-	 * @var string
+	 * @var KalturaESearchHighlightArray
 	 */
 	public $highlight;
 
