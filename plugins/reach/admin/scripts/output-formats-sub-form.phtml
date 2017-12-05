@@ -1,5 +1,5 @@
 <dd id="test">
-<fieldset class="output-format">
+<fieldset id="output-formats-fieldSet" class="output-format">
 	<legend>OutputFormat:</legend>
 	<a class="add-output-format" href="javascript:;" onclick="addOutputFormat(this);" >+ Add Output Format</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
@@ -22,17 +22,17 @@
 <script type="text/javascript">
 
 	var outputFormatIndex = 0;
+	var maxOutputFormatIndex = 0;
 	function addOutputFormat(target)
 	{
+        jQuery('#output-formats-fieldSet').attr('maxOutputFormatIndex', maxOutputFormatIndex++);
 		var outputFormatTag = 'OutputFormat_' + outputFormatIndex++;
-		
 		var newOutputFormat = createOutputFormat(outputFormatTag);
 		jQuery(target).after(newOutputFormat.show());
 	}
 
 	function removeOutputFormat(target) {
 		outputFormatIndex--;
-		alert("outputFormatIndex = " + outputFormatIndex);
 		jQuery(target).parent().remove();
 	}
 
@@ -53,8 +53,10 @@
 
 		return newData;
 	}
-
-	function addOutputFormatFromObject(target, object) {
+    
+    function addOutputFormatFromObject(target, object) 
+    {
+        jQuery('#output-formats-fieldSet').attr('maxOutputFormatIndex', maxOutputFormatIndex++);
 		var outputFormatTag = 'OutputFormat_' + outputFormatIndex++;
 		var newOutputFormat = createOutputFormat(outputFormatTag);
 
