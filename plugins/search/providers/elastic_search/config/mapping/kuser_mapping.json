@@ -53,6 +53,9 @@
 	  "_source" : {
 		"enabled" : true
 	  },
+	  "_all": {
+		"enabled": false
+	  },
 	  "properties" : {
 		"group_ids" : {
 		  "type" : "text",
