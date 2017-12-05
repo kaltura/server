@@ -1,5 +1,5 @@
 <dd id="test">
-<fieldset class="output-format">
+<fieldset id="output-formats-fieldSet" class="output-format">
 	<legend>OutputFormat:</legend>
 	<a class="add-output-format" href="javascript:;" onclick="addOutputFormat(this);" >+ Add Output Format</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
@@ -21,40 +21,44 @@
 
 <script type="text/javascript">
 
-	var formatIndex = 0;
+	var outputFormatIndex = 0;
+	var maxOutputFormatIndex = 0;
 	function addOutputFormat(target)
 	{
-		var outputFormatTag = 'OutputFormat_' + formatIndex++;
+        jQuery('#output-formats-fieldSet').attr('maxOutputFormatIndex', maxOutputFormatIndex++);
+		var outputFormatTag = 'OutputFormat_' + outputFormatIndex++;
 		var newOutputFormat = createOutputFormat(outputFormatTag);
 		jQuery(target).after(newOutputFormat.show());
 	}
 
 	function removeOutputFormat(target) {
-		formatIndex--;
+		outputFormatIndex--;
 		jQuery(target).parent().remove();
 	}
 
-	function createOutputFormat(taskTag)
+	function createOutputFormat(outputFormatTag)
 	{
-		var formatTemplate = jQuery('#OutputFormatTemplate');
-		formatTemplate.attr("name", "Template");
+		var outputFormatTemplate = jQuery('#OutputFormatTemplate');
+        outputFormatTemplate.attr("name", "Template");
 
-		var newData = formatTemplate.clone(true);
-		newData.attr("id", taskTag).attr("name", taskTag);
+		var newData = outputFormatTemplate.clone(true);
+		newData.attr("id", outputFormatTag).attr("name", outputFormatTag);
 
 		newData.find( "input,select").each(function(idx) {
 			var name = $( this ).attr("name");
 			var paramName =name.substring("OutputFormat_".length);
-			var tag = taskTag + "::" + paramName;
+			var tag = outputFormatTag + "::" + paramName;
 			$( this ).attr("name", paramName).attr("id", tag)
 		});
 
 		return newData;
 	}
-
-	function addOutputFormatFromObject(target, object) {
-		var condTag = 'OutputFormat_' + formatIndex++;
-		var newOutputFormat = createOutputFormat(condTag);
+    
+    function addOutputFormatFromObject(target, object) 
+    {
+        jQuery('#output-formats-fieldSet').attr('maxOutputFormatIndex', maxOutputFormatIndex++);
+		var outputFormatTag = 'OutputFormat_' + outputFormatIndex++;
+		var newOutputFormat = createOutputFormat(outputFormatTag);
 
 		newOutputFormat.find( "input,select").each(function(idx) {
 			if ($( this ).attr("type") == 'hidden')

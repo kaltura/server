@@ -393,82 +393,53 @@
 		$('fieldset[id^="SourceLanguageTemplate"]').remove();
 		setSourceLanguageData();
 	}
-
-
-	function setOutputFormatData() {
-		var conditions = [];
-		var currentIndex = 0;
-		while (jQuery('#OutputFormat_' + currentIndex.toString()).length > 0) {
-			conditions.push(buildOutputFormatsParams(currentIndex));
-			currentIndex++;
-		}
-		jQuery('#OutputFormats').val(JSON.stringify(conditions));
-	}
+    
+    function setOutputFormatData() {
+        var outputFormats = [];
+        var maxOutputFormatIndex = jQuery('#output-formats-fieldSet').attr('maxOutputFormatIndex');
+        for(i=0; i<=maxOutputFormatIndex; i++)
+        {
+            if(jQuery('#OutputFormat_' + i).length > 0)
+                outputFormats.push(buildOutputParams('OutputFormat_', i));
+        }
+        jQuery('#OutputFormats').val(JSON.stringify(outputFormats));
+    }
 
 	function setSourceLanguageData() {
-		var conditions = [];
-		var currentIndex = 0;
-		while (jQuery('#SourceLanguage_' + currentIndex.toString()).length > 0) {
-			conditions.push(buildSourceLanguageParams(currentIndex));
-			currentIndex++;
-		}
-		jQuery('#SourceLanguages').val(JSON.stringify(conditions));
+		var sourceLanguages = [];
+		var maxSourceLanguageIndex = jQuery('#source-language-fieldSet').attr('maxSourceLanguageIndex');
+		for(i=0; i<=maxSourceLanguageIndex; i++)
+        {
+            if(jQuery('#SourceLanguage_' + i).length > 0)
+                sourceLanguages.push(buildOutputParams('SourceLanguage_', i));
+        }
+		jQuery('#SourceLanguages').val(JSON.stringify(sourceLanguages));
 	}
 
-	function setTargetLanguageData() {
-		var conditions = [];
-		var currentIndex = 0;
-		while (jQuery('#TargetLanguage_' + currentIndex.toString()).length > 0) {
-			conditions.push(buildTargetLanguageParams(currentIndex));
-			currentIndex++;
-		}
-		jQuery('#TargetLanguages').val(JSON.stringify(conditions));
-	}
-
-
-	function buildOutputFormatsParams(index) {
-		var cond = {};
-		jQuery('#OutputFormat_' + index).find('input,select').each(function(idx) {
-			var type = $( this ).attr("type");
-			var name = $( this ).attr("name");
-			var val = $( this ).val();
-			if (type == 'hidden')
-				return;
-			cond[name] = val;
-			$(this).remove();
-		});
-		return cond;
-	}
-
-
-	function buildSourceLanguageParams(index) {
-		var cond = {};
-		jQuery('#SourceLanguage_' + index).find('input,select').each(function(idx) {
-			var type = $( this ).attr("type");
-			var name = $( this ).attr("name");
-			var val = $( this ).val();
-			if (type == 'hidden')
-				return;
-			cond[name] = val;
-			$(this).remove();
-		});
-		return cond;
-	}
-
-	function buildTargetLanguageParams(index) {
-		var cond = {};
-		jQuery('#TargetLanguage_' + index).find('input,select').each(function(idx) {
-			var type = $( this ).attr("type");
-			var name = $( this ).attr("name");
-			var val = $( this ).val();
-			if (type == 'hidden')
-				return;
-
-			cond[name] = val;
-			$(this).remove();
-		});
-		return cond;
-	}
+    function setTargetLanguageData() {
+        var targetLanguages = [];
+        var maxTargetLanguageIndex = jQuery('#target-language-fieldSet').attr('maxTargetLanguageIndex');
+        for(i=0; i<=maxTargetLanguageIndex; i++)
+        {
+            if(jQuery('#TargetLanguage_' + i).length > 0)
+                targetLanguages.push(buildOutputParams('TargetLanguage_', i));
+        }
+        jQuery('#TargetLanguages').val(JSON.stringify(targetLanguages));
+    }
+    
+    function buildOutputParams(paramName, index) {
+        var param = {};
+        jQuery('#' + paramName + index).find('input,select').each(function(idx) {
+            var type = $( this ).attr("type");
+            var name = $( this ).attr("name");
+            var val = $( this ).val();
+            if (type == 'hidden')
+                return;
+            param[name] = val;
+            $(this).remove();
+        });
+        return param;
+    }
 
 	function loadCatalogItemSuccess(html) {
 		if (jQuery(html).filter('#frmCatalogItemConfigure').hasClass('valid'))

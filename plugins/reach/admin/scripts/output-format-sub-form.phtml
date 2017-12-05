@@ -1,6 +1,6 @@
 <fieldset id="<?php echo $this->element->getElementsBelongTo(); ?>">
 	<?php foreach ($this->element->getElements() as $name => $elem) {
-		if (strpos($name,'SourceLanguage_') > -1)
+		if (strpos($name,'OutputFormat_') > -1)
 			echo $elem;
 	} ?>
 

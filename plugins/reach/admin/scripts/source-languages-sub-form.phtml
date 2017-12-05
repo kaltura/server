@@ -1,5 +1,5 @@
 <dd id="test">
-<fieldset class="source-language">
+<fieldset id="source-language-fieldSet" class="source-language">
 	<a class="add-source-language" href="javascript:;" onclick="addSourceLanguage(this);" >+ Add Source Language</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
 		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
@@ -20,40 +20,45 @@
 
 <script type="text/javascript">
 
-	var condIndex = 0;
+	var sourceLanguageIndex = 0;
+	var maxSourceLanguageIndex = 0;
 	function addSourceLanguage(target)
 	{
-		var sourceLanguageTag = 'SourceLanguage_' + condIndex++;
+        jQuery('#source-language-fieldSet').attr('maxSourceLanguageIndex', maxSourceLanguageIndex++);
+		var sourceLanguageTag = 'SourceLanguage_' + sourceLanguageIndex++;
 		var newSourceLanguage = createSourceLanguage(sourceLanguageTag);
+		
 		jQuery(target).after(newSourceLanguage.show());
 	}
 
 	function removeSourceLanguage(target) {
-		condIndex--;
-		jQuery(target).parent().remove();
+        sourceLanguageIndex--;
+        $(target).parent().remove();
 	}
 
-	function createSourceLanguage(taskTag)
+	function createSourceLanguage(sourceLanguageTag)
 	{
-		var condTemplate = jQuery('#SourceLanguageTemplate');
-		condTemplate.attr("name", "Template");
+		var sourceLanguageTemplate = jQuery('#SourceLanguageTemplate');
+        sourceLanguageTemplate.attr("name", "Template");
 
-		var newData = condTemplate.clone(true);
-		newData.attr("id", taskTag).attr("name", taskTag);
+		var newData = sourceLanguageTemplate.clone(true);
+		newData.attr("id", sourceLanguageTag).attr("name", sourceLanguageTag);
 
 		newData.find( "input,select").each(function(idx) {
 			var name = $( this ).attr("name");
 			var paramName =name.substring("SourceLanguage_".length);
-			var tag = taskTag + "::" + paramName;
+			var tag = sourceLanguageTag + "::" + paramName;
 			$( this ).attr("name", paramName).attr("id", tag)
 		});
 
 		return newData;
 	}
 
-	function addSourceLanguageFromObject(target, object) {
-		var condTag = 'SourceLanguage_' + condIndex++;
-		var newSourceLanguage = createSourceLanguage(condTag);
+	function addSourceLanguageFromObject(target, object) 
+    {
+        jQuery('#source-language-fieldSet').attr('maxSourceLanguageIndex', maxSourceLanguageIndex++);
+		var sourceLanguageTag = 'SourceLanguage_' + sourceLanguageIndex++;
+		var newSourceLanguage = createSourceLanguage(sourceLanguageTag);
 
 		newSourceLanguage.find( "input,select").each(function(idx) {
 			if ($( this ).attr("type") == 'hidden')

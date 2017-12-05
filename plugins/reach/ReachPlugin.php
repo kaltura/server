@@ -76,21 +76,17 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		return $map;
 	}
 
- /*
- * @see IKalturaAdminConsolePages::getApplicationPages()
- */
+ 	/*
+ 	 * @see IKalturaAdminConsolePages::getApplicationPages()
+ 	 */
 	public static function getApplicationPages()
 	{
  		$pages = array();
 		$pages[] = new CatalogItemListAction();
 		$pages[] = new CatalogItemConfigureAction();
 		$pages[] = new CatalogItemSetStatusAction();
-//		$pages[] = new VendorProfileListAction();
-//		$pages[] = new VendorProfileConfigureAction();
-//		$pages[] = new VendorProfileSetStatusAction();
 		return $pages;
 	}
-
-
+	
 	//TODO add reach plugin permission
 }

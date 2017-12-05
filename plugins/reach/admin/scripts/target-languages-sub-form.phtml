@@ -1,5 +1,5 @@
 <dd id="test">
-<fieldset class="target-language">
+<fieldset id="target-language-fieldSet" class="target-language">
 	<legend>TargetLanguage:</legend>
 	<a class="add-target-language" href="javascript:;" onclick="addTargetLanguage(this);" >+ Add Target Language</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
@@ -21,26 +21,29 @@
 
 <script type="text/javascript">
 
-	var targetIndex = 0;
+	var targetLanguageIndex = 0;
+	var maxTargetLanguageIndex = 0;
 	function addTargetLanguage(target)
 	{
-		var targetLanguageTag = 'TargetLanguage_' + targetIndex++;
+        jQuery('#target-language-fieldSet').attr('maxTargetLanguageIndex', maxTargetLanguageIndex++);
+		var targetLanguageTag = 'TargetLanguage_' + targetLanguageIndex++;
 		var newTargetLanguage = createTargetLanguage(targetLanguageTag);
+		
 		jQuery(target).after(newTargetLanguage.show());
 	}
 
 	function removeTargetLanguage(target) {
-		targetIndex--;
+        targetLanguageIndex--;
 		jQuery(target).parent().remove();
 	}
 
-	function createTargetLanguage(taskTag)
+	function createTargetLanguage(targetLanguageTag)
 	{
-		var condTemplate = jQuery('#TargetLanguageTemplate');
-		condTemplate.attr("name", "Template");
+		var targetLanguageTemplate = jQuery('#TargetLanguageTemplate');
+        targetLanguageTemplate.attr("name", "Template");
 
-		var newData = condTemplate.clone(true);
-		newData.attr("id", taskTag).attr("name", taskTag);
+		var newData = targetLanguageTemplate.clone(true);
+		newData.attr("id", targetLanguageTag).attr("name", targetLanguageTag);
 
 		newData.find( "input,select").each(function(idx) {
 			var name = $( this ).attr("name");
@@ -53,8 +56,9 @@
 	}
 
 	function addTargetLanguageFromObject(target, object) {
-		var condTag = 'TargetLanguage_' + targetIndex++;
-		var newTargetLanguage = createTargetLanguage(condTag);
+        jQuery('#target-language-fieldSet').attr('maxTargetLanguageIndex', maxTargetLanguageIndex++);
+		var targetLanguageTag = 'TargetLanguage_' + targetLanguageIndex++;
+		var newTargetLanguage = createTargetLanguage(targetLanguageTag);
 
 		newTargetLanguage.find( "input,select").each(function(idx) {
 			if ($( this ).attr("type") == 'hidden')
