@@ -1833,9 +1833,9 @@ class kJobsManager
 			$filePath = $fileSync->getFullPath();
 		$actualFileDescription = trim(kFile::getFileDescription($filePath));
 		$blackList = kconf::get('file_descriptions_black_list');
-		$isFileTypeAllowed = in_array($actualFileDescription,$blackList['fileDescriptions']);
+		$shouldBlock = in_array($actualFileDescription,$blackList['fileDescriptions']);
 		if($fileSync->isEncrypted())
 			$fileSync->deleteTempClear();
-		return $isFileTypeAllowed;
+		return $shouldBlock;
 	}
 }
