@@ -280,7 +280,7 @@ tfoot td {
 
 @
 -moz-document url-prefix () {table tfoot td { height:29px;
-	
+
 }
 
 }
@@ -1952,6 +1952,10 @@ form#frmCreateCatalogItem dd,form#frmCreateCatalogItem dt {
 
 #catalog-item-configure-dialog dl {
 	margin-top: 15px;
+}
+
+#catalog-item-configure-dialog b {
+	display: block;
 }
 
 #catalog-item-configure-dialog dl p {

@@ -90,8 +90,10 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		
 		$this->addLine("Pricing Line");
 		$this->addTitle('Pricing:');
-		$pricingSubFor = new Form_VendorCatalogItemPricing();
-		$this->addSubForm($pricingSubFor, "pricing");
+
+		$pricingSubForm = new Form_VendorCatalogItemPricing(array('DisableLoadDefaultDecorators' => true));
+		$this->addSubForm($pricingSubForm, "pricing");
+		$this->getSubForm("pricing")->removeDecorator("DtDdWrapper");
 
 		$this->addLine("Languages Line");
 		$this->addTitle('Source Languages:');
@@ -173,8 +175,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$this->populateLanguages($object);
 		$this->populateOutputFormats($object);
 		$this->getSubForm("pricing")->populateFromObject($object->pricing);
-		$this->populateSourceLanguages($object);
-		
+
 	}
 
 	private function populateLanguages($object)

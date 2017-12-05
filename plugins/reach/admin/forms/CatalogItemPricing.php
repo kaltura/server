@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_VendorCatalogItemPricing extends Zend_Form_SubForm
+class Form_VendorCatalogItemPricing extends ConfigureSubForm
 {
 	public function init()
 	{
