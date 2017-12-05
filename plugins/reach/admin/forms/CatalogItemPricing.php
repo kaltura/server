@@ -7,9 +7,7 @@ class Form_VendorCatalogItemPricing extends ConfigureSubForm
 {
 	public function init()
 	{
- 		$this->setLegend("Catalog Item Pricing: ");
  		$this->setName("catalogItemPricing");
-		
 		$this->addElement('text', 'pricePerUnit', array(
 			'label'			=> 'Price Per Unit*:',
 			'required'		=> true,
