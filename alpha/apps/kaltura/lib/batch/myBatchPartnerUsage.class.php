@@ -42,7 +42,7 @@ class myBatchPartnerUsage extends myBatchBase
 					if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 					{
 						myPartnerUtils::doPartnerUsage($partner, true);
-						if($partner->getCreatedAt() >= kConf::get('new_free_trial_start_date'))
+						if(myPartnerUtils::isPartnerCreatedAsNewFreeTrial($partner))
 							myPartnerUtils::handleDayInFreeTrial($partner);
 					}
 					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
@@ -52,7 +52,8 @@ class myBatchPartnerUsage extends myBatchBase
 				}
 			}
 			$partner = end($partners);
-			$highest_partner_id = $partner->getId();
+			if($partner)
+				$highest_partner_id = $partner->getId();
 			unset($partners);
 			PartnerPeer::clearInstancePool();
 		}

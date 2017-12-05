@@ -1092,7 +1092,7 @@ class myPartnerUtils
 		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
 
 		$newFreeTrial = false;
-		if($partner->getCreatedAt() >= kConf::get('new_free_trial_start_date'))
+		if(myPartnerUtils::isPartnerCreatedAsNewFreeTrial($partner))
 			$newFreeTrial = true;
 
 		$report_date = date('Y-m').'-01';
@@ -2066,5 +2066,21 @@ class myPartnerUtils
 			$partner->save();
 		}
 
+	}
+
+	/**
+	 *  check if partner was created after we started the new free trial flow
+	 *
+	 * @param partner $partner
+	 * @return bool
+	 */
+	public static function isPartnerCreatedAsNewFreeTrial($partner)
+	{
+		$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
+		if(!$freeTrialStartDate)
+			return false;
+		if($partner->getCreatedAt() >= $freeTrialStartDate)
+			return true;
+		return false;
 	}
 }
