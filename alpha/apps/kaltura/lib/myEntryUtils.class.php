@@ -2105,4 +2105,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return ($canBeHandle && $validDimension);
 	}
 
+	public static function addTrackEntryInfo(entry $entry,$message)
+	{
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($entry->getId());
+		$trackEntry->setDescription($message);
+		TrackEntry::addTrackEntry($trackEntry);
+	}
 }

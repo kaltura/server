@@ -1222,6 +1222,7 @@ class kJobsManager
 		{
 			$entry->setStatus(entryStatus::ERROR_CONVERTING);
 			$entry->save();
+			myEntryUtils::addTrackEntryInfo($entry,"Source file for conversion is not supported");
 			return null;
 		}
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
@@ -1812,7 +1813,7 @@ class kJobsManager
 			KalturaLog::notice('No file-sync supplied for conversion');
 			return false;
 		}
- 		if (self::isTextFile($fileSync))
+ 		if (self::isFileTypeAllowedForConversion($fileSync))
  		{
  			KalturaLog::notice('Source of type text will not be converted - FileSyncId [' . $fileSync->getId() . ']');
  			return false;
@@ -1824,14 +1825,16 @@ class kJobsManager
 	* @param FileSync $fileSync
 	* @return bool
 	*/
-	private static function isTextFile($fileSync)
+	private static function isFileTypeAllowedForConversion($fileSync)
 	{
-		if(!$fileSync->isEncrypted())
-			return kFile::isFileTypeText($fileSync->getFullPath());
-
-		$filePath = $fileSync->createTempClear();
-		$isFileTypeText = kFile::isFileTypeText($filePath);
+		if($fileSync->isEncrypted())
+			$filePath = $fileSync->createTempClear();
+		else
+			$filePath = $fileSync->getFullPath();
+		$actualFileDescription = trim(kFile::getFileDescription($filePath));
+		$blackList = kconf::get('file_descriptions_black_list');
+		$isFileTypeAllowed = in_array($actualFileDescription,$blackList['fileDescriptions']);
 		$fileSync->deleteTempClear();
-		return $isFileTypeText;
+		return $isFileTypeAllowed;
 	}
 }
