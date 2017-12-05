@@ -65,7 +65,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$catalogItemForView = new Kaltura_Form_Element_EnumSelect('serviceFeature', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature'));
 		$catalogItemForView->setLabel('Service Feature:');
 		$catalogItemForView->setValue($this->catalogItemType);
-//		$catalogItemForView->setRequired(true);
 		$catalogItemForView->setAttrib('disabled','disabled');
 		$this->addElement($catalogItemForView);
 
@@ -77,15 +76,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$this->addElement($isDefault);
 
 		$serviceTypeForView = new Kaltura_Form_Element_EnumSelect('serviceType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType'));
-		$serviceTypeForView ->setLabel('Service Type:');
-		$serviceTypeForView ->setRequired(true);
-		$serviceTypeForView ->setValue(Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN);
+		$serviceTypeForView->setLabel('Service Type:');
+		$serviceTypeForView->setRequired(true);
+		$serviceTypeForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN);
 		$this->addElement($serviceTypeForView );
 
 		$turnAroundTimeForView = new Kaltura_Form_Element_EnumSelect('turnAroundTime', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime'));
-		$turnAroundTimeForView ->setLabel('Turn Around Time:');
-		$turnAroundTimeForView ->setRequired(true);
-		$turnAroundTimeForView ->setValue(Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT);
+		$turnAroundTimeForView->setLabel('Turn Around Time:');
+		$turnAroundTimeForView->setRequired(true);
+		$turnAroundTimeForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT);
 		$this->addElement($turnAroundTimeForView );
 		
 		$this->addLine("Pricing Line");
@@ -116,20 +115,18 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		}
 
 		$this->addLine("OutputFormatsLine");
-
 		$this->addTitle('Output Formats:');
 		$outputFormatsSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$outputFormatsSubForm->addDecorator('ViewScript', array(
 			'viewScript' => 'output-formats-sub-form.phtml',
 		));
 		$this->addSubForm($outputFormatsSubForm, 'OutputFormats_');
-
-		$innerOutputFormatsSubForm = new Form_OutputFormatsSubForm('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat');
+		$innerOutputFormatsSubForm = new Form_OutputFormatsSubForm('Kaltura_Client_Reach_Type_OutputFormatItem');
 		$this->addSubForm($innerOutputFormatsSubForm  , "OutputFormatTemplate");
 
 		$enableSpeakerId = new Kaltura_Form_Element_EnumSelect('enableSpeakerId', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 	'excludes' => array (
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
-		$enableSpeakerId ->setLabel('Enable Speaker ID:');
+		$enableSpeakerId->setLabel('Enable Speaker ID:');
 		$enableSpeakerId->setRequired(true);
 		$enableSpeakerId->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableSpeakerId);
@@ -173,8 +170,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$this->populateLanguages($object);
 		$this->populateOutputFormats($object);
 		$this->getSubForm("pricing")->populateFromObject($object->pricing);
-		$this->populateSourceLanguages($object);
-		
 	}
 
 	private function populateLanguages($object)
@@ -201,10 +196,10 @@ class Form_CatalogItemConfigure extends ConfigureForm
 	private function populateOutputFormats($object)
 	{
 		$outputFormats = array();
-		foreach ($object->outputFormats as $outputFormats)
+		foreach ($object->outputFormats as $outputFormat)
 		{
 			$newOutputFormat = array();
-			$newOutputFormat ['outputFormat'] = $outputFormats->format;
+			$newOutputFormat['outputFormat'] = $outputFormat->outputFormat;
 			$outputFormats[] = $newOutputFormat ;
 		}
 		$this->setDefault('OutputFormats',  json_encode($outputFormats));
@@ -222,6 +217,9 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$catalogItem->partnerId = null;
 		$catalogItem->createdAt = null;
 		$catalogItem->updatedAt = null;
+		$catalogItem->OutputFormats = null;
+		$catalogItem->SourceLanguages = null;
+		$catalogItem->TargetLanguages = null;
 	}
 
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -250,6 +248,16 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			}
 			$object->targetLanguages = $languagesArray;
 		}
+		
+		$outputFormats = $properties['OutputFormats'];
+		$outputFormatsArray = array();
+		foreach (json_decode($outputFormats) as $outputFormat)
+		{
+			$outputFormatItem = new Kaltura_Client_Reach_Type_OutputFormatItem();
+			$outputFormatItem->outputFormat = $outputFormat->outputFormat;
+			$outputFormatsArray[] = $outputFormatItem;
+		}
+		$object->outputFormats = $outputFormatsArray;
 
 		return $object;
 	}

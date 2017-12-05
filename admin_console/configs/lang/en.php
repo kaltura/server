@@ -1411,7 +1411,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::IMMEDIATE' => 'IMMEDIATE',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::SIX_HOURS' => 'SIX_HOURS',
-	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THIRTHY_MINUTES' => 'THIRTHY_MINUTES',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THIRTY_MINUTES' => 'THIRTY_MINUTES',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THREE_HOURS' => 'THREE_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
 	'Kaltura_Client_Reach_Type_VendorCatalogItemPricing' => "Default Pricing",

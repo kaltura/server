@@ -21,31 +21,33 @@
 
 <script type="text/javascript">
 
-	var formatIndex = 0;
+	var outputFormatIndex = 0;
 	function addOutputFormat(target)
 	{
-		var outputFormatTag = 'OutputFormat_' + formatIndex++;
+		var outputFormatTag = 'OutputFormat_' + outputFormatIndex++;
+		
 		var newOutputFormat = createOutputFormat(outputFormatTag);
 		jQuery(target).after(newOutputFormat.show());
 	}
 
 	function removeOutputFormat(target) {
-		formatIndex--;
+		outputFormatIndex--;
+		alert("outputFormatIndex = " + outputFormatIndex);
 		jQuery(target).parent().remove();
 	}
 
-	function createOutputFormat(taskTag)
+	function createOutputFormat(outputFormatTag)
 	{
-		var formatTemplate = jQuery('#OutputFormatTemplate');
-		formatTemplate.attr("name", "Template");
+		var outputFormatTemplate = jQuery('#OutputFormatTemplate');
+        outputFormatTemplate.attr("name", "Template");
 
-		var newData = formatTemplate.clone(true);
-		newData.attr("id", taskTag).attr("name", taskTag);
+		var newData = outputFormatTemplate.clone(true);
+		newData.attr("id", outputFormatTag).attr("name", outputFormatTag);
 
 		newData.find( "input,select").each(function(idx) {
 			var name = $( this ).attr("name");
 			var paramName =name.substring("OutputFormat_".length);
-			var tag = taskTag + "::" + paramName;
+			var tag = outputFormatTag + "::" + paramName;
 			$( this ).attr("name", paramName).attr("id", tag)
 		});
 
@@ -53,8 +55,8 @@
 	}
 
 	function addOutputFormatFromObject(target, object) {
-		var condTag = 'OutputFormat_' + formatIndex++;
-		var newOutputFormat = createOutputFormat(condTag);
+		var outputFormatTag = 'OutputFormat_' + outputFormatIndex++;
+		var newOutputFormat = createOutputFormat(outputFormatTag);
 
 		newOutputFormat.find( "input,select").each(function(idx) {
 			if ($( this ).attr("type") == 'hidden')
