@@ -16,35 +16,34 @@ class Form_CreateCatalogItem extends Infra_Form
 
 		$this->addElement('text', 'newPartnerId', array(
 			'label' => 'Publisher ID:',
-//			'onkeypress' => "return supressFormSubmit(event)",
 			'filters' => array('StringTrim'),
 		));
 
 		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('cloneTemplateServiceFeature', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature',
 			'label'			=> 'Service Feature:',
-			'onchange'		=> "switchTemplatesBoxForServiceFeature()",
+			'onchange'		=> "switchAllTemplates()",
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
-		), true);
+		), array("ALL" => "ALL"));
 		$this->addElements(array($newServiceFeature));
 
 		$newServiceType = new Kaltura_Form_Element_EnumSelect('cloneTemplateServiceType', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType',
 			'label'			=> 'Service Type:',
-			'onchange'		=> "switchTemplatesBoxByServiceType()",
+			'onchange'		=> "switchAllTemplates()",
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
-		), true);
+		), array("ALL" => "ALL"));
 		$this->addElements(array($newServiceType));
 
 		$newTurnAround = new Kaltura_Form_Element_EnumSelect('cloneTemplateTurnAround', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime',
 			'label'			=> 'Service Turn Around Time:',
-			'onchange'		=> "switchTemplatesBoxByTurnAround()",
+			'onchange'		=> "switchAllTemplates()",
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
-		), true);
+		), array("ALL" => "ALL"));
 		$this->addElements(array($newTurnAround));
 
 		$element = $this->addElement('select', 'cloneTemplateId', array(

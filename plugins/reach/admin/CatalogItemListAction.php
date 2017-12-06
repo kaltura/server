@@ -34,7 +34,6 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 
 		// init filter
 		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
-//		$catalogItemProfileFilter = $this->getCatalogItemProfileFilterFromRequest($request);
 		$catalogItemProfileFilter->orderBy = "-createdAt";
 
 		$client = Infra_ClientHelper::getClient();
@@ -76,7 +75,6 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 			$obj->id = $template->id;
 			$obj->systemName = $template->systemName;
 			$obj->serviceFeature = $template->serviceFeature; // Caption or Translation
-//			$obj->serviceFeature = "CAPTIONS"; // Caption or Translation
 			$obj->serviceType = $template->serviceType; // Human Or machine
 			$obj->turnAroundTime = $template->turnAroundTime; // TurnAroundTime
 			$obj->name = $template->name;

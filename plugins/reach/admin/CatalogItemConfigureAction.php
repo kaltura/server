@@ -26,8 +26,8 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 		$request = $action->getRequest();
 		$partnerId = $this->_getParam('new_partner_id');
 		$catalogItemId = $this->_getParam('catalog_item_id');
-		$catalogItemType = null;
 		$cloneTemplateId = $this->_getParam('clone_template_id');
+		$catalogItemType = null;
 		$catalogItemForm = null;
 
 		if (!$partnerId)
@@ -40,9 +40,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 		try
 		{
 			Infra_ClientHelper::impersonate($partnerId);
-
 			if ($cloneTemplateId)
 			{
+				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType, true);
 				if ($partnerId)
 				{
 					$catalogItem = $reachPluginClient->vendorCatalogItem->cloneAction($cloneTemplateId);
@@ -59,12 +59,14 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 			{
 				$catalogItem = $reachPluginClient->vendorCatalogItem->get($catalogItemId);
 				$catalogItemType = $catalogItem->serviceFeature;
+				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType, true);
 			} else
 			{
 				$catalogItemType = $this->_getParam('new_catalog_item_type');
+				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType);
 			}
 
-			$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType);
+
 
 			if (!$form || !($form instanceof Form_CatalogItemConfigure))
 			{

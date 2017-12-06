@@ -25,6 +25,9 @@
 	var maxOutputFormatIndex = 0;
 	function addOutputFormat(target)
 	{
+		if (jQuery('#output-formats-fieldSet').attr('disabled'))
+			return;
+
         jQuery('#output-formats-fieldSet').attr('maxOutputFormatIndex', maxOutputFormatIndex++);
 		var outputFormatTag = 'OutputFormat_' + outputFormatIndex++;
 		var newOutputFormat = createOutputFormat(outputFormatTag);
@@ -32,8 +35,10 @@
 	}
 
 	function removeOutputFormat(target) {
-		outputFormatIndex--;
-		jQuery(target).parent().remove();
+		if (!jQuery('#output-formats-fieldSet').attr('disabled')) {
+			outputFormatIndex--;
+			jQuery(target).parent().remove();
+		}
 	}
 
 	function createOutputFormat(outputFormatTag)

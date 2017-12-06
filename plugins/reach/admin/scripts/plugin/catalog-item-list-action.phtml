@@ -8,10 +8,12 @@
 			<th><?php echo $this->translate('ID'); ?></th>
 			<th><?php echo $this->translate('Status'); ?></th>
 			<th><?php echo $this->translate('Name'); ?></th>
+			<th><?php echo $this->translate('System Name'); ?></th>
 			<th><?php echo $this->translate('Publisher ID'); ?></th>
 			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
+			<th><?php echo $this->translate('Feature'); ?></th>
 			<th><?php echo $this->translate('Type'); ?></th>
-			<th><?php echo $this->translate('System Name'); ?></th>
+			<th><?php echo $this->translate('Turn Around Time'); ?></th>
 			<th><?php echo $this->translate('Creation Date'); ?></th>
 			<th><?php echo $this->translate('Last Updated Date'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
@@ -30,10 +32,12 @@
 				<td><?php echo $catalogItem->id; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
 				<td><?php echo $catalogItem->name; ?></td>
+				<td><?php echo $catalogItem->systemName; ?></td>
 				<td><?php echo $catalogItem->partnerId; ?></td>
 				<td><?php echo $catalogItem->vendorPartnerId; ?></td>
-				<td><?php $a= $catalogItem->getKalturaObjectType(); $a = str_replace('KalturaVendor', '', $a); $a = str_replace('CatalogItem', '', $a); echo $a ?></td>
-				<td><?php echo $catalogItem->systemName; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $catalogItem->serviceFeature); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
 				<td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
 				<td>
@@ -57,7 +61,7 @@
 <script type="text/javascript">
 	$(function(){
 		addSubTitle('Catalog Items');
-		switchTemplatesBoxForServiceFeature();
+		switchAllTemplates();
 	});
 
 	jQuery('#filter_type').change(function() {
@@ -90,54 +94,27 @@
 	var templatesByServiceFeature = [];
 	var templatesByServiceType = [];
 
-	function switchTemplatesBoxForServiceFeature() {
+	function switchAllTemplates() {
 		var filteredTemplates = [];
 		jQuery('#cloneTemplateId').find('option').remove();
 
 		var templateServiceFeature = jQuery('#cloneTemplateServiceFeature').val();
-		if(templateServiceFeature == null)
-			return;
-
-		for(var i = 0; i < templates.length; i++){
-			if(templates[i].serviceFeature == templateServiceFeature)
-			{
-				jQuery('#cloneTemplateId').append('<option value="' + templates[i].id + '">' + templates[i].systemName + '</option>');
-				filteredTemplates.push(templates[i]);
-			}
-		}
-		templatesByServiceFeature = filteredTemplates;
-	}
-
-	function switchTemplatesBoxByServiceType() {
-		var filteredTemplates = [];
-		jQuery('#cloneTemplateId').find('option').remove();
-
 		var templateServiceType = jQuery('#cloneTemplateServiceType').val();
-		if(templateServiceType == null)
-			return;
-
-		for(var i = 0; i < templatesByServiceFeature.length; i++){
-			if(templatesByServiceFeature[i].serviceType == templateServiceType)
-			{
-				jQuery('#cloneTemplateId').append('<option value="' + templatesByServiceFeature[i].id + '">' + templatesByServiceFeature[i].systemName + '</option>');
-				filteredTemplates.push(templatesByServiceFeature[i]);
-			}
-		}
-		templatesByServiceType = filteredTemplates;
-	}
-
-	function switchTemplatesBoxByTurnAround() {
-		jQuery('#cloneTemplateId').find('option').remove();
-
 		var templateTurnAroundTime = jQuery('#cloneTemplateTurnAround').val();
-		if(templateTurnAroundTime == null)
-			return;
 
-		for(var i = 0; i < templatesByServiceType.length; i++){
-			if(templatesByServiceType[i].turnAroundTime == templateTurnAroundTime)
-			{
-				jQuery('#cloneTemplateId').append('<option value="' + templatesByServiceType[i].id + '">' + templatesByServiceType[i].systemName + '</option>');
-			}
+		for(var i = 0; i < templates.length; i++)
+		{
+			if (templateServiceFeature !== "ALL" && templates[i].serviceFeature != templateServiceFeature)
+				continue;
+
+			if (templateServiceType !== "ALL" && templates[i].serviceType != templateServiceType)
+				continue;
+
+			if (templateTurnAroundTime !== "ALL" && templates[i].turnAroundTime != templateTurnAroundTime)
+				continue;
+
+			jQuery('#cloneTemplateId').append('<option value="' + templates[i].id + '">' + templates[i].systemName + '</option>');
+			filteredTemplates.push(templates[i]);
 		}
 	}
 
@@ -217,7 +194,7 @@
 			return;
 		}
 
-		if(!catalogItemType || !catalogItemType.length || catalogItemType == 'NONE'){
+		if(!catalogItemType || !catalogItemType.length || catalogItemType == 'ALL'){
 			alert('<?php echo $this->translate('Catalog item type not supplied'); ?>');
 			return;
 		}
@@ -250,6 +227,7 @@
 			title: '<?php echo $this->translate('Catalog Item'); ?>',
 			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function() {
+					removeDisableTags();
 					loadSourceLanguages();
 					loadTargetLanguages();
 					loadOutputFormats();
@@ -268,6 +246,7 @@
 			url,
 			null,
 			function() {
+				addDisableTags();
 				jQuery(this).find('#frmCatalogItemConfigure').ajaxForm({
 					success: loadCatalogItemSuccess,
 					iframe: true
@@ -276,6 +255,16 @@
 		);
 	}
 
+	function removeDisableTags()
+	{
+		jQuery('#isDefault').removeAttr('disabled');
+		jQuery('#serviceType').removeAttr('disabled');
+		jQuery('#turnAroundTime').removeAttr('disabled');
+		jQuery('#source-language-fieldSet').removeAttr('disabled');
+		jQuery('#target-language-fieldSet').removeAttr('disabled');
+		jQuery('#output-formats-fieldSet').removeAttr('disabled');
+		jQuery('#fieldset-pricing').removeAttr('disabled');
+	}
 
 	function cloneCatalogItemTemplate(partnerId , cloneTemplateId) {
 		if(!partnerId.length || isNaN(partnerId)){
@@ -306,6 +295,7 @@
 				'<?php echo $this->translate('Save'); ?>': function() {
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
+					removeDisableTags();
 					loadSourceLanguages();
 					loadTargetLanguages();
 					loadOutputFormats();
@@ -324,12 +314,20 @@
 			url,
 			null,
 			function() {
+				addDisableTags();
 				jQuery('#frmCatalogItemConfigure').ajaxForm({
 					success: loadCatalogItemSuccess,
 					iframe: true
 				});
 			}
 		);
+	}
+
+	function addDisableTags()
+	{
+		jQuery('#source-language-fieldSet').attr('disabled', 'disabled');
+		jQuery('#target-language-fieldSet').attr('disabled', 'disabled');
+		jQuery('#output-formats-fieldSet').attr('disabled', 'disabled');
 	}
 
 	function loadCatalogItem(paramStr)
@@ -460,26 +458,4 @@
 			iframe: true
 		});
 	}
-
-	function replaceCatalogPricingForm() {
-
-		var catalogItemPricingClz = jQuery('#catalogItemPricing-objectType').val();
-		var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'get-catalog-item-pricing-form', 'catalogItemPricingClz' => 'PRICINGCLS')); ?>';
-		url = url.replace('PRICINGCLS', catalogItemPricingClz);
-
-		subform = jQuery('#catalogItemPricing-element');
-		subform.load(
-			url,
-			null,
-			function(html) {
-				jQuery('#catalogItemPricing-element').replaceWith(jQuery.parseHTML(html)[1]);
-				jQuery('#catalogItemPricing-objectType').change(replaceCatalogPricingForm);
-			}
-		);
-	}
-
-	jQuery('#catalogItemPricing-objectType').change(replaceCatalogPricingForm);
-
-
 </script>
-

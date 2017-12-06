@@ -5,7 +5,7 @@
  */
 class Kaltura_Form_Element_EnumSelect extends Zend_Form_Element_Select
 {
-	function __construct($spec, $options = null, $addNoneInitialValue = false)
+	function __construct($spec, $options = null, $additionalValues = array())
 	{
 		parent::__construct($spec, $options);
 		
@@ -20,10 +20,10 @@ class Kaltura_Form_Element_EnumSelect extends Zend_Form_Element_Select
 		$oClass = new ReflectionClass($enumName);
 		$constants = $oClass->getConstants();
 
-		if ($addNoneInitialValue)
-		{
-			$this->addMultiOption("NONE", "NONE");
-		}
+
+		foreach ($additionalValues  as $key => $value)
+			$this->addMultiOption($key, $value);
+
 		foreach($constants as $constName => $constValue)
 		{
 			if(isset($options['excludes']) && in_array($constValue, $options['excludes']))

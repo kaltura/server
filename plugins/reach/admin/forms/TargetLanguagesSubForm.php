@@ -31,8 +31,8 @@ class Form_TargetLanguagesSubForm extends ConfigureSubForm
 
 	public function isValid($data)
 	{
-		if ($data['TargetLanguages'])
-			return true;
-		else return false;
+		if ($data['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION && !$data['TargetLanguages'])
+			return false;
+		else return true;
 	}
 }

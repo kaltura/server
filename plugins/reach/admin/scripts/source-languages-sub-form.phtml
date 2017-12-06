@@ -24,6 +24,9 @@
 	var maxSourceLanguageIndex = 0;
 	function addSourceLanguage(target)
 	{
+		if (jQuery('#source-language-fieldSet').attr('disabled'))
+			return;
+
         jQuery('#source-language-fieldSet').attr('maxSourceLanguageIndex', maxSourceLanguageIndex++);
 		var sourceLanguageTag = 'SourceLanguage_' + sourceLanguageIndex++;
 		var newSourceLanguage = createSourceLanguage(sourceLanguageTag);
@@ -32,8 +35,10 @@
 	}
 
 	function removeSourceLanguage(target) {
-        sourceLanguageIndex--;
-        $(target).parent().remove();
+		if (!jQuery('#source-language-fieldSet').attr('disabled')) {
+			sourceLanguageIndex--;
+			$(target).parent().remove();
+		}
 	}
 
 	function createSourceLanguage(sourceLanguageTag)

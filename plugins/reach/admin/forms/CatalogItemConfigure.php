@@ -7,11 +7,13 @@ class Form_CatalogItemConfigure extends ConfigureForm
 {
 	protected $newPartnerId;
 	protected $catalogItemType;
+	protected $disableAttributes;
 
-	public function __construct($partnerId, $type)
+	public function __construct($partnerId, $type, $disableAttributes = null)
 	{
 		$this->newPartnerId = $partnerId;
 		$this->catalogItemType = $type;
+		$this->disableAttributes = $disableAttributes;
 
 		parent::__construct();
 	}
@@ -38,7 +40,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'required'		=> true,
 			'filters' 		=> array('StringTrim'),
 			'placement' => 'prepend',
-			'readonly'		=> true,
+			'readonly'		=> 'true',
 		));
 
 		$this->addElement('text', 'vendorPartnerId', array(
@@ -46,6 +48,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			'placement' => 'prepend',
+			'readonly'		=> $this->disableAttributes,
 		));
 
 		$this->addElement('text', 'name', array(
@@ -53,6 +56,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			'placement' => 'prepend',
+			'readonly'		=> $this->disableAttributes,
 		));
 
 		$this->addElement('text', 'systemName', array(
@@ -60,6 +64,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			'placement' => 'prepend',
+			'readonly'		=> $this->disableAttributes,
 		));
 
 		$catalogItemForView = new Kaltura_Form_Element_EnumSelect('serviceFeature', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature'));
@@ -72,18 +77,21 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$isDefault->setLabel('Is Default:');
 		$isDefault->setRequired(true);
+		$isDefault->setAttrib('disabled',$this->disableAttributes);
 		$isDefault->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($isDefault);
 
 		$serviceTypeForView = new Kaltura_Form_Element_EnumSelect('serviceType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType'));
 		$serviceTypeForView->setLabel('Service Type:');
 		$serviceTypeForView->setRequired(true);
+		$serviceTypeForView->setAttrib('disabled',$this->disableAttributes);
 		$serviceTypeForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN);
 		$this->addElement($serviceTypeForView );
 
 		$turnAroundTimeForView = new Kaltura_Form_Element_EnumSelect('turnAroundTime', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime'));
 		$turnAroundTimeForView->setLabel('Turn Around Time:');
 		$turnAroundTimeForView->setRequired(true);
+		$turnAroundTimeForView->setAttrib('disabled',$this->disableAttributes);
 		$turnAroundTimeForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT);
 		$this->addElement($turnAroundTimeForView );
 		
@@ -91,6 +99,9 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$this->addTitle('Pricing:');
 
 		$pricingSubForm = new Form_VendorCatalogItemPricing(array('DisableLoadDefaultDecorators' => true));
+		if ($this->disableAttributes)
+			$pricingSubForm->setAttrib('disabled',$this->disableAttributes);
+
 		$this->addSubForm($pricingSubForm, "pricing");
 		$this->getSubForm("pricing")->removeDecorator("DtDdWrapper");
 
@@ -122,6 +133,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$outputFormatsSubForm->addDecorator('ViewScript', array(
 			'viewScript' => 'output-formats-sub-form.phtml',
 		));
+		$outputFormatsSubForm->setAttrib('disabled',$this->disableAttributes);
 		$this->addSubForm($outputFormatsSubForm, 'OutputFormats_');
 		$innerOutputFormatsSubForm = new Form_OutputFormatsSubForm('Kaltura_Client_Reach_Type_OutputFormatItem');
 		$this->addSubForm($innerOutputFormatsSubForm  , "OutputFormatTemplate");
@@ -137,6 +149,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'label' 		=> 'Fixed Price Addons:',
 			'filters' 		=> array('StringTrim'),
 			'placement' => 'prepend',
+			'readonly'		=> $this->disableAttributes,
 		));
 
 		$this->addElement('hidden', 'type', array(
@@ -168,7 +181,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			}
 		}
 
-		$this->setDefault('serviceFeature', $object->serviceFeature);
+		$this->setDefault('type', $object->serviceFeature);
 		$this->populateLanguages($object);
 		$this->populateOutputFormats($object);
 		$this->getSubForm("pricing")->populateFromObject($object->pricing);

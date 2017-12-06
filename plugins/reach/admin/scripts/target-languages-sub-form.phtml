@@ -23,8 +23,15 @@
 
 	var targetLanguageIndex = 0;
 	var maxTargetLanguageIndex = 0;
+
+	var sourceLanguageIndex = 0;
+	var maxSourceLanguageIndex = 0;
+
 	function addTargetLanguage(target)
 	{
+		if (jQuery('#target-language-fieldSet').attr('disabled'))
+			return;
+
         jQuery('#target-language-fieldSet').attr('maxTargetLanguageIndex', maxTargetLanguageIndex++);
 		var targetLanguageTag = 'TargetLanguage_' + targetLanguageIndex++;
 		var newTargetLanguage = createTargetLanguage(targetLanguageTag);
@@ -33,8 +40,10 @@
 	}
 
 	function removeTargetLanguage(target) {
-        targetLanguageIndex--;
-		jQuery(target).parent().remove();
+		if (!jQuery('#target-language-fieldSet').attr('disabled')) {
+			targetLanguageIndex--;
+			jQuery(target).parent().remove();
+		}
 	}
 
 	function createTargetLanguage(targetLanguageTag)
@@ -48,7 +57,7 @@
 		newData.find( "input,select").each(function(idx) {
 			var name = $( this ).attr("name");
 			var paramName =name.substring("TargetLanguage_".length);
-			var tag = taskTag + "::" + paramName;
+			var tag = targetLanguageTag + "::" + paramName;
 			$( this ).attr("name", paramName).attr("id", tag)
 		});
 
