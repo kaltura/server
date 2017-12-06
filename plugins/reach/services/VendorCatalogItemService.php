@@ -53,7 +53,12 @@ class VendorCatalogItemService extends KalturaBaseService
 		
 		/* @var $dbVendorCatalogItem VendorCatalogItem */
 		$dbVendorCatalogItem->setPartnerId($this->impersonatedPartnerId);
-		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::DISABLED);
+		
+		$status = KalturaVendorCatalogItemStatus::ACTIVE;
+		if($this->impersonatedPartnerId && $this->impersonatedPartnerId > 0)
+			$status = KalturaVendorCatalogItemStatus::DISABLED;
+		
+		$dbVendorCatalogItem->setStatus($status);
 		$dbVendorCatalogItem->save();
 		
 		// return the saved object

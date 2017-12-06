@@ -228,9 +228,7 @@
 			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function() {
 					removeDisableTags();
-					loadSourceLanguages();
-					loadTargetLanguages();
-					loadOutputFormats();
+					loadArrayObjectsData();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -296,9 +294,7 @@
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
 					removeDisableTags();
-					loadSourceLanguages();
-					loadTargetLanguages();
-					loadOutputFormats();
+					loadArrayObjectsData();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -348,9 +344,7 @@
 				'<?php echo $this->translate('Save'); ?>': function() {
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
-					loadSourceLanguages();
-					loadTargetLanguages();
-					loadOutputFormats();
+					loadArrayObjectsData();
 					jQuery(this).find('#frmCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
@@ -374,19 +368,15 @@
 		);
 	}
 
-	function loadOutputFormats() {
+	function loadArrayObjectsData() {
 		//remove all template field
 		$('fieldset[id^="OutputFormatTemplate"]').remove();
 		setOutputFormatData();
-	}
 
-	function loadTargetLanguages() {
 		//remove all template field
 		$('fieldset[id^="TargetLanguageTemplate"]').remove();
 		setTargetLanguageData();
-	}
 
-	function loadSourceLanguages() {
 		//remove all template field
 		$('fieldset[id^="SourceLanguageTemplate"]').remove();
 		setSourceLanguageData();
