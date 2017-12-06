@@ -15,8 +15,8 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
+//		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
+//			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
 		if(!in_array($this->actionName, array('listTemplates', 'clone')))
 			$this->applyPartnerFilterForClass('vendorCatalogItem');
@@ -53,7 +53,12 @@ class VendorCatalogItemService extends KalturaBaseService
 		
 		/* @var $dbVendorCatalogItem VendorCatalogItem */
 		$dbVendorCatalogItem->setPartnerId($this->impersonatedPartnerId);
-		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::DISABLED);
+		
+		$status = KalturaVendorCatalogItemStatus::ACTIVE;
+		if($this->impersonatedPartnerId && $this->impersonatedPartnerId > 0)
+			$status = KalturaVendorCatalogItemStatus::DISABLED;
+		
+		$dbVendorCatalogItem->setStatus($status);
 		$dbVendorCatalogItem->save();
 		
 		// return the saved object
