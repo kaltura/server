@@ -1091,9 +1091,9 @@ class myPartnerUtils
 		$packages = new PartnerPackages();
 		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
 
-		$newFreeTrial = false;
-		if(myPartnerUtils::isPartnerCreatedAsNewFreeTrial($partner))
-			$newFreeTrial = true;
+		$monitoredFreeTrial = false;
+		if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+			$monitoredFreeTrial = true;
 
 		$report_date = date('Y-m').'-01';
         // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
@@ -1102,6 +1102,7 @@ class myPartnerUtils
 		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerStatisticsFromDWH($partner, $partnerPackage, $report_date);
 		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
 		$percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
+		$partner->setPartnerUsagePercent($percent);
 
 		KalturaLog::debug("percent (".$partner->getId().") is: $percent");
 		$email_link_hash = 'pid='.$partner->getId().'&h='.(self::getEmailLinkHash($partner->getId(), $partner->getSecret()));
@@ -1121,7 +1122,7 @@ class myPartnerUtils
 			/* prepare mail job, and set EightyPercentWarning() to true/date */
 			$partner->setEightyPercentWarning(time());
 			$partner->setUsageLimitWarning(0);
-			if(!$newFreeTrial)
+			if(!$monitoredFreeTrial)
 			{
 				$body_params = array($partner->getAdminName(), $partnerPackage['cycle_bw'], $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash);
 				myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $body_params);
@@ -1149,7 +1150,7 @@ class myPartnerUtils
 			/* prepare mail job, and set getUsageLimitWarning() date */
 			$partner->setUsageLimitWarning(time());
 			// if ($partnerPackage['cycle_fee'] == 0) - script always works on free partners anyway
-			if(!$newFreeTrial)
+			if(!$monitoredFreeTrial)
 			{
 				KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning");
 				$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
@@ -1184,7 +1185,7 @@ class myPartnerUtils
 		elseif ($percent >= 120 &&
 				$partnerPackage['cycle_fee'] != 0 &&
 				$partner->getUsageLimitWarning() <= $block_notification_grace &&
-				!$newFreeTrial)
+				!$monitoredFreeTrial)
 		{
 			$body_params = array ( $partner->getAdminName(), round($totalUsageGB, 2) );
 			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PAID_PACKAGE_SUGGEST_UPGRADE, $partner, $body_params);
@@ -1194,7 +1195,7 @@ class myPartnerUtils
 				$partner->getUsageLimitWarning() > 0 &&
 				$partner->getUsageLimitWarning() <= $delete_grace &&
 				$partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK &&
-				!$newFreeTrial)
+				!$monitoredFreeTrial)
 		{
 			KalturaLog::debug("partner ". $partner->getId() ." reached 100% a month ago - deleting partner");
 				
@@ -1878,7 +1879,7 @@ class myPartnerUtils
 
 		$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
 		$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
-		KalturaLog::debug('closest day ['.$closestUpdatesDay.']');
+		KalturaLog::debug('closest day comparing today ['.$closestUpdatesDay.']');
 		if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
 		{
 			KalturaLog::debug('Partner ['.$partner->getId().'] reached to one of the Marketo lead sync days.');
@@ -2074,7 +2075,7 @@ class myPartnerUtils
 	 * @param partner $partner
 	 * @return bool
 	 */
-	public static function isPartnerCreatedAsNewFreeTrial($partner)
+	public static function isPartnerCreatedAsMonitoredFreeTrial($partner)
 	{
 		$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
 		if(!$freeTrialStartDate)

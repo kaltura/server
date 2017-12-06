@@ -42,7 +42,7 @@ class myBatchPartnerUsage extends myBatchBase
 					if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 					{
 						myPartnerUtils::doPartnerUsage($partner, true);
-						if(myPartnerUtils::isPartnerCreatedAsNewFreeTrial($partner))
+						if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
 							myPartnerUtils::handleDayInFreeTrial($partner);
 					}
 					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)

@@ -64,6 +64,8 @@ class Partner extends BasePartner
 
 	const HTML_PURIFIER_BASE_LIST_USAGE = "htmlPurifierBaseListUsage";
 
+	private $partnerUsagePercent;
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -1853,4 +1855,16 @@ class Partner extends BasePartner
 		return false;
 	}
 
+
+	public function getPartnerUsagePercent()
+	{
+		if (!$this->partnerUsagePercent)
+			return 0;
+		return $this->partnerUsagePercent ;
+	}
+
+	public function setPartnerUsagePercent($v)
+	{
+		$this->partnerUsagePercent = $v;
+	}
 }
