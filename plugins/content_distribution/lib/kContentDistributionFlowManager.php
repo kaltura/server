@@ -1265,11 +1265,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 	
 		$isLiveEntry = false;
+		$distributionProfiles = array();
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
 		if($entry->getType() == entryType::LIVE_STREAM)
 		{
 			$isLiveEntry = true;
-			$distributionProfiles = array();
 			$shouldDistribute = false;
 			foreach($entryDistributions as $entryDistributionObject)
 			{
