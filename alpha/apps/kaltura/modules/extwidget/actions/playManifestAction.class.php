@@ -752,8 +752,13 @@ class playManifestAction extends kalturaAction
 		if($this->requestedDeliveryProfileIds)
 		{
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()];
-			return isset($storageStreamerTypeDeliveryProfileIds) && count(array_intersect($this->requestedDeliveryProfileIds, $storageStreamerTypeDeliveryProfileIds));
+			if(isset( $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]))
+			{
+				$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()];
+				return count(array_intersect($this->requestedDeliveryProfileIds, $storageStreamerTypeDeliveryProfileIds));
+			}
+
+			return false;
 		}
 
 		return true;
