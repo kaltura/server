@@ -114,30 +114,18 @@ class kmcUtils
 		return $confs;
 	}
 
-	public static function getLiveUiconfByTag($uiConfTag)
-	{
-		$c = new Criteria();
-		$c->addAnd(uiConfPeer::PARTNER_ID, 0);
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::TAGS, '%'.$uiConfTag.'%', Criteria::LIKE );
-		$c->addAnd ( uiConfPeer::TAGS, '%deprecated%', Criteria::NOT_LIKE );
-		$c->addDescendingOrderByColumn(uiConfPeer::CREATED_AT);	
-		$confs = uiConfPeer::doSelect($c);
-		return $confs;
-	}
-	
-	public static function getStudioUiconf($version)
-	{
-		$c = new Criteria();
-		$tag = 'HTML5Studio_' . $version;
-		$c->addAnd(uiConfPeer::PARTNER_ID, 0);
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::TAGS, '%'.$tag.'%', Criteria::LIKE );
-		$c->addAnd ( uiConfPeer::TAGS, '%deprecated%', Criteria::NOT_LIKE );
-		$c->addDescendingOrderByColumn(uiConfPeer::CREATED_AT);
-		$confs = uiConfPeer::doSelect($c);
-		return $confs;
-	}	
+    public static function getUiconfByTagAndVersion($uiConfTag, $version) {
+        $c = new Criteria();
+        $c->addAnd(uiConfPeer::PARTNER_ID, 0);
+        $c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
+        $c->addAnd ( uiConfPeer::TAGS, '%' . $uiConfTag . '%', Criteria::LIKE );
+        $c->addAnd ( uiConfPeer::TAGS, '%' . $version . '%', Criteria::LIKE );
+        $c->addAnd ( uiConfPeer::TAGS, '%deprecated%', Criteria::NOT_LIKE );
+        $c->addDescendingOrderByColumn(uiConfPeer::CREATED_AT);
+        $confs = uiConfPeer::doSelect($c);
+        return $confs;
+    }
+
 	public static function getAllKMCUiconfs($module_tag, $module_version, $template_partner_id)
 	{
 		$c = new Criteria();

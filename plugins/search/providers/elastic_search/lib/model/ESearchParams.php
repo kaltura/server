@@ -5,7 +5,6 @@
  */
 class ESearchParams extends BaseObject
 {
-
 	/**
 	 * @var ESearchOperator
 	 */
@@ -17,9 +16,19 @@ class ESearchParams extends BaseObject
 	protected $objectStatuses;
 
 	/**
+	 * @var string
+	 */
+	protected $objectId;
+
+	/**
 	 * @var ESearchOrderBy
 	 */
 	protected $orderBy;
+
+	/**
+	 * @var bool
+	 */
+	protected $useHighlight;
 
 	/**
 	 * @return ESearchOperator
@@ -54,6 +63,22 @@ class ESearchParams extends BaseObject
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getObjectId()
+	{
+		return $this->objectId;
+	}
+
+	/**
+	 * @param string $objectId
+	 */
+	public function setObjectId($objectId)
+	{
+		$this->objectId = $objectId;
+	}
+
+	/**
 	 * @return ESearchOrderBy
 	 */
 	public function getOrderBy()
@@ -67,6 +92,22 @@ class ESearchParams extends BaseObject
 	public function setOrderBy($orderBy)
 	{
 		$this->orderBy = $orderBy;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getUseHighlight()
+	{
+		return $this->useHighlight;
+	}
+
+	/**
+	 * @param bool $useHighlight
+	 */
+	public function setUseHighlight($useHighlight)
+	{
+		$this->useHighlight = $useHighlight;
 	}
 
 }

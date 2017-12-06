@@ -58,6 +58,14 @@ abstract class KBaseMediaParser
 	}
 
 	/**
+	 * @param string $filePath
+	 */
+	public function setFilePath($filePath)
+	{
+		$this->filePath = $filePath;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getRawMediaInfo()

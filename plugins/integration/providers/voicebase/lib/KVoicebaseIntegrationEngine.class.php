@@ -38,31 +38,25 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$callBackUrl = $data->callbackNotificationUrl;
 	
 		KalturaLog::debug('callback is - ' . $callBackUrl);
-	
-		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword);
+
+		$additionalParameters = json_decode($providerData->additionalParameters, true);
+		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword, $additionalParameters);
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId);
 	
 		$externalEntryExists = $this->clientHelper->checkExistingExternalContent($entryId);
 		if (!$externalEntryExists)
 		{
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
-			if(!$uploadSuccess)
-				throw new Exception("upload failed");
 		}
 		elseif($shouldReplaceRemoteMedia == true)
 		{
 			$this->clientHelper->deleteRemoteFile($entryId);
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
-			if(!$uploadSuccess)
-				throw new Exception("upload failed");
+
 		}
 		elseif($fileLocation)
 		{
 			$result = $this->clientHelper->updateRemoteTranscript($entryId, $fileLocation, $callBackUrl);
-			if ($result->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
-			{
-				throw new Exception("VoiceBase remote transcript update failed. Message: [" . $result->statusMessage . "]");
-			}
 		}	
 		else
 		{

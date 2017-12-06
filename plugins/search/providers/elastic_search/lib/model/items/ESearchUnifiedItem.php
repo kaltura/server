@@ -7,7 +7,7 @@ class ESearchUnifiedItem extends ESearchItem
 {
 
 	const UNIFIED = 'unified';
-	
+
 	/**
 	 * @var string
 	 */
@@ -29,11 +29,6 @@ class ESearchUnifiedItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function getType()
-	{
-		return self::UNIFIED;
-	}
-
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$outQuery = array();
@@ -41,20 +36,14 @@ class ESearchUnifiedItem extends ESearchItem
 		foreach($eSearchItemsArr as $eSearchUnifiedItem)
 		{
 			self::validateUnifiedAllowedTypes($eSearchUnifiedItem);
-			$subQuery = array();
-			$entryUnifiedQuery = array();
-			self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $entryUnifiedQuery, $queryAttributes);
-			self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem,$entryUnifiedQuery, $queryAttributes);
-			self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem,$entryUnifiedQuery, $queryAttributes);
-			self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem,$entryUnifiedQuery, $queryAttributes);
-			
-			if(count($entryUnifiedQuery))
-			{
-				$subQuery['bool']['should'] = $entryUnifiedQuery;
-				$subQuery['bool']['minimum_should_match'] = 1;
-				$outQuery[] = $subQuery;
-			}
-			
+			$subQuery = new kESearchBoolQuery();
+
+			self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+
+			$outQuery[] = $subQuery;
 		}
 
 		return $outQuery;
@@ -81,8 +70,13 @@ class ESearchUnifiedItem extends ESearchItem
 
 		if(count($entryItems))
 		{
-			$entryUnifiedQuery = ESearchEntryItem::createSearchQuery($entryItems, 'should', $queryAttributes,  null);
+			$entryQueries = ESearchEntryItem::createSearchQuery($entryItems, 'should', $queryAttributes,  null);
+			foreach ($entryQueries as $entryQuery)
+			{
+				$entryUnifiedQuery->addToShould($entryQuery);
+			}
 		}
+
 	}
 
 	private static function addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
@@ -106,9 +100,11 @@ class ESearchUnifiedItem extends ESearchItem
 
 		if(count($cuePointItems))
 		{
-			$cuePointQuery = ESearchCuePointItem::createSearchQuery($cuePointItems, 'should', $queryAttributes, null);
-			if(count($cuePointQuery))
-				$entryUnifiedQuery[] = $cuePointQuery;
+			$cuePointQueries = ESearchCuePointItem::createSearchQuery($cuePointItems, 'should', $queryAttributes, null);
+			foreach ($cuePointQueries as $cuePointQuery)
+			{
+				$entryUnifiedQuery->addToShould($cuePointQuery);
+			}
 		}
 	}
 
@@ -132,10 +128,13 @@ class ESearchUnifiedItem extends ESearchItem
 
 		if(count($captionItems))
 		{
-			$captionQuery = ESearchCaptionItem::createSearchQuery($captionItems, 'should', $queryAttributes, null);
-			if(count($captionQuery))
-				$entryUnifiedQuery[] = $captionQuery;
+			$captionQueries = ESearchCaptionItem::createSearchQuery($captionItems, 'should', $queryAttributes, null);
+			foreach ($captionQueries as $captionQuery)
+			{
+				$entryUnifiedQuery->addToShould($captionQuery);
+			}
 		}
+
 	}
 
 	private static function addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
@@ -149,9 +148,14 @@ class ESearchUnifiedItem extends ESearchItem
 			$metadataItem->setRange($eSearchUnifiedItem->getRange());
 		$metadataItems[] = $metadataItem;
 
-		$metadataQuery = ESearchMetadataItem::createSearchQuery($metadataItems, 'should', $queryAttributes, null);
-		if(count($metadataQuery))
-			$entryUnifiedQuery[] = $metadataQuery;
+		if(count($metadataItems))
+		{
+			$metadataQueries = ESearchMetadataItem::createSearchQuery($metadataItems, 'should', $queryAttributes, null);
+			foreach ($metadataQueries as $metadataQuery)
+			{
+				$entryUnifiedQuery->addToShould($metadataQuery);
+			}
+		}
 	}
 
 	protected static function validateUnifiedAllowedTypes($eSearchUnifiedItem)

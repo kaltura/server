@@ -1082,19 +1082,48 @@ HTML;
 	    }
 	}
 	
-	public static function executeStitchedPlaylist(entry $playlist)
+	public static function executeStitchedPlaylist(entry $playlist, $captionLanguages = null)
+	{
+		$entries = self::retrieveStitchedPlaylistEntries($playlist);
+		return self::getPlaylistDataFromEntries($entries, null, $captionLanguages);
+	}
+
+	public static function retrieveStitchedPlaylistEntries(entry $playlist)
 	{
 		$pager = new kFilterPager();
 		$pager->setPageIndex(1);
 		$pager->setPageSize(self::MAX_STITCHED_PLAYLIST_ENTRY_COUNT);
 		$entries = self::executePlaylist(
-				$playlist->getPartnerId(),
-				$playlist,
-				null,
-				false, 
-				$pager);
+			$playlist->getPartnerId(),
+			$playlist,
+			null,
+			false,
+			$pager);
+		return $entries;
+	}
 
-		return self::getPlaylistDataFromEntries($entries, null, null);
+	/**
+	 * @param entry $entry
+	 * @return array
+	 */
+	public static function retrieveAllPlaylistCaptionLanguages(entry $entry)
+	{
+		$entryIds = array();
+		$entries = myPlaylistUtils::retrieveStitchedPlaylistEntries($entry);
+		foreach ($entries as $playlistEntry)
+			$entryIds[] = $playlistEntry->getId();
+		$captionLanguages = array();
+		foreach ($entryIds as $entryId)
+		{
+			$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+			foreach ($captionAssets as $captionAsset)
+			{
+				/* @var $captionAsset CaptionAsset */
+				if (!in_array($captionAsset->getLanguage(), $captionLanguages))
+					array_push($captionLanguages, $captionAsset->getLanguage());
+			}
+		}
+		return $captionLanguages;
 	}
 
 	/**

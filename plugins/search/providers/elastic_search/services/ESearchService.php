@@ -9,11 +9,11 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchEntry
-	 * @param KalturaESearchObject $searchParams
+	 * @param KalturaESearchParams $searchParams
 	 * @param KalturaPager $pager
 	 * @return KalturaESearchResponse
 	 */
-	function searchEntryAction(KalturaESearchObject $searchParams, KalturaPager $pager = null)
+	function searchEntryAction(KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
 		$entrySearch = new kEntrySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($entrySearch, $searchParams, $pager);
@@ -26,11 +26,11 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchCategory
-	 * @param KalturaESearchObject $searchParams
+	 * @param KalturaESearchParams $searchParams
 	 * @param KalturaPager $pager
 	 * @return KalturaESearchResponse
 	 */
-	function searchCategoryAction(KalturaESearchObject $searchParams, KalturaPager $pager = null)
+	function searchCategoryAction(KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
 		$categorySearch = new kCategorySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($categorySearch, $searchParams, $pager);
@@ -43,11 +43,11 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchUser
-	 * @param KalturaESearchObject $searchParams
+	 * @param KalturaESearchParams $searchParams
 	 * @param KalturaPager $pager
 	 * @return KalturaESearchResponse
 	 */
-	function searchUserAction(KalturaESearchObject $searchParams, KalturaPager $pager = null)
+	function searchUserAction(KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
 		$userSearch = new kUserSearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($userSearch, $searchParams, $pager);
@@ -84,11 +84,8 @@ class ESearchService extends KalturaBaseService
 		return $result;
 	}
 
-	private function initSearchActionParams(KalturaESearchObject $searchParams, KalturaPager $pager = null)
+	private function initSearchActionParams(KalturaESearchParams $searchParams, KalturaPager $pager = null)
 	{
-		if ($searchParams instanceof KalturaESearchQuery)
-			$searchParams = kESearchQueryParser::buildKESearchParamsFromKESearchQuery($searchParams);
-
 		$searchOperator = $searchParams->searchOperator;
 		if (!$searchOperator)
 			throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_OPERATOR_NOT_ALLOWED);
@@ -111,21 +108,25 @@ class ESearchService extends KalturaBaseService
 		if ($order)
 			$coreOrder = $order->toObject();
 
-		return array($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+		$useHighlight = $searchParams->useHighlight;
+		if(is_null($useHighlight)) // we use highlight by default
+			$useHighlight = true;
+
+		return array($coreSearchOperator, $objectStatusesArr, $searchParams->objectId, $kPager, $coreOrder, $useHighlight);
 	}
 
 	private function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
 		try
 		{
-			list($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder) = $this->initSearchActionParams($searchParams, $pager);
-			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $kPager, $coreOrder);
+			list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder, $useHighlight) = $this->initSearchActionParams($searchParams, $pager);
+			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder, $useHighlight);
 		} catch (kESearchException $e)
 		{
 			$this->handleSearchException($e);
 		}
 
-		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName());
+		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName(), $coreSearchObject->getPeerRetrieveFunctionName());
 		return array($coreResults, $objectCount);
 	}
 

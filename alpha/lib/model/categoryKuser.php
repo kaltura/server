@@ -119,7 +119,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		$this->updateCategory();
+		// no need to update the category if the categoryKuser wasn't updated
+		if ($this->isModified())
+			$this->updateCategory();
 		
 		return parent::preUpdate($con);
 	}

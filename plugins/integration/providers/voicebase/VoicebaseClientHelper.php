@@ -8,11 +8,23 @@ class VoicebaseClientHelper
 	const VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS = "SUCCESS";
 	const VOICEBASE_MACHINE_COMPLETE_MESSAGE = "MACHINECOMPLETE";
 	const VOICEBASE_MACHINE_FAILURE_MESSAGE = "ERROR";
-	
+
+	const VOICEBASE_ACTION_UPLOADMEDIA = "uploadMedia";
+	const VOICEBASE_ACTION_GETFILESTATUS = "getFileStatus";
+	const VOICEBASE_ACTION_UPDATETRANSCRIPT = "updateTranscript";
+	const VOICEBASE_ACTION_GETTRANSCRIPT = "getTranscript";
+	const VOICEBASE_ACTION_DELETEFILE = "deleteFile";
+
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;
+
+    /**
+     * @var array
+     * Property contains additional parameters to be dispatched to VoiceBase, grouped by action name.
+     */
+	private $additionalParams = array();
 	
-	public function __construct($apiKey, $apiPassword)
+	public function __construct($apiKey, $apiPassword, $additionalParams = null)
 	{
 		$voicebaseParamsMap = kConf::get('voicebase','integration');
 		$this->supportedLanguages = $voicebaseParamsMap['languages'];
@@ -23,6 +35,11 @@ class VoicebaseClientHelper
 		
 		$url = $this->addUrlParams($url, $params, true);
 		$this->baseEndpointUrl = $url;
+
+		if ($additionalParams)
+		{
+			$this->additionalParams = $additionalParams;
+		}
 	}
 	
 	public function checkExistingExternalContent($entryId)
@@ -40,11 +57,9 @@ class VoicebaseClientHelper
 	
 	public function retrieveRemoteProcess ($entryId)
 	{
-		$params = array("action" => "getFileStatus", "externalID" => $entryId);
-		$exitingEntryQueryUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
-	
-		$curlResult = $this->sendAPICall($exitingEntryQueryUrl);
-		
+		$params = array("action" => self::VOICEBASE_ACTION_GETFILESTATUS, "externalID" => $entryId);
+		$curlResult = $this->sendAPICall($params);
+
 		return $curlResult;
 	}
 	
@@ -53,12 +68,17 @@ class VoicebaseClientHelper
 		if($spokenLanguage)
 			$spokenLanguage = $this->supportedLanguages[$spokenLanguage];
 		
-		$params = array("action" => "uploadMedia",
+		$params = array("action" => self::VOICEBASE_ACTION_UPLOADMEDIA,
 						"title" => $entryId,
 						"externalID" => $entryId, 
 						"lang" => $spokenLanguage
 						);
-	
+
+		if (isset($this->additionalParams[self::VOICEBASE_ACTION_UPLOADMEDIA]))
+		{
+			$params = array_merge($params, $this->additionalParams[self::VOICEBASE_ACTION_UPLOADMEDIA]);
+		}
+
 		$postParams = array("mediaURL" => $flavorUrl);
 		if($fileLocation)
 		{
@@ -72,20 +92,21 @@ class VoicebaseClientHelper
 			$postParams["transcriptType"] = "machine-bestAvailable";
 			$postParams["machineReadyCallBack"] = $callBackUrl;
 		}
-		$uploadAPIUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
-
 		$urlOptions = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postParams);
 
-		$curlResult = $this->sendAPICall($uploadAPIUrl, $urlOptions);
-	
-		if($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE)
-			return false;
-		
+		$curlResult = $this->sendAPICall($params, $urlOptions);
+		if ($curlResult->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
+		{
+			$action = $params["action"];
+			throw new Exception("VoiceBase $action failed. Message: [" . $curlResult->statusMessage . "]");
+		}
+
 		return true;
 	}
 	
-	private function sendAPICall($url, $options = null, $noDecoding = false)
+	private function sendAPICall($params, $options = null, $noDecoding = false)
 	{
+		$url = $this->addUrlParams($this->baseEndpointUrl, $params);
 		KalturaLog::debug("sending API call - $url");
 
 		$ch = curl_init($url);
@@ -100,7 +121,7 @@ class VoicebaseClientHelper
 		{
 			KalturaLog::err('problem with curl - ' . $errString . ' error num - ' . $errNum);
 			curl_close($ch);
-			throw new Exception("curl error with url " . $url);
+			throw new Exception("curl error with url " . $url . " error num [$errNum] error message [$errString]");
 		}
 		if(!$noDecoding)
 		{
@@ -114,7 +135,8 @@ class VoicebaseClientHelper
 			}
 			
 		}
-		KalturaLog::debug('result is - ' . var_dump($result));
+
+		KalturaLog::info('result is - ' . var_dump($result));
 		curl_close($ch);
 		
 		return $result;
@@ -122,8 +144,12 @@ class VoicebaseClientHelper
 	
 	public function updateRemoteTranscript($entryId, $transcriptContent, $callBack)
 	{
-		$params = array("action" => "updateTranscript", "externalID" => $entryId);
-		$updateTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
+		$params = array("action" => self::VOICEBASE_ACTION_UPDATETRANSCRIPT, "externalID" => $entryId);
+
+		if (isset($this->additionalParams[self::VOICEBASE_ACTION_UPDATETRANSCRIPT]))
+		{
+			$params = array_merge($params, $this->additionalParams[self::VOICEBASE_ACTION_UPDATETRANSCRIPT]);
+		}
 
 		$transcriptContent = $this->getFile($transcriptContent);
 		$postFields = array(
@@ -132,21 +158,26 @@ class VoicebaseClientHelper
 				"humanReadyCallBack" => $callBack,
 		);
 		$options = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postFields);
-	
-		return $this->sendAPICall($updateTranscriptUrl, $options);
+
+		$result = $this->sendAPICall($params, $options);
+		if ($result->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
+		{
+			$action = $params["action"];
+			throw new Exception("VoiceBase $action failed. Message: [" . $result->statusMessage . "]");
+		}
+
+		return $result;
 	}
 	
 	public function getRemoteTranscripts($entryId, array $formats)
-	{	
-		$params = array("action" => "getTranscript", "externalID" => $entryId);
-		$getTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
-	
+	{
+		$params = array("action" => self::VOICEBASE_ACTION_GETTRANSCRIPT, "externalID" => $entryId);
+
 		$results = array();
 		foreach($formats as $format)
 		{
-			$formatParam = array("format" => $format);
-			$url = $this->addUrlParams($getTranscriptUrl, $formatParam);
-			$result = $this->sendAPICall($url);
+			$params["format"] = $format;
+			$result = $this->sendAPICall($params);
 			$results[$format] = $result->transcript;
 		}
 		
@@ -176,11 +207,10 @@ class VoicebaseClientHelper
 	}
 	
 	public function deleteRemoteFile($entryId)
-	{	
-		$params = array("action" => "deleteFile", "externalID" => $entryId);
-		$deleteUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
-	
-		$curlResult = $this->sendAPICall($deleteUrl);
+	{
+		$params = array("action" => self::VOICEBASE_ACTION_DELETEFILE, "externalID" => $entryId);
+
+		$curlResult = $this->sendAPICall($params);
 	}
 
 	private function getFile($path)

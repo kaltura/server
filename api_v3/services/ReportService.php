@@ -22,7 +22,8 @@ class ReportService extends KalturaBaseService
         KalturaReportType::OPERATING_SYSTEM,
         KalturaReportType::BROWSERS,
         KalturaReportType::LIVE,
-        KalturaReportType::TOP_PLAYBACK_CONTEXT
+        KalturaReportType::TOP_PLAYBACK_CONTEXT,
+        KalturaReportType::VPAAS_USAGE
     );
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -201,17 +202,25 @@ class ReportService extends KalturaBaseService
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		try {
-			$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType ,
-			$reportInputFilter->toReportsInputFilter() ,
-			$dimension ,
-			$objectIds ,
-			$pager->pageSize , $pager->pageIndex , $order );
+			$reportsMgrClass = $this->getReportsManagerClass($reportType);
+
+			$report = call_user_func(array($reportsMgrClass, "getUrlForReportAsCsv"), $this->getPartnerId(),
+				$reportTitle,
+				$reportText,
+				$headers,
+				$reportType,
+				$reportInputFilter->toReportsInputFilter(),
+				$dimension,
+				$objectIds,
+				$pager->pageSize,
+				$pager->pageIndex,
+				$order);
 		}
 		catch(Exception $e){
 			$code = $e->getCode();
 			if ($code == kCoreException::SEARCH_TOO_GENERAL)
 					throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
-			}
+		}
 
 		if ((infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS))
 			$report = str_replace("http://","https://",$report);
@@ -258,8 +267,6 @@ class ReportService extends KalturaBaseService
 		if (is_null($dbReport))
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
 			
-		$query = $dbReport->getQuery();
-		
 		$this->addPartnerIdToParams($params);
 		
 		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
@@ -280,20 +287,29 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getCsvAction($id, KalturaKeyValueArray $params = null)
 	{
-		$dbReport = ReportPeer::retrieveByPK($id);
-		if (is_null($dbReport))
-			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-			
-		$query = $dbReport->getQuery();
-		
 		$this->addPartnerIdToParams($params);
 		
-		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
-		
 		ini_set( "memory_limit","512M" );
-
-		$kReportsManager = new kReportManager($dbReport);
-		list($columns, $rows) = $kReportsManager->execute($execParams);
+		
+		if (kConf::hasParam("druid_url"))
+		{
+			$customReports = kConf::getMap('custom_reports');
+			if (!isset($customReports[$id]))
+				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+			
+			list($columns, $rows) = kKavaReportsMgr::customReport($id, $params->toObjectsArray());
+		}
+		else 
+		{
+			$dbReport = ReportPeer::retrieveByPK($id);
+			if (is_null($dbReport))
+				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+				
+			$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
+			
+			$kReportsManager = new kReportManager($dbReport);
+			list($columns, $rows) = $kReportsManager->execute($execParams);
+		}
 		
 		$fileName = array('Report', $id, $this->getPartnerId());
 		foreach($params as $param)

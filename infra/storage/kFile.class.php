@@ -6,6 +6,7 @@
 class kFile extends kFileBase
 {
 	const MO_PATTERN = "GNU message catalog";
+	const TEXT = "text";
 
 	/**
 	 * Returns directory $path contents as an array of :
@@ -503,12 +504,17 @@ class kFile extends kFileBase
 			$fileBrief = shell_exec('file -b ' . $realPath);
 			if(kString::beginsWith($fileBrief,self::MO_PATTERN))
 				$fileType = 'application/mo';
+			else if(strpos($fileBrief,self::TEXT)!==false)
+				$fileType = self::TEXT;
 		}
-
 		return $fileType;
 	}
 
-
+	public static function isFileTypeText($filePath)
+	{
+		$fileType = self::findFileTypeByFileCmd($filePath);
+		return ($fileType == self::TEXT);
+	}
 	
 
 	

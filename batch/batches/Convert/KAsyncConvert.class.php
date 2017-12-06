@@ -193,27 +193,12 @@ class KAsyncConvert extends KJobHandlerWorker
 		$operator = $this->getOperator($data);
 		try
 		{
-			$actualFileSyncLocalPath = null;
-			$key = null;
-			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
-			if($srcFileSyncDescriptor)
-			{
-				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
-				if (is_file($actualFileSyncLocalPath))
-					$key = $srcFileSyncDescriptor->fileEncryptionKey;
-			}
+			list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
+
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
-			if (!$key)
-				$isDone = $this->operationEngine->operate($operator, $actualFileSyncLocalPath);
-			else
-			{
-				$tempClearPath = $this->createTempClearFile($actualFileSyncLocalPath, $key);
-				KalturaLog::info("Create temporary clear file [$tempClearPath]");
-				$isDone = $this->operationEngine->operate($operator, $tempClearPath);
-				KalturaLog::info("Delete temporary clear file [$tempClearPath]");
-				unlink($tempClearPath);
-			}
+			$isDone = $this->operate($operator, $actualFileSyncLocalPath, null, $key);
+
 			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed
 			
 			$this->stopMonitor();
@@ -255,17 +240,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			throw $e;
 		}
 	}
-
-	private function createTempClearFile($path, $key)
-	{
-		$iv = kConf::get("encryption_iv");
-		KalturaLog::debug("Key is: [$key] iv: [$iv] for path [$path]");
-		$plainData = kEncryptFileUtils::getEncryptedFileContent($path, $key, $iv);
-		$type = pathinfo($path, PATHINFO_EXTENSION);
-		$tempPath =  sys_get_temp_dir(). "/". $key . ".$type";
-		kFileBase::setFileContent($tempPath, $plainData);
-		return $tempPath;
-	}
+	
 
 	protected function getOperator(KalturaConvartableJobData $data)
 	{
@@ -388,5 +363,32 @@ class KAsyncConvert extends KJobHandlerWorker
 				$destFileSync->fileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($destFileSync->fileSyncLocalPath);
 			}					
 		}
+	}
+
+	protected static function getFirstFilePathAndKey($srcFileSyncs)
+	{
+		$actualFileSyncLocalPath = null;
+		$key = null;
+		$srcFileSyncDescriptor = reset($srcFileSyncs);
+		if($srcFileSyncDescriptor)
+		{
+			$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			if (is_file($actualFileSyncLocalPath))
+				$key = $srcFileSyncDescriptor->fileEncryptionKey;
+		}
+		return array($actualFileSyncLocalPath, $key);
+	}
+
+	protected function operate($operator = null, $filePath, $configFilePath = null, $key = null)
+	{
+		if (!$key)
+			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
+		else
+		{
+			$tempClearPath = self::createTempClearFile($filePath, $key);
+			$res = $this->operationEngine->operate($operator, $tempClearPath, $configFilePath);
+			unlink($tempClearPath);
+		}
+		return $res;
 	}
 }
