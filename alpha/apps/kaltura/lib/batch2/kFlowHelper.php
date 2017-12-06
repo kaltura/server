@@ -395,7 +395,7 @@ class kFlowHelper
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount)
+	public static function getReplacingEntry($recordedEntry, $asset = null, $liveSegmentCount, $flavorParamsId = null)
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -415,7 +415,8 @@ class kFlowHelper
 					}
 					else 
 					{
-						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+						$flavorParamsId = $asset ? $asset->getFlavorParamsId() : $flavorParamsId;
+						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $flavorParamsId);
 						if($replacingAsset)
 						{
 							KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
