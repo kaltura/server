@@ -10,7 +10,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof entry && $object->wasObjectSaved() && $object->getType() !== entryType::LIVE_STREAM)
+		if($object instanceof entry && $object->wasObjectSaved())
 			return true;
 		
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) || in_array(assetPeer::VERSION, $modifiedColumns))
@@ -27,7 +27,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED && $object->getType() !== entryType::LIVE_STREAM)
+		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
 		{
 			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 				return self::onEntryReady($object);
@@ -1263,8 +1263,27 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::info("Entry [".$entryId."] not found");
 			return true;
 		}
+	
+		$isLiveEntry = false;
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
 		if($entry->getType() == entryType::LIVE_STREAM)
-			return true;
+		{
+			$isLiveEntry = true;
+			$distributionProfiles = array();
+			$shouldDistribute = false;
+			foreach($entryDistributions as $entryDistributionObject)
+			{
+				$distributionProfileId = $entryDistributionObject->getDistributionProfileId();
+				$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+				if($distributionProfile)
+				{
+					$distributionProfiles[$entryDistributionObject->getId()] = $distributionProfile;
+					$shouldDistribute = $shouldDistribute || $distributionProfile->shouldDistributeLive($entryId);
+				}
+			}
+			if(!$shouldDistribute)
+				return true;
+		}
 
 		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] changed");
 		
@@ -1289,9 +1308,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$previousXml->loadXML($xmlString);
 			}
 		}
-		
-		
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
+
 		foreach($entryDistributions as $entryDistribution)
 		{
 			/**
@@ -1307,13 +1324,23 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 			}
 
-			$distributionProfileId = $entryDistribution->getDistributionProfileId();
-			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if(isset($distributionProfiles[$entryDistributionObject->getId()]))
+			{
+				$distributionProfile = $distributionProfiles[$entryDistributionObject->getId()];
+			}
+			else
+			{
+				$distributionProfileId = $entryDistribution->getDistributionProfileId();
+				$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			}
 			if(!$distributionProfile)
 			{
 				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
+
+			if($isLiveEntry && !$distributionProfile->shouldDistributeLive($entryId))
+				continue;
 			
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
@@ -1321,7 +1348,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
 				continue;
 			}
-			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
 				self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
@@ -1333,7 +1359,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				}
 				continue;
 			}
-		
 			if($entryDistribution->getStatus() == EntryDistributionStatus::READY)
 			{
 				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
@@ -1519,6 +1544,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 			
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
+		$isLiveEntry = $entry->getType() === entryType::LIVE_STREAM;
 		foreach($entryDistributions as $entryDistribution)
 		{
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
@@ -1528,7 +1554,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
-			
+
+			if($isLiveEntry && !$distributionProfile->shouldDistributeLive($entry->getId()))
+				continue;
+
 			if (in_array(entryPeer::START_DATE, $modifiedColumns) || in_array(entryPeer::END_DATE, $modifiedColumns))
 			{
 				$entryDistribution->setUpdatedAt(time());
@@ -1762,8 +1791,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
+		$isLiveEntry = $entry->getType() === entryType::LIVE_STREAM;
 		foreach($distributionProfiles as $distributionProfile)
 		{
+			if($isLiveEntry && !$distributionProfile->shouldAddDistributeLive())
+				continue;
+
 			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
 			if($entryDistribution)
 			{
