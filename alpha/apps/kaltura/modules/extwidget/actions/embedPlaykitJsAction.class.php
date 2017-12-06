@@ -14,7 +14,7 @@ class embedPlaykitJsAction extends sfAction
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
-	
+
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
 	private $eTagHash = null;
@@ -103,9 +103,7 @@ class embedPlaykitJsAction extends sfAction
 	private function formatBundleContent($bundleContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $this->appendUiConfToContent($bundleContentParts[1]);
-		$bundleContent = $this->appendEnvConfigToContent($bundleContent);
-		
+		$bundleContent = $this->appendConfig($bundleContentParts[1]);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 		
@@ -127,29 +125,25 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
-	private function appendUiConfToContent($content)
+	private function appendConfig($content)
 	{
-		$config = array();
-		$config["config"] = $this->playerConfig;
-		$config = json_encode($config);	
-
-		if ($config === false)
-		{
-			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
-		}
-
-		$kalturaPlayerConfig = "
-		(function(){(KalturaPlayer.UiConf = KalturaPlayer.UiConf || {}) [\"" . $this->uiconfId . "\"] = $config;
-		})();";
-
-		$content .= $kalturaPlayerConfig;
-
-		return $content;
+	    $uiConf = $this->playerConfig;
+	    $uiConf["env"] = $this->getEnvConfig();
+	    $uiConfJson = json_encode($uiConf);
+	    if ($uiConfJson === false)
+	    {
+	        KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
+	    }
+	    $confNS = "window.__kalturaplayerdata";
+	    $content .= "
+	    $confNS = ($confNS || {});
+	    $confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
+	    ";
+	    return $content;
 	}
 
-	private function appendEnvConfigToContent($content)
+	private function getEnvConfig()
 	{
-
 		$protocol = infraRequestUtils::getProtocol();
 
 		// The default Kaltura service url:
@@ -157,34 +151,23 @@ class embedPlaykitJsAction extends sfAction
 		// Default Kaltura CDN url:
 		$cdnUrl = requestUtils::getCdnHost($protocol);
 		// Default Stats URL
-		$statsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"stats_host_https") : $this->buildUrl($protocol,"stats_host");
+		$statsServiceUrl = $this->buildUrl($protocol,"stats_host");
 		// Default Live Stats URL
-		$liveStatsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"live_stats_host_https") : $this->buildUrl($protocol,"live_stats_host");
+		$liveStatsServiceUrl = $this->buildUrl($protocol,"live_stats_host");
 		// Default Kaltura Analytics URL
-		$analyticsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"analytics_host_https") : $this->buildUrl($protocol,"analytics_host");
+		$analyticsServiceUrl = $this->buildUrl($protocol,"analytics_host");
 		// Get Kaltura Supported API Features
 		$apiFeatures = $this->getFromConfig('features');
 
 		$envConfig = array(
-			"ServiceUrl" => $serviceUrl,
-			"CDNUrl" => $cdnUrl,
-			"StatsServiceUrl" => $statsServiceUrl,
-			"LiveStatsServiceUrl" => $liveStatsServiceUrl,
-			"AnalyticsServiceUrl" => $analyticsServiceUrl,
-			"ApiFeatures" => $apiFeatures
+			"serviceUrl" => $serviceUrl,
+			"cdnUrl" => $cdnUrl,
+			"statsServiceUrl" => $statsServiceUrl,
+			"liveStatsServiceUrl" => $liveStatsServiceUrl,
+			"analyticsServiceUrl" => $analyticsServiceUrl,
+			"apiFeatures" => $apiFeatures
 		);
-
-		$envConfig = json_encode($envConfig);	
-		
-		if ($envConfig !== false)
-		{
-			$kalturaPlayerEnvConfig = "
-			(function(){KalturaPlayer.EnvConfig = $envConfig;
-			})();";
-			return $content . $kalturaPlayerEnvConfig;
-		}
-
-		return $content;
+		return $envConfig;
 	}
 
 	private function getFromConfig($key)
@@ -197,6 +180,10 @@ class embedPlaykitJsAction extends sfAction
 
 	private function buildUrl($protocol, $key)
 	{
+	    if ($protocol == "https")
+	    {
+	        $key .= "_https";
+	    }
 		$configValue = $this->getFromConfig($key);
 		$port = (($_SERVER['SERVER_PORT']) != '80' && $_SERVER['SERVER_PORT'] != '443')?':'.$_SERVER['SERVER_PORT']:'';
 		if( $key && $configValue)

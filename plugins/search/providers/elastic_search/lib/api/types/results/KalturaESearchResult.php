@@ -11,7 +11,7 @@ abstract class KalturaESearchResult extends KalturaObject
     public $object;
 
     /**
-     * @var string
+     * @var KalturaESearchHighlightArray
      */
     public $highlight;
 

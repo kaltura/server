@@ -6,6 +6,8 @@
 class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 {
 
+	const KUSER_ID_THAT_DOESNT_EXIST = -1;
+
 	/**
 	 * @var KalturaESearchEntryFieldName
 	 */
@@ -72,12 +74,12 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 		if(in_array($this->fieldName, array(KalturaESearchEntryFieldName::USER_ID, KalturaESearchEntryFieldName::ENTITLED_USER_EDIT,
 			KalturaESearchEntryFieldName::ENTITLED_USER_PUBLISH, KalturaESearchEntryFieldName::CREATOR_ID)))
 		{
+			$kuserId = self::KUSER_ID_THAT_DOESNT_EXIST;
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->searchTerm, true);
-			if(!$kuser)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
-			}
-			$this->searchTerm = $kuser->getId();
+			if($kuser)
+				$kuserId = $kuser->getId();
+
+			$this->searchTerm = $kuserId;
 		}
 
 		return parent::toObject($object_to_fill, $props_to_skip);
