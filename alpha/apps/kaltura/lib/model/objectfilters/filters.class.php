@@ -10,7 +10,7 @@
 abstract class baseObjectFilter extends myBaseObject
 {
 	public $fields;
-	private $fieldsToIgnoreInFinalCriteria;
+	protected $fieldsToIgnoreInFinalCriteria;
 
 	protected static $maxInValues = 500;
 	
