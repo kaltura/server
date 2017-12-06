@@ -101,12 +101,12 @@
 				KalturaLog::log($cmdLine);
 			}
 			$this->videoCmdLines = $videoCmdLines;
-			
-			$cmdLine = $chunker->BuildAudioCommandLine();
-			$logFilename = $chunker->getSessionName("audio").".log";
-			$cmdLine = "time $cmdLine > $logFilename 2>&1";
-			$this->audioCmdLines = array($cmdLine);
-			
+			if(isset($cmdLine)){
+				$cmdLine = $chunker->BuildAudioCommandLine();
+				$logFilename = $chunker->getSessionName("audio").".log";
+				$cmdLine = "time $cmdLine > $logFilename 2>&1";
+				$this->audioCmdLines = array($cmdLine);
+			}
 			$this->SerializeSession();
 			return true;
 		}
