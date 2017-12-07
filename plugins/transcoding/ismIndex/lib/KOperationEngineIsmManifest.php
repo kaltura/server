@@ -64,23 +64,22 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 		$filePathMap = array();
 		foreach ($srcFileSyncs as $srcFileSync) 
 		{
-			$trio = null;
+			$tuple = array();
 			if(array_key_exists($srcFileSync->assetId, $filePathMap))
-				$trio = $filePathMap[$srcFileSync->assetId];
-			else
-				$trio = array();
+				$tuple = $filePathMap[$srcFileSync->assetId];
+
 			if($srcFileSync->fileSyncObjectSubType == 3) //ism file
-				$trio[0] = $srcFileSync->fileSyncLocalPath;
+				$tuple[0] = $srcFileSync->fileSyncLocalPath;
 			else if($srcFileSync->fileSyncObjectSubType == 1 ) //ismv file
-				$trio[1] = $srcFileSync->fileSyncLocalPath;
-			 $trio[2] = $srcFileSync->fileEncryptionKey;
+				$tuple[1] = $srcFileSync->fileSyncLocalPath;
+			$tuple[2] = $srcFileSync->fileEncryptionKey;
 				
-			$filePathMap[$srcFileSync->assetId] = $trio;
+			$filePathMap[$srcFileSync->assetId] = $tuple;
 		}
 		
-		foreach ($filePathMap as $filePathPair) 
+		foreach ($filePathMap as $filePathTuple)
 		{			
-			list($ismFilePath, $ismvFilePath, $key) = $filePathPair;
+			list($ismFilePath, $ismvFilePath, $key) = $filePathTuple;
 			if($ismFilePath)
 			{
 				$str = kEncryptFileUtils::getEncryptedFileContent($ismFilePath, $key, KBatchBase::getIV());
