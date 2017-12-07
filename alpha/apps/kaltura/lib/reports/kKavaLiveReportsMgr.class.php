@@ -263,13 +263,13 @@ class kKavaLiveReportsMgr extends kKavaBase
 			self::OUTPUT_PLAYS,
 			self::OUTPUT_AVG_BITRATE, 
 			self::OUTPUT_AUDIENCE, 
-			self::OUTPUT_DVR_AUDIENCE, 
-			self::OUTPUT_BUFFER_TIME);
+			self::OUTPUT_DVR_AUDIENCE);
 		
 		foreach ($fieldNames as $fieldName)
 		{
 			$dest[$fieldName] = $src[$fieldName];
 		}
+		$dest[self::OUTPUT_BUFFER_TIME] = $src[self::OUTPUT_BUFFER_TIME] * 6;	// return in minutes
 		$dest[self::OUTPUT_SEC_VIEWED] = $src[self::METRIC_VIEW_COUNT] * self::VIEW_EVENT_INTERVAL;
 	}
 	
