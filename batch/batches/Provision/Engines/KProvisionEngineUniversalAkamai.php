@@ -226,9 +226,9 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	 */
 	public function checkProvisionedStream(KalturaBatchJob $job, KalturaProvisionJobData $data) 
 	{
-		KalturaLog::info("Retrieving stream with ID [". $data->streamID ."]" );
-		
 		$url = self::$baseServiceUrl . "/{$this->domainName}/stream/".$data->streamID;
+		KalturaLog::info("Retrieving stream with ID [". $data->streamID ."] from URL [$url]" );
+		
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION , true);
@@ -241,10 +241,8 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		}
 		
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if($httpCode<=200 && $httpCode>300)
-		{
+		if (KCurlHeaderResponse::isError($httpCode))
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: retrieval failed");
-		}
 		
 		KalturaLog::info("Result received: $result");
 		$resultXML = new SimpleXMLElement($result);
