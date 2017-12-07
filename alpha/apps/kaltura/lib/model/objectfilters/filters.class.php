@@ -1034,7 +1034,7 @@ abstract class baseObjectFilter extends myBaseObject
 	public function addFieldToIgnoreInFinalCriteria($fieldName)
 	{
 		$fields = $this->getFieldsToIgnoreInFinalCriteria();
-		$fields[] =	$fieldName;
+		$fields[] = $fieldName;
 		$this->setFieldToIgnoreInFinalCriteria($fields);
 	}
 
