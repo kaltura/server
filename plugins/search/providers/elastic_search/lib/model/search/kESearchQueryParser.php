@@ -325,14 +325,14 @@ class kESearchQueryParser
 	}
 
 	/**
-	 * @param KalturaESearchItem $kSearchItem
+	 * @param $kSearchItem
 	 * @param $fieldName
 	 * @param $fieldValue
 	 * @param $isPartial
 	 * @param $isStartsWith
 	 * @throws kESearchException
 	 */
-	private static function validateAndSetTypeAndValue(KalturaESearchItem $kSearchItem, $fieldName, $fieldValue, $isPartial, $isStartsWith)
+	private static function validateAndSetTypeAndValue($kSearchItem, $fieldName, $fieldValue, $isPartial, $isStartsWith)
 	{
 		$rangeObject = self::createRangeObject($fieldValue);
 		if (($isStartsWith || $isPartial) && $rangeObject)

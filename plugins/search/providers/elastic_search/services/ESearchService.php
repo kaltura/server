@@ -9,11 +9,11 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchEntry
-	 * @param KalturaESearchParams $searchParams
+	 * @param KalturaESearchEntryParams $searchParams
 	 * @param KalturaPager $pager
 	 * @return KalturaESearchResponse
 	 */
-	function searchEntryAction(KalturaESearchParams $searchParams, KalturaPager $pager = null)
+	function searchEntryAction(KalturaESearchEntryParams $searchParams, KalturaPager $pager = null)
 	{
 		$entrySearch = new kEntrySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($entrySearch, $searchParams, $pager);
@@ -26,11 +26,11 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchCategory
-	 * @param KalturaESearchParams $searchParams
+	 * @param KalturaESearchCategoryParams $searchParams
 	 * @param KalturaPager $pager
 	 * @return KalturaESearchResponse
 	 */
-	function searchCategoryAction(KalturaESearchParams $searchParams, KalturaPager $pager = null)
+	function searchCategoryAction(KalturaESearchCategoryParams $searchParams, KalturaPager $pager = null)
 	{
 		$categorySearch = new kCategorySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($categorySearch, $searchParams, $pager);
@@ -43,11 +43,11 @@ class ESearchService extends KalturaBaseService
 	/**
 	 *
 	 * @action searchUser
-	 * @param KalturaESearchParams $searchParams
+	 * @param KalturaESearchUserParams $searchParams
 	 * @param KalturaPager $pager
 	 * @return KalturaESearchResponse
 	 */
-	function searchUserAction(KalturaESearchParams $searchParams, KalturaPager $pager = null)
+	function searchUserAction(KalturaESearchUserParams $searchParams, KalturaPager $pager = null)
 	{
 		$userSearch = new kUserSearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($userSearch, $searchParams, $pager);
@@ -57,34 +57,7 @@ class ESearchService extends KalturaBaseService
 		return $response;
 	}
 
-	/**
-	 *
-	 * @action getAllowedSearchTypes
-	 * @param KalturaESearchItem $searchItem
-	 * @return KalturaKeyValueArray
-	 * @throws KalturaAPIException
-	 */
-	function getAllowedSearchTypesAction(KalturaESearchItem $searchItem)
-	{
-		$coreSearchItem = $searchItem->toObject();
-		$coreSearchItemClass = get_class($coreSearchItem);
-		$allowedSearchMap = $coreSearchItemClass::getAllowedSearchTypesForField();
-
-		$result = new KalturaKeyValueArray();
-		if (isset($searchItem->fieldName))
-		{
-			foreach ($allowedSearchMap[$coreSearchItem->getFieldName()] as $searchTypeName => $searchTypeVal)
-			{
-				$currVal = new KalturaKeyValue();
-				$currVal->key = $searchTypeName;
-				$currVal->value = $searchTypeVal;
-				$result[] = $currVal;
-			}
-		}
-		return $result;
-	}
-
-	private function initSearchActionParams(KalturaESearchParams $searchParams, KalturaPager $pager = null)
+	private function initSearchActionParams($searchParams, KalturaPager $pager = null)
 	{
 		$searchOperator = $searchParams->searchOperator;
 		if (!$searchOperator)
