@@ -64,25 +64,27 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 		$filePathMap = array();
 		foreach ($srcFileSyncs as $srcFileSync) 
 		{
-			$pair = null;
+			$trio = null;
 			if(array_key_exists($srcFileSync->assetId, $filePathMap))
-				$pair = $filePathMap[$srcFileSync->assetId];
+				$trio = $filePathMap[$srcFileSync->assetId];
 			else
-				$pair = array();
+				$trio = array();
 			if($srcFileSync->fileSyncObjectSubType == 3) //ism file
-				$pair[0] = $srcFileSync->fileSyncLocalPath;
+				$trio[0] = $srcFileSync->fileSyncLocalPath;
 			else if($srcFileSync->fileSyncObjectSubType == 1 ) //ismv file
-				$pair[1] = $srcFileSync->fileSyncLocalPath;
+				$trio[1] = $srcFileSync->fileSyncLocalPath;
+			 $trio[2] = $srcFileSync->fileEncryptionKey;
 				
-			$filePathMap[$srcFileSync->assetId] = $pair;
+			$filePathMap[$srcFileSync->assetId] = $trio;
 		}
 		
 		foreach ($filePathMap as $filePathPair) 
 		{			
-			list($ismFilePath, $ismvFilePath) = $filePathPair;
+			list($ismFilePath, $ismvFilePath, $key) = $filePathPair;
 			if($ismFilePath)
 			{
-				$xml = new SimpleXMLElement(file_get_contents($ismFilePath));
+				$str = kEncryptFileUtils::getEncryptedFileContent($ismFilePath, $key, KBatchBase::getIV());
+				$xml = new SimpleXMLElement($str);
 				if(isset($xml->body->switch->video)) $xml->body->switch->video['src'] = basename($ismvFilePath);
   				if(isset($xml->body->switch->audio)) $xml->body->switch->audio['src'] = basename($ismvFilePath);
   				
