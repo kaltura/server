@@ -116,7 +116,7 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 		$root = null;
 		foreach ($srcFileSyncs as $srcFileSync) {
 			if($srcFileSync->fileSyncObjectSubType == 4) {
-				$str = file_get_contents($srcFileSync->fileSyncLocalPath);
+				$str = kEncryptFileUtils::getEncryptedFileContent($srcFileSync->fileSyncLocalPath, $srcFileSync->fileEncryptionKey, KBatchBase::getIV());
 				$xml = new SimpleXMLElement($str);
 
 				/*
