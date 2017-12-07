@@ -1031,19 +1031,17 @@ abstract class baseObjectFilter extends myBaseObject
 	/**
 	 * @param string $fieldName
 	 */
-	public function addFieldToIgnoreInFinalCriteria($fieldName)
+	protected function addFieldToIgnoreInFinalCriteria($fieldName)
 	{
 		$fields = $this->getFieldsToIgnoreInFinalCriteria();
 		$fields[] = $fieldName;
 		$this->setFieldToIgnoreInFinalCriteria($fields);
 	}
 
-	public function getFieldsToIgnoreInFinalCriteria()
+	protected function getFieldsToIgnoreInFinalCriteria()
 	{
 		if(empty($this->fieldsToIgnoreInFinalCriteria))
-		{
 			$this->InitFieldsToIgnoreInFinalCriteria();
-		}
 
 		return $this->fieldsToIgnoreInFinalCriteria;
 	}
