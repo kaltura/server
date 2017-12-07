@@ -385,7 +385,7 @@ class KDLMediaDataSet  {
 		$containerFormats = array("mp4","mxf","wmv3","mpegps","mpegts","webm","mp3");
 		$videoCodecs = array("h264","h265","vp6","vp8","vp9","wmv3","mpeg2");
 		$audioCodecs = array("mp3","aac","mpeg2","pcm","ac3","eac3");
-		$allowedFormats = array_merge($containerFormats, $videoCodecs, $audioCodecs);
+		$allowedFormats = array_unique(array_merge($containerFormats, $videoCodecs, $audioCodecs));
 		$allowedFormats[] = "undefined";
 		$allowedChars = ' +-*/()!=<>&|;';
 		$tok = strtok($condition, $allowedChars);
