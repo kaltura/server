@@ -22,7 +22,7 @@ class entryFilter extends baseObjectFilter
 	 
 	private static $relative_time_fields = array("gte_created_at","lte_created_at","gte_updated_at","lte_updated_at","gte_last_played_at","lte_last_played_at","gte_media_date","lte_media_date","lteornull_start_date","gteornull_start_date","lte_start_date","gte_start_date","lteornull_end_date","gteornull_end_date","lte_end_date","gte_end_date");
 
-	public function init ()
+	protected function init ()
 	{
 		// TODO - should separate the schema of the fields from the actual values
 		// or can use this to set default valuse

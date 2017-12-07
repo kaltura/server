@@ -7,7 +7,7 @@ class mediaEntryFilterForPlaylist extends entryFilter
 {
 	const NAME = "_name";
 
-	public function init()
+	protected function init()
 	{
 		parent::init();
 
@@ -16,6 +16,12 @@ class mediaEntryFilterForPlaylist extends entryFilter
 		) , NULL );
 
 		$this->fields = array_merge($this->fields , $extendedFields);
+		$this->InitFieldsToIgnoreInFinalCriteria();
+	}
+
+	protected function InitFieldsToIgnoreInFinalCriteria()
+	{
+		parent::InitFieldsToIgnoreInFinalCriteria();
 		$this->addFieldToIgnoreInFinalCriteria(self::NAME);
 	}
 }
