@@ -3898,4 +3898,31 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return kConf::get("encryption_iv");
 	}
+
+	public function setIsSequenceEntry($v)
+	{
+		$this->putInCustomData("is_sequence_entry", $v);
+	}
+	public function getIsSequenceEntry()
+	{
+		return $this->getFromCustomData("is_sequence_entry", null, false);
+	}
+
+	public function setSequenceEntries( array $entryIds)
+	{
+		$this->putInCustomData("sequence_entries", $entryIds);
+	}
+
+	public function getSequenceEntries()
+	{
+		return $this->getFromCustomData("sequence_entries", null, array());
+	}
+
+	public function addSequenceEntry($entryId)
+	{
+		$sequenceEntries = $this->getSequenceEntries();
+		$sequenceEntries[] = $entryId;
+		$this->setSequenceEntries($sequenceEntries);
+	}
+
 }
