@@ -251,7 +251,13 @@ class SphinxEntryCriteria extends SphinxCriteria
 
 		if(count($matchOrRoots))
 			$filter->set('_matchand_roots', $matchOrRoots);
-			
+
+		if($filter->is_set('_is_sequence_entry'))
+		{
+			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . entry::IS_SEQUENCE_ENTRY . ' = ' . ($filter->get('_is_sequence_entry') == '1' ? '1' : '0') );
+			$filter->unsetByName('_is_sequence_entry');
+		}
+
 //		if ($filter->get("_matchor_duration_type") !== null)
 //			$filter->set("_matchor_duration_type", $filter->durationTypesToIndexedStrings($filter->get("_matchor_duration_type")));
 			

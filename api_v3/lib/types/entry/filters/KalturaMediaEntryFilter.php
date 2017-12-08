@@ -11,6 +11,7 @@ class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 		"sourceTypeNotEqual" => "_not_source",
 		"sourceTypeIn" => "_in_source",
 		"sourceTypeNotIn" => "_notin_source",
+		"isSequenceEntry" => "_is_sequence_entry",
 	);
 	
 	public function getMapBetweenObjects()
@@ -41,4 +42,9 @@ class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 		
 		$this->typeIn = implode(',', array_unique($typeArray));
 	}
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $isSequenceEntry;
 }

@@ -101,9 +101,18 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public $streams;
 
+	/**
+	 * True if the entry is a sequence entry
+	 *
+	 * @var KalturaNullableBoolean
+	 *
+	 */
+	public $isSequenceEntry;
+
+
 	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType" , "searchProviderType", // see special logic for this field below
 	//"searchProviderType", // see special logic for this field below
-	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled", "streams" );
+	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled", "streams", "isSequenceEntry" );
 	
 	public function __construct() {
 		$this->type = KalturaEntryType::MEDIA_CLIP;
