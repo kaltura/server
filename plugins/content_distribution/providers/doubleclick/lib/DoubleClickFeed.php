@@ -277,7 +277,7 @@ class DoubleClickFeed
 			$entry = $flavorAsset->getentry();
 			$duration = $flavorAsset->getentry()->getDuration();
 
-			if($entry->getSequenceEntries())
+			if($entry->getSequenceEntryIds())
 				$duration += myEntryUtils::getSequenceTotalDuration($entry->getId());
 
 			kXml::setNodeValue($this->xpath,'@url', $url, $content);

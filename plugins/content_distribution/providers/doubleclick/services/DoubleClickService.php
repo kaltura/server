@@ -166,7 +166,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
 		$result = CuePointPeer::doSelect($c);
 		$entry = entryPeer::retrieveByPK($entryId);
-		if ($entry->getSequenceEntries())
+		if ($entry->getSequenceEntryIds())
 			$result = $this->alignCuePointsTiming($entryId, $result);
 		return $result;
 	}

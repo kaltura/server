@@ -143,6 +143,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
 	const IS_SEQUENCE_ENTRY = 'isSequenceEntry';
+	const SEQUENCE_ENTRY_IDS = 'sequenceEntryIds';
 
 	private $appears_in = null;
 
@@ -1246,7 +1247,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 		$isSequenceEntry = $this->getIsSequenceEntry();
 		if ($isSequenceEntry)
-			$dynamicAttributes[entry::IS_SEQUENCE_ENTRY] = $this->getIsSequenceEntry();
+			$dynamicAttributes[entry::IS_SEQUENCE_ENTRY] = $isSequenceEntry;
+
+		$sequenceEntryIds = $this->getSequenceEntryIds();
+		if ($sequenceEntryIds)
+			$dynamicAttributes[entry::SEQUENCE_ENTRY_IDS] = $sequenceEntryIds;
 
 		return $dynamicAttributes;
 	}
@@ -3914,21 +3919,14 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return $this->getFromCustomData("is_sequence_entry", null, false);
 	}
 
-	public function setSequenceEntries( array $entryIds)
+	public function setSequenceEntryIds($v)
 	{
-		$this->putInCustomData("sequence_entries", $entryIds);
+		$this->putInCustomData("sequence_entry_ids", $v);
 	}
 
-	public function getSequenceEntries()
+	public function getSequenceEntryIds()
 	{
-		return $this->getFromCustomData("sequence_entries", null, array());
-	}
-
-	public function addSequenceEntry($entryId)
-	{
-		$sequenceEntries = $this->getSequenceEntries();
-		$sequenceEntries[] = $entryId;
-		$this->setSequenceEntries($sequenceEntries);
+		return $this->getFromCustomData("sequence_entry_ids", null, null);
 	}
 
 }

@@ -258,6 +258,15 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$filter->unsetByName('_is_sequence_entry');
 		}
 
+		if($filter->is_set('_sequence_entry_ids'))
+		{
+			//sphinx query: select in(dynamic_attributes.xyz, 'some_val') ... where cnd1 > 0 ...
+			$sequenceEntryIds = $filter->get('_sequence_entry_ids');
+			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . entry::SEQUENCE_ENTRY_IDS .", '" . $sequenceEntryIds . "')";
+			$this->addCondition($cond);
+			$filter->unsetByName('_sequence_entry_ids');
+		}
+
 //		if ($filter->get("_matchor_duration_type") !== null)
 //			$filter->set("_matchor_duration_type", $filter->durationTypesToIndexedStrings($filter->get("_matchor_duration_type")));
 			

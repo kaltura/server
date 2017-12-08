@@ -2079,7 +2079,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
 		$totalSequenceDuration = 0;
 		$entry = entryPeer::retrieveByPk($entryId);
-		$sequenceEntryIds = $entry->getSequenceEntries();
+		$sequenceEntryIds = explode(",", $entry->getSequenceEntryIds());
 		$sequenceEntries = entryPeer::retrieveByPKs($sequenceEntryIds);
 		foreach ($sequenceEntries as $sequenceEntry)
 		{
