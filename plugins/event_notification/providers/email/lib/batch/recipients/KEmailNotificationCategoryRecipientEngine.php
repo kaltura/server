@@ -17,14 +17,15 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
 		$categoryUserIds = array();
-		do {
-			//List categoryKusers
+		$maxPagesToScan = 2;
+		do
+		{
 			$categoryUserList = KBatchBase::$kClient->categoryUser->listAction($this->recipientJobData->categoryUserFilter, $pager);
 			foreach ($categoryUserList->objects as $categoryUser)
 				$categoryUserIds[] = $categoryUser->userId;
 
 			$pager->pageIndex ++;
-		}while ($pager->pageSize == count($categoryUserList->objects));
+		} while (($pager->pageSize == count($categoryUserList->objects)) and ($pager->pageIndex <= $maxPagesToScan));
 
 		if (count($categoryUserIds)==0)
 	            return $recipients;
@@ -32,16 +33,15 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		$pager->pageIndex = 1;
 		$userFilter = new KalturaUserFilter();
 		$userFilter->idIn = implode(',', $categoryUserIds);
-		do{
+		do
+		{
 			$userList = KBatchBase::$kClient->user->listAction($userFilter, $pager);
 			foreach ($userList->objects as $user)
-			{
-				/* @var $user KalturaUser */
 				$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
-			}
-			$pager->pageIndex ++;
-		}while ($pager->pageSize == count($userList->objects));
 
-		return $recipients;
+			$pager->pageIndex ++;
+		} while ($pager->pageSize == count($userList->objects));
+		
+        return $recipients;
 	}
 }
