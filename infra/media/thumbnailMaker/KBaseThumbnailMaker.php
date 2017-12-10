@@ -26,6 +26,27 @@ abstract class KBaseThumbnailMaker
 	
 	public function createThumnail($position = null, $width = null, $height = null, $params = array())
 	{
+		$params = self::normalizeParams($params);
+		
+		KalturaLog::debug("position[$position], width[$width], height[$height], params[".serialize($params)."]");
+		$cmd = $this->getCommand($position, $width, $height, $params);
+		KalturaLog::info("Executing: $cmd");
+		
+		$returnValue = null;
+		$output = system( $cmd , $returnValue );
+		KalturaLog::debug("Returned value: '$returnValue'");
+		
+		if($returnValue)
+			return false;
+			
+		if($this->parseOutput($output)!=true)
+			return false;
+		
+		return true;
+	}
+	
+	protected static function normalizeParams($params = array())
+	{
 		if(!array_key_exists('frameCount', $params)){
 			$params['frameCount'] = 1; 
 		}
@@ -46,21 +67,7 @@ abstract class KBaseThumbnailMaker
 			$params['scanType'] = null;
 		}
 		
-		KalturaLog::debug("position[$position], width[$width], height[$height], params[".serialize($params)."]");
-		$cmd = $this->getCommand($position, $width, $height, $params);
-		KalturaLog::info("Executing: $cmd");
-		
-		$returnValue = null;
-		$output = system( $cmd , $returnValue );
-		KalturaLog::debug("Returned value: '$returnValue'");
-		
-		if($returnValue)
-			return false;
-			
-		if($this->parseOutput($output)!=true)
-			return false;
-		
-		return true;
+		return $params;
 	}
 	
 	/**
