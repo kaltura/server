@@ -299,7 +299,7 @@ abstract class LiveEntry extends entry
 	
 	public function getPushPublishEnabled()
 	{
-		return $this->getFromCustomData("push_publish_enabled", null, false);
+		return $this->getFromCustomData("push_publish_enabled");
 	}
 	
 	public function setPushPublishEnabled($v)
