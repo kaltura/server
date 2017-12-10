@@ -1,6 +1,7 @@
-<p><?php echo $this->translate('Here you can configure your Catalog items'); ?></p>
+<p><?php echo $this->translate('Here you can configure Catalog items and Vendor profiles'); ?></p>
 <?php echo $this->filterForm; ?>
 <?php echo $this->newCatalogItemFolderForm; ?>
+<!-- Catalog items list table-->
 <div id="catalog_item_list_div" class="clear">
 	<table>
 		<thead>
@@ -58,9 +59,63 @@
 	</table>
 </div>
 
+<?php echo $this->vendorProfilefilterForm; ?>
+<?php echo $this->vendorProfileFolderForm; ?>
+<!-- Vendor Profile list table-->
+<div id="vendor_profile_list_div" class="clear">
+	<table>
+		<thead>
+		<tr>
+			<th><?php echo $this->translate('ID'); ?></th>
+			<th><?php echo $this->translate('Status'); ?></th>
+			<th><?php echo $this->translate('Name'); ?></th>
+			<th><?php echo $this->translate('System Name'); ?></th>
+			<th><?php echo $this->translate('Publisher ID'); ?></th>
+			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
+			<th><?php echo $this->translate('Creation Date'); ?></th>
+			<th><?php echo $this->translate('Last Updated Date'); ?></th>
+			<th><?php echo $this->translate('Action'); ?></th>
+		</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="12">
+				<?php echo $this->vendorProfilePaginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+		<?php foreach($this->vendorProfilePaginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */ $vendorProfile): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $vendorProfile->id; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $vendorProfile->status); ?></td>
+				<td><?php echo $vendorProfile->name; ?></td>
+				<td><?php echo $vendorProfile->systemName; ?></td>
+				<td><?php echo $vendorProfile->partnerId; ?></td>
+				<td><?php echo $vendorProfile->vendorPartnerId; ?></td>
+				<td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
+				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $vendorProfile->id;?>, <?php echo $vendorProfile->partnerId; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="configureCatalogItem" ><?php echo $this->translate('Configure'); ?></option>
+						<?php if ($vendorProfile->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED): ?>
+							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
+						<?php elseif ($vendorProfile->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE): ?>
+							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
+						<?php endif; ?>
+						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
+					</select>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
 <script type="text/javascript">
 	$(function(){
-		addSubTitle('Catalog Items');
+		addSubTitle('Reach Configuration');
 		switchAllTemplates();
 	});
 

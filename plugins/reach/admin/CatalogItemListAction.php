@@ -28,18 +28,40 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$request = $action->getRequest();
-		$page = $this->_getParam('page', 1);
-		$pageSize = $this->_getParam('pageSize', 10);
-		$partnerId = $this->_getParam('filter_input');
 
-		// init filter
-		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
-		$catalogItemProfileFilter->orderBy = "-createdAt";
+		$partnerId = $this->_getParam('filter_input');
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
-		// get results and paginate
+		// get results and paginate for catalogItems
+		$this->loadCatalogItemsList($action, $reachPluginClient, $partnerId, $request);
+
+		// get results and paginate for vendorProfile
+		$this->loadVendorProfilesList($action, $reachPluginClient, $partnerId, $request);
+
+		$this->loadCreateCatalogItemForm($action, $partnerId);
+
+		$this->loadCreateVendorProfileForm($action, $partnerId);
+
+		$this->loadVendorCatalogItemsTemplates($action, $reachPluginClient);
+
+	}
+
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $reachPluginClient
+	 * @param $partnerId
+	 * @param $request
+	 */
+	protected function loadCatalogItemsList(Zend_Controller_Action $action, $reachPluginClient, $partnerId, $request)
+	{
+		$page = $this->_getParam('page', 1);
+		$pageSize = $this->_getParam('pageSize', 10);
+		// init filter
+		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+		$catalogItemProfileFilter->orderBy = "-createdAt";
+
 		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listAction", $partnerId, $catalogItemProfileFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
@@ -53,23 +75,82 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 
 		$action->view->filterForm = $catalogItemProfileFilterForm;
 		$action->view->paginator = $paginator;
+	}
 
-		$createProfileForm = new Form_CreateCatalogItem();
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $reachPluginClient
+	 * @param $partnerId
+	 * @param $request
+	 */
+	protected function loadVendorProfilesList(Zend_Controller_Action $action, $reachPluginClient, $partnerId, $request)
+	{
+		$page = $this->_getParam('page', 1);
+		$pageSize = $this->_getParam('pageSize', 10);
+		// init filter
+		$vendorProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+		$vendorProfileFilter->orderBy = "-createdAt";
+
+		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listAction", $partnerId, $vendorProfileFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		$paginator->setCurrentPageNumber($page);
+		$paginator->setItemCountPerPage($pageSize);
+
+		// set view
+		$vendorProfileFilterForm = new Form_CatalogItemFilter();
+		$vendorProfileFilterForm->populate($request->getParams());
+		$vendorProfileFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
+		$vendorProfileFilterForm->setAction($vendorProfileFilterFormAction);
+
+		$action->view->vendorProfilefilterForm = $vendorProfileFilterForm;
+		$action->view->vendorProfilePaginator = $paginator;
+	}
+
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $partnerId
+	 */
+	protected function loadCreateCatalogItemForm(Zend_Controller_Action $action, $partnerId)
+	{
+		$createCatalogItemForm = new Form_CreateCatalogItem();
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigure'), null, true);
+		$createCatalogItemForm->setAction($actionUrl);
+
+		if ($partnerId)
+			$createCatalogItemForm->getElement("newPartnerId")->setValue($partnerId);
+
+		$action->view->newCatalogItemFolderForm = $createCatalogItemForm;
+	}
+
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $partnerId
+	 */
+	protected function loadCreateVendorProfileForm(Zend_Controller_Action $action, $partnerId)
+	{
+		$createProfileForm = new Form_CreateCatalogItem();
+		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'VendorProfileConfigure'), null, true);
 		$createProfileForm->setAction($actionUrl);
 
 		if ($partnerId)
 			$createProfileForm->getElement("newPartnerId")->setValue($partnerId);
 
-		$action->view->newCatalogItemFolderForm = $createProfileForm;
+		$action->view->vendorProfileFolderForm = $createProfileForm;
+	}
 
-		// get results and paginate
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $reachPluginClient
+	 */
+	protected function loadVendorCatalogItemsTemplates(Zend_Controller_Action $action, $reachPluginClient)
+	{
+// get results and paginate
 		$listCatalogItemTemplatespager = new Kaltura_Client_Type_FilterPager();
 		$listCatalogItemTemplatespager->pageSize = 500;
 		$templatesList = $reachPluginClient->vendorCatalogItem->listTemplates(null, $listCatalogItemTemplatespager);
 
 		$templates = array();
-		foreach($templatesList->objects as $template)
+		foreach ($templatesList->objects as $template)
 		{
 			$obj = new stdClass();
 			$obj->id = $template->id;
