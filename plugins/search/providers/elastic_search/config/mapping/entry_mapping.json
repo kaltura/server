@@ -32,12 +32,14 @@
 		  "pattern": "(\\s+)",
 		  "replacement": " "
 		},
-		 "kaltura_apostrophe_filter": {
+		 "kaltura_special_chars_filter": {
 		  "type": "mapping",
 		  "mappings": [
 			  "'=>",
 			  "`=>",
-              "‘=>"
+			  "‘=>",
+			  "^=>",
+			  "~=>"
 			 ]
 		  }
 	  },
@@ -60,8 +62,8 @@
 		"kaltura_ngrams": {
 		  "type": "custom",
 		  "tokenizer": "kaltura_ngram_tokenizer",
-		  "filter": ["lowercase"],
-		  "char_filter": ["kaltura_apostrophe_filter"]
+		  "char_filter": ["kaltura_special_chars_filter"],
+		  "filter": ["lowercase"]
 		},
 		"kaltura_keyword": {
 		  "type": "custom",
@@ -75,8 +77,8 @@
 		},
 		"kaltura_text" : {
           "tokenizer": "standard",
-          "filter": ["standard", "lowercase", "asciifolding"],
-          "char_filter": ["kaltura_apostrophe_filter"]
+		  "char_filter": ["kaltura_special_chars_filter"],
+          "filter": ["standard", "lowercase", "asciifolding"]
         },
 		"kaltura_english_synonym": {
 		  "tokenizer":  "standard",
