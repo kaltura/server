@@ -18,25 +18,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 	
 	public function createThumnail($position = null, $width = null, $height = null, $params = array())
 	{
-		if(!array_key_exists('frameCount', $params)){
-			$params['frameCount'] = 1; 
-		}
-		
-		if(!array_key_exists ('targetType', $params)){
-			$params['targetType'] = "image2"; 
-		}
-		
-		if(!array_key_exists ('dar', $params)){
-			$params['dar'] = null;
-		}
-		
-		if(!array_key_exists ('vidDur', $params)){
-			$params['vidDur'] = null;
-		}
-		
-		if(!array_key_exists ('scanType', $params)){
-			$params['scanType'] = null;
-		}
+		$params = self::normalizeParams($params);
 		
 		KalturaLog::debug("position[$position], width[$width], height[$height], params[".serialize($params)."]");
 		$dar = $params['dar'];
