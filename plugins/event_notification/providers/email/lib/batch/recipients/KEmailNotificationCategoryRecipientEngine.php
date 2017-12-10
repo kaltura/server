@@ -25,7 +25,8 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 				$categoryUserIds[] = $categoryUser->userId;
 
 			$pager->pageIndex ++;
-		} while (($pager->pageSize == count($categoryUserList->objects)) and ($pager->pageIndex <= $maxPagesToScan));
+		}
+		while (($pager->pageSize == count($categoryUserList->objects)) and ($pager->pageIndex <= $maxPagesToScan));
 
 		if (count($categoryUserIds)==0)
 	            return $recipients;
@@ -40,8 +41,9 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 				$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
 
 			$pager->pageIndex ++;
-		} while ($pager->pageSize == count($userList->objects));
+		}
+		while ($pager->pageSize == count($userList->objects));
 		
-        return $recipients;
+		return $recipients;
 	}
 }
