@@ -25,7 +25,6 @@ class kEntrySearch extends kBaseSearch
         if($this->queryAttributes->getShouldUseDisplayInSearch())
             $this->initDisplayInSearch($this->queryAttributes->getObjectId());
 
-        $this->initEntitlement();
         $this->mainBoolQuery->addToMust($subQuery);
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
@@ -41,6 +40,7 @@ class kEntrySearch extends kBaseSearch
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $objectId, $pager, $order, $useHighlight);
+        $this->initEntitlement();
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }

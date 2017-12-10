@@ -145,7 +145,7 @@ abstract class kBaseSearch
         $this->initPartnerLanguages($partnerId);
         $this->queryAttributes->setUseHighlight($useHighlight);
         $this->queryAttributes->setObjectId($objectId);
-        $this->queryAttributes->setObjectId($objectId);
+        $this->queryAttributes->setShouldUseDisplayInSearch(true);
         $this->initOverrideInnerHits($objectId);
     }
 
