@@ -27,10 +27,15 @@ abstract class kBaseSearch
 
 	public abstract function getPeerRetrieveFunctionName();
 
+	protected function handleDisplayInSearch()
+	{
+	}
+
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
-		$this->mainBoolQuery->addToMust($subQuery);
+        $this->handleDisplayInSearch();
+        $this->mainBoolQuery->addToMust($subQuery);
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
         KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
@@ -144,6 +149,8 @@ abstract class kBaseSearch
     {
         $this->initPartnerLanguages($partnerId);
         $this->queryAttributes->setUseHighlight($useHighlight);
+        $this->queryAttributes->setObjectId($objectId);
+        $this->queryAttributes->setShouldUseDisplayInSearch(true);
         $this->initOverrideInnerHits($objectId);
     }
 
