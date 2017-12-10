@@ -19,13 +19,28 @@ class kEntrySearch extends kBaseSearch
         parent::__construct();
     }
 
+    protected function execSearch(ESearchOperator $eSearchOperator)
+    {
+        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
+        if($this->queryAttributes->getShouldUseDisplayInSearch())
+            $this->initDisplayInSearch($this->queryAttributes->getObjectId());
+
+        $this->initEntitlement();
+        $this->mainBoolQuery->addToMust($subQuery);
+        $this->applyElasticSearchConditions();
+        $this->addGlobalHighlights();
+        KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
+        $result = $this->elasticClient->search($this->query);
+        return $result;
+    }
+
+
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight= true)
     {
 	    kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $objectId, $pager, $order, $useHighlight);
-        $this->initEntitlement();
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
@@ -37,7 +52,6 @@ class kEntrySearch extends kBaseSearch
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
         $statuses = $this->initEntryStatuses($statuses);
-        $this->initDisplayInSearch($objectId);
         parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
 
     }

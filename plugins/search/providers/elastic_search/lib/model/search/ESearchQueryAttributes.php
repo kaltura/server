@@ -19,6 +19,48 @@ class ESearchQueryAttributes
 	protected $overrideInnerHitsSize;
 
 	/**
+	 * @var string
+	 */
+	protected $objectId;
+
+	/**
+	 * @return string
+	 */
+	public function getObjectId()
+	{
+		return $this->objectId;
+	}
+
+	/**
+	 * @param string $objectId
+	 */
+	public function setObjectId($objectId)
+	{
+		$this->objectId = $objectId;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getShouldUseDisplayInSearch()
+	{
+		return $this->shouldUseDisplayInSearch;
+	}
+
+	/**
+	 * @param boolean $shouldUseDisplayInSearch
+	 */
+	public function setShouldUseDisplayInSearch($shouldUseDisplayInSearch)
+	{
+		$this->shouldUseDisplayInSearch = $shouldUseDisplayInSearch;
+	}
+
+	/**
+	 * @var bool
+	 */
+	protected $shouldUseDisplayInSearch;
+
+	/**
 	 * @var array
 	 */
 	private $fieldsToHighlight = array(self::GLOBAL_SCOPE => array(), self::INNER_SCOPE => array());
