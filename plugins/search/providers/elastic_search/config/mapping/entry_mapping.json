@@ -76,10 +76,10 @@
 		  ]
 		},
 		"kaltura_text" : {
-          "tokenizer": "standard",
+		  "tokenizer": "standard",
 		  "char_filter": ["kaltura_special_chars_filter"],
-          "filter": ["standard", "lowercase", "asciifolding"]
-        },
+		  "filter": ["standard", "lowercase", "asciifolding"]
+		},
 		"kaltura_english_synonym": {
 		  "tokenizer":  "standard",
 		  "filter": [

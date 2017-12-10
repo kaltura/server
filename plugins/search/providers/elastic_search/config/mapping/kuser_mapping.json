@@ -11,14 +11,14 @@
 		},
 		"kaltura_special_chars_filter": {
 		  "type": "mapping",
-          "mappings": [
-            "'=>",
-            "`=>",
-            "‘=>",
-            "^=>",
-            "~=>"
-          ]
-        }
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>",
+			"^=>",
+			"~=>"
+		  ]
+		}
 	  },
 	  "tokenizer": {
 		"kaltura_ngram_tokenizer": {
@@ -37,7 +37,7 @@
 		  "tokenizer": "kaltura_ngram_tokenizer",
 		  "char_filter": ["kaltura_special_chars_filter"],
 		  "filter": ["lowercase"]
-        },
+		},
 		"kaltura_keyword": {
 		  "type": "custom",
 		  "tokenizer": "keyword",
@@ -54,7 +54,7 @@
 		  "tokenizer" : "standard",
 		  "char_filter": ["kaltura_special_chars_filter"],
 		  "filter" : ["standard", "lowercase", "asciifolding"]
-        }
+		}
 	  }
 	}
   },
