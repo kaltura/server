@@ -8,7 +8,15 @@
 		  "type": "pattern_replace",
 		  "pattern": "(\\s+)",
 		  "replacement": " "
-		}
+		},
+		"kaltura_apostrophe_filter": {
+		  "type": "mapping",
+          "mappings": [
+            "'=>",
+            "`=>",
+            "‘=>"
+          ]
+        }
 	  },
 	  "tokenizer": {
 		"kaltura_ngram_tokenizer": {
@@ -25,10 +33,9 @@
 		"kaltura_ngrams": {
 		  "type": "custom",
 		  "tokenizer": "kaltura_ngram_tokenizer",
-		  "filter": [
-			"lowercase"
-		  ]
-		},
+		  "filter": ["lowercase"],
+		  "char_filter": ["kaltura_apostrophe_filter"]
+        },
 		"kaltura_keyword": {
 		  "type": "custom",
 		  "tokenizer": "keyword",
@@ -43,8 +50,9 @@
 		},
 		"kaltura_text" : {
 		  "tokenizer" : "standard",
-		  "filter" : ["standard", "lowercase", "asciifolding"]
-		}
+		  "filter" : ["standard", "lowercase", "asciifolding"],
+		  "char_filter": ["kaltura_apostrophe_filter"]
+        }
 	  }
 	}
   },
