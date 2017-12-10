@@ -299,13 +299,13 @@ class UiConfService extends KalturaBaseService
 	 * Retrieve a list of all available versions by object type
 	 *
 	 * @action getByTagAndVersion
-	 * @param string $uiConfTag
+	 * @param KalturaUiConfPredefinedTags $uiConfTag
 	 * @param string $version
 	 * @return KalturaUiConfListResponse
 	 */
 	function getByTagAndVersionAction($uiConfTag, $version)
 	{
-		$list = uiConfPeer::retrieveByTagAndVersion($uiConfTag, $version);
+		$list = uiConfPeer::retrieveByTagAndVersion($uiConfTag, $version, $this->getPartnerId());
 		$newList = KalturaUiConfArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaUiConfListResponse();
 		$response->objects = $newList;
