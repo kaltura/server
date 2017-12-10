@@ -19,20 +19,11 @@ class kEntrySearch extends kBaseSearch
         parent::__construct();
     }
 
-    protected function execSearch(ESearchOperator $eSearchOperator)
+    protected function handleDisplayInSearch()
     {
-        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         if($this->queryAttributes->getShouldUseDisplayInSearch())
             $this->initDisplayInSearch($this->queryAttributes->getObjectId());
-
-        $this->mainBoolQuery->addToMust($subQuery);
-        $this->applyElasticSearchConditions();
-        $this->addGlobalHighlights();
-        KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
-        $result = $this->elasticClient->search($this->query);
-        return $result;
     }
-
 
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight= true)
     {
