@@ -445,14 +445,19 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION, $version);
 	}
 
-	public function shouldAddDistributeLive()
-	{
-		return false;
-	}
 
-	public function shouldDistributeLive($liveEntryId)
+	public function shouldAddDistributeByType($entryType)
 	{
-		return false;
+		if($entryType == entryType::LIVE_STREAM)
+			return false;
+		return true;
+	}
+	
+	public function shouldDistributeByType($entryId, $entryType)
+	{
+		if($entryType == entryType::LIVE_STREAM)
+			return false;
+		return true;
 	}
 	
 	public function getSunriseDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	

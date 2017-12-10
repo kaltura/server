@@ -1267,7 +1267,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$isLiveEntry = false;
 		$distributionProfiles = array();
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
-		if($entry->getType() == entryType::LIVE_STREAM)
+		$entryType = $entry->getType();
+		if($entryType == entryType::LIVE_STREAM)
 		{
 			$isLiveEntry = true;
 			$shouldDistribute = false;
@@ -1278,7 +1279,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if($distributionProfile)
 				{
 					$distributionProfiles[$entryDistributionObject->getId()] = $distributionProfile;
-					$shouldDistribute = $shouldDistribute || $distributionProfile->shouldDistributeLive($entryId);
+					$shouldDistribute = $shouldDistribute || $distributionProfile->shouldDistributeByType($entryId, $entryType);
 				}
 			}
 			if(!$shouldDistribute)
@@ -1339,7 +1340,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 
-			if($isLiveEntry && !$distributionProfile->shouldDistributeLive($entryId))
+			if(!$distributionProfile->shouldDistributeByType($entryId, $entryType))
 				continue;
 			
 			$distributionProvider = $distributionProfile->getProvider();
@@ -1542,9 +1543,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
-			
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
-		$isLiveEntry = $entry->getType() === entryType::LIVE_STREAM;
+		$entryId = $entry->getId();
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
+		$entryType = $entry->getType();
 		foreach($entryDistributions as $entryDistribution)
 		{
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
@@ -1555,7 +1556,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 
-			if($isLiveEntry && !$distributionProfile->shouldDistributeLive($entry->getId()))
+			if(!$distributionProfile->shouldDistributeByType($entryId, $entryType))
 				continue;
 
 			if (in_array(entryPeer::START_DATE, $modifiedColumns) || in_array(entryPeer::END_DATE, $modifiedColumns))
@@ -1791,10 +1792,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
-		$isLiveEntry = $entry->getType() === entryType::LIVE_STREAM;
+		$entryType = $entry->getType();
 		foreach($distributionProfiles as $distributionProfile)
 		{
-			if($isLiveEntry && !$distributionProfile->shouldAddDistributeLive())
+			if(!$distributionProfile->shouldAddDistributeByType($entryType))
 				continue;
 
 			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
