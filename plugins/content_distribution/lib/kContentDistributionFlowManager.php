@@ -1270,15 +1270,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($entryType == entryType::LIVE_STREAM)
 		{
 			$shouldDistribute = false;
-			foreach($entryDistributions as $entryDistributionObject)
+			self::getDistProfilesByEntryDistributions($entryDistributions, $distributionProfiles);
+			foreach($distributionProfiles as $distributionProfile)
 			{
-				$distributionProfileId = $entryDistributionObject->getDistributionProfileId();
-				$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-				if($distributionProfile)
-				{
-					$distributionProfiles[$entryDistributionObject->getId()] = $distributionProfile;
-					$shouldDistribute = $shouldDistribute || $distributionProfile->shouldDistributeByType($entryId, $entryType);
-				}
+				$shouldDistribute |= $distributionProfile->shouldDistributeByType($entryId, $entryType);
 			}
 			if(!$shouldDistribute)
 				return true;
@@ -1323,13 +1318,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 			}
 
-			if(isset($distributionProfiles[$entryDistributionObject->getId()]))
+			$distributionProfileId = $entryDistribution->getDistributionProfileId();
+			if(isset($distributionProfiles[$entryDistribution->getId()]))
 			{
-				$distributionProfile = $distributionProfiles[$entryDistributionObject->getId()];
+				$distributionProfile = $distributionProfiles[$entryDistribution->getId()];
 			}
 			else
 			{
-				$distributionProfileId = $entryDistribution->getDistributionProfileId();
 				$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			}
 			if(!$distributionProfile)
@@ -1947,6 +1942,23 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * @param array $entryDistributions
+	 * @param array $distributionProfiles
+	 */
+	public static function getDistProfilesByEntryDistributions(array $entryDistributions, array &$distributionProfiles)
+	{
+		foreach($entryDistributions as $entryDistributionObject)
+		{
+			$distributionProfileId = $entryDistributionObject->getDistributionProfileId();
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if($distributionProfile)
+			{
+				$distributionProfiles[$entryDistributionObject->getId()] = $distributionProfile;
+			}
+		}
 	}
 	
 	protected static function assignAssetsAndValidateForSubmission(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile, $action){
