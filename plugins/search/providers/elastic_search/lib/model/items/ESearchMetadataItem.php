@@ -15,6 +15,11 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 		'metadata.value_int' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, 'ESearchItemType::RANGE'=>ESearchItemType::RANGE, ESearchUnifiedItem::UNIFIED),
 	);
 
+	protected static $field_boost_values = array(
+		'metadata.value_text' => 100,
+		'metadata.value_int' => 100,
+	);
+
 	/**
 	 * @var string
 	 */
