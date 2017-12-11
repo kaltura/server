@@ -1269,7 +1269,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryType = $entry->getType();
 		if($entryType == entryType::LIVE_STREAM)
 		{
-			$shouldDistribute = false;
 			$distributionProfiles = self::getDistProfilesByEntryDistributions($entryDistributions, $distributionProfiles);
 			if(!self::checkShouldDistributeByProfiles($distributionProfiles, $entryId, $entryType))
 				return true;
