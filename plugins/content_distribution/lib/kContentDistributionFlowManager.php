@@ -1270,12 +1270,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($entryType == entryType::LIVE_STREAM)
 		{
 			$shouldDistribute = false;
-			self::getDistProfilesByEntryDistributions($entryDistributions, $distributionProfiles);
-			foreach($distributionProfiles as $distributionProfile)
-			{
-				$shouldDistribute |= $distributionProfile->shouldDistributeByType($entryId, $entryType);
-			}
-			if(!$shouldDistribute)
+			$distributionProfiles = self::getDistProfilesByEntryDistributions($entryDistributions, $distributionProfiles);
+			if(!self::checkShouldDistributeByProfiles($distributionProfiles, $entryId, $entryType))
 				return true;
 		}
 
@@ -1945,10 +1941,25 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	}
 	
 	/**
+	 * @param array $distributionProfiles
+	 * @param string $entryId
+	 * @param int $entryType
+	 */
+	public static function checkShouldDistributeByProfiles(array $distributionProfiles, $entryId, $entryType)
+	{
+		foreach($distributionProfiles as $distributionProfile)
+		{
+			if($distributionProfile->shouldDistributeByType($entryId, $entryType))
+				return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * @param array $entryDistributions
 	 * @param array $distributionProfiles
 	 */
-	public static function getDistProfilesByEntryDistributions(array $entryDistributions, array &$distributionProfiles)
+	public static function getDistProfilesByEntryDistributions(array $entryDistributions, array $distributionProfiles)
 	{
 		foreach($entryDistributions as $entryDistributionObject)
 		{
@@ -1959,8 +1970,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$distributionProfiles[$entryDistributionObject->getId()] = $distributionProfile;
 			}
 		}
+		return $distributionProfiles;
 	}
-	
+
 	protected static function assignAssetsAndValidateForSubmission(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile, $action){
 		$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 		$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
