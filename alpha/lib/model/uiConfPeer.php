@@ -36,4 +36,20 @@ class uiConfPeer extends BaseuiConfPeer
 	{
 		return array(array("uiConf:id=%s", self::ID), array("uiConf:partnerId=%s", self::PARTNER_ID));		
 	}
+
+	public static function retrieveByTagAndVersion($uiConfTag, $version, $partnerId = null)
+	{
+		$partnerIds = array(0);
+		if ($partnerId)
+			$partnerIds[] = $partnerId;
+		$c = new Criteria();
+		$c->addAnd(self::PARTNER_ID, $partnerIds, Criteria::IN);
+		$c->addAnd(self::STATUS, uiConf::UI_CONF_STATUS_READY);
+		$c->addAnd(self::TAGS, '%' . $uiConfTag . '%', Criteria::LIKE);
+		$c->addAnd(self::TAGS, '%' . $version . '%', Criteria::LIKE);
+		$c->addAnd(self::TAGS, '%deprecated%', Criteria::NOT_LIKE);
+		$c->addDescendingOrderByColumn(self::CREATED_AT);
+		$confs = self::doSelect($c);
+		return $confs;
+	}
 }

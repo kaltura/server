@@ -19,6 +19,18 @@
 
 	None.
 
+## Webcasting dashboard - expose kmcUtils::getUiconfByTagAndVersion to API action  ##
+- Issue Type: Feature
+- Issue ID: PLAT-8393
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_12_11_allow_getByTagAndVersion.php	
+	
+#### Known Issues & Limitations ####
+
+	None.
+
 # Mercury 13.8.0 # 
 
 ## Add Recorded Entry replaced HTTP template ##

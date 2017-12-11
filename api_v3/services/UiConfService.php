@@ -16,7 +16,7 @@ class UiConfService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		if(strtolower($actionName) != 'listtemplates')
+		if(strtolower($actionName) != 'listtemplates' && strtolower($actionName) != 'getbytagandversion')
 			$this->applyPartnerFilterForClass('uiConf'); 	
 	}
 	
@@ -294,4 +294,24 @@ class UiConfService extends KalturaBaseService
 		}
 		return $typesInfoArray;
 	}
+
+	/**
+	 * Retrieve a list of all available versions by object type
+	 *
+	 * @action getByTagAndVersion
+	 * @param KalturaUiConfPredefinedTags $uiConfTag
+	 * @param string $version
+	 * @return KalturaUiConfListResponse
+	 */
+	function getByTagAndVersionAction($uiConfTag, $version)
+	{
+		$list = uiConfPeer::retrieveByTagAndVersion($uiConfTag, $version, $this->getPartnerId());
+		$newList = KalturaUiConfArray::fromDbArray($list, $this->getResponseProfile());
+		$response = new KalturaUiConfListResponse();
+		$response->objects = $newList;
+		$response->totalCount = count($newList);
+
+		return $response;
+	}
+
 }
