@@ -16,8 +16,8 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	);
 
 	protected static $field_boost_values = array(
-		'metadata.value_text' => 50,
-		'metadata.value_int' => 50,
+		'metadata.value_text' => 100,
+		'metadata.value_int' => 100,
 	);
 
 	/**
