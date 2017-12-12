@@ -140,6 +140,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 				break;
 			case null:
 				$query = self::getCuePointItemTypeQuery($cuePointSearchItem, $queryAttributes);
+				break;
 			default:
 				KalturaLog::log("Undefined item type[".$cuePointSearchItem->getItemType()."]");
 		}
