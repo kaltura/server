@@ -9,7 +9,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	const INNER_HITS_CONFIG_KEY = 'cuePointsInnerHitsSize';
 	const NESTED_QUERY_PATH = 'cue_points';
 	const HIGHLIGHT_CONFIG_KEY = 'cuepointMaxNumberOfFragments';
-	const CUE_POINTS_TYPE_FIELD = "cue_points.cue_point_type";
+
 
 	/**
 	 * @var ESearchCuePointFieldName
@@ -229,7 +229,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	private static function addFilterByTypeToQuery($cuePointType, &$query)
 	{
-		$cuePointTypeQuery = new kESearchTermQuery('cue_points.cue_point_type', $cuePointType);
+		$cuePointTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::CUE_POINTS_TYPE_FIELD, $cuePointType);
 		$boolQuery = new kESearchBoolQuery();
 		$boolQuery->addToFilter($cuePointTypeQuery);
 		$boolQuery->addToMust($query);
@@ -251,7 +251,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	private static function getCuePointItemTypeQuery($cuePointSearchItem, &$queryAttributes)
 	{
-		$cuePointExactMatch = new kESearchTermQuery(ESearchCuePointItem::CUE_POINTS_TYPE_FIELD, $cuePointSearchItem->getCuePointType());
+		$cuePointExactMatch = new kESearchTermQuery(ESearchCuePointFieldName::CUE_POINTS_TYPE_FIELD, $cuePointSearchItem->getCuePointType());
 		return $cuePointExactMatch;
 	}
 }
