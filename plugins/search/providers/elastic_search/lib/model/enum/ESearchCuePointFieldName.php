@@ -16,5 +16,5 @@ interface ESearchCuePointFieldName extends BaseEnum
 	const ANSWERS = 'cue_points.cue_point_answers';
 	const HINT = 'cue_points.cue_point_hint';
 	const EXPLANATION = 'cue_points.cue_point_explanation';
-	const CUE_POINTS_TYPE_FIELD = "cue_points.cue_point_type";
+	const TYPE = "cue_points.cue_point_type";
 }

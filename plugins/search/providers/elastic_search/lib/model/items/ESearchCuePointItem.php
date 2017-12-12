@@ -229,7 +229,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	private static function addFilterByTypeToQuery($cuePointType, &$query)
 	{
-		$cuePointTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::CUE_POINTS_TYPE_FIELD, $cuePointType);
+		$cuePointTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::TYPE, $cuePointType);
 		$boolQuery = new kESearchBoolQuery();
 		$boolQuery->addToFilter($cuePointTypeQuery);
 		$boolQuery->addToMust($query);
@@ -251,7 +251,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	private static function getCuePointItemTypeQuery($cuePointSearchItem, &$queryAttributes)
 	{
-		$cuePointExactMatch = new kESearchTermQuery(ESearchCuePointFieldName::CUE_POINTS_TYPE_FIELD, $cuePointSearchItem->getCuePointType());
+		$cuePointExactMatch = new kESearchTermQuery(ESearchCuePointFieldName::TYPE, $cuePointSearchItem->getCuePointType());
 		return $cuePointExactMatch;
 	}
 }
