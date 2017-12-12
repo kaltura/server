@@ -454,7 +454,8 @@ abstract class LiveEntry extends entry
 		$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
 		$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
 		$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-		$isMediaServerPartner = (kCurrentContext::getCurrentPartnerId() == Partner::MEDIA_SERVER_PARTNER_ID);
+		$isMediaServerPartner = (kCurrentContext::$ks_partner_id == Partner::MEDIA_SERVER_PARTNER_ID);
+		KalturaLog::err("@@NA is Media server partner id [".$isMediaServerPartner."]");
 		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview && !$isMediaServerPartner)
 			return false;
 		return true;
