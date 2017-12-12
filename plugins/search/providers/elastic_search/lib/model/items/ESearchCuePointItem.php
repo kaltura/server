@@ -9,6 +9,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	const INNER_HITS_CONFIG_KEY = 'cuePointsInnerHitsSize';
 	const NESTED_QUERY_PATH = 'cue_points';
 	const HIGHLIGHT_CONFIG_KEY = 'cuepointMaxNumberOfFragments';
+	const CUE_POINTS_TYPE_FIELD = "cue_points.cue_point_type";
 
 	/**
 	 * @var ESearchCuePointFieldName
@@ -139,7 +140,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 				$query = self::getCuePointRangeQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$cuePointSearchItem->getItemType()."]");
+				$query = self::getCuePointItemTypeQuery($cuePointSearchItem, $queryAttributes);
 		}
 
 		$cuePointBoolQuery->addByOperatorType($boolOperator, $query);
@@ -234,4 +235,22 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		return $boolQuery;
 	}
 
+	protected function validateItemInput()
+	{
+		if(!$this->validateCuePointTypeQuery())
+		{
+			parent::validateItemInput();
+		}
+	}
+
+	private function validateCuePointTypeQuery()
+	{
+		return !($this->getSearchTerm() || $this->getItemType() || $this->getRange() || $this->getFieldName() || !$this->getCuePointType());
+	}
+
+	private static function getCuePointItemTypeQuery($cuePointSearchItem, &$queryAttributes)
+	{
+		$cuePointExactMatch = new kESearchTermQuery(ESearchCuePointItem::CUE_POINTS_TYPE_FIELD, $cuePointSearchItem->getCuePointType());
+		return $cuePointExactMatch;
+	}
 }
