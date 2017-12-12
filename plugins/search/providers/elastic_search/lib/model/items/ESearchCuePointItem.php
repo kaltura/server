@@ -10,7 +10,6 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	const NESTED_QUERY_PATH = 'cue_points';
 	const HIGHLIGHT_CONFIG_KEY = 'cuepointMaxNumberOfFragments';
 
-
 	/**
 	 * @var ESearchCuePointFieldName
 	 */
@@ -121,6 +120,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointBoolQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$cuePointSearchItem->validateItemInput();
+
 		switch ($cuePointSearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
@@ -141,7 +141,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 			case null:
 				$query = self::getCuePointItemTypeQuery($cuePointSearchItem, $queryAttributes);
 			default:
-				KalturaLog::log("Undefined item type[" . $cuePointSearchItem->getItemType() . "]");
+				KalturaLog::log("Undefined item type[" .$cuePointSearchItem->getItemType()."]");
 		}
 
 		$cuePointBoolQuery->addByOperatorType($boolOperator, $query);
