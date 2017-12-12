@@ -138,6 +138,9 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 			case ESearchItemType::RANGE:
 				$query = self::getCuePointRangeQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
+			case null:
+				$query = self::getCuePointItemTypeQuery($cuePointSearchItem, $queryAttributes);
+				break;
 			default:
 				KalturaLog::log("Undefined item type[".$cuePointSearchItem->getItemType()."]");
 		}
@@ -227,11 +230,29 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	private static function addFilterByTypeToQuery($cuePointType, &$query)
 	{
-		$cuePointTypeQuery = new kESearchTermQuery('cue_points.cue_point_type', $cuePointType);
+		$cuePointTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::TYPE, $cuePointType);
 		$boolQuery = new kESearchBoolQuery();
 		$boolQuery->addToFilter($cuePointTypeQuery);
 		$boolQuery->addToMust($query);
 		return $boolQuery;
 	}
 
+	protected function validateItemInput()
+	{
+		if(!$this->shouldQueryByType())
+		{
+			parent::validateItemInput();
+		}
+	}
+
+	private function shouldQueryByType()
+	{
+		return !($this->getSearchTerm() || $this->getItemType() || $this->getRange() || $this->getFieldName() || !$this->getCuePointType());
+	}
+
+	private static function getCuePointItemTypeQuery($cuePointSearchItem, &$queryAttributes)
+	{
+		$cuePointExactMatch = new kESearchTermQuery(ESearchCuePointFieldName::TYPE, $cuePointSearchItem->getCuePointType());
+		return $cuePointExactMatch;
+	}
 }
