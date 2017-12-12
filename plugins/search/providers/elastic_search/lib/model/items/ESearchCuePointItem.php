@@ -26,6 +26,11 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	 */
 	protected $cuePointType;
 
+	/**
+	 * @var bool
+	 */
+	private $shouldQueryByType;
+
 	private static $allowed_search_types_for_field = array(
 		'cue_points.cue_point_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, ESearchUnifiedItem::UNIFIED),
 		'cue_points.cue_point_name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
@@ -121,26 +126,31 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointBoolQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$cuePointSearchItem->validateItemInput();
-
-		switch ($cuePointSearchItem->getItemType())
+		if($cuePointSearchItem->shouldQueryByType)
 		{
-			case ESearchItemType::EXACT_MATCH:
-				$query = self::getCuePointExactMatchQuery($cuePointSearchItem, $allowedSearchTypes, $queryAttributes);
-				break;
-			case ESearchItemType::PARTIAL:
-				$query = self::getCuePointPartialQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $queryAttributes);
-				break;
-			case ESearchItemType::STARTS_WITH:
-				$query = self::getCuePointPrefixQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
-				break;
-			case ESearchItemType::EXISTS:
-				$query = self::getCuePointExistsQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
-				break;
-			case ESearchItemType::RANGE:
-				$query = self::getCuePointRangeQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
-				break;
-			default:
-				$query = self::getCuePointItemTypeQuery($cuePointSearchItem, $queryAttributes);
+			$query = self::getCuePointItemTypeQuery($cuePointSearchItem, $queryAttributes);
+		}
+		else
+		{
+			switch ($cuePointSearchItem->getItemType()) {
+				case ESearchItemType::EXACT_MATCH:
+					$query = self::getCuePointExactMatchQuery($cuePointSearchItem, $allowedSearchTypes, $queryAttributes);
+					break;
+				case ESearchItemType::PARTIAL:
+					$query = self::getCuePointPartialQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $queryAttributes);
+					break;
+				case ESearchItemType::STARTS_WITH:
+					$query = self::getCuePointPrefixQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+					break;
+				case ESearchItemType::EXISTS:
+					$query = self::getCuePointExistsQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+					break;
+				case ESearchItemType::RANGE:
+					$query = self::getCuePointRangeQuery($cuePointSearchItem, $cuePointSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+					break;
+				default:
+					KalturaLog::log("Undefined item type[" . $cuePointSearchItem->getItemType() . "]");
+			}
 		}
 
 		$cuePointBoolQuery->addByOperatorType($boolOperator, $query);
@@ -237,7 +247,8 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	protected function validateItemInput()
 	{
-		if(!$this->validateCuePointTypeQuery())
+		$this->validateCuePointTypeQuery();
+		if(!$this->shouldQueryByType)
 		{
 			parent::validateItemInput();
 		}
@@ -245,7 +256,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	private function validateCuePointTypeQuery()
 	{
-		return !($this->getSearchTerm() || $this->getItemType() || $this->getRange() || $this->getFieldName() || !$this->getCuePointType());
+		$this->shouldQueryByType = !($this->getSearchTerm() || $this->getItemType() || $this->getRange() || $this->getFieldName() || !$this->getCuePointType());
 	}
 
 	private static function getCuePointItemTypeQuery($cuePointSearchItem, &$queryAttributes)
