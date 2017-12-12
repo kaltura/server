@@ -46,6 +46,8 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		'cue_points.cue_point_tags' => 50,
 		'cue_points.cue_point_question' => 50,
 		'cue_points.cue_point_answers' => 50,
+		'cue_points.cue_point_hint' => 50,
+		'cue_points.cue_point_explanation' => 50,
 	);
 
 	private static $multiLanguageFields = array();

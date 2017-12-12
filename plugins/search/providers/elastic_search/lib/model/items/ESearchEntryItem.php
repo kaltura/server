@@ -69,6 +69,11 @@ class ESearchEntryItem extends ESearchItem
 		ESearchEntryFieldName::DESCRIPTION,
 	);
 
+	private static $ignoreDisplayInSearchFields = array(
+		ESearchEntryFieldName::ENTRY_PARENT_ENTRY_ID,
+		ESearchEntryFieldName::ENTRY_ID,
+	);
+
 	/**
 	 * @return ESearchEntryFieldName
 	 */
@@ -149,6 +154,8 @@ class ESearchEntryItem extends ESearchItem
 			default:
 				KalturaLog::log("Undefined item type[".$entrySearchItem->getItemType()."]");
 		}
+		if (in_array($entrySearchItem->getFieldName(), self::$ignoreDisplayInSearchFields))
+			$queryAttributes->setShouldUseDisplayInSearch(false);
 	}
 
 	public function shouldAddLanguageSearch()

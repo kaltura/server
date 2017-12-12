@@ -221,6 +221,7 @@ class kmc4Action extends kalturaAction
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
                 'showStudioV3'		    => $showStudioV3,
+                'html5_version'		    => kConf::get("html5_version")
             ),
             'studioV3'					=> array(
                 'version'				=> kConf::get("studio_v3_version"),
@@ -229,6 +230,7 @@ class kmc4Action extends kalturaAction
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
                 'showStudioV3'		    => $showStudioV3,
+                'html5_version'		    => kConf::get("html5_version")
             ),
 			'liveanalytics'					=> array(
                 'version'				=> kConf::get("liveanalytics_version"),
