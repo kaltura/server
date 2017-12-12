@@ -18,7 +18,7 @@ class KalturaESearchEntryOrderByItem extends KalturaESearchOrderByItem
         KalturaESearchEntryOrderByFieldName::CREATED_AT => ESearchEntryOrderByFieldName::CREATED_AT,
         KalturaESearchEntryOrderByFieldName::UPDATED_AT => ESearchEntryOrderByFieldName::UPDATED_AT,
         KalturaESearchEntryOrderByFieldName::END_DATE => ESearchEntryOrderByFieldName::END_DATE,
-        KalturaESearchEntryOrderByFieldName::START_DATE => ESearchEntryOrderByFieldName::TART_DATE,
+        KalturaESearchEntryOrderByFieldName::START_DATE => ESearchEntryOrderByFieldName::START_DATE,
         KalturaESearchEntryOrderByFieldName::NAME => ESearchEntryOrderByFieldName::NAME,
         KalturaESearchEntryOrderByFieldName::VIEWS => ESearchEntryOrderByFieldName::VIEWS,
         KalturaESearchEntryOrderByFieldName::VOTES => ESearchEntryOrderByFieldName::VOTES,
