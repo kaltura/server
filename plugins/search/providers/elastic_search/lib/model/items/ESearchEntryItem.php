@@ -70,8 +70,8 @@ class ESearchEntryItem extends ESearchItem
 	);
 
 	private static $ignoreDisplayInSearchFields = array(
-		ESearchEntryFieldName::ENTRY_PARENT_ENTRY_ID,
-		ESearchEntryFieldName::ENTRY_ID,
+		ESearchEntryFieldName::PARENT_ENTRY_ID,
+		ESearchEntryFieldName::ID,
 	);
 
 	/**
