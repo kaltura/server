@@ -527,6 +527,10 @@
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
+		"external_source_type": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
 		"length_in_msecs": {
 		  "type" : "long"
 		},
