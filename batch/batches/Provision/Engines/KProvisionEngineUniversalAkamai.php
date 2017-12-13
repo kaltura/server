@@ -71,7 +71,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		$res = $this->provisionStream($data);
 		if (!$res)
 		{
-			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: no result received for connection"); 
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: no result received for connection");
 		}
 		
 		KalturaLog::info ("Request to provision stream returned result: $res");
@@ -82,7 +82,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		{
 			//There is always only 1 error listed in the XML
 			$error = $errors[0];
-			return new KProvisionEngineResult(KalturaBatchJobStatus::RETRY, "Error: ". strval($error));
+			return new KProvisionEngineResult(KalturaBatchJobStatus::RETRY, "Error: ". strval($error[0]));
 		}
 		//Otherwise, the stream provision request probably returned OK, attempt to parse it as a new stream XML
 		try {
