@@ -315,11 +315,21 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $timeAlignedRenditions;
 
 	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $reachCredit;
+
+	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $reachAllowedOvercharge;
+
+  /**
 	 * @var KalturaESearchLanguageArray
 	 */
 	public $eSearchLanguages;
-
-
 
 	private static $map_between_objects = array
 	(
@@ -329,7 +339,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
-		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
+		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages','reachCredit','reachAllowedOvercharge',
 	);
 	
 	public function getMapBetweenObjects ( )
