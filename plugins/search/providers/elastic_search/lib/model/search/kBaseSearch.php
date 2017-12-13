@@ -77,9 +77,9 @@ abstract class kBaseSearch
                     continue;
                 }
                 $fields[$field] = true;
-                $sortConditions[] = array(
-                    $field => array('order' => $orderItem->getSortOrder())
-                );
+				$conditions = $orderItem->getSortConditions();
+				foreach ($conditions as $condition)
+					$sortConditions[] = $condition;
             }
 
             if(count($sortConditions))

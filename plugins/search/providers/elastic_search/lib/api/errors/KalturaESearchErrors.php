@@ -10,6 +10,7 @@ class KalturaESearchErrors extends KalturaErrors
     const SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH = 'SEARCH TYPE IS NOT ALLOWED ON UNIFIED SEARCH;TYPE; Type of search [@TYPE@] not allowed on unified search';
     const EMPTY_SEARCH_OPERATOR_NOT_ALLOWED = 'EMPTY SEARCH OPERATOR IS NOT ALLOWED;;empty search operator is not allowed';
     const EMPTY_SEARCH_ITEMS_NOT_ALLOWED = 'EMPTY SEARCH ITEMS ARE NOT ALLOWED;;empty search items are not allowed';
+    const MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM = 'MISSING MANDATORY PARAMETERS IN ORDER ITEM;;missing mandatory parameters in order item';
 
     //Query parsing errors
     const UNMATCHING_BRACKETS = 'UNMATCHING BRACKETS;;Unmatching brackets';
