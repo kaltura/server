@@ -46,8 +46,8 @@ class ESearchCategoryItem extends ESearchItem
 	);
 
 	private static $multiLanguageFields = array(
-		ESearchCategoryFieldName::CATEGORY_NAME,
-		ESearchCategoryFieldName::CATEGORY_DESCRIPTION,
+		ESearchCategoryFieldName::NAME,
+		ESearchCategoryFieldName::DESCRIPTION,
 	);
 
 	/**
@@ -138,11 +138,11 @@ class ESearchCategoryItem extends ESearchItem
 		$fieldName = $this->getFieldName();
 		switch ($fieldName)
 		{
-			case ESearchCategoryFieldName::CATEGORY_PRIVACY:
+			case ESearchCategoryFieldName::PRIVACY:
 				$this->setSearchTerm(category::formatPrivacy($this->getSearchTerm(), kCategoryElasticEntitlement::$partnerId));
 				break;
-			case ESearchCategoryFieldName::CATEGORY_PRIVACY_CONTEXT:
-			case ESearchCategoryFieldName::CATEGORY_PRIVACY_CONTEXTS:
+			case ESearchCategoryFieldName::PRIVACY_CONTEXT:
+			case ESearchCategoryFieldName::PRIVACY_CONTEXTS:
 				$this->setSearchTerm(kEntitlementUtils::getPartnerPrefix(kCategoryElasticEntitlement::$partnerId).$this->getSearchTerm());
 				break;
 			default:
