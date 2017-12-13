@@ -1046,7 +1046,11 @@
 				  }
 				}
 			  }
-			}
+			},
+			"cue_point_asset_id": {
+              "type" : "text",
+              "analyzer" : "kaltura_keyword"
+            }
 		  }
 		}
 	  }
