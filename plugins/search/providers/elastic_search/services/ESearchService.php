@@ -133,6 +133,8 @@ class ESearchService extends KalturaBaseService
 				throw new kESearchException(KalturaESearchErrors::INVALID_METADATA_FIELD, $data['fieldName']);
 			case kESearchException::INVALID_MIXED_SEARCH_TYPES:
 				throw new kESearchException(KalturaESearchErrors::INVALID_MIXED_SEARCH_TYPES, $data['fieldName'], $data['fieldValue']);
+			case kESearchException::MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM:
+				throw new KalturaAPIException(KalturaESearchErrors::MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM);
 
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);
