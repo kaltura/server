@@ -40,4 +40,5 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const CATEGORY_NAME = 'category_name';
 	const EXTERNAL_SOURCE_TYPE = 'external_source_type';
 	const IS_QUIZ = 'is_quiz';
+	const IS_LIVE = 'is_live';
 }

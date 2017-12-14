@@ -933,8 +933,8 @@ abstract class LiveEntry extends entry
 		$body = array(
 			'recorded_entry_id' => $this->getRecordedEntryId(),
 			'push_publish' => $this->getPushPublishEnabled(),
+			'is_live' => $this->isCurrentlyLive(),
 		);
-
 		elasticSearchUtils::cleanEmptyValues($body);
 
 		return array_merge(parent::getObjectParams($params), $body);
