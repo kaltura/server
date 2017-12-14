@@ -565,7 +565,7 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"is_live": {
-          "type" : "boolean"
+		  "type" : "boolean"
 		},
 		"entry_type": {
 		  "type" : "text",
