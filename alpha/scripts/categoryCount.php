@@ -3,11 +3,12 @@ ini_set("memory_limit","256M");
 
 require_once(__DIR__ . '/bootstrap.php');
 
-
-if(!count($argv))
-	die("No partner_id passed to script!");
+if(count($argv)<2)
+        die("Usage:php $argv[0] <partner id> [<category id>]");
 	
 $partnerId = $argv[1];
+if(isset($argv[2]))
+        $categoryId=$argv[2];
 
 var_dump($partnerId);
 
@@ -16,6 +17,8 @@ if ( !PartnerPeer::retrieveByPK($partnerId) )
 
 $criteria = new Criteria();
 $criteria->add(categoryPeer::PARTNER_ID,$partnerId,Criteria::EQUAL);
+if(isset($categoryId))
+        $criteria->add(categoryPeer::ID,$categoryId);
 $criteria->setLimit(1000);
 $allCats = categoryPeer::doSelect($criteria);
 
