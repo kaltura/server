@@ -3,7 +3,7 @@ ini_set("memory_limit","256M");
 
 require_once(__DIR__ . '/bootstrap.php');
 
-if(count($argv)<2)
+if($argc<2)
         die("Usage:php $argv[0] <partner id> [<category id>]");
 	
 $partnerId = $argv[1];
