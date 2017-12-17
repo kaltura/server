@@ -51,7 +51,8 @@ class LiveEntryServerNode extends EntryServerNode
 			if($this->isColumnModified(EntryServerNodePeer::SERVER_NODE_ID) && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY && $liveEntry->getPrimaryServerNodeId() !== $this->getServerNodeId())
 				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
 			
-			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
+			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE
+					&& $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 				$liveEntry->setLastBroadcast(time());
 			
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::MARKED_FOR_DELETION)

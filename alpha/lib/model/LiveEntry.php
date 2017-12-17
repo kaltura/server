@@ -556,7 +556,7 @@ abstract class LiveEntry extends entry
 		
 		if($liveEntryStatus === EntryServerNodeStatus::PLAYABLE)
 		{
-			if(is_null($this->getFirstBroadcast()))
+			if(is_null($this->getFirstBroadcast()) && $mediaServerIndex === EntryServerNodeType::LIVE_PRIMARY)
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
 			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
