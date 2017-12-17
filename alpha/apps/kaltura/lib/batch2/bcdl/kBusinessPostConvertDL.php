@@ -187,26 +187,16 @@ class kBusinessPostConvertDL
 		// update the root job end exit
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
-			$siblingJobs = $rootBatchJob->getChildJobs();
-			foreach($siblingJobs as $siblingJob)
+			$c = new Criteria();
+			$siblingJobsTypes = array(BatchJobType::CONVERT, BatchJobType::CONVERT_COLLECTION, BatchJobType::POSTCONVERT);
+			$c->addAnd($c->getNewCriterion(BatchJobPeer::JOB_TYPE, $siblingJobsTypes, Criteria::IN));
+			$siblingJobs = $rootBatchJob->getOpenStatusChildJobs();
+			if($siblingJobs)
 			{
-				// checking only conversion child jobs
-				if(
-					$siblingJob->getJobType() != BatchJobType::CONVERT
-					&&
-					$siblingJob->getJobType() != BatchJobType::CONVERT_COLLECTION
-					&&
-					$siblingJob->getJobType() != BatchJobType::POSTCONVERT
-					)
-					continue;
-					
-				// if not complete leave function
-				if(!in_array($siblingJob->getStatus(), BatchJobPeer::getClosedStatusList()))
-				{
-					KalturaLog::info("job id [" . $siblingJob->getId() . "] status [" . $siblingJob->getStatus() . "]");
-					return $dbBatchJob;
-				}
+				KalturaLog::info("job ids [" . $siblingJobs[0]->getId() . "] status [" . $siblingJobs[0]->getStatus() . "]");
+				return $dbBatchJob;
 			}
+
 			// all child jobs completed
 			kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			return $dbBatchJob;
