@@ -64,6 +64,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
 				KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
 			}
+			else //drop folder file entry found
+			{
+				$dropFolderFile = $dropFolderFilesMap[$physicalFileName];
+				unset($dropFolderFilesMap[$physicalFileName]);
+				if ($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
+					$this->handleExistingDropFolderFile($dropFolderFile);
+			}
 		}
 		
 		if ($this->dropFolder->incremental && $maxTime > $this->dropFolder->lastFileTimestamp)
@@ -272,14 +279,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$newDropFolderFile->recordingId = $webexFile->getRecordingID();
 			$newDropFolderFile->webexHostId = $webexFile->getHostWebExID();
 			$newDropFolderFile->contentUrl = $webexFile->getFileURL();
+			$newDropFolderFile->currentWebexFileSize = WebexPlugin::getSizeFromWebexContentUrl($webexFile->getFileURL());
+			$newDropFolderFile->webexFileSizeLastSetAt = time();
+
 			KalturaLog::debug("Adding new WebexDropFolderFile: " . print_r($newDropFolderFile, true));
-			//No such thing as an 'uploading' webex drop folder file - if the file is detected, it is ready for upload. Immediately update status to 'pending'
-			KBatchBase::$kClient->startMultiRequest();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
-			$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
-			$result = KBatchBase::$kClient->doMultiRequest();
 			
-			return $result[1];
+			return $dropFolderFile;
 		}
 		catch(Exception $e)
 		{
@@ -287,6 +293,55 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			return null;
 		}
 	}
+
+	protected function handleExistingDropFolderFile (KalturaWebexDropFolderFile $dropFolderFile)
+	{
+		if (!$dropFolderFile->currentWebexFileSize)
+		{
+			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
+				DropFolderPlugin::ERROR_READING_FILE_MESSAGE.'['.$dropFolderFile->contentUrl.']');
+		}
+		else if ($dropFolderFile->currentWebexFileSize != $dropFolderFile->fileSize)
+		{
+			try
+			{
+				$updateDropFolderFile = new KalturaDropFolderFile();
+				$updateDropFolderFile->currentWebexFileSize = WebexPlugin::getSizeFromWebexContentUrl($dropFolderFile->contentUrl);
+				$updateDropFolderFile->webexFileSizeLastSetAt = time();
+
+				return $this->dropFolderFileService->update($dropFolderFile->id, $updateDropFolderFile);
+			}
+			catch (Exception $e)
+			{
+				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE,
+					DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
+				return null;
+			}
+		}
+		else // file sizes are equal
+		{
+			$time = time();
+			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->webexFileSizeLastSetAt;
+
+			KalturaLog::info("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
+
+			// check if fileSizeCheckInterval time has passed since the last file size update
+			if ($time > $fileSizeLastSetAt)
+			{
+				try
+				{
+					return $this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
+				}
+				catch(KalturaException $e)
+				{
+					$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE,
+						DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
+					return null;
+				}
+			}
+		}
+	}
+
 
 	protected function addAsNewContent (KalturaBatchJob $job, KalturaWebexDropFolderContentProcessorJobData $data, KalturaWebexDropFolder $folder)
 	{
