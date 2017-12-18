@@ -11,17 +11,17 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 	const HIGHLIGHT_CONFIG_KEY = 'captionMaxNumberOfFragments';
 
 	private static $allowed_search_types_for_field = array(
-		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
-		'caption_assets.lines.start_time' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
-		'caption_assets.lines.end_time' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		ESearchCaptionFieldName::CONTENT => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
+		ESearchCaptionFieldName::START_TIME => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		ESearchCaptionFieldName::END_TIME => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 	);
 
 	private static $multiLanguageFields = array(
-		ESearchCaptionFieldName::CAPTION_CONTENT,
+		ESearchCaptionFieldName::CONTENT,
 	);
 
 	protected static $field_boost_values = array(
-		'caption_assets.lines.content' => 10,
+		ESearchCaptionFieldName::CONTENT => 10,
 	);
 
 	/**

@@ -6,5 +6,5 @@
 interface ElasticMethodType extends BaseEnum
 {
     const INDEX = 'index';
-    const UPADTE = 'update';
+    const UPDATE = 'update';
 }

@@ -49,6 +49,7 @@ class ESearchMetadataItemData extends ESearchItemData
 	 */
 	public function setXpath($xpath)
 	{
+		$xpath=str_replace(array('[',']'),' ',$xpath);
 		$this->xpath = $xpath;
 	}
 

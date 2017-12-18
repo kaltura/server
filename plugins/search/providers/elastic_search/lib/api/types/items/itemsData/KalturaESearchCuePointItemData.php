@@ -66,6 +66,11 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	 **/
 	public $explanation;
 
+	/**
+	 * @var string
+	 **/
+	public $assetId;
+
 	private static $map_between_objects = array(
 		'cuePointType',
 		'id',
@@ -79,6 +84,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 		'answers',
 		'hint',
 		'explanation',
+		'assetId',
 	);
 
 	protected function getMapBetweenObjects()
