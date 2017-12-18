@@ -331,7 +331,9 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 
 	public function getNestedQueryName()
 	{
-		return ESearchItemDataType::METADATA.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME;
+		if($this->getXpath())
+			return array(ESearchItemDataType::METADATA.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME.self::getMetadataProfileId().self::QUERY_NAME_DELIMITER.md5($this->getXpath()));
+		return array(ESearchItemDataType::METADATA.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME);
 	}
 
 }
