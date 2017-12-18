@@ -1116,7 +1116,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	/**
 	 * @param FileSyncKey $key
 	 * @param StorageProfile $externalStorage
-	 * @return SyncFile
+	 * @return FileSync
 	 */
 	public static function createPendingExternalSyncFileForKey(FileSyncKey $key, StorageProfile $externalStorage, $isDir = false)
 	{

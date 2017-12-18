@@ -395,7 +395,7 @@ class kFlowHelper
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount)
+	public static function getReplacingEntry($recordedEntry, $asset = null, $liveSegmentCount, $flavorParamsId = null)
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -415,7 +415,8 @@ class kFlowHelper
 					}
 					else 
 					{
-						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+						$flavorParamsId = $asset ? $asset->getFlavorParamsId() : $flavorParamsId;
+						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $flavorParamsId);
 						if($replacingAsset)
 						{
 							KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
@@ -772,7 +773,7 @@ class kFlowHelper
 		$nextJob = self::createNextJob($flavorParamsOutput, $dbBatchJob, $data, $syncKey); //todo validate sync key
 		if(!$nextJob)
 		{
-			self::handleOperatorsProcessingFinished($flavorAsset, $flavorParamsOutput, $entry, $dbBatchJob, $data, $rootBatchJob);
+			self::handleOperatorsProcessingFinished($flavorAsset, $flavorParamsOutput, $entry, $dbBatchJob, $data, $rootBatchJob, $syncKey);
 		}
 		// this logic decide when a thumbnail should be created
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
@@ -840,7 +841,7 @@ class kFlowHelper
 
 		return $nextJob;
 	}
-	private static function handleOperatorsProcessingFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, entry $entry, BatchJob $dbBatchJob, kConvertJobData $data, $rootBatchJob = null)
+	private static function handleOperatorsProcessingFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, entry $entry, BatchJob $dbBatchJob, kConvertJobData $data, $rootBatchJob = null, $syncKey = null)
 	{
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
@@ -886,7 +887,7 @@ class kFlowHelper
 			if($flavorAsset->getIsOriginal())
 				$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE;
 
-			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
+			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $syncKey, $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
 		}
 		else // no need to run post convert
 		{
@@ -1363,7 +1364,7 @@ class kFlowHelper
 
 			// creating post convert job (without thumb)
 			$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
-			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId(), file_exists($thumbPath), $offset);
+			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $syncKey, $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId(), file_exists($thumbPath), $offset);
 
 			$finalFlavors[] = $flavor;
 			$addedFlavorParamsOutputsIds[] = $flavor->getFlavorParamsOutputId();
@@ -1733,11 +1734,10 @@ class kFlowHelper
 				$syncKey = $currentFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 				{
-					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-
+					$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
 					$entry = $dbBatchJob->getEntry();
 					if($entry)
-						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $path);
+						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $fileSync);
 				}
 				$currentFlavorAsset = null;
 			}

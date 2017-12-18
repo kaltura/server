@@ -15,6 +15,11 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 		'metadata.value_int' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, 'ESearchItemType::RANGE'=>ESearchItemType::RANGE, ESearchUnifiedItem::UNIFIED),
 	);
 
+	protected static $field_boost_values = array(
+		'metadata.value_text' => 100,
+		'metadata.value_int' => 100,
+	);
+
 	/**
 	 * @var string
 	 */
@@ -117,38 +122,31 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 		return self::createNestedQueryForItems($eSearchItemsArr, $boolOperator, $queryAttributes);
 	}
 
-	public static function createSingleItemSearchQuery($metadataESearchItem, $boolOperator, &$metadataQuery, $allowedSearchTypes, &$queryAttributes)
+	public static function createSingleItemSearchQuery($metadataESearchItem, $boolOperator, &$metadataBoolQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$metadataESearchItem->validateItemInput();
 		switch ($metadataESearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataExactMatchQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
+				$query = self::getMetadataExactMatchQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataMultiMatchQuery($metadataESearchItem, $queryAttributes);
+				$query = self::getMetadataPartialQuery($metadataESearchItem, $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataPrefixQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
+				$query = self::getMetadataPrefixQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataExistQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
+				$query = self::getMetadataExistQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$metadataQuery['nested']['query']['bool'][$boolOperator][] =
-					self::getMetadataRangeQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
+				$query = self::getMetadataRangeQuery($metadataESearchItem, $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$metadataESearchItem->getItemType()."]");
 		}
 
-		if($boolOperator == 'should')
-			$metadataQuery['nested']['query']['bool']['minimum_should_match'] = 1;
-
+		$metadataBoolQuery->addByOperatorType($boolOperator, $query);
 	}
 
 	/**
@@ -159,30 +157,33 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	 */
 	protected static function getMetadataExactMatchQuery($searchItem, $allowedSearchTypes, &$queryAttributes)
 	{
-		$metadataExactMatch = array();
 		if(ctype_digit($searchItem->getSearchTerm()))
 		{
-			$metadataExactMatch['bool']['should'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
-			$metadataExactMatch['bool']['should'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_int', $allowedSearchTypes, $queryAttributes);
-			$metadataExactMatch['bool']['minimum_should_match'] = 1;
+			$metadataExactMatch = new kESearchBoolQuery();
+			$textExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+			$metadataExactMatch->addToShould($textExactMatch);
+			$intExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_int', $allowedSearchTypes, $queryAttributes);
+			$metadataExactMatch->addToShould($intExactMatch);
 		}
 		else if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
-			$metadataExactMatch['bool']['must'][] = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+			$metadataExactMatch = new kESearchBoolQuery();
+			$textExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+			$metadataExactMatch->addToMust($textExactMatch);
 		}
 		else
 		{
-			$metadataExactMatch = kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+			return kESearchQueryManager::getExactMatchQuery($searchItem, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
 		}
 
 		if($searchItem->getXpath())
-			$metadataExactMatch['bool']['must'][] = self::getXPathQuery($searchItem);
+			$metadataExactMatch->addToFilter(self::getXPathQuery($searchItem));
 
 		if($searchItem->getMetadataProfileId())
-			$metadataExactMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+			$metadataExactMatch->addToFilter(self::getMetadataProfileIdQuery($searchItem));
 
 		if($searchItem->getMetadataFieldId())
-			$metadataExactMatch['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
+			$metadataExactMatch->addToFilter(self::getMetadataFieldIdQuery($searchItem));
 
 		return $metadataExactMatch;
 	}
@@ -192,31 +193,33 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	 * @param ESearchQueryAttributes $queryAttributes
 	 * @return array|null
 	 */
-	protected static function getMetadataMultiMatchQuery($searchItem, &$queryAttributes)
+	protected static function getMetadataPartialQuery($searchItem, &$queryAttributes)
 	{
-		$metadataMultiMatch = kESearchQueryManager::getMultiMatchQuery($searchItem, 'metadata.value_text', $queryAttributes);
-
+		/**@var kESearchBoolQuery $metadataMultiMatch*/
+		$metadataPartialQuery = kESearchQueryManager::getPartialQuery($searchItem, 'metadata.value_text', $queryAttributes);
 		if(ctype_digit($searchItem->getSearchTerm()))//add metadata.value_int
-			$metadataMultiMatch['bool']['should'][0]['multi_match']['fields'][] = 'metadata.value_int^3';
-
-		if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
-			$metadataMultiMatchQuery = $metadataMultiMatch;
-			$metadataMultiMatch = null;
-
-			$metadataMultiMatch['bool']['must'][] = $metadataMultiMatchQuery;
-
-			if($searchItem->getXpath())
-				$metadataMultiMatch['bool']['must'][] = self::getXPathQuery($searchItem);
-
-			if($searchItem->getMetadataProfileId())
-				$metadataMultiMatch['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
-
-			if($searchItem->getMetadataFieldId())
-				$metadataMultiMatch['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
+			$partialShouldQueries = $metadataPartialQuery->getShouldQueries();
+			foreach($partialShouldQueries as $partialShouldQuery)
+			{
+				if($partialShouldQuery instanceof kESearchMultiMatchQuery)
+				{
+					$partialShouldQuery->addToFields('metadata.value_int^'.kESearchQueryManager::RAW_FIELD_BOOST_FACTOR);
+					break;
+				}
+			}
 		}
 
-		return $metadataMultiMatch;
+		if($searchItem->getXpath())
+			$metadataPartialQuery->addToFilter(self::getXPathQuery($searchItem));
+
+		if($searchItem->getMetadataProfileId())
+			$metadataPartialQuery->addToFilter(self::getMetadataProfileIdQuery($searchItem));
+
+		if($searchItem->getMetadataFieldId())
+			$metadataPartialQuery->addToFilter(self::getMetadataFieldIdQuery($searchItem));
+
+		return $metadataPartialQuery;
 	}
 
 	/**
@@ -231,19 +234,19 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 
 		if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
-			$metaDataPrefixQuery = $metaDataPrefix;
-			$metaDataPrefix = null;
-
-			$metaDataPrefix['bool']['must'][] = $metaDataPrefixQuery;
+			$metaDataPrefixQuery = new kESearchBoolQuery();
+			$metaDataPrefixQuery->addToMust($metaDataPrefix);
 
 			if($searchItem->getXpath())
-				$metaDataPrefix['bool']['must'][] = self::getXPathQuery($searchItem);
+				$metaDataPrefixQuery->addToFilter(self::getXPathQuery($searchItem));
 
 			if($searchItem->getMetadataProfileId())
-				$metaDataPrefix['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+				$metaDataPrefixQuery->addToFilter(self::getMetadataProfileIdQuery($searchItem));
 
 			if($searchItem->getMetadataFieldId())
-				$metaDataPrefix['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
+				$metaDataPrefixQuery->addToFilter(self::getMetadataFieldIdQuery($searchItem));
+
+			$metaDataPrefix = $metaDataPrefixQuery;
 		}
 
 		return $metaDataPrefix;
@@ -257,20 +260,20 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	 */
 	protected static function getMetadataExistQuery($searchItem, $allowedSearchTypes, &$queryAttributes)
 	{
-		$metadataExist = array();
-
-		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
-		$metadataExist['bool']['should'][] = kESearchQueryManager::getExistsQuery(null, 'metadata.value_int', $allowedSearchTypes, $queryAttributes);
-		$metadataExist['bool']['minimum_should_match'] = 1;
+		$metadataExist = new kESearchBoolQuery();
+		$metadataTextExist = kESearchQueryManager::getExistsQuery(null, 'metadata.value_text', $allowedSearchTypes, $queryAttributes);
+		$metadataExist->addToShould($metadataTextExist);
+		$metadataIntExist = kESearchQueryManager::getExistsQuery(null, 'metadata.value_int', $allowedSearchTypes, $queryAttributes);
+		$metadataExist->addToShould($metadataIntExist);
 
 		if($searchItem->getXpath())
-			$metadataExist['bool']['must'][] = self::getXPathQuery($searchItem);
+			$metadataExist->addToFilter(self::getXPathQuery($searchItem));
 
 		if($searchItem->getMetadataProfileId())
-			$metadataExist['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+			$metadataExist->addToFilter(self::getMetadataProfileIdQuery($searchItem));
 
 		if($searchItem->getMetadataFieldId())
-			$metadataExist['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
+			$metadataExist->addToFilter(self::getMetadataFieldIdQuery($searchItem));
 
 		return $metadataExist;
 	}
@@ -286,19 +289,19 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 
 		if($searchItem->getXpath() || $searchItem->getMetadataProfileId() || $searchItem->getMetadataFieldId())
 		{
-			$metadataRangeQuery = $metadataRange;
-			$metadataRange = null;
-
-			$metadataRange['bool']['must'][] = $metadataRangeQuery;
+			$metadataRangeQuery = new kESearchBoolQuery();
+			$metadataRangeQuery->addToMust($metadataRange);
 
 			if($searchItem->getXpath())
-				$metadataRange['bool']['must'][] = self::getXPathQuery($searchItem);
+				$metadataRangeQuery->addToFilter(self::getXPathQuery($searchItem));
 
 			if($searchItem->getMetadataProfileId())
-				$metadataRange['bool']['must'][] = self::getMetadataProfileIdQuery($searchItem);
+				$metadataRangeQuery->addToFilter(self::getMetadataProfileIdQuery($searchItem));
 
 			if($searchItem->getMetadataFieldId())
-				$metadataRange['bool']['must'][] = self::getMetadataFieldIdQuery($searchItem);
+				$metadataRangeQuery->addToFilter(self::getMetadataFieldIdQuery($searchItem));
+
+			$metadataRange = $metadataRangeQuery;
 		}
 
 		return $metadataRange;
@@ -306,33 +309,24 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 
 	protected static function getXPathQuery($metadataESearchItem)
 	{
-		$xpathQuery = array(
-			'term' => array(
-				'metadata.xpath' => elasticSearchUtils::formatSearchTerm($metadataESearchItem->getXpath())
-			)
-		);
+		$xpath = elasticSearchUtils::formatSearchTerm($metadataESearchItem->getXpath());
+		$xpathQuery = new kESearchTermQuery('metadata.xpath', $xpath);
 
 		return $xpathQuery;
 	}
 
 	protected static function getMetadataProfileIdQuery($metadataESearchItem)
 	{
-		$metadataProfileIdQuery = array(
-			'term' => array(
-				'metadata.metadata_profile_id' => elasticSearchUtils::formatSearchTerm($metadataESearchItem->getMetadataProfileId())
-			)
-		);
+		$profileId = elasticSearchUtils::formatSearchTerm($metadataESearchItem->getMetadataProfileId());
+		$metadataProfileIdQuery = new kESearchTermQuery('metadata.metadata_profile_id', $profileId);
 
 		return $metadataProfileIdQuery;
 	}
 
 	protected static function getMetadataFieldIdQuery($metadataESearchItem)
 	{
-		$metadataFieldIdQuery = array(
-			'term' => array(
-				'metadata.metadata_field_id' => elasticSearchUtils::formatSearchTerm($metadataESearchItem->getMetadataFieldId())
-			)
-		);
+		$fieldId = elasticSearchUtils::formatSearchTerm($metadataESearchItem->getMetadataFieldId());
+		$metadataFieldIdQuery = new kESearchTermQuery('metadata.metadata_field_id', $fieldId);
 
 		return $metadataFieldIdQuery;
 	}
@@ -362,6 +356,11 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 	public function getItemMappingFieldsDelimiter()
 	{
 
+	}
+
+	public function getNestedQueryName()
+	{
+		return ESearchItemDataType::METADATA.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME;
 	}
 
 }

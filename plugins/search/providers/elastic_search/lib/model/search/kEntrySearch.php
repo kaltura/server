@@ -1,27 +1,28 @@
 <?php
 /**
  * @package plugins.elasticSearch
- * @subpackage lib.search
+ * @subpackage model.search
  */
 class kEntrySearch extends kBaseSearch
 {
 
     const PEER_NAME = 'entryPeer';
+    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKsNoFilter';
 
     protected $isInitialized;
     private $entryEntitlementQuery;
     private $parentEntryEntitlementQuery;
-    protected static $entitlementContributors = array(
-        'kElasticEntryDisableEntitlementCondition',
-        'kElasticPublicEntriesEntitlementCondition',
-        'kElasticUserCategoryEntryEntitlementCondition',
-        'kElasticUserEntitlementCondition'
-    );
 
     public function __construct()
     {
         $this->isInitialized = false;
         parent::__construct();
+    }
+
+    protected function handleDisplayInSearch()
+    {
+        if($this->queryAttributes->getShouldUseDisplayInSearch())
+            $this->initDisplayInSearch($this->queryAttributes->getObjectId());
     }
 
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight= true)
@@ -42,7 +43,6 @@ class kEntrySearch extends kBaseSearch
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
         $statuses = $this->initEntryStatuses($statuses);
-        $this->initDisplayInSearch($objectId);
         parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
 
     }
@@ -60,7 +60,8 @@ class kEntrySearch extends kBaseSearch
 
     protected function initEntitlement()
     {
-        foreach (self::$entitlementContributors as $contributor)
+        $contributors = kEntryElasticEntitlement::getEntitlementContributors();
+        foreach ($contributors as $contributor)
         {
             if($contributor::shouldContribute())
             {
@@ -77,45 +78,57 @@ class kEntrySearch extends kBaseSearch
 
         if(kEntryElasticEntitlement::$parentEntitlement)
         {
-            $entitlementQueryPath = &$this->query['body']['query']['bool']['filter'][];
-            //Validate that parent entry property exist
-            $entitlementQueryPath['bool']['should'][0]['bool']['filter'][]['exists']['field'] = 'parent_id';
+            $EntitlementQueryBool = new kESearchBoolQuery();
 
-            //assign by reference to create name alias
-            $this->parentEntryEntitlementQuery = &$entitlementQueryPath['bool']['should'][0]['bool'];
+            //Validate that parent entry property exist
+            $parentQueryBool = new kESearchBoolQuery();
+            $parentExistQuery = new kESearchExistsQuery('parent_id');
+            $parentQueryBool->addToFilter($parentExistQuery);
+            //assign by reference to create alias
+            $this->parentEntryEntitlementQuery = &$parentQueryBool;
+            $EntitlementQueryBool->addToShould($parentQueryBool);
 
             //Validate that parent entry property does not exist
-            $entitlementQueryPath['bool']['should'][1]['bool']['must_not'][]['exists']['field'] = 'parent_id';
-            //assign by reference to create name alias
-            $this->entryEntitlementQuery = &$entitlementQueryPath['bool']['should'][1]['bool'];
-            $entitlementQueryPath['bool']['minimum_should_match'] = 1;
+            $entryQueryBool = new kESearchBoolQuery();
+            $parentNotExistQuery = new kESearchExistsQuery('parent_id');
+            $entryQueryBool->addToMustNot($parentNotExistQuery);
+            //assign by reference to create alias
+            $this->entryEntitlementQuery = &$entryQueryBool;
+            $EntitlementQueryBool->addToShould($entryQueryBool);
+
+            //add to main query filter
+            $this->mainBoolQuery->addToFilter($EntitlementQueryBool);
         }
         else
         {
-            //entry query - assign by reference to create name alias
-            $this->entryEntitlementQuery = &$this->query['body']['query']['bool']['filter'][]['bool'];
+            $EntitlementQueryBool = new kESearchBoolQuery();
+            //assign by reference to create alias
+            $this->entryEntitlementQuery = &$EntitlementQueryBool;
+            //add to main query filter
+            $this->mainBoolQuery->addToFilter($EntitlementQueryBool);
         }
         $this->isInitialized = true;
     }
 
-    function getPeerName()
+    public function getPeerName()
     {
         return self::PEER_NAME;
+    }
+
+    public function getPeerRetrieveFunctionName()
+    {
+        return self::PEER_RETRIEVE_FUNCTION_NAME;
     }
 
     protected function initDisplayInSearch($objectId)
     {
         if($objectId)
             return;
-
-        //add display in search to filter
-        $this->query['body']['query']['bool']['filter'][] = array(
-            'bool' => array(
-                'must_not' => array(
-                    'term' => array('display_in_search' => EntryDisplayInSearchType::SYSTEM)
-                )
-            )
-        );
+    
+        $displayInSearchQuery = new kESearchTermQuery('display_in_search', EntryDisplayInSearchType::SYSTEM);
+        $displayInSearchBoolQuery = new kESearchBoolQuery();
+        $displayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
+        $this->mainBoolQuery->addToFilter($displayInSearchBoolQuery);
     }
 
 }

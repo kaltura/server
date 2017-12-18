@@ -2,7 +2,9 @@
 
 class kKavaLiveReportsMgr extends kKavaBase
 {
-	const MAX_RESULTS = 1000;
+	const MIN_RESULTS = 1000;
+	const MAX_RESULTS = 10000;
+	const MAX_LIVE_ENTRIES = 1000;
 	const PEAK_AUDIENCE_MAX_BUCKETS = 1000;
 	
 	// intermediate metrics
@@ -24,6 +26,11 @@ class kKavaLiveReportsMgr extends kKavaBase
 	const OUTPUT_PLAYS = 'plays';
 	const OUTPUT_REFERRER = 'referrer';
 		
+	protected static function getLimit($limit)
+	{
+		return max(min($limit, self::MAX_RESULTS), self::MIN_RESULTS);
+	}
+	
 	protected static function getLiveEntries($partnerId, $entryIds, $isLive)
 	{
 		$filter = new entryFilter();
@@ -40,7 +47,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		
 		$criteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$criteria->addAscendingOrderByColumn(entryPeer::NAME);		// Note: don't really care about order here, this is a hack to force the query to go to sphinx
-		$criteria->setLimit(self::MAX_RESULTS);
+		$criteria->setLimit(self::MAX_LIVE_ENTRIES);
 		$filter->attachToCriteria($criteria);
 	
 		$criteria->applyFilters();
@@ -56,6 +63,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		
 		$criteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$criteria->add(entryPeer::ID, array_keys($input), Criteria::IN);
+		$criteria->add(entryPeer::TYPE, entryType::LIVE_STREAM);
 		$criteria->addAscendingOrderByColumn(entryPeer::NAME);
 		$criteria->applyFilters();
 		$orderedIds = $criteria->getFetchedIds();
@@ -113,7 +121,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	protected static function getFilterIntervals($filter)
 	{
 		$fromTime = $filter->fromTime;
-		$toTime = max($filter->fromTime + self::VIEW_EVENT_INTERVAL, $filter->toTime);
+		$toTime = $filter->toTime + self::VIEW_EVENT_INTERVAL;
 		return self::getIntervals($fromTime, $toTime);
 	}
 	
@@ -144,7 +152,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		);
 	}
 	
-	protected static function getBaseTopNQuery($partnerId, $filter, $eventTypes, $dimension, $metric)
+	protected static function getBaseTopNQuery($partnerId, $filter, $eventTypes, $dimension, $metric, $threshold)
 	{
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_TOPN,
@@ -153,7 +161,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 			self::DRUID_DIMENSION => $dimension,
 			self::DRUID_METRIC => $metric,
-			self::DRUID_THRESHOLD => self::MAX_RESULTS,
+			self::DRUID_THRESHOLD => $threshold,
 		);
 	}
 
@@ -255,18 +263,18 @@ class kKavaLiveReportsMgr extends kKavaBase
 			self::OUTPUT_PLAYS,
 			self::OUTPUT_AVG_BITRATE, 
 			self::OUTPUT_AUDIENCE, 
-			self::OUTPUT_DVR_AUDIENCE, 
-			self::OUTPUT_BUFFER_TIME);
+			self::OUTPUT_DVR_AUDIENCE);
 		
 		foreach ($fieldNames as $fieldName)
 		{
 			$dest[$fieldName] = $src[$fieldName];
 		}
+		$dest[self::OUTPUT_BUFFER_TIME] = $src[self::OUTPUT_BUFFER_TIME] * 6;	// return in minutes
 		$dest[self::OUTPUT_SEC_VIEWED] = $src[self::METRIC_VIEW_COUNT] * self::VIEW_EVENT_INTERVAL;
 	}
 	
 	// reports
-	public static function partnerTotal($partnerId, $filter)
+	public static function partnerTotal($partnerId, $filter, $limit)
 	{
 		// view events
 		$query = self::getBaseTimeseriesQuery($partnerId, $filter, null);
@@ -279,7 +287,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return array($result);
 	}
 		
-	public static function entryTotal($partnerId, $filter)
+	public static function entryTotal($partnerId, $filter, $limit)
 	{
 		// view events
 		$query = self::getBaseTopNQuery(
@@ -287,7 +295,8 @@ class kKavaLiveReportsMgr extends kKavaBase
 			$filter, 
 			null, 
 			self::DIMENSION_ENTRY_ID, 
-			self::METRIC_VIEW_COUNT);
+			self::METRIC_VIEW_COUNT,
+			self::getLimit($limit));
 		self::addBaseAggregations($query);
 		$queryResult = self::runGranularityAllQuery($query);
 		
@@ -309,7 +318,8 @@ class kKavaLiveReportsMgr extends kKavaBase
 			$filter, 
 			array(self::EVENT_TYPE_VIEW), 
 			self::DIMENSION_ENTRY_ID, 
-			self::METRIC_VIEW_COUNT);
+			self::METRIC_VIEW_COUNT,
+			self::getLimit($limit));
 		$query[self::DRUID_AGGR] = array(
 			self::getViewCountAggregator(),
 			self::getAudienceAggregator(),
@@ -352,15 +362,16 @@ class kKavaLiveReportsMgr extends kKavaBase
 		
 		return $result;
 	}
-
-	public static function entrySyndicationTotal($partnerId, $filter)
+	
+	public static function entrySyndicationTotal($partnerId, $filter, $limit)
 	{
 		$query = self::getBaseTopNQuery(
 			$partnerId, 
 			$filter, 
 			array(self::EVENT_TYPE_PLAY), 
 			self::DIMENSION_URL, 
-			self::OUTPUT_PLAYS);
+			self::OUTPUT_PLAYS,
+			self::getLimit($limit));
 		$query[self::DRUID_AGGR] = array(
 			self::getPlayCountAggregator(),
 		);
@@ -379,7 +390,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	public static function entryTimeline($partnerId, $filter)
+	public static function entryTimeline($partnerId, $filter, $limit)
 	{
 		$query = self::getBaseTimeseriesQuery(
 			$partnerId, 
@@ -407,12 +418,8 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	public static function entryGeoTimeline($partnerId, $filter)
+	public static function entryGeoTimeline($partnerId, $filter, $limit)
 	{
-		// Note: while the report is called 'time line' we use granularity all since
-		//		all requests have fromTime = toTime, and grouping by 'time' seems like 
-		//		too much information to present.
-		
 		$dimensions = array(
 			self::DIMENSION_ENTRY_ID => self::OUTPUT_ENTRY_ID,
 			self::DIMENSION_LOCATION_CITY => self::OUTPUT_CITY_NAME,
@@ -439,7 +446,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		}
 		
 		$query[self::DRUID_LIMIT_SPEC] = self::getDefaultLimitSpec(
-			self::MAX_RESULTS, 
+			self::getLimit($limit), 
 			array(self::getOrderByColumnSpec(
 				$orderByField, 
 				self::DRUID_DESCENDING, 
@@ -448,8 +455,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		
 		self::addBaseAggregations($query);
 		
-		$query[self::DRUID_GRANULARITY] = self::getGranularityAll();
-		$queryResult = self::runQuery($query);
+		$queryResult = self::runGranularityPeriodQuery($query, self::VIEW_EVENT_PERIOD);
 		KalturaLog::log("Druid returned [" . count($queryResult) . "] rows");
 	
 		// format the results

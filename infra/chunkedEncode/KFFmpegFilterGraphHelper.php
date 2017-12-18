@@ -226,7 +226,7 @@ ini_set("memory_limit","512M");
 		/********************
 		 * CompoundString
 		 */
-		public function CompoundString()
+		public function CompoundString(&$lastLabelOut)
 		{
 			$str = null;
 			$chainArr = array();
@@ -257,8 +257,11 @@ ini_set("memory_limit","512M");
 						$filterStr.= "=".implode($filter->delim,$fieldArr);
 					
 					if(isset($filter->labelOut)){
-						$filterStr.="[$filter->labelOut]";
+						$lastLabelOut ="[$filter->labelOut]";
+						$filterStr.= $lastLabelOut;
 					}
+					else
+						$lastLabelOut = "";
 					$filterArr[] = $filterStr;
 				}
 				$chainStr.= implode(',',$filterArr);

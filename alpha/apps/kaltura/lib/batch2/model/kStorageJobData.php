@@ -47,6 +47,11 @@ class kStorageJobData extends kJobData
 
 	/**
 	 * @var string
+	 */
+	private $srcFileEncryptionKey;
+
+	/**
+	 * @var string
 	 */   
 	private $srcFileSyncId;
 	
@@ -96,6 +101,14 @@ class kStorageJobData extends kJobData
 	}
 
 	/**
+	 * @return string $srcFileSyncLocalPath
+	 */
+	public function getSrcFileEncryptionKey()
+	{
+		return $this->srcFileEncryptionKey;
+	}
+
+	/**
 	 * @return the $srcFileSyncId
 	 */
 	public function getSrcFileSyncId()
@@ -141,6 +154,14 @@ class kStorageJobData extends kJobData
 	public function setSrcFileSyncLocalPath($srcFileSyncLocalPath)
 	{
 		$this->srcFileSyncLocalPath = $srcFileSyncLocalPath;
+	}
+
+	/**
+	 * @param string $srcFileEncryptionKey to set
+	 */
+	public function setSrcFileEncryptionKey($srcFileEncryptionKey)
+	{
+		$this->srcFileEncryptionKey = $srcFileEncryptionKey;
 	}
 
 	/**

@@ -62,7 +62,7 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 
 	private function translateName($name)
 	{
-		$nameArray = array('provider_sign_key' => 'providerSignKey');
+		$nameArray = array('provider_sign_key' => 'providerSignKey', 'key_pem' => 'keyPem');
 		if (isset($nameArray[$name]))
 			return $nameArray[$name];
 		return $name;

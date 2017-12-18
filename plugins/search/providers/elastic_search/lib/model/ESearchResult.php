@@ -17,7 +17,7 @@ class ESearchResult extends BaseObject
 	protected $itemsData;
 
 	/**
-	 * @var string
+	 * @var array
 	 */
 	protected $highlight;
 
@@ -54,7 +54,7 @@ class ESearchResult extends BaseObject
 	}
 
 	/**
-	 * @param string
+	 * @param array
 	 */
 	public function setHighlight($highlight)
 	{
@@ -62,7 +62,7 @@ class ESearchResult extends BaseObject
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function getHighlight()
 	{

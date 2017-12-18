@@ -98,7 +98,7 @@ class ESearchUserItem extends ESearchItem
 				$userQuery[] = kESearchQueryManager::getExactMatchQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$userQuery[] = kESearchQueryManager::getMultiMatchQuery($userSearchItem, $userSearchItem->getFieldName(), $queryAttributes);
+				$userQuery[] = kESearchQueryManager::getPartialQuery($userSearchItem, $userSearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$userQuery[] = kESearchQueryManager::getPrefixQuery($userSearchItem, $userSearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);

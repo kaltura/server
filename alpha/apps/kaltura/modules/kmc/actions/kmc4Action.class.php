@@ -6,6 +6,8 @@
 class kmc4Action extends kalturaAction
 {
 	const CURRENT_KMC_VERSION = 4;
+    const HTML5_STUDIO_TAG = 'HTML5Studio';
+    const STUDIO_V3_TAG = 'HTML5StudioV3';
 	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
 	const LIVE_DASHBOARD_UICONF_TAG = 'lived_player';
 	
@@ -76,6 +78,7 @@ class kmc4Action extends kalturaAction
 		$useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
 		$showFlashStudio = PermissionPeer::isValidForPartner(PermissionName::FEATURE_SHOW_FLASH_STUDIO, $this->partner_id);
 		$showHTMLStudio = PermissionPeer::isValidForPartner(PermissionName::FEATURE_SHOW_HTML_STUDIO, $this->partner_id);
+		$showStudioV3 = PermissionPeer::isValidForPartner(PermissionName::FEATURE_V3_STUDIO_PERMISSION, $this->partner_id);
 		$deliveryTypes = $partner->getDeliveryTypes();
 		$embedCodeTypes = $partner->getEmbedCodeTypes();
 		$defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
@@ -155,15 +158,19 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
 		
-		$this->studioUiConf = kmcUtils::getStudioUiconf(kConf::get("studio_version"));
+		$this->studioUiConf = kmcUtils::getUiconfByTagAndVersion(self::HTML5_STUDIO_TAG, kConf::get("studio_version"));
 		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
 		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
-		
-		$this->liveAUiConf = kmcUtils::getLiveUiconfByTag(self::LIVE_ANALYTICS_UICONF_TAG);
+
+		$this->studioV3UiConf = kmcUtils::getUiconfByTagAndVersion(self::STUDIO_V3_TAG, kConf::get("studio_v3_version"));
+		$this->content_uiconfs_studio_v3 = isset($this->studioV3UiConf) ? array_values($this->studioV3UiConf) : null;
+		$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;
+
+		$this->liveAUiConf = kmcUtils::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->content_uiconf_livea = (is_array($this->content_uiconfs_livea) && reset($this->content_uiconfs_livea)) ? reset($this->content_uiconfs_livea) : null;
 		
-		$this->liveDUiConf = kmcUtils::getLiveUiconfByTag(self::LIVE_DASHBOARD_UICONF_TAG);
+		$this->liveDUiConf = kmcUtils::getUiconfByTagAndVersion(self::LIVE_DASHBOARD_UICONF_TAG, kConf::get("live_dashboard_version"));
 		$this->content_uiconfs_lived = isset($this->liveDUiConf) ? array_values($this->liveDUiConf) : null;
 		$this->content_uiconf_lived = (is_array($this->content_uiconfs_lived) && reset($this->content_uiconfs_lived)) ? reset($this->content_uiconfs_lived) : null;
 
@@ -213,6 +220,17 @@ class kmc4Action extends kalturaAction
                 'config'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getConfig() : '',
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
+                'showStudioV3'		    => $showStudioV3,
+                'html5_version'		    => kConf::get("html5_version")
+            ),
+            'studioV3'					=> array(
+                'version'				=> kConf::get("studio_v3_version"),
+                'uiConfID'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getId() : '',
+                'config'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getConfig() : '',
+                'showFlashStudio'		=> $showFlashStudio,
+                'showHTMLStudio'		=> $showHTMLStudio,
+                'showStudioV3'		    => $showStudioV3,
+                'html5_version'		    => kConf::get("html5_version")
             ),
 			'liveanalytics'					=> array(
                 'version'				=> kConf::get("liveanalytics_version"),

@@ -22,15 +22,15 @@ class kESearchCoreAdapter
 	const HIGHLIGHT_KEY = 'highlight';
 
 	private static $innerHitsObjectType = array(
-		'caption_assets.lines' => ESearchItemDataType::CAPTION,
+		'caption' => ESearchItemDataType::CAPTION,
 		'metadata' => ESearchItemDataType::METADATA,
 		'cue_points' => ESearchItemDataType::CUE_POINTS
 	);
 
-	public static function transformElasticToCoreObject($elasticResults, $peerName)
+	public static function transformElasticToCoreObject($elasticResults, $peerName, $peerRetrieveFunctionName)
 	{
 		list($objectData, $objectOrder, $objectCount, $objectHighlight) = self::getElasticResultAsArray($elasticResults);
-		$objects = $peerName::retrieveByPKsNoFilter(array_keys($objectData));
+		$objects = $peerName::$peerRetrieveFunctionName(array_keys($objectData));
 		$coreResults = self::getCoreESearchResults($objects, $objectData, $objectOrder, $objectHighlight);
 		return array($coreResults, $objectCount);
 	}
@@ -50,7 +50,7 @@ class kESearchCoreAdapter
 			$objectData[$elasticObject[self::ID_KEY]] = $itemData;
 			$objectOrder[$elasticObject[self::ID_KEY]] = $key;
 			if(array_key_exists(self::HIGHLIGHT_KEY, $elasticObject))
-				$objectHighlight[$elasticObject[self::ID_KEY]] = self::pruneHighlight($elasticObject[self::HIGHLIGHT_KEY]);
+				$objectHighlight[$elasticObject[self::ID_KEY]] = self::elasticHighlightToCoreHighlight($elasticObject[self::HIGHLIGHT_KEY]);
 		}
 		
 		if(isset($elasticResults[self::HITS_KEY][self::TOTAL_KEY]))
@@ -89,19 +89,23 @@ class kESearchCoreAdapter
 	{
 		foreach ($elasticObject[self::INNER_HITS_KEY] as $innerHitsKey => $hits)
 		{
-			$objectType = self::getInnerHitsObjectType($innerHitsKey);
-			$itemData[$objectType] = array();
-			$itemData[$objectType][self::TOTAL_COUNT_KEY] = self::getInnerHitsTotalCountForObject($hits, $objectType);
+			list($objectType, $objectSubType) = self::getInnerHitsObjectType($innerHitsKey);
+			$itemsType = $objectType;
+			if($objectSubType)
+				$itemsType = "$itemsType::$objectSubType";
+
+			$itemData[$itemsType] = array();
+			$itemData[$itemsType][self::TOTAL_COUNT_KEY] = self::getInnerHitsTotalCountForObject($hits, $objectType);
 			foreach ($hits[self::HITS_KEY][self::HITS_KEY] as $itemResult)
 			{
 				$currItemData = KalturaPluginManager::loadObject('ESearchItemData', $objectType);
 				if ($currItemData)
 				{
 					if(array_key_exists(self::HIGHLIGHT_KEY, $itemResult))
-						$itemResult[self::HIGHLIGHT_KEY] = self::pruneHighlight($itemResult[self::HIGHLIGHT_KEY]);
+						$itemResult[self::HIGHLIGHT_KEY] = self::elasticHighlightToCoreHighlight($itemResult[self::HIGHLIGHT_KEY]);
 
 					$currItemData->loadFromElasticHits($itemResult);
-					$itemData[$objectType][self::ITEMS_KEY][] = $currItemData;
+					$itemData[$itemsType][self::ITEMS_KEY][] = $currItemData;
 				}
 			}
 		}
@@ -109,11 +113,15 @@ class kESearchCoreAdapter
 
 	private static function getInnerHitsObjectType($innerHitsKey)
 	{
-		if(isset(self::$innerHitsObjectType[$innerHitsKey]))
-			return self::$innerHitsObjectType[$innerHitsKey];
+		$queryNames = explode(ESearchNestedObjectItem::QUERY_NAME_DELIMITER, $innerHitsKey);
+		$objectType = $queryNames[0];
+		$objectSubType = ($queryNames[1] != ESearchNestedObjectItem::DEFAULT_GROUP_NAME) ? $queryNames[1] : null;
+
+		if(isset(self::$innerHitsObjectType[$objectType]))
+			return array(self::$innerHitsObjectType[$objectType], $objectSubType);
 
 		KalturaLog::err('Unsupported inner object key in elastic results['.$innerHitsKey.']');
-		return $innerHitsKey;
+		return array($objectType, $objectSubType);
 	}
 
 	private static function getItemsDataResult($objectType, $values)
@@ -145,12 +153,20 @@ class kESearchCoreAdapter
 		}
 	}
 
-	private static function pruneHighlight($highlight)
+	private static function elasticHighlightToCoreHighlight($eHighlight)
 	{
-		if(isset($highlight))
+		if(isset($eHighlight))
 		{
-			$keys = array_keys($highlight);
-			return $highlight[$keys[0]][0];
+			$result = array();
+			foreach ($eHighlight as $key => $value)
+			{
+				$resultType = new ESearchHighlight();
+				$resultType->setFieldName($key);
+				$resultType->setHits($value);
+				$result[] = $resultType;
+			}
+
+			return $result;
 		}
 
 		return null;

@@ -71,7 +71,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		$res = $this->provisionStream($data);
 		if (!$res)
 		{
-			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: no result received for connection"); 
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: no result received for connection");
 		}
 		
 		KalturaLog::info ("Request to provision stream returned result: $res");
@@ -82,7 +82,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		{
 			//There is always only 1 error listed in the XML
 			$error = $errors[0];
-			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: ". strval($error[0]));
+			return new KProvisionEngineResult(KalturaBatchJobStatus::RETRY, "Error: ". strval($error[0]));
 		}
 		//Otherwise, the stream provision request probably returned OK, attempt to parse it as a new stream XML
 		try {
@@ -93,7 +93,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: ". $e->getMessage());
 		}
 
-		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Succesfully provisioned entry', $data);
+		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Successfully provisioned entry', $data);
 		
 	}
 	
@@ -226,9 +226,9 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	 */
 	public function checkProvisionedStream(KalturaBatchJob $job, KalturaProvisionJobData $data) 
 	{
-		KalturaLog::info("Retrieving stream with ID [". $data->streamID ."]" );
-		
 		$url = self::$baseServiceUrl . "/{$this->domainName}/stream/".$data->streamID;
+		KalturaLog::info("Retrieving stream with ID [". $data->streamID ."] from URL [$url]" );
+		
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION , true);
@@ -241,10 +241,8 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		}
 		
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if($httpCode<=200 && $httpCode>300)
-		{
-			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: retrieval failed");
-		}
+		 if (KCurlHeaderResponse::isError($httpCode))
+			return new KProvisionEngineResult(KalturaBatchJobStatus::RETRY, "Error: retrieval failed , retrying. HTTP Error code:".$httpCode);
 		
 		KalturaLog::info("Result received: $result");
 		$resultXML = new SimpleXMLElement($result);

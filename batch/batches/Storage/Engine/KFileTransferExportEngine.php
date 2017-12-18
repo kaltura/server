@@ -6,6 +6,8 @@ class KFileTransferExportEngine extends KExportEngine
 	protected $destFile;
 	
 	protected $protocol;
+
+	protected $encryptionKey;
 	
 	/* (non-PHPdoc)
 	 * @see KExportEngine::init()
@@ -16,6 +18,7 @@ class KFileTransferExportEngine extends KExportEngine
 		$this->protocol = $jobSubType;
 		$this->srcFile = str_replace('//', '/', trim($this->data->srcFileSyncLocalPath));
 		$this->destFile = str_replace('//', '/', trim($this->data->destFileSyncStoredPath));
+		$this->encryptionKey = $this->data->srcFileEncryptionKey;
 	}
 	
 	/* (non-PHPdoc)
@@ -65,7 +68,14 @@ class KFileTransferExportEngine extends KExportEngine
 		{
 			if (is_file($this->srcFile))
 			{
-				$engine->putFile($this->destFile, $this->srcFile, $this->data->force);
+				if (!$this->encryptionKey)
+					$engine->putFile($this->destFile, $this->srcFile, $this->data->force);
+				else
+				{
+					$tempPath = KBatchBase::createTempClearFile($this->srcFile, $this->encryptionKey);
+					$engine->putFile($this->destFile, $tempPath, $this->data->force);
+					unlink($tempPath);
+				}
 				if(KBatchBase::$taskConfig->params->chmod)
 				{
 					try {

@@ -5,7 +5,6 @@
  */ 
 interface ESearchCuePointFieldName extends BaseEnum
 {
-	const CUE_POINT_TYPE = 'cue_points.cue_point_type';
 	const CUE_POINT_ID = 'cue_points.cue_point_id';
 	const CUE_POINT_NAME = 'cue_points.cue_point_name';
 	const CUE_POINT_TEXT = 'cue_points.cue_point_text';

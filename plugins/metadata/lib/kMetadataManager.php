@@ -690,9 +690,7 @@ class kMetadataManager
 			$job->save();
 			$key = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG);
 			kFileSyncUtils::file_put_contents($key, $xsl);
-			
-			$xslPath = kFileSyncUtils::getLocalFilePathForKey($key);
-			$data->setSrcXslPath($xslPath);
+			$data->setSrcXsl(kJobsManager::getFileContainer($key));
 		}
 		
 		$data->setMetadataProfileId($metadataProfileId);

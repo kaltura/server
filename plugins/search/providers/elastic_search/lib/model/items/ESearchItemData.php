@@ -10,12 +10,12 @@ abstract class ESearchItemData extends BaseObject
 	abstract public function loadFromElasticHits($objectResult);
 
 	/**
-	 * @var string
+	 * @var array
 	 */
 	protected $highlight;
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function getHighlight()
 	{

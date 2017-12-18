@@ -8,12 +8,13 @@ class embedPlaykitJsAction extends sfAction
 {
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
+	const VERSIONS_PARAM_NAME = "versions";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const CONFIG_PARAM_NAME = "config";	
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
-	
+
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
 	private $eTagHash = null;
@@ -102,9 +103,7 @@ class embedPlaykitJsAction extends sfAction
 	private function formatBundleContent($bundleContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $this->appendUiConfToContent($bundleContentParts[1]);
-		$bundleContent = $this->appendEnvConfigToContent($bundleContent);
-		
+		$bundleContent = $this->appendConfig($bundleContentParts[1]);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 		
@@ -126,29 +125,25 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
-	private function appendUiConfToContent($content)
+	private function appendConfig($content)
 	{
-		$config = array();
-		$config["config"] = $this->playerConfig;
-		$config = json_encode($config);	
-
-		if ($config === false)
-		{
-			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
-		}
-
-		$kalturaPlayerConfig = "
-		(function(){(KalturaPlayer.UiConf = KalturaPlayer.UiConf || {}) [\"" . $this->uiconfId . "\"] = $config;
-		})();";
-
-		$content .= $kalturaPlayerConfig;
-
-		return $content;
+	    $uiConf = $this->playerConfig;
+	    $uiConf["env"] = $this->getEnvConfig();
+	    $uiConfJson = json_encode($uiConf);
+	    if ($uiConfJson === false)
+	    {
+	        KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
+	    }
+	    $confNS = "window.__kalturaplayerdata";
+	    $content .= "
+	    $confNS = ($confNS || {});
+	    $confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
+	    ";
+	    return $content;
 	}
 
-	private function appendEnvConfigToContent($content)
+	private function getEnvConfig()
 	{
-
 		$protocol = infraRequestUtils::getProtocol();
 
 		// The default Kaltura service url:
@@ -156,34 +151,23 @@ class embedPlaykitJsAction extends sfAction
 		// Default Kaltura CDN url:
 		$cdnUrl = requestUtils::getCdnHost($protocol);
 		// Default Stats URL
-		$statsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"stats_host_https") : $this->buildUrl($protocol,"stats_host");
+		$statsServiceUrl = $this->buildUrl($protocol,"stats_host");
 		// Default Live Stats URL
-		$liveStatsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"live_stats_host_https") : $this->buildUrl($protocol,"live_stats_host");
+		$liveStatsServiceUrl = $this->buildUrl($protocol,"live_stats_host");
 		// Default Kaltura Analytics URL
-		$analyticsServiceUrl = ($protocol == "https") ? $this->buildUrl($protocol,"analytics_host_https") : $this->buildUrl($protocol,"analytics_host");
+		$analyticsServiceUrl = $this->buildUrl($protocol,"analytics_host");
 		// Get Kaltura Supported API Features
 		$apiFeatures = $this->getFromConfig('features');
 
 		$envConfig = array(
-			"ServiceUrl" => $serviceUrl,
-			"CDNUrl" => $cdnUrl,
-			"StatsServiceUrl" => $statsServiceUrl,
-			"LiveStatsServiceUrl" => $liveStatsServiceUrl,
-			"AnalyticsServiceUrl" => $analyticsServiceUrl,
-			"ApiFeatures" => $apiFeatures
+			"serviceUrl" => $serviceUrl,
+			"cdnUrl" => $cdnUrl,
+			"statsServiceUrl" => $statsServiceUrl,
+			"liveStatsServiceUrl" => $liveStatsServiceUrl,
+			"analyticsServiceUrl" => $analyticsServiceUrl,
+			"apiFeatures" => $apiFeatures
 		);
-
-		$envConfig = json_encode($envConfig);	
-		
-		if ($envConfig !== false)
-		{
-			$kalturaPlayerEnvConfig = "
-			(function(){KalturaPlayer.EnvConfig = $envConfig;
-			})();";
-			return $content . $kalturaPlayerEnvConfig;
-		}
-
-		return $content;
+		return $envConfig;
 	}
 
 	private function getFromConfig($key)
@@ -196,6 +180,10 @@ class embedPlaykitJsAction extends sfAction
 
 	private function buildUrl($protocol, $key)
 	{
+	    if ($protocol == "https")
+	    {
+	        $key .= "_https";
+	    }
 		$configValue = $this->getFromConfig($key);
 		$port = (($_SERVER['SERVER_PORT']) != '80' && $_SERVER['SERVER_PORT'] != '443')?':'.$_SERVER['SERVER_PORT']:'';
 		if( $key && $configValue)
@@ -320,30 +308,60 @@ class embedPlaykitJsAction extends sfAction
                     </html >';
 		return $htmlDoc;
 	}
-	
-	private function setLatestOrBetaVersionNumber($confVars)
+
+	private function toAssociativeArray($input)
 	{
-		//if latest/beta version required set version number in config obj
-		$isLatestVersionRequired = strpos($confVars, "{latest}") !== false;
-		$isBetaVersionRequired = strpos($confVars, "{beta}") !== false;
-		
-		if ($isLatestVersionRequired || $isBetaVersionRequired) {
-			$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
-			$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
-			
-			$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
-			$betatVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
-			
-			foreach ($this->bundleConfig as $key => $val) 
-			{
-				if ($val == "{latest}" && $latestVersionMap != null) 
+		$configs = explode(",", $input);
+		$arr = array();
+		foreach($configs as $conf)
+		{
+			$obj = explode("=", $conf);
+			$key = $obj[0];
+			$value = $obj[1];
+			$arr[$key] = $value;
+		}
+		return $arr;
+	}
+
+	private function mergeVersionsParamIntoConfig()
+	{
+		//Get version from QS
+		$versions = $this->getRequestParameter(self::VERSIONS_PARAM_NAME);
+		if ($versions) {
+			$pattern = '/[^?&,]+=[^?&,]+(?>,[^,?&]+=[^,?&]+)*/'; // key value object
+			$success = preg_match($pattern, $versions, $matches);
+			if ($success && strlen($matches[0]) === strlen($versions)) { // the whole versions string matches the pattern
+				$versionsArr = $this->toAssociativeArray($versions);
+				$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
+			}
+		}
+	}
+	
+	private function setLatestOrBetaVersionNumber()
+	{
+		if ($this->bundleConfig) {
+			//if latest/beta version required set version number in config obj
+			$isLatestVersionRequired = array_search("{latest}", $this->bundleConfig) !== false;
+			$isBetaVersionRequired = array_search("{beta}", $this->bundleConfig) !== false;
+
+			if ($isLatestVersionRequired || $isBetaVersionRequired) {
+				$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
+				$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
+
+				$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
+				$betaVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
+
+				foreach ($this->bundleConfig as $key => $val)
 				{
-					$this->bundleConfig[$key] = $latestVersionMap[$key];
-				}
-				
-				if ($val == "{beta}" && $betatVersionMap != null) 
-				{
-					$this->bundleConfig[$key] = $betatVersionMap[$key];
+					if ($val == "{latest}" && $latestVersionMap != null)
+					{
+						$this->bundleConfig[$key] = $latestVersionMap[$key];
+					}
+
+					if ($val == "{beta}" && $betaVersionMap != null)
+					{
+						$this->bundleConfig[$key] = $betaVersionMap[$key];
+					}
 				}
 			}
 		}
@@ -409,7 +427,8 @@ class embedPlaykitJsAction extends sfAction
 		}
 		
 		$this->bundleConfig = json_decode($confVars, true);
-		$this->setLatestOrBetaVersionNumber($confVars);
+		$this->mergeVersionsParamIntoConfig();
+		$this->setLatestOrBetaVersionNumber();
 		
 		$this->setBundleName();
 	}

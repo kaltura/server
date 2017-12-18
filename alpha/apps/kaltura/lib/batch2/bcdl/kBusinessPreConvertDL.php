@@ -314,14 +314,15 @@ class kBusinessPreConvertDL
 			if($srcAsset->getType() == assetType::FLAVOR)
 			{
 				/* @var $srcAsset flavorAsset */
-				$dar = null;
+				$params = array();
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
-				if($mediaInfo)
-					$dar = $mediaInfo->getVideoDar();
-
+				if($mediaInfo){
+					$params['dar'] = $mediaInfo->getVideoDar();
+					$params['scanType'] = $mediaInfo->getScanType();
+				}
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
-				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), null, null, $dar);
+				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), $params);
 				if(!$created || !file_exists($destPath))
 				{
 					$errDescription = "Thumbnail not captured";
@@ -1110,10 +1111,9 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
-
+		
 		$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS;
-		return kJobsManager::addPostConvertJob($convertProfileJob, $postConvertAssetType, $srcFileSyncLocalPath, $originalFlavorAsset->getId(), null, true, $offset);
+		return kJobsManager::addPostConvertJob($convertProfileJob, $postConvertAssetType, $srcSyncKey, $originalFlavorAsset->getId(), null, true, $offset);
 	}
 
 	/**

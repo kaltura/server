@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.elasticSearch
- * @subpackage lib.search
+ * @subpackage model.search
  */
 
 abstract class kBaseSearch
@@ -12,21 +12,31 @@ abstract class kBaseSearch
     protected $elasticClient;
     protected $query;
     protected $queryAttributes;
+	protected $mainBoolQuery;
 
     public function __construct()
     {
         $this->elasticClient = new elasticClient();
         $this->queryAttributes = new ESearchQueryAttributes();
+		$this->mainBoolQuery = new kESearchBoolQuery();
     }
 
     public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true);
 
     public abstract function getPeerName();
 
+	public abstract function getPeerRetrieveFunctionName();
+
+	protected function handleDisplayInSearch()
+	{
+	}
+
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
         $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
-        $this->applyElasticSearchConditions($subQuery);
+        $this->handleDisplayInSearch();
+        $this->mainBoolQuery->addToMust($subQuery);
+        $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
         KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
         $result = $this->elasticClient->search($this->query);
@@ -87,15 +97,14 @@ abstract class kBaseSearch
             $partnerStatus[] = elasticSearchUtils::formatPartnerStatus($partnerId, $status);
         }
 
-		$this->query['body']['query']['bool']['filter'][] = array(
-			'terms' => array('partner_status' => $partnerStatus)
-		);
-
+		$partnerStatusQuery = new kESearchTermsQuery('partner_status', $partnerStatus);
+		$this->mainBoolQuery->addToFilter($partnerStatusQuery);
+		
         if($objectId)
         {
-            $this->query['body']['query']['bool']['filter'][] = array(
-                'term' => array('_id' => elasticSearchUtils::formatSearchTerm($objectId))
-            );
+			$id = elasticSearchUtils::formatSearchTerm($objectId);
+			$idQuery = new kESearchTermQuery('_id', $id);
+			$this->mainBoolQuery->addToFilter($idQuery);
         }
 
         //return only the object id
@@ -131,15 +140,17 @@ abstract class kBaseSearch
 		return $highlight;
 	}
 
-    protected function applyElasticSearchConditions($conditions)
+    protected function applyElasticSearchConditions()
     {
-        $this->query['body']['query']['bool']['must'] = array($conditions);
+        $this->query['body']['query'] = $this->mainBoolQuery->getFinalQuery();
     }
 
     protected function initQueryAttributes($partnerId, $objectId, $useHighlight)
     {
         $this->initPartnerLanguages($partnerId);
         $this->queryAttributes->setUseHighlight($useHighlight);
+        $this->queryAttributes->setObjectId($objectId);
+        $this->queryAttributes->setShouldUseDisplayInSearch(true);
         $this->initOverrideInnerHits($objectId);
     }
 

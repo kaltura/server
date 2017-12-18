@@ -68,6 +68,11 @@ class ESearchEntryItem extends ESearchItem
 		ESearchEntryFieldName::ENTRY_DESCRIPTION,
 	);
 
+	private static $ignoreDisplayInSearchFields = array(
+		ESearchEntryFieldName::ENTRY_PARENT_ENTRY_ID,
+		ESearchEntryFieldName::ENTRY_ID,
+	);
+
 	/**
 	 * @return ESearchEntryFieldName
 	 */
@@ -134,7 +139,7 @@ class ESearchEntryItem extends ESearchItem
 				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$entryQuery[] = kESearchQueryManager::getMultiMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $queryAttributes);
+				$entryQuery[] = kESearchQueryManager::getPartialQuery($entrySearchItem, $entrySearchItem->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
 				$entryQuery[] = kESearchQueryManager::getPrefixQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
@@ -148,6 +153,8 @@ class ESearchEntryItem extends ESearchItem
 			default:
 				KalturaLog::log("Undefined item type[".$entrySearchItem->getItemType()."]");
 		}
+		if (in_array($entrySearchItem->getFieldName(), self::$ignoreDisplayInSearchFields))
+			$queryAttributes->setShouldUseDisplayInSearch(false);
 	}
 
 	public function shouldAddLanguageSearch()

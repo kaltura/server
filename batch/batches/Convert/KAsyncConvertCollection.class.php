@@ -117,13 +117,11 @@ class KAsyncConvertCollection extends KAsyncConvert
 		$log = null;
 		try
 		{
-			$actualFileSyncLocalPath = null;
-			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
-			if($srcFileSyncDescriptor)
-				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
+				
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
-			$this->operationEngine->operate($operator, $actualFileSyncLocalPath, $data->destFileSyncLocalPath);
+			$this->operate($operator, $actualFileSyncLocalPath, $data->destFileSyncLocalPath, $key);
 		}
 		catch(KOperationEngineException $e)
 		{
