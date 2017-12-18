@@ -65,8 +65,6 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 					$innerNestedQuery = self::createSingleNestedQuery($innerHitsSize, $queryAttributes, $boolOperator, $allowedSearchTypes, $eSearchItem);
 					$innerNestedQuery->setInnerHitsName($nestedQueryName);
 					$queryAttributes->setObjectSubType(null);
-//					if(isset($highlight))
-//						$bool->setHighlight($highlight);
 					$bool->addToShould($innerNestedQuery);
 				}
 				$nestedQuery = $bool;
