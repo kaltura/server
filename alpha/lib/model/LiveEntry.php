@@ -454,7 +454,8 @@ abstract class LiveEntry extends entry
 		$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
 		$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
 		$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+		$isMediaServerPartner = (kCurrentContext::$ks_partner_id == Partner::MEDIA_SERVER_PARTNER_ID);
+		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview && !$isMediaServerPartner)
 			return false;
 		return true;
 	}

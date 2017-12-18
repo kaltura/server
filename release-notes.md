@@ -12,8 +12,20 @@
 	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
 	
 	   Run deployment script:
-		1. remove existing notification template with system name EXPLICIT_LIVE_PUSH_NOTIFICATIONS if it exists	   
+		1. remove existing notification template, through admin console, with system name EXPLICIT_LIVE_PUSH_NOTIFICATIONS if it exists	   
 		2. php /opt/kaltura/app/deployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+## Webcast - allow webcast producer to update cuepoint status  ##
+- Issue Type: Feature
+- Issue ID: PLAT-8409
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_12_14_allow_webcast_producer_to_change_cue_point_status.php
 	
 #### Known Issues & Limitations ####
 
