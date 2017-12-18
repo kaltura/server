@@ -120,7 +120,10 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointBoolQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$cuePointSearchItem->validateItemInput();
-
+		if ($queryAttributes->getObjectSubType())
+		{
+			$queryAttributes->setObjectSubType(constant("ThumbCuePointSubType::".$queryAttributes->getObjectSubType()));
+		}
 		switch ($cuePointSearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
@@ -173,7 +176,7 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 			{
 				$refClass = new ReflectionClass('KalturaThumbCuePointSubType');
 				$subTypes = $refClass->getConstants();
-				foreach ($subTypes as $subType)
+				foreach (array_keys($subTypes) as $subType)
 					$queryNames[] = $queryName . self::SUBTYPE_DELIMITER . $subType;
 			} else
 				$queryNames[] = $queryName;
