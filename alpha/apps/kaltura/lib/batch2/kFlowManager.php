@@ -501,7 +501,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 						if (kFileSyncUtils::fileSync_exists($syncKey))
 						{
-							$fileSync = reset(kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false));
+							list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $fileSync);
 						}
 					}

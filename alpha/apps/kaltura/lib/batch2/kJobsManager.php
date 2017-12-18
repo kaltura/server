@@ -1216,7 +1216,7 @@ class kJobsManager
 	 * @param FileSync $fileSync
 	 * @return BatchJob
 	 */
-	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $fileSync)
+	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $fileSync = null)
 	{
 		if (!self::shouldExeConvertJob($fileSync))
 		{
