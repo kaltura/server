@@ -188,9 +188,9 @@ class kBusinessPostConvertDL
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			$c = new Criteria();
-			$siblingJobsTypes = array(BatchJobType::CONVERT, BatchJobType::CONVERT_COLLECTION, BatchJobType::POSTCONVERT);
-			$c->addAnd($c->getNewCriterion(BatchJobPeer::JOB_TYPE, $siblingJobsTypes, Criteria::IN));
-			$siblingJobs = $rootBatchJob->getOpenStatusChildJobs();
+			$jobsTypes = array(BatchJobType::CONVERT, BatchJobType::CONVERT_COLLECTION, BatchJobType::POSTCONVERT);
+			$c->addAnd($c->getNewCriterion(BatchJobPeer::JOB_TYPE, $jobsTypes, Criteria::IN));
+			$siblingJobs = $rootBatchJob->getOpenStatusChildJobs($c);
 			if($siblingJobs)
 			{
 				KalturaLog::info("job ids [" . $siblingJobs[0]->getId() . "] status [" . $siblingJobs[0]->getStatus() . "]");
