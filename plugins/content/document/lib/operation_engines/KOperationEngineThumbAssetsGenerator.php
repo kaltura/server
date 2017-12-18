@@ -77,11 +77,24 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			KBatchBase::$kClient->thumbAsset->add( $cpEntryId, $thumbAsset) ;
 			$index++;
 
-			$resource = new KalturaServerFileResource();
-			$resource->localFilePath = $this->realInFilePath . DIRECTORY_SEPARATOR . $image;
+			$path = $this->realInFilePath . DIRECTORY_SEPARATOR . $image;
+			$resource = $this->getServerFileResource($path, $this->encryptionKey);
 			KBatchBase::$kClient->thumbAsset->setContent("{" . $index . ":result:id}", $resource);
 			$index++;
 		}
 		KBatchBase::$kClient->doMultiRequest();
+	}
+
+	private static function getServerFileResource($path, $key)
+	{
+		$resource = new KalturaServerFileResource();
+		if (!$key)
+			$resource->localFilePath = $path;
+		else
+		{
+			$resource->localFilePath = KBatchBase::createTempClearFile($path, $key);;
+			$resource->keepOriginalFile = false;
+		}
+		return $resource;
 	}
 }
