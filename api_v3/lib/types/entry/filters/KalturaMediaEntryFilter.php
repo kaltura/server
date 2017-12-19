@@ -52,5 +52,5 @@ class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 	/**
 	 * @var string
 	 */
-	public sequenceEntryIdsIn;
+	public $sequenceEntryIdsIn;
 }

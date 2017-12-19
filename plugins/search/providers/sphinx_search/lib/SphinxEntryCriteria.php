@@ -260,7 +260,8 @@ class SphinxEntryCriteria extends SphinxCriteria
 
 		if($filter->is_set('_in_sequence_entry_ids'))
 		{
-			$sequenceEntryIds = explode(",",$filter->get('_in_sequence_entry_ids'));
+			$sequenceEntryIds = preg_replace('/\s+/', '', $filter->get('_in_sequence_entry_ids'));
+			$sequenceEntryIds = explode(",", $sequenceEntryIds);
 			$stringEntryIds = "";
 			for ($i=0; $i< count($sequenceEntryIds); $i++ )
 			{
