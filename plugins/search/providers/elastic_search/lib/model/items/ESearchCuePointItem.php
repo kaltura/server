@@ -122,8 +122,12 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		$cuePointSearchItem->validateItemInput();
 		if ($queryAttributes->getObjectSubType())
 		{
-			$queryAttributes->setObjectSubType(constant("ThumbCuePointSubType::".$queryAttributes->getObjectSubType()));
+			$apiCuePointType = kPluginableEnumsManager::coreToApi('CuePointType', $cuePointSearchItem->getCuePointType());
+			$plugin = kPluginableEnumsManager::getPlugin($apiCuePointType);
+			$subTypeValue = $plugin->getSubTypeValue($queryAttributes->getObjectSubType());
+			$queryAttributes->setObjectSubType($subTypeValue);
 		}
+
 		switch ($cuePointSearchItem->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
@@ -170,10 +174,10 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		if ($this->getCuePointType())
 		{
 			$apiCuePointType = kPluginableEnumsManager::coreToApi('CuePointType', $this->getCuePointType());
-			$queryName = ESearchItemDataType::CUE_POINTS . self::QUERY_NAME_DELIMITER . $apiCuePointType;
-
 			$plugin = kPluginableEnumsManager::getPlugin($apiCuePointType);
 			$subTypes = $plugin->getSubTypes();
+
+			$queryName = ESearchItemDataType::CUE_POINTS . self::QUERY_NAME_DELIMITER . $apiCuePointType;
 
 			if (!empty($subTypes))
 			{

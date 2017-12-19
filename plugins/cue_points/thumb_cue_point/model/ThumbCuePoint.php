@@ -137,8 +137,4 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 
 		return $data;
 	}
-
-	public static function getSubTypes(){
-		return array();
-	}
 }

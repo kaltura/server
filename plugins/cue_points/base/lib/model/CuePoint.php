@@ -523,9 +523,4 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	{
 		return null;
 	}
-
-	public static function getSubTypes(){
-		return array();
-	}
-
 } // CuePoint

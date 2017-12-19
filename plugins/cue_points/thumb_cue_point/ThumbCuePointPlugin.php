@@ -284,6 +284,10 @@ class ThumbCuePointPlugin extends BaseCuePointPlugin implements IKalturaCuePoint
 	{
 		$refClass = new ReflectionClass('ThumbCuePointSubType');
 		return $refClass->getConstants();
-//		 return array(ThumbCuePointSubType::SLIDE, ThumbCuePointSubType::CHAPTER);
+	}
+
+	public static function getSubTypeValue($subType)
+	{
+		return constant("ThumbCuePointSubType::".$subType);
 	}
 }
