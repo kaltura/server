@@ -14,10 +14,6 @@ class WebexDropFolderFile extends DropFolderFile
 	const WEBEX_CONF_IF = 'webex_conf_id';
 	
 	const CONTENT_URL = 'content_url';
-
-	const CURRENT_WEBEX_FILE_SIZE = 'current_webex_file_size';
-
-	const WEBEX_FILE_SIZE_LAST_SET_AT = 'webex_file_size_last_set_at';
 	
 	/**
 	 * @var int
@@ -44,15 +40,6 @@ class WebexDropFolderFile extends DropFolderFile
 	 */
 	protected $contentUrl;
 
-	/**
-	 * @var float
-	 */
-	protected $currentWebexFileSize;
-
-	/**
-	 * @var string
-	 */
-	protected $webexFileSizeLastSetAt;
 
 	/**
 	 * return int
@@ -151,35 +138,4 @@ class WebexDropFolderFile extends DropFolderFile
 		parent::setParsedSlug($v);
 	}
 
-	/**
-	 * return string
-	 */
-	public function getCurrentWebexFileSize ()
-	{
-		return $this->getFromCustomData(self::CURRENT_WEBEX_FILE_SIZE);
-	}
-
-	/**
-	 * @param float $v
-	 */
-	public function setCurrentWebexFileSize ($v)
-	{
-		$this->putInCustomData(self::CURRENT_WEBEX_FILE_SIZE, $v);
-	}
-
-	/**
-	 * return float
-	 */
-	public function getWebexFileSizeLastSetAt ()
-	{
-		return $this->getFromCustomData(self::WEBEX_FILE_SIZE_LAST_SET_AT);
-	}
-
-	/**
-	 * @param string $v
-	 */
-	public function setWebexFileSizeLastSetAt ($v)
-	{
-		$this->putInCustomData(self::WEBEX_FILE_SIZE_LAST_SET_AT, $v);
-	}
 }

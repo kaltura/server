@@ -29,7 +29,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		KalturaLog::info('Handle Import data: Webex Plugin');
 
 		$downloadUrl = self::retrieveWebexDownloadFilePath($curlInfo, $params, $importData->destFileLocalPath, null);
-		$fileSize = self::getFileSizeFromWebexFileDirectHeader($downloadUrl);
+		$fileSize = self::getFileSizeFromWebexDownloadUrl($downloadUrl);
 
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;'.$curlInfo->headers["set-cookie"]);
@@ -173,7 +173,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		return $url4;
 	}
 
-	public static function getFileSizeFromWebexFileDirectHeader($downloadUrl)
+	public static function getFileSizeFromWebexDownloadUrl($downloadUrl)
 	{
 		$curlHeaderWrapper = new KCurlWrapper();
 		$curlHeaderResponse = $curlHeaderWrapper->getHeader($downloadUrl, true);
@@ -203,17 +203,19 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		return true;
 	}
 
-	// curl from the starting url to get to the inner download path
+	/*
+	 * curl from the starting url (content url) to get to the inner download path and file size
+	 */
 	public static function getSizeFromWebexContentUrl($webexFileUrl)
 	{
 		$curlHeaderWrapper = new KCurlWrapper();
 		$curlHeaderResponse = $curlHeaderWrapper->getHeader($webexFileUrl, true);
 		$curlHeaderWrapper->close();
 		if(!WebexPlugin::checkIfValidWebexHeader($curlHeaderResponse))
-			throw new Exception('Webex header is not valid');
+			throw new kTemporaryException('Webex header is not valid');
 
 		$downloadUrl = WebexPlugin::retrieveWebexDownloadFilePath($curlHeaderResponse, KBatchBase::$taskConfig->params, null, $webexFileUrl);
-		$currentFileSize = WebexPlugin::getFileSizeFromWebexFileDirectHeader($downloadUrl);
+		$currentFileSize = WebexPlugin::getFileSizeFromWebexDownloadUrl($downloadUrl);
 
 		return $currentFileSize;
 	}

@@ -272,15 +272,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$newDropFolderFile = new KalturaWebexDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
 	    	$newDropFolderFile->fileName = $webexFile->getName() . '_' . $webexFile->getRecordingID();
-	    	$newDropFolderFile->fileSize = $webexFile->getSize() * 1024*1024;
+	    	$newDropFolderFile->fileSize = WebexPlugin::getSizeFromWebexContentUrl($webexFile->getFileURL());
 	    	$newDropFolderFile->lastModificationTime = $webexFile->getCreateTime(); 
 			$newDropFolderFile->description = $webexFile->getDescription();
 			$newDropFolderFile->confId = $webexFile->getConfID();
 			$newDropFolderFile->recordingId = $webexFile->getRecordingID();
 			$newDropFolderFile->webexHostId = $webexFile->getHostWebExID();
 			$newDropFolderFile->contentUrl = $webexFile->getFileURL();
-			$newDropFolderFile->currentWebexFileSize = WebexPlugin::getSizeFromWebexContentUrl($webexFile->getFileURL());
-			$newDropFolderFile->webexFileSizeLastSetAt = time();
 
 			KalturaLog::debug("Adding new WebexDropFolderFile: " . print_r($newDropFolderFile, true));
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
@@ -296,18 +294,19 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 
 	protected function handleExistingDropFolderFile (KalturaWebexDropFolderFile $dropFolderFile)
 	{
-		if (!$dropFolderFile->currentWebexFileSize)
+		$updatedFileSize = WebexPlugin::getSizeFromWebexContentUrl($dropFolderFile->contentUrl);
+
+		if (!$dropFolderFile->fileSize)
 		{
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
 				DropFolderPlugin::ERROR_READING_FILE_MESSAGE.'['.$dropFolderFile->contentUrl.']');
 		}
-		else if ($dropFolderFile->currentWebexFileSize != $dropFolderFile->fileSize)
+		else if ($dropFolderFile->fileSize < $updatedFileSize)
 		{
 			try
 			{
 				$updateDropFolderFile = new KalturaDropFolderFile();
-				$updateDropFolderFile->currentWebexFileSize = WebexPlugin::getSizeFromWebexContentUrl($dropFolderFile->contentUrl);
-				$updateDropFolderFile->webexFileSizeLastSetAt = time();
+				$updateDropFolderFile->fileSize = $updatedFileSize;
 
 				return $this->dropFolderFileService->update($dropFolderFile->id, $updateDropFolderFile);
 			}
@@ -321,7 +320,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		else // file sizes are equal
 		{
 			$time = time();
-			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->webexFileSizeLastSetAt;
+			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt ;
 
 			KalturaLog::info("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
 

@@ -30,15 +30,6 @@ class KalturaWebexDropFolderFile extends KalturaDropFolderFile
 	 */
 	public $contentUrl;
 
-	/**
-	 * @var float
-	 */
-	public $currentWebexFileSize;
-
-	/**
-	 * @var string
-	 */
-	public $webexFileSizeLastSetAt;
 
 
 	/*
@@ -50,8 +41,6 @@ class KalturaWebexDropFolderFile extends KalturaDropFolderFile
 		'description',
 		'confId',
 		'contentUrl',
-		'currentWebexFileSize',
-		'webexFileSizeLastSetAt',
 	 );
 		 
 	public function getMapBetweenObjects()
