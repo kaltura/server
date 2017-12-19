@@ -92,9 +92,21 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			$resource->localFilePath = $path;
 		else
 		{
-			$resource->localFilePath = KBatchBase::createTempClearFile($path, $key);;
+			$tempPath = KBatchBase::createTempClearFile($path, $key);
+			$localClearPath = self::getClearPath($path);
+			kFile::moveFile($tempPath, $localClearPath);
+
+			$resource->localFilePath = $localClearPath;
 			$resource->keepOriginalFile = false;
 		}
 		return $resource;
+	}
+
+	private static function getClearPath($path)
+	{
+		$typeLen = strlen(pathinfo($path, PATHINFO_EXTENSION)) + 1;
+		$pos = strlen($path) - $typeLen;
+		return substr($path, 0, $pos) . '_TEMP_CLEAR' . substr($path, $pos);
+
 	}
 }
