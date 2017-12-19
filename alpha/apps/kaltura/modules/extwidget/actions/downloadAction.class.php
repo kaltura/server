@@ -121,10 +121,9 @@ class downloadAction extends sfAction
 		$this->handleFileSyncRedirection($syncKey);
 
 		$fileSync = kFileSyncUtils::getResolveReadyFileSyncForKey($syncKey);
-
-		$filePath = $fileSync ? $fileSync->getFullPath() : null;
-		$key = $fileSync ? $fileSync->getEncryptionKey() : null;
-		$iv = $fileSync ? $fileSync->getIv() : null;
+		if (!$fileSync)
+			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+		$filePath = $fileSync->getFullPath();
 
 		list($fileBaseName, $fileExt) = kAssetUtils::getFileName($entry, $flavorAsset);
 
@@ -144,7 +143,7 @@ class downloadAction extends sfAction
 		//enable downloading file_name which inside the flavor asset directory 
 		if(is_dir($filePath))
 			$filePath = $filePath.DIRECTORY_SEPARATOR.$fileName;
-		$this->dumpFile($filePath, $fileName, $preview, $key, $iv);
+		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv());
 		
 		KExternalErrors::dieGracefully(); // no view
 	}

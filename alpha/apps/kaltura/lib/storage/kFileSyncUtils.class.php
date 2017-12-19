@@ -1658,6 +1658,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		list ( $fileSync , $local ) = self::getReadyFileSyncForKey($key, $strict);
 		if ($fileSync)
 			return self::resolve($fileSync);
+		return null;
 	}
 
 }
