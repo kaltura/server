@@ -66,5 +66,13 @@ class kEncryptFileUtils
             self::encryptFile($filePath, $key, $iv);
     }
 
+    public static function encrypt($path, $key, $iv)
+    {
+        if (is_file($path))
+            self::encryptFile($path, $key, $iv);
+        else if (is_dir($path))
+            self::encryptFolder($path, $key, $iv);
+    }
+
     
 }

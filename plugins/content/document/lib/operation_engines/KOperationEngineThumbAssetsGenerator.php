@@ -76,9 +76,8 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			$thumbAsset->cuePointId = "{" . $index . ":result:id}";
 			KBatchBase::$kClient->thumbAsset->add( $cpEntryId, $thumbAsset) ;
 			$index++;
-
-			$path = $this->realInFilePath . DIRECTORY_SEPARATOR . $image;
-			$resource = $this->getServerFileResource($path, $this->encryptionKey);
+			
+			$resource = $this->getServerFileResource($this->realInFilePath . DIRECTORY_SEPARATOR . $image, $this->encryptionKey);
 			KBatchBase::$kClient->thumbAsset->setContent("{" . $index . ":result:id}", $resource);
 			$index++;
 		}
@@ -92,14 +91,18 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			$resource->localFilePath = $path;
 		else
 		{
-			$tempPath = KBatchBase::createTempClearFile($path, $key);
-			$localClearPath = self::getClearPath($path);
-			kFile::moveFile($tempPath, $localClearPath);
-
-			$resource->localFilePath = $localClearPath;
+			$resource->localFilePath = self::createClearCopyOnCurrentFolder($path, $key);
 			$resource->keepOriginalFile = false;
 		}
 		return $resource;
+	}
+	
+	private static function createClearCopyOnCurrentFolder($path, $key)
+	{
+		$tempPath = KBatchBase::createTempClearFile($path, $key);
+		$clearPath = self::getClearPath($path);
+		kFile::moveFile($tempPath, $clearPath);
+		return $clearPath;
 	}
 
 	private static function getClearPath($path)

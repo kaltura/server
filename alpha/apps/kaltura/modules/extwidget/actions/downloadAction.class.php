@@ -120,7 +120,7 @@ class downloadAction extends sfAction
 			
 		$this->handleFileSyncRedirection($syncKey);
 
-		$fileSync = kFileSyncUtils::getResolveReadyFileSyncForKey($syncKey);
+		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
 		if (!$fileSync)
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		$filePath = $fileSync->getFullPath();

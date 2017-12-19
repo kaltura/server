@@ -864,6 +864,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @param boolean $fetch_from_remote_if_no_local
 	 * @param boolean $strict  - will throw exception if not found
+	 * @param boolean $resolve  - will resolve the file sync
 	 * @return array
 	 */
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
@@ -1653,12 +1654,5 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return self::resolve($fileSync);
 	}
 
-	public static function getResolveReadyFileSyncForKey(FileSyncKey $key , $strict = false)
-	{
-		list ( $fileSync , $local ) = self::getReadyFileSyncForKey($key, $strict);
-		if ($fileSync)
-			return self::resolve($fileSync);
-		return null;
-	}
 
 }

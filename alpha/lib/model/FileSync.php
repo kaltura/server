@@ -61,10 +61,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$key = $this->getEncryptionKey();
 		$realPath = realpath($this->getFullPath());
 		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
-		if (is_file($realPath))
-			kEncryptFileUtils::encryptFile($realPath, $key, $this->getIv());
-		else if (is_dir($realPath))
-			kEncryptFileUtils::encryptFolder($realPath, $key, $this->getIv());
+		kEncryptFileUtils::encrypt($realPath, $key, $this->getIv());
 	}
 
 	public function decrypt()
