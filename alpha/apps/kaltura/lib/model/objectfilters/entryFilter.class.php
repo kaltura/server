@@ -154,7 +154,7 @@ class entryFilter extends baseObjectFilter
 			"_is_recorded_entry_id_empty",
 			"_has_media_server_hostname",
 			"_is_sequence_entry",
-			"_sequence_entry_ids",
+			"_in_sequence_entry_ids",
 		) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
