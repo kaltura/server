@@ -77,6 +77,36 @@ class elasticSearchUtils
 		return sprintf("p%ss%s", $partnerId, $status);
 	}
 
+	public static function formatCategoryIdStatus($categoryId, $status)
+	{
+		return sprintf("c%ss%s", $categoryId, $status);
+	}
+
+	public static function formatCategoryFullIdStatus($categoryId, $status)
+	{
+		return sprintf("s%sfid>%s", $status, $categoryId);
+	}
+
+	public static function formatParentCategoryIdStatus($categoryId, $status)
+	{
+		return sprintf("p%ss%s", $categoryId, $status);
+	}
+
+	public static function formatCategoryNameStatus($categoryName, $status)
+	{
+		return sprintf("s%sc>%s", $status, $categoryName);
+	}
+
+	public static function formatParentCategoryNameStatus($categoryName, $status)
+	{
+		return sprintf("s%sp>%s", $status, $categoryName);
+	}
+
+	public static function formatCategoryEntryStatus($status)
+	{
+		return sprintf("ces%s", $status);
+	}
+
 	public static function formatSearchTerm($searchTerm)
 	{
 		//remove extra spaces
