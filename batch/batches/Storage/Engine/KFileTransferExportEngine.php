@@ -68,21 +68,7 @@ class KFileTransferExportEngine extends KExportEngine
 		{
 			if (is_file($this->srcFile))
 			{
-				if (!$this->encryptionKey)
-					$engine->putFile($this->destFile, $this->srcFile, $this->data->force);
-				else
-				{
-					$tempPath = KBatchBase::createTempClearFile($this->srcFile, $this->encryptionKey);
-					$engine->putFile($this->destFile, $tempPath, $this->data->force);
-					unlink($tempPath);
-				}
-				if(KBatchBase::$taskConfig->params->chmod)
-				{
-					try {
-					$engine->chmod($this->destFile, KBatchBase::$taskConfig->params->chmod);
-					}
-					catch(Exception $e){}
-				}
+				$this->putFile($engine, $this->destFile, $this->srcFile, $this->data->force);
 			}
 			else if (is_dir($this->srcFile))
 			{
@@ -91,14 +77,7 @@ class KFileTransferExportEngine extends KExportEngine
 				foreach ($filesPaths as $filePath)
 				{
 					$destFile = $destDir . '/' . basename($filePath);
-					$engine->putFile($destFile, $filePath, $this->data->force);
-					if(KBatchBase::$taskConfig->params->chmod)
-					{
-						try {
-						$engine->chmod($destFile, KBatchBase::$taskConfig->params->chmod);
-						}
-						catch(Exception $e){}
-					}
+					$this->putFile($engine, $destFile, $filePath, $this->data->force);
 				}
 			}
 		}
@@ -141,4 +120,23 @@ class KFileTransferExportEngine extends KExportEngine
         
         return true;
     }
+
+	private function putFile(kFileTransferMgr $engine, $destFilePath, $srcFilePath, $force)
+	{
+		if (!$this->encryptionKey)
+			$engine->putFile($destFilePath, $srcFilePath, $force);
+		else
+		{
+			$tempPath = KBatchBase::createTempClearFile($srcFilePath, $this->encryptionKey);
+			$engine->putFile($destFilePath, $tempPath, $force);
+			unlink($tempPath);
+		}
+		if(KBatchBase::$taskConfig->params->chmod)
+		{
+			try {
+				$engine->chmod($destFilePath, KBatchBase::$taskConfig->params->chmod);
+			}
+			catch(Exception $e){}
+		}
+	}
 }

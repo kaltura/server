@@ -76,12 +76,40 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			$thumbAsset->cuePointId = "{" . $index . ":result:id}";
 			KBatchBase::$kClient->thumbAsset->add( $cpEntryId, $thumbAsset) ;
 			$index++;
-
-			$resource = new KalturaServerFileResource();
-			$resource->localFilePath = $this->realInFilePath . DIRECTORY_SEPARATOR . $image;
+			
+			$resource = $this->getServerFileResource($this->realInFilePath . DIRECTORY_SEPARATOR . $image, $this->encryptionKey);
 			KBatchBase::$kClient->thumbAsset->setContent("{" . $index . ":result:id}", $resource);
 			$index++;
 		}
 		KBatchBase::$kClient->doMultiRequest();
+	}
+
+	private static function getServerFileResource($path, $key)
+	{
+		$resource = new KalturaServerFileResource();
+		if (!$key)
+			$resource->localFilePath = $path;
+		else
+		{
+			$resource->localFilePath = self::createClearCopyOnCurrentFolder($path, $key);
+			$resource->keepOriginalFile = false;
+		}
+		return $resource;
+	}
+	
+	private static function createClearCopyOnCurrentFolder($path, $key)
+	{
+		$tempPath = KBatchBase::createTempClearFile($path, $key);
+		$clearPath = self::getClearPath($path);
+		kFile::moveFile($tempPath, $clearPath);
+		return $clearPath;
+	}
+
+	private static function getClearPath($path)
+	{
+		$typeLen = strlen(pathinfo($path, PATHINFO_EXTENSION)) + 1;
+		$pos = strlen($path) - $typeLen;
+		return substr($path, 0, $pos) . '_TEMP_CLEAR' . substr($path, $pos);
+
 	}
 }
