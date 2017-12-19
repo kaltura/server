@@ -1,3 +1,21 @@
+# Mercury 13.10.0 # 
+
+## Add Entry replaced HTTP template which excludes kaltura recorded entries ##
+
+- Issue Type: Support
+- Issue ID: SUP-13055
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_12_19_notRecordedEntryReplaced.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_12_19_deploy_not_recorded_entry_replaced_http_notification.php
+
+#### Known Issues & Limitations ####
+None.
+
 # Mercury 13.9.0 #
 
 ## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
