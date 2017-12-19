@@ -284,6 +284,16 @@ class KalturaDispatcher
 			{
 				if ($key[0] == '_')
 				{
+					if ($key == '_partnerId')
+					{
+						$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 
+						if ($partnerId != $value)
+						{
+							$matches = false;
+							break;
+						}
+					}
+					
 					continue;
 				}
 					
@@ -317,21 +327,28 @@ class KalturaDispatcher
 			return true;
 		}
 		
-		$keyOptions = explode(',', $rule['_key']);
-		$key = null;
-		foreach ($keyOptions as $keyOption)
+		if (isset($rule['_key']))
 		{
-			$value = $this->getApiParamValueWildcard($params, $keyOption);
-			if ($value)
+			$keyOptions = explode(',', $rule['_key']);
+			$key = null;
+			foreach ($keyOptions as $keyOption)
 			{
-				$key = $value;
-				break;
+				$value = $this->getApiParamValueWildcard($params, $keyOption);
+				if ($value)
+				{
+					$key = $value;
+					break;
+				}
+			}
+			
+			if (!$key)
+			{
+				return true;
 			}
 		}
-		
-		if (!$key)
+		else
 		{
-			return true;
+			$key = '';
 		}
 		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);

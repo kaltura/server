@@ -454,7 +454,8 @@ abstract class LiveEntry extends entry
 		$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
 		$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
 		$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+		$isMediaServerPartner = (kCurrentContext::$ks_partner_id == Partner::MEDIA_SERVER_PARTNER_ID);
+		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview && !$isMediaServerPartner)
 			return false;
 		return true;
 	}
@@ -933,8 +934,8 @@ abstract class LiveEntry extends entry
 		$body = array(
 			'recorded_entry_id' => $this->getRecordedEntryId(),
 			'push_publish' => $this->getPushPublishEnabled(),
+			'is_live' => $this->isCurrentlyLive(),
 		);
-
 		elasticSearchUtils::cleanEmptyValues($body);
 
 		return array_merge(parent::getObjectParams($params), $body);

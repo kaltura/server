@@ -40,4 +40,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const CATEGORY_NAME = 'categories.name';
 	const EXTERNAL_SOURCE_TYPE = 'external_source_type';
 	const IS_QUIZ = 'is_quiz';
+	const IS_LIVE = 'is_live';
 }
