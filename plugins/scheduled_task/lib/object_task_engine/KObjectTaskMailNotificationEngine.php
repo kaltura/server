@@ -55,7 +55,14 @@ class KObjectTaskMailNotificationEngine
 		return $body;
 	}
 
-	public static function sendMailNotification($mailTask, $userObjectsDataMap, $mediaRepurposingId, $partnerId)
+	/**
+	 * @param $mailTask
+	 * @param array $userObjectsDataMap
+	 * @param string $mediaRepurposingId
+	 * @param string $partnerId
+	 * @param KalturaClient $client
+	 */
+	public static function sendMailNotification($mailTask, $userObjectsDataMap, $mediaRepurposingId, $partnerId, $client)
 	{
 		$subject = $mailTask->subject;
 		$sender = $mailTask->sender;
@@ -73,11 +80,35 @@ class KObjectTaskMailNotificationEngine
 			{
 				$body = $mailTask->message . PHP_EOL . self::getUserObjectsBody($objects, $link);
 				$body = $mailTask->footer ? $body.PHP_EOL.$mailTask->footer : $body;
-				$success = self::sendMail(array($user), $subject, $body, $sender);
-				if (!$success)
-					KalturaLog::info("Mail for MRP [$mediaRepurposingId] did not send successfully");
+				$email = self::getMailFromUserId($user, $client);
+				if($email)
+				{
+					$success = self::sendMail(array($email), $subject, $body, $sender);
+					if (!$success)
+						KalturaLog::info("Mail for MRP [$mediaRepurposingId] did not send successfully");
+				}
+				else
+					KalturaLog::info("Mail for MRP [$mediaRepurposingId] did not send successfully for user [$user] missing valid email.");
 			}
 		}
+	}
+
+
+	/**
+	 * @param string $userId
+	 * @param KalturaClient $client
+	 * @return null|string
+	 */
+	private static function getMailFromUserId($userId, $client)
+	{
+		$result = null;
+		if (filter_var($userId, FILTER_VALIDATE_EMAIL))
+			$result = $userId;
+		$user = $client->user->get($userId);
+		if($user->email)
+			$result = $user->email;
+
+		return $result;
 	}
 
 	public static function sendMail($toArray, $subject, $body, $sender = null)
