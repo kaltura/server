@@ -25,7 +25,9 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 
 	private function parseImagesListXML(){
 		$imagesList = array();
-		$imagesXml = new SimpleXMLElement(file_get_contents($this->realInFilePath . DIRECTORY_SEPARATOR . self::IMAGES_LIST_XML_NAME));
+		$xmlPath = $this->realInFilePath . DIRECTORY_SEPARATOR . self::IMAGES_LIST_XML_NAME;
+		$str = kEncryptFileUtils::getEncryptedFileContent($xmlPath, $this->encryptionKey, KBatchBase::getIV());
+		$imagesXml = new SimpleXMLElement($str);
 		foreach ($imagesXml->item as $item) {
 			$imagesList[] = (string)$item->name;
 		}
