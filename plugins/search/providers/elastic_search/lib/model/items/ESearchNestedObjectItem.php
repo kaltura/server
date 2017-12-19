@@ -48,27 +48,21 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		foreach ($eSearchItemsArr as $eSearchItem)
 		{
 			$queryNames = $eSearchItem->getNestedQueryNames();
-			if (empty($queryNames))
+			$bool = new kESearchBoolQuery();
+			foreach ($queryNames as $nestedQueryName)
 			{
-				$nestedQuery = self::createSingleNestedQuery($innerHitsSize, $queryAttributes, $boolOperator, $allowedSearchTypes, $eSearchItem);
-			} else
-			{
-				$bool = new kESearchBoolQuery();
-				foreach ($queryNames as $nestedQueryName)
+				$subTypeDelimiterIndex = strpos($nestedQueryName, self::SUBTYPE_DELIMITER);
+				if ($subTypeDelimiterIndex !== false)
 				{
-					$subTypeDelimiterIndex = strpos($nestedQueryName, self::SUBTYPE_DELIMITER);
-					if ($subTypeDelimiterIndex !== false)
-					{
-						$subType = substr($nestedQueryName, $subTypeDelimiterIndex + strlen(self::SUBTYPE_DELIMITER));
-						$queryAttributes->setObjectSubType($subType);
-					}
-					$innerNestedQuery = self::createSingleNestedQuery($innerHitsSize, $queryAttributes, $boolOperator, $allowedSearchTypes, $eSearchItem);
-					$innerNestedQuery->setInnerHitsName($nestedQueryName);
-					$queryAttributes->setObjectSubType(null);
-					$bool->addToShould($innerNestedQuery);
+					$subType = substr($nestedQueryName, $subTypeDelimiterIndex + strlen(self::SUBTYPE_DELIMITER));
+					$queryAttributes->setObjectSubType($subType);
 				}
-				$nestedQuery = $bool;
+				$innerNestedQuery = self::createSingleNestedQuery($innerHitsSize, $queryAttributes, $boolOperator, $allowedSearchTypes, $eSearchItem);
+				$innerNestedQuery->setInnerHitsName($nestedQueryName);
+				$queryAttributes->setObjectSubType(null);
+				$bool->addToShould($innerNestedQuery);
 			}
+			$nestedQuery = $bool;
 			$finalQuery[] = $nestedQuery;
 		}
 		return $finalQuery;
@@ -134,10 +128,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		return $finalQuery;
 	}
 
-	public function getNestedQueryNames()
-	{
-		return array();
-	}
+	public abstract function getNestedQueryNames();
 
 	protected static function groupItemsByQueryName($eSearchItemsArr)
 	{

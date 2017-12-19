@@ -172,10 +172,11 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 			$apiCuePointType = kPluginableEnumsManager::coreToApi('CuePointType', $this->getCuePointType());
 			$queryName = ESearchItemDataType::CUE_POINTS . self::QUERY_NAME_DELIMITER . $apiCuePointType;
 
-			if ($apiCuePointType == ThumbCuePointPlugin::getApiValue(ThumbCuePointType::THUMB))
+			$plugin = kPluginableEnumsManager::getPlugin($apiCuePointType);
+			$subTypes = $plugin->getSubTypes();
+
+			if (!empty($subTypes))
 			{
-				$refClass = new ReflectionClass('KalturaThumbCuePointSubType');
-				$subTypes = $refClass->getConstants();
 				foreach (array_keys($subTypes) as $subType)
 					$queryNames[] = $queryName . self::SUBTYPE_DELIMITER . $subType;
 			} else
