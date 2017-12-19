@@ -381,7 +381,7 @@ class KAsyncConvert extends KJobHandlerWorker
 	protected function operate($operator = null, $filePath, $configFilePath = null, $key = null)
 	{
 		$this->operationEngine->setEncryptionKey($key);
-		if (!$key)
+		if (!$key || is_dir($filePath))
 			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
 		else
 		{
