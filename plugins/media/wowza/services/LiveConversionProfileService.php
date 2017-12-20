@@ -281,7 +281,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	private function checkMaxFramerate($ingestFramerate, $flavorMaxFramerate)
 	{
-		return $flavorMaxFramerate ? ceil(($ingestFramerate / $flavorMaxFramerate) - 1.05) : 0;
+		return ($flavorMaxFramerate && $ingestFramerate) ? ceil(($ingestFramerate / $flavorMaxFramerate) - 1.05) : 0;
 	}
 	
 	private function getIngestAudioCodec($ingestParameters)
