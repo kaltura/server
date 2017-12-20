@@ -348,6 +348,12 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		if($bulkUploadResult->tags)
 			$scheduleResource->tags = $bulkUploadResult->tags;
 
+		if($bulkUploadResult->entryId)
+			$scheduleResource->entryId = $bulkUploadResult->entryId;
+
+		if($bulkUploadResult->streamUrl)
+			$scheduleResource->streamUrl = $bulkUploadResult->streamUrl;
+
 		if($bulkUploadResult->parentSystemName)
 		{
 			if(isset($this->existingSystemNames[$bulkUploadResult->parentType]) && isset($this->existingSystemNames[$bulkUploadResult->parentType][$bulkUploadResult->parentSystemName]))
@@ -386,6 +392,8 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 			'tags',
 			'parentType',
 			'parentSystemName',
+			'entryId',
+			'streamUrl',
 		);
 	}
 	
