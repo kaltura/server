@@ -248,8 +248,8 @@ class kFileBase
 
     public static function copyFileOwnerAndGroup($srcFile, $destFile)
     {
-        chown($destFile, fileowner($srcFile));
-        chgrp($destFile, filegroup($srcFile));
+        @chown($destFile, fileowner($srcFile));
+        @chgrp($destFile, filegroup($srcFile));
     }
 
 }
