@@ -245,4 +245,11 @@ class kFileBase
             return mime_content_type($file_name);
         }
     }
+
+    public static function copyFileOwnerAndGroup($srcFile, $destFile)
+    {
+        chown($destFile, fileowner($srcFile));
+        chgrp($destFile, filegroup($srcFile));
+    }
+
 }

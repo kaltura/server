@@ -105,8 +105,7 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 		$clearPath = self::getClearPath($path);
 		kFile::moveFile($tempPath, $clearPath);
 		//maintain original group and owner to clear file
-		chgrp($clearPath, filegroup($path));
-		chown($clearPath, fileowner($path));
+		kFileBase::copyFileOwnerAndGroup($path, $clearPath);
 		return $clearPath;
 	}
 
