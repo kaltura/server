@@ -353,7 +353,7 @@ class serveFlavorAction extends kalturaAction
 		foreach ($sequenceEntries as $sequence)
 		{
 			/* @var entry $sequence */
-			if (!in_array('sequence_entry',$sequence->getTagsArr()))
+			if (!in_array('sequence_entry',$sequence->getTagsArr()) && !$sequence->getIsSequenceEntry())
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_SEQUENCE);
 		}
 		return true;
