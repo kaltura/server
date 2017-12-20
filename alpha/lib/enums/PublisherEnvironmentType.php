@@ -5,7 +5,7 @@
  */
 interface PublisherEnvironmentType extends BaseEnum
 {
-	const BOTH = 0;
-	const OVP = 1;
-	const OTT = 2;
+	const OVP = 0;
+	const OTT = 1;
+	const HYBRID = 2;
 }

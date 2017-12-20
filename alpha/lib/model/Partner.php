@@ -65,8 +65,8 @@ class Partner extends BasePartner
 	const HTML_PURIFIER_BASE_LIST_USAGE = "htmlPurifierBaseListUsage";
 
 	const PUBLISHER_ENVIRONMENT_TYPE = "publisherEnvironmentType";
-	const OVP_ENVIRONMENT_URLS = "ovpEnvironmentUrls";
-	const OTT_ENVIRONMENT_URLS = "ottEnvironmentUrls";
+	const OVP_ENVIRONMENT_URL = "ovpEnvironmentUrl";
+	const OTT_ENVIRONMENT_URL = "ottEnvironmentUrl";
 
 	private $partnerUsagePercent;
 
@@ -1874,7 +1874,7 @@ class Partner extends BasePartner
 
 	public function getPublisherEnvironmentType()
 	{
-		return $this->getFromCustomData( self::PUBLISHER_ENVIRONMENT_TYPE, null , PublisherEnvironmentType::BOTH );
+		return $this->getFromCustomData( self::PUBLISHER_ENVIRONMENT_TYPE, null , PublisherEnvironmentType::OVP );
 	}
 
 	public function setPublisherEnvironmentType($v)
@@ -1882,23 +1882,23 @@ class Partner extends BasePartner
 		return $this->putInCustomData( self::PUBLISHER_ENVIRONMENT_TYPE, $v );
 	}
 
-	public function getOvpEnvironmentUrls()
+	public function getOvpEnvironmentUrl()
 	{
-		return $this->getFromCustomData( self::OVP_ENVIRONMENT_URLS);
+		return $this->getFromCustomData( self::OVP_ENVIRONMENT_URL);
 	}
 
-	public function setOvpEnvironmentUrls($v)
+	public function setOvpEnvironmentUrl($v)
 	{
-		return $this->putInCustomData( self::OVP_ENVIRONMENT_URLS, $v );
+		return $this->putInCustomData( self::OVP_ENVIRONMENT_URL, $v );
 	}
 
-	public function getOttEnvironmentUrls()
+	public function getOttEnvironmentUrl()
 	{
-		return $this->getFromCustomData( self::OTT_ENVIRONMENT_URLS);
+		return $this->getFromCustomData( self::OTT_ENVIRONMENT_URL);
 	}
 
-	public function setOttEnvironmentUrls($v)
+	public function setOttEnvironmentUrl($v)
 	{
-		return $this->putInCustomData( self::OTT_ENVIRONMENT_URLS, $v );
+		return $this->putInCustomData( self::OTT_ENVIRONMENT_URL, $v );
 	}
 }
