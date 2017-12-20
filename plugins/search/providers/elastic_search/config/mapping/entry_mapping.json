@@ -31,7 +31,17 @@
 		  "type": "pattern_replace",
 		  "pattern": "(\\s+)",
 		  "replacement": " "
-		}
+		},
+		 "kaltura_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			  "'=>",
+			  "`=>",
+			  "‘=>",
+			  "^=>",
+			  "~=>"
+			 ]
+		  }
 	  },
 	  "tokenizer": {
 		"kaltura_ngram_tokenizer": {
@@ -52,16 +62,13 @@
 		"kaltura_ngrams": {
 		  "type": "custom",
 		  "tokenizer": "kaltura_ngram_tokenizer",
-		  "filter": [
-			"lowercase"
-		  ]
+		  "char_filter": ["kaltura_special_chars_filter"],
+		  "filter": ["lowercase"]
 		},
 		"kaltura_keyword": {
 		  "type": "custom",
 		  "tokenizer": "keyword",
-		  "char_filter": [
-			"kaltura_whitespace_filter"
-			],
+		  "char_filter": ["kaltura_whitespace_filter"],
 		  "filter": [
 			"lowercase",
 			"trim",
@@ -69,8 +76,9 @@
 		  ]
 		},
 		"kaltura_text" : {
-		  "tokenizer" : "standard",
-		  "filter" : ["standard", "lowercase", "asciifolding"]
+		  "tokenizer": "standard",
+		  "char_filter": ["kaltura_special_chars_filter"],
+		  "filter": ["standard", "lowercase", "asciifolding"]
 		},
 		"kaltura_english_synonym": {
 		  "tokenizer":  "standard",
@@ -101,6 +109,9 @@
 	"entry" : {
 	  "_source" : {
 		"enabled" : true
+	  },
+	  "_all": {
+		"enabled": false
 	  },
 	  "properties" : {
 		"name" : {
@@ -516,6 +527,10 @@
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
+		"external_source_type": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
 		"length_in_msecs": {
 		  "type" : "long"
 		},
@@ -552,6 +567,9 @@
 		"push_publish": {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
+		},
+		"is_live": {
+		  "type" : "boolean"
 		},
 		"entry_type": {
 		  "type" : "text",
@@ -590,6 +608,10 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"redirect_entry_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"is_quiz": {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
@@ -862,6 +884,9 @@
 				"raw" : {
 				  "type" : "text",
 				  "analyzer" : "kaltura_keyword"
+				},
+				"keyword":{
+				  "type" : "keyword"
 				}
 			  }
 			}
@@ -1031,7 +1056,11 @@
 				  }
 				}
 			  }
-			}
+			},
+			"cue_point_asset_id": {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+            }
 		  }
 		}
 	  }

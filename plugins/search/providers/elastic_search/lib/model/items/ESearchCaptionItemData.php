@@ -122,6 +122,7 @@ class ESearchCaptionItemData extends ESearchItemData
 		$this->setEndsAt($objectResult['_source']['end_time']);
 		$this->setLanguage($objectResult['_source']['language']);
 		$this->setCaptionAssetId($objectResult['_source']['caption_asset_id']);
-		$this->setHighlight($objectResult['highlight']);
+		if(isset($objectResult['highlight']))
+			$this->setHighlight($objectResult['highlight']);
 	}
 }

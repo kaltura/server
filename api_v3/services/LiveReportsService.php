@@ -88,7 +88,7 @@ class LiveReportsService extends KalturaBaseService
 		
 		try
 		{
-			$items = call_user_func(array('kKavaLiveReportsMgr', $methodName), $this->getPartnerId(), $filter);
+			$items = call_user_func(array('kKavaLiveReportsMgr', $methodName), $this->getPartnerId(), $filter, $pager->pageSize);
 		}
 		catch (kKavaNoResultsException $e)
 		{
@@ -208,6 +208,8 @@ class LiveReportsService extends KalturaBaseService
 			return $this->getReportKava($reportType, $filter, $pager);			
 		}
 		
+		ini_set('memory_limit', '700M');
+
 		$client = new WSLiveReportsClient();
 		$wsFilter = $filter->getWSObject();
 		$wsFilter->partnerId = kCurrentContext::getCurrentPartnerId();

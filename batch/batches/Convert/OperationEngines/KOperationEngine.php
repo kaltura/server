@@ -16,6 +16,11 @@ abstract class KOperationEngine
 	 * @var string
 	 */
 	protected $inFilePath = null;
+
+	/**
+	 * @var string
+	 */
+	protected $encryptionKey = null;
 	
 	/**
 	 * @var array
@@ -271,6 +276,10 @@ abstract class KOperationEngine
 		return $this->data;
 	}
 
+	public function setEncryptionKey($key)
+	{
+		$this->encryptionKey = $key;
+	}
 }
 
 

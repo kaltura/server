@@ -10,7 +10,8 @@
 abstract class baseObjectFilter extends myBaseObject
 {
 	public $fields;
-	
+	protected $fieldsToIgnoreInFinalCriteria;
+
 	protected static $maxInValues = 500;
 	
 	/**
@@ -194,6 +195,12 @@ abstract class baseObjectFilter extends myBaseObject
 
 		$this->allowed_order_fields[] = ( "id" )	; // always can filter by id
 		return $res;
+	}
+
+	protected function init()
+	{
+		parent::init();
+		$this->InitFieldsToIgnoreInFinalCriteria();
 	}
 
 	function __sleep()
@@ -586,8 +593,8 @@ abstract class baseObjectFilter extends myBaseObject
 
 			if ( $pos === 0 )
 			{
-				if ( $field == self::ORDER ) continue;
-				if ( $field == self::LIMIT ) continue;
+				if( in_array($field, $this->getFieldsToIgnoreInFinalCriteria()) )
+					continue;
 
 				// this is the case of a 'auto-named-field' - the prefix indicates the type of the criterion
 				$end_of_prefix_index = strpos ( $field , baseObjectFilter::FILTER_PREFIX , 1) + 1;
@@ -1019,6 +1026,34 @@ abstract class baseObjectFilter extends myBaseObject
 		}
 
 		return $set_field_count;
+	}
+
+	/**
+	 * @param string $fieldName
+	 */
+	protected function addFieldToIgnoreInFinalCriteria($fieldName)
+	{
+		$fields = $this->getFieldsToIgnoreInFinalCriteria();
+		$fields[] = $fieldName;
+		$this->setFieldToIgnoreInFinalCriteria($fields);
+	}
+
+	protected function getFieldsToIgnoreInFinalCriteria()
+	{
+		if(empty($this->fieldsToIgnoreInFinalCriteria))
+			$this->InitFieldsToIgnoreInFinalCriteria();
+
+		return $this->fieldsToIgnoreInFinalCriteria;
+	}
+
+	protected function InitFieldsToIgnoreInFinalCriteria()
+	{
+		$this->fieldsToIgnoreInFinalCriteria = array(self::ORDER, self::LIMIT);
+	}
+
+	private function setFieldToIgnoreInFinalCriteria($fields)
+	{
+		$this->fieldsToIgnoreInFinalCriteria = $fields;
 	}
 }
 ?>

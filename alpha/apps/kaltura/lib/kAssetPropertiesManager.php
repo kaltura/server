@@ -7,11 +7,17 @@ class kAssetPropertiesManager implements kObjectChangedEventConsumer
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
+		$propertiesListToHandle = array ('language','label','default');
 		if($object instanceof asset)
 		{
-			if (in_array(assetPeer::CUSTOM_DATA, $modifiedColumns) &&
-				($object->isCustomDataModified('language') || $object->isCustomDataModified('label')))
-				return true;
+			if (in_array(assetPeer::CUSTOM_DATA, $modifiedColumns))
+			{
+				foreach($propertiesListToHandle as $propertyItem)
+				{
+					if($object->isCustomDataModified($propertyItem))
+						return true;
+				}
+			}
 		}
 		return false;
 	}

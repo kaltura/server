@@ -1104,9 +1104,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 		
-		$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
-		
-		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $srcFilePath);
+		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $fileSync);
 		if(!$job)
 			return null;
 			
@@ -1550,7 +1548,10 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		if ($updatedOccurred)
+		{
 			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
+			myPartnerUtils::increaseEntriesChangedNum($dbEntry);
+		}
 		
 		return $entry;
 	}

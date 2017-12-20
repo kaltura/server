@@ -81,9 +81,10 @@
 		public function Initialize()
 		{
 			$chunker = $this->chunker;
-			$rv = $chunker->Initialize();
+			$rv = $chunker->Initialize($msgStr);
 			if($rv!==true){
 				$this->returnStatus = KChunkedEncodeReturnStatus::InitializeError;
+				$this->returnMessages[] = $msgStr;
 				return $rv;
 			}
 			if(!isset($this->name))
@@ -103,10 +104,11 @@
 			$this->videoCmdLines = $videoCmdLines;
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
-			$logFilename = $chunker->getSessionName("audio").".log";
-			$cmdLine = "time $cmdLine > $logFilename 2>&1";
-			$this->audioCmdLines = array($cmdLine);
-			
+			if(isset($cmdLine)){
+				$logFilename = $chunker->getSessionName("audio").".log";
+				$cmdLine = "time $cmdLine > $logFilename 2>&1";
+				$this->audioCmdLines = array($cmdLine);
+			}
 			$this->SerializeSession();
 			return true;
 		}

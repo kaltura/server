@@ -39,7 +39,8 @@ class WebexDropFolderFile extends DropFolderFile
 	 * @var string
 	 */
 	protected $contentUrl;
-	
+
+
 	/**
 	 * return int
 	 */
@@ -136,4 +137,5 @@ class WebexDropFolderFile extends DropFolderFile
 		$v .= '_'.$this->getRecordingId();
 		parent::setParsedSlug($v);
 	}
+
 }

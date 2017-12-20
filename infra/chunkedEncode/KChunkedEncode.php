@@ -42,7 +42,7 @@
 		/********************
 		 * Initialize the chunked encode session
 		 */
-		public function Initialize()
+		public function Initialize(&$msgStr)
 		{
 			KalturaLog::log(date("Y-m-d H:i:s"));
 			
@@ -419,6 +419,7 @@
 				/*
 				 * Handle WM fade in's/out's
 				 */
+			$lastLabelOut = null;
 			if(isset($this->params->videoFilters->fadeFilters)){
 				$filterGraph = clone $filterGraphBase;
 				$filterGraph->entities = array();
@@ -435,7 +436,7 @@
 						continue;
 					$filterGraph->RemoveChain($filterGraph->entities[$chainIdx]);
 				}
-				$adjustedFilterStr = $filterGraph->CompoundString();
+				$adjustedFilterStr = $filterGraph->CompoundString($lastLabelOut);
 			}
 			
 				/*
@@ -451,6 +452,9 @@
 					$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename,
 											$adjustedSubsFilename, $cmdLineArr[$filterIdx+1]);
 				}
+			}
+			else {
+				$adjustedFilterStr = str_replace($lastLabelOut, "", $adjustedFilterStr);
 			}
 			
 			if(isset($adjustedFilterStr)) {

@@ -58,6 +58,21 @@ class kEncryptFileUtils
         $data = self::getEncryptedFileContent($filename, $key, $iv, 0, -1);
         return strlen($data);
     }
+    
+    public static function encryptFolder($dirName, $key, $iv)
+    {
+        $filesPaths = kFile::dirList($dirName);
+        foreach ($filesPaths as $filePath)
+            self::encryptFile($filePath, $key, $iv);
+    }
+
+    public static function encrypt($path, $key, $iv)
+    {
+        if (is_file($path))
+            self::encryptFile($path, $key, $iv);
+        else if (is_dir($path))
+            self::encryptFolder($path, $key, $iv);
+    }
 
     
 }

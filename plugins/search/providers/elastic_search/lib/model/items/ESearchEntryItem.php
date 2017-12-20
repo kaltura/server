@@ -49,6 +49,8 @@ class ESearchEntryItem extends ESearchItem
 		'access_control_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'categories.name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
 		'external_source_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
+		'is_quiz' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
+		'is_live' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 	);
 
 	protected static $field_boost_values = array(
@@ -64,8 +66,13 @@ class ESearchEntryItem extends ESearchItem
 	);
 
 	private static $multiLanguageFields = array(
-		ESearchEntryFieldName::ENTRY_NAME,
-		ESearchEntryFieldName::ENTRY_DESCRIPTION,
+		ESearchEntryFieldName::NAME,
+		ESearchEntryFieldName::DESCRIPTION,
+	);
+
+	private static $ignoreDisplayInSearchFields = array(
+		ESearchEntryFieldName::PARENT_ENTRY_ID,
+		ESearchEntryFieldName::ID,
 	);
 
 	/**
@@ -148,6 +155,8 @@ class ESearchEntryItem extends ESearchItem
 			default:
 				KalturaLog::log("Undefined item type[".$entrySearchItem->getItemType()."]");
 		}
+		if (in_array($entrySearchItem->getFieldName(), self::$ignoreDisplayInSearchFields))
+			$queryAttributes->setShouldUseDisplayInSearch(false);
 	}
 
 	public function shouldAddLanguageSearch()
