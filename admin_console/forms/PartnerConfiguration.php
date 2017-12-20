@@ -471,7 +471,31 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addLimitsElements();
-			
+
+
+		//--------------- Publisher Environment ----------------------------
+
+		$publisherEnvironmentOptions = array(
+			Kaltura_Client_Enum_PublisherEnvironmentType::OVP => 'OVP',
+			Kaltura_Client_Enum_PublisherEnvironmentType::OTT=> 'OTT',
+			Kaltura_Client_Enum_PublisherEnvironmentType::BOTH => 'Both',
+		);
+
+		$this->addElement('select', 'publisher_environment_type', array(
+			'label' => 'Publisher Environment Type',
+			'filters' => array('StringTrim')));
+		$this->getElement('publisher_environment_type')->setMultiOptions($publisherEnvironmentOptions);
+
+		$this->addElement('text', 'ovp_environment_urls', array(
+			'label'			=> 'OVP environment urls (comma separated)',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'ott_environment_urls', array(
+			'label'			=> 'OTT environment urls (comma separated)',
+			'filters'		=> array('StringTrim'),
+		));
+
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
 		if ($moduls)
@@ -940,7 +964,15 @@ class Form_PartnerConfiguration extends Infra_Form
 			array('legend' => 'Live Stream Config')
 		);
 		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
-		$this->addDisplayGroup(array('html_purifier_base_list_usage', 'html_purifier_behaviour'), 'htmlPurifierBehaviour');
+		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
+
+		$this->addDisplayGroup(
+			array_merge(
+				array('publisher_environment_type', 'ovp_environment_urls', 'ott_environment_urls'),
+				array('crossLine')),
+			'publisherEnvironmentType',
+			array('legend' => 'Publisher Environment Settings')
+		);
 
 
 
