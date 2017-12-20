@@ -104,6 +104,8 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 		$tempPath = KBatchBase::createTempClearFile($path, $key);
 		$clearPath = self::getClearPath($path);
 		kFile::moveFile($tempPath, $clearPath);
+		//maintain original group and owner to clear file
+		kFile::copyFileOwnerAndGroup($path, $clearPath);
 		return $clearPath;
 	}
 
