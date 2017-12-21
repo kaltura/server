@@ -5,6 +5,8 @@
  */
 class CatalogItemListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
 {
+	const ADMIN_CONSOLE_PARTNER = "-2";
+	
 	public function __construct()
 	{
 		$this->action = 'CatalogItemProfileListAction';
@@ -31,6 +33,8 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		$partnerId = $this->_getParam('filter_input');
+		
+		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
 		// init filter
 		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
@@ -126,5 +130,19 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 			return $this;
 
 		return null;
+	}
+	
+	public function isAllowedForPartner($partnerId)
+	{
+		$client = Infra_ClientHelper::getClient();
+		$client->setPartnerId($partnerId);
+		$filter = new Kaltura_Client_Type_PermissionFilter();
+		$filter->nameEqual = Kaltura_Client_Enum_PermissionName::REACH_PLUGIN_PERMISSION;
+		$filter->partnerIdEqual = $partnerId;
+		$result = $client->permission->listAction($filter, null);
+		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
+		
+		$isAllowed = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
+		return $isAllowed;
 	}
 }

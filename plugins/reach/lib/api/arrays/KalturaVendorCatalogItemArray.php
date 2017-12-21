@@ -1,13 +1,13 @@
 <?php
 /**
- * @package plugins.schedule
+ * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaVendroCatalogItemArray extends KalturaTypedArray
+class KalturaVendorCatalogItemArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$newArr = new KalturaVendroCatalogItemArray();
+		$newArr = new KalturaVendorCatalogItemArray();
 		if ($arr == null)
 			return $newArr;
 

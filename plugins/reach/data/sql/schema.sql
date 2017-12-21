@@ -31,5 +31,30 @@ CREATE TABLE `vendor_catalog_item`
 	KEY `status_service_type_service_feature_index`(`status`, `service_type`, `service_feature`)
 )Type=InnoDB;
 
+#-----------------------------------------------------------------------------
+#-- vendor_profile
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `vendor_profile`;
+
+
+CREATE TABLE `vendor_profile`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME  NOT NULL,
+	`updated_at` DATETIME  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
+	`type` TINYINT  NOT NULL,
+	`status` TINYINT  NOT NULL,
+	`used_credit` INTEGER  NOT NULL,
+	`used_credit_period` INTEGER  NOT NULL,
+	`rules` TEXT,
+	`dictionary` TEXT,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_status_index`(`partner_id`, `status`),
+	KEY `partner_id_type_index`(`partner_id`, `type`)
+)Type=InnoDB;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

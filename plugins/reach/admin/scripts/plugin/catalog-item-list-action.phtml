@@ -1,3 +1,4 @@
+<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to use Reach'); return;} ?>
 <p><?php echo $this->translate('Here you can configure your Catalog items'); ?></p>
 <?php echo $this->filterForm; ?>
 <?php echo $this->newCatalogItemFolderForm; ?>

@@ -3,13 +3,14 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
 	const REACH_MANAGER = 'kReachManager';
+	const REACH_FLOW_MANAGER = 'kReachFlowManager';
 
 	/*
 	 * (non-PHPdoc)
@@ -72,6 +73,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	{
 		$map = array(
 			'vendorCatalogItem' => 'VendorCatalogItemService',
+			'vendorProfile' => 'vendorProfileService',
 		);
 		return $map;
 	}
@@ -86,6 +88,23 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new CatalogItemConfigureAction();
 		$pages[] = new CatalogItemSetStatusAction();
 		return $pages;
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see IKalturaPending::dependsOn()
+ 	*/
+	public static function dependsOn()
+	{
+		$eventNotificationDependency = new KalturaDependency(EventNotificationPlugin::getPluginName());
+		return array($eventNotificationDependency);
+	}
+	
+	/* (non-PHPdoc)
+ 	 * @see IKalturaEventConsumers::getEventConsumers()
+ 	 */
+	public static function getEventConsumers()
+	{
+		return array(self::REACH_MANAGER, self::REACH_FLOW_MANAGER);
 	}
 	
 	//TODO add reach plugin permission

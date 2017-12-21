@@ -7,6 +7,8 @@
 
 class KalturaReachErrors implements kReachErrors
 {
+	/* Vendor Catalog Item*/
+	
 	const INVALID_CATALOG_ITEM_ID = "INVALID_CATALOG_ITEM_ID;ID;Invalid catalog item id [@ID@]";
 	
 	const CATALOG_ITEM_NOT_FOUND = "CATALOG_ITEM_NOT_FOUND;ID;Catalog item with id provided not found [@ID@]";
@@ -18,4 +20,8 @@ class KalturaReachErrors implements kReachErrors
 	const PARTNER_NOT_VENDOR = "PARTNER_NOT_VENDOR;PARTNER_ID;Partner [@PARTNER_ID@] is not of type vendor";
 	
 	const VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME = "VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME;NAME;Vendor catalog item with system name [@NAME@] already exists.";
+	
+	/* Vendor Profile */
+	
+	const VENDOR_PROFILE_NOT_FOUND = "VENDOR_PROFILE_NOT_FOUND;ID;Vendor profile with id provided not found [@ID@]";
 }

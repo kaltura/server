@@ -42,7 +42,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		}
 		
 		$response = new KalturaVendorCatalogItemListResponse();
-		$response->objects = KalturaVendroCatalogItemArray::fromDbArray($list, $responseProfile);
+		$response->objects = KalturaVendorCatalogItemArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
 		return $response;
 	}
@@ -62,7 +62,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		$results = VendorCatalogItemPeer::doSelect($criteria);
 		
 		$response = new KalturaVendorCatalogItemListResponse();
-		$response->objects = KalturaVendroCatalogItemArray::fromDbArray($results, $responseProfile);
+		$response->objects = KalturaVendorCatalogItemArray::fromDbArray($results, $responseProfile);
 		$response->totalCount = $count;
 		return $response;
 	}
