@@ -34,12 +34,6 @@ class KalturaJsonSerializer extends KalturaSerializer
 			}
 			else
 			{
-				if(is_string($value))
-				{
-					$res = json_decode($value);
-					if ( json_last_error() == JSON_ERROR_NONE)
-						$value = $res;
-				}
 				$array[$key] = $this->unsetNull($value);
 			}
 		}
