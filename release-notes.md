@@ -1,5 +1,20 @@
 # Mercury 13.10.0 # 
 
+## Deploy new live audio flavor params ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8294
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_12_20_deploy_new_live_params.php
+
+#### Known Issues & Limitations ####
+None.
+
 ## Add Entry replaced HTTP template which excludes kaltura recorded entries ##
 
 - Issue Type: Support
