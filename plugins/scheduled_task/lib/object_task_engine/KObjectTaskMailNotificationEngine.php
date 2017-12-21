@@ -13,8 +13,9 @@ class KObjectTaskMailNotificationEngine
 	{
 		$body = "Execute for entries:".PHP_EOL;
 		$cnt = 0;
-		foreach($objectsData as $userId => $entriesIdsAndNames)
+		foreach($objectsData as $userId => $data)
 		{
+			$entriesIdsAndNames = $data['idAndName'];
 			foreach($entriesIdsAndNames as $entryIdAndName)
 			{
 				$id = $entryIdAndName['id'];
@@ -60,9 +61,8 @@ class KObjectTaskMailNotificationEngine
 	 * @param array $userObjectsDataMap
 	 * @param string $mediaRepurposingId
 	 * @param string $partnerId
-	 * @param KalturaClient $client
 	 */
-	public static function sendMailNotification($mailTask, $userObjectsDataMap, $mediaRepurposingId, $partnerId, $client)
+	public static function sendMailNotification($mailTask, $userObjectsDataMap, $mediaRepurposingId, $partnerId)
 	{
 		$subject = $mailTask->subject;
 		$sender = $mailTask->sender;
@@ -76,14 +76,14 @@ class KObjectTaskMailNotificationEngine
 
 		if ($mailTask->sendToUsers)
 		{
-			foreach ($userObjectsDataMap as $user => $objects)
+			foreach ($userObjectsDataMap as $user => $data)
 			{
-				$body = $mailTask->message . PHP_EOL . self::getUserObjectsBody($objects, $link);
+				$body = $mailTask->message . PHP_EOL . self::getUserObjectsBody($data['idAndName'], $link);
 				$body = $mailTask->footer ? $body.PHP_EOL.$mailTask->footer : $body;
-				$email = self::getMailFromUserId($user, $client);
-				if($email)
+
+				if($data['email'])
 				{
-					$success = self::sendMail(array($email), $subject, $body, $sender);
+					$success = self::sendMail(array($data['email']), $subject, $body, $sender);
 					if (!$success)
 						KalturaLog::info("Mail for MRP [$mediaRepurposingId] did not send successfully");
 				}
@@ -91,24 +91,6 @@ class KObjectTaskMailNotificationEngine
 					KalturaLog::info("Mail for MRP [$mediaRepurposingId] did not send successfully for user [$user] missing valid email.");
 			}
 		}
-	}
-
-
-	/**
-	 * @param string $userId
-	 * @param KalturaClient $client
-	 * @return null|string
-	 */
-	private static function getMailFromUserId($userId, $client)
-	{
-		$result = null;
-		if (filter_var($userId, FILTER_VALIDATE_EMAIL))
-			$result = $userId;
-		$user = $client->user->get($userId);
-		if($user->email)
-			$result = $user->email;
-
-		return $result;
 	}
 
 	public static function sendMail($toArray, $subject, $body, $sender = null)
