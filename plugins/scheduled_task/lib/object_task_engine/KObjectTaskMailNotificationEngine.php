@@ -8,6 +8,10 @@ class KObjectTaskMailNotificationEngine
 {
 	const ENTRY_ID_PLACE_HOLDER = '{entry_id}';
 	const PARTNER_ID_PLACE_HOLDER = '{partner_id}';
+	const ENTRIES_ID_AND_NAME = 'entriesIdAndName';
+	const EMAIL = 'email';
+	const ENTRY_NAME = 'EntryName';
+	const ENTRY_ID = 'entryId';
 
 	private static function getAdminObjectsBody($objectsData, $sendToUsers, $link = null)
 	{
@@ -15,11 +19,11 @@ class KObjectTaskMailNotificationEngine
 		$cnt = 0;
 		foreach($objectsData as $userId => $data)
 		{
-			$entriesIdsAndNames = $data['idAndName'];
+			$entriesIdsAndNames = $data[self::ENTRIES_ID_AND_NAME];
 			foreach($entriesIdsAndNames as $entryIdAndName)
 			{
-				$id = $entryIdAndName['id'];
-				$name = $entryIdAndName['name'];
+				$id = $entryIdAndName[SELF::ENTRY_ID];
+				$name = $entryIdAndName[self::ENTRY_NAME];
 				$readyLink = $link ? " - ".str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
 				$body.="\t$name Id:$id $readyLink".PHP_EOL;
 				$cnt++;
@@ -45,8 +49,8 @@ class KObjectTaskMailNotificationEngine
 		$cnt = 0;
 		foreach($objectsData as $entryIdAndName)
 		{
-			$id = $entryIdAndName['id'];
-			$name = $entryIdAndName['name'];
+			$id = $entryIdAndName[self::ENTRY_ID];
+			$name = $entryIdAndName[self::ENTRY_NAME];
 			$readyLink = $link ? " - ".str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
 			$body.="\t$name Id:$id $readyLink".PHP_EOL;
 			$cnt++;
@@ -78,12 +82,12 @@ class KObjectTaskMailNotificationEngine
 		{
 			foreach ($userObjectsDataMap as $user => $data)
 			{
-				$body = $mailTask->message . PHP_EOL . self::getUserObjectsBody($data['idAndName'], $link);
+				$body = $mailTask->message . PHP_EOL . self::getUserObjectsBody($data[self::ENTRIES_ID_AND_NAME], $link);
 				$body = $mailTask->footer ? $body.PHP_EOL.$mailTask->footer : $body;
 
-				if($data['email'])
+				if($data[self::EMAIL])
 				{
-					$success = self::sendMail(array($data['email']), $subject, $body, $sender);
+					$success = self::sendMail(array($data[self::EMAIL]), $subject, $body, $sender);
 					if (!$success)
 						KalturaLog::info("Mail for MRP [$mediaRepurposingId] did not send successfully");
 				}

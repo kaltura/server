@@ -109,14 +109,15 @@ class KScheduledTaskRunner extends KPeriodicWorker
 						$errorObjectsIds[] = $object->id;
 					else if ($object instanceof KalturaBaseEntry)
 					{
-						$idAndName = array('id' => $object->id, 'name' => $object->name);
-						if (array_key_exists($object->userId, $objectsData))
-							$objectsData[$object->userId]['idAndName'][] = $idAndName;
-						else
+						if (!array_key_exists($object->userId, $objectsData))
 						{
 							$email = $this->getMailFromUserId($object->userId);
-							$objectsData[$object->userId] = array('email'=>$email, 'idAndName' => array($idAndName));
+							$objectsData[$object->userId] = array(KObjectTaskMailNotificationEngine::EMAIL => $email);
 						}
+
+						$idAndName = array(KObjectTaskMailNotificationEngine::ENTRY_ID => $object->id, KObjectTaskMailNotificationEngine::ENTRY_NAME => $object->name);
+						$objectsData[$object->userId][KObjectTaskMailNotificationEngine::ENTRIES_ID_AND_NAME][] = $idAndName;
+
 					}
 
 					if ($isMediaRepurposingProfile)
