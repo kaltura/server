@@ -439,7 +439,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 
 	public function getOpenStatusChildJobs(Criteria $c = null)
 	{
-		$c ? $c = clone $c : $c = new Criteria();
+		$c = $c ? $c : new Criteria();
 		$c->addAnd($c->getNewCriterion(BatchJobPeer::STATUS, BatchJobPeer::getClosedStatusList(), Criteria::NOT_IN));
 		return $this->getChildJobs($c);
 	}
