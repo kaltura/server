@@ -30,11 +30,9 @@ class KAsyncImport extends KJobHandlerWorker
 		if (version_compare(PHP_VERSION, '5.5.0') < 0) {
 			$downloaded = $download_size;
 			$resource =  self::$currentResource;
-			KalturaLog::debug("Old version");
 		}
 		if(self::$downloadedSoFar < $downloaded)
 		{
-			KalturaLog::debug("Downloaded - $downloaded");
 			$time = time() - self::$startTime + self::IMPORT_TIMEOUT;
 			curl_setopt($resource, CURLOPT_TIMEOUT, $time);
 			self::$downloadedSoFar = $downloaded;
