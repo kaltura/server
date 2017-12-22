@@ -282,7 +282,6 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		catch(kTemporaryException $tex)
 		{
-//			$data->destFileLocalPath = KalturaClient::getKalturaNullValue();
 			$tex->setData($data);
 			throw $tex;
 		}
