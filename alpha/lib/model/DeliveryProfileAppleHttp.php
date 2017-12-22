@@ -22,10 +22,30 @@ class DeliveryProfileAppleHttp extends DeliveryProfileVod {
 	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
+		$flavors = $this->updateAudioLanguages($flavors);
 		$flavors = $this->sortFlavors($flavors);
 		
 		return $flavors;
 	}
-	
+
+	protected function updateAudioLanguages($flavors)
+	{
+		foreach($flavors as &$flavor)
+		{
+			if (isset($flavor['audioLanguage']) && strcmp($flavor['audioLanguage'],'und') != 0)
+			{
+				if (kConf::hasParam('three_code_language_partners') &&
+					in_array($this->getPartnerId(), kConf::get('three_code_language_partners')))
+					continue;
+				else
+				{
+					$twoCodeLanguage = languageCodeManager::getTwoCodeLowerFromThreeCode($flavor['audioLanguage']);
+					if ($twoCodeLanguage)
+						$flavor['audioLanguage'] = $twoCodeLanguage;
+				}
+			}
+		}
+	}
+
 }
 
