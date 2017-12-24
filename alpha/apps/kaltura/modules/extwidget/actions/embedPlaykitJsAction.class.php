@@ -339,29 +339,27 @@ class embedPlaykitJsAction extends sfAction
 	
 	private function setLatestOrBetaVersionNumber()
 	{
-		if ($this->bundleConfig) {
-			//if latest/beta version required set version number in config obj
-			$isLatestVersionRequired = array_search("{latest}", $this->bundleConfig) !== false;
-			$isBetaVersionRequired = array_search("{beta}", $this->bundleConfig) !== false;
+		//if latest/beta version required set version number in config obj
+		$isLatestVersionRequired = array_search("{latest}", $this->bundleConfig) !== false;
+		$isBetaVersionRequired = array_search("{beta}", $this->bundleConfig) !== false;
 
-			if ($isLatestVersionRequired || $isBetaVersionRequired) {
-				$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
-				$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
+		if ($isLatestVersionRequired || $isBetaVersionRequired) {
+			$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
+			$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
 
-				$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
-				$betaVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
+			$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
+			$betaVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
 
-				foreach ($this->bundleConfig as $key => $val)
+			foreach ($this->bundleConfig as $key => $val)
+			{
+				if ($val == "{latest}" && $latestVersionMap != null && isset($latestVersionMap[$key]))
 				{
-					if ($val == "{latest}" && $latestVersionMap != null)
-					{
-						$this->bundleConfig[$key] = $latestVersionMap[$key];
-					}
+					$this->bundleConfig[$key] = $latestVersionMap[$key];
+				}
 
-					if ($val == "{beta}" && $betaVersionMap != null)
-					{
-						$this->bundleConfig[$key] = $betaVersionMap[$key];
-					}
+				if ($val == "{beta}" && $betaVersionMap != null && isset($betaVersionMap[$key]))
+				{
+					$this->bundleConfig[$key] = $betaVersionMap[$key];
 				}
 			}
 		}
@@ -428,6 +426,9 @@ class embedPlaykitJsAction extends sfAction
 		
 		$this->bundleConfig = json_decode($confVars, true);
 		$this->mergeVersionsParamIntoConfig();
+		if (!this->bundleConfig) {
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
+		}
 		$this->setLatestOrBetaVersionNumber();
 		
 		$this->setBundleName();
