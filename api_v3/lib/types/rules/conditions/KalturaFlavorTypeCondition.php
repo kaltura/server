@@ -52,10 +52,10 @@ class KalturaFlavorTypeCondition extends KalturaCondition
 	 */
 	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		/** @var $dbObject kAssetPropertiesCompareCondition */
+		/** @var $dbObject kFlavorTypeCondition */
 		parent::doFromObject($dbObject, $responseProfile);
 		
-		if($this->shouldGet('properties', $responseProfile))
-			$this->properties = KalturaKeyValueArray::fromKeyValueArray($dbObject->getProperties());
+		if($this->shouldGet('flavorTypes', $responseProfile))
+			$this->flavorTypes = implode(',', $dbObject->getFlavorTypes());
 	}
 }
