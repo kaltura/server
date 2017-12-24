@@ -25,13 +25,7 @@ abstract class ESearchBaseCategoryEntryItem extends ESearchItem
 	 */
 	protected $categoryEntryStatus;
 
-	private static $allowed_search_types_for_field = array(
-		ESearchCategoryEntryFieldName::ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
-		ESearchCategoryEntryFieldName::NAME => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
-		ESearchCategoryEntryFieldName::FULL_IDS => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
-		ESearchCategoryEntryFieldName::ANCESTOR_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
-		ESearchCategoryEntryFieldName::ANCESTOR_NAME => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
-	);
+	private static $allowed_search_types_for_field = array();
 
 	/**
 	 * @return ESearchCategoryEntryFieldName
@@ -93,44 +87,44 @@ abstract class ESearchBaseCategoryEntryItem extends ESearchItem
 		$queryAttributes->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $categoryEntrySearchItem)
 		{
-			self::getSingleItemSearchQuery($categoryEntrySearchItem, $categoryEntryQuery, $allowedSearchTypes, $queryAttributes);
+			$categoryEntrySearchItem->getSingleItemSearchQuery($categoryEntryQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
 		return $categoryEntryQuery;
 	}
 
-	public static function getSingleItemSearchQuery($categoryEntrySearchItem, &$categoryEntryQuery, $allowedSearchTypes, &$queryAttributes)
+	public function getSingleItemSearchQuery(&$categoryEntryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
-		$categoryEntrySearchItem->validateItemInput();
-		switch ($categoryEntrySearchItem->getItemType())
+		$this->validateItemInput();
+		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$categoryEntryQuery[] = static::getCategoryEntryExactMatchQuery($categoryEntrySearchItem, $allowedSearchTypes, $queryAttributes);
+				$categoryEntryQuery[] = $this->getCategoryEntryExactMatchQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$categoryEntryQuery[] = static::getCategoryEntryPrefixQuery($categoryEntrySearchItem, $allowedSearchTypes, $queryAttributes);
+				$categoryEntryQuery[] = $this->getCategoryEntryPrefixQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$categoryEntryQuery[] = static::getCategoryEntryExistsQuery($categoryEntrySearchItem, $allowedSearchTypes, $queryAttributes);
+				$categoryEntryQuery[] = $this->getCategoryEntryExistsQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$categoryEntrySearchItem->getItemType()."]");
+				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
 	}
 
-	protected static function getCategoryEntryExactMatchQuery($categoryEntrySearchItem, $allowedSearchTypes, &$queryAttributes)
+	protected function getCategoryEntryExactMatchQuery($allowedSearchTypes, &$queryAttributes)
 	{
-		$categoryEntrySearchItem->transformData();
-		return kESearchQueryManager::getExactMatchQuery($categoryEntrySearchItem, $categoryEntrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+		$this->transformData();
+		return kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 	}
 
-	protected static function getCategoryEntryPrefixQuery($categoryEntrySearchItem, $allowedSearchTypes, &$queryAttributes)
+	protected function getCategoryEntryPrefixQuery($allowedSearchTypes, &$queryAttributes)
 	{
-		$categoryEntrySearchItem->transformData();
-		return kESearchQueryManager::getPrefixQuery($categoryEntrySearchItem, $categoryEntrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+		$this->transformData();
+		return kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 	}
 
-	protected static function getCategoryEntryExistsQuery($categoryEntrySearchItem, $allowedSearchTypes, &$queryAttributes)
+	protected function getCategoryEntryExistsQuery($allowedSearchTypes, &$queryAttributes)
 	{
 
 	}
@@ -143,6 +137,14 @@ abstract class ESearchBaseCategoryEntryItem extends ESearchItem
 	public function getItemMappingFieldsDelimiter()
 	{
 
+	}
+
+	protected function getCategoryEntryStatusSearchValue()
+	{
+		$categoryEntryStatus = $this->getCategoryEntryStatus();
+		if(!$categoryEntryStatus)
+			return CategoryEntryStatus::ACTIVE;
+		return $categoryEntryStatus;
 	}
 
 }
