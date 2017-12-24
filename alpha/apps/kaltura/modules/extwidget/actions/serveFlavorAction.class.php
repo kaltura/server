@@ -645,6 +645,7 @@ class serveFlavorAction extends kalturaAction
 		$captionLangaugesArr = explode(',', $captionLangauges);
 		foreach ($captionLangaugesArr as $captionLang)
 		{
+			$labelEntryId = null;
 			$hasCaptions = false;
 			$captionClips = array();
 			foreach ($entryIds as $entryId)
@@ -652,6 +653,7 @@ class serveFlavorAction extends kalturaAction
 				if (isset($captionFiles[$entryId][$captionLang]))
 				{
 					$hasCaptions = true;
+					$labelEntryId = $entryId;
 					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH]);
 				}
 				else
@@ -665,9 +667,9 @@ class serveFlavorAction extends kalturaAction
 				if (isset(CaptionPlugin::$captionsFormatMap[$langString]))
 					$langString = CaptionPlugin::$captionsFormatMap[$langString];
 				$currSequence = array('clips' => $captionClips, 'language' => $langString);
-				if (!is_null($captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL]))
-					$currSequence['label'] = $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL];
-				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $mainEntry->getId());
+				if (isset($captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL]))
+					$currSequence['label'] = $captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL];
+				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $mainEntry->getId());
 				$sequences[] = $currSequence;
 			}
 		}
