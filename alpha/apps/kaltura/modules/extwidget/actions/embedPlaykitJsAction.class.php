@@ -426,7 +426,7 @@ class embedPlaykitJsAction extends sfAction
 		
 		$this->bundleConfig = json_decode($confVars, true);
 		$this->mergeVersionsParamIntoConfig();
-		if (!this->bundleConfig) {
+		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 		$this->setLatestOrBetaVersionNumber();
