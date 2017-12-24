@@ -39,6 +39,7 @@ class ESearchUnifiedItem extends ESearchItem
 			$subQuery = new kESearchBoolQuery();
 
 			self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
 			self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
 			self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
 			self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
@@ -74,6 +75,35 @@ class ESearchUnifiedItem extends ESearchItem
 			foreach ($entryQueries as $entryQuery)
 			{
 				$entryUnifiedQuery->addToShould($entryQuery);
+			}
+		}
+
+	}
+
+	private static function addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
+	{
+		$categoryEntryItems = array();
+		$categoryEntryAllowedFields = ESearchCategoryEntryItem::getAllowedSearchTypesForField();
+		//Start handling entry fields
+		foreach($categoryEntryAllowedFields as $fieldName => $fieldAllowedTypes)
+		{
+			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
+			{
+				$categoryEntryItem = new ESearchCategoryEntryItem();
+				$categoryEntryItem->setFieldName($fieldName);
+				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
+
+				$categoryEntryItems[] = $categoryEntryItem;
+			}
+		}
+
+		if(count($categoryEntryItems))
+		{
+			$categoryEntryQueries = ESearchCategoryEntryItem::createSearchQuery($categoryEntryItems, 'should', $queryAttributes,  null);
+			foreach ($categoryEntryQueries as $categoryEntryQuery)
+			{
+				$entryUnifiedQuery->addToShould($categoryEntryQuery);
 			}
 		}
 

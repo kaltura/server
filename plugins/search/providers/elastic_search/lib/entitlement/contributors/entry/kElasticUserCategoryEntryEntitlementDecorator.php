@@ -6,7 +6,7 @@
 
 class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEntryEntitlementDecorator
 {
-	const MAX_CATEGORIES = 1024;
+	const MAX_CATEGORIES = 512;
 
 	public static function shouldContribute()
 	{
@@ -18,7 +18,8 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix = '')
 	{
-		$condition = new kESearchTermsQuery("{$fieldPrefix}category_ids", $params['category_ids']);
+		$ids = self::getFormattedCategoryIds($params['category_ids']);
+		$condition = new kESearchTermsQuery("{$fieldPrefix}category_ids", $ids);
 		return $condition;
 	}
 
@@ -105,7 +106,6 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 		$mainBool->addToFilter($conditionsBoolQuery);
 		$body['query'] = $mainBool->getFinalQuery();
 		$params['body'] = $body;
-
 		$elasticClient = new elasticClient();
 		$results = $elasticClient->search($params);
 		$categories = $results['hits']['hits'];
@@ -116,6 +116,17 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 			$categoryIds[] = $category['_id'];
 		}
 		return $categoryIds;
+	}
+
+	private static function getFormattedCategoryIds($categoryIds)
+	{
+		$searchIds = array();
+		foreach ($categoryIds as $categoryId)
+		{
+			$searchIds[] = elasticSearchUtils::formatCategoryIdStatus($categoryId, CategoryEntryStatus::ACTIVE);
+			$searchIds[] = elasticSearchUtils::formatCategoryIdStatus($categoryId, CategoryEntryStatus::PENDING);
+		}
+		return $searchIds;
 	}
 
 }
