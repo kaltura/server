@@ -3830,8 +3830,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		if (!$parentEntry || $parentEntry->getId() == $this->getId())
 			return;
 
-
-		$parentCategoryEntries = $parentEntry->getAllCategoriesIds(true);
+		$parentCategoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($parentEntry->getId());
 		$parentCategoryIdsSearchData = array();
 		foreach ($parentCategoryEntries as $parentCategoryEntry)
 			self::getCategoryEntryElasticSearchData($parentCategoryEntry, $parentCategoryEntry->getStatus(), $parentCategoryIdsSearchData);
