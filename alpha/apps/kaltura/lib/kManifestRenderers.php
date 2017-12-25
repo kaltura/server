@@ -925,7 +925,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		$frameRate = (isset($flavor['frameRate']) ? $flavor['frameRate'] : 0);
 		// to match the bitrate calculation function from the NGINX
 		$bitrate = ($bitrate * 188 / 184) + ($frameRate * 188 * 4);
-		return $bitrate;
+		return floor($bitrate);
 	}
 	
 	/* (non-PHPdoc)
