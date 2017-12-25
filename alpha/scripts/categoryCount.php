@@ -8,7 +8,7 @@ if(!count($argv))
 	die("No partner_id passed to script!");
 	
 $partnerId = $argv[1];
-
+$categoryId = $argv[2];
 var_dump($partnerId);
 
 if ( !PartnerPeer::retrieveByPK($partnerId) )
@@ -16,6 +16,8 @@ if ( !PartnerPeer::retrieveByPK($partnerId) )
 
 $criteria = new Criteria();
 $criteria->add(categoryPeer::PARTNER_ID,$partnerId,Criteria::EQUAL);
+if ($categoryId)
+    $criteria->add(categoryPeer::ID,$categoryId);
 $criteria->setLimit(1000);
 $allCats = categoryPeer::doSelect($criteria);
 
@@ -29,7 +31,8 @@ while(count($allCats))
 		$categoryDb->reSetDirectSubCategoriesCount();
 		$categoryDb->reSetDirectEntriesCount();	
 		$categoryDb->reSetPendingEntriesCount();
-		$categoryDb->reSetPendingMembersCount();	
+		$categoryDb->reSetPendingMembersCount();
+		$categoryDb->reSetMembersCount();
 		$categoryDb->save();
 	}
 	
