@@ -83,13 +83,28 @@ class ESearchUnifiedItem extends ESearchItem
 	private static function addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
 	{
 		$categoryEntryItems = array();
-		$categoryEntryAllowedFields = ESearchCategoryEntryItem::getAllowedSearchTypesForField();
-		//Start handling entry fields
-		foreach($categoryEntryAllowedFields as $fieldName => $fieldAllowedTypes)
+		$categoryEntryNameAllowedFields = ESearchCategoryEntryNameItem::getAllowedSearchTypesForField();
+
+
+		foreach($categoryEntryNameAllowedFields as $fieldName => $fieldAllowedTypes)
 		{
 			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
 			{
-				$categoryEntryItem = new ESearchCategoryEntryItem();
+				$categoryEntryItem = new ESearchCategoryEntryNameItem();
+				$categoryEntryItem->setFieldName($fieldName);
+				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
+
+				$categoryEntryItems[] = $categoryEntryItem;
+			}
+		}
+
+		$categoryEntryAncestorNameAllowedFields = ESearchCategoryEntryAncestorNameItem::getAllowedSearchTypesForField();
+		foreach($categoryEntryAncestorNameAllowedFields as $fieldName => $fieldAllowedTypes)
+		{
+			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
+			{
+				$categoryEntryItem = new ESearchCategoryEntryAncestorNameItem();
 				$categoryEntryItem->setFieldName($fieldName);
 				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
@@ -100,7 +115,7 @@ class ESearchUnifiedItem extends ESearchItem
 
 		if(count($categoryEntryItems))
 		{
-			$categoryEntryQueries = ESearchCategoryEntryItem::createSearchQuery($categoryEntryItems, 'should', $queryAttributes,  null);
+			$categoryEntryQueries = ESearchBaseCategoryEntryItem::createSearchQuery($categoryEntryItems, 'should', $queryAttributes,  null);
 			foreach ($categoryEntryQueries as $categoryEntryQuery)
 			{
 				$entryUnifiedQuery->addToShould($categoryEntryQuery);
