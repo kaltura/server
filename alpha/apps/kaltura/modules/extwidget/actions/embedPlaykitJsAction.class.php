@@ -14,6 +14,8 @@ class embedPlaykitJsAction extends sfAction
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
+	const LATEST = "{latest}";
+	const BETA = "{beta}";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -332,6 +334,9 @@ class embedPlaykitJsAction extends sfAction
 			$success = preg_match($pattern, $versions, $matches);
 			if ($success && strlen($matches[0]) === strlen($versions)) { // the whole versions string matches the pattern
 				$versionsArr = $this->toAssociativeArray($versions);
+				if (!$this->bundleConfig) {
+					$this->bundleConfig = [];
+				}
 				$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
 			}
 		}
@@ -340,8 +345,8 @@ class embedPlaykitJsAction extends sfAction
 	private function setLatestOrBetaVersionNumber()
 	{
 		//if latest/beta version required set version number in config obj
-		$isLatestVersionRequired = array_search("{latest}", $this->bundleConfig) !== false;
-		$isBetaVersionRequired = array_search("{beta}", $this->bundleConfig) !== false;
+		$isLatestVersionRequired = array_search(self::LATEST, $this->bundleConfig) !== false;
+		$isBetaVersionRequired = array_search(self::BETA, $this->bundleConfig) !== false;
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired) {
 			$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
@@ -352,12 +357,12 @@ class embedPlaykitJsAction extends sfAction
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
-				if ($val == "{latest}" && $latestVersionMap != null && isset($latestVersionMap[$key]))
+				if ($val == self::LATEST && $latestVersionMap != null && isset($latestVersionMap[$key]))
 				{
 					$this->bundleConfig[$key] = $latestVersionMap[$key];
 				}
 
-				if ($val == "{beta}" && $betaVersionMap != null && isset($betaVersionMap[$key]))
+				if ($val == self::BETA && $betaVersionMap != null && isset($betaVersionMap[$key]))
 				{
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
 				}
