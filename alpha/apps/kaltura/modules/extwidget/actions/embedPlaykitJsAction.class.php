@@ -335,7 +335,7 @@ class embedPlaykitJsAction extends sfAction
 			if ($success && strlen($matches[0]) === strlen($versions)) { // the whole versions string matches the pattern
 				$versionsArr = $this->toAssociativeArray($versions);
 				if (!$this->bundleConfig) {
-					$this->bundleConfig = [];
+					$this->bundleConfig = array();
 				}
 				$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
 			}
