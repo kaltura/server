@@ -25,12 +25,8 @@ class kFlavorTypeCondition extends kCondition
 	 */
 	protected function internalFulfilled(kScope $scope)
 	{
-		// no flavor type defined, the condition is fulfilled
-		if (count($this->getFlavorTypes()) == 0)
-			return true;
-
 		//get flavor from scope
-		$asset = (is_callable(array($scope, 'getAsset')) ? $scope->getAsset() : null);
+		$asset = ($scope instanceof  accessControlScope) ? $scope->getAsset() : null;
 		if ($asset)
 			return in_array($asset->getType(), $this->flavorTypes);
 		return false;
