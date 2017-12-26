@@ -158,7 +158,7 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager;
 		
-	    if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
 		{
 			return $this->getEventsKava($reportType, $filter);
 		}

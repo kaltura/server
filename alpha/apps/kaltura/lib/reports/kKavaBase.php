@@ -73,8 +73,8 @@ class kKavaBase extends kDruidBase
 	const VIEW_EVENT_PERIOD = 'PT10S';	
 	
 	// params
-	public const VOD_ALLOWED_PARTNERS = "kava_vod_partners";
-	public const LIVE_ALLOWED_PARTNERS = "kava_live_partners";
+	const VOD_ALLOWED_PARTNERS = "kava_vod_partners";
+	const LIVE_ALLOWED_PARTNERS = "kava_live_partners";
 	
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {
