@@ -3,12 +3,12 @@
  * @package Core
  * @subpackage model.data
  */
-class kFlavorTypeCondition extends kCondition
+class kAssetTypeCondition extends kCondition
 {
 	/**
 	 * @var array
 	 */
-	private $flavorTypes;
+	private $assetTypes;
 	
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
@@ -28,24 +28,24 @@ class kFlavorTypeCondition extends kCondition
 		//get flavor from scope
 		$asset = ($scope instanceof  accessControlScope) ? $scope->getAsset() : null;
 		if ($asset)
-			return in_array($asset->getType(), $this->flavorTypes);
+			return in_array($asset->getType(), $this->assetTypes);
 		return false;
 	}
 
 	/**
-	 * @param array $flavorTypes
+	 * @param array $assetTypes
 	 */
-	public function setFlavorTypes($flavorTypes)
+	public function setAssetTypes($assetTypes)
 	{
-		$this->flavorTypes = $flavorTypes;
+		$this->assetTypes = $assetTypes;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getFlavorTypes()
+	public function getAssetTypes()
 	{
-		return $this->flavorTypes;
+		return $this->assetTypes;
 	}
 
 }

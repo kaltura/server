@@ -3,17 +3,12 @@
  * @package api
  * @subpackage objects
  */
-class KalturaFlavorTypeCondition extends KalturaCondition
+class KalturaAssetTypeCondition extends KalturaCondition
 {
 	/**
-	 * @var string comma separated
+	 * @var KalturaAssetTypeHolderArray holder for flavor 
 	 */
 	public $flavorTypes;
-
-	private static $mapBetweenObjects = array
-	(
-		'flavorTypes',
-	);
 
 	/**
 	 * Init object type
@@ -22,11 +17,6 @@ class KalturaFlavorTypeCondition extends KalturaCondition
 	{
 		$this->type = ConditionType::FLAVOR_TYPE;
 	}
-
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
-	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
@@ -34,15 +24,13 @@ class KalturaFlavorTypeCondition extends KalturaCondition
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kFlavorTypeCondition();
+			$dbObject = new kAssetTypeCondition();
 
+		/** @var $dbObject kAssetTypeCondition */
 		$dbObject = parent::toObject($dbObject, $skip);
 
 		if (!is_null($this->flavorTypes))
-		{
-			$flavorTypes = explode(',', $this->flavorTypes);
-			$dbObject->setFlavorTypes($flavorTypes);
-		}
+			$dbObject->setAssetTypes($this->flavorTypes->toObjectsArray());
 
 		return $dbObject;
 	}
@@ -52,10 +40,9 @@ class KalturaFlavorTypeCondition extends KalturaCondition
 	 */
 	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		/** @var $dbObject kFlavorTypeCondition */
+		/** @var $dbObject kAssetTypeCondition */
 		parent::doFromObject($dbObject, $responseProfile);
-		
 		if($this->shouldGet('flavorTypes', $responseProfile))
-			$this->flavorTypes = implode(',', $dbObject->getFlavorTypes());
+			$this->flavorTypes = KalturaAssetTypeHolderArray::fromDbArray($dbObject->getAssetTypes(), $responseProfile);
 	}
 }
