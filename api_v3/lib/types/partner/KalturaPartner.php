@@ -319,6 +319,23 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $eSearchLanguages;
 
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $publisherEnvironmentType;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $ovpEnvironmentUrl;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $ottEnvironmentUrl;
 
 
 	private static $map_between_objects = array
@@ -330,6 +347,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
+		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl',
 	);
 	
 	public function getMapBetweenObjects ( )

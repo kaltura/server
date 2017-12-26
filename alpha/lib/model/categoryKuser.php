@@ -468,7 +468,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	{
 		if($this->getStatus() == CategoryKuserStatus::DELETED)
 		{
-			$script = 'int idx = ctx._source.kuser_ids.indexOf(params.kuser_id); if(idx != -1) {ctx._source.kuser_ids.remove(idx);}';
+			$script = "if(ctx._source.kuser_ids == null) {ctx.op = 'none'} else {int idx = ctx._source.kuser_ids.indexOf(params.kuser_id); if(idx != -1) {ctx._source.kuser_ids.remove(idx);}}";
 		}
 		else
 		{

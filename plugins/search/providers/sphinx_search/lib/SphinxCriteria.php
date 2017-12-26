@@ -1008,6 +1008,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	public function getTranslateIndexId($id)
 	{
+		if ($id != strtolower($id))
+			KalturaLog::debug("upper case id [$id] ");
 		return sprintf('%u', crc32($id));
 	}
 

@@ -64,6 +64,10 @@ class Partner extends BasePartner
 
 	const HTML_PURIFIER_BASE_LIST_USAGE = "htmlPurifierBaseListUsage";
 
+	const PUBLISHER_ENVIRONMENT_TYPE = "publisherEnvironmentType";
+	const OVP_ENVIRONMENT_URL = "ovpEnvironmentUrl";
+	const OTT_ENVIRONMENT_URL = "ottEnvironmentUrl";
+
 	private $partnerUsagePercent;
 
 	public function save(PropelPDO $con = null)
@@ -1866,5 +1870,35 @@ class Partner extends BasePartner
 	public function setPartnerUsagePercent($v)
 	{
 		$this->partnerUsagePercent = $v;
+	}
+
+	public function getPublisherEnvironmentType()
+	{
+		return $this->getFromCustomData( self::PUBLISHER_ENVIRONMENT_TYPE, null , PublisherEnvironmentType::OVP );
+	}
+
+	public function setPublisherEnvironmentType($v)
+	{
+		return $this->putInCustomData( self::PUBLISHER_ENVIRONMENT_TYPE, $v );
+	}
+
+	public function getOvpEnvironmentUrl()
+	{
+		return $this->getFromCustomData( self::OVP_ENVIRONMENT_URL);
+	}
+
+	public function setOvpEnvironmentUrl($v)
+	{
+		return $this->putInCustomData( self::OVP_ENVIRONMENT_URL, $v );
+	}
+
+	public function getOttEnvironmentUrl()
+	{
+		return $this->getFromCustomData( self::OTT_ENVIRONMENT_URL);
+	}
+
+	public function setOttEnvironmentUrl($v)
+	{
+		return $this->putInCustomData( self::OTT_ENVIRONMENT_URL, $v );
 	}
 }

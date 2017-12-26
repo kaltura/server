@@ -420,6 +420,7 @@
 				 * Handle WM fade in's/out's
 				 */
 			$lastLabelOut = null;
+			$adjustedFilterStr = null;
 			if(isset($this->params->videoFilters->fadeFilters)){
 				$filterGraph = clone $filterGraphBase;
 				$filterGraph->entities = array();
@@ -444,21 +445,18 @@
 				 */
 			if(isset($this->params->videoFilters->subsFilename)){
 				$adjustedSubsFilename = $this->getChunkName($chunkIdx,"srt");
-				if(isset($adjustedFilterStr)){
-					$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename, 
-											$adjustedSubsFilename, $adjustedFilterStr);
+				if(!isset($adjustedFilterStr)){
+					$adjustedFilterStr = $filterGraphBase->CompoundString($lastLabelOut);
 				}
-				else {
-					$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename,
-											$adjustedSubsFilename, $cmdLineArr[$filterIdx+1]);
-				}
+				$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename, 
+										$adjustedSubsFilename, $adjustedFilterStr);
 			}
-			else {
+			else if(isset($adjustedFilterStr)) {
 				$adjustedFilterStr = str_replace($lastLabelOut, "", $adjustedFilterStr);
 			}
 			
-			if(isset($adjustedFilterStr)) {
-				KalturaLog::log($adjustedFilterStr);
+			if(isset($adjustedFilterStr) || ($adjustedFilterStr=$filterGraphBase->CompoundString($lastLabelOut))!==null) {
+				KalturaLog::log("adjustedFilterStr:".$adjustedFilterStr);
 				$cmdLineArr[$filterIdx+1] = '\''.$adjustedFilterStr.'\'';
 				$cmdLine = implode(' ',$cmdLineArr);
 			}

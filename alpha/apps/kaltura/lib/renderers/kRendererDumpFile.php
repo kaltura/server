@@ -69,7 +69,7 @@ class kRendererDumpFile implements kRendererBase
 		}
 		$useXsendFile = false;
 		$rangeLength = null;
-		if (!$this->fileData && $this->xSendFileAllowed && in_array('mod_xsendfile', apache_get_modules()))
+		if (!$this->fileData && !$this->key && $this->xSendFileAllowed && in_array('mod_xsendfile', apache_get_modules()))
 			$useXsendFile = true;
 		else
 			list($rangeFrom, $rangeTo, $rangeLength) = infraRequestUtils::handleRangeRequest($this->fileSize);
