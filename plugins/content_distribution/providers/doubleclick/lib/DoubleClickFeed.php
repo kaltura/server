@@ -272,18 +272,12 @@ class DoubleClickFeed
 					//$type = mime_content_type($path);
 					//}
 					break;
-			}
-
-			$entry = $flavorAsset->getentry();
-			$duration = $flavorAsset->getentry()->getDuration();
-
-			if($entry->getSequenceEntryIds())
-				$duration += myEntryUtils::getSequenceTotalDuration($entry->getId());
-
+			} 
+			
 			kXml::setNodeValue($this->xpath,'@url', $url, $content);
 			kXml::setNodeValue($this->xpath,'@type', $type, $content);
 			kXml::setNodeValue($this->xpath,'@fileSize', (int)$flavorAsset->getSize(), $content);
-			kXml::setNodeValue($this->xpath,'@duration', (int)$duration, $content);
+			kXml::setNodeValue($this->xpath,'@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
 			kXml::setNodeValue($this->xpath,'@width', $flavorAsset->getWidth(), $content);
 			kXml::setNodeValue($this->xpath,'@height', $flavorAsset->getHeight(), $content);
 			kXml::setNodeValue($this->xpath,'@bitrate', $flavorAsset->getBitrate(), $content);
