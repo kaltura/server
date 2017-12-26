@@ -141,7 +141,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	const CAPABILITIES = "capabilities";
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
-	
+
+	const IS_SEQUENCE_ENTRY = 'isSequenceEntry';
+	const SEQUENCE_ENTRY_IDS = 'sequenceEntryIds';
 
 	private $appears_in = null;
 
@@ -1242,6 +1244,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				continue;
 			}
 		}
+
+		$isSequenceEntry = $this->getIsSequenceEntry();
+		if ($isSequenceEntry)
+			$dynamicAttributes[entry::IS_SEQUENCE_ENTRY] = $isSequenceEntry;
+
+		$sequenceEntryIds = $this->getSequenceEntryIds();
+		if ($sequenceEntryIds)
+			$dynamicAttributes[entry::SEQUENCE_ENTRY_IDS] = $sequenceEntryIds;
 
 		return $dynamicAttributes;
 	}
