@@ -291,7 +291,7 @@ class ReportService extends KalturaBaseService
 		
 		ini_set( "memory_limit","512M" );
 		
-		if (kConf::hasParam("druid_url"))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS))
 		{
 			$customReports = kConf::getMap('custom_reports');
 			if (!isset($customReports[$id]))
@@ -380,7 +380,7 @@ class ReportService extends KalturaBaseService
 	protected function getReportsManagerClass($reportType) 
 	{
 	    $reportsMgrClass = "myReportsMgr";
-	    if (in_array($reportType, self::$kavaReports) && kConf::hasParam("druid_url"))
+	    if (in_array($reportType, self::$kavaReports) && kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS))
 	    {
 	        $reportsMgrClass = "kKavaReportsMgr";
 	    }

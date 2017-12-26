@@ -158,7 +158,7 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager;
 		
-		if (kConf::hasParam('druid_url'))
+	    if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
 		{
 			return $this->getEventsKava($reportType, $filter);
 		}
@@ -203,7 +203,7 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager();
 		
-		if (kConf::hasParam('druid_url'))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
 		{
 			return $this->getReportKava($reportType, $filter, $pager);			
 		}

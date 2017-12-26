@@ -76,6 +76,8 @@ class kDruidBase
 	const DRUID_ERROR = 'error';
 	const DRUID_ERROR_MSG = 'errorMessage';
 	
+	const DRUID_URL = "druid_url";
+	
 	protected static function getIntervals($fromTime, $toTime)
 	{
 		$fromTime = gmdate('Y-m-d\\TH:i:s\\Z', $fromTime);
@@ -229,7 +231,7 @@ class kDruidBase
 		$post = json_encode($content);
 		KalturaLog::log($post);
 			
-		$url = kConf::get('druid_url');
+		$url = kConf::get(self::DRUID_URL);
 			
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_HEADER, false);
