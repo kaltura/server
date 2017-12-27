@@ -895,12 +895,8 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$audioFlavorsArr[] = $content;
 			}
 			else {
-				$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
+				$bitrate = $this->calculateBitRate($flavor);
 				$codecs = "";
-				// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
-				if (strpos($flavor['url'], "index_0_av.m3u8"))
-					$bitrate += 40 * 1024;
-
 				$resolution = '';
 				if(isset($flavor['width']) && isset($flavor['height']) &&
 					(($flavor['width'] > 0) || ($flavor['height'] > 0)))
@@ -921,6 +917,15 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
 		}		
 		return $flavorsArr;
+	}
+
+	private function calculateBitRate($flavor)
+	{
+		$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
+		$frameRate = (isset($flavor['frameRate']) ? $flavor['frameRate'] : 0);
+		// to match the bitrate calculation function from the NGINX
+		$bitrate = ($bitrate * 188 / 184) + ($frameRate * 188 * 4);
+		return floor($bitrate);
 	}
 	
 	/* (non-PHPdoc)

@@ -405,6 +405,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		}
 	
 		$bitrate = ($flavor && is_callable(array($flavor, 'getVideoBitrate')) ? $flavor->getVideoBitrate() : 0);
+		$frameRate = ($flavor && is_callable(array($flavor, 'getFrameRate')) ? $flavor->getFrameRate() : 0);
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
 
@@ -421,6 +422,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'audioCodec' => $audioCodec,
 				'defaultAudio' => $isDefaultAudio,
 				'type' => $type,
+				'frameRate' => $frameRate,
 			);
 	}
 	
