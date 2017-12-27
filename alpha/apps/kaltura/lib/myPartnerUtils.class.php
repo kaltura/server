@@ -182,8 +182,7 @@ class myPartnerUtils
 		//Category peer should be added before entry - since we select from category on entry->setDefaultCriteria.
 		self::addPartnerToCriteria ( 'kuser', $partner_id , $private_partner_data, $partner_group);
 		self::addPartnerToCriteria ( 'category' , $partner_id , $private_partner_data , $partner_group);
-		// set partner group to null on entry to avoid adding partner_id in (partner_id, 0) to criteria
-		self::addPartnerToCriteria ( 'entry' , $partner_id , $private_partner_data, null , $kaltura_network );
+		self::addPartnerToCriteria ( 'entry' , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
 		self::addPartnerToCriteria ( 'kshow' , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
 		self::addPartnerToCriteria ( 'moderation' , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( 'categoryEntry' , $partner_id , $private_partner_data , $partner_group);
