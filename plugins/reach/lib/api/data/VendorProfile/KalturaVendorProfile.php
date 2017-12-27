@@ -68,12 +68,12 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	/**
 	 * @var KalturaNullableBoolean
 	 */
-	public $autoDisplayMachineOnPlayer;
+	public $autoDisplayMachineCaptionsOnPlayer;
 	
 	/**
 	 * @var KalturaNullableBoolean
 	 */
-	public $autoDisplayHumanOnPlayer;
+	public $autoDisplayHumanCaptionsOnPlayer;
 	
 	/**
 	 * @var KalturaNullableBoolean
@@ -118,9 +118,6 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		'defaultOutputFormat',
 		'enableMachineModeration',
 		'enableHumanModeration',
-		'defaultOutputFormat',
-		'defaultSourceLanguage',
-		'requireCaptionsApproval',
 		'autoDisplayMachineCaptionsOnPlayer',
 		'autoDisplayHumanCaptionsOnPlayer',
 		'enableMetadataExtraction',

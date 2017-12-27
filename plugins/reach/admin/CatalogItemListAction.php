@@ -9,7 +9,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 	
 	public function __construct()
 	{
-		$this->action = 'CatalogItemProfileListAction';
+		$this->action = 'CatalogItemListAction';
 		$this->label = null;
 		$this->rootLabel = null;
 	}
