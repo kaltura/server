@@ -906,7 +906,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 					if ($width && $height)
 						$resolution = ",RESOLUTION={$width}x{$height}";
 				}
-				else if ($bitrate && $bitrate <= 65536)
+				else if ($bitrate && $bitrate <= 66960) // as 65536 (64K) * 188 /184
 					$codecs = ',CODECS="mp4a.40.2"';
 				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
 				$content .= $flavor['url'];
