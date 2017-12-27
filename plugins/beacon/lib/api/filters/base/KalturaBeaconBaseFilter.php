@@ -11,6 +11,7 @@ abstract class KalturaBeaconBaseFilter extends KalturaFilter
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"relatedObjectTypeIn" => "_in_related_object_type",
+		"relatedObjectTypeEqual" => "_eq_related_object_type",
 		"eventTypeIn" => "_in_event_type",
 		"objectIdIn" => "_in_object_id",
 	);
@@ -48,6 +49,11 @@ abstract class KalturaBeaconBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $relatedObjectTypeIn;
+	
+	/**
+	 * @var KalturaBeaconObjectTypes
+	 */
+	public $relatedObjectTypeEqual;
 
 	/**
 	 * @var string

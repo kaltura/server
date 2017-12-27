@@ -19,9 +19,25 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 	public function getListResponse(KalturaFilterPager $pager)
 	{
 		$searchObject = $this->createSearchObject();
-		
 		$searchMgr = new kBeaconSearchQueryManger();
-		$searchQuery = $searchMgr->buildSearchQuery(kBeacon::ELASTIC_BEACONS_INDEX_NAME, $this->indexTypeEqual, $searchObject, $pager->pageSize, $pager->calcOffset());
+		
+		if(!isset($this->relatedObjectTypeEqual) && !isset($this->relatedObjectTypeIn))
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 
+					$this->getFormattedPropertyNameWithClassName('relatedObjectTypeEqual') . '/' . $this->getFormattedPropertyNameWithClassName('relatedObjectTypeIn'));
+		}
+		
+		$relatedObjectType = $this->relatedObjectTypeEqual;
+		if(!$relatedObjectType)
+		{
+			$relatedObjectTypes = explode(",", $this->relatedObjectTypeIn);
+			$relatedObjectType = $relatedObjectTypes[0];
+		}
+		
+		$indexName = kBeacon::$indexNameByBeaconObjectType[$relatedObjectType];
+		$indexType = kBeacon::$indexTypeByBeaconObjectType[$relatedObjectType];
+		
+		$searchQuery = $searchMgr->buildSearchQuery($indexName, $indexType, $searchObject, $pager->pageSize, $pager->calcOffset());
 		$elasticQueryResponse = $searchMgr->search($searchQuery);
 		$responseArray = $searchMgr->getHitsFromElasticResponse($elasticQueryResponse);
 		$totalCount = $searchMgr->getTotalCount($elasticQueryResponse);
@@ -47,10 +63,12 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 	{
 		$terms = array();
 		
-		$terms[kBeacon::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectTypeIn;
 		$terms[kBeacon::FIELD_OBJECT_ID] = elasticSearchUtils::formatSearchTerm($this->objectIdIn);
 		$terms[kBeacon::FIELD_EVENT_TYPE] = elasticSearchUtils::formatSearchTerm($this->eventTypeIn);
 		$terms[kBeacon::FIELD_PARTNER_ID] = kCurrentContext::getCurrentPartnerId();
+		
+		if(isset($this->indexTypeEqual))
+			$terms[kBeacon::FIELD_IS_LOG] = ($this->indexTypeEqual == KalturaBeaconIndexType::LOG) ? 1 : 0; 
 		
 		return $terms;
 	}

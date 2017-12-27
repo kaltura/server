@@ -1,5 +1,8 @@
 {
 	"settings" : {
+		"index": {
+			"mapping": { "total_fields": { "limit": "2000" } }
+		},
 		"number_of_shards" : 6,
 		"number_of_replicas" : 0,
 		"analysis": {
@@ -26,7 +29,7 @@
 		}
 	},
 	"mappings": {
-		"State": {
+		"entry_beacon": {
 			"dynamic_templates": [
 				{
 					"integers": {
@@ -37,11 +40,10 @@
 					}
 				}
 			],
+			"_all": {
+ 				"enabled": false
+ 			},
 			"properties": {
-				"created_at": {
-					"type": "date",
-					"format": "epoch_second"
-				},
 				"event_type": {
 					"type" : "text",
 					"analyzer" : "kaltura_keyword"
@@ -68,51 +70,9 @@
 				"updated_at": {
 					"type": "date",
 					"format": "epoch_second"
-				}
-			}
-		},
-		"Log": {
-			"dynamic_templates": [
-				{
-					"integers": {
-						"match_mapping_type": "long",
-						"mapping": {
-							"type": "float"
-						}
-					}
-				}
-			],
-			"properties": {
-				"created_at": {
-					"type": "date",
-					"format": "epoch_second"
 				},
-				"event_type": {
-					"type" : "text",
-					"analyzer" : "kaltura_keyword"
-				},
-				"object_id": {
-					"type" : "text",
-					"analyzer" : "kaltura_keyword"
-				},
-				"partner_id": {
-					"type" : "text",
-					"analyzer" : "kaltura_keyword"
-				},
-				"private_data": {
-					"type" : "object"
-				},
-				"raw_data": {
-					"type" : "text",
-					"analyzer" : "kaltura_keyword"
-				},
-				"related_object_type": {
-					"type" : "text",
-					"analyzer" : "kaltura_keyword"
-				},
-				"updated_at": {
-					"type": "date",
-					"format": "epoch_second"
+				"is_log": {
+					"type": "short"
 				}
 			}
 		}
