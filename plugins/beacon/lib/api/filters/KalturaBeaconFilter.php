@@ -21,12 +21,6 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		$searchObject = $this->createSearchObject();
 		$searchMgr = new kBeaconSearchQueryManger();
 		
-		if(!isset($this->relatedObjectTypeEqual) && !isset($this->relatedObjectTypeIn))
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 
-					$this->getFormattedPropertyNameWithClassName('relatedObjectTypeEqual') . '/' . $this->getFormattedPropertyNameWithClassName('relatedObjectTypeIn'));
-		}
-		
 		$relatedObjectType = $this->relatedObjectTypeEqual;
 		if(!$relatedObjectType)
 		{
@@ -34,8 +28,13 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 			$relatedObjectType = $relatedObjectTypes[0];
 		}
 		
-		$indexName = kBeacon::$indexNameByBeaconObjectType[$relatedObjectType];
-		$indexType = kBeacon::$indexTypeByBeaconObjectType[$relatedObjectType];
+		$indexName = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
+		$indexType = null;
+		if($relatedObjectType && $relatedObjectType != "") 
+		{
+			$indexName = kBeacon::$indexNameByBeaconObjectType[$relatedObjectType];
+			$indexType = kBeacon::$indexTypeByBeaconObjectType[$relatedObjectType];
+		}
 		
 		$searchQuery = $searchMgr->buildSearchQuery($indexName, $indexType, $searchObject, $pager->pageSize, $pager->calcOffset());
 		$elasticQueryResponse = $searchMgr->search($searchQuery);
@@ -68,7 +67,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		$terms[kBeacon::FIELD_PARTNER_ID] = kCurrentContext::getCurrentPartnerId();
 		
 		if(isset($this->indexTypeEqual))
-			$terms[kBeacon::FIELD_IS_LOG] = ($this->indexTypeEqual == KalturaBeaconIndexType::LOG) ? 1 : 0; 
+			$terms[kBeacon::FIELD_IS_LOG] = ($this->indexTypeEqual == KalturaBeaconIndexType::LOG) ? true : false; 
 		
 		return $terms;
 	}

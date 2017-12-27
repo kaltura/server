@@ -7,17 +7,17 @@
 class kBeacon
 {
 	public static $indexNameByBeaconObjectType = array(
+			BeaconObjectTypes::ENTRY_BEACON => "beacon_entry_index",
+			BeaconObjectTypes::ENTRY_SERVER_NODE_BEACON => "beacon_entry_server_node_index",
+			BeaconObjectTypes::SCHEDULE_RESOURCE_BEACON => "beacon_scheduled_resource_index",
+			BeaconObjectTypes::SERVER_NODE_BEACON => "beacon_server_node_index",
+	);
+	
+	public static $indexTypeByBeaconObjectType = array(
 			BeaconObjectTypes::ENTRY_BEACON => "entry_beacon",
 			BeaconObjectTypes::ENTRY_SERVER_NODE_BEACON => "entry_server_node_beacon",
 			BeaconObjectTypes::SCHEDULE_RESOURCE_BEACON => "scheduled_resource_beacon",
 			BeaconObjectTypes::SERVER_NODE_BEACON => "server_node_beacon",
-	);
-	
-	public static $indexTypeByBeaconObjectType = array(
-			BeaconObjectTypes::ENTRY_BEACON => "entry",
-			BeaconObjectTypes::ENTRY_SERVER_NODE_BEACON => "entry_server_node",
-			BeaconObjectTypes::SCHEDULE_RESOURCE_BEACON => "scheduled_resource",
-			BeaconObjectTypes::SERVER_NODE_BEACON => "server_node",
 	);
 	
 	const ELASTIC_BEACONS_INDEX_NAME = "beaconindex";
@@ -178,14 +178,15 @@ class kBeacon
 	{
 		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
 		$indexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
-		$indexObject[self::FIELD_IS_LOG] = 0;
+		$indexObject[self::FIELD_IS_LOG] = false;
 		
 		return json_encode($indexObject);
 	}
 	
 	private function getIndexObjectForLog($indexObject)
 	{
-		$indexObject[self::FIELD_IS_LOG] = 1;
+		unset($indexObject[self::ELASTIC_DOCUMENT_ID_KEY]);
+		$indexObject[self::FIELD_IS_LOG] = true;
 		return json_encode($indexObject);
 	}
 	

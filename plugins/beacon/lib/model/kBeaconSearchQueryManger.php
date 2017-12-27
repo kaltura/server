@@ -50,7 +50,7 @@ class kBeaconSearchQueryManger
 		
 		foreach ($searchObject[kESearchQueryManager::TERMS_KEY] as $key => $value)
 		{
-			if (!$value)
+			if (!isset($value) || $value === '')
 				continue;
 			
 			$terms = array($key => explode(",",$value));

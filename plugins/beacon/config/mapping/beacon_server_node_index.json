@@ -72,7 +72,7 @@
 					"format": "epoch_second"
 				},
 				"is_log": {
-					"type": "short"
+					"type": "boolean"
 				}
 			}
 		}
