@@ -82,6 +82,11 @@ class kESearchBoolQuery extends kESearchCompoundQuery
 		$this->filterQueries[] = $query;
 	}
 
+	public function addQueriesToFilter($queries)
+	{
+		$this->filterQueries = array_merge($this->filterQueries, $queries);
+	}
+
 	public function addToMust($query)
 	{
 		$this->mustQueries[] = $query;
