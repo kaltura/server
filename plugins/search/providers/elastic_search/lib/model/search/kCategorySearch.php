@@ -20,7 +20,7 @@ class kCategorySearch extends kBaseSearch
         if (!count($statuses))
             $statuses = array(CategoryStatus::ACTIVE);
         $this->initQuery($statuses, $objectId, $pager, $order, $useHighlight);
-		$this->initEntitlement();
+        $this->initEntitlement();
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
