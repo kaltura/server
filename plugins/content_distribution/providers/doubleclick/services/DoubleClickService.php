@@ -164,33 +164,9 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$c->add(CuePointPeer::ENTRY_ID, $entryId);
 		$c->add(CuePointPeer::TYPE, AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD));
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
-		$result = CuePointPeer::doSelect($c);
-		$entry = entryPeer::retrieveByPK($entryId);
-		if ($entry->getSequenceEntryIds())
-			$result = $this->alignCuePointsTiming($entryId, $result);
-		return $result;
+		return CuePointPeer::doSelect($c);
 	}
-
-
-	protected function alignCuePointsTiming($entryId, $cuePoints)
-	{
-		$totalSequenceDuration = myEntryUtils::getSequenceTotalDuration($entryId, true);
-		$updatedCuePoints = array();
-
-		foreach ($cuePoints as $cuePoint)
-		{
-			$alignedStartTime = $cuePoint->getStartTime() + $totalSequenceDuration;
-			$cuePoint->setStartTime($alignedStartTime);
-			$alignedStartTime = $cuePoint->getStartTime() + $totalSequenceDuration;
-			$cuePoint->setEndTime($alignedStartTime);
-			$updatedCuePoints[] = $cuePoint;
-		}
-
-		return $updatedCuePoints;
-	}
-
-
-
+	
 	/**
 	 * @param int $distributionProfileId
 	 * @param string $hash

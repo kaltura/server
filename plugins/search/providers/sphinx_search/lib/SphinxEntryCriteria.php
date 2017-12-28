@@ -251,29 +251,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 
 		if(count($matchOrRoots))
 			$filter->set('_matchand_roots', $matchOrRoots);
-
-		if($filter->is_set('_is_sequence_entry'))
-		{
-			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . entry::IS_SEQUENCE_ENTRY . ' = ' . ($filter->get('_is_sequence_entry') == '1' ? '1' : '0') );
-			$filter->unsetByName('_is_sequence_entry');
-		}
-
-		if($filter->is_set('_in_sequence_entry_ids'))
-		{
-			$sequenceEntryIds = preg_replace('/\s+/', '', $filter->get('_in_sequence_entry_ids'));
-			$sequenceEntryIds = explode(",", $sequenceEntryIds);
-			$stringEntryIds = "";
-			for ($i=0; $i< count($sequenceEntryIds); $i++ )
-			{
-				$stringEntryIds .= "'" . $sequenceEntryIds[$i] . "'";
-				if ( $i < count($sequenceEntryIds) - 1 )
-					$stringEntryIds .= " , ";
-			}
-			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . entry::SEQUENCE_ENTRY_IDS .", " . $stringEntryIds . ")";
-			$this->addCondition($cond);
-			$filter->unsetByName('_in_sequence_entry_ids');
-		}
-
+			
 //		if ($filter->get("_matchor_duration_type") !== null)
 //			$filter->set("_matchor_duration_type", $filter->durationTypesToIndexedStrings($filter->get("_matchor_duration_type")));
 			

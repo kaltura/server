@@ -142,9 +142,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CAPABILITIES = "capabilities";
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
-	const IS_SEQUENCE_ENTRY = 'isSequenceEntry';
-	const SEQUENCE_ENTRY_IDS = 'sequenceEntryIds';
-
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -1244,14 +1241,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				continue;
 			}
 		}
-
-		$isSequenceEntry = $this->getIsSequenceEntry();
-		if ($isSequenceEntry)
-			$dynamicAttributes[entry::IS_SEQUENCE_ENTRY] = $isSequenceEntry;
-
-		$sequenceEntryIds = $this->getSequenceEntryIds();
-		if ($sequenceEntryIds)
-			$dynamicAttributes[entry::SEQUENCE_ENTRY_IDS] = $sequenceEntryIds;
 
 		return $dynamicAttributes;
 	}
@@ -3909,24 +3898,4 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return kConf::get("encryption_iv");
 	}
-
-	public function setIsSequenceEntry($v)
-	{
-		$this->putInCustomData("is_sequence_entry", $v);
-	}
-	public function getIsSequenceEntry()
-	{
-		return $this->getFromCustomData("is_sequence_entry", null, false);
-	}
-
-	public function setSequenceEntryIds($v)
-	{
-		$this->putInCustomData("sequence_entry_ids", $v);
-	}
-
-	public function getSequenceEntryIds()
-	{
-		return $this->getFromCustomData("sequence_entry_ids", null, null);
-	}
-
 }

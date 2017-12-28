@@ -2095,25 +2095,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $content;
 	}
 
-
-	public static function getSequenceTotalDuration($entryId, $milisec = false)
-	{
-		$totalSequenceDuration = 0;
-		$entry = entryPeer::retrieveByPk($entryId);
-		$sequenceEntryIds = explode(",", $entry->getSequenceEntryIds());
-		$sequenceEntries = entryPeer::retrieveByPKs($sequenceEntryIds);
-		foreach ($sequenceEntries as $sequenceEntry)
-		{
-			if($milisec)
-				$totalSequenceDuration+= $sequenceEntry->getLengthInMsecs();
-			else
-				$totalSequenceDuration+= $sequenceEntry->getDuration();
-		}
-
-		return $totalSequenceDuration;
-	}
-
-
 	private static function shouldResizeByPackager($params, $type, $dimension)
 	{
 		//check if all null or 0
@@ -2131,5 +2112,4 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$trackEntry->setDescription($message);
 		TrackEntry::addTrackEntry($trackEntry);
 	}
-
 }

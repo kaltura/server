@@ -7,6 +7,7 @@ if($argc<2)
         die("Usage:php $argv[0] <partner id> [<category id>]");
 	
 $partnerId = $argv[1];
+
 if(isset($argv[2]))
         $categoryId=$argv[2];
 
@@ -32,7 +33,8 @@ while(count($allCats))
 		$categoryDb->reSetDirectSubCategoriesCount();
 		$categoryDb->reSetDirectEntriesCount();	
 		$categoryDb->reSetPendingEntriesCount();
-		$categoryDb->reSetPendingMembersCount();	
+		$categoryDb->reSetPendingMembersCount();
+		$categoryDb->reSetMembersCount();
 		$categoryDb->save();
 	}
 	
