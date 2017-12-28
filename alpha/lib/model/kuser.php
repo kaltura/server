@@ -1366,4 +1366,11 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return 'kuser';
 	}
+
+	public function getRelatedGroupIds()
+	{
+		$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getId());
+		$kgroupIds[] = $this->getId();
+		return $kgroupIds;
+	}
 }

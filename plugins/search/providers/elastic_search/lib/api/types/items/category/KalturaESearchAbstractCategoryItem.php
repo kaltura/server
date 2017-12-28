@@ -40,7 +40,7 @@ abstract class KalturaESearchAbstractCategoryItem extends KalturaESearchCategory
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		list($object_to_fill, $props_to_skip) =
-			KalturaESearchItemImpl::eSearchItemToObjectImpl($this, $this->getDynamicEnumMap(), $this->getItemFieldName, $this->getFieldEnumMap(), $object_to_fill, $props_to_skip);
+			KalturaESearchItemImpl::eSearchItemToObjectImpl($this, $this->getDynamicEnumMap(), $this->getItemFieldName(), $this->getFieldEnumMap(), $object_to_fill, $props_to_skip);
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}

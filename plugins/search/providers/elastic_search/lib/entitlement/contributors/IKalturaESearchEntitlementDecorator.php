@@ -4,9 +4,9 @@
  * @package plugins.elasticSearch
  * @subpackage lib.entitlement
  */
-interface IKalturaESearchEntryEntitlementDecorator
+
+interface IKalturaESearchEntitlementDecorator
 {
 	public static function shouldContribute();
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix ='');
-	public static function applyCondition(&$entryQuery, &$parentEntryQuery);
 }
