@@ -1838,4 +1838,26 @@ class kJobsManager
 			$fileSync->deleteTempClear();
 		return $shouldBlock;
 	}
+
+	/**
+	 * @param entry $entry
+	 * @param HighlightType $highlightType
+	 *
+	 * @return BatchJob
+	 */
+	public static function addWowmeJob($entry, $highlightType)
+	{
+		$batchJob = null;
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($entry->getId());
+		$batchJob->setPartnerId($entry->getPartnerId());
+
+		$batchJob->setObjectId($entry->getId());
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		$batchJob->setJobSubType($highlightType);
+		KalturaLog::log("Creating Wowme job");
+		return self::addJob($batchJob, null, BatchJobType::WOWME, $highlightType);
+	}
+
+
 }

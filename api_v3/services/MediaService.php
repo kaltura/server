@@ -1221,4 +1221,28 @@ class MediaService extends KalturaEntryService
 		return $content;
 	}
 
+	/**
+	 * Wow me
+	 *
+	 * @action wowme
+	 * @param string $entryId Entry id
+	 * @param KalturaHighlightType $highlightType
+	 * @return KalturaMediaEntry
+	 * @throws KalturaApiException
+	 */
+	function wowmeAction($entryId, $highlightType)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+
+		kJobsManager::addWowmeJob($dbEntry, $highlightType);
+
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
+
+		return $entry;
+	}
+
 }
