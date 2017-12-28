@@ -197,6 +197,7 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
+		ini_set( "memory_limit","512M" );
 
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
