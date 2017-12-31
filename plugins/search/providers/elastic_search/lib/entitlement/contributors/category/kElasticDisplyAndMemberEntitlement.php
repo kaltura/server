@@ -10,30 +10,37 @@ class kElasticDisplyAndMemberEntitlement extends kElasticCategoryEntitlementDeco
 	{
 		$query = new kESearchBoolQuery();
 		$query->addToShould(self::getDisplayInSearchQuery());
-		$membersQuery = self::getMembersQuery();
-		if($membersQuery)
-			$query->addToShould($membersQuery);
-
-		return $query;
+		return self::getMembersQuery($query);
 	}
 
-	private static function getMembersQuery()
+
+	/**
+	 * @param kESearchBoolQuery $query
+	 * @return kESearchTermsQuery
+	 */
+	private static function getMembersQuery($query)
 	{
 		$kuser = null;
-		$membersQuery = null;
 		if (kCurrentContext::$ks)
 			$kuser = kCurrentContext::getCurrentKsKuser();
 
 		if ($kuser)
 		{
 			// get the groups that the user belongs to in case she is not associated to the category directly
-			$kgroupIds = $kuser->getRelatedGroupIds();
-			$kgroupIds = array_map('elasticSearchUtils::formatSearchTerm', $kgroupIds);
 			//kuser ids are equivalent to members in our elastic search
-			$membersQuery = new kESearchTermsQuery(ESearchCategoryFieldName::KUSER_IDS, $kgroupIds);
+			$userGroupsQuery = new kESearchTermsQuery(ESearchCategoryFieldName::KUSER_IDS,array(
+				'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+				'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+				'id' => $kuser->getId(),
+				'path' => 'group_ids'
+			));
+
+			$query->addToShould($userGroupsQuery);
+			$userQuery = new kESearchTermQuery(ESearchCategoryFieldName::KUSER_IDS, $kuser->getId());
+			$query->addToShould($userQuery);
 		}
 
-		return $membersQuery;
+		return $query;
 	}
 
 	private static function getDisplayInSearchQuery()
