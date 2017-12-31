@@ -802,11 +802,11 @@ class kKavaReportsMgr extends kKavaBase
 			if (isset(self::$headers_to_metrics[$order_by]))
 				$order_by = self::$headers_to_metrics[$order_by];
 			else
-				throw new Exception("Order by parameter is not a valid column");
+				$order_by = reset($metrics);
 
 			if (!in_array($order_by, $metrics))
 			{
-				throw new Exception("Order by parameter is not one of the report metrics");
+				$order_by = reset($metrics);
 			}
 		}
 
