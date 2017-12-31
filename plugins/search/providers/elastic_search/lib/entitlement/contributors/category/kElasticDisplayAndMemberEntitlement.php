@@ -4,7 +4,7 @@
  * @subpackage lib.entitlement
  */
 
-class kElasticDisplyAndMemberEntitlement extends kElasticCategoryEntitlementDecorator
+class kElasticDisplayAndMemberEntitlement extends kElasticCategoryEntitlementDecorator
 {
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix = '')
 	{
@@ -32,7 +32,7 @@ class kElasticDisplyAndMemberEntitlement extends kElasticCategoryEntitlementDeco
 				'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
 				'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 				'id' => $kuser->getId(),
-				'path' => 'group_ids'
+				'path' => ESearchUserFieldName::GROUP_IDS
 			));
 
 			$query->addToShould($userGroupsQuery);
