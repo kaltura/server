@@ -787,10 +787,18 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		// order by
+		if (in_array(self::EVENT_TYPE_PLAY, $metrics))
+		{
+			$default_order = self::EVENT_TYPE_PLAY;
+		}
+		else
+		{
+			$default_order = reset($metrics);
+		}
 		$order_by_dir = "-";
 		if (!$order_by)
 		{
-			$order_by = reset($metrics);
+			$order_by = $default_order;
 		}
 		else
 		{
@@ -802,11 +810,11 @@ class kKavaReportsMgr extends kKavaBase
 			if (isset(self::$headers_to_metrics[$order_by]))
 				$order_by = self::$headers_to_metrics[$order_by];
 			else
-				$order_by = reset($metrics);
+				$order_by = $default_order;
 
 			if (!in_array($order_by, $metrics))
 			{
-				$order_by = reset($metrics);
+				$order_by = $default_order;
 			}
 		}
 
