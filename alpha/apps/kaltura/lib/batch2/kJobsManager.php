@@ -1542,7 +1542,7 @@ class kJobsManager
 			$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_DATA, null, false);
 		else
 			$batchJob = new BatchJob();
-
+		
 		KalturaLog::log("asdf - 10 - Creating Extract Data job, data as:" );
 		KalturaLog::log(print_r($extractDataJobData, true));
 		return self::addJob($batchJob, $extractDataJobData, BatchJobType::EXTRACT_DATA, null);

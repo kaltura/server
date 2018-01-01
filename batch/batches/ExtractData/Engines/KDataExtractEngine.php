@@ -6,7 +6,6 @@
  */
 abstract class KDataExtractEngine
 {
-    
     CONST START_TIME_FIELD = 'startTime';
     CONST DATA_FIELD = 'data';
     /**
@@ -36,8 +35,5 @@ abstract class KDataExtractEngine
      * @return array
      */
     abstract public function extractData ( KalturaFileContainer $fileContainer );
-
-
+    
 }
-
-

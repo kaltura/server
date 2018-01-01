@@ -37,14 +37,8 @@ class KAsyncExtractData extends KJobHandlerWorker
 	 */
 	private function extractData(KalturaBatchJob $job, KalturaExtractDataJobData $data)
 	{
-		
 		$dataList = array();
-		KalturaLog::debug("inside the new Job - asdf");
-		KalturaLog::debug(print_r($data, true));
-		KalturaLog::debug(print_r($data->fileContainer, true));
-
 		$engines = explode(",", $data->enginesType);
-
 		foreach($engines as $engineType)
 		{
 			$engine = KDataExtractEngine::getInstance($engineType);
@@ -60,12 +54,11 @@ class KAsyncExtractData extends KJobHandlerWorker
 			$dataList = array_merge($dataList, $metadataArray);
 		}
 
-		KalturaLog::debug(print_r($dataList, true));
 		// for all data add cue point
+		KalturaLog::debug("Having list of data with: " . print_r($dataList, true));
 		self::createCuePoint($data->entryId, $dataList);
 		
 		$this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
-		
 		return $job;
 	}
 	
@@ -73,7 +66,6 @@ class KAsyncExtractData extends KJobHandlerWorker
 	private static function createCuePoint($entryId, $dataList)
 	{
 		KalturaLog::log("Creating " . count($dataList) . " cue points for entryId [$entryId]");
-		
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($dataList as $event) {
 			$eventCuePoint = new KalturaEventCuePoint();
@@ -85,6 +77,7 @@ class KAsyncExtractData extends KJobHandlerWorker
 			KBatchBase::$kClient->cuePoint->add( $eventCuePoint ) ;
 		}
 		KBatchBase::$kClient->doMultiRequest();
+		KBatchBase::unimpersonate();
 	}
 	
 	
