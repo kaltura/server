@@ -136,5 +136,13 @@ class elasticSearchUtils
 				unset($body[$key]);
 		}
 	}
+	
+	public static function getNumOfFragmentsByConfigKey($highlightConfigKey)
+	{
+		$highlightConfig = kConf::get('highlights', 'elastic');
+		//return null to use elastic default num of fragments
+		$numOfFragments = isset($highlightConfig[$highlightConfigKey]) ? $highlightConfig[$highlightConfigKey] : null;
+		return $numOfFragments;
+	}
 
 }

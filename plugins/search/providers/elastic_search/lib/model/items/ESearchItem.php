@@ -21,6 +21,11 @@ abstract class ESearchItem extends BaseObject
 	protected $range;
 
 	/**
+	 * @var bool
+	 */
+	protected $addHighlight;
+
+	/**
 	 * @return ESearchItemType
 	 */
 	public function getItemType()
@@ -50,6 +55,22 @@ abstract class ESearchItem extends BaseObject
 	public function setRange($range)
 	{
 		$this->range = $range;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAddHighlight()
+	{
+		return $this->addHighlight;
+	}
+
+	/**
+	 * @param boolean $addHighlight
+	 */
+	public function setAddHighlight($addHighlight)
+	{
+		$this->addHighlight = $addHighlight;
 	}
 
 	protected function validateAllowedSearchTypes($allowedSearchTypes, $fieldName)
@@ -105,19 +126,6 @@ abstract class ESearchItem extends BaseObject
 		}
 
 		return $result;
-	}
-
-	protected static function initializeInnerHitsSize($queryAttributes)
-	{
-		$overrideInnerHitsSize = $queryAttributes->getOverrideInnerHitsSize();
-		if($overrideInnerHitsSize)
-			return $overrideInnerHitsSize;
-
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsConfigKey = static::INNER_HITS_CONFIG_KEY;
-		$innerHitsSize = isset($innerHitsConfig[$innerHitsConfigKey]) ? $innerHitsConfig[$innerHitsConfigKey] : static::DEFAULT_INNER_HITS_SIZE;
-
-		return $innerHitsSize;
 	}
 
 }

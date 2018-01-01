@@ -20,11 +20,17 @@ abstract class KalturaESearchAbstractEntryItem extends KalturaESearchEntryBaseIt
 	 * @var KalturaESearchRange
 	 */
 	public $range;
-	
+
+	/**
+	 * @var bool
+	 */
+	public $addHighlight;
+
 	private static $map_between_objects = array(
 		'searchTerm',
 		'itemType',
 		'range',
+		'addHighlight',
 	);
 	
 	protected function getMapBetweenObjects()

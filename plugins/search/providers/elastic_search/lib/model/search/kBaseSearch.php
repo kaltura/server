@@ -21,7 +21,7 @@ abstract class kBaseSearch
 		$this->mainBoolQuery = new kESearchBoolQuery();
     }
 
-    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true);
+    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null);
 
     public abstract function getPeerName();
 
@@ -43,10 +43,10 @@ abstract class kBaseSearch
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
-        $this->initQueryAttributes($partnerId, $objectId, $useHighlight);
+        $this->initQueryAttributes($partnerId, $objectId);
         $this->initBaseFilter($partnerId, $statuses, $objectId);
         $this->initPager($pager);
         $this->initOrderBy($order);
@@ -114,30 +114,11 @@ abstract class kBaseSearch
     protected function addGlobalHighlights()
 	{
 		$this->queryAttributes->setScopeToGlobal();
-		$highlight = self::getHighlightSection(self::GLOBAL_HIGHLIGHT_CONFIG, $this->queryAttributes);
-		if(isset($highlight))
-		{
+        $numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey(self::GLOBAL_HIGHLIGHT_CONFIG);
+		$highlight = new kESearchHighlightQuery($this->queryAttributes->getFieldsToHighlight(), $numOfFragments);
+		$highlight = $highlight->getFinalQuery();
+		if($highlight)
 			$this->query['body']['highlight'] = $highlight;
-		}
-	}
-
-	public static function getHighlightSection($configKey, $queryAttributes)
-	{
-		$highlight = null;
-		$fieldsToHighlight = $queryAttributes->getFieldsToHighlight();
-		if(!empty($fieldsToHighlight) && $queryAttributes->getUseHighlight())
-		{
-			$highlight = array();
-			$highlight["type"] = "unified";
-			$highlight["order"] = "score";
-			$HighlightConfig = kConf::get('highlights', 'elastic');
-			if(isset($HighlightConfig[$configKey]))
-				$highlight['number_of_fragments'] = $HighlightConfig[$configKey];
-
-			$highlight['fields'] = $fieldsToHighlight;
-		}
-
-		return $highlight;
 	}
 
     protected function applyElasticSearchConditions()
@@ -145,10 +126,9 @@ abstract class kBaseSearch
         $this->query['body']['query'] = $this->mainBoolQuery->getFinalQuery();
     }
 
-    protected function initQueryAttributes($partnerId, $objectId, $useHighlight)
+    protected function initQueryAttributes($partnerId, $objectId)
     {
         $this->initPartnerLanguages($partnerId);
-        $this->queryAttributes->setUseHighlight($useHighlight);
         $this->queryAttributes->setObjectId($objectId);
         $this->queryAttributes->setShouldUseDisplayInSearch(true);
         $this->initOverrideInnerHits($objectId);

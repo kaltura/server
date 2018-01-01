@@ -24,6 +24,13 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		return $innerHitsSize;
 	}
 
+	protected static function initializeNumOfFragments()
+	{
+		$highlightConfigKey = static::HIGHLIGHT_CONFIG_KEY;
+		$numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey($highlightConfigKey);
+		return $numOfFragments;
+	}
+
 	protected static function createNestedQueryForItems($eSearchItemsArr, $boolOperator, &$queryAttributes)
 	{
 		$innerHitsSize = self::initializeInnerHitsSize($queryAttributes);
@@ -82,11 +89,12 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		$nestedQuery->setPath(static::NESTED_QUERY_PATH);
 		$nestedQuery->setInnerHitsSize($innerHitsSize);
 		$nestedQuery->setInnerHitsSource(true);
+		$queryAttributes->setScopeToInner();
 		$boolQuery = new kESearchBoolQuery();
 		static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
-		$highlight = kBaseSearch::getHighlightSection(static::HIGHLIGHT_CONFIG_KEY, $queryAttributes);
-		if (isset($highlight))
-			$nestedQuery->setHighlight($highlight);
+		$numOfFragments = self::initializeNumOfFragments();
+		$highlight = new kESearchHighlightQuery($queryAttributes->getFieldsToHighlight(), $numOfFragments);
+		$nestedQuery->setHighlight($highlight->getFinalQuery());
 		$nestedQuery->setQuery($boolQuery);
 		return $nestedQuery;
 	}
@@ -119,9 +127,9 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		{
 			static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
 		}
-		$highlight = kBaseSearch::getHighlightSection(static::HIGHLIGHT_CONFIG_KEY, $queryAttributes);
-		if(isset($highlight))
-			$nestedQuery->setHighlight($highlight);
+		$numOfFragments = self::initializeNumOfFragments();
+		$highlight = new kESearchHighlightQuery($queryAttributes->getFieldsToHighlight(), $numOfFragments);
+		$nestedQuery->setHighlight($highlight->getFinalQuery());
 		$nestedQuery->setQuery($boolQuery);
 		$finalQuery[] = $nestedQuery;
 
@@ -145,4 +153,5 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		}
 		return $groupedItems;
 	}
+
 }
