@@ -444,6 +444,21 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		$version = kDataCenterMgr::incrementVersion($this->getVersion());
 		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION, $version);
 	}
+
+
+	public function shouldAddDistributeByType($entryType)
+	{
+		if($entryType == entryType::LIVE_STREAM)
+			return false;
+		return true;
+	}
+	
+	public function shouldDistributeByType($entryId, $entryType)
+	{
+		if($entryType == entryType::LIVE_STREAM)
+			return false;
+		return true;
+	}
 	
 	public function getSunriseDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	
 	public function getSunsetDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET);}	
