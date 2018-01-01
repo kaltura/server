@@ -348,6 +348,96 @@ class kKavaReportsMgr extends kKavaBase
 		self::DIMENSION_CATEGORIES
 	);
 
+	static $phpTimezoneNames = array(
+		-840 => 'Pacific/Kiritimati',
+		-780 => 'Pacific/Enderbury',
+		-765 => 'Pacific/Chatham',
+		-720 => 'Pacific/Auckland',
+		-690 => 'Pacific/Norfolk',
+		-660 => 'Asia/Anadyr',
+		-630 => 'Australia/Lord_Howe',
+		-600 => 'Australia/Melbourne',
+		-570 => 'Australia/Adelaide',
+		-540 => 'Asia/Tokyo',
+		-525 => 'Australia/Eucla',
+		-480 => 'Asia/Brunei',
+		-420 => 'Asia/Krasnoyarsk',
+		-390 => 'Asia/Rangoon',
+		-360 => 'Asia/Almaty',
+		-345 => 'Asia/Kathmandu',
+		-330 => 'Asia/Colombo',
+		-300 => 'Asia/Karachi',
+		-270 => 'Asia/Kabul',
+		-240 => 'Asia/Dubai',
+		-210 => 'Asia/Tehran',
+		-180 => 'Europe/Moscow',
+		-120 => 'Europe/Helsinki',
+		-60  => 'Europe/Paris',
+		0    => 'Europe/London',
+		60   => 'Atlantic/Azores',
+		120  => 'America/Noronha',
+		180  => 'America/Sao_Paulo',
+		210  => 'America/St_Johns',
+		240  => 'America/Halifax',
+		270  => 'America/Caracas',
+		300  => 'America/New_York',
+		360  => 'America/Chicago',
+		420  => 'America/Denver',
+		480  => 'America/Los_Angeles',
+		540  => 'America/Anchorage',
+		570  => 'Pacific/Marquesas',
+		600  => 'Pacific/Honolulu',
+		660  => 'Pacific/Niue',
+		720  => 'Pacific/Kwajalein',
+	);
+
+	// Note: while technically the druid list could have been the same as the php list,
+	//		it seems to be better to use Etc/GMT... with Druid when possible -
+	//		https://github.com/druid-io/druid/issues/5200
+	
+	static $druidTimezoneNames = array(
+		-840 => 'Etc/GMT-14',
+		-780 => 'Etc/GMT-13',
+		-765 => 'Pacific/Chatham',
+		-720 => 'Etc/GMT-12',
+		-690 => 'Pacific/Norfolk',
+		-660 => 'Etc/GMT-11',
+		-630 => 'Australia/Lord_Howe',
+		-600 => 'Etc/GMT-10',
+		-570 => 'Australia/Adelaide',
+		-540 => 'Etc/GMT-9',
+		-525 => 'Australia/Eucla',
+		-480 => 'Etc/GMT-8',
+		-420 => 'Etc/GMT-7',
+		-390 => 'Asia/Rangoon',
+		-360 => 'Etc/GMT-6',
+		-345 => 'Asia/Kathmandu',
+		-330 => 'Asia/Colombo',
+		-300 => 'Etc/GMT-5',
+		-270 => 'Asia/Kabul',
+		-240 => 'Etc/GMT-4',
+		-210 => 'Asia/Tehran',
+		-180 => 'Etc/GMT-3',
+		-120 => 'Etc/GMT-2',
+		-60  => 'Etc/GMT-1',
+		 0   => 'Etc/GMT',
+		 60  => 'Etc/GMT+1',
+		 120 => 'Etc/GMT+2',
+		 180 => 'Etc/GMT+3',
+		 210 => 'America/St_Johns',
+		 240 => 'Etc/GMT+4',
+		 270 => 'America/Caracas',
+		 300 => 'Etc/GMT+5',
+		 360 => 'Etc/GMT+6',
+		 420 => 'Etc/GMT+7',
+		 480 => 'Etc/GMT+8',
+		 540 => 'Etc/GMT+9',
+		 570 => 'Pacific/Marquesas',
+		 600 => 'Etc/GMT+10',
+		 660 => 'Etc/GMT+11',
+		 720 => 'Etc/GMT+12',
+	);
+	
 	protected static function transformDeviceName($name)
 	{
 		$name = strtoupper($name);
@@ -776,7 +866,7 @@ class kKavaReportsMgr extends kKavaBase
 		$max_result_size = $isCsv ? PHP_INT_MAX : self::MAX_RESULT_SIZE;
 		if ($page_index * $page_size > $max_result_size)
 		{
-			if ($page_index == 1 && !isCsv)
+			if ($page_index == 1 && !$isCsv)
 			{
 				$page_size = $max_result_size;
 			}
@@ -1095,63 +1185,42 @@ class kKavaReportsMgr extends kKavaBase
 		KalturaLog::log("getTable took [" . ($end - $start) . "]");
 
 		return $res;
-
-
 	}
 
+	private static function fixTimeZoneOffset($timezone_offset)
+	{
+		if (isset(self::$phpTimezoneNames[$timezone_offset]))
+		{
+			return $timezone_offset;
+		}
+
+		$timezone_offset = min(max($timezone_offset, -14 * 60), 12 * 60);
+		return round($timezone_offset / 60) * 60;
+	}
+
+	private static function getPhpTimezoneName($timezone_offset)
+	{
+		// Note: value must be set, since the offset already went through fixTimeZoneOffset
+		return self::$phpTimezoneNames[$timezone_offset];
+	}
+
+	private static function getDruidTimezoneName($timezone_offset)
+	{
+		// Note: value must be set, since the offset already went through fixTimeZoneOffset
+		return self::$druidTimezoneNames[$timezone_offset];
+	}
+	
 	private static function getGranularityDef($granularity, $timezone_offset)
 	{
-		// choose a timezone from - http://joda-time.sourceforge.net/timezones.html
-		// prefer a timezone relative to GMT, so that it won't be affected by DST
-		$nonRoundTimezones = array(
-			570  => 'Pacific/Marquesas',
-			270  => 'America/Caracas',
-			210  => 'America/St_Johns',
-			-210 => 'Asia/Tehran',
-			-270 => 'Asia/Kabul',
-			-330 => 'Asia/Colombo',
-			-345 => 'Asia/Kathmandu',
-			-390 => 'Asia/Rangoon',
-			-525 => 'Australia/Eucla',
-			-570 => 'Australia/Adelaide',
-			-630 => 'Australia/Lord_Howe',
-			-690 => 'Pacific/Norfolk',
-			-765 => 'Pacific/Chatham',
+		if (!isset(self::$granularity_mapping[$granularity]))
+		{
+			return self::DRUID_GRANULARITY_ALL;
+		}
+
+		$granularity_def = array(self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
+			self::DRUID_GRANULARITY_PERIOD => self::$granularity_mapping[$granularity],
+			self::DRUID_TIMEZONE => self::getDruidTimezoneName($timezone_offset)
 		);
-
-		if (isset($nonRoundTimezones[$timezone_offset]))
-		{
-			$timezone_name = $nonRoundTimezones[$timezone_offset];
-		}
-		else
-		{
-			$timezone_offset = min(max($timezone_offset, -12 * 60), 14 * 60);
-			$offset_hours = round($timezone_offset / 60);
-			if ($offset_hours < 0)
-			{
-				$timezone_name = 'Etc/GMT' . $offset_hours;
-			}
-			else if ($offset_hours > 0)
-			{
-				$timezone_name = 'Etc/GMT+' . $offset_hours;
-			}
-			else
-			{
-				$timezone_name = 'Etc/GMT';
-			}
-		}
-
-		if (isset(self::$granularity_mapping[$granularity]))
-		{
-			$granularity_def = array(self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
-				self::DRUID_GRANULARITY_PERIOD => self::$granularity_mapping[$granularity],
-				self::DRUID_TIMEZONE => $timezone_name
-			);
-		}
-		else
-		{
-			$granularity_def = self::DRUID_GRANULARITY_ALL;
-		}
 		return $granularity_def;
 	}
 
@@ -1164,7 +1233,7 @@ class kKavaReportsMgr extends kKavaBase
 			$input_filter->timeZoneOffset = 0;
 		}
 
-		$input_filter->timeZoneOffset = round($input_filter->timeZoneOffset / 30) * 30;
+		$input_filter->timeZoneOffset = self::fixTimeZoneOffset($input_filter->timeZoneOffset);
 		$fromDate = self::dateIdToInterval($input_filter->from_day, $input_filter->timeZoneOffset);
 		$toDate = self::dateIdToInterval($input_filter->to_day, $input_filter->timeZoneOffset, true);
 		if (!$fromDate || !$toDate || strcmp($toDate, $fromDate) < 0)
@@ -1221,24 +1290,24 @@ class kKavaReportsMgr extends kKavaBase
 		return gmmktime(0, 0, 0, $month, $day, $year);
 	}
 
-	// shift date by tz offset
-	private static function timestampToDateId($timestamp, $offset)
+	private static function timestampToDateId($timestamp, $tz)
 	{
 		$date = new DateTime($timestamp);
-		$date->modify((12 * 60 - $offset) . " minute");		// adding 12H in order to round to the nearest day
+		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
+		$date->setTimezone($tz);
 		return $date->format('Ymd');
 	}
 
-	// shift date by tz offset
-	private static function timestampToMonthId($timestamp, $offset)
+	private static function timestampToMonthId($timestamp, $tz)
 	{
 		$date = new DateTime($timestamp);
-		$date->modify((12 * 60 - $offset) . " minute");		// adding 12H in order to round to the nearest day
+		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
+		$date->setTimezone($tz);
 		return $date->format('Ym');
 	}
 
 	// hours are returned from druid query with the right offset so no need to change it
-	private static function timestampToHourId($timestamp)
+	private static function timestampToHourId($timestamp, $tz)
 	{
 		$date = new DateTime($timestamp);
 		return $date->format('YmdH');
@@ -1563,6 +1632,9 @@ class kKavaReportsMgr extends kKavaBase
 
 	public static function getGraphsByDateId($result, $graph_metrics_to_headers, $tz_offset, $transform)
 	{
+		$tz_name = self::getPhpTimezoneName($tz_offset);
+		$tz = new DateTimeZone($tz_name);
+
 		$graphs = array();
 
 		foreach ($graph_metrics_to_headers as $column => $header)
@@ -1574,7 +1646,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$row_data = $row[self::DRUID_RESULT];
 
-			$date = call_user_func($transform, $row[self::DRUID_TIMESTAMP], $tz_offset);
+			$date = call_user_func($transform, $row[self::DRUID_TIMESTAMP], $tz);
 
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
@@ -1586,6 +1658,9 @@ class kKavaReportsMgr extends kKavaBase
 
 	public static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
 	{
+		$tz_name = self::getPhpTimezoneName($tz_offset);
+		$tz = new DateTimeZone($tz_name);
+
 		$graphs = array();
 
 		unset($graph_metrics_to_headers[$multiline_column]);
