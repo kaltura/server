@@ -304,6 +304,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLanguage = null;
 		$audioLanguageName = null;
 
+		$useTwoCodeLang = true;
+		if (kConf::hasParam('three_code_language_partners') &&
+			in_array($flavor->getPartnerId(), kConf::get('three_code_language_partners')))
+			$useTwoCodeLang = false;
+
 		if(!isset($lang)) { //for backward compatibility
 			$mediaInfoObj = $flavor->getMediaInfo();
 			if (!$mediaInfoObj)
@@ -319,10 +324,14 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 
 			$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
 			$obj = languageCodeManager::getObjectFromThreeCode(strtolower($audioLanguage));
+			if($useTwoCodeLang)
+				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $audioLanguage;
 		}
 		else {
 			$obj = languageCodeManager::getObjectFromKalturaName($lang);
 			$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639_T]: $lang;
+			if($useTwoCodeLang)
+				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $lang;
 		}
 
 		$audioLanguageName = $this->getAudioLanguageName($obj, $audioLanguage);
