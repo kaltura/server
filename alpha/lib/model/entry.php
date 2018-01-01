@@ -3509,7 +3509,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 		elseif ($this->getType () == entryType::MEDIA_CLIP || $this->getType() == entryType::PLAYLIST) {
 			try {
-				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
+				$msgPath = $this->getDefaultThumbPath($this->getType());
+				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath );
 			} catch ( Exception $ex ) {
 				if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) {
 					// get original flavor asset
@@ -3533,7 +3534,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			}
 		}
 	}
-	
+
 	public function isSecuredEntry() {
 		
 		$invalidModerationStatuses = array(
@@ -3884,6 +3885,33 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$categoryNamesSearchData = array_unique($categoryNamesSearchData);
 
 		return array($categoryIdsSearchData, $categoryNamesSearchData);
+	}
+
+	/**
+	 * @param $type
+	 * @return null|string
+	 */
+	protected function getDefaultThumbPath($type)
+	{
+		$msgPath = null;
+		switch ($type)
+		{
+			case entryType::MEDIA_CLIP:
+			case entryType::PLAYLIST:
+			{
+				// in case of a recorded entry from live we will use the live default thumb.
+				if ($this->getRootEntryId() != null
+					&& $this->getRootEntryId() != $this->getId()
+					&& entryPeer::retrieveByPK($this->getRootEntryId())->getType() == EntryType::LIVE_STREAM
+					&& !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL))
+				)
+					return myContentStorage::getFSContentRootPath() . "content/templates/entry/thumbnail/live_thumb.jpg";
+				break;
+			}
+			default:
+				break;
+		}
+		return $msgPath;
 	}
 
 	protected static function getCategoryEntryElasticSearchData($categoryEntry, $categoryEntryStatus,  &$categoryIdsSearchArr)
