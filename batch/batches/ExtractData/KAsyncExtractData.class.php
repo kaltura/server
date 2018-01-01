@@ -80,7 +80,6 @@ class KAsyncExtractData extends KJobHandlerWorker
 			$eventCuePoint->entryId = $entryId;
 			$eventCuePoint->eventType = $event[self::SUB_TYPE_FIELD];
 			$eventCuePoint->startTime = $event[KDataExtractEngine::START_TIME_FIELD];
-			$eventCuePoint->startTime = 
 			$eventCuePoint->data = $event[KDataExtractEngine::DATA_FIELD];
 			KalturaLog::debug("sending cue point with as: " . print_r($eventCuePoint, true));
 			KBatchBase::$kClient->cuePoint->add( $eventCuePoint ) ;
