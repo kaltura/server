@@ -9,7 +9,6 @@ class KalturaEventCuePoint extends KalturaCuePoint
 	/**
 	 * @var KalturaEventType
 	 * @filter eq,in
-	 * @requiresPermission insert,update
 	 */
 	public $eventType;
 
