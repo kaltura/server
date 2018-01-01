@@ -55,7 +55,7 @@ class kCurrentContext
 	public static $ks_kuser_id = null;
 	
 	/**
-	 * @var string
+	 * @var kuser
 	 */
 	public static $ks_kuser;
 
