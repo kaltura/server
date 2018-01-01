@@ -167,7 +167,7 @@ class KAsyncConvert extends KJobHandlerWorker
 					
 				$err = null;
 				$fetched = false;
-				if(!$this->distributedFileManager->getLocalPath($srcFileSyncDescriptor->actualFileSyncLocalPath, $srcFileSyncDescriptor->fileSyncRemoteUrl, $err))
+				if(!$this->distributedFileManager->getLocalPath($srcFileSyncDescriptor->actualFileSyncLocalPath, $srcFileSyncDescriptor->fileSyncRemoteUrl, $err, $fetched))
 				{
 					if(!$err)
 						$err = 'Failed to translate url to local path';
