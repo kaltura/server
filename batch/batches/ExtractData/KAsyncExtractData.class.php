@@ -50,18 +50,17 @@ class KAsyncExtractData extends KJobHandlerWorker
 
 		foreach($engines as $engineType)
 		{
-			$engine = self::getEngineByType($engineType);
+			$engine = KDataExtractEngine::getInstance($engineType);
 			if (!$engine)
 			{
 				KalturaLog::log("Engine type of [$engineType] not found");
 				continue;
 			}
-			$newData = $engine->getData($data->fileContainer);
-			//Engine interface:
-			//getType(KalturaFileContainer) return array: start time, data
-			//getSubType(); return KalturaDataExtractEngineType::MUSIC_RECOGNIZER
-			//return array(keys: )
-			$dataList = array_merge($dataList, $newData);
+			/**@var $engine KDataExtractEngine */
+			$newDataArray = $engine->extractData($data->fileContainer);
+			foreach($newDataArray as $data)
+				$data['subType'] = $engine->getSubType();
+			$dataList = array_merge($dataList, $newDataArray);
 		}
 
 		// for all data add cue point
@@ -71,19 +70,7 @@ class KAsyncExtractData extends KJobHandlerWorker
 		
 		return $job;
 	}
-
-	private static function getEngineByType($engineType)
-	{
-		switch ($engineType)
-		{
-			case KalturaDataExtractEngineType::MUSIC_RECOGNIZER:
-				return null;
-			case KalturaDataExtractEngineType::CHAPTER_LINKER:
-				return null;
-			default:
-				return null;
-		}
-	}
+	
 
 	private static function createCuePoint($entryId, $dataList)
 	{
@@ -92,7 +79,7 @@ class KAsyncExtractData extends KJobHandlerWorker
 		foreach ($dataList as $data) {
 			$eventCuePoint = new KalturaEventCuePoint();
 			$eventCuePoint->entryId = $entryId;
-			$eventCuePoint->eventType = $data[0];
+			$eventCuePoint->eventType = $data['subType'];
 			$eventCuePoint->startTime = $data[1];
 			$eventCuePoint->data = $data[2];
 			
