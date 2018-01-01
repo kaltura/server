@@ -5,7 +5,7 @@
  */ 
 interface dataExtractEngineType extends BaseEnum
 {
-	const MUSIC_RECOGNIZER = 1;
-	const CHAPTER_LINKER = 2;
+	const MUSIC_RECOGNIZER = 301;
+	const CHAPTER_LINKER = 302;
 	
 }

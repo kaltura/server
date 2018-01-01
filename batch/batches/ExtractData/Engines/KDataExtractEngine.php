@@ -7,18 +7,18 @@
 abstract class KDataExtractEngine
 {
     /**
-     * Will return the proper engine depending on the type (KalturaConversionEngineType)
+     * Will return the proper engine depending on the type (KalturaDataExtractEngineType)
      *
      * @param int $type
-     * @return KConversionEngine
+     * @return KDataExtractEngine
      */
     public static function getInstance($type)
     {
         switch ($type)
         {
-            case KalturaDataExtractEngineType::MUSIC_RECOGNIZER:
+            case KalturaConversionEngineType::MUSIC_RECOGNIZER:
                 return null;
-            case KalturaDataExtractEngineType::CHAPTER_LINKER:
+            case KalturaConversionEngineType::CHAPTER_LINKER:
                 return null;
             default:
                 return null;
@@ -29,7 +29,7 @@ abstract class KDataExtractEngine
 
     /**
      * @param KalturaFileContainer $fileContainer
-     *  return keys: startTime and data
+     *  return array of keys: startTime and data
      * @return array
      */
     abstract public function extractData ( KalturaFileContainer $fileContainer );
