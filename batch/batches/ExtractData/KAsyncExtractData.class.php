@@ -73,13 +73,15 @@ class KAsyncExtractData extends KJobHandlerWorker
 	private static function createCuePoint($entryId, $dataList)
 	{
 		KalturaLog::log("Creating " . count($dataList) . " cue points for entryId [$entryId]");
+		
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($dataList as $event) {
 			$eventCuePoint = new KalturaEventCuePoint();
 			$eventCuePoint->entryId = $entryId;
 			$eventCuePoint->eventType = $event[self::SUB_TYPE_FIELD];
-			$eventCuePoint->startTime = $event['startTime'];
-			$eventCuePoint->data = $event['data'];
+			$eventCuePoint->startTime = $event[KDataExtractEngine::START_TIME_FIELD];
+			$eventCuePoint->startTime = 
+			$eventCuePoint->data = $event[KDataExtractEngine::DATA_FIELD];
 			KalturaLog::debug("sending cue point with as: " . print_r($eventCuePoint, true));
 			KBatchBase::$kClient->cuePoint->add( $eventCuePoint ) ;
 		}

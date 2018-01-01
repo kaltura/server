@@ -72,16 +72,17 @@ class KDataExtractMusicEngine extends KDataExtractEngine
             return null;
 
         $musicData = array();
+        $startTimes = array(5000, 15000, 25000, 35000);
         foreach ($obj['metadata']['music'] as $song)
         {
             $songDetails = array();
-            $songDetails['startTime'] = $song['play_offset_ms'];
+            $songDetails[self::START_TIME_FIELD] = array_shift($startTimes);
+            //$songDetails['startTime'] = $song['play_offset_ms']; // sample_begin_time_offset_ms -> need to trade to
             $data =  array('name' => $song['title'],
                 'artist' => $song['artists'][0]['name'],
                 'album' => $song['album']['name'],
-                'duration' => $song['duration_ms'],
                 'spotifyId' => $song['external_metadata']['spotify']['track']['id']);
-            $songDetails['data'] = json_encode($data);
+            $songDetails[self::DATA_FIELD] = json_encode($data);
             $musicData[] = $songDetails;
         }
 

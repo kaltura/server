@@ -6,6 +6,9 @@
  */
 abstract class KDataExtractEngine
 {
+    
+    CONST START_TIME_FIELD = 'startTime';
+    CONST DATA_FIELD = 'dataTime';
     /**
      * Will return the proper engine depending on the type (KalturaDataExtractEngineType)
      *
