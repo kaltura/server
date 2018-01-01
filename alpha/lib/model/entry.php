@@ -3835,6 +3835,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 		foreach ($parentCategoryEntries as $parentCategoryEntry)
 			self::getCategoryEntryElasticSearchData($parentCategoryEntry, $parentCategoryEntry->getStatus(), $parentCategoryIdsSearchData);
 
+		$parentCategoryIdsSearchData = array_unique($parentCategoryIdsSearchData);
+		$parentCategoryIdsSearchData = array_values($parentCategoryIdsSearchData);
+
 		$body['parent_entry'] = array(
 			'entry_id' => $parentEntry->getId(),
 			'partner_id' => $parentEntry->getPartnerId(),
@@ -3881,7 +3884,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 
 		$categoryIdsSearchData = array_unique($categoryIdsSearchData);
+		$categoryIdsSearchData = array_values($categoryIdsSearchData);
 		$categoryNamesSearchData = array_unique($categoryNamesSearchData);
+		$categoryNamesSearchData = array_values($categoryNamesSearchData);
 
 		return array($categoryIdsSearchData, $categoryNamesSearchData);
 	}
