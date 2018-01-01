@@ -115,10 +115,9 @@ class kESearchCoreAdapter
 	{
 		$queryNames = explode(ESearchNestedObjectItem::QUERY_NAME_DELIMITER, $innerHitsKey);
 		$objectType = $queryNames[0];
-		if ($queryNames[1] != ESearchNestedObjectItem::DEFAULT_GROUP_NAME)
+		if ($queryNames[1] != ESearchNestedObjectItem::DEFAULT_GROUP_NAME && $objectType == ESearchItemDataType::CUE_POINTS)
 		{
 			$objectSubType = str_replace(ESearchNestedObjectItem::SUBTYPE_DELIMITER,'.' ,$queryNames[1]);
-			$objectSubType = str_replace(ESearchNestedObjectItem::XPATH_DELIMITER,'.' ,$objectSubType);
 		}
 		else
 			$objectSubType = null;

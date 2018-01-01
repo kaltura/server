@@ -10,7 +10,6 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 	const DEFAULT_GROUP_NAME = 'default_group';
 	const QUERY_NAME_DELIMITER = '#DEL#';
 	const SUBTYPE_DELIMITER = '#SUBTYPE_DEL#';
-	const XPATH_DELIMITER = '#XPATH_DEL#';
 
 	protected static function initializeInnerHitsSize($queryAttributes)
 	{
