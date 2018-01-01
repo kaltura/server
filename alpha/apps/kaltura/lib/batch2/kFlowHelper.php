@@ -2042,6 +2042,10 @@ class kFlowHelper
 	 */
 	public static function handleConvertProfilePending(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
+		$extractDataEngines = self::getDataExtractEngines($dbBatchJob);
+		if (count($extractDataEngines))
+			kJobsManager::addExtractDataJob($dbBatchJob, $dbBatchJob->getObjectId(), $extractDataEngines);
+
 		if($data->getExtractMedia()) // check if extract media required
 		{
 			// creates extract media job
@@ -2073,6 +2077,21 @@ class kFlowHelper
 		$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 
 		return $dbBatchJob;
+	}
+
+	private static function getDataExtractEngines(BatchJob $dbBatchJob)
+	{
+		//GET ALL DataExtractEngines for the partnerId
+		/* @var $profile conversionProfile2*/
+		$entryId = $dbBatchJob->getObjectId();
+		$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		$dataExtractEngines = $profile->getDataExtractEngines();
+		KalturaLog::debug("asdf [$entryId] [$dataExtractEngines]");
+		if ($dataExtractEngines && strlen($dataExtractEngines))
+			return explode(',', $dataExtractEngines);
+
+		return array("Engine1", "Engine2");
+		return null;
 	}
 
 	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data)

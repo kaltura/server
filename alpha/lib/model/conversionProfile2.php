@@ -21,6 +21,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	const FILE_SYNC_MEDIAINFO_XSL = 2;
 	
 	const DEFAULT_REPLACEMENT_OPTIONS = "defaultReplacementOptions";
+	const CUSTOM_DATA_DATA_EXTRACT_ENGINE = "dataExtractEngines";
 	
 	private $xsl;
 	private $mediaInfoXsl;
@@ -376,5 +377,8 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	 */
 	public function getDefaultReplacementOptions() {return $this->getFromCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, null, 0);}
 	public function setDefaultReplacementOptions($v) {$this->putInCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, $v);}
+
+	public function getDataExtractEngines() {return $this->getFromCustomData(self::CUSTOM_DATA_DATA_EXTRACT_ENGINE, null, 0);}
+	public function setDataExtractEngines($v) {$this->putInCustomData(self::CUSTOM_DATA_DATA_EXTRACT_ENGINE, $v);}
 
 }

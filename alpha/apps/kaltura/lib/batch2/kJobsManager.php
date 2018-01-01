@@ -1525,8 +1525,31 @@ class kJobsManager
 		KalturaLog::log("Creating File Delete job, from data center id: ". $dc ." with source file: " . $deleteFileData->getLocalFileSyncPath());
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
 	}
-	
-	
+
+	public static function addExtractDataJob(BatchJob $parentJob = null, $entryId, $enginesType)
+	{
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
+		$fileSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($fileSyncKey);
+		
+		$extractDataJobData = new kExtractDataJobData();
+		$fileContainer = self::getFileContainerByFileSync($fileSync);
+		$extractDataJobData->setFileContainer($fileContainer);
+		$extractDataJobData->setEnginesType($enginesType);
+		$extractDataJobData->setEntryId($entryId);
+
+		if ($parentJob)
+			$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_DATA, null, false);
+		else
+			$batchJob = new BatchJob();
+
+		KalturaLog::log("asdf - 10 - Creating Extract Data job, data as:" );
+		KalturaLog::log(print_r($extractDataJobData, true));
+		//return self::addJob($batchJob, $extractDataJobData, BatchJobType::EXTRACT_DATA, null);
+	}
+
+
+
 	public static function addExtractMediaJob(BatchJob $parentJob, $inputFileSyncLocalPath, $flavorAssetId)
 	{
 		$profile = null;

@@ -64,6 +64,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobType::CONVERT_PROFILE => 'Convert Profile',
 		BatchJobType::POSTCONVERT => 'Post Convert',
 		BatchJobType::EXTRACT_MEDIA => 'Extract Media',
+		BatchJobType::EXTRACT_DATA => 'Extract Data',
 		BatchJobType::MAIL => 'Mail',
 		BatchJobType::NOTIFICATION => 'Notification',
 		BatchJobType::CLEANUP => 'Cleanup',

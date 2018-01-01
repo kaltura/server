@@ -186,10 +186,17 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	
 	/**
 	 * Default replacement options to be applied to entries
-	 * 
+	 *
 	 * @var KalturaEntryReplacementOptions
 	 */
 	public $defaultReplacementOptions;
+
+	/**
+	 * data extract engine to run in this profile
+	 * @dynamicType KalturaAssetType
+	 * @var string
+	 */
+	public $dataExtractEngines;
 	
 	private static $map_between_objects = array
 	(
@@ -214,6 +221,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		"conditionalProfiles",
 		"detectGOP",
 		"defaultReplacementOptions",
+		"dataExtractEngines",
 	);
 	
 	public function getMapBetweenObjects ( )
