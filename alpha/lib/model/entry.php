@@ -3892,21 +3892,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 * @param $type
 	 * @return null|string
 	 */
-	protected function getDefaultThumbPath($type)
+	protected function getDefaultThumbPath()
 	{
-		switch ($type)
-		{
-			case entryType::MEDIA_CLIP:
-			case entryType::PLAYLIST:
-			{
-				// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
-				if ($this->getSourceType() != null && $this->getSourceType() == EntrySourceType::RECORDED_LIVE && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
-					return myContentStorage::getFSContentRootPath() . self::LIVE_THUMB_PATH;
-				break;
-			}
-			default:
-				break;
-		}
+		// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
+		if ($this->getSourceType() == EntrySourceType::RECORDED_LIVE && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+			return myContentStorage::getFSContentRootPath() . self::LIVE_THUMB_PATH;
 		return null;
 	}
 
