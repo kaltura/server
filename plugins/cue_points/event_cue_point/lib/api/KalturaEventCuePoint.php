@@ -7,11 +7,17 @@
 class KalturaEventCuePoint extends KalturaCuePoint
 {
 	/**
-	 * @var KalturaEventType 
+	 * @var KalturaEventType
 	 * @filter eq,in
 	 * @requiresPermission insert,update
 	 */
 	public $eventType;
+
+	/**
+	 * @var string
+	 */
+	public $data;
+
 	
 	public function __construct()
 	{
@@ -21,6 +27,7 @@ class KalturaEventCuePoint extends KalturaCuePoint
 	private static $map_between_objects = array
 	(
 		"eventType" => "subType",
+		"data" => "text",
 	);
 	
 	/* (non-PHPdoc)

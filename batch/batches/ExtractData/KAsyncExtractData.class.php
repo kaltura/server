@@ -69,8 +69,11 @@ class KAsyncExtractData extends KJobHandlerWorker
 
 	private static function getEngineByType($engineType)
 	{
-		switch ($engineType) {
-			case "Engine1":
+		switch ($engineType)
+		{
+			case KalturaDataExtractEngineType::MUSIC_RECOGNIZER:
+				return null;
+			case KalturaDataExtractEngineType::CHAPTER_LINKER:
 				return null;
 			default:
 				return null;
@@ -79,15 +82,21 @@ class KAsyncExtractData extends KJobHandlerWorker
 
 	private static function createCuePoint($entryId, $dataList)
 	{
+		KalturaLog::log("Creating " . count($dataList) . " cue points for entryId [$entryId]");
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($dataList as $data) {
-			$thumbCuePoint = new KalturaThumbCuePoint();
-			$thumbCuePoint->entryId = $entryId;
-			$thumbCuePoint->triggeredAt = $data[0];
-			KBatchBase::$kClient->cuePoint->add( $thumbCuePoint ) ;
+			$eventCuePoint = new KalturaEventCuePoint();
+			$eventCuePoint->entryId = $entryId;
+			$eventCuePoint->eventType = $data[0];
+			$eventCuePoint->triggeredAt = $data[1];
+			$eventCuePoint->data = $data[2];
+			
+			KBatchBase::$kClient->cuePoint->add( $eventCuePoint ) ;
 		}
 		KBatchBase::$kClient->doMultiRequest();
 	}
+	
+	
 
 }
 
