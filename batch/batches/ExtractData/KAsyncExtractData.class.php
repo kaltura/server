@@ -57,6 +57,10 @@ class KAsyncExtractData extends KJobHandlerWorker
 				continue;
 			}
 			$newData = $engine->getData($data->fileContainer);
+			//Engine interface:
+			//getType(KalturaFileContainer) return array: start time, data
+			//getSubType(); return KalturaDataExtractEngineType::MUSIC_RECOGNIZER
+			//return array(keys: )
 			$dataList = array_merge($dataList, $newData);
 		}
 
@@ -89,7 +93,7 @@ class KAsyncExtractData extends KJobHandlerWorker
 			$eventCuePoint = new KalturaEventCuePoint();
 			$eventCuePoint->entryId = $entryId;
 			$eventCuePoint->eventType = $data[0];
-			$eventCuePoint->triggeredAt = $data[1];
+			$eventCuePoint->startTime = $data[1];
 			$eventCuePoint->data = $data[2];
 			
 			KBatchBase::$kClient->cuePoint->add( $eventCuePoint ) ;

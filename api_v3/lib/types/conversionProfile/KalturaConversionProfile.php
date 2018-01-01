@@ -193,7 +193,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 
 	/**
 	 * data extract engine to run in this profile
-	 * @dynamicType KalturaAssetType
+	 * @dynamicType KalturaDataExtractEngineType
 	 * @var string
 	 */
 	public $dataExtractEngines;
