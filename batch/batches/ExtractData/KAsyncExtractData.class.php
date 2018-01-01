@@ -1,10 +1,5 @@
 <?php
 /**
- * @package Scheduler
- * @subpackage Extract-Data
- */
-
-/**
  * Will extract the data of a single file 
  *
  * @package Scheduler
