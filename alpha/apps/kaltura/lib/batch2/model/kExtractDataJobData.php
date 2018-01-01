@@ -8,17 +8,17 @@ class kExtractDataJobData extends kJobData
 	/**
 	 * @var FileContainer
 	 */
-	public $fileContainer;
+	private $fileContainer;
 
 	/**
 	 * @var string
 	 */
-	public $entryId;
+	private $entryId;
 
 	/**
 	 * @var string
 	 */
-	public $enginesType;
+	private $enginesType;
 	
 	
 	/**

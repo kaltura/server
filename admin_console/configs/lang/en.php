@@ -19,6 +19,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::CONVERT_PROFILE' => 'Convert Profile',
 	'Kaltura_Client_Enum_BatchJobType::POSTCONVERT' => 'Post Convert',
 	'Kaltura_Client_Enum_BatchJobType::EXTRACT_MEDIA' => 'Extract Media',
+	'Kaltura_Client_Enum_BatchJobType::EXTRACT_DATA' => 'Extract Data',
 	'Kaltura_Client_Enum_BatchJobType::MAIL' => 'Send Mail',
 	'Kaltura_Client_Enum_BatchJobType::NOTIFICATION' => 'Send Notification',
 	'Kaltura_Client_Enum_BatchJobType::CLEANUP' => 'Cleanup',

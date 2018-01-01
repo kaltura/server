@@ -416,6 +416,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaCopyCaptionsJobData();
 				break;
 
+			case 'kExtractDataJobData':
+				$this->data = new KalturaExtractDataJobData();
+				break;
+
 			default:
 				if($dbData instanceof kBulkUploadJobData)
 				{
