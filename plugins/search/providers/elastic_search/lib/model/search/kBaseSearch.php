@@ -113,12 +113,12 @@ abstract class kBaseSearch
 
     protected function addGlobalHighlights()
 	{
-		$this->queryAttributes->setScopeToGlobal();
+        $this->queryAttributes->setScopeToGlobal();
         $numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey(self::GLOBAL_HIGHLIGHT_CONFIG);
-		$highlight = new kESearchHighlightQuery($this->queryAttributes->getFieldsToHighlight(), $numOfFragments);
-		$highlight = $highlight->getFinalQuery();
-		if($highlight)
-			$this->query['body']['highlight'] = $highlight;
+        $highlight = new kESearchHighlightQuery($this->queryAttributes->getFieldsToHighlight(), $numOfFragments);
+        $highlight = $highlight->getFinalQuery();
+        if($highlight)
+            $this->query['body']['highlight'] = $highlight;
 	}
 
     protected function applyElasticSearchConditions()
