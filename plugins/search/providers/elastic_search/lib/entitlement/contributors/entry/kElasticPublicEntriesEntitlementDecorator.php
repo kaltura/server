@@ -18,33 +18,27 @@ class kElasticPublicEntriesEntitlementDecorator implements IKalturaESearchEntryE
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix = '')
 	{
 		$condition = new kESearchBoolQuery();
-		$existQuery = new kESearchExistsQuery("{$fieldPrefix}category_ids");
-		$condition->addToMustNot($existQuery);
+		$statuses = $params['category_statues'];
+		$statuses = array_map('elasticSearchUtils::formatCategoryEntryStatus', $statuses);
+		$termsQuery = new kESearchTermsQuery("{$fieldPrefix}category_ids", $statuses);
+		$condition->addToMustNot($termsQuery);
 		return $condition;
 	}
 
 	public static function applyCondition(&$entryQuery, &$parentEntryQuery)
 	{
+
 		if(kEntryElasticEntitlement::$publicEntries)
+			$params['category_statues'] = array(CategoryEntryStatus::ACTIVE, CategoryEntryStatus::PENDING);
+		else if(kEntryElasticEntitlement::$publicActiveEntries)
+			$params['category_statues'] = array(CategoryEntryStatus::ACTIVE);
+
+		if($parentEntryQuery)
 		{
-			if($parentEntryQuery)
-			{
-				$condition = self::getEntitlementCondition(array(), 'parent_entry.');
-				$parentEntryQuery->addToShould($condition);
-			}
-			$condition = self::getEntitlementCondition();
-			$entryQuery->addToShould($condition);
+			$condition = self::getEntitlementCondition($params, 'parent_entry.');
+			$parentEntryQuery->addToShould($condition);
 		}
-		
-		if(kEntryElasticEntitlement::$publicActiveEntries)
-		{
-			if($parentEntryQuery)
-			{
-				$condition = self::getEntitlementCondition(array(), 'parent_entry.active_');
-				$parentEntryQuery->addToShould($condition);
-			}
-			$condition = self::getEntitlementCondition(array(), 'active_');
-			$entryQuery->addToShould($condition);
-		}
+		$condition = self::getEntitlementCondition($params);
+		$entryQuery->addToShould($condition);
 	}
 }

@@ -329,12 +329,16 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 
 	}
 
-	public function getNestedQueryName()
+	public function getNestedQueryNames()
 	{
+		$groupName = null;
+		if($this->getMetadataProfileId())
+			$groupName = $this->getMetadataProfileId();
 		if($this->getXpath())
-			return ESearchItemDataType::METADATA.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME.self::getMetadataProfileId().self::QUERY_NAME_DELIMITER.md5($this->getXpath());
+			$groupName .= $this->getXpath();
 
-		return ESearchItemDataType::METADATA.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME;
+		$groupName = $groupName ? md5($groupName) : self::DEFAULT_GROUP_NAME;
+		return array(ESearchItemDataType::METADATA.self::QUERY_NAME_DELIMITER.$groupName);
 	}
 
 }

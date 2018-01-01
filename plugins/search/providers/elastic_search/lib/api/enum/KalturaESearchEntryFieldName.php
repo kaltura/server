@@ -9,7 +9,6 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const NAME = 'name';
 	const DESCRIPTION = 'description';
 	const TAGS = 'tags';
-	const CATEGORY_IDS = 'category_ids';
 	const USER_ID = 'kuser_id';
 	const CREATOR_ID = 'creator_kuser_id';
 	const START_DATE = 'start_date';
@@ -30,14 +29,12 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const UPDATED_AT = 'updated_at';
 	const MODERATION_STATUS = 'moderation_status';
 	const ENTRY_TYPE = 'entry_type';
-	const CATEGORIES = 'categories';
 	const ADMIN_TAGS = 'admin_tags';
 	const CREDIT = 'credit';
 	const SITE_URL = 'site_url';
 	const ACCESS_CONTROL_ID = 'access_control_id';
 	const VOTES = 'votes';
 	const VIEWS = 'views';
-	const CATEGORY_NAME = 'category_name';
 	const EXTERNAL_SOURCE_TYPE = 'external_source_type';
 	const IS_QUIZ = 'is_quiz';
 	const IS_LIVE = 'is_live';

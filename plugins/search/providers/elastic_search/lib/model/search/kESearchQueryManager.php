@@ -100,7 +100,7 @@ class kESearchQueryManager
 		$fieldSuffix = '';
 		$queryObject = 'kESearchTermQuery';
 
-		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
+		if(isset($allowedSearchTypes[$fieldName]) && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 			$queryObject = 'kESearchMatchPhraseQuery';
 		
 		$exactMatch = new $queryObject($fieldName, $searchTerm);
@@ -113,7 +113,7 @@ class kESearchQueryManager
 	public static function getPrefixQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)
 	{
 		$fieldSuffix = '';
-		if(in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
+		if(isset($allowedSearchTypes[$fieldName]) && in_array(ESearchItemType::PARTIAL, $allowedSearchTypes[$fieldName]))
 			$fieldSuffix = '.'.self::RAW_FIELD_SUFFIX;
 
 		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());

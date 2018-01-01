@@ -24,6 +24,28 @@ class ESearchQueryAttributes
 	protected $objectId;
 
 	/**
+	 * @var string
+	 */
+	protected $objectSubType;
+
+	/**
+	 * @return string
+	 */
+	public function getObjectSubType()
+	{
+		return $this->objectSubType;
+	}
+
+	/**
+	 * @param string $objectSubType
+	 */
+	public function setObjectSubType($objectSubType)
+	{
+		$this->objectSubType = $objectSubType;
+	}
+
+
+	/**
 	 * @return string
 	 */
 	public function getObjectId()

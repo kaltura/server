@@ -52,10 +52,6 @@
 			"letter",
 			"digit"
 		  ]
-		},
-		"kaltura_category_name_tokenizer" : {
-		  "type": "pattern",
-		  "pattern": ">"
 		}
 	  },
 	  "analyzer": {
@@ -89,17 +85,6 @@
 			"english_stemmer",
 			"kaltura_english_synonym_filter",
 			"kaltura_unique_token_filter"
-		  ]
-		},
-		"kaltura_category_name_analyzer": {
-		  "tokenizer": "kaltura_category_name_tokenizer",
-		  "char_filter": [
-			"kaltura_whitespace_filter"
-		  ],
-		  "filter": [
-			"lowercase",
-			"trim",
-			"asciifolding"
 		  ]
 		}
 	  }
@@ -470,22 +455,11 @@
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
-		"category_ids" : {
+		"categories_ids" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
-		"categories" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword",
-		  "fields": {
-			"name" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_category_name_analyzer",
-			  "search_analyzer": "kaltura_keyword"
-			}
-		  }
-		},
-		"active_category_ids" : {
+		"categories_names" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
@@ -648,11 +622,7 @@
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
 			},
-			"category_ids" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"active_category_ids" : {
+			"categories_ids" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
 			}

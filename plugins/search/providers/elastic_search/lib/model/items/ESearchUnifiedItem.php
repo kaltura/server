@@ -39,6 +39,7 @@ class ESearchUnifiedItem extends ESearchItem
 			$subQuery = new kESearchBoolQuery();
 
 			self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
 			self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
 			self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
 			self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
@@ -74,6 +75,50 @@ class ESearchUnifiedItem extends ESearchItem
 			foreach ($entryQueries as $entryQuery)
 			{
 				$entryUnifiedQuery->addToShould($entryQuery);
+			}
+		}
+
+	}
+
+	private static function addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
+	{
+		$categoryEntryItems = array();
+		$categoryEntryNameAllowedFields = ESearchCategoryEntryNameItem::getAllowedSearchTypesForField();
+
+
+		foreach($categoryEntryNameAllowedFields as $fieldName => $fieldAllowedTypes)
+		{
+			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
+			{
+				$categoryEntryItem = new ESearchCategoryEntryNameItem();
+				$categoryEntryItem->setFieldName($fieldName);
+				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
+
+				$categoryEntryItems[] = $categoryEntryItem;
+			}
+		}
+
+		$categoryEntryAncestorNameAllowedFields = ESearchCategoryEntryAncestorNameItem::getAllowedSearchTypesForField();
+		foreach($categoryEntryAncestorNameAllowedFields as $fieldName => $fieldAllowedTypes)
+		{
+			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
+			{
+				$categoryEntryItem = new ESearchCategoryEntryAncestorNameItem();
+				$categoryEntryItem->setFieldName($fieldName);
+				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
+
+				$categoryEntryItems[] = $categoryEntryItem;
+			}
+		}
+
+		if(count($categoryEntryItems))
+		{
+			$categoryEntryQueries = ESearchBaseCategoryEntryItem::createSearchQuery($categoryEntryItems, 'should', $queryAttributes,  null);
+			foreach ($categoryEntryQueries as $categoryEntryQuery)
+			{
+				$entryUnifiedQuery->addToShould($categoryEntryQuery);
 			}
 		}
 

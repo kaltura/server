@@ -3830,6 +3830,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 		if (!$parentEntry || $parentEntry->getId() == $this->getId())
 			return;
 
+		$parentCategoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($parentEntry->getId());
+		$parentCategoryIdsSearchData = array();
+		foreach ($parentCategoryEntries as $parentCategoryEntry)
+			self::getCategoryEntryElasticSearchData($parentCategoryEntry, $parentCategoryEntry->getStatus(), $parentCategoryIdsSearchData);
+
 		$body['parent_entry'] = array(
 			'entry_id' => $parentEntry->getId(),
 			'partner_id' => $parentEntry->getPartnerId(),
@@ -3839,17 +3844,77 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
 			'kuser_id' => $parentEntry->getKuserId(),
 			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
-			'category_ids' => $parentEntry->getAllCategoriesIds(true),
-			'active_category_ids' => $parentEntry->getAllCategoriesIds(false),
+			'categories_ids' => $parentCategoryIdsSearchData,
 		);
 	}
 
 	protected function addCategoriesToObjectParams(&$body)
 	{
-		$categoryIds = $this->getAllCategoriesIds(true);
-		$body['category_ids'] = $categoryIds;
-		$body['active_category_ids'] = $this->getAllCategoriesIds(false);
-		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);
+		$categoryEntries = categoryEntryPeer::selectByEntryId($this->getId());
+		list($categoryIdsSearchData, $categoryNamesSearchData) = $this->getCategoriesElasticSearchData($categoryEntries);
+		$body['categories_ids'] = $categoryIdsSearchData;
+		$body['categories_names'] = $categoryNamesSearchData;
+	}
+
+	protected function getCategoriesElasticSearchData($categoryEntries)
+	{
+		$categoryIds = array();
+		$mapCategoryEntryStatus = array();
+		$categoryIdsSearchData = array();
+		$categoryNamesSearchData = array();
+		foreach ($categoryEntries as $categoryEntry)
+		{
+			/** @var categoryEntry $categoryEntry */
+			self::getCategoryEntryElasticSearchData($categoryEntry, $categoryEntry->getStatus(), $categoryIdsSearchData);
+			$categoryIds[] = $categoryEntry->getCategoryId();
+			$mapCategoryEntryStatus[$categoryEntry->getCategoryId()] = $categoryEntry->getStatus();
+		}
+
+		if(count($categoryIds))
+		{
+			$categories = categoryPeer::retrieveByPKs($categoryIds);
+			foreach ($categories as $category)
+			{
+				$fullName = $category->getFullName();
+				self::getCategoryNamesSearchData($fullName, $mapCategoryEntryStatus[$category->getId()], $category->getName(), $categoryNamesSearchData);
+			}
+		}
+
+		$categoryIdsSearchData = array_unique($categoryIdsSearchData);
+		$categoryNamesSearchData = array_unique($categoryNamesSearchData);
+
+		return array($categoryIdsSearchData, $categoryNamesSearchData);
+	}
+
+	protected static function getCategoryEntryElasticSearchData($categoryEntry, $categoryEntryStatus,  &$categoryIdsSearchArr)
+	{
+		$fullIds = $categoryEntry->getCategoryFullIds();
+		$categoryIdsSearchArr[] = elasticSearchUtils::formatCategoryFullIdStatus($fullIds, $categoryEntryStatus);
+		$categoryIdsSearchArr[] = elasticSearchUtils::formatCategoryIdStatus($categoryEntry->getCategoryId(),$categoryEntryStatus);
+		$categoryIdsSearchArr[] = elasticSearchUtils::formatCategoryEntryStatus($categoryEntryStatus);
+		$categoryEntryFullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $fullIds);
+		foreach($categoryEntryFullIds as $categoryId)
+		{
+			if (!trim($categoryId))
+				continue;
+
+			if($categoryId != $categoryEntry->getCategoryId())
+				$categoryIdsSearchArr[] = elasticSearchUtils::formatParentCategoryIdStatus($categoryId, $categoryEntryStatus);
+		}
+	}
+
+	protected static function getCategoryNamesSearchData($categoryFullName, $categoryEntryStatus, $categoryName, &$categoryNameSearchArr)
+	{
+		$categoryNameSearchArr[] = elasticSearchUtils::formatCategoryNameStatus($categoryName, $categoryEntryStatus);
+		$categoryFullNames = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryFullName);
+		foreach($categoryFullNames as $categoryFName)
+		{
+			if (!trim($categoryFName))
+				continue;
+
+			if($categoryName != $categoryFName)
+				$categoryNameSearchArr[] = elasticSearchUtils::formatParentCategoryNameStatus($categoryFName, $categoryEntryStatus);
+		}
 	}
 
 	public function getTagsArr()
