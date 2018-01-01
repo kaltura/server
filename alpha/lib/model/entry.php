@@ -142,6 +142,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CAPABILITIES = "capabilities";
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
+	const LIVE_THUMB_PATH = "content/templates/entry/thumbnail/live_thumb.jpg";
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -3893,25 +3894,20 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	protected function getDefaultThumbPath($type)
 	{
-		$msgPath = null;
 		switch ($type)
 		{
 			case entryType::MEDIA_CLIP:
 			case entryType::PLAYLIST:
 			{
-				// in case of a recorded entry from live we will use the live default thumb.
-				if ($this->getRootEntryId() != null
-					&& $this->getRootEntryId() != $this->getId()
-					&& entryPeer::retrieveByPK($this->getRootEntryId())->getType() == EntryType::LIVE_STREAM
-					&& !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL))
-				)
-					return myContentStorage::getFSContentRootPath() . "content/templates/entry/thumbnail/live_thumb.jpg";
+				// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
+				if ($this->getSourceType() != null && $this->getSourceType() == EntrySourceType::RECORDED_LIVE && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+					return myContentStorage::getFSContentRootPath() . self::LIVE_THUMB_PATH;
 				break;
 			}
 			default:
 				break;
 		}
-		return $msgPath;
+		return null;
 	}
 
 	protected static function getCategoryEntryElasticSearchData($categoryEntry, $categoryEntryStatus,  &$categoryIdsSearchArr)
