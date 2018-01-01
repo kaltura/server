@@ -17,7 +17,7 @@ abstract class KDataExtractEngine
         switch ($type)
         {
             case KalturaConversionEngineType::MUSIC_RECOGNIZER:
-                return null;
+                return new KDataExtractMusicEngine();
             case KalturaConversionEngineType::CHAPTER_LINKER:
                 return null;
             default:
