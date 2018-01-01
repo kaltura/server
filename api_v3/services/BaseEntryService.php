@@ -421,7 +421,15 @@ class BaseEntryService extends KalturaEntryService
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
-				$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+				try
+				{
+					$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+				}
+				catch (kCoreException $e)
+				{
+					if ($e->getCode()==kCoreException::SOURCE_FILE_NOT_FOUND)
+						throw new KalturaAPIException(APIErrors::SOURCE_FILE_NOT_FOUND);
+				}
 		    	$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
     			return $baseEntry;
 			case entryType::MIX:
