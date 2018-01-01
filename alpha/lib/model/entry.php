@@ -142,6 +142,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CAPABILITIES = "capabilities";
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
+	const LIVE_THUMB_PATH = "content/templates/entry/thumbnail/live_thumb.jpg";
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -3509,7 +3510,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 		elseif ($this->getType () == entryType::MEDIA_CLIP || $this->getType() == entryType::PLAYLIST) {
 			try {
-				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
+				$msgPath = $this->getDefaultThumbPath($this->getType());
+				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath );
 			} catch ( Exception $ex ) {
 				if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) {
 					// get original flavor asset
@@ -3533,7 +3535,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			}
 		}
 	}
-	
+
 	public function isSecuredEntry() {
 		
 		$invalidModerationStatuses = array(
@@ -3889,6 +3891,18 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$categoryNamesSearchData = array_values($categoryNamesSearchData);
 
 		return array($categoryIdsSearchData, $categoryNamesSearchData);
+	}
+
+	/**
+	 * @param $type
+	 * @return null|string
+	 */
+	protected function getDefaultThumbPath()
+	{
+		// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
+		if (($this->getSourceType() == EntrySourceType::RECORDED_LIVE || $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE) && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+			return myContentStorage::getFSContentRootPath() . self::LIVE_THUMB_PATH;
+		return null;
 	}
 
 	protected static function getCategoryEntryElasticSearchData($categoryEntry, $categoryEntryStatus,  &$categoryIdsSearchArr)
