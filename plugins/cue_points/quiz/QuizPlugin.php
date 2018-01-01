@@ -3,7 +3,7 @@
  * Enable question cue point objects and answer cue point objects management on entry objects
  * @package plugins.quiz
  */
-class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider, IKalturaSearchDataContributor
+class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor
 {
 	const PLUGIN_NAME = 'quiz';
 
@@ -891,6 +891,32 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function getTypesToElasticIndexOnEntry()
 	{
 		return array(self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION));
+	}
+
+	/**
+	 * Return elasticsearch data to be associated with the object
+	 *
+	 * @param BaseObject $object
+	 * @return ArrayObject
+	 */
+	public static function getElasticSearchData(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return self::getQuizElasticSearchData($object);
+
+		return null;
+	}
+
+	private static function getQuizElasticSearchData($entry)
+	{
+		$quizData = null;
+		$isQuiz = self::getQuizData($entry);
+		if (!is_null($isQuiz))
+		{
+			$quizData['is_quiz'] = 1;
+		}
+
+		return $quizData;
 	}
 
 }

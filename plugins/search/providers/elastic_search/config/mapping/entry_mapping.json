@@ -527,6 +527,10 @@
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
+		"external_source_type": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
 		"length_in_msecs": {
 		  "type" : "long"
 		},
@@ -563,6 +567,9 @@
 		"push_publish": {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
+		},
+		"is_live": {
+		  "type" : "boolean"
 		},
 		"entry_type": {
 		  "type" : "text",
@@ -601,6 +608,10 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"redirect_entry_id": {
+		  "type" : "text",
+		  "analyzer" : "kaltura_keyword"
+		},
+		"is_quiz": {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
 		},
@@ -873,6 +884,9 @@
 				"raw" : {
 				  "type" : "text",
 				  "analyzer" : "kaltura_keyword"
+				},
+				"keyword":{
+				  "type" : "keyword"
 				}
 			  }
 			}
@@ -1042,7 +1056,11 @@
 				  }
 				}
 			  }
-			}
+			},
+			"cue_point_asset_id": {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+            }
 		  }
 		}
 	  }

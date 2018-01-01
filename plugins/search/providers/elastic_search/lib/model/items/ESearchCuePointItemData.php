@@ -67,6 +67,11 @@ class ESearchCuePointItemData extends ESearchItemData
 	protected $explanation;
 
 	/**
+	 * @string
+	 **/
+	protected $assetId;
+
+	/**
 	 * @return mixed
 	 */
 	public function getCuePointType()
@@ -263,6 +268,22 @@ class ESearchCuePointItemData extends ESearchItemData
 		return ESearchItemDataType::CUE_POINTS;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getAssetId()
+	{
+		return $this->assetId;
+	}
+
+	/**
+	 * @param mixed $id
+	 */
+	public function setAssetId($assetId)
+	{
+		$this->assetId = $assetId;
+	}
+
 	public function loadFromElasticHits($objectResult)
 	{
 		if(isset($objectResult['_source']['cue_point_type']))
@@ -305,6 +326,9 @@ class ESearchCuePointItemData extends ESearchItemData
 
 		if(isset($objectResult['highlight']))
 			$this->setHighlight($objectResult['highlight']);
+
+		if (isset($objectResult['_source']['cue_point_asset_id']))
+			$this->assetId = $objectResult['_source']['cue_point_asset_id'];
 
 	}
 }

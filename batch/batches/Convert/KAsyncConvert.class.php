@@ -373,15 +373,15 @@ class KAsyncConvert extends KJobHandlerWorker
 		if($srcFileSyncDescriptor)
 		{
 			$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
-			if (is_file($actualFileSyncLocalPath))
-				$key = $srcFileSyncDescriptor->fileEncryptionKey;
+			$key = $srcFileSyncDescriptor->fileEncryptionKey;
 		}
 		return array($actualFileSyncLocalPath, $key);
 	}
 
 	protected function operate($operator = null, $filePath, $configFilePath = null, $key = null)
 	{
-		if (!$key)
+		$this->operationEngine->setEncryptionKey($key);
+		if (!$key || is_dir($filePath))
 			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
 		else
 		{

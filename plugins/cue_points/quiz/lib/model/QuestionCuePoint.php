@@ -60,7 +60,7 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	{
 		$data = null;
 		if($this->getName())
-			$data['cue_point_name'] = $this->getName();
+			$data['cue_point_question'] = $this->getName();
 
 		if($this->getOptionalAnswers())
 			$data['cue_point_answers'] = $this->getElasticAnswersData();

@@ -11,6 +11,7 @@ class kESearchException extends kCoreException
     const ELASTIC_SEARCH_ENGINE_ERROR = 'Elastic search engine error';
     const MISSING_PARAMS_FOR_DELETE = 'Missing params for delete';
     const EMPTY_SEARCH_ITEMS_NOT_ALLOWED = 'empty search items are not allowed';
+    const MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM = 'missing mandatory parameters in order item';
 
     //Query parsing errors
     const MISSING_QUERY_OPERAND = 'Missing operand [AND / OR / NOT]';

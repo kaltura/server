@@ -135,6 +135,7 @@ function getCategoryEntryUpdates($updatedAt)
 	$c->addSelectColumn($categoryIdsCol);
 	$c->addGroupByColumn(categoryEntryPeer::ENTRY_ID);
 	$c->add(categoryEntryPeer::ENTRY_ID, array_keys($result), Criteria::IN);
+	$c->add(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE);
 	$stmt = categoryEntryPeer::doSelectStmt($c);
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
