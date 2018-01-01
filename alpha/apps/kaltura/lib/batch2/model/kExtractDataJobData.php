@@ -16,7 +16,7 @@ class kExtractDataJobData extends kJobData
 	public $entryId;
 
 	/**
-	 * @var array
+	 * @var string
 	 */
 	public $enginesType;
 	
@@ -54,7 +54,7 @@ class kExtractDataJobData extends kJobData
 	}
 	
 	/**
-	 * @return array $enginesType
+	 * @return string $enginesType
 	 */
 	public function getEnginesType()
 	{
@@ -62,7 +62,7 @@ class kExtractDataJobData extends kJobData
 	}
 	
 	/**
-	 * @param array $enginesType
+	 * @param string $enginesType
 	 */
 	public function setEnginesType($enginesType)
 	{

@@ -46,8 +46,9 @@ class KAsyncExtractData extends KJobHandlerWorker
 		KalturaLog::debug("inside the new Job");
 		KalturaLog::debug(print_r($data->enginesType, true));
 		KalturaLog::debug(print_r($data->fileContainer, true));
+		$engines = explode(",", $data->enginesType);
 
-		foreach($data->enginesType as $engineType)
+		foreach($engines as $engineType)
 		{
 			$engine = self::getEngineByType($engineType);
 			if (!$engine)

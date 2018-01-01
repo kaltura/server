@@ -16,7 +16,7 @@ class KalturaExtractDataJobData extends KalturaJobData
 	public $entryId;
 
 	/**
-	 * @var array
+	 * @var string
 	 */
 	public $enginesType;
 

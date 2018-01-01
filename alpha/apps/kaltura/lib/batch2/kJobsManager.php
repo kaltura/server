@@ -1535,7 +1535,7 @@ class kJobsManager
 		$extractDataJobData = new kExtractDataJobData();
 		$fileContainer = self::getFileContainerByFileSync($fileSync);
 		$extractDataJobData->setFileContainer($fileContainer);
-		$extractDataJobData->setEnginesType($enginesType);
+		$extractDataJobData->setEnginesType(implode(',',$enginesType));
 		$extractDataJobData->setEntryId($entryId);
 
 		if ($parentJob)
