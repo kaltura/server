@@ -7,6 +7,7 @@
  */
 class KAsyncExtractData extends KJobHandlerWorker
 {
+	CONST SUB_TYPE_FIELD = 'subType';
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -38,9 +39,10 @@ class KAsyncExtractData extends KJobHandlerWorker
 	{
 		
 		$dataList = array();
-		KalturaLog::debug("inside the new Job");
-		KalturaLog::debug(print_r($data->enginesType, true));
+		KalturaLog::debug("inside the new Job - asdf");
+		KalturaLog::debug(print_r($data, true));
 		KalturaLog::debug(print_r($data->fileContainer, true));
+
 		$engines = explode(",", $data->enginesType);
 
 		foreach($engines as $engineType)
@@ -52,12 +54,13 @@ class KAsyncExtractData extends KJobHandlerWorker
 				continue;
 			}
 			/**@var $engine KDataExtractEngine */
-			$newDataArray = $engine->extractData($data->fileContainer);
-			foreach($newDataArray as $data)
-				$data['subType'] = $engine->getSubType();
-			$dataList = array_merge($dataList, $newDataArray);
+			$metadataArray = $engine->extractData($data->fileContainer);
+			foreach($metadataArray as &$newData)
+				$newData[self::SUB_TYPE_FIELD] = $engine->getSubType();
+			$dataList = array_merge($dataList, $metadataArray);
 		}
 
+		KalturaLog::debug(print_r($dataList, true));
 		// for all data add cue point
 		self::createCuePoint($data->entryId, $dataList);
 		
@@ -74,10 +77,10 @@ class KAsyncExtractData extends KJobHandlerWorker
 		foreach ($dataList as $event) {
 			$eventCuePoint = new KalturaEventCuePoint();
 			$eventCuePoint->entryId = $entryId;
-			$eventCuePoint->eventType = $event['subType'];
+			$eventCuePoint->eventType = $event[self::SUB_TYPE_FIELD];
 			$eventCuePoint->startTime = $event['startTime'];
 			$eventCuePoint->data = $event['data'];
-			
+			KalturaLog::debug("sending cue point with as: " . print_r($eventCuePoint, true));
 			KBatchBase::$kClient->cuePoint->add( $eventCuePoint ) ;
 		}
 		KBatchBase::$kClient->doMultiRequest();
