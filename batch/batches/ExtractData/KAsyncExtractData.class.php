@@ -8,7 +8,7 @@
  * Will extract the data of a single file 
  *
  * @package Scheduler
- * @subpackage Extract-Data
+ * @subpackage ExtractData
  */
 class KAsyncExtractData extends KJobHandlerWorker
 {

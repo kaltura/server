@@ -2,7 +2,7 @@
 /**
  * 
  * @package Scheduler
- * @subpackage DataExtracter.engines
+ * @subpackage ExtractData.engines
  */
 abstract class KDataExtractEngine
 {
