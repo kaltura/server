@@ -2089,8 +2089,6 @@ class kFlowHelper
 		KalturaLog::debug("asdf [$entryId] [$dataExtractEngines]");
 		if ($dataExtractEngines && strlen($dataExtractEngines))
 			return explode(',', $dataExtractEngines);
-
-		return array(dataExtractEngineType::MUSIC_RECOGNIZER, dataExtractEngineType::CHAPTER_LINKER);
 		return null;
 	}
 
