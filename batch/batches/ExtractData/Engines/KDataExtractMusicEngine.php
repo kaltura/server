@@ -134,7 +134,8 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     private static function getSongName($songDetails)
     {
         $data = json_decode($songDetails[self::DATA_FIELD]);
-        return $data['name'];
+        //return $data['name'];
+        return $data->name;
     }
 
     private static function checkIfSongAlreadyExist($musicDataList, $newSongDetails)
