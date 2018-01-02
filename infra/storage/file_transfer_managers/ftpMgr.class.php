@@ -227,7 +227,7 @@ class ftpMgr extends kFileTransferMgr
 	protected function matchFtpRawListOutput($fileInfo, &$matches)
 	{		
 		// -rw-r--r-- 1 kaltura kaltura 1876084736 Oct 31 14:31 1615.mpeg
-		$regexUnix = '^(?P<permissions>[-drwx]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w\-_.]+)\s+(?P<group>[\d\w\-_.]+)\s+(?P<fileSize>\d*)\s+(?P<date>\w{3}\s+\d{1,2}\s+(\d{2}:\d{2}|\d{4}))\s+(?P<file>.+)\s*$';
+		$regexUnix = '^(?P<permissions>[-drwx]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w\-_]+)\s+(?P<group>[\d\w\-_]+)\s+(?P<fileSize>\d*)\s+(?P<date>\w{3}\s+\d{1,2}\s+(\d{1,2}:\d{2}|\d{4}))\s+(?P<file>.+)\s*$';
 		// 08/08/2011  08:52 PM               174 .buildpath
 		$regexWindows = '^(?P<date>\d{2}-\d{2}-\d{2}\s+\d{2}:\d{2}(AM|PM))\s+(?P<fileSize>\d+|<DIR>)\s+(?P<file>.+)\s*$';
 		
