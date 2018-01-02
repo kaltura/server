@@ -103,8 +103,9 @@ class KDataExtractMusicEngine extends KDataExtractEngine
         $cmd = self::PYTHON_EXE_CMD . " $path ";
         for($i = 0 ; $i < $duration; $i =+ 10)
         {
-            $output = shell_exec($cmd . $i);
-            KalturaLog::info("Excute: $cmd");
+            $currentCmd = $cmd . strval($i);
+            KalturaLog::info("Excute: $currentCmd");
+            $output = shell_exec($currentCmd);
             $data = $this->buildDataFromOutput($output, $i*1000);
             if ($data && !self::checkIfSongAlreadyExist($musicData, $data))
                 $musicData[] = $data;
