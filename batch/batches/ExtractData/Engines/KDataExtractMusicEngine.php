@@ -16,7 +16,7 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     const YOU_TUBE_BASE_URL = 'https://www.youtube.com/watch?v=';
     const SPOTIFY_BASE_URL = 'https://open.spotify.com/track/';
     const THRESHOLD = 90;
-    const SEC_INTERVAL = 20;
+    const SEC_INTERVAL = 5;
 
     public function getSubType()
     {
