@@ -21,8 +21,9 @@ class KDataExtractMusicEngine extends KDataExtractEngine
 
     public function extractData(KalturaFileContainer $fileContainer, $extraParams = array())
     {
-        return $this->extractFromPythonSDK($fileContainer->filePath, 600);
+        return $this->extractFromPythonSDK($fileContainer->filePath, 180);
 
+        /*
         $http_method = "POST";
         $http_uri = "/v1/identify";
         $data_type = "audio";
@@ -95,13 +96,14 @@ class KDataExtractMusicEngine extends KDataExtractEngine
 
 
         return $musicData;
+        */
     }
 
     private function extractFromPythonSDK($path, $duration)
     {
         $musicData = array();
         $cmd = self::PYTHON_EXE_CMD . " $path ";
-        for($i = 0 ; $i < $duration; $i =+ 10)
+        for($i = 0 ; $i < $duration; $i += 10)
         {
             $currentCmd = $cmd . strval($i);
             KalturaLog::info("Excute: $currentCmd");
