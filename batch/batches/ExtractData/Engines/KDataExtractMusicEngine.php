@@ -12,7 +12,7 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     const ACCESS_KEY = 'ed5151427d8f5480186c92a10c802707';
     const ACCESS_SECRET = '2BGJPChRIBTPxQfI5Xy1S4sBLChKXMJ5cvD55bvU';
 
-    CONST PYTHON_EXE_CMD = 'python /root/david/python2.7/musicExtarct.py';
+    CONST PYTHON_EXE_CMD = 'python /tmp/david/python2.7/musicExtarct.py';
 
     public function getSubType()
     {
@@ -101,10 +101,10 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     {
         $musicData = array();
         $cmd = self::PYTHON_EXE_CMD . " $path ";
-        KalturaLog::info("Excute: $cmd");
         for($i = 0 ; $i < $duration; $i =+ 10)
         {
             $output = shell_exec($cmd . $i);
+            KalturaLog::info("Excute: $cmd");
             $data = $this->buildDataFromOutput($output, $i*1000);
             if ($data && !self::checkIfSongAlreadyExist($musicData, $data))
                 $musicData[] = $data;
@@ -134,7 +134,6 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     private static function getSongName($songDetails)
     {
         $data = json_decode($songDetails[self::DATA_FIELD]);
-        //return $data['name'];
         return $data->name;
     }
 
