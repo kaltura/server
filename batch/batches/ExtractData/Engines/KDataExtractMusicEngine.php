@@ -112,7 +112,7 @@ class KDataExtractMusicEngine extends KDataExtractEngine
             $currentCmd = $cmd . strval($i);
             KalturaLog::info("Excute: $currentCmd");
             $output = shell_exec($currentCmd);
-            $data = $this->buildDataFromOutput($output, $i*1000);
+            $data = $this->buildDataFromOutput($output, ($i + self::SEC_INTERVAL)*1000);
             if ($data && !self::checkIfSongAlreadyExist($musicData, $data))
                 $musicData[] = $data;
         }
