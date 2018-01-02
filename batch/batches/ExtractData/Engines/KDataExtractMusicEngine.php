@@ -12,6 +12,8 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     const ACCESS_KEY = 'ed5151427d8f5480186c92a10c802707';
     const ACCESS_SECRET = '2BGJPChRIBTPxQfI5Xy1S4sBLChKXMJ5cvD55bvU';
 
+    CONST PYTHON_EXE_CMD = 'python /root/david/python2.7/musicExtarct.py';
+
     public function getSubType()
     {
         return KalturaEventType::MUSIC;
@@ -19,6 +21,8 @@ class KDataExtractMusicEngine extends KDataExtractEngine
 
     public function extractData(KalturaFileContainer $fileContainer, $extraParams = array())
     {
+        return $this->extractFromPythonSDK($fileContainer->filePath, 600);
+
         $http_method = "POST";
         $http_uri = "/v1/identify";
         $data_type = "audio";
@@ -39,7 +43,7 @@ class KDataExtractMusicEngine extends KDataExtractEngine
 
         $signature = base64_encode($signature);
 
-        // suported file formats: mp3,wav,wma,amr,ogg, ape,acc,spx,m4a,mp4,FLAC, etc
+        // supported file formats: mp3,wav,wma,amr,ogg, ape,acc,spx,m4a,mp4,FLAC, etc
         // File size: < 1M , You'de better cut large file to small file, within 15 seconds data size is better
         $file = $fileContainer->filePath;
         $filesize = $fileContainer->fileSize;
@@ -64,6 +68,7 @@ class KDataExtractMusicEngine extends KDataExtractEngine
 
         $result = curl_exec($ch);
         KalturaLog::debug("acrCloud data: " . print_r($result,true));
+        curl_close($ch);
 
         $obj = json_decode($result,true);
         echo(print_r($obj, true));
@@ -87,9 +92,60 @@ class KDataExtractMusicEngine extends KDataExtractEngine
         }
 
         KalturaLog::debug("music data: " . print_r($musicData, true));
-        curl_close($ch);
+
 
         return $musicData;
+    }
+
+    private function extractFromPythonSDK($path, $duration)
+    {
+        $musicData = array();
+        $cmd = self::PYTHON_EXE_CMD . " $path ";
+        KalturaLog::info("Excute: $cmd");
+        for($i = 0 ; $i < $duration; $i =+ 10)
+        {
+            $output = shell_exec($cmd . $i);
+            $data = $this->buildDataFromOutput($output, $i*1000);
+            if ($data && !self::checkIfSongAlreadyExist($musicData, $data))
+                $musicData[] = $data;
+        }
+        return $musicData;
+    }
+
+    private function buildDataFromOutput($output, $offset)
+    {
+        $obj = json_decode($output,true);
+        echo(print_r($obj, true));
+
+        if($obj['status']['code'] != 0 )
+            return null;
+
+        $song = $obj['metadata']['music'][0];
+        $songDetails[self::START_TIME_FIELD] = $offset;
+        $data =  array('name' => $song['title'],
+            'artist' => $song['artists'][0]['name'],
+            'album' => $song['album']['name'],
+            'spotifyId' => $song['external_metadata']['spotify']['track']['id']);
+        $songDetails[self::DATA_FIELD] = json_encode($data);
+
+        return $songDetails;
+    }
+
+    private static function getSongName($songDetails)
+    {
+        $data = json_decode($songDetails[self::DATA_FIELD]);
+        return $data['name'];
+    }
+
+    private static function checkIfSongAlreadyExist($musicDataList, $newSongDetails)
+    {
+        $newSongName = self::getSongName($newSongDetails);
+        foreach($musicDataList as $song)
+        {
+            if ($newSongName == self::getSongName($song))
+                return true;
+        }
+        return false;
     }
 
 }
