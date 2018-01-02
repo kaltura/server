@@ -39,7 +39,8 @@ class KAsyncExtractData extends KJobHandlerWorker
 	{
 		$dataList = array();
 		$engines = explode(",", $data->enginesType);
-		$extraParams = array("entryId" => $data->entryId, "partnerId" =>$job->partnerId);
+		$extraParams = array(KDataExtractEngine::ENTRY_ID_FIELD => $data->entryId,
+							KDataExtractEngine::PARTNER_ID_FIELD =>$job->partnerId);
 		foreach($engines as $engineType)
 		{
 			$engine = KDataExtractEngine::getInstance($engineType);

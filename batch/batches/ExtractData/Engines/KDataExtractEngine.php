@@ -8,6 +8,8 @@ abstract class KDataExtractEngine
 {
     CONST START_TIME_FIELD = 'startTime';
     CONST DATA_FIELD = 'data';
+
+
     /**
      * Will return the proper engine depending on the type (KalturaDataExtractEngineType)
      *
@@ -21,7 +23,7 @@ abstract class KDataExtractEngine
             case KalturaConversionEngineType::MUSIC_RECOGNIZER:
                 return new KDataExtractMusicEngine();
             case KalturaConversionEngineType::CHAPTER_LINKER:
-                return null;
+                return new KDataExtractChapterLinkerEngine();
             default:
                 return null;
         }
@@ -29,6 +31,9 @@ abstract class KDataExtractEngine
 
     abstract public function getSubType();
 
+
+    CONST PARTNER_ID_FIELD = 'partnerId';
+    CONST ENTRY_ID_FIELD = 'entryId';
     /**
      * @param KalturaFileContainer $fileContainer
      * @param array $extraParams
