@@ -2081,12 +2081,11 @@ class kFlowHelper
 
 	private static function getDataExtractEngines(BatchJob $dbBatchJob)
 	{
-		//GET ALL DataExtractEngines for the partnerId
-		/* @var $profile conversionProfile2*/
 		$entryId = $dbBatchJob->getObjectId();
+		/* @var $profile conversionProfile2*/
 		$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
 		$dataExtractEngines = $profile->getDataExtractEngines();
-		KalturaLog::debug("asdf [$entryId] [$dataExtractEngines]");
+		KalturaLog::debug("Having entry [$entryId] with dataExtractEngines [$dataExtractEngines]");
 		if ($dataExtractEngines && strlen($dataExtractEngines))
 			return explode(',', $dataExtractEngines);
 		return null;

@@ -17,7 +17,7 @@ class KDataExtractMusicEngine extends KDataExtractEngine
         return KalturaEventType::MUSIC;
     }
 
-    public function extractData(KalturaFileContainer $fileContainer)
+    public function extractData(KalturaFileContainer $fileContainer, $extraParams = array())
     {
         $http_method = "POST";
         $http_uri = "/v1/identify";

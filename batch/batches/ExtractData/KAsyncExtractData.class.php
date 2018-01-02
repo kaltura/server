@@ -39,6 +39,7 @@ class KAsyncExtractData extends KJobHandlerWorker
 	{
 		$dataList = array();
 		$engines = explode(",", $data->enginesType);
+		$extraParams = array("entryId" => $data->entryId, "partnerId" =>$job->partnerId);
 		foreach($engines as $engineType)
 		{
 			$engine = KDataExtractEngine::getInstance($engineType);
@@ -48,7 +49,7 @@ class KAsyncExtractData extends KJobHandlerWorker
 				continue;
 			}
 			/**@var $engine KDataExtractEngine */
-			$metadataArray = $engine->extractData($data->fileContainer);
+			$metadataArray = $engine->extractData($data->fileContainer, $extraParams);
 			foreach($metadataArray as &$newData)
 				$newData[self::SUB_TYPE_FIELD] = $engine->getSubType();
 			$dataList = array_merge($dataList, $metadataArray);

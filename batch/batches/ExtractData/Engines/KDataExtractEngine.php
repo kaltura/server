@@ -31,9 +31,10 @@ abstract class KDataExtractEngine
 
     /**
      * @param KalturaFileContainer $fileContainer
+     * @param array $extraParams
      *  return array of keys: startTime and data
      * @return array
      */
-    abstract public function extractData ( KalturaFileContainer $fileContainer );
+    abstract public function extractData (KalturaFileContainer $fileContainer, $extraParams );
     
 }
