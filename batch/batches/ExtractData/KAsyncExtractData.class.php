@@ -39,6 +39,10 @@ class KAsyncExtractData extends KJobHandlerWorker
 	{
 		$dataList = array();
 		$engines = explode(",", $data->enginesType);
+		$partnerId = KBatchBase::$kClient->getPartnerId();
+		$partnerId2 = $job->partnerId;
+		$tag = KBatchBase::$kClient->getClientTag();
+		KalturaLog::log("asdf  [$partnerId] [$tag] [$partnerId2]");
 		$entry = KBatchBase::$kClient->baseEntry->get($data->entryId);
 		foreach($engines as $engineType)
 		{
