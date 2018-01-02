@@ -12,7 +12,8 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     const ACCESS_KEY = 'ed5151427d8f5480186c92a10c802707';
     const ACCESS_SECRET = '2BGJPChRIBTPxQfI5Xy1S4sBLChKXMJ5cvD55bvU';
 
-    CONST PYTHON_EXE_CMD = 'python /tmp/david/python2.7/musicExtarct.py';
+    const PYTHON_EXE_CMD = 'python /tmp/david/python2.7/musicExtarct.py';
+    const SEC_INTERVAL = 30;
 
     public function getSubType()
     {
@@ -103,7 +104,7 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     {
         $musicData = array();
         $cmd = self::PYTHON_EXE_CMD . " $path ";
-        for($i = 0 ; $i < $duration; $i += 10)
+        for($i = 0 ; $i < $duration; $i += self::SEC_INTERVAL)
         {
             $currentCmd = $cmd . strval($i);
             KalturaLog::info("Excute: $currentCmd");
