@@ -13,7 +13,10 @@ class KDataExtractMusicEngine extends KDataExtractEngine
     const ACCESS_SECRET = '2BGJPChRIBTPxQfI5Xy1S4sBLChKXMJ5cvD55bvU';
 
     const PYTHON_EXE_CMD = 'python /tmp/david/python2.7/musicExtarct.py';
-    const SEC_INTERVAL = 30;
+    const YOU_TUBE_BASE_URL = 'https://www.youtube.com/watch?v=';
+    const SPOTIFY_BASE_URL = 'https://open.spotify.com/track/';
+    const THRESHOLD = 90;
+    const SEC_INTERVAL = 20;
 
     public function getSubType()
     {
@@ -125,11 +128,18 @@ class KDataExtractMusicEngine extends KDataExtractEngine
             return null;
 
         $song = $obj['metadata']['music'][0];
+        if ($song['score'] < self::THRESHOLD)
+            return null;
+
         $songDetails[self::START_TIME_FIELD] = $offset;
+
+        $youTubeLink = self::YOU_TUBE_BASE_URL . $song['external_metadata']['youtube']['vid'];
+        $spotifyLink = self::SPOTIFY_BASE_URL . $song['external_metadata']['spotify']['track']['id'];
         $data =  array('name' => $song['title'],
             'artist' => $song['artists'][0]['name'],
             'album' => $song['album']['name'],
-            'spotifyId' => $song['external_metadata']['spotify']['track']['id']);
+            'spotifyLink' => $spotifyLink,
+            'youTubeLink' => $youTubeLink);
         $songDetails[self::DATA_FIELD] = json_encode($data);
 
         return $songDetails;
