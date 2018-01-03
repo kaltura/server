@@ -415,6 +415,9 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kCopyCaptionsJobData':
 				$this->data = new KalturaCopyCaptionsJobData();
 				break;
+			case 'kWowmeJobData':
+				$this->data = new KalturaWowmeJobData();
+				break;
 
 			default:
 				if($dbData instanceof kBulkUploadJobData)
@@ -650,6 +653,11 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kCopyCaptionsJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaCopyCaptionsJobData();
+				break;
+			case KalturaBatchJobType::WOWME:
+				$dbData = new kWowmeJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaWowmeJobData();
 				break;
 			default:
 				$dbData = KalturaPluginManager::loadObject('kJobData', $dbBatchJob->getJobType());

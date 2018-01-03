@@ -1842,10 +1842,11 @@ class kJobsManager
 	/**
 	 * @param entry $entry
 	 * @param HighlightType $highlightType
+	 * @param entry $outEntry
 	 *
 	 * @return BatchJob
 	 */
-	public static function addWowmeJob($entry, $highlightType)
+	public static function addWowmeJob($entry, $highlightType, $outEntry)
 	{
 		$batchJob = null;
 		$batchJob = new BatchJob();
@@ -1854,9 +1855,27 @@ class kJobsManager
 
 		$batchJob->setObjectId($entry->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
-		$batchJob->setJobSubType($highlightType);
+
+		$jobData = new kWowmeJobData();
+		$jobData->setOutEntryId($outEntry->getId());
+		$jobData->setHighlightType($highlightType);
+
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		$srcFileSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$srcFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($srcFileSyncKey);
+		/**
+		 * @var FileSync $srcFileSync
+		 */
+		$srcFilePath = $srcFileSync->getFullPath();
+
+
+		/**
+		 * @var FileSync $srcFileSync
+		 */
+		$jobData->setFileSyncPath($srcFilePath);
+
 		KalturaLog::log("Creating Wowme job");
-		return self::addJob($batchJob, null, BatchJobType::WOWME, $highlightType);
+		return self::addJob($batchJob, $jobData, BatchJobType::WOWME, null);
 	}
 
 

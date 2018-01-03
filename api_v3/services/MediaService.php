@@ -1215,7 +1215,11 @@ class MediaService extends KalturaEntryService
 
 		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
 		if (!$flavorAsset)
-			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+		{
+			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($entryId, 'source');
+			$flavorAsset = $flavorAssets[0];
+//			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+		}
 
 		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
@@ -1237,11 +1241,24 @@ class MediaService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 
-		kJobsManager::addWowmeJob($dbEntry, $highlightType);
+		$outEntry = new entry();
+		$outEntry->setType(entryType::MEDIA_CLIP);
+		$outEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+		$outEntry->setSourceType(EntrySourceType::CLIP);
+		$outEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+		$outEntry->setName($dbEntry->getName() . " - " . $highlightType);
+		$outEntry->setKuserId($dbEntry->getKuserId());
+		$outEntry->setPartnerId($dbEntry->getPartnerId());
+		$outEntry->setStatus(entryStatus::NO_CONTENT);
+		$outEntry->setRootEntryId($entryId);
+		$outEntry->setDisplayInSearch(1);
+		$outEntry->setTags("highlights");
+		$outEntry->save();
 
-		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry, $this->getResponseProfile());
+		kJobsManager::addWowmeJob($dbEntry, $highlightType, $outEntry);
 
+		$entry = KalturaEntryFactory::getInstanceByType($outEntry->getType());
+		$entry->fromObject($outEntry, $this->getResponseProfile());
 		return $entry;
 	}
 

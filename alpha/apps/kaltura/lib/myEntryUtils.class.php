@@ -2041,8 +2041,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				//retrieve original ready
 				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
-				if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
-					return null;
+//				if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
+//					return null;
 			}
 		}
 		return $flavorAsset;

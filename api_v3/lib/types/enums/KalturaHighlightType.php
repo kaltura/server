@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaHighlightType extends KalturaEnum implements HighlightType
+class KalturaHighlightType extends KalturaStringEnum implements HighlightType
 {
 
 }
