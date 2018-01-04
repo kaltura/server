@@ -94,7 +94,17 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				{
 					/* @var $transcript TranscriptAsset */
 					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
-						$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+					{
+						if ($transcript->getHumanVerified())
+						{
+							$transcript->setStatus(KalturaAssetStatus::READY);
+							$transcript->save();
+						}
+						else
+						{
+							$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+						}
+					}
 					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
 					{
 						$tokenizedTranscript = $this->normalizeJson ($contentsArray["JSON"]);
