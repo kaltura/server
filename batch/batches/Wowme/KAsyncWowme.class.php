@@ -10,9 +10,11 @@ class KAsyncWowme extends KJobHandlerWorker
 
 	const DIFF_THRESHOLD = 20;
 	const HIGHLIGHT_DURATION = 5;
-	const HIGHLIGHT_PREV = 0;
+	const HIGHLIGHT_PREV = 2000;
 	const HIGHLIGHT_POST = 10;
 	const IS_PROD = false;
+
+	const DRAGON_PREV = 5;
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -41,6 +43,9 @@ class KAsyncWowme extends KJobHandlerWorker
 			case KalturaHighlightType::SPORTS:
 				$highlightsVideoPath = $this->createActionHighlights($job->entryId, $jobData, $job);
 				break;
+			case KalturaHighlightType::DRAGON:
+				$highlightsVideoPath = $this->createDragonHighlights($job);
+				break;
 			default:
 				KalturaLog::err("Job type [" . $jobData->highlightType . "] not implemented yet");
 				return $this->updateJob($job, "Failed to wow you", KalturaBatchJobStatus::FAILED, null);
@@ -66,10 +71,9 @@ class KAsyncWowme extends KJobHandlerWorker
 		KalturaLog::debug("@@NA highlights at [" . print_r($output, true). "]");
 		$videoLocations = $this->cutVideosAtLocation($output, $jobData->fileSyncPath);
 
-		$this->createAndUploadGifs($entryId, $videoLocations, $job->partnerId);
+		$this->createAndUploadGifs($jobData->outEntryId, $videoLocations, $job->partnerId);
 
 		$fileListPath = tempnam("/opt/kaltura/tmp/", 'filelist');
-//		chmod($fileListPath,777);
 		$fileList = fopen($fileListPath, "w");
 		foreach ($videoLocations as $videoLocation)
 		{
@@ -78,7 +82,6 @@ class KAsyncWowme extends KJobHandlerWorker
 		}
 		fclose($fileList);
 		$stitchedVideoPath = $this->concatVideos($fileListPath);
-		chmod('/tmp/stitchedJcw60n.mp4', 0666);
 		return $stitchedVideoPath;
 	}
 
@@ -181,5 +184,137 @@ class KAsyncWowme extends KJobHandlerWorker
 		}
 		self::$kClient->thumbAsset->setAsDefault($firstThumb->id);
 		self::unimpersonate();
+	}
+
+	protected function createDragonHighlights(KalturaBatchJob $job)
+	{
+		$jobData = $job->data;
+		$output = $this->findDragonHighlightsTimes($jobData->fileSyncPath);
+
+		$videoLocations = $this->cutVideosAtLocation($output, $jobData->fileSyncPath);
+
+//		$this->createAndUploadGifs($jobData->outEntryId, $videoLocations, $job->partnerId);
+
+		$fileListPath = tempnam("/opt/kaltura/tmp/", 'filelist');
+		$fileList = fopen($fileListPath, "w");
+		foreach ($videoLocations as $videoLocation)
+		{
+			KalturaLog::debug("Writing video location [$videoLocation] to filelist");
+			fwrite($fileList, "file '".$videoLocation."'\n");
+		}
+		fclose($fileList);
+		$stitchedVideoPath = $this->concatVideos($fileListPath);
+		return $stitchedVideoPath;
+	}
+
+
+	/**
+	 * @param $fileSync
+	 * return array(array(time in ms, duration is s))
+	 */
+	protected function findDragonHighlightsTimes($fileSync)
+	{
+		$output = array();
+		$dragonImgsDir = '/opt/kaltura/tmp/dragonImgs';
+//		$files = array_diff(scandir($dragonImgsDir), array('.','..'));
+//		foreach ($files as $file) {
+//			@unlink("$dragonImgsDir/$file");
+//		}
+//		$createImgsCommands = "ffmpeg -i " . $fileSync . " -vf fps=2 -f image2 -r 0.5 -y " . $dragonImgsDir ."/%d.jpg";
+//		KalturaLog::debug("Running command to create dragon images [".$createImgsCommands."]");
+//		shell_exec($createImgsCommands);
+
+
+
+//		$dragonFiles = array_diff(scandir($dragonImgsDir), array('.','..'));
+//		$dragonImages = array();
+//		foreach ($dragonFiles as $imageFile)
+//		{
+//			if ($this->isDragonImage("$dragonImgsDir/$imageFile", $imageFile))
+//			{
+//				$dragonImages[] = $imageFile;
+//				KalturaLog::debug("File [".$imageFile."] is dragon!");
+//			}
+//		}
+//
+//		KalturaLog::debug("Dragon images [".print_r($dragonImages,true)."]");
+		$dragonImages = $this->getPreComputedDragonResults();
+		foreach ($dragonImages as $dragonImg)
+		{
+			$startTime = (int)substr($dragonImg, 0, strpos($dragonImg, ".jpg"));
+			$startTime = ($startTime - self::DRAGON_PREV) * 1000;
+			$output[] = array($startTime, 15);
+
+		}
+		return $output;
+	}
+
+
+	protected function isDragonImage($imagePath, $filename){
+		$ch = curl_init();
+
+//		curl_setopt($ch, CURLOPT_URL, "https://api.clarifai.com/v2/workflows/kaltura/results");
+		curl_setopt($ch, CURLOPT_URL, "https://api.clarifai.com/v2/models/game_of_thrones/outputs");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$img64 = base64_encode( file_get_contents($imagePath));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"inputs\": [{\"data\": {\"image\": {\"base64\": \"$img64\" }}}]}");
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+		$headers = array();
+		$headers[] = "Authorization: Key a747a3c4c5464742b5a96f32ffbe3d4f";
+		$headers[] = "Content-Type: application/json";
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+		$result = curl_exec($ch);
+		if (curl_errno($ch)) {
+			echo 'Error:' . curl_error($ch);
+		}
+		file_put_contents("/opt/kaltura/tmp/dragonResults.txt", "{\"filename\":\"$filename\",\"data\":".$result."}\n", FILE_APPEND);
+		$res =  json_decode($result,true);
+		curl_close ($ch);
+		return $this->is_action_image($res);
+	}
+
+	protected function is_action_image($res)
+	{
+//		$count = 0;
+		$certainty = 0;
+		try
+		{
+//			foreach ($res['results'][0]['outputs'][0]['data']['concepts'] as $concept)
+			foreach ($res['outputs'][0]['data']['concepts'] as $concept)
+			{
+				if ($concept['id'] == 'dragon' && $concept['value'] == 1)
+					return true;
+				if (in_array($concept['id'], array("dragon", "flames", "fire")))
+				{
+					$certainty = $certainty + $concept['value'];
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::debug("Caught exception in is_action_image [" . print_r($e->getMessage(),true). "]");
+		}
+		return $certainty > 2.1;
+//		return false;
+	}
+
+
+	protected function getPreComputedDragonResults()
+	{
+		$dragonResults = file('/opt/kaltura/tmp/dragonResults.txt');
+		$dragonFiles = array();
+		foreach ($dragonResults as $currResult)
+		{
+			$res =  json_decode($currResult,true);
+			$isActionImg = $this->is_action_image($res['data']);
+			if ($isActionImg)
+			{
+				KalturaLog::debug("File [".$res['filename']."] is dragon!");
+				$dragonFiles[] = $res['filename'];
+			}
+		}
+		return $dragonFiles;
 	}
 }

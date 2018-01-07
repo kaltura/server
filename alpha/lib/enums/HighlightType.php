@@ -9,4 +9,5 @@ interface HighlightType extends BaseEnum
 	const LECTURE = "LECTURE";
 	const DRAMA = "DRAMA";
 	const ACTION = "ACTION";
+	const DRAGON = "DRAGON";
 }
