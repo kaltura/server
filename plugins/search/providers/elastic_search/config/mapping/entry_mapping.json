@@ -586,8 +586,7 @@
 		  "analyzer" : "kaltura_keyword"
 		},
 		"is_quiz": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "boolean"
 		},
 		"parent_entry" : {
 		  "properties" : {
