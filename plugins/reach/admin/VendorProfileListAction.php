@@ -3,14 +3,14 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class CatalogItemListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
+class VendorProfileListAction extends KalturaApplicationPlugin
 {
 	const ADMIN_CONSOLE_PARTNER = "-2";
 	
 	public function __construct()
 	{
-		$this->action = 'CatalogItemListAction';
-		$this->label = "CatalogItemList";
+		$this->action = 'VendorProfileListAction';
+		$this->label = "VendorProfileList";
 		$this->rootLabel = "Reach";
 	}
 
@@ -99,29 +99,6 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$filter->$filterType = $filterInput;
 
 		return $filter;
-	}
-
-	/**
-	 * @return array<string, string> - array of <label, jsActionFunctionName>
-	 */
-	public function getPublisherAdminActionOptions($partner, $permissions)
-	{
-		$options = array();
-		$options[] = array(0 => 'Reach', 1 => 'listCatalogItems');
-		return $options;
-
-	}
-
-	/**
-	 * @return string javascript code to add to publisher list view
-	 */
-	public function getPublisherAdminActionJavascript()
-	{
-		$functionStr = 'function listCatalogItems(partnerId) {
-			var url = pluginControllerUrl + \'/' . get_class($this) . '/filter_type/partnerIdEqual/filter_input/\' + partnerId;
-			document.location = url;
-		}';
-		return $functionStr;
 	}
 
 	public function getInstance($interface)
