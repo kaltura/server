@@ -7,7 +7,7 @@ abstract class kManifestRenderer
 	const PLAY_STREAM_TYPE_DVR = 'dvr';
 	const PLAY_STREAM_TYPE_ANY = 'any';
 
-	const CODECS_ADDING_BITRATE_LIMIT = 66960; // as 64KB * 188 \184
+	const AUDIO_CODECS_BITRATE_THRESHOLD = 66960; // as 64KB * 188 \184
 
 	/**
 	 * @var string
@@ -908,7 +908,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 					if ($width && $height)
 						$resolution = ",RESOLUTION={$width}x{$height}";
 				}
-				else if ($bitrate && $bitrate <= self::CODECS_ADDING_BITRATE_LIMIT)
+				else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
 					$codecs = ',CODECS="mp4a.40.2"';
 				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
 				$content .= $flavor['url'];
