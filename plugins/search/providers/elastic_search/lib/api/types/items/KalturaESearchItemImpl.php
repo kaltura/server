@@ -16,9 +16,9 @@ abstract class KalturaESearchItemImpl
 			KalturaLog::log("Search term exceeded maximum allowed length, setting search term to [$eSearchItem->searchTerm]");
 		}
 
-		if(self::shouldChangePartialToExact($eSearchItem))
+		$searchTerm = trim($eSearchItem->searchTerm);
+		if(self::shouldChangePartialToExact($searchTerm, $eSearchItem->itemType))
 		{
-			$searchTerm = trim($eSearchItem->searchTerm);
 			$searchTerm = substr($searchTerm, 1, -1);
 			$object_to_fill->setSearchTerm($searchTerm);
 			$object_to_fill->setItemType(KalturaESearchItemType::EXACT_MATCH);
@@ -53,10 +53,9 @@ abstract class KalturaESearchItemImpl
 		return array($object_to_fill, $props_to_skip);
 	}
 
-	private static function shouldChangePartialToExact($eSearchItem)
+	private static function shouldChangePartialToExact($searchTerm, $itemType)
 	{
-		$searchTerm = trim($eSearchItem->searchTerm);
-		if($eSearchItem->itemType == KalturaESearchItemType::PARTIAL &&
+		if($itemType == KalturaESearchItemType::PARTIAL &&
 			strlen($searchTerm) > 2 &&
 			substr($searchTerm, 0, 1) == '"' &&
 			substr($searchTerm,-1) == '"')
