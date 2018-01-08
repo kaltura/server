@@ -3711,8 +3711,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return $this->getFromCustomData("recorded_entry_length_in_msecs",null, 0);
 	}
-	
-	public function createPlayManifestUrlByFormat($format)
+
+	private function createPlayManifestUrlByFormat($format)
 	{
 		$entryId = $this->getId();
 		$protocolStr = infraRequestUtils::getProtocol();

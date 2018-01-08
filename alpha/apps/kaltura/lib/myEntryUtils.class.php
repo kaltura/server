@@ -2112,4 +2112,46 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$trackEntry->setDescription($message);
 		TrackEntry::addTrackEntry($trackEntry);
 	}
+
+	public static function getIngestUrl($dbEntry)
+	{
+		$ingestUrl = '';
+
+		$parentEntryId = $dbEntry->getSecurityParentId();
+		if ($parentEntryId)
+		{
+			$dbEntry = $dbEntry->getParentEntry();
+			if(!$dbEntry)
+				return $ingestUrl;
+		}
+
+		$contextDataHelper = new kContextDataHelper($dbEntry, $dbEntry->getPartner());
+
+		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
+			$accessControlScope = $dbEntry->getAccessControl()->getScope();
+		else
+			$accessControlScope = new accessControlScope();
+
+		$contextDataHelper->buildContextDataResult($accessControlScope, kContextDataHelper::ALL_TAGS, 'applehttp', null, true);
+		if ($contextDataHelper->getDisableCache())
+			KalturaResponseCacher::disableCache();
+
+		$isScheduledNow = $dbEntry->isScheduledNow();
+
+		$contextDataHelper->setMediaProtocol('http,https');
+		$contextDataHelper->setStreamerType('applehttp');
+
+		$playbackContextDataHelper = new kPlaybackContextDataHelper();
+		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
+		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
+
+		$playbackContext = $playbackContextDataHelper->getPlaybackContext();
+		if($playbackContext)
+			$source = $playbackContext->getSources();
+		if($source)
+			$ingestUrl = $source[0]->getUrl();
+
+		KalturaLog::debug('ingest URL: '. $ingestUrl);
+		return $ingestUrl;
+	}
 }

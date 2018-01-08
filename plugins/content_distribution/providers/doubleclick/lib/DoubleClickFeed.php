@@ -42,7 +42,7 @@ class DoubleClickFeed
 	protected $distributionProfile;
 
 	/**
-	 * @var int
+	 * @var bool
 	 */
 	protected $version_2;
 
@@ -168,13 +168,13 @@ class DoubleClickFeed
 		$channelNode->appendChild($importedItem);
 	}
 
-	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints, $captionAssets = null, entry $entry)
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints, $captionAssets = null, entry $entry = null)
 	{
 		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $cuePoints, $captionAssets, $entry);
 		return $this->doc->saveXML($item);
 	}
 
-	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints, $captionAssets = null, entry $entry)
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints, $captionAssets = null, entry $entry = null)
 	{
 		$item = $this->item->cloneNode(true);
 
@@ -225,9 +225,11 @@ class DoubleClickFeed
 		kXml::setNodeValue($this->xpath, 'dfpvideo:status', $values[DoubleClickDistributionField::STATUS], $item);
 		kXml::setNodeValue($this->xpath, 'dfpvideo:fw_caid', $values[DoubleClickDistributionField::FW_CAID], $item);
 
-		$ingestUrl = $entry->createPlayManifestUrlByFormat(PlaybackProtocol::APPLE_HTTP) . '/a.m3u8';
-		kXml::setNodeValue($this->xpath, 'dfpvideo:ingestUrl', $ingestUrl, $item);
-
+		if($entry)
+		{
+			$ingestUrl = myEntryUtils::getIngestUrl($entry);
+			kXml::setNodeValue($this->xpath, 'dfpvideo:ingestUrl', $ingestUrl, $item);
+		}
 		$this->setStatsVersion2Elements($values, $item);
 	}
 

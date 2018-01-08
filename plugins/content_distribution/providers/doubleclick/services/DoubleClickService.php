@@ -144,10 +144,11 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param int $distributionProfileId
 	 * @param string $hash
 	 * @param string $entryId
+	 * @param int $version
 	 * @return file
 	 * @ksOptional
 	 */
-	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId)
+	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId, $version = 1)
 	{
 		$this->validateRequest($distributionProfileId, $hash);
 
@@ -157,13 +158,21 @@ class DoubleClickService extends ContentDistributionServiceBase
 			throw new KalturaAPIException (KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		// Construct the feed
-		$feed = new DoubleClickFeed ('doubleclick_template.xml', $this->profile);
+
+		$templateName = 'doubleclick_template.xml';
+		$version_2 = false;
+		if($version == 2)
+		{
+			$version_2 = true;
+			$templateName = 'doubleclick_version2_template.xml';
+		}
+		$feed = new DoubleClickFeed ($templateName, $this->profile, $version_2);
 		$feed->setTotalResult(1);
 		$feed->setStartIndex(1);
 		
 		$entries = array();
 		$entries[] = $entry;
-		$context = new DoubleClickServiceContext($hash);
+		$context = new DoubleClickServiceContext($hash, 1, -1, '', false, $version);
 		$this->handleEntries($context, $feed, $entries);
 		return $this->doneFeedGeneration($context, $feed);
 		
