@@ -129,14 +129,9 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 			static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
 		}
 		$queryAttributes->setObjectSubType(null);
-		$highlight = kBaseSearch::getHighlightSection(static::HIGHLIGHT_CONFIG_KEY, $queryAttributes);
-		if(isset($highlight))
-			$nestedQuery->setHighlight($highlight);
-
 		$numOfFragments = self::initializeNumOfFragments();
 		$highlight = new kESearchHighlightQuery($queryAttributes->getFieldsToHighlight(), $numOfFragments);
 		$nestedQuery->setHighlight($highlight->getFinalQuery());
-
 		$nestedQuery->setQuery($boolQuery);
 		$finalQuery[] = $nestedQuery;
 
