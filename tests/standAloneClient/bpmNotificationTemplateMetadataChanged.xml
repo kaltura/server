@@ -103,34 +103,6 @@
 							<value></value>
 						</value>
 					</item>
-					<item objectType="KalturaEventNotificationParameter">
-						<key>custom_metadata_field_1</key>
-						<description>custom-metadata field #1 as xml-tag-name,target-name</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
-					<item objectType="KalturaEventNotificationParameter">
-						<key>custom_metadata_field_2</key>
-						<description>custom-metadata field #2 as xml-tag-name,target-name</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
-					<item objectType="KalturaEventNotificationParameter">
-						<key>custom_metadata_field_3</key>
-						<description>custom-metadata field #3 as xml-tag-name,target-name</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
-					<item objectType="KalturaEventNotificationParameter">
-						<key>custom_metadata_field_4</key>
-						<description>custom-metadata field #4 as xml-tag-name,target-name</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
 				</userParameters>
 			</template>
 		</request>
