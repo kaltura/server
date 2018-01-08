@@ -17,12 +17,13 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param int $period
 	 * @param string $state
 	 * @param bool $ignoreScheduling
+	 * @param int $version
 	 * @return file
 	 * @ksOptional
 	 */
-	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false)
+	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 1)
 	{
-		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling);
+		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling, $version);
 		$context->keepScheduling = !$ignoreScheduling;
 		return $this->generateFeed($context, $distributionProfileId, $hash);
 	}
@@ -103,7 +104,17 @@ class DoubleClickService extends ContentDistributionServiceBase
 	{
 		// Construct the feed
 		$distributionProfileId = $this->profile->getId();
-		$feed = new DoubleClickFeed('doubleclick_template.xml', $this->profile);
+
+		$templateName = 'doubleclick_template.xml';
+		$version_2 = false;
+		if($context->version == 2)
+		{
+			$version_2 = true;
+			$templateName = 'doubleclick_version2_template.xml';
+		}
+
+		$feed = new DoubleClickFeed($templateName, $this->profile, $version_2);
+
 		$feed->setTotalResult($context->totalCount);
 		$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
 		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds));

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns:dfpvideo="http://api.google.com/dfpvideo" version="2.0">
+    <channel>
+        <title></title>
+        <dfpvideo:version>2</dfpvideo:version>
+        <dfpvideo:keyvalues key="description" value="" type="string"/>
+        <dfpvideo:keyvalues key="link" value="" type="string"/>
+        <generator>Kaltura DoubleClick Distribution Provider</generator>
+        <openSearch:totalResults></openSearch:totalResults>
+        <openSearch:startIndex></openSearch:startIndex>
+        <openSearch:itemsPerPage></openSearch:itemsPerPage>
+        <item>
+            <title></title>
+            <pubDate></pubDate>
+            <dfpvideo:contentID/>
+            <dfpvideo:keyvalues key="link" value="" type="string"/>
+            <dfpvideo:keyvalues key="author" value="" type="string"/>
+            <dfpvideo:keyvalues key="description" value="" type="string"/>
+            <dfpvideo:keyvalues key="keywords" value="" type="string"/>
+            <media:content url="" duration="" />
+            <media:thumbnail url="" height="" width="" />
+            <dfpvideo:keyvalues key="category" value="" type="string"/>
+            <media:status state="active"/>
+            <dfpvideo:cuepoints/>
+            <dfpvideo:keyvalues key="stats" value="" type="string"/>
+            <dfpvideo:ingestUrl type="application/x-mpegURL" preconditioned="false"/>
+            <dfpvideo:lastMediaModifiedDate/>
+            <dfpvideo:closedCaptionUrl language="" type=""/>
+            <dfpvideo:fw_caid/>
+        </item>
+    </channel>
+</rss>
