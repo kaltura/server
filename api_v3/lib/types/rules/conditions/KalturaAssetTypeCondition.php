@@ -16,7 +16,7 @@ class KalturaAssetTypeCondition extends KalturaCondition
 	 */
 	public function __construct() 
 	{
-		$this->type = ConditionType::FLAVOR_TYPE;
+		$this->type = ConditionType::ASSET_TYPE;
 	}
 	
 	/* (non-PHPdoc)

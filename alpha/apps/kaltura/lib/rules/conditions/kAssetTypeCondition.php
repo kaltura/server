@@ -15,7 +15,7 @@ class kAssetTypeCondition extends kCondition
 	 */
 	public function __construct($not = false)
 	{
-		$this->setType(ConditionType::FLAVOR_TYPE);
+		$this->setType(ConditionType::ASSET_TYPE);
 		parent::__construct($not);
 	}
 
