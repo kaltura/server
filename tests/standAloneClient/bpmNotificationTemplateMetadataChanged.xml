@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<!-- script will ask for username / password interactively -->
+	</session>
+	<multirequest continueOnError="1">
+		<!-- Metadata Content Changed -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
+				<systemNameEqual>BPM_START_ENTRY_CUSTOM_METADATA_CONTENT_CHANGED</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
+				<name>Metadata Content Changed</name>
+				<systemName>BPM_START_ENTRY_CUSTOM_METADATA_CONTENT_CHANGED</systemName>
+				<description>Metadata Content Changed</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>6</eventType> <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+				<eventObjectType>metadataEventNotifications.Metadata</eventObjectType> <!-- EventNotificationEventObjectType::METADATA -->
+				<mainObjectCode>$object->getEntry()</mainObjectCode>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>endPoint</key>
+						<description>Server Host</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get('apphome_url')</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>partnerId</key>
+						<description>Partner ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntry()->getPartnerId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>adminSecret</key>
+						<description>Partner Administrator Secret</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null($scope->getObject()->getEntry()->getPartner()) ? $scope->getObject()->getEntry()->getPartner()->getAdminSecret() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entryId</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntry()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_old_version</key>
+						<description>Metadata previous version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getPreviousVersion()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_version</key>
+						<description>Metadata version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getVersion()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<eventConditions objectType="array">
+					<item objectType="KalturaFieldMatchCondition">
+						<description>metadata objects of specific metadata-profile</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getMetadataProfile()->getSystemName()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{metadata_profile_system_name}</value>
+							</item>
+						</values>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Not first metadata version</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>!is_null($scope->getEvent()->getPreviousVersion())</code>
+						</field>
+					</item>
+				</eventConditions>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_system_name</key>
+						<description>Custom metadata profile system name to be compared and used</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{3:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>
