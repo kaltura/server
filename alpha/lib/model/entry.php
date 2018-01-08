@@ -3585,17 +3585,32 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return $flavorAssetIds;
 	}
 	
-	public function getUserNames() {
+	public function getUserNames()
+	{
+		$userNames = $this->getUserNamesAsArray();
+		if($userNames)
+			return implode(" ", $userNames);
+
+		return "";
+	}
+
+	private function getUserNamesAsArray($withNullValues = true)
+	{
 		$kuser = $this->getkuser();
 		if(!$kuser)
-			return "";
-		
+			return null;
+
 		$userNames = array();
-		$userNames[] = $kuser->getFirstName();
-		$userNames[] = $kuser->getLastName();
-		$userNames[] = $kuser->getScreenName();
-		
-		return implode(" ", $userNames);
+		if($withNullValues || $kuser->getFirstName())
+			$userNames[] = $kuser->getFirstName();
+
+		if($withNullValues || $kuser->getLastName())
+			$userNames[] = $kuser->getLastName();
+
+		if($withNullValues || $kuser->getScreenName())
+			$userNames[] = $kuser->getScreenName();
+
+		return $userNames;
 	}
 
 	public function getCapabilities()
@@ -3798,6 +3813,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'redirect_entry_id' => $this->getRedirectEntryId(),
 			'views' => $this->getViews(),
 			'votes' => $this->getVotes(),
+			'user_names' => $this->getUserNamesAsArray(false)
 		);
 
 		$this->addCategoriesToObjectParams($body);
