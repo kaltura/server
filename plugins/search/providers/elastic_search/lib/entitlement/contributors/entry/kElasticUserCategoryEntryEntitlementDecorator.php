@@ -19,7 +19,8 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix = '')
 	{
 		$ids = self::getFormattedCategoryIds($params['category_ids']);
-		$condition = new kESearchTermsQuery("{$fieldPrefix}category_ids", $ids);
+		$fieldName = ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD;
+		$condition = new kESearchTermsQuery("{$fieldPrefix}{$fieldName}", $ids);
 		return $condition;
 	}
 
