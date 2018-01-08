@@ -6,9 +6,10 @@
 class KalturaAssetTypeCondition extends KalturaCondition
 {
 	/**
-	 * @var KalturaAssetTypeHolderArray holder for flavor 
+	 * @dynamicType KalturaAssetType
+	 * @var string
 	 */
-	public $flavorTypes;
+	public $assetTypes;
 
 	/**
 	 * Init object type
@@ -29,8 +30,8 @@ class KalturaAssetTypeCondition extends KalturaCondition
 		/** @var $dbObject kAssetTypeCondition */
 		$dbObject = parent::toObject($dbObject, $skip);
 
-		if (!is_null($this->flavorTypes))
-			$dbObject->setAssetTypes($this->flavorTypes->toObjectsArray());
+		if (!is_null($this->assetTypes))
+			$dbObject->setAssetTypes(explode(',', $this->assetTypes));
 
 		return $dbObject;
 	}
@@ -42,7 +43,7 @@ class KalturaAssetTypeCondition extends KalturaCondition
 	{
 		/** @var $dbObject kAssetTypeCondition */
 		parent::doFromObject($dbObject, $responseProfile);
-		if($this->shouldGet('flavorTypes', $responseProfile))
-			$this->flavorTypes = KalturaAssetTypeHolderArray::fromDbArray($dbObject->getAssetTypes(), $responseProfile);
+		if($this->shouldGet('AssetTypes', $responseProfile))
+			$this->assetTypes = implode(',', $dbObject->getAssetTypes());
 	}
 }
