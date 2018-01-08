@@ -27,7 +27,6 @@
             <dfpvideo:lastMediaModifiedDate/>
             <dfpvideo:closedCaptionUrl type="string" language=""/>
             <dfpvideo:fw_caid/>
-            <dfpvideo:closedCaptionUrl type="string" language=""/>
         </item>
     </channel>
 </rss>

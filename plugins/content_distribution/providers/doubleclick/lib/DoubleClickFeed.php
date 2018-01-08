@@ -472,14 +472,6 @@ class DoubleClickFeed
 			kXml::setNodeValue($this->xpath,'@language', $captionAsset->getLanguage(), $content);
 		}
 	}
-
-
-	public function setStatsInfo(DOMElement $item, array $values)
-	{
-
-	}
-
-
 	
 	public function setTotalResult($v)
 	{
