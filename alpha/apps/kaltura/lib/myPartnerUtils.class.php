@@ -1778,7 +1778,7 @@ class myPartnerUtils
 
 		// validate serve access control
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
-		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE);
+		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
 		$secureEntryHelper->validateForServe($flavorParamsId);
 
 		// enforce delivery
