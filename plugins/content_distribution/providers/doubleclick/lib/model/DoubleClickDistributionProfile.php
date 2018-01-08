@@ -128,6 +128,12 @@ class DoubleClickDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(DoubleClickDistributionField::LAST_MODIFIED_DATE);
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="updatedAt" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(DoubleClickDistributionField::LAST_MEDIA_MODIFIED_DATE);
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="updatedAt" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
@@ -135,7 +141,13 @@ class DoubleClickDistributionProfile extends ConfigurableDistributionProfile
 
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(DoubleClickDistributionField::STATUS);
-		$fieldConfig->setEntryMrssXslt('<xsl:text>blocked</xsl:text>');
+		$fieldConfig->setEntryMrssXslt('<xsl:text>active</xsl:text>');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(DoubleClickDistributionField::FW_CAID);
+		$fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		

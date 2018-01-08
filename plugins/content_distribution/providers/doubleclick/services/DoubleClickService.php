@@ -131,7 +131,11 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 		
 		$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
-		return $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
+
+		$captionAssets = null;
+		if($context->version == 2)
+			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		return $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints, $captionAssets, $entry);
 	}
 	
 	/**
