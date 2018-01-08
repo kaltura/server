@@ -1,10 +1,10 @@
 <?php
-class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer 
+class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 {
 	private $baseEndpointUrl = null;
 	const DEFAULT_ACCURACY = 0.6;
 	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.{ext}";
-	
+
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
 	 */
@@ -18,12 +18,12 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		}
 		return false;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
 	public function updatedJob(BatchJob $dbBatchJob)
-	{	
+	{
 		$data = $dbBatchJob->getData();
 		$providerData = $data->getProviderData();
 		$entryId = $providerData->getEntryId();
@@ -31,7 +31,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$spokenLanguage = $providerData->getSpokenLanguage();
 
 		$transcripts = kTranscriptHelper::getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage);
-		
+
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
 		{
 			if(count ($transcripts))
@@ -55,7 +55,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				else {
 					$transcript = $transcripts[$containerFormat];
 				}
-				
+
 				$transcript->setProviderType (VoicebasePlugin::getTranscriptProviderTypeCoreValue(VoicebaseTranscriptProviderType::VOICEBASE));
 				$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
 				$transcript->save();
@@ -63,24 +63,24 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 
 			return true;
 		}
-	
-		$formatsString = $providerData->getCaptionAssetFormats();		
-	
+
+		$formatsString = $providerData->getCaptionAssetFormats();
+
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$clientHelper = VoicebasePlugin::getClientHelper($providerData->getApiKey(), $providerData->getApiPassword());
-		
+
 			$externalEntryExists = $clientHelper->checkExistingExternalContent($entryId);
 			if (!$externalEntryExists)
 			{
 				KalturaLog::err("Remote content for entry ID [$entryId] does not exist");
-				return true;     	
+				return true;
 			}
-			
+
 			$formatsArray = explode(',',$formatsString);
 			$formatsArray[] = "TXT";
 			$formatsArray[] = "JSON";
-			
+
 			$contentsArray = $clientHelper->getRemoteTranscripts($entryId, $formatsArray);
 			KalturaLog::debug('contents are - ' . print_r($contentsArray, true));
 
@@ -94,7 +94,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				{
 					/* @var $transcript TranscriptAsset */
 					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
-							$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+						$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
 					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
 					{
 						$tokenizedTranscript = $this->normalizeJson ($contentsArray["JSON"]);
@@ -103,11 +103,11 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				}
 			}
 			unset($contentsArray["TXT"]);
-			unset($contentsArray["JSON"]); 
-	
+			unset($contentsArray["JSON"]);
+
 			$captions = kTranscriptHelper::getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
 			foreach ($contentsArray as $format => $content)
-			{        
+			{
 				$captionFormatConst = constant("KalturaCaptionType::" . $format);
 				if(isset($captions[$captionFormatConst]))
 					$caption = $captions[$captionFormatConst];
@@ -129,15 +129,15 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				$this->setObjectContent($caption, $content, $accuracy, $format);
 			}
 		}
-		return true;					    
+		return true;
 	}
-	
+
 	function getAssetsByLanguage($entryId, array $assetTypes, $spokenLanguage, $returnSingleObject = false)
 	{
 		$objects = $returnSingleObject ? null : array();
 		$statuses = array(asset::ASSET_STATUS_QUEUED, asset::ASSET_STATUS_READY);
 		$resultArray = assetPeer::retrieveByEntryId($entryId, $assetTypes, $statuses);
-	
+
 		foreach($resultArray as $object)
 		{
 			if($object->getLanguage() == $spokenLanguage)
@@ -146,11 +146,11 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 					return $object;
 				$objects[$object->getContainerFormat()] = $object;
 			}
-		}	
-		
+		}
+
 		return $objects;
 	}
-	
+
 	private function setObjectContent($assetObject, $content, $accuracy = null, $format = null, $shouldSetTranscriptFileName = false)
 	{
 		$assetObject->incrementVersion();
@@ -164,22 +164,22 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			if ($format == "JSON")
 				$ext = 'json';
 		}
-	
+
 		$assetObject->setFileExt($ext);
 		$assetObject->save();
 		$syncKey = $assetObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-	
+
 		kFileSyncUtils::file_put_contents($syncKey, $content);
 
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($assetObject));
 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		$assetObject->setSize(kFile::fileSize($finalPath));
-	
+
 		if ($shouldSetTranscriptFileName && !$assetObject->getFileName())
 		{
 			$language = str_replace(" ", "", $assetObject->getLanguage());
-			
+
 			$patterns = array("{entryId}","{language}","{ext}");
 			$replacements = array($assetObject->getEntryId(), $language, $ext);
 			$fileName = str_replace($patterns, $replacements, self::FILE_NAME_PATTERN);
@@ -187,7 +187,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		}
 
 		if(!$accuracy)
-			$accuracy = self::DEFAULT_ACCURACY;		
+			$accuracy = self::DEFAULT_ACCURACY;
 
 		$assetObject->setAccuracy($accuracy);
 		$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_READY);
@@ -282,14 +282,14 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$stringTime .= '.' . str_pad($milliseconds, 3, 0, STR_PAD_LEFT);
 		return $stringTime;
 	}
-	
+
 	/*
 	 * 
 	 */
 	private function normalizeJson ($transcript)
 	{
 		$tokens = json_decode($transcript, true);
-		
+
 		$normalizedTokens = array ();
 		foreach ($tokens as $token)
 		{
@@ -299,18 +299,18 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				$normalizedToken['i'] = $token['p'];
 				$normalizedToken['s'] = $token['s'];
 				$normalizedToken['e'] = $token['e'];
-				
+
 				$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_WORD;
 				if (isset ($token['m']) && $token['m'] == 'punc')
 				{
 					$normalizedToken['t'] = kTranscriptHelper::TOKEN_TYPE_PUNC;
 				}
 				$normalizedToken['w'] = $token['w'];
-			
+
 				$normalizedTokens[] = $normalizedToken;
 			}
 		}
-		
+
 		return json_encode($normalizedTokens);
 	}
 }
