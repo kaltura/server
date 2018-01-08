@@ -51,12 +51,10 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 			$bool = new kESearchBoolQuery();
 			foreach ($queryNames as $nestedQueryName)
 			{
-				$subTypeDelimiterIndex = strpos($nestedQueryName, self::SUBTYPE_DELIMITER);
-				if ($subTypeDelimiterIndex !== false)
-				{
-					$subType = substr($nestedQueryName, $subTypeDelimiterIndex + strlen(self::SUBTYPE_DELIMITER));
+				$subType = self::getSubTypeFromQueryName($nestedQueryName);
+				if($subType)
 					$queryAttributes->setObjectSubType($subType);
-				}
+
 				$innerNestedQuery = self::createSingleNestedQuery($innerHitsSize, $queryAttributes, $boolOperator, $allowedSearchTypes, $eSearchItem);
 				$innerNestedQuery->setInnerHitsName($nestedQueryName);
 				$queryAttributes->setObjectSubType(null);
@@ -115,10 +113,14 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 			$nestedQuery->setInnerHitsName($groupQueryName);
 		$queryAttributes->setScopeToInner();
 		$boolQuery = new kESearchBoolQuery();
+		$subType = self::getSubTypeFromQueryName($groupQueryName);
+		if($subType)
+			$queryAttributes->setObjectSubType($subType);
 		foreach ($eSearchItemsArr as $eSearchItem)
 		{
 			static::createSingleItemSearchQuery($eSearchItem, $boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
 		}
+		$queryAttributes->setObjectSubType(null);
 		$highlight = kBaseSearch::getHighlightSection(static::HIGHLIGHT_CONFIG_KEY, $queryAttributes);
 		if(isset($highlight))
 			$nestedQuery->setHighlight($highlight);
@@ -144,5 +146,15 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 				$groupedItems[self::DEFAULT_GROUP_NAME][] = $item;
 		}
 		return $groupedItems;
+	}
+
+	protected static function getSubTypeFromQueryName($queryName)
+	{
+		$subType = null;
+		$subTypeDelimiterIndex = strpos($queryName, self::SUBTYPE_DELIMITER);
+		if ($subTypeDelimiterIndex !== false)
+			$subType = substr($queryName, $subTypeDelimiterIndex + strlen(self::SUBTYPE_DELIMITER));
+
+		return $subType;
 	}
 }

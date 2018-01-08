@@ -120,13 +120,6 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 	public static function createSingleItemSearchQuery($cuePointSearchItem, $boolOperator, &$cuePointBoolQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$cuePointSearchItem->validateItemInput();
-		if ($queryAttributes->getObjectSubType())
-		{
-			$apiCuePointType = kPluginableEnumsManager::coreToApi('CuePointType', $cuePointSearchItem->getCuePointType());
-			$plugin = kPluginableEnumsManager::getPlugin($apiCuePointType);
-			$subTypeValue = $plugin->getSubTypeValue($queryAttributes->getObjectSubType());
-			$queryAttributes->setObjectSubType($subTypeValue);
-		}
 
 		switch ($cuePointSearchItem->getItemType())
 		{
@@ -212,8 +205,12 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 			$cuePointTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::TYPE, $cuePointSearchItem->getCuePointType());
 			if ($queryAttributes->getObjectSubType())
 			{
-				$cuePointSubTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::SUB_TYPE, $queryAttributes->getObjectSubType());
-				$cuePointPartial->addToFilter($cuePointSubTypeQuery);
+				$coreSubType = self::getCoreSubTypeFromApiSubType($cuePointSearchItem->getCuePointType(), $queryAttributes->getObjectSubType());
+				if($coreSubType)
+				{
+					$cuePointSubTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::SUB_TYPE, $coreSubType);
+					$cuePointPartial->addToFilter($cuePointSubTypeQuery);
+				}
 			}
 			$cuePointPartial->addToFilter($cuePointTypeQuery);
 		}
@@ -262,8 +259,12 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		$boolQuery->addToMust($query);
 		if ($subtype)
 		{
-			$cuePointSubTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::SUB_TYPE, $subtype);
-			$boolQuery->addToFilter($cuePointSubTypeQuery);
+			$coreSubType = self::getCoreSubTypeFromApiSubType($cuePointType, $subtype);
+			if($coreSubType)
+			{
+				$cuePointSubTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::SUB_TYPE, $coreSubType);
+				$boolQuery->addToFilter($cuePointSubTypeQuery);
+			}
 		}
 		return $boolQuery;
 	}
@@ -287,13 +288,28 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 		if ($queryAttributes->getObjectSubType())
 		{
-			$boolQuery = new kESearchBoolQuery();
-			$boolQuery->addToFilter($cuePointTypeQuery);
-			$cuePointSubTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::SUB_TYPE, $queryAttributes->getObjectSubType());
-			$boolQuery->addToFilter($cuePointSubTypeQuery);
-			return $boolQuery;
+			$subType = self::getCoreSubTypeFromApiSubType($cuePointSearchItem->getCuePointType(), $queryAttributes->getObjectSubType());
+			if($subType)
+			{
+				$boolQuery = new kESearchBoolQuery();
+				$boolQuery->addToFilter($cuePointTypeQuery);
+				$cuePointSubTypeQuery = new kESearchTermQuery(ESearchCuePointFieldName::SUB_TYPE, $subType);
+				$boolQuery->addToFilter($cuePointSubTypeQuery);
+				return $boolQuery;
+			}
 		}
 
 		return $cuePointTypeQuery;
 	}
+
+	private static function getCoreSubTypeFromApiSubType($cuePointType, $subType)
+	{
+		$coreSubTypeValue = null;
+		$apiCuePointType = kPluginableEnumsManager::coreToApi('CuePointType', $cuePointType);
+		$plugin = kPluginableEnumsManager::getPlugin($apiCuePointType);
+		if($plugin)
+			$coreSubTypeValue = $plugin->getSubTypeValue($subType);
+		return $coreSubTypeValue;
+	}
+
 }
