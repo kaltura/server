@@ -14,24 +14,24 @@ class kUserSearch extends kBaseSearch
         parent::__construct();
     }
     
-    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
+    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
     {
         kUserElasticEntitlement::init();
         if (!count($statuses))
             $statuses = array(KuserStatus::ACTIVE);
-        $this->initQuery($statuses, $objectId, $pager, $order, $useHighlight);
+        $this->initQuery($statuses, $objectId, $pager, $order);
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
             'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE
         );
 
-        parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
+        parent::initQuery($statuses, $objectId, $pager, $order);
     }
 
     function getPeerName()
