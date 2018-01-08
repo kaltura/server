@@ -72,9 +72,19 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 				// Required in order to manage correctly the max concurrent active jobs 
 				// (aka 'chunkedEncodeMaxConcurrent')
 			$jobs = array();
-
+			$attempts = 5;
 			while(1) {
-				if($manager->RefreshJobs($chunkedEncodeMaxConcurrent, $jobs)===false)
+				$rv = $manager->RefreshJobs($chunkedEncodeMaxConcurrent, $jobs);
+				if($rv===false) {
+					if(--$attempts==0){
+						KalturaLog::log("Failed to RefreshJobs. Probably memcache server failure. Leaving");
+						break;
+					}
+					KalturaLog::log("Remaining attempts:$attempts");
+				}
+				if($rv===true)
+					$attempts = 5;
+				else
 					sleep(2);
 			}
         }

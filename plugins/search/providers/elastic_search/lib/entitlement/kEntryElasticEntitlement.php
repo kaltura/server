@@ -49,17 +49,7 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
     private static function shouldEnforceEntitlement()
     {
-        $partner = PartnerPeer::retrieveByPK(self::$partnerId);
-
-        //disable the entitlement checks for partner
-        if(!$partner->getDefaultEntitlementEnforcement())
-            return false;
-
-        //disable the entitlement checks for admin ks
-        if(self::$ks && self::$ks->isAdmin())
-            return false;
-
-        return true;
+        return kEntitlementUtils::getEntitlementEnforcement();
     }
 
     private static function initializeParentEntitlement()
