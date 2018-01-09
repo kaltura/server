@@ -90,7 +90,10 @@ class DoubleClickService extends ContentDistributionServiceBase
 	
 	protected function getEntries($context, $orderBy = null, $limit = null) {
 		$context->hasNextPage = false;
-		$entries = parent::getEntries($context, null, $this->profile->getItemsPerPage() + 1); // get +1 to check if we have next page
+		$orderBy = null;
+		if($context->version == 2)
+			$orderBy = entryPeer::UPDATED_AT;
+		$entries = parent::getEntries($context, $orderBy, $this->profile->getItemsPerPage() + 1); // get +1 to check if we have next page
 		if (count($entries) === ($this->profile->getItemsPerPage() + 1)) { // we tried to get (itemsPerPage + 1) entries, meaning we have another page
 			$context->hasNextPage = true;
 			unset($entries[$this->profile->getItemsPerPage()]);
@@ -106,20 +109,20 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$distributionProfileId = $this->profile->getId();
 
 		$templateName = 'doubleclick_template.xml';
-		$version_2 = false;
 		if($context->version == 2)
-		{
-			$version_2 = true;
 			$templateName = 'doubleclick_version2_template.xml';
+
+		$feed = new DoubleClickFeed($templateName, $this->profile, $context->version);
+
+		if($context->version != 2)
+		{
+			$feed->setTotalResult($context->totalCount);
+			$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
 		}
 
-		$feed = new DoubleClickFeed($templateName, $this->profile, $version_2);
-
-		$feed->setTotalResult($context->totalCount);
-		$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
-		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds));
+		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds, $context->version));
 		if ($context->hasNextPage)
-			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->nextPageStateLastEntryCreatedAt, $context->nextPageStateLastEntryIds));
+			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->nextPageStateLastEntryCreatedAt, $context->nextPageStateLastEntryIds, $context->version));
 		
 		return $feed;
 	}
@@ -160,15 +163,15 @@ class DoubleClickService extends ContentDistributionServiceBase
 		// Construct the feed
 
 		$templateName = 'doubleclick_template.xml';
-		$version_2 = false;
+		if($version == 2)
+			$templateName = 'doubleclick_version2_template.xml';
+
+		$feed = new DoubleClickFeed ($templateName, $this->profile, $version);
 		if($version == 2)
 		{
-			$version_2 = true;
-			$templateName = 'doubleclick_version2_template.xml';
+			$feed->setTotalResult(1);
+			$feed->setStartIndex(1);
 		}
-		$feed = new DoubleClickFeed ($templateName, $this->profile, $version_2);
-		$feed->setTotalResult(1);
-		$feed->setStartIndex(1);
 		
 		$entries = array();
 		$entries[] = $entry;
@@ -196,7 +199,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param string $hash
 	 * @param int $page
 	 */
-	protected function getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds)
+	protected function getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds, $version)
 	{
 		if (!is_null($stateLastEntryCreatedAt) && !is_null($stateLastEntryIds) && count($stateLastEntryIds) > 0)
 			$state = $stateLastEntryCreatedAt.'|'.implode(',', $stateLastEntryIds);
@@ -208,6 +211,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 			'partnerId' => $this->getPartnerId(),
 			'distributionProfileId' => $distributionProfileId,
 			'hash' => $hash,
+			'version' => $version,
 			'page' => $page,
 			'state' => base64_encode($state),
 			'period' => $period,
