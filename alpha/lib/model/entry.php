@@ -3588,38 +3588,21 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function getUserNames()
 	{
 		$kuser = $this->getkuser();
-		if(!$kuser)
-			return null;
-
-		$userNames = $this->getUserNamesAsArray($kuser);
-		if($userNames)
-			return implode(" ", $userNames);
+		if($kuser)
+		{
+			$userNames = $this->getUserNamesAsArray($kuser);
+			if ($userNames)
+				return implode(" ", $userNames);
+		}
 
 		return "";
 	}
 
 	private function getAllUserNamesAsArray()
 	{
-		$kUsersIds = array();
+
 		$result = array();
-		$users = array();
-
-		if($this->getKuserId())
-			$kUsersIds[] = $this->getKuserId();
-
-		if($this->getCreatorKuserId())
-			$kUsersIds[] = $this->getCreatorKuserId();
-
-		$entitledKusersIds = $this->getEntitledKusersEditArray();
-		if($entitledKusersIds)
-			$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
-
-		$entitledKusersIds = $this->getEntitledKusersPublishArray();
-		if($entitledKusersIds)
-			$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
-
-		if($kUsersIds)
-			$users =  kuserPeer::retrieveByPKs($kUsersIds);
+		$users = $this->getAllUsersIds();
 
 		foreach ($users as $user)
 		{
@@ -3633,16 +3616,35 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return null;
 	}
 
-	private function getUserNamesAsArray($kuser, $withNullValues = true)
+	private function getAllUsersIds()
+	{
+		$kUsersIds = array();
+
+		if($this->getKuserId())
+			$kUsersIds[] = $this->getKuserId();
+
+		if($this->getCreatorKuserId())
+			$kUsersIds[] = $this->getCreatorKuserId();
+
+		$entitledKusersIds = $this->getEntitledKusersEditArray();
+		$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		$entitledKusersIds = $this->getEntitledKusersPublishArray();
+		$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		return  kuserPeer::retrieveByPKs($kUsersIds);
+	}
+
+	private function getUserNamesAsArray($kuser, $includeNullValues = true)
 	{
 		$userNames = array();
-		if($withNullValues || $kuser->getFirstName())
+		if($includeNullValues || $kuser->getFirstName())
 			$userNames[] = $kuser->getFirstName();
 
-		if($withNullValues || $kuser->getLastName())
+		if($includeNullValues || $kuser->getLastName())
 			$userNames[] = $kuser->getLastName();
 
-		if($withNullValues || $kuser->getScreenName())
+		if($includeNullValues || $kuser->getScreenName())
 			$userNames[] = $kuser->getScreenName();
 
 		return $userNames;
