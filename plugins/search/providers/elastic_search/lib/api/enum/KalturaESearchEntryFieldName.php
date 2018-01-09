@@ -38,5 +38,5 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const EXTERNAL_SOURCE_TYPE = 'external_source_type';
 	const IS_QUIZ = 'is_quiz';
 	const IS_LIVE = 'is_live';
-	const USER_NAMES = "user_name";
+	const USER_NAMES = "user_names";
 }
