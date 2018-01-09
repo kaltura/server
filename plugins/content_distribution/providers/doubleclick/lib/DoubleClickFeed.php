@@ -72,7 +72,7 @@ class DoubleClickFeed
 		$this->addDfpMrssNameSpaces();
 		$this->setTemplateNodes();
 		$this->setProfileProperties($profile);
-		if($version != 2)
+		if($version < 2)
 			$this->setItemsPerPage($profile->getItemsPerPage());
 	}
 
@@ -272,7 +272,7 @@ class DoubleClickFeed
 			if (!$category)
 				continue;
 			$categoryNode = $this->category->cloneNode(true);
-			if($this->version != 2)
+			if($this->version < 2)
 			{
 				$categoryNode->nodeValue = $category;
 				$mediaGroupNode = $item->getElementsByTagName('group')->item(0);
@@ -365,7 +365,7 @@ class DoubleClickFeed
 		{
 			/* @var $flavorAsset flavorAsset */
 			$content = $this->content->cloneNode(true);
-			if($this->version != 2)
+			if($this->version < 2)
 			{
 				$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
 				$mediaGroup->appendChild($content);
@@ -400,7 +400,7 @@ class DoubleClickFeed
 			
 			kXml::setNodeValue($this->xpath,'@url', $url, $content);
 			kXml::setNodeValue($this->xpath,'@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
-			if($this->version != 2)
+			if($this->version < 2)
 			{
 				kXml::setNodeValue($this->xpath,'@type', $type, $content);
 				kXml::setNodeValue($this->xpath,'@fileSize', (int)$flavorAsset->getSize(), $content);
@@ -423,7 +423,7 @@ class DoubleClickFeed
 		{
 			/* @var $flavorAsset flavorAsset */
 			$content = $this->thumbnail->cloneNode(true);
-			if($this->version != 2)
+			if($this->version < 2)
 			{
 				$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
 				$mediaGroup->appendChild($content);

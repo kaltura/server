@@ -114,7 +114,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 
 		$feed = new DoubleClickFeed($templateName, $this->profile, $context->version);
 
-		if($context->version != 2)
+		if($context->version < 2)
 		{
 			$feed->setTotalResult($context->totalCount);
 			$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
