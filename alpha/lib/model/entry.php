@@ -3587,19 +3587,54 @@ public function copyTemplate($copyPartnerId = false, $template)
 	
 	public function getUserNames()
 	{
-		$userNames = $this->getUserNamesAsArray();
+		$kuser = $this->getkuser();
+		if(!$kuser)
+			return null;
+
+		$userNames = $this->getUserNamesAsArray($kuser);
 		if($userNames)
 			return implode(" ", $userNames);
 
 		return "";
 	}
 
-	private function getUserNamesAsArray($withNullValues = true)
+	private function getAllUserNamesAsArray()
 	{
-		$kuser = $this->getkuser();
-		if(!$kuser)
-			return null;
+		$kUsersIds = array();
+		$result = array();
+		$users = array();
 
+		if($this->getKuserId())
+			$kUsersIds[] = $this->getKuserId();
+
+		if($this->getCreatorKuserId())
+			$kUsersIds[] = $this->getCreatorKuserId();
+
+		$entitledKusersIds = $this->getEntitledKusersEditArray();
+		if($entitledKusersIds)
+			$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		$entitledKusersIds = $this->getEntitledKusersPublishArray();
+		if($entitledKusersIds)
+			$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		if($kUsersIds)
+			$users =  kuserPeer::retrieveByPKs($kUsersIds);
+
+		foreach ($users as $user)
+		{
+			$result2 = $this->getUserNamesAsArray($user, false);
+			$result = array_merge($result, $result2);
+		}
+
+		if($result)
+			return $result;
+
+		return null;
+	}
+
+	private function getUserNamesAsArray($kuser, $withNullValues = true)
+	{
 		$userNames = array();
 		if($withNullValues || $kuser->getFirstName())
 			$userNames[] = $kuser->getFirstName();
@@ -3813,7 +3848,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'redirect_entry_id' => $this->getRedirectEntryId(),
 			'views' => $this->getViews(),
 			'votes' => $this->getVotes(),
-			'user_names' => $this->getUserNamesAsArray(false)
+			'user_names' => $this->getAllUserNamesAsArray()
 		);
 
 		$this->addCategoriesToObjectParams($body);
