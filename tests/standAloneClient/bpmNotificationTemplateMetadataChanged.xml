@@ -44,21 +44,21 @@
 						<key>partnerId</key>
 						<description>Partner ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getEntry()->getPartnerId()</code>
+							<code>!is_null($scope->getObject()->getEntry()) ? $scope->getObject()->getEntry()->getPartnerId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>!is_null($scope->getObject()->getEntry()->getPartner()) ? $scope->getObject()->getEntry()->getPartner()->getAdminSecret() : ''</code>
+							<code>!is_null($scope->getObject()->getEntry()) &amp;&amp; !is_null($scope->getObject()->getEntry()->getPartner()) ? $scope->getObject()->getEntry()->getPartner()->getAdminSecret() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entryId</key>
 						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getEntry()->getId()</code>
+							<code>!is_null($scope->getObject()->getEntry()) ? $scope->getObject()->getEntry()->getId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
