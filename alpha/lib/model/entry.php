@@ -3602,7 +3602,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 
 		$result = array();
-		$users = $this->getAllUsersIds();
+		$users = $this->getAllUsers();
 
 		foreach ($users as $user)
 		{
@@ -3616,7 +3616,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return null;
 	}
 
-	private function getAllUsersIds()
+	private function getAllUsers()
 	{
 		$kUsersIds = array();
 
