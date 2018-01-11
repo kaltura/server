@@ -1,3 +1,26 @@
+# Vendor Profile #
+
+## Reach In-House Support ##
+- Issue Type: Feature
+- Issue ID: PLAT-7596
+
+### Deployment scripts ###
+	
+	Mysql deployment scripts:
+		1. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_11_21_create_vendor_catalog_item_table.sql
+		2. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_entry_vendor_task_table.sql
+		3. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_vendor_profile_table.sql
+	
+	Run Permissions scripts script:
+		1. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_vendor_role_and_permissions.php
+		2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_permissions.php
+	   
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+
 # Mercury 13.9.0 #
 
 ## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
