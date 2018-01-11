@@ -1425,6 +1425,9 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE' => "Enabled",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_SECOND' => "Price Per Second",
+	'Kaltura_Client_Reach_Enum_VendorProfileType::FREE_TRIAL' => "Free Trial",
+	'Kaltura_Client_Reach_Enum_VendorProfileType::PAID' => "Paid",
+
 
 	'Kaltura_Client_Enum_Language::ABQ' => "Abaza",
 	'Kaltura_Client_Enum_Language::AB' => "Abkhazian",

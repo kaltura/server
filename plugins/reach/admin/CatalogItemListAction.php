@@ -6,11 +6,11 @@
 class CatalogItemListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
 {
 	const ADMIN_CONSOLE_PARTNER = "-2";
-	
+
 	public function __construct()
 	{
 		$this->action = 'CatalogItemListAction';
-		$this->label = "CatalogItemList";
+		$this->label = "Catalog Items";
 		$this->rootLabel = "Reach";
 	}
 
@@ -22,18 +22,13 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		return realpath(dirname(__FILE__));
 	}
 
-//	public function getRequiredPermissions()
-//	{
-//		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CATALOG_ITEM_BASE);
-//	}
-
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$request = $action->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		$partnerId = $this->_getParam('filter_input');
-		
+		$partnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
+
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
 		// init filter
@@ -70,19 +65,26 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		// get results and paginate
 		$listCatalogItemTemplatespager = new Kaltura_Client_Type_FilterPager();
 		$listCatalogItemTemplatespager->pageSize = 500;
-		$templatesList = $reachPluginClient->vendorCatalogItem->listTemplates(null, $listCatalogItemTemplatespager);
-
 		$templates = array();
-		foreach($templatesList->objects as $template)
+		try
 		{
-			$obj = new stdClass();
-			$obj->id = $template->id;
-			$obj->systemName = $template->systemName;
-			$obj->serviceFeature = $template->serviceFeature; // Caption or Translation
-			$obj->serviceType = $template->serviceType; // Human Or machine
-			$obj->turnAroundTime = $template->turnAroundTime; // TurnAroundTime
-			$obj->name = $template->name;
-			$templates[] = $obj;
+			$templatesList = $reachPluginClient->vendorCatalogItem->listTemplates(null, $listCatalogItemTemplatespager);
+
+
+			foreach ($templatesList->objects as $template)
+			{
+				$obj = new stdClass();
+				$obj->id = $template->id;
+				$obj->systemName = $template->systemName;
+				$obj->serviceFeature = $template->serviceFeature; // Caption or Translation
+				$obj->serviceType = $template->serviceType; // Human Or machine
+				$obj->turnAroundTime = $template->turnAroundTime; // TurnAroundTime
+				$obj->name = $template->name;
+				$templates[] = $obj;
+			}
+		} catch (Exception $e)
+		{
+			// List call failed since we might be using a non existing partner. we will return an empty list.
 		}
 
 		$action->view->templates = $templates;
@@ -131,7 +133,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 
 		return null;
 	}
-	
+
 	public function isAllowedForPartner($partnerId)
 	{
 		$client = Infra_ClientHelper::getClient();
@@ -139,9 +141,15 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$filter = new Kaltura_Client_Type_PermissionFilter();
 		$filter->nameEqual = Kaltura_Client_Enum_PermissionName::REACH_PLUGIN_PERMISSION;
 		$filter->partnerIdEqual = $partnerId;
-		$result = $client->permission->listAction($filter, null);
+		try
+		{
+			$result = $client->permission->listAction($filter, null);
+		} catch (Exception $e)
+		{
+			return false;
+		}
 		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
-		
+
 		$isAllowed = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
 		return $isAllowed;
 	}

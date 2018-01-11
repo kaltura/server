@@ -159,7 +159,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
-	private function validate(VendorCatalogItem $sourceObject = null)
+	private function validate(VendorProfile $sourceObject = null)
 	{
 //		if(!$sourceObject) //Source object will be null on insert
 //			$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
@@ -178,4 +178,5 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	{
 		return array();
 	}
+
 }
