@@ -6,9 +6,9 @@
 class kTransformMetadataJobData extends kJobData
 {
 	/**
-	 * @var string
+	 * @var FileContainer
 	 */
-	private $srcXslPath;
+	private $srcXsl;
 	
 	/**
 	 * @var int
@@ -32,11 +32,11 @@ class kTransformMetadataJobData extends kJobData
 	
 	
 	/**
-	 * @return the $srcXslPath
+	 * @return FileContainer $srcXsl
 	 */
-	public function getSrcXslPath()
+	public function getSrcXsl()
 	{
-		return $this->srcXslPath;
+		return $this->srcXsl;
 	}
 
 	/**
@@ -64,11 +64,11 @@ class kTransformMetadataJobData extends kJobData
 	}
 
 	/**
-	 * @param $srcXslPath the $srcXslPath to set
+	 * @param FileContainer $srcXsl
 	 */
-	public function setSrcXslPath($srcXslPath)
+	public function setSrcXsl($srcXsl)
 	{
-		$this->srcXslPath = $srcXslPath;
+		$this->srcXsl = $srcXsl;
 	}
 
 	/**

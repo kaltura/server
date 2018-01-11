@@ -8,6 +8,139 @@
  */
 class LiveReportsService extends KalturaBaseService
 {
+	// kava implementation
+	protected function arrayToApiObject(array $input, $objectType)
+	{
+		$result = new $objectType;
+		foreach ($input as $name => $value)
+		{
+			$result->$name = $value;
+		}
+		return $result;
+	}
+	
+	protected function arrayToApiObjects(array $input, $objectType)
+	{
+		$result = array();
+		foreach ($input as $item)
+		{
+			$result[] = $this->arrayToApiObject($item, $objectType);
+		}
+		return $result;
+	}
+	
+	protected function getCoordinates(KalturaCoordinate $dest, $key)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
+		if (!$cache)
+		{
+			return;
+		}
+
+		$key = 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
+		
+		$coords = $cache->get($key);
+		if (!$coords)
+		{
+			return;
+		}
+		
+		list($dest->latitude, $dest->longitude) = array_map('floatval', explode('/', $coords));
+	}
+	
+	protected function setGeoCoordinates($item, $countryName, $cityName)
+	{
+		$item->country = new KalturaCoordinate();
+		$item->country->name = strtoupper($countryName);
+		$this->getCoordinates($item->country, $countryName);
+
+		$item->city = new KalturaCoordinate();
+		$item->city->name = strtoupper($cityName);
+		$this->getCoordinates($item->city, $countryName . '_' . $cityName);
+	}
+	
+	protected function getReportKava($reportType,
+			KalturaLiveReportInputFilter $filter = null,
+			KalturaFilterPager $pager = null)
+	{
+		if ($pager->pageIndex > 1)
+		{
+			throw new APIException(KalturaErrors::ANALYTICS_UNSUPPORTED_QUERY);
+		}
+		
+		$reportTypes = array(
+			KalturaLiveReportType::PARTNER_TOTAL => 
+				array('partnerTotal', 'KalturaLiveStats'),
+			KalturaLiveReportType::ENTRY_TOTAL => 
+				array('entryTotal', 'KalturaEntryLiveStats'),
+			KalturaLiveReportType::ENTRY_GEO_TIME_LINE => 
+				array('entryGeoTimeline', 'KalturaGeoTimeLiveStats'),
+			KalturaLiveReportType::ENTRY_SYNDICATION_TOTAL => 
+				array('entrySyndicationTotal', 'KalturaEntryReferrerLiveStats'),
+		);
+		
+		if (!isset($reportTypes[$reportType]))
+		{
+			throw new APIException(KalturaErrors::ANALYTICS_UNSUPPORTED_QUERY);
+		}
+		
+		list($methodName, $objectType) = $reportTypes[$reportType];
+		
+		try
+		{
+			$items = call_user_func(array('kKavaLiveReportsMgr', $methodName), $this->getPartnerId(), $filter, $pager->pageSize);
+		}
+		catch (kKavaNoResultsException $e)
+		{
+			$items = array();
+		}
+		
+		$items = $this->arrayToApiObjects($items, $objectType);
+		if ($objectType == 'KalturaGeoTimeLiveStats')
+		{
+			foreach ($items as $item)
+			{
+				$countryName = $item->countryName;
+				unset($item->countryName);
+				
+				$cityName = $item->cityName;
+				unset($item->cityName);
+								
+				$this->setGeoCoordinates($item, $countryName, $cityName);
+			}
+		}
+		
+		$result = new KalturaLiveStatsListResponse();
+		$result->objects = array_slice($items, 0, $pager->pageSize);
+		$result->totalCount = count($items);
+		return $result;
+	}
+
+	protected function getEventsKava($reportType,
+			KalturaLiveReportInputFilter $filter = null)
+	{
+		if ($reportType != KalturaLiveReportType::ENTRY_TIME_LINE)
+		{
+			throw new APIException(KalturaErrors::ANALYTICS_UNSUPPORTED_QUERY);
+		}
+	
+		try
+		{
+			$data = kKavaLiveReportsMgr::entryTimeline($this->getPartnerId(), $filter);
+		}
+		catch (kKavaNoResultsException $e)
+		{
+			$data = '';
+		}
+	
+		$graph = new KalturaReportGraph();
+		$graph->id = 'audience';
+		$graph->data = $data;
+			
+		$result = new KalturaReportGraphArray();
+		$result->offsetSet(null, $graph);
+		return $result;
+	}
 	
 	/**
 	 * @action getEvents
@@ -24,6 +157,11 @@ class LiveReportsService extends KalturaBaseService
 			$filter = new KalturaLiveReportInputFilter();
 		if(is_null($pager))
 			$pager = new KalturaFilterPager;
+		
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
+		{
+			return $this->getEventsKava($reportType, $filter);
+		}
 		
 		$client = new WSLiveReportsClient();
 		$wsFilter = $filter->getWSObject();
@@ -65,6 +203,13 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager();
 		
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
+		{
+			return $this->getReportKava($reportType, $filter, $pager);			
+		}
+		
+		ini_set('memory_limit', '700M');
+
 		$client = new WSLiveReportsClient();
 		$wsFilter = $filter->getWSObject();
 		$wsFilter->partnerId = kCurrentContext::getCurrentPartnerId();

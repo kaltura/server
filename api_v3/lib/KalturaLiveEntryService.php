@@ -131,7 +131,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 				if ($recordedEntry->getSourceType() !== EntrySourceType::RECORDED_LIVE)
 				{
 					$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
-					$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 					$recordedEntry->save();
 				}
 				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
@@ -143,9 +142,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return $entry;
 	}
 
-	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true)
+	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true, $flavorParamsId = null)
 	{
-		$flavorParamsId = $dbAsset->getFlavorParamsId();
+		if ($dbAsset)
+			$flavorParamsId = $dbAsset->getFlavorParamsId();
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
 
 		// is first chunk
@@ -164,7 +164,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset->setFlavorParamsId($flavorParams->getId());
 		$recordedAsset->setFromAssetParams($flavorParams);
 		$recordedAsset->incrementVersion();
-		if ($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
+		if ($dbAsset && $dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 		{
 			$recordedAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
 		}
@@ -207,6 +207,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaEntryServerNodeStatus::PLAYABLE, $shouldCreateRecordedEntry = true)
 	{
+		kApiCache::disableConditionalCache();
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
@@ -217,8 +218,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		// setRedirectEntryId to null in all cases, even for broadcasting...
 		$dbLiveEntry->setRedirectEntryId(null);
-		$dbLiveEntry->save();
 
+		$dbLiveEntry->save();
 		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
 	}
 
@@ -290,6 +291,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
 			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
+			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
@@ -385,7 +387,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	}
 
 	/**
-	 * Sey recorded video to live entry
+	 * Set recorded video to live entry
 	 *
 	 * @action setRecordedContent
 	 * @param string $entryId Live entry id
@@ -469,16 +471,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 			return;
 		}
 
-		if (!$recordedEntry->getConversionProfileId())
-		{
-			$recordedEntry->setConversionProfileId($dbLiveEntry->getConversionProfileId());
-			$recordedEntry->save();
-		}
-
 		//In case conversion profile was changed we need to fetch passed streamed assets as well
 		$dbAsset = assetPeer::retrieveByEntryIdAndParamsNoFilter($dbLiveEntry->getId(), $flavorParamsId);
 		if (!$dbAsset)
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+		{
+			$flavorParamConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParamsId, $dbLiveEntry->getConversionProfileId());
+			if (!$flavorParamConversionProfile)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+		}
 
 		$kResource = $resource->toObject();
 		/* @var $kResource kLocalFileResource */
@@ -486,14 +486,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$keepOriginalFile = $kResource->getKeepOriginalFile();
 
 		$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
-		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0));
-		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile);
+		$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $dbAsset, 0, $flavorParamsId));
+		$this->ingestAsset($replacingEntry, $dbAsset, $filename, $keepOriginalFile, $flavorParamsId);
 	}
 
 	/**
-	 * @action createRecordedEntry
 	 * Create recorded entry id if it doesn't exist and make sure it happens on the DC that the live entry was created on.
-	 *
+	 * @action createRecordedEntry
 	 * @param string $entryId Live entry id
 	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
 	 * @param KalturaEntryServerNodeStatus $liveEntryStatus the status KalturaEntryServerNodeStatus::PLAYABLE | KalturaEntryServerNodeStatus::BROADCASTING
@@ -502,7 +501,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	public function createRecordedEntryAction($entryId, $mediaServerIndex, $liveEntryStatus)
 	{
-		KalturaLog::debug("Creating recorded entry for [$entryId]");
 		$this->dumpApiRequest($entryId);
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
@@ -513,7 +511,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 	protected function checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, $forcePrimaryValidation, $shouldCreateRecordedEntry = true)
 	{
-		if ((!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
+		if ($shouldCreateRecordedEntry && (!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
 			in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) &&
 			$dbLiveEntry->getRecordStatus()
 		)
@@ -554,7 +552,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 					}
 				}
 			}
-			if ($createRecordedEntry && $shouldCreateRecordedEntry)
+			if ($createRecordedEntry)
 			{
 				KalturaLog::info("Creating a recorded entry for ".$dbLiveEntry->getId());
 				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);

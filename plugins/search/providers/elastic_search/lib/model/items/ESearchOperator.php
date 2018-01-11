@@ -48,27 +48,30 @@ class ESearchOperator extends ESearchItem
 		$this->searchItems = $searchItems;
 	}
 
-	public static function createSearchQuery(array $eSearchCaptionItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		if (!count($eSearchCaptionItemsArr))
+		if (!$eSearchItemsArr || !count($eSearchItemsArr))
 		{
-			return array();
+			throw new kESearchException('empty search items are not allowed', kESearchException::EMPTY_SEARCH_ITEMS_NOT_ALLOWED);
 		}
 		switch ($eSearchOperatorType)
 		{
 			case ESearchOperatorType::AND_OP:
-				$boolOperator = 'must';
+				$boolOperator = kESearchBoolQuery::MUST_KEY;
 				break;
 			case ESearchOperatorType::OR_OP:
-				$boolOperator = 'should';
+				$boolOperator = kESearchBoolQuery::SHOULD_KEY;
+				break;
+			case ESearchOperatorType::NOT_OP:
+				$boolOperator = kESearchBoolQuery::MUST_NOT_KEY;
 				break;
 			default:
 				KalturaLog::crit('unknown operator type');
 				return null;
 		}
 		
-		$categorizedSearchItems = self::getCategorizedSearchItems($eSearchCaptionItemsArr);
-		$outQuery = self::createSearchQueryForItems($categorizedSearchItems, $boolOperator, $eSearchOperatorType);
+		$categorizedSearchItems = self::getCategorizedSearchItems($eSearchItemsArr);
+		$outQuery = self::createSearchQueryForItems($categorizedSearchItems, $boolOperator, $queryAttributes, $eSearchOperatorType);
 
 		return $outQuery;
 	}
@@ -104,9 +107,9 @@ class ESearchOperator extends ESearchItem
 		return $allCategorizedSearchItems;
 	}
 
-	private static function createSearchQueryForItems($categorizedSearchItems, $boolOperator,  $eSearchOperatorType)
+	private static function createSearchQueryForItems($categorizedSearchItems, $boolOperator, &$queryAttributes, $eSearchOperatorType)
 	{
-		$outQuery = array();
+		$outQuery = new kESearchBoolQuery();
 		foreach ($categorizedSearchItems as $categorizedSearchItem)
 		{
 			$itemClassName = $categorizedSearchItem['className'];
@@ -117,27 +120,32 @@ class ESearchOperator extends ESearchItem
 				$itemSearchItems = $itemSearchItems->getSearchItems();
 				$operatorType = $categorizedSearchItem['operatorType'];
 			}
-			
-			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $operatorType);
 
-			foreach ($subQuery as $key => $value)
+			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $queryAttributes, $operatorType);
+
+			if($itemClassName == get_class())
+				$outQuery->addByOperatorType($boolOperator, $subQuery);
+			else
 			{
-				if($itemClassName == get_class())
-					$outQuery['bool'][$boolOperator][] = $subQuery;
-				else
-					$outQuery['bool'][$boolOperator][] = $value;
+				foreach ($subQuery as $key => $value)
+				{
+						$outQuery->addByOperatorType($boolOperator, $value);
+				}
 			}
+
 		}
 
-		if($eSearchOperatorType == ESearchOperatorType::OR_OP && count($outQuery['bool'][$boolOperator]))
-			$outQuery['bool']['minimum_should_match'] = 1;
-		
 		return $outQuery;
 	}
 
-	public function getType()
+	public function shouldAddLanguageSearch()
 	{
-		return 'operator';
+
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+
 	}
 
 }

@@ -447,12 +447,17 @@ class kPlaybackContextDataHelper
 
 			case PlaybackProtocol::MPEG_DASH:
 				return array(
-					array('dash'),
+					array('dash', 'h265'),
 					array('ipadnew', 'iphonenew'),
 					array('ipad', 'iphone'),
 				);
 
 			case PlaybackProtocol::APPLE_HTTP:
+				return array(
+					array(assetParams::TAG_APPLEMBR),
+					array('ipadnew', 'iphonenew','h265'),
+					array('ipad', 'iphone'),
+				);
 			case PlaybackProtocol::HDS:
 				return array(
 					array(assetParams::TAG_APPLEMBR),

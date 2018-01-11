@@ -5,10 +5,11 @@
  */
 class KalturaVirusScanJobData extends KalturaJobData
 {
+	
 	/**
-	 * @var string
+	 * @var KalturaFileContainer
 	 */
-	public $srcFilePath;
+	public $fileContainer;
 	
 	/**
 	 * @var string
@@ -28,7 +29,7 @@ class KalturaVirusScanJobData extends KalturaJobData
 	
 	private static $map_between_objects = array
 	(
-		"srcFilePath" ,
+		"fileContainer",
 		"flavorAssetId" ,
 		"scanResult" ,
 		"virusFoundAction",
@@ -57,4 +58,5 @@ class KalturaVirusScanJobData extends KalturaJobData
 	{
 		return kPluginableEnumsManager::coreToApi('VirusScanEngineType', $subType);
 	}
+
 }

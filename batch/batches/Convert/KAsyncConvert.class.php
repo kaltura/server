@@ -157,7 +157,7 @@ class KAsyncConvert extends KJobHandlerWorker
 //				return $this->moveFile($job, $data);
 //			}
 //		}
-
+		$fetchFirst = null;
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{		
 			if(self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
@@ -166,12 +166,14 @@ class KAsyncConvert extends KJobHandlerWorker
 					$srcFileSyncDescriptor->actualFileSyncLocalPath = self::$taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
 					
 				$err = null;
-				if(!$this->distributedFileManager->getLocalPath($srcFileSyncDescriptor->actualFileSyncLocalPath, $srcFileSyncDescriptor->fileSyncRemoteUrl, $err))
+				$fetched = false;
+				if(!$this->distributedFileManager->getLocalPath($srcFileSyncDescriptor->actualFileSyncLocalPath, $srcFileSyncDescriptor->fileSyncRemoteUrl, $err, $fetched))
 				{
 					if(!$err)
 						$err = 'Failed to translate url to local path';
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_FILE_NOT_FOUND, $err, KalturaBatchJobStatus::RETRY);
 				}
+				$fetchFirst = ($fetchFirst === null) ? $fetched : $fetchFirst;
 			}
 			if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 			{
@@ -193,13 +195,14 @@ class KAsyncConvert extends KJobHandlerWorker
 		$operator = $this->getOperator($data);
 		try
 		{
-			$actualFileSyncLocalPath = null;
-			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
-			if($srcFileSyncDescriptor)
-				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
+			if ($fetchFirst) // if fetch with curl then the file is not encrypted
+				$key = null;
+
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
-			$isDone = $this->operationEngine->operate($operator, $actualFileSyncLocalPath);
+			$isDone = $this->operate($operator, $actualFileSyncLocalPath, null, $key);
+
 			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed
 			
 			$this->stopMonitor();
@@ -241,6 +244,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			throw $e;
 		}
 	}
+	
 
 	protected function getOperator(KalturaConvartableJobData $data)
 	{
@@ -363,5 +367,32 @@ class KAsyncConvert extends KJobHandlerWorker
 				$destFileSync->fileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($destFileSync->fileSyncLocalPath);
 			}					
 		}
+	}
+
+	protected static function getFirstFilePathAndKey($srcFileSyncs)
+	{
+		$actualFileSyncLocalPath = null;
+		$key = null;
+		$srcFileSyncDescriptor = reset($srcFileSyncs);
+		if($srcFileSyncDescriptor)
+		{
+			$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			$key = $srcFileSyncDescriptor->fileEncryptionKey;
+		}
+		return array($actualFileSyncLocalPath, $key);
+	}
+
+	protected function operate($operator = null, $filePath, $configFilePath = null, $key = null)
+	{
+		$this->operationEngine->setEncryptionKey($key);
+		if (!$key || is_dir($filePath))
+			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
+		else
+		{
+			$tempClearPath = self::createTempClearFile($filePath, $key);
+			$res = $this->operationEngine->operate($operator, $tempClearPath, $configFilePath);
+			unlink($tempClearPath);
+		}
+		return $res;
 	}
 }

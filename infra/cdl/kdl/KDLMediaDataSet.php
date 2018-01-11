@@ -274,6 +274,17 @@ class KDLMediaDataSet  {
 			/*
 			 * Set video related fields
 			 */
+		$valsArr["videoFormat"]="undefined";
+		$valsArr["videoDuration"]=0;
+		$valsArr["videoBitRate"]=0;
+		$valsArr["videoWidth"]=0;
+		$valsArr["videoHeight"]=0;
+		$valsArr["videoFrameRate"]=0;
+		$valsArr["videoDar"]=0;
+		$valsArr["videoRotation"]=0;
+		$valsArr["scanType"]=0;
+		$valsArr["contentAwareness"]=0;		
+		$valsArr["videoGop"]=0;
 		if(isset($this->_video) && $this->_video->IsDataSet()){
 			$obj = $this->_video;
 			if($obj->IsFormatOf(array("avc","avc1","h264"))){
@@ -299,33 +310,27 @@ class KDLMediaDataSet  {
 			}
 			else
 				$valsArr["videoFormat"]="undefined";
-			$valsArr["videoDuration"]=$obj->_duration;
-			$valsArr["videoBitRate"]=$obj->_bitRate;
-			$valsArr["videoWidth"]=$obj->_width;
-			$valsArr["videoHeight"]=$obj->_height;
-			$valsArr["videoFrameRate"]=$obj->_frameRate;
-			$valsArr["videoDar"]=$obj->_dar;
-			$valsArr["videoRotation"]=$obj->_rotation;
-			$valsArr["scanType"]=$obj->_scanType;
-			$valsArr["contentAwareness"]=$obj->_contentAwareness;
-			$valsArr["videoGop"]=$obj->_gop;
-		}
-		else {
-			$valsArr["videoFormat"]="undefined";
-			$valsArr["videoDuration"]=0;
-			$valsArr["videoBitRate"]=0;
-			$valsArr["videoWidth"]=0;
-			$valsArr["videoHeight"]=0;
-			$valsArr["videoFrameRate"]=0;
-			$valsArr["videoDar"]=0;
-			$valsArr["videoRotation"]=0;
-			$valsArr["scanType"]=0;
-			$valsArr["contentAwareness"]=0;		
-			$valsArr["videoGop"]=0;
+			if(isset($obj->_duration))	$valsArr["videoDuration"]=$obj->_duration;
+			if(isset($obj->_bitRate))	$valsArr["videoBitRate"]=$obj->_bitRate;
+			if(isset($obj->_width))		$valsArr["videoWidth"]=$obj->_width;
+			if(isset($obj->_height))	$valsArr["videoHeight"]=$obj->_height;
+			if(isset($obj->_frameRate))	$valsArr["videoFrameRate"]=$obj->_frameRate;
+			if(isset($obj->_dar))		$valsArr["videoDar"]=$obj->_dar;
+			if(isset($obj->_rotation))	$valsArr["videoRotation"]=$obj->_rotation;
+			if(isset($obj->_scanType))	$valsArr["scanType"]=$obj->_scanType;
+			if(isset($obj->_contentAwareness)) $valsArr["contentAwareness"]=$obj->_contentAwareness;
+			if(isset($obj->_gop))		$valsArr["videoGop"]=$obj->_gop;
 		}
 			/*
 			 * Set audio related fields
 			 */
+                $valsArr["audioFormat"]="undefined";
+                $valsArr["audioDuration"]=0;
+                $valsArr["audioBitRate"]=0;
+                $valsArr["audioChannels"]=0;
+                $valsArr["audioSamplingRate"]=0;
+                $valsArr["audioResolution"]=0;
+                $valsArr["audioStreams"]=0;
 		if(isset($this->_audio) && $this->_audio->IsDataSet()){
 			$obj = $this->_audio;
 			$valsArr["audioFormat"]=$obj->GetIdOrFormat();
@@ -341,22 +346,24 @@ class KDLMediaDataSet  {
 			else if($obj->IsFormatOf(array("pcm"))){
 				$valsArr["audioFormat"]="pcm";
 			}
+			else if($obj->IsFormatOf(array("ac3","ac-3"))){
+				$valsArr["audioFormat"]="ac3";
+			}
+			else if($obj->IsFormatOf(array("eac3","eac-3","e-ac-3"))){
+				$valsArr["audioFormat"]="eac3";
+			}
 			else
 				$valsArr["audioFormat"]="undefined";
-			$valsArr["audioDuration"]=$obj->_duration;
-			$valsArr["audioBitRate"]=$obj->_bitRate;
-			$valsArr["audioChannels"]=$obj->_channels;
-			$valsArr["audioSampleRate"]=$obj->_sampleRate;
-			$valsArr["audioResolution"]=$obj->_resolution;
-		}
-		else {
-			$valsArr["audioFormat"]="undefined";
-			$valsArr["audioDuration"]=0;
-			$valsArr["audioBitRate"]=0;
-			$valsArr["audioChannels"]=0;
-			$valsArr["audioSamplingRate"]=0;
-			$valsArr["audioResolution"]=0;
-			
+			if(isset($obj->_duration))	$valsArr["audioDuration"]=$obj->_duration;
+			if(isset($obj->_bitRate))	$valsArr["audioBitRate"]=$obj->_bitRate;
+			if(isset($obj->_channels))	$valsArr["audioChannels"]=$obj->_channels;
+			if(isset($obj->_sampleRate))	$valsArr["audioSampleRate"]=$obj->_sampleRate;
+			if(isset($obj->_resolution))	$valsArr["audioResolution"]=$obj->_resolution;
+			if(isset($this->_contentStreams->audio)) {
+				$valsArr["audioStreams"]=count($this->_contentStreams->audio);
+			}
+			else 
+				$valsArr["audioStreams"]=0;
 		}
 			/*
 			 * Check 'isWeb' and 'isMbr' presets
@@ -377,8 +384,8 @@ class KDLMediaDataSet  {
 			 */
 		$containerFormats = array("mp4","mxf","wmv3","mpegps","mpegts","webm","mp3");
 		$videoCodecs = array("h264","h265","vp6","vp8","vp9","wmv3","mpeg2");
-		$audioCodecs = array("mp3","aac","mpeg2","pcm");
-		$allowedFormats = array_merge($containerFormats, $videoCodecs, $audioCodecs);
+		$audioCodecs = array("mp3","aac","mpeg2","pcm","ac3","eac3");
+		$allowedFormats = array_unique(array_merge($containerFormats, $videoCodecs, $audioCodecs));
 		$allowedFormats[] = "undefined";
 		$allowedChars = ' +-*/()!=<>&|;';
 		$tok = strtok($condition, $allowedChars);

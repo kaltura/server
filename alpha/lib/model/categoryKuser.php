@@ -33,7 +33,13 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	const PERMISSION_NAME_FIELD_INDEX_PREFIX = "per";
 	
 	const STATUS_FIELD_PREFIX = "status";
-	
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
+
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -113,7 +119,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		$this->updateCategory();
+		// no need to update the category if the categoryKuser wasn't updated
+		if ($this->isModified())
+			$this->updateCategory();
 		
 		return parent::preUpdate($con);
 	}
@@ -442,6 +450,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	public function getObjectParams($params = null)
 	{
 		$body = array(
+			'scripted_upsert' => true,
 			'script' => array(
 				'inline' => $this->getInlineScript(),
 				'lang' => 'painless',
@@ -449,6 +458,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 					'kuser_id' => $this->getKuserId(),
 				)
 			),
+			'upsert' => new stdClass(),
 			'retry_on_conflict' => 10
 		);
 		return $body;
@@ -458,7 +468,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	{
 		if($this->getStatus() == CategoryKuserStatus::DELETED)
 		{
-			$script = 'ctx._source.kuser_ids.remove(ctx._source.kuser_ids.indexOf(params.kuser_id));';
+			$script = "if(ctx._source.kuser_ids == null) {ctx.op = 'none'} else {int idx = ctx._source.kuser_ids.indexOf(params.kuser_id); if(idx != -1) {ctx._source.kuser_ids.remove(idx);}}";
 		}
 		else
 		{
@@ -474,7 +484,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	 */
 	public function getElasticSaveMethod()
 	{
-		return ElasticMethodType::UPADTE;
+		return ElasticMethodType::UPDATE;
 	}
 
 	/**
@@ -491,5 +501,21 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	public function shouldDeleteFromElastic()
 	{
 		return false;
+	}
+
+	/**
+  * @return partner
+  */
+        public function getPartner()
+        {
+                return PartnerPeer::retrieveByPK( $this->getPartnerId() );
+        }
+
+/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'category_kuser';
 	}
 } // categoryKuser

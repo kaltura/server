@@ -46,7 +46,7 @@
                 <xsl:value-of select="string(description)" disable-output-escaping="no" />
             </description>
             <pubdate>
-                <xsl:value-of select="php:function('date', 'D, d M Y \ H:i:s e', sum($stamp))" />
+                <xsl:value-of select="php:function('date', 'c', sum($stamp))"/>
             </pubdate>
             <!--<xsl:for-each select="$var1_content">-->
             <media:content>

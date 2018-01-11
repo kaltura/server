@@ -165,8 +165,12 @@
 					<td><?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
 					<td><?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
 					<?php if($enableActions): ?>
-						<td><button onclick="doReconvertEntry();"><?php echo $this->translate('entry-investigate entry reconvert'); ?></button></td>
-						<td><button onclick="doBoostEntryJobs();"><?php echo $this->translate('entry-investigate entry boostJobs'); ?></button></td>
+						<?php if($entry->status == Kaltura_Client_Enum_EntryStatus::DELETED): ?>
+							<td><button onclick="doActionEntry('restoreEntry');"><?php echo $this->translate('entry-investigate entry restore'); ?></button></td>
+						<?php else: ?>
+							<td><button onclick="doActionEntry('reconvertEntry');"><?php echo $this->translate('entry-investigate entry reconvert'); ?></button></td>
+						<?php endif; ?>
+						<td><button onclick="doActionEntry('boostEntryJobs');"><?php echo $this->translate('entry-investigate entry boostJobs'); ?></button></td>
 					<?php endif; ?>
 				</tr>
 			</table>
@@ -945,6 +949,7 @@
 					<tr>
 						<th title="<?php echo $this->translate('entry-investigate history batch tooltip'); ?>"><?php echo $this->translate('entry-investigate history batch th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history status tooltip'); ?>"><?php echo $this->translate('entry-investigate history status th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history object th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history abort th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history recheck th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history msg th'); ?></th>
@@ -997,6 +1002,7 @@
 										echo "<font color=\"$color\">$status</font>";
 									?>
 								</td>
+								<td><?php echo $job->jobObjectId; ?></td>
 								<td><?php echo $job->abort; ?></td>
 								<td><?php echo ($job->checkAgainTimeout ? date($this->translate('time format'), $job->checkAgainTimeout) : ''); ?></td>
 								<td><?php echo htmlspecialchars($job->message); ?></td>
@@ -1297,24 +1303,14 @@
 		var frm = document.getElementById("frmSupport");
 		frm.submit();
 	}
-	
-	function doReconvertEntry(){
+
+	function doActionEntry(action){
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
 
 		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
-		jQuery('#submitAction').val('reconvertEntry');
-	
-		frm.submit();
-	}
+		jQuery('#submitAction').val(action);
 
-	function doBoostEntryJobs(){
-		var frm = document.getElementById("frmSearch");
-		frm.reset();
-
-		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
-		jQuery('#submitAction').val('boostEntryJobs');
-	
 		frm.submit();
 	}
 

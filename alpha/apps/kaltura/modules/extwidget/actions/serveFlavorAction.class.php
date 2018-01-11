@@ -149,7 +149,7 @@ class serveFlavorAction extends kalturaAction
 		return $mediaSet;
 	}
 	
-	protected function servePlaylist($entry)
+	protected function servePlaylist($entry, $captionLanguages)
 	{
 		// allow only manual playlist
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
@@ -165,9 +165,8 @@ class serveFlavorAction extends kalturaAction
 			$entry->setDesiredVersion($version);
 		}
 		
-		list($entryIds, $durations, $referenceEntry, $captionFiles) =
-			myPlaylistUtils::executeStitchedPlaylist($entry);
-		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null, null, null);
+		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry, $captionLanguages);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null, $captionFiles, $captionLanguages);
 	}
 
 	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds, $captionFiles, $captionLanguages)
@@ -242,75 +241,48 @@ class serveFlavorAction extends kalturaAction
 		// build the sequences
 		$storeCache = true;
 		$sequences = array();
-		foreach ($flavorParamIds as $flavorParamsId)
-		{
-			$referenceFlavor = $groupedFlavors[$referenceEntry->getId()][$flavorParamsId];
-			$origEntryFlavor = $referenceFlavor;
-			// build the clips of the current sequence
-			$clips = array();
-			foreach ($entryIds as $entryId)
+		if ($this->getRequestParameter("flavorParamIds") || !$this->getRequestParameter("captions") || !($origEntry->getType() == entryType::PLAYLIST)) {
+			foreach ($flavorParamIds as $flavorParamsId)
 			{
-				if (isset($groupedFlavors[$entryId][$flavorParamsId]))
+				$referenceFlavor = $groupedFlavors[$referenceEntry->getId()][$flavorParamsId];
+				$origEntryFlavor = $referenceFlavor;
+				// build the clips of the current sequence
+				$clips = array();
+				foreach ($entryIds as $entryId)
 				{
-					$flavor = $groupedFlavors[$entryId][$flavorParamsId];
-				}
-				else
-				{
-					// don't have a flavor for this entry in the desired flavor params,
-					// choose the one with the closest bitrate
-					$flavor = reset($groupedFlavors[$entryId]);
-					foreach ($groupedFlavors[$entryId] as $curFlavor)
+					if (isset($groupedFlavors[$entryId][$flavorParamsId]))
 					{
-						// first priority - matching tags
-						if ($flavor->getTags() == $referenceFlavor->getTags())
-						{
-							if ($curFlavor->getTags() != $referenceFlavor->getTags())
-							{
-								continue;
-							}
-						}
-						else
-						{
-							if ($curFlavor->getTags() == $referenceFlavor->getTags())
-							{
-								$flavor = $curFlavor;
-								continue;
-							}
-						}
-
-						// second priority - bitrate
-						if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
-							abs($flavor->getBitrate() - $referenceFlavor->getBitrate()))
-						{
-							$flavor = $curFlavor;
-						}
+						$flavor = $groupedFlavors[$entryId][$flavorParamsId];
 					}
-				}
+					else
+					{
+						$flavor = $this->getBestMatchFlavor($groupedFlavors[$entryId], $referenceFlavor);
+					}
 
-				if ($flavor->getEntryId() == $origEntry->getId())
-				{
-					$origEntryFlavor = $flavor;
-				}
-				// get the file path of the flavor
-				$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey , false, false);
-				if ($fileSync)
-				{
-					$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
-					$path = $this->getFileSyncFullPath($resolvedFileSync);
-				}
-				else
-				{
-					error_log('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
-					$path = '';
-					$storeCache = false;
-				}
+					if ($flavor->getEntryId() == $origEntry->getId())
+					{
+						$origEntryFlavor = $flavor;
+					}
+					// get the file path of the flavor
+					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
+					if ($fileSync)
+					{
+						$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
+						$path = $this->getFileSyncFullPath($resolvedFileSync);
+					}
+					else
+					{
+						error_log('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+						$path = '';
+						$storeCache = false;
+					}
 
-				$clips[] = array('type' => 'source', 'path' => $path);
+					$clips[] = array('type' => 'source', 'path' => $path);
+				}
+				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}
-			$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 		}
-
 		if ($captionFiles)
 			$this->addCaptionSequences($entryIds, $captionFiles, $captionLanguages, $sequences, $origEntry);
 
@@ -420,7 +392,7 @@ class serveFlavorAction extends kalturaAction
 			{
 				list($flavorParamId, $asset) = $this->getFlavorAssetAndParamIds($flavorId);
 				myPartnerUtils::enforceDelivery($entry, $asset);
-				$this->servePlaylist($entry);
+				$this->servePlaylist($entry, $captionLanguages);
 			}
 			if ($sequence  && $isInternalIp)
 			{
@@ -673,6 +645,7 @@ class serveFlavorAction extends kalturaAction
 		$captionLangaugesArr = explode(',', $captionLangauges);
 		foreach ($captionLangaugesArr as $captionLang)
 		{
+			$labelEntryId = null;
 			$hasCaptions = false;
 			$captionClips = array();
 			foreach ($entryIds as $entryId)
@@ -680,6 +653,7 @@ class serveFlavorAction extends kalturaAction
 				if (isset($captionFiles[$entryId][$captionLang]))
 				{
 					$hasCaptions = true;
+					$labelEntryId = $entryId;
 					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH]);
 				}
 				else
@@ -693,9 +667,9 @@ class serveFlavorAction extends kalturaAction
 				if (isset(CaptionPlugin::$captionsFormatMap[$langString]))
 					$langString = CaptionPlugin::$captionsFormatMap[$langString];
 				$currSequence = array('clips' => $captionClips, 'language' => $langString);
-				if (!is_null($captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL]))
-					$currSequence['label'] = $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL];
-				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $mainEntry->getId());
+				if (isset($captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL]))
+					$currSequence['label'] = $captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL];
+				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $mainEntry->getId());
 				$sequences[] = $currSequence;
 			}
 		}
@@ -730,6 +704,61 @@ class serveFlavorAction extends kalturaAction
 			$flavorParamId = $asset->getFlavorParamsId();
 		}
 		return array($flavorParamId, $asset);
+	}
+
+	/**
+	 * Flavor matching logic:
+	 * 1. A flavor with more matching tags should be preferred over one with less matching tags (number of matching tags desc)
+	 * 2. A flavor with less non-matching tags should be preferred (number of non-matching tags asc)
+	 * 3. A flavor with a closer bitrate should be preferred
+	 * @param $groupedFlavors
+	 * @param $referenceFlavor
+	 * @return mixed
+	 */
+	protected function getBestMatchFlavor($groupedFlavors, $referenceFlavor)
+	{
+		$flavor = reset($groupedFlavors);
+		$matchingTags = count(array_intersect($flavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+		$nonMatchingTags = count(array_diff($flavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+
+		foreach ($groupedFlavors as $curFlavor)
+		{
+			$currMatchingTags = count(array_intersect($curFlavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+			$currNonMatchingTags = count(array_diff($curFlavor->getTagsArray(), $referenceFlavor->getTagsArray()));
+
+			if ($currMatchingTags < $matchingTags)
+				continue;
+
+			if ($currMatchingTags > $matchingTags)
+			{
+				$flavor = $curFlavor;
+				$matchingTags = $currMatchingTags;
+				$nonMatchingTags = $currNonMatchingTags;
+				continue;
+			}
+
+			if ($currNonMatchingTags > $nonMatchingTags)
+				continue;
+
+			if ($currNonMatchingTags < $nonMatchingTags)
+			{
+				$flavor = $curFlavor;
+				$matchingTags = $currMatchingTags;
+				$nonMatchingTags = $currNonMatchingTags;
+				continue;
+			}
+
+			// case both flavors have the same matching and nonmatching tags - compare bitrates
+			if (abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
+				abs($flavor->getBitrate() - $referenceFlavor->getBitrate())
+			)
+			{
+				$flavor = $curFlavor;
+				$matchingTags = $currMatchingTags;
+				$nonMatchingTags = $currNonMatchingTags;
+			}
+		}
+		return $flavor;
 	}
 
 }

@@ -1,4 +1,535 @@
+# Mercury 13.11.0 #
+
+## Add Delete to Entry-Server-Node ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7833
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_15_entry_server_enable_delete.php
+
+# Mercury 13.10.0 #
+
+## Deploy new live audio flavor params ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8294
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_12_20_deploy_new_live_params.php
+
+#### Known Issues & Limitations ####
+None.
+
+## Add Entry replaced HTTP template which excludes kaltura recorded entries ##
+
+- Issue Type: Support
+- Issue ID: SUP-13055
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_12_19_notRecordedEntryReplaced.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_12_19_deploy_not_recorded_entry_replaced_http_notification.php
+
+#### Known Issues & Limitations ####
+None.
+
+# Mercury 13.9.0 #
+
+## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
+- Issue Type: Feature
+- Issue ID: PLAT-7977
+
+### Deployment scripts ###
+
+	Deploy Explicit Live Push notification:
+	1. Push notitifications:
+	   First replacae all tokens from in the XML file below and remove ".template" from the fle name:
+	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
+	
+	   Run deployment script:
+		1. remove existing notification template, through admin console, with system name EXPLICIT_LIVE_PUSH_NOTIFICATIONS if it exists	   
+		2. php /opt/kaltura/app/deployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+## Webcast - allow webcast producer to update cuepoint status  ##
+- Issue Type: Feature
+- Issue ID: PLAT-8409
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_12_14_allow_webcast_producer_to_change_cue_point_status.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+# Mercury 13.8.0 # 
+
+## Add Recorded Entry replaced HTTP template ##
+
+- Issue Type: Support
+- Issue ID: SUP-12533
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_11_27_recordedEntryReplaced.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_11_27_deploy_recorded_entry_replaced_http_notification.php
+
+#### Known Issues & Limitations ####
+None.
+
+## eSearch - Increase Inner Hits size ##
+- Issue Type: Task
+- Issue ID: PLAT-7890
+
+### Configuration ###
+	- Add the following to your elastic.ini file in innerHits section:
+    	innerHitsWithObjectId = 100
+### Deployment scripts ###
+	None
+
+## Email Notification - dispatch to multiple category subscribers ## 
+- Issue Type: Feature
+- Issue ID: TR-1693
+
+### Deployment script ### 
+    cd /opt/kaltura/app/tests/standAloneClient
+    php exec.php entryChangesSubscriberNotifications.xml    
+
+## Add eSearch highlight ##
+- Issue Type: Task
+- Issue ID: PLAT-8090
+
+### Configuration ###
+	Configure elasticSearch Kaltura configuration:
+	- Add the following to your elastic.ini file:
+	[highlights]
+	globalMaxNumberOfFragments = 7
+	cuepointMaxNumberOfFragments = 8
+### Deployment scripts ###
+	None
+
+#### Known Issues & Limitations ####
+	None
+
+## Add new app token capabilities ##
+- Issue Type: Task
+- Issue ID: PLAT-8200
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	 mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2017_11_12_alter_app_token_table_add_kuser_id_column.sql
+
+#### Known Issues & Limitations ####
+	None
+
+## Permissions for webcast live dashboard ##
+- Issue Type: Task
+- Issue ID: NO-PLAT
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "WEbcast producer device role" LIVE_STREAM_UPDATE realrun
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_21_allow_webcast_to_list_beacons_and_conversionprofileassetparams.php
+
+#### Known Issues & Limitations ####
+	None
+
+## Add permission to pushnotificationstemplate->register for media_server ##
+- Issue Type: Task
+- Issue ID: PLAT-7977
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	 php deployment/updates/scripts/add_permissions/2017_11_23_add_push_notification_register_permission_to_media_server.php
+
+# Mercury 13.7.0 #
+## New FFMPEG version ##
+- Issue Type: Task
+- Issue ID: Plat-8231
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+- See the PLAT-8231 for link to the patched ffmpeg bins
+
+#### Known Issues & Limitations ####
+	None
+
+## File Encryption ##
+- Issue Type: Task
+- Issue ID: PLAT-7961
+
+### Configuration ###
+	-Add the following to Admin.ini:
+	moduls.FileEncryption.enabled = true
+	moduls.FileEncryption.permissionType = 2
+	moduls.FileEncryption.label = "Enable File Encryption"
+	moduls.FileEncryption.permissionName = FEATURE_CONTENT_ENCRYPTION
+	moduls.FileEncryption.group = GROUP_ENABLE_DISABLE_FEATURES
+	
+	-Add to local.ini:
+	encryption_iv = @DEFAULT_IV_16B@
+	Change the placeholder for 16 characters string 
+       
+### Deployment scripts ###
+	None.
+
+#### Known Issues & Limitations ####
+	None.
+	
+## Explicit Live - allow only admin to view streams until they decide to show everyone  ##
+- Issue Type: Feature
+- Issue ID: PLAT-7977
+
+### Deployment scripts ###
+
+	Deploy Explicit Live Push notification:
+	1. Push notitifications:
+	   First replacae all tokens from in the XML file below and remove ".template" from the fle name:
+	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
+	
+	   Run deployment script:
+		1. php /opt/kaltura/app/deployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+			
+## eSearch Languages support  ##
+ - Issue Type: Task
+- Issue ID: KMS-14857
+
+### Configuration ###
+	-Add the following to Admin.ini:
+	access.search.all = SYSTEM_ADMIN_PUBLISHER_USAGE
+       
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
+## add consumer for asset custom data changes  ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8242
+
+### Configuration ###
+	-Add the following to base.ini:
+	event_consumers[] = kAssetPropertiesManager
+
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+
+# Mercury 13.6.0 #
+
+## Set Entry status to "preconvert" instead of "ready" (for specific partners) when uploading flv files from webcam  ##
+ - Issue Type: Task
+- Issue ID: SUP-11270
+
+### Configuration ###
+	-Added the following to local.ini in server-saas-config:
+	[preconvert_webcam_flv_allowed_partners]
+	Add specific partner to allow this change to affect him (e.g. 0 = @PARTNER_NUMBER@)
+       
+### Deployment scripts ###
+		None.
+
+#### Known Issues & Limitations ####
+		None.
+		
+## Add V3 studio permission ##
+
+- Issue Type: feature
+- Issue ID: PLAT-8174
+
+### Configuration ###
+	-Add new module to the admin-console in admin.ini
+        moduls.V3Studio.enabled = true
+	moduls.V3Studio.permissionType = 2
+	moduls.V3Studio.label = "Enable V3 Studio"
+	moduls.V3Studio.permissionName = FEATURE_V3_STUDIO_PERMISSION
+	moduls.V3Studio.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+		None.
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
+## Increase ACL rules size column ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-8164
+
+### Configuration ###
+
+		None.
+
+### Deployment scripts ###
+
+		mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_10_20_alter_access_control_table_rules.sql
+
+#### Known Issues & Limitations ####
+
+		None.
+
+
+## Fix typo in admin console ##
+
+- Issue Type: Bug
+- Issue ID: 
+
+### Configuration ###
+	- Edit admin.ini
+        'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment' change to 'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy collaboration'
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Mercury 13.5.0 #
+
+## Add permissions to eSearch service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
+
+
+## Add getVolumeMap action to flavorAsset service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8113
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_11_add_flavorasset_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.4.0 #
+
+## Add getVolumeMap action to media service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7986
+
+### Configuration ###
+
+- You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
+- Add the following to local.ini and replace with the tokens with the correct values:
+
+    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_26_add_media_getvolumemap_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add upload url domain to uploadToken API object ##
+
+- Issue Type: Task
+- Issue ID: SUP-12069
+
+### Configuration ####
+
+- Add upload domain in dc_config.ini 
+example:
+0.uploadUrl = dc0-upload.kaltura.com       
+1.uploadUrl = dc1-host-upload.kaltura.com       
+
+## Support unlimited recording duration as feature flip ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8030
+
+### Configuration ####
+
+	- Add new module to the admin-console in admin.ini
+        moduls.liveStreamUnlimitedRecording.enabled = true
+        moduls.liveStreamUnlimitedRecording.permissionType = 2
+        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording Duration
+        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING_DURATION
+        moduls.liveStreamUnlimitedRecording.basePermissionType = 2
+        moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+        moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## Add permission to restore-deleted-entry action ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8064
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_10_02_update_adminconsole_entryadmin_permissions.php
+	  
+## Add co-viewers field to the KalturaBaseEntry object ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7951
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	 Index entry table to sphinx
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Mercury 13.3.0 #
+
+## Expose new API for login by KS ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7952
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_07_add_user_loginByKs_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Mercury 13.2.0 #
+
+## Add new Beacon plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7580
+
+### pre-requisite ###
+	
+* Install elasticSearch for refernce view [how to install Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html) (Tested with elasticSearch 5.5.2).
+* Install logstash for refernce view [how to install Logstah](https://www.elastic.co/guide/en/logstash/current/installing-logstash.html) (Tested with logstash 5.2.2).
+* Install RabbitMQ for refernce view [how to install RabbitMQ](https://www.rabbitmq.com/install-debian.html) (Tested with rabbitMQ 3.6.10).
+
+### configuration ###
+Enable beacon plugin:
+
+	- Enable beacon plugin:
+		1. Add the following to plugins.ini file: "Beacon"
+		2. Make sure the following plugins are enabled since they are required for beacon service to work: ElasticSearch, RabbitMQ, Queue.
+
+Configure elasticSearch Kaltura configuration:
+		  
+	- Add the following to your elastic.ini file:
+	elasticClientCurlTimeout = CURL_TIMEOUT_IN_SEC
+	
+	[beacon]
+	elasticHost = "ELASTIC_HOST"
+	elasticPort = "ELASTIC_PORT"
+	
+	- Create new beaconindes in elastic by runing: curl -XPUT '"ELASTIC_HOST":"ELASTIC_PORT"/beaconindex' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_mapping.json"
+
+Configure logstash Kaltura configuration:
+
+	- Copy configurations/logstash/kaltura_beacons.template.conf to configurations/logstash/kaltura_beacons.conf and update the folloiwng tokens:
+		@RABBIT_MQ_SERVER@ = rabbitMQ server
+		@RABBIT_MQ_PASSWORD@ = rabbitMQ server Password
+		@RABBIT_MQ_USERNAME@ = rabbitMQ server User Name
+		@RABBIT_PORT@ = rabbitMQ server port
+		@LOG_DIR@ = You main log directory
+		@ELASTIC_SEARCH_HOST@ = elasticSearch server host
+		@ELASTIC_SEARCH_PORT@ = elasticSearch server port
+		
+	- Add new symlink in /etc/logstash/conf.d/kaltura_beacons to point to /opt/kaltura/app/configurations/logstash/kaltura_beacons.conf
+
+Configure rabbitMq:
+	- Add new exchange called: beacon_exchange (Type=fanout, durable=true, Policy=ha-all)
+	- Add new queue called: beacons (x-message-ttl=86400000, durable=true, Policy=ha-all)
+	- Bind queue to exchange.
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_04_add_beacon_service_permissions.php
+
+## Add new ElasticSearch plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7410
+
+### configuration ###
+Add the following to plugins.ini file: "ElasticSearch"
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. create configurations/elastic.ini from configurations/elastic.ini.template and update placeholders with the elastic cluster information.
+
+## Add user permission for kclip attributes ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7929
+
+### configuration ###
+None
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2017_08_24_add_kClip_Attribute_user_permission.php
 
 ## Add create recorded entry action ##
 
@@ -11,16 +542,38 @@ None
 ### Deployment scripts ###
 	php deployment/updates/scripts/add_permissions/2017_08_06_live_stream_add_create_recording_across_dc.php
 
-## Add Delete to Entry-Server-Node ##
 
-- Issue Type: Feature
-- Issue ID: PLAT-7833
+## Add new batch job for handling copy caption assets ##
 
-### configuration ###
-None
+ - Issue Type: Story
+ - Issue ID: PLAT-7889
+
+### Configuration ###
+ - The batch.ini has been changed, make sure to add the following to your batch.ini:
+
+	enabledWorkers.KAsyncCopyCaptions					= 1
+
+ - The workers.ini has been change, make sure to add the following to your workers.ini:
+
+	[KAsyncCopyCaptions : JobHandlerWorker]
+
+	id													= 650
+
+	friendlyName										= Copy Caption Assets
+
+	type												= KAsyncCopyCaptions
+
+	scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
+
+ - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
+
+    under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
 
 ### Deployment scripts ###
-	php deployment/updates/scripts/add_permissions/2017_08_15_entry_server_enable_delete.php
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
+
+>>>>>>> Mercury-13.11.0
 
 # Mercury 13.1.0 #
 

@@ -421,7 +421,15 @@ class BaseEntryService extends KalturaEntryService
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
-				$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+				try
+				{
+					$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+				}
+				catch (kCoreException $e)
+				{
+					if ($e->getCode()==kCoreException::SOURCE_FILE_NOT_FOUND)
+						throw new KalturaAPIException(APIErrors::SOURCE_FILE_NOT_FOUND);
+				}
 		    	$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
     			return $baseEntry;
 			case entryType::MIX:
@@ -891,7 +899,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntry The cloned entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function cloneAction( $entryId, $cloneOptions=null)
+	public function cloneAction( $entryId, $cloneOptions=null )
 	{
 		// Reset criteria filters such that it will be
 		entryPeer::setUseCriteriaFilter(false);
@@ -913,6 +921,7 @@ class BaseEntryService extends KalturaEntryService
 
 		// Copy the entry into a new one based on the given partner data.
 		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreClonedOptionsArray);
+
 		return $this->getEntry($clonedEntry->getId());
 	}
 

@@ -72,70 +72,89 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	 */
 	protected function processProfile(KalturaScheduledTaskProfile $profile)
 	{
-		$this->updateProfileBeforeExecution($profile);
-		if ($profile->maxTotalCountAllowed)
-			$maxTotalCountAllowed = $profile->maxTotalCountAllowed;
-		else
-			$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
-
-		$objectsIds = array();
-		$errorObjectsIds = array();
-		$isMediaRepurposingProfile = $this->isMediaRepurposingProfile($profile);
-		if ($isMediaRepurposingProfile)
-			$this->addDateToFilter($profile);
-
-		$pager = new KalturaFilterPager();
-		$pager->pageIndex = 1;
-		$pager->pageSize = 500;
-		while(true)
+		$this->impersonate($profile->partnerId);
+		try
 		{
-			$this->impersonate($profile->partnerId);
-			try
+			$this->updateProfileBeforeExecution($profile);
+			if ($profile->maxTotalCountAllowed)
+				$maxTotalCountAllowed = $profile->maxTotalCountAllowed;
+			else
+				$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
+
+			$objectsData = array();
+			$errorObjectsIds = array();
+			$isMediaRepurposingProfile = $this->isMediaRepurposingProfile($profile);
+			if ($isMediaRepurposingProfile)
+				$this->addDateToFilter($profile);
+
+			$pager = new KalturaFilterPager();
+			$pager->pageIndex = 1;
+			$pager->pageSize = 500;
+			while (true)
 			{
 				$result = ScheduledTaskBatchHelper::query($this->getClient(), $profile, $pager);
-				$this->unimpersonate();
-			}
-			catch(Exception $ex)
-			{
-				$this->unimpersonate();
-				throw $ex;
+				if ($result->totalCount > $maxTotalCountAllowed) {
+					KalturaLog::crit("List query for profile $profile->id returned too many results ($result->totalCount when the allowed total count is $maxTotalCountAllowed), suspending the profile");
+					$this->suspendProfile($profile);
+					break;
+				}
+
+				if (!count($result->objects))
+					break;
+
+				foreach ($result->objects as $object)
+				{
+					$error = $this->processObject($profile, $object);
+					if ($error)
+						$errorObjectsIds[] = $object->id;
+					else if ($object instanceof KalturaBaseEntry)
+					{
+						if (!array_key_exists($object->userId, $objectsData))
+						{
+							$email = $this->getMailFromUserId($object->userId);
+							$objectsData[$object->userId] = array(KObjectTaskMailNotificationEngine::EMAIL => $email);
+						}
+
+						$idAndName = array(KObjectTaskMailNotificationEngine::ENTRY_ID => $object->id, KObjectTaskMailNotificationEngine::ENTRY_NAME => $object->name);
+						$objectsData[$object->userId][KObjectTaskMailNotificationEngine::ENTRIES_ID_AND_NAME][] = $idAndName;
+
+					}
+
+					if ($isMediaRepurposingProfile)
+						$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
+				}
+
+				if (!$isMediaRepurposingProfile)
+					$pager->pageIndex++;
 			}
 
-			if ($result->totalCount > $maxTotalCountAllowed)
-			{
-				KalturaLog::crit("List query for profile $profile->id returned too many results ($result->totalCount when the allowed total count is $maxTotalCountAllowed), suspending the profile");
-				$this->suspendProfile($profile);
-				break;
-			}
-			if (!count($result->objects))
-				break;
-
-			foreach($result->objects as $object)
-			{
-				$error = $this->processObject($profile, $object);
-
-				if ($error) {
-					$errorObjectsIds[] = $object->id;
-				} else {
-					if (array_key_exists($object->userId, $objectsIds))
-						$objectsIds[$object->userId][] = $object->id;
-					else
-						$objectsIds[$object->userId] = array($object->id);
-				} 
-
-				if ($isMediaRepurposingProfile)
-					$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
-			}
-			if (!$isMediaRepurposingProfile)
-				$pager->pageIndex++;
+			if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsData))
+				KObjectTaskMailNotificationEngine::sendMailNotification($profile->objectTasks[0], $objectsData, $profile->id, $profile->partnerId);
 		}
-		
-		if ($isMediaRepurposingProfile && (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::MAIL_NOTIFICATION) && count($objectsIds))
+		catch (Exception $ex)
 		{
-			KObjectTaskMailNotificationEngine::sendMailNotification($profile->objectTasks[0], $objectsIds, $profile->id, $profile->partnerId);
+			$this->unimpersonate();
+			throw $ex;
 		}
 
+		$this->unimpersonate();
+	}
 
+	/**
+	 * @param string $userId
+	 * @return null|string
+	 */
+	private function getMailFromUserId($userId)
+	{
+		$result = null;
+		$client = $this->getClient();
+		$user = $client->user->get($userId);
+		if($user->email)
+			$result = $user->email;
+		else if (filter_var($userId, FILTER_VALIDATE_EMAIL))
+			$result = $userId;
+
+		return $result;
 	}
 
 	/**
@@ -159,7 +178,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			}
 			catch(Exception $ex)
 			{
-				$this->unimpersonate();
 				$id = '';
 				if (property_exists($object, 'id'))
 					$id = $object->id;
@@ -174,6 +192,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				}
 			}
 		}
+
 		return $error;
 	}
 
@@ -212,9 +231,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$scheduledTaskClient = $this->getScheduledTaskClient();
 		$profileForUpdate = new KalturaScheduledTaskProfile();
 		$profileForUpdate->lastExecutionStartedAt = time();
-		$this->impersonate($profile->partnerId);
 		$scheduledTaskClient->scheduledTaskProfile->update($profile->id, $profileForUpdate);
-		$this->unimpersonate();
 	}
 
 	/**
@@ -227,9 +244,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$scheduledTaskClient = $this->getScheduledTaskClient();
 		$profileForUpdate = new KalturaScheduledTaskProfile();
 		$profileForUpdate->status = KalturaScheduledTaskProfileStatus::SUSPENDED;
-		$this->impersonate($profile->partnerId);
 		$scheduledTaskClient->scheduledTaskProfile->update($profile->id, $profileForUpdate);
-		$this->unimpersonate();
 		KalturaLog::alert("Media Repurposing profile [$profile->id] has been suspended");
 		if (self::isMediaRepurposingProfile($profile))
 		{
@@ -362,22 +377,16 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return $profile->objectFilter->advancedSearch->items[0];
 	}
 
-	
-
-
 	private function getPartnerMail($partnerId)
 	{
 		$client = $this->getClient();
-		self::impersonate($partnerId);
 		$res = $client->partner->get($partnerId);
-		self::unimpersonate();
 		return $res->adminEmail;
 	}
 
-	private function updateMetadataStatusForMediaRepurposing(KalturaScheduledTaskProfile $profile, $object, $error) {
+	private function updateMetadataStatusForMediaRepurposing(KalturaScheduledTaskProfile $profile, $object, $error)
+	{
 		$metadataProfileId = self::getMrAdvancedSearchFilter($profile)->metadataProfileId;
-
-		self::impersonate($object->partnerId);
 		$metadataPlugin = KalturaMetadataClientPlugin::get(self::$kClient);
 		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
 
@@ -389,21 +398,24 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $xml, $error);
 		}
 
-		try {
+		try
+		{
 			$xml = $xml ? $xml->asXML(): null;
 			if ($metadata && $metadata->id)
 				$result = $metadataPlugin->metadata->update($metadata->id, $xml);
 			else
 				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml);
 
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
 				return null; //delete entry should get exception when update metadata for deleted entry
-			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage());
+
+			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage(),
+				KalturaBatchJobAppErrors::MEDIA_REPURPOSING_FAILED, null);
 		}
-		
-		self::unimpersonate();
+
 		return $result->id;
 	}
-
 }

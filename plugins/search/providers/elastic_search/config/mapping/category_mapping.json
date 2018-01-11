@@ -1,30 +1,42 @@
 {
   "settings" : {
-	"number_of_shards" : 5,
+	"number_of_shards" : 6,
 	"number_of_replicas" : 0,
 	"analysis": {
-	  "filter": {
-		"trigrams_filter": {
-		  "type": "ngram",
-		  "min_gram": 3,
-		  "max_gram": 3
-		}
-	  },
 	  "char_filter": {
 		"kaltura_whitespace_filter": {
 		  "type": "pattern_replace",
 		  "pattern": "(\\s+)",
 		  "replacement": " "
+		},
+		"kaltura_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			  "'=>",
+			  "`=>",
+			  "‘=>",
+			  "^=>",
+			  "~=>"
+		  ]
+		}
+	  },
+	  "tokenizer": {
+		"kaltura_ngram_tokenizer": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3,
+		  "token_chars": [
+			"letter",
+			"digit"
+		  ]
 		}
 	  },
 	  "analyzer": {
-		"trigrams": {
+		"kaltura_ngrams": {
 		  "type": "custom",
-		  "tokenizer": "standard",
-		  "filter": [
-			"lowercase",
-			"trigrams_filter"
-		  ]
+		  "tokenizer": "kaltura_ngram_tokenizer",
+		  "char_filter": ["kaltura_special_chars_filter"],
+		  "filter": ["lowercase"]
 		},
 		"kaltura_keyword": {
 		  "type": "custom",
@@ -34,8 +46,14 @@
 		  ],
 		  "filter": [
 			"lowercase",
-			"trim"
+			"trim",
+			"asciifolding"
 		  ]
+		},
+		"kaltura_text" : {
+		  "tokenizer" : "standard",
+		  "char_filter": ["kaltura_special_chars_filter"],
+		  "filter" : ["standard", "lowercase", "asciifolding"]
 		}
 	  }
 	}
@@ -44,6 +62,9 @@
 	"category" : {
 	  "_source" : {
 		"enabled" : true
+	  },
+	  "_all": {
+		"enabled": false
 	  },
 	  "properties" : {
 		"partner_id" : {
@@ -82,23 +103,157 @@
 		},
 		"name" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english"
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"armenian" : {
+			  "type" : "text",
+			  "analyzer" : "armenian"
+			},
+			"basque" : {
+			  "type" : "text",
+			  "analyzer" : "basque"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"bulgarian" : {
+			  "type" : "text",
+			  "analyzer" : "bulgarian"
+			},
+			"catalan" : {
+			  "type" : "text",
+			  "analyzer" : "catalan"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"czech" : {
+			  "type" : "text",
+			  "analyzer" : "czech"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"galician" : {
+			  "type" : "text",
+			  "analyzer" : "galician"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"hungarian" : {
+			  "type" : "text",
+			  "analyzer" : "hungarian"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"irish" : {
+			  "type" : "text",
+			  "analyzer" : "irish"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"latvian" : {
+			  "type" : "text",
+			  "analyzer" : "latvian"
+			},
+			"lithuanian" : {
+			  "type" : "text",
+			  "analyzer" : "lithuanian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"persian" : {
+			  "type" : "text",
+			  "analyzer" : "persian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"romanian" : {
+			  "type" : "text",
+			  "analyzer" : "romanian"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"sorani" : {
+			  "type" : "text",
+			  "analyzer" : "sorani"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
 			}
 		  }
 		},
 		"full_name" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
@@ -114,10 +269,12 @@
 		  "type" : "integer"
 		},
 		"created_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"updated_at" : {
-		  "type" : "date"
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"direct_entries_count" : {
 		  "type" : "integer"
@@ -136,20 +293,163 @@
 		},
 		"description" : {
 		  "type" : "text",
+		  "analyzer" : "kaltura_text",
 		  "fields": {
-			"trigrams" : {
+			"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "trigrams"
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english"
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"armenian" : {
+			  "type" : "text",
+			  "analyzer" : "armenian"
+			},
+			"basque" : {
+			  "type" : "text",
+			  "analyzer" : "basque"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"bulgarian" : {
+			  "type" : "text",
+			  "analyzer" : "bulgarian"
+			},
+			"catalan" : {
+			  "type" : "text",
+			  "analyzer" : "catalan"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"czech" : {
+			  "type" : "text",
+			  "analyzer" : "czech"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"galician" : {
+			  "type" : "text",
+			  "analyzer" : "galician"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"hungarian" : {
+			  "type" : "text",
+			  "analyzer" : "hungarian"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"irish" : {
+			  "type" : "text",
+			  "analyzer" : "irish"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"latvian" : {
+			  "type" : "text",
+			  "analyzer" : "latvian"
+			},
+			"lithuanian" : {
+			  "type" : "text",
+			  "analyzer" : "lithuanian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"persian" : {
+			  "type" : "text",
+			  "analyzer" : "persian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"romanian" : {
+			  "type" : "text",
+			  "analyzer" : "romanian"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"sorani" : {
+			  "type" : "text",
+			  "analyzer" : "sorani"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
+			}
+		  }
+		},
+		"tags" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_keyword"
 			}
 		  }
-		},
-		"tags" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
 		},
 		"display_in_search" : {
 		  "type" : "text",
@@ -210,10 +510,11 @@
 			},
 			"value_text": {
 			  "type" : "text",
+			  "analyzer" : "kaltura_text",
 			  "fields": {
-				"trigrams" : {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "trigrams"
+				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
 				  "type" : "text",

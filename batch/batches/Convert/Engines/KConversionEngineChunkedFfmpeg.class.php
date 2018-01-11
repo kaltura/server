@@ -23,17 +23,151 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	}
 	
 	/**
-	 *
+	 * execute_conversion_cmdline
+	 *	Chunked Encoding can executed both in standalone and memcache managed modes.
+	 *	'executionMode' config field used to differntiate between the modes, 
+	 *	allowed values - 'standalone'/'memcache'
 	 */
 	protected function execute_conversion_cmdline($command, &$returnVar)
 	{
 		KalturaLog::log($command);
-		if(isset(KBatchBase::$taskConfig->params->chunkedEncodeScriptPath) && strstr($command,KBatchBase::$taskConfig->params->ffmpegCmd)!==false) {
-			$output=$this->execute_chunked_encode($command, $returnVar);
+		if(!isset(KBatchBase::$taskConfig->params->executionMode)){
+			$returnVar = -1;
+			$errMsg = "ERROR: Missing executionMode value in the batch/worker.ini";
+			KalturaLog::log($errMsg);
+			return ($errMsg);
+		}
+		
+		$executionMode = KBatchBase::$taskConfig->params->executionMode;
+		if($executionMode=="standalone") {
+			$output=$this->execute_chunked_encode_standalone($command, $returnVar);
+		}
+		else if($executionMode=="memcache"){
+			$output=$this->execute_chunked_encode_memcache($command, $returnVar);
 		}
 		else {
-			$output = system($command, $returnVar);
+			$returnVar = -1;
+			$errMsg = "ERROR: Invalid executionMode value ($executionMode) in the batch/worker.ini";
+			KalturaLog::log($errMsg);
+			return ($errMsg);
 		}
+		KalturaLog::log("rv($returnVar),".print_r($output,1));
+		return $output;
+	}
+
+	/**
+	 * execute_chunked_encode_memcache
+	 * 	Execute memcache based (distributed) Chunked Encode session
+	 *	Uses following configuration fields - 
+	 *	- chunkedEncodeMemcacheHost - memcache host URL (mandatory)
+	 *	- chunkedEncodeMemcachePort - memcache host port (mandatory)
+	 *	- chunkedEncodeMemcacheToken - token to differentiate between general/global Kaltura jobs and per customer dedicated servers (optional, default:null)
+	 *	- chunkedEncodeMaxConcurrent - maximum concurrently executed chunks jobs, more or less servers core number (optional, default:5)
+	 */
+	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar)
+	{
+		KalturaLog::log("Original cmdLine:$cmdLine");
+		
+				/*
+				 * 'chunkedEncodeMemcacheHost' and 'chunkedEncodeMemcachePort'
+				 * are mandatory
+				 */
+		if(!(isset(KBatchBase::$taskConfig->params->chunkedEncodeMemcacheHost) 
+		&& isset(KBatchBase::$taskConfig->params->chunkedEncodeMemcachePort))){
+			$returnVar = -1;
+			$errMsg = "ERROR: Missing memcache host/port in the batch/worker.ini";
+			KalturaLog::log($errMsg);
+			return ($errMsg);
+		}
+			/*
+			 * Clean up the cmd line - remove 'ffmpeg' and log file redirection instructions
+			 * those will be handled by the Chunked flow
+			 */
+		$cmdLineAdjusted = $this->adjust_cmdline($cmdLine);
+		
+		{
+			$host = KBatchBase::$taskConfig->params->chunkedEncodeMemcacheHost;
+			$port = KBatchBase::$taskConfig->params->chunkedEncodeMemcachePort;
+			
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMemcacheToken)){
+				$token = KBatchBase::$taskConfig->params->chunkedEncodeMemcacheToken;
+			}
+			else $token = null;
+			
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent)){
+				$concurrent = KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent;
+			}
+			else 
+				$concurrent = 5;
+
+			$sessionName = null;
+		}
+		{
+			$cmdLine = 'php -r "';
+			$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
+
+			$cmdLine.= '\$rv=KChunkedEncodeMemcacheWrap::ExecuteSession(';
+			$cmdLine.= '\''.($host).'\',';
+			$cmdLine.= '\''.($port).'\',';
+			$cmdLine.= '\''.($token).'\',';
+			$cmdLine.= '\''.($concurrent).'\',';
+			$cmdLine.= '\''.($sessionName).'\',';
+			$cmdLine.= '\''.$cmdLineAdjusted.'\');';
+			$cmdLine.= 'if(\$rv==false) exit(1);';
+			$cmdLine.= '"';
+		}
+		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
+		KalturaLog::log("Final cmdLine:$cmdLine");
+
+		$output = system($cmdLine, $returnVar);
+		KalturaLog::log("rv($returnVar),".print_r($output,1));
+		return $output;
+	}
+	
+	/**
+	 * execute_chunked_encode_standalone
+	 * 	Execute standalone (one server) Chunked Encode session
+	 *	Uses following configuration fields - 
+	 *	- chunkedEncodeMaxConcurrent - maximum concurrently executed chunks jobs, more or less servers core number (optional, default:5)
+	 */
+	protected function execute_chunked_encode_standalone($cmdLine, &$returnVar)
+	{
+		KalturaLog::log("Original cmdLine:$cmdLine");
+			/*
+			 * Clean up the cmd line - remove 'ffmpeg' and log file redirection instructions
+			 * those will be handled by the Chunked flow
+			 */
+		$cmdLineAdjusted = $this->adjust_cmdline($cmdLine);
+
+		{
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent)){
+				$concurrent = KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent;
+			}
+			else
+				$concurrent = 5;
+
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent)) {
+				$concurrentMin = KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent;
+			}
+			else
+				$concurrentMin = 1;
+			$sessionName = null;
+			
+			$cmdLine = 'php -r "';
+			$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
+			
+			$cmdLine.= '\$rv=KChunkedEncodeSessionManagerStandalone::ExecuteSession(';
+			$cmdLine.= '\''.($concurrent).'\',';
+			$cmdLine.= '\''.($concurrentMin).'\',';
+			$cmdLine.= '\''.($sessionName).'\',';
+			$cmdLine.= '\''.$cmdLineAdjusted.'\');';
+                        $cmdLine.= 'if(\$rv==false) exit(1);';
+                        $cmdLine.= '"';
+		}
+		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
+		KalturaLog::log("Final cmdLine:$cmdLine");
+
+		$output = system($cmdLine, $returnVar);
 		KalturaLog::log("rv($returnVar),".print_r($output,1));
 		return $output;
 	}
@@ -41,89 +175,36 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	/**
 	 *
 	 */
-	protected function execute_chunked_encode($cmdLine, &$returnVar)
+	private function adjust_cmdline($cmdLine)
 	{
 		KalturaLog::log("Original cmdLine:$cmdLine");
 			/*
 			 * Clean up the cmd line - remove 'ffmpeg' and log file redirection instructions
 			 * those will be handled by the Chunked flow
 			 */
-		{
-			$cmdLineAdjusted = str_replace(KBatchBase::$taskConfig->params->ffmpegCmd, KDLCmdlinePlaceholders::BinaryName, $cmdLine);
-			$cmdValsArr = explode(' ', $cmdLineAdjusted);
-			if(($idx=array_search('>>', $cmdValsArr))!==false){
-				$cmdValsArr = array_slice ($cmdValsArr,0,$idx);
-			}
-			if(($idx=array_search(KDLCmdlinePlaceholders::BinaryName, $cmdValsArr))!==false){
+		$cmdLineAdjusted = str_replace(KBatchBase::$taskConfig->params->ffmpegCmd, KDLCmdlinePlaceholders::BinaryName, $cmdLine);
+		$cmdValsArr = explode(' ', $cmdLineAdjusted);
+		if(($idx=array_search('>>', $cmdValsArr))!==false){
+			$cmdValsArr = array_slice ($cmdValsArr,0,$idx);
+		}
+		if(($idx=array_search(KDLCmdlinePlaceholders::BinaryName, $cmdValsArr))!==false){
+			unset($cmdValsArr[$idx]);
+		}
+		if(($idx=array_search('&&', $cmdValsArr))!==false){
+			$cmdValsArr[$idx] = "ANDAND";
+		}
+
+		foreach($cmdValsArr as $idx=>$val){
+			$val = trim($val);
+			if(!isset($val) || $val==' ' || $val==""){
 				unset($cmdValsArr[$idx]);
 			}
-			if(($idx=array_search('&&', $cmdValsArr))!==false){
-				$cmdValsArr[$idx] = "ANDAND";
-			}
-
-			foreach($cmdValsArr as $idx=>$val){
-				$val = trim($val);
-				if(!isset($val) || $val==' ' || $val==""){
-					unset($cmdValsArr[$idx]);
-				}
-			}
-			$cmdLineAdjusted = implode(" ",$cmdValsArr);
-			$cmdLineAdjusted = str_replace(KDLCmdlinePlaceholders::BinaryName, KBatchBase::$taskConfig->params->ffmpegCmd, $cmdLineAdjusted);
-			KalturaLog::log("Cleaned up cmdLine:$cmdLineAdjusted");
 		}
-//		$cmdLineAdjusted = KChunkedEncodeSessionManager::quickFixCmdline($cmdLineAdjusted);
-//		KalturaLog::log("Fixed cmdLine:$cmdLineAdjusted");
+		$cmdLineAdjusted = implode(" ",$cmdValsArr);
+		$cmdLineAdjusted = str_replace(KDLCmdlinePlaceholders::BinaryName, KBatchBase::$taskConfig->params->ffmpegCmd, $cmdLineAdjusted);
+		$cmdLineAdjusted = str_replace('\'', '\\\'',$cmdLineAdjusted);
+		KalturaLog::log("Cleaned up cmdLine:$cmdLineAdjusted");
 		
-			/*
-			 * Initialze the Chunked setup object
-			 * Use task::params fields -
-			 * - chunkedEncodeMaxConcurrent
-			 * - chunkedEncodeMinConcurrent
-			 * otherwise defaults will be used.
-			 */
-		{
-			$setup = new KChunkedEncodeSetup();
-			$setup->ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
-			$setup->cmd = $cmdLineAdjusted;
-
-			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent)){
-				$setup->concurrent = KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent;
-			}
-			else {
-				$setup->concurrent = KBatchBase::$taskConfig->maxInstances;
-			}
-			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent)) {
-				$setup->concurrentMin = KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent;
-			}
-			$chunkedEncodeScriptParams = " -cleanUp 0";//null; //
-			$chunkedEncodeScriptParams.= " -concurrent $setup->concurrent";
-			$chunkedEncodeScriptParams.= " -concurrentMin $setup->concurrentMin";
-		}
-		
-
-			/*
-			 * Initialize the Chunked Encode Session Manager -
-			 * if failed ==> fallback to 'normal' ffmpeg transcoding.
-			 * The output file should be 'signed' with 'chunkEncodeToken' to allow 
-			 * the KChunkedEncodeSessionManager::concurrencyLogic to take it in account, 
-			 * along with 'chunked' conversions. Otherwise the hosting server might get overloaded.
-			 */
-		$runChunkedEncode = new KChunkedEncodeSessionManager($setup);
-		if($runChunkedEncode->Initialize()!=true){
-			$output = $runChunkedEncode->ExecuteFallback($cmdLine, $returnVar);
-			return $output;
-		}
-		$sessionFilename = $runChunkedEncode->chunker->getSessionName("session");
-		
-		$chunkedEncodeScriptCmdLine = "php ".KBatchBase::$taskConfig->params->chunkedEncodeScriptPath;
-//		$chunkedEncodeScriptCmdLine.= " -sessionFile $sessionFilename >> ".$this->logFilePath." 2>&1";
-		$chunkedEncodeScriptCmdLine.= "$chunkedEncodeScriptParams $cmdLineAdjusted >> ".$this->logFilePath." 2>&1";
-		KalturaLog::log("Final cmdLine:$chunkedEncodeScriptCmdLine");
-
-		$output = system($chunkedEncodeScriptCmdLine, $returnVar);
-		KalturaLog::log("rv($returnVar),".print_r($output,1));
-		return $output;
+		return $cmdLineAdjusted;
 	}
-	
 }
-

@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor
+class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler, IKalturaPlaybackContextDataContributor, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'drm';
 
@@ -35,6 +35,7 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 		$pages[] = new DrmProfileListAction();
 		$pages[] = new DrmProfileConfigureAction();
 		$pages[] = new DrmProfileDeleteAction();
+		$pages[] = new DrmAdminApiAction();
 
 		return $pages;
 	}
@@ -122,7 +123,7 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
             return "KDLOperatorrm";
         if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return "KalturaDrmProfile";
-        if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
+        if($baseClass == 'DrmProfile' && $enumValue == DrmProviderType::CENC)
             return "DrmProfile";
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return 'Kaltura_Client_Drm_Type_DrmProfile';
@@ -268,6 +269,20 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 		{
 			kDrmPartnerSetup::setupPartner($partnerId);
 		}
+	}
+
+	public static function getConfig($configName)
+	{
+		$path = dirname(__FILE__) . '/config/drm.ini';
+		if($configName == 'admin' && file_exists($path))
+			return new Zend_Config_Ini($path);
+		return null;
+	}
+	
+	public static function isAllowAdminApi($actionApi = null)
+	{
+		$currentPermissions = Infra_AclHelper::getCurrentPermissions();
+		return ($currentPermissions && in_array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_DRM_PROFILE_MODIFY, $currentPermissions));
 	}
 
 }

@@ -5,7 +5,6 @@
  */
 class ESearchCaptionItemData extends ESearchItemData
 {
-
 	/**
 	 * @var string
 	 */
@@ -21,9 +20,19 @@ class ESearchCaptionItemData extends ESearchItemData
 	 */
 	protected $endsAt;
 
+	/**
+	 * @var string
+	 */
+	protected $language;
+
+	/**
+	 * @var string
+	 */
+	protected $captionAssetId;
+
 	public function getType()
 	{
-		return 'caption';
+		return ESearchItemDataType::CAPTION;
 	}
 
 	/**
@@ -74,13 +83,46 @@ class ESearchCaptionItemData extends ESearchItemData
 		$this->endsAt = $endsAt;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getLanguage()
+	{
+		return $this->language;
+	}
+
+	/**
+	 * @param string $language
+	 */
+	public function setLanguage($language)
+	{
+		$this->language = $language;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCaptionAssetId()
+	{
+		return $this->captionAssetId;
+	}
+
+	/**
+	 * @param string $captionAssetId
+	 */
+	public function setCaptionAssetId($captionAssetId)
+	{
+		$this->captionAssetId = $captionAssetId;
+	}
+
 	public function loadFromElasticHits($objectResult)
 	{
 		$this->setLine($objectResult['_source']['content']);
 		$this->setStartsAt($objectResult['_source']['start_time']);
 		$this->setEndsAt($objectResult['_source']['end_time']);
-
+		$this->setLanguage($objectResult['_source']['language']);
+		$this->setCaptionAssetId($objectResult['_source']['caption_asset_id']);
+		if(isset($objectResult['highlight']))
+			$this->setHighlight($objectResult['highlight']);
 	}
-
-
 }

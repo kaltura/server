@@ -79,6 +79,15 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$ffMi->videoCodecId = "encv / avc1";
 				return $ffMi;
 			}
+			
+			/*
+			 * mediaInfo does not recognize duration in some MP3 cases
+			 */
+			 if(isset($kMi->containerFormat) && strstr($kMi->containerFormat,"mpeg audio")!==false
+			 && (!isset($kMi->audioDuration) || (isset($kMi->audioDuration) && $kMi->audioDuration==0))
+			 && (isset($ffMi->audioDuration) && $ffMi->audioDuration>0)) {
+				 $kMi->audioDuration = $ffMi->audioDuration;
+			 }
 		}
 		
 		$durLimit=3600000;

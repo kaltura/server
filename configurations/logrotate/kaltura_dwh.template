@@ -1,6 +1,8 @@
-@DWH_DIR@/logs/*.log {
+@DWH_DIR@/logs/log_*.log {
  rotate 30
  daily
  missingok
+ create 0644 kaltura kaltura
  compress
+ su root kaltura
 }

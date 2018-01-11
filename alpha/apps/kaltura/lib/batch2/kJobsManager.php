@@ -312,7 +312,7 @@ class kJobsManager
 		if($fileSync)
 		{
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
-				$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());
+				$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 			$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($entry->getId()));
 			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());			
 			$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());		
@@ -463,6 +463,7 @@ class kJobsManager
 		}
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$srcFileSyncs = array();
+		$firstValidFileSync = null;
 		
 		foreach ($srcSyncKeys as $srcSyncKey) 
 		{		
@@ -487,21 +488,25 @@ class kJobsManager
 			{
 				if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 				{
-					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)	
-						$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());							
+					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
+						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);						
 				}
 				else
 				{
-					$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFilePath());
+					$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 				}
 				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
 				$srcFileSyncDescriptor->setAssetParamsId($srcFlavorAsset->getFlavorParamsId());
 				$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
+				$firstValidFileSync = $firstValidFileSync ? $firstValidFileSync : $fileSync;
 			}
 		}
-			
+
+		if (!self::shouldExeConvertJob($firstValidFileSync))
+			return null;
+
 		// creates convert data
 		$convertData = new kConvertJobData();
 		$convertData->setSrcFileSyncs($srcFileSyncs);
@@ -510,7 +515,7 @@ class kJobsManager
 		$convertData->setFlavorAssetId($flavorAssetId);
 		$convertData->setConversionProfileId($conversionProfileId);
 		$convertData->setPriority($priority);
-		
+
 		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
 		if(!$dbCurrentConversionEngine)
 			return null;
@@ -766,7 +771,6 @@ class kJobsManager
 				throw new kCoreException("Source file not found for thumbnail capture [$thumbAssetId]", kCoreException::SOURCE_FILE_NOT_FOUND);
 			}
 		}
-		$localPath = $fileSync->getFullPath();
 		$remoteUrl = $fileSync->getExternalUrl($entryId);
 		
 		// creates convert data
@@ -774,7 +778,7 @@ class kJobsManager
 		$data->setThumbAssetId($thumbAssetId);
 		$data->setSrcAssetId($srcAssetId);
 		$data->setSrcAssetType($srcAssetType);
-		$data->setSrcFileSyncLocalPath($localPath);
+		$data->setFileContainer(self::getFileContainerByFileSync($fileSync));
 		$data->setSrcFileSyncRemoteUrl($remoteUrl);
 		$data->setThumbParamsOutputId($thumbParams->getId());
 	
@@ -798,7 +802,7 @@ class kJobsManager
 	/**
 	 * @param BatchJob $parentJob
 	 * @param int $postConvertAssetType
-	 * @param string $srcFileSyncLocalPath
+	 * @param FileSyncKey $fileSyncKey
 	 * @param int $flavorAssetId
 	 * @param int $flavorParamsOutputId
 	 * @param bool $createThumb
@@ -806,11 +810,11 @@ class kJobsManager
 	 * @param string $customData
 	 * @return BatchJob
 	 */
-	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
+	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $fileSyncKey, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setPostConvertAssetType($postConvertAssetType);
-		$postConvertData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
+		$postConvertData->setSrcFileSyncLocalPath(kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey));
 		$postConvertData->setFlavorParamsOutputId($flavorParamsOutputId);
 		$postConvertData->setFlavorAssetId($flavorAssetId);
 		$postConvertData->setThumbOffset($thumbOffset);
@@ -1206,14 +1210,21 @@ class kJobsManager
 	}
 	
 	/**
-	 * @param BatchJob $batchJob
+	 * @param BatchJob $parentJob
 	 * @param entry $entry
 	 * @param string $flavorAssetId
-	 * @param string $inputFileSyncLocalPath
+	 * @param FileSync $fileSync
 	 * @return BatchJob
 	 */
-	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
+	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $fileSync = null)
 	{
+		if (!self::shouldExeConvertJob($fileSync))
+		{
+			$entry->setStatus(entryStatus::ERROR_CONVERTING);
+			$entry->save();
+			myEntryUtils::addTrackEntryInfo($entry,"Source file for conversion is not supported");
+			return null;
+		}
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);
@@ -1222,7 +1233,10 @@ class kJobsManager
 			KalturaLog::notice('Entry should not be converted');
 			return null;
 		}
-		
+
+		$inputFileSyncLocalPath = $fileSync->getFullPath();
+		if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			$inputFileSyncLocalPath = $fileSync->getFilePath();
 		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
@@ -1376,16 +1390,16 @@ class kJobsManager
 	 * @param string $entryId
 	 * @param int $partnerId
 	 * @param StorageProfile $externalStorage
-	 * @param SyncFile $fileSync
-	 * @param string $srcFileSyncLocalPath
+	 * @param FileSync $fileSync
+	 * @param FileSync $srcFileSync
 	 * @param bool $force
 	 * 
 	 * @return BatchJob
 	 */
-	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null)
+	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, FileSync $srcFileSync, $force = false, $dc = null)
 	{
 		$netStorageExportData = kStorageExportJobData::getInstance($externalStorage->getProtocol());
-		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSyncLocalPath);
+		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSync);
 				
 		$batchJob = null;
 		if($parentJob)
@@ -1534,6 +1548,7 @@ class kJobsManager
 		$extractMediaData = new kExtractMediaJobData();
 		$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 		$srcFileSyncDescriptor->setFileSyncLocalPath($inputFileSyncLocalPath);
+		$srcFileSyncDescriptor->setFileEncryptionKey(self::getEncryptionKeyForAssetId($flavorAssetId));
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
 		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
@@ -1541,6 +1556,7 @@ class kJobsManager
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$entry = $flavorAsset->getentry();
 		
+		$shouldDetectGOP = null;
 		if($entry)
 		{
 			if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
@@ -1554,7 +1570,7 @@ class kJobsManager
 			}
 		}
 		
-		if($shouldDetectGOP===null)
+		if($shouldDetectGOP === null)
 			$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
 		$extractMediaData->setDetectGOP($shouldDetectGOP);
 		
@@ -1563,6 +1579,16 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
+	}
+
+	private static function getEncryptionKeyForAssetId($flavorAssetId)
+	{
+		$asset = assetPeer::retrieveById($flavorAssetId);
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
+		if ($fileSync && $fileSync->isEncrypted())
+			return $fileSync->getEncryptionKey();
+		return null;
 	}
 	
 	public static function addNotificationJob(BatchJob $parentJob = null, $entryId, $partnerId, $notificationType, $sendType, $puserId, $objectId, $notificationData)
@@ -1755,5 +1781,61 @@ class kJobsManager
 		$job->setData($jobData);
 		
 		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
+	}
+
+	public static function getFileContainer(FileSyncKey $syncKey)
+	{
+
+		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
+		return self::getFileContainerByFileSync($fileSync);
+	}
+
+	protected static function getFileContainerByFileSync(FileSync $fileSync)
+	{
+		$fileContainer = new FileContainer();
+		if ($fileSync)
+		{
+			$fileContainer->setFilePath($fileSync->getFullPath());
+			$fileContainer->setEncryptionKey($fileSync->getEncryptionKey());
+			$fileContainer->setFileSize($fileSync->getFileSize());
+		}
+		return $fileContainer;
+	}
+
+	/**
+	 * @param FileSync $fileSync
+	 * @return bool
+	 */
+	private static function shouldExeConvertJob($fileSync)
+ 	{
+		if (!$fileSync)
+		{
+			KalturaLog::notice('No file-sync supplied for conversion');
+			return false;
+		}
+ 		if (self::shouldBlockFileConversion($fileSync))
+ 		{
+ 			KalturaLog::notice('Source of type text will not be converted - FileSyncId [' . $fileSync->getId() . ']');
+ 			return false;
+ 		}
+		return true;
+	}
+
+	/**
+	* @param FileSync $fileSync
+	* @return bool
+	*/
+	private static function shouldBlockFileConversion($fileSync)
+	{
+		if($fileSync->isEncrypted())
+			$filePath = $fileSync->createTempClear();
+		else
+			$filePath = $fileSync->getFullPath();
+		$actualFileDescription = trim(kFile::getFileDescription($filePath));
+		$blackList = kconf::get('file_descriptions_black_list');
+		$shouldBlock = in_array($actualFileDescription,$blackList['fileDescriptions']);
+		if($fileSync->isEncrypted())
+			$fileSync->deleteTempClear();
+		return $shouldBlock;
 	}
 }

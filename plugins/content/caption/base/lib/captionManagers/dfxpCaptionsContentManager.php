@@ -91,11 +91,11 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				continue;
 			}
 			
-			$startTime = $this->parseStrTTTime($childNode->getAttribute('begin'));
+			$startTime = $this->parseDfxpStrTTTime($childNode->getAttribute('begin'));
 			$endTime = $startTime;
 			if($childNode->hasAttribute('end'))
 			{
-				$endTime = $this->parseStrTTTime($childNode->getAttribute('end'));
+				$endTime = $this->parseDfxpStrTTTime($childNode->getAttribute('end'));
 			}
 			elseif($childNode->hasAttribute('dur'))
 			{
@@ -161,7 +161,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return $itemsData;
 	}
 	
-	private function parseStrTTTime($timeStr)
+	private function parseDfxpStrTTTime($timeStr)
 	{
 		$matches = null;
 		if(preg_match('/(\d+)s/', $timeStr))
@@ -199,4 +199,73 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new dfxpCaptionsContentManager();
 	}
+
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	{
+	}
+
+	public function buildFile($content, $clipStartTime, $clipEndTime)
+	{
+		$xml = new KDOMDocument();
+		try
+		{
+			$content = trim($content, " \r\n\t");
+			$xml->loadXML($content);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return '';
+		}
+		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime);
+		$xmlUpdatedContent = trim($xmlUpdatedContent, " \r\n\t");
+		$xmlUpdatedContent = str_replace("      \n", "", $xmlUpdatedContent);
+		return $xmlUpdatedContent;
+	}
+
+	private function editBody(DOMNode $curNode, $clipStartTime, $clipEndTime)
+	{
+		for ($i = 0; $i < $curNode->childNodes->length; $i++)
+		{
+			$childNode = $curNode->childNodes->item($i);
+			if ($childNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+
+			if (strtolower($childNode->nodeName) != 'p')
+			{
+				$this->editBody($childNode, $clipStartTime, $clipEndTime);
+				continue;
+			}
+
+			$captionStartTime = $this->parseDfxpStrTTTime($childNode->getAttribute('begin'));
+			$captionEndTime = $captionStartTime;
+			if($childNode->hasAttribute('end'))
+			{
+				$captionEndTime = $this->parseDfxpStrTTTime($childNode->getAttribute('end'));
+			}
+			elseif($childNode->hasAttribute('dur'))
+			{
+				$duration = floatval($childNode->getAttribute('dur')) * 1000;
+				$captionEndTime = $captionStartTime + $duration;
+			}
+			if(!kCaptionsContentManager::onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
+				$curNode->removeChild($childNode);
+			else
+				{
+				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime);
+				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime);
+
+				$childNode->setAttribute('begin',kXml::integerToTime($adjustedStartTime));
+				if($childNode->hasAttribute('end'))
+					$childNode->setAttribute('end',kXml::integerToTime($adjustedEndTime));
+			}
+		}
+		$content = "";
+		if(!$curNode instanceof DOMElement)
+		{
+			$content = $curNode->saveXML();
+		}
+		return $content;
+	}
+
 }

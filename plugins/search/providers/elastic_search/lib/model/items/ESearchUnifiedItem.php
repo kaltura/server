@@ -7,7 +7,7 @@ class ESearchUnifiedItem extends ESearchItem
 {
 
 	const UNIFIED = 'unified';
-	
+
 	/**
 	 * @var string
 	 */
@@ -29,37 +29,28 @@ class ESearchUnifiedItem extends ESearchItem
 		$this->searchTerm = $searchTerm;
 	}
 
-	public function getType()
-	{
-		return self::UNIFIED;
-	}
-
-	public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null)
+	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$outQuery = array();
 
 		foreach($eSearchItemsArr as $eSearchUnifiedItem)
 		{
-			$subQuery = array();
-			$entryUnifiedQuery = array();
-			self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem,$entryUnifiedQuery);
-			self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem,$entryUnifiedQuery);
-			self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem,$entryUnifiedQuery);
-			self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem,$entryUnifiedQuery);
-			
-			if(count($entryUnifiedQuery))
-			{
-				$subQuery['bool']['should'] = $entryUnifiedQuery;
-				$subQuery['bool']['minimum_should_match'] = 1;
-				$outQuery[] = $subQuery;
-			}
-			
+			self::validateUnifiedAllowedTypes($eSearchUnifiedItem);
+			$subQuery = new kESearchBoolQuery();
+
+			self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+			self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+
+			$outQuery[] = $subQuery;
 		}
 
 		return $outQuery;
 	}
 
-	private static function addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery)
+	private static function addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
 	{
 		$entryItems = array();
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
@@ -80,11 +71,60 @@ class ESearchUnifiedItem extends ESearchItem
 
 		if(count($entryItems))
 		{
-			$entryUnifiedQuery = ESearchEntryItem::createSearchQuery($entryItems, 'should', null);
+			$entryQueries = ESearchEntryItem::createSearchQuery($entryItems, 'should', $queryAttributes,  null);
+			foreach ($entryQueries as $entryQuery)
+			{
+				$entryUnifiedQuery->addToShould($entryQuery);
+			}
 		}
+
 	}
 
-	private static function addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery)
+	private static function addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
+	{
+		$categoryEntryItems = array();
+		$categoryEntryNameAllowedFields = ESearchCategoryEntryNameItem::getAllowedSearchTypesForField();
+
+
+		foreach($categoryEntryNameAllowedFields as $fieldName => $fieldAllowedTypes)
+		{
+			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
+			{
+				$categoryEntryItem = new ESearchCategoryEntryNameItem();
+				$categoryEntryItem->setFieldName($fieldName);
+				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
+
+				$categoryEntryItems[] = $categoryEntryItem;
+			}
+		}
+
+		$categoryEntryAncestorNameAllowedFields = ESearchCategoryEntryAncestorNameItem::getAllowedSearchTypesForField();
+		foreach($categoryEntryAncestorNameAllowedFields as $fieldName => $fieldAllowedTypes)
+		{
+			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
+			{
+				$categoryEntryItem = new ESearchCategoryEntryAncestorNameItem();
+				$categoryEntryItem->setFieldName($fieldName);
+				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
+				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
+
+				$categoryEntryItems[] = $categoryEntryItem;
+			}
+		}
+
+		if(count($categoryEntryItems))
+		{
+			$categoryEntryQueries = ESearchBaseCategoryEntryItem::createSearchQuery($categoryEntryItems, 'should', $queryAttributes,  null);
+			foreach ($categoryEntryQueries as $categoryEntryQuery)
+			{
+				$entryUnifiedQuery->addToShould($categoryEntryQuery);
+			}
+		}
+
+	}
+
+	private static function addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
 	{
 		$cuePointAllowedFields = ESearchCuePointItem::getAllowedSearchTypesForField();
 		$cuePointItems = array();
@@ -105,13 +145,15 @@ class ESearchUnifiedItem extends ESearchItem
 
 		if(count($cuePointItems))
 		{
-			$cuePointQuery = ESearchCuePointItem::createSearchQuery($cuePointItems, 'should', null);
-			if(count($cuePointQuery))
-				$entryUnifiedQuery[] = $cuePointQuery;
+			$cuePointQueries = ESearchCuePointItem::createSearchQuery($cuePointItems, 'should', $queryAttributes, null);
+			foreach ($cuePointQueries as $cuePointQuery)
+			{
+				$entryUnifiedQuery->addToShould($cuePointQuery);
+			}
 		}
 	}
 
-	private static function addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery)
+	private static function addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
 	{
 		$captionItems = array();
 		$captionAllowedFields = ESearchCaptionItem::getAllowedSearchTypesForField();
@@ -131,13 +173,16 @@ class ESearchUnifiedItem extends ESearchItem
 
 		if(count($captionItems))
 		{
-			$captionQuery = ESearchCaptionItem::createSearchQuery($captionItems, 'should', null);
-			if(count($captionQuery))
-				$entryUnifiedQuery[] = $captionQuery;
+			$captionQueries = ESearchCaptionItem::createSearchQuery($captionItems, 'should', $queryAttributes, null);
+			foreach ($captionQueries as $captionQuery)
+			{
+				$entryUnifiedQuery->addToShould($captionQuery);
+			}
 		}
+
 	}
 
-	private static function addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery)
+	private static function addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
 	{
 		//metadata is special case - we don't need to check for allowed field types
 		$metadataItems = array();
@@ -148,9 +193,34 @@ class ESearchUnifiedItem extends ESearchItem
 			$metadataItem->setRange($eSearchUnifiedItem->getRange());
 		$metadataItems[] = $metadataItem;
 
-		$metadataQuery = ESearchMetadataItem::createSearchQuery($metadataItems, 'should', null);
-		if(count($metadataQuery))
-			$entryUnifiedQuery[] = $metadataQuery;
+		if(count($metadataItems))
+		{
+			$metadataQueries = ESearchMetadataItem::createSearchQuery($metadataItems, 'should', $queryAttributes, null);
+			foreach ($metadataQueries as $metadataQuery)
+			{
+				$entryUnifiedQuery->addToShould($metadataQuery);
+			}
+		}
+	}
+
+	protected static function validateUnifiedAllowedTypes($eSearchUnifiedItem)
+	{
+		if (in_array($eSearchUnifiedItem->getItemType(), array(ESearchItemType::RANGE, ESearchItemType::EXISTS)))
+		{
+			$data = array();
+			$data['itemType'] = $eSearchUnifiedItem->getItemType();
+			throw new kESearchException('Item type ['.$eSearchUnifiedItem->getItemType().']. is not allowed in Unified Search', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH, $data);
+		}
+	}
+
+	public function shouldAddLanguageSearch()
+	{
+
+	}
+
+	public function getItemMappingFieldsDelimiter()
+	{
+
 	}
 
 }

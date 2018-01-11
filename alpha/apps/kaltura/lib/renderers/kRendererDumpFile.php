@@ -2,7 +2,7 @@
 
 require_once(dirname(__file__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__file__) . '/kRendererBase.php');
-
+require_once(dirname(__file__) . '/../../../../../infra/storage/kEncryptFileUtils.php');
 /*
  * @package server-infra
  * @subpackage renderers
@@ -19,15 +19,19 @@ class kRendererDumpFile implements kRendererBase
 	protected $maxAge;
 	protected $xSendFileAllowed;
 	protected $lastModified;
+	protected $key;
+	protected $iv;
 	
 	public $partnerId;
 
-	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null)
+	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null)
 	{
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
 		$this->maxAge = $maxAge;
 		$this->lastModified = $lastModified;
+		$this->key = $key;
+		$this->iv = $iv;
 		
 		$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
 		if ($limitFileSize)
@@ -38,13 +42,13 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			clearstatcache();
-			$this->fileSize = kFile::fileSize($filePath);
+			$this->fileSize = kEncryptFileUtils::fileSize($filePath, $key, $iv);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
 		
 		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
 		{
-			 $this->fileData = file_get_contents($this->filePath, false , null , -1, $limitFileSize);
+			$this->fileData = kEncryptFileUtils::getEncryptedFileContent($this->filePath, $key, $iv, 0, $limitFileSize);
 		}
 	}
 	
@@ -63,10 +67,9 @@ class kRendererDumpFile implements kRendererBase
 			header("HTTP/1.1 304 Not Modified");
 			return;
 		}
-		
 		$useXsendFile = false;
 		$rangeLength = null;
-		if (!$this->fileData && $this->xSendFileAllowed && in_array('mod_xsendfile', apache_get_modules()))
+		if (!$this->fileData && !$this->key && $this->xSendFileAllowed && in_array('mod_xsendfile', apache_get_modules()))
 			$useXsendFile = true;
 		else
 			list($rangeFrom, $rangeTo, $rangeLength) = infraRequestUtils::handleRangeRequest($this->fileSize);
@@ -94,7 +97,10 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
-			infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
+			if ($this->key)
+				echo kEncryptFileUtils::getEncryptedFileContent($this->filePath, $this->key, $this->iv, $rangeFrom, $rangeLength);
+			else
+				infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);		
 		}
 	}
 }

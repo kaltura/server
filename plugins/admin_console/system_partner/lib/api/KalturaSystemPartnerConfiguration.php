@@ -354,7 +354,27 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
  * @var int
  */
 	public $defaultLiveStreamSegmentDuration;
-	
+
+	/**
+	 * @var string
+	 */
+	public $eSearchLanguages;
+
+	/**
+	 * @var int
+	 */
+	public $publisherEnvironmentType;
+
+	/**
+	 * @var string
+	 */
+	public $ovpEnvironmentUrl;
+
+	/**
+	 * @var string
+	 */
+	public $ottEnvironmentUrl;
+
 	
 	private static $map_between_objects = array
 	(
@@ -423,7 +443,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	    "timeAlignedRenditions",
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
-		"defaultLiveStreamSegmentDuration"
+		"defaultLiveStreamSegmentDuration",
+		"eSearchLanguages",
+		"publisherEnvironmentType",
+		"ovpEnvironmentUrl",
+		"ottEnvironmentUrl",
 	);
 
 	public function getMapBetweenObjects()
@@ -441,6 +465,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		$this->restrictEntryByMetadata = $source_object->getShouldApplyAccessControlOnEntryMetadata();
 		$this->htmlPurifierBaseListUsage = $source_object->getHtmlPurifierBaseListUsage();
+		$this->ovpEnvironmentUrl = $source_object->getOvpEnvironmentUrl();
+		$this->ottEnvironmentUrl = $source_object->getOttEnvironmentUrl();
 		
 		$dbAutoModerationEntryFilter = $source_object->getAutoModerateEntryFilter();
 		if ($dbAutoModerationEntryFilter)
@@ -458,6 +484,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		if($this->liveDeliveryProfileIds) {
 			$this->liveDeliveryProfileIds = json_encode($this->liveDeliveryProfileIds);
+		}
+		if($this->eSearchLanguages) {
+			$this->eSearchLanguages = json_encode($this->eSearchLanguages);
 		}
 	}
 	
@@ -518,7 +547,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		} else {
 			$object_to_fill->setLiveDeliveryProfileIds(json_decode($this->liveDeliveryProfileIds, true));
 		}
-		
+
+		if(empty($this->eSearchLanguages)) {
+			$object_to_fill->setESearchLanguages(array());
+		} else {
+			$object_to_fill->setESearchLanguages(json_decode($this->eSearchLanguages, true));
+		}
+
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{
 		    $parentPartnerDb = PartnerPeer::retrieveByPK($this->partnerParentId);

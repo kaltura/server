@@ -57,26 +57,38 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return true;
 	}
 
+	public static function getLocalContentsByFileSync(FileSync $file_sync, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
+	{
+		$full_path = $file_sync->getFullPath();
+		$real_path = realpath( $full_path );
+		if ( file_exists ( $real_path ) )
+		{
+			$startTime = microtime(true);
+			if (!$maxlen)
+				$contents = file_get_contents( $real_path);
+			else
+				$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
+			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
+			if ($file_sync->isEncrypted())
+			{
+				$key = $file_sync->getEncryptionKey();
+				$iv = $file_sync->getIv();
+				$contents = kEncryptFileUtils::decryptData($contents, $key,$iv);
+			}
+			return $contents;
+		}
+		else
+		{
+			KalturaLog::info("file was not found locally [$full_path]");
+			throw new kFileSyncException("Cannot find file on local disk [$full_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
+		}
+	}
+
 	public static function getContentsByFileSync ( FileSync $file_sync , $local = true , $fetch_from_remote_if_no_local = true , $strict = true )
 	{
 		if ( $local )
-		{
-			$full_path = $file_sync->getFullPath();
-			$real_path = realpath( $full_path );
-			if ( file_exists ( $real_path ) )
-			{
-				$startTime = microtime(true);
-				$contents = file_get_contents( $real_path);
-				KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
-
-				return $contents;
-			}
-			else
-			{
-				KalturaLog::info("file was not found locally [$full_path]");
-				throw new kFileSyncException("Cannot find file on local disk [$full_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
-			}
-		}
+			return self::getLocalContentsByFileSync($file_sync);
+		
 
 		if ( $fetch_from_remote_if_no_local )
 		{
@@ -226,8 +238,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		// place the content there
 		file_put_contents ( $fullPath , $content );
 		self::setPermissions($fullPath);
-
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
+		self::encryptByFileSyncKey($key);
 	}
 
 	protected static function setPermissions($filePath)
@@ -496,6 +508,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			self::setPermissions($targetFullPath);
 			if(!$existsFileSync)
 				self::createSyncFileForKey($rootPath, $filePath, $target_key, $strict, false, $cacheOnly);
+			self::encryptByFileSyncKey($target_key);
 		}
 		else
 		{
@@ -827,7 +840,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getOriginFileSyncForKey ( FileSyncKey $key , $strict = true )
 	{
-		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		$c->addAnd ( FileSyncPeer::ORIGINAL , 1 );
 
@@ -852,6 +864,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @param boolean $fetch_from_remote_if_no_local
 	 * @param boolean $strict  - will throw exception if not found
+	 * @param boolean $resolve  - will resolve the file sync
 	 * @return array
 	 */
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
@@ -866,7 +879,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			// if $fetch_from_remote_if_no_local is true - don't restrict to the current DC - this will save an extra hit to the DB in case the file is not present
 			$c->addAnd ( FileSyncPeer::DC , $dc_id );
 		}
-		// saerch only for ready
+		// search only for ready
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
 		$c->addAscendingOrderByColumn(FileSyncPeer::DC); // favor local data centers instead of remote storage locations
 
@@ -990,11 +1003,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
-			$path = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
+			$path = $parent_file_sync->getFullPath();
 			KalturaLog::info("path [$path]");
 			return $path;
 		}
 	}
+
 
 	/**
 	 * @param FileSyncKey $key
@@ -1103,7 +1117,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	/**
 	 * @param FileSyncKey $key
 	 * @param StorageProfile $externalStorage
-	 * @return SyncFile
+	 * @return FileSync
 	 */
 	public static function createPendingExternalSyncFileForKey(FileSyncKey $key, StorageProfile $externalStorage, $isDir = false)
 	{
@@ -1375,6 +1389,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$firstLink->setFileRoot($fileSync->getFileRoot());
 			$firstLink->setFilePath($fileSync->getFilePath());
 			$firstLink->setFileType($fileSync->getFileType());
+			$firstLink->setEncryptionKey($fileSync->getEncryptionKey());
 			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
 			$firstLink->setIsDir($fileSync->getIsDir());
 			if (!is_null($fileSync->getOriginalDc()))
@@ -1610,4 +1625,34 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return ($fileSync->getContentMd5() == md5($contentMd5));
 		}
 	}
+
+	public static function dumpFileByFileSync( FileSync $fileSync)
+	{
+		$resolveFileSync = self::resolve($fileSync);
+		$path = $resolveFileSync->getFullPath();
+		KalturaLog::info("Resolve path [$path]");
+		kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv());
+	}
+
+	public static function dumpFileByFileSyncKey( FileSyncKey $key , $strict = false )
+	{
+		KalturaLog::debug("Dumping File: key [$key], strict [$strict]");
+		list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
+		if ( $file_sync )
+			self::dumpFileByFileSync($file_sync);
+	}
+	
+	public static function encryptByFileSyncKey(FileSyncKey $key)
+	{
+		$fileSync = self::getLocalFileSyncForKey($key);
+		return $fileSync->encrypt();
+	}
+
+	public static function getResolveLocalFileSyncForKey(FileSyncKey $key)
+	{
+		$fileSync = self::getLocalFileSyncForKey($key);
+		return self::resolve($fileSync);
+	}
+
+
 }

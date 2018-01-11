@@ -107,7 +107,7 @@ class FreewheelGenericDistributionEngine extends DistributionEngine implements
 		if (!$sftp_id)
 			throw new Exception('Distribution failed with error [Could not establish connection to FTP server]');
 		
-		$stream = fopen("ssh2.sftp://$sftp_id/$filename", 'r');
+		$stream = fopen("ssh2.sftp://" . intval($sftp_id) . "/$filename", 'r');
 		if (!$stream)
 			return false; // file doesn't exist yet
 		

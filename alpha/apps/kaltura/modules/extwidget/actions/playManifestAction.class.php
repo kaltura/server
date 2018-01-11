@@ -123,9 +123,9 @@ class playManifestAction extends kalturaAction
 	private $deliveryAttributes = null;
 
 	/**
-	 * @var int
+	 * @var array
 	 */
-	private $deliveryProfileId = null;
+	private $requestedDeliveryProfileIds = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -188,7 +188,9 @@ class playManifestAction extends kalturaAction
 		{
 			return;
 		}
-		
+
+		myPartnerUtils::addPartnerToCriteria ('entry' ,kCurrentContext::getCurrentPartnerId(), true);
+
 		// enforce entitlement
 		kEntitlementUtils::initEntitlementEnforcement();
 		
@@ -747,10 +749,16 @@ class playManifestAction extends kalturaAction
 
 	private function shouldIncludeStorageProfile($storageProfile)
 	{
-		if($this->deliveryProfileId)
+		if($this->requestedDeliveryProfileIds)
 		{
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			return isset($deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]) && in_array($this->deliveryProfileId, $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]);
+			if(isset( $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]))
+			{
+				$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()];
+				return count(array_intersect($this->requestedDeliveryProfileIds, $storageStreamerTypeDeliveryProfileIds));
+			}
+
+			return false;
 		}
 
 		return true;
@@ -766,8 +774,7 @@ class playManifestAction extends kalturaAction
 		foreach($flavors as $flavorAsset)
 		{
 			/* @var $flavorAsset flavorAsset */
-			
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+			$mediaInfo = $flavorAsset->getMediaInfo();
 			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 			{
 				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 
@@ -999,7 +1006,7 @@ class playManifestAction extends kalturaAction
 
 		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes) && !$this->deliveryAttributes->getServeVodFromLive())
  		{
- 			if (!$this->entry->hasMediaServer())
+ 			if (!$this->entry->isCurrentlyLive())
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
  			
  			kApiCache::setExpiry(120);
@@ -1147,14 +1154,28 @@ class playManifestAction extends kalturaAction
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 
-		$this->deliveryProfileId = $this->getRequestParameter( "deliveryProfileId", null );
-		$this->deliveryAttributes->setDeliveryProfileId($this->deliveryProfileId);
+		$requestDeliveryProfileIds = $this->getRequestParameter( "deliveryProfileIds", null);
+		if($requestDeliveryProfileIds)
+		{
+			$this->requestedDeliveryProfileIds = explode(',', $requestDeliveryProfileIds);
+		}
+		else
+		{
+			$requestDeliveryProfileIds = $this->getRequestParameter( "deliveryProfileId", null);
+			if($requestDeliveryProfileIds)
+			{
+				$this->requestedDeliveryProfileIds = array($requestDeliveryProfileIds);
+			}
+		}
+
+		$this->deliveryAttributes->setRequestedDeliveryProfileIds($this->requestedDeliveryProfileIds);
 
 		// Initialize
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
 		$this->setParamsForPlayServer($this->getRequestParameter("usePlayServer"));
+		$this->deliveryAttributes->setDefaultAudioLanguage($this->getRequestParameter("defaultAudioLang"));
 
 		if ( in_array($this->deliveryAttributes->getFormat(), array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::AKAMAI_HDS)) )
 			$this->deliveryAttributes->setSequence($this->getRequestParameter("sequence"));
@@ -1197,6 +1218,8 @@ class playManifestAction extends kalturaAction
 		$config->rendererClass = get_class($renderer);
 		$config->deliveryProfile = $this->deliveryProfile;
 		$config->hasSequence = $this->deliveryAttributes->getHasValidSequence();
+		$config->disableCaptions = $this->getRequestParameter("disableCaptions", false);
+
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{

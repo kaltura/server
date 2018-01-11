@@ -31,6 +31,12 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 	 */
 	public $message;
 	/**
+	 * The footer of the message to send in the notification mail
+	 *
+	 * @var string area
+	 */
+	public $footer;
+	/**
 	 * The basic link for the KMC site
 	 *
 	 * @var string
@@ -58,6 +64,7 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 		$dbObject->setDataValue('sender', $this->sender);
 		$dbObject->setDataValue('subject', $this->subject);
 		$dbObject->setDataValue('link', $this->link);
+		$dbObject->setDataValue('footer', $this->footer);
 		return $dbObject;
 	}
 	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
@@ -66,6 +73,7 @@ class KalturaMailNotificationObjectTask extends KalturaObjectTask
 		/** @var kObjectTask $srcObj */
 		$this->mailTo = $srcObj->getDataValue('mailTo');
 		$this->message = $srcObj->getDataValue('message');
+		$this->footer = $srcObj->getDataValue('footer');
 		$this->sendToUsers = $srcObj->getDataValue('sendToUsers');
 		$this->sender = $srcObj->getDataValue('sender');
 		$this->subject = $srcObj->getDataValue('subject');

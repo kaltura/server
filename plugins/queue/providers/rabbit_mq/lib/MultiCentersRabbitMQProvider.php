@@ -11,13 +11,13 @@ class MultiCentersRabbitMQProvider extends QueueProvider
 	 * @var array<RabbitMQProvider>
 	 */
 	protected $providers = array();
-	public function __construct(array $rabbitConfigs)
+	public function __construct(array $rabbitConfigs, $constructorArgs)
 	{
 		foreach($rabbitConfigs as $section => $rabbitConfig)
 		{
 			if(is_numeric($section)) 
 			{
-				$this->providers[] = new RabbitMQProvider($rabbitConfig);
+				$this->providers[] = new RabbitMQProvider($rabbitConfig, $constructorArgs);
 			}
 		}
 	}

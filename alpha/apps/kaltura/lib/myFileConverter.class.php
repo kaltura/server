@@ -532,6 +532,15 @@ class myFileConverter
 		@list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
 		return array ( $sourcewidth , $sourceheight );
 	}
+
+	public static function getImageDimensionsFromString($imgStr)
+	{
+		$image = imagecreatefromstring($imgStr);
+		$width = imagesx($image);
+		$height = imagesy($image);
+		imagedestroy($image);
+		return array($width, $height);
+	}
 	
 	public static function createLogFileName ( $source_file , $plain_log_file_name = false )
 	{
@@ -539,15 +548,6 @@ class myFileConverter
 		return $source_file . $add_on . ".txt";
 	}
 
-
-	private static function addToLogFile ( $file_name , $str )
-	{
-		// TODO - append text to file, don't read it all and then write it again
-		if ( file_exists ( $file_name ))		$log_content = @file_get_contents( $file_name ) ; // sync - OK
-		else $log_content = "";
-		$extra_content = "\n\n----------------------\n$str\n----------------------\n\n";
-		file_put_contents( $file_name , $log_content . $extra_content ); // sync - OK
-	}
 }
 
 class conversionInfo

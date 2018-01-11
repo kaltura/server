@@ -54,14 +54,14 @@ class RabbitMQPlugin extends KalturaPlugin implements IKalturaPending, IKalturaO
 			{
 				throw new kCoreException("RabbitMQ configuration file (rabbit_mq.ini) wasn't found!");
 			}
-			$rabbitConfig = kConf::getMap('rabbit_mq');
 			
+			$rabbitConfig = kConf::getMap('rabbit_mq');
 			if(isset($rabbitConfig['multiple_dcs']) && $rabbitConfig['multiple_dcs'])
 			{
-				return new MultiCentersRabbitMQProvider($rabbitConfig);
+				return new MultiCentersRabbitMQProvider($rabbitConfig, $constructorArgs);
 			}
 			
-			return new RabbitMQProvider($rabbitConfig);
+			return new RabbitMQProvider($rabbitConfig, $constructorArgs);
 		}
 		
 		return null;

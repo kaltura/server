@@ -767,5 +767,30 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	}
 	
 	public function shouldCopyOnReplacement() {return true;}
+	
+	private $m_media_info = null;
+	
+	public function getMediaInfo()
+	{
+		if($this->m_media_info)
+			return $this->m_media_info;
+		
+		$this->m_media_info = mediaInfoPeer::retrieveByFlavorAssetId($this->getId());
+	}
+
+	/**
+	 * @param      string $name
+	 * @param      string $namespace
+	 * @return     boolean True if $name has been modified.
+	 */
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
+		{
+			return true;
+		}
+
+		return false;
+	}
 		
 }

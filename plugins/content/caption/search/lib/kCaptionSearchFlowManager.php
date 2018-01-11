@@ -137,6 +137,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 		$entry->setUpdatedAt(time());
 		$entry->save();
 		$entry->indexToSearchIndex();
+		return true;
 	}
 
 	/* (non-PHPdoc)

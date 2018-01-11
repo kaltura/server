@@ -6,8 +6,10 @@
 class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjectReadyForElasticIndexEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer
 {
 
-    const CACHE_PREFIX = 'executed_elastic_server_';
+    const CACHE_PREFIX = 'executed_elastic_cluster_';
     const MAX_LENGTH = 32766;
+    const MAX_CUE_POINTS = 5000;
+
     /**
      * @param BaseObject $object
      * @param BatchJob $raisedJob
@@ -15,7 +17,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function objectReadyForIndex(BaseObject $object, BatchJob $raisedJob = null)
     {
-        if($object instanceof CuePoint && in_array($object->getType(),CuePointPlugin::getElasticIndexOnEntryTypes()))
+        if($object instanceof CuePoint && in_array($object->getType(), CuePointPlugin::getElasticIndexOnEntryTypes()) && !in_array($object->getType(), CuePointPlugin::getIndexOnEntryTypes()))
         {
             kCuePointManager::reIndexCuePointEntry($object, false, true);//reindex the entry only on elastic
         }
@@ -37,7 +39,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeReadyForIndexEvent(BaseObject $object)
     {
-        if($object instanceof CuePoint && in_array($object->getType(),CuePointPlugin::getElasticIndexOnEntryTypes()))
+        if($object instanceof CuePoint && in_array($object->getType(), CuePointPlugin::getElasticIndexOnEntryTypes()) && !in_array($object->getType(), CuePointPlugin::getIndexOnEntryTypes()))
             return true;
 
         if($object instanceof IElasticIndexable)
@@ -48,13 +50,16 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function saveToElastic(IElasticIndexable $object ,$params = null)
     {
+        if(kConf::get('disableElastic', 'elastic', true))
+            return true;
+
         KalturaLog::debug('Saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
         $cmd = $this->getElasticSaveParams($object, $params);
 
         if(!$cmd)
             return true;
 
-        return $this->execElastic($cmd, $object);
+        return $this->execElastic($cmd, $object, $object->getElasticSaveMethod());
     }
 
     public function getElasticSaveParams($object, $params)
@@ -85,11 +90,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
             if($elasticPluginData)
             {
-                KalturaLog::debug("Elastic data for $pluginName [" . print_r($elasticPluginData,true) . "]");
-                foreach ($elasticPluginData as $fieldName => $fieldValue)
-                {
-                    $dataContributionPath[$fieldName] = $fieldValue;
-                }
+                $dataContributionPath = array_merge($dataContributionPath, $elasticPluginData);
             }
         }
         
@@ -97,16 +98,15 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     }
 
     //exe the curl
-    public function execElastic($params, IElasticIndexable $object)
+    public function execElastic($params, IElasticIndexable $object, $action)
     {
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
-        $op = $object->getElasticSaveMethod();
         $params['index'] = $object->getElasticIndexName();
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
-        $params['action'] = $op;
+        $params['action'] = $action;
 
         try
         {
@@ -119,7 +119,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 return true;
 
             $client = new elasticClient();
-            $ret = $client->$op($params);
+            $ret = $client->$action($params);
             if(!$ret)
             {
                 KalturaLog::err('Failed to Execute elasticSearch query: '.print_r($params,true));
@@ -139,38 +139,38 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog = new SphinxLog();
         $command = serialize($params);
         $elasticLog->setSql($command);
-        $elasticLog->setExecutedServerId($this->retrieveElasticServerId());
+        $elasticLog->setExecutedServerId($this->retrieveElasticClusterId());
         $elasticLog->setObjectId($object->getId());
-        $elasticLog->setObjectType($object->getElasticObjectType());
+        $elasticLog->setObjectType($object->getElasticObjectName());
         //$elasticLog->setEntryId($object->getEntryId());
         $elasticLog->setPartnerId($object->getPartnerId());
         $elasticLog->setType(SphinxLogType::ELASTIC);
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
     }
 
-    private function retrieveElasticServerId()
+    private function retrieveElasticClusterId()
     {
-        $elasticServerId = null;
+        $elasticClusterId = null;
         if(kConf::hasParam('exec_elastic') && kConf::get('exec_elastic'))
         {
-            $elasticHostName = kConf::get('elasticHost', 'elastic');
-            $elasticServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_SERVER);
-            if ($elasticServerCacheStore)
+            $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
+            $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+            if ($elasticClusterCacheStore)
             {
-                $elasticServerId = $elasticServerCacheStore->get(self::CACHE_PREFIX . $elasticHostName);
-                if ($elasticServerId)
-                    return $elasticServerId;
+                $elasticClusterId = $elasticClusterCacheStore->get(self::CACHE_PREFIX . $elasticClusterName);
+                if ($elasticClusterId)
+                    return $elasticClusterId;
             }
-            $elasticServer = SphinxLogServerPeer::retrieveByLocalServer($elasticHostName);
-            if($elasticServer)
+            $elasticCluster = SphinxLogServerPeer::retrieveByLocalServer($elasticClusterName);
+            if($elasticCluster)
             {
-                $elasticServerId = $elasticServer->getId();
-                if ($elasticServerCacheStore)
-                    $elasticServerCacheStore->set(self::CACHE_PREFIX . $elasticHostName, $elasticServerId);
+                $elasticClusterId = $elasticCluster->getId();
+                if ($elasticClusterCacheStore)
+                    $elasticClusterCacheStore->set(self::CACHE_PREFIX . $elasticClusterName, $elasticClusterId);
             }
         }
 
-        return $elasticServerId;
+        return $elasticClusterId;
     }
 
     /**
@@ -282,6 +282,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         if($object instanceof entry)
         {
+            unset($modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES]);
+
             if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
                 return true;
 
@@ -311,7 +313,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         foreach ($itemsToTrim as $item)
         {
-            if (array_key_exists($item, $params))
+            if (array_key_exists($item, $params) && (strlen($params[$item]) > kElasticSearchManager::MAX_LENGTH))
                 $params[$item] = substr($params[$item], 0, self::MAX_LENGTH);
         }
         return $tempParams;
@@ -319,10 +321,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     public function deleteFromElastic(IElasticIndexable $object)
     {
-        $params['index'] = $object->getElasticIndexName();
-        $params['type'] = $object->getElasticObjectType();
-        $params['id'] = $object->getElasticId();
-        $client = new elasticClient();
-        $client->delete($params);
+        $this->execElastic(null, $object, 'delete');
     }
+
 }

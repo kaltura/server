@@ -6,9 +6,9 @@
 class KalturaTransformMetadataJobData extends KalturaJobData
 {
 	/**
-	 * @var string
+	 * @var KalturaFileContainer
 	 */
-	public $srcXslPath;
+	public $srcXsl;
 	
 	/**
 	 * @var int
@@ -32,7 +32,7 @@ class KalturaTransformMetadataJobData extends KalturaJobData
     
 	private static $map_between_objects = array
 	(
-		"srcXslPath" ,
+		"srcXsl" ,
 		"srcVersion" ,
 		"destVersion" ,
 		"metadataProfileId" ,

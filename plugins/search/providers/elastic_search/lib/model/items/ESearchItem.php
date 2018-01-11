@@ -5,6 +5,10 @@
  */
 abstract class ESearchItem extends BaseObject
 {
+	/**
+	 * @var array
+	 */
+	protected static $field_boost_values = array();
 
 	/**
 	 * @var ESearchItemType
@@ -15,6 +19,11 @@ abstract class ESearchItem extends BaseObject
 	 * @var ESearchRange
 	 */
 	protected $range;
+
+	/**
+	 * @var bool
+	 */
+	protected $addHighlight;
 
 	/**
 	 * @return ESearchItemType
@@ -48,25 +57,75 @@ abstract class ESearchItem extends BaseObject
 		$this->range = $range;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getAddHighlight()
+	{
+		return $this->addHighlight;
+	}
+
+	/**
+	 * @param boolean $addHighlight
+	 */
+	public function setAddHighlight($addHighlight)
+	{
+		$this->addHighlight = $addHighlight;
+	}
+
 	protected function validateAllowedSearchTypes($allowedSearchTypes, $fieldName)
 	{
 		if (!in_array($this->getItemType(),  $allowedSearchTypes[$fieldName]))
-			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $fieldName.']', kCoreException::INTERNAL_SERVER_ERROR);
+		{
+			$data = array();
+			$data['itemType'] = $this->getItemType();
+			$data['fieldName'] = $fieldName;
+			throw new kESearchException('Type of search ['.$this->getItemType().'] not allowed on specific field ['. $fieldName.']', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data);
+		}
 	}
 
 	protected function validateEmptySearchTerm($fieldName, $searchTerm)
 	{
-		if (empty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE)))
-			throw new kCoreException('Type of search ['.$this->getItemType().'] not allowed on empty search term on field ['. $fieldName.']', kCoreException::INTERNAL_SERVER_ERROR);
+		if (empty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE, ESearchItemType::EXISTS)))
+		{
+			$data = array();
+			$data['itemType'] = $this->getItemType();
+			$data['fieldName'] = $fieldName;
+			throw new kESearchException('Empty search term is not allowed on Field ['. $fieldName.'] and search type ['.$this->getItemType().']', kESearchException::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data);
+		}
 	}
 
-	abstract public function getType();
+	protected function validateItemInput()
+	{
+		$allowedSearchTypes = static::getAllowedSearchTypesForField();
+		$this->validateAllowedSearchTypes($allowedSearchTypes, $this->getFieldName());
+		$this->validateEmptySearchTerm($this->getFieldName(), $this->getSearchTerm());
+	}
 
 	public static function getAllowedSearchTypesForField()
 	{
 		return array();
 	}
 
-	abstract public static function createSearchQuery(array $eSearchItemsArr, $boolOperator, $eSearchOperatorType = null);
+	abstract public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null);
+
+	abstract public function shouldAddLanguageSearch();
+
+	abstract public function getItemMappingFieldsDelimiter();
+
+	/**
+	 * @param $fieldName
+	 * @return int
+	 */
+	public static function getFieldBoostFactor($fieldName)
+	{
+		$result = 1;
+		if(array_key_exists($fieldName, static::$field_boost_values))
+		{
+			$result = static::$field_boost_values[$fieldName];
+		}
+
+		return $result;
+	}
 
 }

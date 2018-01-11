@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -24,7 +22,7 @@
  *
  * <p>
  * For more information about this service, see the API
- * <a href="" target="_blank">Documentation</a>
+ * <a href="https://developers.google.com/android/work/play/emm-api" target="_blank">Documentation</a>
  * </p>
  *
  * @author Google, Inc.
@@ -45,6 +43,8 @@ class Google_Service_AndroidEnterprise extends Google_Service
   public $installs;
   public $permissions;
   public $products;
+  public $storelayoutclusters;
+  public $storelayoutpages;
   public $users;
   
 
@@ -56,6 +56,7 @@ class Google_Service_AndroidEnterprise extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'androidenterprise/v1/';
     $this->version = 'v1';
     $this->serviceName = 'androidenterprise';
@@ -376,6 +377,16 @@ class Google_Service_AndroidEnterprise extends Google_Service
                   'required' => true,
                 ),
               ),
+            ),'getStoreLayout' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
             ),'insert' => array(
               'path' => 'enterprises',
               'httpMethod' => 'POST',
@@ -396,8 +407,28 @@ class Google_Service_AndroidEnterprise extends Google_Service
                   'required' => true,
                 ),
               ),
+            ),'sendTestPushNotification' => array(
+              'path' => 'enterprises/{enterpriseId}/sendTestPushNotification',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
             ),'setAccount' => array(
               'path' => 'enterprises/{enterpriseId}/account',
+              'httpMethod' => 'PUT',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'setStoreLayout' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout',
               'httpMethod' => 'PUT',
               'parameters' => array(
                 'enterpriseId' => array(
@@ -753,7 +784,41 @@ class Google_Service_AndroidEnterprise extends Google_Service
         'products',
         array(
           'methods' => array(
-            'get' => array(
+            'approve' => array(
+              'path' => 'enterprises/{enterpriseId}/products/{productId}/approve',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'productId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'generateApprovalUrl' => array(
+              'path' => 'enterprises/{enterpriseId}/products/{productId}/generateApprovalUrl',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'productId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'languageCode' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+              ),
+            ),'get' => array(
               'path' => 'enterprises/{enterpriseId}/products/{productId}',
               'httpMethod' => 'GET',
               'parameters' => array(
@@ -825,6 +890,216 @@ class Google_Service_AndroidEnterprise extends Google_Service
           )
         )
     );
+    $this->storelayoutclusters = new Google_Service_AndroidEnterprise_Storelayoutclusters_Resource(
+        $this,
+        $this->serviceName,
+        'storelayoutclusters',
+        array(
+          'methods' => array(
+            'delete' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}',
+              'httpMethod' => 'DELETE',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'clusterId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'get' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'clusterId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'insert' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'list' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'patch' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}',
+              'httpMethod' => 'PATCH',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'clusterId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'update' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}',
+              'httpMethod' => 'PUT',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'clusterId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),
+          )
+        )
+    );
+    $this->storelayoutpages = new Google_Service_AndroidEnterprise_Storelayoutpages_Resource(
+        $this,
+        $this->serviceName,
+        'storelayoutpages',
+        array(
+          'methods' => array(
+            'delete' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}',
+              'httpMethod' => 'DELETE',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'get' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'insert' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'list' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'patch' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}',
+              'httpMethod' => 'PATCH',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'update' => array(
+              'path' => 'enterprises/{enterpriseId}/storeLayout/pages/{pageId}',
+              'httpMethod' => 'PUT',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),
+          )
+        )
+    );
     $this->users = new Google_Service_AndroidEnterprise_Users_Resource(
         $this,
         $this->serviceName,
@@ -861,6 +1136,21 @@ class Google_Service_AndroidEnterprise extends Google_Service
                   'required' => true,
                 ),
               ),
+            ),'getAvailableProductSet' => array(
+              'path' => 'enterprises/{enterpriseId}/users/{userId}/availableProductSet',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'userId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
             ),'list' => array(
               'path' => 'enterprises/{enterpriseId}/users',
               'httpMethod' => 'GET',
@@ -879,6 +1169,21 @@ class Google_Service_AndroidEnterprise extends Google_Service
             ),'revokeToken' => array(
               'path' => 'enterprises/{enterpriseId}/users/{userId}/token',
               'httpMethod' => 'DELETE',
+              'parameters' => array(
+                'enterpriseId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'userId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'setAvailableProductSet' => array(
+              'path' => 'enterprises/{enterpriseId}/users/{userId}/availableProductSet',
+              'httpMethod' => 'PUT',
               'parameters' => array(
                 'enterpriseId' => array(
                   'location' => 'path',
@@ -1203,7 +1508,7 @@ class Google_Service_AndroidEnterprise_Enterprises_Resource extends Google_Servi
 {
 
   /**
-   * Deletes the binding between the MDM and enterprise. This is now deprecated;
+   * Deletes the binding between the EMM and enterprise. This is now deprecated;
    * use this to unenroll customers that were previously enrolled with the
    * 'insert' call, then enroll them again with the 'enroll' call.
    * (enterprises.delete)
@@ -1219,10 +1524,10 @@ class Google_Service_AndroidEnterprise_Enterprises_Resource extends Google_Servi
   }
 
   /**
-   * Enrolls an enterprise with the calling MDM. (enterprises.enroll)
+   * Enrolls an enterprise with the calling EMM. (enterprises.enroll)
    *
    * @param string $token The token provided by the enterprise to register the
-   * MDM.
+   * EMM.
    * @param Google_Enterprise $postBody
    * @param array $optParams Optional parameters.
    * @return Google_Service_AndroidEnterprise_Enterprise
@@ -1249,11 +1554,25 @@ class Google_Service_AndroidEnterprise_Enterprises_Resource extends Google_Servi
   }
 
   /**
-   * Establishes the binding between the MDM and an enterprise. This is now
+   * Returns the store layout resource. (enterprises.getStoreLayout)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreLayout
+   */
+  public function getStoreLayout($enterpriseId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId);
+    $params = array_merge($params, $optParams);
+    return $this->call('getStoreLayout', array($params), "Google_Service_AndroidEnterprise_StoreLayout");
+  }
+
+  /**
+   * Establishes the binding between the EMM and an enterprise. This is now
    * deprecated; use enroll instead. (enterprises.insert)
    *
    * @param string $token The token provided by the enterprise to register the
-   * MDM.
+   * EMM.
    * @param Google_Enterprise $postBody
    * @param array $optParams Optional parameters.
    * @return Google_Service_AndroidEnterprise_Enterprise
@@ -1281,6 +1600,22 @@ class Google_Service_AndroidEnterprise_Enterprises_Resource extends Google_Servi
   }
 
   /**
+   * Sends a test push notification to validate the EMM integration with the
+   * Google Cloud Pub/Sub service for this enterprise.
+   * (enterprises.sendTestPushNotification)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_EnterprisesSendTestPushNotificationResponse
+   */
+  public function sendTestPushNotification($enterpriseId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId);
+    $params = array_merge($params, $optParams);
+    return $this->call('sendTestPushNotification', array($params), "Google_Service_AndroidEnterprise_EnterprisesSendTestPushNotificationResponse");
+  }
+
+  /**
    * Set the account that will be used to authenticate to the API as the
    * enterprise. (enterprises.setAccount)
    *
@@ -1297,7 +1632,22 @@ class Google_Service_AndroidEnterprise_Enterprises_Resource extends Google_Servi
   }
 
   /**
-   * Unenrolls an enterprise from the calling MDM. (enterprises.unenroll)
+   * Sets the store layout resource. (enterprises.setStoreLayout)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param Google_StoreLayout $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreLayout
+   */
+  public function setStoreLayout($enterpriseId, Google_Service_AndroidEnterprise_StoreLayout $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('setStoreLayout', array($params), "Google_Service_AndroidEnterprise_StoreLayout");
+  }
+
+  /**
+   * Unenrolls an enterprise from the calling EMM. (enterprises.unenroll)
    *
    * @param string $enterpriseId The ID of the enterprise.
    * @param array $optParams Optional parameters.
@@ -1642,6 +1992,48 @@ class Google_Service_AndroidEnterprise_Products_Resource extends Google_Service_
 {
 
   /**
+   * Approves the specified product (and the relevant app permissions, if any).
+   * (products.approve)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $productId The ID of the product.
+   * @param Google_ProductsApproveRequest $postBody
+   * @param array $optParams Optional parameters.
+   */
+  public function approve($enterpriseId, $productId, Google_Service_AndroidEnterprise_ProductsApproveRequest $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'productId' => $productId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('approve', array($params));
+  }
+
+  /**
+   * Generates a URL that can be rendered in an iframe to display the permissions
+   * (if any) of a product. An enterprise admin must view these permissions and
+   * accept them on behalf of their organization in order to approve that product.
+   *
+   * Admins should accept the displayed permissions by interacting with a separate
+   * UI element in the EMM console, which in turn should trigger the use of this
+   * URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to
+   * approve the product. This URL can only be used to display permissions for up
+   * to 1 day. (products.generateApprovalUrl)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $productId The ID of the product.
+   * @param array $optParams Optional parameters.
+   *
+   * @opt_param string languageCode The BCP 47 language code used for permission
+   * names and descriptions in the returned iframe, for instance "en-US".
+   * @return Google_Service_AndroidEnterprise_ProductsGenerateApprovalUrlResponse
+   */
+  public function generateApprovalUrl($enterpriseId, $productId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'productId' => $productId);
+    $params = array_merge($params, $optParams);
+    return $this->call('generateApprovalUrl', array($params), "Google_Service_AndroidEnterprise_ProductsGenerateApprovalUrlResponse");
+  }
+
+  /**
    * Retrieves details of a product for display to an enterprise admin.
    * (products.get)
    *
@@ -1716,6 +2108,220 @@ class Google_Service_AndroidEnterprise_Products_Resource extends Google_Service_
 }
 
 /**
+ * The "storelayoutclusters" collection of methods.
+ * Typical usage is:
+ *  <code>
+ *   $androidenterpriseService = new Google_Service_AndroidEnterprise(...);
+ *   $storelayoutclusters = $androidenterpriseService->storelayoutclusters;
+ *  </code>
+ */
+class Google_Service_AndroidEnterprise_Storelayoutclusters_Resource extends Google_Service_Resource
+{
+
+  /**
+   * Deletes a cluster. (storelayoutclusters.delete)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param string $clusterId The ID of the cluster.
+   * @param array $optParams Optional parameters.
+   */
+  public function delete($enterpriseId, $pageId, $clusterId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId, 'clusterId' => $clusterId);
+    $params = array_merge($params, $optParams);
+    return $this->call('delete', array($params));
+  }
+
+  /**
+   * Retrieves details of a cluster. (storelayoutclusters.get)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param string $clusterId The ID of the cluster.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreCluster
+   */
+  public function get($enterpriseId, $pageId, $clusterId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId, 'clusterId' => $clusterId);
+    $params = array_merge($params, $optParams);
+    return $this->call('get', array($params), "Google_Service_AndroidEnterprise_StoreCluster");
+  }
+
+  /**
+   * Inserts a new cluster in a page. (storelayoutclusters.insert)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param Google_StoreCluster $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreCluster
+   */
+  public function insert($enterpriseId, $pageId, Google_Service_AndroidEnterprise_StoreCluster $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('insert', array($params), "Google_Service_AndroidEnterprise_StoreCluster");
+  }
+
+  /**
+   * Retrieves the details of all clusters on the specified page.
+   * (storelayoutclusters.listStorelayoutclusters)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreLayoutClustersListResponse
+   */
+  public function listStorelayoutclusters($enterpriseId, $pageId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId);
+    $params = array_merge($params, $optParams);
+    return $this->call('list', array($params), "Google_Service_AndroidEnterprise_StoreLayoutClustersListResponse");
+  }
+
+  /**
+   * Updates a cluster. This method supports patch semantics.
+   * (storelayoutclusters.patch)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param string $clusterId The ID of the cluster.
+   * @param Google_StoreCluster $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreCluster
+   */
+  public function patch($enterpriseId, $pageId, $clusterId, Google_Service_AndroidEnterprise_StoreCluster $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId, 'clusterId' => $clusterId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('patch', array($params), "Google_Service_AndroidEnterprise_StoreCluster");
+  }
+
+  /**
+   * Updates a cluster. (storelayoutclusters.update)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param string $clusterId The ID of the cluster.
+   * @param Google_StoreCluster $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreCluster
+   */
+  public function update($enterpriseId, $pageId, $clusterId, Google_Service_AndroidEnterprise_StoreCluster $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId, 'clusterId' => $clusterId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('update', array($params), "Google_Service_AndroidEnterprise_StoreCluster");
+  }
+}
+
+/**
+ * The "storelayoutpages" collection of methods.
+ * Typical usage is:
+ *  <code>
+ *   $androidenterpriseService = new Google_Service_AndroidEnterprise(...);
+ *   $storelayoutpages = $androidenterpriseService->storelayoutpages;
+ *  </code>
+ */
+class Google_Service_AndroidEnterprise_Storelayoutpages_Resource extends Google_Service_Resource
+{
+
+  /**
+   * Deletes a store page. (storelayoutpages.delete)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param array $optParams Optional parameters.
+   */
+  public function delete($enterpriseId, $pageId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId);
+    $params = array_merge($params, $optParams);
+    return $this->call('delete', array($params));
+  }
+
+  /**
+   * Retrieves details of a store page. (storelayoutpages.get)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StorePage
+   */
+  public function get($enterpriseId, $pageId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId);
+    $params = array_merge($params, $optParams);
+    return $this->call('get', array($params), "Google_Service_AndroidEnterprise_StorePage");
+  }
+
+  /**
+   * Inserts a new store page. (storelayoutpages.insert)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param Google_StorePage $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StorePage
+   */
+  public function insert($enterpriseId, Google_Service_AndroidEnterprise_StorePage $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('insert', array($params), "Google_Service_AndroidEnterprise_StorePage");
+  }
+
+  /**
+   * Retrieves the details of all pages in the store.
+   * (storelayoutpages.listStorelayoutpages)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StoreLayoutPagesListResponse
+   */
+  public function listStorelayoutpages($enterpriseId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId);
+    $params = array_merge($params, $optParams);
+    return $this->call('list', array($params), "Google_Service_AndroidEnterprise_StoreLayoutPagesListResponse");
+  }
+
+  /**
+   * Updates the content of a store page. This method supports patch semantics.
+   * (storelayoutpages.patch)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param Google_StorePage $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StorePage
+   */
+  public function patch($enterpriseId, $pageId, Google_Service_AndroidEnterprise_StorePage $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('patch', array($params), "Google_Service_AndroidEnterprise_StorePage");
+  }
+
+  /**
+   * Updates the content of a store page. (storelayoutpages.update)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $pageId The ID of the page.
+   * @param Google_StorePage $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_StorePage
+   */
+  public function update($enterpriseId, $pageId, Google_Service_AndroidEnterprise_StorePage $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'pageId' => $pageId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('update', array($params), "Google_Service_AndroidEnterprise_StorePage");
+  }
+}
+
+/**
  * The "users" collection of methods.
  * Typical usage is:
  *  <code>
@@ -1729,7 +2335,9 @@ class Google_Service_AndroidEnterprise_Users_Resource extends Google_Service_Res
   /**
    * Generates a token (activation code) to allow this user to configure their
    * work account in the Android Setup Wizard. Revokes any previously generated
-   * token. (users.generateToken)
+   * token.
+   *
+   * This call only works with Google managed accounts. (users.generateToken)
    *
    * @param string $enterpriseId The ID of the enterprise.
    * @param string $userId The ID of the user.
@@ -1759,7 +2367,23 @@ class Google_Service_AndroidEnterprise_Users_Resource extends Google_Service_Res
   }
 
   /**
-   * Looks up a user by email address. (users.listUsers)
+   * Retrieves the set of products a user is entitled to access.
+   * (users.getAvailableProductSet)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $userId The ID of the user.
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_ProductSet
+   */
+  public function getAvailableProductSet($enterpriseId, $userId, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'userId' => $userId);
+    $params = array_merge($params, $optParams);
+    return $this->call('getAvailableProductSet', array($params), "Google_Service_AndroidEnterprise_ProductSet");
+  }
+
+  /**
+   * Looks up a user by their primary email address. (users.listUsers)
    *
    * @param string $enterpriseId The ID of the enterprise.
    * @param string $email The exact primary email address of the user to look up.
@@ -1787,6 +2411,23 @@ class Google_Service_AndroidEnterprise_Users_Resource extends Google_Service_Res
     $params = array_merge($params, $optParams);
     return $this->call('revokeToken', array($params));
   }
+
+  /**
+   * Modifies the set of products a user is entitled to access.
+   * (users.setAvailableProductSet)
+   *
+   * @param string $enterpriseId The ID of the enterprise.
+   * @param string $userId The ID of the user.
+   * @param Google_ProductSet $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AndroidEnterprise_ProductSet
+   */
+  public function setAvailableProductSet($enterpriseId, $userId, Google_Service_AndroidEnterprise_ProductSet $postBody, $optParams = array())
+  {
+    $params = array('enterpriseId' => $enterpriseId, 'userId' => $userId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('setAvailableProductSet', array($params), "Google_Service_AndroidEnterprise_ProductSet");
+  }
 }
 
 
@@ -1797,10 +2438,19 @@ class Google_Service_AndroidEnterprise_AppRestrictionsSchema extends Google_Coll
   protected $collection_key = 'restrictions';
   protected $internal_gapi_mappings = array(
   );
+  public $kind;
   protected $restrictionsType = 'Google_Service_AndroidEnterprise_AppRestrictionsSchemaRestriction';
   protected $restrictionsDataType = 'array';
 
 
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
   public function setRestrictions($restrictions)
   {
     $this->restrictions = $restrictions;
@@ -1938,6 +2588,58 @@ class Google_Service_AndroidEnterprise_AppRestrictionsSchemaRestrictionRestricti
   }
 }
 
+class Google_Service_AndroidEnterprise_AppVersion extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $versionCode;
+  public $versionString;
+
+
+  public function setVersionCode($versionCode)
+  {
+    $this->versionCode = $versionCode;
+  }
+  public function getVersionCode()
+  {
+    return $this->versionCode;
+  }
+  public function setVersionString($versionString)
+  {
+    $this->versionString = $versionString;
+  }
+  public function getVersionString()
+  {
+    return $this->versionString;
+  }
+}
+
+class Google_Service_AndroidEnterprise_ApprovalUrlInfo extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $approvalUrl;
+  public $kind;
+
+
+  public function setApprovalUrl($approvalUrl)
+  {
+    $this->approvalUrl = $approvalUrl;
+  }
+  public function getApprovalUrl()
+  {
+    return $this->approvalUrl;
+  }
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+}
+
 class Google_Service_AndroidEnterprise_Collection extends Google_Collection
 {
   protected $collection_key = 'productId';
@@ -2054,6 +2756,7 @@ class Google_Service_AndroidEnterprise_Device extends Google_Model
   );
   public $androidId;
   public $kind;
+  public $managementType;
 
 
   public function setAndroidId($androidId)
@@ -2071,6 +2774,14 @@ class Google_Service_AndroidEnterprise_Device extends Google_Model
   public function getKind()
   {
     return $this->kind;
+  }
+  public function setManagementType($managementType)
+  {
+    $this->managementType = $managementType;
+  }
+  public function getManagementType()
+  {
+    return $this->managementType;
   }
 }
 
@@ -2223,6 +2934,32 @@ class Google_Service_AndroidEnterprise_EnterprisesListResponse extends Google_Co
   public function getKind()
   {
     return $this->kind;
+  }
+}
+
+class Google_Service_AndroidEnterprise_EnterprisesSendTestPushNotificationResponse extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $messageId;
+  public $topicName;
+
+
+  public function setMessageId($messageId)
+  {
+    $this->messageId = $messageId;
+  }
+  public function getMessageId()
+  {
+    return $this->messageId;
+  }
+  public function setTopicName($topicName)
+  {
+    $this->topicName = $topicName;
+  }
+  public function getTopicName()
+  {
+    return $this->topicName;
   }
 }
 
@@ -2479,6 +3216,32 @@ class Google_Service_AndroidEnterprise_InstallsListResponse extends Google_Colle
   }
 }
 
+class Google_Service_AndroidEnterprise_LocalizedText extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $locale;
+  public $text;
+
+
+  public function setLocale($locale)
+  {
+    $this->locale = $locale;
+  }
+  public function getLocale()
+  {
+    return $this->locale;
+  }
+  public function setText($text)
+  {
+    $this->text = $text;
+  }
+  public function getText()
+  {
+    return $this->text;
+  }
+}
+
 class Google_Service_AndroidEnterprise_Permission extends Google_Model
 {
   protected $internal_gapi_mappings = array(
@@ -2523,19 +3286,33 @@ class Google_Service_AndroidEnterprise_Permission extends Google_Model
   }
 }
 
-class Google_Service_AndroidEnterprise_Product extends Google_Model
+class Google_Service_AndroidEnterprise_Product extends Google_Collection
 {
+  protected $collection_key = 'appVersion';
   protected $internal_gapi_mappings = array(
   );
+  protected $appVersionType = 'Google_Service_AndroidEnterprise_AppVersion';
+  protected $appVersionDataType = 'array';
   public $authorName;
   public $detailsUrl;
+  public $distributionChannel;
   public $iconUrl;
   public $kind;
   public $productId;
+  public $productPricing;
+  public $requiresContainerApp;
   public $title;
   public $workDetailsUrl;
 
 
+  public function setAppVersion($appVersion)
+  {
+    $this->appVersion = $appVersion;
+  }
+  public function getAppVersion()
+  {
+    return $this->appVersion;
+  }
   public function setAuthorName($authorName)
   {
     $this->authorName = $authorName;
@@ -2551,6 +3328,14 @@ class Google_Service_AndroidEnterprise_Product extends Google_Model
   public function getDetailsUrl()
   {
     return $this->detailsUrl;
+  }
+  public function setDistributionChannel($distributionChannel)
+  {
+    $this->distributionChannel = $distributionChannel;
+  }
+  public function getDistributionChannel()
+  {
+    return $this->distributionChannel;
   }
   public function setIconUrl($iconUrl)
   {
@@ -2575,6 +3360,22 @@ class Google_Service_AndroidEnterprise_Product extends Google_Model
   public function getProductId()
   {
     return $this->productId;
+  }
+  public function setProductPricing($productPricing)
+  {
+    $this->productPricing = $productPricing;
+  }
+  public function getProductPricing()
+  {
+    return $this->productPricing;
+  }
+  public function setRequiresContainerApp($requiresContainerApp)
+  {
+    $this->requiresContainerApp = $requiresContainerApp;
+  }
+  public function getRequiresContainerApp()
+  {
+    return $this->requiresContainerApp;
   }
   public function setTitle($title)
   {
@@ -2654,6 +3455,251 @@ class Google_Service_AndroidEnterprise_ProductPermissions extends Google_Collect
   public function getProductId()
   {
     return $this->productId;
+  }
+}
+
+class Google_Service_AndroidEnterprise_ProductSet extends Google_Collection
+{
+  protected $collection_key = 'productId';
+  protected $internal_gapi_mappings = array(
+  );
+  public $kind;
+  public $productId;
+
+
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+  public function setProductId($productId)
+  {
+    $this->productId = $productId;
+  }
+  public function getProductId()
+  {
+    return $this->productId;
+  }
+}
+
+class Google_Service_AndroidEnterprise_ProductsApproveRequest extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  protected $approvalUrlInfoType = 'Google_Service_AndroidEnterprise_ApprovalUrlInfo';
+  protected $approvalUrlInfoDataType = '';
+
+
+  public function setApprovalUrlInfo(Google_Service_AndroidEnterprise_ApprovalUrlInfo $approvalUrlInfo)
+  {
+    $this->approvalUrlInfo = $approvalUrlInfo;
+  }
+  public function getApprovalUrlInfo()
+  {
+    return $this->approvalUrlInfo;
+  }
+}
+
+class Google_Service_AndroidEnterprise_ProductsGenerateApprovalUrlResponse extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $url;
+
+
+  public function setUrl($url)
+  {
+    $this->url = $url;
+  }
+  public function getUrl()
+  {
+    return $this->url;
+  }
+}
+
+class Google_Service_AndroidEnterprise_StoreCluster extends Google_Collection
+{
+  protected $collection_key = 'productId';
+  protected $internal_gapi_mappings = array(
+  );
+  public $id;
+  public $kind;
+  protected $nameType = 'Google_Service_AndroidEnterprise_LocalizedText';
+  protected $nameDataType = 'array';
+  public $orderInPage;
+  public $productId;
+
+
+  public function setId($id)
+  {
+    $this->id = $id;
+  }
+  public function getId()
+  {
+    return $this->id;
+  }
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+  public function setName($name)
+  {
+    $this->name = $name;
+  }
+  public function getName()
+  {
+    return $this->name;
+  }
+  public function setOrderInPage($orderInPage)
+  {
+    $this->orderInPage = $orderInPage;
+  }
+  public function getOrderInPage()
+  {
+    return $this->orderInPage;
+  }
+  public function setProductId($productId)
+  {
+    $this->productId = $productId;
+  }
+  public function getProductId()
+  {
+    return $this->productId;
+  }
+}
+
+class Google_Service_AndroidEnterprise_StoreLayout extends Google_Model
+{
+  protected $internal_gapi_mappings = array(
+  );
+  public $homepageId;
+  public $kind;
+
+
+  public function setHomepageId($homepageId)
+  {
+    $this->homepageId = $homepageId;
+  }
+  public function getHomepageId()
+  {
+    return $this->homepageId;
+  }
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+}
+
+class Google_Service_AndroidEnterprise_StoreLayoutClustersListResponse extends Google_Collection
+{
+  protected $collection_key = 'cluster';
+  protected $internal_gapi_mappings = array(
+  );
+  protected $clusterType = 'Google_Service_AndroidEnterprise_StoreCluster';
+  protected $clusterDataType = 'array';
+  public $kind;
+
+
+  public function setCluster($cluster)
+  {
+    $this->cluster = $cluster;
+  }
+  public function getCluster()
+  {
+    return $this->cluster;
+  }
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+}
+
+class Google_Service_AndroidEnterprise_StoreLayoutPagesListResponse extends Google_Collection
+{
+  protected $collection_key = 'page';
+  protected $internal_gapi_mappings = array(
+  );
+  public $kind;
+  protected $pageType = 'Google_Service_AndroidEnterprise_StorePage';
+  protected $pageDataType = 'array';
+
+
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+  public function setPage($page)
+  {
+    $this->page = $page;
+  }
+  public function getPage()
+  {
+    return $this->page;
+  }
+}
+
+class Google_Service_AndroidEnterprise_StorePage extends Google_Collection
+{
+  protected $collection_key = 'name';
+  protected $internal_gapi_mappings = array(
+  );
+  public $id;
+  public $kind;
+  public $link;
+  protected $nameType = 'Google_Service_AndroidEnterprise_LocalizedText';
+  protected $nameDataType = 'array';
+
+
+  public function setId($id)
+  {
+    $this->id = $id;
+  }
+  public function getId()
+  {
+    return $this->id;
+  }
+  public function setKind($kind)
+  {
+    $this->kind = $kind;
+  }
+  public function getKind()
+  {
+    return $this->kind;
+  }
+  public function setLink($link)
+  {
+    $this->link = $link;
+  }
+  public function getLink()
+  {
+    return $this->link;
+  }
+  public function setName($name)
+  {
+    $this->name = $name;
+  }
+  public function getName()
+  {
+    return $this->name;
   }
 }
 

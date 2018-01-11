@@ -1325,8 +1325,11 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'last_name' => $this->getLastName(),
 			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
-			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getKuserId())
+			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId())
 		);
+
+		elasticSearchUtils::cleanEmptyValues($body);
+
 		return $body;
 	}
 
@@ -1354,5 +1357,13 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if($this->getStatus() == KuserStatus::DELETED)
 			return true;
 		return false;
+	}
+
+	/**
+	 * return the name of the object we are indexing
+	 */
+	public function getElasticObjectName()
+	{
+		return 'kuser';
 	}
 }

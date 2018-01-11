@@ -281,7 +281,7 @@ class KCurlWrapper
 		if (KCurlHeaderResponse::isError($httpCode))
 		{
 			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
-			if ($destFilePath)
+			if ($destFilePath && file_exists($destFilePath))
 				unlink($destFilePath);
 			$res = false;
 		}
@@ -493,9 +493,10 @@ class KCurlWrapper
 	/**
 	 * @param string $sourceUrl
 	 * @param string $destFile
+	 * @param function $progressCallBack
 	 * @return boolean
 	 */
-	public function exec($sourceUrl, $destFile = null)
+	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
 	{
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
@@ -509,7 +510,11 @@ class KCurlWrapper
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, $returnTransfer);
 		if (!is_null($destFd))
 			curl_setopt($this->ch, CURLOPT_FILE, $destFd);
-
+		if($progressCallBack)
+		{
+			curl_setopt($this->ch, CURLOPT_NOPROGRESS, false);
+			curl_setopt($this->ch, CURLOPT_PROGRESSFUNCTION, $progressCallBack);
+		}
 		$ret = curl_exec($this->ch);
 
 		if (!is_null($destFd)) {
@@ -518,6 +523,35 @@ class KCurlWrapper
 
 		return $ret;
 	}
+
+
+	public function getSourceUrlProtocol($sourceUrl)
+	{
+		$protocol = null;
+		$sourceUrl = trim($sourceUrl);
+		try
+		{
+			$url_parts = parse_url( $sourceUrl );
+			if ( isset ( $url_parts["scheme"] ) )
+			{
+				if (in_array ($url_parts["scheme"], array ('http', 'https')))
+				{
+					$protocol = self::HTTP_PROTOCOL_HTTP;
+				}
+				elseif ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
+				{
+					$protocol = self::HTTP_PROTOCOL_FTP;
+				}
+			}
+		}
+		catch ( Exception $exception )
+		{
+			throw new Exception($exception->getMessage());
+		}
+		return $protocol;
+	}
+
+
 	
 	public function setSourceUrlAndprotocol($sourceUrl)
 	{

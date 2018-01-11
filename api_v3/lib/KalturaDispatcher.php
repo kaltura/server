@@ -78,6 +78,11 @@ class KalturaDispatcher
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 
+		if (!$this->rateLimit($service, $action, $params))
+		{
+			throw new KalturaAPIException(KalturaErrors::ACTION_BLOCKED, $action, $service);
+		}
+		
 		// validate it's ok to access this service
 		$deserializer = new KalturaRequestDeserializer($params);
 		$this->arguments = $deserializer->buildActionArguments($actionParams);
@@ -226,5 +231,150 @@ class KalturaDispatcher
 				(in_array(self::OWNER_ONLY_OPTION,$optionsArray)) && !$dbObject->isOwnerActionsAllowed(kCurrentContext::getCurrentKsKuserId()))
 					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 		}
+	}
+	
+	protected function getApiParamValue($params, $key)
+	{
+		if (isset($params[$key]))
+		{
+			return $params[$key];
+		}
+		
+		$explodedKey = explode(':', $key);
+		foreach ($explodedKey as $curKey)
+		{
+			if (!is_array($params) || !isset($params[$curKey]))
+			{
+				return null;
+			}
+			
+			$params = $params[$curKey];
+		}
+		
+		return $params;
+	}
+	
+	protected function getApiParamValueWildcard($params, $key)
+	{
+		$result = '';
+		foreach ($params as $curKey => $value)
+		{
+			if (is_array($value))
+			{
+				// recurse into the nested param
+				$result .= $this->getApiParamValueWildcard($value, $key);
+				continue;
+			}
+			
+			if ($curKey == $key || 
+				substr($curKey, -strlen($key) - 1) == ':' . $key)
+			{
+				$result .= $value;
+			}
+		}
+		return $result;
+	}
+	
+	protected function getRateLimitRule($params)
+	{
+		foreach (kConf::getMap('api_rate_limit') as $rateLimitRule)
+		{
+			$matches = true;
+			foreach ($rateLimitRule as $key => $value)
+			{
+				if ($key[0] == '_')
+				{
+					if ($key == '_partnerId')
+					{
+						$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 
+						if ($partnerId != $value)
+						{
+							$matches = false;
+							break;
+						}
+					}
+					
+					continue;
+				}
+					
+				if ($this->getApiParamValue($params, $key) != $value)
+				{
+					$matches = false;
+					break;
+				}
+			}
+		
+			if ($matches)
+			{
+				return $rateLimitRule;
+			}
+		}
+		
+		return null;
+	}
+	
+	protected function rateLimit($service, $action, $params)
+	{
+		if (!kConf::hasMap('api_rate_limit') ||
+			kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			return true;
+		}
+		
+		$rule = $this->getRateLimitRule($params);
+		if (!$rule)
+		{
+			return true;
+		}
+		
+		if (isset($rule['_key']))
+		{
+			$keyOptions = explode(',', $rule['_key']);
+			$key = null;
+			foreach ($keyOptions as $keyOption)
+			{
+				$value = $this->getApiParamValueWildcard($params, $keyOption);
+				if ($value)
+				{
+					$key = $value;
+					break;
+				}
+			}
+			
+			if (!$key)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$key = '';
+		}
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$cache)
+		{
+			return true;
+		}
+		
+		$partnerId = kCurrentContext::$ks_partner_id;
+		$keySeed = "$service-$action-$partnerId-$key";
+		$key = 'apiRateLimit-'.md5($keySeed);
+				
+		$cache->add($key, 0, 10);
+		$counter = $cache->increment($key);
+		if ($counter <= $rule['_limit'])
+		{
+			return true;
+		}
+		
+		KalturaLog::log("Rate limit exceeded - key=$key keySeed=$keySeed counter=$counter");
+		
+		if (isset($rule['_logOnly']) && $rule['_logOnly'])
+		{
+			return true;
+		}
+		
+		return false;
 	}
 }

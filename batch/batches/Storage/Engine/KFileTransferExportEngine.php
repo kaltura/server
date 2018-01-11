@@ -6,6 +6,8 @@ class KFileTransferExportEngine extends KExportEngine
 	protected $destFile;
 	
 	protected $protocol;
+
+	protected $encryptionKey;
 	
 	/* (non-PHPdoc)
 	 * @see KExportEngine::init()
@@ -16,6 +18,7 @@ class KFileTransferExportEngine extends KExportEngine
 		$this->protocol = $jobSubType;
 		$this->srcFile = str_replace('//', '/', trim($this->data->srcFileSyncLocalPath));
 		$this->destFile = str_replace('//', '/', trim($this->data->destFileSyncStoredPath));
+		$this->encryptionKey = $this->data->srcFileEncryptionKey;
 	}
 	
 	/* (non-PHPdoc)
@@ -49,8 +52,8 @@ class KFileTransferExportEngine extends KExportEngine
 			}
 			
 			if($keyPairLogin) {
-				$privateKeyFile = self::getTempFileWithContent($this->data->serverPrivateKey, 'privateKey');
-				$publicKeyFile = self::getTempFileWithContent($this->data->serverPublicKey, 'publicKey');
+				$privateKeyFile = $this->data->serverPrivateKey ? kFile::createTempFile($this->data->serverPrivateKey, 'privateKey', 0600) : null;
+				$publicKeyFile = $this->data->serverPublicKey ? kFile::createTempFile($this->data->serverPublicKey, 'publicKey', 0600) : null;
 				$engine->loginPubKey($this->data->serverUrl, $this->data->serverUsername, $publicKeyFile, $privateKeyFile, $this->data->serverPassPhrase);
 			} else {	
 				$engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
@@ -65,14 +68,7 @@ class KFileTransferExportEngine extends KExportEngine
 		{
 			if (is_file($this->srcFile))
 			{
-				$engine->putFile($this->destFile, $this->srcFile, $this->data->force);
-				if(KBatchBase::$taskConfig->params->chmod)
-				{
-					try {
-					$engine->chmod($this->destFile, KBatchBase::$taskConfig->params->chmod);
-					}
-					catch(Exception $e){}
-				}
+				$this->putFile($engine, $this->destFile, $this->srcFile, $this->data->force);
 			}
 			else if (is_dir($this->srcFile))
 			{
@@ -81,14 +77,7 @@ class KFileTransferExportEngine extends KExportEngine
 				foreach ($filesPaths as $filePath)
 				{
 					$destFile = $destDir . '/' . basename($filePath);
-					$engine->putFile($destFile, $filePath, $this->data->force);
-					if(KBatchBase::$taskConfig->params->chmod)
-					{
-						try {
-						$engine->chmod($destFile, KBatchBase::$taskConfig->params->chmod);
-						}
-						catch(Exception $e){}
-					}
+					$this->putFile($engine, $destFile, $filePath, $this->data->force);
 				}
 			}
 		}
@@ -101,23 +90,6 @@ class KFileTransferExportEngine extends KExportEngine
 		}
 		
 		return true;
-	}
-	
-	/**
-	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
-	 * @param string $fileContent
-	 * @param string $prefix
-	 * @return string path to temporary file location
-	 */
-	private static function getTempFileWithContent($fileContent, $prefix = '')
-	{
-		if(!$fileContent)
-			return null;
-		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, $prefix);
-		file_put_contents($fileLocation, $fileContent);
-		chmod($fileLocation, 0600);
-		return $fileLocation;
 	}
 
 	/* (non-PHPdoc)
@@ -148,4 +120,23 @@ class KFileTransferExportEngine extends KExportEngine
         
         return true;
     }
+
+	private function putFile(kFileTransferMgr $engine, $destFilePath, $srcFilePath, $force)
+	{
+		if (!$this->encryptionKey)
+			$engine->putFile($destFilePath, $srcFilePath, $force);
+		else
+		{
+			$tempPath = KBatchBase::createTempClearFile($srcFilePath, $this->encryptionKey);
+			$engine->putFile($destFilePath, $tempPath, $force);
+			unlink($tempPath);
+		}
+		if(KBatchBase::$taskConfig->params->chmod)
+		{
+			try {
+				$engine->chmod($destFilePath, KBatchBase::$taskConfig->params->chmod);
+			}
+			catch(Exception $e){}
+		}
+	}
 }

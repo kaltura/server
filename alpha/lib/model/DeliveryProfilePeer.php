@@ -69,6 +69,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIMELIGHT_RTMP => 'DeliveryProfileLimeLightRtmp',
 			
 			DeliveryProfileType::VOD_PACKAGER_HLS => 'DeliveryProfileVodPackagerHls',
+			DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST => 'DeliveryProfileVodPackagerHlsManifest',
 			DeliveryProfileType::VOD_PACKAGER_DASH => 'DeliveryProfileVodPackagerDash',
 			DeliveryProfileType::VOD_PACKAGER_HDS => 'DeliveryProfileVodPackagerHds',
 			DeliveryProfileType::VOD_PACKAGER_MSS => 'DeliveryProfileVodPackagerMss',
@@ -215,11 +216,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		if($deliveryAttributes->getDeliveryProfileId())
-			$deliveryIds = array($deliveryAttributes->getDeliveryProfileId());
+		if($deliveryAttributes->getRequestedDeliveryProfileIds())
+			$deliveryIds = $deliveryAttributes->getRequestedDeliveryProfileIds();
 		else
-			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 
+			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))
 		{
@@ -332,7 +333,22 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = DeliveryProfilePeer::doSelect($c);
 
 		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
+
+		if($isLive)
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partner->getLiveDeliveryProfileIds();
+		}
+		else
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds();
+		}
+
+		if(isset( $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()]))
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
+		}
+
+		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
 		uasort($deliveries, array($cmp, "compare"));
 
 		return $deliveries;
@@ -403,21 +419,22 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			return null;
 		}
 
-		$deliveryProfileId = $deliveryAttributes->getDeliveryProfileId();
-		if($deliveryProfileId)
+		$deliveryIds = $deliveryIds[$streamerType];
+		$requestedDeliveryProfileIds = $deliveryAttributes->getRequestedDeliveryProfileIds();
+		if($requestedDeliveryProfileIds)
 		{
-			if(in_array($deliveryProfileId, $deliveryIds[$streamerType]))
-				$deliveryIds = array($streamerType => array($deliveryProfileId));
+			$intersectDeliveryProfileIds = array_intersect($deliveryIds, $requestedDeliveryProfileIds);
+			if(count($intersectDeliveryProfileIds))
+				$deliveryIds = $intersectDeliveryProfileIds;
 			else
 			{
-				KalturaLog::err('Requested delivery profile id ['. $deliveryProfileId."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
+				KalturaLog::err('Requested delivery profile ids ['. implode("|", $intersectDeliveryProfileIds)."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
 				return null;
 			}
 		}
 
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-		
-		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
+		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::info("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());

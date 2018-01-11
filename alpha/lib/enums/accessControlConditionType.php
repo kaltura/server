@@ -20,4 +20,5 @@ interface ConditionType extends BaseEnum
 	const DELIVERY_PROFILE = 13;
 	const ACTIVE_EDGE_VALIDATE = 14;
 	const ANONYMOUS_IP = 15;
+	const ASSET_TYPE = 16;
 }

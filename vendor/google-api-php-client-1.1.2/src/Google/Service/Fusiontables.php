@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -53,6 +51,7 @@ class Google_Service_Fusiontables extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'fusiontables/v2/';
     $this->version = 'v2';
     $this->serviceName = 'fusiontables';
@@ -112,13 +111,13 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -170,11 +169,11 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'typed' => array(
+                'hdrs' => array(
                   'location' => 'query',
                   'type' => 'boolean',
                 ),
-                'hdrs' => array(
+                'typed' => array(
                   'location' => 'query',
                   'type' => 'boolean',
                 ),
@@ -188,11 +187,11 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'typed' => array(
+                'hdrs' => array(
                   'location' => 'query',
                   'type' => 'boolean',
                 ),
-                'hdrs' => array(
+                'typed' => array(
                   'location' => 'query',
                   'type' => 'boolean',
                 ),
@@ -256,13 +255,13 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -348,7 +347,15 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'startLine' => array(
+                'delimiter' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'encoding' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'endLine' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
@@ -356,15 +363,7 @@ class Google_Service_Fusiontables extends Google_Service
                   'location' => 'query',
                   'type' => 'boolean',
                 ),
-                'encoding' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'delimiter' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'endLine' => array(
+                'startLine' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
@@ -395,13 +394,13 @@ class Google_Service_Fusiontables extends Google_Service
               'path' => 'tables',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -427,7 +426,15 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'startLine' => array(
+                'delimiter' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'encoding' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'endLine' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
@@ -435,15 +442,7 @@ class Google_Service_Fusiontables extends Google_Service
                   'location' => 'query',
                   'type' => 'boolean',
                 ),
-                'encoding' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'delimiter' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'endLine' => array(
+                'startLine' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
@@ -511,15 +510,15 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'maxResults' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
                 'startIndex' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
-                'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
@@ -583,13 +582,13 @@ class Google_Service_Fusiontables extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -692,10 +691,10 @@ class Google_Service_Fusiontables_Column_Resource extends Google_Service_Resourc
    * @param string $tableId Table whose columns are being listed.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken Continuation token specifying which result page
-   * to return.
    * @opt_param string maxResults Maximum number of columns to return. Default is
    * 5.
+   * @opt_param string pageToken Continuation token specifying which result page
+   * to return.
    * @return Google_Service_Fusiontables_ColumnList
    */
   public function listColumn($tableId, $optParams = array())
@@ -760,10 +759,10 @@ class Google_Service_Fusiontables_Query_Resource extends Google_Service_Resource
    * SELECT - INSERT - UPDATE - DELETE - SHOW - DESCRIBE - CREATE
    * @param array $optParams Optional parameters.
    *
+   * @opt_param bool hdrs Whether column names are included in the first row.
+   * Default is true.
    * @opt_param bool typed Whether typed values are returned in the (JSON)
    * response: numbers for numeric values and parsed geometries for KML values.
-   * Default is true.
-   * @opt_param bool hdrs Whether column names are included in the first row.
    * Default is true.
    * @return Google_Service_Fusiontables_Sqlresponse
    */
@@ -782,10 +781,10 @@ class Google_Service_Fusiontables_Query_Resource extends Google_Service_Resource
    * DESCRIBE
    * @param array $optParams Optional parameters.
    *
+   * @opt_param bool hdrs Whether column names are included (in the first row).
+   * Default is true.
    * @opt_param bool typed Whether typed values are returned in the (JSON)
    * response: numbers for numeric values and parsed geometries for KML values.
-   * Default is true.
-   * @opt_param bool hdrs Whether column names are included (in the first row).
    * Default is true.
    * @return Google_Service_Fusiontables_Sqlresponse
    */
@@ -858,10 +857,10 @@ class Google_Service_Fusiontables_Style_Resource extends Google_Service_Resource
    * @param string $tableId Table whose styles are being listed
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken Continuation token specifying which result page
-   * to return. Optional.
    * @opt_param string maxResults Maximum number of styles to return. Optional.
    * Default is 5.
+   * @opt_param string pageToken Continuation token specifying which result page
+   * to return. Optional.
    * @return Google_Service_Fusiontables_StyleSettingList
    */
   public function listStyle($tableId, $optParams = array())
@@ -966,19 +965,19 @@ class Google_Service_Fusiontables_Table_Resource extends Google_Service_Resource
    * @param string $tableId The table into which new rows are being imported.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int startLine The index of the first line from which to start
-   * importing, inclusive. Default is 0.
-   * @opt_param bool isStrict Whether the imported CSV must have the same number
-   * of values for each row. If false, rows with fewer values will be padded with
-   * empty values. Default is true.
-   * @opt_param string encoding The encoding of the content. Default is UTF-8. Use
-   * auto-detect if you are unsure of the encoding.
    * @opt_param string delimiter The delimiter used to separate cell values. This
    * can only consist of a single character. Default is ,.
+   * @opt_param string encoding The encoding of the content. Default is UTF-8. Use
+   * auto-detect if you are unsure of the encoding.
    * @opt_param int endLine The index of the line up to which data will be
    * imported. Default is to import the entire file. If endLine is negative, it is
    * an offset from the end of the file; the imported content will exclude the
    * last endLine lines.
+   * @opt_param bool isStrict Whether the imported CSV must have the same number
+   * of values for each row. If false, rows with fewer values will be padded with
+   * empty values. Default is true.
+   * @opt_param int startLine The index of the first line from which to start
+   * importing, inclusive. Default is 0.
    * @return Google_Service_Fusiontables_Import
    */
   public function importRows($tableId, $optParams = array())
@@ -1026,10 +1025,10 @@ class Google_Service_Fusiontables_Table_Resource extends Google_Service_Resource
    *
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken Continuation token specifying which result page
-   * to return.
    * @opt_param string maxResults Maximum number of tables to return. Default is
    * 5.
+   * @opt_param string pageToken Continuation token specifying which result page
+   * to return.
    * @return Google_Service_Fusiontables_TableList
    */
   public function listTable($optParams = array())
@@ -1067,20 +1066,20 @@ class Google_Service_Fusiontables_Table_Resource extends Google_Service_Resource
    * @param string $tableId Table whose rows will be replaced.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int startLine The index of the first line from which to start
-   * importing, inclusive. Default is 0.
-   * @opt_param bool isStrict Whether the imported CSV must have the same number
-   * of column values for each row. If true, throws an exception if the CSV does
-   * not have the same number of columns. If false, rows with fewer column values
-   * will be padded with empty values. Default is true.
-   * @opt_param string encoding The encoding of the content. Default is UTF-8. Use
-   * 'auto-detect' if you are unsure of the encoding.
    * @opt_param string delimiter The delimiter used to separate cell values. This
    * can only consist of a single character. Default is ,.
+   * @opt_param string encoding The encoding of the content. Default is UTF-8. Use
+   * 'auto-detect' if you are unsure of the encoding.
    * @opt_param int endLine The index of the line up to which data will be
    * imported. Default is to import the entire file. If endLine is negative, it is
    * an offset from the end of the file; the imported content will exclude the
    * last endLine lines.
+   * @opt_param bool isStrict Whether the imported CSV must have the same number
+   * of column values for each row. If true, throws an exception if the CSV does
+   * not have the same number of columns. If false, rows with fewer column values
+   * will be padded with empty values. Default is true.
+   * @opt_param int startLine The index of the first line from which to start
+   * importing, inclusive. Default is 0.
    * @return Google_Service_Fusiontables_Task
    */
   public function replaceRows($tableId, $optParams = array())
@@ -1158,11 +1157,11 @@ class Google_Service_Fusiontables_Task_Resource extends Google_Service_Resource
    * @param string $tableId Table whose tasks are being listed.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string maxResults Maximum number of tasks to return. Default is 5.
    * @opt_param string pageToken Continuation token specifying which result page
    * to return.
    * @opt_param string startIndex Index of the first result returned in the
    * current page.
-   * @opt_param string maxResults Maximum number of tasks to return. Default is 5.
    * @return Google_Service_Fusiontables_TaskList
    */
   public function listTask($tableId, $optParams = array())
@@ -1235,10 +1234,10 @@ class Google_Service_Fusiontables_Template_Resource extends Google_Service_Resou
    * requested
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string pageToken Continuation token specifying which results page
-   * to return. Optional.
    * @opt_param string maxResults Maximum number of templates to return. Optional.
    * Default is 5.
+   * @opt_param string pageToken Continuation token specifying which results page
+   * to return. Optional.
    * @return Google_Service_Fusiontables_TemplateList
    */
   public function listTemplate($tableId, $optParams = array())

@@ -18,13 +18,19 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
     public static $parentEntitlement = false;
     public static $entryInSomeCategoryNoPC = false; //active + pending
     
+    protected static $entitlementContributors = array(
+        'kElasticEntryDisableEntitlementDecorator',
+        'kElasticPublicEntriesEntitlementDecorator',
+        'kElasticUserCategoryEntryEntitlementDecorator',
+        'kElasticUserEntitlementDecorator',
+    );
+
     protected static function initialize()
     {
         parent::initialize();
-        $partner = PartnerPeer::retrieveByPK(self::$partnerId);
 
-        //disable the entitlement checks for partner
-        if(!$partner->getDefaultEntitlementEnforcement())
+        //check if we need to enforce entitlement
+        if(!self::shouldEnforceEntitlement())
             return;
 
         self::initializeParentEntitlement();
@@ -39,6 +45,11 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         self::initializeUserCategoryEntryEntitlement(self::$ks);
         
         self::$isInitialized = true;
+    }
+
+    private static function shouldEnforceEntitlement()
+    {
+        return kEntitlementUtils::getEntitlementEnforcement();
     }
 
     private static function initializeParentEntitlement()

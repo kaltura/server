@@ -5,7 +5,7 @@
  */
 class KalturaCuePointErrors extends KalturaErrors implements kCuePointErrors
 {
-	const INVALID_CUE_POINT_ID = "INVALID_ID;ID;Invalid cue point id [@ID@]";
+	const INVALID_CUE_POINT_ID = "INVALID_CUE_POINT_ID;ID;Invalid cue point id [@ID@]";
 	
 	const CUE_POINT_NOT_FOUND = "CUE_POINT_NOT_FOUND;ID;Cue point with id provided not found [@ID@]";
 	

@@ -11,7 +11,6 @@ class kMetadataManager
 	
 	const SEARCH_TEXT_SUFFIX = 'mdend';
 	const ELASTIC_DATA_FIELD_NAME = 'metadata';
-	const NO_SYSTEM_NAME = 'NOSYSTEMNAME';
 	
 	protected static $objectTypeNames = array(
 		MetadataObjectType::ENTRY => 'entry',
@@ -164,9 +163,8 @@ class kMetadataManager
 	public static function parseProfileSearchFields($partnerId, MetadataProfile $metadataProfile)
 	{
 		$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
-		
-		$xPaths = kXsd::findXpathsByAppInfo($xsdPath, self::APP_INFO_SEARCH, 'true');
+		$xmlString = kFileSyncUtils::file_get_contents($key);
+		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'true', false);
 		
 		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
 		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfile->getId());
@@ -228,7 +226,7 @@ class kMetadataManager
 		}
 	
 		// set none searchable existing fields
-		$xPaths = kXsd::findXpathsByAppInfo($xsdPath, self::APP_INFO_SEARCH, 'false');
+		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'false', false);
 		foreach($profileFields as $profileField)
 		{
 			$xPath = $profileField->getXpath();
@@ -336,16 +334,16 @@ class kMetadataManager
 		}
 		
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
+		$xmlString = kFileSyncUtils::file_get_contents($key);
 		
 		try{
 			$xml = new KDOMDocument();
-			$xml->load($xmlPath);
+			$xml->loadXML($xmlString);
 			$xPath = new DOMXPath($xml);
 		}
 		catch (Exception $ex)
 		{
-			KalturaLog::err('Could not load metadata xml [' . $xmlPath . '] - ' . $ex->getMessage());
+			KalturaLog::err('Could not load metadata xml [' . kFileSyncUtils::getLocalFilePathForKey($key) . '] - ' . $ex->getMessage());
 			return '';
 		}
 					
@@ -692,9 +690,7 @@ class kMetadataManager
 			$job->save();
 			$key = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG);
 			kFileSyncUtils::file_put_contents($key, $xsl);
-			
-			$xslPath = kFileSyncUtils::getLocalFilePathForKey($key);
-			$data->setSrcXslPath($xslPath);
+			$data->setSrcXsl(kJobsManager::getFileContainer($key));
 		}
 		
 		$data->setMetadataProfileId($metadataProfileId);
@@ -743,10 +739,10 @@ class kMetadataManager
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::info("Found " . count($metadatas) . " metadata object");
 
-		return self::getElasticMetadataValuesByMetadataObjects($metadatas);
+		return self::getElasticMetadataValuesByMetadataObjects($metadatas, $objectType);
 	}
 
-	public static function getElasticMetadataValuesByMetadataObjects(array $metadatas)
+	public static function getElasticMetadataValuesByMetadataObjects(array $metadatas, $objectType)
 	{
 		$metaDataSearchValues = array();
 		$searchValues = null;
@@ -757,7 +753,13 @@ class kMetadataManager
 		if(count($metaDataSearchValues))
 			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = $metaDataSearchValues;
 		else
-			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
+		{
+			if($objectType == MetadataObjectType::CATEGORY)
+				$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
+			else
+				$searchValues = null;
+		}
+
 		return $searchValues; //return an array(metadata => array(...)) or null if no values
 	}
 
@@ -796,9 +798,10 @@ class kMetadataManager
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($profileId);
 			if($metadataProfile)
 				$systemName = $metadataProfile->getSystemName();
-			else
-				$systemName = self::NO_SYSTEM_NAME;
-			$profileFieldData['system_name'] = $systemName;
+
+			if($systemName)
+				$profileFieldData['system_name'] = $systemName;
+
 			$xpath = $profileField->getXpath();
 			$profileFieldData['xpath'] = $xpath;
 			$profileFieldData['metadata_field_id'] = $profileField->getId();
@@ -830,8 +833,10 @@ class kMetadataManager
 				{
 					if(iconv_strlen($searchItemValue, 'UTF-8') >= 128)
 						continue;
-					
-					$searchItemValue= substr($searchItemValue, 0 , kElasticSearchManager::MAX_LENGTH);
+
+					if(strlen($searchItemValue) > kElasticSearchManager::MAX_LENGTH)
+						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::MAX_LENGTH);
+
 					$profileFieldData['value_text'][] = $searchItemValue;
 				}
 				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
@@ -857,7 +862,8 @@ class kMetadataManager
 			{
 				foreach ($searchItemValues as &$searchItemValue)
 				{
-					$searchItemValue = substr($searchItemValue, 0 , kElasticSearchManager::MAX_LENGTH);
+					if(strlen($searchItemValue) > kElasticSearchManager::MAX_LENGTH)
+						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::MAX_LENGTH);
 				}
 				$profileFieldData['value_text'] = $searchItemValues;
 			}

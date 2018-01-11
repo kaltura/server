@@ -1,5 +1,4 @@
 <?php
-
 require_once 'oauth2Action.class.php';
 
 /**
@@ -18,8 +17,9 @@ class googleoauth2Action extends oauth2Action
 	public function execute()
 	{
 		// add google client library to include path
-		set_include_path(get_include_path().PATH_SEPARATOR.KALTURA_ROOT_PATH.'/vendor/google-api-php-client/src/');
-		require_once 'Google_Client.php';
+		set_include_path(get_include_path().PATH_SEPARATOR.KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google');
+		require_once 'autoload.php';
+		require_once 'Client.php';
 
 		$ks    = $this->getRequestParameter('ks');
 		$state = $this->getRequestParameter('state');
@@ -146,18 +146,17 @@ class googleoauth2Action extends oauth2Action
 			$this->ksError = true;
 			return;
 		}
+
 		$appId = isset($stateObject->ytid) ? $stateObject->ytid : null;
 		$subId = isset($stateObject->subid) ? $stateObject->subid : null;
-
 		$partner = $this->getPartner($limitedKs->partner_id);
-
 		$client = $this->getGoogleClient($appId);
 		$redirect = $this->getController()->genUrl('extservices/googleoauth2', true);
 		$client->setRedirectUri($redirect);
-
 		try
 		{
-			$client->authenticate();
+			$code = $this->getRequestParameter('code');
+			$client->authenticate($code);
 		}
 		catch(Google_AuthException $ex)
 		{
@@ -167,9 +166,15 @@ class googleoauth2Action extends oauth2Action
 		}
 
 		$tokenJsonStr = $client->getAccessToken();
+		
+		$origTimeZone = date_default_timezone_get();
+		date_default_timezone_set(kConf::get( "date_default_timezone"));
+		
 		$partner->setGoogleOAuth2($appId, $tokenJsonStr, $subId);
 		$partner->save();
 
+		date_default_timezone_set($origTimeZone);
+		
 		$params = array(
 			'ytid' => $appId,
 			'status' => 1,
@@ -211,8 +216,8 @@ class googleoauth2Action extends oauth2Action
 		try
 		{
 			$client->setAccessToken(json_encode($tokenData));
-			$http = new Google_HttpRequest('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token='.$tokenData['access_token']);
-			$request = Google_Client::$io->makeRequest($http);
+			$http = new Google_Http_Request('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token='.$tokenData['access_token']);
+			$request = $client->getIo()->makeRequest($http);
 			$code = $request->getResponseHttpCode();
 			$body = $request->getResponseBody();
 			if ($code != 200)

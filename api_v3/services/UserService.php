@@ -38,17 +38,16 @@ class UserService extends KalturaBaseUserService
 		{
 			$user->isAdmin = true;
 		}
-		$user->partnerId = $this->getPartnerId();
-
 
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
 	}
 	
-	function addUserImpl($user)
+	function addUserImpl(KalturaUser $user)
 	{
-		$dbUser = null;
-		$dbUser = $user->toObject($dbUser);
+		/* @var $dbUser kuser */
+		$dbUser = $user->toInsertableObject();
+		$dbUser->setPartnerId($this->getPartnerId());
 		try {
 			$checkPasswordStructure = isset($user->password) ? true : false;
 			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure);
@@ -595,6 +594,40 @@ class UserService extends KalturaBaseUserService
 			
 		return $kuser->getPuserId();
 	}
-
+	
+	/**
+	 * Loges a user to the destination account as long the ks user id exists in the desc acount and the loginData id match for both accounts
+	 *
+	 * @action loginByKs
+	 * @param int $requestedPartnerId
+	 * @throws APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED
+	 *
+	 * @return KalturaSessionResponse The generated session information
+	 * 
+	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::PARTNER_CHANGE_ACCOUNT_DISABLED
+	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
+	 * @throws KalturaErrors::LOGIN_BLOCKED
+	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
+	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
+	 * @throws KalturaErrors::SERVICE_ACCESS_CONTROL_RESTRICTED
+	 * 
+	 */
+	public function loginByKsAction($requestedPartnerId)
+	{
+		$this->partnerGroup .= ",$requestedPartnerId";
+		$this->applyPartnerFilterForClass('kuser');
+		
+		$ks = parent::loginByKsImpl($this->getKs()->getOriginalString(), $requestedPartnerId);
+		
+		$res = new KalturaSessionResponse();
+		$res->ks = $ks;
+		$res->userId = $this->getKuser()->getPuserId();
+		$res->partnerId = $requestedPartnerId;
+		
+		return $res;
+	}
 
 }

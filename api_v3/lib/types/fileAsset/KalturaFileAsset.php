@@ -6,7 +6,7 @@
 class KalturaFileAsset extends KalturaObject implements IRelatedFilterable 
 {
 	/**
-	 * @var int
+	 * @var bigint
 	 * @filter eq,in
 	 * @readonly
 	 */

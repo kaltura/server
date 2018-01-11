@@ -988,6 +988,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if (!$this->sphinxSkipped)
 			return $this->recordsCount;
 		
+		if(!$this->doCount)
+		{
+			KalturaLog::log("doCountOnPeer for sphinx criteria is disabled, objectClass [$objectClass], service:action [".kCurrentContext::$service.":".kCurrentContext::$action."]");
+			//return 0;
+		}
+
+
 		$c = clone $this;
 		$c->setLimit(null);
 		$c->setOffset(null);
@@ -1001,6 +1008,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	public function getTranslateIndexId($id)
 	{
+		if ($id != strtolower($id))
+			KalturaLog::debug("upper case id [$id] ");
 		return sprintf('%u', crc32($id));
 	}
 

@@ -10,6 +10,11 @@ class accessControlScope extends kScope
 	 * @var array
 	 */
 	protected $hashes;
+
+	/**
+	 * @var asset
+	 */
+	protected $asset;
 	
 	public function __construct()
 	{
@@ -29,5 +34,19 @@ class accessControlScope extends kScope
 	 */
 	public function setHashes($hashes) {
 		$this->hashes = $hashes;
+	}
+
+	/**
+	 * @return asset $asset
+	 */
+	public function getAsset() {
+		return $this->asset;
+	}
+
+	/**
+	 * @param asset $asset
+	 */
+	public function setAsset($asset) {
+		$this->asset = $asset;
 	}
 }

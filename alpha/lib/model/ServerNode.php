@@ -19,6 +19,20 @@ class ServerNode extends BaseServerNode {
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("serverNode:id".strtolower($this->getId()));
+		return array("serverNode:id".strtolower($this->getId()), "serverNode:hostName=".strtolower($this->getHostName()));
 	}
+	
+	public function getParentIdsArray()
+	{
+		$parentIds = array();
+	
+		$ids = $this->getParentId();
+		if($ids)
+		{
+			$parentIds = explode(",", $ids);
+		}
+	
+		return $parentIds;
+	}
+	
 } // ServerNode

@@ -281,6 +281,7 @@ class kBusinessPreConvertDL
 	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription, $rotate=null)
 	{
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 
 		if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
@@ -295,7 +296,6 @@ class kBusinessPreConvertDL
 		if(!file_exists($tempDir))
 			mkdir($tempDir, 0700, true);
 		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
-		$logPath = $destPath . '.log';
 
 		if(!file_exists($srcPath))
 		{
@@ -314,14 +314,15 @@ class kBusinessPreConvertDL
 			if($srcAsset->getType() == assetType::FLAVOR)
 			{
 				/* @var $srcAsset flavorAsset */
-				$dar = null;
+				$params = array();
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
-				if($mediaInfo)
-					$dar = $mediaInfo->getVideoDar();
-
+				if($mediaInfo){
+					$params['dar'] = $mediaInfo->getVideoDar();
+					$params['scanType'] = $mediaInfo->getScanType();
+				}
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
-				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), null, null, $dar);
+				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), $params);
 				if(!$created || !file_exists($destPath))
 				{
 					$errDescription = "Thumbnail not captured";
@@ -358,8 +359,11 @@ class kBusinessPreConvertDL
 			$density = $destThumbParamsOutput->getDensity();
 			$stripProfiles = $destThumbParamsOutput->getStripProfiles();
 
+			if ($srcAsset->getType() == assetType::THUMBNAIL && $fileSync->isEncrypted())
+				$srcPath = $fileSync->createTempClear();
 			$cropper = new KImageMagickCropper($srcPath, $destPath, kConf::get('bin_path_imagemagick'), true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $rotate, $stripProfiles);
+			$fileSync->deleteTempClear();
 			if(!$cropped || !file_exists($destPath))
 			{
 				$errDescription = "Crop failed";
@@ -1107,10 +1111,9 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
-
+		
 		$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS;
-		return kJobsManager::addPostConvertJob($convertProfileJob, $postConvertAssetType, $srcFileSyncLocalPath, $originalFlavorAsset->getId(), null, true, $offset);
+		return kJobsManager::addPostConvertJob($convertProfileJob, $postConvertAssetType, $srcSyncKey, $originalFlavorAsset->getId(), null, true, $offset);
 	}
 
 	/**
@@ -1878,14 +1881,43 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 */
 	protected static function setEncryptionAtRest($flavor, $flavorAsset)
 	{
-		KalturaLog::log("for asset".$flavorAsset->getId());
-		$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
+		KalturaLog::log("for asset:".$flavorAsset->getId());
+		
+		/*
+		 * Handle replacement flow - use original entry/asset enc-key, if it is already has one.
+		 * Otherwise (non-replacement) - acquire uDRM encryptionParams
+		 */
+		if(($entry=entryPeer::retrieveByPK($flavorAsset->getEntryId()))!==null
+		&& ($replacedEntryId=$entry->getReplacedEntryId())!==null) {
+
+			KalturaLog::log("Found replacedEntryId:".$replacedEntryId);
+			$replacedEntry = entryPeer::retrieveByPK($replacedEntryId);
+			if(isset($replacedEntry)){
+				$replacedAssets = assetPeer::retrieveFlavorsByEntryId($replacedEntryId);
+				foreach($replacedAssets as $replacedAsset){
+					if(($encKey=$replacedAsset->getEncryptionKey())!==null){
+						$encryptionParamsKey = $encKey;
+						KalturaLog::log("Found encKey in the replaced asset:".$replacedAsset->getId());
+						break;
+					}
+				}
+			}
+		}
+		
+		/*
+		 * For non-replacement flow - acquire uDRM encryptionParams
+		 */
+		if($encryptionParamsKey===null) {
+			$encryptionParams = self::acquireEncryptionParams($flavorAsset->getEntryId(), $flavorAsset->getId(), $flavorAsset->getPartnerId());
+			$encryptionParamsKey = $encryptionParams->key;
+		}
+		$encryptionParamsKeyId = "0000000000000000000000==";//$encryptionParams->key_id;
 		if(($commandLines=$flavor->getCommandLines())!=null) {
 				// Update the transcoding engines cmd-lines with encryption key/key_id values
 			KalturaLog::log("CommandLines Pre:".serialize($commandLines));
 			$commandLines = str_replace (
 				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				array(bin2hex(base64_decode($encryptionParamsKey)), bin2hex(base64_decode($encryptionParamsKeyId))),
 				$commandLines);
 				// Save updated cmd-lines
 			$flavor->setCommandLines($commandLines);
@@ -1896,14 +1928,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::log("Operators Pre:".($operatorsJsonStr));
 			$operatorsJsonStr = str_replace (
 				array(KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER, KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER),
-				array(bin2hex(base64_decode($encryptionParams->key)), bin2hex(base64_decode($encryptionParams->key_id))),
+				array(bin2hex(base64_decode($encryptionParamsKey)), bin2hex(base64_decode($encryptionParamsKeyId))),
 				$operatorsJsonStr);
 				// Save updated cmd-lines
 			$flavor->setOperators($operatorsJsonStr);
 			$flavor->save();
 		}
 			// Save encryption key on the flavorAsset obj
-		$flavorAsset->setEncryptionKey($encryptionParams->key);
+		$flavorAsset->setEncryptionKey($encryptionParamsKey);
+
 		$flavorAsset->save();
 	}
 

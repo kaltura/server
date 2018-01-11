@@ -132,6 +132,9 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		if($this->getSubType())
 			$data['cue_point_sub_type'] = $this->getSubType();
 
+		if($this->getAssetId())
+			$data['cue_point_asset_id'] = $this->getAssetId();
+
 		return $data;
 	}
 }
