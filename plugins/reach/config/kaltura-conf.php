@@ -32,5 +32,8 @@ return array (
     'VendorProfileTableMap' => 'lib/model/map/VendorProfileTableMap.php',
     'VendorProfilePeer' => 'lib/model/VendorProfilePeer.php',
     'VendorProfile' => 'lib/model/VendorProfile.php',
+    'EntryVendorTaskTableMap' => 'lib/model/map/EntryVendorTaskTableMap.php',
+    'EntryVendorTaskPeer' => 'lib/model/EntryVendorTaskPeer.php',
+    'EntryVendorTask' => 'lib/model/EntryVendorTask.php',
   ),
 );

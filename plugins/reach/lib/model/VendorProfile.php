@@ -30,6 +30,7 @@ class VendorProfile extends BaseVendorProfile
 	const CUSTOM_DATA_ENABLE_SPEAKER_AUDIO_TAGS = 			'enable_audio_tags';
 	const CUSTOM_DATA_ENABLE_POFANITY_REMOVAL = 			'enable_profanity_removal';
 	const CUSTOM_DATA_MAX_CHARS_PER_LINE = 					'max_chars_per_line';
+	const CUSTOM_DATA_VENDOR_CREDIT = 						'vendor_credit';
 	
 	//setters
 	
@@ -113,6 +114,10 @@ class VendorProfile extends BaseVendorProfile
 		$this->setRules($serializedRulesArray);
 	}
 	
+	public function setCredit($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_VENDOR_CREDIT, serialize($v));
+	}
 	
 	//getters
 	
@@ -202,6 +207,17 @@ class VendorProfile extends BaseVendorProfile
 		return $rules;
 	}
 	
-	
+	/**
+	 * @return kVendorCredit
+	 */
+	public function getCredit()
+	{
+		$credit = $this->getFromCustomData(self::CUSTOM_DATA_VENDOR_CREDIT);
+		
+		if($credit)
+			$credit = unserialize($credit);
+		
+		return $credit;
+	}
 
 } // VendorProfile

@@ -3,15 +3,22 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaLanguageItem extends KalturaObject
+
+class KalturaReoccurringVendorCredit extends KalturaVendorCredit
 {
 	/**
-	 *  @var KalturaCatalogItemLanguage
+	 * @var int
 	 */
-	public $language;
+	public $reOccurrenceCount;
 	
+	/**
+	 * @var KalturaVendorCreditRecurrenceFrequency
+	 */
+	public $frequency;
+
 	private static $map_between_objects = array (
-		'language',
+		'reOccurrenceCount',
+		'frequency',
 	);
 	
 	public function getMapBetweenObjects()
@@ -20,13 +27,13 @@ class KalturaLanguageItem extends KalturaObject
 	}
 	
 	/* (non-PHPdoc)
- * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
- */
+ 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+ 	 */
 	public function toObject($dbObject = null, $propsToSkip = array())
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kLanguageItem();
+			$dbObject = new kReoccurringVendorCredit();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);

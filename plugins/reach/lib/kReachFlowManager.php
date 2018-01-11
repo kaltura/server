@@ -5,86 +5,9 @@
  */
 class kReachFlowManager implements kGenericEventConsumer
 {
-	
 	static protected $allVendorProfiles = null;
 	
-	protected $catalogItemIds = array();
-	
-	/* (non-PHPdoc)
-	 * @see kGenericEventConsumer::consumeEvent()
-	 */
-	public function consumeEvent(KalturaEvent $event)
-	{
-		foreach($this->catalogItemIds as $catalogItemId)
-		{
-			// TODO check if job does not exist and if so create it
-		}
-		return true;
-	}
-	
-	/**
-	 * Return single integer value that represents the event type
-	 * @param KalturaEvent $event
-	 * @return int
-	 */
-	protected function getEventType(KalturaEvent $event)
-	{
-		$matches = null;
-		if(!preg_match('/k(\w+)Event/', get_class($event), $matches))
-			return null;
-		
-		$typeName = $matches[1];
-		$constName = strtoupper(preg_replace('/(?!^)[[:upper:]]/','_\0', $typeName));
-		if(defined("EventNotificationEventType::{$constName}"))
-		{
-			$type = constant("EventNotificationEventType::{$constName}");
-			if($type)
-				return $type;
-		}
-		
-		return DynamicEnumPeer::retrieveValueByEnumValueName('EventNotificationEventType', $constName);
-	}
-	
-	/**
-	 * @param EventNotificationEventObjectType $objectType
-	 * @param string $objectId
-	 * @return BaseObject
-	 */
-	public static function getObject($objectType, $objectId)
-	{
-		$objectClass = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType);
-		$peerClass = $objectClass . 'Peer';
-		$peer = null;
-		
-		if(class_exists($peerClass))
-		{
-			$peer = new $peerClass();
-		}
-		else
-		{
-			$objectInstance = new $objectClass();
-			$peer = $objectInstance->getPeer();
-		}
-		
-		return $peer->retrieveByPK($objectId);
-	}
-	
-	/**
-	 * Return single integer value that represents the event object type
-	 * @param KalturaEvent $event
-	 * @return string class name
-	 */
-	protected function getEventObjectType(KalturaEvent $event)
-	{
-		if($event instanceof kBatchJobStatusEvent)
-			return 'BatchJob';
-		
-		if(!method_exists($event, 'getObject'))
-			return null;
-		
-		$object = $event->getObject();
-		return get_class($object);
-	}
+	protected $fullFiledItems = array();
 	
 	/* (non-PHPdoc)
 	 * @see kGenericEventConsumer::shouldConsumeEvent()
@@ -94,15 +17,17 @@ class kReachFlowManager implements kGenericEventConsumer
 		$scope = $event->getScope();
 		$partnerId = $scope->getPartnerId();
 		
+		if(!ReachPlugin::isAllowedPartner($partnerId))
+			return false;
+		
 		if(!self::$allVendorProfiles)
 			self::$allVendorProfiles = VendorProfilePeer::retrieveByPartnerId($partnerId);
-			
-			
+		
 		if(!count(self::$allVendorProfiles))
 				return false;
 		
-		$eventType = self::getEventType($event);
-		$eventObjectClassName = self::getEventObjectType($event);
+		$eventType = kEventNotificationFlowManager::getEventType($event);
+		$eventObjectClassName = kEventNotificationFlowManager::getEventObjectType($event);
 		
 		foreach(self::$allVendorProfiles as $vendorProfile)
 		{
@@ -116,12 +41,17 @@ class kReachFlowManager implements kGenericEventConsumer
 				if($rule->getEventType() != $eventType || strcmp($eventObjectClassName, $ruleEventObjectType) && !is_subclass_of($eventObjectClassName, $ruleEventObjectType))
 					continue;
 				
-				if($this->conditionsFulfilled($rule->getEventConditions(), $scope))
-					$this->catalogItemIds = array_merge($this->catalogItemIds, explode(",", $rule->getCatalogItemIds));
+				if($this->conditionsFulfilled($rule->getEventConditions(), $scope)) 
+				{
+					if (!isset($this->fullFiledItems[$vendorProfile->getId()]))
+						$this->fullFiledItems[$vendorProfile->getId()] = array();
+					
+					$this->fullFiledItems[$vendorProfile->getId()] = array_merge($this->fullFiledItems[$vendorProfile->getId()], explode(",", $rule->getCatalogItemIds()));
+				}
 			}
 		}
 		
-		return count($this->catalogItemIds);
+		return count($this->fullFiledItems);
 	}
 	
 	private function conditionsFulfilled($conditions, $scope)
@@ -133,5 +63,47 @@ class kReachFlowManager implements kGenericEventConsumer
 		}
 		
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kGenericEventConsumer::consumeEvent()
+	 */
+	public function consumeEvent(KalturaEvent $event)
+	{
+		$entryId = $this->getEntryId($event->getScope()->getObject());
+		if(!$entryId)
+		{
+			KalturaLog::debug("Entry ID cannot be retrieved form event object, reach consumer will no run");
+			return true;
+		}
+		
+		foreach($this->fullFiledItems as $key => $catalogItemIds)
+		{
+			foreach ($catalogItemIds as $catalogItemId) 
+			{
+				$c = new Criteria();
+				$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
+				$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
+				
+				if(EntryVendorTaskPeer::doSelectOne($c))
+				{
+					KalturaLog::debug("Vendor task for entry [$entryId] and catalog item [$catalogItemId] already exists, skipping!!!");
+					continue;
+				}
+				
+				kReachManager::addEntryVendorTask($entryId, $catalogItemId, $key);
+			}
+		}
+		
+		$this->fullFiledItems = array();
+		return true;
+	}
+	
+	private function getEntryId($object)
+	{
+		if(is_callable(array($object, "getEntryId")))
+			return $object->getEntryId();
+		
+		return null;
 	}
 }

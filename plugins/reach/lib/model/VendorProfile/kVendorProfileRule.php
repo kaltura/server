@@ -11,16 +11,6 @@
 class kVendorProfileRule
 {
 	/**
-	 * @var bool
-	 */	
-	protected $manualDispatchEnabled;
-	
-	/**
-	 * @var bool
-	 */
-	protected $automaticDispatchEnabled;
-	
-	/**
 	 * @var string
 	 */
 	protected $eventType;
@@ -39,26 +29,6 @@ class kVendorProfileRule
 	 * @var string
 	 */
 	protected $catalogItemIds;
-	
-	/**
-	 * @return the $manualDispatchEnabled
-	 */
-	public function getManualDispatchEnabled() { return $this->manualDispatchEnabled; }
-	
-	/**
-	 * @param bool $manualDispatchEnabled
-	 */
-	public function setManualDispatchEnabled($manualDispatchEnabled) { $this->manualDispatchEnabled = $manualDispatchEnabled; }
-	
-	/**
-	 * @return the $automaticDispatchEnabled
-	 */
-	public function getAutomaticDispatchEnabled() { return $this->automaticDispatchEnabled; }
-	
-	/**
-	 * @param bool $automaticDispatchEnabled
-	 */
-	public function setAutomaticDispatchEnabled($automaticDispatchEnabled) { $this->automaticDispatchEnabled = $automaticDispatchEnabled; }
 	
 	/**
 	 * @return the $eventType

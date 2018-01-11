@@ -52,4 +52,9 @@ class kReachManager implements kObjectDeletedEventConsumer, kObjectChangedEventC
 	{
 		return true;
 	}
+	
+	public static function addEntryVendorTask($entryId, $catalogItemId, $vendorProfileId)
+	{
+		
+	}
 }

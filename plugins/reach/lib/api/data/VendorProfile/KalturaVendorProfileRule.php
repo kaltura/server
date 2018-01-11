@@ -6,16 +6,6 @@
 class KalturaVendorProfileRule extends KalturaObject
 {
 	/**
-	 *  @var KalturaNullableBoolean
-	 */
-	public $manualDispatchEnabled;
-	
-	/**
-	 *  @var KalturaNullableBoolean
-	 */
-	public $automaticDispatchEnabled;
-	
-	/**
 	 * Define the event that should trigger this notification
 	 *
 	 * @var KalturaVendorProfileEventType
@@ -41,8 +31,6 @@ class KalturaVendorProfileRule extends KalturaObject
 	public $catalogItemIds;
 	
 	private static $map_between_objects = array (
-		'manualDispatchEnabled',
-		'automaticDispatchEnabled',
 		'eventType',
 		'eventObjectType',
 		'eventConditions',

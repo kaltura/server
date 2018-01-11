@@ -104,7 +104,17 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	 * @var KalturaVendorProfileRulesArray
 	 */
 	public $rules; //ToDo add object and sub classes
+
+	/**
+	 * @var KalturaVendorCredit
+	 */
+	public $credit;
 	
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $usedCredit;
 	
 	private static $map_between_objects = array
 	(
@@ -126,6 +136,8 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		'enableProfanityRemoval',
 		'maxCharactersPerCaptionLine',
 		'rules' => 'rulesArray',
+		'credit',
+		'usedCredit',
 	);
 	
 	/* (non-PHPdoc)
@@ -161,11 +173,9 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	
 	private function validate(VendorProfile $sourceObject = null)
 	{
-//		if(!$sourceObject) //Source object will be null on insert
-//			$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
-//		
-//		$this->validateVendorPartnerId($sourceObject);
-//		$this->validateSystemName($sourceObject);
+		if(!$sourceObject) //Source object will be null on insert
+			$this->validatePropertyNotNull("profileType");
+		
 		return;
 	}
 	

@@ -3,15 +3,16 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaLanguageItem extends KalturaObject
+
+class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 {
 	/**
-	 *  @var KalturaCatalogItemLanguage
+	 *  @var time
 	 */
-	public $language;
-	
+	public $toDate;
+
 	private static $map_between_objects = array (
-		'language',
+		'toDate',
 	);
 	
 	public function getMapBetweenObjects()
@@ -20,13 +21,13 @@ class KalturaLanguageItem extends KalturaObject
 	}
 	
 	/* (non-PHPdoc)
- * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
- */
+ 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+ 	 */
 	public function toObject($dbObject = null, $propsToSkip = array())
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kLanguageItem();
+			$dbObject = new kTimeRangeVendorCredit();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);

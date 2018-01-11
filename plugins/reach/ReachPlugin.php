@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -74,6 +74,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$map = array(
 			'vendorCatalogItem' => 'VendorCatalogItemService',
 			'vendorProfile' => 'vendorProfileService',
+			'entryVendorTask' => 'entryVendorTaskService',
 		);
 		return $map;
 	}
