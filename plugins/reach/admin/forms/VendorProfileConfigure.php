@@ -60,7 +60,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableMachineModeration->setLabel('Enable Machine Moderation:');
 		$enableMachineModeration->setRequired(true);
-//		$enableMachineModeration->setAttrib('disabled',$this->disableAttributes);
 		$enableMachineModeration->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableMachineModeration);
 
@@ -68,7 +67,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableHumanModeration->setLabel('Enable Human Moderation:');
 		$enableHumanModeration->setRequired(true);
-//		$enableHumanModeration->setAttrib('disabled',$this->disableAttributes);
 		$enableHumanModeration->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableHumanModeration);
 
@@ -76,7 +74,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$autoDisplayMachineCaptionsOnPlayer ->setLabel('Auto Display Machine Captions On Player:');
 		$autoDisplayMachineCaptionsOnPlayer ->setRequired(true);
-//		$autoDisplayMachineCaptionsOnPlayer ->setAttrib('disabled',$this->disableAttributes);
 		$autoDisplayMachineCaptionsOnPlayer ->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($autoDisplayMachineCaptionsOnPlayer );
 
@@ -84,7 +81,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$autoDisplayHumanCaptionsOnPlayer ->setLabel('Auto Display Human Captions On Player:');
 		$autoDisplayHumanCaptionsOnPlayer ->setRequired(true);
-//		$autoDisplayHumanCaptionsOnPlayer ->setAttrib('disabled',$this->disableAttributes);
 		$autoDisplayHumanCaptionsOnPlayer ->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($autoDisplayHumanCaptionsOnPlayer );
 
@@ -92,7 +88,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableMetadataExtraction->setLabel('Enable Metadata Extraction:');
 		$enableMetadataExtraction->setRequired(true);
-//		$enableMetadataExtraction->setAttrib('disabled',$this->disableAttributes);
 		$enableMetadataExtraction->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableMetadataExtraction);
 
@@ -100,7 +95,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableSpeakerChangeIndication->setLabel('Enable Speaker Change Indication:');
 		$enableSpeakerChangeIndication->setRequired(true);
-//		$enableSpeakerChangeIndication->setAttrib('disabled',$this->disableAttributes);
 		$enableSpeakerChangeIndication->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableSpeakerChangeIndication);
 
@@ -108,7 +102,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableAudioTags->setLabel('Enable Audion Tags:');
 		$enableAudioTags->setRequired(true);
-//		$enableAudioTags->setAttrib('disabled',$this->disableAttributes);
 		$enableAudioTags->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableAudioTags);
 
@@ -116,28 +109,14 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableProfanityRemoval->setLabel('Enable Profanity Removal:');
 		$enableProfanityRemoval->setRequired(true);
-//		$enableProfanityRemoval->setAttrib('disabled',$this->disableAttributes);
 		$enableProfanityRemoval->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableProfanityRemoval);
 
 		$this->addElement('text', 'maxCharactersPerCaptionLine', array(
 			'label' 		=> 'Max Characters Per Caption Line:',
-//			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			'placement' => 'prepend',
-//			'readonly'		=> $this->disableAttributes,
 		));
-
-//		$this->addLine("Rules Line");
-//		$this->addTitle('Rules:');
-//
-//		$rulesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
-//		$rulesSubForm->addDecorator('ViewScript', array(
-//			'viewScript' => 'rules-sub-form.phtml',
-//		));
-//		$this->addSubForm($rulesSubForm, 'Rules_');
-//		$innerRulesSubForm = new Form_RulesSubForm('Kaltura_Client_Reach_Type_VendorProfileAdminRule');
-//		$this->addSubForm($innerRulesSubForm , "RuleTemplate");
 
 		$this->addRulesSection();
 		$this->addRulesTemplate();

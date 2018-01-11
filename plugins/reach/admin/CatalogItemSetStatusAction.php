@@ -5,7 +5,6 @@
  */
 class CatalogItemSetStatusAction extends KalturaApplicationPlugin
 {
-
 	/**
 	 * @return string - absolute file path of the phtml template
 	 */
@@ -13,11 +12,6 @@ class CatalogItemSetStatusAction extends KalturaApplicationPlugin
 	{
 		return realpath(dirname(__FILE__));
 	}
-
-//	public function getRequiredPermissions()
-//	{
-//		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CATALOG_ITEM_MODIFY_MODIFY);
-//	}
 
 	public function doAction(Zend_Controller_Action $action)
 	{

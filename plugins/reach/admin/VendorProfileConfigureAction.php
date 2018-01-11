@@ -23,9 +23,6 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		$vendorProfileId = $this->_getParam('vendor_profile_id');
 		$catalogItemForm = null;
 
-		if (!$partnerId)
-			$partnerId = 0;
-
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
