@@ -573,7 +573,6 @@ None
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_08_20_list_captionAssetItem_permissions.php
 
->>>>>>> Mercury-13.11.0
 
 # Mercury 13.1.0 #
 
