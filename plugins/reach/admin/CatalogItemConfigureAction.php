@@ -30,9 +30,6 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 		$catalogItemType = null;
 		$catalogItemForm = null;
 
-		if (!$partnerId)
-			$partnerId = 0;
-
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;

@@ -204,14 +204,14 @@
 		loadCatalogItem(paramsStr);
 	}
 
-	function configureCatalogItem(catalogItemId)
+	function configureCatalogItem(catalogItemId, partnerId)
 	{
 		if(typeof catalogItemId == 'undefined'){
 			alert('<?php echo $this->translate('Catalog Item ID not supplied'); ?>');
 			return;
 		}
 
-		var catalogItemIdStr = '/catalog_item_id/' + catalogItemId;
+		var catalogItemIdStr = '/catalog_item_id/' + catalogItemId + '/new_partner_id/' + partnerId;
 
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + catalogItemIdStr;
 

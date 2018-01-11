@@ -5,6 +5,6 @@
  */ 
 interface VendorProfileType extends BaseEnum
 {
-	const FREE_TRAIL 	= 1;
+	const FREE_TRIAL 	= 1;
 	const PAID		 	= 2;
 }
