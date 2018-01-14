@@ -27,8 +27,8 @@
 		<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorProfile */ $vendorProfile): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $vendorProfile->id; ?></td>
-				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Type_VendorProfileStatus', $vendorProfile->status); ?></td>
-				<td><?php echo $vendorProfile->profileType; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorProfileStatus', $vendorProfile->status); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorProfileType', $vendorProfile->profileType); ?></td>
 				<td><?php echo $vendorProfile->partnerId; ?></td>
 				<td><?php echo date($this->translate('time format'), $vendorProfile->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
