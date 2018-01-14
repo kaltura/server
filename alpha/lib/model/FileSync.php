@@ -92,7 +92,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if (in_array($this->object_type, $excludeObjectTypes))
 			return false;
 
-		$fileTypeNotToEncrypt[] = 'log';
+		$fileTypeNotToEncrypt = array('log');
 		if (in_array($this->getFileExt(), $fileTypeNotToEncrypt))
 			return false;
 
