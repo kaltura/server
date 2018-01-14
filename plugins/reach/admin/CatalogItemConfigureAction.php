@@ -13,11 +13,6 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 		return realpath(dirname(__FILE__));
 	}
 
-//	public function getRequiredPermissions()
-//	{
-//		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CATALOG_ITEM_MODIFY);
-//	}
-
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('layout')->disableLayout();
@@ -42,9 +37,14 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType, true);
 				if ($partnerId)
 				{
-					$catalogItem = $reachPluginClient->vendorCatalogItem->cloneAction($cloneTemplateId);
-					$catalogItemId = $catalogItem->id;
-					$catalogItemType = $catalogItem->serviceFeature;
+					if (!$request->isPost())
+					{
+						Infra_ClientHelper::unimpersonate(); // we need to retrieve template catalog item from partner 0
+						$catalogItem = $reachPluginClient->vendorCatalogItem->get($cloneTemplateId);
+						$catalogItemId = $cloneTemplateId;
+						$catalogItemType = $catalogItem->serviceFeature;
+
+					}
 				} else
 				{
 					$action->view->errMessage = "Partner ID must be defined.";
@@ -63,8 +63,6 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType);
 			}
 
-
-
 			if (!$form || !($form instanceof Form_CatalogItemConfigure))
 			{
 				$action->view->errMessage = "Template form not found for type [$catalogItemType]";
@@ -74,7 +72,6 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 			$urlParams = array(
 				'controller' => 'plugin',
 				'action' => 'CatalogItemConfigureAction',
-				'clone_template_id' => null,
 			);
 			if ($catalogItemId)
 				$urlParams['catalog_item_id'] = $catalogItemId;
@@ -86,15 +83,21 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				if ($request->isPost())
 				{
 					$formData = $request->getPost();
-					$form->populate($formData);
-
-					if ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
-						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-					elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
-
 					if ($form->isValid($formData))
 					{
+						if ($cloneTemplateId)// clone the catalog item an update allowed params.
+						{
+							$catalogItem = $reachPluginClient->vendorCatalogItem->cloneAction($cloneTemplateId);
+							$catalogItemId = $catalogItem->id;
+							$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType, true);
+						}
+						$form->populate($formData);
+
+						if ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
+							$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
+						elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+							$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
+
 						$form->resetUnUpdatebleAttributes($catalogItem);
 						$catalogItem = $reachPluginClient->vendorCatalogItem->update($catalogItemId, $catalogItem);
 						$form->setAttrib('class', 'valid');
