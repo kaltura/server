@@ -1,3 +1,22 @@
+# Mercury 13.12.0 # 
+
+## Add notification for server node going offline ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8047
+
+### Configuration ###
+	First replcae all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_14_AddServerNodeDownTemplate.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_01_server_node_unregister.php
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_14_deploy_server_node_offline_email_notification.php
+
+#### Known Issues & Limitations ####
+None.
+
 # Mercury 13.10.0 # 
 
 ## Deploy new live audio flavor params ##
