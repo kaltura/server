@@ -2022,7 +2022,7 @@
 	</multirequest>
 
 	<multirequest>
-		<!-- Media Entry Ready -->
+		<!-- Server-Node is down -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Server Node Down</name>
