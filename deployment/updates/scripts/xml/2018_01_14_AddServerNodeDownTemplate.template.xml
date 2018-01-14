@@ -24,6 +24,13 @@
                 <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
                 <eventObjectType>39</eventObjectType> <!-- EventNotificationEventObjectType::SERVER_NODE -->
                 <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Server Node status changed </description>
+                        <modifiedColumns>status</modifiedColumns>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getType()</code>
+                        </field>
+                    </item>
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
                             <code>$scope->getObject() instanceof EdgeServerNode &amp;&amp; $scope->getObject()->getStatus() == ServerNodeStatus::NOT_REGISTERED</code>

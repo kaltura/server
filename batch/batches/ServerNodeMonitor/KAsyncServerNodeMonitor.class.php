@@ -26,10 +26,10 @@ class KAsyncServerNodeMonitor extends KPeriodicWorker
 	public function run($jobs = null)
 	{
 		$filter = new KalturaServerNodeFilter();
-		$filter->statusEqual=KalturaServerNodeStatus::ACTIVE;
 		$filter->typeIn=self::$taskConfig->params->typesToMonitor;
+		$filter->heartbeatTimeLessThanOrEqual = (time() - self::$taskConfig->params->serverNodeTTL);
 		$pager = new KalturaFilterPager();
-		$pager->pageSize=1000;
+		$pager->pageSize=500;
 		$pager->pageIndex = 1;
 		$serverNodes = self::$kClient->serverNode->listAction($filter, $pager);
 		while (count($serverNodes->objects))
@@ -39,11 +39,8 @@ class KAsyncServerNodeMonitor extends KPeriodicWorker
 				/**
 				 * @var KalturaEdgeServerNode $serverNode
 				 */
-				if ($serverNode->heartbeatTime < (time() - self::$taskConfig->params->serverNodeTTL))
-				{
-					KalturaLog::info("ServerNode [" . $serverNode->id . "] is offline");
-					self::$kClient->serverNode->unregister($serverNode->id);
-				}
+				KalturaLog::info("ServerNode [" . $serverNode->id . "] is offline, last heartbeat [" . $serverNode->heartbeatTime . "]");
+				self::$kClient->serverNode->markOffline($serverNode->id);
 			}
 
 			$pager->pageIndex++;

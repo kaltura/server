@@ -172,8 +172,7 @@ class ServerNodeService extends KalturaBaseService
 		}
 	
 		$dbServerNode->setHeartbeatTime(time());
-		if ($dbServerNode->getStatus() == ServerNodeStatus::NOT_REGISTERED)
-			$dbServerNode->setStatus(ServerNodeStatus::ACTIVE);
+		$dbServerNode->setStatus(ServerNodeStatus::ACTIVE);
 		$dbServerNode->save();
 	
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
@@ -192,17 +191,21 @@ class ServerNodeService extends KalturaBaseService
 	}
 
 	/**
-	 * Unregister server node by id
+	 * Mark server node offline
 	 *
-	 * @action unregister
+	 * @action markOffline
 	 * @param string $serverNodeId
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @return KalturaServerNode
 	 * @throws KalturaAPIException
 	 */
-	function unregisterAction($serverNodeId)
+	function markOfflineAction($serverNodeId)
 	{
-		$dbServerNode = ServerNodePeer::retrieveByPK($serverNodeId);
+		$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
+		$criteria->add(ServerNodePeer::ID, $serverNodeId);
+		$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
+		$dbServerNode = ServerNodePeer::doSelectOne($criteria);
+
 		if(!$dbServerNode)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
 
