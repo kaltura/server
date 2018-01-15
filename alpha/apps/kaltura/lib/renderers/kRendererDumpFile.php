@@ -98,7 +98,7 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			if ($this->key)
-				echo kEncryptFileUtils::getEncryptedFileContent($this->filePath, $this->key, $this->iv, $rangeFrom, $rangeLength);
+				kEncryptFileUtils::dumpEncryptFilePart($this->filePath, $this->key, $this->iv, $rangeFrom, $rangeLength);
 			else
 				infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);		
 		}

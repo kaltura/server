@@ -97,12 +97,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$fileTypeNotToEncrypt[] = 'log';
 		if (in_array($this->getFileExt(), $fileTypeNotToEncrypt))
 			return false;
-
-		$maxFileSize = kConf::get('max_file_size_for_encryption', 'local', self::MAX_FILE_SIZE_FOR_ENCRYPTION);
-		if (filesize($this->getFullPath()) > $maxFileSize)
-			return false;
-
-
+		
 		if ($this->getEncryptionKey())
 		{
 			KalturaLog::info("File of fileSyncId [$this->id] already has key and should not be encrypt again");
@@ -132,11 +127,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function createTempClear()
 	{
-		$plainData = $this->decrypt();
+		$realPath = realpath($this->getFullPath());
 		$tempPath = $this->getClearTempPath();
 		KalturaLog::info("Creating new file for syncId [$this->id] on [$tempPath]");
 		if (!file_exists($tempPath))
-			kFileBase::setFileContent( $tempPath, $plainData);
+			kEncryptFileUtils::decryptFile($realPath, $this->getEncryptionKey(), $this->getIv(), $tempPath);
 		return $tempPath;
 	}
 

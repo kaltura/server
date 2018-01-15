@@ -950,9 +950,7 @@ class myEntryUtils
 
 		if ($isEncryptionNeeded)
 		{
-			$maxFileSize = kConf::get('max_file_size_for_encryption', 'local', FileSync::MAX_FILE_SIZE_FOR_ENCRYPTION);
-			if (filesize($finalThumbPath) < $maxFileSize)
-				$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
+			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
 				
 		return $finalThumbPath;
@@ -965,10 +963,9 @@ class myEntryUtils
 	
 	private static function encryptThumb($thumbPath, $key, $iv)
 	{
-		if (!kEncryptFileUtils::encryptFile($thumbPath, $key, $iv))
-			return $thumbPath;
 		$encryptedPath = kFileUtils::addEncryptToFileName($thumbPath);
-		kFile::moveFile($thumbPath, $encryptedPath);
+		if (!kEncryptFileUtils::encryptFile($thumbPath, $key, $iv, $encryptedPath))
+			return $thumbPath;
 		KalturaLog::debug("Data for entry should encrypted. Encrypted data at [$encryptedPath] with key [$key] and iv [$iv]");
 		return $encryptedPath;
 	}
