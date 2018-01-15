@@ -83,8 +83,7 @@ class kEncryptFileUtils
 
             if ($dstFilePath)
                 $srcFilePath = $dstFilePath;
-            return kFile::moveFile($tempPath, $srcFilePath);
-
+            return rename($tempPath, $srcFilePath);
         }
         catch(Exception $e)
         {
