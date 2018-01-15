@@ -263,7 +263,7 @@ class KalturaRequestDeserializer
 	private function buildObject(KalturaTypeReflector $typeReflector, &$params, $objectName)
 	{
 		if (!is_array($params))
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_WRONG_FORMAT, 'params', 'array' );
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_WRONG_FORMAT, $objectName, 'array' );
 		// if objectType was specified, we will use it only if the anotation type is it's base type
 		if (array_key_exists("objectType", $params))
 		{
