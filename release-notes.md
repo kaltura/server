@@ -1,3 +1,30 @@
+# Mercury 13.11.0 # 
+
+## Add Entry replaced EMAIL template which excludes kaltura recorded entries ##
+
+- Issue Type: Support
+- Issue ID: SUP-13175
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_notRecordedEntryReplaced_emailNotification.template.xml
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_not_recorded_entry_replaced_email_notification.php 
+
+
+## Add Recorded Entry replaced EMAIL template ##
+
+- Issue Type: Support
+- Issue ID: SUP-13175
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_RecordedEntryReplaced_emailNotification.template.xml
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
+      
 # Mercury 13.10.0 # 
 
 ## Deploy new live audio flavor params ##
