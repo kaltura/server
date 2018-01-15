@@ -1227,6 +1227,8 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT' => 'ScheduleEvent',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_RESOURCE' => 'ScheduleResource',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT_RESOURCE' => 'ScheduleEventResource',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::LIVE_STREAM' => 'Live Stream',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SERVER_NODE' => 'Server Node',
 
 	
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::HTML' => 'HTML',
