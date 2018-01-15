@@ -11,7 +11,7 @@
 
 ### Deployment scripts ###
 
-	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_01_server_node_unregister.php
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/201810_01_server_node_markOffline.php
 	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_14_deploy_server_node_offline_email_notification.php
 
 #### Known Issues & Limitations ####
