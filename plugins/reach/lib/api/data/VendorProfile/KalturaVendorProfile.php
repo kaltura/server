@@ -46,7 +46,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	public $profileType;
 	
 	/**
-	 * @var KalturaLanguageArray
+	 * @var KalturaCatalogItemLanguage
 	 */
 	public $defaultSourceLanguage;
 	

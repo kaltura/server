@@ -25,133 +25,56 @@ class entryVendorTaskService extends KalturaBaseService
 	 * Allows you to add a entry vendor task 
 	 *
 	 * @action add
-	 * @param KalturaVendorProfile $vendorProfile
-	 * @return KalturaVendorProfile
+	 * @param KalturaEntryVendorTask $entryVendorTask
+	 * @return KalturaEntryVendorTask
+	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 */
-	public function addAction(KalturaVendorProfile $vendorProfile)
+	public function addAction(KalturaEntryVendorTask $entryVendorTask)
 	{
-		$dbVendorProfile = $vendorProfile->toInsertableObject();
-		
-		/* @var $dbVendorProfile VendorProfile */
-		$dbVendorProfile->setPartnerId(kCurrentContext::getCurrentPartnerId());
-		$dbVendorProfile->setStatus(KalturaVendorProfileStatus::ACTIVE);
-		$dbVendorProfile->save();
+		$dbEntryVendorTask = $entryVendorTask->toInsertableObject();
+		$dbEntryVendorTask->save();
 		
 		// return the saved object
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
 	}
 	
 	/**
-	 * Retrieve specific vendor profile by id
+	 * Retrieve specific entry vendor task by id
 	 *
 	 * @action get
 	 * @param int $id
-	 * @return KalturaVendorProfile
+	 * @return KalturaEntryVendorTask
 	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
 	 */
 	function getAction($id)
 	{
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if(!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $id);
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
+		if(!$dbEntryVendorTask)
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		
-		$vendorProfile = new KalturaVendorProfile();
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
+		$entryVendorTask = new KalturaEntryVendorTask();
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
 	}
 	
 	/**
-	 * List KalturaVendorProfile objects
+	 * List KalturaEntryVendorTask objects
 	 *
 	 * @action list
-	 * @param KalturaVendorProfileFilter $filter
+	 * @param KalturaEntryVendorTaskFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaVendorProfileListResponse
+	 * @return KalturaEntryVendorTaskListResponse
 	 */
-	public function listAction(KalturaVendorProfileFilter $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
-			$filter = new KalturaVendorProfileFilter();
+			$filter = new KalturaEntryVendorTaskFilter();
 		
 		if(!$pager)
 			$pager = new KalturaFilterPager();
 		
 		return $filter->getListResponse($pager, $this->getResponseProfile());
-	}
-	
-	/**
-	 * Update an existing vendor profile object
-	 *
-	 * @action update
-	 * @param int $id
-	 * @param KalturaVendorProfile $vendorProfile
-	 * @return KalturaVendorProfile
-	 *
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
-	 */
-	public function updateAction($id, KalturaVendorProfile $vendorProfile)
-	{
-		// get the object
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if(!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
-		
-		// save the object
-		$dbVendorProfile = $vendorProfile->toUpdatableObject($dbVendorProfile);
-		$dbVendorProfile->save();
-		
-		// return the saved object
-		$vendorProfile = new KalturaVendorProfile();
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
-	}
-	
-	/**
-	 * Update vendor profile status by id
-	 *
-	 * @action updateStatus
-	 * @param int $id
-	 * @param KalturaVendorProfileStatus $status
-	 * @return KalturaVendorProfile
-	 *
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
-	 */
-	function updateStatusAction($id, $status)
-	{
-		// get the object
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if (!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
-		
-		// save the object
-		$dbVendorProfile->setStatus($status);
-		$dbVendorProfile->save();
-		
-		// return the saved object
-		// return the saved object
-		$vendorProfile = new KalturaVendorProfile();
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
-	}
-	
-	/**
-	 * Delete vednor profile by id
-	 *
-	 * @action delete
-	 * @param int $id
-	 *
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
-	 */
-	public function deleteAction($id)
-	{
-		// get the object
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if(!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $id);
-		
-		// set the object status to deleted
-		$dbVendorProfile->setStatus(KalturaVendorProfileStatus::DELETED);
-		$dbVendorProfile->save();
 	}
 }

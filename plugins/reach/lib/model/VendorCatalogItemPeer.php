@@ -40,52 +40,76 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		$criteriaFilter = self::getCriteriaFilter();
 		$criteria = $criteriaFilter->getFilter();
 		
-		if(empty($partnerGroup) && empty($kalturaNetwork))
+		if(!$privatePartnerData)
 		{
-			// the default case
-			$criteria->addAnd(self::PARTNER_ID, $partnerId);
-		}
-		elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
-		{
-			// all is allowed - don't add anything to the criteria
-		}
-		else
-		{
-			$criterion = null;
-			if($partnerGroup)
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
 			{
-				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
-				$partners = explode(',', trim($partnerGroup));
-				$hasPartnerZero = false;
-				foreach($partners as $index => &$p)
+				// allow only the kaltura network stuff
+				if($partnerId)
 				{
-					trim($p); // make sure there are not leading or trailing spaces
-					if($p == 0)
-					{
-						unset($partners[$index]);
-						$hasPartnerZero = true;
-					}
-				}
-				
-				// add the partner_id to the partner_group
-				$partners[] = strval($partnerId);
-				$partners = array_unique($partners);
-				
-				$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
-				
-				if($hasPartnerZero)
-				{
-					$defaultAndGlobal = $criteria->getNewCriterion(self::PARTNER_ID, 0);
-					$defaultAndGlobal->addAnd($criteria->getNewCriterion(self::IS_DEFAULT, 1));
-					$criterion->addOr($defaultAndGlobal);
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
 				}
 			}
 			else
 			{
-				$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
 			}
-			
-			$criteria->addAnd($criterion);
+		}
+		else
+		{
+			// private data is allowed
+			if(empty($partnerGroup) && empty($kalturaNetwork))
+			{
+				// the default case
+				$criteria->addAnd(self::PARTNER_ID, $partnerId);
+			}
+			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else
+			{
+				$criterion = null;
+				if($partnerGroup)
+				{
+					// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+					$partners = explode(',', trim($partnerGroup));
+					$hasPartnerZero = false;
+					foreach($partners as $index => &$p)
+					{
+						trim($p); // make sure there are not leading or trailing spaces
+						if($p == 0)
+						{
+							unset($partners[$index]);
+							$hasPartnerZero = true;
+						}
+					}
+					
+					// add the partner_id to the partner_group
+					$partners[] = strval($partnerId);
+					$partners = array_unique($partners);
+					
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+					
+					if($hasPartnerZero)
+					{
+						$defaultAndGlobal = $criteria->getNewCriterion(self::PARTNER_ID, 0);
+						$defaultAndGlobal->addAnd($criteria->getNewCriterion(self::IS_DEFAULT, 1));
+						$criterion->addOr($defaultAndGlobal);
+					}
+				}
+				else
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				}
+				
+				$criteria->addAnd($criterion);
+			}
 		}
 		
 		$criteriaFilter->enable();

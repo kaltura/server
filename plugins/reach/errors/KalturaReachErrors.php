@@ -24,4 +24,8 @@ class KalturaReachErrors implements kReachErrors
 	/* Vendor Profile */
 	
 	const VENDOR_PROFILE_NOT_FOUND = "VENDOR_PROFILE_NOT_FOUND;ID;Vendor profile with id provided not found [@ID@]";
+	
+	/* Entry Vendor Task */
+	
+	const ENTRY_VENDOR_TASK_NOT_FOUND = "ENTRY_VENDOR_TASK_NOT_FOUND;ID;Entry Vendor task with id provided not found [@ID@]";
 }

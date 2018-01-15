@@ -219,5 +219,16 @@ class VendorProfile extends BaseVendorProfile
 		
 		return $credit;
 	}
+	
+	public function shouldModerate($type)
+	{
+		if($type == VendorServiceType::HUMAN)
+			return $this->getEnableHumanModeration();
+		
+		if($type == VendorServiceType::MACHINE)
+			return $this->getEnableMachineModeration();
+		
+		return false;
+	}
 
 } // VendorProfile
