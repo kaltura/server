@@ -11,7 +11,7 @@ class kEncryptFileUtils
     //iv length should be 16
     CONST ENCRYPT_METHOD = "AES-256-CBC";
     const OPENSSL_RAW_DATA = 1;
-    const ENCRYPT_INTERVAL = 3000000; // as 3MB
+    const ENCRYPT_INTERVAL = 3145728; // as 3MB = 1024 * 1024 * 3
     const AES_BLOCK_SIZE = 16; //For IV extraction
 
     public static function encryptData($plainText, $key, $iv)
@@ -81,9 +81,9 @@ class kEncryptFileUtils
             fclose($fd1);
             fclose($fd2);
 
-            if ($dstFilePath)
-                $srcFilePath = $dstFilePath;
-            return rename($tempPath, $srcFilePath);
+            if (!$dstFilePath)
+                $dstFilePath = $srcFilePath;
+            return rename($tempPath, $dstFilePath);
         }
         catch(Exception $e)
         {
@@ -106,9 +106,10 @@ class kEncryptFileUtils
 
     public static function fileSize($filePath, $key = null, $iv = null)
     {
-        if (!$key)
-            return kFileBase::fileSize($filePath);
         $size = kFileBase::fileSize($filePath);
+        if (!$key)
+            return $size;
+        
         if ($size < self::ENCRYPT_INTERVAL)
             return strlen(self::getEncryptedFileContent($filePath, $key, $iv, 0, -1));
 
