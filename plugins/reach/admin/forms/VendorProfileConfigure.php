@@ -46,7 +46,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$profileType->setValue(Kaltura_Client_Reach_Enum_VendorProfileType::FREE_TRIAL);
 		$this->addElement($profileType);
 
-		$defaultSourceLanguageView = new Kaltura_Form_Element_EnumSelect('defaultSourceLanguage', array('enum' => 'Kaltura_Client_Enum_Language'));
+		$defaultSourceLanguageView = new Kaltura_Form_Element_EnumSelect('defaultSourceLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
 		$defaultSourceLanguageView->setLabel('Default Source Language:');
 		$defaultSourceLanguageView->setValue(Kaltura_Client_Enum_Language::AA);
 		$this->addElement($defaultSourceLanguageView);
