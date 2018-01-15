@@ -13,23 +13,13 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 		return realpath(dirname(__FILE__));
 	}
 
-//	public function getRequiredPermissions()
-//	{
-//		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CATALOG_ITEM_MODIFY);
-//	}
-
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('layout')->disableLayout();
 		$this->client = Infra_ClientHelper::getClient();
-		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-		$request = $action->getRequest();
 		$partnerId = $this->_getParam('new_partner_id');
 		$catalogItemId = $this->_getParam('catalog_item_id');
 		$cloneTemplateId = $this->_getParam('clone_template_id');
-		$catalogItemType = null;
-		$catalogItemForm = null;
-
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -38,104 +28,18 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 		{
 			Infra_ClientHelper::impersonate($partnerId);
 			if ($cloneTemplateId)
-			{
-				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType, true);
-				if ($partnerId)
-				{
-					$catalogItem = $reachPluginClient->vendorCatalogItem->cloneAction($cloneTemplateId);
-					$catalogItemId = $catalogItem->id;
-					$catalogItemType = $catalogItem->serviceFeature;
-				} else
-				{
-					$action->view->errMessage = "Partner ID must be defined.";
-					$catalogItemId = null;
-					Infra_ClientHelper::unimpersonate();
-					return;
-				}
-			} elseif ($catalogItemId)
-			{
-				$catalogItem = $reachPluginClient->vendorCatalogItem->get($catalogItemId);
-				$catalogItemType = $catalogItem->serviceFeature;
-				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType, true);
-			} else
-			{
-				$catalogItemType = $this->_getParam('new_catalog_item_type');
-				$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType);
-			}
-
-
-
-			if (!$form || !($form instanceof Form_CatalogItemConfigure))
-			{
-				$action->view->errMessage = "Template form not found for type [$catalogItemType]";
-				return;
-			}
-
-			$urlParams = array(
-				'controller' => 'plugin',
-				'action' => 'CatalogItemConfigureAction',
-				'clone_template_id' => null,
-			);
-			if ($catalogItemId)
-				$urlParams['catalog_item_id'] = $catalogItemId;
-
-			$form->setAction($action->view->url($urlParams));
-
-			if ($catalogItemId) // update or clone
-			{
-				if ($request->isPost())
-				{
-					$formData = $request->getPost();
-					$form->populate($formData);
-
-					if ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
-						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-					elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
-
-					if ($form->isValid($formData))
-					{
-						$form->resetUnUpdatebleAttributes($catalogItem);
-						$catalogItem = $reachPluginClient->vendorCatalogItem->update($catalogItemId, $catalogItem);
-						$form->setAttrib('class', 'valid');
-						$action->view->formValid = true;
-					}
-				}else
-				{
-					$form->populateFromObject($catalogItem, false);
-				}
-			} else // new
-			{
-				$formData = $request->getPost();
-				$form->populate($formData);
-				if ($request->isPost() && $form->isValid($formData))
-				{
-					if ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
-					{
-						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-					}
-					elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-						$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
-
-					$form->populate($formData);
-					$form->resetUnUpdatebleAttributes($catalogItem);
-					$catalogItem = $reachPluginClient->vendorCatalogItem->add($catalogItem);
-					$form->setAttrib('class', 'valid');
-					$action->view->formValid = true;
-				} else
-				{
-					$form->getElement('partnerId')->setValue($partnerId);
-					$form->getElement('serviceFeature')->setValue($catalogItemType);
-				}
-			}
+				$form  = $this->handleClone($action, $cloneTemplateId, $partnerId);
+			elseif ($catalogItemId)
+				$form = $this->handleExistingCatalogItem($action, $catalogItemId, $partnerId);
+			else
+				$form = $this->handleNewCatalogItem($action, $partnerId);
 		} catch (Exception $e)
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
-
 			if ($form)
 			{
-				$formData = $request->getPost();
+				$formData = $action->getRequest()->getPost();
 				$form->populate($formData);
 				if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
@@ -144,8 +48,133 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 			}
 		}
 		Infra_ClientHelper::unimpersonate();
-
 		$action->view->form = $form;
 		$action->view->catalogItemId = $catalogItemId;
+	}
+
+	/***
+	 * @param Zend_Controller_Action $action
+	 * @param $cloneTemplateId
+	 * @param $partnerId
+	 * @return array
+	 */
+	protected function handleClone(Zend_Controller_Action $action, $cloneTemplateId, $partnerId)
+	{
+		$request = $action->getRequest();
+		if ($request->isPost())
+		{
+			$form = $this->initForm($action, $partnerId, null, $cloneTemplateId);
+			$this->handlePost($action, $form, null, $cloneTemplateId);
+		} else
+		{
+			Infra_ClientHelper::unimpersonate(); // we need to retrieve template catalog item from partner 0
+			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+			$catalogItem = $reachPluginClient->vendorCatalogItem->get($cloneTemplateId);
+			$catalogItemType = $catalogItem->serviceFeature;
+			$form = $this->initForm($action, $partnerId, $catalogItemType, $cloneTemplateId);
+			$form->populateFromObject($catalogItem, false);
+		}
+		return $form;
+	}
+
+	/***
+	 * @param $action
+	 * @param $catalogItemId
+	 * @param $partnerId
+	 * @return Form_CatalogItemConfigure
+	 */
+	protected function handleExistingCatalogItem($action, $catalogItemId, $partnerId)
+	{
+		$request = $action->getRequest();
+		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+		$catalogItem = $reachPluginClient->vendorCatalogItem->get($catalogItemId);
+		$catalogItemType = $catalogItem->serviceFeature;
+		$form = $this->initForm($action, $partnerId, $catalogItemType, $catalogItem->id);
+		if ($request->isPost())
+			$this->handlePost($action, $form, $catalogItem->id);
+		else
+			$form->populateFromObject($catalogItem, false);
+		return $form;
+	}
+
+	/***
+	 * @param $action
+	 * @return Form_CatalogItemConfigure|null
+	 * @throws Zend_Form_Exception
+	 */
+	protected function handleNewCatalogItem($action, $partnerId)
+	{
+		$request = $action->getRequest();
+		$catalogItemType = $this->_getParam('new_catalog_item_type');
+		$form = $this->initForm($action, $partnerId, $catalogItemType);
+
+		if ($request->isPost())
+			$this->handlePost($action, $form);
+		else
+		{
+			$form->getElement('partnerId')->setValue($partnerId);
+			$form->getElement('serviceFeature')->setValue($catalogItemType);
+		}
+		return $form;
+	}
+
+	/***
+	 * @param $action
+	 * @param ConfigureForm $form
+	 * @param null $catalogItemId
+	 * @param null $cloneTemplateId
+	 * @throws Zend_Form_Exception
+	 */
+	protected function handlePost($action, ConfigureForm $form, $catalogItemId = null, $cloneTemplateId = null)
+	{
+		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+		$formData = $action->getRequest()->getPost();
+		$form->populate($formData);
+		if ($form->isValid($formData))
+		{
+			if ($cloneTemplateId)
+			{
+				$catalogItem = $reachPluginClient->vendorCatalogItem->cloneAction($cloneTemplateId);
+				$catalogItemId = $catalogItem->id;
+			}
+
+			if ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
+				$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
+			elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+				$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
+
+			$form->resetUnUpdatebleAttributes($catalogItem);
+			if($catalogItemId)
+				$catalogItem = $reachPluginClient->vendorCatalogItem->update($catalogItemId, $catalogItem);
+			else
+				$catalogItem = $reachPluginClient->vendorCatalogItem->add($catalogItem);
+			$form->setAttrib('class', 'valid');
+			$action->view->formValid = true;
+		}
+	}
+
+	/***
+	 * @param Zend_Controller_Action $action
+	 * @param $partnerId
+	 * @param null $catalogItemType
+	 * @param null $catalogItemId
+	 * @return Form_CatalogItemConfigure
+	 */
+	protected function initForm(Zend_Controller_Action $action, $partnerId, $catalogItemType = null, $catalogItemId = null)
+	{
+		$urlParams = array(
+			'controller' => 'plugin',
+			'action' => 'CatalogItemConfigureAction',
+		);
+		if ($catalogItemId)
+		{
+			$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType, true);
+			$urlParams['catalog_item_id'] = $catalogItemId;
+		}
+		else
+			$form = new Form_CatalogItemConfigure($partnerId, $catalogItemType);
+
+		$form->setAction($action->view->url($urlParams));
+		return $form;
 	}
 }
