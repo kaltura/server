@@ -201,7 +201,7 @@ class ServerNodeService extends KalturaBaseService
 	 */
 	function markOfflineAction($serverNodeId)
 	{
-		$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
+		$criteria = new Criteria();
 		$criteria->add(ServerNodePeer::ID, $serverNodeId);
 		$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
 		$dbServerNode = ServerNodePeer::doSelectOne($criteria);
