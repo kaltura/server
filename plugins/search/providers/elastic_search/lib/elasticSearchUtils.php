@@ -77,6 +77,36 @@ class elasticSearchUtils
 		return sprintf("p%ss%s", $partnerId, $status);
 	}
 
+	public static function formatCategoryIdStatus($categoryId, $status)
+	{
+		return sprintf("c%ss%s", $categoryId, $status);
+	}
+
+	public static function formatCategoryFullIdStatus($categoryId, $status)
+	{
+		return sprintf("s%sfid>%s", $status, $categoryId);
+	}
+
+	public static function formatParentCategoryIdStatus($categoryId, $status)
+	{
+		return sprintf("p%ss%s", $categoryId, $status);
+	}
+
+	public static function formatCategoryNameStatus($categoryName, $status)
+	{
+		return sprintf("s%sc>%s", $status, $categoryName);
+	}
+
+	public static function formatParentCategoryNameStatus($categoryName, $status)
+	{
+		return sprintf("s%sp>%s", $status, $categoryName);
+	}
+
+	public static function formatCategoryEntryStatus($status)
+	{
+		return sprintf("ces%s", $status);
+	}
+
 	public static function formatSearchTerm($searchTerm)
 	{
 		//remove extra spaces
@@ -105,6 +135,14 @@ class elasticSearchUtils
 			if(is_array($value) && ( count($value) == 0 || ( (count($value) == 1 && (isset($value[0])) && $value[0] === '' ) ) ))
 				unset($body[$key]);
 		}
+	}
+	
+	public static function getNumOfFragmentsByConfigKey($highlightConfigKey)
+	{
+		$highlightConfig = kConf::get('highlights', 'elastic');
+		//return null to use elastic default num of fragments
+		$numOfFragments = isset($highlightConfig[$highlightConfigKey]) ? $highlightConfig[$highlightConfigKey] : null;
+		return $numOfFragments;
 	}
 
 }

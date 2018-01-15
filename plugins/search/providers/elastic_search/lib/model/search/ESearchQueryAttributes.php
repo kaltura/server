@@ -24,6 +24,42 @@ class ESearchQueryAttributes
 	protected $objectId;
 
 	/**
+	 * @var string
+	 */
+	protected $objectSubType;
+
+	/**
+	 * @var bool
+	 */
+	protected $shouldUseDisplayInSearch;
+
+	/**
+	 * @var array
+	 */
+	private $fieldsToHighlight = array(self::GLOBAL_SCOPE => array(), self::INNER_SCOPE => array());
+
+	/**
+	 * @var string
+	 */
+	private $scope = self::GLOBAL_SCOPE;
+
+	/**
+	 * @return string
+	 */
+	public function getObjectSubType()
+	{
+		return $this->objectSubType;
+	}
+
+	/**
+	 * @param string $objectSubType
+	 */
+	public function setObjectSubType($objectSubType)
+	{
+		$this->objectSubType = $objectSubType;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getObjectId()
@@ -54,20 +90,6 @@ class ESearchQueryAttributes
 	{
 		$this->shouldUseDisplayInSearch = $shouldUseDisplayInSearch;
 	}
-
-	/**
-	 * @var bool
-	 */
-	protected $shouldUseDisplayInSearch;
-
-	/**
-	 * @var array
-	 */
-	private $fieldsToHighlight = array(self::GLOBAL_SCOPE => array(), self::INNER_SCOPE => array());
-	
-	private $scope = self::GLOBAL_SCOPE;
-
-	private $useHighlight = true;
 
 	public function setScopeToInner()
 	{
@@ -131,13 +153,4 @@ class ESearchQueryAttributes
 		$this->overrideInnerHitsSize = $overrideInnerHitsSize;
 	}
 
-	public function setUseHighlight($useHighlight)
-	{
-		$this->useHighlight = $useHighlight;
-	}
-
-	public function getUseHighlight()
-	{
-		return $this->useHighlight;
-	}
 }

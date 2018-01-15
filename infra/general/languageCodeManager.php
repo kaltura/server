@@ -86,6 +86,14 @@ class languageCodeManager
         return isset(self::$arrayKalturaName[$kalturaName]) ? self::$arrayKalturaName[$kalturaName] : null;
     }
 
+	public static function getTwoCodeLowerFromThreeCode($code)
+	{
+		if(!self::isAlreadyLoaded())
+			self::loadLanguageCodeMap();
+		$obj = self::getObjectFromThreeCode($code);
+		return !is_null($obj) ? $obj[self::ISO639] : null;
+	}
+
     /**
      * @param $language - the language to search
      * @return the 2 code key or $defaultCode if not known

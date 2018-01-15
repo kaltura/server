@@ -22,7 +22,7 @@ class KObjectTaskMailNotificationEngine
 			$entriesIdsAndNames = $data[self::ENTRIES_ID_AND_NAME];
 			foreach($entriesIdsAndNames as $entryIdAndName)
 			{
-				$id = $entryIdAndName[SELF::ENTRY_ID];
+				$id = $entryIdAndName[self::ENTRY_ID];
 				$name = $entryIdAndName[self::ENTRY_NAME];
 				$readyLink = $link ? " - ".str_replace(self::ENTRY_ID_PLACE_HOLDER, $id, $link) : '';
 				$body.="\t$name Id:$id $readyLink".PHP_EOL;

@@ -477,14 +477,17 @@ ini_set("memory_limit","512M");
 				/*
 				 * Get list of per scheduler running jobs
 				 */
-			$this->refetchJobs($jobs);
+			$refreshed = $this->refetchJobs($jobs);
 			$running = count($jobs);
+			if($running>0 && $refreshed==0){
+				return false;
+			}
 				/*
 				 * If there are no free execution slots - wait and retry
 				 */
 			if($running>=$maxSlots) {
 				KalturaLog::log("Running:$running - No free job slots, maxSlots:$maxSlots");
-				return false;
+				return null;
 			}
 
 				/*
@@ -493,7 +496,7 @@ ini_set("memory_limit","512M");
 			$job = $this->FetchNextJob();
 			if($job===null){
 				KalturaLog::log("Running:$running - No pending jobs");
-				return false;
+				return null;
 			}
 			else if($job===false){
 				KalturaLog::log("Failed to fetch next job");
@@ -513,6 +516,7 @@ ini_set("memory_limit","512M");
 		 */
 		protected function refetchJobs(&$jobs)
 		{
+			$cnt=0;
 			foreach($jobs as $idx=>$job) {
 				$job = $this->FetchJob($job->keyIdx);
 				if($job===false) {
@@ -525,7 +529,9 @@ ini_set("memory_limit","512M");
 				else {
 					$jobs[$idx] = $job;
 				}
+				$cnt++;
 			}
+			return $cnt;
 		}
 
 		/* ---------------------------

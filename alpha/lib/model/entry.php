@@ -142,6 +142,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CAPABILITIES = "capabilities";
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
+	const LIVE_THUMB_PATH = "content/templates/entry/thumbnail/live_thumb.jpg";
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -3509,7 +3510,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 		elseif ($this->getType () == entryType::MEDIA_CLIP || $this->getType() == entryType::PLAYLIST) {
 			try {
-				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
+				$msgPath = $this->getDefaultThumbPath($this->getType());
+				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath );
 			} catch ( Exception $ex ) {
 				if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) {
 					// get original flavor asset
@@ -3533,7 +3535,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			}
 		}
 	}
-	
+
 	public function isSecuredEntry() {
 		
 		$invalidModerationStatuses = array(
@@ -3830,6 +3832,14 @@ public function copyTemplate($copyPartnerId = false, $template)
 		if (!$parentEntry || $parentEntry->getId() == $this->getId())
 			return;
 
+		$parentCategoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($parentEntry->getId());
+		$parentCategoryIdsSearchData = array();
+		foreach ($parentCategoryEntries as $parentCategoryEntry)
+			self::getCategoryEntryElasticSearchData($parentCategoryEntry, $parentCategoryEntry->getStatus(), $parentCategoryIdsSearchData);
+
+		$parentCategoryIdsSearchData = array_unique($parentCategoryIdsSearchData);
+		$parentCategoryIdsSearchData = array_values($parentCategoryIdsSearchData);
+
 		$body['parent_entry'] = array(
 			'entry_id' => $parentEntry->getId(),
 			'partner_id' => $parentEntry->getPartnerId(),
@@ -3839,17 +3849,91 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entitled_kusers_publish' => $parentEntry->getEntitledKusersPublishArray(),
 			'kuser_id' => $parentEntry->getKuserId(),
 			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
-			'category_ids' => $parentEntry->getAllCategoriesIds(true),
-			'active_category_ids' => $parentEntry->getAllCategoriesIds(false),
+			'categories_ids' => $parentCategoryIdsSearchData,
 		);
 	}
 
 	protected function addCategoriesToObjectParams(&$body)
 	{
-		$categoryIds = $this->getAllCategoriesIds(true);
-		$body['category_ids'] = $categoryIds;
-		$body['active_category_ids'] = $this->getAllCategoriesIds(false);
-		$body['categories'] = categoryPeer::getFullNamesByCategoryIds($categoryIds);
+		$categoryEntries = categoryEntryPeer::selectByEntryId($this->getId());
+		list($categoryIdsSearchData, $categoryNamesSearchData) = $this->getCategoriesElasticSearchData($categoryEntries);
+		$body['categories_ids'] = $categoryIdsSearchData;
+		$body['categories_names'] = $categoryNamesSearchData;
+	}
+
+	protected function getCategoriesElasticSearchData($categoryEntries)
+	{
+		$categoryIds = array();
+		$mapCategoryEntryStatus = array();
+		$categoryIdsSearchData = array();
+		$categoryNamesSearchData = array();
+		foreach ($categoryEntries as $categoryEntry)
+		{
+			/** @var categoryEntry $categoryEntry */
+			self::getCategoryEntryElasticSearchData($categoryEntry, $categoryEntry->getStatus(), $categoryIdsSearchData);
+			$categoryIds[] = $categoryEntry->getCategoryId();
+			$mapCategoryEntryStatus[$categoryEntry->getCategoryId()] = $categoryEntry->getStatus();
+		}
+
+		if(count($categoryIds))
+		{
+			$categories = categoryPeer::retrieveByPKs($categoryIds);
+			foreach ($categories as $category)
+			{
+				$fullName = $category->getFullName();
+				self::getCategoryNamesSearchData($fullName, $mapCategoryEntryStatus[$category->getId()], $category->getName(), $categoryNamesSearchData);
+			}
+		}
+
+		$categoryIdsSearchData = array_unique($categoryIdsSearchData);
+		$categoryIdsSearchData = array_values($categoryIdsSearchData);
+		$categoryNamesSearchData = array_unique($categoryNamesSearchData);
+		$categoryNamesSearchData = array_values($categoryNamesSearchData);
+
+		return array($categoryIdsSearchData, $categoryNamesSearchData);
+	}
+
+	/**
+	 * @param $type
+	 * @return null|string
+	 */
+	protected function getDefaultThumbPath()
+	{
+		// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
+		if (($this->getSourceType() == EntrySourceType::RECORDED_LIVE || $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE) && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+			return myContentStorage::getFSContentRootPath() . self::LIVE_THUMB_PATH;
+		return null;
+	}
+
+	protected static function getCategoryEntryElasticSearchData($categoryEntry, $categoryEntryStatus,  &$categoryIdsSearchArr)
+	{
+		$fullIds = $categoryEntry->getCategoryFullIds();
+		$categoryIdsSearchArr[] = elasticSearchUtils::formatCategoryFullIdStatus($fullIds, $categoryEntryStatus);
+		$categoryIdsSearchArr[] = elasticSearchUtils::formatCategoryIdStatus($categoryEntry->getCategoryId(),$categoryEntryStatus);
+		$categoryIdsSearchArr[] = elasticSearchUtils::formatCategoryEntryStatus($categoryEntryStatus);
+		$categoryEntryFullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $fullIds);
+		foreach($categoryEntryFullIds as $categoryId)
+		{
+			if (!trim($categoryId))
+				continue;
+
+			if($categoryId != $categoryEntry->getCategoryId())
+				$categoryIdsSearchArr[] = elasticSearchUtils::formatParentCategoryIdStatus($categoryId, $categoryEntryStatus);
+		}
+	}
+
+	protected static function getCategoryNamesSearchData($categoryFullName, $categoryEntryStatus, $categoryName, &$categoryNameSearchArr)
+	{
+		$categoryNameSearchArr[] = elasticSearchUtils::formatCategoryNameStatus($categoryName, $categoryEntryStatus);
+		$categoryFullNames = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryFullName);
+		foreach($categoryFullNames as $categoryFName)
+		{
+			if (!trim($categoryFName))
+				continue;
+
+			if($categoryName != $categoryFName)
+				$categoryNameSearchArr[] = elasticSearchUtils::formatParentCategoryNameStatus($categoryFName, $categoryEntryStatus);
+		}
 	}
 
 	public function getTagsArr()

@@ -11,6 +11,12 @@ class KSecureEntryHelper
 	 * @var entry
 	 */
 	private $entry;
+
+	/**
+	 *
+	 * @var asset
+	 */
+	private $asset;
 	
 	/**
 	 * 
@@ -66,7 +72,7 @@ class KSecureEntryHelper
 	 * 
 	 * @param entry $entry
 	 */
-	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array(), $hashes = array())
+	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array(), $hashes = array(), $asset = null)
 	{
 		if(!is_array($contexts))
 			$contexts = array($contexts);
@@ -83,6 +89,7 @@ class KSecureEntryHelper
 		$this->referrer = $referrer;
 		$this->contexts = $contexts;
 		$this->hashes = $hashes;
+		$this->asset = $asset;
 		
 		$this->validateKs();
 		$this->applyContext();
@@ -423,6 +430,7 @@ class KSecureEntryHelper
 		$accessControlScope->setEntryId($this->entry->getId());
 		$accessControlScope->setContexts($this->contexts);
 		$accessControlScope->setHashes($this->hashes);
+		$accessControlScope->setAsset($this->asset);
 		
 		return $accessControlScope;
 	}

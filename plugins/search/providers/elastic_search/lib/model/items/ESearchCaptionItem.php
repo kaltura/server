@@ -123,8 +123,8 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		return elasticSearchUtils::UNDERSCORE_FIELD_DELIMITER;
 	}
 
-	public function getNestedQueryName()
+	public function getNestedQueryNames()
 	{
-		return ESearchItemDataType::CAPTION.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME;
+		return array(ESearchItemDataType::CAPTION.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME);
 	}
 }
