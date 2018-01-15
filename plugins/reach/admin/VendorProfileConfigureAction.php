@@ -17,12 +17,8 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 	{
 		$action->getHelper('layout')->disableLayout();
 		$this->client = Infra_ClientHelper::getClient();
-		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-		$request = $action->getRequest();
 		$partnerId = $this->_getParam('new_partner_id');
 		$vendorProfileId = $this->_getParam('vendor_profile_id');
-		$catalogItemForm = null;
-
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -31,82 +27,106 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		{
 			Infra_ClientHelper::impersonate($partnerId);
 			if ($vendorProfileId)
-			{
-				$vendorProfile = $reachPluginClient->vendorProfile->get($vendorProfileId);
-				$form = new Form_VendorProfileConfigure($partnerId, true);
-			} else
-			{
-				$form = new Form_VendorProfileConfigure($partnerId);
-			}
-
-			if (!$form || !($form instanceof Form_VendorProfileConfigure))
-			{
-				$action->view->errMessage = "Template form not found for type [test]";
-				return;
-			}
-
-			$urlParams = array(
-				'controller' => 'plugin',
-				'action' => 'VendorProfileConfigureAction',
-			);
-			if ($vendorProfileId)
-				$urlParams['vendor_profile_id'] = $vendorProfileId;
-
-			$form->setAction($action->view->url($urlParams));
-
-			if ($vendorProfileId) // update
-			{
-				if ($request->isPost())
-				{
-					$formData = $request->getPost();
-					$form->populate($formData);
-
-					$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
-
-					if ($form->isValid($formData))
-					{
-						$form->resetUnUpdatebleAttributes($vendorProfile);
-						$vendorProfile = $reachPluginClient->vendorProfile->update($vendorProfileId, $vendorProfile);
-						$form->setAttrib('class', 'valid');
-						$action->view->formValid = true;
-					}
-				}else
-				{
-					$form->populateFromObject($vendorProfile, false);
-				}
-			} else // new
-			{
-				$formData = $request->getPost();
-				$form->populate($formData);
-				if ($request->isPost() && $form->isValid($formData))
-				{
-					$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
-
-					$form->populate($formData);
-					$form->resetUnUpdatebleAttributes($vendorProfile);
-					$catalogItem = $reachPluginClient->vendorProfile->add($vendorProfile);
-					$form->setAttrib('class', 'valid');
-					$action->view->formValid = true;
-				} else
-				{
-					$form->getElement('partnerId')->setValue($partnerId);
-				}
-			}
+				$form = $this->handleExistingVendorProfile($action, $vendorProfileId, $partnerId);
+			else
+				$form = $this->handleNewVendorProfile($action, $partnerId);
 		} catch (Exception $e)
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
-
 			if ($form)
 			{
-				$formData = $request->getPost();
+				$formData = $action->getRequest()->getPost();
 				$form->populate($formData);
 				$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
 			}
 		}
-		Infra_ClientHelper::unimpersonate();
 
+		Infra_ClientHelper::unimpersonate();
 		$action->view->form = $form;
 		$action->view->vendorProfileId = $vendorProfileId;
+	}
+
+	/***
+	 * @param Zend_Controller_Action $action
+	 * @param $vendorProfileId
+	 * @param $partnerId
+	 * @throws Zend_Form_Exception
+	 */
+	protected function handleExistingVendorProfile(Zend_Controller_Action $action, $vendorProfileId, $partnerId)
+	{
+		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+		$vendorProfile = $reachPluginClient->vendorProfile->get($vendorProfileId);
+		$form = $this->initForm($action, $partnerId, $vendorProfileId);
+
+		$request = $action->getRequest();
+		$formData = $request->getPost();
+		if ($request->isPost() && $form->isValid($formData))
+			$this->handlePost($action, $form, $formData, $vendorProfileId);
+		else
+			$form->populateFromObject($vendorProfile, false);
+		return $form;
+	}
+
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $partnerId
+	 * @return mixed
+	 */
+	protected function handleNewVendorProfile(Zend_Controller_Action $action, $partnerId)
+	{
+		$form = $this->initForm($action, $partnerId);
+		$request = $action->getRequest();
+		$formData = $request->getPost();
+		$form->populate($formData);
+		if ($request->isPost() && $form->isValid($formData))
+			$this->handlePost($action, $form, $formData);
+		else
+			$form->getElement('partnerId')->setValue($partnerId);
+
+		return $form;
+	}
+
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $form
+	 * @param $formData
+	 */
+	protected function handlePost(Zend_Controller_Action $action, $form, $formData, $vendorProfileId = null)
+	{
+		$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
+		$form->populate($formData);
+		$form->resetUnUpdatebleAttributes($vendorProfile);
+		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+		if ($vendorProfileId)
+			$vendorProfile = $reachPluginClient->vendorProfile->update($vendorProfileId, $vendorProfile);
+		else
+			$vendorProfile = $reachPluginClient->vendorProfile->add($vendorProfile);
+
+		$form->setAttrib('class', 'valid');
+		$action->view->formValid = true;
+	}
+
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $partnerId
+	 * @param $vendorProfileId
+	 * @return Form_VendorProfileConfigure
+	 */
+	protected function initForm(Zend_Controller_Action $action, $partnerId, $vendorProfileId = null)
+	{
+		$urlParams = array(
+			'controller' => 'plugin',
+			'action' => 'VendorProfileConfigureAction',
+		);
+
+		if ($vendorProfileId)
+		{
+			$blockFields = true;
+			$urlParams['vendor_profile_id'] = $vendorProfileId;
+		}
+		$form = new Form_VendorProfileConfigure($partnerId, $blockFields);
+		$form->setAction($action->view->url($urlParams));
+		return $form;
 	}
 }
