@@ -3798,6 +3798,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'redirect_entry_id' => $this->getRedirectEntryId(),
 			'views' => $this->getViews(),
 			'votes' => $this->getVotes(),
+			'plays' => $this->getPlays(),
+			'last_played_at' => $this->getLastPlayedAt(null),
 		);
 
 		$this->addCategoriesToObjectParams($body);

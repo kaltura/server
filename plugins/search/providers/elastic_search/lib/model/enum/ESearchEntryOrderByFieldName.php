@@ -12,4 +12,6 @@ interface ESearchEntryOrderByFieldName extends BaseEnum
     const NAME = 'name.keyword';
     const VOTES = 'votes';
     const VIEWS = 'views';
+    const PLAYS = 'plays';
+    const LAST_PLAYED_AT = 'last_played_at';
 }
