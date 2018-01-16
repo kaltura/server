@@ -318,4 +318,10 @@ class flavorAsset extends exportableAsset
 		$copyObj->setLanguage($this->getLanguage());
 		$copyObj->setLabel($this->getLabel());
 	}
+
+	public function shouldEncrypt()
+	{
+		$entry = $this->getentry();
+		return ($entry->getType() == entryType::DOCUMENT);
+	}
 }

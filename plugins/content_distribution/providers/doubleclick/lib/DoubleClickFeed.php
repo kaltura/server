@@ -40,16 +40,28 @@ class DoubleClickFeed
 	 * @var DoubleClickDistributionProfile
 	 */
 	protected $distributionProfile;
-	
+
+	/**
+	 * @var int
+	 */
+	protected $version;
+
+	/**
+	 * @var DOMElement
+	 */
+	protected $caption;
+
 	/**
 	 * @param $templateName
 	 * @param DoubleClickDistributionProfile $profile
+	 * @param $version
 	 * @param $distributionProfile
 	 */
-	public function __construct($templateName, DoubleClickDistributionProfile $profile)
+	public function __construct($templateName, DoubleClickDistributionProfile $profile, $version)
 	{
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
 		$this->distributionProfile = $profile;
+		$this->version = $version;
 		
 		$this->doc = new KDOMDocument('1.0', 'UTF-8');
 		$this->doc->formatOutput = true;
@@ -57,37 +69,70 @@ class DoubleClickFeed
 		$this->doc->load($xmlTemplate);
 		
 		$this->xpath = new DOMXPath($this->doc);
-		$this->xpath->registerNamespace('media', 'http://search.yahoo.com/mrss/');
-		$this->xpath->registerNamespace('atom', 'http://www.w3.org/2005/Atom');
-		$this->xpath->registerNamespace('openSearch', 'http://a9.com/-/spec/opensearchrss/1.0/');
-		$this->xpath->registerNamespace('dfpvideo', 'http://api.google.com/dfpvideo');
-		
+		$this->addDfpMrssNameSpaces();
+		$this->setTemplateNodes();
+		$this->setProfileProperties($profile);
+		if($version < 2)
+			$this->setItemsPerPage($profile->getItemsPerPage());
+	}
+
+	public function setTemplateNodes()
+	{
 		// item node template
 		$node = $this->xpath->query('/rss/channel/item')->item(0);
 		$this->item = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 
-		// content node template
-		$node = $this->xpath->query('media:group/media:content', $this->item)->item(0);
-		$this->content = $node->cloneNode(true);
-		$node->parentNode->removeChild($node);
-		
-		// thumbnail node template
-		$node = $this->xpath->query('media:group/media:thumbnail', $this->item)->item(0);
-		$this->thumbnail = $node->cloneNode(true);
-		$node->parentNode->removeChild($node);
-		
-		// category node template
-		$node = $this->xpath->query('media:group/media:category', $this->item)->item(0);
-		$this->category = $node->cloneNode(true);
-		$node->parentNode->removeChild($node);
-		
-		// set profile properties
-		kXml::setNodeValue($this->xpath,'/rss/channel/title', $profile->getChannelTitle());
-		kXml::setNodeValue($this->xpath,'/rss/channel/description', $profile->getChannelDescription());
-		kXml::setNodeValue($this->xpath,'/rss/channel/link', $profile->getChannelLink());
-		
-		$this->setItemsPerPage($profile->getItemsPerPage());
+		$nodes = array();
+		if($this->version == 2)
+		{
+			$nodes['content'] = $this->xpath->query('media:content', $this->item)->item(0);
+			$nodes['thumbnail'] = $this->xpath->query('media:thumbnail', $this->item)->item(0);
+			$nodes['category'] = $this->xpath->query('dfpvideo:keyvalues[@key="category"]', $this->item)->item(0);
+			$nodes['caption'] = $this->xpath->query('dfpvideo:closedCaptionUrl', $this->item)->item(0);
+		}
+		else
+		{
+			$nodes['content'] = $this->xpath->query('media:group/media:content', $this->item)->item(0);
+			$nodes['thumbnail'] = $this->xpath->query('media:group/media:thumbnail', $this->item)->item(0);
+			$nodes['category']  = $this->xpath->query('media:group/media:category', $this->item)->item(0);
+		}
+
+		foreach ($nodes as $key=>$value)
+		{
+			$this->{$key} = $value->cloneNode(true);
+			$value->parentNode->removeChild($value);
+		}
+	}
+
+
+	public function addDfpMrssNameSpaces()
+	{
+		$this->xpath->registerNamespace('media', 'http://search.yahoo.com/mrss/');
+		$this->xpath->registerNamespace('atom', 'http://www.w3.org/2005/Atom');
+		$this->xpath->registerNamespace('openSearch', 'http://a9.com/-/spec/opensearchrss/1.0/');
+		$this->xpath->registerNamespace('dfpvideo', 'http://api.google.com/dfpvideo');
+		if($this->version == 2)
+			$this->xpath->registerNamespace('version', '2.0');
+	}
+
+	/**
+	 * @param DoubleClickDistributionProfile $profile
+	 */
+	public function setProfileProperties(DoubleClickDistributionProfile $profile)
+	{
+		if($this->version == 2)
+		{
+			kXml::setNodeValue($this->xpath,'/rss/channel/title', $profile->getChannelTitle());
+			kXml::setNodeValue($this->xpath,'/rss/channel/dfpvideo:keyvalues[@key="description"]/@value', $profile->getChannelDescription());
+			kXml::setNodeValue($this->xpath,'/rss/channel/dfpvideo:keyvalues[@key="link"]/@value', $profile->getChannelLink());
+		}
+		else
+		{
+			kXml::setNodeValue($this->xpath,'/rss/channel/title', $profile->getChannelTitle());
+			kXml::setNodeValue($this->xpath,'/rss/channel/description', $profile->getChannelDescription());
+			kXml::setNodeValue($this->xpath,'/rss/channel/link', $profile->getChannelLink());
+		}
 	}
 	
 	/**
@@ -113,50 +158,26 @@ class DoubleClickFeed
 		$channelNode->appendChild($importedItem);
 	}
 
-	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints)
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints, $captionAssets = null, entry $entry = null)
 	{
-		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $cuePoints);
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $cuePoints, $captionAssets, $entry);
 		return $this->doc->saveXML($item);
 	}
 
-	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints)
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints, $captionAssets = null, entry $entry = null)
 	{
 		$item = $this->item->cloneNode(true);
 
-		kXml::setNodeValue($this->xpath,'guid', $values[DoubleClickDistributionField::GUID], $item);
 		kXml::setNodeValue($this->xpath,'pubDate', date('r', $values[DoubleClickDistributionField::PUB_DATE]), $item);
 		kXml::setNodeValue($this->xpath,'title', $values[DoubleClickDistributionField::TITLE], $item);
-		kXml::setNodeValue($this->xpath,'description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
-		kXml::setNodeValue($this->xpath,'link', $values[DoubleClickDistributionField::LINK], $item);
-		kXml::setNodeValue($this->xpath,'author', $values[DoubleClickDistributionField::AUTHOR], $item);
-		kXml::setNodeValue($this->xpath,'media:title', $values[DoubleClickDistributionField::TITLE], $item);
-		kXml::setNodeValue($this->xpath,'media:description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
-		kXml::setNodeValue($this->xpath,'media:keywords', $values[DoubleClickDistributionField::KEYWORDS], $item);
-
-		$categories = explode(',', $values[DoubleClickDistributionField::CATEGORIES]);
-		foreach($categories as $category)
-		{
-			$category = trim($category);
-			if (!$category)
-				continue;
-			$categoryNode = $this->category->cloneNode(true);
-			$categoryNode->nodeValue = $category;
-			$mediaGroupNode = $item->getElementsByTagName('group')->item(0);
-			if ($mediaGroupNode)
-				$mediaGroupNode->appendChild($categoryNode);
-		}
-
 		kXml::setNodeValue($this->xpath,'dfpvideo:contentID', $values[DoubleClickDistributionField::GUID], $item);
-		kXml::setNodeValue($this->xpath,'dfpvideo:monetizable', $values[DoubleClickDistributionField::MONETIZABLE], $item);
 
-		$statsNode = $this->xpath->query('dfpvideo:stats', $item)->item(0);
-		$this->setOptionalAttribute($statsNode, 'totalViewCount', $values[DoubleClickDistributionField::TOTAL_VIEW_COUNT]);
-		$this->setOptionalAttribute($statsNode, 'previousDayViewCount', $values[DoubleClickDistributionField::PREVIOUS_DAY_VIEW_COUNT]);
-		$this->setOptionalAttribute($statsNode, 'previousWeekViewCount', $values[DoubleClickDistributionField::PREVIOUS_WEEK_VIEW_COUNT]);
-		$this->setOptionalAttribute($statsNode, 'favoriteCount', $values[DoubleClickDistributionField::FAVORITE_COUNT]);
-		$this->setOptionalAttribute($statsNode, 'likeCount', $values[DoubleClickDistributionField::LIKE_COUNT]);
-		$this->setOptionalAttribute($statsNode, 'dislikeCount', $values[DoubleClickDistributionField::DISLIKE_COUNT]);
+		if($this->version == 2)
+			$this->setUniqueVersion2Elements($values, $item, $entry);
+		else
+			$this->setUniqueVersion1Elements($values, $item);
 
+		$this->setCategories($values, $item);
 		$this->setCuePoints($item, $cuePoints);
 		$this->setDynamicMetadata($item, $values);
 
@@ -166,9 +187,106 @@ class DoubleClickFeed
 		if (is_array($thumbAssets))
 			$this->setThumbAssets($item, $thumbAssets);
 
+		if (is_array($captionAssets))
+			$this->setCaptionAssets($item, $captionAssets);
+
 		return $item;
 	}
-	
+
+
+	public function addKeyvaluesElement($item, $type, $key, $value)
+	{
+		$keyvaluesElement = $this->doc->createElement('dfpvideo:keyvalues');
+		$keyvaluesElement->setAttribute('type', $type);
+		$keyvaluesElement->setAttribute('key', $key);
+		$keyvaluesElement->setAttribute('value', $value);
+		$item->appendChild($keyvaluesElement);
+	}
+
+
+	public function setUniqueVersion2Elements($values, $item, $entry)
+	{
+		kXml::setNodeValue($this->xpath, 'dfpvideo:lastModifiedDate', date('r', $values[DoubleClickDistributionField::LAST_MEDIA_MODIFIED_DATE]), $item);
+		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="description"]/@value', $values[DoubleClickDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="link"]/@value', $values[DoubleClickDistributionField::LINK], $item);
+		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="author"]/@value', $values[DoubleClickDistributionField::AUTHOR], $item);
+		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="keywords"]/@value', $values[DoubleClickDistributionField::KEYWORDS], $item);
+		kXml::setNodeValue($this->xpath, 'dfpvideo:lastMediaModifiedDate', date('r', $values[DoubleClickDistributionField::LAST_MEDIA_MODIFIED_DATE]), $item);
+		kXml::setNodeValue($this->xpath, 'media:status/@state', $values[DoubleClickDistributionField::STATUS], $item);
+		kXml::setNodeValue($this->xpath, 'dfpvideo:fw_caid', $values[DoubleClickDistributionField::FW_CAID], $item);
+
+		if($entry)
+		{
+			$ingestUrl = $entry->createPlayManifestUrlByFormat(PlaybackProtocol::APPLE_HTTP) . '/a.m3u8';
+			kXml::setNodeValue($this->xpath, 'dfpvideo:ingestUrl', $ingestUrl, $item);
+		}
+		$this->setStatsVersion2Elements($values, $item);
+	}
+
+
+	public function setStatsVersion2Elements($values, $item)
+	{
+		$statsInfo = array(
+			'totalViewCount' => $values[DoubleClickDistributionField::TOTAL_VIEW_COUNT],
+			'previousDayViewCount' => $values[DoubleClickDistributionField::PREVIOUS_DAY_VIEW_COUNT],
+			'previousWeekViewCount'=> $values[DoubleClickDistributionField::PREVIOUS_WEEK_VIEW_COUNT],
+			'favoriteCount' => $values[DoubleClickDistributionField::FAVORITE_COUNT],
+			'likeCount' => $values[DoubleClickDistributionField::LIKE_COUNT],
+			'dislikeCount' => $values[DoubleClickDistributionField::DISLIKE_COUNT]
+		);
+
+		foreach ($statsInfo as $key=>$value)
+		{
+			if ($value)
+				$this->addKeyvaluesElement($item, 'int', $key, $value);
+		}
+	}
+
+
+	public function setUniqueVersion1Elements($values, $item)
+	{
+		kXml::setNodeValue($this->xpath, 'guid', $values[DoubleClickDistributionField::GUID], $item);
+		kXml::setNodeValue($this->xpath, 'description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath, 'link', $values[DoubleClickDistributionField::LINK], $item);
+		kXml::setNodeValue($this->xpath, 'author', $values[DoubleClickDistributionField::AUTHOR], $item);
+		kXml::setNodeValue($this->xpath, 'media:title', $values[DoubleClickDistributionField::TITLE], $item);
+		kXml::setNodeValue($this->xpath, 'media:description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath, 'media:keywords', $values[DoubleClickDistributionField::KEYWORDS], $item);
+		kXml::setNodeValue($this->xpath, 'dfpvideo:monetizable', $values[DoubleClickDistributionField::MONETIZABLE], $item);
+
+		$statsNode = $this->xpath->query('dfpvideo:stats', $item)->item(0);
+		$this->setOptionalAttribute($statsNode, 'totalViewCount', $values[DoubleClickDistributionField::TOTAL_VIEW_COUNT]);
+		$this->setOptionalAttribute($statsNode, 'previousDayViewCount', $values[DoubleClickDistributionField::PREVIOUS_DAY_VIEW_COUNT]);
+		$this->setOptionalAttribute($statsNode, 'previousWeekViewCount', $values[DoubleClickDistributionField::PREVIOUS_WEEK_VIEW_COUNT]);
+		$this->setOptionalAttribute($statsNode, 'favoriteCount', $values[DoubleClickDistributionField::FAVORITE_COUNT]);
+		$this->setOptionalAttribute($statsNode, 'likeCount', $values[DoubleClickDistributionField::LIKE_COUNT]);
+		$this->setOptionalAttribute($statsNode, 'dislikeCount', $values[DoubleClickDistributionField::DISLIKE_COUNT]);
+	}
+
+
+	public function setCategories($values, $item)
+	{
+		$categories = explode(',', $values[DoubleClickDistributionField::CATEGORIES]);
+		foreach ($categories as $category) {
+			$category = trim($category);
+			if (!$category)
+				continue;
+			$categoryNode = $this->category->cloneNode(true);
+			if($this->version < 2)
+			{
+				$categoryNode->nodeValue = $category;
+				$mediaGroupNode = $item->getElementsByTagName('group')->item(0);
+				if ($mediaGroupNode)
+					$mediaGroupNode->appendChild($categoryNode);
+			}
+			else
+			{
+				kXml::setNodeValue($this->xpath,'@value', $category, $categoryNode);
+				$item->appendChild($categoryNode);
+			}
+		}
+	}
+
 	public function getAssetUrl(asset $asset)
 	{
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
@@ -247,8 +365,14 @@ class DoubleClickFeed
 		{
 			/* @var $flavorAsset flavorAsset */
 			$content = $this->content->cloneNode(true);
-			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
-			$mediaGroup->appendChild($content);
+			if($this->version < 2)
+			{
+				$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
+				$mediaGroup->appendChild($content);
+			}
+			else
+				$item->appendChild($content);
+			
 				
 			$url = $this->getAssetUrl($flavorAsset);
 			$type = '';
@@ -266,7 +390,7 @@ class DoubleClickFeed
 				default:
 					// mime type function is not available on our enviroment, we will only cover mp4 & flv mime types
 					//$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					//if(kFileSyncUtils::fileSync_exists($syncKey)) 
+					//if(kFileSyncUtils::fileSync_exists($syncKey))
 					//{
 					//$path = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 					//$type = mime_content_type($path);
@@ -275,13 +399,17 @@ class DoubleClickFeed
 			} 
 			
 			kXml::setNodeValue($this->xpath,'@url', $url, $content);
-			kXml::setNodeValue($this->xpath,'@type', $type, $content);
-			kXml::setNodeValue($this->xpath,'@fileSize', (int)$flavorAsset->getSize(), $content);
 			kXml::setNodeValue($this->xpath,'@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
-			kXml::setNodeValue($this->xpath,'@width', $flavorAsset->getWidth(), $content);
-			kXml::setNodeValue($this->xpath,'@height', $flavorAsset->getHeight(), $content);
-			kXml::setNodeValue($this->xpath,'@bitrate', $flavorAsset->getBitrate(), $content);
-			kXml::setNodeValue($this->xpath,'@isDefault', ($first) ? 'true' : 'false', $content);
+			if($this->version < 2)
+			{
+				kXml::setNodeValue($this->xpath,'@type', $type, $content);
+				kXml::setNodeValue($this->xpath,'@fileSize', (int)$flavorAsset->getSize(), $content);
+				kXml::setNodeValue($this->xpath,'@width', $flavorAsset->getWidth(), $content);
+				kXml::setNodeValue($this->xpath,'@height', $flavorAsset->getHeight(), $content);
+				kXml::setNodeValue($this->xpath,'@bitrate', $flavorAsset->getBitrate(), $content);
+				kXml::setNodeValue($this->xpath,'@isDefault', ($first) ? 'true' : 'false', $content);
+			}
+
 			$first = false;
 		}
 	}
@@ -295,13 +423,46 @@ class DoubleClickFeed
 		{
 			/* @var $flavorAsset flavorAsset */
 			$content = $this->thumbnail->cloneNode(true);
-			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
-			$mediaGroup->appendChild($content);
+			if($this->version < 2)
+			{
+				$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
+				$mediaGroup->appendChild($content);
+			}
+			else
+				$item->appendChild($content);
+
 			$url = $this->getAssetUrl($thumbAsset);
-			
+
 			kXml::setNodeValue($this->xpath,'@url', $url, $content);
 			kXml::setNodeValue($this->xpath,'@width', $thumbAsset->getWidth(), $content);
 			kXml::setNodeValue($this->xpath,'@height', $thumbAsset->getHeight(), $content);
+		}
+	}
+
+
+	public function setCaptionAssets($item, $captionAssets)
+	{
+		foreach($captionAssets as $captionAsset)
+		{
+			/* @var $captionAsset captionAsset */
+			$type = '';
+			if($captionAsset->getFileExt() == 'xml')
+				$type = 'application/ttaf+xml';
+			elseif($captionAsset->getFileExt() == 'vtt')
+				$type = 'text/vtt';
+			else
+				continue;
+
+			$content = $this->caption->cloneNode(true);
+			$item->appendChild($content);
+			$url = $this->getAssetUrl($captionAsset);
+
+			$content->nodeValue = $url;
+			kXml::setNodeValue($this->xpath,'@type', $type, $content);
+
+			$obj = languageCodeManager::getObjectFromKalturaName($captionAsset->getLanguage());
+			$twoCodeLang = !is_null($obj)? $obj[languageCodeManager::ISO639]: '';
+			kXml::setNodeValue($this->xpath,'@language', $twoCodeLang, $content);
 		}
 	}
 	

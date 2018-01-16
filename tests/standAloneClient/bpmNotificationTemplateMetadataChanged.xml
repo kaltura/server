@@ -88,12 +88,6 @@
 							</item>
 						</values>
 					</item>
-					<item objectType="KalturaEventFieldCondition">
-						<description>Not first metadata version</description>
-						<field objectType="KalturaEvalBooleanField">
-							<code>!is_null($scope->getEvent()->getPreviousVersion())</code>
-						</field>
-					</item>
 				</eventConditions>
 				<userParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
