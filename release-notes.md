@@ -1,4 +1,4 @@
-# Mercury 13.11.0 # 
+ 
 
 ## Add Entry replaced EMAIL template which excludes kaltura recorded entries ##
 
