@@ -477,6 +477,20 @@
 			}
 		  }
 		},
+		"users_name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+		  	"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			}
+		  }
+		},
 		"reference_id": {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"

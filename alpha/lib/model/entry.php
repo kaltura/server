@@ -3585,17 +3585,69 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return $flavorAssetIds;
 	}
 	
-	public function getUserNames() {
+	public function getUserNames()
+	{
 		$kuser = $this->getkuser();
-		if(!$kuser)
-			return "";
-		
+		if($kuser)
+		{
+			$userNames = $this->getUserNamesAsArray($kuser);
+			if ($userNames)
+				return implode(" ", $userNames);
+		}
+
+		return "";
+	}
+
+	private function getAllUserNamesAsArray()
+	{
+
+		$result = array();
+		$users = $this->getAllUsers();
+
+		foreach ($users as $user)
+		{
+			$result2 = $this->getUserNamesAsArray($user, false);
+			$result = array_merge($result, $result2);
+		}
+
+		if($result)
+			return $result;
+
+		return null;
+	}
+
+	private function getAllUsers()
+	{
+		$kUsersIds = array();
+
+		if($this->getKuserId())
+			$kUsersIds[] = $this->getKuserId();
+
+		if($this->getCreatorKuserId())
+			$kUsersIds[] = $this->getCreatorKuserId();
+
+		$entitledKusersIds = $this->getEntitledKusersEditArray();
+		$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		$entitledKusersIds = $this->getEntitledKusersPublishArray();
+		$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		return  kuserPeer::retrieveByPKs($kUsersIds);
+	}
+
+	private function getUserNamesAsArray($kuser, $includeNullValues = true)
+	{
 		$userNames = array();
-		$userNames[] = $kuser->getFirstName();
-		$userNames[] = $kuser->getLastName();
-		$userNames[] = $kuser->getScreenName();
-		
-		return implode(" ", $userNames);
+		if($includeNullValues || $kuser->getFirstName())
+			$userNames[] = $kuser->getFirstName();
+
+		if($includeNullValues || $kuser->getLastName())
+			$userNames[] = $kuser->getLastName();
+
+		if($includeNullValues || $kuser->getScreenName())
+			$userNames[] = $kuser->getScreenName();
+
+		return $userNames;
 	}
 
 	public function getCapabilities()
@@ -3800,6 +3852,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'votes' => $this->getVotes(),
 			'plays' => $this->getPlays(),
 			'last_played_at' => $this->getLastPlayedAt(null),
+			'user_names' => $this->getAllUserNamesAsArray(),
 		);
 
 		$this->addCategoriesToObjectParams($body);
