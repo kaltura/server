@@ -10,7 +10,7 @@ class kEncryptFileUtils
 {
     //iv length should be 16
     CONST ENCRYPT_METHOD = "AES-256-CBC";
-    const OPENSSL_RAW_DATA = 1;
+    const OPENSSL_RAW_DATA = 1; //can be removed once on PHP7
     const ENCRYPT_INTERVAL = 3145728; // as 3MB = 1024 * 1024 * 3
     const AES_BLOCK_SIZE = 16; //For IV extraction
 
@@ -73,7 +73,7 @@ class kEncryptFileUtils
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
             $fd1 = fopen($srcFilePath, "rb");
-            $fd2 = fopen($tempPath, "w+");
+            $fd2 = fopen($tempPath, "w");
             while (!feof($fd1))
             {
                 $iv = call_user_func_array("self::$functionName", array($fd1, $key, $iv, $fd2));
@@ -91,7 +91,7 @@ class kEncryptFileUtils
                 fclose($fd1);
             if ($fd2)
                 fclose($fd2);
-            return false;
+            throw new Exception("Failed to [$functionName] for src path [$srcFilePath] and dest [$dstFilePath] because " . $e->getMessage());
         }
     }
 

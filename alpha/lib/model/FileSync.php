@@ -122,7 +122,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	private function getClearTempPath()
 	{
 		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
-		return sys_get_temp_dir(). "/". $this->getEncryptionKey() . ".$type";
+		return sys_get_temp_dir(). "/". $this->getEncryptionKey() . $this->getVersion() . ".$type";
 	}
 	
 	public function getFullPath ()
