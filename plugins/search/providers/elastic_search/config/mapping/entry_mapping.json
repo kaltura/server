@@ -525,8 +525,15 @@
 		"views": {
 		  "type" : "long"
 		},
+		"plays": {
+		  "type" : "long"
+		},
 		"votes": {
 		  "type" : "long"
+		},
+		"last_played_at": {
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"recorded_entry_id": {
 		  "type" : "text",

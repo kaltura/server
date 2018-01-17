@@ -3850,7 +3850,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'redirect_entry_id' => $this->getRedirectEntryId(),
 			'views' => $this->getViews(),
 			'votes' => $this->getVotes(),
-			'user_names' => $this->getAllUserNamesAsArray()
+			'plays' => $this->getPlays(),
+			'last_played_at' => $this->getLastPlayedAt(null),
+			'user_names' => $this->getAllUserNamesAsArray(),
 		);
 
 		$this->addCategoriesToObjectParams($body);
