@@ -25,12 +25,6 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaFilter
 		"vendorProfileIdIn" => "_in_vendor_profile_id",
 		"catalogItemIdEqual" => "_eq_catalog_item_id",
 		"catalogItemIdIn" => "_in_catalog_item_id",
-		"userIdEqual" => "_eq_user_id",
-		"userIdIn" => "_in_user_id",
-		"userIdNotIn" => "_notin_user_id",
-		"approvedByEqual" => "_eq_approved_by",
-		"approvedByIn" => "_in_approved_by",
-		"approvedByNotIn" => "_notin_approved_by",
 	);
 
 	static private $order_by_map = array
@@ -141,34 +135,4 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $catalogItemIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $userIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $userIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $userIdNotIn;
-
-	/**
-	 * @var string
-	 */
-	public $approvedByEqual;
-
-	/**
-	 * @var string
-	 */
-	public $approvedByIn;
-
-	/**
-	 * @var string
-	 */
-	public $approvedByNotIn;
 }

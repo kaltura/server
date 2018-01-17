@@ -5,6 +5,6 @@
  */ 
 interface VendorCatalogItemPriceFunction extends BaseEnum
 {
-	const PRICE_PER_SECOND		= "entry::calcPricePerSecond";
-	const PRICE_PER_MINUTE		= "entry::calcPricePerMinute";
+	const PRICE_PER_SECOND		= "kReachUtils::calcPricePerSecond";
+	const PRICE_PER_MINUTE		= "kReachUtils::calcPricePerMinute";
 }

@@ -8,7 +8,7 @@
  * @subpackage model
  *
  */
-class kTimeRangeVendorCredit
+class kTimeRangeVendorCredit extends kVendorCredit
 {
 	/**
 	 *  @var string
