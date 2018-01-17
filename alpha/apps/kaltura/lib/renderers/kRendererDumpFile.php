@@ -24,7 +24,7 @@ class kRendererDumpFile implements kRendererBase
 	
 	public $partnerId;
 
-	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null)
+	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null, $fileSize = null)
 	{
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
@@ -42,7 +42,7 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			clearstatcache();
-			$this->fileSize = kEncryptFileUtils::fileSize($filePath, $key, $iv);
+			$this->fileSize = $fileSize ? $fileSize : kEncryptFileUtils::fileSize($filePath, $key, $iv);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
 		
