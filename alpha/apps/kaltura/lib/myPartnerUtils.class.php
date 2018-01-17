@@ -1877,15 +1877,17 @@ class myPartnerUtils
 			$partner->setStatus(Partner::PARTNER_STATUS_DELETED);
 		}
 
-		$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
-		$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
-		KalturaLog::debug('closest day comparing today ['.$closestUpdatesDay.']');
-		if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
+		if(kConf::hasParam('free_trial_updates_days'))
 		{
-			KalturaLog::debug('Partner ['.$partner->getId().'] reached to one of the Marketo lead sync days.');
-			$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
+			$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
+			$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
+			KalturaLog::debug('closest day comparing today [' . $closestUpdatesDay . ']');
+			if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
+			{
+				KalturaLog::debug('Partner [' . $partner->getId() . '] reached to one of the Marketo lead sync days.');
+				$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
+			}
 		}
-
 		$partner->save();
 	}
 

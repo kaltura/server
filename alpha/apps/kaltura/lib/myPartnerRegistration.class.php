@@ -355,11 +355,17 @@ class myPartnerRegistration
 				{
 					$result = myPartnerUtils::retrieveActivePartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
 					if($result)
+					{
+						$similarPartner = $result[0];
+						$similarPartner->setSubPartnerRequestCampaign(1);
+						$similarPartner->save();
 						throw new SignupException("Free Trial user with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS);
+					}
+
 				}
 			}
 		}
-			
+
 			
 		// TODO: log request
 		$newPartner = NULL;
