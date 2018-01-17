@@ -1,4 +1,26 @@
-# Mercury 13.12.0 # 
+# Mercury 13.12.0 #
+
+## Add permission to create VAST cue point without URL ##
+
+- Issue Type: feature
+- Issue ID: PLAT-8468
+
+### Configuration ###
+	-Add new module to the admin-console in admin.ini
+        moduls.VastCuePointNoUrl.enabled = true
+        moduls.VastCuePointNoUrl.permissionType = 2
+        moduls.VastCuePointNoUrl.label = "Allow creating VAST advertising cue points without URL"
+        moduls.VastCuePointNoUrl.permissionName = FEATURE_ALLOW_VAST_CUE_POINT_NO_URL
+        moduls.VastCuePointNoUrl.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+		None.
+
+#### Known Issues & Limitations ####
+
+		None.
+
 
 ## Add notification for server node going offline ##
 
