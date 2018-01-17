@@ -154,13 +154,27 @@ class KDLWrap
 			/*
 			 * Handle Chunked-Encode cases
 			 */
-			if ($trg->_cdlObject->getChunkedEncodeMode() == 1)
-			{
+			if ($trg->_cdlObject->getChunkedEncodeMode() == 1) {
 				$tmpTrans = clone $trg->_transcoders[0];
-				if ($tmpTrans->_id == KDLTranscoders::FFMPEG)
-				{
-					$tmpTrans->_id = conversionEngineType::CHUNKED_FFMPEG;
-					array_unshift($trg->_transcoders, $tmpTrans);
+				if($tmpTrans->_id==KDLTranscoders::FFMPEG) {
+					/*
+					 * Check compliance to Chunked Encoding requirements
+					 */
+					$vcodec = isset($trg->_video->_id)? $trg->_video->_id: null;
+					$acodec = isset($trg->_audio->_id)? $trg->_audio->_id: null;
+					$format = isset($trg->_container->_id)? $trg->_container->_id: null;
+					$fps 	= isset($trg->_video->_frameRate)? $trg->_video->_frameRate: null;
+					$gop 	= isset($trg->_video->_gop)? $trg->_video->_gop: null;
+					$duration = isset($trg->_container->_duration)? round($trg->_container->_duration/1000): null;;
+					$height = isset($trg->_video->_height)? $trg->_video->_height: null;
+					$rv=KChunkedEncode::verifySupport($vcodec,$acodec,$format,$fps,$gop,$duration,$height,$msgStr);
+					if($rv===true){
+						$tmpTrans->_id=conversionEngineType::CHUNKED_FFMPEG;
+						array_unshift($trg->_transcoders,$tmpTrans);
+					}
+					else {
+						KalturaLog::log($msgStr);
+					}
 				}
 			}
 
