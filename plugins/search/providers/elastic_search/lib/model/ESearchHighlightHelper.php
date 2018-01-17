@@ -8,9 +8,9 @@ class ESearchHighlightHelper
 {
 	public static function removeDuplicateHits(&$eHighlight)
 	{
-		uksort($eHighlight, 'ESearchHighlightHelper::cmpHighlightFieldsByPriority');
+		uksort($eHighlight, array('ESearchHighlightHelper','cmpHighlightFieldsByPriority'));
 		$uniqueValues = array();
-		foreach ($eHighlight as $key => $hits)
+		foreach ($eHighlight as $fieldName => $hits)
 		{
 			$filteredHits = array();
 			foreach ($hits as $hit)
@@ -25,9 +25,9 @@ class ESearchHighlightHelper
 			}
 
 			if(empty($filteredHits))
-				unset($eHighlight[$key]);
+				unset($eHighlight[$fieldName]);
 			else
-				$eHighlight[$key] = $filteredHits;
+				$eHighlight[$fieldName] = $filteredHits;
 		}
 	}
 
