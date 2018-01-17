@@ -53,13 +53,19 @@ while($s = trim(fgets($f))){
 			$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
 			//update elastic via sphinx log
-			$params['body']['doc']['plays'] = $entry->getPlays();
-			$params['body']['doc']['views'] = $entry->getViews();
-			$params['body']['doc']['last_played_at'] = $entry->getLastPlayedAt(null);
-			$params['index'] = $entry->getElasticIndexName();
-			$params['type'] = $entry->getElasticObjectType();
-			$params['id'] = $entry->getElasticId();
-			$params['action'] = ElasticMethodType::UPDATE;
+			$params = array(
+				'index' => $entry->getElasticIndexName(),
+				'type' => $entry->getElasticObjectType(),
+				'id' => $entry->getElasticId(),
+				'action' => ElasticMethodType::UPDATE,
+				'body' => array(
+					'doc' => array(
+						'plays' => $entry->getPlays(),
+						'views' => $entry->getViews(),
+						'last_played_at' => $entry->getLastPlayedAt(null)
+					)
+				)
+			);
 
 			$elasticLog = new SphinxLog();
 			$command = serialize($params);
