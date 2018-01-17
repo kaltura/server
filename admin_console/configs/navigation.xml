@@ -20,11 +20,6 @@
 				<controller>partner-usage</controller>
 				<action>index</action>
 			</account-usage>
-			<kava-usage>
-				<label>Kava dashboard</label>
-				<controller>kava</controller>
-				<action>kava</action>
-			</kava-usage>
 		</pages>
 	</accounts>
 	<users>

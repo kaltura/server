@@ -58,13 +58,13 @@ class IndexController extends Zend_Controller_Action
 		$jwtKey = $settings->kavaDashboard->jwtKey;
 		$partnerId = $settings->partnerId;
 		
-		if(!$kavaDashboardUrl || $kavaDashboardUrl == "" || !$jwtKey || $jwtKey == "")
+		if(!$kavaDashboardUrl || !$jwtKey)
 			$this->view->kavaDashboardUrl = null;
 		else
-			$this->view->kavaDashboardUrl = $this->getnerateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
+			$this->view->kavaDashboardUrl = $this->generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
 	}
 	
-	private function getnerateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry)
+	private function generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry)
 	{
 		$jwtPayload = array(
 			'partnerId' => $partnerId,
