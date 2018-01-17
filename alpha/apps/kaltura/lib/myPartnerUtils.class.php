@@ -2084,4 +2084,22 @@ class myPartnerUtils
 			return true;
 		return false;
 	}
+
+	/**
+	 *  retrieve all the partners in status active with specific admin email and package type
+	 *
+	 * @param partner $partner
+	 * @param $package
+	 * @return array
+	 */
+	public static function retrieveActivePartnerByEmailAndPackage ($partner, $package)
+	{
+		$c = new Criteria();
+		$c->add(PartnerPeer::ADMIN_EMAIL, $partner->getAdminEmail());
+		$c->add(PartnerPeer::PARTNER_PACKAGE, $package);
+		$c->add(PartnerPeer::STATUS, KalturaPartnerStatus::ACTIVE);
+		$result = PartnerPeer::doSelect($c);
+		return $result;
+	}
+
 }
