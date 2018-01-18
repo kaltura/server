@@ -130,8 +130,14 @@ class embedPlaykitJsAction extends sfAction
 	private function appendConfig($content)
 	{
 	    $uiConf = $this->playerConfig;
-	    $uiConf["env"] = $this->getEnvConfig();
-	    $uiConfJson = json_encode($uiConf);
+	    if (!$uiConf["provider"]) {
+		    $uiConf["provider"] = array();
+	    }
+	    if (!$uiConf["provider"]["env"]) {
+		    $uiConf["provider"]["env"] = array();
+	    }
+	    $uiConf["provider"]["env"] = array_merge($this->getEnvConfig(), $uiConf["provider"]["env"]);
+		$uiConfJson = json_encode($uiConf, JSON_FORCE_OBJECT);
 	    if ($uiConfJson === false)
 	    {
 	        KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
