@@ -137,7 +137,7 @@ class embedPlaykitJsAction extends sfAction
 		    $uiConf["provider"]["env"] = array();
 	    }
 	    $uiConf["provider"]["env"] = array_merge($this->getEnvConfig(), $uiConf["provider"]["env"]);
-		$uiConfJson = json_encode($uiConf, JSON_FORCE_OBJECT);
+	    $uiConfJson = json_encode($uiConf, JSON_FORCE_OBJECT);
 	    if ($uiConfJson === false)
 	    {
 	        KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
@@ -399,7 +399,7 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 		$this->playerConfig = json_decode($uiConf->getConfig(), true);
 		$this->uiConfUpdatedAt = $uiConf->getUpdatedAt(null);
-		
+
 		//Get bundle configuration stored in conf_vars
 		$confVars = $uiConf->getConfVars();
 		if (!$confVars) {
