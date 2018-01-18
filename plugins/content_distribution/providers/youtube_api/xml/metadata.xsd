@@ -25,21 +25,21 @@
           </xsd:annotation>
           <xsd:simpleType>
             <xsd:restriction base="listType">
-              <xsd:enumeration value="Autos & Vehicles"/>
+              <xsd:enumeration value="Animals"/>
+              <xsd:enumeration value="Autos"/>
               <xsd:enumeration value="Comedy"/>
               <xsd:enumeration value="Education"/>
               <xsd:enumeration value="Entertainment"/>
-              <xsd:enumeration value="Film & Animation"/>
-              <xsd:enumeration value="Gaming"/>
-              <xsd:enumeration value="Howto & Style"/>
+              <xsd:enumeration value="Film"/>
+              <xsd:enumeration value="Games"/>
+              <xsd:enumeration value="Howto"/>
               <xsd:enumeration value="Music"/>
-              <xsd:enumeration value="News & Politics"/>
-              <xsd:enumeration value="Nonprofits & Activism"/>
-              <xsd:enumeration value="People & Blogs"/>
-              <xsd:enumeration value="Pets & Animals"/>
-              <xsd:enumeration value="Science & Technology"/>
+              <xsd:enumeration value="News"/>
+              <xsd:enumeration value="Nonprofit"/>
+              <xsd:enumeration value="People"/>
               <xsd:enumeration value="Sports"/>
-              <xsd:enumeration value="Travel & Events"/>
+              <xsd:enumeration value="Tech"/>
+              <xsd:enumeration value="Travel"/>
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:element>
