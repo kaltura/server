@@ -1631,7 +1631,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$resolveFileSync = self::resolve($fileSync);
 		$path = $resolveFileSync->getFullPath();
 		KalturaLog::info("Resolve path [$path]");
-		kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv());
+		kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSync->getFileSize());
 	}
 
 	public static function dumpFileByFileSyncKey( FileSyncKey $key , $strict = false )

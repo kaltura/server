@@ -309,9 +309,10 @@ abstract class KalturaBaseService
 	 * @param string $mimeType
 	 * @param string $key
 	 * @param string $iv
+	 * @param int $fileSize
 	 * @return kRendererDumpFile
 	 */
-	protected function dumpFile($filePath, $mimeType, $key = null, $iv = null)
+	protected function dumpFile($filePath, $mimeType, $key = null, $iv = null, $fileSize = null)
 	{
 		$maxAge = null;
 		if ($this->ks)
@@ -319,7 +320,7 @@ abstract class KalturaBaseService
 			$maxAge = min(max($this->ks->valid_until - time(), 1), 8640000);
 		}
 
-		return kFileUtils::getDumpFileRenderer($filePath, $mimeType, $maxAge, 0, null, $key, $iv);
+		return kFileUtils::getDumpFileRenderer($filePath, $mimeType, $maxAge, 0, null, $key, $iv, $fileSize);
 	}
 	
 	/**
