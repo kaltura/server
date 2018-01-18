@@ -129,25 +129,38 @@ class embedPlaykitJsAction extends sfAction
 
 	private function appendConfig($content)
 	{
-	    $uiConf = $this->playerConfig;
-	    if (!$uiConf["provider"]) {
-		    $uiConf["provider"] = array();
-	    }
-	    if (!$uiConf["provider"]["env"]) {
-		    $uiConf["provider"]["env"] = array();
-	    }
-	    $uiConf["provider"]["env"] = array_merge($this->getEnvConfig(), $uiConf["provider"]["env"]);
-	    $uiConfJson = json_encode($uiConf, JSON_FORCE_OBJECT);
-	    if ($uiConfJson === false)
-	    {
-	        KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
-	    }
-	    $confNS = "window.__kalturaplayerdata";
-	    $content .= "
-	    $confNS = ($confNS || {});
-	    $confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
-	    ";
-	    return $content;
+		$uiConf = $this->playerConfig;
+		$this->mergeEnvConfig($uiConf);
+		$uiConfJson = json_encode($uiConf);
+
+		if ($uiConfJson === false)
+		{
+			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
+		}
+		$confNS = "window.__kalturaplayerdata";
+		$content .= "
+		$confNS = ($confNS || {});
+		$confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
+		";
+		return $content;
+	}
+
+	private function mergeEnvConfig($uiConf)
+	{
+		if (!property_exists($uiConf, "provider"))
+		{
+			$uiConf->provider = new stdClass();
+			$uiConf->provider->env = new stdClass();
+		}
+
+		if (!property_exists($uiConf->provider, "env"))
+		{
+			$uiConf->provider->env = new stdClass();
+		}
+		foreach ($this->getEnvConfig() as $key => $value) {
+			if (!(property_exists($uiConf->provider->env, $key) && $uiConf->provider->env->$key))
+				$uiConf->provider->env->$key = $value;
+		}
 	}
 
 	private function getEnvConfig()
@@ -397,7 +410,7 @@ class embedPlaykitJsAction extends sfAction
 		$uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
 		if (!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
-		$this->playerConfig = json_decode($uiConf->getConfig(), true);
+		$this->playerConfig = json_decode($uiConf->getConfig());
 		$this->uiConfUpdatedAt = $uiConf->getUpdatedAt(null);
 		
 		//Get bundle configuration stored in conf_vars
