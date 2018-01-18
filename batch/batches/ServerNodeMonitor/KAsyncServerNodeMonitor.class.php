@@ -41,7 +41,14 @@ class KAsyncServerNodeMonitor extends KPeriodicWorker
 				 * @var KalturaEdgeServerNode $serverNode
 				 */
 				KalturaLog::info("ServerNode [" . $serverNode->id . "] is offline, last heartbeat [" . $serverNode->heartbeatTime . "]");
-				self::$kClient->serverNode->markOffline($serverNode->id);
+				try
+				{
+					self::$kClient->serverNode->markOffline($serverNode->id);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::info("Could not mark servernode offline, continuing [". $serverNode->id . "]");
+				}
 			}
 			//No need to move the pager index since we change all the server-nodes we found from active to unregistered.
 			$serverNodes = self::$kClient->serverNode->listAction($filter, $pager);
