@@ -165,6 +165,35 @@ class embedPlaykitJsAction extends sfAction
 
 	private function getEnvConfig()
 	{
+		$tags = $this->uiConf->getTags();
+		$publisherEnvType = $this->partner->getPublisherEnvironmentType();
+		if (strpos($tags, "ott") || $publisherEnvType === PublisherEnvironmentType::OTT) {
+			return $this->getOttEnvConfig();
+		} else {
+			return $this->getOvpEnvConfig();
+		}
+	}
+
+	private function getOttEnvConfig()
+	{
+		$ottEnvConfig = json_decode($this->partner->getOttEnvironmentUrl(), true);
+		if (!is_array($ottEnvConfig)) {
+			$ottEnvConfig = array();
+		}
+		return $ottEnvConfig;
+	}
+
+	private function getOvpEnvConfig()
+	{
+		$ovpEnvConfig = json_decode($this->partner->getOvpEnvironmentUrl(), true);
+		if (!is_array($ovpEnvConfig)) {
+			$ovpEnvConfig = array();
+		}
+		return array_merge($this->getDefaultOvpEnvConfig(), $ovpEnvConfig);
+	}
+
+	private function getDefaultOvpEnvConfig()
+	{
 		$protocol = infraRequestUtils::getProtocol();
 
 		// The default Kaltura service url:
@@ -407,21 +436,24 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, self::UI_CONF_ID_PARAM_NAME);
 		
 		// retrieve uiCong Obj
-		$uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
-		if (!$uiConf)
+		$this->uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
+		if (!$this->uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
-		$this->playerConfig = json_decode($uiConf->getConfig());
-		$this->uiConfUpdatedAt = $uiConf->getUpdatedAt(null);
+		$this->playerConfig = json_decode($this->uiConf->getConfig());
+		$this->uiConfUpdatedAt = $this->uiConf->getUpdatedAt(null);
 		
 		//Get bundle configuration stored in conf_vars
-		$confVars = $uiConf->getConfVars();
+		$confVars = $this->uiConf->getConfVars();
 		if (!$confVars) {
 			KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
 		}
 		
 		//Get partner ID from QS or from UI conf
-		$this->partnerId = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $uiConf->getPartnerId());
-		
+		$this->partnerId = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $this->uiConf->getPartnerId());
+		$this->partner = PartnerPeer::retrieveByPK($this->partnerId);
+		if (!$this->partner)
+			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
+
 		//Get should force regenration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 		
