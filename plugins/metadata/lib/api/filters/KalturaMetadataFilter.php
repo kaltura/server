@@ -119,9 +119,9 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
 			return false;
 		
-	    $metadataListNoFilterExcludePartners = array();
-	    if(kConf::hasParam('metadata_list_without_object_filtering_partners'))
-	    	$metadataListNoFilterExcludePartners = kConf::get('metadata_list_without_object_filtering_partners');
+		$metadataListNoFilterExcludePartners = array();
+		if(kConf::hasParam('metadata_list_without_object_filtering_partners'))
+			$metadataListNoFilterExcludePartners = kConf::get('metadata_list_without_object_filtering_partners');
 		
 		if(!count($metadataListNoFilterExcludePartners))
 			return true;
