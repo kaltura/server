@@ -342,7 +342,7 @@ class myPartnerRegistration
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::EMAIL_ALREADY_EXISTS );
 			}
 
-			if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+			if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner, true))
 			{
 				$partnerPackage = $partner->getPartnerPackage();
 				if ($this->partnerParentId)
@@ -356,15 +356,15 @@ class myPartnerRegistration
 					$result = myPartnerUtils::retrieveActivePartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
 					if($result)
 					{
-						$similarPartner = $result[0];
-						$similarPartner->setSubPartnerRequestCampaign(1);
-						$similarPartner->save();
+						$result->setSubPartnerRequestCampaign(1);
+						$result->save();
 						throw new SignupException("Free Trial user with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS);
 					}
 
 				}
 			}
 		}
+
 
 			
 		// TODO: log request
