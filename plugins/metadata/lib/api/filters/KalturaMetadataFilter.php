@@ -135,7 +135,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		
 		$allowedFilterTypesArray = explode(",", $allowedFilterTypes);
 		if(!in_array($this->metadataObjectTypeEqual, $allowedFilterTypesArray))
-        	return true;
+			return true;
 		
 		return false;
 	}
