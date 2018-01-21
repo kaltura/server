@@ -116,9 +116,28 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 	
 	private function partnerNotInExcludeList()
 	{
-		return kConf::hasParam('metadata_list_without_object_filtering_partners') &&
-			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
-				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID;
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+			return false;
+		
+	    $metadataListNoFilterExcludePartners = array();
+	    if(kConf::hasParam('metadata_list_without_object_filtering_partners'))
+	    	$metadataListNoFilterExcludePartners = kConf::get('metadata_list_without_object_filtering_partners');
+		
+	    if(!count($metadataListNoFilterExcludePartners))
+	    	return true;
+		
+        if(!array_key_exists(kCurrentContext::getCurrentPartnerId(), $metadataListNoFilterExcludePartners))
+        	return true;
+		
+		$allowedFilterTypes = $metadataListNoFilterExcludePartners[kCurrentContext::getCurrentPartnerId()];
+		if($allowedFilterTypes == "");
+			return false;
+		
+        $allowedFilterTypesArray = explode(",", $allowedFilterTypes);
+        if(!in_array($this->metadataObjectTypeEqual, $allowedFilterTypesArray))
+        	return true;
+		
+        return false;
 	}
 	
 	public function getObjectIdsFiltered()
