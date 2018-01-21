@@ -21,7 +21,9 @@ class embedPlaykitJsAction extends sfAction
 	private $sourceMapsCache = null;
 	private $eTagHash = null;
 	private $uiconfId = null;
+	private $uiConf = null;
 	private $partnerId = null;
+	private $partner = null;
 	private $bundle_name = null;
 	private $bundlerUrl = null;
 	private $sourcesPath = null;
