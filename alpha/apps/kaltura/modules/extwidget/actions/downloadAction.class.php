@@ -123,6 +123,7 @@ class downloadAction extends sfAction
 		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
 		if (!$fileSync)
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+		/**@var $fileSync FileSync */
 		$filePath = $fileSync->getFullPath();
 
 		list($fileBaseName, $fileExt) = kAssetUtils::getFileName($entry, $flavorAsset);
@@ -143,7 +144,7 @@ class downloadAction extends sfAction
 		//enable downloading file_name which inside the flavor asset directory 
 		if(is_dir($filePath))
 			$filePath = $filePath.DIRECTORY_SEPARATOR.$fileName;
-		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv());
+		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSync->getFileSize());
 		
 		KExternalErrors::dieGracefully(); // no view
 	}
@@ -174,7 +175,7 @@ class downloadAction extends sfAction
 		return $syncKey;
 	}
 
-	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null)
+	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null)
 	{
 		$file_name = str_replace("\n", ' ', $file_name);
 		$relocate = $this->getRequestParameter("relocate");
@@ -205,7 +206,7 @@ class downloadAction extends sfAction
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
 				
 			$mime_type = kFile::mimeType($file_path);
-			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv);
+			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize);
 		}
 	}
 	

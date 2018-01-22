@@ -2034,10 +2034,7 @@
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventObjectChangedCondition">
 						<description>Server Node status changed </description>
-						<modifiedColumns>status</modifiedColumns>
-						<field objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getType()</code>
-						</field>
+						<modifiedColumns>server_node.STATUS</modifiedColumns>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
@@ -2067,9 +2064,9 @@
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>server_node_hostname</key>
-						<description>Entry name</description>
+						<description>Server-Node hostname</description>
 						<value objectType="KalturaEvalStringField">
-							<code>($scope->getObject() instanceof EdgeServerNode) &amp;&amp; $scope->getObject()->getHostName()</code>
+							<code>$scope->getObject()->getHostName()</code>
 						</value>
 					</item>
 				</contentParameters>

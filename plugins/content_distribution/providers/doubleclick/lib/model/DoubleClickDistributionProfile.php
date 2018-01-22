@@ -141,7 +141,7 @@ class DoubleClickDistributionProfile extends ConfigurableDistributionProfile
 
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(DoubleClickDistributionField::STATUS);
-		$fieldConfig->setEntryMrssXslt('<xsl:text>blocked</xsl:text>');
+		$fieldConfig->setEntryMrssXslt('<xsl:text>active</xsl:text>');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 

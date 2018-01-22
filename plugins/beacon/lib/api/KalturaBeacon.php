@@ -35,7 +35,7 @@ class KalturaBeacon extends KalturaObject implements IFilterable
 	 * The object which this beacon belongs to
 	 *
 	 * @var KalturaBeaconObjectTypes
-	 * @filter in
+	 * @filter eq,in
 	 */
 	public $relatedObjectType;
 	

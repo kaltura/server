@@ -67,7 +67,14 @@ class KSecureEntryHelper
 	 * @var array
 	 */
 	private $actionLists = array();
-	
+
+
+	/**
+	 * Array containing trusted admministrative partner IDs
+	 * @var array
+	 */
+	protected static $trustedPartnerIds = array (Partner::BATCH_PARTNER_ID);
+
 	/**
 	 * 
 	 * @param entry $entry
@@ -341,11 +348,16 @@ class KSecureEntryHelper
 					$valid = $ks->isValidForPartner($ks->partner_id);
 				}
 				if ($valid === ks::EXPIRED)
+				{
 					KExternalErrors::dieError(KExternalErrors::KS_EXPIRED, "This URL is expired");
+				}
 				else if ($valid === ks::INVALID_PARTNER)
 				{
-					if ($this->hasRules()) // TODO - for now if the entry doesnt have restrictions any way disregard a partner group check
+					if (!in_array($ks->partner_id, self::$trustedPartnerIds) && $this->hasRules())
+					{
+						// TODO - for now if the entry doesnt have restrictions any way disregard a partner group check
 						KExternalErrors::dieError(KExternalErrors::INVALID_PARTNER, "Invalid session [".$valid."]");
+					}
 				}
 				else if ($valid === ks::EXCEEDED_RESTRICTED_IP)
 				{

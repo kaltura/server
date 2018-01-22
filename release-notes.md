@@ -1,6 +1,68 @@
+# Mercury 13.12.0 #
 
+## Split beacon index to index per object type ##
 
-# Mercury 13.12.0 # 
+- Issue Type: Feature
+- Issue ID: PLAT-8432
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	1. Stop logstash process to avoid re-creating the old beacon index.
+
+	2. Delete all old elstic aliases.
+	
+	3. Delete old beaconIndex.
+	
+	4. Create new indexes in elastic by runing: 
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_entry_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_entry_index.json"
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_entry_server_node_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_entry_server_node_index.json" 
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_scheduled_resource_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_scheduled_resource_index.json"
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_server_node_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_server_node_index.json"
+	
+	5. Create new alises in elastic:
+		curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
+    	"actions" : [
+        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beacon_entry_index" } },
+        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beacon_entry_server_node_index" } },
+        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beacon_scheduled_resource_index" } },
+        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beacon_server_node_index" } },
+        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beaconindex" } }
+			]
+		}'
+		
+	6. strat logstash process.
+
+#### Known Issues & Limitations ####
+
+	Please note the old data will be removed during this process.
+
+## Add permission to create VAST cue point without URL ##
+
+- Issue Type: feature
+- Issue ID: PLAT-8468
+
+### Configuration ###
+	-Add new module to the admin-console in admin.ini
+        moduls.VastCuePointNoUrl.enabled = true
+        moduls.VastCuePointNoUrl.permissionType = 2
+        moduls.VastCuePointNoUrl.label = "Allow creating VAST advertising cue points without URL"
+        moduls.VastCuePointNoUrl.permissionName = FEATURE_ALLOW_VAST_CUE_POINT_NO_URL
+        moduls.VastCuePointNoUrl.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+		None.
+
+#### Known Issues & Limitations ####
+
+		None.
 
 ## Add Entry replaced EMAIL template which excludes kaltura recorded entries ##
 
@@ -37,7 +99,7 @@ First replcae all tokens from the XML files below and remove ".template" from th
 
 ### Deployment scripts ###
 
-	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_01_server_node_unregister.php
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/201810_01_server_node_markOffline.php
 	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_14_deploy_server_node_offline_email_notification.php
 
 #### Known Issues & Limitations ####

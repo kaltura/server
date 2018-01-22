@@ -12,4 +12,6 @@ class KalturaESearchEntryOrderByFieldName extends KalturaStringEnum
 	const NAME = 'name';
 	const VOTES = 'votes';
 	const VIEWS = 'views';
+	const PLAYS = 'plays';
+	const LAST_PLAYED_AT = 'last_played_at';
 }

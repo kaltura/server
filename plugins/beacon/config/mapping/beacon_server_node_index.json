@@ -1,0 +1,1126 @@
+{
+	"settings" : {
+		"index": {
+			"mapping": { "total_fields": { "limit": "2000" } }
+		},
+		"number_of_shards" : 6,
+		"number_of_replicas" : 0,
+		"analysis": {
+			"char_filter": {
+				"kaltura_whitespace_filter": {
+					"type": "pattern_replace",
+					"pattern": "(\\s+)",
+					"replacement": " "
+				}
+			},
+			"analyzer": {
+				"kaltura_keyword": {
+					"type": "custom",
+					"tokenizer": "keyword",
+					"char_filter": [
+						"kaltura_whitespace_filter"
+					],
+					"filter": [
+						"lowercase",
+						"trim"
+					]
+				}
+			}
+		}
+	},
+	"mappings": {
+		"server_node_beacon": {
+			"dynamic_templates": [
+				{
+					"integers": {
+						"match_mapping_type": "long",
+						"mapping": {
+							"type": "float"
+						}
+					}
+				}
+			],
+			"_all": {
+ 				"enabled": false
+ 			},
+			"properties": {
+				"event_type": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"object_id": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"partner_id": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"raw_data": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"related_object_type": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"updated_at": {
+					"type": "date",
+					"format": "epoch_second"
+				},
+				"is_log": {
+					"type": "boolean"
+				},
+				"private_data": {
+					"properties": {
+						"kes_hostname": {
+							"type": "text",
+							"fields": {
+								"keyword": {
+									"type": "keyword",
+									"ignore_above": 256
+								}
+							}
+						},
+						"systemMetrics": {
+							"properties": {
+								"appData": {
+									"properties": {
+										"net": {
+											"properties": {
+												"recv_bits_per_sec": {
+													"type": "float"
+												},
+												"sent_bits_per_sec": {
+													"type": "float"
+												}
+											}
+										},
+										"nginx": {
+											"properties": {
+												"cache": {
+													"properties": {
+														"one": {
+															"properties": {
+																"max_size": {
+																	"type": "long"
+																},
+																"name": {
+																	"type": "text",
+																	"fields": {
+																		"keyword": {
+																			"type": "keyword",
+																			"ignore_above": 256
+																		}
+																	}
+																},
+																"units": {
+																	"type": "text",
+																	"fields": {
+																		"keyword": {
+																			"type": "keyword",
+																			"ignore_above": 256
+																		}
+																	}
+																},
+																"usage": {
+																	"type": "float"
+																},
+																"used_percent": {
+																	"type": "float"
+																}
+															}
+														},
+														"vod-longterm-zone": {
+															"properties": {
+																"max_size": {
+																	"type": "long"
+																},
+																"name": {
+																	"type": "text",
+																	"fields": {
+																		"keyword": {
+																			"type": "keyword",
+																			"ignore_above": 256
+																		}
+																	}
+																},
+																"units": {
+																	"type": "text",
+																	"fields": {
+																		"keyword": {
+																			"type": "keyword",
+																			"ignore_above": 256
+																		}
+																	}
+																},
+																"usage": {
+																	"type": "float"
+																},
+																"used_percent": {
+																	"type": "float"
+																}
+															}
+														}
+													}
+												}
+											}
+										},
+										"preposition": {
+											"properties": {
+												"cache": {
+													"properties": {
+														"prePositioning_1": {
+															"properties": {
+																"max_size": {
+																	"type": "long"
+																},
+																"name": {
+																	"type": "text",
+																	"fields": {
+																		"keyword": {
+																			"type": "keyword",
+																			"ignore_above": 256
+																		}
+																	}
+																},
+																"units": {
+																	"type": "text",
+																	"fields": {
+																		"keyword": {
+																			"type": "keyword",
+																			"ignore_above": 256
+																		}
+																	}
+																},
+																"usage": {
+																	"type": "float"
+																},
+																"used_percent": {
+																	"type": "float"
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								},
+								"systemData": {
+									"properties": {
+										"cpu": {
+											"properties": {
+												"cpu-total": {
+													"properties": {
+														"usage_guest": {
+															"type": "long"
+														},
+														"usage_guest_nice": {
+															"type": "long"
+														},
+														"usage_idle": {
+															"type": "long"
+														},
+														"usage_iowait": {
+															"type": "long"
+														},
+														"usage_irq": {
+															"type": "long"
+														},
+														"usage_nice": {
+															"type": "long"
+														},
+														"usage_softirq": {
+															"type": "long"
+														},
+														"usage_steal": {
+															"type": "long"
+														},
+														"usage_system": {
+															"type": "long"
+														},
+														"usage_user": {
+															"type": "long"
+														}
+													}
+												},
+												"data": {
+													"properties": {
+														"cpu_id": {
+															"type": "text",
+															"fields": {
+																"keyword": {
+																	"type": "keyword",
+																	"ignore_above": 256
+																}
+															}
+														},
+														"usage_guest": {
+															"type": "long"
+														},
+														"usage_guest_nice": {
+															"type": "long"
+														},
+														"usage_idle": {
+															"type": "long"
+														},
+														"usage_iowait": {
+															"type": "long"
+														},
+														"usage_irq": {
+															"type": "long"
+														},
+														"usage_nice": {
+															"type": "long"
+														},
+														"usage_softirq": {
+															"type": "long"
+														},
+														"usage_steal": {
+															"type": "long"
+														},
+														"usage_system": {
+															"type": "long"
+														},
+														"usage_user": {
+															"type": "long"
+														}
+													}
+												},
+												"total": {
+													"properties": {
+														"usage_guest": {
+															"type": "long"
+														},
+														"usage_guest_nice": {
+															"type": "long"
+														},
+														"usage_idle": {
+															"type": "long"
+														},
+														"usage_iowait": {
+															"type": "long"
+														},
+														"usage_irq": {
+															"type": "long"
+														},
+														"usage_nice": {
+															"type": "long"
+														},
+														"usage_softirq": {
+															"type": "long"
+														},
+														"usage_steal": {
+															"type": "long"
+														},
+														"usage_system": {
+															"type": "long"
+														},
+														"usage_user": {
+															"type": "long"
+														}
+													}
+												}
+											}
+										},
+										"disk": {
+											"properties": {
+												"data": {
+													"properties": {
+														"disk_id": {
+															"type": "text",
+															"fields": {
+																"keyword": {
+																	"type": "keyword",
+																	"ignore_above": 256
+																}
+															}
+														},
+														"free": {
+															"type": "long"
+														},
+														"inodes_free": {
+															"type": "long"
+														},
+														"inodes_total": {
+															"type": "long"
+														},
+														"inodes_used": {
+															"type": "long"
+														},
+														"total": {
+															"type": "long"
+														},
+														"used": {
+															"type": "long"
+														},
+														"used_percent": {
+															"type": "float"
+														}
+													}
+												},
+												"total": {
+													"properties": {
+														"free": {
+															"type": "long"
+														},
+														"inodes_free": {
+															"type": "long"
+														},
+														"inodes_total": {
+															"type": "long"
+														},
+														"inodes_used": {
+															"type": "long"
+														},
+														"total": {
+															"type": "long"
+														},
+														"used": {
+															"type": "long"
+														},
+														"used_percent": {
+															"type": "float"
+														}
+													}
+												}
+											}
+										},
+										"diskio": {
+											"properties": {
+												"data": {
+													"properties": {
+														"diskio_id": {
+															"type": "text",
+															"fields": {
+																"keyword": {
+																	"type": "keyword",
+																	"ignore_above": 256
+																}
+															}
+														},
+														"io_time": {
+															"type": "long"
+														},
+														"iops_in_progress": {
+															"type": "long"
+														},
+														"read_bytes": {
+															"type": "long"
+														},
+														"read_time": {
+															"type": "long"
+														},
+														"reads": {
+															"type": "long"
+														},
+														"write_bytes": {
+															"type": "long"
+														},
+														"write_time": {
+															"type": "long"
+														},
+														"writes": {
+															"type": "long"
+														}
+													}
+												},
+												"total": {
+													"properties": {
+														"io_time": {
+															"type": "long"
+														},
+														"iops_in_progress": {
+															"type": "long"
+														},
+														"read_bytes": {
+															"type": "long"
+														},
+														"read_time": {
+															"type": "long"
+														},
+														"reads": {
+															"type": "long"
+														},
+														"write_bytes": {
+															"type": "long"
+														},
+														"write_time": {
+															"type": "long"
+														},
+														"writes": {
+															"type": "long"
+														}
+													}
+												}
+											}
+										},
+										"kernel": {
+											"properties": {
+												"boot_time": {
+													"type": "long"
+												},
+												"context_switches": {
+													"type": "long"
+												},
+												"interrupts": {
+													"type": "long"
+												},
+												"processes_forked": {
+													"type": "long"
+												}
+											}
+										},
+										"mem": {
+											"properties": {
+												"active": {
+													"type": "long"
+												},
+												"available": {
+													"type": "long"
+												},
+												"available_percent": {
+													"type": "float"
+												},
+												"buffered": {
+													"type": "long"
+												},
+												"cached": {
+													"type": "long"
+												},
+												"free": {
+													"type": "long"
+												},
+												"inactive": {
+													"type": "long"
+												},
+												"total": {
+													"type": "long"
+												},
+												"used": {
+													"type": "long"
+												},
+												"used_percent": {
+													"type": "float"
+												}
+											}
+										},
+										"net": {
+											"properties": {
+												"data": {
+													"properties": {
+														"bytes_recv": {
+															"type": "long"
+														},
+														"bytes_sent": {
+															"type": "long"
+														},
+														"drop_in": {
+															"type": "long"
+														},
+														"drop_out": {
+															"type": "long"
+														},
+														"err_in": {
+															"type": "long"
+														},
+														"err_out": {
+															"type": "long"
+														},
+														"icmp_inaddrmaskreps": {
+															"type": "long"
+														},
+														"icmp_inaddrmasks": {
+															"type": "long"
+														},
+														"icmp_indestunreachs": {
+															"type": "long"
+														},
+														"icmp_inechoreps": {
+															"type": "long"
+														},
+														"icmp_inechos": {
+															"type": "long"
+														},
+														"icmp_inerrors": {
+															"type": "long"
+														},
+														"icmp_inmsgs": {
+															"type": "long"
+														},
+														"icmp_inparmprobs": {
+															"type": "long"
+														},
+														"icmp_inredirects": {
+															"type": "long"
+														},
+														"icmp_insrcquenchs": {
+															"type": "long"
+														},
+														"icmp_intimeexcds": {
+															"type": "long"
+														},
+														"icmp_intimestampreps": {
+															"type": "long"
+														},
+														"icmp_intimestamps": {
+															"type": "long"
+														},
+														"icmp_outaddrmaskreps": {
+															"type": "long"
+														},
+														"icmp_outaddrmasks": {
+															"type": "long"
+														},
+														"icmp_outdestunreachs": {
+															"type": "long"
+														},
+														"icmp_outechoreps": {
+															"type": "long"
+														},
+														"icmp_outechos": {
+															"type": "long"
+														},
+														"icmp_outerrors": {
+															"type": "long"
+														},
+														"icmp_outmsgs": {
+															"type": "long"
+														},
+														"icmp_outparmprobs": {
+															"type": "long"
+														},
+														"icmp_outredirects": {
+															"type": "long"
+														},
+														"icmp_outsrcquenchs": {
+															"type": "long"
+														},
+														"icmp_outtimeexcds": {
+															"type": "long"
+														},
+														"icmp_outtimestampreps": {
+															"type": "long"
+														},
+														"icmp_outtimestamps": {
+															"type": "long"
+														},
+														"icmpmsg_outtype3": {
+															"type": "long"
+														},
+														"ip_defaultttl": {
+															"type": "long"
+														},
+														"ip_forwarding": {
+															"type": "long"
+														},
+														"ip_forwdatagrams": {
+															"type": "long"
+														},
+														"ip_fragcreates": {
+															"type": "long"
+														},
+														"ip_fragfails": {
+															"type": "long"
+														},
+														"ip_fragoks": {
+															"type": "long"
+														},
+														"ip_inaddrerrors": {
+															"type": "long"
+														},
+														"ip_indelivers": {
+															"type": "long"
+														},
+														"ip_indiscards": {
+															"type": "long"
+														},
+														"ip_inhdrerrors": {
+															"type": "long"
+														},
+														"ip_inreceives": {
+															"type": "long"
+														},
+														"ip_inunknownprotos": {
+															"type": "long"
+														},
+														"ip_outdiscards": {
+															"type": "long"
+														},
+														"ip_outnoroutes": {
+															"type": "long"
+														},
+														"ip_outrequests": {
+															"type": "long"
+														},
+														"ip_reasmfails": {
+															"type": "long"
+														},
+														"ip_reasmoks": {
+															"type": "long"
+														},
+														"ip_reasmreqds": {
+															"type": "long"
+														},
+														"ip_reasmtimeout": {
+															"type": "long"
+														},
+														"net_id": {
+															"type": "text",
+															"fields": {
+																"keyword": {
+																	"type": "keyword",
+																	"ignore_above": 256
+																}
+															}
+														},
+														"packets_recv": {
+															"type": "long"
+														},
+														"packets_sent": {
+															"type": "long"
+														},
+														"tcp_activeopens": {
+															"type": "long"
+														},
+														"tcp_attemptfails": {
+															"type": "long"
+														},
+														"tcp_currestab": {
+															"type": "long"
+														},
+														"tcp_estabresets": {
+															"type": "long"
+														},
+														"tcp_inerrs": {
+															"type": "long"
+														},
+														"tcp_insegs": {
+															"type": "long"
+														},
+														"tcp_maxconn": {
+															"type": "long"
+														},
+														"tcp_outrsts": {
+															"type": "long"
+														},
+														"tcp_outsegs": {
+															"type": "long"
+														},
+														"tcp_passiveopens": {
+															"type": "long"
+														},
+														"tcp_retranssegs": {
+															"type": "long"
+														},
+														"tcp_rtoalgorithm": {
+															"type": "long"
+														},
+														"tcp_rtomax": {
+															"type": "long"
+														},
+														"tcp_rtomin": {
+															"type": "long"
+														},
+														"udp_indatagrams": {
+															"type": "long"
+														},
+														"udp_inerrors": {
+															"type": "long"
+														},
+														"udp_noports": {
+															"type": "long"
+														},
+														"udp_outdatagrams": {
+															"type": "long"
+														},
+														"udp_rcvbuferrors": {
+															"type": "long"
+														},
+														"udp_sndbuferrors": {
+															"type": "long"
+														},
+														"udplite_indatagrams": {
+															"type": "long"
+														},
+														"udplite_inerrors": {
+															"type": "long"
+														},
+														"udplite_noports": {
+															"type": "long"
+														},
+														"udplite_outdatagrams": {
+															"type": "long"
+														},
+														"udplite_rcvbuferrors": {
+															"type": "long"
+														},
+														"udplite_sndbuferrors": {
+															"type": "long"
+														}
+													}
+												},
+												"total": {
+													"properties": {
+														"bytes_recv": {
+															"type": "long"
+														},
+														"bytes_sent": {
+															"type": "long"
+														},
+														"drop_in": {
+															"type": "long"
+														},
+														"drop_out": {
+															"type": "long"
+														},
+														"err_in": {
+															"type": "long"
+														},
+														"err_out": {
+															"type": "long"
+														},
+														"icmp_inaddrmaskreps": {
+															"type": "long"
+														},
+														"icmp_inaddrmasks": {
+															"type": "long"
+														},
+														"icmp_indestunreachs": {
+															"type": "long"
+														},
+														"icmp_inechoreps": {
+															"type": "long"
+														},
+														"icmp_inechos": {
+															"type": "long"
+														},
+														"icmp_inerrors": {
+															"type": "long"
+														},
+														"icmp_inmsgs": {
+															"type": "long"
+														},
+														"icmp_inparmprobs": {
+															"type": "long"
+														},
+														"icmp_inredirects": {
+															"type": "long"
+														},
+														"icmp_insrcquenchs": {
+															"type": "long"
+														},
+														"icmp_intimeexcds": {
+															"type": "long"
+														},
+														"icmp_intimestampreps": {
+															"type": "long"
+														},
+														"icmp_intimestamps": {
+															"type": "long"
+														},
+														"icmp_outaddrmaskreps": {
+															"type": "long"
+														},
+														"icmp_outaddrmasks": {
+															"type": "long"
+														},
+														"icmp_outdestunreachs": {
+															"type": "long"
+														},
+														"icmp_outechoreps": {
+															"type": "long"
+														},
+														"icmp_outechos": {
+															"type": "long"
+														},
+														"icmp_outerrors": {
+															"type": "long"
+														},
+														"icmp_outmsgs": {
+															"type": "long"
+														},
+														"icmp_outparmprobs": {
+															"type": "long"
+														},
+														"icmp_outredirects": {
+															"type": "long"
+														},
+														"icmp_outsrcquenchs": {
+															"type": "long"
+														},
+														"icmp_outtimeexcds": {
+															"type": "long"
+														},
+														"icmp_outtimestampreps": {
+															"type": "long"
+														},
+														"icmp_outtimestamps": {
+															"type": "long"
+														},
+														"icmpmsg_outtype3": {
+															"type": "long"
+														},
+														"ip_defaultttl": {
+															"type": "long"
+														},
+														"ip_forwarding": {
+															"type": "long"
+														},
+														"ip_forwdatagrams": {
+															"type": "long"
+														},
+														"ip_fragcreates": {
+															"type": "long"
+														},
+														"ip_fragfails": {
+															"type": "long"
+														},
+														"ip_fragoks": {
+															"type": "long"
+														},
+														"ip_inaddrerrors": {
+															"type": "long"
+														},
+														"ip_indelivers": {
+															"type": "long"
+														},
+														"ip_indiscards": {
+															"type": "long"
+														},
+														"ip_inhdrerrors": {
+															"type": "long"
+														},
+														"ip_inreceives": {
+															"type": "long"
+														},
+														"ip_inunknownprotos": {
+															"type": "long"
+														},
+														"ip_outdiscards": {
+															"type": "long"
+														},
+														"ip_outnoroutes": {
+															"type": "long"
+														},
+														"ip_outrequests": {
+															"type": "long"
+														},
+														"ip_reasmfails": {
+															"type": "long"
+														},
+														"ip_reasmoks": {
+															"type": "long"
+														},
+														"ip_reasmreqds": {
+															"type": "long"
+														},
+														"ip_reasmtimeout": {
+															"type": "long"
+														},
+														"packets_recv": {
+															"type": "long"
+														},
+														"packets_sent": {
+															"type": "long"
+														},
+														"tcp_activeopens": {
+															"type": "long"
+														},
+														"tcp_attemptfails": {
+															"type": "long"
+														},
+														"tcp_currestab": {
+															"type": "long"
+														},
+														"tcp_estabresets": {
+															"type": "long"
+														},
+														"tcp_inerrs": {
+															"type": "long"
+														},
+														"tcp_insegs": {
+															"type": "long"
+														},
+														"tcp_maxconn": {
+															"type": "long"
+														},
+														"tcp_outrsts": {
+															"type": "long"
+														},
+														"tcp_outsegs": {
+															"type": "long"
+														},
+														"tcp_passiveopens": {
+															"type": "long"
+														},
+														"tcp_retranssegs": {
+															"type": "long"
+														},
+														"tcp_rtoalgorithm": {
+															"type": "long"
+														},
+														"tcp_rtomax": {
+															"type": "long"
+														},
+														"tcp_rtomin": {
+															"type": "long"
+														},
+														"udp_indatagrams": {
+															"type": "long"
+														},
+														"udp_inerrors": {
+															"type": "long"
+														},
+														"udp_noports": {
+															"type": "long"
+														},
+														"udp_outdatagrams": {
+															"type": "long"
+														},
+														"udp_rcvbuferrors": {
+															"type": "long"
+														},
+														"udp_sndbuferrors": {
+															"type": "long"
+														},
+														"udplite_indatagrams": {
+															"type": "long"
+														},
+														"udplite_inerrors": {
+															"type": "long"
+														},
+														"udplite_noports": {
+															"type": "long"
+														},
+														"udplite_outdatagrams": {
+															"type": "long"
+														},
+														"udplite_rcvbuferrors": {
+															"type": "long"
+														},
+														"udplite_sndbuferrors": {
+															"type": "long"
+														}
+													}
+												}
+											}
+										},
+										"netstat": {
+											"properties": {
+												"tcp_close": {
+													"type": "long"
+												},
+												"tcp_close_wait": {
+													"type": "long"
+												},
+												"tcp_closing": {
+													"type": "long"
+												},
+												"tcp_established": {
+													"type": "long"
+												},
+												"tcp_fin_wait1": {
+													"type": "long"
+												},
+												"tcp_fin_wait2": {
+													"type": "long"
+												},
+												"tcp_last_ack": {
+													"type": "long"
+												},
+												"tcp_listen": {
+													"type": "long"
+												},
+												"tcp_none": {
+													"type": "long"
+												},
+												"tcp_syn_recv": {
+													"type": "long"
+												},
+												"tcp_syn_sent": {
+													"type": "long"
+												},
+												"tcp_time_wait": {
+													"type": "long"
+												},
+												"udp_socket": {
+													"type": "long"
+												}
+											}
+										},
+										"processes": {
+											"properties": {
+												"blocked": {
+													"type": "long"
+												},
+												"dead": {
+													"type": "long"
+												},
+												"paging": {
+													"type": "long"
+												},
+												"running": {
+													"type": "long"
+												},
+												"sleeping": {
+													"type": "long"
+												},
+												"stopped": {
+													"type": "long"
+												},
+												"total": {
+													"type": "long"
+												},
+												"total_threads": {
+													"type": "long"
+												},
+												"unknown": {
+													"type": "long"
+												},
+												"zombies": {
+													"type": "long"
+												}
+											}
+										},
+										"swap": {
+											"properties": {
+												"in": {
+													"type": "long"
+												},
+												"out": {
+													"type": "long"
+												}
+											}
+										},
+										"system": {
+											"properties": {
+												"uptime": {
+													"type": "long"
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						"timestamp": {
+							"type": "date",
+							"format": "yyyy\/MM\/dd HH:mm:ss||yyyy\/MM\/dd||epoch_millis"
+						},
+						"version": {
+							"type": "text",
+							"fields": {
+								"keyword": {
+									"type": "keyword",
+									"ignore_above": 256
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
