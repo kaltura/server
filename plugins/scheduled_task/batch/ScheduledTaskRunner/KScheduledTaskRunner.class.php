@@ -147,9 +147,19 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private function getMailFromUserId($userId)
 	{
 		$result = null;
+		$user = null;
 		$client = $this->getClient();
-		$user = $client->user->get($userId);
-		if($user->email)
+		try
+		{
+			$user = $client->user->get($userId);
+		}
+		catch ( Exception $e )
+		{
+			KalturaLog::err( $e );
+			return null;
+		}
+
+		if($user && $user->email)
 			$result = $user->email;
 		else if (filter_var($userId, FILTER_VALIDATE_EMAIL))
 			$result = $userId;

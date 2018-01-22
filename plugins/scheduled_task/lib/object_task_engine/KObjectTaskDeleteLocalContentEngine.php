@@ -31,17 +31,8 @@ class KObjectTaskDeleteLocalContentEngine extends KObjectTaskEntryEngineBase
 		$pager->pageSize = 500; // use max size, throw exception in case we got more than 500 flavors where pagination is not supported
 		$filter = new KalturaFlavorAssetFilter();
 		$filter->entryIdEqual = $object->id;
-		$this->impersonate($object->partnerId);
-		try
-		{
-			$flavorsResponse = $client->flavorAsset->listAction($filter);
-			$this->unimpersonate();
-		}
-		catch(Exception $ex)
-		{
-			$this->unimpersonate();
-			throw $ex;
-		}
+		$flavorsResponse = $client->flavorAsset->listAction($filter);
+
 		if ($flavorsResponse->totalCount > $pager->pageSize)
 			throw new Exception('Too many flavors were found where pagination is not supported');
 
@@ -58,16 +49,13 @@ class KObjectTaskDeleteLocalContentEngine extends KObjectTaskEntryEngineBase
 	protected function deleteFlavor($id, $partnerId)
 	{
 		$client = $this->getClient();
-		$this->impersonate($partnerId);
 		try
 		{
 			$client->flavorAsset->deleteLocalContent($id);
 			KalturaLog::info("Local content of flavor id [$id] was deleted");
-			$this->unimpersonate();
 		}
 		catch(Exception $ex)
 		{
-			$this->unimpersonate();
 			KalturaLog::err($ex->getMessage());
 			KalturaLog::err("Failed to delete local content of flavor id [$id]");
 		}
