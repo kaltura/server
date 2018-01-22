@@ -23,6 +23,8 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 */
 	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 2)
 	{
+		if (kConf::hasParam('dfp_version_1_partners') && in_array($this->getPartnerId(), kConf::get('dfp_version_1_partners')))
+			$version = 1;
 		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling, $version);
 		$context->keepScheduling = !$ignoreScheduling;
 		return $this->generateFeed($context, $distributionProfileId, $hash);
@@ -161,6 +163,8 @@ class DoubleClickService extends ContentDistributionServiceBase
 			throw new KalturaAPIException (KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		// Construct the feed
+		if (kConf::hasParam('dfp_version_1_partners') && in_array($this->getPartnerId(), kConf::get('dfp_version_1_partners')))
+			$version = 1;
 
 		$templateName = 'doubleclick_template.xml';
 		if($version == 2)
