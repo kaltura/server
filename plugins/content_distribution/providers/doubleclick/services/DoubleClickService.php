@@ -21,7 +21,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @return file
 	 * @ksOptional
 	 */
-	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 1)
+	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 2)
 	{
 		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling, $version);
 		$context->keepScheduling = !$ignoreScheduling;
@@ -151,7 +151,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @return file
 	 * @ksOptional
 	 */
-	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId, $version = 1)
+	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId, $version = 2)
 	{
 		$this->validateRequest($distributionProfileId, $hash);
 

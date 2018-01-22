@@ -16,7 +16,7 @@ class DoubleClickServiceContext extends ContentDistributionServiceContext
 	public $nextPageStateLastEntryCreatedAt;
 	public $nextPageStateLastEntryIds;
 	
-	public function __construct($hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 1)
+	public function __construct($hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 2)
 	{
 		if($page && $page >= 1)
 			$this->page =  $page;

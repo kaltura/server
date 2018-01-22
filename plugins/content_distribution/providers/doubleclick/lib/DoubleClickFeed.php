@@ -212,7 +212,8 @@ class DoubleClickFeed
 		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="author"]/@value', $values[DoubleClickDistributionField::AUTHOR], $item);
 		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="keywords"]/@value', $values[DoubleClickDistributionField::KEYWORDS], $item);
 		kXml::setNodeValue($this->xpath, 'dfpvideo:lastMediaModifiedDate', date('r', $values[DoubleClickDistributionField::LAST_MEDIA_MODIFIED_DATE]), $item);
-		kXml::setNodeValue($this->xpath, 'media:status/@state', $values[DoubleClickDistributionField::STATUS], $item);
+		$status = $this->getStatusFieldValue($values[DoubleClickDistributionField::STATUS]);
+		kXml::setNodeValue($this->xpath, 'media:status/@state', $status, $item);
 		kXml::setNodeValue($this->xpath, 'dfpvideo:fw_caid', $values[DoubleClickDistributionField::FW_CAID], $item);
 
 		if($entry)
@@ -221,6 +222,18 @@ class DoubleClickFeed
 			kXml::setNodeValue($this->xpath, 'dfpvideo:ingestUrl', $ingestUrl, $item);
 		}
 		$this->setStatsVersion2Elements($values, $item);
+	}
+
+	/**
+	 * function added in order to support old deprecated monetize field values
+	 */
+	public function getStatusFieldValue($configStatusValue)
+	{
+		if($configStatusValue == 'true')
+			return 'active';
+		if($configStatusValue == 'false')
+			return 'blocked';
+		return $configStatusValue;
 	}
 
 
