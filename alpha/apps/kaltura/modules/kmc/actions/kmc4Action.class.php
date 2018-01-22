@@ -230,7 +230,8 @@ class kmc4Action extends kalturaAction
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
                 'showStudioV3'		    => $showStudioV3,
-                'html5_version'		    => kConf::get("html5_version")
+                'html5_version'		    => kConf::get("html5_version"),
+                'publisherEnvType'		=> isset($this->partner) ? $this->partner->getPublisherEnvironmentType() : ''
             ),
 			'liveanalytics'					=> array(
                 'version'				=> kConf::get("liveanalytics_version"),
