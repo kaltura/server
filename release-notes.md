@@ -1,5 +1,48 @@
 # Mercury 13.12.0 #
 
+## Split beacon index to index per object type ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8432
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	1. Stop logstash process to avoid re-creating the old beacon index.
+
+	2. Delete all old elstic aliases.
+	
+	3. Delete old beaconIndex.
+	
+	4. Create new indexes in elastic by runing: 
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_entry_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_entry_index.json"
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_entry_server_node_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_entry_server_node_index.json" 
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_scheduled_resource_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_scheduled_resource_index.json"
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_server_node_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_server_node_index.json"
+	
+	5. Create new alises in elastic:
+		curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
+    	"actions" : [
+        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beacon_entry_index" } },
+        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beacon_entry_server_node_index" } },
+        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beacon_scheduled_resource_index" } },
+        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beacon_server_node_index" } },
+        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beaconindex" } }
+			]
+		}'
+		
+	6. strat logstash process.
+
+#### Known Issues & Limitations ####
+
+	Please note the old data will be removed during this process.
+
 ## Add permission to create VAST cue point without URL ##
 
 - Issue Type: feature
