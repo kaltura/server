@@ -92,11 +92,19 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if (in_array($this->object_type, $excludeObjectTypes))
 			return false;
 
-		//check the file extension and size
-		$fileTypeNotToEncrypt = array_merge(kConf::get('video_file_ext'), kConf::get('audio_file_ext'));
-		$fileTypeNotToEncrypt[] = 'log';
+		$fileTypeNotToEncrypt = array('log');
 		if (in_array($this->getFileExt(), $fileTypeNotToEncrypt))
 			return false;
+
+		if ($this->object_type == FileSyncObjectType::ASSET)
+		{
+			/** @var  Asset $asset */
+			$asset = assetPeer::retrieveById($this->object_id);
+			$shouldEncrypt = $asset->shouldEncrypt();
+			KalturaLog::debug("Asset id [$this->object_id] of type [" . $asset->getType() . "] should be encrypt: [$shouldEncrypt]");
+			if (!$shouldEncrypt)
+				return false;
+		}
 
 		$maxFileSize = kConf::get('max_file_size_for_encryption', 'local', self::MAX_FILE_SIZE_FOR_ENCRYPTION);
 		if (filesize($this->getFullPath()) > $maxFileSize)

@@ -91,4 +91,9 @@ class liveAsset extends flavorAsset
 		
 		return $this->getEntryId() . "_" . $this->getId() . "_{$sub_type}_{$version}";
 	}
+	
+	public function shouldEncrypt()
+	{
+		return false;
+	}
 }
