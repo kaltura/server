@@ -37,7 +37,7 @@
                 </eventConditions>
 
                 <format>1</format>
-                <subject>[Kaltura] -Not Recorded Entry was replaced successfully</subject>
+                <subject>[Kaltura] -Entry was replaced successfully</subject>
                 <body>Your recently replaced media: "{entry_name}", is ready for playback.</body>
                 <fromEmail>{from_email}</fromEmail>
                 <fromName>{from_name}</fromName>
@@ -46,10 +46,10 @@
                     <emailRecipients objectType="array">
                         <item objectType = "KalturaEmailNotificationRecipient">
                             <email objectType="KalturaEvalStringField">
-                                <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : '') : ''</code>
+                                <code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getEmail() : ''</code>
                             </email>
                             <name objectType="KalturaEvalStringField">
-                                <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : '') : ''</code>
+                                <code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getFirstName() . ' ' . $scope->getObject()->getkuser()->getLastName() : ''</code>
                             </name>
                         </item>
                     </emailRecipients>
