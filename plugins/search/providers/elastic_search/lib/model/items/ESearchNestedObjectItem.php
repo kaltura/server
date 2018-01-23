@@ -80,8 +80,9 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		$queryAttributes->setNestedOperatorPath(static::NESTED_QUERY_PATH);
 	}
 
-	private static function createNestedQuery($queryName, &$boolQuery, &$queryAttributes)
+	public function createNestedQuery(&$boolQuery, &$queryAttributes)
 	{
+		$queryName = $this->getNestedQueryName($queryAttributes);
 		$queryAttributes->setNestedQueryName($queryName);
 		$nestedQuery = kESearchQueryManager::getNestedQuery($boolQuery, $queryAttributes);
 		$queryAttributes->setNestedQueryName(null);
@@ -89,7 +90,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		return $nestedQuery;
 	}
 
-	private static function createBoolQueryForNestedOperator($eSearchItemsArr, &$queryAttributes,$boolOperator,$allowedSearchTypes)
+	private static function createBoolQueryForNestedOperator($eSearchItemsArr, &$queryAttributes, $boolOperator, $allowedSearchTypes)
 	{
 		$boolQuery = new kESearchBoolQuery();
 		foreach ($eSearchItemsArr as $eSearchItem)
@@ -109,7 +110,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		$boolQuery = new kESearchBoolQuery();
 		$queryAttributes->setScopeToInner();
 		$this->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
-		return self::createNestedQuery($this->getNestedQueryName($queryAttributes), $boolQuery, $queryAttributes);
+		return $this->createNestedQuery($boolQuery, $queryAttributes);
 	}
 
 	private static function createGroupedNestedQueryForItems($eSearchItemsArr, &$queryAttributes, $boolOperator, $allowedSearchTypes, $innerHitsSize, $numOfFragments)
@@ -121,7 +122,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 			$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
 		}
 		self::initNestedQueryParams($queryAttributes, $innerHitsSize, $numOfFragments);
-		return self::createNestedQuery($eSearchItem->getNestedQueryName($queryAttributes), $boolQuery, $queryAttributes);
+		return $eSearchItem->createNestedQuery($boolQuery, $queryAttributes);
 	}
 
 	public abstract function getNestedQueryName(&$queryAttributes);
