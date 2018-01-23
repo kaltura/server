@@ -20,7 +20,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 	{
 		$this->setAttrib('id', 'frmVendorProfileConfigure');
 		$this->setMethod('post');
-
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
 		$titleElement->setLabel('General');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
@@ -120,6 +119,13 @@ class Form_VendorProfileConfigure extends ConfigureForm
 
 		$this->addRulesSection();
 		$this->addRulesTemplate();
+
+		$element3 = new Infra_Form_Html ( 'place_holder3', array ('content' => '<span/>' ) );
+		$this->addElement ( $element3 );
+
+		$this->addDisplayGroup(array('place_holder3'), 'vendorProfileCredit', array(
+			'legend' => 'Credit Configuration',
+		));
 	}
 
 	public static $rulesMap = array("Kaltura_Client_Reach_Type_VendorProfileRuleEntryAdded" => "Entry_Created",
@@ -169,6 +175,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		}
 
 		$this->populateRules($object);
+		$this->getSubForm("vendorProfileCredit")->populateFromObject($object->credit);
 	}
 
 	private function populateRules($object)
@@ -197,6 +204,8 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			$rulesArray[] = $a;
 		}
 		$object->rules = $rulesArray;
+
+		$object->credit = $this->getSubForm("vendorProfileCredit")->getObject($properties["vendorProfileCredit"]);
 
 		return $object;
 	}

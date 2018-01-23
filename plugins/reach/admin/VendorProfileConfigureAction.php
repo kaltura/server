@@ -57,7 +57,8 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 	{
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
 		$vendorProfile = $reachPluginClient->vendorProfile->get($vendorProfileId);
-		$form = $this->initForm($action, $partnerId, $vendorProfileId);
+		$creditHandlerClass = get_class($vendorProfile->credit);
+		$form = $this->initForm($action, $partnerId, $vendorProfileId, $creditHandlerClass);
 
 		$request = $action->getRequest();
 		$formData = $request->getPost();
@@ -75,9 +76,10 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 	 */
 	protected function handleNewVendorProfile(Zend_Controller_Action $action, $partnerId)
 	{
-		$form = $this->initForm($action, $partnerId);
 		$request = $action->getRequest();
 		$formData = $request->getPost();
+		$creditHandlerClass = $this->_getParam('creditHandlerClass') != 'Null' ? $this->_getParam('creditHandlerClass') : $formData['vendorProfileCredit']['objectType'];
+		$form = $this->initForm($action, $partnerId, null, $creditHandlerClass);
 		$form->populate($formData);
 		if ($request->isPost() && $form->isValid($formData))
 			$this->handlePost($action, $form, $formData);
@@ -111,9 +113,10 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 	 * @param Zend_Controller_Action $action
 	 * @param $partnerId
 	 * @param $vendorProfileId
+	 * @param $creditHandlerClass
 	 * @return Form_VendorProfileConfigure
 	 */
-	protected function initForm(Zend_Controller_Action $action, $partnerId, $vendorProfileId = null)
+	protected function initForm(Zend_Controller_Action $action, $partnerId, $vendorProfileId = null, $creditHandlerClass = null)
 	{
 		$urlParams = array(
 			'controller' => 'plugin',
@@ -127,6 +130,51 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		}
 		$form = new Form_VendorProfileConfigure($partnerId, $blockFields);
 		$form->setAction($action->view->url($urlParams));
+
+		$creditHandlerForm = $this->getCreditHandlerForm($creditHandlerClass);
+
+		if(is_null($creditHandlerForm))
+			throw new Exception("Can't instantiate vendor profile credit form of type $creditHandlerClass");
+		$creditHandlerForm->updateCreditOptions($this->getVendorProfileCreditClasses($action));
+		$form->addSubForm($creditHandlerForm, "vendorProfileCredit");
 		return $form;
+	}
+
+	protected function getCreditHandlerForm($type) {
+		switch($type) {
+			case 'Null':
+				return new Form_VendorProfileNullCredit();
+			case 'Kaltura_Client_Reach_Type_VendorCredit':
+				return new Form_VendorProfileCredit();
+			case 'Kaltura_Client_Reach_Type_ReoccurringVendorCredit':
+				return new Form_VendorProfileRecurringCredit();
+			case 'Kaltura_Client_Reach_Type_TimeRangeVendorCredit':
+				return new Form_VendorProfileTimeFramedCredit();
+			default:
+				return new Form_VendorProfileNullCredit();
+		}
+	}
+
+	public function getVendorProfileCreditFormAction(Zend_Controller_Action $action)
+	{
+		$action->getHelper('layout')->disableLayout();
+		$type = $action->getRequest()->getParam('creditHandlerClass');
+		$form = $this->getCreditHandlerForm($type);
+		if(is_null($form))
+			throw new Exception("Can't instantiate vendor profile credit form of type $form");
+
+		$action->view->form = $form;
+		$action->view->form->updateCreditOptions($this->getVendorProfileCreditClasses($action));
+		$action->view->form->getElement("objectType")->setValue($type);
+	}
+
+	protected function getVendorProfileCreditClasses($action) {
+		$credits = array();
+		$credits['Null'] = $action->view->translate('Choose Credit Type');
+		$credits['Kaltura_Client_Reach_Type_VendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_VendorCredit');
+		$credits['Kaltura_Client_Reach_Type_ReoccurringVendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_ReoccurringVendorCredit');
+		$credits['Kaltura_Client_Reach_Type_TimeRangeVendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_TimeRangeVendorCredit');
+
+		return $credits;
 	}
 }

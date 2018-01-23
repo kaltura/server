@@ -385,7 +385,9 @@
     function setOutputFormatData() {
         var outputFormats = [];
         var maxOutputFormatIndex = jQuery('#output-formats-fieldSet').attr('maxOutputFormatIndex');
-        for(i=0; i<=maxOutputFormatIndex; i++)
+	    if (maxOutputFormatIndex == undefined)
+		    alert("Please Enter Output Format!");
+	    for(i=0; i<=maxOutputFormatIndex; i++)
         {
             if(jQuery('#OutputFormat_' + i).length > 0)
                 outputFormats.push(buildOutputParams('OutputFormat_', i));
@@ -396,6 +398,8 @@
 	function setSourceLanguageData() {
 		var sourceLanguages = [];
 		var maxSourceLanguageIndex = jQuery('#source-language-fieldSet').attr('maxSourceLanguageIndex');
+		if (maxSourceLanguageIndex == undefined)
+			alert("Please Enter Source Languages!");
 		for(i=0; i<=maxSourceLanguageIndex; i++)
         {
             if(jQuery('#SourceLanguage_' + i).length > 0)
@@ -407,6 +411,8 @@
     function setTargetLanguageData() {
         var targetLanguages = [];
         var maxTargetLanguageIndex = jQuery('#target-language-fieldSet').attr('maxTargetLanguageIndex');
+	    if (maxTargetLanguageIndex == undefined)
+		    alert("Please Enter Target Languages!");
         for(i=0; i<=maxTargetLanguageIndex; i++)
         {
             if(jQuery('#TargetLanguage_' + i).length > 0)

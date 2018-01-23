@@ -4,7 +4,7 @@
  * @subpackage api.objects
  */
 
-class KalturaReoccurringVendorCredit extends KalturaVendorCredit
+class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 {
 	/**
 	 * @var int

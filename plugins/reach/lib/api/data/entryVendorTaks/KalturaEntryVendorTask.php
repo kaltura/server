@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaEntryVendorTask extends KalturaObject implements IFilterable
+class KalturaEntryVendorTask extends KalturaObject implements IFilterable, IApiObjectFactory
 {
 	/**
 	 * @var int
@@ -208,5 +208,16 @@ class KalturaEntryVendorTask extends KalturaObject implements IFilterable
 	public function getFilterDocs()
 	{
 		return array();
+	}
+
+	/* (non-PHPdoc)
+ 	 * @see IApiObjectFactory::getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)
+ 	 */
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$object = new KalturaEntryVendorTask();
+		/* @var $object KalturaEntryVendorTask */
+		$object->fromObject($sourceObject, $responseProfile);
+		return $object;
 	}
 }

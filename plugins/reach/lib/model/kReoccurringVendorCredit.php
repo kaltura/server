@@ -8,7 +8,7 @@
  * @subpackage model
  *
  */
-class kReoccurringVendorCredit extends kVendorCredit
+class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 {
 	/**
 	 *  @var int
@@ -19,7 +19,30 @@ class kReoccurringVendorCredit extends kVendorCredit
 	 *  @var VendorCreditRecurrenceFrequency
 	 */
 	protected $frequency;
-	
+
+	/**
+	 *  @var string
+	 */
+	protected $finalEndDate;
+
+
+	/**
+	 * @param string $toDate
+	 */
+	public function setToDate($toDate)
+	{
+		$this->finalEndDate = $toDate;
+		parent::setToDate($this->calculateNextPeriodEndDate());
+	}
+
+	/**
+	 * @param string $toDate
+	 */
+	public function getToDate()
+	{
+		return $this->finalEndDate;
+	}
+
 	/**
 	 * @return the $reOccurrenceCount
 	 */
@@ -37,7 +60,7 @@ class kReoccurringVendorCredit extends kVendorCredit
 	}
 	
 	/**
-	 * @param string $reOccurrenceCount
+	 * @param int $reOccurrenceCount
 	 */
 	public function setReOccurrenceCount($reOccurrenceCount)
 	{
@@ -51,4 +74,22 @@ class kReoccurringVendorCredit extends kVendorCredit
 	{
 		$this->frequency = $frequency;
 	}
+
+	public function syncCredit($vendorProfileId)
+	{
+		$syncedCredit = parent::syncCredit($vendorProfileId);
+		if ( $this->getLastSyncTime() > $this->getToDate() )
+		{
+			$this->calculateNextPeriodEndDate();
+			$this->setSyncedCredit(0);
+		}
+		return $syncedCredit;
+	}
+
+	private function calculateNextPeriodEndDate()
+	{
+		$newTime = strtotime('+'.$this->getFrequency(), strtotime($this->getToDate()));
+		parent::setToDate(min ($newTime , $this->finalEndDate));
+	}
+
 }

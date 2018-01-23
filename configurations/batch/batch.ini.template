@@ -786,3 +786,9 @@ friendlyName										= Copy Caption Assets
 type												= KAsyncCopyCaptions
 scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
 
+[KReachTaskRunner : PeriodicWorker]
+id													= 690
+type												= KReachTaskRunner
+maximumExecutionTime								= 3600
+scriptPath											= ../plugins/reach/batch/KReachTaskRunner/KReachTaskRunnerExe.php
+sleepBetweenStopStart								= 86400

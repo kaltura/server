@@ -10,6 +10,7 @@
 	try{
 		$('fieldset[id^="vendorProfileRuleTemplate"]').hide();
 		populateRules();
+		populateDates()
 	}
 	catch (e)
 	{
@@ -37,5 +38,49 @@
 	{
 
 	}
+	function replaceVendorProfileCreditForm() {
 
+		var creditHandlerClass = jQuery('#vendorProfileCredit-objectType').val();
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'VendorProfileCreditConfigureAction', 'creditHandlerClass' => 'CREDIT_HANDLER')); ?>';
+		url = url.replace('CREDIT_HANDLER', creditHandlerClass);
+
+		subform = jQuery('#vendorProfileCredit-element');
+		subform.load(
+			url,
+			null,
+			function(html) {
+				jQuery('#vendorProfileCredit-element').replaceWith(jQuery.parseHTML(html)[1]);
+				jQuery('#vendorProfileCredit-objectType').change(replaceVendorProfileCreditForm);
+			}
+		);
+	}
+
+	try {
+		jQuery('#vendorProfileCredit-objectType').change(replaceVendorProfileCreditForm);
+	}
+	catch (e)
+	{
+
+	}
+
+	function populateDates() {
+		let f = jQuery('#frmVendorProfileConfigure');
+		f.find( "input[innertype=DateElement]").each(function(idx) {
+			var val = parseInt($(this).val());
+			if (isNaN(val))
+				return;
+
+			if ( val > 315360000) {// 10 Year in second (max relative time)
+				var d = new Date(0);
+				d.setUTCSeconds(val);
+				$(this).val(d.toISOString().slice(0,10).replace(/-/g,"."));
+				return;
+			}
+
+			var id = this.id; //set months instead of seconds
+			if (epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
+				$(this).val(val / 2592000); // 60*60*24*30 - one month in seconds
+		});
+
+	}
 </script>

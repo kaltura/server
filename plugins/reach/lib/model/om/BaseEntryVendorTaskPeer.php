@@ -334,54 +334,6 @@ abstract class BaseEntryVendorTaskPeer {
 			}
 		}
 	}
-	
-	/**
-	 * Method to do selects.
-	 *
-	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
-	 * @param      PropelPDO $con
-	 * @return     array Array of selected Objects
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
-	{		
-		$criteriaForSelect = EntryVendorTaskPeer::prepareCriteriaForSelect($criteria);
-		
-		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
-		$cacheKey = null;
-		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteriaForSelect, 
-			kQueryCache::QUERY_TYPE_SELECT,
-			'EntryVendorTaskPeer', 
-			$cacheKey, 
-			$queryDB);
-		if ($cachedResult !== null)
-		{
-			$cacheKey = null;
-			EntryVendorTaskPeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			EntryVendorTaskPeer::updateInstancePool($cachedResult);
-			return $cachedResult;
-		}
-		
-		$con = EntryVendorTaskPeer::alternativeCon($con, $queryDB);
-		
-		$queryResult = EntryVendorTaskPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
-		
-		if($criteriaForSelect instanceof KalturaCriteria)
-			$criteriaForSelect->applyResultsSort($queryResult);
-		
-		if ($cacheKey !== null)
-		{
-			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
-			$cacheKey = null;
-		}
-		
-		EntryVendorTaskPeer::filterSelectResults($queryResult, $criteria);
-		
-		EntryVendorTaskPeer::addInstancesToPool($queryResult);
-		return $queryResult;
-	}
 
 	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
 	{
@@ -398,16 +350,64 @@ abstract class BaseEntryVendorTaskPeer {
 				break;
 			}
 		}
-	
+
 		if($con === null)
 			$con = myDbHelper::alternativeCon($con);
-			
+
 		if($con === null)
 			$con = Propel::getConnection(EntryVendorTaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		
+
 		return $con;
 	}
-		
+
+	/**
+	 * Method to do selects.
+	 *
+	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
+	 * @param      PropelPDO $con
+	 * @return     array Array of selected Objects
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$criteriaForSelect = EntryVendorTaskPeer::prepareCriteriaForSelect($criteria);
+
+		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
+		$cacheKey = null;
+		$cachedResult = kQueryCache::getCachedQueryResults(
+			$criteriaForSelect,
+			kQueryCache::QUERY_TYPE_SELECT,
+			'EntryVendorTaskPeer',
+			$cacheKey,
+			$queryDB);
+		if ($cachedResult !== null)
+		{
+			$cacheKey = null;
+			EntryVendorTaskPeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			EntryVendorTaskPeer::updateInstancePool($cachedResult);
+			return $cachedResult;
+		}
+
+		$con = EntryVendorTaskPeer::alternativeCon($con, $queryDB);
+
+		$queryResult = EntryVendorTaskPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+
+		if ($cacheKey !== null)
+		{
+			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
+		}
+
+		EntryVendorTaskPeer::filterSelectResults($queryResult, $criteria);
+
+		EntryVendorTaskPeer::addInstancesToPool($queryResult);
+		return $queryResult;
+	}
+
 	/**
 	 * @var criteriaFilter The default criteria filter.
 	 */

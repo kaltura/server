@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers,IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -25,6 +25,22 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			return 'KalturaVendorTranslationCatalogItem';
 
 		return null;
+	}
+
+	/**
+	 * Returns a list of enumeration class names that implement the baseEnumName interface.
+	 * @param string $baseEnumName the base implemented enum interface, set to null to retrieve all plugin enums
+	 * @return array<string> A string listing the enum class names that extend baseEnumName
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('SyncReachCreditTaskBatchType');
+
+		if($baseEnumName == 'BatchJobType')
+			return array('SyncReachCreditTaskBatchType');
+
+		return array();
 	}
 
 	/* (non-PHPdoc)
@@ -91,6 +107,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new VendorProfileListAction();
 		$pages[] = new VendorProfileConfigureAction();
 		$pages[] = new VendorProfileSetStatusAction();
+		$pages[] = new VendorProfileCreditConfigureAction();
 		return $pages;
 	}
 	
