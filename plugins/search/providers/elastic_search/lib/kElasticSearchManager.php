@@ -94,14 +94,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             }
         }
 
-        array_walk_recursive($cmd, array('kElasticSearchManager','cleanseHtml'));
+        array_walk_recursive($cmd, array('elasticSearchUtils','purifyHtml'));
         return $cmd;
-    }
-
-    private static function cleanseHtml(&$value, $key)
-    {
-        $value = html_entity_decode($value);
-        $value = strip_tags($value);
     }
 
     //exe the curl

@@ -145,4 +145,10 @@ class elasticSearchUtils
 		return $numOfFragments;
 	}
 
+	public static function purifyHtml(&$value, $key)
+	{
+		$value = html_entity_decode($value);
+		$value = strip_tags($value);
+	}
+
 }
