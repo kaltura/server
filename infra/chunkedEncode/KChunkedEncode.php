@@ -353,7 +353,7 @@
 				$cmdLineArr[$key]='-an';
 			}
 
-			$toRemove = array("-ac","-ar", "-b:a","-ab","-vsync", "-async","-filter_complex","-flags","-f");
+			$toRemove = array("-ac","-ar", "-b:a","-ab","-async","-filter_complex","-flags","-f");
 			foreach($cmdLineArr as $idx=>$opt){
 				if(in_array($opt, array("-rc_eq"))){
 					if($cmdLineArr[$idx+1][0]!="'")
