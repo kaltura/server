@@ -68,6 +68,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 				{
 					$boolQuery = new kESearchBoolQuery();
 					self::initNestedQueryParams($queryAttributes, $innerHitsSize, $numOfFragments);
+					$queryAttributes->setScopeToInner();
 					$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
 					$nestedQuery = self::createNestedQuery($eSearchItem->getNestedQueryName($queryAttributes), $boolQuery, $queryAttributes);
 					$finalQuery[] = $nestedQuery;
@@ -76,6 +77,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 			else //in case of should operator we can group
 			{
 				$boolQuery = new kESearchBoolQuery();
+				$queryAttributes->setScopeToInner();
 				foreach ($eSearchItemsArr as $eSearchItem)
 				{
 					$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
