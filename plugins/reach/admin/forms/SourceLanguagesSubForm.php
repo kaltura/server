@@ -20,7 +20,6 @@ class Form_SourceLanguagesSubForm extends ConfigureSubForm
 	{
 		$this->setAttrib('id', 'frmSourceLanguagesSubForm');
 		$this->setMethod('post');
-
 		$this->addDecorator('ViewScript', array(
 			'viewScript' => 'source-language-sub-form.phtml',
 		));
@@ -31,8 +30,9 @@ class Form_SourceLanguagesSubForm extends ConfigureSubForm
 
 	public function isValid($data)
 	{
-		if ($data['SourceLanguages'])
+		if ($data['SourceLanguages'] && !empty(json_decode($data['SourceLanguages'], true)))
 			return true;
-		else return false;
+		else
+			return false;
 	}
 }

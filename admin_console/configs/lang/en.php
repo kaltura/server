@@ -1430,6 +1430,13 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorProfileStatus::DISABLED' => "Disabled",
 	'Kaltura_Client_Reach_Enum_VendorProfileStatus::DELETED' => "Deleted",
 	'Kaltura_Client_Reach_Enum_VendorProfileStatus::ACTIVE' => "Enabled",
+	'Kaltura_Client_Reach_Type_TimeRangeVendorCredit' => "Time Ranged Credit",
+	'Kaltura_Client_Reach_Type_ReoccurringVendorCredit' => "Recurring Credit",
+	'Kaltura_Client_Reach_Type_VendorCredit'  => "Generic Credit",
+	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::MONTHLY' => "MONTHLY",
+	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::DAILY' => "DAILY",
+	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::WEEKLY' => "WEEKLY",
+	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::YEARLY' => "YEARLY",
 
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN' => "English",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_US' => "English (American)",

@@ -30,4 +30,10 @@ class kTimeRangeVendorCredit extends kVendorCredit
 	{
 		$this->toDate = $toDate;
 	}
+
+	public function addAdditionalCriteria(Criteria $c)
+	{
+		$c->add(EntryVendorTaskPeer::QUEUE_TIME ,$this->getToDate() , Criteria::LESS_EQUAL);
+	}
+
 }

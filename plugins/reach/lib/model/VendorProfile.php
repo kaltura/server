@@ -219,6 +219,16 @@ class VendorProfile extends BaseVendorProfile
 		
 		return $credit;
 	}
+
+	public function syncCredit()
+	{
+		$vendorProfileCredit = $this->getCredit();
+		if ($vendorProfileCredit)
+		{
+			$syncedCredit = $vendorProfileCredit->syncCredit($this->getId());
+			$this->setUsedCredit($syncedCredit);
+		}
+	}
 	
 	public function shouldModerate($type)
 	{

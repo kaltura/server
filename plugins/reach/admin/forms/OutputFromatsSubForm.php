@@ -31,8 +31,9 @@ class Form_OutputFormatsSubForm extends ConfigureSubForm
 
 	public function isValid($data)
 	{
-		if ($data['OutputFormats'])
+		if ($data['OutputFormats'] && !empty(json_decode($data['OutputFormats'], true)))
 			return true;
-		else return false;
+		else
+			return false;
 	}
 }

@@ -199,7 +199,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				break;
 				
 		}
-		
+		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
 	}

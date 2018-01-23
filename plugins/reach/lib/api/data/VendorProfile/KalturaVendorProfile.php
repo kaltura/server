@@ -11,95 +11,95 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	 * @filter eq,in,order
 	 */
 	public $id;
-	
+
 	/**
 	 * @var int
 	 * @readonly
 	 */
 	public $partnerId;
-	
+
 	/**
 	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
-	
+
 	/**
 	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
-	
+
 	/**
 	 * @var KalturaVendorProfileStatus
 	 * @readonly
 	 * @filter eq,in
 	 */
 	public $status;
-	
+
 	/**
 	 * @var KalturaVendorProfileType
 	 * @filter eq,in
 	 */
 	public $profileType;
-	
+
 	/**
 	 * @var KalturaCatalogItemLanguage
 	 */
 	public $defaultSourceLanguage;
-	
+
 	/**
 	 * @var KalturaVendorCatalogItemOutputFormat
 	 */
 	public $defaultOutputFormat;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableMachineModeration;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableHumanModeration;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $autoDisplayMachineCaptionsOnPlayer;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $autoDisplayHumanCaptionsOnPlayer;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableMetadataExtraction;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableSpeakerChangeIndication;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableAudioTags;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableProfanityRemoval;
-	
+
 	/**
 	 * @var int
 	 */
 	public $maxCharactersPerCaptionLine;
-	
+
 	/**
 	 * @var KalturaVendorProfileRulesArray
 	 */
@@ -109,13 +109,13 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	 * @var KalturaVendorCredit
 	 */
 	public $credit;
-	
+
 	/**
 	 * @var int
 	 * @readonly
 	 */
 	public $usedCredit;
-	
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -139,7 +139,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		'credit',
 		'usedCredit',
 	);
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaCuePoint::getMapBetweenObjects()
 	 */
@@ -147,7 +147,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
 	/* (non-PHPdoc)
  	 * @see KalturaObject::toInsertableObject()
  	 */
@@ -155,38 +155,66 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	{
 		if (is_null($object_to_fill))
 			$object_to_fill = new VendorProfile();
-		
+
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
-	
+
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validate();
 		return parent::validateForInsert($propertiesToSkip);
 	}
-	
+
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validate($sourceObject);
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
-	
+
 	private function validate(VendorProfile $sourceObject = null)
 	{
-		if(!$sourceObject) //Source object will be null on insert
+		if (!$sourceObject) //Source object will be null on insert
 			$this->validatePropertyNotNull("profileType");
-		
+
 		return;
 	}
-	
+
 	public function getExtraFilters()
 	{
 		return array();
 	}
-	
+
 	public function getFilterDocs()
 	{
 		return array();
 	}
 
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		/* @var $dbObject VendorProfile */
+		parent::doFromObject($dbObject, $responseProfile);
+
+		$creditType = get_class($dbObject->getCredit());
+		switch ($creditType)
+		{
+			case 'kVendorCredit':
+				$this->credit = new KalturaVendorCredit();
+				break;
+
+			case 'kTimeRangeVendorCredit':
+				$this->credit = new KalturaTimeRangeVendorCredit();
+				break;
+
+			case 'kReoccurringVendorCredit':
+				$this->credit = new KalturaReoccurringVendorCredit();
+				break;
+		}
+
+		if ($this->credit)
+			$this->credit->fromObject($dbObject->getCredit());
+	}
 }

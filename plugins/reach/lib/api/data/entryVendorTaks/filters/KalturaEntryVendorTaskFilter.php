@@ -37,4 +37,5 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		$response->totalCount = $totalCount;
 		return $response;
 	}
+
 }
