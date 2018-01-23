@@ -90,7 +90,7 @@ class ESearchCategoryItem extends ESearchItem
 	/**
 	 * @param $eSearchItemsArr
 	 * @param $boolOperator
-	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param $queryAttributes
 	 * @param null $eSearchOperatorType
 	 * @return array
 	 */
@@ -101,35 +101,35 @@ class ESearchCategoryItem extends ESearchItem
 		$allowedSearchTypes = ESearchCategoryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $categorySearchItem)
 		{
-			self::createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes, $queryAttributes);
+			$categorySearchItem->createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
 		return $categoryQuery;
 	}
 	
-	public static function createSingleItemSearchQuery($categorySearchItem, &$categoryQuery, $allowedSearchTypes, &$queryAttributes)
+	public function createSingleItemSearchQuery(&$categoryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
-		$categorySearchItem->validateItemInput();
-		$categorySearchItem->translateSearchTerm();
-		switch ($categorySearchItem->getItemType())
+		$this->validateItemInput();
+		$this->translateSearchTerm();
+		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$categoryQuery[] = kESearchQueryManager::getPartialQuery($categorySearchItem, $categorySearchItem->getFieldName(), $queryAttributes);
+				$categoryQuery[] = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$categoryQuery[] = kESearchQueryManager::getPrefixQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$categoryQuery[] = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$categoryQuery[] = kESearchQueryManager::getExistsQuery($categorySearchItem, $categorySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$categoryQuery[] = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$categoryQuery[] = kESearchQueryManager::getRangeQuery($categorySearchItem,$categorySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$categoryQuery[] = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$categorySearchItem->getItemType()."]");
+				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
 	}
 
