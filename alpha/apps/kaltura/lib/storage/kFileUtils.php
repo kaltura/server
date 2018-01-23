@@ -7,7 +7,7 @@
 class kFileUtils extends kFile
 {
 
-	const ENCRYPT = '_ENCRYPT';
+	const ENCRYPT = '_ENCRYPT_V2';
 
 	public static function pollFileExists($file_name)
 	{
