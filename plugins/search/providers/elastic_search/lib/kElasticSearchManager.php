@@ -93,9 +93,16 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 $dataContributionPath = array_merge($dataContributionPath, $elasticPluginData);
             }
         }
-        
+
+		array_walk_recursive($cmd, array('kElasticSearchManager','cleanseHtml'));
         return $cmd;
     }
+
+    private static function cleanseHtml(&$value, $key)
+	{
+		$value = html_entity_decode($value);
+		$value = strip_tags($value);
+	}
 
     //exe the curl
     public function execElastic($params, IElasticIndexable $object, $action)
