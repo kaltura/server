@@ -44,19 +44,12 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		if($boolOperator == 'must_not')
 			$boolOperator = 'must';
 
+		$finalQuery = array();
+
 		if($queryAttributes->isNestedOperatorContext()) //nested operator
 		{
 			self::initNestedQueryParams($queryAttributes, $innerHitsSize, $numOfFragments);
-			$boolQuery = new kESearchBoolQuery();
-			foreach ($eSearchItemsArr as $eSearchItem)
-			{
-				$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
-			}
-			if(!$queryAttributes->getNestedQueryName())//in case of parent-child nested operators we already set the name in the parent
-			{
-				$queryAttributes->setNestedQueryName($eSearchItem->getNestedQueryName($queryAttributes));
-				$queryAttributes->incrementNestedQueryNameIndex();
-			}
+			$boolQuery = self::createBoolQueryForNestedOperator($eSearchItemsArr, $queryAttributes, $boolOperator, $allowedSearchTypes);
 			$finalQuery[] = $boolQuery;
 		}
 		else//entry operator
@@ -66,24 +59,14 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 				//create single for each item with nested
 				foreach ($eSearchItemsArr as $eSearchItem)
 				{
-					$boolQuery = new kESearchBoolQuery();
 					self::initNestedQueryParams($queryAttributes, $innerHitsSize, $numOfFragments);
-					$queryAttributes->setScopeToInner();
-					$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
-					$nestedQuery = self::createNestedQuery($eSearchItem->getNestedQueryName($queryAttributes), $boolQuery, $queryAttributes);
+					$nestedQuery = $eSearchItem->createSingleNestedQueryForItem($queryAttributes, $boolOperator, $allowedSearchTypes);
 					$finalQuery[] = $nestedQuery;
 				}
 			}
 			else //in case of should operator we can group
 			{
-				$boolQuery = new kESearchBoolQuery();
-				$queryAttributes->setScopeToInner();
-				foreach ($eSearchItemsArr as $eSearchItem)
-				{
-					$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
-				}
-				self::initNestedQueryParams($queryAttributes, $innerHitsSize, $numOfFragments);
-				$nestedQuery = self::createNestedQuery($eSearchItem->getNestedQueryName($queryAttributes), $boolQuery, $queryAttributes);
+				$nestedQuery = self::createGroupedNestedQueryForItems($eSearchItemsArr, $queryAttributes, $boolOperator, $allowedSearchTypes, $innerHitsSize, $numOfFragments);
 				$finalQuery[] = $nestedQuery;
 			}
 		}
@@ -104,6 +87,41 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		$queryAttributes->setNestedQueryName(null);
 		$queryAttributes->incrementNestedQueryNameIndex();
 		return $nestedQuery;
+	}
+
+	private static function createBoolQueryForNestedOperator($eSearchItemsArr, &$queryAttributes,$boolOperator,$allowedSearchTypes)
+	{
+		$boolQuery = new kESearchBoolQuery();
+		foreach ($eSearchItemsArr as $eSearchItem)
+		{
+			$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
+		}
+		if(!$queryAttributes->getNestedQueryName())//in case of parent-child nested operators we already set the name in the parent
+		{
+			$queryAttributes->setNestedQueryName($eSearchItem->getNestedQueryName($queryAttributes));
+			$queryAttributes->incrementNestedQueryNameIndex();
+		}
+		return $boolQuery;
+	}
+
+	public function createSingleNestedQueryForItem(&$queryAttributes, $boolOperator, $allowedSearchTypes)
+	{
+		$boolQuery = new kESearchBoolQuery();
+		$queryAttributes->setScopeToInner();
+		$this->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
+		return self::createNestedQuery($this->getNestedQueryName($queryAttributes), $boolQuery, $queryAttributes);
+	}
+
+	private static function createGroupedNestedQueryForItems($eSearchItemsArr, &$queryAttributes, $boolOperator, $allowedSearchTypes, $innerHitsSize, $numOfFragments)
+	{
+		$boolQuery = new kESearchBoolQuery();
+		$queryAttributes->setScopeToInner();
+		foreach ($eSearchItemsArr as $eSearchItem)
+		{
+			$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
+		}
+		self::initNestedQueryParams($queryAttributes, $innerHitsSize, $numOfFragments);
+		return self::createNestedQuery($eSearchItem->getNestedQueryName($queryAttributes), $boolQuery, $queryAttributes);
 	}
 
 	public abstract function getNestedQueryName(&$queryAttributes);
