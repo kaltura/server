@@ -26,16 +26,6 @@ class KalturaVendorCredit extends KalturaObject
 	 */
 	public $overageCredit;
 
-	/**
-	 *  @var time
-	 */
-	public $lastSyncTime;
-
-	/**
-	 *  @var int
-	 */
-	public $syncedCredit;
-
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -46,8 +36,6 @@ class KalturaVendorCredit extends KalturaObject
 		'fromDate',
 		'allowOverage',
 		'overageCredit',
-		'lastSyncTime',
-		'syncedCredit'
 	);
 
 	/* (non-PHPdoc)

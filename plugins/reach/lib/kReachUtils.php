@@ -34,24 +34,4 @@ class kReachUtils
 		return $limitedKs;
 
 	}
-
-	public static function isAllowedForPartner($partnerId)
-	{
-		$client = Infra_ClientHelper::getClient();
-		$client->setPartnerId($partnerId);
-		$filter = new KalturaPermissionFilter();
-		$filter->nameEqual = KalturaPermissionName::REACH_VENDOR_PARTNER_PERMISSION;
-		$filter->partnerIdEqual = $partnerId;
-		try
-		{
-			$result = $client->permission->listAction($filter, null);
-		} catch (Exception $e)
-		{
-			return false;
-		}
-		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
-
-		$isAllowed = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
-		return $isAllowed;
-	}
 }
