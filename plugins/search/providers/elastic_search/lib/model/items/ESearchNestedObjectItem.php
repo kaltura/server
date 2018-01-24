@@ -41,8 +41,8 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		$allowedSearchTypes = static::getAllowedSearchTypesForField();
 		$numOfFragments = self::initializeNumOfFragments();
 		// must_not was already set in a higher level of the query inside ESearchOperator
-		if($boolOperator == 'must_not')
-			$boolOperator = 'must';
+		if($boolOperator == kESearchBoolQuery::MUST_NOT_KEY)
+			$boolOperator = kESearchBoolQuery::MUST_KEY;
 
 		$finalQuery = array();
 

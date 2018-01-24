@@ -19,7 +19,6 @@ class ESearchOperator extends ESearchBaseOperator
 				$queryAttributes->setInitNestedQuery(true);
 
 			$subQuery = call_user_func(array($itemClassName, 'createSearchQuery'), $itemSearchItems, $boolOperator, $queryAttributes, $operatorType);
-			$queryAttributes->setInitNestedQuery(false);
 
 			self::addSubQueryToFinalQuery($subQuery, $outQuery, $itemClassName, $boolOperator);
 		}
