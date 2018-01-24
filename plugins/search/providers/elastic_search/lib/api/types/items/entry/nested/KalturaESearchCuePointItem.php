@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchCuePointItem extends KalturaESearchAbstractEntryItem
+class KalturaESearchCuePointItem extends KalturaESearchEntryAbstractNestedItem
 {
 
 	/**
@@ -11,17 +11,13 @@ class KalturaESearchCuePointItem extends KalturaESearchAbstractEntryItem
 	 */
 	public $fieldName;
 
-	/**
-	 * @var KalturaCuePointType
-	 */
-	public $cuePointType;
-
 	private static $map_between_objects = array(
 		'fieldName',
-		'cuePointType',
 	);
 
-	private static $map_dynamic_enum = array();
+	private static $map_dynamic_enum = array(
+		KalturaESearchCuePointFieldName::TYPE => 'KalturaCuePointType',
+	);
 
 	private static $map_field_enum = array(
 		KalturaESearchCuePointFieldName::ANSWERS => ESearchCuePointFieldName::ANSWERS,
@@ -35,6 +31,7 @@ class KalturaESearchCuePointItem extends KalturaESearchAbstractEntryItem
 		KalturaESearchCuePointFieldName::TAGS => ESearchCuePointFieldName::TAGS,
 		KalturaESearchCuePointFieldName::TEXT => ESearchCuePointFieldName::TEXT,
 		KalturaESearchCuePointFieldName::SUB_TYPE => ESearchCuePointFieldName::SUB_TYPE,
+		KalturaESearchCuePointFieldName::TYPE => ESearchCuePointFieldName::TYPE,
 	);
 
 	protected function getMapBetweenObjects()

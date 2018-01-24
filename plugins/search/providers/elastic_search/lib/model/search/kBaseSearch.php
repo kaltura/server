@@ -33,7 +33,7 @@ abstract class kBaseSearch
 
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
-        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
+        $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->handleDisplayInSearch();
         $this->mainBoolQuery->addToMust($subQuery);
         $this->applyElasticSearchConditions();

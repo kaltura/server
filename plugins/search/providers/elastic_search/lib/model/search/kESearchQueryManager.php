@@ -146,4 +146,19 @@ class kESearchQueryManager
 		return $existsQuery;
 	}
 
+	public static function getNestedQuery($query, &$queryAttributes)
+	{
+		/** @var  ESearchQueryAttributes $queryAttributes*/
+		$nestedQuery = new kESearchNestedQuery();
+		$nestedQuery->setPath($queryAttributes->getNestedOperatorPath());
+		$nestedQuery->setInnerHitsSize($queryAttributes->getNestedOperatorInnerHitsSize());
+		$nestedQuery->setInnerHitsSource(true);
+		$highlight = new kESearchHighlightQuery($queryAttributes->getFieldsToHighlight(), $queryAttributes->getNestedOperatorNumOfFragments());
+		$nestedQuery->setHighlight($highlight->getFinalQuery());
+		$nestedQuery->setQuery($query);
+		$nestedQuery->setInnerHitsName($queryAttributes->getNestedQueryName());
+
+		return $nestedQuery;
+	}
+
 }
