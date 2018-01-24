@@ -145,7 +145,17 @@ class elasticSearchUtils
 		return $numOfFragments;
 	}
 
-	public static function purifyHtml(&$value, $key)
+
+	/**
+	 * Go over the array and decode html and strip tags from all of its leafs
+	 * @param array $cmd
+	 */
+	public static function PurifyHtml(&$cmd)
+	{
+		array_walk_recursive($cmd, array('elasticSearchUtils','purifyHtmlFromLeaf'));
+	}
+
+	public static function purifyHtmlFromLeaf(&$value, $key)
 	{
 		$value = html_entity_decode($value);
 		$value = strip_tags($value);

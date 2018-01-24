@@ -94,7 +94,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             }
         }
 
-        array_walk_recursive($cmd, array('elasticSearchUtils','purifyHtml'));
+		elasticSearchUtils::PurifyHtml($cmd);
         return $cmd;
     }
 
