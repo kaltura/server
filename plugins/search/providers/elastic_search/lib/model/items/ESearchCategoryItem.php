@@ -101,7 +101,7 @@ class ESearchCategoryItem extends ESearchItem
 		$allowedSearchTypes = ESearchCategoryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $categorySearchItem)
 		{
-			$categorySearchItem->createSingleItemSearchQuery($categorySearchItem, $categoryQuery, $allowedSearchTypes, $queryAttributes);
+			$categorySearchItem->createSingleItemSearchQuery($categoryQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
 		return $categoryQuery;
