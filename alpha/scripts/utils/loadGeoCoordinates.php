@@ -22,7 +22,7 @@ function loadFile($fileName, $keyCount, $cache)
 			break;
 		}
 		
-		if (count($data) != $keyCount + 2 || in_array('-', $data))
+		if (count($data) < $keyCount + 2 || in_array('-', $data))
 		{
 			continue;
 		}
@@ -30,7 +30,7 @@ function loadFile($fileName, $keyCount, $cache)
 		$key = array_slice($data, 0, $keyCount);
 		$key = 'coord_' . normalizeKey(implode('_', $key));
 		
-		$value = array_slice($data, -2);
+		$value = array_slice($data, $keyCount, 2);
 		$value = implode('/', $value);
 
 		if (!$cache->set($key, $value))
@@ -57,5 +57,5 @@ if (!$cache->connect($argv[1], $argv[2]))
 }
 
 loadFile("countriesCoordinates.txt", 1, $cache);
-loadFile("citiesCoordinates.txt", 2, $cache);
+loadFile("citiesCoordinates.txt", 3, $cache);
 echo "done\n";
