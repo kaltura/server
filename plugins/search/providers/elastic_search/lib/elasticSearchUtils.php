@@ -162,7 +162,10 @@ class elasticSearchUtils
 
 	public static function filterHtmlFromLeaf(&$value)
 	{
-		$value = html_entity_decode($value);
-		$value = strip_tags($value);
+		if(is_string($value))
+		{
+			$value = html_entity_decode($value);
+			$value = strip_tags($value);
+		}
 	}
 }
