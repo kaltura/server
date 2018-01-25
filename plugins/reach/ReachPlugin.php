@@ -109,6 +109,9 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new VendorProfileConfigureAction();
 		$pages[] = new VendorProfileSetStatusAction();
 		$pages[] = new VendorProfileCreditConfigureAction();
+		$pages[] = new PartnerCatalogItemListAction();
+		$pages[] = new PartnerCatalogItemConfigureAction();
+		$pages[] = new PartnerCatalogItemSetStatusAction();
 		return $pages;
 	}
 	

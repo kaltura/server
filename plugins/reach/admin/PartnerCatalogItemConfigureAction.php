@@ -172,7 +172,7 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 	{
 		$urlParams = array(
 			'controller' => 'plugin',
-			'action' => 'CatalogItemConfigureAction',
+			'action' => 'PartnerCatalogItemConfigureAction',
 		);
 		if ($catalogItemId)
 		{
