@@ -15,6 +15,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	const OUTPUT_ENTRY_ID = 'entryId';
 	const OUTPUT_TIMESTAMP = 'timestamp';
 	const OUTPUT_CITY_NAME = 'cityName';
+	const OUTPUT_REGION_NAME = 'regionName';
 	const OUTPUT_COUNTRY_NAME = 'countryName';
 	const OUTPUT_SEC_VIEWED = 'secondsViewed';
 	const OUTPUT_AUDIENCE = 'audience';
@@ -423,6 +424,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		$dimensions = array(
 			self::DIMENSION_ENTRY_ID => self::OUTPUT_ENTRY_ID,
 			self::DIMENSION_LOCATION_CITY => self::OUTPUT_CITY_NAME,
+			self::DIMENSION_LOCATION_REGION => self::OUTPUT_REGION_NAME,
 			self::DIMENSION_LOCATION_COUNTRY => self::OUTPUT_COUNTRY_NAME,
 		);
 
