@@ -145,4 +145,24 @@ class elasticSearchUtils
 		return $numOfFragments;
 	}
 
+
+	/**
+	 * Go over the array and decode html and strip tags from all of its leafs
+	 * @param array $cmd
+	 */
+	public static function prepareElasticInput(&$cmd)
+	{
+		array_walk_recursive($cmd, array('elasticSearchUtils','prepareElasticLeafInput'));
+	}
+
+	public static function prepareElasticLeafInput(&$value, $key)
+	{
+		self::filterHtmlFromLeaf($value);
+	}
+
+	public static function filterHtmlFromLeaf(&$value)
+	{
+		$value = html_entity_decode($value);
+		$value = strip_tags($value);
+	}
 }
