@@ -124,7 +124,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 			return true;
 		
 		$allowedFilterTypes = $metadataListNoFilterExcludePartners[kCurrentContext::getCurrentPartnerId()];
-		if($allowedFilterTypes == "");
+		if($allowedFilterTypes == "")
 			return false;
 		
 		$allowedFilterTypesArray = explode(",", $allowedFilterTypes);
