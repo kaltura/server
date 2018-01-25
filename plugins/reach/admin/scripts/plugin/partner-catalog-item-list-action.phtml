@@ -8,15 +8,15 @@
 		<tr>
 			<th><?php echo $this->translate('ID'); ?></th>
 			<th><?php echo $this->translate('Status'); ?></th>
-			<th><?php echo $this->translate('Name'); ?></th>
 			<th><?php echo $this->translate('System Name'); ?></th>
 			<th><?php echo $this->translate('Publisher ID'); ?></th>
 			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
 			<th><?php echo $this->translate('Feature'); ?></th>
 			<th><?php echo $this->translate('Type'); ?></th>
 			<th><?php echo $this->translate('Turn Around Time'); ?></th>
-			<th><?php echo $this->translate('Creation Date'); ?></th>
-			<th><?php echo $this->translate('Last Updated Date'); ?></th>
+			<th><?php echo $this->translate('Source Language'); ?></th>
+			<th><?php echo $this->translate('Target Language'); ?></th>
+			<th><?php echo $this->translate('Output Format'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
 		</tr>
 		</thead>
@@ -34,22 +34,16 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
 				<td><?php echo $catalogItem->name; ?></td>
 				<td><?php echo $catalogItem->systemName; ?></td>
-				<td><?php echo $catalogItem->partnerId; ?></td>
 				<td><?php echo $catalogItem->vendorPartnerId; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $catalogItem->serviceFeature); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
-				<td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
-				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $catalogItem->partnerId; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
-						<option value="configureCatalogItem" ><?php echo $this->translate('Configure'); ?></option>
-						<?php if ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED): ?>
-							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
-						<?php elseif ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE): ?>
-							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
-						<?php endif; ?>
 						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
 					</select>
 				</td>
@@ -85,35 +79,9 @@
 		}
 		jQuery('select.options').val('');
 	}
-
-	function enable(catalogItemId, partnerId)
-	{
-		changeStatus(
-			catalogItemId,
-
-			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE; ?>,
-			partnerId,
-			function() {
-				alert('<?php echo $this->translate('Catalog Item enabled');?>');
-			}
-		);
-	}
-
-	function disable(catalogItemId,partnerId)
-	{
-		changeStatus(
-			catalogItemId,
-			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED; ?>,
-			partnerId,
-			function() {
-				alert('<?php echo $this->translate('Catalog Item disabled');?>');
-			}
-		);
-	}
-
 	function remove(catalogItemId,partnerId)
 	{
-		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Catalog Item ?'); ?>');
+		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Catalog Item from partner ?'); ?>');
 		if (ok)
 		{
 			changeStatus(
@@ -129,7 +97,7 @@
 
 	function changeStatus(catalogItemId, status, partnerId, callback)
 	{
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID','partnerId' => 'PARTNERID', 'catalogItemStatus' => 'STATUS')); ?>';
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID','partnerId' => 'PARTNERID', 'catalogItemStatus' => 'STATUS')); ?>';
 		url = url.replace('STATUS', status);
 		url = url.replace('CATALOGITEMID', catalogItemId);
 		url = url.replace('PARTNERID', partnerId);
@@ -154,59 +122,11 @@
 		});
 	}
 
-	function addNewCatalogItem(partnerId, catalogItemType, catalogItemServiceType, catalogItemTurnAroundTime)
+	function configureCatalogItems(partnerId, catalogItemType, catalogItemServiceType, catalogItemTurnAroundTime)
 	{
 		var paramsStr = '/new_partner_id/' + partnerId + '/new_catalog_item_type/' + catalogItemType + '/new_catalog_item_service_type/' + catalogItemServiceType + '/new_catalog_item_turn_around_time/' +catalogItemTurnAroundTime;
 
 		loadCatalogItem(paramsStr);
-	}
-
-	function configureCatalogItem(catalogItemId, partnerId)
-	{
-		if(typeof catalogItemId == 'undefined'){
-			alert('<?php echo $this->translate('Catalog Item ID not supplied'); ?>');
-			return;
-		}
-
-		var catalogItemIdStr = '/catalog_item_id/' + catalogItemId + '/new_partner_id/' + partnerId;
-
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + catalogItemIdStr;
-
-		jQuery('#catalog-item-configure-dialog').remove();
-		dialogDiv = jQuery('<div id="catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
-
-		dialogDiv.dialog({
-			bgiframe: true,
-			modal: true,
-			resizable: false,
-			width: 600,
-			height: 600,
-			title: '<?php echo $this->translate('Catalog Item'); ?>',
-			buttons: {
-				'<?php echo $this->translate('Save'); ?>': function() {
-					removeDisableTags();
-					jQuery(this).find('#frmCatalogItemConfigure').submit();
-				},
-				'<?php echo $this->translate('Close'); ?>': function() {
-					jQuery(this).dialog('close');
-				}
-			},
-			close: function() {
-				jQuery(this).dialog('destroy').remove();
-			}
-		});
-
-		dialogDiv.load(
-			url,
-			null,
-			function() {
-				addDisableTags();
-				jQuery(this).find('#frmCatalogItemConfigure').ajaxForm({
-					success: loadCatalogItemSuccess,
-					iframe: true
-				});
-			}
-		);
 	}
 
 	function removeDisableTags()
@@ -220,60 +140,6 @@
 		jQuery('#fieldset-pricing').removeAttr('disabled');
 	}
 
-	function cloneCatalogItemTemplate(partnerId , cloneTemplateId) {
-		if(!partnerId.length || isNaN(partnerId)){
-			alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
-			return;
-		}
-
-		if(!cloneTemplateId || !cloneTemplateId.length){
-			alert('<?php echo $this->translate('Catalog Template was not supplied'); ?>');
-			return;
-		}
-
-		var paramsStr1 = '/new_partner_id/' + partnerId + '/clone_template_id/' + cloneTemplateId;
-
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + paramsStr1;
-
-		jQuery('#catalog-item-configure-dialog').remove();
-		dialogDiv = jQuery('<div id="catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
-
-		dialogDiv.dialog({
-			bgiframe: true,
-			modal: true,
-			resizable: false,
-			width: 600,
-			height: 600,
-			title: '<?php echo $this->translate('Catalog Item Template Setup Configuration'); ?>',
-			buttons: {
-				'<?php echo $this->translate('Save'); ?>': function() {
-					jQuery('.ui-widget-overlay').css('z-index', 1003 );
-					jQuery('#loader').show();
-					removeDisableTags();
-					jQuery(this).find('#frmCatalogItemConfigure').submit();
-				},
-				'<?php echo $this->translate('Close'); ?>': function() {
-					jQuery(this).dialog('close');
-				}
-			},
-			close: function() {
-				jQuery(this).dialog('destroy').remove();
-			}
-		});
-
-		dialogDiv.load(
-			url,
-			null,
-			function() {
-				addDisableTags();
-				jQuery('#frmCatalogItemConfigure').ajaxForm({
-					success: loadCatalogItemSuccess,
-					iframe: true
-				});
-			}
-		);
-	}
-
 	function addDisableTags()
 	{
 		jQuery('#source-language-fieldSet').attr('disabled', 'disabled');
@@ -283,10 +149,10 @@
 
 	function loadCatalogItem(paramStr)
 	{
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + paramStr;
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction', 'catalogItemPricingClz' => 'Null')); ?>' + paramStr;
 
-		jQuery('#catalog-item-configure-dialog').remove();
-		dialogDiv = jQuery('<div id="catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+		jQuery('#partner-catalog-item-configure-dialog').remove();
+		dialogDiv = jQuery('<div id="partner-catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 
 		dialogDiv.dialog({
 			bgiframe: true,
@@ -299,7 +165,7 @@
 				'<?php echo $this->translate('Save'); ?>': function() {
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
-					jQuery(this).find('#frmCatalogItemConfigure').submit();
+					jQuery(this).find('#frmPartnerCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
 					jQuery(this).dialog('close');
@@ -314,7 +180,7 @@
 			url,
 			null,
 			function() {
-				jQuery(this).find('#frmCatalogItemConfigure').ajaxForm({
+				jQuery(this).find('#frmPartnerCatalogItemConfigure').ajaxForm({
 					success: loadCatalogItemSuccess,
 					iframe: true
 				});
@@ -335,8 +201,8 @@
 		}
 		jQuery('.ui-widget-overlay').css('z-index', 1000 );
 		jQuery('#loader').hide();
-		jQuery('#frmCatalogItemConfigure').replaceWith(html);
-		jQuery('#frmCatalogItemConfigure').ajaxForm({
+		jQuery('#frmPartnerCatalogItemConfigure').replaceWith(html);
+		jQuery('#frmPartnerCatalogItemConfigure').ajaxForm({
 			success: loadCatalogItemSuccess,
 			iframe: true
 		});

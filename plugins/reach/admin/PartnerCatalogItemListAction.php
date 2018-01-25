@@ -3,14 +3,14 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class CatalogItemListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
+class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 {
 	const ADMIN_CONSOLE_PARTNER = "-2";
 
 	public function __construct()
 	{
-		$this->action = 'CatalogItemListAction';
-		$this->label = "Catalog Items";
+		$this->action = 'PartnerCatalogItemListAction';
+		$this->label = "Partner Catalog Items";
 		$this->rootLabel = "Reach";
 	}
 
@@ -27,11 +27,10 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$request = $action->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		$vendorPartnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
-		$ServiceFeature = $this->_getParam('cloneTemplateServiceFeature') != "" ? $this->_getParam('cloneTemplateServiceFeature') : null;
-		$ServiceType = $this->_getParam('cloneTemplateServiceType') != "" ? $this->_getParam('cloneTemplateServiceType') : null;
-		$turnAround = $this->_getParam('cloneTemplateTurnAround') != "" ? $this->_getParam('cloneTemplateTurnAround') : null;
-		$partnerId = null;
+		$partnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
+		$ServiceFeature = $this->_getParam('templateServiceFeature') != "" ? $this->_getParam('templateServiceFeature') : null;
+		$ServiceType = $this->_getParam('templateServiceType') != "" ? $this->_getParam('templateServiceType') : null;
+		$turnAround = $this->_getParam('templateTurnAround') != "" ? $this->_getParam('templateTurnAround') : null;
 
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
@@ -41,19 +40,19 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$catalogItemProfileFilter->serviceFeatureEqual = $ServiceFeature;
 		$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
-		$catalogItemProfileFilter->vendorPartnerIdEqual = $vendorPartnerId;
+		$catalogItemProfileFilter->partnerIdEqual = $partnerId;
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listTemplates", $partnerId, $catalogItemProfileFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "list", $partnerId, $catalogItemProfileFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 
 		// set view
-		$catalogItemProfileFilterForm = new Form_CatalogItemFilter();
+		$catalogItemProfileFilterForm = new Form_PartnerCatalogItemFilter();
 		$catalogItemProfileFilterForm->populate($request->getParams());
 		$catalogItemProfileFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
 		$catalogItemProfileFilterForm->setAction($catalogItemProfileFilterFormAction);
@@ -61,37 +60,11 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$action->view->filterForm = $catalogItemProfileFilterForm;
 		$action->view->paginator = $paginator;
 
-		$createProfileForm = new Form_CreateCatalogItem();
-		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'CatalogItemConfigure'), null, true);
+		$createProfileForm = new Form_PartnerCreateCatalogItem();
+		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigure'), null, true);
 		$createProfileForm->setAction($actionUrl);
 
-		if ($partnerId)
-			$createProfileForm->getElement("newPartnerId")->setValue($partnerId);
-
-		$action->view->newCatalogItemFolderForm = $createProfileForm;
-	}
-
-	/**
-	 * @return array<string, string> - array of <label, jsActionFunctionName>
-	 */
-	public function getPublisherAdminActionOptions($partner, $permissions)
-	{
-		$options = array();
-		$options[] = array(0 => 'Reach', 1 => 'listCatalogItems');
-		return $options;
-
-	}
-
-	/**
-	 * @return string javascript code to add to publisher list view
-	 */
-	public function getPublisherAdminActionJavascript()
-	{
-		$functionStr = 'function listCatalogItems(partnerId) {
-			var url = pluginControllerUrl + \'/' . get_class($this) . '/filter_type/partnerIdEqual/filter_input/\' + partnerId;
-			document.location = url;
-		}';
-		return $functionStr;
+		$action->view->newPartnerCatalogItemFolderForm = $createProfileForm;
 	}
 
 	public function getInstance($interface)

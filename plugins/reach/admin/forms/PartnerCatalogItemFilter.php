@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_CatalogItemFilter extends Form_PartnerIdFilter
+class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 {
 	public function init()
 	{
@@ -12,11 +12,10 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		$this->removeElement("cmdSubmit");
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
-			'vendorPartnerIdEqual' => 'Vendor Partner ID',
-//			'idEqual' => 'Catalog Item ID',
+			'partnerIdEqual' => 'Partner ID',
 		));
 
-		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('cloneTemplateServiceFeature', array(
+		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('templateServiceFeature', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature',
 			'label'			=> 'Service Feature:',
 			'onchange'		=> "switchAllTemplates()",
@@ -25,7 +24,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		), array(null => "Service Feature"));
 		$this->addElements(array($newServiceFeature));
 
-		$newServiceType = new Kaltura_Form_Element_EnumSelect('cloneTemplateServiceType', array(
+		$newServiceType = new Kaltura_Form_Element_EnumSelect('templateServiceType', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType',
 			'label'			=> 'Service Type:',
 			'onchange'		=> "switchAllTemplates()",
@@ -34,7 +33,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		), array(null => "Service Type"));
 		$this->addElements(array($newServiceType));
 
-		$newTurnAround = new Kaltura_Form_Element_EnumSelect('cloneTemplateTurnAround', array(
+		$newTurnAround = new Kaltura_Form_Element_EnumSelect('templateTurnAround', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime',
 			'label'			=> 'Service Turn Around Time:',
 			'onchange'		=> "switchAllTemplates()",
@@ -51,10 +50,10 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		));
 
 		// submit button
-		$this->addElement('button', 'newCatalogItem', array(
+		$this->addElement('button', 'configureCatalogItems', array(
 			'ignore' => true,
-			'label' => 'Create New',
-			'onclick' => "addNewCatalogItem(0, $('#cloneTemplateServiceFeature').val(), $('#cloneTemplateServiceType').val(), $('#cloneTemplateTurnAround').val())",
+			'label' => 'Configure',
+			'onclick' => "configureCatalogItems($('#filter_type').val(), $('#templateServiceFeature').val(), $('#templateServiceType').val(), $('#templateTurnAround').val())",
 			'decorators' => array('ViewHelper'),
 		));
 	}

@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class CatalogItemConfigureAction extends KalturaApplicationPlugin
+class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 {
 	/**
 	 * @return string - absolute file path of the phtml template

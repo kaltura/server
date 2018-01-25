@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_CatalogItemConfigure extends ConfigureForm
+class Form_PartnerCatalogItemConfigure extends ConfigureForm
 {
 	protected $newPartnerId;
 	protected $catalogItemType;
@@ -24,7 +24,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 
 	public function init()
 	{
-		$this->setAttrib('id', 'frmCatalogItemConfigure');
+		$this->setAttrib('id', 'frmPartnerCatalogItemConfigure');
 		$this->setMethod('post');
 
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');

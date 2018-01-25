@@ -64,19 +64,6 @@ class VendorProfileListAction extends KalturaApplicationPlugin
 
 	}
 
-	private function getCatalogItemProfileFilterFromRequest(Zend_Controller_Request_Abstract $request)
-	{
-		$filter = new Kaltura_Client_Reach_Type_VendorProfileFilter();
-		$filterInput = $request->getParam('filter_input');
-		if (!strlen($filterInput))
-			return $filter;
-
-		$filterType = $request->getParam('filter_type');
-		$filter->$filterType = $filterInput;
-
-		return $filter;
-	}
-
 	public function getInstance($interface)
 	{
 		if ($this instanceof $interface)
