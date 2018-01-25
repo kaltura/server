@@ -3,7 +3,7 @@
 /**
  * Base static class for performing query and update operations on the 'entry_vendor_task' table.
  *
- *
+ * 
  *
  * @package plugins.reach
  * @subpackage model.om
@@ -24,7 +24,7 @@ abstract class BaseEntryVendorTaskPeer {
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'EntryVendorTaskTableMap';
-
+	
 	/** The total number of columns. */
 	const NUM_COLUMNS = 13;
 
@@ -217,40 +217,40 @@ abstract class BaseEntryVendorTaskPeer {
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
-
+		
 		EntryVendorTaskPeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria,
+			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'EntryVendorTaskPeer',
-			$cacheKey,
+			'EntryVendorTaskPeer', 
+			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			return $cachedResult;
 		}
-
+		
 		// select the connection for the query
 		$con = EntryVendorTaskPeer::alternativeCon ($con, $queryDB);
-
+		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
-
+		
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
 			$count = 0; // no rows returned; we infer that means 0 matches.
 		}
 		$stmt->closeCursor();
-
+		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $count);
 		}
-
+		
 		return $count;
 	}
 	/**
@@ -272,14 +272,14 @@ abstract class BaseEntryVendorTaskPeer {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Override in order to use the query cache.
 	 * Cache invalidation keys are used to determine when cached queries are valid.
 	 * Before returning a query result from the cache, the time of the cached query
 	 * is compared to the time saved in the invalidation key.
 	 * A cached query will only be used if it's newer than the matching invalidation key.
-	 *
+	 *  
 	 * @return     array The invalidation keys that should be checked before returning a cached result for this criteria.
 	 *		 if an empty array is returned, the query cache won't be used - the query will be performed on the DB.
 	 */
@@ -290,18 +290,18 @@ abstract class BaseEntryVendorTaskPeer {
 
 	/**
 	 * Override in order to filter objects returned from doSelect.
-	 *
+	 *  
 	 * @param      array $selectResults The array of objects to filter.
 	 * @param	   Criteria $criteria
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
-
+	
 	/**
 	 * Adds the supplied object array to the instance pool, objects already found in the pool
 	 * will be replaced with instance from the pool.
-	 *
+	 *  
 	 * @param      array $queryResult The array of objects to get / add to pool.
 	 */
 	public static function updateInstancePool(&$queryResult)
@@ -319,10 +319,10 @@ abstract class BaseEntryVendorTaskPeer {
 			}
 		}
 	}
-
+						
 	/**
 	 * Adds the supplied object array to the instance pool.
-	 *
+	 *  
 	 * @param      array $queryResult The array of objects to add to pool.
 	 */
 	public static function addInstancesToPool($queryResult)
@@ -330,7 +330,7 @@ abstract class BaseEntryVendorTaskPeer {
 		if (Propel::isInstancePoolingEnabled())
 		{
 			if ( count( self::$instances ) + count( $queryResult ) <= kConf::get('max_num_instances_in_pool') )
-			{
+			{  
 				foreach ($queryResult as $curResult)
 				{
 					EntryVendorTaskPeer::addInstanceToPool($curResult);
@@ -338,7 +338,7 @@ abstract class BaseEntryVendorTaskPeer {
 			}
 		}
 	}
-
+	
 	/**
 	 * Method to do selects.
 	 *
@@ -349,16 +349,16 @@ abstract class BaseEntryVendorTaskPeer {
 	 *		 rethrown wrapped into a PropelException.
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
-	{
+	{		
 		$criteriaForSelect = EntryVendorTaskPeer::prepareCriteriaForSelect($criteria);
-
+		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteriaForSelect,
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'EntryVendorTaskPeer',
-			$cacheKey,
+			'EntryVendorTaskPeer', 
+			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
@@ -367,22 +367,22 @@ abstract class BaseEntryVendorTaskPeer {
 			EntryVendorTaskPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
-
+		
 		$con = EntryVendorTaskPeer::alternativeCon($con, $queryDB);
-
+		
 		$queryResult = EntryVendorTaskPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
-
+		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
-
+		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 			$cacheKey = null;
 		}
-
+		
 		EntryVendorTaskPeer::filterSelectResults($queryResult, $criteria);
-
+		
 		EntryVendorTaskPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -393,38 +393,38 @@ abstract class BaseEntryVendorTaskPeer {
 		{
 			switch ($queryDB)
 			{
-				case kQueryCache::QUERY_DB_MASTER:
-					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-					break;
+			case kQueryCache::QUERY_DB_MASTER:
+				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+				break;
 
-				case kQueryCache::QUERY_DB_SLAVE:
-					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-					break;
+			case kQueryCache::QUERY_DB_SLAVE:
+				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+				break;
 			}
 		}
-
+	
 		if($con === null)
 			$con = myDbHelper::alternativeCon($con);
-
+			
 		if($con === null)
 			$con = Propel::getConnection(EntryVendorTaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-
+		
 		return $con;
 	}
-
+		
 	/**
 	 * @var criteriaFilter The default criteria filter.
 	 */
 	protected static $s_criteria_filter;
-
+	
 	public static function  setUseCriteriaFilter ( $use )
 	{
 		$criteria_filter = EntryVendorTaskPeer::getCriteriaFilter();
-
-		if ( $use )  $criteria_filter->enable();
+		
+		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
 	}
-
+	
 	/**
 	 * Returns the default criteria filter
 	 *
@@ -434,16 +434,16 @@ abstract class BaseEntryVendorTaskPeer {
 	{
 		if(self::$s_criteria_filter == null)
 			EntryVendorTaskPeer::setDefaultCriteriaFilter();
-
+		
 		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('EntryVendorTask');
 		if ($partnerCriteria)
 		{
 			call_user_func_array(array('EntryVendorTaskPeer','addPartnerToCriteria'), $partnerCriteria);
 		}
-
+		
 		return self::$s_criteria_filter;
 	}
-
+	 
 	/**
 	 * Creates default criteria filter
 	 */
@@ -451,31 +451,31 @@ abstract class BaseEntryVendorTaskPeer {
 	{
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
-
-		$c = new myCriteria();
+		
+		$c = new myCriteria(); 
 		self::$s_criteria_filter->setFilter($c);
 	}
-
-
+	
+	
 	/**
 	 * the filterCriteria will filter out all the doSelect methods - ONLY if the filter is turned on.
 	 * IMPORTANT - the filter is turend on by default and when switched off - should be turned on again manually .
-	 *
+	 * 
 	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
 		EntryVendorTaskPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
-
+	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
 		$criteriaFilter = self::getCriteriaFilter();
 		$criteria = $criteriaFilter->getFilter();
-
+		
 		if(!$privatePartnerData)
 		{
-			// the private partner data is not allowed -
+			// the private partner data is not allowed - 
 			if($kalturaNetwork)
 			{
 				// allow only the kaltura netword stuff
@@ -488,7 +488,7 @@ abstract class BaseEntryVendorTaskPeer {
 			}
 			else
 			{
-				// no private data and no kaltura_network -
+				// no private data and no kaltura_network - 
 				// add a criteria that will return nothing
 				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
 			}
@@ -505,7 +505,7 @@ abstract class BaseEntryVendorTaskPeer {
 			{
 				// all is allowed - don't add anything to the criteria
 			}
-			else
+			else 
 			{
 				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
 				$partners = explode(',', trim($partnerGroup));
@@ -515,22 +515,22 @@ abstract class BaseEntryVendorTaskPeer {
 				// add the partner_id to the partner_group
 				if (!in_array(strval($partnerId), $partners))
 					$partners[] = strval($partnerId);
-
+				
 				if(count($partners) == 1 && reset($partners) == $partnerId)
 				{
 					$criteria->addAnd(self::PARTNER_ID, $partnerId);
 				}
-				else
+				else 
 				{
 					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
 					$criteria->addAnd($criterion);
 				}
 			}
 		}
-
+			
 		$criteriaFilter->enable();
 	}
-
+	
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
 	 *
@@ -548,17 +548,17 @@ abstract class BaseEntryVendorTaskPeer {
 	{
 		// attach default criteria
 		EntryVendorTaskPeer::attachCriteriaFilter($criteria);
-
+		
 		// select the connection for the query
 		$con = EntryVendorTaskPeer::alternativeCon ( $con );
-
+		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
 	}
-
+	
 	public static function prepareCriteriaForSelect(Criteria $criteria)
 	{
-		if ($criteria->hasSelectClause())
+		if ($criteria->hasSelectClause()) 
 		{
 			$asColumns = $criteria->getAsColumns();
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
@@ -572,7 +572,7 @@ abstract class BaseEntryVendorTaskPeer {
 			$criteria = clone $criteria;
 			EntryVendorTaskPeer::addSelectColumns($criteria);
 		}
-
+		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
@@ -581,7 +581,7 @@ abstract class BaseEntryVendorTaskPeer {
 
 		return $criteria;
 	}
-
+	
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
 	 *
@@ -598,9 +598,9 @@ abstract class BaseEntryVendorTaskPeer {
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		$con = EntryVendorTaskPeer::alternativeCon($con);
-
+		
 		$criteria = EntryVendorTaskPeer::prepareCriteriaForSelect($criteria);
-
+		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
 	}
@@ -624,10 +624,10 @@ abstract class BaseEntryVendorTaskPeer {
 			{
 				$key = (string) $obj->getId();
 			}
-
+				
 			if ( isset( self::$instances[$key] )											// Instance is already mapped?
-				|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
-			)
+					|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+				)
 			{
 				self::$instances[$key] = $obj;
 				kMemoryManager::registerPeer('EntryVendorTaskPeer');
@@ -681,7 +681,7 @@ abstract class BaseEntryVendorTaskPeer {
 		}
 		return null; // just to be explicit
 	}
-
+	
 	/**
 	 * Clear the instance pool.
 	 *
@@ -695,7 +695,7 @@ abstract class BaseEntryVendorTaskPeer {
 		}
 		self::$instances = array();
 	}
-
+	
 	/**
 	 * Method to invalidate the instance pool of all tables related to entry_vendor_task
 	 * by a foreign key with ON DELETE CASCADE
@@ -733,7 +733,7 @@ abstract class BaseEntryVendorTaskPeer {
 	public static function populateObjects(PDOStatement $stmt)
 	{
 		$results = array();
-
+	
 		// set the class once to avoid overhead in the loop
 		$cls = EntryVendorTaskPeer::getOMClass(false);
 		// populate the object(s)
@@ -770,11 +770,11 @@ abstract class BaseEntryVendorTaskPeer {
 	 */
 	public static function buildTableMap()
 	{
-		$dbMap = Propel::getDatabaseMap(BaseEntryVendorTaskPeer::DATABASE_NAME);
-		if (!$dbMap->hasTable(BaseEntryVendorTaskPeer::TABLE_NAME))
-		{
-			$dbMap->addTableObject(new EntryVendorTaskTableMap());
-		}
+	  $dbMap = Propel::getDatabaseMap(BaseEntryVendorTaskPeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BaseEntryVendorTaskPeer::TABLE_NAME))
+	  {
+	    $dbMap->addTableObject(new EntryVendorTaskTableMap());
+	  }
 	}
 
 	/**
@@ -785,7 +785,7 @@ abstract class BaseEntryVendorTaskPeer {
 	 * relative to a location on the PHP include_path.
 	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
 	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name
+	 * @param      boolean  Whether or not to return the path wit hthe class name 
 	 * @return     string path.to.ClassName
 	 */
 	public static function getOMClass($withPrefix = true)
@@ -869,7 +869,7 @@ abstract class BaseEntryVendorTaskPeer {
 
 		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
 	}
-
+	
 	/**
 	 * Return array of columns that should change only if there is a real change.
 	 * @return array
@@ -878,7 +878,7 @@ abstract class BaseEntryVendorTaskPeer {
 	{
 		return array();
 	}
-
+	
 	/**
 	 * Return array of custom-data fields that shouldn't be auto-updated.
 	 * @return array
@@ -928,8 +928,8 @@ abstract class BaseEntryVendorTaskPeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function doDelete($values, PropelPDO $con = null)
-	{
+	 public static function doDelete($values, PropelPDO $con = null)
+	 {
 		if ($con === null) {
 			$con = Propel::getConnection(EntryVendorTaskPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
@@ -964,7 +964,7 @@ abstract class BaseEntryVendorTaskPeer {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-
+			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
 			EntryVendorTaskPeer::clearRelatedInstancePool();
 			$con->commit();
@@ -1060,3 +1060,4 @@ abstract class BaseEntryVendorTaskPeer {
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
 BaseEntryVendorTaskPeer::buildTableMap();
+

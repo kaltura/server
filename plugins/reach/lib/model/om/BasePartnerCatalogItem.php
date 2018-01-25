@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Base class that represents a row from the 'vendor_catalog_item' table.
+ * Base class that represents a row from the 'partner_catalog_item' table.
  *
  * 
  *
  * @package plugins.reach
  * @subpackage model.om
  */
-abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
+abstract class BasePartnerCatalogItem extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        VendorCatalogItemPeer
+	 * @var        PartnerCatalogItemPeer
 	 */
 	protected static $peer;
 
@@ -24,18 +24,6 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * @var        int
 	 */
 	protected $id;
-
-	/**
-	 * The value for the name field.
-	 * @var        string
-	 */
-	protected $name;
-
-	/**
-	 * The value for the system_name field.
-	 * @var        string
-	 */
-	protected $system_name;
 
 	/**
 	 * The value for the created_at field.
@@ -56,46 +44,16 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	protected $status;
 
 	/**
-	 * The value for the vendor_partner_id field.
+	 * The value for the partner_id field.
 	 * @var        int
 	 */
-	protected $vendor_partner_id;
+	protected $partner_id;
 
 	/**
-	 * The value for the service_type field.
+	 * The value for the catalog_item_id field.
 	 * @var        int
 	 */
-	protected $service_type;
-
-	/**
-	 * The value for the service_feature field.
-	 * @var        int
-	 */
-	protected $service_feature;
-
-	/**
-	 * The value for the turn_around_time field.
-	 * @var        int
-	 */
-	protected $turn_around_time;
-
-	/**
-	 * The value for the source_language field.
-	 * @var        string
-	 */
-	protected $source_language;
-
-	/**
-	 * The value for the target_language field.
-	 * @var        string
-	 */
-	protected $target_language;
-
-	/**
-	 * The value for the output_format field.
-	 * @var        string
-	 */
-	protected $output_format;
+	protected $catalog_item_id;
 
 	/**
 	 * The value for the custom_data field.
@@ -156,26 +114,6 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Get the [name] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
-
-	/**
-	 * Get the [system_name] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSystemName()
-	{
-		return $this->system_name;
 	}
 
 	/**
@@ -269,73 +207,23 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [vendor_partner_id] column value.
+	 * Get the [partner_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getVendorPartnerId()
+	public function getPartnerId()
 	{
-		return $this->vendor_partner_id;
+		return $this->partner_id;
 	}
 
 	/**
-	 * Get the [service_type] column value.
+	 * Get the [catalog_item_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getServiceType()
+	public function getCatalogItemId()
 	{
-		return $this->service_type;
-	}
-
-	/**
-	 * Get the [service_feature] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getServiceFeature()
-	{
-		return $this->service_feature;
-	}
-
-	/**
-	 * Get the [turn_around_time] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getTurnAroundTime()
-	{
-		return $this->turn_around_time;
-	}
-
-	/**
-	 * Get the [source_language] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSourceLanguage()
-	{
-		return $this->source_language;
-	}
-
-	/**
-	 * Get the [target_language] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getTargetLanguage()
-	{
-		return $this->target_language;
-	}
-
-	/**
-	 * Get the [output_format] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getOutputFormat()
-	{
-		return $this->output_format;
+		return $this->catalog_item_id;
 	}
 
 	/**
@@ -352,12 +240,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     PartnerCatalogItem The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::ID]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::ID] = $this->id;
+		if(!isset($this->oldColumnsValues[PartnerCatalogItemPeer::ID]))
+			$this->oldColumnsValues[PartnerCatalogItemPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -365,64 +253,18 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::ID;
+			$this->modifiedColumns[] = PartnerCatalogItemPeer::ID;
 		}
 
 		return $this;
 	} // setId()
 
 	/**
-	 * Set the value of [name] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setName($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::NAME]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::NAME] = $this->name;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->name !== $v) {
-			$this->name = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::NAME;
-		}
-
-		return $this;
-	} // setName()
-
-	/**
-	 * Set the value of [system_name] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setSystemName($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::SYSTEM_NAME]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::SYSTEM_NAME] = $this->system_name;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->system_name !== $v) {
-			$this->system_name = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::SYSTEM_NAME;
-		}
-
-		return $this;
-	} // setSystemName()
-
-	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     PartnerCatalogItem The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -459,7 +301,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = VendorCatalogItemPeer::CREATED_AT;
+				$this->modifiedColumns[] = PartnerCatalogItemPeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -471,7 +313,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     PartnerCatalogItem The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
@@ -508,7 +350,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 					)
 			{
 				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = VendorCatalogItemPeer::UPDATED_AT;
+				$this->modifiedColumns[] = PartnerCatalogItemPeer::UPDATED_AT;
 			}
 		} // if either are not null
 
@@ -519,12 +361,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * Set the value of [status] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     PartnerCatalogItem The current object (for fluent API support)
 	 */
 	public function setStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::STATUS]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::STATUS] = $this->status;
+		if(!isset($this->oldColumnsValues[PartnerCatalogItemPeer::STATUS]))
+			$this->oldColumnsValues[PartnerCatalogItemPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -532,178 +374,63 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 
 		if ($this->status !== $v) {
 			$this->status = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::STATUS;
+			$this->modifiedColumns[] = PartnerCatalogItemPeer::STATUS;
 		}
 
 		return $this;
 	} // setStatus()
 
 	/**
-	 * Set the value of [vendor_partner_id] column.
+	 * Set the value of [partner_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     PartnerCatalogItem The current object (for fluent API support)
 	 */
-	public function setVendorPartnerId($v)
+	public function setPartnerId($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::VENDOR_PARTNER_ID]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::VENDOR_PARTNER_ID] = $this->vendor_partner_id;
+		if(!isset($this->oldColumnsValues[PartnerCatalogItemPeer::PARTNER_ID]))
+			$this->oldColumnsValues[PartnerCatalogItemPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->vendor_partner_id !== $v) {
-			$this->vendor_partner_id = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::VENDOR_PARTNER_ID;
+		if ($this->partner_id !== $v) {
+			$this->partner_id = $v;
+			$this->modifiedColumns[] = PartnerCatalogItemPeer::PARTNER_ID;
 		}
 
 		return $this;
-	} // setVendorPartnerId()
+	} // setPartnerId()
 
 	/**
-	 * Set the value of [service_type] column.
+	 * Set the value of [catalog_item_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     PartnerCatalogItem The current object (for fluent API support)
 	 */
-	public function setServiceType($v)
+	public function setCatalogItemId($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::SERVICE_TYPE]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::SERVICE_TYPE] = $this->service_type;
+		if(!isset($this->oldColumnsValues[PartnerCatalogItemPeer::CATALOG_ITEM_ID]))
+			$this->oldColumnsValues[PartnerCatalogItemPeer::CATALOG_ITEM_ID] = $this->catalog_item_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->service_type !== $v) {
-			$this->service_type = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::SERVICE_TYPE;
+		if ($this->catalog_item_id !== $v) {
+			$this->catalog_item_id = $v;
+			$this->modifiedColumns[] = PartnerCatalogItemPeer::CATALOG_ITEM_ID;
 		}
 
 		return $this;
-	} // setServiceType()
-
-	/**
-	 * Set the value of [service_feature] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setServiceFeature($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::SERVICE_FEATURE]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::SERVICE_FEATURE] = $this->service_feature;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->service_feature !== $v) {
-			$this->service_feature = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::SERVICE_FEATURE;
-		}
-
-		return $this;
-	} // setServiceFeature()
-
-	/**
-	 * Set the value of [turn_around_time] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setTurnAroundTime($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::TURN_AROUND_TIME]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::TURN_AROUND_TIME] = $this->turn_around_time;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->turn_around_time !== $v) {
-			$this->turn_around_time = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::TURN_AROUND_TIME;
-		}
-
-		return $this;
-	} // setTurnAroundTime()
-
-	/**
-	 * Set the value of [source_language] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setSourceLanguage($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::SOURCE_LANGUAGE]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::SOURCE_LANGUAGE] = $this->source_language;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->source_language !== $v) {
-			$this->source_language = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::SOURCE_LANGUAGE;
-		}
-
-		return $this;
-	} // setSourceLanguage()
-
-	/**
-	 * Set the value of [target_language] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setTargetLanguage($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::TARGET_LANGUAGE]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::TARGET_LANGUAGE] = $this->target_language;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->target_language !== $v) {
-			$this->target_language = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::TARGET_LANGUAGE;
-		}
-
-		return $this;
-	} // setTargetLanguage()
-
-	/**
-	 * Set the value of [output_format] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
-	 */
-	public function setOutputFormat($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorCatalogItemPeer::OUTPUT_FORMAT]))
-			$this->oldColumnsValues[VendorCatalogItemPeer::OUTPUT_FORMAT] = $this->output_format;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->output_format !== $v) {
-			$this->output_format = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::OUTPUT_FORMAT;
-		}
-
-		return $this;
-	} // setOutputFormat()
+	} // setCatalogItemId()
 
 	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     VendorCatalogItem The current object (for fluent API support)
+	 * @return     PartnerCatalogItem The current object (for fluent API support)
 	 */
 	public function setCustomData($v)
 	{
@@ -713,7 +440,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 
 		if ($this->custom_data !== $v) {
 			$this->custom_data = $v;
-			$this->modifiedColumns[] = VendorCatalogItemPeer::CUSTOM_DATA;
+			$this->modifiedColumns[] = PartnerCatalogItemPeer::CUSTOM_DATA;
 		}
 
 		return $this;
@@ -755,19 +482,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->system_name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->vendor_partner_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->service_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->service_feature = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->turn_around_time = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->source_language = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->target_language = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->output_format = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->created_at = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->status = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->catalog_item_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->custom_data = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -777,10 +497,10 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 14; // 14 = VendorCatalogItemPeer::NUM_COLUMNS - VendorCatalogItemPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = PartnerCatalogItemPeer::NUM_COLUMNS - PartnerCatalogItemPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating VendorCatalogItem object", $e);
+			throw new PropelException("Error populating PartnerCatalogItem object", $e);
 		}
 	}
 
@@ -823,17 +543,17 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		VendorCatalogItemPeer::setUseCriteriaFilter(false);
+		PartnerCatalogItemPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		VendorCatalogItemPeer::addSelectColumns($criteria);
+		PartnerCatalogItemPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
-		VendorCatalogItemPeer::setUseCriteriaFilter(true);
+		PartnerCatalogItemPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -862,14 +582,14 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			if ($ret) {
-				VendorCatalogItemPeer::doDelete($this, $con);
+				PartnerCatalogItemPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				$this->setDeleted(true);
 				$con->commit();
@@ -902,7 +622,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(VendorCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(PartnerCatalogItemPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -923,12 +643,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
                $affectedRows = $this->doSave($con);
-                if ($affectedRows || !$this->isColumnModified(VendorCatalogItemPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                if ($affectedRows || !$this->isColumnModified(PartnerCatalogItemPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
                 KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
-				$criteria->addSelectColumn(VendorCatalogItemPeer::CUSTOM_DATA);
+				$criteria->addSelectColumn(PartnerCatalogItemPeer::CUSTOM_DATA);
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
@@ -940,7 +660,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 
 				//set custom data column values we wanted to change to
 				$validUpdate = true;
-				$atomicCustomDataFields = VendorCatalogItemPeer::getAtomicCustomDataFields();
+				$atomicCustomDataFields = PartnerCatalogItemPeer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
@@ -990,7 +710,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 				$this->postUpdate($con);
 			}
 			$this->postSave($con);
-			VendorCatalogItemPeer::addInstanceToPool($this);
+			PartnerCatalogItemPeer::addInstanceToPool($this);
 			
 			$con->commit();
 			return $affectedRows;
@@ -1023,14 +743,14 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 			$this->alreadyInSave = true;
 
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = VendorCatalogItemPeer::ID;
+				$this->modifiedColumns[] = PartnerCatalogItemPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = VendorCatalogItemPeer::doInsert($this, $con);
+					$pk = PartnerCatalogItemPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -1040,7 +760,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
-					$affectedObjects = VendorCatalogItemPeer::doUpdate($this, $con);
+					$affectedObjects = PartnerCatalogItemPeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
 						
@@ -1259,7 +979,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = VendorCatalogItemPeer::doValidate($this, $columns)) !== true) {
+			if (($retval = PartnerCatalogItemPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
@@ -1282,7 +1002,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = VendorCatalogItemPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = PartnerCatalogItemPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -1301,42 +1021,21 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getName();
-				break;
-			case 2:
-				return $this->getSystemName();
-				break;
-			case 3:
 				return $this->getCreatedAt();
 				break;
-			case 4:
+			case 2:
 				return $this->getUpdatedAt();
 				break;
-			case 5:
+			case 3:
 				return $this->getStatus();
 				break;
+			case 4:
+				return $this->getPartnerId();
+				break;
+			case 5:
+				return $this->getCatalogItemId();
+				break;
 			case 6:
-				return $this->getVendorPartnerId();
-				break;
-			case 7:
-				return $this->getServiceType();
-				break;
-			case 8:
-				return $this->getServiceFeature();
-				break;
-			case 9:
-				return $this->getTurnAroundTime();
-				break;
-			case 10:
-				return $this->getSourceLanguage();
-				break;
-			case 11:
-				return $this->getTargetLanguage();
-				break;
-			case 12:
-				return $this->getOutputFormat();
-				break;
-			case 13:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1358,22 +1057,15 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = VendorCatalogItemPeer::getFieldNames($keyType);
+		$keys = PartnerCatalogItemPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getName(),
-			$keys[2] => $this->getSystemName(),
-			$keys[3] => $this->getCreatedAt(),
-			$keys[4] => $this->getUpdatedAt(),
-			$keys[5] => $this->getStatus(),
-			$keys[6] => $this->getVendorPartnerId(),
-			$keys[7] => $this->getServiceType(),
-			$keys[8] => $this->getServiceFeature(),
-			$keys[9] => $this->getTurnAroundTime(),
-			$keys[10] => $this->getSourceLanguage(),
-			$keys[11] => $this->getTargetLanguage(),
-			$keys[12] => $this->getOutputFormat(),
-			$keys[13] => $this->getCustomData(),
+			$keys[1] => $this->getCreatedAt(),
+			$keys[2] => $this->getUpdatedAt(),
+			$keys[3] => $this->getStatus(),
+			$keys[4] => $this->getPartnerId(),
+			$keys[5] => $this->getCatalogItemId(),
+			$keys[6] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1390,7 +1082,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = VendorCatalogItemPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = PartnerCatalogItemPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -1409,42 +1101,21 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setName($value);
-				break;
-			case 2:
-				$this->setSystemName($value);
-				break;
-			case 3:
 				$this->setCreatedAt($value);
 				break;
-			case 4:
+			case 2:
 				$this->setUpdatedAt($value);
 				break;
-			case 5:
+			case 3:
 				$this->setStatus($value);
 				break;
+			case 4:
+				$this->setPartnerId($value);
+				break;
+			case 5:
+				$this->setCatalogItemId($value);
+				break;
 			case 6:
-				$this->setVendorPartnerId($value);
-				break;
-			case 7:
-				$this->setServiceType($value);
-				break;
-			case 8:
-				$this->setServiceFeature($value);
-				break;
-			case 9:
-				$this->setTurnAroundTime($value);
-				break;
-			case 10:
-				$this->setSourceLanguage($value);
-				break;
-			case 11:
-				$this->setTargetLanguage($value);
-				break;
-			case 12:
-				$this->setOutputFormat($value);
-				break;
-			case 13:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1469,22 +1140,15 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = VendorCatalogItemPeer::getFieldNames($keyType);
+		$keys = PartnerCatalogItemPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setSystemName($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setVendorPartnerId($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setServiceType($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setServiceFeature($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setTurnAroundTime($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setSourceLanguage($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setTargetLanguage($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setOutputFormat($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
+		if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setStatus($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setPartnerId($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setCatalogItemId($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setCustomData($arr[$keys[6]]);
 	}
 
 	/**
@@ -1494,22 +1158,15 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(VendorCatalogItemPeer::DATABASE_NAME);
+		$criteria = new Criteria(PartnerCatalogItemPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(VendorCatalogItemPeer::ID)) $criteria->add(VendorCatalogItemPeer::ID, $this->id);
-		if ($this->isColumnModified(VendorCatalogItemPeer::NAME)) $criteria->add(VendorCatalogItemPeer::NAME, $this->name);
-		if ($this->isColumnModified(VendorCatalogItemPeer::SYSTEM_NAME)) $criteria->add(VendorCatalogItemPeer::SYSTEM_NAME, $this->system_name);
-		if ($this->isColumnModified(VendorCatalogItemPeer::CREATED_AT)) $criteria->add(VendorCatalogItemPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(VendorCatalogItemPeer::UPDATED_AT)) $criteria->add(VendorCatalogItemPeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(VendorCatalogItemPeer::STATUS)) $criteria->add(VendorCatalogItemPeer::STATUS, $this->status);
-		if ($this->isColumnModified(VendorCatalogItemPeer::VENDOR_PARTNER_ID)) $criteria->add(VendorCatalogItemPeer::VENDOR_PARTNER_ID, $this->vendor_partner_id);
-		if ($this->isColumnModified(VendorCatalogItemPeer::SERVICE_TYPE)) $criteria->add(VendorCatalogItemPeer::SERVICE_TYPE, $this->service_type);
-		if ($this->isColumnModified(VendorCatalogItemPeer::SERVICE_FEATURE)) $criteria->add(VendorCatalogItemPeer::SERVICE_FEATURE, $this->service_feature);
-		if ($this->isColumnModified(VendorCatalogItemPeer::TURN_AROUND_TIME)) $criteria->add(VendorCatalogItemPeer::TURN_AROUND_TIME, $this->turn_around_time);
-		if ($this->isColumnModified(VendorCatalogItemPeer::SOURCE_LANGUAGE)) $criteria->add(VendorCatalogItemPeer::SOURCE_LANGUAGE, $this->source_language);
-		if ($this->isColumnModified(VendorCatalogItemPeer::TARGET_LANGUAGE)) $criteria->add(VendorCatalogItemPeer::TARGET_LANGUAGE, $this->target_language);
-		if ($this->isColumnModified(VendorCatalogItemPeer::OUTPUT_FORMAT)) $criteria->add(VendorCatalogItemPeer::OUTPUT_FORMAT, $this->output_format);
-		if ($this->isColumnModified(VendorCatalogItemPeer::CUSTOM_DATA)) $criteria->add(VendorCatalogItemPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(PartnerCatalogItemPeer::ID)) $criteria->add(PartnerCatalogItemPeer::ID, $this->id);
+		if ($this->isColumnModified(PartnerCatalogItemPeer::CREATED_AT)) $criteria->add(PartnerCatalogItemPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(PartnerCatalogItemPeer::UPDATED_AT)) $criteria->add(PartnerCatalogItemPeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(PartnerCatalogItemPeer::STATUS)) $criteria->add(PartnerCatalogItemPeer::STATUS, $this->status);
+		if ($this->isColumnModified(PartnerCatalogItemPeer::PARTNER_ID)) $criteria->add(PartnerCatalogItemPeer::PARTNER_ID, $this->partner_id);
+		if ($this->isColumnModified(PartnerCatalogItemPeer::CATALOG_ITEM_ID)) $criteria->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $this->catalog_item_id);
+		if ($this->isColumnModified(PartnerCatalogItemPeer::CUSTOM_DATA)) $criteria->add(PartnerCatalogItemPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1524,29 +1181,29 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(VendorCatalogItemPeer::DATABASE_NAME);
+		$criteria = new Criteria(PartnerCatalogItemPeer::DATABASE_NAME);
 
-		$criteria->add(VendorCatalogItemPeer::ID, $this->id);
+		$criteria->add(PartnerCatalogItemPeer::ID, $this->id);
 		
 		if($this->alreadyInSave)
 		{
-			if ($this->isColumnModified(VendorCatalogItemPeer::CUSTOM_DATA))
+			if ($this->isColumnModified(PartnerCatalogItemPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
-					$criteria->add(VendorCatalogItemPeer::CUSTOM_DATA, "MD5(cast(" . VendorCatalogItemPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					$criteria->add(PartnerCatalogItemPeer::CUSTOM_DATA, "MD5(cast(" . PartnerCatalogItemPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
-					$criteria->add(VendorCatalogItemPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+					$criteria->add(PartnerCatalogItemPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
 			
-			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(VendorCatalogItemPeer::UPDATED_AT))
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(PartnerCatalogItemPeer::UPDATED_AT))
 			{
 				$theModifiedColumn = null;
 				foreach($this->modifiedColumns as $modifiedColumn)
-					if($modifiedColumn != VendorCatalogItemPeer::UPDATED_AT)
+					if($modifiedColumn != PartnerCatalogItemPeer::UPDATED_AT)
 						$theModifiedColumn = $modifiedColumn;
 						
-				$atomicColumns = VendorCatalogItemPeer::getAtomicColumns();
+				$atomicColumns = PartnerCatalogItemPeer::getAtomicColumns();
 				if(in_array($theModifiedColumn, $atomicColumns))
 					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
@@ -1581,16 +1238,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of VendorCatalogItem (or compatible) type.
+	 * @param      object $copyObj An object of PartnerCatalogItem (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
-
-		$copyObj->setName($this->name);
-
-		$copyObj->setSystemName($this->system_name);
 
 		$copyObj->setCreatedAt($this->created_at);
 
@@ -1598,19 +1251,9 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 
 		$copyObj->setStatus($this->status);
 
-		$copyObj->setVendorPartnerId($this->vendor_partner_id);
+		$copyObj->setPartnerId($this->partner_id);
 
-		$copyObj->setServiceType($this->service_type);
-
-		$copyObj->setServiceFeature($this->service_feature);
-
-		$copyObj->setTurnAroundTime($this->turn_around_time);
-
-		$copyObj->setSourceLanguage($this->source_language);
-
-		$copyObj->setTargetLanguage($this->target_language);
-
-		$copyObj->setOutputFormat($this->output_format);
+		$copyObj->setCatalogItemId($this->catalog_item_id);
 
 		$copyObj->setCustomData($this->custom_data);
 
@@ -1630,7 +1273,7 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     VendorCatalogItem Clone of current object.
+	 * @return     PartnerCatalogItem Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1646,16 +1289,16 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     VendorCatalogItem Clone of current object.
+	 * @var     PartnerCatalogItem Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      VendorCatalogItem $copiedFrom Clone of current object.
+	 * @param      PartnerCatalogItem $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(VendorCatalogItem $copiedFrom)
+	public function setCopiedFrom(PartnerCatalogItem $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}
@@ -1667,12 +1310,12 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     VendorCatalogItemPeer
+	 * @return     PartnerCatalogItemPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new VendorCatalogItemPeer();
+			self::$peer = new PartnerCatalogItemPeer();
 		}
 		return self::$peer;
 	}
@@ -1840,4 +1483,4 @@ abstract class BaseVendorCatalogItem extends BaseObject  implements Persistent {
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	
-} // BaseVendorCatalogItem
+} // BasePartnerCatalogItem

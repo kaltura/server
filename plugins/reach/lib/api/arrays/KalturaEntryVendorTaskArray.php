@@ -15,6 +15,7 @@ class KalturaEntryVendorTaskArray extends KalturaTypedArray
 		{
 			$object = new KalturaEntryVendorTask();
 			$object->fromObject($obj, $responseProfile);
+			$object->jobData = $obj->getJobData();
 			$newArr[] = $object;
 		}
 		

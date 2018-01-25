@@ -10,6 +10,7 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"idNotIn" => "_notin_id",
 		"vendorPartnerIdEqual" => "_eq_vendor_partner_id",
 		"vendorPartnerIdIn" => "_in_vendor_partner_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -18,7 +19,6 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
-		"isDefaultEqual" => "_eq_is_default",
 		"serviceTypeEqual" => "_eq_service_type",
 		"serviceTypeIn" => "_in_service_type",
 		"serviceFeatureEqual" => "_eq_service_feature",
@@ -56,6 +56,11 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $idIn;
+	
+	/**
+	 * @var string
+	 */
+	public $idNotIn;
 
 	/**
 	 * @var int
@@ -96,11 +101,6 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $statusIn;
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $isDefaultEqual;
 
 	/**
 	 * @var KalturaVendorServiceType

@@ -3,15 +3,15 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaOutputFormatItem extends KalturaObject
+class KalturaTranslationEntryVendorTaskJobData extends KalturaCaptionsEntryVendorTaskJobData
 {
 	/**
-	 *  @var KalturaVendorCatalogItemOutputFormat
+	 * @var KalturaCatalogItemLanguage
 	 */
-	public $outputFormat;
+	public $targetLanguage;
 	
 	private static $map_between_objects = array (
-		'outputFormat',
+		'targetLanguage',
 	);
 	
 	public function getMapBetweenObjects()
@@ -20,13 +20,13 @@ class KalturaOutputFormatItem extends KalturaObject
 	}
 	
 	/* (non-PHPdoc)
- 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
- 	 */
+ * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+ */
 	public function toObject($dbObject = null, $propsToSkip = array())
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kOutputFormatItem();
+			$dbObject = new kTranslationEntryVendorTaskJobData();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);

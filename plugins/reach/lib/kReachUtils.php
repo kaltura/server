@@ -32,6 +32,20 @@ class kReachUtils
 			throw new Exception('Failed to create REACH Vendor limited session for partner '.$partner->getId());
 
 		return $limitedKs;
+	}
+	
+	public static function calcPricePerSecond(entry $entry, $pricePerUnit)
+	{
+		return ($entry->getLengthInMsecs()/1000) * $pricePerUnit;
+	}
 
+	public static function calcPricePerMinute(entry $entry, $pricePerUnit)
+	{
+		return ($entry->getLengthInMsecs()/1000/dateUtils::MINUTE) * $pricePerUnit;
+	}
+	
+	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem)
+	{
+		return call_user_func($vendorCatalogItem->getPricing()->getPriceFunction(), $entry, $vendorCatalogItem->getPricing()->getPricePerUnit());
 	}
 }

@@ -20,20 +20,9 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::CAPTIONS);
 	}
 	
-	const CUSTOM_DATA_SOURCE_LANGUAGES = "source_languages";
-	const CUSTOM_DATA_OUTPUT_FORMATS = "output_formats";
 	const CUSTOM_DATA_ENABLE_SPEAKER_ID = "enable_speaker_id";
 	const CUSTOM_DATA_FIXED_PRICE_ADDONS = "fixed_price_addons";
 	
-	public function setSourceLanguages($sourceLanguages)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGES, serialize($sourceLanguages));
-	}
-	
-	public function setOutputFormats($outPutFormats)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_OUTPUT_FORMATS, serialize($outPutFormats));
-	}
 	
 	public function setEnableSpeakerId($enableSpeakerId)
 	{
@@ -43,22 +32,6 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 	public function setFixedPriceAddons($fixedPriceAddons)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS, $fixedPriceAddons);
-	}
-	
-	public function getSourceLanguages()
-	{
-		$languages = $this->getFromCustomData(self::CUSTOM_DATA_SOURCE_LANGUAGES);
-		if($languages)
-			$languages = unserialize($languages);
-		return $languages;
-	}
-	
-	public function getOutputFormats()
-	{
-		$outputFormats = $this->getFromCustomData(self::CUSTOM_DATA_OUTPUT_FORMATS);
-		if($outputFormats)
-			$outputFormats = unserialize($outputFormats);
-		return $outputFormats;
 	}
 	
 	public function getEnableSpeakerId()

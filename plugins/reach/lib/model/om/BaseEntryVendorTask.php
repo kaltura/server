@@ -86,6 +86,12 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	protected $catalog_item_id;
 
 	/**
+	 * The value for the vendor_profile_id field.
+	 * @var        int
+	 */
+	protected $vendor_profile_id;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -364,6 +370,16 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	public function getCatalogItemId()
 	{
 		return $this->catalog_item_id;
+	}
+
+	/**
+	 * Get the [vendor_profile_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getVendorProfileId()
+	{
+		return $this->vendor_profile_id;
 	}
 
 	/**
@@ -740,6 +756,29 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	} // setCatalogItemId()
 
 	/**
+	 * Set the value of [vendor_profile_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     EntryVendorTask The current object (for fluent API support)
+	 */
+	public function setVendorProfileId($v)
+	{
+		if(!isset($this->oldColumnsValues[EntryVendorTaskPeer::VENDOR_PROFILE_ID]))
+			$this->oldColumnsValues[EntryVendorTaskPeer::VENDOR_PROFILE_ID] = $this->vendor_profile_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->vendor_profile_id !== $v) {
+			$this->vendor_profile_id = $v;
+			$this->modifiedColumns[] = EntryVendorTaskPeer::VENDOR_PROFILE_ID;
+		}
+
+		return $this;
+	} // setVendorProfileId()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -805,7 +844,8 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->price = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->catalog_item_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->vendor_profile_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -815,7 +855,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = EntryVendorTaskPeer::NUM_COLUMNS - EntryVendorTaskPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = EntryVendorTaskPeer::NUM_COLUMNS - EntryVendorTaskPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating EntryVendorTask object", $e);
@@ -1369,6 +1409,9 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 				return $this->getCatalogItemId();
 				break;
 			case 11:
+				return $this->getVendorProfileId();
+				break;
+			case 12:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1403,7 +1446,8 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			$keys[8] => $this->getStatus(),
 			$keys[9] => $this->getPrice(),
 			$keys[10] => $this->getCatalogItemId(),
-			$keys[11] => $this->getCustomData(),
+			$keys[11] => $this->getVendorProfileId(),
+			$keys[12] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1469,6 +1513,9 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 				$this->setCatalogItemId($value);
 				break;
 			case 11:
+				$this->setVendorProfileId($value);
+				break;
+			case 12:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1506,7 +1553,8 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setPrice($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCatalogItemId($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
+		if (array_key_exists($keys[11], $arr)) $this->setVendorProfileId($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
 	}
 
 	/**
@@ -1529,6 +1577,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS)) $criteria->add(EntryVendorTaskPeer::STATUS, $this->status);
 		if ($this->isColumnModified(EntryVendorTaskPeer::PRICE)) $criteria->add(EntryVendorTaskPeer::PRICE, $this->price);
 		if ($this->isColumnModified(EntryVendorTaskPeer::CATALOG_ITEM_ID)) $criteria->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $this->catalog_item_id);
+		if ($this->isColumnModified(EntryVendorTaskPeer::VENDOR_PROFILE_ID)) $criteria->add(EntryVendorTaskPeer::VENDOR_PROFILE_ID, $this->vendor_profile_id);
 		if ($this->isColumnModified(EntryVendorTaskPeer::CUSTOM_DATA)) $criteria->add(EntryVendorTaskPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1627,6 +1676,8 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 		$copyObj->setPrice($this->price);
 
 		$copyObj->setCatalogItemId($this->catalog_item_id);
+
+		$copyObj->setVendorProfileId($this->vendor_profile_id);
 
 		$copyObj->setCustomData($this->custom_data);
 

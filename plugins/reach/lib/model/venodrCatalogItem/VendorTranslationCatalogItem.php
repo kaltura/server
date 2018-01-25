@@ -19,17 +19,5 @@ class VendorTranslationCatalogItem extends VendorCaptionsCatalogItem
 	{
 		$this->setServiceFeature(VendorServiceFeature::TRANSLATION);
 	}
-	
-	const CUSTOM_DATA_TARGET_LANGUAGES = "target_languages";
-	
-	public function setTargetLanguages($targetLanguages)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_TARGET_LANGUAGES, $targetLanguages);
-	}
-	
-	public function getTargetLanguages()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_TARGET_LANGUAGES);
-	}
 
 } // VendorTranslationCatalogItem

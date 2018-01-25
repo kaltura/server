@@ -13,6 +13,66 @@
  * @package plugins.reach
  * @subpackage model
  */
-class EntryVendorTask extends BaseEntryVendorTask {
-
+class EntryVendorTask extends BaseEntryVendorTask 
+{
+	const CUSTOM_DATA_NOTES = 				'notes';
+	const CUSTOM_DATA_ACCESS_KEY = 			'access_key';
+	const CUSTOM_DATA_ERR_DESCRIPTION = 	'err_description';
+	const CUSTOM_DATA_USER_ID = 			'user_id';
+	const CUSTOM_DATA_APPROVED_BY = 		'approved_by';
+	
+	//setters
+	
+	public function setNotes($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_NOTES, $v);
+	}
+	
+	public function setAccessKey($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ACCESS_KEY, $v);
+	}
+	
+	public function setErrDescription($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ERR_DESCRIPTION, $v);
+	}
+	
+	public function setApprovedBy($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_APPROVED_BY, $v);
+	}
+	
+	public function setUserId($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_USER_ID, $v);
+	}
+	
+	//getters
+	
+	public function getNotes($v)
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES, null, null);
+	}
+	
+	public function getAccessKey($v)
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ACCESS_KEY, null, null);
+	}
+	
+	public function getErrDescription($v)
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ERR_DESCRIPTION, null, null);
+	}
+	
+	public function getApprovedBy($v)
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_APPROVED_BY, null, null);
+	}
+	
+	public function getUserId($v)
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_USER_ID, null, null);
+	}
+	
 } // EntryVendorTask

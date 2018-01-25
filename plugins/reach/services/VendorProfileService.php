@@ -8,7 +8,7 @@
  * @throws KalturaErrors::SERVICE_FORBIDDEN
  */
 
-class vendorProfileService extends KalturaBaseService
+class VendorProfileService extends KalturaBaseService
 {
 
 	public function initService($serviceId, $serviceName, $actionName)

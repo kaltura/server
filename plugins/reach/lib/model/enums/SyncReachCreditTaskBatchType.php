@@ -20,7 +20,7 @@ class SyncReachCreditTaskBatchType implements IKalturaPluginEnum, BatchJobType
 	/* (non-PHPdoc)
 	 * @see IKalturaPluginEnum::getAdditionalDescriptions()
 	 */
-	public static function getAdditionalDescriptions() app/plugins/reach/lib/model/enums/SyncReachCreditTaskBatchType.php:26
+	public static function getAdditionalDescriptions()
 	{
 		return array();
 	}

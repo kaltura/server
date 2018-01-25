@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `entry_vendor_task`
 	`status` TINYINT  NOT NULL,
 	`price` INTEGER  NOT NULL,
 	`catalog_item_id` INTEGER  NOT NULL,
+	`vendor_profile_id` INTEGER  NOT NULL,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),

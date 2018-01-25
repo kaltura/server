@@ -17,6 +17,7 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 	
 	public function getMapBetweenObjects()
 	{
+		$a = array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
