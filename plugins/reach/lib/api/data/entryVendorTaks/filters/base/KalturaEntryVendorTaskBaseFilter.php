@@ -10,6 +10,8 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"vendorPartnerIdEqual" => "_eq_vendor_partner_id",
+		"vendorPartnerIdIn" => "_in_vendor_partner_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -60,6 +62,16 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * @var int
+	 */
+	public $vendorPartnerIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $vendorPartnerIdIn;
 
 	/**
 	 * @var time

@@ -5,6 +5,11 @@
  */
 class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 {
+	/**
+	 * @var int
+	 */
+	public $partnerIdEqual;
+	
 	protected function getCoreFilter()
 	{
 		return new VendorCatalogItemFilter();
@@ -15,20 +20,21 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		return $this->doGetListResponse($pager, $responseProfile, $type);
 	}
 	
-	public function getTypeListTemplatesResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
-	{
-		return $this->doGetTypeListTemplatesResponse($pager, $responseProfile, $type);
-	}
-	
 	public function doGetListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
 		$c = new Criteria();
 		if($type)
-			$c->add(VendorCatalogItemPeer::SERVICE_TYPE, $type);
+			$c->add(VendorCatalogItemPeer::SERVICE_FEATURE, $type);
 		
 		$filter = $this->toObject();
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
+		
+		if($this->partnerIdEqual)
+		{
+			$c->add(PartnerCatalogItemPeer::PARTNER_ID, $this->partnerIdEqual);
+			$c->addJoin(PartnerCatalogItemPeer::CATALOG_ITEM_ID, VendorCatalogItemPeer::ID, Criteria::INNER_JOIN);
+		}
 		
 		$list = VendorCatalogItemPeer::doSelect($c);
 		
@@ -44,26 +50,6 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		$response = new KalturaVendorCatalogItemListResponse();
 		$response->objects = KalturaVendorCatalogItemArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
-		return $response;
-	}
-	
-	public function doGetTypeListTemplatesResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
-	{
-		$criteria = new Criteria();
-		if($type)
-			$criteria->add(VendorCatalogItemPeer::SERVICE_FEATURE, $type);
-		
-		$coreFilter = $this->toObject();
-		$coreFilter->attachToCriteria($criteria);
-		$criteria->add(VendorCatalogItemPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
-		$count = VendorCatalogItemPeer::doCount($criteria);
-		
-		$pager->attachToCriteria($criteria);
-		$results = VendorCatalogItemPeer::doSelect($criteria);
-		
-		$response = new KalturaVendorCatalogItemListResponse();
-		$response->objects = KalturaVendorCatalogItemArray::fromDbArray($results, $responseProfile);
-		$response->totalCount = $count;
 		return $response;
 	}
 	

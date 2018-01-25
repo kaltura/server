@@ -8,7 +8,7 @@
  * @throws KalturaErrors::SERVICE_FORBIDDEN
  */
 
-class entryVendorTaskService extends KalturaBaseService
+class EntryVendorTaskService extends KalturaBaseService
 {
 
 	public function initService($serviceId, $serviceName, $actionName)

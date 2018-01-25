@@ -6,13 +6,14 @@
 class KalturaVendorTranslationCatalogItem extends KalturaVendorCaptionsCatalogItem
 {
 	/**
-	 * @var KalturaLanguageArray
+	 * @var KalturaCatalogItemLanguage
+	 * @filter eq,in
 	 */
-	public $targetLanguages;
+	public $targetLanguage;
 	
 	private static $map_between_objects = array
 	(
-		'targetLanguages',
+		'targetLanguage',
 	);
 	
 	protected function getServiceFeature()
@@ -41,7 +42,7 @@ class KalturaVendorTranslationCatalogItem extends KalturaVendorCaptionsCatalogIt
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("targetLanguages"));
+		$this->validatePropertyNotNull(array("targetLanguage"));
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	

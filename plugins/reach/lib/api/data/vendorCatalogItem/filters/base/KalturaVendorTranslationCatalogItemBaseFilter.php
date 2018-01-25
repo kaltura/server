@@ -8,6 +8,8 @@ abstract class KalturaVendorTranslationCatalogItemBaseFilter extends KalturaVend
 {
 	static private $map_between_objects = array
 	(
+		"targetLanguageEqual" => "_eq_target_language",
+		"targetLanguageIn" => "_in_target_language",
 	);
 
 	static private $order_by_map = array
@@ -23,4 +25,14 @@ abstract class KalturaVendorTranslationCatalogItemBaseFilter extends KalturaVend
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/**
+	 * @var KalturaCatalogItemLanguage
+	 */
+	public $targetLanguageEqual;
+
+	/**
+	 * @var string
+	 */
+	public $targetLanguageIn;
 }

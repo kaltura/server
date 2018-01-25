@@ -9,6 +9,10 @@ $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.reach.ven
 echo "Running php $script $config";
 passthru("php $script $config");
 
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.reach.partnerCatalogItem.ini';
+echo "Running php $script $config";
+passthru("php $script $config");
+
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.reach.vendorProfile.ini';
 echo "Running php $script $config";
 passthru("php $script $config");

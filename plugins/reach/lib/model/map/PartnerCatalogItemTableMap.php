@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'vendor_catalog_item' table.
+ * This class defines the structure of the 'partner_catalog_item' table.
  *
  *
  *
@@ -14,12 +14,12 @@
  * @package plugins.reach
  * @subpackage model.map
  */
-class VendorCatalogItemTableMap extends TableMap {
+class PartnerCatalogItemTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'plugins.reach.VendorCatalogItemTableMap';
+	const CLASS_NAME = 'plugins.reach.PartnerCatalogItemTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -31,25 +31,18 @@ class VendorCatalogItemTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('vendor_catalog_item');
-		$this->setPhpName('VendorCatalogItem');
-		$this->setClassname('VendorCatalogItem');
+		$this->setName('partner_catalog_item');
+		$this->setPhpName('PartnerCatalogItem');
+		$this->setClassname('PartnerCatalogItem');
 		$this->setPackage('plugins.reach');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 256, null);
-		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 256, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
-		$this->addColumn('VENDOR_PARTNER_ID', 'VendorPartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('SERVICE_TYPE', 'ServiceType', 'TINYINT', true, null, null);
-		$this->addColumn('SERVICE_FEATURE', 'ServiceFeature', 'TINYINT', true, null, null);
-		$this->addColumn('TURN_AROUND_TIME', 'TurnAroundTime', 'INTEGER', true, null, null);
-		$this->addColumn('SOURCE_LANGUAGE', 'SourceLanguage', 'VARCHAR', true, 256, null);
-		$this->addColumn('TARGET_LANGUAGE', 'TargetLanguage', 'VARCHAR', true, 256, null);
-		$this->addColumn('OUTPUT_FORMAT', 'OutputFormat', 'VARCHAR', true, 256, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
+		$this->addColumn('CATALOG_ITEM_ID', 'CatalogItemId', 'INTEGER', true, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
@@ -61,4 +54,4 @@ class VendorCatalogItemTableMap extends TableMap {
 	{
 	} // buildRelations()
 
-} // VendorCatalogItemTableMap
+} // PartnerCatalogItemTableMap

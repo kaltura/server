@@ -46,7 +46,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		
 		if($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::PENDING

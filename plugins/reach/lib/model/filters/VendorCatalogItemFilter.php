@@ -10,6 +10,7 @@ class VendorCatalogItemFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",
+			'_notin_id',
 			"_eq_vendor_partner_id",
 			"_in_vendor_partner_id",
 			"_gte_created_at",
@@ -23,6 +24,12 @@ class VendorCatalogItemFilter extends baseObjectFilter
 			"_in_service_type",
 			"_eq_turn_around_time",
 			"_in_turn_around_time",
+			"_eq_source_language",
+			"_in_source_language",
+			"_eq_output_format",
+			"_in_output_format",
+			"_eq_target_language",
+			"_in_target_language",
 		) , NULL );
 		
 		$this->allowed_order_fields = array (

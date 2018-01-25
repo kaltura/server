@@ -89,8 +89,9 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	{
 		$map = array(
 			'vendorCatalogItem' => 'VendorCatalogItemService',
-			'vendorProfile' => 'vendorProfileService',
-			'entryVendorTask' => 'entryVendorTaskService',
+			'vendorProfile' => 'VendorProfileService',
+			'entryVendorTask' => 'EntryVendorTaskService',
+			'partnerCatalogItem' => 'PartnerCatalogItemService',
 		);
 		return $map;
 	}
