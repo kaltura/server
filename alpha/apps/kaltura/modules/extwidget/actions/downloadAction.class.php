@@ -141,11 +141,18 @@ class downloadAction extends sfAction
 			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW, 0);
 		}
 		
-		//enable downloading file_name which inside the flavor asset directory 
-		if(is_dir($filePath))
-			$filePath = $filePath.DIRECTORY_SEPARATOR.$fileName;
-		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSync->getFileSize());
-		
+               //enable downloading file_name which inside the flavor asset directory
+                if(is_dir($filePath))
+                {
+                        $filePath = $filePath . DIRECTORY_SEPARATOR . $fileName;
+                        $fileSize = null;
+                }
+                else
+                {
+                        $fileSize = $fileSync->getFileSize();
+                }
+                $this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSize);
+	
 		KExternalErrors::dieGracefully(); // no view
 	}
 	
