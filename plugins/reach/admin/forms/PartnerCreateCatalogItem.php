@@ -13,5 +13,6 @@ class Form_PartnerCreateCatalogItem extends Infra_Form
 			array('HtmlTag', array('tag' => 'fieldset')),
 			array('Form', array('class' => 'simple')),
 		));
+
 	}
 }

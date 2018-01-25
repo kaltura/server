@@ -16,7 +16,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 //			'idEqual' => 'Catalog Item ID',
 		));
 
-		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('cloneTemplateServiceFeature', array(
+		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('templateServiceFeature', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature',
 			'label'			=> 'Service Feature:',
 			'onchange'		=> "switchAllTemplates()",
@@ -25,7 +25,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		), array(null => "Service Feature"));
 		$this->addElements(array($newServiceFeature));
 
-		$newServiceType = new Kaltura_Form_Element_EnumSelect('cloneTemplateServiceType', array(
+		$newServiceType = new Kaltura_Form_Element_EnumSelect('templateServiceType', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType',
 			'label'			=> 'Service Type:',
 			'onchange'		=> "switchAllTemplates()",
@@ -34,7 +34,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		), array(null => "Service Type"));
 		$this->addElements(array($newServiceType));
 
-		$newTurnAround = new Kaltura_Form_Element_EnumSelect('cloneTemplateTurnAround', array(
+		$newTurnAround = new Kaltura_Form_Element_EnumSelect('templateTurnAround', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime',
 			'label'			=> 'Service Turn Around Time:',
 			'onchange'		=> "switchAllTemplates()",
@@ -54,7 +54,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'newCatalogItem', array(
 			'ignore' => true,
 			'label' => 'Create New',
-			'onclick' => "addNewCatalogItem(0, $('#cloneTemplateServiceFeature').val(), $('#cloneTemplateServiceType').val(), $('#cloneTemplateTurnAround').val())",
+			'onclick' => "addNewCatalogItem(0, $('#templateServiceFeature').val(), $('#templateServiceType').val(), $('#templateTurnAround').val())",
 			'decorators' => array('ViewHelper'),
 		));
 	}

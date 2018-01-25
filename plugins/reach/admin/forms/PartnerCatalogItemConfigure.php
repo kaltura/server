@@ -185,9 +185,6 @@ class Form_PartnerCatalogItemConfigure extends ConfigureForm
 		$catalogItem->partnerId = null;
 		$catalogItem->createdAt = null;
 		$catalogItem->updatedAt = null;
-//		$catalogItem->OutputFormats = null;
-//		$catalogItem->SourceLanguages = null;
-//		$catalogItem->TargetLanguages = null;
 	}
 
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)

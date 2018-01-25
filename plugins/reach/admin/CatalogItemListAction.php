@@ -28,9 +28,9 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		$vendorPartnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
-		$ServiceFeature = $this->_getParam('cloneTemplateServiceFeature') != "" ? $this->_getParam('cloneTemplateServiceFeature') : null;
-		$ServiceType = $this->_getParam('cloneTemplateServiceType') != "" ? $this->_getParam('cloneTemplateServiceType') : null;
-		$turnAround = $this->_getParam('cloneTemplateTurnAround') != "" ? $this->_getParam('cloneTemplateTurnAround') : null;
+		$ServiceFeature = $this->_getParam('templateServiceFeature') != "" ? $this->_getParam('templateServiceFeature') : null;
+		$ServiceType = $this->_getParam('templateServiceType') != "" ? $this->_getParam('templateServiceType') : null;
+		$turnAround = $this->_getParam('templateTurnAround') != "" ? $this->_getParam('templateTurnAround') : null;
 		$partnerId = null;
 
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
@@ -47,7 +47,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listTemplates", $partnerId, $catalogItemProfileFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listAction", $partnerId, $catalogItemProfileFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
