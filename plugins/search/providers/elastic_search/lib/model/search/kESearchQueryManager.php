@@ -153,7 +153,7 @@ class kESearchQueryManager
 		$nestedQuery->setPath($queryAttributes->getNestedOperatorPath());
 		$nestedQuery->setInnerHitsSize($queryAttributes->getNestedOperatorInnerHitsSize());
 		$nestedQuery->setInnerHitsSource(true);
-		$highlight = new kESearchHighlightQuery($queryAttributes->getFieldsToHighlight(), $queryAttributes->getNestedOperatorNumOfFragments());
+		$highlight = new kESearchHighlightQuery($queryAttributes->getQueryHighlightsAttributes()->getFieldsToHighlight(), $queryAttributes->getNestedOperatorNumOfFragments());
 		$nestedQuery->setHighlight($highlight->getFinalQuery());
 		$nestedQuery->setQuery($query);
 		$nestedQuery->setInnerHitsName($queryAttributes->getNestedQueryName());

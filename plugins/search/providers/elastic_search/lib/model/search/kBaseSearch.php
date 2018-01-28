@@ -123,7 +123,7 @@ abstract class kBaseSearch
 	{
         $this->queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
         $numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey(self::GLOBAL_HIGHLIGHT_CONFIG);
-        $highlight = new kESearchHighlightQuery($this->queryAttributes->getFieldsToHighlight(), $numOfFragments);
+        $highlight = new kESearchHighlightQuery($this->queryAttributes->getQueryHighlightsAttributes()->getFieldsToHighlight(), $numOfFragments);
         $highlight = $highlight->getFinalQuery();
         if($highlight)
             $this->query['body']['highlight'] = $highlight;

@@ -72,7 +72,7 @@ class ESearchQueryAttributes
 
 	function __construct()
 	{
-		$queryHighlightsAttributes = new ESearchQueryHighlightsAttributes();
+		$this->queryHighlightsAttributes = new ESearchQueryHighlightsAttributes();
 	}
 
 	/**
