@@ -1134,7 +1134,7 @@ CREATE TABLE IF NOT EXISTS `generic_distribution_provider_action` (
 /*Table structure for table `invalid_session` */
 
 CREATE TABLE IF NOT EXISTS `invalid_session` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `ks` varchar(300) DEFAULT NULL,
   `ks_valid_until` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
