@@ -57,6 +57,12 @@ class ESearchService extends KalturaBaseService
 		return $response;
 	}
 
+	/**
+	 * @param $searchParams
+	 * @param KalturaPager|null $pager
+	 * @return array
+	 * @throws KalturaAPIException
+	 */
 	private function initSearchActionParams($searchParams, KalturaPager $pager = null)
 	{
 		$searchOperator = $searchParams->searchOperator;
@@ -84,6 +90,12 @@ class ESearchService extends KalturaBaseService
 		return array($coreSearchOperator, $objectStatusesArr, $searchParams->objectId, $kPager, $coreOrder);
 	}
 
+	/**
+	 * @param kBaseSearch $coreSearchObject
+	 * @param $searchParams
+	 * @param $pager
+	 * @return array
+	 */
 	private function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
 		try
@@ -95,7 +107,9 @@ class ESearchService extends KalturaBaseService
 			$this->handleSearchException($e);
 		}
 
-		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName(), $coreSearchObject->getPeerRetrieveFunctionName());
+		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults,
+			$coreSearchObject->getPeerName(), $coreSearchObject->getPeerRetrieveFunctionName(),
+			$coreSearchObject->getQueryAttributes()->getQueryHighlightsAttributes());
 		return array($coreResults, $objectCount);
 	}
 

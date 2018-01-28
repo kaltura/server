@@ -36,7 +36,7 @@ class ESearchNestedOperator extends ESearchBaseOperator
 			$shouldCreateNested = true;
 			$queryAttributes->setNestedOperatorContext(true);
 			$queryAttributes->setInitNestedQuery(false);
-			$queryAttributes->setScopeToInner();
+			$queryAttributes->getQueryHighlightsAttributes()->setScopeToInner();
 			$queryAttributes->resetNestedOperatorObjectTypes();
 		}
 		return $shouldCreateNested;

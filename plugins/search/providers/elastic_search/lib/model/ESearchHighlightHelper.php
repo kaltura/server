@@ -6,32 +6,7 @@
 
 class ESearchHighlightHelper
 {
-	public static function removeDuplicateHits(&$eHighlight)
-	{
-		uksort($eHighlight, array('ESearchHighlightHelper','cmpHighlightFieldsByPriority'));
-		$uniqueValues = array();
-		foreach ($eHighlight as $fieldName => $hits)
-		{
-			$filteredHits = array();
-			foreach ($hits as $hit)
-			{
-				$uniqueValue =  strip_tags($hit);
-				$uniqueValue = trim($uniqueValue);
-				if(!in_array ($uniqueValue , $uniqueValues))
-				{
-					$uniqueValues[] = $uniqueValue;
-					$filteredHits[] = $hit;
-				}
-			}
-
-			if(empty($filteredHits))
-				unset($eHighlight[$fieldName]);
-			else
-				$eHighlight[$fieldName] = $filteredHits;
-		}
-	}
-
-	private static function cmpHighlightFieldsByPriority($field1, $field2)
+	public static function cmpHighlightFieldsByPriority($field1, $field2)
 	{
 		return (ESearchHighlightHelper::getFieldTypePriority($field1) - ESearchHighlightHelper::getFieldTypePriority($field2));
 	}

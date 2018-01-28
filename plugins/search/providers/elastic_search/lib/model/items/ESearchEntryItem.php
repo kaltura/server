@@ -113,7 +113,7 @@ class ESearchEntryItem extends ESearchItem
 	/**
 	 * @param $eSearchItemsArr
 	 * @param $boolOperator
-	 * @param $queryAttributes
+	 * @param ESearchQueryAttributes $queryAttributes
 	 * @param null $eSearchOperatorType
 	 * @return array
 	 */
@@ -121,7 +121,7 @@ class ESearchEntryItem extends ESearchItem
 	{
 		$entryQuery = array();
 		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
-		$queryAttributes->setScopeToGlobal();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $entrySearchItem)
 		{
 			$entrySearchItem->getSingleItemSearchQuery($entryQuery, $allowedSearchTypes, $queryAttributes);
@@ -130,6 +130,11 @@ class ESearchEntryItem extends ESearchItem
 		return $entryQuery;
 	}
 
+	/**
+	 * @param array $entryQuery
+	 * @param array $allowedSearchTypes
+	 * @param ESearchQueryAttributes $queryAttributes
+	 */
 	public function getSingleItemSearchQuery(&$entryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$this->validateItemInput();
