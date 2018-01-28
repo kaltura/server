@@ -105,11 +105,9 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
 		$criteria->add ( EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE );
 		
-		if ($partnerId)
-			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, array (PartnerPeer::GLOBAL_PARTNER, $partnerId ), Criteria::IN );
-		else
-			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
+		$partnerIds = $partnerId ? array(PartnerPeer::GLOBAL_PARTNER, $partnerId) : array($partnerId);
 		
+		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, array_map('strval',  $partnerIds), Criteria::IN);
 		return EventNotificationTemplatePeer::doSelect ( $criteria, $con );
 	}
 	
@@ -129,11 +127,9 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		$criteria->add ( EventNotificationTemplatePeer::EVENT_TYPE, $eventType );
 		$criteria->add ( EventNotificationTemplatePeer::OBJECT_TYPE, $objectType );
 		
-		if ($partnerId)
-			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, array (PartnerPeer::GLOBAL_PARTNER, $partnerId ), Criteria::IN );
-		else
-			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
+		$partnerIds = $partnerId ? array(PartnerPeer::GLOBAL_PARTNER, $partnerId) : array($partnerId); 
 		
+		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, array_map('strval',  $partnerIds), Criteria::IN);
 		return EventNotificationTemplatePeer::doSelect ( $criteria, $con );
 	}
 	
@@ -158,11 +154,9 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		{
 		    $partnerIds = array (kCurrentContext::getCurrentPartnerId());
 		}
-
-		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, $partnerIds, Criteria::IN);
 		
+		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, array_map('strval',  $partnerIds), Criteria::IN);
 		$criteria->addDescendingOrderByColumn(EventNotificationTemplatePeer::PARTNER_ID);
-		
 		return EventNotificationTemplatePeer::doSelectOne($criteria);
 	}
 
