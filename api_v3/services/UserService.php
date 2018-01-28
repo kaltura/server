@@ -630,4 +630,26 @@ class UserService extends KalturaBaseUserService
 		return $res;
 	}
 
+	/**
+	 * add batch job that sends an email with a link to download an updated CSV that contains list of users
+	 *
+	 * @action getCsv
+	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
+	 * @param int $metadataProfileId
+	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
+	 * @return string
+	 */
+	function getCsvAction(KalturaUserFilter $filter, $metadataProfileId = null, $additionalFields = null)
+	{
+		if (!$filter)
+			$filter = new KalturaUserFilter();
+
+		$dbFilter = new kuserFilter();
+		$filter->toObject($dbFilter);
+
+		kJobsManager::addUsersCsvJob($this->getPartnerId(), $dbFilter, $metadataProfileId, $additionalFields);
+
+		return $this->getKuser()->getEmail();
+	}
+
 }

@@ -416,6 +416,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaCopyCaptionsJobData();
 				break;
 
+			case 'kUsersCsvJobData':
+				$this->data = new KalturaUsersCsvJobData();
+				break;
+
 			default:
 				if($dbData instanceof kBulkUploadJobData)
 				{
@@ -651,6 +655,13 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				if(is_null($this->data))
 					$this->data = new KalturaCopyCaptionsJobData();
 				break;
+
+			case KalturaBatchJobType::USERS_CSV:
+				$dbData = new kCopyUsersCsvJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaUsersCsvJobData();
+				break;
+
 			default:
 				$dbData = KalturaPluginManager::loadObject('kJobData', $dbBatchJob->getJobType());
 				if(is_null($this->data)) {

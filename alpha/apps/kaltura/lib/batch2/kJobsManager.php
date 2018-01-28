@@ -1838,4 +1838,17 @@ class kJobsManager
 			$fileSync->deleteTempClear();
 		return $shouldBlock;
 	}
+
+	public static function addUsersCsvJob($partnerId, baseObjectFilter $filter, $metadataProfileId, $additionalFields)
+	{
+		$jobData = new kUsersCsvJobData();
+		$jobData->setFilter($filter);
+		$jobData->setMetadataProfileId($metadataProfileId);
+		$jobData->setAdditionalFields($additionalFields);
+
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+
+		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
+	}
 }
