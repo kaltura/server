@@ -77,6 +77,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$catalogItemForView->setValue($this->catalogItemType);
 		else
 			$catalogItemForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS);
+		$catalogItemForView->setAttrib('disabled','disabled');
 		$this->addElement($catalogItemForView);
 
 		$serviceTypeForView = new Kaltura_Form_Element_EnumSelect('serviceType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType'));

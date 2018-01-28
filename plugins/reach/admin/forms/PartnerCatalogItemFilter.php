@@ -49,8 +49,7 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 			'decorators' => array('ViewHelper'),
 		));
 
-		// submit button
-		$this->addElement('button', 'configureCatalogItems', array(
+		$this->addElement('button', 'configureCatalogItemsButton', array(
 			'ignore' => true,
 			'label' => 'Configure',
 			'onclick' => "configureCatalogItems($('#filter_type').val(), $('#templateServiceFeature').val(), $('#templateServiceType').val(), $('#templateTurnAround').val())",
