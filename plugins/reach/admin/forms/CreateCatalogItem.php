@@ -10,7 +10,6 @@ class Form_CreateCatalogItem extends Infra_Form
 		$this->setAttrib('id', 'frmCreateCatalogItem');
 		$this->setDecorators(array(
 			'FormElements',
-			array('HtmlTag', array('tag' => 'fieldset')),
 			array('Form', array('class' => 'simple')),
 		));
 	}

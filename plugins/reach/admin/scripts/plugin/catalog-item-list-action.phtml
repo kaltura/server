@@ -10,11 +10,13 @@
 			<th><?php echo $this->translate('Status'); ?></th>
 			<th><?php echo $this->translate('Name'); ?></th>
 			<th><?php echo $this->translate('System Name'); ?></th>
-			<th><?php echo $this->translate('Publisher ID'); ?></th>
 			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
 			<th><?php echo $this->translate('Feature'); ?></th>
 			<th><?php echo $this->translate('Type'); ?></th>
 			<th><?php echo $this->translate('Turn Around Time'); ?></th>
+            <th><?php echo $this->translate('Source Language'); ?></th>
+            <th><?php echo $this->translate('Target Language'); ?></th>
+            <th><?php echo $this->translate('Output Format'); ?></th>
 			<th><?php echo $this->translate('Creation Date'); ?></th>
 			<th><?php echo $this->translate('Last Updated Date'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
@@ -22,7 +24,7 @@
 		</thead>
 		<tfoot>
 		<tr>
-			<td colspan="12">
+			<td colspan="14">
 				<?php echo $this->paginator; ?>
 			</td>
 		</tr>
@@ -34,18 +36,20 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
 				<td><?php echo $catalogItem->name; ?></td>
 				<td><?php echo $catalogItem->systemName; ?></td>
-				<td><?php echo $catalogItem->partnerId; ?></td>
 				<td><?php echo $catalogItem->vendorPartnerId; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $catalogItem->serviceFeature); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
-				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->sourceLanguage); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
 				<td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $catalogItem->partnerId; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configureCatalogItem" ><?php echo $this->translate('Configure'); ?></option>
-						<?php if ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED): ?>
+						<?php if ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED): ?>
 							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
 						<?php elseif ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE): ?>
 							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
@@ -60,6 +64,11 @@
 </div>
 
 <script type="text/javascript">
+
+	$(function(){
+		updateFiltersView();
+	});
+    
 	jQuery('#filter_type').change(function() {
 		if(this.value == "none") {
 			$("#filter_text").css("display","none");
@@ -103,7 +112,7 @@
 	{
 		changeStatus(
 			catalogItemId,
-			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED; ?>,
+			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED; ?>,
 			partnerId,
 			function() {
 				alert('<?php echo $this->translate('Catalog Item disabled');?>');
@@ -340,5 +349,20 @@
 			success: loadCatalogItemSuccess,
 			iframe: true
 		});
+	}
+
+	function updateFiltersView() {
+		var templateServiceFeature = jQuery('#filterServiceFeature').val();
+
+		jQuery('#filterSourceLanguage').attr('hidden', 1);
+		jQuery('#filterTargetLanguage').attr('hidden', 1);
+
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+		}
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+			jQuery('#filterTargetLanguage').removeAttr('hidden');
+		}
 	}
 </script>

@@ -28,26 +28,43 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		$vendorPartnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
-		$ServiceFeature = $this->_getParam('cloneTemplateServiceFeature') != "" ? $this->_getParam('cloneTemplateServiceFeature') : null;
-		$ServiceType = $this->_getParam('cloneTemplateServiceType') != "" ? $this->_getParam('cloneTemplateServiceType') : null;
-		$turnAround = $this->_getParam('cloneTemplateTurnAround') != "" ? $this->_getParam('cloneTemplateTurnAround') : null;
+		$serviceFeature = $this->_getParam('filterServiceFeature') != "" ? $this->_getParam('filterServiceFeature') : null;
+		$serviceType = $this->_getParam('filterServiceType') != "" ? $this->_getParam('filterServiceType') : null;
+		$turnAroundTime = $this->_getParam('filterTurnAroundTime') != "" ? $this->_getParam('filterTurnAroundTime') : null;
+		$sourceLanguage = $this->_getParam('filterSourceLanguage') != "" ? $this->_getParam('filterSourceLanguage') : null;
+		$targetLanguage = $this->_getParam('filterTargetLanguage') != "" ? $this->_getParam('filterTargetLanguage') : null;
 		$partnerId = null;
 
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
 		// init filter
 		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
+			$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
+		elseif($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
+		
 		$catalogItemProfileFilter->orderBy = "-createdAt";
-		$catalogItemProfileFilter->serviceFeatureEqual = $ServiceFeature;
-		$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
-		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
+		$catalogItemProfileFilter->serviceFeatureEqual = $serviceFeature;
+		$catalogItemProfileFilter->serviceTypeEqual = $serviceType;
+		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAroundTime;
 		$catalogItemProfileFilter->vendorPartnerIdEqual = $vendorPartnerId;
+		
+		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS || $serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		{
+			$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
+		}
+		
+		if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		{
+			$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
+		}
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listTemplates", $partnerId, $catalogItemProfileFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listAction", $partnerId, $catalogItemProfileFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
