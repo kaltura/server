@@ -1,3 +1,21 @@
+# Mercury 13.13.0 #
+
+## Base Upload Permission and User-role ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-8435
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_11_add_base_upload_permission_and_role.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
 # Mercury 13.12.0 #
 
 ## Split beacon index to index per object type ##
