@@ -164,6 +164,7 @@ class kESearchCoreAdapter
 		if(isset($eHighlight))
 		{
 			$result = array();
+			ESearchHighlightHelper::removeDuplicateHits($eHighlight);
 			foreach ($eHighlight as $key => $value)
 			{
 				$resultType = new ESearchHighlight();

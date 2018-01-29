@@ -25,8 +25,6 @@ class KObjectTaskStorageExportEngine extends KObjectTaskEntryEngineBase
 		KalturaLog::info("Submitting entry export for entry $entryId to remote storage $storageId");
 
 		$client = $this->getClient();
-		$this->impersonate($object->partnerId);
 		$client->baseEntry->export($entryId, $storageId);
-		$this->unimpersonate();
 	}
 }

@@ -477,6 +477,20 @@
 			}
 		  }
 		},
+		"users_name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+		  	"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_keyword"
+			}
+		  }
+		},
 		"reference_id": {
 		  "type" : "text",
 		  "analyzer" : "kaltura_keyword"
@@ -511,8 +525,15 @@
 		"views": {
 		  "type" : "long"
 		},
+		"plays": {
+		  "type" : "long"
+		},
 		"votes": {
 		  "type" : "long"
+		},
+		"last_played_at": {
+		  "type" : "date",
+		  "format": "epoch_second"
 		},
 		"recorded_entry_id": {
 		  "type" : "text",

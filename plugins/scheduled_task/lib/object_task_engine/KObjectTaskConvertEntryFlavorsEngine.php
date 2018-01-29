@@ -22,7 +22,6 @@ class KObjectTaskConvertEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		{
 			try
 			{
-				$this->impersonate($object->partnerId);
 				$flavorAssetFilter = new KalturaFlavorAssetFilter();
 				$flavorAssetFilter->entryIdEqual = $entryId;
 				$flavorAssetFilter->flavorParamsIdEqual = $flavorParamsId;
@@ -31,7 +30,6 @@ class KObjectTaskConvertEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 				if (!count($flavorAssetResponse->objects) || $reconvert)
 					$client->flavorAsset->convert($entryId, $flavorParamsId);
 
-				$this->unimpersonate();
 			}
 			catch(Exception $ex)
 			{

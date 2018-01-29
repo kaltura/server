@@ -26,6 +26,7 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		$filterType = $this->_getParam('new_mr_filter_type');
 		
 		$action->view->formValid = false;
+		$mediaRepurposingForm = null;
 		try
 		{
 			if ($request->isPost())

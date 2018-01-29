@@ -44,13 +44,10 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 			{
 				try
 				{
-					$this->impersonate($object->partnerId);
 					$this->processCategory($entryId, $categoryId, $addRemoveType);
-					$this->unimpersonate();
 				}
 				catch(Exception $ex)
 				{
-					$this->unimpersonate();
 					KalturaLog::err($ex);
 				}
 			}
@@ -95,13 +92,10 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 	{
 		try
 		{
-			$this->impersonate($partnerId);
 			$this->doRemoveAllCategories($entryId);
-			$this->unimpersonate();
 		}
 		catch(Exception $ex)
 		{
-			$this->unimpersonate();
 			KalturaLog::err($ex);
 		}
 	}

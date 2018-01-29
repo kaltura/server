@@ -254,8 +254,9 @@ class kPlaybackContextDataHelper
 				$activeStorageProfileIds[] = $storageProfile->getId();
 
 				$deliveryProfilesIds = array();
-				if(!is_null($storageProfile->getFromCustomData("delivery_profile_ids")))
-					$deliveryProfilesIds = call_user_func_array('array_merge', $storageProfile->getFromCustomData("delivery_profile_ids"));
+				$ids = $storageProfile->getFromCustomData("delivery_profile_ids");
+				if(!empty($ids))
+					$deliveryProfilesIds = call_user_func_array('array_merge', $ids);
 
 				foreach ($deliveryProfilesIds as $deliveryProfileId)
 					$this->remoteDcByDeliveryProfile[$deliveryProfileId] = $storageProfile->getId();

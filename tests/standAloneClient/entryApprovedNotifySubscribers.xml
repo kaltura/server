@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <!-- script will ask for username / password interactively -->
+    </session>
+    <multirequest>
+        <!-- Entry Approved In Category -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Approved In Category - Notify Subscribers</name>
+                <systemName>Entry_Approved_In_Category_Notify_Subscribers</systemName>
+                <description>Email notification template to be sent when a new entry is approved in a category.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>37</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status changed to active, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope-&gt;getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope-&gt;getEvent()-&gt;getModifiedColumns()) &amp;&amp; $scope-&gt;getObject()-&gt;getStatus() == CategoryEntryStatus::ACTIVE</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>[AppTitle] - New Media Added To {category_name}</subject>
+                <body>New media {entry_name} [AppEntryUrl]{entry_id} has been added to {category_name}</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
+                    <categoryId objectType="KalturaEvalStringField">
+                        <code>$scope->getObject()->getCategoryId()</code>
+                    </categoryId>
+                    <categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
+                        <permissionNamesMatchOr>CATEGORY_SUBSCRIBE</permissionNamesMatchOr>
+                    </categoryUserFilter>
+                </bcc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope-&gt;getObject()-&gt;getEntryId())) ? entryPeer::retrieveByPk($scope-&gt;getObject()-&gt;getEntryId())-&gt;getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(categoryPeer::retrieveByPk($scope-&gt;getObject()-&gt;getCategoryId())) ? categoryPeer::retrieveByPk($scope-&gt;getObject()-&gt;getCategoryId())-&gt;getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope-&gt;getObject()-&gt;getEntryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

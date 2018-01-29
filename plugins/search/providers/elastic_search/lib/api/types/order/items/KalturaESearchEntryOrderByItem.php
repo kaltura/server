@@ -22,6 +22,8 @@ class KalturaESearchEntryOrderByItem extends KalturaESearchOrderByItem
         KalturaESearchEntryOrderByFieldName::NAME => ESearchEntryOrderByFieldName::NAME,
         KalturaESearchEntryOrderByFieldName::VIEWS => ESearchEntryOrderByFieldName::VIEWS,
         KalturaESearchEntryOrderByFieldName::VOTES => ESearchEntryOrderByFieldName::VOTES,
+        KalturaESearchEntryOrderByFieldName::PLAYS => ESearchEntryOrderByFieldName::PLAYS,
+        KalturaESearchEntryOrderByFieldName::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT,
     );
 
     public function getMapBetweenObjects()

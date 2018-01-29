@@ -137,14 +137,9 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		$encodes = $transcode->addChild('Encodes');
 		$defaultFrameRate = null;
-
-		$groups = array();
+		
 		foreach($liveParams as $liveParamsItem)
 		{
-			/* @var $liveParamsItem liveParams */
-			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
-				continue;
-
 			if ($liveParamsItem->hasTag(assetParams::TAG_SOURCE))
 			{
 				if ($liveParamsItem->getFrameRate() >= self::MINIMAL_DEFAULT_FRAME_RATE)
@@ -153,6 +148,20 @@ class LiveConversionProfileService extends KalturaBaseService
 					$defaultFrameRate = $liveParamsItem->getFrameRate();
 				}
 			}
+		}
+		
+		if ($defaultFrameRate && $streamParametersArray['framerate'] == 0)
+		{
+			$streamParametersArray['framerate'] = $defaultFrameRate;
+		}
+		
+		$groups = array();
+		foreach($liveParams as $liveParamsItem)
+		{
+			/* @var $liveParamsItem liveParams */
+			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
+				continue;
+			
 			$shouldAddFlavor = $this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $streamParametersArray);
 			if ($shouldAddFlavor) {
 				$tags = array(self::DEFAULT_NAME_GROUP);

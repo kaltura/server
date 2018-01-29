@@ -7,6 +7,7 @@ class DoubleClickServiceContext extends ContentDistributionServiceContext
 	public $period;
 	public $state;
 	public $hash;
+	public $version;
 	
 	public $totalCount;
 	public $hasNextPage;
@@ -15,7 +16,7 @@ class DoubleClickServiceContext extends ContentDistributionServiceContext
 	public $nextPageStateLastEntryCreatedAt;
 	public $nextPageStateLastEntryIds;
 	
-	public function __construct($hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false) 
+	public function __construct($hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 2)
 	{
 		if($page && $page >= 1)
 			$this->page =  $page;
@@ -23,6 +24,7 @@ class DoubleClickServiceContext extends ContentDistributionServiceContext
 		$this->state = $state;
 		$this->ignoreScheduling = $ignoreScheduling;
 		$this->hash = $hash;
+		$this->version = $version;
 	}
 }
 
