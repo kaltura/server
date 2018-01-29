@@ -65,7 +65,7 @@ class ESearchQueryHighlightsAttributes
 	 */
 	public function removeDuplicateHits($eHighlight)
 	{
-		uksort($eHighlight, array('ESearchHighlightHelper','cmpHighlightFieldsByPriority'));
+		uksort($eHighlight, array($this, 'cmpHighlightFieldsByPriority'));
 		$uniqueValuesPerBaseFieldName = array();
 		foreach ($eHighlight as $fieldName => $hits)
 		{
@@ -94,5 +94,23 @@ class ESearchQueryHighlightsAttributes
 		}
 
 		return $eHighlight;
+	}
+
+	public function cmpHighlightFieldsByPriority($field1, $field2)
+	{
+		return ($this->getFieldTypePriority($field1) - $this->getFieldTypePriority($field2));
+	}
+
+	private function getFieldTypePriority($fieldName)
+	{
+		$priority = 10;
+		if(kString::endsWith($fieldName, kESearchQueryManager::RAW_FIELD_SUFFIX))
+			$priority =  1;
+		else if(kString::endsWith($fieldName, kESearchQueryManager::NGRAMS_FIELD_SUFFIX))
+			$priority = 20;
+		else if($this->baseFieldNameMapping[$fieldName] == $fieldName)
+			$priority = 5;
+
+		return $priority;
 	}
 }
