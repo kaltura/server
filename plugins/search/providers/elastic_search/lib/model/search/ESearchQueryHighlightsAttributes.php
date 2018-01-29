@@ -7,12 +7,10 @@ class ESearchQueryHighlightsAttributes
 {
 	const GLOBAL_SCOPE = "global";
 	const INNER_SCOPE = "inner";
-
 	const HIGHLIGHT_HIGHEST_PRIORITY = 1;
 	const HIGHLIGHT_MEDIUM_PRIORITY = 10;
 	const HIGHLIGHT_DEFUALT_PRIORITY = 50;
 	const HIGHLIGHT_LOWEST_PRIORITY = 100;
-
 
 	/**
 	 * @var array
