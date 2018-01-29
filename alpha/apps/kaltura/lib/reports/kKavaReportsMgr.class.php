@@ -1797,7 +1797,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	function getEntriesUserIdLengthAndCreated($ids, $partner_id)
+	private static function getEntriesUserIdLengthAndCreated($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		
