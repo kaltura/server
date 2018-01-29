@@ -657,7 +657,7 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				break;
 
 			case KalturaBatchJobType::USERS_CSV:
-				$dbData = new kCopyUsersCsvJobData();
+				$dbData = new kUsersCsvJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaUsersCsvJobData();
 				break;

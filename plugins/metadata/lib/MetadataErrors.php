@@ -48,4 +48,6 @@ class MetadataErrors extends KalturaErrors
 	const METADATA_PROFILE_REFERENCE_EXISTS = "METADATA_PROFILE_REFERENCE_EXISTS;ID,FIELD;Metadata profile reference exists in profile [@ID@] on field [@FIELD@]";
 
 	const METADATA_NO_PERMISSION_ON_ENTRY = "METADATA_NO_PERMISSION_ON_ENTRY;ID;No permissions to add metadata for entry [@ID@]";
+
+	const METADATA_PROFILE_NOT_SPECIFIED = "METADATA_PROFILE_NOT_SPECIFIED;;Metadata Profile need to be specified";
 }

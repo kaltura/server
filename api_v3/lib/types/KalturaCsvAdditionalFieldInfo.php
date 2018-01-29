@@ -28,4 +28,15 @@ class KalturaCsvAdditionalFieldInfo extends KalturaObject
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
+	/* (non-PHPdoc)
+ 	* @see KalturaObject::toObject()
+ 	*/
+	public function toObject($dbAdditionalField = null, $skip = array())
+	{
+		if(!$dbAdditionalField)
+			$dbAdditionalField = new kCsvAdditionalFieldInfo();
+
+		return parent::toObject($dbAdditionalField, $skip);
+	}
+
 }

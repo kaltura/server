@@ -37,24 +37,58 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 	}
 
 	/**
-	 * Will generate and send users csv
+	 * Generate csv contains users info which will be later sent by mail
 	 */
 	private function generateUsersCsv(KalturaBatchJob $job, KalturaUsersCsvJobData $data)
 	{
 		$this->updateJob($job, "Start generating users csv", KalturaBatchJobStatus::PROCESSING);
 		self::impersonate($job->partnerId);
 
-		//TO DO: change the way we save the csv
-		$csvFile = fopen("/opt/kaltura/users.csv","w");
+		// Create local path for csv generation
+		$directory = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $job->partnerId;
+		KBatchBase::createDir($directory);
+		$filePath = $directory . DIRECTORY_SEPARATOR . 'users_' .$job->partnerId.'_'.$job->id . '.csv';
+		$data->outputPath = $filePath;
+		KalturaLog::info("Temp file path: [$filePath]");
+
+		//fill the csv with users data
+		$csvFile = fopen($filePath,"w");
 		$csvFile = $this->fillUsersCsv($csvFile, $data);
 		fclose($csvFile);
-
+		$this->setFilePermissions($filePath);
 		self::unimpersonate();
-		$this->closeJob($job, null, null, 'Finished Users Csv', KalturaBatchJobStatus::FINISHED);
+
+		// Copy the report to shared location.
+		$this->moveFile($job, $data, $job->partnerId);
 		return $job;
 	}
 
 
+	/**
+	 * the function move the file to the shared location
+	 */
+	protected function moveFile(KalturaBatchJob $job, KalturaUsersCsvJobData $data, $partnerId) {
+		$fileName =  basename($data->outputPath);
+		$directory = self::$taskConfig->params->sharedPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR;
+		KBatchBase::createDir($directory);
+		$sharedLocation = self::$taskConfig->params->sharedPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR. $fileName;
+
+		$fileSize = kFile::fileSize($data->outputPath);
+		rename($data->outputPath, $sharedLocation);
+		$data->outputPath = $sharedLocation;
+
+		$this->setFilePermissions($sharedLocation);
+		if(!$this->checkFileExists($sharedLocation, $fileSize))
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'Failed to move users csv file', KalturaBatchJobStatus::RETRY);
+		}
+
+		return $this->closeJob($job, null, null, 'users CSV created successfully', KalturaBatchJobStatus::FINISHED, $data);
+	}
+
+	/**
+	 * The function fills the csv file with the users data
+	 */
 	private function fillUsersCsv($csvFile, $data)
 	{
 		$filter = clone $data->filter;
@@ -62,7 +96,14 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
 
-		$csvFile = $this->addHeaderRowToCsv($csvFile, $data->additionalFields);
+		$additionalFields = $data->additionalFields;
+
+		/*
+		if(!$data->additionalFields && $data->metadataProfileId)
+			$additionalFields = $this->extractAdditionalFieldsFromMetadataProfile($data->metadataProfileId);
+		*/
+
+		$csvFile = $this->addHeaderRowToCsv($csvFile, $additionalFields);
 		do
 		{
 			try
@@ -72,8 +113,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 			catch(Exception $e)
 			{
 				KalturaLog::info("Couldn't list users on page: [$pager->pageIndex]" . $e->getMessage());
+				return $csvFile;
 			}
-			$csvFile = $this->addUsersToCsv($userList->objects, $csvFile, $data->metadataProfileId, $data->additionalFields);
+			$csvFile = $this->addUsersToCsv($userList->objects, $csvFile, $data->metadataProfileId, $additionalFields);
 			$pager->pageIndex ++;
 		}
 		while ($pager->pageSize == count($userList->objects));
@@ -82,6 +124,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 	}
 
 
+	/**
+	 * Generate the first csv row containing the fields
+	 */
 	private function addHeaderRowToCsv($csvFile, $additionalFields)
 	{
 		$headerRow = 'User ID,First Name,Last Name,Email';
@@ -91,8 +136,15 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		return $csvFile;
 	}
 
+
+	/**
+	 * The function grabs all the fields values for each user and adding them as a new row to the csv file
+	 */
 	private function addUsersToCsv($users, $csvFile, $metadataProfileId, $additionalFields)
 	{
+		if(!$users)
+			return $csvFile;
+
 		$userIds = array();
 		$userIdToRow = array();
 
@@ -112,7 +164,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		return $csvFile;
 	}
 
-
+	/**
+	 * adds the default fields values and the additional fields as nulls
+	 */
 	private function initializeCsvRowValues($user, $additionalFields, $userIdToRow)
 	{
 		$defaultRowValues = array(
@@ -132,27 +186,40 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		return $userIdToRow;
 	}
 
+	/**
+	 * the function run over each additional field and returns the value for the given field xpath
+	 */
 	private function fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow)
 	{
 		foreach($usersMetadata->objects as $metadataObj)
 		{
 			foreach ($additionalFields as $field)
 			{
-				$strValue = $this->getValueFromXmlElement($metadataObj->xml, $field->xpath);
-				if($strValue)
+				if($field->xpath)
 				{
-					$objectRow = $userIdToRow[$metadataObj->objectId];
-					$objectRow[$field->fieldName] = $strValue;
-					$userIdToRow[$metadataObj->objectId] = $objectRow;
+					KalturaLog::info("current field xpath: [$field->xpath]");
+					$strValue = $this->getValueFromXmlElement($metadataObj->xml, $field->xpath);
+					if($strValue)
+					{
+						$objectRow = $userIdToRow[$metadataObj->objectId];
+						$objectRow[$field->fieldName] = $strValue;
+						$userIdToRow[$metadataObj->objectId] = $objectRow;
+					}
 				}
+
 			}
 		}
 
 		return $userIdToRow;
 	}
 
+
+	/**
+	 * Retrieve all the metadata objects for all the users in specific page
+	 */
 	private function retrieveUsersMetadata($userIds, $metadataProfileId)
 	{
+		$result = null;
 		$filter = new KalturaMetadataFilter();
 		$filter->objectIdIn = implode(',', $userIds);
 		$filter->metadataObjectTypeEqual = MetadataObjectType::USER;
@@ -169,6 +236,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		return $result;
 	}
 
+	/**
+	 * Extract specific value from xml using given xpath
+	 */
 	private function getValueFromXmlElement($xml, $xpath)
 	{
 		$strValue = null;
@@ -183,8 +253,38 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		$value = $xmlObj->xpath($xpath);
 		if(is_array($value) && count($value) == 1)
 			$strValue = (string)$value[0];
+		else if (count($value) == 1)
+			KalturaLog::err("Unknown element in the base xml when quering the xpath: [$xpath]");
 
 		return $strValue;
+	}
+
+	/**
+	 * retrieve all the fields names and xpath in a given metadata profile and add them later to the csv
+	 * this function should be in use in case metadata profile id is specified but there are no given xpath
+	 * in additional fields object
+	 */
+	private function extractAdditionalFieldsFromMetadataProfile($metadataProfileId)
+	{
+		$additionalParams = array();
+		try
+		{
+			$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
+			$metadataProfileFieldList = $metadataPlugin->metadataProfile->listFields($metadataProfileId);
+			foreach ($metadataProfileFieldList->objects as $field)
+			{
+				$data = array();
+				$data['fieldName']  = $field->key;
+				$data['xpath']  = $field->xPath;
+				$additionalParams[] = $data;
+			}
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Couldn't list metadata fields for metadataProfileId: [$metadataProfileId]" . $e->getMessage());
+		}
+
+		return $additionalParams;
 	}
 
 }

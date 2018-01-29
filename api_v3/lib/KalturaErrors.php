@@ -85,6 +85,8 @@ class KalturaErrors extends APIErrors
 
 	const INVALID_USER_ID = "INVALID_USER_ID;;Invalid user id";
 
+	const INVALID_METADATA_PROFILE_ID = "INVALID_USER_ID;;Invalid user id";
+
 	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND;DCID;There is no data center with id [@DCID@]";
 
 	const PLUGIN_NOT_AVAILABLE_FOR_PARTNER = "PLUGIN_NOT_AVAILABLE_FOR_PARTNER;PLUGIN,PARTNER;Plugin [@PLUGIN@] is not available for partner [@PARTNER@]";

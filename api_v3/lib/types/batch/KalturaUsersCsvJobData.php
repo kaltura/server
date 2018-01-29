@@ -30,12 +30,34 @@ class KalturaUsersCsvJobData extends KalturaJobData
 	 */
 	public $additionalFields;
 
+	/**
+	 * The users name
+	 * @var string
+	 */
+	public $userName;
+
+	/**
+	 * The users email
+	 * @var string
+	 */
+	public $userMail;
+
+	/**
+	 * The file location
+	 * @var string
+	 */
+	public $outputPath;
+
+
 
 	private static $map_between_objects = array
 	(
 		'filter',
 		'metadataProfileId',
 		'additionalFields',
+		'userMail',
+		'userName',
+		'outputPath',
 	);
 
 	/* (non-PHPdoc)
