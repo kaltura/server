@@ -212,16 +212,9 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
 		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
 
-		$shouldDisableDefCriteria = kCurrentContext::getCurrentPartnerId() == Partner::BATCH_PARTNER_ID ? true : false;
-		if($shouldDisableDefCriteria)
-		{
-			self::setUseCriteriaFilter(false);
-		}
+		self::setUseCriteriaFilter(false);
 		$categoryKusers = categoryKuserPeer::doSelect($criteria, $con);
-		if($shouldDisableDefCriteria)
-		{
-			self::setUseCriteriaFilter(true);
-		}
+		self::setUseCriteriaFilter(true);
 		return $categoryKusers;
 	}
 	
