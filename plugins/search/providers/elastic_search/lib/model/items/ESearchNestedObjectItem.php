@@ -108,7 +108,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 	public function createSingleNestedQueryForItem(&$queryAttributes, $boolOperator, $allowedSearchTypes)
 	{
 		$boolQuery = new kESearchBoolQuery();
-		$queryAttributes->setScopeToInner();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToInner();
 		$this->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);
 		return $this->createNestedQuery($boolQuery, $queryAttributes);
 	}
@@ -116,7 +116,7 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 	private static function createGroupedNestedQueryForItems($eSearchItemsArr, &$queryAttributes, $boolOperator, $allowedSearchTypes, $innerHitsSize, $numOfFragments)
 	{
 		$boolQuery = new kESearchBoolQuery();
-		$queryAttributes->setScopeToInner();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToInner();
 		foreach ($eSearchItemsArr as $eSearchItem)
 		{
 			$eSearchItem->createSingleItemSearchQuery($boolOperator, $boolQuery, $allowedSearchTypes, $queryAttributes);

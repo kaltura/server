@@ -97,7 +97,7 @@ class ESearchCategoryItem extends ESearchItem
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$categoryQuery = array();
-		$queryAttributes->setScopeToGlobal();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
 		$allowedSearchTypes = ESearchCategoryItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $categorySearchItem)
 		{

@@ -5,9 +5,6 @@
  */
 class ESearchQueryAttributes
 {
-	const GLOBAL_SCOPE = "global";
-	const INNER_SCOPE = "inner";
-
 	/**
 	 * @var array
 	 */
@@ -27,16 +24,6 @@ class ESearchQueryAttributes
 	 * @var bool
 	 */
 	protected $shouldUseDisplayInSearch;
-
-	/**
-	 * @var array
-	 */
-	private $fieldsToHighlight = array(self::GLOBAL_SCOPE => array(), self::INNER_SCOPE => array());
-
-	/**
-	 * @var string
-	 */
-	private $scope = self::GLOBAL_SCOPE;
 
 	/**
 	 * @var bool
@@ -79,6 +66,16 @@ class ESearchQueryAttributes
 	protected $nestedOperatorObjectTypes;
 
 	/**
+	 * @var ESearchQueryHighlightsAttributes
+	 */
+	private $queryHighlightsAttributes;
+
+	function __construct()
+	{
+		$this->queryHighlightsAttributes = new ESearchQueryHighlightsAttributes();
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getObjectId()
@@ -108,36 +105,6 @@ class ESearchQueryAttributes
 	public function setShouldUseDisplayInSearch($shouldUseDisplayInSearch)
 	{
 		$this->shouldUseDisplayInSearch = $shouldUseDisplayInSearch;
-	}
-
-	public function setScopeToInner()
-	{
-		$this->scope = self::INNER_SCOPE;
-		$this->fieldsToHighlight[self::INNER_SCOPE] = array();
-	}
-
-	public function setScopeToGlobal()
-	{
-		$this->scope = self::GLOBAL_SCOPE;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getFieldsToHighlight()
-	{
-		return $this->fieldsToHighlight[$this->scope];
-	}
-
-	/**
-	 * @param string $field
-	 */
-	public function addFieldToHighlight($field)
-	{
-		if(!array_key_exists($field ,$this->fieldsToHighlight[$this->scope]))
-		{
-			$this->fieldsToHighlight[$this->scope][$field] = new stdClass();
-		}
 	}
 
 	/**
@@ -301,4 +268,8 @@ class ESearchQueryAttributes
 		return false;
 	}
 
+	public function getQueryHighlightsAttributes()
+	{
+		return $this->queryHighlightsAttributes;
+	}
 }

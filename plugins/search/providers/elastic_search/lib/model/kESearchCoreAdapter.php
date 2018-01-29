@@ -27,15 +27,15 @@ class kESearchCoreAdapter
 		'cue_points' => ESearchItemDataType::CUE_POINTS
 	);
 
-	public static function transformElasticToCoreObject($elasticResults, $peerName, $peerRetrieveFunctionName)
+	public static function transformElasticToCoreObject($elasticResults, $peerName, $peerRetrieveFunctionName, $queryHighlightsAttribute)
 	{
-		list($objectData, $objectOrder, $objectCount, $objectHighlight) = self::getElasticResultAsArray($elasticResults);
+		list($objectData, $objectOrder, $objectCount, $objectHighlight) = self::getElasticResultAsArray($elasticResults, $queryHighlightsAttribute);
 		$objects = $peerName::$peerRetrieveFunctionName(array_keys($objectData));
 		$coreResults = self::getCoreESearchResults($objects, $objectData, $objectOrder, $objectHighlight);
 		return array($coreResults, $objectCount);
 	}
 
-	private static function getElasticResultAsArray($elasticResults)
+	private static function getElasticResultAsArray($elasticResults, $queryHighlightsAttribute)
 	{
 		$objectData = array();
 		$objectOrder = array();
@@ -45,12 +45,12 @@ class kESearchCoreAdapter
 		{
 			$itemData = array();
 			if (isset($elasticObject[self::INNER_HITS_KEY]))
-				self::getItemDataFromInnerHits($elasticObject, $itemData);
+				self::getItemDataFromInnerHits($elasticObject, $itemData, $queryHighlightsAttribute);
 			
 			$objectData[$elasticObject[self::ID_KEY]] = $itemData;
 			$objectOrder[$elasticObject[self::ID_KEY]] = $key;
 			if(array_key_exists(self::HIGHLIGHT_KEY, $elasticObject))
-				$objectHighlight[$elasticObject[self::ID_KEY]] = self::elasticHighlightToCoreHighlight($elasticObject[self::HIGHLIGHT_KEY]);
+				$objectHighlight[$elasticObject[self::ID_KEY]] = self::elasticHighlightToCoreHighlight($elasticObject[self::HIGHLIGHT_KEY], $queryHighlightsAttribute);
 		}
 		
 		if(isset($elasticResults[self::HITS_KEY][self::TOTAL_KEY]))
@@ -85,7 +85,7 @@ class kESearchCoreAdapter
 		return $resultsObjects;
 	}
 
-	private static function getItemDataFromInnerHits($elasticObject, &$itemData)
+	private static function getItemDataFromInnerHits($elasticObject, &$itemData, $queryHighlightsAttribute)
 	{
 		foreach ($elasticObject[self::INNER_HITS_KEY] as $innerHitsKey => $hits)
 		{
@@ -99,7 +99,7 @@ class kESearchCoreAdapter
 				if ($currItemData)
 				{
 					if(array_key_exists(self::HIGHLIGHT_KEY, $itemResult))
-						$itemResult[self::HIGHLIGHT_KEY] = self::elasticHighlightToCoreHighlight($itemResult[self::HIGHLIGHT_KEY]);
+						$itemResult[self::HIGHLIGHT_KEY] = self::elasticHighlightToCoreHighlight($itemResult[self::HIGHLIGHT_KEY], $queryHighlightsAttribute);
 
 					$currItemData->loadFromElasticHits($itemResult);
 					$itemData[$innerHitsKey][self::ITEMS_KEY][] = $currItemData;
@@ -156,12 +156,18 @@ class kESearchCoreAdapter
 		}
 	}
 
-	private static function elasticHighlightToCoreHighlight($eHighlight)
+
+	/**
+	 * @param array $eHighlight
+	 * @param ESearchQueryHighlightsAttributes $queryHighlightsAttribute
+	 * @return array|null
+	 */
+	private static function elasticHighlightToCoreHighlight($eHighlight, $queryHighlightsAttribute)
 	{
 		if(isset($eHighlight))
 		{
 			$result = array();
-			ESearchHighlightHelper::removeDuplicateHits($eHighlight);
+			$eHighlight = $queryHighlightsAttribute->removeDuplicateHits($eHighlight);
 			foreach ($eHighlight as $key => $value)
 			{
 				$resultType = new ESearchHighlight();

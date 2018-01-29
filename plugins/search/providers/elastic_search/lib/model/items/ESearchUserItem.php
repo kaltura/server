@@ -80,7 +80,7 @@ class ESearchUserItem extends ESearchItem
 	{
 		$userQuery = array();
 		$allowedSearchTypes = ESearchUserItem::getAllowedSearchTypesForField();
-		$queryAttributes->setScopeToGlobal();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $userSearchItem)
 		{
 			$userSearchItem->getSingleItemSearchQuery($userQuery, $allowedSearchTypes, $queryAttributes);

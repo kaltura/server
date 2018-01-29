@@ -27,6 +27,14 @@ abstract class kBaseSearch
 
 	public abstract function getPeerRetrieveFunctionName();
 
+	/**
+	 * @return ESearchQueryAttributes
+	 */
+	public function getQueryAttributes()
+	{
+		return $this->queryAttributes;
+	}
+
 	protected function handleDisplayInSearch()
 	{
 	}
@@ -113,9 +121,9 @@ abstract class kBaseSearch
 
     protected function addGlobalHighlights()
 	{
-        $this->queryAttributes->setScopeToGlobal();
+        $this->queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
         $numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey(self::GLOBAL_HIGHLIGHT_CONFIG);
-        $highlight = new kESearchHighlightQuery($this->queryAttributes->getFieldsToHighlight(), $numOfFragments);
+        $highlight = new kESearchHighlightQuery($this->queryAttributes->getQueryHighlightsAttributes()->getFieldsToHighlight(), $numOfFragments);
         $highlight = $highlight->getFinalQuery();
         if($highlight)
             $this->query['body']['highlight'] = $highlight;

@@ -84,7 +84,7 @@ abstract class ESearchBaseCategoryEntryItem extends ESearchItem
 	{
 		$categoryEntryQuery = array();
 		$allowedSearchTypes = ESearchBaseCategoryEntryItem::getAllowedSearchTypesForField();
-		$queryAttributes->setScopeToGlobal();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $categoryEntrySearchItem)
 		{
 			$categoryEntrySearchItem->getSingleItemSearchQuery($categoryEntryQuery, $allowedSearchTypes, $queryAttributes);
