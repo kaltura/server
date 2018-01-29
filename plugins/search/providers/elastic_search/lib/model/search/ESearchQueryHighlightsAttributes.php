@@ -8,6 +8,12 @@ class ESearchQueryHighlightsAttributes
 	const GLOBAL_SCOPE = "global";
 	const INNER_SCOPE = "inner";
 
+	const HIGHLIGHT_HIGHEST_PRIORITY = 1;
+	const HIGHLIGHT_MEDIUM_PRIORITY = 10;
+	const HIGHLIGHT_DEFUALT_PRIORITY = 50;
+	const HIGHLIGHT_LOWEST_PRIORITY = 100;
+
+
 	/**
 	 * @var array
 	 */
@@ -103,13 +109,13 @@ class ESearchQueryHighlightsAttributes
 
 	private function getFieldTypePriority($fieldName)
 	{
-		$priority = 10;
+		$priority = self::HIGHLIGHT_DEFUALT_PRIORITY;
 		if(kString::endsWith($fieldName, kESearchQueryManager::RAW_FIELD_SUFFIX))
-			$priority =  1;
+			$priority =  self::HIGHLIGHT_HIGHEST_PRIORITY;
 		else if(kString::endsWith($fieldName, kESearchQueryManager::NGRAMS_FIELD_SUFFIX))
-			$priority = 20;
+			$priority = self::HIGHLIGHT_LOWEST_PRIORITY;
 		else if($this->baseFieldNameMapping[$fieldName] == $fieldName)
-			$priority = 5;
+			$priority = self::HIGHLIGHT_MEDIUM_PRIORITY;
 
 		return $priority;
 	}
