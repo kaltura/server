@@ -1021,6 +1021,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			$categoryIdToGetAllMembers = $inheritedParentId;
 		
 		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($categoryIdToGetAllMembers);
+		KalturaLog::notice("members - " . print_r($members, true));
 		if (!$members)
 			return array();
 		
