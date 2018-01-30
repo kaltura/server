@@ -2022,12 +2022,12 @@
 	</multirequest>
 
 	<multirequest>
-		<!-- Server-Node is down -->
+		<!-- Server-Node is Status Changed -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
-				<name>Server Node Down</name>
-				<systemName>Server_Node_Down</systemName>
-				<description>Email notification template to be sent when a server node stopped sending heart beats.</description>
+				<name>Server Node Status Changed</name>
+				<systemName>SERVER_NODE_STATUS_CHANGE</systemName>
+				<description>Email notification template to be sent when a server node status is changed.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 				<eventObjectType>39</eventObjectType> <!-- EventNotificationEventObjectType::SERVER_NODE -->
@@ -2038,7 +2038,7 @@
 					</item>
 				</eventConditions>
 				<format>1</format>
-				<subject>Server Node is down ID: {server_node_hostname} </subject>
+				<subject>Server Node ID: {server_node_hostname} Status Changed </subject>
 				<body><![CDATA[Hello,<p>Server node {server_node_hostname} status has changed to {server_node_status}.</p>]]></body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>

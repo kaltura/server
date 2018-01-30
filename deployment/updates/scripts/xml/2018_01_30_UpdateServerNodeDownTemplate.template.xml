@@ -23,10 +23,26 @@
                 <pageSize>1</pageSize>
             </pager>
         </request>
-
         <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
+                <name>Server Node Status Changed</name>
+                <systemName>SERVER_NODE_STATUS_CHANGE</systemName>
+                <description>Email notification template to be sent when a server node status is changed.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>39</eventObjectType> <!-- EventNotificationEventObjectType::SERVER_NODE -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Server Node status changed </description>
+                        <modifiedColumns>server_node.STATUS</modifiedColumns>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>Server Node ID: {server_node_hostname} Status Changed </subject>
+                <body><![CDATA[Hello,<p>Server node {server_node_hostname} status has changed to {server_node_status}.</p>]]></body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
                         <key>from_email</key>
