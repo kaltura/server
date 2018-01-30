@@ -31,6 +31,12 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	public $explanation;
 
 
+	/**
+	 * @var KalturaQuestionType.
+	 */
+	public $questionType;
+
+
 	public function __construct()
 	{
 		$this->cuePointType = QuizPlugin::getApiValue(QuizCuePointType::QUIZ_QUESTION);
@@ -42,6 +48,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		"hint",
 		"question" => "name",
 		"explanation",
+		"questionType",
 	);
 
 	/* (non-PHPdoc)
