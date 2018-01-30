@@ -367,7 +367,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("categoryEntry:entryId=%s", self::ENTRY_ID));		
+		return array(array("categoryEntry:entryId=%s", self::ENTRY_ID), array("categoryEntry:categoryId=%s", self::CATEGORY_ID));		
 	}
 	
 	/* (non-PHPdoc)

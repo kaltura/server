@@ -78,4 +78,8 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		return $ids;
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("userEntry:kuserId=%s", self::KUSER_ID));		
+	}
 } // UserEntryPeer

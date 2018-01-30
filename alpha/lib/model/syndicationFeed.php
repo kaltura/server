@@ -225,4 +225,8 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	public function init()
 	{
 	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("syndicationFeed:id=".strtolower($this->getId()));
+	}
 }

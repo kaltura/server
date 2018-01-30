@@ -237,6 +237,6 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("categoryKuser:categoryId=%s", self::CATEGORY_ID));		
+		return array(array("categoryKuser:id=%s", self::ID), array("categoryKuser:categoryId=%s", self::CATEGORY_ID));		
 	}
 } // categoryKuserPeer
