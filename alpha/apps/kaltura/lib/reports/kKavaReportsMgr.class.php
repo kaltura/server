@@ -866,11 +866,11 @@ class kKavaReportsMgr extends kKavaBase
 		
 		// enrich the data in chunks
 		$rows_count = count($data);
-		$current_row = 0;
-		while ($current_row < $rows_count)
+		$start = 0;
+		while ($start < $rows_count)
 		{
-			$limit = min($current_row + self::ENRICH_CHUNK_SIZE, $rows_count);
-			$dimension_ids = array_map('reset', array_slice($data, $current_row, $limit - $current_row));
+			$limit = min($start + self::ENRICH_CHUNK_SIZE, $rows_count);
+			$dimension_ids = array_map('reset', array_slice($data, $start, $limit - $start));
 		
 			foreach ($enrich_specs as $enrich_spec)
 			{
@@ -878,7 +878,7 @@ class kKavaReportsMgr extends kKavaBase
 					
 				$entities = call_user_func($enrich_func, $dimension_ids, $partner_id, $enrich_context);
 		
-				for (; $current_row < $limit; $current_row++) 
+				for ($current_row = $start; $current_row < $limit; $current_row++) 
 				{
 					$entity = $entities[reset($data[$current_row])];
 					foreach ($enriched_indexes as $index => $enrich_field) 
@@ -887,6 +887,8 @@ class kKavaReportsMgr extends kKavaBase
 					}
 				}
 			}
+			
+			$start = $limit;
 		}
 	}
 
@@ -1817,7 +1819,7 @@ class kKavaReportsMgr extends kKavaBase
 		$result = self::getEntriesNames($ids, $partner_id);
 		foreach ($result as &$name)
 		{
-			$name = '"' . $name . '"';
+			$name = '"' . str_replace('"', '""', $name) . '"';
 		}
 		return $result;
 	}
