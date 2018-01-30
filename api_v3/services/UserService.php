@@ -684,7 +684,7 @@ class UserService extends KalturaBaseUserService
 
 		// KS verification - we accept either admin session or download privilege of the file
 		$ks = $this->getKs();
-		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
+		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 
 		$partner_id = $this->getPartnerId();

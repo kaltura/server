@@ -2898,7 +2898,7 @@ class kFlowHelper
 		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
 
 		if(!$data->getOutputPath())
-			throw new APIException(APIErrors::FILE_CREATION_FAILED);
+			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
 
 		KalturaLog::info("Trying to move users csv file from: " . $data->getOutputPath() . " to: " . $filePath);
 		try
@@ -2907,7 +2907,7 @@ class kFlowHelper
 		}
 		catch (Exception $e)
 		{
-			throw $e;
+			throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
 		}
 
 

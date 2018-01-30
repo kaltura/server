@@ -69,9 +69,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 	 */
 	protected function moveFile(KalturaBatchJob $job, KalturaUsersCsvJobData $data, $partnerId) {
 		$fileName =  basename($data->outputPath);
-		$directory = self::$taskConfig->params->sharedPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR;
+		$directory = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR;
 		KBatchBase::createDir($directory);
-		$sharedLocation = self::$taskConfig->params->sharedPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR. $fileName;
+		$sharedLocation = $directory . $fileName;
 
 		$fileSize = kFile::fileSize($data->outputPath);
 		rename($data->outputPath, $sharedLocation);
