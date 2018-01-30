@@ -1,11 +1,8 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: roie.beck
- * Date: 1/30/2018
- * Time: 10:33 AM
+ * @package plugins.cuePoint
+ * @subpackage api.en
  */
-
 interface QuestionType extends BaseEnum
 {
 	const MULTIPLE_CHOICE_ANSWER = 1;

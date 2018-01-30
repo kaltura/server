@@ -41,13 +41,10 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	public function getExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_EXPLANATION);}
 
 	/**
-	 * @package QuestionType $v
+	 * @param QuestionType $v
 	 */
-	public function setQuestionType($v) {return $this->putInCustomData(self::CUSTOM_DATA_QUESTION_TYPE, $v);}
+	public function setQuestionType($v) {$this->putInCustomData(self::CUSTOM_DATA_QUESTION_TYPE, $v);}
 
-	/**
-	 * @return QuestionType
-	 */
 	public function getQuestionType() {return $this->getFromCustomData(self::CUSTOM_DATA_QUESTION_TYPE);}
 
 	public function getIsPublic()	{return true;}
@@ -81,9 +78,6 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 
 		if($this->getExplanation())
 			$data['cue_point_explanation'] = $this->getExplanation();
-
-		if($this->getQuestionType())
-			$data['question_type'] = $this->getQuestionType();
 
 		return $data;
 	}
