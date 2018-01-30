@@ -9,7 +9,7 @@ interface ESearchEntryOrderByFieldName extends BaseEnum
     const CREATED_AT = 'created_at';
     const START_DATE = 'start_date';
     const END_DATE = 'end_date';
-    const NAME = 'name.keyword';
+    const NAME = 'name.raw';
     const VOTES = 'votes';
     const VIEWS = 'views';
     const PLAYS = 'plays';

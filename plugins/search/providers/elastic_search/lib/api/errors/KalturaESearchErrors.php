@@ -11,6 +11,7 @@ class KalturaESearchErrors extends KalturaErrors
     const EMPTY_SEARCH_OPERATOR_NOT_ALLOWED = 'EMPTY SEARCH OPERATOR IS NOT ALLOWED;;empty search operator is not allowed';
     const EMPTY_SEARCH_ITEMS_NOT_ALLOWED = 'EMPTY SEARCH ITEMS ARE NOT ALLOWED;;empty search items are not allowed';
     const MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM = 'MISSING MANDATORY PARAMETERS IN ORDER ITEM;;missing mandatory parameters in order item';
+    const MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED = 'MIXED SEARCH ITEMS IN NESTED OPERATOR NOT ALLOWED;;mixed search items in nested operator not allowed';
 
     //Query parsing errors
     const UNMATCHING_BRACKETS = 'UNMATCHING BRACKETS;;Unmatching brackets';

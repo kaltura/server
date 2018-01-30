@@ -27,7 +27,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	public $text;
 
 	/**
-	 * @var string
+	 * @var KalturaStringArray
 	 **/
 	public $tags;
 
@@ -52,7 +52,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	public $question;
 
 	/**
-	 * @var string
+	 * @var KalturaStringArray
 	 **/
 	public $answers;
 

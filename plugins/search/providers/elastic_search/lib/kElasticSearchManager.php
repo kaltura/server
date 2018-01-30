@@ -93,7 +93,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 $dataContributionPath = array_merge($dataContributionPath, $elasticPluginData);
             }
         }
-        
+
+        elasticSearchUtils::prepareForInsertToElastic($cmd);
         return $cmd;
     }
 
