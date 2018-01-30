@@ -83,7 +83,8 @@ class kEncryptFileUtils
 
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
-            return rename($tempPath, $dstFilePath);
+            // adding @ to avoid valid case which in 2 process creating clear file at the same time
+            return @rename($tempPath, $dstFilePath);
         }
         catch(Exception $e)
         {
