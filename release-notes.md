@@ -23,11 +23,11 @@ None.
 
 ### Configuration ###
 	First replcae all tokens from the XML files below and remove ".template" from the file name:
-	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_30_UpdateServerNodeDownTemplate.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_30_UpdateServerNodeDownTemplate_toServerNodeStatusChanged.template.xml
 
 ### Deployment scripts ###
 
-	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_30_update_server_node_offline_email_notification.php
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_30_update_server_node_offline_email_notification_to_server_node_status_changed.php
 
 #### Known Issues & Limitations ####
 None.
