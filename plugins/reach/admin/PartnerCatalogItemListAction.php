@@ -28,28 +28,33 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		$partnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
-		$ServiceFeature = $this->_getParam('templateServiceFeature') != "" ? $this->_getParam('templateServiceFeature') : null;
-		$ServiceType = $this->_getParam('templateServiceType') != "" ? $this->_getParam('templateServiceType') : null;
-		$turnAround = $this->_getParam('templateTurnAround') != "" ? $this->_getParam('templateTurnAround') : null;
+		$ServiceFeature = $this->_getParam('serviceFeature') != "" ? $this->_getParam('serviceFeature') : null;
+		$ServiceType = $this->_getParam('serviceType') != "" ? $this->_getParam('serviceType') : null;
+		$turnAround = $this->_getParam('turnAround') != "" ? $this->_getParam('turnAround') : null;
 
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
+		if ($partnerId)
+		{
+			$vendorCatalogItemFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+			$vendorCatalogItemFilter->orderBy = "-createdAt";
+			$vendorCatalogItemFilter->serviceFeatureEqual = $ServiceFeature;
+			$vendorCatalogItemFilter->serviceTypeEqual = $ServiceType;
+			$vendorCatalogItemFilter->turnAroundTimeEqual = $turnAround;
+			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
 
-		// init filter
-		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
-		$catalogItemProfileFilter->orderBy = "-createdAt";
-		$catalogItemProfileFilter->serviceFeatureEqual = $ServiceFeature;
-		$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
-		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
-		$catalogItemProfileFilter->partnerIdEqual = $partnerId;
+			$client = Infra_ClientHelper::getClient();
+			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
-		$client = Infra_ClientHelper::getClient();
-		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
+			// get results and paginate
+			Infra_ClientHelper::unimpersonate();
+			$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "listAction", $partnerId, $vendorCatalogItemFilter);
 
-		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorCatalogItem, "list", $partnerId, $catalogItemProfileFilter);
-		$paginator = new Infra_Paginator($paginatorAdapter, $request);
-		$paginator->setCurrentPageNumber($page);
-		$paginator->setItemCountPerPage($pageSize);
+			// init filter
+			$paginator = new Infra_Paginator($paginatorAdapter, $request);
+			$paginator->setCurrentPageNumber($page);
+			$paginator->setItemCountPerPage($pageSize);
+			$action->view->paginator = $paginator;
+		}
 
 		// set view
 		$catalogItemProfileFilterForm = new Form_PartnerCatalogItemFilter();
@@ -58,7 +63,6 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$catalogItemProfileFilterForm->setAction($catalogItemProfileFilterFormAction);
 
 		$action->view->filterForm = $catalogItemProfileFilterForm;
-		$action->view->paginator = $paginator;
 
 		$createProfileForm = new Form_PartnerCreateCatalogItem();
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigure'), null, true);

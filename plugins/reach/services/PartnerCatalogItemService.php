@@ -18,7 +18,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
-		$this->applyPartnerFilterForClass('PartnerCatalogItem');
+//		$this->applyPartnerFilterForClass('PartnerCatalogItem');
 	}
 	
 	/**
@@ -39,7 +39,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
 		//Check if catalog item already enabled
-		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id) ;
+		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id, kCurrentContext::$ks_partner_id) ;
 		if ($dbPartnerCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER, $id, $this->getPartnerId());
 		
@@ -59,7 +59,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 	 * Remove existing catalogItem from specific account
 	 *
 	 * @action delete
-	 * @param int $id source catalog item to clone
+	 * @param int $id source catalog item to remove
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER
 	 *
@@ -72,7 +72,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
 		//Check if catalog item already enabled
-		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id);
+		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id, kCurrentContext::$ks_partner_id) ;
 		if(!$dbPartnerCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_CATALOG_ITEM_NOT_FOUND, $id);
 		

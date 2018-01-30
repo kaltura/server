@@ -26,9 +26,9 @@ class PartnerCatalogItemSetStatusAction extends KalturaApplicationPlugin
 		try
 		{
 			if  ( $newStatus == Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED )
-				$res = $reachPluginClient->partnerCatalogItem->delete($catalogItemId);
+				$res = $reachPluginClient->PartnerCatalogItem->delete($catalogItemId);
 			else
-				$res = $reachPluginClient->partnerCatalogItem->updateStatus($catalogItemId, $newStatus);
+				KalturaLog::err("Error trying to set invalid partner catalog item status of [$newStatus]");
 			echo $action->getHelper('json')->sendJson('ok', false);
 		} catch (Exception $e)
 		{

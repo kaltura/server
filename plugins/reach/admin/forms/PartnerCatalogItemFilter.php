@@ -15,28 +15,25 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 			'partnerIdEqual' => 'Partner ID',
 		));
 
-		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('templateServiceFeature', array(
+		$newServiceFeature = new Kaltura_Form_Element_EnumSelect('serviceFeature', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature',
 			'label'			=> 'Service Feature:',
-			'onchange'		=> "switchAllTemplates()",
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
 		), array(null => "Service Feature"));
 		$this->addElements(array($newServiceFeature));
 
-		$newServiceType = new Kaltura_Form_Element_EnumSelect('templateServiceType', array(
+		$newServiceType = new Kaltura_Form_Element_EnumSelect('serviceType', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType',
 			'label'			=> 'Service Type:',
-			'onchange'		=> "switchAllTemplates()",
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
 		), array(null => "Service Type"));
 		$this->addElements(array($newServiceType));
 
-		$newTurnAround = new Kaltura_Form_Element_EnumSelect('templateTurnAround', array(
+		$newTurnAround = new Kaltura_Form_Element_EnumSelect('turnAround', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime',
 			'label'			=> 'Service Turn Around Time:',
-			'onchange'		=> "switchAllTemplates()",
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
 		), array(null => "Turn Around Time"));
@@ -52,8 +49,10 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'configureCatalogItemsButton', array(
 			'ignore' => true,
 			'label' => 'Configure',
-			'onclick' => "configureCatalogItems($('#filter_type').val(), $('#templateServiceFeature').val(), $('#templateServiceType').val(), $('#templateTurnAround').val())",
+			'onclick' => "configureCatalogItems($('#filter_input').val(), $('#serviceFeature').val(), $('#serviceType').val(), $('#turnAround').val())",
 			'decorators' => array('ViewHelper'),
 		));
+
+
 	}
 }
