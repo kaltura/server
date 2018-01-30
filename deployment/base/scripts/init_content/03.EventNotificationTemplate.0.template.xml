@@ -2036,15 +2036,10 @@
 						<description>Server Node status changed </description>
 						<modifiedColumns>server_node.STATUS</modifiedColumns>
 					</item>
-					<item objectType="KalturaEventFieldCondition">
-						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getObject() instanceof EdgeServerNode &amp;&amp; $scope->getObject()->getStatus() == ServerNodeStatus::NOT_REGISTERED</code>
-						</field>
-					</item>
 				</eventConditions>
 				<format>1</format>
 				<subject>Server Node is down ID: {server_node_hostname} </subject>
-				<body><![CDATA[Hello,<p>Server node {server_node_hostname} is down.</p>]]></body>
+				<body><![CDATA[Hello,<p>Server node {server_node_hostname} status has changed to {server_node_status}.</p>]]></body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<contentParameters objectType="array">
@@ -2067,6 +2062,13 @@
 						<description>Server-Node hostname</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getObject()->getHostName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>server_node_status</key>
+						<description>Server-Node status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>($scope->getObject()->getStatus() == ServerNodeStatus::ACTIVE) ? 'Active' : (($scope->getObject()->getStatus() == ServerNodeStatus::DISABLED)?'Disabled' : (($scope->getObject()->getStatus() == ServerNodeStatus::NOT_REGISTERED)?'Not Registered': 'Deleted'))</code>
 						</value>
 					</item>
 				</contentParameters>
