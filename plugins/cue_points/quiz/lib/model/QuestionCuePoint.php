@@ -10,6 +10,7 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	const CUSTOM_DATA_HINT = 'hint';
 	const CUSTOM_DATA_CORRECT_ANSWER_KEYS = 'correctAnswerKeys';
 	const CUSTOM_DATA_EXPLANATION = 'explanation';
+	const CUSTOM_DATA_QUESTION_TYPE = 'questionType';
 
 	public function __construct()
 	{
@@ -38,6 +39,16 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	public function setExplanation($v) {return $this->putInCustomData(self::CUSTOM_DATA_EXPLANATION, $v);}
 
 	public function getExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_EXPLANATION);}
+
+	/**
+	 * @package QuestionType $v
+	 */
+	public function setQuestionType($v) {return $this->putInCustomData(self::CUSTOM_DATA_QUESTION_TYPE, $v);}
+
+	/**
+	 * @return QuestionType
+	 */
+	public function getQuestionType() {return $this->getFromCustomData(self::CUSTOM_DATA_QUESTION_TYPE);}
 
 	public function getIsPublic()	{return true;}
 
@@ -70,6 +81,9 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 
 		if($this->getExplanation())
 			$data['cue_point_explanation'] = $this->getExplanation();
+
+		if($this->getQuestionType())
+			$data['question_type'] = $this->getQuestionType();
 
 		return $data;
 	}
