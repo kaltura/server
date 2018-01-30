@@ -83,7 +83,7 @@ class kEncryptFileUtils
 
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
-            return rename($tempPath, $dstFilePath);
+            return @rename($tempPath, $dstFilePath);
         }
         catch(Exception $e)
         {
