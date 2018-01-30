@@ -212,7 +212,10 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
 		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
 
-		return categoryKuserPeer::doSelect($criteria, $con);
+		self::setUseCriteriaFilter(false);
+		$categoryKusers = categoryKuserPeer::doSelect($criteria, $con);
+		self::setUseCriteriaFilter(true);
+		return $categoryKusers;
 	}
 	
 	
