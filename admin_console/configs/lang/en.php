@@ -1103,12 +1103,10 @@ return array(
     'Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP' => 'Remote SFTP',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::SCP' => 'Remote SCP',
 	'Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX' => 'Webex',
-	'Kaltura_Client_DropFolder_Enum_DropFolderType::TR_RDS_COMPANY' => 'TR_RDS_COMPANY',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::ICAL' => 'ICAL',
-	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::TR_RDS' => 'TR_RDS',
 
 	'Kaltura_Client_Schedule_Enum_ScheduleEventType::LIVE_STREAM' => 'Live-Stream',
 	'Kaltura_Client_Schedule_Enum_ScheduleEventType::RECORD' => 'Recording',
