@@ -1102,7 +1102,7 @@ return array(
     'Kaltura_Client_DropFolder_Enum_DropFolderType::FTP' => 'Remote FTP',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP' => 'Remote SFTP',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::SCP' => 'Remote SCP',
-	'Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX' => 'Webex',
+    'Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX' => 'Webex',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
