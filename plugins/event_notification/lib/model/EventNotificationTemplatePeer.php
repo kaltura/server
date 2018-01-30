@@ -162,7 +162,7 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("eventNotificationTemplate:partnerId=%s", self::PARTNER_ID));		
+		return array(array("eventNotificationTemplate:id=%s", self::ID), array("eventNotificationTemplate:partnerId=%s", self::PARTNER_ID));		
 	}
 } // EventNotificationTemplatePeer
 

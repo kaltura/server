@@ -83,4 +83,8 @@ class AppToken extends BaseAppToken
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DESCRIPTION);
 
 	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("appToken:id=".strtolower($this->getId()));
+	}
 }// AppToken

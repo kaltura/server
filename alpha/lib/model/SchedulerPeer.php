@@ -39,4 +39,8 @@ class SchedulerPeer extends BaseSchedulerPeer
 
 		return $result[0]->getConfiguredId();
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("scheduler:configuredId=%s", self::CONFIGURED_ID));		
+	}
 }

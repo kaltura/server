@@ -322,7 +322,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("conversionProfile2:partnerId=".strtolower($this->getPartnerId()));
+		return array("conversionProfile2:id=".strtolower($this->getId()), "conversionProfile2:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
 	public function getRequiredCopyTemplatePermissions ()

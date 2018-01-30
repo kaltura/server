@@ -409,7 +409,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("categoryKuser:categoryId=".strtolower($this->getCategoryId()));
+		return array("categoryKuser:id=".strtolower($this->getId()), "categoryKuser:categoryId=".strtolower($this->getCategoryId()));
 	}
 
 	/**
