@@ -35,9 +35,8 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 		if ($partnerId)
 		{
-			$vendorCatalogItemFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+			$vendorCatalogItemFilter = $this->getCatalogItemFilter($ServiceFeature);
 			$vendorCatalogItemFilter->orderBy = "-createdAt";
-			$vendorCatalogItemFilter->serviceFeatureEqual = $ServiceFeature;
 			$vendorCatalogItemFilter->serviceTypeEqual = $ServiceType;
 			$vendorCatalogItemFilter->turnAroundTimeEqual = $turnAround;
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
@@ -69,6 +68,16 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$createProfileForm->setAction($actionUrl);
 
 		$action->view->newPartnerCatalogItemFolderForm = $createProfileForm;
+	}
+
+	protected function getCatalogItemFilter($serviceFeature)
+	{
+		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
+			return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			return new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
+		else
+			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}
 
 	public function getInstance($interface)

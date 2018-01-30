@@ -48,7 +48,7 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		$request = $action->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		$ServiceFeature = $this->_getParam('serviceFeature') != "" ? $this->_getParam('serviceFeature') : null;
+		$serviceFeature = $this->_getParam('serviceFeature') != "" ? $this->_getParam('serviceFeature') : null;
 		$ServiceType = $this->_getParam('serviceType') != "" ? $this->_getParam('serviceType') : null;
 		$turnAround = $this->_getParam('turnAroundTime') != "" ? $this->_getParam('turnAroundTime') : null;
 
@@ -60,9 +60,8 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
 			Infra_ClientHelper::impersonate($partnerId);
 
-			$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+			$catalogItemProfileFilter = $this->getCatalogItemFilter($serviceFeature);
 			$catalogItemProfileFilter->orderBy = "-createdAt";
-			$catalogItemProfileFilter->serviceFeatureEqual = $ServiceFeature;
 			$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 			$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
 			$catalogItemProfileFilter->partnerIdEqual = $partnerId;
@@ -88,9 +87,8 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 
 			Infra_ClientHelper::unimpersonate();// to get all catalog items from partner 0
 			// init filter
-			$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+			$catalogItemProfileFilter = $this->getCatalogItemFilter($serviceFeature);
 			$catalogItemProfileFilter->orderBy = "-createdAt";
-			$catalogItemProfileFilter->serviceFeatureEqual = $ServiceFeature;
 			$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 			$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
 			$catalogItemProfileFilter->idNotIn = implode(',', $partnerCatalogItems);
@@ -112,6 +110,15 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		return $form;
 	}
 
+	protected function getCatalogItemFilter($serviceFeature)
+	{
+		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
+			return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			return new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
+		else
+			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
+	}
 	/***
 	 * @param $action
 	 * @param ConfigureForm $form

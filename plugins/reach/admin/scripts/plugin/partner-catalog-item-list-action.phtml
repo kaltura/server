@@ -125,7 +125,7 @@
 
 	function configureCatalogItems(partnerId, serviceFeature, serviceType, turnAroundTime)
 	{
-		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime + '/page/1/pageSize/10';
+		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime;
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>' + paramsStr;
 
 		jQuery('#partner-catalog-item-configure-dialog').remove();

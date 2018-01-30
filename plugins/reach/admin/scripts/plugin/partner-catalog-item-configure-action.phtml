@@ -83,8 +83,11 @@
 		jQuery('#frmPartnerCatalogItemInnerConfigure').removeAttr('onsubmit').submit();
 	}
 
-	function loadPartnerCatalogItems(pageIndex, pageSize)
+	function loadPartnerCatalogItems()
 	{
+		var pageIndex = $('#frmPaginator2').find('input[name="page"]').val();
+		var pageSize = $('#frmPaginator2').find('select[name="pageSize"]').val();
+
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>' ;
 		url = url.replace(/\/page\/[0-9]+\//,'/page/' +pageIndex + '/');
 		url = url.replace(/\/pageSize\/[0-9]+/, '/pageSize/'+pageSize);

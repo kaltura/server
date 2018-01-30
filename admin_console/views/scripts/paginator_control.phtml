@@ -50,16 +50,19 @@
 	
 <?php if ($this->index == 1 || $this->index == 2): ?>
 	<script type="text/javascript">
-	function gotoPage(index, page)
-	{
-		var frm = document.getElementById("frmPaginator" + index);
-		frm.page.value = page;
+		function gotoPage(index, page) {
+			var frm = document.getElementById("frmPaginator" + index);
+			frm.page.value = page;
 
-		if (frm.onsubmit) {
-			frm.onsubmit();
-		}else {
-			frm.submit();
+			if (typeof frm.onsubmit === 'function') {
+				var event = new Event('submit');
+				var result = frm.onsubmit(event);
+				if (!event.defaultPrevented && (typeof result !== 'boolean' && result === true)) {
+					frm.submit();
+				}
+			} else {
+				frm.submit();
+			}
 		}
-	}
 	</script>
 <?php endif; ?>
