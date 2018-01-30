@@ -1091,22 +1091,25 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		else
 		{
-			$otherDCs = kDataCenterMgr::getAllDcs( );
-			foreach ( $otherDCs as $remoteDC )
+			if (FileSyncImportBatchService::shouldSyncFileObjectType($currentDCFileSync))
 			{
-				$remoteDCFileSync = FileSync::createForFileSyncKey( $key );
-				$remoteDCFileSync->setDc( $remoteDC["id"] );
-				$remoteDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
-				$remoteDCFileSync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
-				$remoteDCFileSync->setOriginal ( 0 );
-				$remoteDCFileSync->setPartnerID ( $key->partner_id );
-				$remoteDCFileSync->setIsDir($isDir);
-				$remoteDCFileSync->setFileSize($currentDCFileSync->getFileSize());
-				$remoteDCFileSync->setOriginalId($currentDCFileSync->getId());
-				$remoteDCFileSync->setOriginalDc($currentDCFileSync->getDc());
-				$remoteDCFileSync->save();
+				$otherDCs = kDataCenterMgr::getAllDcs( );
+				foreach ( $otherDCs as $remoteDC )
+				{
+					$remoteDCFileSync = FileSync::createForFileSyncKey( $key );
+					$remoteDCFileSync->setDc( $remoteDC["id"] );
+					$remoteDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
+					$remoteDCFileSync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
+					$remoteDCFileSync->setOriginal ( 0 );
+					$remoteDCFileSync->setPartnerId ( $key->partner_id );
+					$remoteDCFileSync->setIsDir($isDir);
+					$remoteDCFileSync->setFileSize($currentDCFileSync->getFileSize());
+					$remoteDCFileSync->setOriginalId($currentDCFileSync->getId());
+					$remoteDCFileSync->setOriginalDc($currentDCFileSync->getDc());
+					$remoteDCFileSync->save();
 
-				kEventsManager::raiseEvent(new kObjectAddedEvent($remoteDCFileSync));
+					kEventsManager::raiseEvent(new kObjectAddedEvent($remoteDCFileSync));
+				}
 			}
 			kEventsManager::raiseEvent(new kObjectAddedEvent($currentDCFileSync));
 		}
