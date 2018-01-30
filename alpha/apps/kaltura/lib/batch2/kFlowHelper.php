@@ -16,6 +16,10 @@ class kFlowHelper
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
 	const LIVE_REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
+
+	const SERVE_CSV_PARTIAL_URL = "/api_v3/index.php/service/user/action/serveCsv/ks/";
+
+
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -2893,9 +2897,19 @@ class kFlowHelper
 			mkdir($directory);
 		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
 
-		$moveFile = kFile::moveFile($data->getOutputPath, $filePath);
-		if(!$moveFile)
-			KalturaLog::err("Failed to move users csv file from: " . $data->getOutputPath() . " to: " . $filePath);
+		if(!$data->getOutputPath())
+			throw new APIException(APIErrors::FILE_CREATION_FAILED);
+
+		KalturaLog::info("Trying to move users csv file from: " . $data->getOutputPath() . " to: " . $filePath);
+		try
+		{
+			kFile::moveFile($data->getOutputPath(), $filePath);
+		}
+		catch (Exception $e)
+		{
+			throw $e;
+		}
+
 
 		$data->setOutputPath($filePath);
 		$dbBatchJob->setData($data);
@@ -2935,10 +2949,10 @@ class kFlowHelper
 		$result = kSessionUtils::startKSession($partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege);
 
 		if ($result < 0)
-			throw new Exception ("Failed to generate session for partner [" . $partner . "]");
+			throw new APIException(APIErrors::START_SESSION_ERROR, $partner);
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/user/action/serveCsv/ks/$ksStr/id/$file_name";
+		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
 
 		return $url;
 	}

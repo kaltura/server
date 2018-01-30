@@ -438,5 +438,7 @@ class APIErrors
 	
 	const RECORDING_CONTENT_NOT_YET_SET = "RECORDING_CONTENT_NOT_YET_SET;ENTRY_ID;Entry [@ENTRY_ID@] cannot be deleted, waiting for recording engine to finish handling";
 
-	const USER_EMAIL_NOT_FOUND = "USER_EMAIL_NOT_FOUND;USER_ID;Email address for the user [@USER_ID@] was not found";
+	const USER_EMAIL_NOT_FOUND = "USER_EMAIL_NOT_FOUND;USER_ID;Email address for user [@USER_ID@] was not found";
+
+	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;;Failed to create file on specified location";
 }
