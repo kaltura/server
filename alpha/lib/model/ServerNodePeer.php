@@ -128,4 +128,19 @@ class ServerNodePeer extends BaseServerNodePeer {
 	{
 		return array(array("serverNode:id%s", self::ID), array("serverNode:hostName=%s", self::HOST_NAME));		
 	}
+
+	public static function retrieveActiveUnoccupiedServerNodesByType($type, PropelPDO $con = null)
+	{
+		$c = new Criteria();
+		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
+		$c->add(ServerNodePeer::TYPE, $type);
+		$c->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
+		$c->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
+		$c->add(EntryServerNodePeer::SERVER_NODE_ID, null);
+		$c->addJoin(ServerNodePeer::ID, EntryServerNodePeer::SERVER_NODE_ID, Criteria::LEFT_JOIN);
+		$objs = ServerNodePeer::doSelect($c, $con);
+
+		return $objs;
+	}
+
 } // ServerNodePeer

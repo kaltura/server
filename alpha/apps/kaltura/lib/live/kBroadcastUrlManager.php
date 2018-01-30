@@ -17,6 +17,8 @@ class kBroadcastUrlManager
 	const RTSP_DOMAIN = 'rtsp_domain';
 	const RTSP_PORT = 'rtsp_port';
 
+	const PROTOCOL_RTC = 'rtc';
+
 	
 	protected $partnerId;
 	protected $useOldUrlPattern;
@@ -210,5 +212,10 @@ class kBroadcastUrlManager
 			$hostname = $this->getHostName($dc, false, $entry, $protocol);
 			return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $concatStreamName);
 		}
+	}
+
+	public function getRTCBroadcastingUrl(LiveStreamEntry $entry, $protocol, $hostname)
+	{
+		return $this->getBroadcastUrl($entry, $protocol, $hostname, -1, true);
 	}
 }
