@@ -20,34 +20,22 @@ class elasticSearchUtils
         $fieldMap = array(
             'english' => 'english',
             'arabic' => 'arabic',
-            'basque' => 'basque',
             'brazilian' => 'brazilian',
-            'bulgarian' => 'bulgarian',
-            'catalan' => 'catalan',
             'chinese' => 'cjk',
             'korean' => 'cjk',
             'japanese' => 'cjk',
-            'czech' => 'czech',
             'danish' => 'danish',
             'dutch' => 'dutch',
             'finnish' => 'finnish',
             'french' => 'french',
-            'galician' => 'galician',
             'german' => 'german',
             'greek' => 'greek',
             'hindi' => 'hindi',
-            'hungarian' => 'hungarian',
             'indonesian' => 'indonesian',
-            'irish' => 'irish',
             'italian' => 'italian',
-            'latvian' => 'latvian',
-            'lithuanian' => 'lithuanian',
             'norwegian' => 'norwegian',
-            'persian' => 'persian',
             'portuguese' => 'portuguese',
-            'romanian' => 'romanian',
             'russian' => 'russian',
-            'sorani' => 'sorani',
             'spanish' => 'spanish',
             'swedish' => 'swedish',
             'turkish' => 'turkish',
@@ -150,22 +138,24 @@ class elasticSearchUtils
 	 * Go over the array and decode html and strip tags from all of its leafs
 	 * @param array $cmd
 	 */
-	public static function prepareElasticInput(&$cmd)
+	public static function prepareForInsertToElastic(&$cmd)
 	{
 		array_walk_recursive($cmd, array('elasticSearchUtils','prepareElasticLeafInput'));
 	}
 
 	public static function prepareElasticLeafInput(&$value, $key)
 	{
-		self::filterHtmlFromLeaf($value);
+		if(is_string($value))
+		{
+			self::filterHtmlFromLeaf($value);
+			$value = trim($value);
+		}
 	}
 
 	public static function filterHtmlFromLeaf(&$value)
 	{
-		if(is_string($value))
-		{
-			$value = html_entity_decode($value);
-			$value = strip_tags($value);
-		}
+		$value = html_entity_decode($value);
+		$value = strip_tags($value);
 	}
+
 }

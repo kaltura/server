@@ -227,8 +227,6 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 
 			$language = $captionAsset->getLanguage();
 			$data['caption_assets'][] = array(
-				'id' => $captionAsset->getId(),
-				'language' => $language,
 				'lines' => self::getElasticLines($items, $language, $captionAsset->getId())
 			);
 		}

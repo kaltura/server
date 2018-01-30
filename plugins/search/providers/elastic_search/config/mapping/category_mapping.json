@@ -9,14 +9,44 @@
 		  "pattern": "(\\s+)",
 		  "replacement": " "
 		},
+		"kaltura_ngram_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>",
+			"^=>",
+			"~=>"
+		  ]
+		},
 		"kaltura_special_chars_filter": {
 		  "type": "mapping",
 		  "mappings": [
-			  "'=>",
-			  "`=>",
-			  "‘=>",
-			  "^=>",
-			  "~=>"
+			"!=>__exclamationmark__",
+			"@=>__at__",
+			"#=>__number__",
+			"$=>__dollar__",
+			"%=>__percent__",
+			"^=>__caret__",
+			"&=>__ampersand__",
+			"*=>__asterisk__",
+			"(=>__openbracket__",
+			")=>__closebracket__",
+			"-=>__hyphen__",
+			"==>__equals__",
+			"+=>__plus__",
+			"?=>__questionmark__",
+			"/=>__slash__",
+			"\\\\=>__backslash__",
+			"[=>__openbracket1__",
+			"]=>__closebracket1__",
+			"{=>__openbracket2__",
+			"}=>__closebracket2__",
+			";=>__semicolon__",
+			"|=>__verticalbar__",
+			"<=>__lessthan__",
+			">=>__greaterthan__",
+			"~=>__tilde__"
 		  ]
 		}
 	  },
@@ -31,29 +61,40 @@
 		  ]
 		}
 	  },
-	  "analyzer": {
-		"kaltura_ngrams": {
+	  "normalizer": {
+		"kaltura_keyword_normalizer": {
 		  "type": "custom",
-		  "tokenizer": "kaltura_ngram_tokenizer",
-		  "char_filter": ["kaltura_special_chars_filter"],
-		  "filter": ["lowercase"]
-		},
-		"kaltura_keyword": {
-		  "type": "custom",
-		  "tokenizer": "keyword",
 		  "char_filter": [
 			"kaltura_whitespace_filter"
 		  ],
 		  "filter": [
 			"lowercase",
-			"trim",
 			"asciifolding"
+		  ]
+		}
+	  },
+	  "analyzer": {
+		"kaltura_ngrams": {
+		  "type": "custom",
+		  "tokenizer": "kaltura_ngram_tokenizer",
+		  "char_filter": [
+			"kaltura_ngram_special_chars_filter"
+		  ],
+		  "filter": [
+			"lowercase"
 		  ]
 		},
 		"kaltura_text" : {
+		  "type": "custom",
 		  "tokenizer" : "standard",
-		  "char_filter": ["kaltura_special_chars_filter"],
-		  "filter" : ["standard", "lowercase", "asciifolding"]
+		  "char_filter": [
+			"kaltura_special_chars_filter"
+		  ],
+		  "filter" : [
+			"standard",
+			"lowercase",
+			"asciifolding"
+		  ]
 		}
 	  }
 	}
@@ -68,35 +109,35 @@
 	  },
 	  "properties" : {
 		"partner_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"status" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"partner_status" : {
 		  "type" : "keyword"
 		},
 		"privacy" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"privacy_context" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"privacy_contexts" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"kuser_ids" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"parent_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"depth" : {
 		  "type" : "short"
@@ -110,8 +151,8 @@
 			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"english" : {
 			  "type" : "text",
@@ -121,33 +162,13 @@
 			  "type" : "text",
 			  "analyzer": "arabic"
 			},
-			"armenian" : {
-			  "type" : "text",
-			  "analyzer" : "armenian"
-			},
-			"basque" : {
-			  "type" : "text",
-			  "analyzer" : "basque"
-			},
 			"brazilian" : {
 			  "type" : "text",
 			  "analyzer" : "brazilian"
 			},
-			"bulgarian" : {
-			  "type" : "text",
-			  "analyzer" : "bulgarian"
-			},
-			"catalan" : {
-			  "type" : "text",
-			  "analyzer" : "catalan"
-			},
 			"cjk" : {
 			  "type" : "text",
 			  "analyzer" : "cjk"
-			},
-			"czech" : {
-			  "type" : "text",
-			  "analyzer" : "czech"
 			},
 			"danish" : {
 			  "type" : "text",
@@ -165,10 +186,6 @@
 			  "type" : "text",
 			  "analyzer" : "french"
 			},
-			"galician" : {
-			  "type" : "text",
-			  "analyzer" : "galician"
-			},
 			"german" : {
 			  "type" : "text",
 			  "analyzer" : "german"
@@ -181,53 +198,25 @@
 			  "type" : "text",
 			  "analyzer" : "hindi"
 			},
-			"hungarian" : {
-			  "type" : "text",
-			  "analyzer" : "hungarian"
-			},
 			"indonesian" : {
 			  "type" : "text",
 			  "analyzer" : "indonesian"
-			},
-			"irish" : {
-			  "type" : "text",
-			  "analyzer" : "irish"
 			},
 			"italian" : {
 			  "type" : "text",
 			  "analyzer" : "italian"
 			},
-			"latvian" : {
-			  "type" : "text",
-			  "analyzer" : "latvian"
-			},
-			"lithuanian" : {
-			  "type" : "text",
-			  "analyzer" : "lithuanian"
-			},
 			"norwegian" : {
 			  "type" : "text",
 			  "analyzer" : "norwegian"
-			},
-			"persian" : {
-			  "type" : "text",
-			  "analyzer" : "persian"
 			},
 			"portuguese" : {
 			  "type" : "text",
 			  "analyzer" : "portuguese"
 			},
-			"romanian" : {
-			  "type" : "text",
-			  "analyzer" : "romanian"
-			},
 			"russian" : {
 			  "type" : "text",
 			  "analyzer" : "russian"
-			},
-			"sorani" : {
-			  "type" : "text",
-			  "analyzer" : "sorani"
 			},
 			"spanish" : {
 			  "type" : "text",
@@ -256,14 +245,14 @@
 			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			}
 		  }
 		},
 		"full_ids" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"entries_count" : {
 		  "type" : "integer"
@@ -300,8 +289,8 @@
 			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"english" : {
 			  "type" : "text",
@@ -446,61 +435,57 @@
 			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			}
 		  }
 		},
 		"display_in_search" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"inheritance_type" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"kuser_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"reference_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"inherited_parent_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"moderation" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"contribution_policy" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"metadata" :{
 		  "type"  : "nested",
 		  "properties"  : {
 			"metadata_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"system_name" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"xpath" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"metadata_profile_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"systemname_xpath_metadataprofileid" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"metadata_field_id" : {
 			  "type" : "long"
@@ -517,8 +502,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			}
