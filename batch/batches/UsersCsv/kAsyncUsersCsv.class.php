@@ -98,11 +98,6 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 
 		$additionalFields = $data->additionalFields;
 
-		/*
-		if(!$data->additionalFields && $data->metadataProfileId)
-			$additionalFields = $this->extractAdditionalFieldsFromMetadataProfile($data->metadataProfileId);
-		*/
-
 		$csvFile = $this->addHeaderRowToCsv($csvFile, $additionalFields);
 		do
 		{
@@ -259,33 +254,6 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		return $strValue;
 	}
 
-	/**
-	 * retrieve all the fields names and xpath in a given metadata profile and add them later to the csv
-	 * this function should be in use in case metadata profile id is specified but there are no given xpath
-	 * in additional fields object
-	 */
-	private function extractAdditionalFieldsFromMetadataProfile($metadataProfileId)
-	{
-		$additionalParams = array();
-		try
-		{
-			$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
-			$metadataProfileFieldList = $metadataPlugin->metadataProfile->listFields($metadataProfileId);
-			foreach ($metadataProfileFieldList->objects as $field)
-			{
-				$data = array();
-				$data['fieldName']  = $field->key;
-				$data['xpath']  = $field->xPath;
-				$additionalParams[] = $data;
-			}
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::info("Couldn't list metadata fields for metadataProfileId: [$metadataProfileId]" . $e->getMessage());
-		}
-
-		return $additionalParams;
-	}
 
 }
 
