@@ -8,6 +8,9 @@ class elasticSearchUtils
 	const UNDERSCORE_FIELD_DELIMITER ='_';
 	const DOT_FIELD_DELIMITER = '.';
 
+	private static $html_chars_to_replace = array('<br />', '<br>',
+		'<br/>', '<div>', '</div>', '<div/>', '<p>', '</p>', '<p/>');
+
     /**
      * return the analyzed language field name
      * @param $language
@@ -155,6 +158,7 @@ class elasticSearchUtils
 	public static function filterHtmlFromLeaf(&$value)
 	{
 		$value = html_entity_decode($value);
+		$value = str_replace(self::$html_chars_to_replace, " ", $value);
 		$value = strip_tags($value);
 	}
 
