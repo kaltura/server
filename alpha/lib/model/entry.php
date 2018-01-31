@@ -3611,7 +3611,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 
 		if($result)
+		{
+			$result = array_unique($result);
+			$result = array_values($result);
 			return $result;
+		}
 
 		return null;
 	}
