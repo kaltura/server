@@ -2036,6 +2036,12 @@
 						<description>Server Node status changed </description>
 						<modifiedColumns>server_node.STATUS</modifiedColumns>
 					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof EdgeServerNode &amp;&amp; in_array($scope->getObject()->getStatus(),  explode(',',$scope->getDynamicValues()['server_node_trigger_status']))</code>
+						</field>
+					</item>
+
 				</eventConditions>
 				<format>1</format>
 				<subject>Server Node ID: {server_node_hostname} Status Changed </subject>
@@ -2072,6 +2078,35 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationArrayParameter">
+						<key>server_node_trigger_status</key>
+						<description>Server node statuses that trigger the notification</description>
+						<allowedValues objectType="array">
+							<item objectType="KalturaIntegerValue">
+								<value>1</value>
+								<description>ACTIVE</description>
+							</item>
+							<item objectType="KalturaIntegerValue">
+								<value>2</value>
+								<description>DISABLED</description>
+							</item>
+							<item objectType="KalturaIntegerValue">
+								<value>3</value>
+								<description>DELETED</description>
+							</item>
+							<item objectType="KalturaIntegerValue">
+								<value>4</value>
+								<description>NOT_REGISTERED</description>
+							</item>
+						</allowedValues>
+						<values>
+							<item objectType="KalturaIntegerValue">
+								<value>4</value>
+							</item>
+						</values>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
