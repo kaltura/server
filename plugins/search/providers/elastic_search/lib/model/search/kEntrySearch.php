@@ -24,7 +24,7 @@ class kEntrySearch extends kBaseSearch
         if($this->queryAttributes->getObjectId())
             return;
 
-        $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
+        $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getEntryDisplayInSearchFilter();
         $this->mainBoolQuery->addToFilter($displayInSearchQuery);
     }
 

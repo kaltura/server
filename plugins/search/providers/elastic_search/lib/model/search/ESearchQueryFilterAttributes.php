@@ -5,37 +5,30 @@
  */
 class ESearchQueryFilterAttributes
 {
-	public static $ignoreDisplayInSearchFields = array(
-		ESearchEntryFieldName::PARENT_ENTRY_ID,
-		ESearchEntryFieldName::ID,
-	);
-
 	private $ignoreDisplayInSearchValues;
 
 	function __construct()
 	{
 		$this->ignoreDisplayInSearchValues = array();
-		foreach	(self::$ignoreDisplayInSearchFields as $key)
-			$this->ignoreDisplayInSearchValues[$key] = array();
 	}
 
-	public function getDisplayInSearchFilter()
+	public function getEntryDisplayInSearchFilter()
 	{
 		$displayInSearchQuery = new kESearchTermQuery(ESearchEntryFieldName::DISPLAY_IN_SEARCH, EntryDisplayInSearchType::SYSTEM);
-		$specialCaseQueries = array();
+		$ignoreDisplayInSearchQueries = array();
 		foreach	($this->ignoreDisplayInSearchValues as $key => $value)
 		{
 			if($value)
 			{
-				$specialCaseQueries[] = new kESearchTermQuery($key, $value);
+				$ignoreDisplayInSearchQueries[] = new kESearchTermsQuery($key, $value);
 			}
 		}
 
 		$displayInSearchBoolQuery = new kESearchBoolQuery();
-		if($specialCaseQueries)
+		if($ignoreDisplayInSearchQueries)
 		{
 			$innerSearchBoolQuery = new kESearchBoolQuery();
-			$innerSearchBoolQuery->addQueriesToShould($specialCaseQueries);
+			$innerSearchBoolQuery->addQueriesToShould($ignoreDisplayInSearchQueries);
 			$innerDisplayInSearchBoolQuery = new kESearchBoolQuery();
 			$innerDisplayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
 			$innerSearchBoolQuery->addToShould($innerDisplayInSearchBoolQuery);
@@ -51,6 +44,9 @@ class ESearchQueryFilterAttributes
 
 	public function addValueToIgnoreDisplayInSearch($key, $value)
 	{
+		if(!array_key_exists($key, $this->ignoreDisplayInSearchValues))
+			$this->ignoreDisplayInSearchValues[$key] = array();
+
 		$this->ignoreDisplayInSearchValues[$key][] = $value;
 	}
 }

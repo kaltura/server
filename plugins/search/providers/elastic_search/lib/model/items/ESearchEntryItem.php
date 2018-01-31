@@ -142,7 +142,7 @@ class ESearchEntryItem extends ESearchItem
 		{
 			case ESearchItemType::EXACT_MATCH:
 				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
-				if (in_array($this->getFieldName(), ESearchQueryFilterAttributes::$ignoreDisplayInSearchFields))
+				if (in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
 					$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
 
 				break;
