@@ -1796,6 +1796,38 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		return $result;
 	}
+	
+	private static function getEntriesUserIdLengthAndCreated($ids, $partner_id)
+	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		
+		$c->addSelectColumn(entryPeer::ID);
+		$c->addSelectColumn(entryPeer::NAME);
+		$c->addSelectColumn(entryPeer::PUSER_ID);
+		$c->addSelectColumn(entryPeer::LENGTH_IN_MSECS);
+		$c->addSelectColumn(entryPeer::CREATED_AT);
+
+		$c->add(entryPeer::PARTNER_ID, $partner_id);
+		$c->add(entryPeer::ID, $ids, Criteria::IN);
+
+		entryPeer::setUseCriteriaFilter(false);
+		$stmt = entryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		entryPeer::setUseCriteriaFilter(true);
+		
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$id = $row['ID'];
+			$puserId = $row['PUSER_ID'];
+			$name = $row['NAME'];
+			$duration = $row['LENGTH_IN_MSECS'];
+			$createdAt = $row['CREATED_AT'];
+			$result[$id] = array($puserId, '"' . $name . '"', $duration, $createdAt);
+		}
+		return $result;
+	}
+
 
 	private static function getCategoriesNames($ids, $partner_id)
 	{
