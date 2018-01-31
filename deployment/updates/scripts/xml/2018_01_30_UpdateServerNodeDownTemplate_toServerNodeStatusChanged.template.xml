@@ -15,7 +15,7 @@
 
     <multirequest>
         <!-- Server-Node is down -->
-        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification">
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
             <filter objectType="KalturaEventNotificationTemplateFilter">
                 <systemNameEqual>Server_Node_Down</systemNameEqual>
             </filter>
