@@ -1796,6 +1796,41 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		return $result;
 	}
+	
+	function getEntriesUserIdsSizeAndLastPlayedAt($ids, $partner_id)
+	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		
+		$c->addSelectColumn(entryPeer::ID);
+		$c->addSelectColumn(entryPeer::NAME);
+		$c->addSelectColumn(entryPeer::PUSER_ID);
+		$c->addSelectColumn(entryPeer::LAST_PLAYED_AT);
+		$c->addSelectColumn(assetPeer::SIZE);
+		
+		$c->add(entryPeer::PARTNER_ID, $partner_id);
+		$c->add(entryPeer::ID, $ids, Criteria::IN);
+		$c->add(assetPeer::IS_ORIGINAL, 1, Criteria::EQUAL);
+		
+		$c->addJoin(entryPeer::ID, assetPeer::ENTRY_ID, Criteria::INNER_JOIN);
+		
+		entryPeer::setUseCriteriaFilter(false);
+		$stmt = entryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		entryPeer::setUseCriteriaFilter(true);
+		
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$id = $row['ID'];
+			$puserId = $row['PUSER_ID'];
+			$name = $row['NAME'];
+			$lastPlayedAt = $row['LAST_PLAYED_AT'];
+			$size = $row['SIZE'];
+		
+			$result[$id] = array($puserId, '"' . $name . '"', $size, $lastPlayedAt);
+		}
+		return $result;
+	}
 
 	private static function getCategoriesNames($ids, $partner_id)
 	{
