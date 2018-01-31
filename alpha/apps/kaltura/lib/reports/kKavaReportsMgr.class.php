@@ -20,9 +20,9 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_GRAPH_METRICS = "report_graph_metrics";
 	const REPORT_ENRICH_DEF = "report_enrich_definition";
 	const REPORT_GRANULARITY = "report_granularity";
-	const REPORT_ENRICH_FIELD = "report_enrich_field";
-	const REPORT_ENRICH_FUNC = "report_enrich_func";
-	const REPORT_ENRICH_CONTEXT = "report_enrich_context";
+	const REPORT_ENRICH_FIELD = "field";
+	const REPORT_ENRICH_FUNC = "func";
+	const REPORT_ENRICH_CONTEXT = "context";
 	const REPORT_TOTAL_ADDITIONAL_METRICS = "report_total_metrics";
 	const REPORT_DRILLDOWN_GRANULARITY = "report_drilldown_granularity";
 	const REPORT_DRILLDOWN_DIMENSION = "report_drilldown_dimension";
@@ -1874,6 +1874,79 @@ class kKavaReportsMgr extends kKavaBase
 			$categories_names[$id] = $name;
 		}
 		return $categories_names;
+	}
+
+	private static function genericQueryEnrich($ids, $partner_id, $context)
+	{
+		$peer = $context['peer'];
+		$columns = $context['columns'];
+		$dim_column = isset($context['dim_column']) ? $context['dim_column'] : 'ID';
+		$partner_id_column = isset($context['partner_id_column']) ? $context['partner_id_column'] : 'PARTNER_ID';
+		$custom_crit = isset($context['custom_criterion']) ? $context['custom_criterion'] : null;
+
+		$c = KalturaCriteria::create($peer::OM_CLASS);
+
+		$table_name = $peer::TABLE_NAME;
+		$c->addSelectColumn($table_name . '.' . $dim_column);
+
+		$quoted_columns = array();
+		foreach ($columns as $index => $column)
+		{
+			if ($column[0] == '"')
+			{
+				$column = trim($column, '"');
+				$columns[$index] = $column;
+				$quoted_columns[$column] = true;
+			}
+			$exploded_column = explode('.', $column);
+			$c->addSelectColumn($table_name . '.' . $exploded_column[0]);
+		}
+
+		$c->add($table_name . '.' . $partner_id_column, $partner_id);
+		$c->add($table_name . '.' . $dim_column, $ids, Criteria::IN);
+
+		if ($custom_crit)
+		{
+			$c->addAnd($c->getNewCriterion($custom_crit['column'], $custom_crit['value'], Criteria::CUSTOM));
+		}
+
+		$peer::setUseCriteriaFilter(false);
+		$stmt = $peer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$peer::setUseCriteriaFilter(true);
+
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$output_row = array();
+			foreach ($columns as $column)
+			{
+				$quote = isset($quoted_columns[$column]);
+
+				$exploded_column = explode('.', $column);
+				if (count($exploded_column) > 1)
+				{
+					list($column, $field) = $exploded_column;
+					$value = @unserialize($row[$column]);
+					$value = isset($value[$field]) ? $value[$field] : '';
+				}
+				else
+				{
+					$value = $row[$column];
+				}
+
+				if ($quote)
+				{
+					$value = '"' . str_replace('"', '""', $value) . '"';
+				}
+
+				$output_row[] = $value;
+			}
+
+			$id = $row[$dim_column];
+			$result[$id] = $output_row;
+		}
+		return $result;
 	}
 
 	private static function getCategoriesIds($categories, $partner_id)
