@@ -5,6 +5,8 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
+
+	private static $dontUpdateMetaDataTaskTypes = array (KalturaObjectTaskType::DELETE_ENTRY);
 	/**
 	 * @var array
 	 */
@@ -104,7 +106,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 				foreach ($result->objects as $object)
 				{
-					list($error, $entryDeleted)= $this->processObject($profile, $object);
+					list($error, $tasksCompleted)= $this->processObject($profile, $object);
 					if ($error)
 						$errorObjectsIds[] = $object->id;
 					else if ($object instanceof KalturaBaseEntry)
@@ -120,7 +122,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 					}
 
-					if ($isMediaRepurposingProfile && !$entryDeleted)
+					if ($isMediaRepurposingProfile && $this->shouldUpdateMetadataStatusForMR($tasksCompleted))
 						$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
 				}
 
@@ -138,6 +140,17 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		}
 
 		$this->unimpersonate();
+	}
+
+	private function shouldUpdateMetadataStatusForMR($tasksCompleted)
+	{
+		foreach ($tasksCompleted as $task)
+		{
+			if(in_array($task, self::$dontUpdateMetaDataTaskTypes))
+				return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -173,7 +186,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	 */
 	protected function processObject(KalturaScheduledTaskProfile $profile, $object)
 	{
-		$entryDeleted = false;
+		$tasksCompleted = array();
 		$error = false;
 		foreach($profile->objectTasks as $objectTask)
 		{
@@ -185,8 +198,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			try
 			{
 				$objectTaskEngine->execute($object);
-				if($objectTask->type == ObjectTaskType::DELETE_ENTRY)
-					$entryDeleted = true;
+				$tasksCompleted[] = $objectTask->type;
 			}
 			catch(Exception $ex)
 			{
@@ -206,7 +218,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			}
 		}
 
-		return array($error, $entryDeleted);
+		return array($error, $tasksCompleted);
 	}
 
 	/**
