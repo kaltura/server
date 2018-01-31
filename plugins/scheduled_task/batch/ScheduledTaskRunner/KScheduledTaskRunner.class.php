@@ -104,7 +104,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 				foreach ($result->objects as $object)
 				{
-					$error = $this->processObject($profile, $object);
+					list($error, $entryDeleted)= $this->processObject($profile, $object);
 					if ($error)
 						$errorObjectsIds[] = $object->id;
 					else if ($object instanceof KalturaBaseEntry)
@@ -120,7 +120,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 					}
 
-					if ($isMediaRepurposingProfile)
+					if ($isMediaRepurposingProfile && !$entryDeleted)
 						$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
 				}
 
@@ -173,6 +173,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	 */
 	protected function processObject(KalturaScheduledTaskProfile $profile, $object)
 	{
+		$entryDeleted = false;
 		$error = false;
 		foreach($profile->objectTasks as $objectTask)
 		{
@@ -184,13 +185,15 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			try
 			{
 				$objectTaskEngine->execute($object);
-
+				if($objectTask->type == ObjectTaskType::DELETE_ENTRY)
+					$entryDeleted = true;
 			}
 			catch(Exception $ex)
 			{
 				$id = '';
 				if (property_exists($object, 'id'))
 					$id = $object->id;
+
 				KalturaLog::err(sprintf('An error occurred while executing %s on object %s (id %s)', get_class($objectTaskEngine), get_class($object), $id));
 				KalturaLog::err($ex);
 				$error = true;
@@ -203,7 +206,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			}
 		}
 
-		return $error;
+		return array($error, $entryDeleted);
 	}
 
 	/**
