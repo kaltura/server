@@ -21,16 +21,16 @@ class kEntrySearch extends kBaseSearch
 
     protected function handleDisplayInSearch()
     {
-		if($this->queryAttributes->getObjectId())
-			return;
+        if($this->queryAttributes->getObjectId())
+            return;
 
-		$displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
-		$this->mainBoolQuery->addToFilter($displayInSearchQuery);
+        $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
+        $this->mainBoolQuery->addToFilter($displayInSearchQuery);
     }
 
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
     {
-	    kEntryElasticEntitlement::init();
+        kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $objectId, $pager, $order);
