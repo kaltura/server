@@ -142,6 +142,9 @@ class ESearchEntryItem extends ESearchItem
 		{
 			case ESearchItemType::EXACT_MATCH:
 				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				if (in_array($this->getFieldName(), ESearchQueryFilterAttributes::$ignoreDisplayInSearchFields))
+					$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
+
 				break;
 			case ESearchItemType::PARTIAL:
 				$entryQuery[] = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
@@ -158,9 +161,6 @@ class ESearchEntryItem extends ESearchItem
 			default:
 				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
-
-		if (in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
-			$queryAttributes->setShouldUseDisplayInSearch(false);
 	}
 
 	public function shouldAddLanguageSearch()

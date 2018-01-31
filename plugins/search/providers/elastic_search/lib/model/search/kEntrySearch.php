@@ -21,8 +21,11 @@ class kEntrySearch extends kBaseSearch
 
     protected function handleDisplayInSearch()
     {
-        if($this->queryAttributes->getShouldUseDisplayInSearch())
-            $this->initDisplayInSearch($this->queryAttributes->getObjectId());
+		if($this->queryAttributes->getObjectId())
+			return;
+
+		$displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
+		$this->mainBoolQuery->addToFilter($displayInSearchQuery);
     }
 
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
@@ -119,16 +122,4 @@ class kEntrySearch extends kBaseSearch
     {
         return self::PEER_RETRIEVE_FUNCTION_NAME;
     }
-
-    protected function initDisplayInSearch($objectId)
-    {
-        if($objectId)
-            return;
-    
-        $displayInSearchQuery = new kESearchTermQuery('display_in_search', EntryDisplayInSearchType::SYSTEM);
-        $displayInSearchBoolQuery = new kESearchBoolQuery();
-        $displayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
-        $this->mainBoolQuery->addToFilter($displayInSearchBoolQuery);
-    }
-
 }
