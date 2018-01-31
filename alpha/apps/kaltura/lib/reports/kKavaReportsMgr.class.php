@@ -20,8 +20,9 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_GRAPH_METRICS = "report_graph_metrics";
 	const REPORT_ENRICH_DEF = "report_enrich_definition";
 	const REPORT_GRANULARITY = "report_granularity";
-	const REPORT_ENRICH_FIELD = "report_enrich_field";
-	const REPORT_ENRICH_FUNC = "report_enrich_func";
+	const REPORT_ENRICH_FIELD = "field";
+	const REPORT_ENRICH_FUNC = "func";
+	const REPORT_ENRICH_CONTEXT = "context";
 	const REPORT_TOTAL_ADDITIONAL_METRICS = "report_total_metrics";
 	const REPORT_DRILLDOWN_GRANULARITY = "report_drilldown_granularity";
 	const REPORT_DRILLDOWN_DIMENSION = "report_drilldown_dimension";
@@ -803,6 +804,93 @@ class kKavaReportsMgr extends kKavaBase
 			return self::$custom_reports[-$report_type];
 		}
 	}
+	
+	protected static function getEnrichDefs($report_def)
+	{
+		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			return array();
+		}
+		
+		$result = $report_def[self::REPORT_ENRICH_DEF];
+		if (isset($result[self::REPORT_ENRICH_FIELD]))
+		{
+			$result = array($result);
+		}
+		return $result;
+	}
+	
+	protected static function getEnrichedFields($report_def)
+	{		
+		$result = array();
+		$enrich_defs = self::getEnrichDefs($report_def);
+		foreach ($enrich_defs as $enrich_def)
+		{
+			$cur_fields = $enrich_def[self::REPORT_ENRICH_FIELD];
+			if (is_array($cur_fields))
+			{
+				$result = array_merge($result, $cur_fields);
+			}
+			else
+			{
+				$result[] = $cur_fields;
+			}
+		}
+		
+		return $result;
+	}
+	
+	protected static function enrichData($report_def, $headers, $partner_id, &$data)
+	{
+		// get the enrichment specification
+		$enrich_specs = array();
+		$enrich_defs = self::getEnrichDefs($report_def);
+		foreach ($enrich_defs as $enrich_def)
+		{
+			$enrich_func = $enrich_def[self::REPORT_ENRICH_FUNC];
+			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? $enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
+			$cur_fields = $enrich_def[self::REPORT_ENRICH_FIELD];
+			if (!is_array($cur_fields))
+			{
+				$cur_fields = array($cur_fields);
+			}
+		
+			$enriched_indexes = array();
+			foreach ($cur_fields as $field)
+			{
+				$enriched_indexes[] = array_search($field, $headers);
+			}
+		
+			$enrich_specs[] = array($enrich_func, $enrich_context, $enriched_indexes);
+		}
+		
+		// enrich the data in chunks
+		$rows_count = count($data);
+		$start = 0;
+		while ($start < $rows_count)
+		{
+			$limit = min($start + self::ENRICH_CHUNK_SIZE, $rows_count);
+			$dimension_ids = array_map('reset', array_slice($data, $start, $limit - $start));
+		
+			foreach ($enrich_specs as $enrich_spec)
+			{
+				list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
+					
+				$entities = call_user_func($enrich_func, $dimension_ids, $partner_id, $enrich_context);
+		
+				for ($current_row = $start; $current_row < $limit; $current_row++) 
+				{
+					$entity = $entities[reset($data[$current_row])];
+					foreach ($enriched_indexes as $index => $enrich_field) 
+					{
+						$data[$current_row][$enrich_field] = is_array($entity) ? $entity[$index] : $entity;
+					}
+				}
+			}
+			
+			$start = $limit;
+		}
+	}
 
 	public static function getTable($partner_id, $report_type, reportsInputFilter $input_filter,
 		$page_size, $page_index, $order_by, $object_ids = null, $isCsv = false)
@@ -1083,18 +1171,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		// build the row mapping
-		if (isset($report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD]))
-		{
-			$enriched_fields = $report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FIELD];
-			if (!is_array($enriched_fields))
-			{
-				$enriched_fields = array($enriched_fields);
-			}
-		}
-		else
-		{
-			$enriched_fields = array();
-		}
+		$enriched_fields = self::getEnrichedFields($report_def); 
 
 		if (!is_array($dimension))
 		{
@@ -1153,30 +1230,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		if ($enriched_fields) {
-			$enrich_func = $report_def[self::REPORT_ENRICH_DEF][self::REPORT_ENRICH_FUNC];
-
-			$enriched_indexes = array();
-			foreach ($enriched_fields as $field)
-			{
-				$enriched_indexes[] = array_search($field, $headers);
-			}
-
-			$rows_count = count($data);
-
-			$current_row = 0;
-			while ($current_row < $rows_count)
-			{
-				$limit = min($current_row + self::ENRICH_CHUNK_SIZE, $rows_count);
-				$dimension_ids = array_map('reset', array_slice($data, $current_row, $limit - $current_row));
-				$entities = call_user_func($enrich_func, $dimension_ids, $partner_id);
-
-				for (; $current_row < $limit; $current_row++) {
-					$entity = $entities[reset($data[$current_row])];
-					foreach ($enriched_indexes as $index => $enrich_field) {
-				 		$data[$current_row][$enrich_field] = is_array($entity) ? $entity[$index] : $entity;
-					}
-				}
-			}
+			self::enrichData($report_def, $headers, $partner_id, $data);
 		}
 
 		$res = array ($headers, $data, $total_count);
@@ -1765,7 +1819,7 @@ class kKavaReportsMgr extends kKavaBase
 		$result = self::getEntriesNames($ids, $partner_id);
 		foreach ($result as &$name)
 		{
-			$name = '"' . $name . '"';
+			$name = '"' . str_replace('"', '""', $name) . '"';
 		}
 		return $result;
 	}
@@ -1820,6 +1874,79 @@ class kKavaReportsMgr extends kKavaBase
 			$categories_names[$id] = $name;
 		}
 		return $categories_names;
+	}
+
+	private static function genericQueryEnrich($ids, $partner_id, $context)
+	{
+		$peer = $context['peer'];
+		$columns = $context['columns'];
+		$dim_column = isset($context['dim_column']) ? $context['dim_column'] : 'ID';
+		$partner_id_column = isset($context['partner_id_column']) ? $context['partner_id_column'] : 'PARTNER_ID';
+		$custom_crit = isset($context['custom_criterion']) ? $context['custom_criterion'] : null;
+
+		$c = KalturaCriteria::create($peer::OM_CLASS);
+
+		$table_name = $peer::TABLE_NAME;
+		$c->addSelectColumn($table_name . '.' . $dim_column);
+
+		$quoted_columns = array();
+		foreach ($columns as $index => $column)
+		{
+			if ($column[0] == '"')
+			{
+				$column = trim($column, '"');
+				$columns[$index] = $column;
+				$quoted_columns[$column] = true;
+			}
+			$exploded_column = explode('.', $column);
+			$c->addSelectColumn($table_name . '.' . $exploded_column[0]);
+		}
+
+		$c->add($table_name . '.' . $partner_id_column, $partner_id);
+		$c->add($table_name . '.' . $dim_column, $ids, Criteria::IN);
+
+		if ($custom_crit)
+		{
+			$c->addAnd($c->getNewCriterion($custom_crit['column'], $custom_crit['value'], Criteria::CUSTOM));
+		}
+
+		$peer::setUseCriteriaFilter(false);
+		$stmt = $peer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$peer::setUseCriteriaFilter(true);
+
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$output_row = array();
+			foreach ($columns as $column)
+			{
+				$quote = isset($quoted_columns[$column]);
+
+				$exploded_column = explode('.', $column);
+				if (count($exploded_column) > 1)
+				{
+					list($column, $field) = $exploded_column;
+					$value = @unserialize($row[$column]);
+					$value = isset($value[$field]) ? $value[$field] : '';
+				}
+				else
+				{
+					$value = $row[$column];
+				}
+
+				if ($quote)
+				{
+					$value = '"' . str_replace('"', '""', $value) . '"';
+				}
+
+				$output_row[] = $value;
+			}
+
+			$id = $row[$dim_column];
+			$result[$id] = $output_row;
+		}
+		return $result;
 	}
 
 	private static function getCategoriesIds($categories, $partner_id)
