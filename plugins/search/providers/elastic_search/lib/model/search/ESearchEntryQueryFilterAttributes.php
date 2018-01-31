@@ -3,16 +3,9 @@
  * @package plugins.elasticSearch
  * @subpackage model.search
  */
-class ESearchQueryFilterAttributes
+class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 {
-	private $ignoreDisplayInSearchValues;
-
-	function __construct()
-	{
-		$this->ignoreDisplayInSearchValues = array();
-	}
-
-	public function getEntryDisplayInSearchFilter()
+	public function getDisplayInSearchFilter()
 	{
 		$displayInSearchQuery = new kESearchTermQuery(ESearchEntryFieldName::DISPLAY_IN_SEARCH, EntryDisplayInSearchType::SYSTEM);
 		$ignoreDisplayInSearchQueries = array();
@@ -40,13 +33,5 @@ class ESearchQueryFilterAttributes
 		}
 
 		return $displayInSearchBoolQuery;
-	}
-
-	public function addValueToIgnoreDisplayInSearch($key, $value)
-	{
-		if(!array_key_exists($key, $this->ignoreDisplayInSearchValues))
-			$this->ignoreDisplayInSearchValues[$key] = array();
-
-		$this->ignoreDisplayInSearchValues[$key][] = $value;
 	}
 }

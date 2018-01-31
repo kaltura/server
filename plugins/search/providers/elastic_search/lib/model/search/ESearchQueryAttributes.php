@@ -21,7 +21,7 @@ class ESearchQueryAttributes
 	protected $objectId;
 
 	/**
-	 * @var queryFilterAttributes
+	 * @var ESearchBaseQueryFilterAttributes
 	 */
 	protected $queryFilterAttributes;
 
@@ -73,7 +73,7 @@ class ESearchQueryAttributes
 	function __construct()
 	{
 		$this->queryHighlightsAttributes = new ESearchQueryHighlightsAttributes();
-		$this->queryFilterAttributes = new ESearchQueryFilterAttributes();
+		$this->queryFilterAttributes = new ESearchEntryQueryFilterAttributes();
 	}
 
 	/**
@@ -259,10 +259,16 @@ class ESearchQueryAttributes
 	}
 
 	/**
-	 * @return ESearchQueryFilterAttributes queryFilterAttributes
+	 * @return ESearchBaseQueryFilterAttributes queryFilterAttributes
 	 */
 	public function getQueryFilterAttributes()
 	{
 		return $this->queryFilterAttributes;
 	}
+
+	public function setQueryFilterAttributes($queryFilterAttributes)
+	{
+		$this->queryFilterAttributes = $queryFilterAttributes;
+	}
+
 }
