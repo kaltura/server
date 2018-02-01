@@ -57,10 +57,10 @@ class kReachUtils
 	 */
 	public static function isEnoughCreditLeft($entry, $catalogItem, $vendorProfile)
 	{
-		$credit = $vendorProfile->getCurrentCredit();
+		$credit = $vendorProfile->getCredit();
 		$creditUsed = $vendorProfile->getUsedCredit();
 		
-		$allowedCredit = $credit->getCredit();
+		$allowedCredit = $credit->getCurrentCredit();
 		if ( $credit->getAllowOverage())
 			$allowedCredit += $credit->getOverageCredit();
 		
