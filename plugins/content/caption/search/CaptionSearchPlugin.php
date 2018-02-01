@@ -204,6 +204,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			return null;
 
 		$data = array();
+		$captionData = array();
 		foreach($captionAssets as $captionAsset)
 		{
 			/* @var $captionAsset CaptionAsset */
@@ -226,25 +227,27 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				continue;
 
 			$language = $captionAsset->getLanguage();
-			$data['caption_assets'][] = array(
-				'lines' => self::getElasticLines($items, $language, $captionAsset->getId())
-			);
+			self::getElasticLines($captionData, $items, $language, $captionAsset->getId(), $captionAsset->getLabel());
 		}
+
+		$data['caption_assets'] = $captionData;
 
 		return $data;
 	}
 
-	protected static function getElasticLines($items, $language, $assetId)
+	protected static function getElasticLines(&$captionData ,$items, $language, $assetId, $label = null)
 	{
-		$lines = array();
 		foreach ($items as $item)
 		{
 			$line = array(
 				'start_time' => $item['startTime'],
 				'end_time' => $item['endTime'],
 				'language' => $language,
-				'caption_asset_id' => $assetId
+				'caption_asset_id' => $assetId,
 			);
+
+			if($label)
+				$line['label'] = $label;
 
 			$content = '';
 			foreach ($item['content'] as $curChunk)
@@ -260,9 +263,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			if($analyzedFieldName)
 				$line[$analyzedFieldName] = $content;
 
-			$lines[] = $line;
+			$captionData[] = $line;
 		}
-
-		return $lines;
 	}
 }
