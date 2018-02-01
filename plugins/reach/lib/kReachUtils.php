@@ -80,10 +80,10 @@ class kReachUtils
 	{
 		$vendorProfile = $entryVendorTask->getVendorProfile();
 		
-		$credit = $vendorProfile->getCurrentCredit();
+		$credit = $vendorProfile->getCredit();
 		$creditUsed = $vendorProfile->getUsedCredit();
 		
-		$allowedCredit = $credit->getCredit();
+		$allowedCredit = $credit->getCurrentCredit();
 		if ( $credit->getAllowOverage())
 			$allowedCredit += $credit->getOverageCredit();
 		
