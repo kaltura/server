@@ -21,9 +21,9 @@ class ESearchQueryAttributes
 	protected $objectId;
 
 	/**
-	 * @var bool
+	 * @var ESearchBaseQueryFilterAttributes
 	 */
-	protected $shouldUseDisplayInSearch;
+	protected $queryFilterAttributes;
 
 	/**
 	 * @var bool
@@ -73,6 +73,7 @@ class ESearchQueryAttributes
 	function __construct()
 	{
 		$this->queryHighlightsAttributes = new ESearchQueryHighlightsAttributes();
+		$this->queryFilterAttributes = new ESearchEntryQueryFilterAttributes();
 	}
 
 	/**
@@ -89,22 +90,6 @@ class ESearchQueryAttributes
 	public function setObjectId($objectId)
 	{
 		$this->objectId = $objectId;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function getShouldUseDisplayInSearch()
-	{
-		return $this->shouldUseDisplayInSearch;
-	}
-
-	/**
-	 * @param boolean $shouldUseDisplayInSearch
-	 */
-	public function setShouldUseDisplayInSearch($shouldUseDisplayInSearch)
-	{
-		$this->shouldUseDisplayInSearch = $shouldUseDisplayInSearch;
 	}
 
 	/**
@@ -272,4 +257,18 @@ class ESearchQueryAttributes
 	{
 		return $this->queryHighlightsAttributes;
 	}
+
+	/**
+	 * @return ESearchBaseQueryFilterAttributes queryFilterAttributes
+	 */
+	public function getQueryFilterAttributes()
+	{
+		return $this->queryFilterAttributes;
+	}
+
+	public function setQueryFilterAttributes($queryFilterAttributes)
+	{
+		$this->queryFilterAttributes = $queryFilterAttributes;
+	}
+
 }
