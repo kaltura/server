@@ -128,9 +128,9 @@
 		});
 	}
 
-	function configureCatalogItems(partnerId, serviceFeature, serviceType, turnAroundTime)
+	function configureCatalogItems(partnerId, serviceFeature, serviceType, turnAroundTime, sourceLanguage, targetLanguage)
 	{
-		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime;
+		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime + '/sourceLanguage/' + sourceLanguage + '/targetLanguage/'+targetLanguage;
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>' + paramsStr;
 
 		jQuery('#partner-catalog-item-configure-dialog').remove();

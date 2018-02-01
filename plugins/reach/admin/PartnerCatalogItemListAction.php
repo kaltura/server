@@ -42,16 +42,10 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 			$vendorCatalogItemFilter->serviceTypeEqual = $serviceType;
 			$vendorCatalogItemFilter->turnAroundTimeEqual = $turnAroundTime;
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
-			
-			if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS || $serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-			{
-				$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
-			}
-			
+			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
+
 			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-			{
 				$vendorCatalogItemFilter->targetLanguageEqual = $targetLanguage;
-			}
 
 			$client = Infra_ClientHelper::getClient();
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);

@@ -68,7 +68,7 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'configureCatalogItemsButton', array(
 			'ignore' => true,
 			'label' => 'Configure',
-			'onclick' => "configureCatalogItems($('#filter_input').val(), $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val())",
+			'onclick' => "configureCatalogItems($('#filter_input').val(), $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val(), $('#filterSourceLanguage').val(), $('#filterTargetLanguage').val())",
 			'decorators' => array('ViewHelper'),
 		));
 

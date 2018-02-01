@@ -44,16 +44,10 @@ class CatalogItemListAction extends KalturaApplicationPlugin
 		$catalogItemProfileFilter->serviceTypeEqual = $serviceType;
 		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAroundTime;
 		$catalogItemProfileFilter->vendorPartnerIdEqual = $vendorPartnerId;
-		
-		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS || $serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-		{
-			$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
-		}
-		
+		$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
+
 		if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-		{
 			$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
-		}
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);

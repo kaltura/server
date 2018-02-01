@@ -51,6 +51,8 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		$serviceFeature = $this->_getParam('serviceFeature') != "" ? $this->_getParam('serviceFeature') : null;
 		$ServiceType = $this->_getParam('serviceType') != "" ? $this->_getParam('serviceType') : null;
 		$turnAround = $this->_getParam('turnAroundTime') != "" ? $this->_getParam('turnAroundTime') : null;
+		$sourceLanguage = $this->_getParam('sourceLanguage') != "" ? $this->_getParam('sourceLanguage') : null;
+		$targetLanguage = $this->_getParam('targetLanguage') != "" ? $this->_getParam('targetLanguage') : null;
 
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
@@ -65,6 +67,10 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 			$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
 			$catalogItemProfileFilter->partnerIdEqual = $partnerId;
+			$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
+
+			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+				$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
 
 			$pager = new Kaltura_Client_Type_FilterPager();
 			$pager->pageIndex = 1;
@@ -92,6 +98,10 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 			$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
 			$catalogItemProfileFilter->idNotIn = implode(',', $partnerCatalogItems);
+			$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
+
+			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+				$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
 
 			$client = Infra_ClientHelper::getClient();
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
