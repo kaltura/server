@@ -18,7 +18,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
-//		$this->applyPartnerFilterForClass('PartnerCatalogItem');
+	$this->applyPartnerFilterForClass('PartnerCatalogItem');
 	}
 	
 	/**

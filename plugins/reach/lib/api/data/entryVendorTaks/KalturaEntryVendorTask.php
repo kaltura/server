@@ -160,50 +160,13 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		if (is_null($object_to_fill))
 			$object_to_fill = new EntryVendorTask();
 		
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		if(!$dbEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($this->vendorProfileId);
-		if(!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $this->vendorProfileId);
-		
-		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->catalogItemId);
-		if(!$dbVendorCatalogItem)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $this->catalogItemId);
-		
-		$status = KalturaEntryVendorTaskStatus::PENDING;
-		if($dbVendorProfile->shouldModerate($dbVendorCatalogItem->getServiceType()))
-			$status = KalturaEntryVendorTaskStatus::PENDING_MODERATION;
-		
-		$object_to_fill->setStatus($status);
-		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validate();
+		$this->validatePropertyNotNull(array("vendorProfileId", "catalogItemId", "entryId"));
 		return parent::validateForInsert($propertiesToSkip);
-	}
-	
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		$this->validate($sourceObject);
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
-	
-	private function validate(EntryVendorTask $sourceObject = null)
-	{
-		if(!$sourceObject) //Source object will be null on insert
-		{
-			$this->validatePropertyNotNull(array("vendorProfileId", "catalogItemId", "entryId"));
-			
-			if(EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemId($this->entryId, $this->catalogItemId))
-				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $this->entryId, $this->catalogItemId, kCurrentContext::getCurrentPartnerId());
-		}
-		
-		return;
 	}
 	
 	public function getExtraFilters()

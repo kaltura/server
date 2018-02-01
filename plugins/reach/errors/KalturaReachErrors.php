@@ -34,4 +34,14 @@ class KalturaReachErrors implements kReachErrors
 	const ENTRY_VENDOR_TASK_NOT_FOUND = "ENTRY_VENDOR_TASK_NOT_FOUND;ID;entry vendor task item with id provided not found [@ID@]";
 	
 	const ENTRY_VENDOR_TASK_DUPLICATION = "ENTRY_VENDOR_TASK_DUPLICATION;ENTRY_ID,CATALOG_ITEM_ID;entry vendor task already exists for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
+	
+	const EXCEEDED_MAX_CREDIT_ALLOWED = "EXCEEDED_MAX_CREDIT_ALLOWED;ENTRY_ID,CATALOG_ITEM_ID;Exceeded max credit allowed, Task could not be added for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
+	
+	const CANNOT_APPROVE_NOT_MODERATED_TASK = "CANNOT_APPROVE_NOT_MODERATED_TASK;;Cannot approve task which is not pending moderation";
+	
+	const CANNOT_REJECT_NOT_MODERATED_TASK = "CANNOT_REJECT_NOT_MODERATED_TASK;;Cannot reject task which is not pending moderation";
+	
+	/* Credit */
+	
+	const CANNOT_SET_ALLOW_OVERAGE_CREDIT = "CANNOT_SET_ALLOW_OVERAGE_CREDIT;;Allow overage set to false but overage credit is set";
 }

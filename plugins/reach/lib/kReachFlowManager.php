@@ -77,7 +77,7 @@ class kReachFlowManager implements kGenericEventConsumer
 			return true;
 		}
 		
-		foreach($this->fullFiledItems as $key => $catalogItemIds)
+		foreach($this->fullFiledItems as $vendorProfileId => $catalogItemIds)
 		{
 			foreach ($catalogItemIds as $catalogItemId) 
 			{
@@ -100,7 +100,7 @@ class kReachFlowManager implements kGenericEventConsumer
 					continue;
 				}
 				
-				kReachManager::addEntryVendorTask($entryId, $catalogItemId, $key);
+				kReachManager::addEntryVendorTaskByObjectIds($entryId, $catalogItemId, $vendorProfileId);
 			}
 		}
 		
