@@ -9,7 +9,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if($object instanceof EntryVendorTask)
+		if($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 		
 		return false;
@@ -34,10 +34,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectCreated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$this->addJobData($object);
-		if($object->getStatus() == EntryVendorTaskStatus::PENDING) 
-			$this->updateVendorProfileCreditUsage($object);
-		
+		$this->updateVendorProfileCreditUsage($object);
 		return true;
 	}
 	
@@ -63,31 +60,46 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$vendorProfile->save();
 	}
 	
-	public static function addEntryVendorTask($entryId, $catalogItemId, $vendorProfileId)
+	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $vendorProfileId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
-		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
 		$vendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
+		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
+		
+		if(!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $vendorProfile))
+		{
+			KalturaLog::err("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+			return;
+		}
+		
+		$entryVendorTask = self::addEntryVendorTask($entry, $vendorProfile, $vendorCatalogItem);
+		return $entryVendorTask;
+	}
+	
+	public static function addEntryVendorTask(entry $entry, VendorProfile $vendorProfile, VendorCatalogItem $vendorCatalogItem)
+	{
+		//Create new entry vendor task object
+		$entryVendorTask = new EntryVendorTask();
+		
+		//Assign default parameters
+		$entryVendorTask->setEntryId($entry->getId());
+		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
+		$entryVendorTask->setVendorProfileId($vendorProfile->getId());
+		$entryVendorTask->setPartnerId($entry->getPartnerId());
+		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
+		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
+		
+		//Set calcualted values
+		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId()));
+		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
 		
 		$status = EntryVendorTaskStatus::PENDING;
 		if($vendorProfile->shouldModerate($vendorCatalogItem->getServiceType()))
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 		
-		$entryVendorTask = new EntryVendorTask();
-		$entryVendorTask->setEntryId($entryId);
-		$entryVendorTask->setCatalogItemId($catalogItemId);
-		$entryVendorTask->setVendorPartnerId($vendorProfileId);
-		$entryVendorTask->setPartnerId($entry->getPartnerId());
 		$entryVendorTask->setStatus($status);
 		$entryVendorTask->save();
-	}
-	
-	private function addJobData(EntryVendorTask $entryVendorTask)
-	{
-		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId()));
-		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entryVendorTask->getEntry(), $entryVendorTask->getCatalogItem()));
-		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
-		$entryVendorTask->setVendorPartnerId($entryVendorTask->getCatalogItem()->getVendorPartnerId());
-		$entryVendorTask->save();
+		
+		return $entryVendorTask;
 	}
 }

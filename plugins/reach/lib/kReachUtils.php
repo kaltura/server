@@ -49,9 +49,49 @@ class kReachUtils
 		return call_user_func($vendorCatalogItem->getPricing()->getPriceFunction(), $entry, $vendorCatalogItem->getPricing()->getPricePerUnit());
 	}
 	
-	public static function isEnoughCreditLeft(EntryVendorTask $entryVendorTask)
+	/**
+	 * @param $entry
+	 * @param $catalogItem
+	 * @param $vendorProfile
+	 * @return bool
+	 */
+	public static function isEnoughCreditLeft($entry, $catalogItem, $vendorProfile)
+	{
+		$credit = $vendorProfile->getCurrentCredit();
+		$creditUsed = $vendorProfile->getUsedCredit();
+		
+		$allowedCredit = $credit->getCredit();
+		if ( $credit->getAllowOverage())
+			$allowedCredit += $credit->getOverageCredit();
+		
+		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
+		
+		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
+		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
+		
+		return $remainingCredit >= 0 ? true : false;
+	}
+	
+	/**
+	 * @param EntryVendorTask $entryVendorTask
+	 * @return bool
+	 */
+	public static function checkCreditForApproval(EntryVendorTask $entryVendorTask)
 	{
 		$vendorProfile = $entryVendorTask->getVendorProfile();
-		return $vendorProfile->isEnoughCreditLeft($entryVendorTask->getPrice());
+		
+		$credit = $vendorProfile->getCurrentCredit();
+		$creditUsed = $vendorProfile->getUsedCredit();
+		
+		$allowedCredit = $credit->getCredit();
+		if ( $credit->getAllowOverage())
+			$allowedCredit += $credit->getOverageCredit();
+		
+		$entryTaskPrice = $entryVendorTask->getPrice();
+		
+		alturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
+		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
+		
+		return $remainingCredit >= 0 ? true : false;
 	}
 }
