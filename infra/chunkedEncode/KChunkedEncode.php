@@ -283,16 +283,16 @@
 				 */
 			if(isset($height)) {
 				if($height>480) {
-					if($duration<KChunkedEncodeSetup::DefaultChunkDuration) 
-						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".KChunkedEncodeSetup::DefaultChunkDuration."sec");
-				}
-				else if($height>360) {
-					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*2)
+					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*2) 
 						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*2)."sec");
 				}
+				else if($height>360) {
+					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*4)
+						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*4)."sec");
+				}
 				else {
-					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*3)
-						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*3)."sec");
+					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*6)
+						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*6)."sec");
 				}
 				if(isset($msgStr))
 					return false;
