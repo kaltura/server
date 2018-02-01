@@ -129,7 +129,11 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 			</xs:choice>
 			<xs:element ref="subtitle-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		
+		<xs:attribute name="label" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Specify label you want to set for the caption asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="captionParamsId" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>The asset id to be updated with this resource used only for update</xs:documentation>
@@ -250,7 +254,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($caption->tags);
-		
+
 		if(isset($caption->captionAssetId))
 			$captionAsset->id = $caption->captionAssetId;
 		
@@ -264,6 +268,9 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				$captionAsset->isDefault = KalturaNullableBoolean::FALSE_VALUE;
 			}
 		
+		if(isset($caption['label']))
+			$captionAsset->label = $caption['label'];
+
 		if(isset($caption['format']))
 			$captionAsset->format = $caption['format'];
 		
