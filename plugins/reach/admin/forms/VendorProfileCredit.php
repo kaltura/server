@@ -24,7 +24,6 @@ class Form_VendorProfileCredit extends Zend_Form_SubForm
 
 		$this->addElement('text', 'overageCredit', array(
 			'label'			=> 'Overage Credit:',
-			'required'      => true,
 			'filters'		=> array('StringTrim'),
 			'validators' => array(),
 		));
@@ -78,12 +77,16 @@ class Form_VendorProfileCredit extends Zend_Form_SubForm
 			return new Kaltura_Client_Type_UrlTokenizer();
 
 		$object = new $objectClass();
-		
+		$object->allowOverage=false;
+
  		foreach($properties as $prop => $value) {
 			if($prop == "objectType")
 				continue;
 			$object->$prop = $value;
 		}
+
+		if (!empty($properties['overageCredit']))
+			$object->allowOverage=true;
 		
 		return $object;
 	}
