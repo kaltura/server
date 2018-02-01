@@ -41,7 +41,7 @@ None.
           friendlyName					= Users Csv
           type						= KAsyncUsersCsv
           params.localTempPath				= @TMP_DIR@/userscsv
-          params.sharedPath				= @WEB_DIR@/tmp/userscsv
+          params.sharedTempPath				= @WEB_DIR@/tmp/userscsv
           scriptPath					= batches/UsersCsv/kAsyncUsersCsvExe.php
 
 ### Deployment scripts ###
