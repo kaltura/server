@@ -40,7 +40,7 @@ class kTimeRangeVendorCredit extends kVendorCredit
 	 * @param $date
 	 * @return int
 	 */
-	public function getCurrentCredit($date)
+	public function getCurrentCredit()
 	{
 		$now = time();
 		if ( $now < $this->fromDate || $now > $this->toDate )
