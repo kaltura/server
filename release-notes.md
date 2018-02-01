@@ -27,6 +27,28 @@ None.
 
 None.
 
+## Add new batch job for generating users CSV ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8446
+ 
+ ### Configuration ###
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncUsersCsv = 1
+
+	- [KAsyncUsersCsv : JobHandlerWorker]
+          id						= XXXXX
+          friendlyName					= Users Csv
+          type						= KAsyncUsersCsv
+          params.localTempPath				= @TMP_DIR@/userscsv
+          params.sharedTempPath				= @WEB_DIR@/tmp/userscsv
+          scriptPath					= batches/UsersCsv/kAsyncUsersCsvExe.php
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_23_getCsv_user_permissions.php
+ 
+
 # Mercury 13.12.0 #
 
 ## Split beacon index to index per object type ##
