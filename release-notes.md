@@ -1,5 +1,16 @@
 # Mercury 13.13.0 #
 
+## New SaaS Drop Folder Type ##  
+- Issue Type: New Feature  
+- Issue ID: PSVAMB-939  
+
+### Configuration ###  
+    Update the plugins.ini, admin.ini, batch.ini config files from the SaaS tag.
+    
+### Deployment scripts ###  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_12_allow_batch_partner_to_delete_metadata.php
+
 ## Base Upload Permission and User-role ##
 
 - Issue Type: New Feature
