@@ -197,24 +197,26 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	{
 		/* @var $dbObject VendorProfile */
 		parent::doFromObject($dbObject, $responseProfile);
-
-		$creditType = get_class($dbObject->getCredit());
-		switch ($creditType)
+		
+		if($this->shouldGet('credit', $responseProfile) && !is_null($dbObject->getCredit())) 
 		{
-			case 'kVendorCredit':
-				$this->credit = new KalturaVendorCredit();
-				break;
-
-			case 'kTimeRangeVendorCredit':
-				$this->credit = new KalturaTimeRangeVendorCredit();
-				break;
-
-			case 'kReoccurringVendorCredit':
-				$this->credit = new KalturaReoccurringVendorCredit();
-				break;
+			$creditType = get_class($dbObject->getCredit());
+			switch ($creditType) {
+				case 'kVendorCredit':
+					$this->credit = new KalturaVendorCredit();
+					break;
+				
+				case 'kTimeRangeVendorCredit':
+					$this->credit = new KalturaTimeRangeVendorCredit();
+					break;
+				
+				case 'kReoccurringVendorCredit':
+					$this->credit = new KalturaReoccurringVendorCredit();
+					break;
+			}
+			
+			if ($this->credit)
+				$this->credit->fromObject($dbObject->getCredit(), $responseProfile);
 		}
-
-		if ($this->credit)
-			$this->credit->fromObject($dbObject->getCredit());
 	}
 }

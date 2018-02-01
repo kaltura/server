@@ -13,7 +13,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class EntryVendorTask extends BaseEntryVendorTask 
+class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 {
 	const CUSTOM_DATA_NOTES = 				'notes';
 	const CUSTOM_DATA_ACCESS_KEY = 			'access_key';
@@ -73,6 +73,22 @@ class EntryVendorTask extends BaseEntryVendorTask
 	public function getUserId($v)
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_USER_ID, null, null);
+	}
+	
+	public function getVendorProfile()
+	{
+		return VendorProfilePeer::retrieveByPK($this->getVendorProfileId());
+		
+	}
+	
+	public function getEntry()
+	{
+		return entryPeer::retrieveByPK($this->getEntryId());
+	}
+	
+	public function getCatalogItem()
+	{
+		return VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
 	}
 	
 } // EntryVendorTask

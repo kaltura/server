@@ -316,7 +316,7 @@
 
 	function convertDates()
 	{
-		let f = jQuery('#frmVendorProfileConfigure');
+		var f = jQuery('#frmVendorProfileConfigure');
 		f.find( "input[innertype=DateElement]").each(function(idx) {
 			var val = $(this).val();
 			if (isDatesFormat(val)) {
@@ -334,7 +334,7 @@
 	}
 
 	function getEpochTime(val) {
-		let epoch = new Date(val).getTime() / 1000 + 3600*4; // + 4 hour for not slide a day backward in for time zones
+		var epoch = new Date(val).getTime() / 1000 + 3600*4; // + 4 hour for not slide a day backward in for time zones
 		if (epoch)
 			return epoch;
 		alert("Date is not valid.");

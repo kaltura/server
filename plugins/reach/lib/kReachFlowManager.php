@@ -91,6 +91,15 @@ class kReachFlowManager implements kGenericEventConsumer
 					continue;
 				}
 				
+				$c = new Criteria();
+				$c->add(PartnerCatalogItemPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
+				$c->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $catalogItemId);
+				if(!PartnerCatalogItemPeer::doSelectOne($c))
+				{
+					KalturaLog::debug("Catalog item with id [$catalogItemId] not enabled on current partner, skipping!!!");
+					continue;
+				}
+				
 				kReachManager::addEntryVendorTask($entryId, $catalogItemId, $key);
 			}
 		}

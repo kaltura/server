@@ -15,7 +15,13 @@
 	Run Permissions scripts script:
 		1. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_vendor_role_and_permissions.php
 		2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_permissions.php
-	   
+		
+	Response profiles:
+		First replcae all tokens from the XML files below and remove ".template" from the fle name:
+			/opt/kalturapp/deployment/updates/scripts/xml/responseProfiles/reach_vendor_response_profiles.template.xml
+		
+		Run deployment script:
+			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_vendor_related_response_profiles.php	   
 	
 #### Known Issues & Limitations ####
 

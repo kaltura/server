@@ -13,6 +13,16 @@
  * @package plugins.reach
  * @subpackage model
  */
-class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer {
-
+class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer 
+{
+	public static function retrieveEntryIdAndCatalogItemId($entryId, $catalogItemId, $partnerId)
+	{
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
+		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
+		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		
+		return EntryVendorTaskPeer::doSelectOne($c);
+	}
+	
 } // EntryVendorTaskPeer

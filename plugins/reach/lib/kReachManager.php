@@ -2,14 +2,14 @@
 /**
  * @package plugins.reach
  */
-class kReachManager implements kObjectChangedEventConsumer, kObjectAddedEventConsumer
+class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
 	 */
-	public function shouldConsumeAddedEvent(BaseObject $object)
+	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
+		if($object instanceof EntryVendorTask)
 			return true;
 		
 		return false;
@@ -32,10 +32,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectAddedEventCon
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
-	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
+	public function objectCreated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
-			return $this->updateVendorProfileCreditUsage($object);
+		$this->addJobData($object);
+		if($object->getStatus() == EntryVendorTaskStatus::PENDING) 
+			$this->updateVendorProfileCreditUsage($object);
 		
 		return true;
 	}
@@ -60,30 +61,33 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectAddedEventCon
 		$vendorProfile = VendorProfilePeer::retrieveByPK($entryVendorTask->getVendorProfileId());
 		$vendorProfile->setUsedCredit($vendorProfile->getUsedCredit() + $entryVendorTask->getPrice());
 		$vendorProfile->save();
-		
-		return true;
 	}
 	
 	public static function addEntryVendorTask($entryId, $catalogItemId, $vendorProfileId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
-		$catalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
+		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
+		$vendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
+		
+		$status = EntryVendorTaskStatus::PENDING;
+		if($vendorProfile->shouldModerate($vendorCatalogItem->getServiceType()))
+			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 		
 		$entryVendorTask = new EntryVendorTask();
-		
 		$entryVendorTask->setEntryId($entryId);
 		$entryVendorTask->setCatalogItemId($catalogItemId);
-		$entryVendorTask->setVendorProfileId($vendorProfileId);
-		
-		$entryVendorTask->setPartnerId($entry->getId());
-		$entryVendorTask->setVendorPartnerId($catalogItem->getVendorPartnerId());
-		$entryVendorTask->setUserId(kCurrentContext::getCurrentKsKuserId());
-		
-		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryId));
-		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $catalogItem));
-		
-		$entryVendorTask->setStatus(EntryVendorTaskStatus::PENDING);
-		
+		$entryVendorTask->setVendorPartnerId($vendorProfileId);
+		$entryVendorTask->setPartnerId($entry->getPartnerId());
+		$entryVendorTask->setStatus($status);
+		$entryVendorTask->save();
+	}
+	
+	private function addJobData(EntryVendorTask $entryVendorTask)
+	{
+		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId()));
+		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entryVendorTask->getEntry(), $entryVendorTask->getCatalogItem()));
+		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
+		$entryVendorTask->setVendorPartnerId($entryVendorTask->getCatalogItem()->getVendorPartnerId());
 		$entryVendorTask->save();
 	}
 }

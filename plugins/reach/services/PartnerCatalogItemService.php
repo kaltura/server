@@ -38,10 +38,10 @@ class PartnerCatalogItemService extends KalturaBaseService
 		if (!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
-		//Check if catalog item already enabled
-		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id, kCurrentContext::$ks_partner_id) ;
+		//Check if catalog item already enabled on partner
+		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id, kCurrentContext::getCurrentPartnerId());
 		if ($dbPartnerCatalogItem)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER, $id, $this->getPartnerId());
+			throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER, $id, kCurrentContext::getCurrentPartnerId());
 		
 		$partnerCatalogItem = new PartnerCatalogItem();
 		$partnerCatalogItem->setPartnerId($this->getPartnerId());
@@ -49,7 +49,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 		$partnerCatalogItem->setCatalogItemId($id);
 		$partnerCatalogItem->save();
 		
-		// return the cloned catalog item
+		// return the catalog item
 		$vendorCatalogItem = KalturaVendorCatalogItem::getInstance($dbVendorCatalogItem, $this->getResponseProfile());
 		$vendorCatalogItem->fromObject($dbVendorCatalogItem, $this->getResponseProfile());
 		return $vendorCatalogItem;
@@ -62,8 +62,6 @@ class PartnerCatalogItemService extends KalturaBaseService
 	 * @param int $id source catalog item to remove
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER
-	 *
-	 * @return KalturaVendorCatalogItem
 	 */
 	public function deleteAction($id)
 	{
@@ -72,7 +70,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
 		//Check if catalog item already enabled
-		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id, kCurrentContext::$ks_partner_id) ;
+		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id, kCurrentContext::getCurrentPartnerId());
 		if(!$dbPartnerCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_CATALOG_ITEM_NOT_FOUND, $id);
 		

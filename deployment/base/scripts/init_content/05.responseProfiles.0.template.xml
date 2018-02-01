@@ -70,5 +70,44 @@
 			</responseProfile>
 		</request>
 	</multirequest>
+
+	<multirequest>
+		<request service="responseProfile" action="add" partnerId="0">
+			<responseProfile objectType="KalturaResponseProfile">
+				<type>1</type>
+				<name>reach_vendor</name>
+				<systemName>reach_vendor</systemName>
+				<fields>id,partnerId,vendorPartnerId,createdAt,updatedAt,queuedAt,finishedAt,entryId,status,vendorProfileId,catalogItemId,price,userId,approvedBy,errDescription,accessKey,notes</fields>
+				<relatedProfiles objectType="array">
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>reach_vendor_catalog_item</name>
+						<type>2</type>
+						<fields>id,vendorPartnerId,name,systemName,createdAt,updatedAt,status,pricing,fixedPriceAddons</fields>
+						<filter objectType="KalturaVendorCatalogItemFilter">
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>catalogItemId</parentProperty>
+								<filterProperty>idEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>reach_vendor_profile</name>
+						<type>2</type>
+						<fields>autoDisplayMachineCaptionsOnPlayer,autoDisplayHumanCaptionsOnPlayer,enableMetadataExtraction,enableSpeakerChangeIndication,enableAudioTags,enableProfanityRemoval,maxCharactersPerCaptionLine</fields>
+						<filter objectType="KalturaVendorProfileFilter">
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>vendorProfileId</parentProperty>
+								<filterProperty>idEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+				</relatedProfiles>
+			</responseProfile>
+		</request>
+	</multirequest>
 	
 </xml>

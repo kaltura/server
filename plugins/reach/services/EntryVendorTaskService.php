@@ -34,6 +34,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	public function addAction(KalturaEntryVendorTask $entryVendorTask)
 	{
 		$dbEntryVendorTask = $entryVendorTask->toInsertableObject();
+		$dbEntryVendorTask->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		$dbEntryVendorTask->save();
 
 		// return the saved object
@@ -102,56 +103,75 @@ class EntryVendorTaskService extends KalturaBaseService
 		return $filter->getListResponse($pager, $this->getResponseProfile(true));
 	}
 
-	/***
+	/**
 	 * Update entry vendor task. Only the properties that were set will be updated.
 	 *
 	 * @action update
-	 * @param string $vendortaskId vendor task id to update
+	 * @param int $id vendor task id to update
 	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to update
 	 *
-	 * @throws KalturaAPIException
+	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 */
-	function updateAction($vendorTaskId, KalturaEntryVendorTask $entryVendorTask)
+	public function updateAction($id, KalturaEntryVendorTask $entryVendorTask)
 	{
-		$dbVendorTask = entryPeer::retrieveByPK($vendorTaskId);
-		if (!$dbVendorTask)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $vendorTaskId);
-
-		$dbVendorTask = $entryVendorTask->toUpdatableObject($dbVendorTask);
-		/* @var $dbVendorTask EntryVendorTask */
-		$dbVendorTask->save();
+		$dbEntryVendorTask = entryPeer::retrieveByPK($id);
+		if (!$dbEntryVendorTask)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		
+		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
+		$dbEntryVendorTask->save();
 
 		// return the saved object
-		$entryVendorTask = KalturaEntryVendorTask::getInstance($dbVendorTask, $this->getResponseProfile());
-		$entryVendorTask->fromObject($dbVendorTask, $this->getResponseProfile());
+		$entryVendorTask = new KalturaEntryVendorTask();
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
 	}
 
 	/**
-	 * @param $vendorTaskId
-	 * @throws KalturaAPIException
+	 * Approve entry vendor task for execution.
+	 *
+	 * @action approve
+	 * @param int $id vendor task id to update
+	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to update
+	 *
+	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 */
-	public function approveAction($vendorTaskId)
+	public function approveAction($id)
 	{
-		$dbVendorTask = EntryVendorTaskPeer::retrieveByPK($vendorTaskId);
-		if (!$dbVendorTask )
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $vendorTaskId);
-
-		$dbVendorTask->setStatus(KalturaEntryVendorTaskStatus::PENDING);
-		$dbVendorTask->save();
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
+		if (!$dbEntryVendorTask )
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		
+		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::PENDING);
+		$dbEntryVendorTask->save();
+		
+		// return the saved object
+		$entryVendorTask = new KalturaEntryVendorTask();
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
 	}
-
+	
 	/**
-	 * @param $vendorTaskId
-	 * @throws KalturaAPIException
+	 * Reject entry vendor task for execution.
+	 *
+	 * @action reject
+	 * @param int $id vendor task id to update
+	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to update
+	 *
+	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 */
-	public function rejectAction($vendorTaskId)
+	public function rejectAction($id)
 	{
-		$dbVendorTask = EntryVendorTaskPeer::retrieveByPK($vendorTaskId);
-		if (!$dbVendorTask )
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $vendorTaskId);
-
-		$dbVendorTask->setStatus(KalturaEntryVendorTaskStatus::REJECTED);
-		$dbVendorTask->save();
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
+		if (!$dbEntryVendorTask )
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		
+		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::v);
+		$dbEntryVendorTask->save();
+		
+		// return the saved object
+		$entryVendorTask = new KalturaEntryVendorTask();
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
 	}
 }

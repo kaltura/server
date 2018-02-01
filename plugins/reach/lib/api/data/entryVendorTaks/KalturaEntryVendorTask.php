@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaEntryVendorTask extends KalturaObject implements IFilterable, IApiObjectFactory
+class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * @var int
@@ -123,12 +123,6 @@ class KalturaEntryVendorTask extends KalturaObject implements IFilterable, IApiO
 	 */
 	public $notes;
 	
-	/**
-	 * Task job data, will hold the task basic configuration
-	 * @var KalturaEntryVendorTaskJobData
-	 */
-	public $jobData;
-	
 	private static $map_between_objects = array
 	(
 		'id',
@@ -183,17 +177,6 @@ class KalturaEntryVendorTask extends KalturaObject implements IFilterable, IApiO
 			$status = KalturaEntryVendorTaskStatus::PENDING_MODERATION;
 		
 		$object_to_fill->setStatus($status);
-		$object_to_fill->setPartnerId(kCurrentContext::getCurrentPartnerId());
-		$object_to_fill->setVendorPartnerId($dbVendorCatalogItem->getVendorPartnerId());
-		$object_to_fill->setUserId(kCurrentContext::getCurrentKsKuserId());
-		$object_to_fill->setCatalogItemId($this->catalogItemId);
-		$object_to_fill->setVendorProfileId($this->vendorProfileId);
-		$object_to_fill->setPrice(kReachUtils::calculateTaskPrice($dbEntry, $dbVendorCatalogItem));
-		$object_to_fill->setAccessKey(kReachUtils::generateReachVendorKs($this->entryId));
-		
-		// ToDo add job data
-		
-		
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -215,6 +198,9 @@ class KalturaEntryVendorTask extends KalturaObject implements IFilterable, IApiO
 		if(!$sourceObject) //Source object will be null on insert
 		{
 			$this->validatePropertyNotNull(array("vendorProfileId", "catalogItemId", "entryId"));
+			
+			if(EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemId($this->entryId, $this->catalogItemId))
+				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $this->entryId, $this->catalogItemId, kCurrentContext::getCurrentPartnerId());
 		}
 		
 		return;
@@ -228,16 +214,5 @@ class KalturaEntryVendorTask extends KalturaObject implements IFilterable, IApiO
 	public function getFilterDocs()
 	{
 		return array();
-	}
-
-	/* (non-PHPdoc)
- 	 * @see IApiObjectFactory::getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)
- 	 */
-	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		$object = new KalturaEntryVendorTask();
-		/* @var $object KalturaEntryVendorTask */
-		$object->fromObject($sourceObject, $responseProfile);
-		return $object;
 	}
 }

@@ -48,4 +48,10 @@ class kReachUtils
 	{
 		return call_user_func($vendorCatalogItem->getPricing()->getPriceFunction(), $entry, $vendorCatalogItem->getPricing()->getPricePerUnit());
 	}
+	
+	public static function isEnoughCreditLeft(EntryVendorTask $entryVendorTask)
+	{
+		$vendorProfile = $entryVendorTask->getVendorProfile();
+		return $vendorProfile->isEnoughCreditLeft($entryVendorTask->getPrice());
+	}
 }

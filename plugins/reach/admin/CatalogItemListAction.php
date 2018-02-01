@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class CatalogItemListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
+class CatalogItemListAction extends KalturaApplicationPlugin
 {
 	const ADMIN_CONSOLE_PARTNER = "-2";
 
@@ -38,12 +38,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
 		// init filter
-		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
-		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
-			$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
-		elseif($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-			$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
-		
+		$catalogItemProfileFilter = $this->getCatalogItemFilter($serviceFeature);
 		$catalogItemProfileFilter->orderBy = "-createdAt";
 		$catalogItemProfileFilter->serviceFeatureEqual = $serviceFeature;
 		$catalogItemProfileFilter->serviceTypeEqual = $serviceType;
@@ -87,28 +82,15 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 
 		$action->view->newCatalogItemFolderForm = $createProfileForm;
 	}
-
-	/**
-	 * @return array<string, string> - array of <label, jsActionFunctionName>
-	 */
-	public function getPublisherAdminActionOptions($partner, $permissions)
+	
+	protected function getCatalogItemFilter($serviceFeature)
 	{
-		$options = array();
-		$options[] = array(0 => 'Reach', 1 => 'listCatalogItems');
-		return $options;
-
-	}
-
-	/**
-	 * @return string javascript code to add to publisher list view
-	 */
-	public function getPublisherAdminActionJavascript()
-	{
-		$functionStr = 'function listCatalogItems(partnerId) {
-			var url = pluginControllerUrl + \'/' . get_class($this) . '/filter_type/partnerIdEqual/filter_input/\' + partnerId;
-			document.location = url;
-		}';
-		return $functionStr;
+		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
+			return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			return new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
+		else
+			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}
 
 	public function getInstance($interface)

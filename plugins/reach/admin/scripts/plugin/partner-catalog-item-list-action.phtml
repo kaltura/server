@@ -54,6 +54,11 @@
 </div>
 
 <script type="text/javascript">
+
+	$(function () {
+		updateFiltersView();
+	});
+    
 	jQuery('#filter_type').change(function() {
 		if(this.value == "none") {
 			$("#filter_text").css("display","none");
@@ -90,7 +95,7 @@
 				<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED; ?>,
 				partnerId,
 				function() {
-					alert('<?php echo $this->translate('Catalog Item removed');?>');
+					alert('<?php echo $this->translate('Partner catalog Item removed');?>');
 				}
 			);
 		}
@@ -209,4 +214,21 @@
 			iframe: true
 		});
 	}
+
+	function updateFiltersView() {
+		var templateServiceFeature = jQuery('#filterServiceFeature').val();
+
+		jQuery('#filterSourceLanguage').attr('hidden', 1);
+		jQuery('#filterTargetLanguage').attr('hidden', 1);
+
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+		}
+		
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+			jQuery('#filterTargetLanguage').removeAttr('hidden');
+		}
+	}
+	
 </script>

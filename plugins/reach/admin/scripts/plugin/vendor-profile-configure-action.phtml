@@ -64,7 +64,7 @@
 	}
 
 	function populateDates() {
-		let f = jQuery('#frmVendorProfileConfigure');
+		var f = jQuery('#frmVendorProfileConfigure');
 		f.find( "input[innertype=DateElement]").each(function(idx) {
 			var val = parseInt($(this).val());
 			if (isNaN(val))

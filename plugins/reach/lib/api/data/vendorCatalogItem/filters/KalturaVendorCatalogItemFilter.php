@@ -33,6 +33,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		if($this->partnerIdEqual)
 		{
 			$c->add(PartnerCatalogItemPeer::PARTNER_ID, $this->partnerIdEqual);
+			$c->add(PartnerCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE);
 			$c->addJoin(PartnerCatalogItemPeer::CATALOG_ITEM_ID, VendorCatalogItemPeer::ID, Criteria::INNER_JOIN);
 		}
 		

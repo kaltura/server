@@ -13,7 +13,8 @@
  * @package plugins.reach
  * @subpackage model
  */
-class VendorCatalogItem extends BaseVendorCatalogItem {
+class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject 
+{
 
 	/**
 	 * Initializes internal state of VendorCatalogItem object.
@@ -54,6 +55,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem {
 			$pricing = unserialize($pricing);
 		
 		return $pricing;
+	}
+	
+	public function getPartnerId()
+	{
+		return 0;
 	}
 
 } // VendorCatalogItem
