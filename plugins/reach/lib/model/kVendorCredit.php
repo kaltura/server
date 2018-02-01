@@ -163,4 +163,20 @@ class kVendorCredit
 
 		return $totalUsedCredit;
 	}
+
+	/***
+	 * @param $date
+	 * @return int
+	 */
+	public function getCurrentCredit()
+	{
+		$now = time();
+		if ( $now < $this->fromDate)
+		{
+				KalturaLog::debug("Current date [$now] is not in credit time Range [ from - $this->fromDate ] ");
+				return 0;
+		}
+
+		return $this->credit;
+	}
 }

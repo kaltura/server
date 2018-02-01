@@ -36,4 +36,19 @@ class kTimeRangeVendorCredit extends kVendorCredit
 		$c->add(EntryVendorTaskPeer::QUEUE_TIME ,$this->getToDate() , Criteria::LESS_EQUAL);
 	}
 
+	/***
+	 * @param $date
+	 * @return int
+	 */
+	public function getCurrentCredit($date)
+	{
+		$now = time();
+		if ( $now < $this->fromDate || $now > $this->toDate )
+		{
+			KalturaLog::debug("Current date [$now] is not in credit time range  [ from - $this->fromDate , to - $this->toDate] ");
+			return 0;
+		}
+		return $this->credit;
+	}
+
 }
