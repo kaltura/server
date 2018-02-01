@@ -437,4 +437,8 @@ class APIErrors
 	const CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING = "CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING;LIVE_ENTRY_ID;Live entry [@LIVE_ENTRY_ID@] cannot be deleted while streaming";
 	
 	const RECORDING_CONTENT_NOT_YET_SET = "RECORDING_CONTENT_NOT_YET_SET;ENTRY_ID;Entry [@ENTRY_ID@] cannot be deleted, waiting for recording engine to finish handling";
+
+	const USER_EMAIL_NOT_FOUND = "USER_EMAIL_NOT_FOUND;USER_ID;Email address for user [@USER_ID@] was not found";
+
+	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;MESSAGE;Failed to create file on specified location with message: \"@MESSAGE@\"";
 }

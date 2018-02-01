@@ -630,4 +630,69 @@ class UserService extends KalturaBaseUserService
 		return $res;
 	}
 
+	/**
+	 * add batch job that sends an email with a link to download an updated CSV that contains list of users
+	 *
+	 * @action exportToCsv
+	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
+	 * @param int $metadataProfileId
+	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
+	 * @return string
+	 */
+	function exportToCsvAction(KalturaUserFilter $filter, $metadataProfileId = null, $additionalFields = null)
+	{
+		if($metadataProfileId)
+		{
+			$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+			if (!$metadataProfile || ($metadataProfile->getPartnerId() != $this->getPartnerId()))
+				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $metadataProfileId);
+		}
+		else
+		{
+			if($additionalFields->count)
+				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED, $metadataProfileId);
+		}
+
+		if (!$filter)
+			$filter = new KalturaUserFilter();
+		$dbFilter = new kuserFilter();
+		$filter->toObject($dbFilter);
+
+		$kuser = $this->getKuser();
+		if(!$kuser || !$kuser->getEmail())
+			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
+
+		kJobsManager::addUsersCsvJob($this->getPartnerId(), $dbFilter, $metadataProfileId, $additionalFields, $kuser);
+
+		return $kuser->getEmail();
+	}
+
+
+	/**
+	 *
+	 * Will serve a requested csv
+	 * @action serveCsv
+	 *
+	 *
+	 * @param string $id - the requested file id
+	 * @return string
+	 */
+	public function serveCsvAction($id)
+	{
+		if(!preg_match('/^\w+\.csv$/', $id))
+			throw new KalturaAPIException(KalturaErrors::INVALID_ID, $id);
+
+		// KS verification - we accept either admin session or download privilege of the file
+		$ks = $this->getKs();
+		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+
+		$partner_id = $this->getPartnerId();
+		$folderPath = "/content/userscsv/$partner_id";
+		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
+		$file_path = "$fullPath/$id";
+
+		return $this->dumpFile($file_path, 'text/csv');
+	}
+
 }
