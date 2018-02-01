@@ -876,6 +876,11 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
 					
+				if (is_array($report_def[self::REPORT_DIMENSION]))
+				{
+					$dimension_ids = array_unique($dimension_ids);
+				}
+
 				$entities = call_user_func($enrich_func, $dimension_ids, $partner_id, $enrich_context);
 		
 				for ($current_row = $start; $current_row < $limit; $current_row++) 
