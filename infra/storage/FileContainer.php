@@ -21,6 +21,11 @@ class FileContainer
 	private $fileSize;
 
 	/**
+	 * @var string
+	 */
+	private $downloadUrl;
+
+	/**
 	 * @return string filePath
 	 */
 	public function getFilePath()
@@ -45,6 +50,14 @@ class FileContainer
 	}
 
 	/**
+	 * @return string $downloadUrl
+	 */
+	public function getDownloadUrl()
+	{
+		return $this->downloadUrl;
+	}
+
+	/**
 	 * @param string $filePath
 	 */
 	public function setFilePath($filePath)
@@ -66,6 +79,14 @@ class FileContainer
 	public function setFileSize($fileSize)
 	{
 		$this->fileSize = $fileSize;
+	}
+
+	/**
+	 * @param string $downloadUrl
+	 */
+	public function setDownloadUrl($downloadUrl)
+	{
+		$this->downloadUrl = $downloadUrl;
 	}
 }
 ?>
