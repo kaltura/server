@@ -35,6 +35,7 @@ class kESearchQueryManager
 	const FIELD_KEY = 'field';
 	const NGRAMS_FIELD_SUFFIX = 'ngrams';
 	const RAW_FIELD_SUFFIX = 'raw';
+	const SYNONYM_FIELD_SUFFIX = 'synonym';
 	const MATCH_PHRASE_KEY = 'match_phrase';
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
@@ -81,7 +82,11 @@ class kESearchQueryManager
 					$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
 					
 					if($synonymField)
+					{
 						$multiMatchQuery->addToFields($synonymField);//don't boost
+						if($searchItem->getAddHighlight())
+							$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $synonymField);
+					}
 				}
 			}
 		}
