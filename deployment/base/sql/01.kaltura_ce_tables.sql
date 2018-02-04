@@ -887,7 +887,7 @@ CREATE TABLE IF NOT EXISTS `file_sync` (
   `partner_id` int(11) DEFAULT NULL,
   `object_type` int(4) DEFAULT NULL,
   `object_id` varchar(20) DEFAULT NULL,
-  `version` varchar(20) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
   `object_sub_type` tinyint(4) DEFAULT NULL,
   `dc` int(11) DEFAULT NULL,
   `original` tinyint(4) DEFAULT NULL,
