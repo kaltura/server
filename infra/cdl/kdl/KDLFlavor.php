@@ -1362,6 +1362,10 @@ $plannedDur = 0;
 			else if($target->_frameRate==0 && $source->IsFormatOf(array("h.263","h263","sorenson spark","vp6")) ){
 				$target->_frameRate=24;
 			}
+			// For webrtc recordings - if FR==0, set FR=30
+			else if($target->_frameRate==0 && $source->IsFormatOf(array("vp8","v_vp8","vp9","v_vp9")) ){
+				$target->_frameRate=30;
+			}
 			
 			/*
 			 * For frame rates to comply w/HLS (relevant for low br 110 and 200 kfps)
