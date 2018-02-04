@@ -92,7 +92,7 @@
 		  ],
 		  "filter": [
 			"lowercase",
-			"asciifolding"
+			"icu_folding"
 		  ]
 		}
 	  },
@@ -104,7 +104,8 @@
 			"kaltura_ngram_special_chars_filter"
 		  ],
 		  "filter": [
-			"lowercase"
+			"lowercase",
+			"icu_folding"
 		  ]
 		},
 		"kaltura_text" : {
@@ -116,7 +117,7 @@
 		  "filter": [
 			"standard",
 			"lowercase",
-			"asciifolding"
+			"icu_folding"
 		  ]
 		},
 		"kaltura_english_synonym": {
