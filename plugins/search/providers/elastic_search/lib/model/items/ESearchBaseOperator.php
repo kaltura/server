@@ -144,14 +144,10 @@ abstract class ESearchBaseOperator extends ESearchItem
 		{
 			foreach ($subQuery as $key => $value)
 			{
-				if($boolOperator == kESearchBoolQuery::MUST_KEY && is_callable(array($value, "getShouldMoveToFilterContext")))
+				if($boolOperator == kESearchBoolQuery::MUST_KEY && $value->getShouldMoveToFilterContext())
 				{
-					$moveToFilter = $value->getShouldMoveToFilterContext();
-					if($moveToFilter)
-					{
-						$outQuery->addToFilter($value);
-						continue;
-					}
+					$outQuery->addToFilter($value);
+					continue;
 				}
 				$outQuery->addByOperatorType($boolOperator, $value);
 			}
