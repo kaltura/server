@@ -518,4 +518,10 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 	{
 		return 'category_kuser';
 	}
+
+	public function getElasticEntryId()
+	{
+		return null;
+	}
+
 } // categoryKuser

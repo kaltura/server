@@ -3872,6 +3872,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return ElasticMethodType::INDEX;
 	}
 
+	public function getElasticEntryId()
+	{
+		return $this->getId();
+	}
+
 	/**
 	 * Index the object into elasticsearch
 	 */

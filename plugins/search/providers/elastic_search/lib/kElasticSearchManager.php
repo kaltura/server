@@ -181,7 +181,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog->setExecutedServerId($this->retrieveElasticClusterId());
         $elasticLog->setObjectId($object->getId());
         $elasticLog->setObjectType($object->getElasticObjectName());
-        //$elasticLog->setEntryId($object->getEntryId());
+        $elasticLog->setEntryId($object->getElasticEntryId());
         $elasticLog->setPartnerId($object->getPartnerId());
         $elasticLog->setType(SphinxLogType::ELASTIC);
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
