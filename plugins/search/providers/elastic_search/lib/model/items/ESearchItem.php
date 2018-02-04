@@ -136,11 +136,4 @@ abstract class ESearchItem extends BaseObject
 		return $result;
 	}
 
-	protected function shouldTryToOptimizeToFilterContext(&$subQuery, $fieldName)
-	{
-		if($subQuery && $subQuery instanceof kESearchBaseFieldQuery && self::getFieldBoostFactor($fieldName) == 1)
-			return true;
-		return false;
-	}
-
 }

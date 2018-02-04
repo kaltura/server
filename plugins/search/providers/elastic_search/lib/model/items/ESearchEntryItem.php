@@ -163,9 +163,6 @@ class ESearchEntryItem extends ESearchItem
 		if ($this->getItemType() == ESearchItemType::EXACT_MATCH && in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
 			$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
 
-		if($this->shouldTryToOptimizeToFilterContext($subQuery, $this->getFieldName()))
-			$subQuery->setShouldMoveToFilterContext(true);
-
 		if($subQuery)
 			$entryQuery[] = $subQuery;
 	}

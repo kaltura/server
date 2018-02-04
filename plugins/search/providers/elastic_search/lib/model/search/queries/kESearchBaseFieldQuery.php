@@ -49,4 +49,14 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 		$this->boostFactor = $boostFactor;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getShouldMoveToFilterContext()
+	{
+		if($this->getBoostFactor() == 1)
+			return true;
+		return false;
+	}
+
 }

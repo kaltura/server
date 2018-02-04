@@ -114,9 +114,6 @@ class ESearchUserItem extends ESearchItem
 				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
 
-		if($this->shouldTryToOptimizeToFilterContext($subQuery,$this->getFieldName()))
-			$subQuery->setShouldMoveToFilterContext(true);
-
 		if($subQuery)
 			$userQuery[] = $subQuery;
 	}

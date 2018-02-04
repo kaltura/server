@@ -133,9 +133,6 @@ class ESearchCategoryItem extends ESearchItem
 				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
 
-		if($this->shouldTryToOptimizeToFilterContext($subQuery,$this->getFieldName()))
-			$subQuery->setShouldMoveToFilterContext(true);
-
 		if($subQuery)
 			$categoryQuery[] = $subQuery;
 	}
