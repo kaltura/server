@@ -111,26 +111,33 @@ class ESearchCategoryItem extends ESearchItem
 	{
 		$this->validateItemInput();
 		$this->translateSearchTerm();
+		$subQuery = null;
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$categoryQuery[] = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$categoryQuery[] = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
+				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$categoryQuery[] = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$categoryQuery[] = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$categoryQuery[] = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
+
+		if($this->shouldTryToOptimizeToFilterContext($subQuery,$this->getFieldName()))
+			$subQuery->setShouldMoveToFilterContext(true);
+
+		if($subQuery)
+			$categoryQuery[] = $subQuery;
 	}
 
 	protected function translateSearchTerm()

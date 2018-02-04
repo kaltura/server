@@ -8,30 +8,25 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 	public function getDisplayInSearchFilter()
 	{
 		$displayInSearchQuery = new kESearchTermQuery(ESearchEntryFieldName::DISPLAY_IN_SEARCH, EntryDisplayInSearchType::SYSTEM);
+		$mustNotDisplayInSearchBoolQuery = new kESearchBoolQuery();
+		$mustNotDisplayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
+
 		$ignoreDisplayInSearchQueries = array();
+
 		foreach	($this->ignoreDisplayInSearchValues as $key => $value)
 		{
 			if($value)
-			{
 				$ignoreDisplayInSearchQueries[] = new kESearchTermsQuery($key, $value);
-			}
 		}
 
-		$displayInSearchBoolQuery = new kESearchBoolQuery();
-		if($ignoreDisplayInSearchQueries)
+		if(count($ignoreDisplayInSearchQueries))
 		{
-			$innerSearchBoolQuery = new kESearchBoolQuery();
-			$innerSearchBoolQuery->addQueriesToShould($ignoreDisplayInSearchQueries);
-			$innerDisplayInSearchBoolQuery = new kESearchBoolQuery();
-			$innerDisplayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
-			$innerSearchBoolQuery->addToShould($innerDisplayInSearchBoolQuery);
-			$displayInSearchBoolQuery->addToFilter($innerSearchBoolQuery);
-		}
-		else
-		{
-			$displayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
+			$displayInSearchBoolQuery = new kESearchBoolQuery();
+			$displayInSearchBoolQuery->addQueriesToShould($ignoreDisplayInSearchQueries);
+			$displayInSearchBoolQuery->addToShould($mustNotDisplayInSearchBoolQuery);
+			return $displayInSearchBoolQuery;
 		}
 
-		return $displayInSearchBoolQuery;
+		return $mustNotDisplayInSearchBoolQuery;
 	}
 }
