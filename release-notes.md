@@ -1,5 +1,22 @@
 # Mercury 13.13.0 #
 
+## Update File-Sync version field type ##
+
+- Issue Type: Task
+- Issue ID: No Plat
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_02_04_alter_file_sync_version_from_varchar_to_int.sql
+	
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## New SaaS Drop Folder Type ##  
 - Issue Type: New Feature  
 - Issue ID: PSVAMB-939  
