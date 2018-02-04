@@ -1587,8 +1587,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c->add ( FileSyncPeer::OBJECT_SUB_TYPE , $newFileSync->getObjectSubType() );
 			$c->add ( FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_PURGED, FileSync::FILE_SYNC_STATUS_DELETED), Criteria::NOT_IN);
 			$c->add ( FileSyncPeer::VERSION, $intVersion - $keepCount, Criteria::LESS_THAN);
+			//Get oldest 5 version's (10 is the jump offset between versions)
+			//we limit the number of files to delete in one run so there will be no out of memory issues
+			$c->add ( FileSyncPeer::VERSION, $intVersion - $keepCount - (5*10), Criteria::GREATER_EQUAL);
 			$c->addAscendingOrderByColumn(FileSyncPeer::VERSION);
-			$c->setLimit(40); //we limit the number of files to delete in one run so there will be no out of memory issues
 			$fileSyncs = FileSyncPeer::doSelect($c);
 			foreach ($fileSyncs as $fileSync)
 			{
