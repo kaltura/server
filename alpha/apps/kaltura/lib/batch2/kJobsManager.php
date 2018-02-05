@@ -1790,7 +1790,7 @@ class kJobsManager
 		return self::getFileContainerByFileSync($fileSync);
 	}
 
-	protected static function getFileContainerByFileSync(FileSync $fileSync)
+	protected static function getFileContainerByFileSync(FileSync $fileSync, $entryId = null)
 	{
 		$fileContainer = new FileContainer();
 		if ($fileSync)
@@ -1798,6 +1798,10 @@ class kJobsManager
 			$fileContainer->setFilePath($fileSync->getFullPath());
 			$fileContainer->setEncryptionKey($fileSync->getEncryptionKey());
 			$fileContainer->setFileSize($fileSync->getFileSize());
+			if($entryId)
+			{
+				$fileContainer->setDownloadUrl($fileSync->getExternalUrl($entryId));
+			}
 		}
 		return $fileContainer;
 	}

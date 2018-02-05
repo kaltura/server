@@ -20,11 +20,17 @@ class KalturaFileContainer extends KalturaObject
 	 */
 	public $fileSize;
 
+	/**
+	 * @var string
+	 */
+	public $downloadUrl;
+
 	private static $map_between_objects = array
 	(
 		"filePath",
 		"encryptionKey",
 		"fileSize",
+		"downloadUrl",
 	);
 
 	public function getMapBetweenObjects ( )
