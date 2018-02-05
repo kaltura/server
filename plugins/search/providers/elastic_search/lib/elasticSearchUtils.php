@@ -55,7 +55,7 @@ class elasticSearchUtils
 	public static function getSynonymFieldName($language, $fieldName, $delimiter)
 	{
 		$fieldMap = array(
-			'english' => 'synonym',
+			'english' => kESearchQueryManager::SYNONYM_FIELD_SUFFIX,
 		);
 
 		$language = strtolower($language);
