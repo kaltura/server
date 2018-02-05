@@ -25,4 +25,13 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelectOne($c);
 	}
 	
+	public static function retrievePendingByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
+		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION), Criteria::IN);
+		
+		return EntryVendorTaskPeer::doSelect($c);
+	}
+	
 } // EntryVendorTaskPeer

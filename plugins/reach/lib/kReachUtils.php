@@ -89,9 +89,25 @@ class kReachUtils
 		
 		$entryTaskPrice = $entryVendorTask->getPrice();
 		
-		alturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
+		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
 		
+		return $remainingCredit >= 0 ? true : false;
+	}
+	
+	public static function checkPriceAddon($entryVendorTask, $taskPriceDiff)
+	{
+		$vendorProfile = $entryVendorTask->getVendorProfile();
+		
+		$credit = $vendorProfile->getCredit();
+		$creditUsed = $vendorProfile->getUsedCredit();
+		
+		$allowedCredit = $credit->getCurrentCredit();
+		if ( $credit->getAllowOverage())
+			$allowedCredit += $credit->getOverageCredit();
+		
+		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] taskPriceDiff [$taskPriceDiff]");
+		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);
 		return $remainingCredit >= 0 ? true : false;
 	}
 }
