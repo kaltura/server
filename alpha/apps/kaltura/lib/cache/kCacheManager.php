@@ -35,6 +35,7 @@ class kCacheManager
 	const CACHE_TYPE_UPLOAD_TOKEN = 'uploadToken';
 	const CACHE_TYPE_REPORTS_COUNT = "reportsCount";
 	const CACHE_TYPE_GEO_COORDINATES = 'geoCoordinates';
+	const CACHE_TYPE_ELASTIC_STICKY_SESSIONS = 'elasticStickySessions';
 
 	protected static $caches = array();
 	

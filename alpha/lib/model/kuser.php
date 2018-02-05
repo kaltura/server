@@ -1366,4 +1366,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return 'kuser';
 	}
+
+	public function getElasticEntryId()
+	{
+		return null;
+	}
+
 }
