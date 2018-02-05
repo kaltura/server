@@ -21,6 +21,7 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
+	const CUSTOM_DATA_IS_LIVE_USER = "is_live_user";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -144,7 +145,12 @@ abstract class LiveEntry extends entry
 			$this->setRedirectEntryId(null);
 			$this->setCustomDataObj();
 		}
-		
+		if ($this->getExplicitLive() && $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_VIEW_MODE) && $this->getViewMode() == ViewMode::PREVIEW)
+		{
+				$this->setIsLiveUser(false);
+				$this->setCustomDataObj();
+		}
+
 		return parent::preUpdate($con);
 	}
 	
@@ -469,6 +475,10 @@ abstract class LiveEntry extends entry
 		{
 			if (!$this->canViewExplicitLive())
 				return false;
+		}
+		if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$this->getIsLiveUser())
+		{
+			return false;
 		}
 
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
@@ -980,6 +990,16 @@ abstract class LiveEntry extends entry
 	public function setRecordingStatus($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
+	}
+
+	public function getIsLiveUser()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_LIVE_USER, null, true);
+	}
+
+	public function setIsLiveUser($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_LIVE_USER, $v);
 	}
 
 }

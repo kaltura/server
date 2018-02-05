@@ -125,6 +125,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $recordingStatus;
 
+	/**
+	 * @var bool
+	 * @requiresPermission all
+	 */
+	public $isLiveUser;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -145,6 +151,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"explicitLive",
 		"viewMode",
 		"recordingStatus",
+		"isLiveUser"
 	);
 	
 	/* (non-PHPdoc)
