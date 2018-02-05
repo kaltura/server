@@ -1790,8 +1790,7 @@ class kJobsManager
 		return self::getFileContainerByFileSync($fileSync);
 	}
 
-//	protected static function getFileContainerByFileSync(FileSync $fileSync)
-	public static function getFileContainerByFileSync(FileSync $fileSync)
+	protected static function getFileContainerByFileSync(FileSync $fileSync)
 	{
 		$fileContainer = new FileContainer();
 		if ($fileSync)
