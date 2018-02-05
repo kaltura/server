@@ -1654,5 +1654,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return self::resolve($fileSync);
 	}
 
+	public static function getExternalUrlByFileSync(FileSync $fileSync)
+	{
+		$fileSyncId = $fileSync->getId();
+		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		$dcConfig = kDataCenterMgr::getDcById($currentDcId);
+
+		return self::getSourceUrl($fileSyncId, $dcConfig['url'], $dcConfig['dcSecret']);
+	}
+	public static function getSourceUrl($fileSyncId, $baseUrl, $dcSecret)
+	{
+		$fileHash = md5($dcSecret . $fileSyncId);
+		return $baseUrl . "/index.php/extwidget/servefile/id/$fileSyncId/hash/$fileHash";
+	}
 
 }
