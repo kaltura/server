@@ -11,9 +11,9 @@ class DoubleClickServiceContext extends ContentDistributionServiceContext
 	
 	public $totalCount;
 	public $hasNextPage;
-	public $stateLastEntryCreatedAt = null;
+	public $stateLastEntryTimeMark = null;
 	public $stateLastEntryIds = array();
-	public $nextPageStateLastEntryCreatedAt;
+	public $nextPageStateLastEntryTimeMark;
 	public $nextPageStateLastEntryIds;
 	
 	public function __construct($hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 2)
