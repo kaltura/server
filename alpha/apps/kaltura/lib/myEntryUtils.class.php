@@ -5,6 +5,13 @@ class myEntryUtils
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
 
+	static private $liveSourceType = array
+	(
+		EntrySourceType::RECORDED_LIVE,
+		EntrySourceType::KALTURA_RECORDED_LIVE,
+		EntrySourceType::LECTURE_CAPTURE,
+	);
+
 	public static function updateThumbnailFromFile(entry $dbEntry, $filePath, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
 	{
 		$dbEntry->setThumbnail(".jpg"); // this will increase the thumbnail version
@@ -1610,15 +1617,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		    $newEntry->copyMetaData = false;
 
 		$newEntry->setSourceType(self::getCloneSourceType($entry->getSourceType()),true);
+		$newEntry->setConversionProfileId(self::getCloneConversionProfile($entry->getSourceType(),$toPartner,$entry));
 
-	    $quizData = $entry->getFromCustomData( QuizPlugin::QUIZ_DATA );
-	    if ($quizData)
-	    {
-		    $newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
-		    $newEntry->addCapability(QuizPlugin::getCapatabilityCoreValue());
-	    }
+		$quizData = $entry->getFromCustomData( QuizPlugin::QUIZ_DATA );
+		if ($quizData)
+		{
+			$newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
+			$newEntry->addCapability(QuizPlugin::getCapatabilityCoreValue());
+		}
 
-	    // save the entry
+	    	// save the entry
  		$newEntry->save();
  		 		
  		// restore the original partner id in the default category criteria filter
@@ -1795,28 +1803,28 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		    $newEntry->save();
 	    }
 	    return $newEntry;
- 	} 	
+ 	}
+
+	private static function isSourceLive($sourceType)
+    	{
+        	return in_array($sourceType,self::$liveSourceType);
+    	}
 
 	private static function getCloneSourceType($originSourceType)
 	{
-		$targetSourceType = $originSourceType;
-		switch ($originSourceType)
-		{
-			case EntrySourceType::FILE:
-			case EntrySourceType::WEBCAM:
-			case EntrySourceType::URL:
-			case EntrySourceType::RECORDED_LIVE:
-			case EntrySourceType::CLIP:
-			case EntrySourceType::KALTURA_RECORDED_LIVE:
-			case EntrySourceType::LECTURE_CAPTURE:
-			case EntrySourceType::SEARCH_PROVIDER:
-				$targetSourceType = EntrySourceType::CLIP;
-				break;
-			default:
-				break;
-		}
+	        $entrySourceType = array_merge(self::$liveSourceType, array(EntrySourceType::FILE, EntrySourceType::WEBCAM, EntrySourceType::URL, EntrySourceType::CLIP, EntrySourceType::SEARCH_PROVIDER));
+        	if (in_array($originSourceType,$entrySourceType))
+	            return EntrySourceType::CLIP;
 
-		return $targetSourceType;
+        	return $originSourceType;
+	}	
+
+	private static function getCloneConversionProfile($originSourceType,$partner,$sourceEntry)
+	{
+        	if (self::isSourceLive($originSourceType))
+	            return $partner->getDefaultConversionProfileId();
+
+        	return $sourceEntry->getConversionProfileId();
 	}
 
  	/*
