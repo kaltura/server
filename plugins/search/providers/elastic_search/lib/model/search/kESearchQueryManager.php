@@ -42,6 +42,7 @@ class kESearchQueryManager
 	const RAW_FIELD_BOOST_FACTOR = 4;
 	const LANGUAGE_FIELD_BOOST_FACTOR = 3;
 	const MATCH_FIELD_BOOST_FACTOR = 2;
+	const DEFAULT_BOOST_FACTOR = 1;
 
 
 	/**
