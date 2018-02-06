@@ -21,7 +21,6 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
-	const CUSTOM_DATA_IS_LIVE_USER = "is_live_user";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -147,8 +146,13 @@ abstract class LiveEntry extends entry
 		}
 		if ($this->getExplicitLive() && $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_VIEW_MODE) && $this->getViewMode() == ViewMode::PREVIEW)
 		{
-				$this->setIsLiveUser(false);
-				$this->setCustomDataObj();
+			$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
+			foreach ($liveEntryServerNodes as $liveEntryServerNode)
+			{
+				/* @var LiveEntryServerNode $liveEntryServerNode*/
+				$liveEntryServerNode->setIsPlayableUser(false);
+				$liveEntryServerNode->save();
+			}
 		}
 
 		return parent::preUpdate($con);
@@ -476,10 +480,6 @@ abstract class LiveEntry extends entry
 			if (!$this->canViewExplicitLive())
 				return false;
 		}
-		if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$this->getIsLiveUser())
-		{
-			return false;
-		}
 
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
 		if(!count($liveEntryServerNodes))
@@ -491,7 +491,11 @@ abstract class LiveEntry extends entry
 			/* @var WowzaMediaServerNode $serverNode*/
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+			{
+				if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$liveEntryServerNode->getIsPlayableUser())
+					return false;
 				return true;
+			}
 		}
 		
 		return !$currentDcOnly;
@@ -990,16 +994,6 @@ abstract class LiveEntry extends entry
 	public function setRecordingStatus($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
-	}
-
-	public function getIsLiveUser()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_IS_LIVE_USER, null, true);
-	}
-
-	public function setIsLiveUser($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_IS_LIVE_USER, $v);
 	}
 
 }
