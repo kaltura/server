@@ -100,7 +100,6 @@ class UiConfService extends KalturaBaseService
 	 * @action get
 	 * @param int $id 
 	 * @return KalturaUiConf
-	 * @ksIgnored
 	 *
 	 * @throws APIErrors::INVALID_UI_CONF_ID
 	 */		
