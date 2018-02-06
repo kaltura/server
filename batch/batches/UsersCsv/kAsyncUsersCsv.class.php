@@ -245,6 +245,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 	private function retrieveUsersMetadata($userIds, $metadataProfileId)
 	{
 		$result = null;
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$pager->pageIndex = 1;
 		$filter = new KalturaMetadataFilter();
 		$filter->objectIdIn = implode(',', $userIds);
 		$filter->metadataObjectTypeEqual = MetadataObjectType::USER;
@@ -252,7 +255,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		try
 		{
 			$metadataClient = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
-			$result = $metadataClient->metadata->listAction($filter);
+			$result = $metadataClient->metadata->listAction($filter, $pager);
 		}
 		catch(Exception $e)
 		{

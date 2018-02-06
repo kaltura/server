@@ -77,6 +77,7 @@ None.
           params.localTempPath				= @TMP_DIR@/userscsv
           params.sharedTempPath				= @WEB_DIR@/tmp/userscsv
           scriptPath					= batches/UsersCsv/kAsyncUsersCsvExe.php
+          maximumExecutionTime			= 3600
 
 ### Deployment scripts ###
 
