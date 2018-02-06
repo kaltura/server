@@ -353,7 +353,7 @@ class myPartnerRegistration
 
 				if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 				{
-					$result = myPartnerUtils::retrieveActivePartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
+					$result = myPartnerUtils::retrieveNotDeletedPartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
 					if($result)
 					{
 						$result->setSubPartnerRequestCampaign(1);
