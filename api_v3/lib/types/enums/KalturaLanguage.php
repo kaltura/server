@@ -28,8 +28,8 @@ class KalturaLanguage extends KalturaStringEnum
 	const KM = 'Cambodian';
 	const CA = 'Catalan';
 	const ZH = 'Chinese';
-	const ZH_HANT = 'Chinese (Traditional)';
-	const ZH_HANS = 'Chinese (Simplified)';
+	const ZH_T = 'Chinese (Traditional)';
+	const ZH_S = 'Chinese (Simplified)';
 	const CO = 'Corsican';
 	const HR = 'Croatian';
 	const CS = 'Czech';
