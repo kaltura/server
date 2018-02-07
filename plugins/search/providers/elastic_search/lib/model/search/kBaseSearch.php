@@ -46,8 +46,8 @@ abstract class kBaseSearch
         $this->mainBoolQuery->addToMust($subQuery);
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
-        KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
-        $result = $this->elasticClient->search($this->query);
+        KalturaLog::debug("Elasticsearch performing search.");
+        $result = $this->elasticClient->search($this->query, true);
         return $result;
     }
 
