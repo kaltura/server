@@ -121,7 +121,7 @@ class kBroadcastUrlManager
 		return $port;
 	}
 	
-	protected function getExtraQueryParamsConfig(LiveStreamEntry $entry, $mediaServerIndex)
+	protected function getExtraQueryParamsConfig(LiveEntry $entry, $mediaServerIndex)
 	{
 		$extraQueryPrams = array();
 		$broadcastConfig = $this->getConfiguration(kDataCenterMgr::getCurrentDcId());
@@ -150,7 +150,7 @@ class kBroadcastUrlManager
 		return $extraQueryPrams;
 	}
 	
-	protected function getQueryParams(LiveStreamEntry $entry, $mediaServerIndex)
+	protected function getQueryParams(LiveEntry $entry, $mediaServerIndex)
 	{
 		$queryParams = array('t' => $entry->getStreamPassword());
 		
@@ -166,7 +166,7 @@ class kBroadcastUrlManager
 		return http_build_query($queryParams);
 	}
 	
-	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
+	protected function getBroadcastUrl(LiveEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
 	{
 		if (!$hostname)
 		{
@@ -214,7 +214,7 @@ class kBroadcastUrlManager
 		}
 	}
 
-	public function getRTCBroadcastingUrl(LiveStreamEntry $entry, $protocol, $hostname)
+	public function getRTCBroadcastingUrl(LiveConferenceEntry $entry, $protocol, $hostname)
 	{
 		return $this->getBroadcastUrl($entry, $protocol, $hostname, -1, true);
 	}

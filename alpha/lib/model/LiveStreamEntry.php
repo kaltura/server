@@ -21,9 +21,6 @@ class LiveStreamEntry extends LiveEntry
 	public function setStreamUsername ( $v )	{	$this->putInCustomData ( "streamUsername" , $v );	}
 	public function getStreamUsername (  )		{	return $this->getFromCustomData( "streamUsername" );	}
 
-	public function setStreamPassword ( $v )	{	$this->putInCustomData ( "streamPassword" , $v );	}
-	public function getStreamPassword (  )		{	return $this->getFromCustomData( "streamPassword" );	}
-
 	public function setStreamRemoteId ( $v )	{	$this->putInCustomData ( "streamRemoteId" , $v );	}
 	public function getStreamRemoteId (  )		{	return $this->getFromCustomData( "streamRemoteId" );	}
 

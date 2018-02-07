@@ -10,7 +10,7 @@ class ConferenceServerNode extends ServerNode {
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->setType(KonferencePlugin::getConferenceCoreValue(ConferenceServerNodeType::CONFERENCE_SERVER));
+		$this->setType(KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
 	}
 
 } // ConferenceServerNode

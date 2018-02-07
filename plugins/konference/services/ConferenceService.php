@@ -38,7 +38,7 @@ class ConferenceService extends KalturaBaseService {
 		if ($existingConfRoom)
 			return $existingConfRoom;
 
-		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(KonferencePlugin::getConferenceCoreValue(ConferenceServerNodeType::CONFERENCE_SERVER));
+		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
 		if (!$serverNodes)
 		{
 			KalturaLog::debug("Could not find avaialable conference server node in pool");
@@ -63,7 +63,7 @@ class ConferenceService extends KalturaBaseService {
 
 	protected function findExistingConferenceRoom($entryId)
 	{
-		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getConferenceCoreValue(ConferenceServerNodeType::CONFERENCE_SERVER));
+		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
 		if ($existingConfRoom)
 		{
 			$outObj = new KalturaConferenceEntryServerNode();
@@ -87,7 +87,7 @@ class ConferenceService extends KalturaBaseService {
 		$room = EntryServerNodePeer::retrieveByPK($confRoomId);
 		if (!$room)
 		{
-			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $confRoomId);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $confRoomId);
 		}
 		/** @var ConferenceEntryServerNode $room */
 		try
