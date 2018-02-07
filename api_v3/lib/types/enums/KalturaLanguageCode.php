@@ -28,8 +28,6 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const KM = 'km';
 	const CA = 'ca';
 	const ZH = 'zh';
-	const ZH_HANT = 'zh_t';
-	const ZH_HANS = 'zh_s';
 	const CO = 'co';
 	const HR = 'hr';
 	const CS = 'cs';
