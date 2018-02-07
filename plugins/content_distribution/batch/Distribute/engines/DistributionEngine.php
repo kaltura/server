@@ -185,4 +185,32 @@ abstract class DistributionEngine implements IDistributionEngine
 
 		return $metadataListResponse->objects;
 	}
+
+	protected function putTempFile($fileName, $contentUrl, $subDirectoryName = null)
+	{
+		$tempDirectory = $this->getTempDirectoryForProfile($subDirectoryName);
+		$fileLocation = $tempDirectory . $fileName;
+		$content = file_get_contents($contentUrl);
+		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $content))
+		{
+			file_put_contents($fileLocation, $content);
+			chmod($fileLocation, 0600);
+		}
+
+		return $fileLocation;
+	}
+
+	protected function getTempDirectoryForProfile($subDirectoryName = null)
+	{
+		$tempFilePath = $this->tempDirectory . '/';
+		if($subDirectoryName)
+		{
+			$tempFilePath .= $subDirectoryName . '/';
+		}
+		if (!file_exists($tempFilePath))
+		{
+			mkdir($tempFilePath, 0777, true);
+		}
+		return $tempFilePath;
+	}
 }
