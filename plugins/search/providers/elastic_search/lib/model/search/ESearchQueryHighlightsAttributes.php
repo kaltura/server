@@ -112,6 +112,8 @@ class ESearchQueryHighlightsAttributes
 			$priority =  self::HIGHLIGHT_HIGHEST_PRIORITY;
 		else if(kString::endsWith($fieldName, kESearchQueryManager::NGRAMS_FIELD_SUFFIX))
 			$priority = self::HIGHLIGHT_LOWEST_PRIORITY;
+		else if(kString::endsWith($fieldName, kESearchQueryManager::SYNONYM_FIELD_SUFFIX))
+			$priority = self::HIGHLIGHT_LOWEST_PRIORITY;
 		else if($this->baseFieldNameMapping[$fieldName] == $fieldName)
 			$priority = self::HIGHLIGHT_MEDIUM_PRIORITY;
 

@@ -21,9 +21,9 @@ class KalturaTransformMetadataJobData extends KalturaJobData
 	public $destVersion;
 	
 	/**
-	 * @var string
+	 * @var KalturaFileContainer
 	 */
-	public $destXsdPath;
+	public $destXsd;
 	
 	/**
 	 * @var int
@@ -36,7 +36,7 @@ class KalturaTransformMetadataJobData extends KalturaJobData
 		"srcVersion" ,
 		"destVersion" ,
 		"metadataProfileId" ,
-		"destXsdPath" ,
+		"destXsd" ,
 	);
 
 	public function getMapBetweenObjects ( )

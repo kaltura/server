@@ -17,17 +17,21 @@ class kEntrySearch extends kBaseSearch
     {
         $this->isInitialized = false;
         parent::__construct();
+		$this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
     }
 
     protected function handleDisplayInSearch()
     {
-        if($this->queryAttributes->getShouldUseDisplayInSearch())
-            $this->initDisplayInSearch($this->queryAttributes->getObjectId());
+        if($this->queryAttributes->getObjectId())
+            return;
+
+        $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
+        $this->mainBoolQuery->addToFilter($displayInSearchQuery);
     }
 
     public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
     {
-	    kEntryElasticEntitlement::init();
+        kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $objectId, $pager, $order);
@@ -119,16 +123,4 @@ class kEntrySearch extends kBaseSearch
     {
         return self::PEER_RETRIEVE_FUNCTION_NAME;
     }
-
-    protected function initDisplayInSearch($objectId)
-    {
-        if($objectId)
-            return;
-    
-        $displayInSearchQuery = new kESearchTermQuery('display_in_search', EntryDisplayInSearchType::SYSTEM);
-        $displayInSearchBoolQuery = new kESearchBoolQuery();
-        $displayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
-        $this->mainBoolQuery->addToFilter($displayInSearchBoolQuery);
-    }
-
 }

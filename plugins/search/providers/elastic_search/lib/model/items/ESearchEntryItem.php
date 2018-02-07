@@ -131,36 +131,40 @@ class ESearchEntryItem extends ESearchItem
 	}
 
 	/**
-	 * @param array $entryQuery
-	 * @param array $allowedSearchTypes
-	 * @param ESearchQueryAttributes $queryAttributes
+	 * @param $entryQuery
+	 * @param $allowedSearchTypes
+	 * @param $queryAttributes
 	 */
 	public function getSingleItemSearchQuery(&$entryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$this->validateItemInput();
+		$subQuery = null;
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$entryQuery[] = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
+				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$entryQuery[] = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$entryQuery[] = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$entryQuery[] = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
 
-		if (in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
-			$queryAttributes->setShouldUseDisplayInSearch(false);
+		if ($this->getItemType() == ESearchItemType::EXACT_MATCH && in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
+			$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
+
+		if($subQuery)
+			$entryQuery[] = $subQuery;
 	}
 
 	public function shouldAddLanguageSearch()

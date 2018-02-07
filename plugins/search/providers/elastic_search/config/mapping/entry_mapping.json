@@ -92,7 +92,7 @@
 		  ],
 		  "filter": [
 			"lowercase",
-			"asciifolding"
+			"icu_folding"
 		  ]
 		}
 	  },
@@ -104,7 +104,8 @@
 			"kaltura_ngram_special_chars_filter"
 		  ],
 		  "filter": [
-			"lowercase"
+			"lowercase",
+			"icu_folding"
 		  ]
 		},
 		"kaltura_text" : {
@@ -116,7 +117,7 @@
 		  "filter": [
 			"standard",
 			"lowercase",
-			"asciifolding"
+			"icu_folding"
 		  ]
 		},
 		"kaltura_english_synonym": {
@@ -565,125 +566,124 @@
 		"caption_assets": {
 		  "type"  : "nested",
 		  "properties"  : {
-			"lines"  : {
-			  "type"  : "nested",
-			  "properties"  : {
-				"content" : {
+			"content" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "kaltura_text",
-				  "fields": {
-					"ngrams" : {
-					  "type" : "text",
-					  "analyzer" : "kaltura_ngrams"
-					},
-					"raw" : {
-					  "type" : "keyword",
-					  "normalizer" : "kaltura_keyword_normalizer"
-					}
-				  }
+				  "analyzer" : "kaltura_ngrams"
 				},
-				"content_english" : {
-				  "type" : "text",
-				  "analyzer": "english",
-				  "fields":{
-					"synonym" : {
-					  "type" : "text",
-					  "analyzer": "kaltura_english_synonym",
-					  "search_analyzer": "standard"
-					}
-				  }
-				},
-				"content_arabic" : {
-				  "type" : "text",
-				  "analyzer": "arabic"
-				},
-				"content_brazilian" : {
-				  "type" : "text",
-				  "analyzer" : "brazilian"
-				},
-				"content_cjk" : {
-				  "type" : "text",
-				  "analyzer" : "cjk"
-				},
-				"content_danish" : {
-				  "type" : "text",
-				  "analyzer" : "danish"
-				},
-				"content_dutch" : {
-				  "type" : "text",
-				  "analyzer" : "dutch"
-				},
-				"content_finnish" : {
-				  "type" : "text",
-				  "analyzer" : "finnish"
-				},
-				"content_french" : {
-				  "type" : "text",
-				  "analyzer" : "french"
-				},
-				"content_german" : {
-				  "type" : "text",
-				  "analyzer" : "german"
-				},
-				"content_greek" : {
-				  "type" : "text",
-				  "analyzer" : "greek"
-				},
-				"content_hindi" : {
-				  "type" : "text",
-				  "analyzer" : "hindi"
-				},
-				"content_indonesian" : {
-				  "type" : "text",
-				  "analyzer" : "indonesian"
-				},
-				"content_italian" : {
-				  "type" : "text",
-				  "analyzer" : "italian"
-				},
-				"content_norwegian" : {
-				  "type" : "text",
-				  "analyzer" : "norwegian"
-				},
-				"content_portuguese" : {
-				  "type" : "text",
-				  "analyzer" : "portuguese"
-				},
-				"content_russian" : {
-				  "type" : "text",
-				  "analyzer" : "russian"
-				},
-				"content_spanish" : {
-				  "type" : "text",
-				  "analyzer" : "spanish"
-				},
-				"content_swedish" : {
-				  "type" : "text",
-				  "analyzer" : "swedish"
-				},
-				"content_turkish" : {
-				  "type" : "text",
-				  "analyzer" : "turkish"
-				},
-				"content_thai" : {
-				  "type" : "text",
-				  "analyzer" : "thai"
-				},
-				"start_time"  : {
-				  "type" : "long"
-				},
-				"end_time"  : {
-				  "type" : "long"
-				},
-				"caption_asset_id": {
-				  "type" : "keyword",
-				  "normalizer" : "kaltura_keyword_normalizer"
-				},
-				"language" : {
+				"raw" : {
 				  "type" : "keyword",
 				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
+			},
+			"content_english" : {
+			  "type" : "text",
+			  "analyzer": "english",
+			  "fields":{
+				"synonym" : {
+				  "type" : "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "standard"
+				}
+			  }
+			},
+			"content_arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"content_brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"content_cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"content_danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"content_dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"content_finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"content_french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"content_german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"content_greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"content_hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"content_indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"content_italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"content_norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"content_portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"content_russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"content_spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"content_swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"content_turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"content_thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
+			},
+			"start_time"  : {
+			  "type" : "long"
+			},
+			"end_time"  : {
+			  "type" : "long"
+			},
+			"caption_asset_id": {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"language" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"label" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			}
 		  }
 		},

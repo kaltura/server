@@ -7,7 +7,7 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 {
 
 	const INNER_HITS_CONFIG_KEY = 'captionInnerHitsSize';
-	const NESTED_QUERY_PATH = 'caption_assets.lines';
+	const NESTED_QUERY_PATH = 'caption_assets';
 	const HIGHLIGHT_CONFIG_KEY = 'captionMaxNumberOfFragments';
 
 	private static $allowed_search_types_for_field = array(

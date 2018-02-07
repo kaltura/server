@@ -1984,4 +1984,10 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	{
 		return 'category';
 	}
+
+	public function getElasticEntryId()
+	{
+		return null;
+	}
+
 }
