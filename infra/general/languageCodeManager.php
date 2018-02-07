@@ -177,6 +177,8 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'CE', "ce", "che", "che", "Chechen", "\xd0\xbd\xd0\xbe\xd1\x85\xd1\x87\xd0\xb8\xd0\xb9\xd0\xbd \xd0\xbc\xd0\xbe\xd1\x82\xd1\x82",'Chechen');//not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'NY', "ny", "nya", "nya", "Chichewa, Chewa, Nyanja", "chiChe\xc5\xb5",'Chichewa'); //not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'ZH', "zh", "zho", "chi", "Chinese", "\xe4\xb8\xad\xe6\x96\x87 (Zh\xc5\x8dngw\xc3\xa9n), \xe6\xb1\x89\xe8\xaf\xad, \xe6\xbc\xa2\xe8\xaa\x9e",'Chinese');
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'ZH-HANT', "zh-hant", "zh-t", "zh-t", "Chinese (Traditional)");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'ZH-HANS', "zh-hans", "zh-s", "zh-s", "Chinese (Simplified)");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'CV', "cv", "chv", "chv", "Chuvash", "\xd1\x87\xd3\x91\xd0\xb2\xd0\xb0\xd1\x88 \xd1\x87\xd3\x97\xd0\xbb\xd1\x85\xd0\xb8",'Chuvash');//not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'KW', "kw", "cor", "cor", "Cornish", "Kernewek",'Cornish');//not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'CO', "co", "cos", "cos", "Corsican", "corsu, lingua corsa",'Corsican');
@@ -743,8 +745,6 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"TEO","teo","teo","teo","Teo Chew","Teo Chew","Teo Chew");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"HNN","hnn","hnn","hnn","Hainanese","Hainanese","Hainanese");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,"HAK","hak","hak","hak","Hakka","Hakka","Hakka");
-        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'ZH-HANT', "zh-hant", "zh-t", "zh-t", "Chinese (Traditional)",'Chinese (Traditional)');
-        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'ZH-HANS', "zh-hans", "zh-s", "zh-s", "Chinese (Simplified)",'Chinese (Simplified)');
 
         $result = "<?php\n\n".self::assignArrayToVar($tmpArrKeyCode ,'arrayISO639');
         $result .= self::assignArrayToVar($tmpArrThreeCodeT, 'arrayISO639_T');
