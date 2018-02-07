@@ -162,7 +162,7 @@ class elasticClient
 	/**
 	 * search API
 	 * @param array $params
-	 * @logQuery bool
+	 * @param $logQuery bool
 	 * @return mixed
 	 */
 	public function search(array $params, $logQuery = false)
