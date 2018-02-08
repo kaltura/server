@@ -2022,12 +2022,12 @@
 	</multirequest>
 
 	<multirequest>
-		<!-- Server-Node is down -->
+		<!-- Server-Node is Status Changed -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
-				<name>Server Node Down</name>
-				<systemName>Server_Node_Down</systemName>
-				<description>Email notification template to be sent when a server node stopped sending heart beats.</description>
+				<name>Server Node Status Changed</name>
+				<systemName>SERVER_NODE_STATUS_CHANGE</systemName>
+				<description>Email notification template to be sent when a server node status is changed.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 				<eventObjectType>39</eventObjectType> <!-- EventNotificationEventObjectType::SERVER_NODE -->
@@ -2038,13 +2038,14 @@
 					</item>
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getObject() instanceof EdgeServerNode &amp;&amp; $scope->getObject()->getStatus() == ServerNodeStatus::NOT_REGISTERED</code>
+							<code>$scope->getObject() instanceof EdgeServerNode &amp;&amp; in_array($scope->getObject()->getStatus(),  explode(',',$scope->getDynamicValues()['server_node_trigger_status']))</code>
 						</field>
 					</item>
+
 				</eventConditions>
 				<format>1</format>
-				<subject>Server Node is down ID: {server_node_hostname} </subject>
-				<body><![CDATA[Hello,<p>Server node {server_node_hostname} is down.</p>]]></body>
+				<subject>Server Node ID: {server_node_hostname} Status Changed </subject>
+				<body><![CDATA[Hello,<p>Server node {server_node_hostname} status has changed to {server_node_status}.</p>]]></body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<contentParameters objectType="array">
@@ -2069,7 +2070,43 @@
 							<code>$scope->getObject()->getHostName()</code>
 						</value>
 					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>server_node_status</key>
+						<description>Server-Node status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>($scope->getObject()->getStatus() == ServerNodeStatus::ACTIVE) ? 'Active' : (($scope->getObject()->getStatus() == ServerNodeStatus::DISABLED)?'Disabled' : (($scope->getObject()->getStatus() == ServerNodeStatus::NOT_REGISTERED)?'Not Registered': 'Deleted'))</code>
+						</value>
+					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationArrayParameter">
+						<key>server_node_trigger_status</key>
+						<description>Server node statuses that trigger the notification</description>
+						<allowedValues objectType="array">
+							<item objectType="KalturaIntegerValue">
+								<value>1</value>
+								<description>ACTIVE</description>
+							</item>
+							<item objectType="KalturaIntegerValue">
+								<value>2</value>
+								<description>DISABLED</description>
+							</item>
+							<item objectType="KalturaIntegerValue">
+								<value>3</value>
+								<description>DELETED</description>
+							</item>
+							<item objectType="KalturaIntegerValue">
+								<value>4</value>
+								<description>NOT_REGISTERED</description>
+							</item>
+						</allowedValues>
+						<values>
+							<item objectType="KalturaIntegerValue">
+								<value>4</value>
+							</item>
+						</values>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">

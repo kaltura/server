@@ -44,6 +44,22 @@ None.
 
 None.
 
+## Update notification for server node changing status ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8047
+
+### Configuration ###
+	First replcae all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_30_UpdateServerNodeDownTemplate_toServerNodeStatusChanged.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_30_update_server_node_offline_email_notification_to_server_node_status_changed.php
+
+#### Known Issues & Limitations ####
+None.
+
 ## Add new batch job for generating users CSV ##
  - Issue Type: Story
  - Issue ID: PLAT-8446
@@ -65,7 +81,6 @@ None.
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_23_getCsv_user_permissions.php
  
-
 # Mercury 13.12.0 #
 
 ## Split beacon index to index per object type ##
