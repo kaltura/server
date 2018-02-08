@@ -107,6 +107,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * @var KalturaVendorCredit
+	 * @requiresPermission update
 	 */
 	public $credit;
 

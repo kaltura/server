@@ -99,6 +99,7 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
 			$catalogItemProfileFilter->idNotIn = implode(',', $partnerCatalogItems);
 			$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
+			$catalogItemProfileFilter->statusEqual =  Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE;
 
 			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 				$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;

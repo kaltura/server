@@ -18,7 +18,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 
-		if (!in_array($actionName, array('getJobs')))
+		if (!in_array($actionName, array('getJobs', 'updateJob')))
 			$this->applyPartnerFilterForClass('entryVendorTask');
 	}
 
@@ -113,13 +113,13 @@ class EntryVendorTaskService extends KalturaBaseService
 	 */
 	public function getJobsAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::$partner_id);
+		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::$ks_partner_id))
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::$ks_partner_id);
 
 		if (!$filter)
 			$filter = new KalturaEntryVendorTaskFilter();
 
-		$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
+		$filter->vendorPartnerIdEqual = kCurrentContext::$ks_partner_id;
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 
@@ -137,9 +137,9 @@ class EntryVendorTaskService extends KalturaBaseService
 	 */
 	public function updateAction($id, KalturaEntryVendorTask $entryVendorTask)
 	{
-		$dbEntryVendorTask = entryPeer::retrieveByPK($id);
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
 		if (!$dbEntryVendorTask)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		$dbEntryVendorTask->save();
@@ -208,5 +208,30 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
+	}
+
+	/**
+	 * Update entry vendor task. Only the properties that were set will be updated.
+	 *
+	 * @action updateJob
+	 * @param int $id vendor task id to update
+	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to update
+	 * @return KalturaEntryVendorTask
+	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
+	 */
+	public function updateJobAction($id, KalturaEntryVendorTask $entryVendorTask)
+	{
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
+		if (!$dbEntryVendorTask)
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+
+		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
+		$dbEntryVendorTask->save();
+
+		// return the saved object
+		$entryVendorTask = new KalturaEntryVendorTask();
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
+
 	}
 }

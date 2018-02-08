@@ -62,9 +62,9 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	
 	/**
 	 * @var KalturaEntryVendorTaskStatus
-	 * @readonly
 	 * @filter eq,in
 	 */
+	//TODO update to requires permissions to insert or update
 	public $status;
 	
 	/**
@@ -107,6 +107,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	/**
 	 * Err description provided by provider in case job execution has failed
 	 * @var string
+	 * @requiresPermission insert, update
 	 */
 	public $errDescription;
 	
