@@ -77,7 +77,7 @@
 				<type>1</type>
 				<name>reach_vendor</name>
 				<systemName>reach_vendor</systemName>
-				<fields>id,partnerId,vendorPartnerId,createdAt,updatedAt,queuedAt,finishedAt,entryId,status,vendorProfileId,catalogItemId,price,userId,approvedBy,errDescription,accessKey,notes</fields>
+				<fields>id,partnerId,vendorPartnerId,createdAt,updatedAt,queuedAt,finishedAt,entryId,status,vendorProfileId,catalogItemId,price,userId,moderatingUser,errDescription,accessKey,notes</fields>
 				<relatedProfiles objectType="array">
 					<item objectType="KalturaDetachedResponseProfile">
 						<name>reach_vendor_catalog_item</name>

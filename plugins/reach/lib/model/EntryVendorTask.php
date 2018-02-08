@@ -19,7 +19,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	const CUSTOM_DATA_ACCESS_KEY = 			'access_key';
 	const CUSTOM_DATA_ERR_DESCRIPTION = 	'err_description';
 	const CUSTOM_DATA_USER_ID = 			'user_id';
-	const CUSTOM_DATA_APPROVED_BY = 		'approved_by';
+	const CUSTOM_DATA_MODERATING_USER = 	'moderating_user';
 	
 	//setters
 	
@@ -38,9 +38,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 		$this->putInCustomData(self::CUSTOM_DATA_ERR_DESCRIPTION, $v);
 	}
 	
-	public function setApprovedBy($v)
+	public function setModeratingUser($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_APPROVED_BY, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_MODERATING_USER, $v);
 	}
 	
 	public function setUserId($v)
@@ -50,27 +50,27 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	
 	//getters
 	
-	public function getNotes($v)
+	public function getNotes()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES, null, null);
 	}
 	
-	public function getAccessKey($v)
+	public function getAccessKey()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ACCESS_KEY, null, null);
 	}
 	
-	public function getErrDescription($v)
+	public function getErrDescription()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ERR_DESCRIPTION, null, null);
 	}
 	
-	public function getApprovedBy($v)
+	public function getModeratingUser()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_APPROVED_BY, null, null);
+		return $this->getFromCustomData(self::CUSTOM_DATA_MODERATING_USER, null, null);
 	}
 	
-	public function getUserId($v)
+	public function getUserId()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_USER_ID, null, null);
 	}
@@ -90,5 +90,24 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	{
 		return VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
 	}
+	
+	/* (non-PHPdoc)
+ 	 * @see BaseEntryVendorTask::preUpdate()
+ 	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && $this->getStatus() == EntryVendorTaskStatus::PROCESSING)
+		{
+			$this->setQueueTime(time());
+		}
+		
+		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && in_array($this->getStatus(), array(EntryVendorTaskStatus::READY, EntryVendorTaskStatus::ERROR)))
+		{
+			$this->setFinishTime(time());
+		}
+		
+		return parent::preUpdate($con);
+	}
+	
 	
 } // EntryVendorTask

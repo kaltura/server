@@ -71,6 +71,9 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		if(in_array($partnerId, array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER)))
 			return true;
 		
+		if(PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, $partnerId))
+			return true;
+		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
