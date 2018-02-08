@@ -238,7 +238,7 @@ class FacebookGraphSdkUtils
 	}
 
 	/**
-	 * @param $entryId
+	 * @param $baseFileName
 	 * @param $locale
 	 * @return string
 	 */

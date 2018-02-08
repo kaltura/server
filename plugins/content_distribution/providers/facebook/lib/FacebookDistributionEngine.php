@@ -12,7 +12,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 {
 	protected $appId;
 	protected $appSecret;
-	
+
 	const FACEBOOK_CUSTOM_DATA_DELIMITER = ';';
 
 	/* (non-PHPdoc)
