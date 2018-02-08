@@ -31,7 +31,6 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	protected $tempXmlPath;
 	protected $timeout = 90;
 	protected  $processedTimeout = 300;
-	protected $captionPlugin = null;
 	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -66,8 +65,6 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			if (isset(KBatchBase::$taskConfig->params->youtubeApi->processedTimeout))
 				$this->processedTimeout = KBatchBase::$taskConfig->params->youtubeApi->processedTimeout;
 		}
-		
-		$this->captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
 
 		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');
 	}
@@ -496,7 +493,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$captionUpdateRequest = $youtube->captions->update('snippet', $caption);
 
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $captionUpdateRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
-		$captionContentUrl = $this->getRemoteCaptionContentUrl($captionInfo);
+		$captionContentUrl = $this->getRemoteCaptionContentUrl($captionInfo->assetId);
 		if($captionContentUrl)
 		{
 			$this->uploadCaptionContent($media, $captionInfo, $captionContentUrl);
@@ -536,7 +533,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
 
-		$captionContentUrl = $this->getRemoteCaptionContentUrl($captionInfo);
+		$captionContentUrl = $this->getRemoteCaptionContentUrl($captionInfo->assetId);
 		if($captionContentUrl)
 		{
 			$ingestedCaption = $this->uploadCaptionContent($media, $captionInfo, $captionContentUrl);
@@ -717,20 +714,6 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$ingestedCaption = self::uploadInChunks($media, $tempPath);
 		unlink($tempPath);
 		return $ingestedCaption;
-	}
-
-	protected function getRemoteCaptionContentUrl($captionInfo)
-	{
-		try
-		{
-			$captionContentUrl = $this->captionPlugin->captionAsset->serve($captionInfo->assetId);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::err("content not served for caption id " . $captionInfo->assetId);
-			return null;
-		}
-		return $captionContentUrl;
 	}
 
 	private function getTempSubDirName()

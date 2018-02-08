@@ -16,6 +16,11 @@ abstract class DistributionEngine implements IDistributionEngine
 	protected $tempDirectory = null;
 	
 	/**
+	 * @var KalturaCaptionClientPlugin
+	 */
+	protected $captionPlugin = null;
+
+	/**
 	 * @param string $interface
 	 * @param KalturaDistributionProviderType $providerType
 	 * @param KalturaDistributionJobData $data
@@ -184,6 +189,24 @@ abstract class DistributionEngine implements IDistributionEngine
 			throw new Exception("No metadata objects found");
 
 		return $metadataListResponse->objects;
+	}
+
+	protected function getRemoteCaptionContentUrl($assetId)
+	{
+		if(!$this->captionPlugin)
+		{
+			$this->captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		}
+		try
+		{
+			$captionContentUrl = $this->captionPlugin->captionAsset->serve($assetId);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("content not served for caption id " . $assetId);
+			return null;
+		}
+		return $captionContentUrl;
 	}
 
 	protected function putTempFile($fileName, $contentUrl, $subDirectoryName = null)
