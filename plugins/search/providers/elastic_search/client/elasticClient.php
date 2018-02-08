@@ -123,20 +123,19 @@ class elasticClient
 		}
 		else
 		{
+			KalturaLog::debug("Elastic client response " .$response);
 			//return the response as associative array
-			$decodedResponse = json_decode($response, true);
-			if (isset($decodedResponse['error']))
+			$response = json_decode($response, true);
+			if (isset($response['error']))
 			{
 				$data = array();
-				$data['errorMsg'] = $decodedResponse['error'];
-				$data['status'] = $decodedResponse['status'];
-				throw new kESearchException('Elastic search engine error [' . print_r($decodedResponse, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
+				$data['errorMsg'] = $response['error'];
+				$data['status'] = $response['status'];
+				throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
 			}
-
-			KalturaLog::debug("Elastic client response " .$response);
 		}
 		
-		return $decodedResponse;
+		return $response;
 	}
 	
 	/**
