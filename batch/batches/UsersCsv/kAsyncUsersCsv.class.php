@@ -53,7 +53,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 
 		//fill the csv with users data
 		$csvFile = fopen($filePath,"w");
-		$csvFile = $this->fillUsersCsv($csvFile, $data);
+		$this->fillUsersCsv($csvFile, $data);
 		fclose($csvFile);
 		$this->setFilePermissions($filePath);
 		self::unimpersonate();
@@ -89,7 +89,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 	/**
 	 * The function fills the csv file with the users data
 	 */
-	private function fillUsersCsv($csvFile, $data)
+	private function fillUsersCsv(&$csvFile,&$data)
 	{
 		$filter = clone $data->filter;
 		$pager = new KalturaFilterPager();
@@ -98,24 +98,56 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 
 		$additionalFields = $data->additionalFields;
 
-		$csvFile = $this->addHeaderRowToCsv($csvFile, $additionalFields);
+		$this->addHeaderRowToCsv($csvFile, $additionalFields);
+		$lastCreatedAtObjectIdList = array();
+		$lastCreatedAt=0;
+		$totalCount=0;
+		$filter->orderBy = KalturaUserOrderBy::CREATED_AT_ASC;
 		do
 		{
+			if($lastCreatedAt)
+			{
+				$filter->createdAtGreaterThanOrEqual = $lastCreatedAt;
+			}
 			try
 			{
+
 				$userList = KBatchBase::$kClient->user->listAction($filter, $pager);
+				$returnedSize = count($userList->objects);
 			}
 			catch(Exception $e)
 			{
 				KalturaLog::info("Couldn't list users on page: [$pager->pageIndex]" . $e->getMessage());
-				return $csvFile;
 			}
-			$csvFile = $this->addUsersToCsv($userList->objects, $csvFile, $data->metadataProfileId, $additionalFields);
-			$pager->pageIndex ++;
-		}
-		while ($pager->pageSize == count($userList->objects));
 
-		return $csvFile;
+			$lastObject = $userList->objects[$returnedSize-1];
+			$lastCreatedAt=$lastObject->createdAt;
+			$newCreatedAtListObject = array();
+
+			//contain only the users that are were not the former list
+			$uniqUsers = array();
+			foreach ($userList->objects as $user)
+			{
+				if(!in_array($user, $lastCreatedAtObjectIdList))
+					$uniqUsers[]=$user;
+			}
+			//Prepare list of the last second users to avoid duplicate in the next iteration
+			foreach ($uniqUsers as $user)
+			{
+				if($user->createdAt == $lastCreatedAt)
+					$newCreatedAtListObject[]=$user->id;
+			}
+			$lastCreatedAtObjectIdList = $newCreatedAtListObject;
+			$this->addUsersToCsv($userList->objects, $csvFile, $data->metadataProfileId, $additionalFields);
+			$totalCount+=count($uniqUsers);
+			KalturaLog::debug("Adding More  - ".count($uniqUsers). " totalCount - ". $totalCount);
+			unset($newCreatedAtListObject);
+			unset($uniqUsers);
+			unset($userList);
+			if(function_exists('gc_collect_cycles')) // php 5.3 and above
+				gc_collect_cycles();
+		}
+		while ($pager->pageSize == $returnedSize);
 	}
 
 
@@ -135,10 +167,10 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 	/**
 	 * The function grabs all the fields values for each user and adding them as a new row to the csv file
 	 */
-	private function addUsersToCsv($users, $csvFile, $metadataProfileId, $additionalFields)
+	private function addUsersToCsv(&$users, &$csvFile, $metadataProfileId, $additionalFields)
 	{
 		if(!$users)
-			return $csvFile;
+			return ;
 
 		$userIds = array();
 		$userIdToRow = array();
@@ -155,8 +187,6 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 
 		foreach ($userIdToRow as $key=>$val)
 			fputcsv($csvFile, $val);
-
-		return $csvFile;
 	}
 
 	/**
