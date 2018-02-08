@@ -780,7 +780,6 @@ CREATE TABLE IF NOT EXISTS `entry` (
   `last_played_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `int_id_index` (`int_id`),
-  KEY `entry_FI_2` (`kuser_id`),
   KEY `partner_status_index` (`partner_id`,`status`),
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_created_at` (`partner_id`,`created_at`)
