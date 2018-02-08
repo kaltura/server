@@ -39,6 +39,7 @@ None.
 ### Deployment scripts ###
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_11_add_base_upload_permission_and_role.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_11_update_base_upload_permission.php
 	
 #### Known Issues & Limitations ####
 
