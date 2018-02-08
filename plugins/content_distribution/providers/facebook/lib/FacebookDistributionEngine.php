@@ -185,7 +185,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		if (!$locale)
 			throw new Exception("Failed to find matching language for language ".$captionInfo->language." and there was no label available");
 
-		$contentUrl = $this->getRemoteCaptionContentUrl($captionInfo);
+		$contentUrl = $this->getRemoteCaptionContentUrl($captionInfo->assetId);
 		if($contentUrl)
 		{
 			$fileName = FacebookGraphSdkUtils::transformCaptionFilePathByFormat($captionInfo->assetId, $locale);
