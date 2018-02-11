@@ -34,4 +34,14 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelect($c);
 	}
 	
+	public static function retrieveByPKAndVendorPartnerId($taskId, $partnerId)
+	{
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::ID, $taskId);
+		$c->add(EntryVendorTaskPeer::VENDOR_PARTNER_ID, $partnerId);
+		
+		return EntryVendorTaskPeer::doSelectOne($c);
+	}
+	
+	
 } // EntryVendorTaskPeer

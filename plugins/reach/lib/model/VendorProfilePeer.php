@@ -35,12 +35,12 @@ class VendorProfilePeer extends BaseVendorProfilePeer
 		return VendorProfilePeer::doSelect($c);
 	}
 	
-	public static function updateUsedCredit($vendorProfileId, $value, $arithmeticSign)
+	public static function updateUsedCredit($vendorProfileId, $value)
 	{
 		$connection = Propel::getConnection();
 		
 		$updateSql = "UPDATE ".VendorProfilePeer::TABLE_NAME." SET " . 
-			VendorProfilePeer::USED_CREDIT . " = " . VendorProfilePeer::USED_CREDIT . "$arithmeticSign$value WHERE " .
+			VendorProfilePeer::USED_CREDIT . " = " . VendorProfilePeer::USED_CREDIT . "$value WHERE " .
 			VendorProfilePeer::ID . "=" . $vendorProfileId . ";";
 		
 		$stmt = $connection->prepare($updateSql);

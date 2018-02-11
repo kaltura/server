@@ -102,7 +102,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 * @readonly
 	 */
-	public $approvedBy;
+	public $moderatingUser;
 	
 	/**
 	 * Err description provided by provider in case job execution has failed
@@ -139,7 +139,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'catalogItemId',
 		'price',
 		'userId',
-		'approvedBy',
+		'moderatingUser',
 		'errDescription',
 		'accessKey',
 		'notes',
@@ -166,7 +166,9 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("vendorProfileId", "catalogItemId", "entryId"));
+		$this->validatePropertyNotNull("vendorProfileId");
+		$this->validatePropertyNotNull("catalogItemId");
+		$this->validatePropertyNotNull("entryId");
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	

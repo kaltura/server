@@ -104,29 +104,6 @@ class EntryVendorTaskService extends KalturaBaseService
 	}
 
 	/**
-	 * get KalturaEntryVendorTask objects for specific vendor partner
-	 *
-	 * @action getJobs
-	 * @param KalturaEntryVendorTaskFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaEntryVendorTaskListResponse
-	 */
-	public function getJobsAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::$ks_partner_id))
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::$ks_partner_id);
-
-		if (!$filter)
-			$filter = new KalturaEntryVendorTaskFilter();
-
-		$filter->vendorPartnerIdEqual = kCurrentContext::$ks_partner_id;
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-
-		return $filter->getListResponse($pager, $this->getResponseProfile());
-	}
-
-	/**
 	 * Update entry vendor task. Only the properties that were set will be updated.
 	 *
 	 * @action update
@@ -173,6 +150,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if(!kReachUtils::checkCreditForApproval($dbEntryVendorTask))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED, $dbEntryVendorTask->getEntry(), $dbEntryVendorTask->getCatalogItem());
 		
+		$dbEntryVendorTask->setModeratingUser($this->getKuser()->getPuserId());
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::PENDING);
 		$dbEntryVendorTask->save();
 		
@@ -201,6 +179,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PENDING_MODERATION)
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_REJECT_NOT_MODERATED_TASK);
 		
+		$dbEntryVendorTask->setModeratingUser($this->getKuser()->getPuserId());
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::REJECTED);
 		$dbEntryVendorTask->save();
 		
@@ -208,6 +187,29 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
+	}
+	
+	/**
+	 * get KalturaEntryVendorTask objects for specific vendor partner
+	 *
+	 * @action getJobs
+	 * @param KalturaEntryVendorTaskFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaEntryVendorTaskListResponse
+	 */
+	public function getJobsAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::getCurrentPartnerId());
+		
+		if (!$filter)
+			$filter = new KalturaEntryVendorTaskFilter();
+		
+		$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+		
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
 	/**
@@ -221,7 +223,10 @@ class EntryVendorTaskService extends KalturaBaseService
 	 */
 	public function updateJobAction($id, KalturaEntryVendorTask $entryVendorTask)
 	{
-		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
+		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::getCurrentPartnerId());
+		
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPKAndVendorPartnerId($id, kCurrentContext::getCurrentPartnerId());
 		if (!$dbEntryVendorTask)
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 

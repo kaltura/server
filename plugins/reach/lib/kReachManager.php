@@ -78,12 +78,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	
 	private function updateVendorProfileCreditUsage(EntryVendorTask $entryVendorTask)
 	{
-		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), $entryVendorTask->getPrice(), "+");
+		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), $entryVendorTask->getPrice());
 	}
 	
 	private function handleErrorTask(EntryVendorTask $entryVendorTask)
 	{
-		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), $entryVendorTask->getPrice(), "-");
+		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), -$entryVendorTask->getPrice());
 	}
 	
 	private function handleEntryDurationChanged(entry $entry)
@@ -118,7 +118,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		foreach($addedCostByProfileId as $vendorProfileId => $addedCost)
 		{
-			VendorProfilePeer::updateUsedCredit($vendorProfileId, $addedCost, $addedCost < 0 ? "-" : "+" );
+			VendorProfilePeer::updateUsedCredit($vendorProfileId, $addedCost);
 		}
 		
 		return true;

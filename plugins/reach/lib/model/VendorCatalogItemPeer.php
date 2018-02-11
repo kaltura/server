@@ -68,7 +68,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	public static function retrieveBySystemName ($systemName, $excludeId = null)
 	{
 		$criteria = new Criteria ( VendorCatalogItemPeer::DATABASE_NAME );
-		$criteria->add ( VendorCatalogItemPeer::STATUS, array(VendorCatalogItemStatus::ACTIVE, VendorCatalogItemStatus::DEPRECATED) );
+		$criteria->add ( VendorCatalogItemPeer::STATUS, array(VendorCatalogItemStatus::ACTIVE, VendorCatalogItemStatus::DEPRECATED), Criteria::IN);
 		$criteria->add ( VendorCatalogItemPeer::SYSTEM_NAME, $systemName );
 		if ($excludeId)
 			$criteria->add( VendorCatalogItemPeer::ID, $excludeId, Criteria::NOT_EQUAL);
