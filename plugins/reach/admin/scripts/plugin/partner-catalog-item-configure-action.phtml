@@ -12,6 +12,11 @@
 
 <div id="partner_catalog_item_configure_div" align="center">
 	<form id ="frmPartnerCatalogItemInnerConfigure" onSubmit="return addPartnerCatalogItems();" method="post"  >
+		<td><input type="checkbox" name="selectAllItemsOnPageCheckbox" onchange="flipAllCheckboxesOnPage()" id="selectAllItemsInPage" align="left" />Select All Items On Page</td>
+		<?php if($this->vendorPartnerId != null): ?>
+			<td><input type="checkbox" name="selectAllItemsCheckbox" onchange="flipAllCheckboxes()" id="selectAllItems" align="left" />Select All Items</td>
+		<?php endif; ?>
+
 		<table>
 			<thead>
 			<tr>
@@ -74,6 +79,26 @@
 	catch (e)
 	{
 
+	}
+
+	function flipAllCheckboxesOnPage()
+	{
+		var shouldSelectAll = $('input[name=selectAllItemsOnPageCheckbox]').prop('checked');
+		$('input[name=selectAllItemsCheckbox]').prop('checked',false);
+		$('input[type=checkbox]').each(function () {
+			if($( this ).attr("name") == 'catalogItemsCheckBoxes[]')
+				$(this).prop('checked', shouldSelectAll);
+		});
+	}
+
+	function flipAllCheckboxes()
+	{
+		var shouldSelectAll = $('input[name=selectAllItemsCheckbox]').prop('checked');
+		$('input[name=selectAllItemsOnPageCheckbox]').prop('checked',false);
+		$('input[type=checkbox]').each(function () {
+			if($( this ).attr("name") == 'catalogItemsCheckBoxes[]')
+				$(this).prop('checked', shouldSelectAll);
+		});
 	}
 
 	function addPartnerCatalogItems()

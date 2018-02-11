@@ -33,6 +33,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 		$turnAroundTime = $this->_getParam('filterTurnAroundTime') != "" ? $this->_getParam('filterTurnAroundTime') : null;
 		$sourceLanguage = $this->_getParam('filterSourceLanguage') != "" ? $this->_getParam('filterSourceLanguage') : null;
 		$targetLanguage = $this->_getParam('filterTargetLanguage') != "" ? $this->_getParam('filterTargetLanguage') : null;
+		$vendorPartnerId = $this->_getParam('vendorPartnerId') != "" ? $this->_getParam('vendorPartnerId') : null;
 
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 		if ($partnerId)
@@ -43,6 +44,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 			$vendorCatalogItemFilter->turnAroundTimeEqual = $turnAroundTime;
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
 			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
+			$vendorCatalogItemFilter->vendorPartnerIdEqual = $vendorPartnerId;
 
 			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 				$vendorCatalogItemFilter->targetLanguageEqual = $targetLanguage;

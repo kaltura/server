@@ -16,7 +16,7 @@ class PartnerCatalogItemSetStatusAction extends KalturaApplicationPlugin
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('layout')->disableLayout();
-		$catalogItemId = $this->_getParam('catalogItemId');
+		$catalogItemIds = $this->_getParam('catalogItemIds');
 		$newStatus = $this->_getParam('catalogItemStatus');
 		$partnerId = $this->_getParam('partnerId');
 
@@ -25,9 +25,16 @@ class PartnerCatalogItemSetStatusAction extends KalturaApplicationPlugin
 		Infra_ClientHelper::impersonate($partnerId);
 		try
 		{
-			if  ( $newStatus == Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED )
-				$res = $reachPluginClient->PartnerCatalogItem->delete($catalogItemId);
-			else
+			if ($newStatus == Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED && trim($catalogItemIds) != '')
+			{
+				$catalogItemIdsArray = explode(',', $catalogItemIds);
+				foreach ($catalogItemIdsArray as $catalogItemId)
+				{
+					$client->startMultiRequest();
+						$res = $reachPluginClient->PartnerCatalogItem->delete($catalogItemId);
+					$result = $client->doMultiRequest();
+				}
+			} else
 				KalturaLog::err("Error trying to set invalid partner catalog item status of [$newStatus]");
 			echo $action->getHelper('json')->sendJson('ok', false);
 		} catch (Exception $e)

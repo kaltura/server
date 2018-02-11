@@ -15,5 +15,6 @@ class Form_PartnerCatalogItemConfigure extends Form_PartnerIdFilter
 		$this->removeElement("cmdSubmit");
 		$this->removeElement("filter_type");
 		$this->removeElement("filter_input");
+
 	}
 }

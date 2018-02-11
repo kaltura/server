@@ -15,6 +15,12 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 			'partnerIdEqual' => 'Partner ID',
 		));
 
+		// filter by vendor partner id
+		$this->addElement('text', 'vendorPartnerId', array(
+			'label' => 'Vendor Partner ID',
+			'decorators' => array('ViewHelper', 'Label')
+		));
+
 		$filterServiceFeature = new Kaltura_Form_Element_EnumSelect('filterServiceFeature', array(
 			'enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature',
 			'label'			=> 'Service Feature:',
@@ -68,7 +74,7 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'configureCatalogItemsButton', array(
 			'ignore' => true,
 			'label' => 'Configure',
-			'onclick' => "configureCatalogItems($('#filter_input').val(), $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val(), $('#filterSourceLanguage').val(), $('#filterTargetLanguage').val())",
+			'onclick' => "configureCatalogItems($('#filter_input').val(), $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val(), $('#filterSourceLanguage').val(), $('#filterTargetLanguage').val(),$('#vendorPartnerId').val())",
 			'decorators' => array('ViewHelper'),
 		));
 
