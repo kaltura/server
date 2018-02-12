@@ -18,7 +18,7 @@
 		},
 		"kaltura_english_synonym_filter": {
 		  "type": "synonym",
-		  "synonyms_path": "analysis/kaltura_synonym.txt"
+		  "synonyms_path": "analysis/kaltura_synonyms.txt"
 		},
 		"kaltura_unique_token_filter": {
 		  "type": "unique",
