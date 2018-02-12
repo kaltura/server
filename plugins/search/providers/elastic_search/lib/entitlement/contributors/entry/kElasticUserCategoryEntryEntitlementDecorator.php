@@ -108,7 +108,7 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 		$body['query'] = $mainBool->getFinalQuery();
 		$params['body'] = $body;
 		$elasticClient = new elasticClient();
-		$results = $elasticClient->search($params);
+		$results = $elasticClient->search($params, true);
 		$categories = $results['hits']['hits'];
 		$categoryIds = array();
 
