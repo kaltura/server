@@ -2098,12 +2098,12 @@ class myPartnerUtils
 	 * @param $package
 	 * @return array
 	 */
-	public static function retrieveActivePartnerByEmailAndPackage ($partner, $package)
+	public static function retrieveNotDeletedPartnerByEmailAndPackage ($partner, $package)
 	{
 		$c = new Criteria();
 		$c->add(PartnerPeer::ADMIN_EMAIL, $partner->getAdminEmail());
 		$c->add(PartnerPeer::PARTNER_PACKAGE, $package);
-		$c->add(PartnerPeer::STATUS, KalturaPartnerStatus::ACTIVE);
+		$c->add(PartnerPeer::STATUS, KalturaPartnerStatus::DELETED, Criteria::NOT_EQUAL);
 		$result = PartnerPeer::doSelectOne($c);
 		return $result;
 	}
