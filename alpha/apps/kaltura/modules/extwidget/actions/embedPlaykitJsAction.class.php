@@ -110,7 +110,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = $this->appendConfig($bundleContentParts[1]);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
-		
+
 		//if auto embed selected add embed script to bundle content
 		if ($autoEmbed) 
 		{
@@ -315,9 +315,20 @@ class embedPlaykitJsAction extends sfAction
 			$config[$key] = json_decode($val);
 		}
 
-		$config["partnerId"] = $this->partnerId;		
-		$config["uiConfId"] = $this->uiconfId;
-		
+		if (!isset($config["provider"])) {
+			$config["provider"] = new stdClass();
+		}
+
+		if (!isset($config["provider"]->partnerId)) {
+			$config["provider"]->partnerId = $this->partnerId;
+		}
+
+		if (!isset($config["provider"]->uiConfId)) {
+			$config["provider"]->uiConfId = $this->uiconfId;
+		}
+
+		$config["targetId"] = $targetId;
+
 		$config = json_encode($config);		
 		if ($config === false)
 		{
@@ -326,13 +337,13 @@ class embedPlaykitJsAction extends sfAction
 
 		$autoEmbedCode = "
 		try {
-			var kalturaPlayer = KalturaPlayer.setup(\"$targetId\", $config);
-		    kalturaPlayer.loadMedia(\"" . $entry_id . "\");
-		  } catch (e) {
-		    console.error(e.message)
-		  }
+			var kalturaPlayer = KalturaPlayer.setup($config);
+			kalturaPlayer.loadMedia({entryId: \"" . $entry_id . "\"});
+		} catch (e) {
+			console.error(e.message);
+		}
 		";
-		
+
 		return $autoEmbedCode;
 	}
 	
