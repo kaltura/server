@@ -50,8 +50,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		if(!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $entryVendorTask->catalogItemId);
 		
-		if(EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemId($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId()))
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId());
+//		if(EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemId($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId()))
+//			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId());
 		
 		if(!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbVendorProfile))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED,  $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
@@ -206,6 +206,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			$filter = new KalturaEntryVendorTaskFilter();
 		
 		$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
+		$filter->statusEqual = EntryVendorTaskStatus::PENDING;
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 		

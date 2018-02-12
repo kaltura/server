@@ -64,7 +64,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::ERROR
-			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PROCESSING
+			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
 		

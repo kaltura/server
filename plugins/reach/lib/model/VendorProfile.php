@@ -32,6 +32,8 @@ class VendorProfile extends BaseVendorProfile
 	const CUSTOM_DATA_MAX_CHARS_PER_LINE = 					'max_chars_per_line';
 	const CUSTOM_DATA_VENDOR_CREDIT = 						'vendor_credit';
 	
+	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
+	
 	//setters
 	
 	public function setEnableMachineModeration($v)
@@ -117,6 +119,11 @@ class VendorProfile extends BaseVendorProfile
 	public function setCredit($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_VENDOR_CREDIT, serialize($v));
+	}
+	
+	public function setCreditUsagePercentage($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE, $v);
 	}
 	
 	//getters
@@ -219,6 +226,11 @@ class VendorProfile extends BaseVendorProfile
 		
 		return $credit;
 	}
+	
+	public function getCreditUsagePercentage()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE, null, 0);
+	}
 
 	public function syncCredit()
 	{
@@ -240,5 +252,28 @@ class VendorProfile extends BaseVendorProfile
 		
 		return false;
 	}
-
+	
+	
+	/* (non-PHPdoc)
+	 * @see BaseEntryVendorTask::preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if ($this->isColumnModified(VendorProfilePeer::USED_CREDIT))
+		{
+			$creditUsagePercentage = 100;
+			$currentCredit = $this->getCredit()->getCurrentCredit();
+			
+			if($currentCredit != 0)
+			{
+				$usedCredit = $this->getUsedCredit();
+				$creditUsagePercentage = ceil($usedCredit/$currentCredit);
+			}
+			
+			$this->setCreditUsagePercentage($creditUsagePercentage);
+		}
+		
+		return parent::preUpdate($con);
+	}
+	
 } // VendorProfile

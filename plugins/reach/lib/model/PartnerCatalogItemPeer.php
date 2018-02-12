@@ -46,5 +46,18 @@ class PartnerCatalogItemPeer extends BasePartnerCatalogItemPeer {
 		$criteria->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerId);
 		return PartnerCatalogItemPeer::doSelectOne($criteria);
 	}
+	
+	public static function retrieveByCatalogItemIdNoFilter($catalogItemId, $partnerId)
+	{
+		$criteria = new Criteria ( PartnerCatalogItemPeer::DATABASE_NAME );
+		$criteria->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $catalogItemId);
+		$criteria->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerId);
+		
+		PartnerCatalogItemPeer::setUseCriteriaFilter(false);
+		$result = PartnerCatalogItemPeer::doSelectOne($criteria);
+		PartnerCatalogItemPeer::setUseCriteriaFilter(true);
+		
+		return $result;
+	}
 
 } // PartnerCatalogItemPeer

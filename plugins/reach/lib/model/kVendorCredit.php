@@ -176,7 +176,11 @@ class kVendorCredit
 				KalturaLog::debug("Current date [$now] is not in credit time Range [ from - $this->fromDate ] ");
 				return 0;
 		}
-
-		return $this->credit;
+		
+		$credit = $this->credit;
+		if($this->allowOverage)
+			$credit += $this->overageCredit;
+		
+		return $credit;
 	}
 }

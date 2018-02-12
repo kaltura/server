@@ -43,10 +43,16 @@ class PartnerCatalogItemService extends KalturaBaseService
 		if ($dbPartnerCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER, $id, kCurrentContext::getCurrentPartnerId());
 		
-		$partnerCatalogItem = new PartnerCatalogItem();
-		$partnerCatalogItem->setPartnerId($this->getPartnerId());
+		//Check if catalog item exists but deleted to re-use it
+		$partnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemIdNoFilter($id, kCurrentContext::getCurrentPartnerId());
+		if(!$partnerCatalogItem) 
+		{
+			$partnerCatalogItem = new PartnerCatalogItem();
+			$partnerCatalogItem->setPartnerId($this->getPartnerId());
+			$partnerCatalogItem->setCatalogItemId($id);
+		}
+		
 		$partnerCatalogItem->setStatus(KalturaVendorCatalogItemStatus::ACTIVE);
-		$partnerCatalogItem->setCatalogItemId($id);
 		$partnerCatalogItem->save();
 		
 		// return the catalog item

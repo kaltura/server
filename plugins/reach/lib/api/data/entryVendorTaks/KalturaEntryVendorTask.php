@@ -44,14 +44,14 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
-	public $queuedAt;
+	public $queueTime;
 	
 	/**
 	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
-	public $finishedAt;
+	public $finishTime;
 	
 	/**
 	 * @var string
@@ -131,8 +131,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'vendorPartnerId',
 		'createdAt',
 		'updatedAt',
-		'queuedAt',
-		'finishedAt',
+		'queueTime',
+		'finishTime',
 		'entryId',
 		'status',
 		'vendorProfileId',

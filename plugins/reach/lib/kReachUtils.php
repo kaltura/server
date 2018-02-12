@@ -36,12 +36,12 @@ class kReachUtils
 	
 	public static function calcPricePerSecond(entry $entry, $pricePerUnit)
 	{
-		return ($entry->getLengthInMsecs()/1000) * $pricePerUnit;
+		return ceil(($entry->getLengthInMsecs()/1000) * $pricePerUnit);
 	}
 
 	public static function calcPricePerMinute(entry $entry, $pricePerUnit)
 	{
-		return ($entry->getLengthInMsecs()/1000/dateUtils::MINUTE) * $pricePerUnit;
+		return ceil(($entry->getLengthInMsecs()/1000/dateUtils::MINUTE) * $pricePerUnit);
 	}
 	
 	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem)
@@ -55,15 +55,10 @@ class kReachUtils
 	 * @param $vendorProfile
 	 * @return bool
 	 */
-	public static function isEnoughCreditLeft($entry, $catalogItem, $vendorProfile)
+	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, VendorProfile $vendorProfile)
 	{
-		$credit = $vendorProfile->getCredit();
 		$creditUsed = $vendorProfile->getUsedCredit();
-		
-		$allowedCredit = $credit->getCurrentCredit();
-		if ( $credit->getAllowOverage())
-			$allowedCredit += $credit->getOverageCredit();
-		
+		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
 		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
 		
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
@@ -80,13 +75,8 @@ class kReachUtils
 	{
 		$vendorProfile = $entryVendorTask->getVendorProfile();
 		
-		$credit = $vendorProfile->getCredit();
 		$creditUsed = $vendorProfile->getUsedCredit();
-		
-		$allowedCredit = $credit->getCurrentCredit();
-		if ( $credit->getAllowOverage())
-			$allowedCredit += $credit->getOverageCredit();
-		
+		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
 		$entryTaskPrice = $entryVendorTask->getPrice();
 		
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
@@ -99,12 +89,8 @@ class kReachUtils
 	{
 		$vendorProfile = $entryVendorTask->getVendorProfile();
 		
-		$credit = $vendorProfile->getCredit();
 		$creditUsed = $vendorProfile->getUsedCredit();
-		
-		$allowedCredit = $credit->getCurrentCredit();
-		if ( $credit->getAllowOverage())
-			$allowedCredit += $credit->getOverageCredit();
+		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
 		
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] taskPriceDiff [$taskPriceDiff]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);

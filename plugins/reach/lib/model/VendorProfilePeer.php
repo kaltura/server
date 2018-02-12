@@ -40,7 +40,7 @@ class VendorProfilePeer extends BaseVendorProfilePeer
 		$connection = Propel::getConnection();
 		
 		$updateSql = "UPDATE ".VendorProfilePeer::TABLE_NAME." SET " . 
-			VendorProfilePeer::USED_CREDIT . " = " . VendorProfilePeer::USED_CREDIT . "$value WHERE " .
+			VendorProfilePeer::USED_CREDIT . " = " . VendorProfilePeer::USED_CREDIT . " +$value WHERE " .
 			VendorProfilePeer::ID . "=" . $vendorProfileId . ";";
 		
 		$stmt = $connection->prepare($updateSql);

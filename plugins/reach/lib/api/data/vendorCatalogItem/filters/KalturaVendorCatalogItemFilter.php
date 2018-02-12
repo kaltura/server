@@ -30,9 +30,24 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		
-		if($this->partnerIdEqual)
+		$partnerIdEqual = null;
+		if($this->partnerIdEqual && !in_array(kCurrentContext::$ks_partner_id, array(Partner::ADMIN_CONSOLE_PARTNER_ID, $this->partnerIdEqual)))
 		{
-			$c->add(PartnerCatalogItemPeer::PARTNER_ID, $this->partnerIdEqual);
+			//Add Id that does not exist to break list
+			$c->add(VendorCatalogItemPeer::ID, -1);
+		}
+		elseif ($this->partnerIdEqual && in_array(kCurrentContext::$ks_partner_id, array(Partner::ADMIN_CONSOLE_PARTNER_ID, $this->partnerIdEqual)))
+		{
+			$partnerIdEqual = $this->partnerIdEqual;
+		}
+		elseif (!$this->partnerIdEqual && kCurrentContext::$ks_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$partnerIdEqual = kCurrentContext::$ks_partner_id;
+		}
+			
+		if($partnerIdEqual)
+		{
+			$c->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerIdEqual);
 			$c->add(PartnerCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE);
 			$c->addJoin(PartnerCatalogItemPeer::CATALOG_ITEM_ID, VendorCatalogItemPeer::ID, Criteria::INNER_JOIN);
 		}
