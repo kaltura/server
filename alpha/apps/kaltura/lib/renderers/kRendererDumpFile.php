@@ -42,7 +42,9 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			clearstatcache();
-			$this->fileSize = $fileSize ? $fileSize : kEncryptFileUtils::fileSize($filePath, $key, $iv);
+			if (!$fileSize || $fileSize < 0)
+				$fileSize = kEncryptFileUtils::fileSize($filePath, $key, $iv);
+			$this->fileSize = $fileSize;
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
 		

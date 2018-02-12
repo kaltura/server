@@ -56,7 +56,7 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 	}
 	public function getCacheInvalidationKeys()
 	{
-		return array("eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
+		return array("eventNotificationTemplate:id=".strtolower($this->getId()), "eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
 	public function getContentParametersKeyValueArray()

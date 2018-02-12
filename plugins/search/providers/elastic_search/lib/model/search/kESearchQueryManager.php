@@ -35,12 +35,14 @@ class kESearchQueryManager
 	const FIELD_KEY = 'field';
 	const NGRAMS_FIELD_SUFFIX = 'ngrams';
 	const RAW_FIELD_SUFFIX = 'raw';
+	const SYNONYM_FIELD_SUFFIX = 'synonym';
 	const MATCH_PHRASE_KEY = 'match_phrase';
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
 	const RAW_FIELD_BOOST_FACTOR = 4;
 	const LANGUAGE_FIELD_BOOST_FACTOR = 3;
 	const MATCH_FIELD_BOOST_FACTOR = 2;
+	const DEFAULT_BOOST_FACTOR = 1;
 
 
 	/**
@@ -62,8 +64,8 @@ class kESearchQueryManager
 		$multiMatchQuery->addToFields($fieldName.'^'.$multiMatchFieldBoostFactor);
 		if($searchItem->getAddHighlight())
 		{
-			$queryAttributes->addFieldToHighlight($fieldName.'.'.self::RAW_FIELD_SUFFIX);
-			$queryAttributes->addFieldToHighlight($fieldName);
+			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName,$fieldName.'.'.self::RAW_FIELD_SUFFIX);
+			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $fieldName);
 		}
 
 		if($searchItem->shouldAddLanguageSearch())
@@ -77,11 +79,15 @@ class kESearchQueryManager
 					$languageFieldBoostFactor = self::LANGUAGE_FIELD_BOOST_FACTOR * $fieldBoostFactor;
 					$multiMatchQuery->addToFields($mappingLanguageField.'^'.$languageFieldBoostFactor);
 					if($searchItem->getAddHighlight())
-						$queryAttributes->addFieldToHighlight($mappingLanguageField);
+						$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $mappingLanguageField);
 					$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
 					
 					if($synonymField)
+					{
 						$multiMatchQuery->addToFields($synonymField);//don't boost
+						if($searchItem->getAddHighlight())
+							$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $synonymField);
+					}
 				}
 			}
 		}
@@ -92,7 +98,7 @@ class kESearchQueryManager
 		$trigramPercentage = kConf::get('ngramPercentage', 'elastic', self::DEFAULT_TRIGRAM_PERCENTAGE);
 		$matchQuery->setMinimumShouldMatch("$trigramPercentage%");
 		if($searchItem->getAddHighlight())
-			$queryAttributes->addFieldToHighlight($trigramFieldName);
+			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $trigramFieldName);
 		$partialQuery->addToShould($matchQuery);
 
 		return $partialQuery;
@@ -111,7 +117,7 @@ class kESearchQueryManager
 		$exactMatch = new $queryObject($fieldName, $searchTerm);
 		$exactMatch->setBoostFactor($fieldBoostFactor);
 		if($searchItem->getAddHighlight())
-			$queryAttributes->addFieldToHighlight($fieldName . $fieldSuffix);
+			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $fieldName . $fieldSuffix);
 
 		return $exactMatch;
 	}
@@ -127,7 +133,7 @@ class kESearchQueryManager
 		$prefixQuery = new kESearchPrefixQuery($fieldName . $fieldSuffix, $searchTerm);
 		$prefixQuery->setBoostFactor($fieldBoostFactor);
 		if($searchItem->getAddHighlight())
-			$queryAttributes->addFieldToHighlight($fieldName . $fieldSuffix);
+			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $fieldName . $fieldSuffix);
 		return $prefixQuery;
 	}
 
@@ -144,6 +150,21 @@ class kESearchQueryManager
 	{
 		$existsQuery = new kESearchExistsQuery($fieldName);
 		return $existsQuery;
+	}
+
+	public static function getNestedQuery($query, &$queryAttributes)
+	{
+		/** @var  ESearchQueryAttributes $queryAttributes*/
+		$nestedQuery = new kESearchNestedQuery();
+		$nestedQuery->setPath($queryAttributes->getNestedOperatorPath());
+		$nestedQuery->setInnerHitsSize($queryAttributes->getNestedOperatorInnerHitsSize());
+		$nestedQuery->setInnerHitsSource(true);
+		$highlight = new kESearchHighlightQuery($queryAttributes->getQueryHighlightsAttributes()->getFieldsToHighlight(), $queryAttributes->getNestedOperatorNumOfFragments());
+		$nestedQuery->setHighlight($highlight->getFinalQuery());
+		$nestedQuery->setQuery($query);
+		$nestedQuery->setInnerHitsName($queryAttributes->getNestedQueryName());
+
+		return $nestedQuery;
 	}
 
 }

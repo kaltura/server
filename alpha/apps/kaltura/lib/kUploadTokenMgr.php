@@ -127,8 +127,6 @@ class kUploadTokenMgr
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		$this->_uploadToken->save();
-		
-		$this->addTrackEntry();
 	}
 	
 	/**
@@ -139,21 +137,7 @@ class kUploadTokenMgr
 		$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_DELETED);
 		$this->_uploadToken->save();
 	}
-	
-	/**
-	 * Adds track entry for investigations
-	 */
-	protected function addTrackEntry()
-	{
-		$te = new TrackEntry();
-		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPLOADED_FILE);
-		$te->setParam1Str($this->_uploadToken->getId());
-		$te->setParam2Str($this->_uploadToken->getFileName());
-		$te->setParam3Str($this->_uploadToken->getUploadTempPath());
-		$te->setDescription(__METHOD__ . ":" . __LINE__);
-		TrackEntry::addTrackEntry($te);
-	}
-	
+
 	/**
 	 * Validate the file data
 	 * @param file $fileData

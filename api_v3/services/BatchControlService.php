@@ -67,9 +67,11 @@ class BatchControlService extends KalturaBaseService
 				$schedulerDb->setStatus($schedulerStatus->type, $schedulerStatus->value);
 			}
 			
-			$schedulerStatusDb = new SchedulerStatus();
-			$schedulerStatus->toObject($schedulerStatusDb);
-			$schedulerStatusDb->save();
+			//Don't save SchedulerStatus to avoid DB insert load every couple of minutes
+			//Next step would be to remove the logic that ready & writes the schedulerStatus file in KScheduleHelper & KGenericScheduler
+// 			$schedulerStatusDb = new SchedulerStatus();
+// 			$schedulerStatus->toObject($schedulerStatusDb);
+// 			$schedulerStatusDb->save();
 		}
 		if($schedulerChanged)
 			$schedulerDb->save();

@@ -635,7 +635,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("kuser:id=%s", self::ID), array("kuser:partnerId=%s,puserid=%s", self::PARTNER_ID, self::PUSER_ID));		
+		return array(array("kuser:id=%s", self::ID), array("kuser:partnerId=%s,puserid=%s", self::PARTNER_ID, self::PUSER_ID), array("kuser:loginDataId=%s", self::LOGIN_DATA_ID));		
 	}
 	
 	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)

@@ -121,40 +121,50 @@ class ESearchEntryItem extends ESearchItem
 	{
 		$entryQuery = array();
 		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
-		$queryAttributes->setScopeToGlobal();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $entrySearchItem)
 		{
-			self::getSingleItemSearchQuery($entrySearchItem, $entryQuery, $allowedSearchTypes, $queryAttributes);
+			$entrySearchItem->getSingleItemSearchQuery($entryQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
 		return $entryQuery;
 	}
 
-	public static function getSingleItemSearchQuery($entrySearchItem, &$entryQuery, $allowedSearchTypes, &$queryAttributes)
+	/**
+	 * @param $entryQuery
+	 * @param $allowedSearchTypes
+	 * @param $queryAttributes
+	 */
+	public function getSingleItemSearchQuery(&$entryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
-		$entrySearchItem->validateItemInput();
-		switch ($entrySearchItem->getItemType())
+		$this->validateItemInput();
+		$subQuery = null;
+		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$entryQuery[] = kESearchQueryManager::getPartialQuery($entrySearchItem, $entrySearchItem->getFieldName(), $queryAttributes);
+				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$entryQuery[] = kESearchQueryManager::getPrefixQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$entryQuery[] = kESearchQueryManager::getExistsQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$entryQuery[] = kESearchQueryManager::getRangeQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$entrySearchItem->getItemType()."]");
+				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
-		if (in_array($entrySearchItem->getFieldName(), self::$ignoreDisplayInSearchFields))
-			$queryAttributes->setShouldUseDisplayInSearch(false);
+
+		if ($this->getItemType() == ESearchItemType::EXACT_MATCH && in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
+			$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
+
+		if($subQuery)
+			$entryQuery[] = $subQuery;
 	}
 
 	public function shouldAddLanguageSearch()

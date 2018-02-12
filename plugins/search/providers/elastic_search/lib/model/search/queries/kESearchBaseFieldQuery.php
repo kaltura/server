@@ -16,7 +16,7 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	 * @var string
 	 */
 	protected $boostFactor;
-	
+
 	/**
 	 * @return string
 	 */
@@ -48,4 +48,15 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	{
 		$this->boostFactor = $boostFactor;
 	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getShouldMoveToFilterContext()
+	{
+		if($this->getBoostFactor() == kESearchQueryManager::DEFAULT_BOOST_FACTOR)
+			return true;
+		return false;
+	}
+
 }

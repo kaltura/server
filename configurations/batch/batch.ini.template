@@ -794,3 +794,12 @@ type                                                = KAsyncServerNodeMonitor
 scriptPath                                          = batches/ServerNodeMonitor/KAsyncServerNodeMonitorExe.php
 params.serverNodeTTL                                = 120
 params.typesToMonitor                               = 1
+
+[KAsyncUsersCsv : JobHandlerWorker]
+id													= 690
+friendlyName										= Users Csv
+type												= KAsyncUsersCsv
+params.localTempPath                                = @TMP_DIR@/userscsv
+params.sharedTempPath                                   = @WEB_DIR@/tmp/userscsv
+scriptPath											= batches/UsersCsv/kAsyncUsersCsvExe.php
+maximumExecutionTime			                    = 3600

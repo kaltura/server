@@ -30,6 +30,22 @@ class mediaInfo extends BasemediaInfo
 	public function setMaxGOP($v)	{$this->putInCustomData('MaxGOP', $v);}
 	public function getMaxGOP()	{return $this->getFromCustomData('MaxGOP', null, null);}
 	
+	public function setRawData($v)
+	{
+		$saveRawDataAllowedPartners = kConf::get("save_media_info_raw_data_partners", 'local', array());
+		if(!count($saveRawDataAllowedPartners))
+			return parent::setRawData($v);
+	
+		$flavorAsset = assetPeer::retrieveById($this->getFlavorAssetId());
+		if(!$flavorAsset)
+			return parent::setRawData($v);
+	
+		if(in_array($flavorAsset->getPartnerId(), $saveRawDataAllowedPartners))
+			return parent::setRawData($v);
+	
+		return;
+	}
+	
 	public function getRawDataXml()
 	{
 		$rawData = $this->getRawData();

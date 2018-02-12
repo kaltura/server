@@ -1,3 +1,88 @@
+# Mercury 13.13.0 #
+
+## Update File-Sync version field type ##
+
+- Issue Type: Task
+- Issue ID: No Plat
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_02_04_alter_file_sync_version_from_varchar_to_int.sql
+	
+#### Known Issues & Limitations ####
+
+None.
+
+
+## New SaaS Drop Folder Type ##  
+- Issue Type: New Feature  
+- Issue ID: PSVAMB-939  
+
+### Configuration ###  
+    Update the plugins.ini, admin.ini, batch.ini config files from the SaaS tag.
+    
+### Deployment scripts ###  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_12_allow_batch_partner_to_delete_metadata.php
+
+## Base Upload Permission and User-role ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-8435
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_11_add_base_upload_permission_and_role.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_11_update_base_upload_permission.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Update notification for server node changing status ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8047
+
+### Configuration ###
+	First replcae all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_30_UpdateServerNodeDownTemplate_toServerNodeStatusChanged.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_30_update_server_node_offline_email_notification_to_server_node_status_changed.php
+
+#### Known Issues & Limitations ####
+None.
+
+## Add new batch job for generating users CSV ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8446
+ 
+ ### Configuration ###
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncUsersCsv = 1
+
+	- [KAsyncUsersCsv : JobHandlerWorker]
+          id						= XXXXX
+          friendlyName					= Users Csv
+          type						= KAsyncUsersCsv
+          params.localTempPath				= @TMP_DIR@/userscsv
+          params.sharedTempPath				= @WEB_DIR@/tmp/userscsv
+          scriptPath					= batches/UsersCsv/kAsyncUsersCsvExe.php
+          maximumExecutionTime			= 3600
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_23_getCsv_user_permissions.php
+ 
 # Mercury 13.12.0 #
 
 ## Split beacon index to index per object type ##

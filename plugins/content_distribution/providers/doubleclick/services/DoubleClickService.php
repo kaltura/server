@@ -42,7 +42,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 			if (strpos($stateDecoded, '|') !== false)
 			{
 				$stateExploded = explode('|', $stateDecoded);
-				$context->stateLastEntryCreatedAt = $stateExploded[0];
+				$context->stateLastEntryTimeMark = $stateExploded[0];
 				$stateLastEntryIdsStr =  $stateExploded[1];
 				$context->stateLastEntryIds = explode(',', $stateLastEntryIdsStr);
 			}
@@ -50,15 +50,20 @@ class DoubleClickService extends ContentDistributionServiceBase
 	}
 	protected function fillnextStateDependentFields ($context, $entries) {
 		// Find the new state
-		$context->nextPageStateLastEntryCreatedAt = $context->stateLastEntryCreatedAt;
+		$context->nextPageStateLastEntryTimeMark = $context->stateLastEntryTimeMark;
 		$context->nextPageStateLastEntryIds = $context->stateLastEntryIds;
 		foreach($entries as $entry)
 		{
-			if ($context->nextPageStateLastEntryCreatedAt > $entry->getCreatedAt(null))
+			if($context->version < 2)
+				$timeMark = $entry->getCreatedAt(null);
+			else
+				$timeMark = $entry->getUpdatedAt(null);
+
+			if ($context->nextPageStateLastEntryTimeMark > $timeMark)
 				$context->nextPageStateLastEntryIds = array();
-	
+
 			$context->nextPageStateLastEntryIds[] = $entry->getId();
-			$context->nextPageStateLastEntryCreatedAt = $entry->getCreatedAt(null);
+			$context->nextPageStateLastEntryTimeMark = $timeMark;
 		}
 	}
 	
@@ -82,8 +87,14 @@ class DoubleClickService extends ContentDistributionServiceBase
 		// Add the state data to proceed to next page
 		$this->fillStateDependentFields($context);
 		
-		if ($context->stateLastEntryCreatedAt)
-			$entryFilter->set('_lte_created_at', $context->stateLastEntryCreatedAt);
+		if ($context->stateLastEntryTimeMark)
+		{
+			if ($context->version < 2)
+				$entryFilter->set('_lte_created_at', $context->stateLastEntryTimeMark);
+			else
+				$entryFilter->set('_lte_updated_at', $context->stateLastEntryTimeMark);
+		}
+
 		if ($context->stateLastEntryIds)
 			$entryFilter->set('_notin_id', $context->stateLastEntryIds);
 		
@@ -122,9 +133,9 @@ class DoubleClickService extends ContentDistributionServiceBase
 			$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
 		}
 
-		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds, $context->version));
+		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryTimeMark, $context->stateLastEntryIds, $context->version));
 		if ($context->hasNextPage)
-			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->nextPageStateLastEntryCreatedAt, $context->nextPageStateLastEntryIds, $context->version));
+			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->nextPageStateLastEntryTimeMark, $context->nextPageStateLastEntryIds, $context->version));
 		
 		return $feed;
 	}
@@ -203,10 +214,10 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param string $hash
 	 * @param int $page
 	 */
-	protected function getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds, $version)
+	protected function getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryTimeMark, $stateLastEntryIds, $version)
 	{
-		if (!is_null($stateLastEntryCreatedAt) && !is_null($stateLastEntryIds) && count($stateLastEntryIds) > 0)
-			$state = $stateLastEntryCreatedAt.'|'.implode(',', $stateLastEntryIds);
+		if (!is_null($stateLastEntryTimeMark) && !is_null($stateLastEntryIds) && count($stateLastEntryIds) > 0)
+			$state = $stateLastEntryTimeMark.'|'.implode(',', $stateLastEntryIds);
 		else
 			$state = '';
 		$urlParams = array(

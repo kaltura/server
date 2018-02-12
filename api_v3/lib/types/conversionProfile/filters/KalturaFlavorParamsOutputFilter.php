@@ -13,6 +13,28 @@ class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsOutputBaseFilte
 		return new assetParamsOutputFilter();
 	}
 	
+	protected function doGetListResponse(KalturaFilterPager $pager, array $types = null)
+	{
+		$flavorParamsOutputFilter = $this->toObject();
+	
+		$c = new Criteria();
+		$flavorParamsOutputFilter->attachToCriteria($c);
+	
+		$pager->attachToCriteria($c);
+	
+		if($types)
+		{
+			$c->add(assetParamsOutputPeer::TYPE, $types, Criteria::IN);
+		}
+	
+		$list = assetParamsOutputPeer::doSelect($c);
+	
+		$c->setLimit(null);
+		$totalCount = assetParamsOutputPeer::doCount($c);
+	
+		return array($list, $totalCount);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaAssetParamsFilter::getTypeListResponse()
 	 */

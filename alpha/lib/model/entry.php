@@ -3611,7 +3611,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 
 		if($result)
+		{
+			$result = array_unique($result);
+			$result = array_values($result);
 			return $result;
+		}
 
 		return null;
 	}
@@ -3820,12 +3824,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
 			'kuser_id' => $this->getKuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => elasticSearchUtils::formatSearchTerm($this->getName()),
+			'name' => $this->getName(),
 			'description' => $this->getDescription(),
 			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
-			'parent_id' => $this->getParentEntryId(),
 			'reference_id' => $this->getReferenceID(),
 			'conversion_profile_id' => $this->getConversionProfileId(),
 			'template_entry_id' => $this->getTemplateEntryId(),
@@ -3873,6 +3876,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return ElasticMethodType::INDEX;
 	}
 
+	public function getElasticEntryId()
+	{
+		return $this->getId();
+	}
+
 	/**
 	 * Index the object into elasticsearch
 	 */
@@ -3897,7 +3905,6 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 		$body['parent_entry'] = array(
 			'entry_id' => $parentEntry->getId(),
-			'partner_id' => $parentEntry->getPartnerId(),
 			'status' => $parentEntry->getStatus(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($parentEntry->getPartnerId(), $parentEntry->getStatus()),
 			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),

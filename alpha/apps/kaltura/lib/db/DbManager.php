@@ -204,7 +204,7 @@ class DbManager
 		if(!self::$sphinxConnection)
 		{
 			$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
-			$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 300;
+			$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 30;
 			$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
 			
 			$preferredIndex = self::getSphinxConnIndexFromCache();
@@ -238,7 +238,7 @@ class DbManager
 		return self::$sphinxConnection;
 	}
 
-	public static function connectFallbackLogic($connectCallback, array $connectParams, $dataSources, $preferredIndex = false, $cacheExpiry = 300)
+	public static function connectFallbackLogic($connectCallback, array $connectParams, $dataSources, $preferredIndex = false, $cacheExpiry = 30)
 	{
 		// loop twice, on first iteration try only connections not marked as failed
 		// in case all connections failed, try all connections on second iteration

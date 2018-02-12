@@ -252,6 +252,7 @@ class CuePointIndex extends BaseIndexObject
 		if (!self::$conditionToKeep)
 		{
 			self::$conditionToKeep = array(
+				'cue_point.ENTRY_ID',
 			);
 		}
 		return self::$conditionToKeep;

@@ -31,6 +31,7 @@ class MetadataBatchService extends KalturaBatchService
 		{
 			foreach ($jobs as &$job)
 			{
+				/**@var kTransformMetadataJobData $data*/
 				$data = $job->getData();
 				$metadataProfileId = $data->getMetadataProfileId();
 				$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
@@ -38,8 +39,7 @@ class MetadataBatchService extends KalturaBatchService
 					continue;
 
 				$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-				$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
-				$data->setDestXsdPath($xsdPath);
+				$data->setDestXsd(kJobsManager::getFileContainer($key));
 				$job->setData($data);
 			}
 		}

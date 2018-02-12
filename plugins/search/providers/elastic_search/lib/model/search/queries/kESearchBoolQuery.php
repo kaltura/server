@@ -97,6 +97,11 @@ class kESearchBoolQuery extends kESearchCompoundQuery
 		$this->shouldQueries[] = $query;
 	}
 
+	public function addQueriesToShould($queries)
+	{
+		$this->shouldQueries = array_merge($this->shouldQueries, $queries);
+	}
+
 	public function addToMustNot($query)
 	{
 		$this->mustNotQueries[] = $query;

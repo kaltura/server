@@ -51,4 +51,9 @@ interface IElasticIndexable extends IBaseObject
      */
     public function getElasticObjectName();
 
+    /**
+     * return the entry id of the object we are indexing or null if no entry id
+     */
+    public function getElasticEntryId();
+
 }
