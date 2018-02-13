@@ -238,6 +238,29 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
+	}
 
+	/**
+	 * Cancel entry task. will only occur for task in PENDING or PENDING_MODERATION status
+	 *
+	 * @action abort
+	 * @param int $id vendor task id
+	 * @return KalturaEntryVendorTask
+	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
+	 */
+	public function abortAction($id)
+	{
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrievePendingByEntryIdAndPartnerId($id, kCurrentContext::getCurrentPartnerId());
+		if (!$dbEntryVendorTask)
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+
+		/* @var EntryVendorTask $dbEntryVendorTask*/
+		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::ABORTED);
+		$dbEntryVendorTask->save();
+
+		// return the saved object
+		$entryVendorTask = new KalturaEntryVendorTask();
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
 	}
 }

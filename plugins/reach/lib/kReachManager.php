@@ -67,6 +67,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
+
+		if($object instanceof EntryVendorTask
+			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == EntryVendorTaskStatus::ABORTED
+			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING))
+		)
+			return $this->handleAbortedTask($object);
 		
 		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
 			in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
@@ -85,7 +92,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), -$entryVendorTask->getPrice());
 	}
-	
+
+	private function handleAbortedTask(EntryVendorTask $entryVendorTask)
+	{
+		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), -$entryVendorTask->getPrice());
+	}
+
 	private function handleEntryDurationChanged(entry $entry)
 	{
 		$pendingEntryVendorTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId());
