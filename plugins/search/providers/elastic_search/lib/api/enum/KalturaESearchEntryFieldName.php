@@ -37,4 +37,5 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const IS_QUIZ = 'is_quiz';
 	const IS_LIVE = 'is_live';
 	const USER_NAMES = "user_names";
+	const ROOT_ID = 'root_id';
 }

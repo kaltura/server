@@ -38,4 +38,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const IS_LIVE = 'is_live';
 	const USER_NAMES = "user_names";
 	const DISPLAY_IN_SEARCH = 'display_in_search';
+	const ROOT_ID = 'root_id';
 }
