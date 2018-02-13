@@ -2,128 +2,246 @@
 
 class kKavaReportsMgr extends kKavaBase
 {
-	const METRIC_TOTAL_PLAY_TIME = "playTimeSumMin";
-	const METRIC_TOTAL_PLAY_TIME_SEC = "playTimeSum";
-	const METRIC_AVG_PLAY_TIME = "playTimeAvg";
-	const METRIC_PLAYER_IMPRESSION_RATIO = "playerImpressionRatio";
-	const METRIC_AVG_DROP_OFF = "avgDropOffRatio";
-	const METRIC_PLAYTHROUGH_RATIO = "playThroughRatio";
-	const METRIC_TOTAL_ENTRIES = "totalEntries";
-	const METRIC_UNIQUE_USERS = "uniqueUsers";
-	const METRIC_UNIQUE_USER_IDS = "uniqueUserIds";
-	const METRIC_PLAYTHROUGH = "playThrough";
-	const METRIC_TOTAL_COUNT = "total_count";
+	// metrics
+	const METRIC_TOTAL_PLAY_TIME = 'playTimeSumMin';
+	const METRIC_TOTAL_PLAY_TIME_SEC = 'playTimeSum';
+	const METRIC_AVG_PLAY_TIME = 'playTimeAvg';
+	const METRIC_PLAYER_IMPRESSION_RATIO = 'playerImpressionRatio';
+	const METRIC_AVG_DROP_OFF = 'avgDropOffRatio';
+	const METRIC_PLAYTHROUGH_RATIO = 'playThroughRatio';
+	const METRIC_TOTAL_ENTRIES = 'totalEntries';
+	const METRIC_UNIQUE_USERS = 'uniqueUsers';
+	const METRIC_UNIQUE_USER_IDS = 'uniqueUserIds';
+	const METRIC_PLAYTHROUGH = 'playThrough';
+	const METRIC_TOTAL_COUNT = 'total_count';
+	const METRIC_COUNT_UGC = 'count_ugc';
+	const METRIC_COUNT_ADMIN = 'count_admin';
+	
+	// report settings
+	const REPORT_DATA_SOURCE = 'report_data_source';
+	const REPORT_FILTER = 'report_filter';
+	const REPORT_DIMENSION = 'report_dimension';
+	const REPORT_METRICS = 'report_metrics';
+	const REPORT_DETAIL_DIM_HEADERS = 'report_detail_dimensions_headers';
+	const REPORT_GRAPH_METRICS = 'report_graph_metrics';
+	const REPORT_ENRICH_DEF = 'report_enrich_definition';
+	const REPORT_GRANULARITY = 'report_granularity';
+	const REPORT_ENRICH_FIELD = 'field';
+	const REPORT_ENRICH_FUNC = 'func';
+	const REPORT_ENRICH_CONTEXT = 'context';
+	const REPORT_TOTAL_METRICS = 'report_total_metrics';
+	const REPORT_DRILLDOWN_GRANULARITY = 'report_drilldown_granularity';
+	const REPORT_DRILLDOWN_DIMENSION = 'report_drilldown_dimension';
+	const REPORT_DRILLDOWN_METRICS = 'report_drilldown_metrics';
+	const REPORT_DRILLDOWN_DETAIL_DIM_HEADERS = 'report_drilldown_detail_dimensions_headers';
+	const REPORT_CARDINALITY_METRIC = 'report_cardinality_metric';
+	const REPORT_PLAYBACK_TYPES = 'report_playback_types';
+	const REPORT_OBJECT_IDS_TRANSFORM = 'report_object_ids_transform';
+	const REPORT_FILTER_DIMENSION = 'report_filter_dimension';
 
-	const REPORT_DIMENSION = "report_dimension";
-	const REPORT_METRICS = "report_metrics";
-	const REPORT_DETAIL_DIM_HEADERS = "report_detail_dimensions_headers";
-	const REPORT_GRAPH_METRICS = "report_graph_metrics";
-	const REPORT_ENRICH_DEF = "report_enrich_definition";
-	const REPORT_GRANULARITY = "report_granularity";
-	const REPORT_ENRICH_FIELD = "field";
-	const REPORT_ENRICH_FUNC = "func";
-	const REPORT_ENRICH_CONTEXT = "context";
-	const REPORT_TOTAL_ADDITIONAL_METRICS = "report_total_metrics";
-	const REPORT_DRILLDOWN_GRANULARITY = "report_drilldown_granularity";
-	const REPORT_DRILLDOWN_DIMENSION = "report_drilldown_dimension";
-	const REPORT_DRILLDOWN_METRICS = "report_drilldown_metrics";
-	const REPORT_DRILLDOWN_DETAIL_DIM_HEADERS = "report_drilldown_detail_dimensions_headers";
-	const REPORT_CARDINALITY_METRIC = "report_cardinality_metric";
-
-	const REPORT_LEGACY = "report_legacy";
-	const REPORT_LEGACY_MAPPING = "legacy_mapping";
-	const REPORT_LEGACY_JOIN_FIELD = "join_field";
-
-	const CLIENT_TAG_PRIORITY = 5;
+	const REPORT_LEGACY = 'report_legacy';
+	const REPORT_LEGACY_MAPPING = 'legacy_mapping';
+	const REPORT_LEGACY_JOIN_FIELD = 'join_field';
+	
+	// limits
 	const MAX_RESULT_SIZE = 12000;
 	const MAX_CSV_RESULT_SIZE = 60000;
 	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
 	const MIN_THRESHOLD = 500;
+	
 	const ENRICH_CHUNK_SIZE = 10000;
+	const CLIENT_TAG_PRIORITY = 5;
+	
+	static $reports_def = array(
+		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
+			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'entry_name'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => 'entry_name', 
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+		),
 
-	static $aggregations_def = array();
-	static $metrics_def = array();
+		myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF => array(
+			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
+			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'entry_name'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => 'entry_name', 
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
+			self::REPORT_CARDINALITY_METRIC => self::EVENT_TYPE_PLAY
+		),
 
-	private static $event_type_count_aggr_template =
-		array(self::DRUID_TYPE => self::DRUID_FILTERED_AGGR,
-			self::DRUID_FILTER => array(self::DRUID_TYPE => self::DRUID_SELECTOR_FILTER,
-										self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-										self::DRUID_VALUE => "value"),
-										self::DRUID_AGGREGATOR => array(self::DRUID_TYPE => self::DRUID_LONG_SUM_AGGR,
-																		self::DRUID_NAME => "name",
-																		self::DRUID_FIELD_NAME => "count"));
+		myReportsMgr::REPORT_TYPE_CONTENT_INTERACTIONS => array(
+			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'entry_name'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => 'entry_name', 
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
+		),
 
-	private static $events_types_count_aggr_template =
-		array(self::DRUID_TYPE => self::DRUID_FILTERED_AGGR,
-			self::DRUID_FILTER => array(self::DRUID_TYPE => self::DRUID_SELECTOR_FILTER,
-			self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-			self::DRUID_VALUES => "value"),
-			self::DRUID_AGGREGATOR => array(self::DRUID_TYPE => self::DRUID_LONG_SUM_AGGR,
-											self::DRUID_NAME => "name",
-											self::DRUID_FIELD_NAME => "count"));
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY => array(
+			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'country'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
+			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_REGION,
+			self::REPORT_DRILLDOWN_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
+			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array('object_id', 'location_name'),
+		),
 
-	private static $arithmetic_post_aggr_template =
-		array(self::DRUID_TYPE => self::DRUID_ARITHMETIC_POST_AGGR,
-			self::DRUID_NAME => "name",
-			self::DRUID_FUNCTION => "function",
+		myReportsMgr::REPORT_TYPE_TOP_SYNDICATION => array(
+			self::REPORT_DIMENSION => self::DIMENSION_DOMAIN,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'domain_name'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DOMAIN,
+			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_URL,
+			self::REPORT_DRILLDOWN_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array('referrer'),
+		),
+
+		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT => array(
+			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('name'),
+			self::REPORT_METRICS => array(self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+		),
+
+		myReportsMgr::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT => array(
+			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('entry_name'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => 'entry_name', 
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
+			self::REPORT_METRICS => array(self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+		),
+
+		myReportsMgr::REPORT_TYPE_USER_TOP_CONTENT => array(
+			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('name'),
+			self::REPORT_METRICS => array(self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+		),
+
+		myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF => array(
+			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
+			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('name'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
+			self::REPORT_CARDINALITY_METRIC => self::EVENT_TYPE_PLAY
+		),
+
+		myReportsMgr::REPORT_TYPE_USER_CONTENT_INTERACTIONS => array(
+			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('name'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
+		),
+
+		myReportsMgr::REPORT_TYPE_APPLICATIONS => array(
+			self::REPORT_DIMENSION => self::DIMENSION_APPLICATION,
+			self::REPORT_DETAIL_DIM_HEADERS => array('name'),
+			self::REPORT_METRICS => array(),
+		),
+
+		myReportsMgr::REPORT_TYPE_PLATFORMS => array(
+			self::REPORT_DIMENSION => self::DIMENSION_DEVICE,
+			self::REPORT_DETAIL_DIM_HEADERS => array('device'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DEVICE,
+			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'untransformDeviceName'),
+			self::REPORT_DRILLDOWN_GRANULARITY => self::DRUID_GRANULARITY_ALL,
+			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_OS,
+			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array('os'),
+		),
+
+		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM => array(
+			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
+			self::REPORT_DIMENSION => self::DIMENSION_OS,
+			self::REPORT_DETAIL_DIM_HEADERS => array('os'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_BROWSER,
+			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array('browser')
+		),
+
+		myReportsMgr::REPORT_TYPE_BROWSERS => array(
+			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
+			self::REPORT_DIMENSION => self::DIMENSION_BROWSER,
+			self::REPORT_DETAIL_DIM_HEADERS => array('browser'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+		),
+
+		myReportsMgr::REPORT_TYPE_LIVE => array(
+			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_HOUR,
+			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR), 
+			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'entry_name'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => 'entry_name', 
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
+		),
+
+		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => array(
+			self::REPORT_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'name'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => 'name', 
+				self::REPORT_ENRICH_FUNC => 'self::getCategoriesNames'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self:: METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+		),
+
+		myReportsMgr::REPORT_TYPE_VPAAS_USAGE => array(
+			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_MONTH,
+			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+			self::REPORT_LEGACY => array(
+				self::REPORT_LEGACY_MAPPING => array('total_plays' => 'count_plays'),
+				self::REPORT_LEGACY_JOIN_FIELD => 'month_id'),
+		),
+
+		myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE => array(
+			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_LEGACY => array(
+				self::REPORT_LEGACY_MAPPING => array('count loads' => 'count_loads',
+				'count plays' => 'count_plays'),
+			self::REPORT_LEGACY_JOIN_FIELD =>'id'),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+		),
+
+		myReportsMgr::REPORT_TYPE_TOP_CONTRIBUTORS => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'name'),
+			self::REPORT_METRICS => array(self::METRIC_COUNT, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_SHOW),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_COUNT, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+				self::DRUID_VALUES => array('entryCreated')),
+		),
 	);
-
-	private static $top_n_query_template =
-		array(self::DRUID_QUERY_TYPE => self::DRUID_TOPN,
-			self::DRUID_DATASOURCE => self::HISTORICAL_DATASOURCE,
-			self::DRUID_INTERVALS => "time_intervals",
-			self::DRUID_GRANULARITY => self::DRUID_GRANULARITY_ALL,
-			self::DRUID_DIMENSION => "dimension",
-			self::DRUID_METRIC => "metric",
-			self::DRUID_THRESHOLD => "threshold");
-
-	private static $time_series_query_template =
-		array(self::DRUID_QUERY_TYPE => self::DRUID_TIMESERIES,
-			self::DRUID_DATASOURCE => self::HISTORICAL_DATASOURCE,
-			self::DRUID_INTERVALS => "time_intervals",
-			self::DRUID_GRANULARITY => "granularity");
-
-	private static $group_by_query_template =
-		array(self::DRUID_QUERY_TYPE => self::DRUID_GROUP_BY,
-			self::DRUID_DATASOURCE => self::HISTORICAL_DATASOURCE,
-			self::DRUID_INTERVALS => "time_intervals",
-			self::DRUID_GRANULARITY => self::DRUID_GRANULARITY_ALL,
-			self::DRUID_DIMENSIONS => "dimension");
-
-	private static $simple_metrics = array(
-		self::EVENT_TYPE_PLAYER_IMPRESSION,
-		self::EVENT_TYPE_PLAY_REQUESTED,
-		self::EVENT_TYPE_PLAY,
-		self::EVENT_TYPE_RESUME,
-		self::EVENT_TYPE_PLAYTHROUGH_25,
-		self::EVENT_TYPE_PLAYTHROUGH_50,
-		self::EVENT_TYPE_PLAYTHROUGH_75,
-		self::EVENT_TYPE_PLAYTHROUGH_100,
-		self::EVENT_TYPE_EDIT_CLICKED,
-		self::EVENT_TYPE_SHARE_CLICKED,
-		self::EVENT_TYPE_SHARED,
-		self::EVENT_TYPE_DOWNLOAD_CLICKED,
-		self::EVENT_TYPE_REPORT_CLICKED,
-		self::EVENT_TYPE_REPORT_SUBMITTED,
-		self::EVENT_TYPE_ENTER_FULL_SCREEN,
-		self::EVENT_TYPE_EXIT_FULL_SCREEN,
-		self::EVENT_TYPE_PAUSE,
-		self::EVENT_TYPE_REPLAY,
-		self::EVENT_TYPE_SEEK,
-		self::EVENT_TYPE_RELATED_CLICKED,
-		self::EVENT_TYPE_RELATED_SELECTED,
-		self::EVENT_TYPE_CAPTIONS,
-		self::EVENT_TYPE_SOURCE_SELECTED,
-		self::EVENT_TYPE_INFO,
-		self::EVENT_TYPE_SPEED,
-		self::EVENT_TYPE_VIEW,
-		self::EVENT_TYPE_PLAY_END,
-		self::METRIC_PLAYTHROUGH,
-		self::METRIC_TOTAL_ENTRIES,
-		self::METRIC_TOTAL_PLAY_TIME_SEC,
-		self::METRIC_UNIQUE_USERS);
-
-	private static $simple_event_type_aggrs = array(
+	
+	private static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
 		self::EVENT_TYPE_PLAYER_IMPRESSION,
 		self::EVENT_TYPE_PLAY_END,
@@ -137,183 +255,52 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_REPORT_CLICKED
 	);
 
-	static $custom_reports = null;
-
-	static $reports_def = array(
-		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
-			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "entry_name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "entry_name", self::REPORT_ENRICH_FUNC => "self::getEntriesNames")
-		),
-		myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF => array(
-			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
-			self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "entry_name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
-			self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "entry_name", self::REPORT_ENRICH_FUNC => "self::getEntriesNames"),
-			self::REPORT_CARDINALITY_METRIC => self::EVENT_TYPE_PLAY
-		),
-		myReportsMgr::REPORT_TYPE_CONTENT_INTERACTIONS => array(
-			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
-			self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "entry_name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
-			self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "entry_name", self::REPORT_ENRICH_FUNC => "self::getEntriesNames")
-		),
-		myReportsMgr::REPORT_TYPE_MAP_OVERLAY => array(
-			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
-			self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "country"),
-			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_REGION,
-			self::REPORT_DRILLDOWN_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
-			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("object_id","location_name")
-		),
-		myReportsMgr::REPORT_TYPE_TOP_SYNDICATION => array(
-			self::REPORT_DIMENSION => self::DIMENSION_DOMAIN,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
-			self::REPORT_DETAIL_DIM_HEADERS => array("object_id","domain_name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_URL,
-			self::REPORT_DRILLDOWN_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
-			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("referrer")
-		),
-		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT => array(
-			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
-			self::REPORT_METRICS => array(self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
-			self::REPORT_DETAIL_DIM_HEADERS => array("name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_TOTAL_ADDITIONAL_METRICS => array(self::METRIC_UNIQUE_USERS)
-		),
-		myReportsMgr::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT => array(
-			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
-			self::REPORT_METRICS => array(self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
-			self::REPORT_DETAIL_DIM_HEADERS => array("entry_name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "entry_name", self::REPORT_ENRICH_FUNC => "self::getEntriesNames"),
-			self::REPORT_TOTAL_ADDITIONAL_METRICS => array(self::METRIC_UNIQUE_USERS)
-		),
-		myReportsMgr::REPORT_TYPE_USER_TOP_CONTENT => array(
-			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
-			self::REPORT_METRICS => array(self::METRIC_TOTAL_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
-			self::REPORT_DETAIL_DIM_HEADERS => array("name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_TOTAL_ADDITIONAL_METRICS => array(self::METRIC_UNIQUE_USERS)
-
-		),
-		myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF => array(
-			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
-			self::REPORT_DETAIL_DIM_HEADERS => array("name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
-			self::REPORT_TOTAL_ADDITIONAL_METRICS => array(self::METRIC_UNIQUE_USERS),
-			self::REPORT_CARDINALITY_METRIC => self::EVENT_TYPE_PLAY
-
-		),
-		myReportsMgr::REPORT_TYPE_USER_CONTENT_INTERACTIONS => array(
-			self::REPORT_DIMENSION => self::DIMENSION_USER_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
-			self::REPORT_DETAIL_DIM_HEADERS => array("name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
-			self::REPORT_TOTAL_ADDITIONAL_METRICS => array(self::METRIC_UNIQUE_USERS)
-
-		),
-		myReportsMgr::REPORT_TYPE_APPLICATIONS => array(
-			self::REPORT_DIMENSION => self::DIMENSION_APPLICATION,
-			self::REPORT_METRICS => array(),
-			self::REPORT_DETAIL_DIM_HEADERS => array("name"),
-		),
-		myReportsMgr::REPORT_TYPE_PLATFORMS => array(
-			self::REPORT_DIMENSION => self::DIMENSION_DEVICE,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_DETAIL_DIM_HEADERS => array("device"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_DRILLDOWN_GRANULARITY => self::DRUID_GRANULARITY_ALL,
-			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_OS,
-			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("os")
-		),
-		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM => array(
-			self::REPORT_DIMENSION => self::DIMENSION_OS,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
-			self::REPORT_DETAIL_DIM_HEADERS => array("os"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_BROWSER,
-			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array("browser")
-		),
-		myReportsMgr::REPORT_TYPE_BROWSERS => array(
-			self::REPORT_DIMENSION => self::DIMENSION_BROWSER,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_ALL,
-			self::REPORT_DETAIL_DIM_HEADERS => array("browser"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-
-		),
-		myReportsMgr::REPORT_TYPE_LIVE => array(
-			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_HOUR,
-			self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "entry_name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
-			self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "entry_name", self::REPORT_ENRICH_FUNC => "self::getEntriesNames")
-		),
-
-		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => array(
-			self::REPORT_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
-			self::REPORT_DETAIL_DIM_HEADERS => array("object_id", "name"),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self:: METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_ENRICH_DEF => array(self::REPORT_ENRICH_FIELD => "name", self::REPORT_ENRICH_FUNC => "self::getCategoriesNames")
-		),
-
-		myReportsMgr::REPORT_TYPE_VPAAS_USAGE => array(
-			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_MONTH,
-			self::REPORT_LEGACY => array(self::REPORT_LEGACY_MAPPING => array("total_plays" => "count_plays"),
-										self::REPORT_LEGACY_JOIN_FIELD => "month_id"),
-		),
-
-		myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE => array(
-			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_LEGACY => array(self::REPORT_LEGACY_MAPPING => array("count loads" => "count_loads",
-										"count plays" => "count_plays"),
-														self::REPORT_LEGACY_JOIN_FIELD =>"id"),
-		)
-
+	private static $media_type_count_aggrs = array(
+		self::MEDIA_TYPE_VIDEO,
+		self::MEDIA_TYPE_AUDIO,
+		self::MEDIA_TYPE_IMAGE,
+		self::MEDIA_TYPE_SHOW,
 	);
-
+	
+	private static $playthrough_event_types = array(
+		self::EVENT_TYPE_PLAYTHROUGH_25,
+		self::EVENT_TYPE_PLAYTHROUGH_50,
+		self::EVENT_TYPE_PLAYTHROUGH_75,
+		self::EVENT_TYPE_PLAYTHROUGH_100
+	);
+	
 	static $metrics_to_headers = array(
-		self::EVENT_TYPE_PLAY => "count_plays",
-		self::METRIC_TOTAL_PLAY_TIME => "sum_time_viewed",
-		self::METRIC_AVG_PLAY_TIME => "avg_time_viewed",
-		self::EVENT_TYPE_PLAYER_IMPRESSION => "count_loads",
-		self::METRIC_PLAYER_IMPRESSION_RATIO => "load_play_ratio",
-		self::METRIC_AVG_DROP_OFF => "avg_view_drop_off",
-		self::EVENT_TYPE_PLAYTHROUGH_25 => "count_plays_25",
-		self::EVENT_TYPE_PLAYTHROUGH_50 => "count_plays_50",
-		self::EVENT_TYPE_PLAYTHROUGH_75 => "count_plays_75",
-		self::EVENT_TYPE_PLAYTHROUGH_100 => "count_plays_100",
-		self::DIMENSION_DEVICE => "device",
-		self::DIMENSION_OS => "os",
-		self::DIMENSION_BROWSER => "browser",
-		self::METRIC_TOTAL_ENTRIES => "unique_videos",
-		self::METRIC_UNIQUE_USERS => "unique_known_users",
-		self::EVENT_TYPE_REPORT_CLICKED => "count_report",
-		self::EVENT_TYPE_DOWNLOAD_CLICKED => "count_download",
-		self::EVENT_TYPE_SHARE_CLICKED => "count_viral",
-		self::EVENT_TYPE_EDIT_CLICKED => "count_edit",
-		self::METRIC_PLAYTHROUGH_RATIO => "play_through_ratio",
-		self::DIMENSION_LOCATION_COUNTRY => "country",
-		self::DIMENSION_LOCATION_REGION => "location_name",
+		self::EVENT_TYPE_PLAY => 'count_plays',
+		self::METRIC_TOTAL_PLAY_TIME => 'sum_time_viewed',
+		self::METRIC_AVG_PLAY_TIME => 'avg_time_viewed',
+		self::EVENT_TYPE_PLAYER_IMPRESSION => 'count_loads',
+		self::METRIC_PLAYER_IMPRESSION_RATIO => 'load_play_ratio',
+		self::METRIC_AVG_DROP_OFF => 'avg_view_drop_off',
+		self::EVENT_TYPE_PLAYTHROUGH_25 => 'count_plays_25',
+		self::EVENT_TYPE_PLAYTHROUGH_50 => 'count_plays_50',
+		self::EVENT_TYPE_PLAYTHROUGH_75 => 'count_plays_75',
+		self::EVENT_TYPE_PLAYTHROUGH_100 => 'count_plays_100',
+		self::DIMENSION_DEVICE => 'device',
+		self::DIMENSION_OS => 'os',
+		self::DIMENSION_BROWSER => 'browser',
+		self::METRIC_TOTAL_ENTRIES => 'unique_videos',
+		self::METRIC_UNIQUE_USERS => 'unique_known_users',
+		self::EVENT_TYPE_REPORT_CLICKED => 'count_report',
+		self::EVENT_TYPE_DOWNLOAD_CLICKED => 'count_download',
+		self::EVENT_TYPE_SHARE_CLICKED => 'count_viral',
+		self::EVENT_TYPE_EDIT_CLICKED => 'count_edit',
+		self::METRIC_PLAYTHROUGH_RATIO => 'play_through_ratio',
+		self::DIMENSION_LOCATION_COUNTRY => 'country',
+		self::DIMENSION_LOCATION_REGION => 'location_name',
+		self::MEDIA_TYPE_VIDEO => 'count_video',
+		self::MEDIA_TYPE_AUDIO => 'count_audio',
+		self::MEDIA_TYPE_IMAGE => 'count_image',
+		self::MEDIA_TYPE_SHOW => 'count_mix',
+		self::METRIC_COUNT => 'count_total',
+		self::METRIC_COUNT_UGC => 'count_ugc',
+		self::METRIC_COUNT_ADMIN => 'count_admin',
 	);
-
-	static $headers_to_metrics = array();
-
+	
 	static $transform_metrics = array(
 		self::METRIC_TOTAL_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
@@ -349,7 +336,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::DIMENSION_CATEGORIES
 	);
 
-	static $phpTimezoneNames = array(
+	static $php_timezone_names = array(
 		-840 => 'Pacific/Kiritimati',
 		-780 => 'Pacific/Enderbury',
 		-765 => 'Pacific/Chatham',
@@ -396,7 +383,7 @@ class kKavaReportsMgr extends kKavaBase
 	//		it seems to be better to use Etc/GMT... with Druid when possible -
 	//		https://github.com/druid-io/druid/issues/5200
 	
-	static $druidTimezoneNames = array(
+	static $druid_timezone_names = array(
 		-840 => 'Etc/GMT-14',
 		-780 => 'Etc/GMT-13',
 		-765 => 'Pacific/Chatham',
@@ -439,6 +426,11 @@ class kKavaReportsMgr extends kKavaBase
 		 720 => 'Etc/GMT+12',
 	);
 	
+	static $aggregations_def = array();
+	static $metrics_def = array();
+	static $headers_to_metrics = array();
+	static $custom_reports = null;
+	
 	protected static function transformDeviceName($name)
 	{
 		$name = strtoupper($name);
@@ -473,107 +465,113 @@ class kKavaReportsMgr extends kKavaBase
 		return $name;
 	}
 
-	private static function getEventTypeCountAggr($event_type) {
-		$count_aggr = self::$event_type_count_aggr_template;
-		$count_aggr[self::DRUID_FILTER][self::DRUID_VALUE] = $event_type;
-		$count_aggr[self::DRUID_AGGREGATOR][self::DRUID_NAME] = $event_type;
-
-		return $count_aggr;
-	}
-
 	private static function getFieldRatioAggr($agg_name, $field1, $field2)
 	{
-		$ratio_aggr = self::$arithmetic_post_aggr_template;
-		$ratio_aggr[self::DRUID_NAME] = $agg_name;
-		$ratio_aggr[self::DRUID_FUNCTION] = "/";
-		$fields = array(array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => $field1, self::DRUID_FIELD_NAME => $field1),
-			array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => $field2, self::DRUID_FIELD_NAME => $field2));
-		$ratio_aggr[self::DRUID_FIELDS] = $fields;
-
-		return $ratio_aggr;
+		return self::getArithmeticPostAggregator($agg_name, '/', array(
+			self::getFieldAccessPostAggregator($field1),
+			self::getFieldAccessPostAggregator($field2)));
 	}
 
-	private static function init() {
-
+	private static function init()
+	{
 		if (self::$metrics_def)
 		{
 			return;
 		}
-
-		foreach (self::$simple_metrics as $metric) {
-			self::$metrics_def[$metric] = array(self::DRUID_AGGR => array($metric));
+		
+		// count aggregators
+		self::$aggregations_def[self::METRIC_COUNT] = 
+			self::getLongSumAggregator(self::METRIC_COUNT, self::METRIC_COUNT);
+		
+		self::$aggregations_def[self::METRIC_PLAYTHROUGH] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$playthrough_event_types),
+			self::getLongSumAggregator(self::METRIC_PLAYTHROUGH, self::METRIC_COUNT));
+		
+		foreach (self::$event_type_count_aggrs as $event_type)
+		{
+			self::$aggregations_def[$event_type] = self::getFilteredAggregator(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, $event_type),
+				self::getLongSumAggregator($event_type, self::METRIC_COUNT)); 
+		}
+		
+		foreach (self::$media_type_count_aggrs as $media_type)
+		{
+			self::$aggregations_def[$media_type] = self::getFilteredAggregator(
+				self::getSelectorFilter(self::DIMENSION_MEDIA_TYPE, $media_type),
+				self::getLongSumAggregator($media_type, self::METRIC_COUNT)); 
 		}
 
-		self::$metrics_def[self::METRIC_TOTAL_PLAY_TIME] = array(self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME_SEC),
+		$is_admin_metrics = array(
+			self::METRIC_COUNT_UGC => '0', 
+			self::METRIC_COUNT_ADMIN => '1');
+		foreach ($is_admin_metrics as $metric => $value)
+		{
+			self::$aggregations_def[$metric] = self::getFilteredAggregator(
+				self::getSelectorFilter(self::DIMENSION_USER_IS_ADMIN, $value),
+				self::getLongSumAggregator($metric, self::METRIC_COUNT));
+		}
+		
+		// other aggregators
+		self::$aggregations_def[self::METRIC_AVG_PLAY_TIME] = self::getFieldRatioAggr(
+			self::METRIC_AVG_PLAY_TIME, 
+			self::METRIC_TOTAL_PLAY_TIME, 
+			self::EVENT_TYPE_PLAY);
+		
+		self::$aggregations_def[self::METRIC_PLAYER_IMPRESSION_RATIO] = self::getFieldRatioAggr(
+			self::METRIC_PLAYER_IMPRESSION_RATIO, 
+			self::EVENT_TYPE_PLAY, 
+			self::EVENT_TYPE_PLAYER_IMPRESSION);
+		
+		self::$aggregations_def[self::METRIC_PLAYTHROUGH_RATIO] = self::getFieldRatioAggr(
+			self::METRIC_PLAYTHROUGH_RATIO, 
+			self::EVENT_TYPE_PLAYTHROUGH_100, 
+			self::EVENT_TYPE_PLAY);
+
+		self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$playthrough_event_types), 
+			self::getLongSumAggregator(self::METRIC_TOTAL_PLAY_TIME_SEC, self::METRIC_TOTAL_PLAY_TIME_SEC));
+		
+		self::$aggregations_def[self::METRIC_TOTAL_ENTRIES] = self::getCardinalityAggregator(
+			self::METRIC_TOTAL_ENTRIES, 
+			array(self::DIMENSION_ENTRY_ID));
+		
+		self::$aggregations_def[self::METRIC_UNIQUE_USERS] = self::getHyperUniqueAggregator(
+			self::METRIC_UNIQUE_USERS, 
+			self::METRIC_UNIQUE_USER_IDS);
+
+		self::$aggregations_def[self::METRIC_AVG_DROP_OFF] = self::getArithmeticPostAggregator(
+			self::METRIC_AVG_DROP_OFF, '/', array(
+				self::getArithmeticPostAggregator('subDropOff', '/', array(
+					self::getFieldAccessPostAggregator(self::METRIC_PLAYTHROUGH),
+					self::getConstantPostAggregator('quarter', '4'))), 
+				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY)));
+		
+		self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME] = self::getArithmeticPostAggregator(
+			self::METRIC_TOTAL_PLAY_TIME, '/', array(
+				self::getFieldAccessPostAggregator(self::METRIC_TOTAL_PLAY_TIME_SEC),
+				self::getConstantPostAggregator('seconds', '60')));
+
+		// metrics
+		self::$metrics_def[self::METRIC_TOTAL_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME_SEC),
 			self::DRUID_POST_AGGR => array(self::METRIC_TOTAL_PLAY_TIME));
-		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
+		
+		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_TOTAL_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
 			self::DRUID_POST_AGGR => array(self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME));
-		self::$metrics_def[self::METRIC_PLAYER_IMPRESSION_RATIO] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
+		
+		self::$metrics_def[self::METRIC_PLAYER_IMPRESSION_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
 			self::DRUID_POST_AGGR => array(self::METRIC_PLAYER_IMPRESSION_RATIO));
-		self::$metrics_def[self::METRIC_AVG_DROP_OFF] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_PLAYTHROUGH),
+		
+		self::$metrics_def[self::METRIC_AVG_DROP_OFF] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_PLAYTHROUGH),
 			self::DRUID_POST_AGGR => array(self::METRIC_AVG_DROP_OFF));
-		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_100),
+		
+		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_100),
 			self::DRUID_POST_AGGR => array(self::METRIC_PLAYTHROUGH_RATIO));
-
-		foreach (self::$simple_event_type_aggrs as $event_type) {
-			self::$aggregations_def[$event_type] = self::getEventTypeCountAggr($event_type);
-		}
-
-		self::$aggregations_def[self::METRIC_AVG_PLAY_TIME] = self::getFieldRatioAggr(self::METRIC_AVG_PLAY_TIME, self::METRIC_TOTAL_PLAY_TIME, self::EVENT_TYPE_PLAY);
-		self::$aggregations_def[self::METRIC_PLAYER_IMPRESSION_RATIO] = self::getFieldRatioAggr(self::METRIC_PLAYER_IMPRESSION_RATIO, self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION);
-		self::$aggregations_def[self::METRIC_PLAYTHROUGH_RATIO] = self::getFieldRatioAggr(self::METRIC_PLAYTHROUGH_RATIO, self::EVENT_TYPE_PLAYTHROUGH_100, self::EVENT_TYPE_PLAY);
-
-		//$play_time_aggr = self::$event_type_count_aggr_template;
-		//$play_time_aggr[self::DRUID_FILTER][self::DRUID_VALUE] = self::EVENT_TYPE_PLAY_END;
-		//$play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_NAME] = self::METRIC_TOTAL_PLAY_TIME;
-		//$play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_FIELD_NAME] = self::METRIC_TOTAL_PLAY_TIME;
-
-		$play_time_aggr = self::$events_types_count_aggr_template;
-		$play_time_aggr[self::DRUID_FILTER][self::DRUID_TYPE] = self::DRUID_IN_FILTER;
-		$play_time_aggr[self::DRUID_FILTER][self::DRUID_VALUES] = array(self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100);
-		$play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_NAME] = self::METRIC_TOTAL_PLAY_TIME_SEC;
-		$play_time_aggr[self::DRUID_AGGREGATOR][self::DRUID_FIELD_NAME] = self::METRIC_TOTAL_PLAY_TIME_SEC;
-
-		$play_through_aggr = self::$events_types_count_aggr_template;
-		$play_through_aggr[self::DRUID_FILTER][self::DRUID_TYPE] = self::DRUID_IN_FILTER;
-		$play_through_aggr[self::DRUID_FILTER][self::DRUID_VALUES] = array(self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100);
-		$play_through_aggr[self::DRUID_AGGREGATOR][self::DRUID_NAME] = self::METRIC_PLAYTHROUGH;
-
-		$total_entries_aggr = array(self::DRUID_TYPE => self::DRUID_CARDINALITY,
-			self::DRUID_NAME => self::METRIC_TOTAL_ENTRIES,
-			self::DRUID_FIELDS => array(self::DIMENSION_ENTRY_ID));
-
-		$unique_users_aggr = array(self::DRUID_TYPE => self::DRUID_HYPER_UNIQUE,
-			self::DRUID_NAME => self::METRIC_UNIQUE_USERS,
-			self::DRUID_FIELD_NAME => self::METRIC_UNIQUE_USER_IDS);
-
-		self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME_SEC] = $play_time_aggr;
-		self::$aggregations_def[self::METRIC_PLAYTHROUGH] = $play_through_aggr;
-		self::$aggregations_def[self::METRIC_TOTAL_ENTRIES] = $total_entries_aggr;
-		self::$aggregations_def[self::METRIC_UNIQUE_USERS] = $unique_users_aggr;
-
-
-		$avg_dropoff_ratio = self::$arithmetic_post_aggr_template;
-		$avg_dropoff_ratio[self::DRUID_NAME] = self::METRIC_AVG_DROP_OFF;
-		$avg_dropoff_ratio[self::DRUID_FUNCTION] = "/";
-
-		$avg_dropoff_ratio_sub_calc = self::$arithmetic_post_aggr_template;
-		$avg_dropoff_ratio_sub_calc[self::DRUID_FUNCTION] = "/";
-		$avg_dropoff_ratio_sub_calc[self::DRUID_NAME] = "subDropOff";
-		$sub_calc_fields = array(array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => self::METRIC_PLAYTHROUGH, self::DRUID_FIELD_NAME => self::METRIC_PLAYTHROUGH),
-			array(self::DRUID_TYPE => self::DRUID_CONSTANT, self::DRUID_NAME => "quarter", "value" => "4"));
-		$avg_dropoff_ratio_sub_calc[self::DRUID_FIELDS] = $sub_calc_fields;
-		$avg_dropoff_ratio[self::DRUID_FIELDS] = array($avg_dropoff_ratio_sub_calc, array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => self::EVENT_TYPE_PLAY, self::DRUID_FIELD_NAME => self::EVENT_TYPE_PLAY));
-		self::$aggregations_def[self::METRIC_AVG_DROP_OFF] = $avg_dropoff_ratio;
-
-		$play_time_aggr_min = self::$arithmetic_post_aggr_template;
-		$play_time_aggr_min[self::DRUID_NAME] = self::METRIC_TOTAL_PLAY_TIME;
-		$play_time_aggr_min[self::DRUID_FUNCTION] = "/";
-		$fields = array(array(self::DRUID_TYPE => self::DRUID_FIELD_ACCESS, self::DRUID_NAME => self::METRIC_TOTAL_PLAY_TIME_SEC, self::DRUID_FIELD_NAME => self::METRIC_TOTAL_PLAY_TIME_SEC),
-			array(self::DRUID_TYPE => self::DRUID_CONSTANT, self::DRUID_NAME => "seconds", "value" => 60));
-		$play_time_aggr_min[self::DRUID_FIELDS] = $fields;
-		self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME] = $play_time_aggr_min;
-
+		
 		foreach (self::$metrics_to_headers as $metric => $header)
 		{
 			self::$headers_to_metrics[$header] = $metric;
@@ -588,11 +586,12 @@ class kKavaReportsMgr extends kKavaBase
 		$report_def = self::getReportDef($report_type);
 		if (!isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{
-			throw new Exception("unsupported query - report has no metrics");
+			throw new Exception('unsupported query - report has no metrics');
 		}
+		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
 		$metrics = $report_def[self::REPORT_GRAPH_METRICS];
 		$intervals = self::getFilterIntervals($report_type, $input_filter);
-		$druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
+		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
 
 		if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_GRANULARITY, $report_def))
 			$granularity = $report_def[self::REPORT_DRILLDOWN_GRANULARITY];
@@ -609,15 +608,15 @@ class kKavaReportsMgr extends kKavaBase
 			case myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM:
 			case myReportsMgr::REPORT_TYPE_BROWSERS:
 				$dimension = self::getDimension($report_def, $object_ids);
-				$query = self::getGroupByReport($partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
+				$query = self::getGroupByReport($data_source, $partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
 				break;
 			default:
-				$query = self::getTimeSeriesReport($partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
+				$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
 
 		}
 
 		$result = self::runQuery($query);
-		KalturaLog::log("Druid returned [" . count($result) . "] rows");
+		KalturaLog::log('Druid returned [' . count($result) . '] rows');
 
 		foreach ($metrics as $column)
 		{
@@ -645,7 +644,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$end = microtime(true);
-		KalturaLog::log("getGraph took ["  . ($end - $start) . "]");
+		KalturaLog::log('getGraph took [' . ($end - $start) . ']');
 
 		return $res;
 	}
@@ -656,18 +655,24 @@ class kKavaReportsMgr extends kKavaBase
 
 		$start = microtime(true);
 		$report_def = self::getReportDef($report_type);
+		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
 		$intervals = self::getFilterIntervals($report_type, $input_filter);
-		$druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
-		$metrics = self::getMetrics($report_def);
-		if (!$metrics)
+		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
+		if (array_key_exists(self::REPORT_TOTAL_METRICS, $report_def))
 		{
-			throw new Exception("unsupported query - report has no metrics");
+			$metrics = $report_def[self::REPORT_TOTAL_METRICS];
+		}
+		else 
+		{
+			$metrics = self::getMetrics($report_def);
+			if (!$metrics)
+			{
+				throw new Exception('unsupported query - report has no metrics');
+			}
 		}
 
 		$granularity = self::DRUID_GRANULARITY_ALL;
-		if (array_key_exists(self::REPORT_TOTAL_ADDITIONAL_METRICS, $report_def))
-			$metrics = array_merge($report_def[self::REPORT_TOTAL_ADDITIONAL_METRICS], $metrics);
-		$query = self::getTimeSeriesReport($partner_id, $intervals, $granularity, $metrics, $druid_filter);
+		$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $druid_filter);
 		$result = self::runQuery($query);
 		if (count($result) > 0)
 		{
@@ -680,9 +685,11 @@ class kKavaReportsMgr extends kKavaBase
 				$data[] = $row_data[$column];
 			}
 
-			foreach (self::$transform_metrics as $metric => $func) {
+			foreach (self::$transform_metrics as $metric => $func)
+			{
 				$field_index = array_search(self::$metrics_to_headers[$metric], $headers);
-				if (false !== $field_index) {
+				if (false !== $field_index)
+				{
 					$data[$field_index] = call_user_func($func, $data[$field_index]);
 				}
 			}
@@ -698,7 +705,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$res = array($headers, $data);
 		$end = microtime(true);
-		KalturaLog::log("getTotal took ["  . ($end - $start) . "]");
+		KalturaLog::log('getTotal took ['  . ($end - $start) . ']');
 
 		return $res;
 	}
@@ -905,8 +912,9 @@ class kKavaReportsMgr extends kKavaBase
 		$total_count = null;
 
 		$report_def = self::getReportDef($report_type);
+		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
 		$intervals = self::getFilterIntervals($report_type, $input_filter);
-		$druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, $object_ids);
+		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
 		$dimension = self::getDimension($report_def, $object_ids);
 		$metrics = self::getMetrics($report_def);
 
@@ -915,10 +923,11 @@ class kKavaReportsMgr extends kKavaBase
 			//get the report from the legacy dwh
 			list($headers, $data, $total_count) = myReportsMgr::getTable($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids, null);
 
-			switch ($report_type) {
+			switch ($report_type)
+			{
 				case myReportsMgr::REPORT_TYPE_VPAAS_USAGE:
 					if ($object_ids)
-						throw new Exception("objectIds filter is not supported for this report");
+						throw new Exception('objectIds filter is not supported for this report');
 
 					$data = self::getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $input_filter->timeZoneOffset);
 					break;
@@ -932,14 +941,14 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (!$metrics)
 		{
-			$query = self::getSearchReport($partner_id, $intervals, array($dimension), $druid_filter);
+			$query = self::getSearchReport($data_source, $partner_id, $intervals, array($dimension), $druid_filter);
 			$result = self::runQuery($query);
 
 			$data = array();
 			if ($result)
 			{
 				$rows = $result[0][self::DRUID_RESULT];
-				KalturaLog::log("Druid returned [" . count($rows) . "] rows");
+				KalturaLog::log('Druid returned [' . count($rows) . '] rows');
 				foreach ($rows as $row)
 				{
 					$data[] = array($row[self::DRUID_VALUE]);
@@ -965,7 +974,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			else
 			{
-				throw new Exception("result limit is " . $max_result_size. " rows");
+				throw new Exception('result limit is ' . $max_result_size. ' rows');
 			}
 		}
 
@@ -978,14 +987,15 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$default_order = reset($metrics);
 		}
-		$order_by_dir = "-";
+		$order_by_dir = '-';
 		if (!$order_by)
 		{
 			$order_by = $default_order;
 		}
 		else
 		{
-			if ($order_by[0] === "-" || $order_by[0] === "+") {
+			if ($order_by[0] === '-' || $order_by[0] === '+')
+			{
 				$order_by_dir = $order_by[0];
 				$order_by = substr($order_by, 1);
 			}
@@ -1014,6 +1024,7 @@ class kKavaReportsMgr extends kKavaBase
 			$threshold = $page_size * $page_index;
 
 			$query = self::getGroupByReport(
+				$data_source,
 				$partner_id,
 				$intervals,
 				self::DRUID_GRANULARITY_ALL,
@@ -1034,7 +1045,7 @@ class kKavaReportsMgr extends kKavaBase
 			!$isCsv)
 		{
 			// get the topN objects first, otherwise the returned metrics can be inaccurate
-			$query = self::getTopReport($partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold, $metrics);
+			$query = self::getTopReport($data_source, $partner_id, $intervals, array($order_by), $dimension, $druid_filter, $order_by, $order_by_dir, $threshold, $metrics);
 			$result = self::runQuery($query);
 			if (!$result)
 			{
@@ -1088,7 +1099,7 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				// Note: not passing $dimension_ids as $object_ids since in some reports $object_ids
 				//		filters by entries, and not by $dimension
-				$druid_filter = self::getDruidFilter($partner_id, $report_type, $input_filter, null);
+				$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, null);
 			}
 
 			$druid_filter[] = array(
@@ -1096,11 +1107,11 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_VALUES => $dimension_ids
 			);
 
-			$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+			$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
 		}
 		else
 		{
-			$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+			$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, $dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
 		}
 
 		if ($isCsv && isset($query[self::DRUID_CONTEXT][self::DRUID_PRIORITY]))
@@ -1148,7 +1159,7 @@ class kKavaReportsMgr extends kKavaBase
 				if ($total_count <= 0)
 				{
 					$end = microtime(true);
-					KalturaLog::log("getTable took [" . ($end - $start) . "]");
+					KalturaLog::log('getTable took [' . ($end - $start) . ']');
 					return array(array(), array(), 0);
 				}
 			}
@@ -1224,31 +1235,35 @@ class kKavaReportsMgr extends kKavaBase
 		// set to null to free memory as we dont need this var anymore
 		$rows = null;
 
-		foreach (self::$transform_metrics as $metric => $func) {
+		foreach (self::$transform_metrics as $metric => $func)
+		{
 			$field_index = array_search(self::$metrics_to_headers[$metric], $headers);
-			if (false !== $field_index) {
+			if (false !== $field_index)
+			{
 				$rows_count = count($data);
-				for ($i = 0; $i < $rows_count; $i++) {
+				for ($i = 0; $i < $rows_count; $i++)
+				{
 					$data[$i][$field_index] = call_user_func($func, $data[$i][$field_index]);
 				}
 			}
 		}
 
-		if ($enriched_fields) {
+		if ($enriched_fields)
+		{
 			self::enrichData($report_def, $headers, $partner_id, $data);
 		}
 
 		$res = array ($headers, $data, $total_count);
 
 		$end = microtime(true);
-		KalturaLog::log("getTable took [" . ($end - $start) . "]");
+		KalturaLog::log('getTable took [' . ($end - $start) . ']');
 
 		return $res;
 	}
 
 	private static function fixTimeZoneOffset($timezone_offset)
 	{
-		if (isset(self::$phpTimezoneNames[$timezone_offset]))
+		if (isset(self::$php_timezone_names[$timezone_offset]))
 		{
 			return $timezone_offset;
 		}
@@ -1260,13 +1275,19 @@ class kKavaReportsMgr extends kKavaBase
 	private static function getPhpTimezoneName($timezone_offset)
 	{
 		// Note: value must be set, since the offset already went through fixTimeZoneOffset
-		return self::$phpTimezoneNames[$timezone_offset];
+		return self::$php_timezone_names[$timezone_offset];
 	}
 
+	private static function getPhpTimezone($timezone_offset)
+	{
+		$tz_name = self::getPhpTimezoneName($timezone_offset);
+		return new DateTimeZone($tz_name);
+	}
+	
 	private static function getDruidTimezoneName($timezone_offset)
 	{
 		// Note: value must be set, since the offset already went through fixTimeZoneOffset
-		return self::$druidTimezoneNames[$timezone_offset];
+		return self::$druid_timezone_names[$timezone_offset];
 	}
 	
 	private static function getGranularityDef($granularity, $timezone_offset)
@@ -1283,7 +1304,8 @@ class kKavaReportsMgr extends kKavaBase
 		return $granularity_def;
 	}
 
-	private static function getFilterIntervals($report_type, $input_filter) {
+	private static function getFilterIntervals($report_type, $input_filter)
+	{
 		if ($report_type == myReportsMgr::REPORT_TYPE_APPLICATIONS)
 		{
 			// the applications report does not depend on from_day/to_day, use the last 30 days
@@ -1299,18 +1321,20 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$fromDate = $toDate = '2010-01-01T00:00:00+00:00';
 		}
-		$intervals = array($fromDate . "/" . $toDate);
+		$intervals = array($fromDate . '/' . $toDate);
 		return $intervals;
 	}
 
-	private static function getDimension($report_def, $object_ids) {
+	private static function getDimension($report_def, $object_ids)
+	{
 		if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
 			return $report_def[self::REPORT_DRILLDOWN_DIMENSION];
 
 		return $report_def[self::REPORT_DIMENSION];
 	}
 
-	private static function getMetrics($report_def) {
+	private static function getMetrics($report_def)
+	{
 		return $report_def[self::REPORT_METRICS];
 	}
 
@@ -1330,8 +1354,8 @@ class kKavaReportsMgr extends kKavaBase
 		$month = substr($date_id, 4, 2);
 		$day = substr($date_id, 6, 2);
 
-		$timezone_offset = sprintf("%s%02d:%02d", $offset <= 0 ? '+' : '-', intval(abs($offset)/60), abs($offset) % 60);
-		$time = $end_of_the_day? "T23:59:59" : "T00:00:00";
+		$timezone_offset = sprintf('%s%02d:%02d', $offset <= 0 ? '+' : '-', intval(abs($offset)/60), abs($offset) % 60);
+		$time = $end_of_the_day? 'T23:59:59' : 'T00:00:00';
 
 		return "$year-$month-$day$time$timezone_offset";
 	}
@@ -1381,60 +1405,79 @@ class kKavaReportsMgr extends kKavaBase
 
 		if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
 		{
-
 			if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
+			{
 				$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+			}
 			else
+			{
 				$category_ids = self::getPlaybackContextCategoriesIds($partner_id, $input_filter->playbackContext ?
-						$input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
+					$input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
+			}
 
-			$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
-					self::DRUID_VALUES => $category_ids);
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
+				self::DRUID_VALUES => $category_ids);
 		}
 
-		if ($input_filter->application) {
-			$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
-					self::DRUID_VALUES => explode(',', $input_filter->application)
+		if ($input_filter->application)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
+				self::DRUID_VALUES => explode(',', $input_filter->application)
 			);
 		}
 
-		if ($input_filter->userIds != null) {
-			$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_USER_ID,
-					self::DRUID_VALUES => explode(",", $input_filter->userIds)
+		if ($input_filter->userIds != null)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_USER_ID,
+				self::DRUID_VALUES => explode(',', $input_filter->userIds)
 			);
 		}
 	}
 
-	private static function getDruidFilter($partner_id, $report_type, $input_filter, $object_ids)
+	private static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids)
 	{
 		$druid_filter = array();
-		$druid_filter[] = array(
-			self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
-			self::DRUID_VALUES => $report_type == myReportsMgr::REPORT_TYPE_LIVE ?
-					array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR) :
-					array(self::PLAYBACK_TYPE_VOD));
-
+		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
+		{
+			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+				self::DRUID_VALUES => $playback_types
+			);
+		}
+		
+		if (isset($report_def[self::REPORT_FILTER]))
+		{
+			$druid_filter[] = $report_def[self::REPORT_FILTER];
+		}
+		
 		self::addEndUserReportsDruidFilters($partner_id, $input_filter, $druid_filter);
 
 		if ($input_filter->categories)
 		{
 			$category_ids = self::getCategoriesIds($input_filter->categories, $partner_id);
-			$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
 				self::DRUID_VALUES => $category_ids
 			);
 		}
 
 		if ($input_filter->categoriesIds)
 		{
-			$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
 				self::DRUID_VALUES => explode(',', $input_filter->categoriesIds)
 			);
 		}
 
 		if ($input_filter->countries)
 		{
-				$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
-					self::DRUID_VALUES => explode(',', $input_filter->countries)
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
+				self::DRUID_VALUES => explode(',', $input_filter->countries)
 			);
 		}
 
@@ -1445,9 +1488,9 @@ class kKavaReportsMgr extends kKavaBase
 			$entry_filter->setPartnerSearchScope($partner_id);
 
 			if($input_filter->search_in_tags)
-				$entry_filter->set("_free_text", $input_filter->keywords);
+				$entry_filter->set('_free_text', $input_filter->keywords);
 			else
-				$entry_filter->set("_like_admin_tags", $input_filter->keywords);
+				$entry_filter->set('_like_admin_tags', $input_filter->keywords);
 
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entry_filter->attachToCriteria($c);
@@ -1465,45 +1508,51 @@ class kKavaReportsMgr extends kKavaBase
 
 		if($object_ids)
 		{
-			$object_ids_arr = explode(",", $object_ids);
+			$object_ids_arr = explode(',', $object_ids);
 
-			switch ($report_type)
+			if (isset($report_def[self::REPORT_OBJECT_IDS_TRANSFORM]))
 			{
-				case myReportsMgr::REPORT_TYPE_PLATFORMS:
-					$object_ids_arr = array_map(array('kKavaReportsMgr', 'untransformDeviceName'), $object_ids_arr);
-					// fallthrough
-
-				case myReportsMgr::REPORT_TYPE_TOP_SYNDICATION:
-				case myReportsMgr::REPORT_TYPE_MAP_OVERLAY:
-				case myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE:
-					$druid_filter[] = array(self::DRUID_DIMENSION => self::$reports_def[$report_type][self::REPORT_DIMENSION],
+				$object_ids_arr = array_map($report_def[self::REPORT_OBJECT_IDS_TRANSFORM], $object_ids_arr);
+			}
+			
+			if (isset($report_def[self::REPORT_FILTER_DIMENSION]))
+			{
+				$druid_filter[] = array(
+					self::DRUID_DIMENSION => $report_def[self::REPORT_FILTER_DIMENSION],
 					self::DRUID_VALUES => $object_ids_arr
-					);
-					break;
-				default:
-					$entry_ids_from_db = array_merge($object_ids_arr, $entry_ids_from_db);
+				);
+			}
+			else
+			{
+				$entry_ids_from_db = array_merge($object_ids_arr, $entry_ids_from_db);
 			}
 		}
 
 		if (count($entry_ids_from_db))
 		{
-			$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
 				self::DRUID_VALUES => $entry_ids_from_db
 			);
 		}
 
-		if ($report_type != myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE)
-		$druid_filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
 				self::DRUID_VALUES => array($partner_id)
 			);
+		}
 
 		return $druid_filter;
 	}
 
-	private static function getBaseReportDef($partner_id, $intervals, $metrics, $filter, $granularity, $filterMetrics = null) {
+	private static function getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filterMetrics = null)
+	{
 		$client_tag = kCurrentContext::$client_lang;
 
-		if (kConf::hasParam('kava_top_priority_client_tags')) {
+		if (kConf::hasParam('kava_top_priority_client_tags'))
+		{
 			$priority_tags = kConf::get('kava_top_priority_client_tags');
 			foreach ($priority_tags as $tag)
 			{
@@ -1515,7 +1564,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		$report_def[self::DRUID_DATASOURCE] = self::HISTORICAL_DATASOURCE;
+		$report_def[self::DRUID_DATASOURCE] = $data_source ? $data_source : self::DATASOURCE_HISTORICAL;
 		$report_def[self::DRUID_INTERVALS] = $intervals;
 		$report_def[self::DRUID_GRANULARITY] = $granularity;
 
@@ -1524,18 +1573,27 @@ class kKavaReportsMgr extends kKavaBase
 		$report_def[self::DRUID_POST_AGGR] = array();
 		foreach ($metrics as $metric)
 		{
-			if (!array_key_exists($metric, self::$metrics_def))
-				continue;
-			$metric_aggr = self::$metrics_def[$metric];
-			foreach ($metric_aggr[self::DRUID_AGGR] as $aggr) {
+			if (array_key_exists($metric, self::$metrics_def))
+			{
+				$metric_aggr = self::$metrics_def[$metric];
+			}
+			else
+			{
+				$metric_aggr = array(self::DRUID_AGGR => array($metric));
+			}
+			
+			foreach ($metric_aggr[self::DRUID_AGGR] as $aggr)
+			{
 				if (in_array(self::$aggregations_def[$aggr], $report_def[self::DRUID_AGGR]))
 					continue;
 
 				$report_def[self::DRUID_AGGR][] = self::$aggregations_def[$aggr];
 			}
+			
 			if (array_key_exists(self::DRUID_POST_AGGR, $metric_aggr))
 			{
-				foreach ($metric_aggr[self::DRUID_POST_AGGR] as $aggr) {
+				foreach ($metric_aggr[self::DRUID_POST_AGGR] as $aggr)
+				{
 					if (in_array(self::$aggregations_def[$aggr], $report_def[self::DRUID_POST_AGGR]))
 						continue;
 					$report_def[self::DRUID_POST_AGGR][] = self::$aggregations_def[$aggr];
@@ -1551,12 +1609,23 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		foreach ($filterMetrics as $metric)
 		{
-			if (!array_key_exists($metric, self::$metrics_def))
-				continue;
-
-		 	$metric_aggr = self::$metrics_def[$metric];
-		 	foreach ($metric_aggr[self::DRUID_AGGR] as $aggr)
+			if (array_key_exists($metric, self::$metrics_def))
+			{
+		 		$aggrs = self::$metrics_def[$metric][self::DRUID_AGGR];
+			}
+			else
+			{
+				$aggrs = array($metric);
+			}
+			
+		 	foreach ($aggrs as $aggr)
 		 	{
+		 		if (!isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_DIMENSION]) ||
+		 			self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_DIMENSION] != self::DIMENSION_EVENT_TYPE)
+		 		{
+		 			continue;
+		 		}
+		 		
 				if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE]))
 					$event_types[] = self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUE];
 				else if (isset(self::$aggregations_def[$aggr][self::DRUID_FILTER][self::DRUID_VALUES]))
@@ -1570,7 +1639,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		// filter
 		$filter_def = self::buildFilter($filter);
-		$report_def[self::DRUID_FILTER] = array(self::DRUID_TYPE => "and",
+		$report_def[self::DRUID_FILTER] = array(self::DRUID_TYPE => 'and',
 			self::DRUID_FIELDS => $filter_def);
 
 		return $report_def;
@@ -1589,9 +1658,9 @@ class kKavaReportsMgr extends kKavaBase
 		return null;
 	}
 
-	private static function getTopReport($partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filterMetrics = null)
+	private static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filterMetrics = null)
 	{
-		$report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filterMetrics);
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filterMetrics);
 
 		if (in_array($dimensions, self::$multi_value_dimensions))
 		{
@@ -1613,7 +1682,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TOPN;
 		$report_def[self::DRUID_DIMENSION] = $dimensions;
-		$order_type = $order_dir === "+" ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
+		$order_type = $order_dir === '+' ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
 		$report_def[self::DRUID_METRIC] = array(self::DRUID_TYPE => $order_type,
 												self::DRUID_METRIC => $order_by);
 		$report_def[self::DRUID_THRESHOLD] = $threshold;
@@ -1621,23 +1690,25 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	private static function getSearchReport($partner_id, $intervals, $dimensions, $filter)
+	private static function getSearchReport($data_source, $partner_id, $intervals, $dimensions, $filter)
 	{
-		$report_def = self::getBaseReportDef($partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_SEARCH;
 		$report_def[self::DRUID_SEARCH_DIMENSIONS] = $dimensions;
 		$report_def[self::DRUID_QUERY] = array(
 			self::DRUID_TYPE => self::DRUID_CONTAINS,
 			self::DRUID_CASE_SENSITIVE => true,
-			self::DRUID_VALUE => ""
+			self::DRUID_VALUE => ''
 		);
 
 		return $report_def;
 	}
 
-	private static function buildFilter($filters) {
+	private static function buildFilter($filters)
+	{
 		$filters_def = array();
-		foreach ($filters as $filter) {
+		foreach ($filters as $filter)
+		{
 			if (count($filter[self::DRUID_VALUES]) == 1)
 				$filters_def[] = array(self::DRUID_TYPE => self::DRUID_SELECTOR_FILTER,
 										self::DRUID_DIMENSION => $filter[self::DRUID_DIMENSION],
@@ -1653,24 +1724,24 @@ class kKavaReportsMgr extends kKavaBase
 		return $filters_def;
 	}
 
-	private static function getTimeSeriesReport($partner_id, $intervals, $granularity, $metrics, $filter)
+	private static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter)
 	{
-		$report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, $granularity);
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
 		if (!isset($report_def[self::DRUID_CONTEXT]))
 			$report_def[self::DRUID_CONTEXT] = array();
-		$report_def[self::DRUID_CONTEXT][self::DRUID_SKIP_EMPTY_BUCKETS] = "true";
+		$report_def[self::DRUID_CONTEXT][self::DRUID_SKIP_EMPTY_BUCKETS] = 'true';
 		return $report_def;
 	}
 
-	private static function getDimCardinalityReport($partner_id, $intervals, $dimension, $filter, $event_type)
+	private static function getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $filter, $event_type)
 	{
 		if (!$filter)
 			$filter = array();
 		$filter[] = array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						 self::DRUID_VALUES => array($event_type));
 
-		$report_def = self::getBaseReportDef($partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
 
 		$report_def[self::DRUID_AGGR][] = array(self::DRUID_TYPE => self::DRUID_CARDINALITY,
@@ -1680,9 +1751,9 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	private static function getGroupByReport($partner_id, $intervals, $granularity, $dimensions, $metrics, $filter, $pageSize = 0)
+	private static function getGroupByReport($data_source, $partner_id, $intervals, $granularity, $dimensions, $metrics, $filter, $pageSize = 0)
 	{
-		$report_def = self::getBaseReportDef($partner_id, $intervals, $metrics, $filter, $granularity);
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_GROUP_BY;
 		$report_def[self::DRUID_DIMENSIONS] = $dimensions;
 
@@ -1691,8 +1762,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	public static function getGraphsByDateId($result, $graph_metrics_to_headers, $tz_offset, $transform)
 	{
-		$tz_name = self::getPhpTimezoneName($tz_offset);
-		$tz = new DateTimeZone($tz_name);
+		$tz = self::getPhpTimezone($tz_offset);
 
 		$graphs = array();
 
@@ -1717,8 +1787,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	public static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
 	{
-		$tz_name = self::getPhpTimezoneName($tz_offset);
-		$tz = new DateTimeZone($tz_name);
+		$tz = self::getPhpTimezone($tz_offset);
 
 		$graphs = array();
 
@@ -1732,16 +1801,16 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$row_data = $row[self::DRUID_EVENT];
 
-			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz_offset);
+			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz);
 			$multiline_val = call_user_func($transform, $row_data[$multiline_column]);
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
 				if (isset($graphs[$header][$date]))
-					$graphs[$header][$date] .=	",";
+					$graphs[$header][$date] .=	',';
 				else
-					$graphs[$header][$date] = "";
+					$graphs[$header][$date] = '';
 
-				$graphs[$header][$date] .= $multiline_val . ":" . $row_data[$column];
+				$graphs[$header][$date] .= $multiline_val . ':' . $row_data[$column];
 
 			}
 		}
@@ -1961,7 +2030,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->addSelectColumn(categoryPeer::ID);
 
 		$c->add(categoryPeer::PARTNER_ID, $partner_id);
-		$c->add(categoryPeer::FULL_NAME, explode(",", $categories), Criteria::IN);
+		$c->add(categoryPeer::FULL_NAME, explode(',', $categories), Criteria::IN);
 
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$stmt = categoryPeer::doSelectStmt($c);
@@ -1989,9 +2058,9 @@ class kKavaReportsMgr extends kKavaBase
 		$category_filter = new categoryFilter();
 
 		if ($is_ancestor)
-			$category_filter->set("_matchor_likex_full_name", $playback_context);
+			$category_filter->set('_matchor_likex_full_name', $playback_context);
 		else
-			$category_filter->set("_in_full_name", $playback_context);
+			$category_filter->set('_in_full_name', $playback_context);
 
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$category_filter->attachToCriteria($c);
@@ -2012,7 +2081,8 @@ class kKavaReportsMgr extends kKavaBase
 		$cache_key = 'reportCount-' . md5("$partner_id|$report_type|$object_ids|".serialize($input_filter));
 
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_REPORTS_COUNT);
-		if ($cache) {
+		if ($cache)
+		{
 			$total_count = $cache->get($cache_key);
 			if ($total_count)
 			{
@@ -2022,10 +2092,11 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$report_def = self::$reports_def[$report_type];
+		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
 		$event_type = array_key_exists(self::REPORT_CARDINALITY_METRIC, $report_def) ?
 		$report_def[self::REPORT_CARDINALITY_METRIC] : self::EVENT_TYPE_PLAYER_IMPRESSION;
 
-		$query = self::getDimCardinalityReport($partner_id, $intervals, $dimension, $druid_filter, $event_type);
+		$query = self::getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $druid_filter, $event_type);
 
 		$total_count_arr = self::runQuery($query);
 		if (isset($total_count_arr[0][self::DRUID_RESULT][self::METRIC_TOTAL_COUNT]))
@@ -2078,7 +2149,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		if ($page_index * $page_size > self::MAX_CSV_RESULT_SIZE)
 		{
-			throw new kCoreException("Exceeded max query size: " . self::MAX_CSV_RESULT_SIZE, kCoreException::SEARCH_TOO_GENERAL);
+			throw new kCoreException('Exceeded max query size: ' . self::MAX_CSV_RESULT_SIZE, kCoreException::SEARCH_TOO_GENERAL);
 		}
 
 		if (!in_array($report_type, myReportsMgr::$reports_without_table))
@@ -2148,7 +2219,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	private static function getAdminConsoleReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $dimension, $druid_filter, $object_ids)
 	{
-		$query = self::getTopReport($partner_id, $intervals, $metrics, $dimension, $druid_filter, $metrics[0], "-", count(explode(",", $object_ids)));
+		$query = self::getTopReport(null, $partner_id, $intervals, $metrics, $dimension, $druid_filter, $metrics[0], '-', count(explode(',', $object_ids)));
 		$result = self::runQuery($query);
 		$key_field = $report_def[self::REPORT_DIMENSION];
 		$rows = $result[0][self::DRUID_RESULT];
@@ -2166,7 +2237,8 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		$key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $headers);
 
-		foreach ($data as &$row) {
+		foreach ($data as &$row)
+		{
 			foreach ($mapping_by_index as $index => $druid_field)
 				if (isset($druid_rows[$row[$key_index]]))
 					$row[$index] = $druid_rows[$row[$key_index]][$druid_field];
@@ -2180,7 +2252,7 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$granularity = $report_def[self::REPORT_GRANULARITY];
 		$granularity_def = self::getGranularityDef($granularity, $timezone_offset);
-		$query = self::getTimeSeriesReport($partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
+		$query = self::getTimeSeriesReport(null, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
 		$result = self::runQuery($query);
 		$report_metrics_to_headers = array();
 		foreach ($metrics as $column)
@@ -2194,8 +2266,10 @@ class kKavaReportsMgr extends kKavaBase
 		$legacy_field_index = array_search($legacy_field, $headers);
 
 		$key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $headers);
-		if (false !== $legacy_field_index) {
-			foreach ($data as &$row) {
+		if (false !== $legacy_field_index)
+		{
+			foreach ($data as &$row)
+			{
 				$row[$legacy_field_index] = isset($druid_result[$druid_field][$row[$key_index]]) ? $druid_result[$druid_field][$row[$key_index]] : 0;
 			}
 		}

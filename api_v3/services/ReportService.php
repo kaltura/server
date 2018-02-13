@@ -7,24 +7,25 @@
  */
 class ReportService extends KalturaBaseService
 {
-    static $kavaReports = array(KalturaReportType::TOP_CONTENT,
-        KalturaReportType::CONTENT_DROPOFF,
-        KalturaReportType::CONTENT_INTERACTIONS,
-        KalturaReportType::MAP_OVERLAY,
-        KalturaReportType::TOP_SYNDICATION,
-        KalturaReportType::USER_ENGAGEMENT,
-        KalturaReportType::SPECIFIC_USER_ENGAGEMENT,
-        KalturaReportType::USER_TOP_CONTENT,
-        KalturaReportType::USER_CONTENT_DROPOFF,
-        KalturaReportType::USER_CONTENT_INTERACTIONS,
-        KalturaReportType::APPLICATIONS,
-        KalturaReportType::PLATFORMS,
-        KalturaReportType::OPERATING_SYSTEM,
-        KalturaReportType::BROWSERS,
-        KalturaReportType::LIVE,
-        KalturaReportType::TOP_PLAYBACK_CONTEXT,
-        KalturaReportType::VPAAS_USAGE
-    );
+	static $kavaReports = array(KalturaReportType::TOP_CONTENT,
+		KalturaReportType::CONTENT_DROPOFF,
+		KalturaReportType::CONTENT_INTERACTIONS,
+		KalturaReportType::MAP_OVERLAY,
+		KalturaReportType::TOP_SYNDICATION,
+		KalturaReportType::USER_ENGAGEMENT,
+		KalturaReportType::SPECIFIC_USER_ENGAGEMENT,
+		KalturaReportType::USER_TOP_CONTENT,
+		KalturaReportType::USER_CONTENT_DROPOFF,
+		KalturaReportType::USER_CONTENT_INTERACTIONS,
+		KalturaReportType::APPLICATIONS,
+		KalturaReportType::PLATFORMS,
+		KalturaReportType::OPERATING_SYSTEM,
+		KalturaReportType::BROWSERS,
+		KalturaReportType::LIVE,
+		KalturaReportType::TOP_PLAYBACK_CONTEXT,
+		KalturaReportType::VPAAS_USAGE,
+		KalturaReportType::TOP_CONTRIBUTORS,
+	);
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{

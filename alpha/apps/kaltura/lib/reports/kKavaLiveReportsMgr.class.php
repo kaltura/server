@@ -147,7 +147,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	{
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_TIMESERIES,
-			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
+			self::DRUID_DATASOURCE => self::DATASOURCE_REALTIME,
 			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 		);
@@ -157,7 +157,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	{
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_TOPN,
-			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
+			self::DRUID_DATASOURCE => self::DATASOURCE_REALTIME,
 			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 			self::DRUID_DIMENSION => $dimension,
@@ -170,7 +170,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	{
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_GROUP_BY,
-			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
+			self::DRUID_DATASOURCE => self::DATASOURCE_REALTIME,
 			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 			self::DRUID_DIMENSIONS => $dimensions,
