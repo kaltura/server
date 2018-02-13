@@ -37,6 +37,7 @@ class kESearchQueryManager
 	const RAW_FIELD_SUFFIX = 'raw';
 	const SYNONYM_FIELD_SUFFIX = 'synonym';
 	const MATCH_PHRASE_KEY = 'match_phrase';
+	const KALTURA_TEXT_PARTIAL_SEARCH_ANALYZER = 'kaltura_text_partial_search';
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
 	const RAW_FIELD_BOOST_FACTOR = 4;
@@ -54,14 +55,19 @@ class kESearchQueryManager
 	public static function getPartialQuery($searchItem, $fieldName, &$queryAttributes)
 	{
 		$partialQuery = new kESearchBoolQuery();
-
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
-		$rawBoostFactor = self::RAW_FIELD_BOOST_FACTOR * $fieldBoostFactor;
+
+		$matchQuery = new kESearchMatchQuery($fieldName, $searchItem->getSearchTerm());
 		$multiMatchFieldBoostFactor = self::MATCH_FIELD_BOOST_FACTOR * $fieldBoostFactor;
+		$matchQuery->setBoostFactor($multiMatchFieldBoostFactor);
+		$matchQuery->setAnalyzer(self::KALTURA_TEXT_PARTIAL_SEARCH_ANALYZER);
+		$partialQuery->addToShould($matchQuery);
+
 		$multiMatchQuery = new kESearchMultiMatchQuery();
 		$multiMatchQuery->setQuery($searchItem->getSearchTerm());
+		$rawBoostFactor = self::RAW_FIELD_BOOST_FACTOR * $fieldBoostFactor;
 		$multiMatchQuery->addToFields($fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor);
-		$multiMatchQuery->addToFields($fieldName.'^'.$multiMatchFieldBoostFactor);
+
 		if($searchItem->getAddHighlight())
 		{
 			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName,$fieldName.'.'.self::RAW_FIELD_SUFFIX);

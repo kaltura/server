@@ -18,7 +18,7 @@
 		},
 		"kaltura_english_synonym_filter": {
 		  "type": "synonym",
-		  "synonyms_path": "analysis/kaltura_synonym.txt"
+		  "synonyms_path": "analysis/kaltura_synonyms.txt"
 		},
 		"kaltura_unique_token_filter": {
 		  "type": "unique",
@@ -31,14 +31,12 @@
 		  "pattern": "(\\s+)",
 		  "replacement": " "
 		},
-		"kaltura_ngram_special_chars_filter": {
+		"kaltura_apostrophe_filter": {
 		  "type": "mapping",
 		  "mappings": [
 			"'=>",
 			"`=>",
-			"‘=>",
-			"^=>",
-			"~=>"
+			"‘=>"
 		  ]
 		},
 		"kaltura_special_chars_filter": {
@@ -70,6 +68,39 @@
 			">=>__greaterthan__",
 			"~=>__tilde__"
 		  ]
+		},
+		"kaltura_remove_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>",
+			"!=>",
+			"@=>",
+			"#=>",
+			"$=>",
+			"%=>",
+			"^=>",
+			"&=>",
+			"*=>",
+			"(=>",
+			")=>",
+			"-=>",
+			"==>",
+			"+=>",
+			"?=>",
+			"/=>",
+			"\\\\=>",
+			"[=>",
+			"]=>",
+			"{=>",
+			"}=>",
+			";=>",
+			"|=>",
+			"<=>",
+			">=>",
+			"~=>"
+		  ]
 		}
 	  },
 	  "tokenizer": {
@@ -100,7 +131,7 @@
 		  "type": "custom",
 		  "tokenizer": "kaltura_ngram_tokenizer",
 		  "char_filter": [
-			"kaltura_ngram_special_chars_filter"
+			"kaltura_apostrophe_filter"
 		  ],
 		  "filter": [
 			"lowercase",
@@ -111,7 +142,20 @@
 		  "type": "custom",
 		  "tokenizer": "standard",
 		  "char_filter": [
+			"kaltura_apostrophe_filter",
 			"kaltura_special_chars_filter"
+		  ],
+		  "filter": [
+			"standard",
+			"lowercase",
+			"icu_folding"
+		  ]
+		},
+		"kaltura_text_partial_search" : {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "char_filter": [
+			"kaltura_apostrophe_filter"
 		  ],
 		  "filter": [
 			"standard",
@@ -130,6 +174,9 @@
 		},
 		"kaltura_english_synonym_search": {
 		  "tokenizer":  "whitespace",
+		  "char_filter": [
+			"kaltura_remove_special_chars_filter"
+		  ],
 		  "filter": [
 			"lowercase",
 			"english_stop"
