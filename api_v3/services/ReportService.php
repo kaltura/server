@@ -25,6 +25,7 @@ class ReportService extends KalturaBaseService
 		KalturaReportType::TOP_PLAYBACK_CONTEXT,
 		KalturaReportType::VPAAS_USAGE,
 		KalturaReportType::TOP_CONTRIBUTORS,
+		KalturaReportType::CONTENT_CONTRIBUTIONS,
 	);
 
 	public function initService($serviceId, $serviceName, $actionName)
