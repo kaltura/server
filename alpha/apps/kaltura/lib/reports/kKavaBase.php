@@ -31,6 +31,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_TYPE = 'eventType';
 	const DIMENSION_HAS_BITRATE = 'hasBitrate';
 	const DIMENSION_MEDIA_TYPE = 'mediaType';
+	const DIMENSION_SOURCE_TYPE = 'sourceType';
 
 	// metrics
 	const METRIC_COUNT = 'count';

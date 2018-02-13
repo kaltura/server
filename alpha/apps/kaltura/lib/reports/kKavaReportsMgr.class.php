@@ -163,7 +163,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_TOTAL_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DEVICE,
-			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'untransformDeviceName'),
+			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId'),
 			self::REPORT_DRILLDOWN_GRANULARITY => self::DRUID_GRANULARITY_ALL,
 			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_OS,
 			self::REPORT_DRILLDOWN_DETAIL_DIM_HEADERS => array('os'),
@@ -239,6 +239,18 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 				self::DRUID_VALUES => array('entryCreated')),
 		),
+			
+		myReportsMgr::REPORT_TYPE_CONTENT_CONTRIBUTIONS => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+			self::REPORT_DIMENSION => self::DIMENSION_SOURCE_TYPE,
+			self::REPORT_DETAIL_DIM_HEADERS => array('object_id', 'entry_media_source_name'),
+			self::REPORT_METRICS => array(self::METRIC_COUNT, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+				self::DRUID_VALUES => array('entryCreated')),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_SOURCE_TYPE,
+		),
 	);
 	
 	private static $event_type_count_aggrs = array(
@@ -270,32 +282,33 @@ class kKavaReportsMgr extends kKavaBase
 	);
 	
 	static $metrics_to_headers = array(
+		self::DIMENSION_DEVICE => 'device',
+		self::DIMENSION_OS => 'os',
+		self::DIMENSION_BROWSER => 'browser',
+		self::DIMENSION_LOCATION_COUNTRY => 'country',
+		self::DIMENSION_LOCATION_REGION => 'location_name',
+		self::DIMENSION_SOURCE_TYPE => 'entry_media_source_name',
 		self::EVENT_TYPE_PLAY => 'count_plays',
-		self::METRIC_TOTAL_PLAY_TIME => 'sum_time_viewed',
-		self::METRIC_AVG_PLAY_TIME => 'avg_time_viewed',
 		self::EVENT_TYPE_PLAYER_IMPRESSION => 'count_loads',
-		self::METRIC_PLAYER_IMPRESSION_RATIO => 'load_play_ratio',
-		self::METRIC_AVG_DROP_OFF => 'avg_view_drop_off',
 		self::EVENT_TYPE_PLAYTHROUGH_25 => 'count_plays_25',
 		self::EVENT_TYPE_PLAYTHROUGH_50 => 'count_plays_50',
 		self::EVENT_TYPE_PLAYTHROUGH_75 => 'count_plays_75',
 		self::EVENT_TYPE_PLAYTHROUGH_100 => 'count_plays_100',
-		self::DIMENSION_DEVICE => 'device',
-		self::DIMENSION_OS => 'os',
-		self::DIMENSION_BROWSER => 'browser',
-		self::METRIC_TOTAL_ENTRIES => 'unique_videos',
-		self::METRIC_UNIQUE_USERS => 'unique_known_users',
 		self::EVENT_TYPE_REPORT_CLICKED => 'count_report',
 		self::EVENT_TYPE_DOWNLOAD_CLICKED => 'count_download',
 		self::EVENT_TYPE_SHARE_CLICKED => 'count_viral',
 		self::EVENT_TYPE_EDIT_CLICKED => 'count_edit',
-		self::METRIC_PLAYTHROUGH_RATIO => 'play_through_ratio',
-		self::DIMENSION_LOCATION_COUNTRY => 'country',
-		self::DIMENSION_LOCATION_REGION => 'location_name',
 		self::MEDIA_TYPE_VIDEO => 'count_video',
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
 		self::MEDIA_TYPE_SHOW => 'count_mix',
+		self::METRIC_TOTAL_PLAY_TIME => 'sum_time_viewed',
+		self::METRIC_AVG_PLAY_TIME => 'avg_time_viewed',
+		self::METRIC_PLAYER_IMPRESSION_RATIO => 'load_play_ratio',
+		self::METRIC_AVG_DROP_OFF => 'avg_view_drop_off',
+		self::METRIC_TOTAL_ENTRIES => 'unique_videos',
+		self::METRIC_UNIQUE_USERS => 'unique_known_users',
+		self::METRIC_PLAYTHROUGH_RATIO => 'play_through_ratio',
 		self::METRIC_COUNT => 'count_total',
 		self::METRIC_COUNT_UGC => 'count_ugc',
 		self::METRIC_COUNT_ADMIN => 'count_admin',
@@ -304,11 +317,12 @@ class kKavaReportsMgr extends kKavaBase
 	static $transform_metrics = array(
 		self::METRIC_TOTAL_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
-		self::DIMENSION_DEVICE => array('kKavaReportsMgr', 'transformDeviceName'),
+		self::DIMENSION_DEVICE => array('kKavaReportsMgr', 'toSafeId'),
 		self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
 		self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
 		self::DIMENSION_LOCATION_COUNTRY => array('kKavaCountryCodes', 'toShortName'),
 		self::DIMENSION_LOCATION_REGION => 'strtoupper',
+		self::DIMENSION_SOURCE_TYPE => array('kKavaReportsMgr', 'toSafeId'),
 	);
 
 	static $transform_time_dimensions = array(
@@ -431,14 +445,14 @@ class kKavaReportsMgr extends kKavaBase
 	static $headers_to_metrics = array();
 	static $custom_reports = null;
 	
-	protected static function transformDeviceName($name)
+	protected static function toSafeId($name)
 	{
 		$name = strtoupper($name);
 		$name = preg_replace('/[^\w]/', '_', $name);
 		return $name;
 	}
 
-	protected static function untransformDeviceName($name)
+	protected static function fromSafeId($name)
 	{
 		$name = str_replace('_', ' ', $name);
 		$name = ucfirst(strtolower($name));
