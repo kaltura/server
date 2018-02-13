@@ -70,6 +70,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	
 	/**
 	 * @var KalturaVendorCatalogItemPricing
+	 * @requiresPermission read
 	 */
 	public $pricing;
 	
@@ -124,13 +125,8 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	
 	private function validate(VendorCatalogItem $sourceObject = null)
 	{
-		if (!$sourceObject) //Source object will be null on insert
-		{
-			$this->validatePropertyNotNull("vendorPartnerId");
-			$this->validatePropertyNotNull("serviceType");
-			$this->validatePropertyNotNull("turnAroundTime");
-			$this->validatePropertyNotNull("pricing");
-		}
+		if(!$sourceObject) //Source object will be null on insert
+			$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
 		
 		$this->validateVendorPartnerId($sourceObject);
 		$this->validateSystemName($sourceObject);

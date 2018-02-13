@@ -103,7 +103,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	/**
 	 * @var KalturaVendorProfileRulesArray
 	 */
-	public $rules; //ToDo add object and sub classes
+	public $rules;
 
 	/**
 	 * @var KalturaVendorCredit

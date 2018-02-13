@@ -21,3 +21,17 @@ passthru("php $script $config");
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.reach.entryVendorTask.ini';
 echo "Running php $script $config";
 passthru("php $script $config");
+
+/// adding objects permissions
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaVendorProfile.ini';
+echo "Running php $script $config";
+passthru("php $script $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaEntryVendorTask.ini';
+echo "Running php $script $config";
+passthru("php $script $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaVendorCatalogItem.ini';
+echo "Running php $script $config";
+passthru("php $script $config");
+
