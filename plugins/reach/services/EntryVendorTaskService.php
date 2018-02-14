@@ -250,7 +250,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	 */
 	public function abortAction($id)
 	{
-		$dbEntryVendorTask = EntryVendorTaskPeer::retrievePendingByEntryIdAndPartnerId($id, kCurrentContext::getCurrentPartnerId());
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrievePendingModerationByEntryIdAndPartnerId($id, kCurrentContext::getCurrentPartnerId());
 		if (!$dbEntryVendorTask)
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 
