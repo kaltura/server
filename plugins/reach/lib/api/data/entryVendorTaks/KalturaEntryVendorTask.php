@@ -93,6 +93,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	/**
 	 * The ID of the user who created this task
 	 * @var string
+	 * @filter eq
 	 * @readonly
 	 */
 	public $userId;
@@ -169,7 +170,15 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$this->validatePropertyNotNull("vendorProfileId");
 		$this->validatePropertyNotNull("catalogItemId");
 		$this->validatePropertyNotNull("entryId");
+		$this->validateEntryId();
 		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	private function validateEntryId()
+	{
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 	}
 	
 	public function getExtraFilters()

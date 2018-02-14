@@ -62,12 +62,6 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	protected $used_credit;
 
 	/**
-	 * The value for the used_credit_period field.
-	 * @var        int
-	 */
-	protected $used_credit_period;
-
-	/**
 	 * The value for the rules field.
 	 * @var        string
 	 */
@@ -258,16 +252,6 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	public function getUsedCredit()
 	{
 		return $this->used_credit;
-	}
-
-	/**
-	 * Get the [used_credit_period] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getUsedCreditPeriod()
-	{
-		return $this->used_credit_period;
 	}
 
 	/**
@@ -514,29 +498,6 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	} // setUsedCredit()
 
 	/**
-	 * Set the value of [used_credit_period] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
-	 */
-	public function setUsedCreditPeriod($v)
-	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::USED_CREDIT_PERIOD]))
-			$this->oldColumnsValues[VendorProfilePeer::USED_CREDIT_PERIOD] = $this->used_credit_period;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->used_credit_period !== $v) {
-			$this->used_credit_period = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::USED_CREDIT_PERIOD;
-		}
-
-		return $this;
-	} // setUsedCreditPeriod()
-
-	/**
 	 * Set the value of [rules] column.
 	 * 
 	 * @param      string $v new value
@@ -644,10 +605,9 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 			$this->type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->used_credit = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->used_credit_period = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->rules = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->dictionary = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->rules = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->dictionary = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -657,7 +617,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = VendorProfilePeer::NUM_COLUMNS - VendorProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 10; // 10 = VendorProfilePeer::NUM_COLUMNS - VendorProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating VendorProfile object", $e);
@@ -1199,15 +1159,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 				return $this->getUsedCredit();
 				break;
 			case 7:
-				return $this->getUsedCreditPeriod();
-				break;
-			case 8:
 				return $this->getRules();
 				break;
-			case 9:
+			case 8:
 				return $this->getDictionary();
 				break;
-			case 10:
+			case 9:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1238,10 +1195,9 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 			$keys[4] => $this->getType(),
 			$keys[5] => $this->getStatus(),
 			$keys[6] => $this->getUsedCredit(),
-			$keys[7] => $this->getUsedCreditPeriod(),
-			$keys[8] => $this->getRules(),
-			$keys[9] => $this->getDictionary(),
-			$keys[10] => $this->getCustomData(),
+			$keys[7] => $this->getRules(),
+			$keys[8] => $this->getDictionary(),
+			$keys[9] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1295,15 +1251,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 				$this->setUsedCredit($value);
 				break;
 			case 7:
-				$this->setUsedCreditPeriod($value);
-				break;
-			case 8:
 				$this->setRules($value);
 				break;
-			case 9:
+			case 8:
 				$this->setDictionary($value);
 				break;
-			case 10:
+			case 9:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1337,10 +1290,9 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setType($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setUsedCredit($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setUsedCreditPeriod($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setRules($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDictionary($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
+		if (array_key_exists($keys[7], $arr)) $this->setRules($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setDictionary($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
 	}
 
 	/**
@@ -1359,7 +1311,6 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(VendorProfilePeer::TYPE)) $criteria->add(VendorProfilePeer::TYPE, $this->type);
 		if ($this->isColumnModified(VendorProfilePeer::STATUS)) $criteria->add(VendorProfilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(VendorProfilePeer::USED_CREDIT)) $criteria->add(VendorProfilePeer::USED_CREDIT, $this->used_credit);
-		if ($this->isColumnModified(VendorProfilePeer::USED_CREDIT_PERIOD)) $criteria->add(VendorProfilePeer::USED_CREDIT_PERIOD, $this->used_credit_period);
 		if ($this->isColumnModified(VendorProfilePeer::RULES)) $criteria->add(VendorProfilePeer::RULES, $this->rules);
 		if ($this->isColumnModified(VendorProfilePeer::DICTIONARY)) $criteria->add(VendorProfilePeer::DICTIONARY, $this->dictionary);
 		if ($this->isColumnModified(VendorProfilePeer::CUSTOM_DATA)) $criteria->add(VendorProfilePeer::CUSTOM_DATA, $this->custom_data);
@@ -1452,8 +1403,6 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 		$copyObj->setStatus($this->status);
 
 		$copyObj->setUsedCredit($this->used_credit);
-
-		$copyObj->setUsedCreditPeriod($this->used_credit_period);
 
 		$copyObj->setRules($this->rules);
 

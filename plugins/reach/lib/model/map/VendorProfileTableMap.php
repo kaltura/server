@@ -44,7 +44,6 @@ class VendorProfileTableMap extends TableMap {
 		$this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('USED_CREDIT', 'UsedCredit', 'INTEGER', true, null, null);
-		$this->addColumn('USED_CREDIT_PERIOD', 'UsedCreditPeriod', 'INTEGER', true, null, null);
 		$this->addColumn('RULES', 'Rules', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DICTIONARY', 'Dictionary', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

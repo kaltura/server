@@ -26,7 +26,7 @@ abstract class BaseVendorProfilePeer {
 	const TM_CLASS = 'VendorProfileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 11;
+	const NUM_COLUMNS = 10;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -51,9 +51,6 @@ abstract class BaseVendorProfilePeer {
 
 	/** the column name for the USED_CREDIT field */
 	const USED_CREDIT = 'vendor_profile.USED_CREDIT';
-
-	/** the column name for the USED_CREDIT_PERIOD field */
-	const USED_CREDIT_PERIOD = 'vendor_profile.USED_CREDIT_PERIOD';
 
 	/** the column name for the RULES field */
 	const RULES = 'vendor_profile.RULES';
@@ -80,11 +77,11 @@ abstract class BaseVendorProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Type', 'Status', 'UsedCredit', 'UsedCreditPeriod', 'Rules', 'Dictionary', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'type', 'status', 'usedCredit', 'usedCreditPeriod', 'rules', 'dictionary', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::TYPE, self::STATUS, self::USED_CREDIT, self::USED_CREDIT_PERIOD, self::RULES, self::DICTIONARY, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'type', 'status', 'used_credit', 'used_credit_period', 'rules', 'dictionary', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Type', 'Status', 'UsedCredit', 'Rules', 'Dictionary', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'type', 'status', 'usedCredit', 'rules', 'dictionary', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::TYPE, self::STATUS, self::USED_CREDIT, self::RULES, self::DICTIONARY, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'type', 'status', 'used_credit', 'rules', 'dictionary', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -94,11 +91,11 @@ abstract class BaseVendorProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Type' => 4, 'Status' => 5, 'UsedCredit' => 6, 'UsedCreditPeriod' => 7, 'Rules' => 8, 'Dictionary' => 9, 'CustomData' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'type' => 4, 'status' => 5, 'usedCredit' => 6, 'usedCreditPeriod' => 7, 'rules' => 8, 'dictionary' => 9, 'customData' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::TYPE => 4, self::STATUS => 5, self::USED_CREDIT => 6, self::USED_CREDIT_PERIOD => 7, self::RULES => 8, self::DICTIONARY => 9, self::CUSTOM_DATA => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'type' => 4, 'status' => 5, 'used_credit' => 6, 'used_credit_period' => 7, 'rules' => 8, 'dictionary' => 9, 'custom_data' => 10, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Type' => 4, 'Status' => 5, 'UsedCredit' => 6, 'Rules' => 7, 'Dictionary' => 8, 'CustomData' => 9, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'type' => 4, 'status' => 5, 'usedCredit' => 6, 'rules' => 7, 'dictionary' => 8, 'customData' => 9, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::TYPE => 4, self::STATUS => 5, self::USED_CREDIT => 6, self::RULES => 7, self::DICTIONARY => 8, self::CUSTOM_DATA => 9, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'type' => 4, 'status' => 5, 'used_credit' => 6, 'rules' => 7, 'dictionary' => 8, 'custom_data' => 9, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -175,7 +172,6 @@ abstract class BaseVendorProfilePeer {
 		$criteria->addSelectColumn(VendorProfilePeer::TYPE);
 		$criteria->addSelectColumn(VendorProfilePeer::STATUS);
 		$criteria->addSelectColumn(VendorProfilePeer::USED_CREDIT);
-		$criteria->addSelectColumn(VendorProfilePeer::USED_CREDIT_PERIOD);
 		$criteria->addSelectColumn(VendorProfilePeer::RULES);
 		$criteria->addSelectColumn(VendorProfilePeer::DICTIONARY);
 		$criteria->addSelectColumn(VendorProfilePeer::CUSTOM_DATA);
