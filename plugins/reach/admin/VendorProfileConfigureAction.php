@@ -146,6 +146,8 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 				return new Form_VendorProfileNullCredit();
 			case 'Kaltura_Client_Reach_Type_VendorCredit':
 				return new Form_VendorProfileCredit();
+			case 'Kaltura_Client_Reach_Type_UnlimitedVendorCredit':
+				return new Form_VendorProfileUnlimitedCredit();
 			case 'Kaltura_Client_Reach_Type_ReoccurringVendorCredit':
 				return new Form_VendorProfileRecurringCredit();
 			case 'Kaltura_Client_Reach_Type_TimeRangeVendorCredit':
@@ -172,6 +174,7 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		$credits = array();
 		$credits['Null'] = $action->view->translate('Choose Credit Type');
 		$credits['Kaltura_Client_Reach_Type_VendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_VendorCredit');
+		$credits['Kaltura_Client_Reach_Type_UnlimitedVendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_UnlimitedVendorCredit');
 		$credits['Kaltura_Client_Reach_Type_ReoccurringVendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_ReoccurringVendorCredit');
 		$credits['Kaltura_Client_Reach_Type_TimeRangeVendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_TimeRangeVendorCredit');
 

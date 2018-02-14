@@ -264,7 +264,7 @@ class VendorProfile extends BaseVendorProfile
 			$creditUsagePercentage = 100;
 			$currentCredit = $this->getCredit()->getCurrentCredit();
 			
-			if($currentCredit != 0)
+			if($currentCredit != 0 && $currentCredit != VendorProfileCreditValues::UNLIMITED_CREDIT)
 			{
 				$usedCredit = $this->getUsedCredit();
 				$creditUsagePercentage = ceil($usedCredit/$currentCredit);

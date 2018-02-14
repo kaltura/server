@@ -4,18 +4,18 @@
  * @subpackage api.objects
  */
 
-class KalturaVendorCredit extends KalturaObject
+class KalturaVendorCredit extends KalturaBaseVendorCredit
 {
 	/**
 	 *  @var int
 	 */
 	public $credit;
-	
+
 	/**
 	 *  @var time
 	 */
 	public $fromDate;
-	
+
 	/**
 	 *  @var KalturaNullableBoolean
 	 */
@@ -53,11 +53,11 @@ class KalturaVendorCredit extends KalturaObject
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("credit", "fromDate"));
-		
+		$this->validatePropertyNotNull(array("credit",'fromDate'));
+
 		if(!$this->allowOverage && $this->overageCredit && $this->overageCredit > 0)
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_SET_ALLOW_OVERAGE_CREDIT);
-		
+
 		parent::validateForInsert($propertiesToSkip);
 	}
 }

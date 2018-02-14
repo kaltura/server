@@ -1433,6 +1433,7 @@ return array(
 	'Kaltura_Client_Reach_Type_TimeRangeVendorCredit' => "Time Ranged Credit",
 	'Kaltura_Client_Reach_Type_ReoccurringVendorCredit' => "Recurring Credit",
 	'Kaltura_Client_Reach_Type_VendorCredit'  => "Generic Credit",
+	'Kaltura_Client_Reach_Type_UnlimitedVendorCredit' => "Unlimited Credit",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::MONTHLY' => "MONTHLY",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::DAILY' => "DAILY",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::WEEKLY' => "WEEKLY",

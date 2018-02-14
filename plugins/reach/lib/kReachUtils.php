@@ -59,6 +59,9 @@ class kReachUtils
 	{
 		$creditUsed = $vendorProfile->getUsedCredit();
 		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
+		if ($allowedCredit == VendorProfileCreditValues::UNLIMITED_CREDIT )
+			return true;
+
 		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
 		
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
@@ -74,9 +77,12 @@ class kReachUtils
 	public static function checkCreditForApproval(EntryVendorTask $entryVendorTask)
 	{
 		$vendorProfile = $entryVendorTask->getVendorProfile();
-		
-		$creditUsed = $vendorProfile->getUsedCredit();
+
 		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
+		if ($allowedCredit == VendorProfileCreditValues::UNLIMITED_CREDIT )
+			return true;
+
+		$creditUsed = $vendorProfile->getUsedCredit();
 		$entryTaskPrice = $entryVendorTask->getPrice();
 		
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
@@ -88,10 +94,13 @@ class kReachUtils
 	public static function checkPriceAddon($entryVendorTask, $taskPriceDiff)
 	{
 		$vendorProfile = $entryVendorTask->getVendorProfile();
-		
-		$creditUsed = $vendorProfile->getUsedCredit();
 		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
-		
+
+		if ($allowedCredit == VendorProfileCreditValues::UNLIMITED_CREDIT )
+			return true;
+
+		$creditUsed = $vendorProfile->getUsedCredit();
+
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] taskPriceDiff [$taskPriceDiff]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);
 		return $remainingCredit >= 0 ? true : false;
