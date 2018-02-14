@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaPushNotificationTemplate">
+				<name>PRESENTER_TAB_PUSH_NOTIFICATIONS</name>
+				<systemName>PRESENTER_TAB_PUSH_NOTIFICATIONS</systemName>
+				<description>Place holder for push notifications message passing</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+
+				<queueNameParameters objectType="array">
+					<item objectType="KalturaPushEventNotificationParameter">
+						<key>entryId</key>
+						<description></description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getId()</code>
+						</value>
+					</item>
+				</queueNameParameters>
+				<apiObjectType>KalturaUser</apiObjectType>
+				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
+			</template>		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>2</status><!-- EventNotificationTemplateStatus::ACTIVE -->
+		</request>
+	</multirequest>
+</xml>

@@ -90,8 +90,9 @@ class PushNotificationTemplateService extends KalturaBaseService
 	 * @param string $notificationTemplateSystemName Existing push notification template system name
 	 * @param KalturaPushNotificationParams $pushNotificationParams
 	 * @param KalturaPushNotificationCommandType $command Command to be sent to push server
+	 * @param string $data
 	 */
-	function sendCommandAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams, $command)
+	function sendCommandAction($notificationTemplateSystemName, KalturaPushNotificationParams $pushNotificationParams, $command, $data = null)
 	{
 		kApiCache::disableCache();
 		// find the template, according to its system name, on both current partner and partner 0
@@ -131,11 +132,21 @@ class PushNotificationTemplateService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, implode(",", $missingParams));
 		
 		$queueName = $dbEventNotificationTemplate->getQueueName($queueNameParams, $partnerId, null);
-		
+		$queueKey = null;
+		switch ($command)
+		{
+			case KalturaPushNotificationCommandType::CLEAR_QUEUE:
+				$data = null;
+				break;
+			case KalturaPushNotificationCommandType::NOTIFY_USER:
+				$queueKey = $dbEventNotificationTemplate->getQueueKey($queueNameParams, $partnerId, null, false);
+				break;
+		}
+
 		$time = time();
 		$msg = json_encode(array(
-				"data" 		=> null,
-				"queueKey" 	=> null,
+				"data" 		=> $data,
+				"queueKey" 	=> $queueKey,
 				"queueName"	=> $queueName,
 				"msgId"		=> md5("$queueName $time"),
 				"msgTime"	=> $time,
