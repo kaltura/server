@@ -128,8 +128,8 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		));
 	}
 
-	public static $rulesMap = array("Kaltura_Client_Reach_Type_VendorProfileRuleEntryAdded" => "Entry_Created",
-		"Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryAdded" => "Category_Entry_Added");
+	public static $rulesMap = array("Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified" => "Entry_Tags_Modified",
+		"Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive" => "Category_Entry_Active");
 
 	private function addRulesSection()
 	{
@@ -196,18 +196,40 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$rulesArray = array();
 		foreach (json_decode($rules) as $rule)
 		{
-			$class = array_search ($rule->ruleType, self::$rulesMap);
-			/* @var $ruleObject Kaltura_Client_Reach_Type_VendorProfileRuleOption  */
-//			$ruleObject = new $class();
-//			$ruleItem = $ruleObject->getVendorProfileRule($rule);
-			$a = new Kaltura_Client_Reach_Type_VendorProfileRule();
-			$rulesArray[] = $a;
+			switch(array_search ($rule->ruleType, self::$rulesMap))
+			{
+				case 'Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified':
+					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds, 'array_intersect($scope->getObject()->getTags(), array('. explode(',',$rule->tags).')' );
+					break;
+				case 'Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive':
+					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds,'$scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE && in_array($scope->getObject()->getCategoryId(), array('. explode(',',$rule->categoryIds).')'  );
+					break;
+			}
 		}
+
 		$object->rules = $rulesArray;
 
 		$object->credit = $this->getSubForm("vendorProfileCredit")->getObject($properties["vendorProfileCredit"]);
 
 		return $object;
+	}
+
+	public function getVendorProfileRule($objectType ,$eventType, $catalogItemsIds, $code)
+	{
+		$rule = new KalturaVendorProfileRule();
+//		$rule->catalogItemIds = $this->catalogItemsIds;
+		$rule->eventObjectType = $objectType;
+		$rule->eventType = $eventType;
+		$rule->catalogItemIds = catalogItemsIds;
+
+		$conditions = array();
+		$condition = new KalturaEventFieldCondition();
+		$field = new KalturaEvalBooleanField();
+		$field->code = $code;
+		$condition->field = $field;
+		$conditions[] = $condition;
+		$rule->eventConditions = $conditions;
+		return $rule;
 	}
 
 	/**
