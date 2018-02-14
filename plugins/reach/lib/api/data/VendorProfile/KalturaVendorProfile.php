@@ -175,7 +175,10 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	private function validate(VendorProfile $sourceObject = null)
 	{
 		if (!$sourceObject) //Source object will be null on insert
+		{
 			$this->validatePropertyNotNull("profileType");
+			$this->validatePropertyNotNull("credit");
+		}
 
 		return;
 	}

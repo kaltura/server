@@ -136,11 +136,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		$entryVendorTask = self::addEntryVendorTask($entry, $vendorProfile, $vendorCatalogItem);
+		$entryVendorTask = self::addEntryVendorTask($entry, $vendorProfile, $vendorCatalogItem, false);
 		return $entryVendorTask;
 	}
 	
-	public static function addEntryVendorTask(entry $entry, VendorProfile $vendorProfile, VendorCatalogItem $vendorCatalogItem)
+	public static function addEntryVendorTask(entry $entry, VendorProfile $vendorProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true)
 	{
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
@@ -150,6 +150,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setVendorProfileId($vendorProfile->getId());
 		$entryVendorTask->setPartnerId($entry->getPartnerId());
+		$entryVendorTask->setKuserId(kCurrentContext::getCurrentKsKuserId());
 		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		
@@ -158,7 +159,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
 		
 		$status = EntryVendorTaskStatus::PENDING;
-		if($vendorProfile->shouldModerate($vendorCatalogItem->getServiceType()))
+		if($validateModeration && $vendorProfile->shouldModerate($vendorCatalogItem->getServiceType()))
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 		
 		$entryVendorTask->setStatus($status);

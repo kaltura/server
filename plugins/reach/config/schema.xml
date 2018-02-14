@@ -79,6 +79,7 @@
 		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="price" 				type="integer" />
 		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="catalog_item_id"		type="integer" />
 		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="vendor_profile_id"		type="integer" />
+		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="kuser_id"				type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" 			type="longvarchar" />
 		<index name="partner_id_status_index">
 			<index-column name="partner_id" />

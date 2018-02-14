@@ -21,6 +21,8 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		
+		$this->fixFilterUserId($c);
+		
 		$list = EntryVendorTaskPeer::doSelect($c);
 		
 		$resultCount = count($list);
@@ -29,7 +31,7 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = VendorProfilePeer::doCount($c);
+			$totalCount = EntryVendorTaskPeer::doCount($c);
 		}
 		
 		$response = new KalturaEntryVendorTaskListResponse();
@@ -37,5 +39,19 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		$response->totalCount = $totalCount;
 		return $response;
 	}
-
+	
+	/**
+	 * The user_id is infact a puser_id and the kuser_id should be retrieved
+	 */
+	private function fixFilterUserId(Criteria $c)
+	{
+		if ($this->userIdEqual !== null) 
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
+			if ($kuser)
+				$c->add(EntryVendorTaskPeer::KUSER_ID, $kuser->getId());
+			else
+				$c->add(EntryVendorTaskPeer::KUSER_ID, -1); // no result will be returned when the user is missing
+		}
+	}
 }
