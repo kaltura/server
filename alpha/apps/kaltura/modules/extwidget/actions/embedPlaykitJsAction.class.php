@@ -318,14 +318,8 @@ class embedPlaykitJsAction extends sfAction
 		if (!isset($config["provider"])) {
 			$config["provider"] = new stdClass();
 		}
-
-		if (!isset($config["provider"]->partnerId)) {
-			$config["provider"]->partnerId = $this->partnerId;
-		}
-
-		if (!isset($config["provider"]->uiConfId)) {
-			$config["provider"]->uiConfId = $this->uiconfId;
-		}
+		$config["provider"]->partnerId = $this->partnerId;
+		$config["provider"]->uiConfId = $this->uiconfId;
 
 		$config["targetId"] = $targetId;
 
