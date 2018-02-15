@@ -3856,6 +3856,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'plays' => $this->getPlays(),
 			'last_played_at' => $this->getLastPlayedAt(null),
 			'user_names' => $this->getAllUserNamesAsArray(),
+			'root_id' => $this->getRootEntryId(),
 		);
 
 		$this->addCategoriesToObjectParams($body);

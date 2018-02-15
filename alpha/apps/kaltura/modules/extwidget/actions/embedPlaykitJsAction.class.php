@@ -257,7 +257,7 @@ class embedPlaykitJsAction extends sfAction
 		) {
 			infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 			header("HTTP/1.1 304 Not Modified");
-			return;
+			KExternalErrors::dieGracefully();
 		}
 		
 		$iframeEmbed = $this->getRequestParameter('iframeembed');

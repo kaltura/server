@@ -12,6 +12,9 @@
  */
 class KAsyncUsersCsv extends KJobHandlerWorker
 {
+
+	private $apiError = null;
+
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -57,6 +60,12 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		fclose($csvFile);
 		$this->setFilePermissions($filePath);
 		self::unimpersonate();
+
+		if($this->apiError)
+		{
+			$e = $this->apiError;
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::RETRY);
+		}
 
 		// Copy the report to shared location.
 		$this->moveFile($job, $data, $job->partnerId);
@@ -111,13 +120,14 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 			}
 			try
 			{
-
 				$userList = KBatchBase::$kClient->user->listAction($filter, $pager);
 				$returnedSize = count($userList->objects);
 			}
 			catch(Exception $e)
 			{
 				KalturaLog::info("Couldn't list users on page: [$pager->pageIndex]" . $e->getMessage());
+				$this->apiError = $e;
+				return;
 			}
 
 			$lastObject = $userList->objects[$returnedSize-1];
@@ -128,7 +138,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 			$uniqUsers = array();
 			foreach ($userList->objects as $user)
 			{
-				if(!in_array($user, $lastCreatedAtObjectIdList))
+				if(!in_array($user->id, $lastCreatedAtObjectIdList))
 					$uniqUsers[]=$user;
 			}
 			//Prepare list of the last second users to avoid duplicate in the next iteration
@@ -138,7 +148,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 					$newCreatedAtListObject[]=$user->id;
 			}
 			$lastCreatedAtObjectIdList = $newCreatedAtListObject;
-			$this->addUsersToCsv($userList->objects, $csvFile, $data->metadataProfileId, $additionalFields);
+			$this->addUsersToCsv($uniqUsers, $csvFile, $data->metadataProfileId, $additionalFields);
 			$totalCount+=count($uniqUsers);
 			KalturaLog::debug("Adding More  - ".count($uniqUsers). " totalCount - ". $totalCount);
 			unset($newCreatedAtListObject);
@@ -181,10 +191,12 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 			$userIdToRow = $this->initializeCsvRowValues($user, $additionalFields, $userIdToRow);
 		}
 
-		$usersMetadata = $this->retrieveUsersMetadata($userIds, $metadataProfileId);
-		if($usersMetadata->objects)
-			$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow);
-
+		if($metadataProfileId)
+		{
+			$usersMetadata = $this->retrieveUsersMetadata($userIds, $metadataProfileId);
+			if ($usersMetadata->objects)
+				$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow);
+		}
 		foreach ($userIdToRow as $key=>$val)
 			fputcsv($csvFile, $val);
 	}
@@ -260,6 +272,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		catch(Exception $e)
 		{
 			KalturaLog::info("Couldn't list metadata objects for metadataProfileId: [$metadataProfileId]" . $e->getMessage());
+			$this->apiError = $e;
 		}
 		return $result;
 	}
