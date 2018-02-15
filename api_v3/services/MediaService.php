@@ -788,8 +788,8 @@ class MediaService extends KalturaEntryService
 	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
      	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 		
-     	try{
-       		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+		try{
+			$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 			if ($this->shouldUpdateRelatedEntry($resource))
 				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
@@ -797,7 +797,13 @@ class MediaService extends KalturaEntryService
 			if($lock){
 				$lock->unlock();
 			}
-       		throw $e;
+			if (($e->getCode() == kCoreException::SOURCE_FILE_NOT_FOUND) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
+			{
+				$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
+				KalturaLog::info("Source file wasn't found on current DC. dumping the request to DC id [$remoteDc]");
+				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc));
+			}
+	       		throw $e;
 		}
 		if($lock){
 			$lock->unlock();
