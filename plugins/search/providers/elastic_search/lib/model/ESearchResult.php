@@ -19,7 +19,7 @@ class ESearchResult extends BaseObject
 	/**
 	 * @var array
 	 */
-	protected $highlight;
+	protected $highlight = array();
 
 	/**
 	 * @return BaseObject
