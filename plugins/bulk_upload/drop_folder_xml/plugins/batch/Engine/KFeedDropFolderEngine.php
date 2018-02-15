@@ -358,7 +358,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		$res = curl_exec($ch);
 		curl_close ($ch);
 		
-		KalturaLog::info("For URL [$url], the curl result is: " . print_r($res, true));
+//		KalturaLog::info("For URL [$url], the curl result is: " . print_r($res, true));
 		return $res;
 	}
 
