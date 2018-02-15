@@ -129,18 +129,27 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entry = entryPeer::retrieveByPK($entryId);
 		$vendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
-		
+
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
+		if( EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemIdAndEntryVersion($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
+		{
+			KalturaLog::err("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
+			return true;
+		}
+
 		if(!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $vendorProfile))
 		{
 			KalturaLog::err("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
 		
-		$entryVendorTask = self::addEntryVendorTask($entry, $vendorProfile, $vendorCatalogItem, false);
+		$entryVendorTask = self::addEntryVendorTask($entry, $vendorProfile, $vendorCatalogItem, false, $sourceFlavorVersion);
 		return $entryVendorTask;
 	}
 	
-	public static function addEntryVendorTask(entry $entry, VendorProfile $vendorProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true)
+	public static function addEntryVendorTask(entry $entry, VendorProfile $vendorProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0)
 	{
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
@@ -153,6 +162,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setKuserId(kCurrentContext::getCurrentKsKuserId());
 		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
+		$entryVendorTask->setVersion($version);
 		
 		//Set calculated values
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId()));

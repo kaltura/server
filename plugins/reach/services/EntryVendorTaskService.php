@@ -49,14 +49,17 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->catalogItemId);
 		if(!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $entryVendorTask->catalogItemId);
-		
-		if(EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemId($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId()))
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId());
+
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($dbEntry->getId());
+		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
+		if(EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemIdAndEntryVersion($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(),$sourceFlavorVersion))
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $sourceFlavorVersion, kCurrentContext::getCurrentPartnerId());
 		
 		if(!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbVendorProfile))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED,  $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		
-		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbVendorProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session);
+		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbVendorProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $sourceFlavorVersion);
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
 		$dbEntryVendorTask->save();
 

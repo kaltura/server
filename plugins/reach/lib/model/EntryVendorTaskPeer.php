@@ -15,13 +15,13 @@
  */
 class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer 
 {
-	public static function retrieveEntryIdAndCatalogItemId($entryId, $catalogItemId, $partnerId)
+	public static function retrieveEntryIdAndCatalogItemIdAndEntryVersion($entryId, $catalogItemId, $partnerId, $version)
 	{
 		$c = new Criteria();
 		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
 		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		
+		$c->add(EntryVendorTaskPeer::VERSION, $version);
 		return EntryVendorTaskPeer::doSelectOne($c);
 	}
 	

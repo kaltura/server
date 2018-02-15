@@ -50,6 +50,7 @@ class EntryVendorTaskTableMap extends TableMap {
 		$this->addColumn('CATALOG_ITEM_ID', 'CatalogItemId', 'INTEGER', true, null, null);
 		$this->addColumn('VENDOR_PROFILE_ID', 'VendorProfileId', 'INTEGER', true, null, null);
 		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', true, null, null);
+		$this->addColumn('VERSION', 'Version', 'INTEGER', true, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

@@ -27,6 +27,7 @@ class EntryVendorTaskFilter extends baseObjectFilter
 			"_in_catalog_item_id",
 			"_eq_vendor_partner_id",
 			"_in_vendor_partner_id",
+			"_eq_version",
 		) , NULL );
 
 		$this->allowed_order_fields = array (

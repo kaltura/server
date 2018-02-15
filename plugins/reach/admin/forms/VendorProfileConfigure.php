@@ -183,7 +183,22 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$rules = array();
 		foreach ($object->rules as $rule)
 		{
-			$rules[] = $rule;
+			$newRule = array();
+
+			if ($rule->eventObjectType == Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY && $rule->eventType  == Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED)
+			{
+				$newRule['ruleType'] = self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified'];
+				$newRule['tags'] = $rule->tags;
+			}
+			elseif ($rule->eventObjectType == Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY && $rule->eventType == Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED)
+			{
+				$newRule['ruleType'] = self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive'];
+				$newRule['categoryIds'] = $rule->categoryIds;
+			}
+			else
+				continue;
+			$newRule['catalogItemsIds'] = $rule->catalogItemIds;
+			$rules[] = $newRule;
 		}
 		$this->setDefault('VendorProfileRules',  json_encode($rules));
 	}
@@ -199,10 +214,10 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			switch(array_search ($rule->ruleType, self::$rulesMap))
 			{
 				case 'Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified':
-					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds, 'array_intersect($scope->getObject()->getTags(), array('. explode(',',$rule->tags).')' );
+					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds, 'array_intersect($scope->getObject()->getTags(), array('. "'" . implode("','", explode(',',$rule->tags)) . "'".')' );
 					break;
 				case 'Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive':
-					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds,'$scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE && in_array($scope->getObject()->getCategoryId(), array('. explode(',',$rule->categoryIds).')'  );
+					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds,'$scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE && in_array($scope->getObject()->getCategoryId(), array('.$rule->categoryIds. ')'  );
 					break;
 			}
 		}
@@ -216,15 +231,14 @@ class Form_VendorProfileConfigure extends ConfigureForm
 
 	public function getVendorProfileRule($objectType ,$eventType, $catalogItemsIds, $code)
 	{
-		$rule = new KalturaVendorProfileRule();
-//		$rule->catalogItemIds = $this->catalogItemsIds;
+		$rule = new Kaltura_Client_Reach_Type_VendorProfileRule();
 		$rule->eventObjectType = $objectType;
 		$rule->eventType = $eventType;
-		$rule->catalogItemIds = catalogItemsIds;
+		$rule->catalogItemIds = $catalogItemsIds;
 
 		$conditions = array();
-		$condition = new KalturaEventFieldCondition();
-		$field = new KalturaEvalBooleanField();
+		$condition = new Kaltura_Client_EventNotification_Type_EventFieldCondition();
+		$field = new Kaltura_Client_Type_EvalBooleanField();
 		$field->code = $code;
 		$condition->field = $field;
 		$conditions[] = $condition;
