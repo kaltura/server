@@ -785,8 +785,8 @@ class MediaService extends KalturaEntryService
 		//calling replaceResource only if no lock or we grabbed it
 		$lock = kLock::create("media_updateContent_{$entryId}");
 		
-	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
-     	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+		if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 		
 		try{
 			$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
