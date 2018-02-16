@@ -51,19 +51,18 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	 * @var string
 	 */
 	private $spokenLanguage;
-
+	
 	/**
 	 * should replace remote media content
 	 * @var bool
 	 */
 	private $replaceMediaContent;
-
+	
 	/**
-	 *
 	 * @var string
 	 */
 	private $additionalParameters;
-
+	
 	/**
 	 * @return string
 	 */
@@ -71,7 +70,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->entryId;
 	}
-
+	
 	/**
 	 * @param string $entryId
 	 */
@@ -79,7 +78,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->entryId = $entryId;
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -87,7 +86,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->flavorAssetId;
 	}
-
+	
 	/**
 	 * @param string $flavorAssetId
 	 */
