@@ -6,37 +6,37 @@
 class kCielo24JobProviderData extends kIntegrationJobProviderData
 {
 	const CUSTOM_DATA_SPOKEN_LANGUAGE = "spokenLanguage";
-	
+
 	/**
 	 * @var string
 	 */
 	private $entryId;
-	
+
 	/**
 	 * @var string
 	 */
 	private $flavorAssetId;
-	
+
 	/**
 	 * @var string
 	 */
 	private $captionAssetFormats;
-	
+
 	/**
 	 * @var string
 	 */
 	private $priority;
-	
+
 	/**
 	 * @var string
 	 */
 	private $fidelity;
-	
+
 	/**
 	 * @var string
 	 */
 	private $username;
-	
+
 	/**
 	 * @var string
 	 */
@@ -46,24 +46,24 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	 * @var string
 	 */
 	private $baseUrl;
-	
+
 	/**
 	 * @var string
 	 */
 	private $spokenLanguage;
-	
+
 	/**
 	 * should replace remote media content
 	 * @var bool
 	 */
 	private $replaceMediaContent;
-	
+
 	/**
-	 * 
+	 *
 	 * @var string
 	 */
 	private $additionalParameters;
-	
+
 	/**
 	 * @return string
 	 */
@@ -71,7 +71,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->entryId;
 	}
-	
+
 	/**
 	 * @param string $entryId
 	 */
@@ -79,7 +79,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->entryId = $entryId;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -87,7 +87,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->flavorAssetId;
 	}
-	
+
 	/**
 	 * @param string $flavorAssetId
 	 */
@@ -95,7 +95,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->flavorAssetId = $flavorAssetId;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -103,7 +103,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->captionAssetFormats;
 	}
-	
+
 	/**
 	 * @param string $captionAssetFormats
 	 */
@@ -111,7 +111,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->captionAssetFormats = $captionAssetFormats;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -119,7 +119,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->priority;
 	}
-	
+
 	/**
 	 * @param string $priority
 	 */
@@ -127,7 +127,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->priority = $priority;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -135,7 +135,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->fidelity;
 	}
-	
+
 	/**
 	 * @param string $fidelity
 	 */
@@ -143,7 +143,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->fidelity = $fidelity;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -151,7 +151,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->username;
 	}
-	
+
 	/**
 	 * @param string $username
 	 */
@@ -159,7 +159,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->username = $username;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -167,7 +167,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->password;
 	}
-	
+
 	/**
 	 * @param string $password
 	 */
@@ -183,7 +183,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->baseUrl;
 	}
-	
+
 	/**
 	 * @param string $baseUrl
 	 */
@@ -199,7 +199,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->spokenLanguage;
 	}
-	
+
 	/**
 	 * @param string $spokenLanguage
 	 */
@@ -207,7 +207,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->spokenLanguage = $spokenLanguage;
 	}
-	
+
 	/**
 	 * @return bool
 	 */
@@ -215,7 +215,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->replaceMediaContent;
 	}
-	
+
 	/**
 	 * @param bool $replaceMediaContent
 	 */
@@ -223,7 +223,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->replaceMediaContent = $replaceMediaContent;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -231,7 +231,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		return $this->additionalParameters;
 	}
-	
+
 	/**
 	 * @param string $additionalParameters
 	 */
