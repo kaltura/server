@@ -189,7 +189,7 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	 */
 	public function setBaseUrl($baseUrl)
 	{
-			$this->baseUrl = $baseUrl;
+		$this->baseUrl = $baseUrl;
 	}
 
 	/**
