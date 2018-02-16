@@ -71,6 +71,30 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	 * @var string
 	 */
 	public $additionalParameters;
+
+	private static $whitelistedActionParams = array
+	(
+		'get_transcript' => array (
+			"emit_speaker_change_tokens_as",
+			"newlines_after_paragraph",
+			"newlines_after_sentence",
+			"mask_profanity",
+			"remove_sounds_list",
+			"remove_sound_references",
+			"replace_slang",
+			"timecode_every_paragraph",
+		),
+		'get_caption' => array (
+			"disallow_dangling",
+			"remove_disfluencies",
+			"display_speaker_id",
+			"emit_speaker_change_tokens_as",
+			"mask_profanity",
+			"replace_slang",
+			"remove_sound_references",
+		)
+	);
+
 	
 	private static $map_between_objects = array
 	(
@@ -117,6 +141,22 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 			if (!isset($supportedLanguages[$this->spokenLanguage]))
 				throw new KalturaAPIException(KalturaCielo24Errors::LANGUAGE_NOT_SUPPORTED, $this->spokenLanguage);
 		}
+
+		$providerDataParams = json_decode($this->additionalParameters, true);
+		foreach ($providerDataParams as $action => $actionParams)
+		{
+			if (!isset(self::$whitelistedActionParams[$action]))
+			{
+				throw new KalturaAPIException (KalturaCielo24Errors::ILLEGAL_ADDITIONAL_PARAMETERS_DETECTED);
+			}
+			foreach ($actionParams as $actionParam)
+			{
+				if (!isset(self::$whitelistedActionParams[$action][$actionParam]))
+				{
+					throw new KalturaAPIException (KalturaCielo24Errors::ILLEGAL_ADDITIONAL_PARAMETERS_DETECTED);
+				}
+			}
+		}
 	
 		return parent::validateForUsage($sourceObject, $propertiesToSkip = array());
 	}
@@ -124,7 +164,8 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$object = parent::toObject($object_to_fill, $props_to_skip);
-	
+
+		/* @var $object kCielo24JobProviderData */
 		$entryId = $object->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
@@ -133,7 +174,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 		$object->setUsername($cielo24OptionsObj->username);
 		$object->setPassword($cielo24OptionsObj->password);
 		$object->setBaseUrl($cielo24OptionsObj->baseUrl);
-		
+
 		if(!$object->getFlavorAssetId())
 		{
 			$sourceAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
@@ -171,11 +212,22 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 		}
 		
 		if(!$object->getPriority())
+		{
 			$object->setPriority($cielo24ParamsMap['default_priority']);
-		
+			if ($cielo24OptionsObj->priority)
+			{
+				$additionalParams = json_decode($object->getAdditionalParameters(), true);
+				$additionalParams["perform_transcription"]["priority"] = $cielo24OptionsObj->priority;
+
+				$object->setAdditionalParameters(json_encode($additionalParams));
+			}
+		}
+
 		if(!$object->getFidelity())
+		{
 			$object->setFidelity($cielo24ParamsMap['default_fidelity']);
-		
+		}
+
 		return $object;
 	}
 }

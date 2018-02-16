@@ -185,12 +185,12 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	}
 	
 	/**
-         * @param string $baseUrl
-         */
-        public function setBaseUrl($baseUrl)
-        {
-                $this->baseUrl = $baseUrl;
-        }
+	 * @param string $baseUrl
+	 */
+	public function setBaseUrl($baseUrl)
+	{
+			$this->baseUrl = $baseUrl;
+	}
 
 	/**
 	 * @return string
@@ -238,5 +238,17 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	public function setAdditionalParameters($additionalParameters)
 	{
 		$this->additionalParameters = $additionalParameters;
+	}
+
+	/**
+	 * kVoicebaseJobProviderData constructor.
+	 * The VoiceBase job provider data must include the partner's additional params.
+	 */
+	public function __construct()
+	{
+		$partnerOptions = Cielo24Plugin::getPartnerCielo24Options(kCurrentContext::getCurrentPartnerId());
+
+		if($partnerOptions->defaultParams)
+			$this->setAdditionalParameters($partnerOptions->defaultParams);
 	}
 }
