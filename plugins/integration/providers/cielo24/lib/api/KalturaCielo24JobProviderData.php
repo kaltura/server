@@ -10,36 +10,36 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	 * @var string
 	 */
 	public $entryId;
-	
+
 	/**
 	 * Flavor ID
 	 * @var string
 	 */
 	public $flavorAssetId;
-	
+
 	/**
 	 * Caption formats
 	 * @var string
 	 */
 	public $captionAssetFormats;
-	
+
 	/**
 	 * @var KalturaCielo24Priority
 	 */
 	public $priority;
-	
+
 	/**
 	 * @var KalturaCielo24Fidelity
 	 */
 	public $fidelity;
-	
+
 	/**
 	 * Api key for service provider
 	 * @var string
 	 * @readonly
 	 */
 	public $username;
-	
+
 	/**
 	 * Api key for service provider
 	 * @var string
@@ -53,19 +53,19 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	 * @readonly
 	 */
 	public $baseUrl;
-	
+
 	/**
 	 * Transcript content language
 	 * @var KalturaLanguage
 	 */
 	public $spokenLanguage;
-	
+
 	/**
 	 * should replace remote media content
 	 * @var bool
 	 */
 	public $replaceMediaContent;
-	
+
 	/**
 	 * additional parameters to send to Cielo24
 	 * @var string
