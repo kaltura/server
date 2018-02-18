@@ -1,3 +1,33 @@
+# Vendor Profile #
+
+## Reach In-House Support ##
+- Issue Type: Feature
+- Issue ID: PLAT-7596
+
+### Deployment scripts ###
+	
+	Mysql deployment scripts:
+		1. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_11_21_create_vendor_catalog_item_table.sql
+		2. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_11_21_create_partner_catalog_item_table.sql
+		3. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_entry_vendor_task_table.sql
+		4. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_vendor_profile_table.sql
+		
+	Run Permissions scripts script:
+		1. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_vendor_role_and_permissions.php
+		2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_permissions.php
+		
+	Response profiles:
+		First replcae all tokens from the XML files below and remove ".template" from the fle name:
+			/opt/kalturapp/deployment/updates/scripts/xml/responseProfiles/reach_vendor_response_profiles.template.xml
+		
+		Run deployment script:
+			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_vendor_related_response_profiles.php	   
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+
 # Mercury 13.9.0 #
 
 ## Explicit Live - allow only admin to view streams until they decide to show everyone  ##

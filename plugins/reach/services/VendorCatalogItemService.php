@@ -15,29 +15,10 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-//		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
-//			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
+		if(!ReachPlugin::isAllowedPartner($this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
-		if(!in_array($this->actionName, array('listTemplates', 'clone')))
-			$this->applyPartnerFilterForClass('vendorCatalogItem');
-	}
-	
-	/* (non-PHPdoc)
- 	 * @see KalturaBaseService::partnerGroup()
- 	 */
-	protected function partnerGroup($peer = null)
-	{
-		switch ($this->actionName)
-		{
-			case 'clone':
-				return '0';
-			case 'listTemplates':
-				return '0';
-			case 'list':
-				return $this->partnerGroup . ',0';
-		}
-		
-		return $this->partnerGroup;
+		$this->applyPartnerFilterForClass('PartnerCatalogItem');
 	}
 	
 	/**
@@ -52,13 +33,7 @@ class VendorCatalogItemService extends KalturaBaseService
 		$dbVendorCatalogItem = $vendorCatalogItem->toInsertableObject();
 		
 		/* @var $dbVendorCatalogItem VendorCatalogItem */
-		$dbVendorCatalogItem->setPartnerId($this->impersonatedPartnerId);
-		
-		$status = KalturaVendorCatalogItemStatus::ACTIVE;
-		if($this->impersonatedPartnerId && $this->impersonatedPartnerId > 0)
-			$status = KalturaVendorCatalogItemStatus::DISABLED;
-		
-		$dbVendorCatalogItem->setStatus($status);
+		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::ACTIVE);
 		$dbVendorCatalogItem->save();
 		
 		// return the saved object
@@ -75,7 +50,7 @@ class VendorCatalogItemService extends KalturaBaseService
 	 * @return KalturaVendorCatalogItem
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 */
-	function getAction($id)
+	public function getAction($id)
 	{
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
 		if(!$dbVendorCatalogItem)
@@ -133,7 +108,7 @@ class VendorCatalogItemService extends KalturaBaseService
 	}
 	
 	/**
-	 * Update vedor catalog item status by id
+	 * Update vendor catalog item status by id
 	 *
 	 * @action updateStatus
 	 * @param int $id
@@ -143,7 +118,7 @@ class VendorCatalogItemService extends KalturaBaseService
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME
 	 */
-	function updateStatusAction($id, $status)
+	public function updateStatusAction($id, $status)
 	{
 		// get the object
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
@@ -186,59 +161,5 @@ class VendorCatalogItemService extends KalturaBaseService
 		// set the object status to deleted
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::DELETED);
 		$dbVendorCatalogItem->save();
-	}
-	
-	/**
-	 * This action assigning various bvendor cataog items to a specifc account.
-	 *
-	 * @action clone
-	 * @param int $id source catalog item to clone
-	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
-	 * @throws KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME
-	 * 
-	 * @return KalturaVendorCatalogItem
-	 */
-	public function cloneAction($id)
-	{
-		// get the object
-		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
-		if (!$dbVendorCatalogItem)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
-		
-		//Check uniqueness of new object's system name
-		$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($dbVendorCatalogItem->getSystemName());
-		if (count($systemNameTemplates))
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $dbVendorCatalogItem->getSystemName());
-		
-		
-		// copy into new db object
-		$newDbVendorCatalogItem = $dbVendorCatalogItem->copy();
-		$newDbVendorCatalogItem->setPartnerId($this->impersonatedPartnerId);
-		$newDbVendorCatalogItem->save();
-		
-		
-		// return the saved object
-		$vendorCatalogItem = KalturaVendorCatalogItem::getInstance($newDbVendorCatalogItem, $this->getResponseProfile());
-		$vendorCatalogItem->fromObject($newDbVendorCatalogItem, $this->getResponseProfile());
-		return $vendorCatalogItem;
-	}
-	
-	/**
-	 * Action lists the basic vendor catalog items.
-	 * @action listTemplates
-	 *
-	 * @param KalturaVendorCatalogItemFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaVendorCatalogItemListResponse
-	 */
-	public function listTemplatesAction (KalturaVendorCatalogItemFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		if (!$filter)
-			$filter = new KalturaVendorCatalogItemFilter();
-		
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-		
-		return $filter->getTypeListTemplatesResponse($pager, $this->getResponseProfile());
 	}
 }

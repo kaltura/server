@@ -2555,23 +2555,76 @@ CREATE TABLE `business_process_case`
 	KEY `object_id_and_type`(`object_type`, `object_id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `vendor_catalog_item`
+CREATE TABLE `vendor_catalog_item`
+(
+        `id` INTEGER  NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(256)  NOT NULL,
+        `system_name` VARCHAR(256),
+        `created_at` DATETIME  NOT NULL,
+        `updated_at` DATETIME  NOT NULL,
+        `status` TINYINT  NOT NULL,
+        `vendor_partner_id` INTEGER  NOT NULL,
+        `service_type` TINYINT  NOT NULL,
+        `service_feature` TINYINT  NOT NULL,
+        `turn_around_time` INTEGER  NOT NULL,
+        `source_language` VARCHAR(256)  NOT NULL,
+        `target_language` VARCHAR(256)  NOT NULL,
+        `output_format` VARCHAR(256)  NOT NULL,
+        `custom_data` TEXT,
+        PRIMARY KEY (`id`),
+        KEY `partner_id_status_index`(`partner_id`, `status`),
+        KEY `status_service_type_index`(`status`, `service_type`),
+        KEY `status_service_type_service_feature_index`(`status`, `service_type`, `service_feature`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `partner_catalog_item`
+(
+        `id` INTEGER  NOT NULL AUTO_INCREMENT,
+        `created_at` DATETIME  NOT NULL,
+        `updated_at` DATETIME  NOT NULL,
+        `status` TINYINT  NOT NULL,
+        `partner_id` INTEGER  NOT NULL,
+        `catalog_item_id` INTEGER  NOT NULL,
+        `custom_data` TEXT,
+        PRIMARY KEY (`id`),
+        KEY `partner_id_status_index`(`partner_id`, `status`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `vendor_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(256)  NOT NULL,
-	`system_name` VARCHAR(256),
 	`created_at` DATETIME  NOT NULL,
 	`updated_at` DATETIME  NOT NULL,
-	`is_default` TINYINT default 0,
-	`status` TINYINT  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
-	`vendor_partner_id` INTEGER  NOT NULL,
-	`service_type` TINYINT  NOT NULL,
-	`service_feature` TINYINT  NOT NULL,
-	`turn_around_time` INTEGER  NOT NULL,
+	`type` TINYINT  NOT NULL,
+	`status` TINYINT  NOT NULL,
+	`used_credit` INTEGER  NOT NULL,
+	`used_credit_period` INTEGER  NOT NULL,
+	`rules` TEXT,
+	`dictionary` TEXT,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),
-	KEY `status_service_type_index`(`status`, `service_type`),
-	KEY `status_service_type_service_feature_index`(`status`, `service_type`, `service_feature`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+	KEY `partner_id_type_index`(`partner_id`, `type`)
+)Type=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `entry_vendor_task`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME  NOT NULL,
+	`updated_at` DATETIME  NOT NULL,
+	`queue_time` DATETIME  NOT NULL,
+	`finish_time` DATETIME  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
+	`vendor_partner_id` INTEGER  NOT NULL,
+	`entry_id` VARCHAR(31)  NOT NULL,
+	`status` TINYINT  NOT NULL,
+	`price` INTEGER  NOT NULL,
+	`catalog_item_id` INTEGER  NOT NULL,
+	`vendor_profile_id` INTEGER  NOT NULL,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_status_index`(`partner_id`, `status`),
+	KEY `vendor_partner_id_status_index`(`vendor_partner_id`, `status`),
+	KEY `partner_entry_index`(`partner_id`, `entry_id`)
+)Type=InnoDB DEFAULT CHARSET=utf8;

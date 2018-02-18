@@ -8,46 +8,6 @@
 <script type="text/javascript">
 
 	try{
-		$('fieldset[id^="TargetLanguageTemplate"]').hide();
-		populate("TargetLanguages", "add-target-language");
-	}
-	catch (e)
-	{
-	}
-
-	try{
-		$('fieldset[id^="SourceLanguageTemplate"]').hide();
-		populate("SourceLanguages", "add-source-language");
-	}
-	catch (e)
-	{
-	}
-
-	try{
-		$('fieldset[id^="OutputFormatTemplate"]').hide();
-		populate("OutputFormats", "add-output-format");
-	}
-	catch (e)
-	{
-	}
-
-	function populate(name, file ) {
-		var data = jQuery('#' + name).val();
-		if (!data)
-			return;
-		var arr = JSON.parse(data);
-		var ts = $("." + file);
-		for (var i = 0, len = arr.length; i < len; i++) {
-			if (name == 'SourceLanguages')
-				addSourceLanguageFromObject(ts, arr[i]);
-			else if (name == 'TargetLanguages')
-				addTargetLanguageFromObject(ts, arr[i]);
-			else if (name == 'OutputFormats')
-				addOutputFormatFromObject(ts, arr[i]);
-		}
-	}
-
-	try{
 		jQuery(function() {
 		<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');

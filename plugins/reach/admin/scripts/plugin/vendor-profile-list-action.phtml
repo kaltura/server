@@ -1,0 +1,352 @@
+<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to use Reach'); return;} ?>
+<p><?php echo $this->translate('Here you can configure your Vendor profiles'); ?></p>
+<?php echo $this->filterForm; ?>
+<?php echo $this->newVendorProfileFolderForm; ?>
+<div id="vendor_profile_list_div" class="clear">
+	<table>
+		<thead>
+		<tr>
+			<th><?php echo $this->translate('ID'); ?></th>
+			<th><?php echo $this->translate('Status'); ?></th>
+			<th><?php echo $this->translate('Profile Type'); ?></th>
+			<th><?php echo $this->translate('Publisher ID'); ?></th>
+			<th><?php echo $this->translate('Credit Type'); ?></th>
+			<th><?php echo $this->translate('Creation Date'); ?></th>
+			<th><?php echo $this->translate('Last Updated Date'); ?></th>
+			<th><?php echo $this->translate('Action'); ?></th>
+		</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="8">
+				<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+
+		<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorProfile */ $vendorProfile): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $vendorProfile->id; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorProfileStatus', $vendorProfile->status); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorProfileType', $vendorProfile->profileType); ?></td>
+				<td><?php echo $vendorProfile->partnerId; ?></td>
+				<td><?php echo (is_null($vendorProfile->credit) ? "-" : $this->translate(get_class($vendorProfile->credit))); ?></td>
+				<td><?php echo date($this->translate('time format'), $vendorProfile->createdAt); ?></td>
+				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $vendorProfile->id;?>, <?php echo $vendorProfile->partnerId; ?>, <?php if(is_null($vendorProfile->credit)) echo "'Null'"; else echo "'" . get_class($vendorProfile->credit) . "'"; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="configureVendorProfile" ><?php echo $this->translate('Configure'); ?></option>
+						<?php if ($vendorProfile->status === Kaltura_Client_Reach_Enum_VendorProfileStatus::DISABLED): ?>
+							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
+						<?php elseif ($vendorProfile->status === Kaltura_Client_Reach_Enum_VendorProfileStatus::ACTIVE): ?>
+							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
+						<?php endif; ?>
+						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
+					</select>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	var epocToMonthsField= ['fromDate', 'toDate'];
+
+	jQuery('#filter_type').change(function() {
+		if(this.value == "none") {
+			$("#filter_text").css("display","none");
+		}
+		else {
+			$("#filter_text").css("display","inline");
+			$("#filter_text input").focus();
+			if(this.value == "free")
+				$("div.help").show();
+			else
+				$("div.help").hide();
+		}
+	});
+
+	jQuery('#filter_type').change();
+
+	function doAction(action, folderId) {
+		if (action && eval('typeof ' + action) == 'function')
+		{
+			f = eval(action);
+			Array.prototype.shift.apply(arguments);
+			f.apply(this, arguments);
+		}
+		jQuery('select.options').val('');
+	}
+
+	function enable(vendorProfileId, partnerId)
+	{
+		changeStatus(
+			vendorProfileId,
+
+			<?php echo Kaltura_Client_Reach_Enum_VendorProfileStatus::ACTIVE; ?>,
+			partnerId,
+			function() {
+				alert('<?php echo $this->translate('Vendor Profile enabled');?>');
+			}
+		);
+	}
+
+	function disable(vendorProfileId,partnerId)
+	{
+		changeStatus(
+			vendorProfileId,
+			<?php echo Kaltura_Client_Reach_Enum_VendorProfileStatus::DISABLED; ?>,
+			partnerId,
+			function() {
+				alert('<?php echo $this->translate('Vendor Profile disabled');?>');
+			}
+		);
+	}
+
+	function remove(vendorProfileId,partnerId)
+	{
+		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Vendor Profile ?'); ?>');
+		if (ok)
+		{
+			changeStatus(
+				vendorProfileId,
+				<?php echo Kaltura_Client_Reach_Enum_VendorProfileStatus::DELETED; ?>,
+				partnerId,
+				function() {
+					alert('<?php echo $this->translate('Vendor Profile removed');?>');
+				}
+			);
+		}
+	}
+
+	function changeStatus(vendorProfileId, status, partnerId, callback)
+	{
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'VendorProfileSetStatusAction', 'vendorProfileId' => 'VENDOROFILEID','partnerId' => 'PARTNERID', 'vendorProfileStatus' => 'STATUS')); ?>';
+		url = url.replace('STATUS', status);
+		url = url.replace('VENDOROFILEID', vendorProfileId);
+		url = url.replace('PARTNERID', partnerId);
+		jQuery.ajax({
+			url: url,
+			dataType: 'json',
+			success: function(result) {
+				if (result != 'ok')
+					this.error(result);
+				else
+				{
+					if (callback && (typeof callback == 'function'))
+					{
+						callback.apply(this);
+					}
+				}
+				jQuery('#frmPaginator1').submit();
+			},
+			error: function(result) {
+				alert(result);
+			}
+		});
+	}
+
+	function addVendorProfile(partnerId)
+	{
+		if(!partnerId.length || isNaN(partnerId)){
+			alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
+			return;
+		}
+
+		var paramsStr = '/creditHandlerClass/Null' + '/new_partner_id/' + partnerId;
+
+		loadVendorProfile(paramsStr);
+	}
+
+	function configureVendorProfile(vendorProfileId, partnerId, credit)
+	{
+		if(typeof vendorProfileId == 'undefined'){
+			alert('<?php echo $this->translate('Vendor Profile ID not supplied'); ?>');
+			return;
+		}
+
+		var vendorProfileIdStr = '/vendor_profile_id/' + vendorProfileId + '/creditHandlerClass/'+credit + '/new_partner_id/' + partnerId ;
+
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'VendorProfileConfigureAction')); ?>' + vendorProfileIdStr;
+
+		jQuery('#vendor-profile-configure-dialog').remove();
+		dialogDiv = jQuery('<div id="vendor-profile-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+
+		dialogDiv.dialog({
+			bgiframe: true,
+			modal: true,
+			resizable: false,
+			width: 600,
+			height: 600,
+			title: '<?php echo $this->translate('Vendor Profile'); ?>',
+			buttons: {
+				'<?php echo $this->translate('Save'); ?>': function() {
+					removeDisableTags();
+					convertDates();
+					loadArrayObjectsData();
+					jQuery(this).find('#frmVendorProfileConfigure').submit();
+				},
+				'<?php echo $this->translate('Close'); ?>': function() {
+					jQuery(this).dialog('close');
+				}
+			},
+			close: function() {
+				jQuery(this).dialog('destroy').remove();
+			}
+		});
+
+		dialogDiv.load(
+			url,
+			null,
+			function() {
+				addDisableTags();
+				jQuery(this).find('#frmVendorProfileConfigure').ajaxForm({
+					success: loadVendorProfileSuccess,
+					iframe: true
+				});
+			}
+		);
+	}
+
+	function removeDisableTags()
+	{
+		jQuery('#rule-fieldSet').removeAttr('disabled');
+	}
+
+	function addDisableTags()
+	{
+		jQuery('#rule-fieldSet').attr('disabled', 'disabled');
+	}
+
+	function loadVendorProfile(paramStr)
+	{
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'VendorProfileConfigureAction')); ?>' + paramStr;
+
+		jQuery('#vendor-profile-configure-dialog').remove();
+		dialogDiv = jQuery('<div id="vendor-profile-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+
+		dialogDiv.dialog({
+			bgiframe: true,
+			modal: true,
+			resizable: false,
+			width: 600,
+			height: 600,
+			title: '<?php echo $this->translate('Vendor Profile'); ?>',
+			buttons: {
+				'<?php echo $this->translate('Save'); ?>': function() {
+					jQuery('.ui-widget-overlay').css('z-index', 1003 );
+					jQuery('#loader').show();
+					loadArrayObjectsData();
+					convertDates();
+					jQuery(this).find('#frmVendorProfileConfigure').submit();
+				},
+				'<?php echo $this->translate('Close'); ?>': function() {
+					jQuery(this).dialog('close');
+				}
+			},
+			close: function() {
+				jQuery(this).dialog('destroy').remove();
+			}
+		});
+
+		dialogDiv.load(
+			url,
+			null,
+			function() {
+				jQuery(this).find('#frmVendorProfileConfigure').ajaxForm({
+					success: loadVendorProfileSuccess,
+					iframe: true
+				});
+			}
+		);
+	}
+
+	function loadArrayObjectsData() {
+		//remove all template field
+		$('fieldset[id^="vendorProfileRuleTemplate"]').remove();
+		setRuleData();
+	}
+    
+	function setRuleData() {
+		var rules = [];
+		var currentIndex = 0;
+		while (jQuery('#Rule_' + currentIndex.toString()).length > 0) {
+			rules.push(buildOutputParams('Rule_', currentIndex));
+			currentIndex++;
+		}
+		jQuery('#VendorProfileRules').val(JSON.stringify(rules));
+	}
+
+    function buildOutputParams(paramName, index) {
+        var param = {};
+        jQuery('#' + paramName + index).find('input,select').each(function(idx) {
+            var type = $( this ).attr("type");
+            var name = $( this ).attr("name");
+            var val = $( this ).val();
+            if (type == 'hidden')
+                return;
+            param[name] = val;
+            $(this).remove();
+        });
+        return param;
+    }
+
+	function loadVendorProfileSuccess(html) {
+		if (jQuery(html).filter('#frmVendorProfileConfigure').hasClass('valid'))
+		{
+			dialogDiv.dialog('close');
+			if (jQuery('#frmPaginator1').length){
+				jQuery('#frmPaginator1').submit();
+			}
+			else {
+				jQuery('#frmPartnerIdFilter').submit();
+			}
+		}
+		jQuery('.ui-widget-overlay').css('z-index', 1000 );
+		jQuery('#loader').hide();
+		jQuery('#frmVendorProfileConfigure').replaceWith(html);
+		jQuery('#frmVendorProfileConfigure').ajaxForm({
+			success: loadVendorProfileSuccess,
+			iframe: true
+		});
+	}
+
+	function convertDates()
+	{
+		var f = jQuery('#frmVendorProfileConfigure');
+		f.find( "input[innertype=DateElement]").each(function(idx) {
+			var val = $(this).val();
+			if (isDatesFormat(val)) {
+				$(this).val(getEpochTime(val));
+				return;
+			}
+			var id = this.id;
+			if (val != 'N/A' && epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
+				$(this).val(val * 2592000); // 60*60*24*30 - set relative in seconds from relative months
+		});
+	}
+
+	function isDatesFormat(val) {
+		return (val.split('.').length == 3 || val.split('/').length == 3);
+	}
+
+	function getEpochTime(val) {
+		var epoch = new Date(val).getTime() / 1000 + 3600*4; // + 4 hour for not slide a day backward in for time zones
+		if (epoch)
+			return epoch;
+		alert("Date is not valid.");
+		return null;
+	}
+	function checkNumValid(val) {
+		if (isDatesFormat(val)) {
+			if(isNaN(new Date(val).getTime()))
+				alert("Not a valid Date!");
+			return;
+		}
+		if (isNaN(val))
+			alert("Please enter a valid Date!");
+	}
+</script>

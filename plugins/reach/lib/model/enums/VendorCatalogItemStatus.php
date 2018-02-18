@@ -5,7 +5,7 @@
  */ 
 interface VendorCatalogItemStatus extends BaseEnum
 {
-	const DISABLED 	= 1;
-	const ACTIVE 	= 2;
-	const DELETED 	= 3;
+	const DEPRECATED = 1;
+	const ACTIVE 	 = 2;
+	const DELETED 	 = 3;
 }

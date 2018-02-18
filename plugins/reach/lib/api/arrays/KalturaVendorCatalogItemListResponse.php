@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.schedule
+ * @package plugins.reach
  * @subpackage api.objects
  */
 class KalturaVendorCatalogItemListResponse extends KalturaListResponse
 {
 	/**
-	 * @var KalturaVendroCatalogItemArray
+	 * @var KalturaVendorCatalogItemArray
 	 * @readonly
 	 */
 	public $objects;

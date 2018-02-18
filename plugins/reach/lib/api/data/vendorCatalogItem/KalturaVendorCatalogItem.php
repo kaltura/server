@@ -8,15 +8,9 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in,order
+	 * @filter eq,in,notin,order
 	 */
 	public $id;
-	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId;
 	
 	/**
 	 * @var int
@@ -56,12 +50,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public $status;
 	
 	/**
-	 * @var KalturaNullableBoolean
-	 * @filter eq
-	 */
-	public $isDefault;
-	
-	/**
 	 * @var KalturaVendorServiceType
 	 * @filter eq,in
 	 */
@@ -82,6 +70,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	
 	/**
 	 * @var KalturaVendorCatalogItemPricing
+	 * @requiresPermission read
 	 */
 	public $pricing;
 	
@@ -89,14 +78,12 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	private static $map_between_objects = array
 	(
 		'id',
-		'partnerId',
 		'vendorPartnerId',
 		'name',
 		'systemName',
 		'createdAt',
 		'updatedAt',
 		'status',
-		'isDefault',
 		'serviceType',
 		'serviceFeature',
 		'turnAroundTime',
@@ -164,8 +151,8 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		$vendorPartner = PartnerPeer::retrieveByPK($this->vendorPartnerId);
 		if(!$vendorPartner)
 			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PARTNER_ID_NOT_FOUND, $this->vendorPartnerId);
-	
-		if($vendorPartner->getType() != KalturaPartnerType::VENDOR)
+
+		if(!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, $this->vendorPartnerId))
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_NOT_VENDOR, $this->vendorPartnerId);
 	}
 	
@@ -199,7 +186,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				break;
 				
 		}
-		
+		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
 	}

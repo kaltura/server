@@ -26,7 +26,7 @@ abstract class BaseVendorCatalogItemPeer {
 	const TM_CLASS = 'VendorCatalogItemTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 13;
+	const NUM_COLUMNS = 14;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -46,14 +46,8 @@ abstract class BaseVendorCatalogItemPeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'vendor_catalog_item.UPDATED_AT';
 
-	/** the column name for the IS_DEFAULT field */
-	const IS_DEFAULT = 'vendor_catalog_item.IS_DEFAULT';
-
 	/** the column name for the STATUS field */
 	const STATUS = 'vendor_catalog_item.STATUS';
-
-	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'vendor_catalog_item.PARTNER_ID';
 
 	/** the column name for the VENDOR_PARTNER_ID field */
 	const VENDOR_PARTNER_ID = 'vendor_catalog_item.VENDOR_PARTNER_ID';
@@ -66,6 +60,15 @@ abstract class BaseVendorCatalogItemPeer {
 
 	/** the column name for the TURN_AROUND_TIME field */
 	const TURN_AROUND_TIME = 'vendor_catalog_item.TURN_AROUND_TIME';
+
+	/** the column name for the SOURCE_LANGUAGE field */
+	const SOURCE_LANGUAGE = 'vendor_catalog_item.SOURCE_LANGUAGE';
+
+	/** the column name for the TARGET_LANGUAGE field */
+	const TARGET_LANGUAGE = 'vendor_catalog_item.TARGET_LANGUAGE';
+
+	/** the column name for the OUTPUT_FORMAT field */
+	const OUTPUT_FORMAT = 'vendor_catalog_item.OUTPUT_FORMAT';
 
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'vendor_catalog_item.CUSTOM_DATA';
@@ -86,11 +89,11 @@ abstract class BaseVendorCatalogItemPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'SystemName', 'CreatedAt', 'UpdatedAt', 'IsDefault', 'Status', 'PartnerId', 'VendorPartnerId', 'ServiceType', 'ServiceFeature', 'TurnAroundTime', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'systemName', 'createdAt', 'updatedAt', 'isDefault', 'status', 'partnerId', 'vendorPartnerId', 'serviceType', 'serviceFeature', 'turnAroundTime', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::SYSTEM_NAME, self::CREATED_AT, self::UPDATED_AT, self::IS_DEFAULT, self::STATUS, self::PARTNER_ID, self::VENDOR_PARTNER_ID, self::SERVICE_TYPE, self::SERVICE_FEATURE, self::TURN_AROUND_TIME, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'system_name', 'created_at', 'updated_at', 'is_default', 'status', 'partner_id', 'vendor_partner_id', 'service_type', 'service_feature', 'turn_around_time', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'SystemName', 'CreatedAt', 'UpdatedAt', 'Status', 'VendorPartnerId', 'ServiceType', 'ServiceFeature', 'TurnAroundTime', 'SourceLanguage', 'TargetLanguage', 'OutputFormat', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'systemName', 'createdAt', 'updatedAt', 'status', 'vendorPartnerId', 'serviceType', 'serviceFeature', 'turnAroundTime', 'sourceLanguage', 'targetLanguage', 'outputFormat', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::SYSTEM_NAME, self::CREATED_AT, self::UPDATED_AT, self::STATUS, self::VENDOR_PARTNER_ID, self::SERVICE_TYPE, self::SERVICE_FEATURE, self::TURN_AROUND_TIME, self::SOURCE_LANGUAGE, self::TARGET_LANGUAGE, self::OUTPUT_FORMAT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'system_name', 'created_at', 'updated_at', 'status', 'vendor_partner_id', 'service_type', 'service_feature', 'turn_around_time', 'source_language', 'target_language', 'output_format', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -100,11 +103,11 @@ abstract class BaseVendorCatalogItemPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'SystemName' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'IsDefault' => 5, 'Status' => 6, 'PartnerId' => 7, 'VendorPartnerId' => 8, 'ServiceType' => 9, 'ServiceFeature' => 10, 'TurnAroundTime' => 11, 'CustomData' => 12, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'systemName' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'isDefault' => 5, 'status' => 6, 'partnerId' => 7, 'vendorPartnerId' => 8, 'serviceType' => 9, 'serviceFeature' => 10, 'turnAroundTime' => 11, 'customData' => 12, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::SYSTEM_NAME => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::IS_DEFAULT => 5, self::STATUS => 6, self::PARTNER_ID => 7, self::VENDOR_PARTNER_ID => 8, self::SERVICE_TYPE => 9, self::SERVICE_FEATURE => 10, self::TURN_AROUND_TIME => 11, self::CUSTOM_DATA => 12, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'system_name' => 2, 'created_at' => 3, 'updated_at' => 4, 'is_default' => 5, 'status' => 6, 'partner_id' => 7, 'vendor_partner_id' => 8, 'service_type' => 9, 'service_feature' => 10, 'turn_around_time' => 11, 'custom_data' => 12, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'SystemName' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'Status' => 5, 'VendorPartnerId' => 6, 'ServiceType' => 7, 'ServiceFeature' => 8, 'TurnAroundTime' => 9, 'SourceLanguage' => 10, 'TargetLanguage' => 11, 'OutputFormat' => 12, 'CustomData' => 13, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'systemName' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'status' => 5, 'vendorPartnerId' => 6, 'serviceType' => 7, 'serviceFeature' => 8, 'turnAroundTime' => 9, 'sourceLanguage' => 10, 'targetLanguage' => 11, 'outputFormat' => 12, 'customData' => 13, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::SYSTEM_NAME => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::STATUS => 5, self::VENDOR_PARTNER_ID => 6, self::SERVICE_TYPE => 7, self::SERVICE_FEATURE => 8, self::TURN_AROUND_TIME => 9, self::SOURCE_LANGUAGE => 10, self::TARGET_LANGUAGE => 11, self::OUTPUT_FORMAT => 12, self::CUSTOM_DATA => 13, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'system_name' => 2, 'created_at' => 3, 'updated_at' => 4, 'status' => 5, 'vendor_partner_id' => 6, 'service_type' => 7, 'service_feature' => 8, 'turn_around_time' => 9, 'source_language' => 10, 'target_language' => 11, 'output_format' => 12, 'custom_data' => 13, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -179,13 +182,14 @@ abstract class BaseVendorCatalogItemPeer {
 		$criteria->addSelectColumn(VendorCatalogItemPeer::SYSTEM_NAME);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::CREATED_AT);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::UPDATED_AT);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::IS_DEFAULT);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::STATUS);
-		$criteria->addSelectColumn(VendorCatalogItemPeer::PARTNER_ID);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::VENDOR_PARTNER_ID);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::SERVICE_TYPE);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::SERVICE_FEATURE);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::TURN_AROUND_TIME);
+		$criteria->addSelectColumn(VendorCatalogItemPeer::SOURCE_LANGUAGE);
+		$criteria->addSelectColumn(VendorCatalogItemPeer::TARGET_LANGUAGE);
+		$criteria->addSelectColumn(VendorCatalogItemPeer::OUTPUT_FORMAT);
 		$criteria->addSelectColumn(VendorCatalogItemPeer::CUSTOM_DATA);
 	}
 
@@ -470,65 +474,6 @@ abstract class BaseVendorCatalogItemPeer {
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
-		$criteriaFilter = self::getCriteriaFilter();
-		$criteria = $criteriaFilter->getFilter();
-		
-		if(!$privatePartnerData)
-		{
-			// the private partner data is not allowed - 
-			if($kalturaNetwork)
-			{
-				// allow only the kaltura netword stuff
-				if($partnerId)
-				{
-					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
-					myCriteria::addComment($criteria , "Only Kaltura Network");
-					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
-				}
-			}
-			else
-			{
-				// no private data and no kaltura_network - 
-				// add a criteria that will return nothing
-				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
-			}
-		}
-		else
-		{
-			// private data is allowed
-			if(!strlen(strval($partnerGroup)))
-			{
-				// the default case
-				$criteria->addAnd(self::PARTNER_ID, $partnerId);
-			}
-			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
-			{
-				// all is allowed - don't add anything to the criteria
-			}
-			else 
-			{
-				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
-				$partners = explode(',', trim($partnerGroup));
-				foreach($partners as &$p)
-					trim($p); // make sure there are not leading or trailing spaces
-
-				// add the partner_id to the partner_group
-				if (!in_array(strval($partnerId), $partners))
-					$partners[] = strval($partnerId);
-				
-				if(count($partners) == 1 && reset($partners) == $partnerId)
-				{
-					$criteria->addAnd(self::PARTNER_ID, $partnerId);
-				}
-				else 
-				{
-					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
-					$criteria->addAnd($criterion);
-				}
-			}
-		}
-			
-		$criteriaFilter->enable();
 	}
 	
 	/**
@@ -791,7 +736,7 @@ abstract class BaseVendorCatalogItemPeer {
 	{
 		try {
 
-			$omClass = $row[$colnum + 10];
+			$omClass = $row[$colnum + 8];
 			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 		} catch (Exception $e) {

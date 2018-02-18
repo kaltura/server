@@ -1,0 +1,176 @@
+<?php if($this->errMessage): ?>
+	<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+
+<style type="text/css">
+	#partner-catalog-item-configure-dialog { width:auto ; left: auto}
+	#partner-catalog-item-configure-dialog #kmcHeader{ display:none}
+	#partner-catalog-item-configure-dialog #sub-header{ display:none}
+	#partner-catalog-item-configure-dialog #frmPartnerIdFilter{ display:none}
+
+</style>
+
+<div id="partner_catalog_item_configure_div" align="center">
+	<form id ="frmPartnerCatalogItemInnerConfigure" onSubmit="return addPartnerCatalogItems();" method="post"  >
+		<td><input type="checkbox" name="selectAllItemsOnPageCheckbox" onchange="flipAllCheckboxesOnPage()" id="selectAllItemsInPage" align="left" />Select All Items On Page</td>
+		<?php if($this->vendorPartnerId != null): ?>
+			<td><input type="checkbox" name="selectAllItemsCheckbox" onchange="flipAllCheckboxes()" id="selectAllItems" align="left" />Select All Items</td>
+		<?php endif; ?>
+
+		<table>
+			<thead>
+			<tr>
+				<th>Select</th>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('System Name'); ?></th>
+				<th><?php echo $this->translate('Publisher ID'); ?></th>
+				<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
+				<th><?php echo $this->translate('Feature'); ?></th>
+				<th><?php echo $this->translate('Type'); ?></th>
+				<th><?php echo $this->translate('Turn Around Time'); ?></th>
+				<th><?php echo $this->translate('Source Language'); ?></th>
+				<th><?php echo $this->translate('Target Language'); ?></th>
+				<th><?php echo $this->translate('Output Format'); ?></th>
+			</tr>
+			</thead>
+			<tfoot>
+			<tr>
+				<td colspan="12">
+				</td>
+			</tr>
+			</tfoot>
+			<tbody>
+			<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */ $catalogItem): ?>
+				<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+					<td><input type="checkbox" name="catalogItemsCheckBoxes[]" id="$catalogItemsCheckBoxes-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>" <?php echo in_array($catalogItem->id, $values) ? 'checked="checked"':''; ?>/></td>
+					<td><?php echo $catalogItem->id; ?></td>
+					<td><?php echo $catalogItem->name; ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
+					<td><?php echo $catalogItem->systemName; ?></td>
+					<td><?php echo $catalogItem->vendorPartnerId; ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $catalogItem->serviceFeature); ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->sourceLanguage); ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage); ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
+				</tr>
+			<?php endforeach;?>
+			</tbody>
+		</table>
+	</form>
+
+	<div id="innerPaginator" align="center">
+		<?php echo $this->paginator; ?>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	try{
+		jQuery(function() {
+			<?php if ($this->formValid): ?>
+			dialogDiv.dialog('close');
+			jQuery('#frmPartnerCatalogItemConfigure').submit();
+			<?php endif; ?>
+		});
+	}
+	catch (e)
+	{
+
+	}
+
+	function flipAllCheckboxesOnPage()
+	{
+		var shouldSelectAll = $('input[name=selectAllItemsOnPageCheckbox]').prop('checked');
+		$('input[name=selectAllItemsCheckbox]').prop('checked',false);
+		$('input[type=checkbox]').each(function () {
+			if($( this ).attr("name") == 'catalogItemsCheckBoxes[]')
+				$(this).prop('checked', shouldSelectAll);
+		});
+	}
+
+	function flipAllCheckboxes()
+	{
+		var shouldSelectAll = $('input[name=selectAllItemsCheckbox]').prop('checked');
+		$('input[name=selectAllItemsOnPageCheckbox]').prop('checked',false);
+		$('input[type=checkbox]').each(function () {
+			if($( this ).attr("name") == 'catalogItemsCheckBoxes[]')
+				$(this).prop('checked', shouldSelectAll);
+		});
+	}
+
+	function addPartnerCatalogItems()
+	{
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>';
+		document.getElementById('frmPartnerCatalogItemInnerConfigure').action = url;
+		jQuery('#frmPartnerCatalogItemInnerConfigure').removeAttr('onsubmit').submit();
+	}
+
+	function loadPartnerCatalogItems()
+	{
+		var pageIndex = $('#frmPaginator2').find('input[name="page"]').val();
+		var pageSize = $('#frmPaginator2').find('select[name="pageSize"]').val();
+
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>' ;
+		url = url.replace(/\/page\/[0-9]+\//,'/page/' +pageIndex + '/');
+		url = url.replace(/\/pageSize\/[0-9]+/, '/pageSize/'+pageSize);
+
+		jQuery('#partner-catalog-item-configure-dialog').remove();
+		dialogDiv = jQuery('<div id="partner-catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+		dialogDiv.dialog({
+			bgiframe: true,
+			modal: true,
+			resizable: false,
+			width: 'auto',
+			height: 600,
+			title: '<?php echo $this->translate('Catalog Item'); ?>',
+			buttons: {
+				'<?php echo $this->translate('Save'); ?>': function() {
+					jQuery('.ui-widget-overlay').css('z-index', 1003 );
+					jQuery('#loader').show();
+					jQuery(this).find('#frmPartnerCatalogItemInnerConfigure').submit();
+				},
+				'<?php echo $this->translate('Close'); ?>': function() {
+					jQuery(this).dialog('close');
+				}
+			},
+			close: function() {
+				jQuery(this).dialog('destroy').remove();
+			}
+		});
+
+		dialogDiv.load(
+			url,
+			null,
+			function() {
+				jQuery(this).find('#frmPartnerCatalogItemInnerConfigure').ajaxForm({
+					success: loadInnerCatalogItemSuccess,
+					iframe: true
+				});
+
+			}
+		);
+	}
+
+	function loadInnerCatalogItemSuccess(html) {
+		if (jQuery(html).filter('#frmPartnerCatalogItemInnerConfigure').hasClass('valid'))
+		{
+			dialogDiv.dialog('close');
+			if (jQuery('#frmPaginator2').length){
+				jQuery('#frmPaginator2').submit();
+			}
+			else {
+				jQuery('#frmPartnerIdFilter').submit();
+			}
+		}
+		jQuery('.ui-widget-overlay').css('z-index', 1000 );
+		jQuery('#loader').hide();
+		jQuery('#frmPartnerCatalogItemInnerConfigure').replaceWith(html);
+		jQuery('#frmPartnerCatalogItemInnerConfigure').ajaxForm({
+			success: loadInnerCatalogItemSuccess,
+			iframe: true
+		});
+	}
+</script>

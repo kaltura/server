@@ -854,12 +854,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		$numberOfEntriesSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES, 'Number of videos allowed:');
 		$this->addLimitSubForm($numberOfEntriesSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES);
 
-		$reachCreditSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::REACH_CREDIT, 'REACH credit:',false);
-		$this->addLimitSubForm($reachCreditSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::REACH_CREDIT);
-
-		$reachOverchargeSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::REACH_OVERCHARGE, 'REACH overcharge:',false);
-		$this->addLimitSubForm($reachOverchargeSubForm , Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::REACH_OVERCHARGE);
-
 		$accessControlsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS, 'Maximum access control profiles:', false);
 		$this->addLimitSubForm($accessControlsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS);
 		
