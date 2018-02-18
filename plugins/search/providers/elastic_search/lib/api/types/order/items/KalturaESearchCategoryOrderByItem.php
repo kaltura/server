@@ -14,6 +14,11 @@ class KalturaESearchCategoryOrderByItem extends KalturaESearchOrderByItem
         'sortField',
     );
 
+    private static $map_field_enum = array(
+        KalturaESearchCategoryOrderByFieldName::UPDATED_AT => ESearchCategoryOrderByFieldName::UPDATED_AT,
+        KalturaESearchCategoryOrderByFieldName::CREATED_AT => ESearchCategoryOrderByFieldName::CREATED_AT,
+    );
+
     public function getMapBetweenObjects()
     {
         return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -25,4 +30,15 @@ class KalturaESearchCategoryOrderByItem extends KalturaESearchOrderByItem
             $object_to_fill = new ESearchCategoryOrderByItem();
         return parent::toObject($object_to_fill, $props_to_skip);
     }
+
+    public function getFieldEnumMap()
+    {
+        return self::$map_field_enum;
+    }
+
+    public function getItemFieldName()
+    {
+        return $this->sortField;
+    }
+
 }

@@ -72,4 +72,8 @@ class syndicationFeedPeer extends BasesyndicationFeedPeer
 			
 		return parent::OM_CLASS;
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("syndicationFeed:id=%s", self::ID));		
+	}
 }

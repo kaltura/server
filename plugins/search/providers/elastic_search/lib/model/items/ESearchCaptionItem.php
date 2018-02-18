@@ -7,21 +7,21 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 {
 
 	const INNER_HITS_CONFIG_KEY = 'captionInnerHitsSize';
-	const NESTED_QUERY_PATH = 'caption_assets.lines';
+	const NESTED_QUERY_PATH = 'caption_assets';
 	const HIGHLIGHT_CONFIG_KEY = 'captionMaxNumberOfFragments';
 
 	private static $allowed_search_types_for_field = array(
-		'caption_assets.lines.content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
-		'caption_assets.lines.start_time' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
-		'caption_assets.lines.end_time' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		ESearchCaptionFieldName::CONTENT => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
+		ESearchCaptionFieldName::START_TIME => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		ESearchCaptionFieldName::END_TIME => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 	);
 
 	private static $multiLanguageFields = array(
-		ESearchCaptionFieldName::CAPTION_CONTENT,
+		ESearchCaptionFieldName::CONTENT,
 	);
 
 	protected static $field_boost_values = array(
-		'caption_assets.lines.content' => 10,
+		ESearchCaptionFieldName::CONTENT => 10,
 	);
 
 	/**
@@ -71,43 +71,34 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		return array_merge(self::$allowed_search_types_for_field, parent::getAllowedSearchTypesForField());
 	}
 
-	/**
-	 * @param $eSearchItemsArr
-	 * @param $boolOperator
-	 * @param ESearchQueryAttributes $queryAttributes
-	 * @param null $eSearchOperatorType
-	 * @return array
-	 */
-	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
+	public function createSingleItemSearchQuery($boolOperator, &$captionBoolQuery, $allowedSearchTypes, &$queryAttributes)
 	{
-		return self::createNestedQueryForItems($eSearchItemsArr, $boolOperator, $queryAttributes);
-	}
-
-	public static function createSingleItemSearchQuery($eSearchCaptionItem, $boolOperator, &$captionBoolQuery, $allowedSearchTypes, &$queryAttributes)
-	{
-		$eSearchCaptionItem->validateItemInput();
-		switch ($eSearchCaptionItem->getItemType())
+		$this->validateItemInput();
+		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$query = kESearchQueryManager::getExactMatchQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$query = kESearchQueryManager::getPartialQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $queryAttributes);
+				$query = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$query = kESearchQueryManager::getPrefixQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$query = kESearchQueryManager::getExistsQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$query = kESearchQueryManager::getRangeQuery($eSearchCaptionItem, $eSearchCaptionItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$eSearchCaptionItem->getItemType()."]");
+				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
 
-		$captionBoolQuery->addByOperatorType($boolOperator, $query);
+		if($boolOperator == kESearchBoolQuery::MUST_KEY && !array_key_exists($this->getFieldName(), self::$field_boost_values))
+			$captionBoolQuery->addToFilter($query);
+		else
+			$captionBoolQuery->addByOperatorType($boolOperator, $query);
 	}
 
 	public function shouldAddLanguageSearch()
@@ -123,8 +114,9 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		return elasticSearchUtils::UNDERSCORE_FIELD_DELIMITER;
 	}
 
-	public function getNestedQueryName()
+	public function getNestedQueryName(&$queryAttributes)
 	{
-		return ESearchItemDataType::CAPTION.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME;
+		return ESearchItemDataType::CAPTION.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME.self::QUERY_NAME_DELIMITER.$queryAttributes->getNestedQueryNameIndex();
 	}
+
 }

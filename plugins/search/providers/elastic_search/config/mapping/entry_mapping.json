@@ -1,6 +1,6 @@
 {
   "settings" : {
-	"number_of_shards" : 6,
+	"number_of_shards" : 12,
 	"number_of_replicas" : 0,
 	"analysis": {
 	  "filter":{
@@ -18,8 +18,7 @@
 		},
 		"kaltura_english_synonym_filter": {
 		  "type": "synonym",
-		  "format": "wordnet",
-		  "synonyms_path": "analysis/wn_s.pl"
+		  "synonyms_path": "analysis/kaltura_synonyms.txt"
 		},
 		"kaltura_unique_token_filter": {
 		  "type": "unique",
@@ -31,6 +30,77 @@
 		  "type": "pattern_replace",
 		  "pattern": "(\\s+)",
 		  "replacement": " "
+		},
+		"kaltura_apostrophe_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>"
+		  ]
+		},
+		"kaltura_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"!=>__exclamationmark__",
+			"@=>__at__",
+			"#=>__number__",
+			"$=>__dollar__",
+			"%=>__percent__",
+			"^=>__caret__",
+			"&=>__ampersand__",
+			"*=>__asterisk__",
+			"(=>__openbracket__",
+			")=>__closebracket__",
+			"-=>__hyphen__",
+			"==>__equals__",
+			"+=>__plus__",
+			"?=>__questionmark__",
+			"/=>__slash__",
+			"\\\\=>__backslash__",
+			"[=>__openbracket1__",
+			"]=>__closebracket1__",
+			"{=>__openbracket2__",
+			"}=>__closebracket2__",
+			";=>__semicolon__",
+			"|=>__verticalbar__",
+			"<=>__lessthan__",
+			">=>__greaterthan__",
+			"~=>__tilde__"
+		  ]
+		},
+		"kaltura_remove_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>",
+			"!=>",
+			"@=>",
+			"#=>",
+			"$=>",
+			"%=>",
+			"^=>",
+			"&=>",
+			"*=>",
+			"(=>",
+			")=>",
+			"-=>",
+			"==>",
+			"+=>",
+			"?=>",
+			"/=>",
+			"\\\\=>",
+			"[=>",
+			"]=>",
+			"{=>",
+			"}=>",
+			";=>",
+			"|=>",
+			"<=>",
+			">=>",
+			"~=>"
+		  ]
 		}
 	  },
 	  "tokenizer": {
@@ -42,56 +112,74 @@
 			"letter",
 			"digit"
 		  ]
-		},
-		"kaltura_category_name_tokenizer" : {
-		  "type": "pattern",
-		  "pattern": ">"
+		}
+	  },
+	  "normalizer": {
+		"kaltura_keyword_normalizer": {
+		  "type": "custom",
+		  "char_filter": [
+			"kaltura_whitespace_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"icu_folding"
+		  ]
 		}
 	  },
 	  "analyzer": {
 		"kaltura_ngrams": {
 		  "type": "custom",
 		  "tokenizer": "kaltura_ngram_tokenizer",
-		  "filter": [
-			"lowercase"
-		  ]
-		},
-		"kaltura_keyword": {
-		  "type": "custom",
-		  "tokenizer": "keyword",
 		  "char_filter": [
-			"kaltura_whitespace_filter"
-			],
+			"kaltura_apostrophe_filter"
+		  ],
 		  "filter": [
 			"lowercase",
-			"trim",
-			"asciifolding"
+			"icu_folding"
 		  ]
 		},
 		"kaltura_text" : {
-		  "tokenizer" : "standard",
-		  "filter" : ["standard", "lowercase", "asciifolding"]
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "char_filter": [
+			"kaltura_apostrophe_filter",
+			"kaltura_special_chars_filter"
+		  ],
+		  "filter": [
+			"standard",
+			"lowercase",
+			"icu_folding"
+		  ]
+		},
+		"kaltura_text_partial_search" : {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "char_filter": [
+			"kaltura_apostrophe_filter"
+		  ],
+		  "filter": [
+			"standard",
+			"lowercase",
+			"icu_folding"
+		  ]
 		},
 		"kaltura_english_synonym": {
-		  "tokenizer":  "standard",
+		  "tokenizer":  "whitespace",
 		  "filter": [
-			"english_possessive_stemmer",
 			"lowercase",
 			"english_stop",
-			"english_stemmer",
 			"kaltura_english_synonym_filter",
 			"kaltura_unique_token_filter"
 		  ]
 		},
-		"kaltura_category_name_analyzer": {
-		  "tokenizer": "kaltura_category_name_tokenizer",
+		"kaltura_english_synonym_search": {
+		  "tokenizer":  "whitespace",
 		  "char_filter": [
-			"kaltura_whitespace_filter"
+			"kaltura_remove_special_chars_filter"
 		  ],
 		  "filter": [
 			"lowercase",
-			"trim",
-			"asciifolding"
+			"english_stop"
 		  ]
 		}
 	  }
@@ -115,11 +203,8 @@
 			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"keyword" : {
-			  "type" : "keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"english" : {
 			  "type" : "text",
@@ -128,7 +213,7 @@
 				"synonym": {
 				  "type": "text",
 				  "analyzer": "kaltura_english_synonym",
-				  "search_analyzer": "english"
+				  "search_analyzer": "kaltura_english_synonym_search"
 				}
 			  }
 			},
@@ -136,33 +221,13 @@
 			  "type" : "text",
 			  "analyzer": "arabic"
 			},
-			"armenian" : {
-			  "type" : "text",
-			  "analyzer" : "armenian"
-			},
-			"basque" : {
-			  "type" : "text",
-			  "analyzer" : "basque"
-			},
 			"brazilian" : {
 			  "type" : "text",
 			  "analyzer" : "brazilian"
 			},
-			"bulgarian" : {
-			  "type" : "text",
-			  "analyzer" : "bulgarian"
-			},
-			"catalan" : {
-			  "type" : "text",
-			  "analyzer" : "catalan"
-			},
 			"cjk" : {
 			  "type" : "text",
 			  "analyzer" : "cjk"
-			},
-			"czech" : {
-			  "type" : "text",
-			  "analyzer" : "czech"
 			},
 			"danish" : {
 			  "type" : "text",
@@ -180,10 +245,6 @@
 			  "type" : "text",
 			  "analyzer" : "french"
 			},
-			"galician" : {
-			  "type" : "text",
-			  "analyzer" : "galician"
-			},
 			"german" : {
 			  "type" : "text",
 			  "analyzer" : "german"
@@ -196,53 +257,25 @@
 			  "type" : "text",
 			  "analyzer" : "hindi"
 			},
-			"hungarian" : {
-			  "type" : "text",
-			  "analyzer" : "hungarian"
-			},
 			"indonesian" : {
 			  "type" : "text",
 			  "analyzer" : "indonesian"
-			},
-			"irish" : {
-			  "type" : "text",
-			  "analyzer" : "irish"
 			},
 			"italian" : {
 			  "type" : "text",
 			  "analyzer" : "italian"
 			},
-			"latvian" : {
-			  "type" : "text",
-			  "analyzer" : "latvian"
-			},
-			"lithuanian" : {
-			  "type" : "text",
-			  "analyzer" : "lithuanian"
-			},
 			"norwegian" : {
 			  "type" : "text",
 			  "analyzer" : "norwegian"
-			},
-			"persian" : {
-			  "type" : "text",
-			  "analyzer" : "persian"
 			},
 			"portuguese" : {
 			  "type" : "text",
 			  "analyzer" : "portuguese"
 			},
-			"romanian" : {
-			  "type" : "text",
-			  "analyzer" : "romanian"
-			},
 			"russian" : {
 			  "type" : "text",
 			  "analyzer" : "russian"
-			},
-			"sorani" : {
-			  "type" : "text",
-			  "analyzer" : "sorani"
 			},
 			"spanish" : {
 			  "type" : "text",
@@ -271,8 +304,8 @@
 			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"english" : {
 			  "type" : "text",
@@ -281,7 +314,7 @@
 				"synonym": {
 				  "type": "text",
 				  "analyzer": "kaltura_english_synonym",
-				  "search_analyzer": "english"
+				  "search_analyzer": "kaltura_english_synonym_search"
 				}
 			  }
 			},
@@ -289,33 +322,13 @@
 			  "type" : "text",
 			  "analyzer": "arabic"
 			},
-			"armenian" : {
-			  "type" : "text",
-			  "analyzer" : "armenian"
-			},
-			"basque" : {
-			  "type" : "text",
-			  "analyzer" : "basque"
-			},
 			"brazilian" : {
 			  "type" : "text",
 			  "analyzer" : "brazilian"
 			},
-			"bulgarian" : {
-			  "type" : "text",
-			  "analyzer" : "bulgarian"
-			},
-			"catalan" : {
-			  "type" : "text",
-			  "analyzer" : "catalan"
-			},
 			"cjk" : {
 			  "type" : "text",
 			  "analyzer" : "cjk"
-			},
-			"czech" : {
-			  "type" : "text",
-			  "analyzer" : "czech"
 			},
 			"danish" : {
 			  "type" : "text",
@@ -333,10 +346,6 @@
 			  "type" : "text",
 			  "analyzer" : "french"
 			},
-			"galician" : {
-			  "type" : "text",
-			  "analyzer" : "galician"
-			},
 			"german" : {
 			  "type" : "text",
 			  "analyzer" : "german"
@@ -349,53 +358,25 @@
 			  "type" : "text",
 			  "analyzer" : "hindi"
 			},
-			"hungarian" : {
-			  "type" : "text",
-			  "analyzer" : "hungarian"
-			},
 			"indonesian" : {
 			  "type" : "text",
 			  "analyzer" : "indonesian"
-			},
-			"irish" : {
-			  "type" : "text",
-			  "analyzer" : "irish"
 			},
 			"italian" : {
 			  "type" : "text",
 			  "analyzer" : "italian"
 			},
-			"latvian" : {
-			  "type" : "text",
-			  "analyzer" : "latvian"
-			},
-			"lithuanian" : {
-			  "type" : "text",
-			  "analyzer" : "lithuanian"
-			},
 			"norwegian" : {
 			  "type" : "text",
 			  "analyzer" : "norwegian"
-			},
-			"persian" : {
-			  "type" : "text",
-			  "analyzer" : "persian"
 			},
 			"portuguese" : {
 			  "type" : "text",
 			  "analyzer" : "portuguese"
 			},
-			"romanian" : {
-			  "type" : "text",
-			  "analyzer" : "romanian"
-			},
 			"russian" : {
 			  "type" : "text",
 			  "analyzer" : "russian"
-			},
-			"sorani" : {
-			  "type" : "text",
-			  "analyzer" : "sorani"
 			},
 			"spanish" : {
 			  "type" : "text",
@@ -416,70 +397,43 @@
 		  }
 		},
 		"partner_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"partner_status" : {
 		  "type" : "keyword"
 		},
 		"parent_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"status" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"entitled_kusers_edit" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"entitled_kusers_publish" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
-		},
-		"entitled_pusers_edit" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
-		},
-		"entitled_pusers_publish" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"kuser_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
-		},
-		"puser_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
-		},
-		"creator_puser_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"creator_kuser_id" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
-		"category_ids" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		"categories_ids" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
-		"categories" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword",
-		  "fields": {
-			"name" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_category_name_analyzer",
-			  "search_analyzer": "kaltura_keyword"
-			}
-		  }
-		},
-		"active_category_ids" : {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		"categories_names" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"tags" : {
 		  "type" : "text",
@@ -490,34 +444,52 @@
 			  "analyzer" : "kaltura_ngrams"
 			},
 			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
+		"users_name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+		  	"ngrams" : {
 			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			}
 		  }
 		},
 		"reference_id": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"conversion_profile_id": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"template_entry_id": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"display_in_search": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"media_type": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"source_type": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"external_source_type": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"length_in_msecs": {
 		  "type" : "long"
@@ -525,16 +497,23 @@
 		"views": {
 		  "type" : "long"
 		},
+		"plays": {
+		  "type" : "long"
+		},
 		"votes": {
 		  "type" : "long"
 		},
+		"last_played_at": {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
 		"recorded_entry_id": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"credit": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"start_date": {
 		  "type" : "date",
@@ -545,24 +524,27 @@
 		  "format": "epoch_second"
 		},
 		"site_url": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"admin_tags": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"push_publish": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"is_live": {
+		  "type" : "boolean"
 		},
 		"entry_type": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"moderation_status": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"created_at" : {
 		  "type" : "date",
@@ -577,250 +559,188 @@
 		  "format": "epoch_second"
 		},
 		"total_rank": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"access_control_id": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"group_id": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"partner_sort_value": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"redirect_entry_id": {
-		  "type" : "text",
-		  "analyzer" : "kaltura_keyword"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"is_quiz": {
+		  "type" : "boolean"
+		},
+		"root_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"parent_entry" : {
 		  "properties" : {
 			"entry_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"status" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"partner_id" :{
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"partner_status" :{
 			  "type" : "keyword"
 			},
 			"entitled_kusers_edit" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"entitled_kusers_publish" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"kuser_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"creator_kuser_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
-			"category_ids" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"active_category_ids" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			"categories_ids" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			}
 		  }
 		},
 		"caption_assets": {
 		  "type"  : "nested",
 		  "properties"  : {
-			"id": {
+			"content" : {
 			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"language" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"lines"  : {
-			  "type"  : "nested",
-			  "properties"  : {
-				"content" : {
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
 				  "type" : "text",
-				  "analyzer" : "kaltura_text",
-				  "fields": {
-					"ngrams" : {
-					  "type" : "text",
-					  "analyzer" : "kaltura_ngrams"
-					},
-					"raw" : {
-					  "type" : "text",
-					  "analyzer" : "kaltura_keyword"
-					}
-				  }
+				  "analyzer" : "kaltura_ngrams"
 				},
-				"content_english" : {
-				  "type" : "text",
-				  "analyzer": "english",
-				  "fields":{
-					"synonym" : {
-					  "type" : "text",
-					  "analyzer": "kaltura_english_synonym",
-					  "search_analyzer": "english"
-					}
-				  }
-				},
-				"content_arabic" : {
-				  "type" : "text",
-				  "analyzer": "arabic"
-				},
-				"content_armenian" : {
-				  "type" : "text",
-				  "analyzer" : "armenian"
-				},
-				"content_basque" : {
-				  "type" : "text",
-				  "analyzer" : "basque"
-				},
-				"content_brazilian" : {
-				  "type" : "text",
-				  "analyzer" : "brazilian"
-				},
-				"content_bulgarian" : {
-				  "type" : "text",
-				  "analyzer" : "bulgarian"
-				},
-				"content_catalan" : {
-				  "type" : "text",
-				  "analyzer" : "catalan"
-				},
-				"content_cjk" : {
-				  "type" : "text",
-				  "analyzer" : "cjk"
-				},
-				"content_czech" : {
-				  "type" : "text",
-				  "analyzer" : "czech"
-				},
-				"content_danish" : {
-				  "type" : "text",
-				  "analyzer" : "danish"
-				},
-				"content_dutch" : {
-				  "type" : "text",
-				  "analyzer" : "dutch"
-				},
-				"content_finnish" : {
-				  "type" : "text",
-				  "analyzer" : "finnish"
-				},
-				"content_french" : {
-				  "type" : "text",
-				  "analyzer" : "french"
-				},
-				"content_galician" : {
-				  "type" : "text",
-				  "analyzer" : "galician"
-				},
-				"content_german" : {
-				  "type" : "text",
-				  "analyzer" : "german"
-				},
-				"content_greek" : {
-				  "type" : "text",
-				  "analyzer" : "greek"
-				},
-				"content_hindi" : {
-				  "type" : "text",
-				  "analyzer" : "hindi"
-				},
-				"content_hungarian" : {
-				  "type" : "text",
-				  "analyzer" : "hungarian"
-				},
-				"content_indonesian" : {
-				  "type" : "text",
-				  "analyzer" : "indonesian"
-				},
-				"content_irish" : {
-				  "type" : "text",
-				  "analyzer" : "irish"
-				},
-				"content_italian" : {
-				  "type" : "text",
-				  "analyzer" : "italian"
-				},
-				"content_latvian" : {
-				  "type" : "text",
-				  "analyzer" : "latvian"
-				},
-				"content_lithuanian" : {
-				  "type" : "text",
-				  "analyzer" : "lithuanian"
-				},
-				"content_norwegian" : {
-				  "type" : "text",
-				  "analyzer" : "norwegian"
-				},
-				"content_persian" : {
-				  "type" : "text",
-				  "analyzer" : "persian"
-				},
-				"content_portuguese" : {
-				  "type" : "text",
-				  "analyzer" : "portuguese"
-				},
-				"content_romanian" : {
-				  "type" : "text",
-				  "analyzer" : "romanian"
-				},
-				"content_russian" : {
-				  "type" : "text",
-				  "analyzer" : "russian"
-				},
-				"content_sorani" : {
-				  "type" : "text",
-				  "analyzer" : "sorani"
-				},
-				"content_spanish" : {
-				  "type" : "text",
-				  "analyzer" : "spanish"
-				},
-				"content_swedish" : {
-				  "type" : "text",
-				  "analyzer" : "swedish"
-				},
-				"content_turkish" : {
-				  "type" : "text",
-				  "analyzer" : "turkish"
-				},
-				"content_thai" : {
-				  "type" : "text",
-				  "analyzer" : "thai"
-				},
-				"start_time"  : {
-				  "type" : "long"
-				},
-				"end_time"  : {
-				  "type" : "long"
-				},
-				"caption_asset_id": {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
-				},
-				"language" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
+			},
+			"content_english" : {
+			  "type" : "text",
+			  "analyzer": "english",
+			  "fields":{
+				"synonym" : {
+				  "type" : "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "kaltura_english_synonym_search"
+				}
+			  }
+			},
+			"content_arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"content_brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"content_cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"content_danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"content_dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"content_finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"content_french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"content_german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"content_greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"content_hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"content_indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"content_italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"content_norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"content_portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"content_russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"content_spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"content_swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"content_turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"content_thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
+			},
+			"start_time"  : {
+			  "type" : "long"
+			},
+			"end_time"  : {
+			  "type" : "long"
+			},
+			"caption_asset_id": {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"language" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"label" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			}
 		  }
 		},
@@ -828,28 +748,24 @@
 		  "type"  : "nested",
 		  "properties"  : {
 			"metadata_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"system_name" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"xpath" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"metadata_profile_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
-			},
-			"systemname_xpath_metadataprofileid" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"metadata_field_id" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"value_int": {
 			  "type": "long"
@@ -863,8 +779,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			}
@@ -874,12 +790,12 @@
 		  "type" : "nested",
 		  "properties"  : {
 			"cue_point_type" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"cue_point_id": {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
 			"cue_point_name" : {
 			  "type" : "text",
@@ -890,8 +806,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			},
@@ -904,8 +820,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			},
@@ -918,8 +834,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			},
@@ -930,10 +846,10 @@
 			  "type" : "long"
 			},
 			"cue_point_sub_type" : {
-			  "type" : "text",
-			  "analyzer" : "kaltura_keyword"
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
 			},
-			"cue_point_question" : { //for polls
+			"cue_point_question" : {
 			  "type" : "text",
 			  "analyzer" : "kaltura_text",
 			  "fields": {
@@ -942,8 +858,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			},
@@ -956,8 +872,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			},
@@ -970,8 +886,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			},
@@ -984,8 +900,8 @@
 				  "analyzer" : "kaltura_ngrams"
 				},
 				"raw" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				}
 			  }
 			},
@@ -993,28 +909,24 @@
 			  "type"  : "nested",
 			  "properties"  : {
 				"metadata_id" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				},
 				"system_name" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				},
 				"xpath" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				},
 				"metadata_profile_id" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
-				},
-				"systemname_xpath_metadataprofileid" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				},
 				"metadata_field_id" : {
-				  "type" : "text",
-				  "analyzer" : "kaltura_keyword"
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
 				},
 				"value_int": {
 				  "type": "long"
@@ -1028,13 +940,17 @@
 					  "analyzer" : "kaltura_ngrams"
 					},
 					"raw" : {
-					  "type" : "text",
-					  "analyzer" : "kaltura_keyword"
+					  "type" : "keyword",
+					  "normalizer" : "kaltura_keyword_normalizer"
 					}
 				  }
 				}
 			  }
-			}
+			},
+			"cue_point_asset_id": {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+            }
 		  }
 		}
 	  }

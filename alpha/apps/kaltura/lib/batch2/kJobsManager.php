@@ -1216,12 +1216,13 @@ class kJobsManager
 	 * @param FileSync $fileSync
 	 * @return BatchJob
 	 */
-	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $fileSync)
+	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $fileSync = null)
 	{
 		if (!self::shouldExeConvertJob($fileSync))
 		{
 			$entry->setStatus(entryStatus::ERROR_CONVERTING);
 			$entry->save();
+			myEntryUtils::addTrackEntryInfo($entry,"Source file for conversion is not supported");
 			return null;
 		}
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
@@ -1812,7 +1813,7 @@ class kJobsManager
 			KalturaLog::notice('No file-sync supplied for conversion');
 			return false;
 		}
- 		if (self::isTextFile($fileSync))
+ 		if (self::shouldBlockFileConversion($fileSync))
  		{
  			KalturaLog::notice('Source of type text will not be converted - FileSyncId [' . $fileSync->getId() . ']');
  			return false;
@@ -1824,14 +1825,32 @@ class kJobsManager
 	* @param FileSync $fileSync
 	* @return bool
 	*/
-	private static function isTextFile($fileSync)
+	private static function shouldBlockFileConversion($fileSync)
 	{
-		if(!$fileSync->isEncrypted())
-			return kFile::isFileTypeText($fileSync->getFullPath());
+		if($fileSync->isEncrypted())
+			$filePath = $fileSync->createTempClear();
+		else
+			$filePath = $fileSync->getFullPath();
+		$actualFileDescription = trim(kFile::getFileDescription($filePath));
+		$blackList = kconf::get('file_descriptions_black_list');
+		$shouldBlock = in_array($actualFileDescription,$blackList['fileDescriptions']);
+		if($fileSync->isEncrypted())
+			$fileSync->deleteTempClear();
+		return $shouldBlock;
+	}
 
-		$filePath = $fileSync->createTempClear();
-		$isFileTypeText = kFile::isFileTypeText($filePath);
-		$fileSync->deleteTempClear();
-		return $isFileTypeText;
+	public static function addUsersCsvJob($partnerId, baseObjectFilter $filter, $metadataProfileId, $additionalFields, $kuser)
+	{
+		$jobData = new kUsersCsvJobData();
+		$jobData->setFilter($filter);
+		$jobData->setMetadataProfileId($metadataProfileId);
+		$jobData->setAdditionalFields($additionalFields);
+		$jobData->setUserMail($kuser->getEmail());
+		$jobData->setUserName($kuser->getPuserId());
+
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+
+		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
 	}
 }

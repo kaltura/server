@@ -52,6 +52,31 @@ while($s = trim(fgets($f))){
 			$sphinxLog->setType(SphinxLogType::SPHINX);
 			$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
+			//update elastic via sphinx log
+			$params = array(
+				'index' => $entry->getElasticIndexName(),
+				'type' => $entry->getElasticObjectType(),
+				'id' => $entry->getElasticId(),
+				'action' => ElasticMethodType::UPDATE,
+				'body' => array(
+					'doc' => array(
+						'plays' => $entry->getPlays(),
+						'views' => $entry->getViews(),
+						'last_played_at' => $entry->getLastPlayedAt(null)
+					)
+				)
+			);
+
+			$elasticLog = new SphinxLog();
+			$command = serialize($params);
+			$elasticLog->setSql($command);
+			$elasticLog->setObjectId($entry->getId());
+			$elasticLog->setObjectType($entry->getElasticObjectName());
+			$elasticLog->setEntryId($entry->getId());
+			$elasticLog->setPartnerId($entry->getPartnerId());
+			$elasticLog->setType(SphinxLogType::ELASTIC);
+			$elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+
 		} catch (Exception $e) {
 			KalturaLog::log($e->getMessage(), Propel::LOG_ERR);
 

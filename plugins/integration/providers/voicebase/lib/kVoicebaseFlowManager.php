@@ -56,9 +56,12 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 					$transcript = $transcripts[$containerFormat];
 				}
 				
-				$transcript->setProviderType (VoicebasePlugin::getTranscriptProviderTypeCoreValue(VoicebaseTranscriptProviderType::VOICEBASE));
-				$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
-				$transcript->save();
+				if ($transcript->getContainerFormat() == AttachmentType::JSON || !$transcript->getHumanVerified())
+				{
+					$transcript->setProviderType (VoicebasePlugin::getTranscriptProviderTypeCoreValue(VoicebaseTranscriptProviderType::VOICEBASE));
+					$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
+					$transcript->save();
+				}
 			}
 
 			return true;
@@ -94,7 +97,17 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				{
 					/* @var $transcript TranscriptAsset */
 					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
-						$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+					{
+						if ($transcript->getHumanVerified())
+						{
+							$transcript->setStatus(KalturaAssetStatus::READY);
+							$transcript->save();
+						}
+						else
+						{
+							$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+						}
+					}
 					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
 					{
 						$tokenizedTranscript = $this->normalizeJson ($contentsArray["JSON"]);

@@ -37,6 +37,7 @@ class flavorParamsAction extends kalturaSystemAction
 			{
 				$newFalvorParams = $this->editFlavorParam->copy();
 				$newFalvorParams->setSourceAssetParamsIds($this->editFlavorParam->getSourceAssetParamsIds());
+				$newFalvorParams->setChunkedEncodeMode($this->editFlavorParam->getChunkedEncodeMode());
 				$newFalvorParams->setAspectRatioProcessingMode($this->editFlavorParam->getAspectRatioProcessingMode());
 				$newFalvorParams->setForceFrameToMultiplication16($this->editFlavorParam->getForceFrameToMultiplication16());
 				$newFalvorParams->setIsGopInSec($this->editFlavorParam->getIsGopInSec());
@@ -91,6 +92,7 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setSourceAssetParamsIds($this->getRequestParameter("sourceAssetParamsIds"));
 						$this->editFlavorParam->setFormat($this->getRequestParameter("format"));
 						$this->editFlavorParam->setTwoPass($this->getRequestParameter("two-pass", false));
+						$this->editFlavorParam->setChunkedEncodeMode($this->getRequestParameter("chunkedEncodeMode",0));
 						$this->editFlavorParam->setRotate($this->getRequestParameter("rotate", false));
 						$this->editFlavorParam->setAspectRatioProcessingMode($this->getRequestParameter("aspectRatioProcessingMode",0));
 						$this->editFlavorParam->setIsGopInSec($this->getRequestParameter("isGopInSec",0));

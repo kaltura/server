@@ -23,8 +23,14 @@ class KAsyncImport extends KJobHandlerWorker
 	static $downloadedSoFar;
 	const  IMPORT_TIMEOUT=120;
 	const  HEADERS_TIMEOUT=30;
-	public static function  progressWatchDog($resource,$download_size, $downloaded, $upload_size, $uploaded)
+	static $currentResource;
+
+	public static function  progressWatchDog($resource,$download_size, $downloaded, $upload_size)
 	{
+		if (version_compare(PHP_VERSION, '5.5.0') < 0) {
+			$downloaded = $download_size;
+			$resource =  self::$currentResource;
+		}
 		if(self::$downloadedSoFar < $downloaded)
 		{
 			$time = time() - self::$startTime + self::IMPORT_TIMEOUT;
@@ -58,23 +64,28 @@ class KAsyncImport extends KJobHandlerWorker
 	}
 
 	/* Will download $sourceUrl to $localPath and will monitor progress with watchDog*/
-	private function curlExec($sourceUrl,$localPath)
+	private function curlExec($sourceUrl,$localPath,$resumeOffset=0)
 	{
-		self::$startTime		= time();
+		self::$startTime			= time();
 		self::$downloadedSoFar		= 0;
-		$progressCallBack		= null;
-		$curlWrapper			= new KCurlWrapper(self::$taskConfig->params);
-		$protocol			= $curlWrapper->getSourceUrlProtocol($sourceUrl);
-		if($protocol			== KCurlWrapper::HTTP_PROTOCOL_HTTP)
+		$progressCallBack			= null;
+		$curlWrapper				= new KCurlWrapper(self::$taskConfig->params);
+		self::$currentResource  	= $curlWrapper->ch;
+		if($resumeOffset)
+			$curlWrapper->setResumeOffset($resumeOffset);
+		$protocol					= $curlWrapper->getSourceUrlProtocol($sourceUrl);
+		if($protocol				== KCurlWrapper::HTTP_PROTOCOL_HTTP)
 		{
 			$curlWrapper->setTimeout(self::IMPORT_TIMEOUT);
-			$progressCallBack 	= array('KAsyncImport', 'progressWatchDog');
+			$progressCallBack 		= array('KAsyncImport', 'progressWatchDog');
 		}
-		$res				= $curlWrapper->exec($sourceUrl, $localPath,$progressCallBack);
-		$responseStatusCode		= $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+		$res 						= $curlWrapper->exec($sourceUrl, $localPath,$progressCallBack);
+		$responseStatusCode			= $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+		$errorMessage				= $curlWrapper->getError();
+		$errorNumber				= $curlWrapper->getErrorNumber();
 		$curlWrapper->close();
-		KalturaLog::debug("Curl results: [$res] responseStatusCode [$responseStatusCode]");
-		return array($res,$responseStatusCode);
+		KalturaLog::debug("Curl results: [$res] responseStatusCode [$responseStatusCode] error [$errorMessage] error number [$errorNumber]");
+		return array($res,$responseStatusCode,$errorMessage,$errorNumber);
 	}
 
 	/*
@@ -91,8 +102,8 @@ class KAsyncImport extends KJobHandlerWorker
 
 		if (in_array($jobSubType, $sshProtocols))
 		{
-		    // use SSH file transfer manager for SFTP/SCP
-            return $this->fetchFileSsh($job, $data);
+			// use SSH file transfer manager for SFTP/SCP
+			return $this->fetchFileSsh($job, $data);
 		}
 
 		try
@@ -105,45 +116,51 @@ class KAsyncImport extends KJobHandlerWorker
 			$contentType = null;
 			if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
 			{
-    			$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-    			$useNoBody = ($job->executionAttempts > 1); // if the process crashed first time, tries with no body instead of range 0-0
-    			$curlWrapper->setTimeout(self::HEADERS_TIMEOUT);
-    			$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, $useNoBody);
-    			$curlWrapper->close();
-    			if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
-    			{
-    				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), "Couldn't read file. Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::FAILED);
-    				return $job;
-    			}
+				$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+				$useNoBody = ($job->executionAttempts > 1); // if the process crashed first time, tries with no body instead of range 0-0
+				$curlWrapper->setTimeout(self::HEADERS_TIMEOUT);
+				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, $useNoBody);
 
-    			if($curlWrapper->getError())
-    			{
-    				KalturaLog::err("Headers error: " . $curlWrapper->getError());
-    				KalturaLog::err("Headers error number: " . $curlWrapper->getErrorNumber());
-    			}
-    			if(!$curlHeaderResponse->isGoodCode())
-    			{
-    				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED);
-    				return $job;
-    			}
+				$curlErrorMessage = $curlWrapper->getError();
+				$curlErrorNumber = $curlWrapper->getErrorNumber();
+				$curlWrapper->close();
+
+				if($curlErrorNumber)
+				{
+					KalturaLog::err("Headers error: " . $curlErrorMessage);
+					KalturaLog::err("Headers error number: " . $curlErrorNumber);
+				}
+
+				if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
+				{
+					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, "Couldn't read file. Error: " .$curlErrorMessage, KalturaBatchJobStatus::FAILED);
+					return $job;
+				}
+
+				if(!$curlHeaderResponse->isGoodCode())
+				{
+					$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED);
+					return $job;
+				}
 				if(isset($curlHeaderResponse->headers['content-type']))
 					$contentType = $curlHeaderResponse->headers['content-type'];
 				if(isset($curlHeaderResponse->headers['content-length']))
 					$fileSize = $curlHeaderResponse->headers['content-length'];
 
-    			if( $fileSize )
-    			{
-    				clearstatcache();
-    				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
-    				if($actualFileSize >= $fileSize)
-    				{
-    					return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
-    				}
-    				else
-    				{
-    					$resumeOffset = $actualFileSize;
-    				}
-    			}
+				if( $fileSize )
+				{
+					clearstatcache();
+					$actualFileSize = kFile::fileSize($data->destFileLocalPath);
+					if($actualFileSize >= $fileSize)
+					{
+						$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
+						return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+					}
+					else
+					{
+						$resumeOffset = $actualFileSize;
+					}
+				}
 			}
 
 			$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
@@ -153,12 +170,12 @@ class KAsyncImport extends KJobHandlerWorker
 				$curlWrapper->setTimeout(self::HEADERS_TIMEOUT);
 				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
 				if(isset($curlHeaderResponse->headers['content-type']))
-	                               	$contentType = $curlHeaderResponse->headers['content-type'];
+					$contentType = $curlHeaderResponse->headers['content-type'];
 
 				if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
 					$fileSize = $curlHeaderResponse->headers['content-length'];
-				
-				//Close the curl used to fetch the header and create a new one. 
+
+				//Close the curl used to fetch the header and create a new one.
 				//When fetching headers we set curl options that than are not reset once header is fetched. 
 				//Not all servers support all the options so we need to remove them from our headers.
 				$curlWrapper->close();
@@ -166,19 +183,19 @@ class KAsyncImport extends KJobHandlerWorker
 
 			if($resumeOffset)
 			{
-				$curlWrapper->setResumeOffset($resumeOffset);
+				$this->updateJob($job, "Resuming download, from ".$resumeOffset ." size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 			else
 			{
 				// creates a temp file path
-				$destFile = $this->getTempFilePath($sourceUrl);
-				KalturaLog::debug("destFile [$destFile]");
-				$data->destFileLocalPath = $destFile;
+				$data->destFileLocalPath = $this->getTempFilePath($sourceUrl);;
+				KalturaLog::debug("destFile [$data->destFileLocalPath]");
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 
-			list($res,$responseStatusCode) = $this->curlExec($sourceUrl, $data->destFileLocalPath);
+			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->curlExec($sourceUrl, $data->destFileLocalPath,$resumeOffset);
+
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{
 				if(!$resumeOffset && file_exists($data->destFileLocalPath))
@@ -187,26 +204,41 @@ class KAsyncImport extends KJobHandlerWorker
 				return $job;
 			}
 			
-			if(!$res || $curlWrapper->getError())
+			if(!$res || $errNumber)
 			{
-				$errNumber = $curlWrapper->getErrorNumber();
+				clearstatcache();
+				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
+				KalturaLog::debug("errNumber: $errNumber ,Actual file size: $actualFileSize ,Expected file size: $fileSize, Resume offset :$resumeOffset");
+				if($errNumber == CURLE_PARTIAL_FILE)
+				{
+					if( $actualFileSize >= $fileSize)
+					{
+						$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
+						return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+					}
+					else
+					{
+						$percent = floor($actualFileSize/$fileSize*100);
+						$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
+						$e->setResetJobExecutionAttempts(true);
+						throw $e;
+					}
+				}
 				if($errNumber != CURLE_OPERATION_TIMEOUTED)
 				{
-					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
+					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Error: " . $errorMessage , KalturaBatchJobStatus::RETRY);
 					return $job;
 				}
 				else
 				{
-					clearstatcache();
-					$actualFileSize = kFile::fileSize($data->destFileLocalPath);
 					if($actualFileSize == $resumeOffset)
 					{
-						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "No new information. Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
+						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "No new information. Error: " . $errorMessage, KalturaBatchJobStatus::RETRY);
 						return $job;
 					}
 					if(!$fileSize)
 					{
-						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Received timeout, but no filesize available. Completed size [$actualFileSize]" . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
+						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Received timeout, but no filesize available. Completed size [$actualFileSize]" . $errorMessage, KalturaBatchJobStatus::RETRY);
 						return $job;
 					}
 				}
@@ -230,9 +262,8 @@ class KAsyncImport extends KJobHandlerWorker
 				if($actualFileSize < $fileSize && $shouldCheckFileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
-					$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
-					$e->setResetJobExecutionAttempts(true);
-					throw $e;
+					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "DDownloaded size: $actualFileSize($percent%) " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
+					return job;
 				}
 				
 				KalturaLog::info("headers " . print_r($curlHeaderResponse, true));
@@ -249,7 +280,6 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		catch(kTemporaryException $tex)
 		{
-			$data->destFileLocalPath = KalturaClient::getKalturaNullValue();
 			$tex->setData($data);
 			throw $tex;
 		}

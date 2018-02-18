@@ -493,7 +493,7 @@ class KCurlWrapper
 	/**
 	 * @param string $sourceUrl
 	 * @param string $destFile
-	 * @param function pointer
+	 * @param function $progressCallBack
 	 * @return boolean
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
@@ -524,6 +524,7 @@ class KCurlWrapper
 		return $ret;
 	}
 
+
 	public function getSourceUrlProtocol($sourceUrl)
 	{
 		$protocol = null;
@@ -551,6 +552,7 @@ class KCurlWrapper
 	}
 
 
+	
 	public function setSourceUrlAndprotocol($sourceUrl)
 	{
 		$sourceUrl = trim($sourceUrl);
@@ -561,20 +563,20 @@ class KCurlWrapper
 			{
 				if ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
 					$this->protocol = self::HTTP_PROTOCOL_FTP;
-
+					
 				if ( in_array ($url_parts["scheme"], array ('http', 'https')) && isset ($url_parts['user']) )
 				{
 					curl_setopt ($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 				}
 			}
-
+			
 		}
 		catch ( Exception $exception )
 		{
 			throw new Exception($exception->getMessage());
 		}
 		KalturaLog::info("Setting source URL to [$sourceUrl]");
-
+		
 		$sourceUrl = self::encodeUrl($sourceUrl);
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 	}

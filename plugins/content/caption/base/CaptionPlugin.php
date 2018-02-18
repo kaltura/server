@@ -515,6 +515,11 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					return array();
 				$captionLanguages = array();
 
+				$useThreeCodeLang = false;
+				if (kConf::hasParam('three_code_language_partners') &&
+					in_array($entry->getPartnerId(), kConf::get('three_code_language_partners')))
+					$useThreeCodeLang = true;
+
 				foreach ($captionAssets as $captionAsset)
 				{
 					if (($entry->getType() == entryType::PLAYLIST) && (in_array($captionAsset->getLanguage(), $captionLanguages)))
@@ -571,7 +576,19 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$captionAssetObj['label'] = $label;
 					$captionAssetObj['default'] = $captionAsset->getDefault() ? "YES" : "NO";
 					if (isset(self::$captionsFormatMap[$captionAsset->getLanguage()]))
-						$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
+					{
+						$threeCodeLang = self::$captionsFormatMap[$captionAsset->getLanguage()];
+						if ($useThreeCodeLang)
+							$captionAssetObj['language'] = $threeCodeLang;
+						else
+						{
+							$twoCodeLang =  languageCodeManager::getTwoCodeLowerFromThreeCode($threeCodeLang);
+							if($twoCodeLang)
+								$captionAssetObj['language'] = $twoCodeLang;
+							else
+								$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
+						}
+					}
 
 					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
 					$contributor->captions[] = $captionAssetObj;

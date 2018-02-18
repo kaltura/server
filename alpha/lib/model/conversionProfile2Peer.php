@@ -52,7 +52,7 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 	}
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("conversionProfile2:partnerId=%s", self::PARTNER_ID));		
+		return array(array("conversionProfile2:id=%s", self::ID), array("conversionProfile2:partnerId=%s", self::PARTNER_ID));		
 	}
 	
 	public static function retrieveByPartnerIdAndSystemName ($partnerId, $systemName, $type)

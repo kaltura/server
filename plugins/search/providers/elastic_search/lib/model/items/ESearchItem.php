@@ -21,6 +21,11 @@ abstract class ESearchItem extends BaseObject
 	protected $range;
 
 	/**
+	 * @var bool
+	 */
+	protected $addHighlight;
+
+	/**
 	 * @return ESearchItemType
 	 */
 	public function getItemType()
@@ -52,6 +57,22 @@ abstract class ESearchItem extends BaseObject
 		$this->range = $range;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getAddHighlight()
+	{
+		return $this->addHighlight;
+	}
+
+	/**
+	 * @param boolean $addHighlight
+	 */
+	public function setAddHighlight($addHighlight)
+	{
+		$this->addHighlight = $addHighlight;
+	}
+
 	protected function validateAllowedSearchTypes($allowedSearchTypes, $fieldName)
 	{
 		if (!in_array($this->getItemType(),  $allowedSearchTypes[$fieldName]))
@@ -65,13 +86,21 @@ abstract class ESearchItem extends BaseObject
 
 	protected function validateEmptySearchTerm($fieldName, $searchTerm)
 	{
-		if (empty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE, ESearchItemType::EXISTS)))
+		if ($this->isSearchTermEmpty($searchTerm) && !in_array($this->getItemType(), array(ESearchItemType::RANGE, ESearchItemType::EXISTS)))
 		{
 			$data = array();
 			$data['itemType'] = $this->getItemType();
 			$data['fieldName'] = $fieldName;
 			throw new kESearchException('Empty search term is not allowed on Field ['. $fieldName.'] and search type ['.$this->getItemType().']', kESearchException::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data);
 		}
+	}
+
+	private function isSearchTermEmpty($searchTerm)
+	{
+		if(is_null($searchTerm) || $searchTerm == '')
+			return true;
+
+		return false;
 	}
 
 	protected function validateItemInput()
@@ -98,26 +127,13 @@ abstract class ESearchItem extends BaseObject
 	 */
 	public static function getFieldBoostFactor($fieldName)
 	{
-		$result = 1;
+		$result = kESearchQueryManager::DEFAULT_BOOST_FACTOR;
 		if(array_key_exists($fieldName, static::$field_boost_values))
 		{
 			$result = static::$field_boost_values[$fieldName];
 		}
 
 		return $result;
-	}
-
-	protected static function initializeInnerHitsSize($queryAttributes)
-	{
-		$overrideInnerHitsSize = $queryAttributes->getOverrideInnerHitsSize();
-		if($overrideInnerHitsSize)
-			return $overrideInnerHitsSize;
-
-		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-		$innerHitsConfigKey = static::INNER_HITS_CONFIG_KEY;
-		$innerHitsSize = isset($innerHitsConfig[$innerHitsConfigKey]) ? $innerHitsConfig[$innerHitsConfigKey] : static::DEFAULT_INNER_HITS_SIZE;
-
-		return $innerHitsSize;
 	}
 
 }

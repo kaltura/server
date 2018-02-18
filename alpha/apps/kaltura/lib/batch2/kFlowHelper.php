@@ -16,6 +16,10 @@ class kFlowHelper
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
 	const LIVE_REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
+
+	const SERVE_CSV_PARTIAL_URL = "/api_v3/index.php/service/user/action/serveCsv/ks/";
+
+
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -395,7 +399,7 @@ class kFlowHelper
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset, $liveSegmentCount)
+	public static function getReplacingEntry($recordedEntry, $asset = null, $liveSegmentCount, $flavorParamsId = null)
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -415,7 +419,8 @@ class kFlowHelper
 					}
 					else 
 					{
-						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+						$flavorParamsId = $asset ? $asset->getFlavorParamsId() : $flavorParamsId;
+						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $flavorParamsId);
 						if($replacingAsset)
 						{
 							KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
@@ -2882,4 +2887,75 @@ class kFlowHelper
 		else 
 			return false;
 	}
+
+	public static function handleUsersCsvFinished(BatchJob $dbBatchJob, kUsersCsvJobData $data)
+	{
+		// Move file from shared temp to it's final location
+		$fileName =  basename($data->getOutputPath());
+		$directory =  myContentStorage::getFSContentRootPath() . "/content/userscsv/" . $dbBatchJob->getPartnerId() ;
+		if(!file_exists($directory))
+			mkdir($directory);
+		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+
+		if(!$data->getOutputPath())
+			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
+
+		KalturaLog::info("Trying to move users csv file from: " . $data->getOutputPath() . " to: " . $filePath);
+		try
+		{
+			kFile::moveFile($data->getOutputPath(), $filePath);
+		}
+		catch (Exception $e)
+		{
+			throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
+		}
+
+
+		$data->setOutputPath($filePath);
+		$dbBatchJob->setData($data);
+		$dbBatchJob->save();
+
+		KalturaLog::info("file path: [$filePath]");
+
+		$downloadUrl = self::createUsersCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
+		$userName = $data->getUserName();
+		$bodyParams = array($userName, $downloadUrl);
+
+		//send the created csv by mail
+		kJobsManager::addMailJob(
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			MailType::MAIL_TYPE_USERS_CSV,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get("partner_notification_email"),
+			kConf::get("partner_notification_name"),
+			$data->getUserMail(),
+			$bodyParams
+		);
+
+		return $dbBatchJob;
+	}
+
+
+	protected static function createUsersCsvDownloadUrl ($partner_id, $file_name)
+	{
+		$ksStr = "";
+		$partner = PartnerPeer::retrieveByPK ($partner_id);
+		$secret = $partner->getSecret ();
+		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+		//ks will expire after 3 hours
+		$expiry = 10800;
+		$result = kSessionUtils::startKSession($partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege);
+
+		if ($result < 0)
+			throw new APIException(APIErrors::START_SESSION_ERROR, $partner);
+
+		//url is built with DC url in order to be directed to the same DC of the saved file
+		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+
+		return $url;
+	}
+
+
 }

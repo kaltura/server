@@ -13,6 +13,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	//File sync Insert limitation consts
 	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
 
+	/**
+	 * Contain all object types and sub types that should not be synced
+	 * @var array
+	 */
+	static protected $excludedSyncFileFromDcSynchronization = null;
+
 	protected static $uncachedObjectTypes = array(
 		FileSyncObjectType::ASSET,				// should not cache conversion logs since they can change (batch.logConversion)
 		);
@@ -864,6 +870,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @param boolean $fetch_from_remote_if_no_local
 	 * @param boolean $strict  - will throw exception if not found
+	 * @param boolean $resolve  - will resolve the file sync
 	 * @return array
 	 */
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
@@ -1090,22 +1097,25 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		else
 		{
-			$otherDCs = kDataCenterMgr::getAllDcs( );
-			foreach ( $otherDCs as $remoteDC )
+			if (self::shouldSyncFileObjectType($currentDCFileSync))
 			{
-				$remoteDCFileSync = FileSync::createForFileSyncKey( $key );
-				$remoteDCFileSync->setDc( $remoteDC["id"] );
-				$remoteDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
-				$remoteDCFileSync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
-				$remoteDCFileSync->setOriginal ( 0 );
-				$remoteDCFileSync->setPartnerID ( $key->partner_id );
-				$remoteDCFileSync->setIsDir($isDir);
-				$remoteDCFileSync->setFileSize($currentDCFileSync->getFileSize());
-				$remoteDCFileSync->setOriginalId($currentDCFileSync->getId());
-				$remoteDCFileSync->setOriginalDc($currentDCFileSync->getDc());
-				$remoteDCFileSync->save();
+				$otherDCs = kDataCenterMgr::getAllDcs( );
+				foreach ( $otherDCs as $remoteDC )
+				{
+					$remoteDCFileSync = FileSync::createForFileSyncKey( $key );
+					$remoteDCFileSync->setDc( $remoteDC["id"] );
+					$remoteDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
+					$remoteDCFileSync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
+					$remoteDCFileSync->setOriginal ( 0 );
+					$remoteDCFileSync->setPartnerId ( $key->partner_id );
+					$remoteDCFileSync->setIsDir($isDir);
+					$remoteDCFileSync->setFileSize($currentDCFileSync->getFileSize());
+					$remoteDCFileSync->setOriginalId($currentDCFileSync->getId());
+					$remoteDCFileSync->setOriginalDc($currentDCFileSync->getDc());
+					$remoteDCFileSync->save();
 
-				kEventsManager::raiseEvent(new kObjectAddedEvent($remoteDCFileSync));
+					kEventsManager::raiseEvent(new kObjectAddedEvent($remoteDCFileSync));
+				}
 			}
 			kEventsManager::raiseEvent(new kObjectAddedEvent($currentDCFileSync));
 		}
@@ -1585,19 +1595,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c->add ( FileSyncPeer::OBJECT_TYPE , $newFileSync->getObjectType() );
 			$c->add ( FileSyncPeer::OBJECT_SUB_TYPE , $newFileSync->getObjectSubType() );
 			$c->add ( FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_PURGED, FileSync::FILE_SYNC_STATUS_DELETED), Criteria::NOT_IN);
-			$c->setLimit(40); //we limit the number of files to delete in one run so there will be no out of memory issues
+			$c->addAnd ( FileSyncPeer::VERSION, $intVersion - $keepCount, Criteria::LESS_THAN);
+			//Get oldest 5 version's (10 is the jump offset between versions)
+			//we limit the number of files to delete in one run so there will be no out of memory issues
+			$c->addAnd ( FileSyncPeer::VERSION, $intVersion - $keepCount - (5*10), Criteria::GREATER_EQUAL);
+			$c->addAscendingOrderByColumn(FileSyncPeer::VERSION);
 			$fileSyncs = FileSyncPeer::doSelect($c);
 			foreach ($fileSyncs as $fileSync)
 			{
-				if(is_numeric($fileSync->getVersion()))
-				{
-					$currentIntVersion = intval($fileSync->getVersion());
-					if($intVersion - $keepCount > $currentIntVersion)
-					{
-						$key = kFileSyncUtils::getKeyForFileSync($fileSync);
-						self::deleteSyncFileForKey($key);
-					}
-				}
+				$key = kFileSyncUtils::getKeyForFileSync($fileSync);
+				self::deleteSyncFileForKey($key);
 			}
 		}
 	}
@@ -1630,7 +1637,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$resolveFileSync = self::resolve($fileSync);
 		$path = $resolveFileSync->getFullPath();
 		KalturaLog::info("Resolve path [$path]");
-		kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv());
+		kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSync->getFileSize());
 	}
 
 	public static function dumpFileByFileSyncKey( FileSyncKey $key , $strict = false )
@@ -1652,5 +1659,58 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSync = self::getLocalFileSyncForKey($key);
 		return self::resolve($fileSync);
 	}
+
+	/**
+	 * Check if specific file sync that belong to object type and sub type should be synced
+	 *
+	 * @param FileSync $fileSync
+	 * @return bool
+	 */
+	public static function shouldSyncFileObjectType($fileSync)
+	{
+		if(is_null(self::$excludedSyncFileFromDcSynchronization))
+		{
+			self::$excludedSyncFileFromDcSynchronization = array();
+			$dcConfig = kConf::getMap("dc_config");
+			if(isset($dcConfig['sync_exclude_types']))
+			{
+				foreach($dcConfig['sync_exclude_types'] as $syncExcludeType)
+				{
+					$configObjectType = $syncExcludeType;
+					$configObjectSubType = null;
+
+					if(strpos($syncExcludeType, ':') > 0)
+						list($configObjectType, $configObjectSubType) = explode(':', $syncExcludeType, 2);
+
+					// translate api dynamic enum, such as contentDistribution.EntryDistribution - {plugin name}.{object name}
+					if(!is_numeric($configObjectType))
+						$configObjectType = kPluginableEnumsManager::apiToCore('FileSyncObjectType', $configObjectType);
+
+					// translate api dynamic enum, including the enum type, such as conversionEngineType.mp4box.Mp4box - {enum class name}.{plugin name}.{object name}
+					if(!is_null($configObjectSubType) && !is_numeric($configObjectSubType))
+					{
+						list($enumType, $configObjectSubType) = explode('.', $configObjectSubType);
+						$configObjectSubType = kPluginableEnumsManager::apiToCore($enumType, $configObjectSubType);
+					}
+
+					if(!isset(self::$excludedSyncFileFromDcSynchronization[$configObjectType]))
+						self::$excludedSyncFileFromDcSynchronization[$configObjectType] = array();
+
+					if(!is_null($configObjectSubType))
+						self::$excludedSyncFileFromDcSynchronization[$configObjectType][] = $configObjectSubType;
+				}
+			}
+		}
+
+		if(!isset(self::$excludedSyncFileFromDcSynchronization[$fileSync->getObjectType()]))
+			return true;
+
+		if(count(self::$excludedSyncFileFromDcSynchronization[$fileSync->getObjectType()]) &&
+			!in_array($fileSync->getObjectSubType(), self::$excludedSyncFileFromDcSynchronization[$fileSync->getObjectType()]))
+			return true;
+
+		return false;
+	}
+
 
 }

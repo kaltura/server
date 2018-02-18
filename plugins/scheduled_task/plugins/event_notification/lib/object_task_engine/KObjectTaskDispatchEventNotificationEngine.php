@@ -22,17 +22,6 @@ class KObjectTaskDispatchEventNotificationEngine extends KObjectTaskEntryEngineB
 		$scope = new KalturaEventNotificationScope();
 		$scope->objectId =$object->id;
 		$scope->scopeObjectType = KalturaEventNotificationEventObjectType::ENTRY;
-		$this->impersonate($object->partnerId);
-		try
-		{
-			$eventNotificationPlugin->eventNotificationTemplate->dispatch($templateId, $scope);
-			$this->unimpersonate();
-		}
-		catch(Exception $ex)
-		{
-			$this->unimpersonate();
-			throw $ex;
-		}
-
+		$eventNotificationPlugin->eventNotificationTemplate->dispatch($templateId, $scope);
 	}
 }

@@ -9,6 +9,9 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     const CACHE_PREFIX = 'executed_elastic_cluster_';
     const MAX_LENGTH = 32766;
     const MAX_CUE_POINTS = 5000;
+    const MAX_SQL_LENGTH = 131072;// 128 * 1024
+    const CACHE_PREFIX_STICKY_SESSIONS = 'elastic_large_sql_lock_';
+    const REPETITIVE_UPDATES_CONFIG_KEY = 'skip_elastic_repetitive_updates';
 
     /**
      * @param BaseObject $object
@@ -53,13 +56,44 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if(kConf::get('disableElastic', 'elastic', true))
             return true;
 
-        KalturaLog::debug('Saving to elastic for object [' . get_class($object) . '] [' . $object->getId() . ']');
+        $skipSave = $this->checkRepetitiveUpdates($object);
+        if($skipSave)
+            return true;
+
         $cmd = $this->getElasticSaveParams($object, $params);
 
         if(!$cmd)
             return true;
 
         return $this->execElastic($cmd, $object, $object->getElasticSaveMethod());
+    }
+
+    private function checkRepetitiveUpdates($object)
+    {
+        $className = get_class($object);
+        $objectId = $object->getId();
+
+        // track repetitive updates of the same object (e.g. adding many annotations which cause updates of the entry)
+        // once hitting a threshold, we will avoid more than one update per minute
+        // threshold is defined by kConf parameter skip_elastic_repetitive_updates using lowercase of {className}_{service}_{action}={threshold}
+        $saveCounter = 0;
+        $cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+        if ($cache)
+        {
+            $cacheKey = "ELSSave:$className:$objectId";
+            $cache->add($cacheKey, 0, 60);
+            $saveCounter = $cache->increment($cacheKey);
+        }
+
+        $updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+        $skipElasticRepetitiveUpdates = kConf::get(self::REPETITIVE_UPDATES_CONFIG_KEY, 'local', array());
+        $skipSave = isset($skipElasticRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipElasticRepetitiveUpdates[$updatesKey];
+        KalturaLog::debug("Saving to elastic for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
+
+        if ($skipSave)
+            return true;
+
+        return false;
     }
 
     public function getElasticSaveParams($object, $params)
@@ -93,7 +127,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 $dataContributionPath = array_merge($dataContributionPath, $elasticPluginData);
             }
         }
-        
+
+        elasticSearchUtils::prepareForInsertToElastic($cmd);
         return $cmd;
     }
 
@@ -136,16 +171,36 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     private function saveToSphinxLog($object, $params)
     {
-        $elasticLog = new SphinxLog();
         $command = serialize($params);
+        $skipSave = $this->shouldSkipSaveToSphinxLog($object, $command);
+        if($skipSave)
+            return;
+
+        $elasticLog = new SphinxLog();
         $elasticLog->setSql($command);
         $elasticLog->setExecutedServerId($this->retrieveElasticClusterId());
         $elasticLog->setObjectId($object->getId());
         $elasticLog->setObjectType($object->getElasticObjectName());
-        //$elasticLog->setEntryId($object->getEntryId());
+        $elasticLog->setEntryId($object->getElasticEntryId());
         $elasticLog->setPartnerId($object->getPartnerId());
         $elasticLog->setType(SphinxLogType::ELASTIC);
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+    }
+
+    private function shouldSkipSaveToSphinxLog($object, &$command)
+    {
+        // limit the number of large SQLs to 1/min per object, since they load the sphinx log database and elastic servers
+        if (strlen($command) > self::MAX_SQL_LENGTH)
+        {
+            $lockKey = self::CACHE_PREFIX_STICKY_SESSIONS . $object->getElasticObjectName() . '_' . $object->getId();
+            $cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_STICKY_SESSIONS);
+            if ($cache && !$cache->add($lockKey, true, 60))
+            {
+                KalturaLog::log('skipping saving elastic sphinxLog sql for key ' . $lockKey);
+                return true;
+            }
+        }
+        return false;
     }
 
     private function retrieveElasticClusterId()

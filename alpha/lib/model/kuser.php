@@ -1133,7 +1133,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("kuser:id=".strtolower($this->getId()), "kuser:partnerId=".strtolower($this->getPartnerId()).",puserid=".strtolower($this->getPuserId()));
+		return array("kuser:id=".strtolower($this->getId()), "kuser:partnerId=".strtolower($this->getPartnerId()).",puserid=".strtolower($this->getPuserId()), "kuser:loginDataId=".strtolower($this->getLoginDataId()));
 	}
 	
 	/* (non-PHPdoc)
@@ -1366,4 +1366,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return 'kuser';
 	}
+
+	public function getElasticEntryId()
+	{
+		return null;
+	}
+
 }

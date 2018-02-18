@@ -3,13 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchParams extends KalturaObject
+abstract class KalturaESearchParams extends KalturaObject
 {
-	/**
-	 * @var KalturaESearchOperator
-	 */
-	public $searchOperator;
-
 	/**
 	 * @var string
 	 */
@@ -25,18 +20,11 @@ class KalturaESearchParams extends KalturaObject
 	 */
 	public $orderBy;
 
-	/**
-	 * @var bool
-	 */
-	public $useHighlight;
-
 	private static $mapBetweenObjects = array
 	(
-		"searchOperator",
 		"objectStatuses",
 		"objectId",
 		"orderBy",
-		"useHighlight",
 	);
 
 	public function getMapBetweenObjects()

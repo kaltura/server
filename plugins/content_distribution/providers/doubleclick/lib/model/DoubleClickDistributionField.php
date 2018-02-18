@@ -21,4 +21,8 @@ interface DoubleClickDistributionField extends BaseEnum
 	const LIKE_COUNT				= 'LIKE_COUNT';
 	const DISLIKE_COUNT				= 'DISLIKE_COUNT';
 	const DFP_METADATA 				= 'DFP_METADATA';
+	const LAST_MODIFIED_DATE		= 'LAST_MODIFIED_DATE';
+	const LAST_MEDIA_MODIFIED_DATE	= 'LAST_MEDIA_MODIFIED_DATE';
+	const STATUS					= 'STATUS';
+	const FW_CAID					= 'FW_CAID';
 }

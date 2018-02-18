@@ -26,8 +26,6 @@ class KObjectTaskDistributeEngine extends KObjectTaskEntryEngineBase
 
 		$client = $this->getClient();
 		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get($client);
-
-		$this->impersonate($object->partnerId);
 		$distributionProfile = $contentDistributionPlugin->distributionProfile->get($distributionProfileId);
 
 		if ($distributionProfile->submitEnabled == KalturaDistributionProfileActionStatus::DISABLED)
@@ -93,8 +91,6 @@ class KObjectTaskDistributeEngine extends KObjectTaskEntryEngineBase
 		{
 			$contentDistributionPlugin->entryDistribution->submitAdd($entryDistribution->id, true);
 		}
-
-		$this->unimpersonate();
 	}
 
 	protected function getEntryDistribution($entryId, $distributionProfileId)

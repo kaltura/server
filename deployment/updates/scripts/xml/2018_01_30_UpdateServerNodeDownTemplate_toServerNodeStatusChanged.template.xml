@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <!-- Server-Node is down -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Server_Node_Down</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Server Node Status Changed</name>
+                <systemName>SERVER_NODE_STATUS_CHANGE</systemName>
+                <description>Email notification template to be sent when a server node status is changed.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>39</eventObjectType> <!-- EventNotificationEventObjectType::SERVER_NODE -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Server Node status changed </description>
+                        <modifiedColumns>server_node.STATUS</modifiedColumns>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>Server Node ID: {server_node_hostname} Status Changed </subject>
+                <body><![CDATA[Hello,<p>Server node {server_node_hostname} status has changed to {server_node_status}.</p>]]></body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Sender email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Sender name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>server_node_hostname</key>
+                        <description>Server-Node hostname</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getHostName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>server_node_status</key>
+                        <description>Server-Node status</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($scope->getObject()->getStatus() == ServerNodeStatus::ACTIVE) ? 'Active' : (($scope->getObject()->getStatus() == ServerNodeStatus::DISABLED)?'Disabled' : (($scope->getObject()->getStatus() == ServerNodeStatus::NOT_REGISTERED)?'Not Registered': 'Deleted'))</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <userParameters objectType="array">
+                </userParameters>
+            </template>
+        </request>
+    </multirequest>
+</xml>

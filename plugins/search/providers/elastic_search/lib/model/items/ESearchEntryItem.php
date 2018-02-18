@@ -21,7 +21,6 @@ class ESearchEntryItem extends ESearchItem
 		'name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
 		'description' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 		'tags' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
-		'category_ids' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS),
 		'kuser_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
 		'creator_kuser_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
 		'start_date' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS),
@@ -42,13 +41,15 @@ class ESearchEntryItem extends ESearchItem
 		'updated_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 		'moderation_status' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'entry_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
-		'categories' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
 		'admin_tags' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'credit' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'site_url' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		'access_control_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
-		'categories.name' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, ESearchUnifiedItem::UNIFIED),
 		'external_source_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
+		'is_quiz' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
+		'is_live' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
+		'user_names' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
+		'root_id' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 	);
 
 	protected static $field_boost_values = array(
@@ -64,8 +65,13 @@ class ESearchEntryItem extends ESearchItem
 	);
 
 	private static $multiLanguageFields = array(
-		ESearchEntryFieldName::ENTRY_NAME,
-		ESearchEntryFieldName::ENTRY_DESCRIPTION,
+		ESearchEntryFieldName::NAME,
+		ESearchEntryFieldName::DESCRIPTION,
+	);
+
+	private static $ignoreDisplayInSearchFields = array(
+		ESearchEntryFieldName::PARENT_ENTRY_ID,
+		ESearchEntryFieldName::ID,
 	);
 
 	/**
@@ -116,38 +122,50 @@ class ESearchEntryItem extends ESearchItem
 	{
 		$entryQuery = array();
 		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
-		$queryAttributes->setScopeToGlobal();
+		$queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $entrySearchItem)
 		{
-			self::getSingleItemSearchQuery($entrySearchItem, $entryQuery, $allowedSearchTypes, $queryAttributes);
+			$entrySearchItem->getSingleItemSearchQuery($entryQuery, $allowedSearchTypes, $queryAttributes);
 		}
 
 		return $entryQuery;
 	}
 
-	public static function getSingleItemSearchQuery($entrySearchItem, &$entryQuery, $allowedSearchTypes, &$queryAttributes)
+	/**
+	 * @param $entryQuery
+	 * @param $allowedSearchTypes
+	 * @param $queryAttributes
+	 */
+	public function getSingleItemSearchQuery(&$entryQuery, $allowedSearchTypes, &$queryAttributes)
 	{
-		$entrySearchItem->validateItemInput();
-		switch ($entrySearchItem->getItemType())
+		$this->validateItemInput();
+		$subQuery = null;
+		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$entryQuery[] = kESearchQueryManager::getExactMatchQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
-				$entryQuery[] = kESearchQueryManager::getPartialQuery($entrySearchItem, $entrySearchItem->getFieldName(), $queryAttributes);
+				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$entryQuery[] = kESearchQueryManager::getPrefixQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$entryQuery[] = kESearchQueryManager::getExistsQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$entryQuery[] = kESearchQueryManager::getRangeQuery($entrySearchItem, $entrySearchItem->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$entrySearchItem->getItemType()."]");
+				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
 		}
+
+		if ($this->getItemType() == ESearchItemType::EXACT_MATCH && in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
+			$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
+
+		if($subQuery)
+			$entryQuery[] = $subQuery;
 	}
 
 	public function shouldAddLanguageSearch()

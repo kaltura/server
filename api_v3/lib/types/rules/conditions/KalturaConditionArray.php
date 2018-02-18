@@ -60,6 +60,8 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaValidateActiveEdgeCondition();
 			case ConditionType::ANONYMOUS_IP:
 				return new KalturaAnonymousIPCondition();
+			case ConditionType::ASSET_TYPE:
+				return new KalturaAssetTypeCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}

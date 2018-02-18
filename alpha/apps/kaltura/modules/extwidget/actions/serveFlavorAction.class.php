@@ -668,10 +668,8 @@ class serveFlavorAction extends kalturaAction
 					$langString = CaptionPlugin::$captionsFormatMap[$langString];
 				$currSequence = array('clips' => $captionClips, 'language' => $langString);
 				if (isset($captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL]))
-				{
 					$currSequence['label'] = $captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_LABEL];
-					$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $mainEntry->getId());
-				}
+				$currSequence['id'] = $this->getServeUrlForFlavor($captionFiles[$labelEntryId][$captionLang][myPlaylistUtils::CAPTION_FILES_ID], $mainEntry->getId());
 				$sequences[] = $currSequence;
 			}
 		}

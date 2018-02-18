@@ -44,7 +44,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_TYPE);
 		
 		$objectIds = $this->validateObjectIdFiltered();
-		if(!count($objectIds) && $this->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT && $this->partnerNotInExcludeList())
+		if(!count($objectIds) && $this->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT && $this->shouldBlockEmptyObjectIdsFiltering())
 		{
 			$response = new KalturaMetadataListResponse();
 			$response->objects = new KalturaMetadataArray();
@@ -88,11 +88,12 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		$objectIds = $this->getObjectIdsFiltered();
 		
 		if(($this->metadataObjectTypeEqual == MetadataObjectType::ENTRY || kEntitlementUtils::getEntitlementEnforcement()) && 
-			empty($objectIds) && $this->partnerNotInExcludeList())
+			empty($objectIds) && $this->shouldBlockEmptyObjectIdsFiltering())
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 		
 		if ($this->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
+			$objectIds = array_map('strtolower', $objectIds);
 			$objectIds = !empty($objectIds) ? entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId()) : array();
 		}
 		elseif($this->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
@@ -113,11 +114,24 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		return $objectIds;
 	}
 	
-	private function partnerNotInExcludeList()
+	private function shouldBlockEmptyObjectIdsFiltering()
 	{
-		return kConf::hasParam('metadata_list_without_object_filtering_partners') &&
-			!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
-				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID;
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+			return false;
+		
+		$metadataListNoFilterExcludePartners = kConf::get('metadata_list_without_object_filtering_partners', 'local', array());
+		if(!array_key_exists(kCurrentContext::getCurrentPartnerId(), $metadataListNoFilterExcludePartners))
+			return true;
+		
+		$allowedFilterTypes = $metadataListNoFilterExcludePartners[kCurrentContext::getCurrentPartnerId()];
+		if($allowedFilterTypes == "")
+			return false;
+		
+		$allowedFilterTypesArray = explode(",", $allowedFilterTypes);
+		if(!in_array($this->metadataObjectTypeEqual, $allowedFilterTypesArray))
+			return true;
+		
+		return false;
 	}
 	
 	public function getObjectIdsFiltered()

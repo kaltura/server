@@ -88,6 +88,6 @@ class Form_DoubleClickProfileConfiguration extends Form_ConfigurableProfileConfi
 		if (!$url)
 			return 'Feed URL will be generated once the feed is saved';
 		else
-			return '<a href="'.$url.'" target="_blank">Feed URL</a> <a href="'.$url.'&period=86400" target="_blank">Last 24 Hours Feed URL</a>';
+			return '<a href="'.$url.'&version=1" target="_blank">Feed URL</a> <a href="'.$url.'&period=86400&version=1" target="_blank">Last 24 Hours Feed URL</a> <a href="'.$url.'" target="_blank">24 Hour Feed (v2)</a>';
 	}
 }

@@ -212,7 +212,10 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
 		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
 
-		return categoryKuserPeer::doSelect($criteria, $con);
+		self::setUseCriteriaFilter(false);
+		$categoryKusers = categoryKuserPeer::doSelect($criteria, $con);
+		self::setUseCriteriaFilter(true);
+		return $categoryKusers;
 	}
 	
 	
@@ -234,6 +237,6 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("categoryKuser:categoryId=%s", self::CATEGORY_ID));		
+		return array(array("categoryKuser:id=%s", self::ID), array("categoryKuser:categoryId=%s", self::CATEGORY_ID));		
 	}
 } // categoryKuserPeer

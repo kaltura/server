@@ -42,7 +42,7 @@
 		/********************
 		 * Initialize the chunked encode session
 		 */
-		public function Initialize()
+		public function Initialize(&$msgStr)
 		{
 			KalturaLog::log(date("Y-m-d H:i:s"));
 			
@@ -58,32 +58,34 @@
 				KalturaLog::log($msgStr="ERROR: missing essential - source");
 				return false;
 			}
+				// Get source mediaData. Required for 'supported' validation
+			$this->sourceFileDt = $this->getMediaData($params->source);
+
+				/*
+				 * Evaluate session duration 
+				 */
+			if($this->setup->duration==-1) {
+				$params->duration = round($this->sourceFileDt->containerDuration/1000,4);
+			}
+			else $params->duration = $this->setup->duration;
 			
 			if(isset($setup->fps)){
 				$params->fps = $setup->fps;
 			}
-			else if(!isset($params->fps)){
-				KalturaLog::log($msgStr="ERROR: missing essential - fps");
-				return false;
-			}
-
 			if(isset($setup->gop)){
 				$params->gop = round($setup->gop*$params->fps);
 			}
-			else if(!isset($params->gop)){
-				KalturaLog::log($msgStr="ERROR: missing essential - gop");
-				return false;
-			}
-			
-				// Get source mediaData. Required for 'supported' validation
-			$this->sourceFileDt = $this->getMediaData($this->params->source);
-				/*
-				 * Check for supported codecs/formats
-				 */
-			if($this->verifySupport($msgStr)!=true){
+
+			if(self::verifySupport($params->vcodec, $params->acodec, $params->format, $params->fps, $params->gop, $params->duration, $params->height, $msgStr)!=true){
 				KalturaLog::log($msgStr);
 				return false;
 			}
+			
+			if(($key=array_search("-vsync", $params->cmdLineArr))!==false && $params->cmdLineArr[$key+1]!=1) {
+				KalturaLog::log($msgStr="UNSUPPORTED: vsync param (".($params->cmdLineArr[$key+1])."), should be 1 (cfr)");
+				return false;
+			}
+
 				/*
 				 * Adjust the thread number to ouput frame size 
 				 * -  SD - dec:7, enc:4
@@ -122,7 +124,7 @@
 			$this->buildTemplateVideoCommandLine();
 
 				/*
-				 * Setup work folders
+				 * Setup work folders 
 				 */
 			$pInfo = pathinfo($params->output);
 			$setup->output = realpath($pInfo['dirname'])."/".$pInfo['basename'];
@@ -137,19 +139,6 @@
 			}
 			
 			KalturaLog::log("data:".print_r($this,1));
-
-				/*
-				 * Evaluate session duration 
-				 */
-			$duration = $this->setup->duration;
-			if($duration==-1) {
-				$duration = round($this->sourceFileDt->containerDuration/1000,4);
-			}
-/**/		if($duration<180){
-				KalturaLog::log($msgStr="ERROR: too short duration ($duration), must be at least 180sec");
-				return false;
-			}
-			$params->duration = $duration;
 
 				/*
 				 * Evaluate various defaults
@@ -252,37 +241,67 @@
 		/********************
 		 * Check for supported codecs/formats, conditions
 		 */
-		protected function verifySupport(&$msgStr)
-		{
-			$params = $this->params;
-			if(!in_array($params->vcodec, array("libx264","libx265"))){
-				KalturaLog::log($msgStr="UNSUPPORTED: video codec ($params->vcodec)");
+		static public function verifySupport($vcodec, $acodec=null, $format, $fps, $gop, $duration, $height, &$msgStr){
+			KalturaLog::log("vcodec($vcodec), acodec($acodec), format($format), fps($fps), gop($gop), duration($duration), height($height)");
+
+
+			if(!in_array($vcodec, array("libx264","libx265","h264","h264b","h264m","h264h","h265"))){
+				KalturaLog::log($msgStr="UNSUPPORTED: video codec ($vcodec)");
 				return false;
 			}
 
-			if(isset($params->acodec) && strstr($params->acodec, "aac")===false) {
-				KalturaLog::log($msgStr="UNSUPPORTED: audio codec ($params->acodec)");
+			if(isset($acodec) && strstr($acodec, "aac")===false) {
+				KalturaLog::log($msgStr="UNSUPPORTED: audio codec ($acodec)");
 				return false;
 			}
 			
-			if(!in_array($params->format, array("mp4","mov","ismv"))){
-				KalturaLog::log($msgStr="UNSUPPORTED: media file format ($params->format)");
+			if(!in_array($format, array("mp4","mov","ismv"))){
+				KalturaLog::log($msgStr="UNSUPPORTED: media file format ($format)");
 				return false;
 			}
-/*			
-			if(abs(1-($this->sourceFileDt->videoFrameRate/$params->fps))>0.1){
-				KalturaLog::log($msgStr="UNSUPPORTED: incompatible frame-rates (source:".$this->sourceFileDt->videoFrameRate.",target:$params->fps). Allowed variance up to 10%.");
+			
+			if(!isset($fps) || $fps==0){
+				KalturaLog::log($msgStr="UNSUPPORTED: missing essential - fps");
 				return false;
 			}
-*/			
+
+			if(!isset($gop) || $gop==0){
+				KalturaLog::log($msgStr="UNSUPPORTED: missing essential - gop");
+				return false;
+			}
 				/*
 				 * WV session fail with chunked encoding. Detect chunks by very large GOP value
 					***** Disable this check, WV related flavors can disable chunks via conv-prof 
-			if($params->gop>100){
-				KalturaLog::log($msgStr="UNSUPPORTED: WV conversion detected (large GOP=$params->gop). Currently chunked encoding does not work with WV.");
+			if($gop>100){
+				KalturaLog::log($msgStr="UNSUPPORTED: WV conversion detected (large GOP=$gop). Currently chunked encoding does not work with WV.");
 				return false;
 			}*/
 
+			
+				/*
+				 * Evaluate session duration 
+				 */
+			if(isset($height)) {
+				if($height>480) {
+					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*2) 
+						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*2)."sec");
+				}
+				else if($height>360) {
+					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*4)
+						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*4)."sec");
+				}
+				else {
+					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*6)
+						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*6)."sec");
+				}
+				if(isset($msgStr))
+					return false;
+			}
+			else if($duration<180){
+				KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short, must be at least 180sec");
+				return false;
+			}
+			
 			return true;
 		}
 	
@@ -334,7 +353,7 @@
 				$cmdLineArr[$key]='-an';
 			}
 
-			$toRemove = array("-ac","-ar", "-b:a","-ab","-vsync", "-async","-filter_complex","-flags","-f");
+			$toRemove = array("-ac","-ar", "-b:a","-ab","-async","-filter_complex","-flags","-f");
 			foreach($cmdLineArr as $idx=>$opt){
 				if(in_array($opt, array("-rc_eq"))){
 					if($cmdLineArr[$idx+1][0]!="'")
@@ -419,6 +438,8 @@
 				/*
 				 * Handle WM fade in's/out's
 				 */
+			$lastLabelOut = null;
+			$adjustedFilterStr = null;
 			if(isset($this->params->videoFilters->fadeFilters)){
 				$filterGraph = clone $filterGraphBase;
 				$filterGraph->entities = array();
@@ -435,7 +456,7 @@
 						continue;
 					$filterGraph->RemoveChain($filterGraph->entities[$chainIdx]);
 				}
-				$adjustedFilterStr = $filterGraph->CompoundString();
+				$adjustedFilterStr = $filterGraph->CompoundString($lastLabelOut);
 			}
 			
 				/*
@@ -443,18 +464,18 @@
 				 */
 			if(isset($this->params->videoFilters->subsFilename)){
 				$adjustedSubsFilename = $this->getChunkName($chunkIdx,"srt");
-				if(isset($adjustedFilterStr)){
-					$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename, 
-											$adjustedSubsFilename, $adjustedFilterStr);
+				if(!isset($adjustedFilterStr)){
+					$adjustedFilterStr = $filterGraphBase->CompoundString($lastLabelOut);
 				}
-				else {
-					$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename,
-											$adjustedSubsFilename, $cmdLineArr[$filterIdx+1]);
-				}
+				$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename, 
+										$adjustedSubsFilename, $adjustedFilterStr);
+			}
+			else if(isset($adjustedFilterStr)) {
+				$adjustedFilterStr = str_replace($lastLabelOut, "", $adjustedFilterStr);
 			}
 			
-			if(isset($adjustedFilterStr)) {
-				KalturaLog::log($adjustedFilterStr);
+			if(isset($adjustedFilterStr) || ($adjustedFilterStr=$filterGraphBase->CompoundString($lastLabelOut))!==null) {
+				KalturaLog::log("adjustedFilterStr:".$adjustedFilterStr);
 				$cmdLineArr[$filterIdx+1] = '\''.$adjustedFilterStr.'\'';
 				$cmdLine = implode(' ',$cmdLineArr);
 			}

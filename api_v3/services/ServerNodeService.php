@@ -13,7 +13,7 @@ class ServerNodeService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		$partnerId = $this->getPartnerId();
-		if(!$this->getPartner()->getEnabledService(PermissionName::FEATURE_SERVER_NODE))
+		if(!$this->getPartner()->getEnabledService(PermissionName::FEATURE_SERVER_NODE) && $partnerId != PARTNER::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 			
 		$this->applyPartnerFilterForClass('serverNode');
@@ -172,6 +172,7 @@ class ServerNodeService extends KalturaBaseService
 		}
 	
 		$dbServerNode->setHeartbeatTime(time());
+		$dbServerNode->setStatus(ServerNodeStatus::ACTIVE);
 		$dbServerNode->save();
 	
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
@@ -187,5 +188,31 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode->save();
 		
 		return $dbServerNode;
+	}
+
+	/**
+	 * Mark server node offline
+	 *
+	 * @action markOffline
+	 * @param string $serverNodeId
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @return KalturaServerNode
+	 * @throws KalturaAPIException
+	 */
+	function markOfflineAction($serverNodeId)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ServerNodePeer::ID, $serverNodeId);
+		$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
+		$dbServerNode = ServerNodePeer::doSelectOne($criteria);
+
+		if(!$dbServerNode)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
+
+		$dbServerNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
+		$dbServerNode->save();
+
+		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
+		return $serverNode;
 	}
 }

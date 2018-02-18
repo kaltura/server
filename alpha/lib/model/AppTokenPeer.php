@@ -40,4 +40,8 @@ class AppTokenPeer extends BaseAppTokenPeer {
 		return $appToken;
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("appToken:id=%s", self::ID));		
+	}
 } // AppTokenPeer

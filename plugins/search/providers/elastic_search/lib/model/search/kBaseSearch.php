@@ -21,27 +21,39 @@ abstract class kBaseSearch
 		$this->mainBoolQuery = new kESearchBoolQuery();
     }
 
-    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true);
+    public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null);
 
     public abstract function getPeerName();
 
 	public abstract function getPeerRetrieveFunctionName();
 
+	/**
+	 * @return ESearchQueryAttributes
+	 */
+	public function getQueryAttributes()
+	{
+		return $this->queryAttributes;
+	}
+
+	protected function handleDisplayInSearch()
+	{
+	}
+
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
-        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
-		$this->mainBoolQuery->addToMust($subQuery);
+        $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
+        $this->handleDisplayInSearch();
+        $this->mainBoolQuery->addToMust($subQuery);
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
-        KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
-        $result = $this->elasticClient->search($this->query);
+        $result = $this->elasticClient->search($this->query, true);
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
     {
         $partnerId = kBaseElasticEntitlement::$partnerId;
-        $this->initQueryAttributes($partnerId, $objectId, $useHighlight);
+        $this->initQueryAttributes($partnerId, $objectId);
         $this->initBaseFilter($partnerId, $statuses, $objectId);
         $this->initPager($pager);
         $this->initOrderBy($order);
@@ -72,9 +84,9 @@ abstract class kBaseSearch
                     continue;
                 }
                 $fields[$field] = true;
-                $sortConditions[] = array(
-                    $field => array('order' => $orderItem->getSortOrder())
-                );
+				$conditions = $orderItem->getSortConditions();
+				foreach ($conditions as $condition)
+					$sortConditions[] = $condition;
             }
 
             if(count($sortConditions))
@@ -108,31 +120,12 @@ abstract class kBaseSearch
 
     protected function addGlobalHighlights()
 	{
-		$this->queryAttributes->setScopeToGlobal();
-		$highlight = self::getHighlightSection(self::GLOBAL_HIGHLIGHT_CONFIG, $this->queryAttributes);
-		if(isset($highlight))
-		{
-			$this->query['body']['highlight'] = $highlight;
-		}
-	}
-
-	public static function getHighlightSection($configKey, $queryAttributes)
-	{
-		$highlight = null;
-		$fieldsToHighlight = $queryAttributes->getFieldsToHighlight();
-		if(!empty($fieldsToHighlight) && $queryAttributes->getUseHighlight())
-		{
-			$highlight = array();
-			$highlight["type"] = "unified";
-			$highlight["order"] = "score";
-			$HighlightConfig = kConf::get('highlights', 'elastic');
-			if(isset($HighlightConfig[$configKey]))
-				$highlight['number_of_fragments'] = $HighlightConfig[$configKey];
-
-			$highlight['fields'] = $fieldsToHighlight;
-		}
-
-		return $highlight;
+        $this->queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
+        $numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey(self::GLOBAL_HIGHLIGHT_CONFIG);
+        $highlight = new kESearchHighlightQuery($this->queryAttributes->getQueryHighlightsAttributes()->getFieldsToHighlight(), $numOfFragments);
+        $highlight = $highlight->getFinalQuery();
+        if($highlight)
+            $this->query['body']['highlight'] = $highlight;
 	}
 
     protected function applyElasticSearchConditions()
@@ -140,10 +133,10 @@ abstract class kBaseSearch
         $this->query['body']['query'] = $this->mainBoolQuery->getFinalQuery();
     }
 
-    protected function initQueryAttributes($partnerId, $objectId, $useHighlight)
+    protected function initQueryAttributes($partnerId, $objectId)
     {
         $this->initPartnerLanguages($partnerId);
-        $this->queryAttributes->setUseHighlight($useHighlight);
+        $this->queryAttributes->setObjectId($objectId);
         $this->initOverrideInnerHits($objectId);
     }
 

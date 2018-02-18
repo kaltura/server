@@ -17,28 +17,37 @@ class kEntrySearch extends kBaseSearch
     {
         $this->isInitialized = false;
         parent::__construct();
+		$this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight= true)
+    protected function handleDisplayInSearch()
     {
-	    kEntryElasticEntitlement::init();
+        if($this->queryAttributes->getObjectId())
+            return;
+
+        $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
+        $this->mainBoolQuery->addToFilter($displayInSearchQuery);
+    }
+
+    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+    {
+        kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
-        $this->initQuery($entriesStatus, $objectId, $pager, $order, $useHighlight);
+        $this->initQuery($entriesStatus, $objectId, $pager, $order);
         $this->initEntitlement();
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, $useHighlight = true)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_ENTRY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
         $statuses = $this->initEntryStatuses($statuses);
-        $this->initDisplayInSearch($objectId);
-        parent::initQuery($statuses, $objectId, $pager, $order, $useHighlight);
+        parent::initQuery($statuses, $objectId, $pager, $order);
 
     }
 
@@ -114,16 +123,4 @@ class kEntrySearch extends kBaseSearch
     {
         return self::PEER_RETRIEVE_FUNCTION_NAME;
     }
-
-    protected function initDisplayInSearch($objectId)
-    {
-        if($objectId)
-            return;
-    
-        $displayInSearchQuery = new kESearchTermQuery('display_in_search', EntryDisplayInSearchType::SYSTEM);
-        $displayInSearchBoolQuery = new kESearchBoolQuery();
-        $displayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
-        $this->mainBoolQuery->addToFilter($displayInSearchBoolQuery);
-    }
-
 }

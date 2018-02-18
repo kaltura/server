@@ -48,6 +48,8 @@
 		newData.find( "input,select").each(function(idx) {
 			var name = $( this ).attr("name");
 			var paramName =name.substring("Cond_".length);
+			if (paramName == "conditionType")
+				$(this).attr("readonly","1");
 			var tag = taskTag + "::" + paramName;
 			$( this ).attr("name", paramName).attr("id", tag)
 		});

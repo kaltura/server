@@ -7,24 +7,26 @@
  */
 class ReportService extends KalturaBaseService
 {
-    static $kavaReports = array(KalturaReportType::TOP_CONTENT,
-        KalturaReportType::CONTENT_DROPOFF,
-        KalturaReportType::CONTENT_INTERACTIONS,
-        KalturaReportType::MAP_OVERLAY,
-        KalturaReportType::TOP_SYNDICATION,
-        KalturaReportType::USER_ENGAGEMENT,
-        KalturaReportType::SPECIFIC_USER_ENGAGEMENT,
-        KalturaReportType::USER_TOP_CONTENT,
-        KalturaReportType::USER_CONTENT_DROPOFF,
-        KalturaReportType::USER_CONTENT_INTERACTIONS,
-        KalturaReportType::APPLICATIONS,
-        KalturaReportType::PLATFORMS,
-        KalturaReportType::OPERATING_SYSTEM,
-        KalturaReportType::BROWSERS,
-        KalturaReportType::LIVE,
-        KalturaReportType::TOP_PLAYBACK_CONTEXT,
-        KalturaReportType::VPAAS_USAGE
-    );
+	static $kavaReports = array(KalturaReportType::TOP_CONTENT,
+		KalturaReportType::CONTENT_DROPOFF,
+		KalturaReportType::CONTENT_INTERACTIONS,
+		KalturaReportType::MAP_OVERLAY,
+		KalturaReportType::TOP_SYNDICATION,
+		KalturaReportType::USER_ENGAGEMENT,
+		KalturaReportType::SPECIFIC_USER_ENGAGEMENT,
+		KalturaReportType::USER_TOP_CONTENT,
+		KalturaReportType::USER_CONTENT_DROPOFF,
+		KalturaReportType::USER_CONTENT_INTERACTIONS,
+		KalturaReportType::APPLICATIONS,
+		KalturaReportType::PLATFORMS,
+		KalturaReportType::OPERATING_SYSTEM,
+		KalturaReportType::BROWSERS,
+		KalturaReportType::LIVE,
+		KalturaReportType::TOP_PLAYBACK_CONTEXT,
+		KalturaReportType::VPAAS_USAGE,
+		KalturaReportType::TOP_CONTRIBUTORS,
+		KalturaReportType::CONTENT_CONTRIBUTIONS,
+	);
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -197,6 +199,7 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
+		ini_set( "memory_limit","512M" );
 
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
@@ -291,7 +294,7 @@ class ReportService extends KalturaBaseService
 		
 		ini_set( "memory_limit","512M" );
 		
-		if (kConf::hasParam("druid_url"))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS))
 		{
 			$customReports = kConf::getMap('custom_reports');
 			if (!isset($customReports[$id]))
@@ -380,7 +383,7 @@ class ReportService extends KalturaBaseService
 	protected function getReportsManagerClass($reportType) 
 	{
 	    $reportsMgrClass = "myReportsMgr";
-	    if (in_array($reportType, self::$kavaReports) && kConf::hasParam("druid_url"))
+	    if (in_array($reportType, self::$kavaReports) && kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS))
 	    {
 	        $reportsMgrClass = "kKavaReportsMgr";
 	    }

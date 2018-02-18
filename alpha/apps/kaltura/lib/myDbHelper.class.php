@@ -12,6 +12,7 @@ class myDbHelper
 	const DB_HELPER_CONN_DWH = "dwh";
 	
 	public static $use_alternative_con = null;
+	protected static $slaveConnIndex = false;
 	
 	/**
 	 * @param string $name
@@ -29,10 +30,11 @@ class myDbHelper
 		if (!in_array($name, $slaves))
 			return Propel::getConnection($name);
 		
-		list($connection, $connIndex) = DbManager::connectFallbackLogic(
+		list($connection, self::$slaveConnIndex) = DbManager::connectFallbackLogic(
 				array('Propel', 'getConnection'),
 				array(),
-				$slaves);
+				$slaves, 
+				self::$slaveConnIndex);
 		if (!$connection)
 			throw new PropelException('Could not connect to any database server');
 			

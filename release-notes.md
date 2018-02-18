@@ -1,3 +1,4 @@
+# Mercury 13.14.0 #
 # Vendor Profile #
 
 ## Reach In-House Support ##
@@ -27,6 +28,230 @@
 
 	None.
 
+# Mercury 13.13.0 #
+
+## Update File-Sync version field type ##
+
+- Issue Type: Task
+- Issue ID: No Plat
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_02_04_alter_file_sync_version_from_varchar_to_int.sql
+	
+#### Known Issues & Limitations ####
+
+None.
+
+
+## New SaaS Drop Folder Type ##  
+- Issue Type: New Feature  
+- Issue ID: PSVAMB-939  
+
+### Configuration ###  
+    Update the plugins.ini, admin.ini, batch.ini config files from the SaaS tag.
+    
+### Deployment scripts ###  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_12_allow_batch_partner_to_delete_metadata.php
+
+## Base Upload Permission and User-role ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-8435
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_11_add_base_upload_permission_and_role.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_11_update_base_upload_permission.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Update notification for server node changing status ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8047
+
+### Configuration ###
+	First replcae all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_30_UpdateServerNodeDownTemplate_toServerNodeStatusChanged.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_30_update_server_node_offline_email_notification_to_server_node_status_changed.php
+
+#### Known Issues & Limitations ####
+None.
+
+## Add new batch job for generating users CSV ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8446
+ 
+ ### Configuration ###
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncUsersCsv = 1
+
+	- [KAsyncUsersCsv : JobHandlerWorker]
+          id						= XXXXX
+          friendlyName					= Users Csv
+          type						= KAsyncUsersCsv
+          params.localTempPath				= @TMP_DIR@/userscsv
+          params.sharedTempPath				= @WEB_DIR@/tmp/userscsv
+          scriptPath					= batches/UsersCsv/kAsyncUsersCsvExe.php
+          maximumExecutionTime			= 3600
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_23_getCsv_user_permissions.php
+ 
+# Mercury 13.12.0 #
+
+## Split beacon index to index per object type ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8432
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	1. Stop logstash process to avoid re-creating the old beacon index.
+
+	2. Delete all old elstic aliases.
+	
+	3. Delete old beaconIndex.
+	
+	4. Create new indexes in elastic by runing: 
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_entry_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_entry_index.json"
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_entry_server_node_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_entry_server_node_index.json" 
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_scheduled_resource_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_scheduled_resource_index.json"
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_server_node_index_2017_01_21' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_server_node_index.json"
+	
+	5. Create new alises in elastic:
+		curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
+    	"actions" : [
+        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beacon_entry_index" } },
+        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beacon_entry_server_node_index" } },
+        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beacon_scheduled_resource_index" } },
+        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beaconindex" } },
+        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beacon_server_node_index" } },
+        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beaconindex" } }
+			]
+		}'
+		
+	6. strat logstash process.
+
+#### Known Issues & Limitations ####
+
+	Please note the old data will be removed during this process.
+
+## Add permission to create VAST cue point without URL ##
+
+- Issue Type: feature
+- Issue ID: PLAT-8468
+
+### Configuration ###
+	-Add new module to the admin-console in admin.ini
+        moduls.VastCuePointNoUrl.enabled = true
+        moduls.VastCuePointNoUrl.permissionType = 2
+        moduls.VastCuePointNoUrl.label = "Allow creating VAST advertising cue points without URL"
+        moduls.VastCuePointNoUrl.permissionName = FEATURE_ALLOW_VAST_CUE_POINT_NO_URL
+        moduls.VastCuePointNoUrl.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+
+		None.
+
+#### Known Issues & Limitations ####
+
+		None.
+
+## Add Entry replaced EMAIL template which excludes kaltura recorded entries ##
+
+- Issue Type: Support
+- Issue ID: SUP-13175
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_notRecordedEntryReplaced_emailNotification.template.xml
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_not_recorded_entry_replaced_email_notification.php 
+
+
+## Add Recorded Entry replaced EMAIL template ##
+
+- Issue Type: Support
+- Issue ID: SUP-13175
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_RecordedEntryReplaced_emailNotification.template.xml
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
+## Add notification for server node going offline ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8047
+
+### Configuration ###
+	First replcae all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_14_AddServerNodeDownTemplate.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/201810_01_server_node_markOffline.php
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_14_deploy_server_node_offline_email_notification.php
+
+#### Known Issues & Limitations ####
+None.
+
+# Mercury 13.10.0 # 
+
+## Deploy new live audio flavor params ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-8294
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_12_20_deploy_new_live_params.php
+
+#### Known Issues & Limitations ####
+None.
+
+## Add Entry replaced HTTP template which excludes kaltura recorded entries ##
+
+- Issue Type: Support
+- Issue ID: SUP-13055
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_12_19_notRecordedEntryReplaced.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_12_19_deploy_not_recorded_entry_replaced_http_notification.php
+
+#### Known Issues & Limitations ####
+None.
 
 # Mercury 13.9.0 #
 
@@ -42,8 +267,20 @@
 	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
 	
 	   Run deployment script:
-		1. remove existing notification template with system name EXPLICIT_LIVE_PUSH_NOTIFICATIONS if it exists	   
+		1. remove existing notification template, through admin console, with system name EXPLICIT_LIVE_PUSH_NOTIFICATIONS if it exists	   
 		2. php /opt/kaltura/app/deployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
+	
+#### Known Issues & Limitations ####
+
+	None.
+
+## Webcast - allow webcast producer to update cuepoint status  ##
+- Issue Type: Feature
+- Issue ID: PLAT-8409
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_12_14_allow_webcast_producer_to_change_cue_point_status.php
 	
 #### Known Issues & Limitations ####
 

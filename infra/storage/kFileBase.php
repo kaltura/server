@@ -245,4 +245,13 @@ class kFileBase
             return mime_content_type($file_name);
         }
     }
+
+    public static function copyFileMetadata($srcFile, $destFile)
+    {
+        @chown($destFile, fileowner($srcFile));
+        @chgrp($destFile, filegroup($srcFile));
+        $mode = substr(decoct(fileperms($srcFile)), -4);
+        self::chmod($destFile,intval($mode,8));
+    }
+
 }

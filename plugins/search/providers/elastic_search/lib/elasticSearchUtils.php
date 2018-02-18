@@ -8,6 +8,9 @@ class elasticSearchUtils
 	const UNDERSCORE_FIELD_DELIMITER ='_';
 	const DOT_FIELD_DELIMITER = '.';
 
+	private static $html_chars_to_replace = array('<br />', '<br>',
+		'<br/>', '<div>', '</div>', '<div/>', '<p>', '</p>', '<p/>');
+
     /**
      * return the analyzed language field name
      * @param $language
@@ -20,34 +23,22 @@ class elasticSearchUtils
         $fieldMap = array(
             'english' => 'english',
             'arabic' => 'arabic',
-            'basque' => 'basque',
             'brazilian' => 'brazilian',
-            'bulgarian' => 'bulgarian',
-            'catalan' => 'catalan',
             'chinese' => 'cjk',
             'korean' => 'cjk',
             'japanese' => 'cjk',
-            'czech' => 'czech',
             'danish' => 'danish',
             'dutch' => 'dutch',
             'finnish' => 'finnish',
             'french' => 'french',
-            'galician' => 'galician',
             'german' => 'german',
             'greek' => 'greek',
             'hindi' => 'hindi',
-            'hungarian' => 'hungarian',
             'indonesian' => 'indonesian',
-            'irish' => 'irish',
             'italian' => 'italian',
-            'latvian' => 'latvian',
-            'lithuanian' => 'lithuanian',
             'norwegian' => 'norwegian',
-            'persian' => 'persian',
             'portuguese' => 'portuguese',
-            'romanian' => 'romanian',
             'russian' => 'russian',
-            'sorani' => 'sorani',
             'spanish' => 'spanish',
             'swedish' => 'swedish',
             'turkish' => 'turkish',
@@ -64,7 +55,7 @@ class elasticSearchUtils
 	public static function getSynonymFieldName($language, $fieldName, $delimiter)
 	{
 		$fieldMap = array(
-			'english' => 'synonym',
+			'english' => kESearchQueryManager::SYNONYM_FIELD_SUFFIX,
 		);
 
 		$language = strtolower($language);
@@ -75,6 +66,36 @@ class elasticSearchUtils
 	public static function formatPartnerStatus($partnerId, $status)
 	{
 		return sprintf("p%ss%s", $partnerId, $status);
+	}
+
+	public static function formatCategoryIdStatus($categoryId, $status)
+	{
+		return sprintf("c%ss%s", $categoryId, $status);
+	}
+
+	public static function formatCategoryFullIdStatus($categoryId, $status)
+	{
+		return sprintf("s%sfid>%s", $status, $categoryId);
+	}
+
+	public static function formatParentCategoryIdStatus($categoryId, $status)
+	{
+		return sprintf("p%ss%s", $categoryId, $status);
+	}
+
+	public static function formatCategoryNameStatus($categoryName, $status)
+	{
+		return sprintf("s%sc>%s", $status, $categoryName);
+	}
+
+	public static function formatParentCategoryNameStatus($categoryName, $status)
+	{
+		return sprintf("s%sp>%s", $status, $categoryName);
+	}
+
+	public static function formatCategoryEntryStatus($status)
+	{
+		return sprintf("ces%s", $status);
 	}
 
 	public static function formatSearchTerm($searchTerm)
@@ -105,6 +126,40 @@ class elasticSearchUtils
 			if(is_array($value) && ( count($value) == 0 || ( (count($value) == 1 && (isset($value[0])) && $value[0] === '' ) ) ))
 				unset($body[$key]);
 		}
+	}
+	
+	public static function getNumOfFragmentsByConfigKey($highlightConfigKey)
+	{
+		$highlightConfig = kConf::get('highlights', 'elastic');
+		//return null to use elastic default num of fragments
+		$numOfFragments = isset($highlightConfig[$highlightConfigKey]) ? $highlightConfig[$highlightConfigKey] : null;
+		return $numOfFragments;
+	}
+
+
+	/**
+	 * Go over the array and decode html and strip tags from all of its leafs
+	 * @param array $cmd
+	 */
+	public static function prepareForInsertToElastic(&$cmd)
+	{
+		array_walk_recursive($cmd, array('elasticSearchUtils','prepareElasticLeafInput'));
+	}
+
+	public static function prepareElasticLeafInput(&$value, $key)
+	{
+		if(is_string($value))
+		{
+			self::filterHtmlFromLeaf($value);
+			$value = trim($value);
+		}
+	}
+
+	public static function filterHtmlFromLeaf(&$value)
+	{
+		$value = html_entity_decode($value);
+		$value = str_replace(self::$html_chars_to_replace, " ", $value);
+		$value = strip_tags($value);
 	}
 
 }

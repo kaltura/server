@@ -11,6 +11,12 @@ class KSecureEntryHelper
 	 * @var entry
 	 */
 	private $entry;
+
+	/**
+	 *
+	 * @var asset
+	 */
+	private $asset;
 	
 	/**
 	 * 
@@ -61,12 +67,19 @@ class KSecureEntryHelper
 	 * @var array
 	 */
 	private $actionLists = array();
-	
+
+
+	/**
+	 * Array containing trusted admministrative partner IDs
+	 * @var array
+	 */
+	protected static $trustedPartnerIds = array (Partner::BATCH_PARTNER_ID);
+
 	/**
 	 * 
 	 * @param entry $entry
 	 */
-	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array(), $hashes = array())
+	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array(), $hashes = array(), $asset = null)
 	{
 		if(!is_array($contexts))
 			$contexts = array($contexts);
@@ -83,6 +96,7 @@ class KSecureEntryHelper
 		$this->referrer = $referrer;
 		$this->contexts = $contexts;
 		$this->hashes = $hashes;
+		$this->asset = $asset;
 		
 		$this->validateKs();
 		$this->applyContext();
@@ -334,11 +348,16 @@ class KSecureEntryHelper
 					$valid = $ks->isValidForPartner($ks->partner_id);
 				}
 				if ($valid === ks::EXPIRED)
+				{
 					KExternalErrors::dieError(KExternalErrors::KS_EXPIRED, "This URL is expired");
+				}
 				else if ($valid === ks::INVALID_PARTNER)
 				{
-					if ($this->hasRules()) // TODO - for now if the entry doesnt have restrictions any way disregard a partner group check
+					if (!in_array($ks->partner_id, self::$trustedPartnerIds) && $this->hasRules())
+					{
+						// TODO - for now if the entry doesnt have restrictions any way disregard a partner group check
 						KExternalErrors::dieError(KExternalErrors::INVALID_PARTNER, "Invalid session [".$valid."]");
+					}
 				}
 				else if ($valid === ks::EXCEEDED_RESTRICTED_IP)
 				{
@@ -423,6 +442,7 @@ class KSecureEntryHelper
 		$accessControlScope->setEntryId($this->entry->getId());
 		$accessControlScope->setContexts($this->contexts);
 		$accessControlScope->setHashes($this->hashes);
+		$accessControlScope->setAsset($this->asset);
 		
 		return $accessControlScope;
 	}

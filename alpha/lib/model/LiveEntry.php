@@ -299,7 +299,7 @@ abstract class LiveEntry extends entry
 	
 	public function getPushPublishEnabled()
 	{
-		return $this->getFromCustomData("push_publish_enabled", null, false);
+		return $this->getFromCustomData("push_publish_enabled");
 	}
 	
 	public function setPushPublishEnabled($v)
@@ -448,7 +448,18 @@ abstract class LiveEntry extends entry
 		KalturaLog::info("media servers hostnames: " . print_r($hostnames,true));
 		return $hostnames;
 	}
-	
+
+	public function canViewExplicitLive()
+	{
+		$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
+		$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
+		$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+		$isMediaServerPartner = (kCurrentContext::$ks_partner_id == Partner::MEDIA_SERVER_PARTNER_ID);
+		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview && !$isMediaServerPartner)
+			return false;
+		return true;
+	}
+
 	/**
 	 * @return boolean
 	 */
@@ -456,10 +467,7 @@ abstract class LiveEntry extends entry
 	{
 		if ($this->getViewMode() == ViewMode::PREVIEW)
 		{
-			$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
-			$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
-			$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
-			if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview)
+			if (!$this->canViewExplicitLive())
 				return false;
 		}
 
@@ -548,7 +556,7 @@ abstract class LiveEntry extends entry
 		
 		if($liveEntryStatus === EntryServerNodeStatus::PLAYABLE)
 		{
-			if(is_null($this->getFirstBroadcast()))
+			if(is_null($this->getFirstBroadcast()) && $mediaServerIndex === EntryServerNodeType::LIVE_PRIMARY)
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
 			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
@@ -926,8 +934,8 @@ abstract class LiveEntry extends entry
 		$body = array(
 			'recorded_entry_id' => $this->getRecordedEntryId(),
 			'push_publish' => $this->getPushPublishEnabled(),
+			'is_live' => $this->isCurrentlyLive(),
 		);
-
 		elasticSearchUtils::cleanEmptyValues($body);
 
 		return array_merge(parent::getObjectParams($params), $body);

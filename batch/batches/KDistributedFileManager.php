@@ -23,7 +23,7 @@ class KDistributedFileManager
 		$this->fileCacheTimeout = $fileCacheTimeout;
 	}
 	
-	public function getLocalPath($localPath, $remotePath, &$errDescription)
+	public function getLocalPath($localPath, $remotePath, &$errDescription, &$fetched = false)
 	{
 		KalturaLog::info("Translating remote path [$remotePath] to local path [$localPath]");
 				
@@ -38,7 +38,7 @@ class KDistributedFileManager
 				
 			@unlink($localPath);
 		}
-		
+		$fetched = true;
 		$res = $this->fetchFile($remotePath, $localPath, $errDescription);
 		if(!$res) {
 			if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {

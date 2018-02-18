@@ -359,7 +359,22 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $eSearchLanguages;
-	
+
+	/**
+	 * @var int
+	 */
+	public $publisherEnvironmentType;
+
+	/**
+	 * @var string
+	 */
+	public $ovpEnvironmentUrl;
+
+	/**
+	 * @var string
+	 */
+	public $ottEnvironmentUrl;
+
 	
 	private static $map_between_objects = array
 	(
@@ -429,7 +444,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
 		"defaultLiveStreamSegmentDuration",
-		"eSearchLanguages"
+		"eSearchLanguages",
+		"publisherEnvironmentType",
+		"ovpEnvironmentUrl",
+		"ottEnvironmentUrl",
 	);
 
 	public function getMapBetweenObjects()
@@ -447,6 +465,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		$this->restrictEntryByMetadata = $source_object->getShouldApplyAccessControlOnEntryMetadata();
 		$this->htmlPurifierBaseListUsage = $source_object->getHtmlPurifierBaseListUsage();
+		$this->ovpEnvironmentUrl = $source_object->getOvpEnvironmentUrl();
+		$this->ottEnvironmentUrl = $source_object->getOttEnvironmentUrl();
 		
 		$dbAutoModerationEntryFilter = $source_object->getAutoModerateEntryFilter();
 		if ($dbAutoModerationEntryFilter)

@@ -6,8 +6,8 @@ disableElastic = false
 ngramPercentage = 80
 
 [innerHits]
-captionInnerHitsSize = 10
-cuePointsInnerHitsSize = 10
+captionInnerHitsSize = 5
+cuePointsInnerHitsSize = 5
 metadataInnerHitsSize = 10
 innerHitsWithObjectId = 100
 

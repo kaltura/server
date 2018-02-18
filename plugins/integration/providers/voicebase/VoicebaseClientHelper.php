@@ -8,7 +8,7 @@ class VoicebaseClientHelper
 	const VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS = "SUCCESS";
 	const VOICEBASE_MACHINE_COMPLETE_MESSAGE = "MACHINECOMPLETE";
 	const VOICEBASE_MACHINE_FAILURE_MESSAGE = "ERROR";
-
+	
 	const VOICEBASE_ACTION_UPLOADMEDIA = "uploadMedia";
 	const VOICEBASE_ACTION_GETFILESTATUS = "getFileStatus";
 	const VOICEBASE_ACTION_UPDATETRANSCRIPT = "updateTranscript";
@@ -59,7 +59,7 @@ class VoicebaseClientHelper
 	{
 		$params = array("action" => self::VOICEBASE_ACTION_GETFILESTATUS, "externalID" => $entryId);
 		$curlResult = $this->sendAPICall($params);
-
+		
 		return $curlResult;
 	}
 	
@@ -100,7 +100,7 @@ class VoicebaseClientHelper
 			$action = $params["action"];
 			throw new Exception("VoiceBase $action failed. Message: [" . $curlResult->statusMessage . "]");
 		}
-
+		
 		return true;
 	}
 	
@@ -158,7 +158,7 @@ class VoicebaseClientHelper
 				"humanReadyCallBack" => $callBack,
 		);
 		$options = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postFields);
-
+	
 		$result = $this->sendAPICall($params, $options);
 		if ($result->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE)
 		{
@@ -170,9 +170,9 @@ class VoicebaseClientHelper
 	}
 	
 	public function getRemoteTranscripts($entryId, array $formats)
-	{
+	{	
 		$params = array("action" => self::VOICEBASE_ACTION_GETTRANSCRIPT, "externalID" => $entryId);
-
+	
 		$results = array();
 		foreach($formats as $format)
 		{
@@ -207,9 +207,9 @@ class VoicebaseClientHelper
 	}
 	
 	public function deleteRemoteFile($entryId)
-	{
+	{	
 		$params = array("action" => self::VOICEBASE_ACTION_DELETEFILE, "externalID" => $entryId);
-
+	
 		$curlResult = $this->sendAPICall($params);
 	}
 

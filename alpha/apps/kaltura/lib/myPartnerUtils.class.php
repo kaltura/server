@@ -12,7 +12,9 @@ class myPartnerUtils
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const BLOCKING_DAYS_GRACE = 7;
-	
+
+	const FREE_TRIAL_END_DAY = 30;
+	const FREE_TRIAL_PARTNER_DELETION_DAY = 60;
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1088,7 +1090,11 @@ class myPartnerUtils
 		
 		$packages = new PartnerPackages();
 		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
-		
+
+		$monitoredFreeTrial = false;
+		if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+			$monitoredFreeTrial = true;
+
 		$report_date = date('Y-m').'-01';
         // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
         $report_date = dateUtils::todayOffset(-1);
@@ -1096,6 +1102,7 @@ class myPartnerUtils
 		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerStatisticsFromDWH($partner, $partnerPackage, $report_date);
 		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
 		$percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
+		$partner->setPartnerUsagePercent($percent);
 
 		KalturaLog::debug("percent (".$partner->getId().") is: $percent");
 		$email_link_hash = 'pid='.$partner->getId().'&h='.(self::getEmailLinkHash($partner->getId(), $partner->getSecret()));
@@ -1115,8 +1122,11 @@ class myPartnerUtils
 			/* prepare mail job, and set EightyPercentWarning() to true/date */
 			$partner->setEightyPercentWarning(time());
 			$partner->setUsageLimitWarning(0);
-			$body_params = array ( $partner->getAdminName(), $partnerPackage['cycle_bw'], $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
-			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $body_params);
+			if(!$monitoredFreeTrial)
+			{
+				$body_params = array($partner->getAdminName(), $partnerPackage['cycle_bw'], $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash);
+				myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $body_params);
+			}
 		}
 		elseif ($percent >= 80 &&
 			$percent < 100 &&
@@ -1137,14 +1147,22 @@ class myPartnerUtils
 		elseif ($percent >= 100 &&
 				!$partner->getUsageLimitWarning())
 		{
-			KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning");
-				
 			/* prepare mail job, and set getUsageLimitWarning() date */
 			$partner->setUsageLimitWarning(time());
 			// if ($partnerPackage['cycle_fee'] == 0) - script always works on free partners anyway
+			if(!$monitoredFreeTrial)
 			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning");
 				$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
 				myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_LIMIT_WARNING_1, $partner, $body_params);
+			}
+			else
+			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 100% - blocking partner");
+				if($should_block_delete_partner)
+				{
+					$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
+				}
 			}
 		}
 		elseif ($percent >= 100 &&
@@ -1166,7 +1184,8 @@ class myPartnerUtils
 		}
 		elseif ($percent >= 120 &&
 				$partnerPackage['cycle_fee'] != 0 &&
-				$partner->getUsageLimitWarning() <= $block_notification_grace)
+				$partner->getUsageLimitWarning() <= $block_notification_grace &&
+				!$monitoredFreeTrial)
 		{
 			$body_params = array ( $partner->getAdminName(), round($totalUsageGB, 2) );
 			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PAID_PACKAGE_SUGGEST_UPGRADE, $partner, $body_params);
@@ -1175,7 +1194,8 @@ class myPartnerUtils
 				$partnerPackage['cycle_fee'] == 0 &&
 				$partner->getUsageLimitWarning() > 0 &&
 				$partner->getUsageLimitWarning() <= $delete_grace &&
-				$partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK)
+				$partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK &&
+				!$monitoredFreeTrial)
 		{
 			KalturaLog::debug("partner ". $partner->getId() ." reached 100% a month ago - deleting partner");
 				
@@ -1449,6 +1469,8 @@ class myPartnerUtils
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
+
+		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
  		// Launch a batch job that will copy the heavy load as an async operation 
   		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
@@ -1756,7 +1778,7 @@ class myPartnerUtils
 
 		// validate serve access control
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
-		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE);
+		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
 		$secureEntryHelper->validateForServe($flavorParamsId);
 
 		// enforce delivery
@@ -1831,4 +1853,259 @@ class myPartnerUtils
 		}
 		return null;
 	}
+
+	/**
+	 * The function checks for new free trial partners if its time to block/delete them and whether
+	 * we need to sync their lead in Marketo
+	 *
+	 * @param partner $partner
+	 */
+	public static function handleDayInFreeTrial(Partner $partner)
+	{
+		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());
+		KalturaLog::debug("partner [{$partner->getId()}] is currently at the [$dayInFreeTrial] day of free trial");
+
+		if (($dayInFreeTrial >= self::FREE_TRIAL_END_DAY) && ($dayInFreeTrial < self::FREE_TRIAL_PARTNER_DELETION_DAY))
+		{
+			KalturaLog::debug('Partner ['.$partner->getId().'] reached to end of free trial day. Blocking content.');
+			$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
+		}
+
+		if ($dayInFreeTrial >= self::FREE_TRIAL_PARTNER_DELETION_DAY)
+		{
+			KalturaLog::debug('Partner ['.$partner->getId().'] reached to free trial deletion day. Deleting partner.');
+			$partner->setStatus(Partner::PARTNER_STATUS_DELETED);
+		}
+
+		if(kConf::hasParam('free_trial_updates_days'))
+		{
+			$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
+			$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
+			KalturaLog::debug('closest day comparing today [' . $closestUpdatesDay . ']');
+			if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
+			{
+				KalturaLog::debug('Partner [' . $partner->getId() . '] reached to one of the Marketo lead sync days.');
+				$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
+			}
+		}
+		$partner->save();
+	}
+
+	/**
+	 * retrieve the closest (lowest) notification day compering today
+	 *
+	 * @param int $search
+	 * @param array $arr
+	 * @return int
+	 */
+	public static function getClosestDay($search, $arr) {
+		$closest = 0;
+		foreach ($arr as $item)
+		{
+			if (($item <= $search) && (abs($search - $closest) > abs($item - $search)))
+				$closest = $item;
+		}
+		return $closest;
+	}
+
+
+	/**
+	 * save in partner's custom data the number of objects from different type that were created
+	 * as part of the partner population from template partner
+	 *
+	 * @param partner $fromPartner
+	 * @param partner $toPartner
+	 */
+	public static function saveTemplateObjectsNum(Partner $fromPartner, Partner $toPartner)
+	{
+		KalturaLog::log('Saving the number of entries, categories and metadata objects exist on partner ['.$fromPartner->getId().'] on partner ['.$toPartner->getId().']');
+		$fromPartnerId = $fromPartner->getId();
+
+		$categoriesNum = self::getCategoriesNumForPartner($fromPartnerId);
+		$toPartner->setTemplateCategoriesNum($categoriesNum);
+
+		$entriesNum = self::getEntriesNumForPartner($fromPartnerId);
+		$toPartner->setTemplateEntriesNum($entriesNum);
+
+		$metadataNum = self::getMetadataObjectsNumForPartner($fromPartnerId);
+		$toPartner->setTemplateCustomMetadataNum($metadataNum);
+
+		$toPartner->save();
+	}
+
+	/**
+	 * calculate the number of categories using partner and status
+	 *
+	 * @param string $partnerId
+	 * @param bool $onlyActive
+	 * @return int $categoriesNum
+	 */
+	public static function getCategoriesNumForPartner($partnerId, $onlyActive = true)
+	{
+		categoryPeer::setUseCriteriaFilter(false);
+		$c = new Criteria();
+		$c->addAnd(categoryPeer::PARTNER_ID, $partnerId);
+		if($onlyActive)
+			$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
+		$categoriesNum = categoryPeer::doCount($c);
+		categoryPeer::setUseCriteriaFilter(true);
+		return $categoriesNum;
+	}
+
+	/**
+	 * calculate the number of entries using partner and status
+	 *
+	 * @param string $partnerId
+	 * @param bool $onlyReady
+	 * @return int $entriesNum
+	 */
+	public static function getEntriesNumForPartner($partnerId, $onlyReady = true)
+	{
+		entryPeer::setUseCriteriaFilter(false);
+		$c = new Criteria();
+		$c->addAnd(entryPeer::PARTNER_ID, $partnerId);
+		if($onlyReady)
+			$c->addAnd(entryPeer::STATUS, entryStatus::READY);
+		$entriesNum = entryPeer::doCount($c);
+		entryPeer::setUseCriteriaFilter(true);
+		return $entriesNum;
+	}
+
+	/**
+	 * calculate the number of custome metadata objects using partner and status
+	 *
+	 * @param string $partnerId
+	 * @param bool $onlyValid
+	 * @return int $metadataNum
+	 */
+	public static function getMetadataObjectsNumForPartner($partnerId, $onlyValid = true)
+	{
+		MetadataPeer::setUseCriteriaFilter(false);
+		$c = new Criteria();
+		$c->addAnd(metadataPeer::PARTNER_ID, $partnerId);
+		if($onlyValid)
+			$c->addAnd(MetadataPeer::STATUS, Metadata::STATUS_VALID);
+		$metadataNum = MetadataPeer::doCount($c);
+		MetadataPeer::setUseCriteriaFilter(true);
+		return $metadataNum;
+	}
+
+	/**
+	 * calculate the number of categories that the partner created after the account population
+	 * (exclude objects that were from template partner)
+	 *
+	 * @param partner $partner
+	 * @return int $partnerCategories
+	 */
+	public static function getNumOfCategoriesCreatedByPartner ($partner)
+	{
+		$partnerId = $partner->getId();
+		$categories = self::getCategoriesNumForPartner($partnerId, false);
+		$partnerCategories = $categories - $partner->getTemplateCategoriesNum();
+		return $partnerCategories;
+	}
+
+	/**
+	 * calculate the number of entries that the partner created after the account population
+	 * (exclude objects that were from template partner)
+	 *
+	 * @param partner $partner
+	 * @return int $partnerEntries
+	 */
+	public static function getNumOfEntriesCreatedByPartner ($partner)
+	{
+		$partnerId = $partner->getId();
+		$entries = self::getEntriesNumForPartner($partnerId, false);
+		$partnerEntries = $entries - $partner->getTemplateEntriesNum();
+		return $partnerEntries;
+	}
+
+	/**
+	 * calculate the number of custom metadata objects that the partner created after the account population
+	 * (exclude objects that were from template partner)
+	 *
+	 * @param partner $partner
+	 * @return int $partnerMetadata
+	 */
+	public static function getNumOfMetadataObjectsCreatedByPartner ($partner)
+	{
+		$partnerId = $partner->getId();
+		$MetadataObjects = self::getMetadataObjectsNumForPartner($partnerId, false);
+		$partnerMetadata = $MetadataObjects - $partner->getTemplateCustomMetadataNum();
+		return $partnerMetadata;
+	}
+
+
+	/**
+	 * calculate the partner percent usage
+	 *
+	 * @param partner $partner
+	 * @return int $percent
+	 */
+	public static function retrievePartnerUsagePercent($partner)
+	{
+		$packages = new PartnerPackages();
+		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
+		$report_date = date('Y-m').'-01';
+		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerStatisticsFromDWH($partner, $partnerPackage, $report_date);
+		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
+		$percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
+		return $percent;
+	}
+
+
+	/**
+	 *  calculate the number of entries that were changed after creation
+	 *
+	 * @param entry $entry
+	 */
+	public static function increaseEntriesChangedNum($entry)
+	{
+		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE)
+		{
+			$entriesNum = $partner->getEntriesChangedByPartnerNum() + 1;
+			$partner->setEntriesChangedByPartnerNum($entriesNum);
+			$partner->save();
+		}
+
+	}
+
+	/**
+	 *  check if partner was created after we started the new free trial flow
+	 *
+	 * @param partner $partner
+	 * @param bool useCurrentTime
+	 * @return bool
+	 */
+	public static function isPartnerCreatedAsMonitoredFreeTrial($partner, $useCurrentTime = false)
+	{
+		$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
+		if(!$freeTrialStartDate)
+			return false;
+		$createTime = $partner->getCreatedAt();
+		if($useCurrentTime)
+			$createTime = date('Y-m-d H:i:s');
+		if($createTime >= $freeTrialStartDate)
+			return true;
+		return false;
+	}
+
+	/**
+	 *  retrieve all the partners in status active with specific admin email and package type
+	 *
+	 * @param partner $partner
+	 * @param $package
+	 * @return array
+	 */
+	public static function retrieveNotDeletedPartnerByEmailAndPackage ($partner, $package)
+	{
+		$c = new Criteria();
+		$c->add(PartnerPeer::ADMIN_EMAIL, $partner->getAdminEmail());
+		$c->add(PartnerPeer::PARTNER_PACKAGE, $package);
+		$c->add(PartnerPeer::STATUS, KalturaPartnerStatus::DELETED, Criteria::NOT_EQUAL);
+		$result = PartnerPeer::doSelectOne($c);
+		return $result;
+	}
+
 }

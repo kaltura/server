@@ -333,4 +333,8 @@ class UserLoginData extends BaseUserLoginData{
 	}
 	
 		
+	public function getCacheInvalidationKeys()
+	{
+		return array("userLoginData:id=".strtolower($this->getId()), "userLoginData:loginEmail=".strtolower($this->getLoginEmail()));
+	}
 } // UserLoginData

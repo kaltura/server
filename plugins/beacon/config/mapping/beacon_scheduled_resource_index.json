@@ -1,0 +1,80 @@
+{
+	"settings" : {
+		"index": {
+			"mapping": { "total_fields": { "limit": "2000" } }
+		},
+		"number_of_shards" : 6,
+		"number_of_replicas" : 0,
+		"analysis": {
+			"char_filter": {
+				"kaltura_whitespace_filter": {
+					"type": "pattern_replace",
+					"pattern": "(\\s+)",
+					"replacement": " "
+				}
+			},
+			"analyzer": {
+				"kaltura_keyword": {
+					"type": "custom",
+					"tokenizer": "keyword",
+					"char_filter": [
+						"kaltura_whitespace_filter"
+					],
+					"filter": [
+						"lowercase",
+						"trim"
+					]
+				}
+			}
+		}
+	},
+	"mappings": {
+		"scheduled_resource_beacon": {
+			"dynamic_templates": [
+				{
+					"integers": {
+						"match_mapping_type": "long",
+						"mapping": {
+							"type": "float"
+						}
+					}
+				}
+			],
+			"_all": {
+ 				"enabled": false
+ 			},
+			"properties": {
+				"event_type": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"object_id": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"partner_id": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"private_data": {
+					"type" : "object"
+				},
+				"raw_data": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"related_object_type": {
+					"type" : "text",
+					"analyzer" : "kaltura_keyword"
+				},
+				"updated_at": {
+					"type": "date",
+					"format": "epoch_second"
+				},
+				"is_log": {
+					"type": "boolean"
+				}
+			}
+		}
+	}
+}

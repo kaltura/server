@@ -697,4 +697,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	{
 		return true;
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("userLoginData:id=%s", self::ID), array("userLoginData:loginEmail=%s", self::LOGIN_EMAIL));		
+	}
 } // UserLoginDataPeer

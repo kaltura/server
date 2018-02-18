@@ -64,6 +64,12 @@ class Partner extends BasePartner
 
 	const HTML_PURIFIER_BASE_LIST_USAGE = "htmlPurifierBaseListUsage";
 
+	const PUBLISHER_ENVIRONMENT_TYPE = "publisherEnvironmentType";
+	const OVP_ENVIRONMENT_URL = "ovpEnvironmentUrl";
+	const OTT_ENVIRONMENT_URL = "ottEnvironmentUrl";
+
+	private $partnerUsagePercent;
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -1031,7 +1037,13 @@ class Partner extends BasePartner
     public function setPrimaryBroadcastUrl($v)			{$this->putInCustomData('primary_broadcast_url', $v);}
 	public function setSecondaryBroadcastUrl($v)		{$this->putInCustomData('secondary_broadcast_url', $v);}
 	public function setLiveStreamPlaybackUrlConfigurations($v)		{$this->putInCustomData('live_stream_playback_url_configurations', $v);}
-    
+	public function setLastFreeTrialNotificationDay($v)	{$this->putInCustomData('last_free_trial_notification_day', $v);}
+	public function setTemplateEntriesNum($v)			{$this->putInCustomData('template_entries_num', $v);}
+	public function setTemplateCategoriesNum($v)		{$this->putInCustomData('template_categories_num', $v);}
+	public function setTemplateCustomMetadataNum($v)	{$this->putInCustomData('template_custom_metadata_num', $v);}
+	public function setEntriesChangedByPartnerNum($v)	{$this->putInCustomData('entries_changed_by_partner_num', $v);}
+	public function setSubPartnerRequestCampaign($v)	{$this->putInCustomData('sub_partner_request_campaign', $v);}
+
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
 	public function getPublishersQuota()				{return $this->getFromCustomData('publishers_quota', null, 0);}
@@ -1075,6 +1087,12 @@ class Partner extends BasePartner
 	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
 	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
 	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
+	public function getLastFreeTrialNotificationDay()	{return $this->getFromCustomData('last_free_trial_notification_day');}
+	public function getTemplateEntriesNum()				{return $this->getFromCustomData('template_entries_num', null, 0);}
+	public function getTemplateCategoriesNum()			{return $this->getFromCustomData('template_categories_num', null, 0);}
+	public function getTemplateCustomMetadataNum()		{return $this->getFromCustomData('template_custom_metadata_num', null, 0);}
+	public function getEntriesChangedByPartnerNum()		{return $this->getFromCustomData('entries_changed_by_partner_num', null, 0);}
+	public function getSubPartnerRequestCampaign()		{return $this->getFromCustomData('sub_partner_request_campaign', null, 0);}
 
 
     public function setLiveStreamBroadcastUrlConfigurations($key, $value)
@@ -1846,5 +1864,63 @@ class Partner extends BasePartner
 	public function setDefaultLiveStreamSegmentDuration($v)
 	{
 		$this->putInCustomData( "default_live_stream_segment_duration", $v );
+	}
+
+	/**
+	 * @param      string $name
+	 * @param      string $namespace
+	 * @return     boolean True if $name has been modified.
+	 */
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+
+	public function getPartnerUsagePercent()
+	{
+		if (!$this->partnerUsagePercent)
+			return 0;
+		return $this->partnerUsagePercent ;
+	}
+
+	public function setPartnerUsagePercent($v)
+	{
+		$this->partnerUsagePercent = $v;
+	}
+
+	public function getPublisherEnvironmentType()
+	{
+		return $this->getFromCustomData( self::PUBLISHER_ENVIRONMENT_TYPE, null , PublisherEnvironmentType::OVP );
+	}
+
+	public function setPublisherEnvironmentType($v)
+	{
+		return $this->putInCustomData( self::PUBLISHER_ENVIRONMENT_TYPE, $v );
+	}
+
+	public function getOvpEnvironmentUrl()
+	{
+		return $this->getFromCustomData( self::OVP_ENVIRONMENT_URL);
+	}
+
+	public function setOvpEnvironmentUrl($v)
+	{
+		return $this->putInCustomData( self::OVP_ENVIRONMENT_URL, $v );
+	}
+
+	public function getOttEnvironmentUrl()
+	{
+		return $this->getFromCustomData( self::OTT_ENVIRONMENT_URL);
+	}
+
+	public function setOttEnvironmentUrl($v)
+	{
+		return $this->putInCustomData( self::OTT_ENVIRONMENT_URL, $v );
 	}
 }

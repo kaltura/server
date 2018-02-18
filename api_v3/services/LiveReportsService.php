@@ -48,7 +48,7 @@ class LiveReportsService extends KalturaBaseService
 		list($dest->latitude, $dest->longitude) = array_map('floatval', explode('/', $coords));
 	}
 	
-	protected function setGeoCoordinates($item, $countryName, $cityName)
+	protected function setGeoCoordinates($item, $countryName, $regionName, $cityName)
 	{
 		$item->country = new KalturaCoordinate();
 		$item->country->name = strtoupper($countryName);
@@ -56,7 +56,7 @@ class LiveReportsService extends KalturaBaseService
 
 		$item->city = new KalturaCoordinate();
 		$item->city->name = strtoupper($cityName);
-		$this->getCoordinates($item->city, $countryName . '_' . $cityName);
+		$this->getCoordinates($item->city, $countryName . '_' . $regionName . '_' . $cityName);
 	}
 	
 	protected function getReportKava($reportType,
@@ -88,7 +88,7 @@ class LiveReportsService extends KalturaBaseService
 		
 		try
 		{
-			$items = call_user_func(array('kKavaLiveReportsMgr', $methodName), $this->getPartnerId(), $filter);
+			$items = call_user_func(array('kKavaLiveReportsMgr', $methodName), $this->getPartnerId(), $filter, $pager->pageSize);
 		}
 		catch (kKavaNoResultsException $e)
 		{
@@ -103,10 +103,13 @@ class LiveReportsService extends KalturaBaseService
 				$countryName = $item->countryName;
 				unset($item->countryName);
 				
+				$regionName = $item->regionName;
+				unset($item->regionName);
+
 				$cityName = $item->cityName;
 				unset($item->cityName);
-								
-				$this->setGeoCoordinates($item, $countryName, $cityName);
+
+				$this->setGeoCoordinates($item, $countryName, $regionName, $cityName);
 			}
 		}
 		
@@ -158,7 +161,7 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager;
 		
-		if (kConf::hasParam('druid_url'))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
 		{
 			return $this->getEventsKava($reportType, $filter);
 		}
@@ -203,11 +206,13 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager();
 		
-		if (kConf::hasParam('druid_url'))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
 		{
 			return $this->getReportKava($reportType, $filter, $pager);			
 		}
 		
+		ini_set('memory_limit', '700M');
+
 		$client = new WSLiveReportsClient();
 		$wsFilter = $filter->getWSObject();
 		$wsFilter->partnerId = kCurrentContext::getCurrentPartnerId();

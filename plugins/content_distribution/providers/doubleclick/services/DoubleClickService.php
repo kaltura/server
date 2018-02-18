@@ -17,12 +17,15 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param int $period
 	 * @param string $state
 	 * @param bool $ignoreScheduling
+	 * @param int $version
 	 * @return file
 	 * @ksOptional
 	 */
-	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false)
+	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false, $version = 2)
 	{
-		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling);
+		if (kConf::hasParam('dfp_version_1_partners') && in_array($this->getPartnerId(), kConf::get('dfp_version_1_partners')))
+			$version = 1;
+		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling, $version);
 		$context->keepScheduling = !$ignoreScheduling;
 		return $this->generateFeed($context, $distributionProfileId, $hash);
 	}
@@ -39,7 +42,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 			if (strpos($stateDecoded, '|') !== false)
 			{
 				$stateExploded = explode('|', $stateDecoded);
-				$context->stateLastEntryCreatedAt = $stateExploded[0];
+				$context->stateLastEntryTimeMark = $stateExploded[0];
 				$stateLastEntryIdsStr =  $stateExploded[1];
 				$context->stateLastEntryIds = explode(',', $stateLastEntryIdsStr);
 			}
@@ -47,15 +50,20 @@ class DoubleClickService extends ContentDistributionServiceBase
 	}
 	protected function fillnextStateDependentFields ($context, $entries) {
 		// Find the new state
-		$context->nextPageStateLastEntryCreatedAt = $context->stateLastEntryCreatedAt;
+		$context->nextPageStateLastEntryTimeMark = $context->stateLastEntryTimeMark;
 		$context->nextPageStateLastEntryIds = $context->stateLastEntryIds;
 		foreach($entries as $entry)
 		{
-			if ($context->nextPageStateLastEntryCreatedAt > $entry->getCreatedAt(null))
+			if($context->version < 2)
+				$timeMark = $entry->getCreatedAt(null);
+			else
+				$timeMark = $entry->getUpdatedAt(null);
+
+			if ($context->nextPageStateLastEntryTimeMark > $timeMark)
 				$context->nextPageStateLastEntryIds = array();
-	
+
 			$context->nextPageStateLastEntryIds[] = $entry->getId();
-			$context->nextPageStateLastEntryCreatedAt = $entry->getCreatedAt(null);
+			$context->nextPageStateLastEntryTimeMark = $timeMark;
 		}
 	}
 	
@@ -79,8 +87,14 @@ class DoubleClickService extends ContentDistributionServiceBase
 		// Add the state data to proceed to next page
 		$this->fillStateDependentFields($context);
 		
-		if ($context->stateLastEntryCreatedAt)
-			$entryFilter->set('_lte_created_at', $context->stateLastEntryCreatedAt);
+		if ($context->stateLastEntryTimeMark)
+		{
+			if ($context->version < 2)
+				$entryFilter->set('_lte_created_at', $context->stateLastEntryTimeMark);
+			else
+				$entryFilter->set('_lte_updated_at', $context->stateLastEntryTimeMark);
+		}
+
 		if ($context->stateLastEntryIds)
 			$entryFilter->set('_notin_id', $context->stateLastEntryIds);
 		
@@ -89,7 +103,10 @@ class DoubleClickService extends ContentDistributionServiceBase
 	
 	protected function getEntries($context, $orderBy = null, $limit = null) {
 		$context->hasNextPage = false;
-		$entries = parent::getEntries($context, null, $this->profile->getItemsPerPage() + 1); // get +1 to check if we have next page
+		$orderBy = null;
+		if($context->version == 2)
+			$orderBy = entryPeer::UPDATED_AT;
+		$entries = parent::getEntries($context, $orderBy, $this->profile->getItemsPerPage() + 1); // get +1 to check if we have next page
 		if (count($entries) === ($this->profile->getItemsPerPage() + 1)) { // we tried to get (itemsPerPage + 1) entries, meaning we have another page
 			$context->hasNextPage = true;
 			unset($entries[$this->profile->getItemsPerPage()]);
@@ -103,12 +120,22 @@ class DoubleClickService extends ContentDistributionServiceBase
 	{
 		// Construct the feed
 		$distributionProfileId = $this->profile->getId();
-		$feed = new DoubleClickFeed('doubleclick_template.xml', $this->profile);
-		$feed->setTotalResult($context->totalCount);
-		$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
-		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds));
+
+		$templateName = 'doubleclick_template.xml';
+		if($context->version == 2)
+			$templateName = 'doubleclick_version2_template.xml';
+
+		$feed = new DoubleClickFeed($templateName, $this->profile, $context->version);
+
+		if($context->version < 2)
+		{
+			$feed->setTotalResult($context->totalCount);
+			$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
+		}
+
+		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryTimeMark, $context->stateLastEntryIds, $context->version));
 		if ($context->hasNextPage)
-			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->nextPageStateLastEntryCreatedAt, $context->nextPageStateLastEntryIds));
+			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->nextPageStateLastEntryTimeMark, $context->nextPageStateLastEntryIds, $context->version));
 		
 		return $feed;
 	}
@@ -120,7 +147,11 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 		
 		$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
-		return $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
+
+		$captionAssets = null;
+		if($context->version == 2)
+			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		return $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints, $captionAssets, $entry);
 	}
 	
 	/**
@@ -129,10 +160,11 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param int $distributionProfileId
 	 * @param string $hash
 	 * @param string $entryId
+	 * @param int $version
 	 * @return file
 	 * @ksOptional
 	 */
-	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId)
+	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId, $version = 2)
 	{
 		$this->validateRequest($distributionProfileId, $hash);
 
@@ -142,13 +174,23 @@ class DoubleClickService extends ContentDistributionServiceBase
 			throw new KalturaAPIException (KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		// Construct the feed
-		$feed = new DoubleClickFeed ('doubleclick_template.xml', $this->profile);
-		$feed->setTotalResult(1);
-		$feed->setStartIndex(1);
+		if (kConf::hasParam('dfp_version_1_partners') && in_array($this->getPartnerId(), kConf::get('dfp_version_1_partners')))
+			$version = 1;
+
+		$templateName = 'doubleclick_template.xml';
+		if($version == 2)
+			$templateName = 'doubleclick_version2_template.xml';
+
+		$feed = new DoubleClickFeed ($templateName, $this->profile, $version);
+		if($version == 2)
+		{
+			$feed->setTotalResult(1);
+			$feed->setStartIndex(1);
+		}
 		
 		$entries = array();
 		$entries[] = $entry;
-		$context = new DoubleClickServiceContext($hash);
+		$context = new DoubleClickServiceContext($hash, 1, -1, '', false, $version);
 		$this->handleEntries($context, $feed, $entries);
 		return $this->doneFeedGeneration($context, $feed);
 		
@@ -172,10 +214,10 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 * @param string $hash
 	 * @param int $page
 	 */
-	protected function getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds)
+	protected function getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryTimeMark, $stateLastEntryIds, $version)
 	{
-		if (!is_null($stateLastEntryCreatedAt) && !is_null($stateLastEntryIds) && count($stateLastEntryIds) > 0)
-			$state = $stateLastEntryCreatedAt.'|'.implode(',', $stateLastEntryIds);
+		if (!is_null($stateLastEntryTimeMark) && !is_null($stateLastEntryIds) && count($stateLastEntryIds) > 0)
+			$state = $stateLastEntryTimeMark.'|'.implode(',', $stateLastEntryIds);
 		else
 			$state = '';
 		$urlParams = array(
@@ -184,6 +226,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 			'partnerId' => $this->getPartnerId(),
 			'distributionProfileId' => $distributionProfileId,
 			'hash' => $hash,
+			'version' => $version,
 			'page' => $page,
 			'state' => base64_encode($state),
 			'period' => $period,
