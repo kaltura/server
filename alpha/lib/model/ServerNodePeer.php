@@ -138,9 +138,20 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$c->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
 		$c->add(EntryServerNodePeer::SERVER_NODE_ID, null);
 		$c->addJoin(ServerNodePeer::ID, EntryServerNodePeer::SERVER_NODE_ID, Criteria::LEFT_JOIN);
+		$c->setLimit(3);
 		$objs = ServerNodePeer::doSelect($c, $con);
 
 		return $objs;
+	}
+
+	public static function retrieveByHostname($hostname)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ServerNodePeer::HOST_NAME, $hostname);
+
+		$v = ServerNodePeer::doSelect($criteria);
+		return !empty($v) > 0 ? $v[0] : null;
+
 	}
 
 } // ServerNodePeer

@@ -7,6 +7,7 @@
  * @subpackage api.services
  */
 class ConferenceService extends KalturaBaseService {
+	const CAN_REACH_EXPECTED_VALUE = 'kaltura';
 
 	/**
 	 * Allocates a conference room or returns ones that has already been allocated
@@ -38,20 +39,11 @@ class ConferenceService extends KalturaBaseService {
 		if ($existingConfRoom)
 			return $existingConfRoom;
 
-		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
-		if (!$serverNodes)
-		{
-			KalturaLog::debug("Could not find avaialable conference server node in pool");
-			if (kConf::get('CONFERNCE_SERVER_NODE_DYNAMIC_ALLOCATION', null, null) === true)
-			{
-				throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
-			}
-			throw new KalturaAPIException(KalturaKonferenceErrors::CONFERENCE_ROOMS_UNAVAILABLE);
-		}
+		$serverNode = $this->findFreeServerNode();
 		$confEntryServerNode = new ConferenceEntryServerNode();
 		$confEntryServerNode->setEntryId($entryId);
-		$confEntryServerNode->setServerNodeId($serverNodes[0]->getId());
-		$confEntryServerNode->setServerType($serverNodes[0]->getType());
+		$confEntryServerNode->setServerNodeId($serverNode->getId());
+		$confEntryServerNode->setServerType($serverNode->getType());
 		$confEntryServerNode->setConfRoomStatus(ConferenceRoomStatus::READY);
 		$confEntryServerNode->save();
 
@@ -73,6 +65,39 @@ class ConferenceService extends KalturaBaseService {
 		return null;
 	}
 
+	protected function findFreeServerNode()
+	{
+		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
+		if (!$serverNodes)
+		{
+			KalturaLog::debug("Could not find avaialable conference server node in pool");
+			if (kConf::get('CONFERNCE_SERVER_NODE_DYNAMIC_ALLOCATION', null, null) === true)
+			{
+				throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+			}
+			throw new KalturaAPIException(KalturaKonferenceErrors::CONFERENCE_ROOMS_UNAVAILABLE);
+		}
+		foreach ($serverNodes as $serverNode)
+		{
+			/**
+			 * @var ConferenceServerNode $serverNode
+			 */
+			if ($this->canReach($serverNode))
+				return $serverNode;
+		}
+		throw new KalturaAPIException(KalturaKonferenceErrors::CONFERENCE_ROOMS_UNREACHABLE);
+	}
+
+	protected function canReach(ConferenceServerNode $serverNode)
+	{
+		//TODO: make sure that HTTP protocol is available for RTC servers.
+		$aliveUrl = "https://" . $serverNode->getHostName() . ":" . $serverNode->getExternalPort() . "/alive";
+		$content = KCurlWrapper::getContent($aliveUrl);
+		if ($content === self::CAN_REACH_EXPECTED_VALUE)
+			return true;
+		return false;
+	}
+
 	/**
 	 * Returns a url to broadcast to the specified room
 	 *
@@ -82,7 +107,7 @@ class ConferenceService extends KalturaBaseService {
 	 * @return string
 	 * @throws KalturaAPIException
 	 */
-	public function getRoomUrl($confRoomId)
+	public function getRoomUrlAction($confRoomId)
 	{
 		$room = EntryServerNodePeer::retrieveByPK($confRoomId);
 		if (!$room)
@@ -99,6 +124,37 @@ class ConferenceService extends KalturaBaseService {
 			throw new KalturaAPIException($e->getMessage());
 		}
 		return $url;
+	}
+
+	/**
+	 * When the conf is finished this API should be called.
+	 *
+	 * @action finishConf
+	 * @actionAlias liveStream.finishConf
+	 * @param string $hostname
+	 * @return KalturaServerNode
+	 * @throws KalturaAPIException
+	 */
+	public function finishConfAction($hostname)
+	{
+		$serverNodeDb = ServerNodePeer::retrieveByHostname($hostname);
+		if (!$serverNodeDb)
+		{
+			KalturaLog::info("Could not find server node with hostname [" . $hostname . "]");
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
+		}
+		/**
+		 * @var ConferenceServerNode $serverNodeDb
+		 */
+		if ($serverNodeDb->getType() != KonferencePlugin::getCoreValue('ServerNodeType', ConferenceServerNodeType::CONFERENCE_SERVER) )
+		{
+			KalturaLog::info("Wrong server node type received");
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_WRONG_TYPE);
+		}
+		$serverNodeDb->removeAttachedEntryServerNodes();
+		$serverNode = new KalturaConferenceServerNode();
+		$serverNode->fromObject($serverNodeDb);
+		return $serverNode;
 	}
 
 }

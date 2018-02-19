@@ -21,10 +21,13 @@ class KonferencePlugin extends KalturaPlugin implements IKalturaObjectLoader, IK
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('ConferenceServerNodeType');
+			return array('ConferenceServerNodeType','ConferenceEntryType');
 	
 		if($baseEnumName == 'serverNodeType')
 			return array('ConferenceServerNodeType');
+
+		if($baseEnumName == 'entryType')
+			return array('ConferenceEntryType');
 			
 		return array();
 	}
@@ -37,7 +40,7 @@ class KonferencePlugin extends KalturaPlugin implements IKalturaObjectLoader, IK
 		if($baseClass == 'KalturaServerNode' && $enumValue == self::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER))
 			return new KalturaConferenceServerNode();
 		if($baseClass == 'KalturaBaseEntry' && $enumValue == self::getCoreValue('entryType', ConferenceEntryType::CONFERENCE))
-			return new KalturaConferenceServerNode();
+			return new KalturaLiveConferenceEntry();
 
 	}
 	

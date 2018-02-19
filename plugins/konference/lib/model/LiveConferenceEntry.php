@@ -9,6 +9,14 @@ class LiveConferenceEntry extends LiveEntry
 	{
 		parent::applyDefaultValues();
 		$this->setType(ConferenceEntryType::CONFERENCE);
-		$this->setStatus(entryStatus::NO_CONTENT);
 	}
+
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		$this->setStatus(entryStatus::READY);
+		$this->save();
+	}
+
+
 }
