@@ -1,5 +1,29 @@
 # Mercury 13.13.0 #
+## Add Parameters to Recorded Entry replaced EMAIL template ##
 
+- Issue Type: Support
+- Issue ID: SUP-13536
+
+### Configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_RecordedEntryReplaced_emailNotification.template.xml
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
+
+## fix Add-Media-Entry ready email template ##
+
+- Issue Type: Support
+- Issue ID: SUP-13536
+
+### Configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_06_20_AddMediaEntryReadyTemplate.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
+      	
 ## Update File-Sync version field type ##
 
 - Issue Type: Task
@@ -83,32 +107,6 @@ None.
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_23_getCsv_user_permissions.php
 	
-## Add Parameters to Recorded Entry replaced EMAIL template ##
-
-- Issue Type: Support
-- Issue ID: SUP-13536
-
-### Configuration ###
-First replace all tokens from the XML files below and remove ".template" from the file name:
-	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_RecordedEntryReplaced_emailNotification.template.xml
-
-### Deployment scripts ###
-      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
-
-## fix Add-Media-Entry ready email template ##
-
-- Issue Type: Support
-- Issue ID: SUP-13536
-
-### Configuration ###
-First replace all tokens from the XML files below and remove ".template" from the file name:
-	/opt/kaltura/app/deployment/updates/scripts/xml/2017_06_20_AddMediaEntryReadyTemplate.template.xml
-
-### Deployment scripts ###
-
-	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
-      	
- 
 # Mercury 13.12.0 #
 
 ## Split beacon index to index per object type ##
