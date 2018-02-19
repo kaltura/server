@@ -24,8 +24,6 @@ class ReportService extends KalturaBaseService
 		KalturaReportType::LIVE,
 		KalturaReportType::TOP_PLAYBACK_CONTEXT,
 		KalturaReportType::VPAAS_USAGE,
-		KalturaReportType::TOP_CONTRIBUTORS,
-		KalturaReportType::CONTENT_CONTRIBUTIONS,
 	);
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -70,6 +68,9 @@ class ReportService extends KalturaBaseService
 		
 		$stmt = PartnerPeer::doSelectStmt($c);
 		$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		if (!$partnerIds)
+			return Partner::PARTNER_THAT_DOWS_NOT_EXIST;
+
 		return implode(',', $partnerIds); 
 	}
 		
