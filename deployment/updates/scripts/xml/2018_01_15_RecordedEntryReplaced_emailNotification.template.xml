@@ -95,6 +95,27 @@
                             <code>$scope->getObject()->getReferenceID()</code>
                         </value>
                     </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_name</key>
+                        <description>Entry creator name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_id</key>
+                        <description>Entry creator ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getObject()->getKuserId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_email</key>
+                        <description>Entry creator email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getObject()->getkuser()->getEmail()</code>
+                        </value>
+                    </item>
                 </contentParameters>
             </template>
         </request>
