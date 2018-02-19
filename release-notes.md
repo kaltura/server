@@ -1,4 +1,4 @@
-# Mercury 13.13.0 #
+# Mercury 13.14.0 #
 ## Add Parameters to Recorded Entry replaced EMAIL template ##
 
 - Issue Type: Support
@@ -24,6 +24,7 @@ First replace all tokens from the XML files below and remove ".template" from th
 
 	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
       	
+# Mercury 13.13.0 #
 ## Update File-Sync version field type ##
 
 - Issue Type: Task
