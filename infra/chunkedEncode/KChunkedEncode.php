@@ -582,6 +582,16 @@
 			if(isset($params->formatParams))
 				$mergeCmd.= " ".$params->formatParams;
 			$mergeCmd.= " -f $params->format -copyts";
+				/*
+				 * Following code uses ffmpeg patch to clean up mpeg-ts leftovers from remuxed mp4 files.
+				 * Required for udrm support
+				 */
+			if($params->format=="mp4") {
+				if($params->vcodec=="libx264")
+					$mergeCmd.= " -nal_types_mask 0x3e";
+				else if($params->vcodec=="libx265")
+					$mergeCmd.= " -nal_types_mask 0xffffffff";
+			}
 
 			if(($key=array_search("-tag:v", $params->cmdLineArr))!==false) {
 				$mergeCmd.= " -tag:v ".$params->cmdLineArr[$key+1];
