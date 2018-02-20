@@ -3,31 +3,14 @@
  * @package plugins.cielo24
  */
 class Cielo24ClientHelper
-{	
+{
+	const CIELO24_PERFORM_TRANSCRIPTION = "perform_transcription";
+
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;
 	private $apiCredentialsStr = null;
 	private $additionalParams = array();
-	private static $getTranscriptWhitelistedParams = array (
-															"emit_speaker_change_tokens_as",
-															"newlines_after_paragraph",
-															"newlines_after_sentence",
-															"mask_profanity",
-															"remove_sounds_list",
-															"remove_sound_references",
-															"replace_slang",
-															"timecode_every_paragraph",
-														);
-	private static $getCaptionWhitelistedParams = array (
-															"disallow_dangling",
-															"remove_disfluencies",
-															"display_speaker_id",
-															"emit_speaker_change_tokens_as",
-															"mask_profanity",
-															"replace_slang",
-															"remove_sound_references",
-															);
-	 
+
 	
 	public function __construct($username, $password, $baseUrl = null, $additionalParams = array())
 	{
@@ -101,8 +84,14 @@ class Cielo24ClientHelper
 		$requestParams = array("job_id" => $jobId,
 								"transcription_fidelity" => $fidelity,
 								"priority" => $priority,
-								"callback_url" => $callBackUrl
+								"callback_url" => $callBackUrl,
 								);
+
+		if (isset($this->additionalParams[self::CIELO24_PERFORM_TRANSCRIPTION]))
+		{
+			$requestParams = array_merge($requestParams, $this->additionalParams[self::CIELO24_PERFORM_TRANSCRIPTION]);
+		}
+
 		$requestTransctiptAPIUrl = $this->createAPIUrl("job/perform_transcription", $requestParams);
 		$requestTranscriptionResult = $this->sendAPICall($requestTransctiptAPIUrl);
 		if(!$requestTranscriptionResult || !isset($requestTranscriptionResult->TaskId))
@@ -159,8 +148,7 @@ class Cielo24ClientHelper
 			$additionalParameters = array ();
 			foreach ($this->additionalParams['get_transcript'] as $key => $value)
 			{
-				if (in_array ($key, self::$getTranscriptWhitelistedParams))
-					$additionalParameters[$key] = $value;
+				$additionalParameters[$key] = $value;
 			}
 			
 			$transcriptRetrievalParams = array_merge($transcriptRetrievalParams, $additionalParameters);
@@ -191,8 +179,7 @@ class Cielo24ClientHelper
 			$additionalParameters = array ();
 			foreach ($this->additionalParams['get_caption'] as $key => $value)
 			{
-				if (in_array ($key, self::$getCaptionWhitelistedParams))
-					$additionalParameters[$key] = $value;
+				$additionalParameters[$key] = $value;
 			}
 			$captionRetrievalParams = array_merge($captionRetrievalParams, $additionalParameters);
 		}
