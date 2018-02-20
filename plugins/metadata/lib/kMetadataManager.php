@@ -831,11 +831,8 @@ class kMetadataManager
 				$profileFieldData['value_text'] = array();
 				foreach ($searchItemValues as $searchItemValue)
 				{
-					if(iconv_strlen($searchItemValue, 'UTF-8') >= 128)
-						continue;
-
-					if(strlen($searchItemValue) > kElasticSearchManager::MAX_LENGTH)
-						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::MAX_LENGTH);
+					if(strlen($searchItemValue) > kElasticSearchManager::MAX_METADATA_LENGTH)
+						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::MAX_METADATA_LENGTH);
 
 					$profileFieldData['value_text'][] = $searchItemValue;
 				}
@@ -862,8 +859,8 @@ class kMetadataManager
 			{
 				foreach ($searchItemValues as &$searchItemValue)
 				{
-					if(strlen($searchItemValue) > kElasticSearchManager::MAX_LENGTH)
-						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::MAX_LENGTH);
+					if(strlen($searchItemValue) > kElasticSearchManager::MAX_METADATA_LENGTH)
+						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::MAX_METADATA_LENGTH);
 				}
 				$profileFieldData['value_text'] = $searchItemValues;
 			}
