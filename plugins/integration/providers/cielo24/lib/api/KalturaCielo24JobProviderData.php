@@ -147,13 +147,13 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 		{
 			if (!isset(self::$whitelistedActionParams[$action]))
 			{
-				throw new KalturaAPIException (KalturaCielo24Errors::ILLEGAL_ADDITIONAL_PARAMETERS_DETECTED);
+				throw new KalturaAPIException (KalturaCielo24Errors::ILLEGAL_ADDITIONAL_PARAMETERS_DETECTED, $action);
 			}
 			foreach ($actionParams as $actionParam)
 			{
 				if (!isset(self::$whitelistedActionParams[$action][$actionParam]))
 				{
-					throw new KalturaAPIException (KalturaCielo24Errors::ILLEGAL_ADDITIONAL_PARAMETERS_DETECTED);
+					throw new KalturaAPIException (KalturaCielo24Errors::ILLEGAL_ADDITIONAL_PARAMETERS_DETECTED, $actionParam);
 				}
 			}
 		}
@@ -216,7 +216,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 			if ($cielo24OptionsObj->priority)
 			{
 				$additionalParams = json_decode($object->getAdditionalParameters(), true);
-				$additionalParams["perform_transcription"]["priority"] = $cielo24OptionsObj->priority;
+				$additionalParams[Cielo24ClientHelper::CIELO24_PERFORM_TRANSCRIPTION]["priority"] = $cielo24OptionsObj->priority;
 
 				$object->setAdditionalParameters(json_encode($additionalParams));
 			}
