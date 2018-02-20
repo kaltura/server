@@ -12,7 +12,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     const MAX_SQL_LENGTH = 131072;// 128 * 1024
     const CACHE_PREFIX_STICKY_SESSIONS = 'elastic_large_sql_lock_';
     const REPETITIVE_UPDATES_CONFIG_KEY = 'skip_elastic_repetitive_updates';
-    const MAX_METADATA_LENGTH = 256;
+    const METADATA_MAX_LENGTH = 256;
 
     /**
      * @param BaseObject $object
