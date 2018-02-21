@@ -8,7 +8,6 @@
 
 ## Kaltura ENV
 *Please fill out this section if you are hosting the Kaltura platform on your own servers [as opposed to using Kaltura SaaS].
-
 In the event of SaaS, the below should be deleted.*
 
 
