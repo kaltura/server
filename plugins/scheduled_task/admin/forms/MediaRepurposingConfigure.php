@@ -273,9 +273,11 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 			if ($value != 'N/A')
 				$filter->$key = $value;
 
-		$metadataSearchArray = $this->buildMetadataSearchArray($formData['AdvanceSearch']);
-		$filter->advancedSearch = MediaRepurposingUtils::createSearchOperator($metadataSearchArray);
-
+		if ($filterType != 'Kaltura_Client_Reach_Type_EntryVendorTaskFilter')
+		{
+			$metadataSearchArray = $this->buildMetadataSearchArray($formData['AdvanceSearch']);
+			$filter->advancedSearch = MediaRepurposingUtils::createSearchOperator($metadataSearchArray);
+		}
 		return $filter;
 	}
 

@@ -155,7 +155,7 @@ class MediaRepurposingUtils
 		$scheduleTask->name = $name;
 		$scheduleTask->status = ScheduledTaskProfileStatus::DISABLED;
 
-		if (!$originalFilter->advancedSearch)
+		if (!$originalFilter->advancedSearch && get_class($originalFilter) != 'Kaltura_Client_Reach_Type_EntryVendorTaskFilter')
 			$originalFilter->advancedSearch = self::createSearchOperator();
 
 		// clone the advance search field and add the status-not-exclude filter
@@ -186,9 +186,12 @@ class MediaRepurposingUtils
 	private static function appendMRStatusfilter($originalFilter, $partnerId)
 	{
 		$filter = clone $originalFilter;
-		$advanceSearch = clone $filter->advancedSearch;
-		array_unshift($advanceSearch->items, self::createMRFilterForStatus($partnerId));
-		$filter->advancedSearch = $advanceSearch;
+		if ($filter->advancedSearch)
+		{
+			$advanceSearch = clone $filter->advancedSearch;
+			array_unshift($advanceSearch->items, self::createMRFilterForStatus($partnerId));
+			$filter->advancedSearch = $advanceSearch;
+		}
 		return $filter;
 	}
 
