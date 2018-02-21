@@ -90,7 +90,13 @@
 										<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
 									<?php endif;?>
 								<?php endif; ?>
-								
+                                
+                                
+								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
+									<?php if (Zend_Registry::get('config')->settings->kavaDashboard->partnerUrl): ?>
+                                        <option value="kavaDashboard" ><?php echo $this->translate('Kava Dashboard'); ?></option>
+									<?php endif; ?>
+								<?php endif; ?>
 								
 								
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users')): ?>
@@ -211,6 +217,11 @@ function widgets(partnerId) {
 
 function manage(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
+	window.open(url);
+}
+
+function kavaDashboard(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kava-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
 	window.open(url);
 }
 
