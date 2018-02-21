@@ -7,8 +7,7 @@
 
 
 ## Kaltura ENV
-*Please fill out this section if you are hosting the Kaltura platform on your own servers [as opposed to using Kaltura SaaS].
-In the event of SaaS, the below should be deleted.*
+*Please fill out this section if you are hosting the Kaltura platform on your own servers [as opposed to using Kaltura SaaS]. In the event of SaaS, the below should be deleted.*
 
 
 **Relevant errors from /opt/kaltura/log/kaltura_api_v3.log, /opt/kaltura/log/kaltura_apache_errors*log and /opt/kaltura/log/kaltura_prod.log:**
