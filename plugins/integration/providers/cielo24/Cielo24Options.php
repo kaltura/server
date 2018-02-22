@@ -23,13 +23,7 @@ class Cielo24Options
  	 * Should transform DFXP
  	 */
  	public $transformDfxp;
-
-	/**
-	 * @var string
-	 * Job priority
-	 */
- 	public $priority;
-
+	
 	/**
 	 * Default set of parameters to be sent for get_caption and get_transcript
 	 * @var string

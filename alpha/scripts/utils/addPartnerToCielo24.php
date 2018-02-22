@@ -9,8 +9,7 @@
 	$password = $argv[3];
 	$baseUrl = isset($argv[4]) ? $argv[4] : null;
 	$transformDfxp = isset($argv[5]) ? (bool)$argv[5] : null;
-	$priority = isset($argv[6]) ? $argv[6] : null;
-	$defaultParams = isset($argv[7]) ? $argv[7] : null;
+	$defaultParams = isset($argv[6]) ? $argv[6] : null;
 
 	$partner = PartnerPeer::retrieveByPK($partnerId);
 
@@ -35,11 +34,6 @@
 
 	if (!is_null($transformDfxp)) {
 		$options->transformDfxp = $transformDfxp;
-	}
-
-	if (!is_null($priority))
-	{
-		$options->priority = $priority;
 	}
 
 	if (!is_null($defaultParams)) {
