@@ -251,6 +251,7 @@ class PartnerController extends Zend_Controller_Action
 		$sessionExpiry = $settings->sessionExpiry;
 		$kavaDashboardUrl = $settings->kavaDashboard->partnerUrl;
 		$jwtKey = $settings->kavaDashboard->partnerJwtKey;
+		$partnerId = $this->_getParam('partner_id');
 		
 		$partnerkavaDashboardUrl = Form_KavaHelper::generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
 		$this->getResponse()->setRedirect($partnerkavaDashboardUrl);
