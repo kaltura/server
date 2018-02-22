@@ -247,37 +247,13 @@ class PartnerController extends Zend_Controller_Action
 	
 	public function kavaRedirectAction()
 	{
-		$partnerId = $this->_getParam('partner_id');
-		$userId = $this->_getParam('user_id');
-		
-		$client = Infra_ClientHelper::getClient();
-		
-		$client->startMultiRequest();
-		
-		$currentPartner = $client->partner->getInfo();
-		
-		if (!$userId)
-		{
-			$impersonatedPartner = $client->partner->get($partnerId);
-			/* @var $impersonatedPartner Kaltura_Client_Type_Partner */
-		}
-		
-		/* @var $currentPartner Kaltura_Client_Type_Partner */
-		$client->session->impersonate('{1:result:adminSecret}', $partnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement,disablechangeaccount");
-		
-		$result = $client->doMultiRequest();
-		
-		$url = null;
 		$settings = Zend_Registry::get('config')->settings;
-		if($settings->kavaDashboard->partnerUrl)
-		{
-			$url = $settings->kavaDashboard->partnerUrl;
-		}
+		$sessionExpiry = $settings->sessionExpiry;
+		$kavaDashboardUrl = $settings->kavaDashboard->partnerUrl;
+		$jwtKey = $settings->kavaDashboard->partnerJwtKey;
 		
-		// The KS is always the last item received in the multi-request
-		$ks = $result[count($result)-1];
-		$url .= '?ks='.$ks;
-		$this->getResponse()->setRedirect($url);
+		$partnerkavaDashboardUrl = Form_KavaHelper::generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
+		$this->getResponse()->setRedirect($partnerkavaDashboardUrl);
 	}
 	
 	public function configureStorageAction()

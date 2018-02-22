@@ -49,7 +49,6 @@ class IndexController extends Zend_Controller_Action
     	
     }
 	
-
 	public function kavaAction()
 	{
 		$settings = Zend_Registry::get('config')->settings;
@@ -61,33 +60,6 @@ class IndexController extends Zend_Controller_Action
 		if(!$kavaDashboardUrl || !$jwtKey)
 			$this->view->kavaDashboardUrl = null;
 		else
-			$this->view->kavaDashboardUrl = $this->generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
+			$this->view->kavaDashboardUrl = Form_KavaHelper::generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
 	}
-	
-	private function generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry)
-	{
-		$jwtPayload = array(
-			'partnerId' => $partnerId,
-			'iat' => time(),
-			'exp' => time() + $sessionExpiry,
-		);
-		$jwt = $this->encode($jwtPayload, $jwtKey);
-		return rtrim($kavaDashboardUrl, "/") . "/?jwt=" . $jwt;
-	}
-	
-	private function urlsafeB64Encode($input)
-	{
-		return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
-	}
-
-	private function encode($payload, $key)
-	{
-		$header = array('typ' => 'JWT', 'alg' => 'HS256');
-		$result = $this->urlsafeB64Encode(json_encode($header)) . '.' .
-			$this->urlsafeB64Encode(json_encode($payload));
-		$signature = hash_hmac('sha256', $result, $key, true);
-		$result .= '.' . $this->urlsafeB64Encode($signature);
-		return $result;
-	}
-
 }
