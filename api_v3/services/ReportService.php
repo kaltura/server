@@ -7,24 +7,24 @@
  */
 class ReportService extends KalturaBaseService
 {
-    static $kavaReports = array(KalturaReportType::TOP_CONTENT,
-        KalturaReportType::CONTENT_DROPOFF,
-        KalturaReportType::CONTENT_INTERACTIONS,
-        KalturaReportType::MAP_OVERLAY,
-        KalturaReportType::TOP_SYNDICATION,
-        KalturaReportType::USER_ENGAGEMENT,
-        KalturaReportType::SPECIFIC_USER_ENGAGEMENT,
-        KalturaReportType::USER_TOP_CONTENT,
-        KalturaReportType::USER_CONTENT_DROPOFF,
-        KalturaReportType::USER_CONTENT_INTERACTIONS,
-        KalturaReportType::APPLICATIONS,
-        KalturaReportType::PLATFORMS,
-        KalturaReportType::OPERATING_SYSTEM,
-        KalturaReportType::BROWSERS,
-        KalturaReportType::LIVE,
-        KalturaReportType::TOP_PLAYBACK_CONTEXT,
-        KalturaReportType::VPAAS_USAGE
-    );
+	static $kavaReports = array(KalturaReportType::TOP_CONTENT,
+		KalturaReportType::CONTENT_DROPOFF,
+		KalturaReportType::CONTENT_INTERACTIONS,
+		KalturaReportType::MAP_OVERLAY,
+		KalturaReportType::TOP_SYNDICATION,
+		KalturaReportType::USER_ENGAGEMENT,
+		KalturaReportType::SPECIFIC_USER_ENGAGEMENT,
+		KalturaReportType::USER_TOP_CONTENT,
+		KalturaReportType::USER_CONTENT_DROPOFF,
+		KalturaReportType::USER_CONTENT_INTERACTIONS,
+		KalturaReportType::APPLICATIONS,
+		KalturaReportType::PLATFORMS,
+		KalturaReportType::OPERATING_SYSTEM,
+		KalturaReportType::BROWSERS,
+		KalturaReportType::LIVE,
+		KalturaReportType::TOP_PLAYBACK_CONTEXT,
+		KalturaReportType::VPAAS_USAGE,
+	);
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -68,6 +68,9 @@ class ReportService extends KalturaBaseService
 		
 		$stmt = PartnerPeer::doSelectStmt($c);
 		$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		if (!$partnerIds)
+			return Partner::PARTNER_THAT_DOWS_NOT_EXIST;
+
 		return implode(',', $partnerIds); 
 	}
 		

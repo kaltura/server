@@ -96,33 +96,43 @@ class elasticClient
 	 * @param $cmd
 	 * @param $method
 	 * @param null $body
+	 * @param $logQuery bool
 	 * @return mixed
 	 * @throws kESearchException
 	 */
-	protected function sendRequest($cmd, $method, $body = null)
+	protected function sendRequest($cmd, $method, $body = null, $logQuery = false)
 	{
 		curl_setopt($this->ch, CURLOPT_URL, $cmd);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true); //TRUE to return the transfer as a string of the return value of curl_exec() instead of outputting it out directly
 		curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, $method); // PUT/GET/POST/DELETE
 		curl_setopt($this->ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 		if ($body)
-			curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($body));
+		{
+			$jsonEncodedBody = json_encode($body);
+			curl_setopt($this->ch, CURLOPT_POSTFIELDS, $jsonEncodedBody);
+			if ($logQuery)
+				KalturaLog::debug("Elastic client request: ".$jsonEncodedBody);
+		}
 		
 		$response = curl_exec($this->ch);
-		if (!$response) {
+		if (!$response)
+		{
 			$code = $this->getErrorNumber();
 			$message = $this->getError();
 			KalturaLog::err("Elastic client curl error code[" . $code . "] message[" . $message . "]");
-		} else {
+		}
+		else
+		{
+			KalturaLog::debug("Elastic client response " .$response);
 			//return the response as associative array
 			$response = json_decode($response, true);
-			if (isset($response['error'])) {
+			if (isset($response['error']))
+			{
 				$data = array();
 				$data['errorMsg'] = $response['error'];
 				$data['status'] = $response['status'];
 				throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
 			}
-			KalturaLog::debug("Elastic client response " . print_r($response, true));
 		}
 		
 		return $response;
@@ -151,9 +161,10 @@ class elasticClient
 	/**
 	 * search API
 	 * @param array $params
+	 * @param $logQuery bool
 	 * @return mixed
 	 */
-	public function search(array $params)
+	public function search(array $params, $logQuery = false)
 	{
 		kApiCache::disableConditionalCache();
 		$cmd = $this->buildElasticCommandUrl($params, '', self::ELASTIC_ACTION_SEARCH);
@@ -164,7 +175,7 @@ class elasticClient
 		if (isset($params[self::ELASTIC_FROM_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_FROM_KEY] = $params[self::ELASTIC_FROM_KEY];
 		
-		$val = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY]);
+		$val = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], $logQuery);
 		return $val;
 	}
 	

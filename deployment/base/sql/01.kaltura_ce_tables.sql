@@ -315,8 +315,7 @@ CREATE TABLE IF NOT EXISTS `caption_asset_item` (
   `start_time` int(11) DEFAULT NULL,
   `end_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `caption_asset` (`caption_asset_id`),
-  KEY `partner_caption_asset` (`partner_id`,`caption_asset_id`)
+  KEY `caption_asset` (`caption_asset_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `category` */
@@ -780,10 +779,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   `available_from` datetime DEFAULT NULL,
   `last_played_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `kshow_created_index` (`kshow_id`,`created_at`),
   KEY `int_id_index` (`int_id`),
-  KEY `entry_FI_2` (`kuser_id`),
-  KEY `status_created_index` (`status`,`created_at`),
   KEY `partner_status_index` (`partner_id`,`status`),
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_created_at` (`partner_id`,`created_at`)
