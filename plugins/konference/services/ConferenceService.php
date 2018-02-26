@@ -20,6 +20,19 @@ class ConferenceService extends KalturaBaseService {
 	 */
 	public function allocateConferenceRoomAction($entryId)
 	{
+		$liveEntryDb = entryPeer::retrieveByPK($entryId);
+		if (!$liveEntryDb)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		/**
+		 * @var LiveStreamEntry $liveEntryDb
+		 */
+		if ($liveEntryDb->getType() != entryType::LIVE_STREAM)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE, $liveEntryDb->getName(), $liveEntryDb->getType(), entryType::LIVE_STREAM);
+		}
+
 		$existingConfRoom = $this->findExistingConferenceRoom($entryId);
 		if ($existingConfRoom)
 			return $existingConfRoom;
@@ -58,6 +71,16 @@ class ConferenceService extends KalturaBaseService {
 		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
 		if ($existingConfRoom)
 		{
+			/**
+			 * @var EntryServerNode $existingConfRoom
+			 */
+			$serverNode = ServerNodePeer::retrieveByPK($existingConfRoom->getServerNodeId());
+			if (!$this->canReach($serverNode))
+			{
+				$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
+				$serverNode->save();
+				return null;
+			}
 			$outObj = new KalturaConferenceEntryServerNode();
 			$outObj->fromObject($existingConfRoom);
 			return $outObj;
@@ -84,6 +107,8 @@ class ConferenceService extends KalturaBaseService {
 			 */
 			if ($this->canReach($serverNode))
 				return $serverNode;
+			$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
+			$serverNode->save();
 		}
 		throw new KalturaAPIException(KalturaKonferenceErrors::CONFERENCE_ROOMS_UNREACHABLE);
 	}
