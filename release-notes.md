@@ -1,3 +1,15 @@
+# Mercury 13.15.0 #
+## Taking a break with explicit-live feature breaks player playback ##
+
+- Issue Type: Support
+- Issue ID: PLAT-8554
+
+### Configuration ###
+None. 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_04_add_is_playable_user_configurations_KalturaLiveEntryServerNode.php
+
 # Mercury 13.14.0 #
 ## Add Parameters to Recorded Entry replaced EMAIL template ##
 
