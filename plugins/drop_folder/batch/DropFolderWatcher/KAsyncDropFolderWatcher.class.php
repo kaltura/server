@@ -45,7 +45,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 				if (!$folder)
 					continue;
 				$this->impersonate($folder->partnerId);
-				$engine = KDropFolderEngine::getInstance($folder->type);			    	
+				$engine = KDropFolderEngine::getInstance($folder->type);
+				$engine->setMaximumExecutionTime(self::$taskConfig->maximumExecutionTime);
 				$engine->watchFolder($folder);
 				$this->unimpersonate();
 				$this->freeExclusiveDropFolder($folder->id);		
