@@ -214,11 +214,13 @@
 	function removeDisableTags()
 	{
 		jQuery('#rule-fieldSet').removeAttr('disabled');
+		jQuery('#dictionary-fieldSet').removeAttr('disabled');
 	}
 
 	function addDisableTags()
 	{
 		jQuery('#rule-fieldSet').attr('disabled', 'disabled');
+		jQuery('#dictionary-fieldSet');
 	}
 
 	function loadVendorProfile(paramStr)
@@ -268,6 +270,9 @@
 		//remove all template field
 		$('fieldset[id^="vendorProfileRuleTemplate"]').remove();
 		setRuleData();
+		//remove all template field
+		$('fieldset[id^="DictionaryTemplate"]').remove();
+		setDictionaryData();
 	}
     
 	function setRuleData() {
@@ -281,7 +286,7 @@
 	}
 
     function buildOutputParams(paramName, index) {
-        var param = {};
+	    var param = {};
         jQuery('#' + paramName + index).find('input,select').each(function(idx) {
             var type = $( this ).attr("type");
             var name = $( this ).attr("name");
@@ -348,5 +353,41 @@
 		}
 		if (isNaN(val))
 			alert("Please enter a valid Date!");
+	}
+
+
+	function setDictionaryData() {
+		var dictionaries = [];
+		var maxDictionariesIndex = jQuery('#dictionary-fieldSet').attr('maxDictionariesIndex');
+		for(i=0; i<=maxDictionariesIndex; i++)
+		{
+			if(jQuery('#Dictionary_' + i).length > 0)
+			{
+				var dictionary = (buildDictionaryParams('Dictionary_', i));
+				if (dictionary)
+					dictionaries.push(dictionary);
+			}
+		}
+		jQuery('#VendorProfileDictionaries').val(JSON.stringify(dictionaries));
+	}
+
+	function buildDictionaryParams(paramName, index ) {
+		var param = {};
+		var isValid = true;
+		jQuery('#' + paramName + index).find('input,select').each(function (idx) {
+			var type = $(this).attr("type");
+			var name = $(this).attr("name");
+			var val = $(this).val();
+			if (type == 'hidden')
+				return;
+			if ( !val || val == 'N/A')
+				isValid = false;
+			param[name] = val;
+			$(this).remove();
+		});
+		if (isValid )
+			return param;
+		else
+			return null;
 	}
 </script>

@@ -126,6 +126,19 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$this->addDisplayGroup(array('place_holder3'), 'vendorProfileCredit', array(
 			'legend' => 'Credit Configuration',
 		));
+
+		$this->addLine("Dictionaries Line");
+		$this->addTitle('Vendor Profile Dictionaries:');
+		$this->addTitle('Max 1000 Characters per dictionary');
+
+		$dictionariesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+		$dictionariesSubForm ->addDecorator('ViewScript', array(
+			'viewScript' => 'dictionaries-sub-form.phtml',
+		));
+		$this->addSubForm($dictionariesSubForm , 'VendorProfileDictionaries_');
+		$innerDictionariesSubForm = new Form_DictionariesSubForm ('Kaltura_Client_Reach_Type_Dictionary');
+		$this->addSubForm($innerDictionariesSubForm , "DictionaryTemplate");
+
 	}
 
 	public static $rulesMap = array("Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified" => "Entry_Tags_Modified",
@@ -174,8 +187,23 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			}
 		}
 
+		$this->populateDictionaries($object);
 		$this->populateRules($object);
 		$this->getSubForm("vendorProfileCredit")->populateFromObject($object->credit);
+
+	}
+
+	private function populateDictionaries($object)
+	{
+		$dictionaries = array();
+		foreach ($object->dictionaries as $dictionary)
+		{
+			$newDictionary = array();
+			$newDictionary['language'] = $dictionary->language;
+			$newDictionary['data'] = $dictionary->data;
+			$dictionaries[] = $newDictionary;
+		}
+		$this->setDefault('VendorProfileDictionaries',  json_encode($dictionaries));
 	}
 
 	private function populateRules($object)
@@ -224,8 +252,18 @@ class Form_VendorProfileConfigure extends ConfigureForm
 
 		$object->rules = $rulesArray;
 
-		$object->credit = $this->getSubForm("vendorProfileCredit")->getObject($properties["vendorProfileCredit"]);
+		$dictionaries = $properties['VendorProfileDictionaries'];
+		$dictionariesArray = array();
+		foreach (json_decode($dictionaries) as $dictionary)
+		{
+			$dictionaryItem = new Kaltura_Client_Reach_Type_Dictionary();
+			$dictionaryItem->language = $dictionary->language;
+			$dictionaryItem->data = $dictionary->data;
+			$dictionariesArray [] = $dictionaryItem;
+		}
+		$object->dictionaries = $dictionariesArray;
 
+		$object->credit = $this->getSubForm("vendorProfileCredit")->getObject($properties["vendorProfileCredit"]);
 		return $object;
 	}
 
@@ -258,5 +296,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$vendorProfile->createdAt = null;
 		$vendorProfile->updatedAt = null;
 		$vendorProfile->VendorProfileRules = null;
+		$vendorProfile->VendorProfileDictionaries = null;
 	}
 }

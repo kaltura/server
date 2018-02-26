@@ -20,6 +20,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	const CUSTOM_DATA_ERR_DESCRIPTION = 	'err_description';
 	const CUSTOM_DATA_USER_ID = 			'user_id';
 	const CUSTOM_DATA_MODERATING_USER = 	'moderating_user';
+	const CUSTOM_DATA_DICTIONARY =          'dictionary';
 	
 	//setters
 	
@@ -27,7 +28,12 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_NOTES, $v);
 	}
-	
+
+	public function setDictionary($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_DICTIONARY, $v);
+	}
+
 	public function setAccessKey($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ACCESS_KEY, $v);
@@ -49,7 +55,12 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	}
 	
 	//getters
-	
+
+	public function getDictionary()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_DICTIONARY, null, null);
+	}
+
 	public function getNotes()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES, null, null);

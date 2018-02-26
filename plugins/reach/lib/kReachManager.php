@@ -171,7 +171,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$status = EntryVendorTaskStatus::PENDING;
 		if($validateModeration && $vendorProfile->shouldModerate($vendorCatalogItem->getServiceType()))
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
-		
+
+		foreach ($vendorProfile->getDictionariesArray() as $dictionary)
+		{
+			/* @var kDictionary $dictionary*/
+			if ($dictionary->getLanguage() == $vendorCatalogItem->getSourceLanguage())
+			{
+				$entryVendorTask->setDictionary($dictionary->getData());
+				break;
+			}
+		}
+
 		$entryVendorTask->setStatus($status);
 		$entryVendorTask->save();
 		

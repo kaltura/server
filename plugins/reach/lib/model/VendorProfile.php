@@ -16,6 +16,7 @@
 class VendorProfile extends BaseVendorProfile 
 {
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 				'rules_array_compressed';
+	const CUSTOM_DATA_DICTIONARY_ARRAY_COMPRESSED = 		'dictionary_array_compressed';
 	const CUSTOM_DATA_DEFAULT_OUTPUT_FORMAT = 				'default_output_format';
 	const CUSTOM_DATA_DEFAULT_SOURCE_LANGUAGE = 			'default_source_language';
 	
@@ -114,6 +115,61 @@ class VendorProfile extends BaseVendorProfile
 		}
 		
 		$this->setRules($serializedRulesArray);
+	}
+
+	public function setDictionariesArrayCompressed($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_DICTIONARY_ARRAY_COMPRESSED, $v);
+	}
+
+	public function setDictionariesArray($dictionaries)
+	{
+		$serializedDictionariesArray = serialize($dictionaries);
+
+		if(strlen($serializedDictionariesArray) > myCustomData::MAX_TEXT_FIELD_SIZE)
+		{
+			$this->setDictionariesArrayCompressed(true);
+			$serializedDictionariesArray = gzcompress($serializedDictionariesArray);
+			if(strlen(utf8_encode($serializedDictionariesArray)) > myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
+				throw new kCoreException('Exceeded max size allowed for access control', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
+
+		}
+		else
+		{
+			$this->setDictionariesArrayCompressed(false);
+		}
+
+		$this->setDictionary($serializedDictionariesArray);
+	}
+
+	public function getDictionariesArrayCompressed()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_DICTIONARY_ARRAY_COMPRESSED, null, false);
+	}
+
+	/**
+	 * @return array<kDictionary>
+	 */
+	public function getDictionariesArray()
+	{
+		$dictionaries = array();
+		$dictionariesString = $this->getDictionary();
+		if($dictionariesString )
+		{
+			try
+			{
+				if($this->getDictionariesArrayCompressed())
+					$dictionariesString   = gzuncompress($dictionariesString  );
+
+				$dictionaries = unserialize($dictionariesString );
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err("Unable to unserialize [$dictionariesString ], " . $e->getMessage());
+				$dictionaries = array();
+			}
+		}
+		return $dictionaries;
 	}
 	
 	public function setCredit($v)
