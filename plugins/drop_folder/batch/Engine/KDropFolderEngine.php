@@ -9,6 +9,8 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	protected $dropFolderPlugin;
 	
 	protected $dropFolderFileService;
+
+	private $maximumExecutionTime = null;
 	
 	public function __construct ()
 	{
@@ -278,5 +280,16 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	function log($message)
 	{
 		KalturaLog::log($message);
+	}
+	
+	public function setMaximumExecutionTime($maximumExecutionTime = null)
+	{
+		if (is_null($this->maximumExecutionTime))
+			$this->maximumExecutionTime = $maximumExecutionTime;
+	}
+
+	public function getMaximumExecutionTime()
+	{
+		return $this->maximumExecutionTime;
 	}
 }
