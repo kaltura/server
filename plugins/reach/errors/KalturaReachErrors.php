@@ -27,6 +27,10 @@ class KalturaReachErrors implements kReachErrors
 
 	const VENDOR_PROFILE_NOT_FOUND = "VENDOR_PROFILE_NOT_FOUND;ID;Vendor profile with id provided not found [@ID@]";
 
+	const DICTIONARY_LANGUAGE_DUPLICATION = "DICTIONARY_LANGUAGE_DUPLICATION;LANGUAGE; Vendor profile configuration error - not allowed duplicate dictionaries for language [@LANGUAGE@] ";
+
+	const MAX_DICTIONARY_LENGTH_EXCEEDED = "MAX_DICTIONARY_LENGTH_EXCEEDED;LANGUAGE,LENGTH; Vendor profile configuration error - Dictionary for language [@LANGUAGE@] exceeded maximum length of  [@LENGTH@] characters";
+
 	/* Entry Vendor Task */
 
 	const ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED = "VENDOR_TASK_SERVICE__GET_JOB_NOT_ALLOWED;ID;Vendor Task Service 'Get Job' action Not allowed. Vendor partner Type is not enabled on partner [@ID@]";

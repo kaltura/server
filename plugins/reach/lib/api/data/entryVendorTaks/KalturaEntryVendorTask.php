@@ -131,6 +131,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 */
 	public $notes;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $dictionary;
 	
 	private static $map_between_objects = array
 	(
@@ -152,6 +158,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'accessKey',
 		'notes',
 		'version',
+		'dictionary',
 	);
 	
 	/* (non-PHPdoc)
@@ -197,5 +204,15 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	public function getFilterDocs()
 	{
 		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		if(!$srcObj)
+			return;
+
 	}
 }

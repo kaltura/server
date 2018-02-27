@@ -126,6 +126,19 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$this->addDisplayGroup(array('place_holder3'), 'vendorProfileCredit', array(
 			'legend' => 'Credit Configuration',
 		));
+
+		$this->addLine("Dictionaries Line");
+		$this->addTitle('Vendor Profile Dictionaries:');
+		$this->addTitle('Max 1000 Characters per dictionary');
+
+		$dictionariesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+		$dictionariesSubForm ->addDecorator('ViewScript', array(
+			'viewScript' => 'dictionaries-sub-form.phtml',
+		));
+		$this->addSubForm($dictionariesSubForm , 'VendorProfileDictionaries_');
+		$innerDictionariesSubForm = new Form_DictionariesSubForm ('Kaltura_Client_Reach_Type_Dictionary');
+		$this->addSubForm($innerDictionariesSubForm , "DictionaryTemplate");
+
 	}
 
 	public static $rulesMap = array("Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified" => "Entry_Tags_Modified",
@@ -174,8 +187,24 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			}
 		}
 
+		$this->populateDictionaries($object);
 		$this->populateRules($object);
 		$this->getSubForm("vendorProfileCredit")->populateFromObject($object->credit);
+
+	}
+
+	private function populateDictionaries($object)
+	{
+		$dictionaries = array();
+		foreach ($object->dictionaries as $dictionary)
+		{
+			$newDictionary = array();
+			$newDictionary['language'] = $dictionary->language;
+			$newDictionary['data'] = $dictionary->data;
+			$dictionaries[] = $newDictionary;
+		}
+		if (!empty($dictionaries))
+			$this->setDefault('VendorProfileDictionaries',  json_encode($dictionaries));
 	}
 
 	private function populateRules($object)
@@ -183,26 +212,37 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$rules = array();
 		foreach ($object->rules as $rule)
 		{
-			$newRule = array();
-
 			if ($rule->eventObjectType == Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY && $rule->eventType  == Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED)
-			{
-				$newRule['ruleType'] = self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified'];
-				$newRule['tags'] = $rule->tags;
-			}
+				$newRule = $this->createRule($rule,self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified'] );
 			elseif ($rule->eventObjectType == Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY && $rule->eventType == Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED)
-			{
-				$newRule['ruleType'] = self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive'];
-				$newRule['categoryIds'] = $rule->categoryIds;
-			}
+				$newRule = $this->createRule($rule,self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive'] );
 			else
+			{
 				continue;
-			$newRule['catalogItemsIds'] = $rule->catalogItemIds;
+			}
 			$rules[] = $newRule;
 		}
 		$this->setDefault('VendorProfileRules',  json_encode($rules));
 	}
 
+	private function createRule($rule, $ruleType)
+	{
+		$newRule = array();
+		$newRule['ruleType'] = $ruleType;
+		foreach ($rule->eventConditions as $condition)
+		{
+			/* @var Kaltura_Client_EventNotification_Type_EventFieldCondition $condition*/
+			if ($condition->description)
+			{
+				$elements = json_decode($condition->description);
+				foreach ( $elements as $key => $value )
+				{
+					$newRule[$key] = $value;
+				}
+			}
+		}
+		return $newRule;
+	}
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
@@ -211,25 +251,42 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$rulesArray = array();
 		foreach (json_decode($rules) as $rule)
 		{
+			$description = array();
+			$description['catalogItemsIds'] = $rule->catalogItemsIds;
 			switch(array_search ($rule->ruleType, self::$rulesMap))
 			{
 				case 'Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified':
-					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds, 'array_intersect($scope->getObject()->getTags(), array('. "'" . implode("','", explode(',',$rule->tags)) . "'".')' );
+
+					$description['tags'] = $rule->tags;
+					$descriptionJson = json_encode($description);
+					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds, 'array_intersect($scope->getObject()->getTags(), array('. "'" . implode("','", explode(',',$rule->tags)) . "'".')' ,$descriptionJson );
 					break;
 				case 'Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive':
-					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds,'$scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE && in_array($scope->getObject()->getCategoryId(), array('.$rule->categoryIds. ')'  );
+					$description['categoryIds'] = $rule->categoryIds;
+					$descriptionJson = json_encode($description);
+					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds,'$scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE && in_array($scope->getObject()->getCategoryId(), array('.$rule->categoryIds. ')' ,$descriptionJson  );
 					break;
 			}
 		}
 
 		$object->rules = $rulesArray;
 
-		$object->credit = $this->getSubForm("vendorProfileCredit")->getObject($properties["vendorProfileCredit"]);
+		$dictionaries = $properties['VendorProfileDictionaries'];
+		$dictionariesArray = array();
+		foreach (json_decode($dictionaries) as $dictionary)
+		{
+			$dictionaryItem = new Kaltura_Client_Reach_Type_Dictionary();
+			$dictionaryItem->language = $dictionary->language;
+			$dictionaryItem->data = $dictionary->data;
+			$dictionariesArray [] = $dictionaryItem;
+		}
+		$object->dictionaries = $dictionariesArray;
 
+		$object->credit = $this->getSubForm("vendorProfileCredit")->getObject($properties["vendorProfileCredit"]);
 		return $object;
 	}
 
-	public function getVendorProfileRule($objectType ,$eventType, $catalogItemsIds, $code)
+	public function getVendorProfileRule($objectType ,$eventType, $catalogItemsIds, $code, $descriptionJson = null)
 	{
 		$rule = new Kaltura_Client_Reach_Type_VendorProfileRule();
 		$rule->eventObjectType = $objectType;
@@ -241,6 +298,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$field = new Kaltura_Client_Type_EvalBooleanField();
 		$field->code = $code;
 		$condition->field = $field;
+		$condition->description = $descriptionJson;
 		$conditions[] = $condition;
 		$rule->eventConditions = $conditions;
 		return $rule;
@@ -258,5 +316,6 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$vendorProfile->createdAt = null;
 		$vendorProfile->updatedAt = null;
 		$vendorProfile->VendorProfileRules = null;
+		$vendorProfile->VendorProfileDictionaries = null;
 	}
 }

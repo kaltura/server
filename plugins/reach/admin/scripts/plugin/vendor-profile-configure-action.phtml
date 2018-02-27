@@ -10,10 +10,24 @@
 	try{
 		$('fieldset[id^="vendorProfileRuleTemplate"]').hide();
 		populateRules();
-		populateDates()
+		populateDates();
+		$('fieldset[id^="DictionaryTemplate"]').hide();
+		populate("VendorProfileDictionaries", "add-dictionary");
 	}
 	catch (e)
 	{
+	}
+
+	function populate(name, file ) {
+		var data = jQuery('#' + name).val();
+		if (!data)
+			return;
+		var arr = JSON.parse(data);
+		var ts = $("." + file);
+		for (var i = 0, len = arr.length; i < len; i++) {
+			if (name == 'VendorProfileDictionaries')
+				addDictionaryFromObject(ts, arr[i]);
+		}
 	}
 
 	function populateRules() {
