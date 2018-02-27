@@ -45,7 +45,10 @@ class VendorProfilePeer extends BaseVendorProfilePeer
 		
 		$stmt = $connection->prepare($updateSql);
 		$stmt->execute();
-		KalturaLog::debug("Successfully saved vendor profile [$vendorProfileId]");
+		KalturaLog::debug("Successfully updated vendor credit for profile Id [$vendorProfileId]");
+		
+		$vendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
+		$vendorProfile->syncCreditPercentageUsage();
 	}
 	
 } // VendorProfilePeer

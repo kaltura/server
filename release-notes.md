@@ -1,9 +1,13 @@
 # Mercury 13.14.0 #
+
 # Vendor Profile #
 
 ## Reach In-House Support ##
 - Issue Type: Feature
 - Issue ID: PLAT-7596
+
+### Configuration ###
+	None.
 
 ### Deployment scripts ###
 	
@@ -22,7 +26,24 @@
 			/opt/kalturapp/deployment/updates/scripts/xml/responseProfiles/reach_vendor_response_profiles.template.xml
 		
 		Run deployment script:
-			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_vendor_related_response_profiles.php	   
+			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_vendor_related_response_profiles.php
+			
+	Email notifications:
+		First replcae all tokens from the XML files below and remove ".template" from the fle 
+			/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_approved_moderation.template.xml
+    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_done.template.xml
+    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_pending_moderation.template.xml
+    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_rejected_moderation.template.xml
+    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_75_percent.template.xml
+    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_90_percent.template.xml
+		
+		Run deployment script:
+			php /opt/kaltura/app/deployment/updates/scripts/2018_02_22_entry_vendor_task_approved_moderation.xml
+			php /opt/kaltura/app/deployment/updates/scripts/			php /opt/kaltura/app/deployment/updates/scripts/2018_02_22_entry_vendor_task_pending_moderation.xml
+			php /opt/kaltura/app/deployment/updates/scripts/2018_02_22_entry_vendor_task_rejected_moderation.xml
+			php /opt/kaltura/app/deployment/updates/scripts/2018_02_22_reach_credit_usage_over_75_percent.xml
+			php /opt/kaltura/app/deployment/updates/scripts/2018_02_22_reach_credit_usage_over_90_percent.xml
+				    
 	
 #### Known Issues & Limitations ####
 

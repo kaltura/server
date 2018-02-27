@@ -99,6 +99,11 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	 * @var int
 	 */
 	public $maxCharactersPerCaptionLine;
+	
+	/**
+	 * @var KalturaVendorProfileContentDeletionPolicy
+	 */
+	public $contentDeletionPolicy;
 
 	/**
 	 * @var KalturaVendorProfileRulesArray
@@ -136,6 +141,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		'enableAudioTags',
 		'enableProfanityRemoval',
 		'maxCharactersPerCaptionLine',
+		'contentDeletionPolicy',
 		'rules' => 'rulesArray',
 		'credit',
 		'usedCredit',

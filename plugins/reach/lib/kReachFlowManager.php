@@ -22,6 +22,17 @@ class kReachFlowManager implements kGenericEventConsumer
 	public function shouldConsumeEvent(KalturaEvent $event)
 	{
 		$scope = $event->getScope();
+		
+		$e = $scope->getEvent();
+		if($e instanceof kObjectChangedEvent)
+		{
+			$m = $scope->getEvent()->getModifiedColumns();
+			if($m)
+				$m1 = $m['CUSTOM_DATA']['']['credit_usage_percentage'];
+			if($scope->getEvent()->isCustomDataModified('credit_usage_percentage'))
+				KalturaLog::debug("Kukui");	
+		}
+		
 		$partnerId = $scope->getPartnerId();
 		
 		if(!ReachPlugin::isAllowedPartner($partnerId))

@@ -28,6 +28,7 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 		"catalogItemIdEqual" => "_eq_catalog_item_id",
 		"catalogItemIdIn" => "_in_catalog_item_id",
 		"userIdEqual" => "_eq_user_id",
+		"contextEqual" => "_eq_context",
 	);
 
 	static private $order_by_map = array
@@ -153,4 +154,9 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $userIdEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $contextEqual;
 }

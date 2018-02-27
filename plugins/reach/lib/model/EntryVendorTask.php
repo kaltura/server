@@ -20,6 +20,8 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	const CUSTOM_DATA_ERR_DESCRIPTION = 	'err_description';
 	const CUSTOM_DATA_USER_ID = 			'user_id';
 	const CUSTOM_DATA_MODERATING_USER = 	'moderating_user';
+	const CUSTOM_DATA_ACCURACY 	= 			'accuracy';
+	const CUSTOM_DATA_OUTPUT_OBJECT_ID = 	'output_object_id';
 	
 	//setters
 	
@@ -46,6 +48,16 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	public function setUserId($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_USER_ID, $v);
+	}
+	
+	public function setAccuracy($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ACCURACY, $v);
+	}
+	
+	public function setOutputObjectId($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_OUTPUT_OBJECT_ID, $v);
 	}
 	
 	//getters
@@ -78,7 +90,6 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	public function getVendorProfile()
 	{
 		return VendorProfilePeer::retrieveByPK($this->getVendorProfileId());
-		
 	}
 	
 	public function getEntry()
@@ -89,6 +100,16 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	public function getCatalogItem()
 	{
 		return VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
+	}
+	
+	public function getAccuracy()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ACCURACY, null, null);
+	}
+	
+	public function getOutputObjectId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_OUTPUT_OBJECT_ID, null, null);
 	}
 	
 	/* (non-PHPdoc)
@@ -109,5 +130,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 		return parent::preUpdate($con);
 	}
 	
+	public function getKuser()
+	{
+		return kuserPeer::retrieveByPk($this->kuser_id);
+	}
 	
 } // EntryVendorTask
