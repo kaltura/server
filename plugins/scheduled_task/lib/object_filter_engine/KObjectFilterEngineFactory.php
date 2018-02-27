@@ -17,6 +17,8 @@ class KObjectFilterEngineFactory
 		{
 			case KalturaObjectFilterEngineType::ENTRY:
 				return new KObjectFilterBaseEntryEngine($client);
+			case KalturaObjectFilterEngineType::ENTRY_VENDOR_TASK:
+				return new KObjectFilterEntryVendorTaskEngine($client);
 			default:
 				return KalturaPluginManager::loadObject('KObjectFilterEngineBase', $type, array($client));
 		}
