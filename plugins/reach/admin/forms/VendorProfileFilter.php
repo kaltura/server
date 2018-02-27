@@ -11,7 +11,6 @@ class Form_VendorProfileFilter extends Form_PartnerIdFilter
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
 			'partnerIdEqual' => 'Publisher ID',
-			'idEqual' => 'Catalog Item ID',
 		));
 	}
 }
