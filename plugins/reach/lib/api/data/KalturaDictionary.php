@@ -42,7 +42,8 @@ class KalturaDictionary extends KalturaObject
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("language",'data'));
+		$this->validatePropertyNotNull('data');
+		$this->validatePropertyNotNull('language');
 		parent::validateForInsert($propertiesToSkip);
 	}
 }

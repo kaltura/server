@@ -171,52 +171,12 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	{
 		$this->validate();
 
-		$languages = array();
-		foreach($this->dictionaries as $dictionary)
-		{
-			/* @var KalturaDictionary $dictionary */
-			if (in_array($dictionary->language, $languages))
-				throw new KalturaAPIException(KalturaReachErrors::DICTIONARY_LANGUAGE_DUPLICATION, $dictionary->language);
-
-			if (!$this->validateDictionaryLength($dictionary->data))
-				throw new KalturaAPIException(KalturaReachErrors::MAX_DICTIONARY_LENGTH_EXCEEDED , $dictionary->language, self::MAX_DICTIONARY_LENGTH);
-
-			$languages[] = $dictionary->language;
-		}
-
 		return parent::validateForInsert($propertiesToSkip);
 	}
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validate($sourceObject);
-
-		//validate we are not inserting or adding duplicates dictionaries
-		$languages = array();
-		foreach($this->dictionaries as $dictionary)
-		{
-			/* @var KalturaDictionary $dictionary */
-			if (in_array($dictionary->language, $languages))
-				throw new KalturaAPIException(KalturaReachErrors::DICTIONARY_LANGUAGE_DUPLICATION, $dictionary->language);
-
-				if (!$this->validateDictionaryLength($dictionary->data))
-					throw new KalturaAPIException(KalturaReachErrors::MAX_DICTIONARY_LENGTH_EXCEEDED , $dictionary->language, self::MAX_DICTIONARY_LENGTH);
-			$languages[] = $dictionary->language;
-		}
-
-		/* @var VendorProfile $sourceObject */
-		foreach($sourceObject->getDictionariesArray() as $dictionary)
-		{
-			/* @var kDictionary $dictionary */
-			if (in_array($dictionary->getLanguage(), $languages))
-				throw new KalturaAPIException(KalturaReachErrors::DICTIONARY_LANGUAGE_DUPLICATION, $dictionary->getLanguage());
-
-			if (!$this->validateDictionaryLength($dictionary->getData()))
-				throw new KalturaAPIException(KalturaReachErrors::MAX_DICTIONARY_LENGTH_EXCEEDED , $dictionary->getLanguage(), self::MAX_DICTIONARY_LENGTH);
-
-			$languages[] = $dictionary->getLanguage();
-		}
-
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
@@ -230,6 +190,20 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		{
 			$this->validatePropertyNotNull("profileType");
 			$this->validatePropertyNotNull("credit");
+		}
+
+		//validating dictionary duplications
+		$languages = array();
+		foreach($this->dictionaries as $dictionary)
+		{
+			/* @var KalturaDictionary $dictionary */
+			if (in_array($dictionary->language, $languages))
+				throw new KalturaAPIException(KalturaReachErrors::DICTIONARY_LANGUAGE_DUPLICATION, $dictionary->language);
+
+			if (!$this->validateDictionaryLength($dictionary->data))
+				throw new KalturaAPIException(KalturaReachErrors::MAX_DICTIONARY_LENGTH_EXCEEDED , $dictionary->language, self::MAX_DICTIONARY_LENGTH);
+
+			$languages[] = $dictionary->language;
 		}
 
 		return;

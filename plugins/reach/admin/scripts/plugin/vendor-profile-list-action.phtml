@@ -368,7 +368,8 @@
 					dictionaries.push(dictionary);
 			}
 		}
-		jQuery('#VendorProfileDictionaries').val(JSON.stringify(dictionaries));
+		if (dictionaries.length>0)
+			jQuery('#VendorProfileDictionaries').val(JSON.stringify(dictionaries));
 	}
 
 	function buildDictionaryParams(paramName, index ) {

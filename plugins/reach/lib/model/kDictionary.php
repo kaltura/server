@@ -29,7 +29,7 @@ class kDictionary
 	}
 
 	/**
-	 * @return the $fromDate
+	 * @return the data
 	 */
 	public function getData()
 	{
@@ -37,7 +37,7 @@ class kDictionary
 	}
 
 	/**
-	 * @param KalturaCatalogItemLanguage $credit
+	 * @param KalturaCatalogItemLanguage $language
 	 */
 	public function setLanguage($language)
 	{

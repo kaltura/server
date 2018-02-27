@@ -282,6 +282,25 @@ class VendorProfile extends BaseVendorProfile
 		
 		return $credit;
 	}
+
+	/**
+	 * @param $language
+	 * @return string
+	 */
+	public function getDictionaryByLanguage($language)
+	{
+		foreach ($this->getDictionariesArray() as $dictionary)
+		{
+			/* @var kDictionary $dictionary*/
+			if ($dictionary->getLanguage() == $language)
+			{
+				return $dictionary;
+			}
+		}
+		return null;
+	}
+
+
 	
 	public function getCreditUsagePercentage()
 	{
