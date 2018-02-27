@@ -5,6 +5,7 @@
  */
 class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 {
+    const MAX_DICTIONARY_LENGTH = 1000;
 	/**
 	 * @var int
 	 * @readonly
@@ -122,6 +123,11 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	 */
 	public $usedCredit;
 
+	/**
+	 * @var KalturaDictionaryArray
+	 */
+	public $dictionaries;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -145,6 +151,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		'rules' => 'rulesArray',
 		'credit',
 		'usedCredit',
+		'dictionaries' => 'dictionariesArray',
 	);
 
 	/* (non-PHPdoc)
@@ -169,6 +176,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validate();
+
 		return parent::validateForInsert($propertiesToSkip);
 	}
 
@@ -178,12 +186,30 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
+	private function validateDictionaryLength($data){
+		return strlen($data) <= self::MAX_DICTIONARY_LENGTH ? true : false;
+	}
+
 	private function validate(VendorProfile $sourceObject = null)
 	{
 		if (!$sourceObject) //Source object will be null on insert
 		{
 			$this->validatePropertyNotNull("profileType");
 			$this->validatePropertyNotNull("credit");
+		}
+
+		//validating dictionary duplications
+		$languages = array();
+		foreach($this->dictionaries as $dictionary)
+		{
+			/* @var KalturaDictionary $dictionary */
+			if (in_array($dictionary->language, $languages))
+				throw new KalturaAPIException(KalturaReachErrors::DICTIONARY_LANGUAGE_DUPLICATION, $dictionary->language);
+
+			if (!$this->validateDictionaryLength($dictionary->data))
+				throw new KalturaAPIException(KalturaReachErrors::MAX_DICTIONARY_LENGTH_EXCEEDED , $dictionary->language, self::MAX_DICTIONARY_LENGTH);
+
+			$languages[] = $dictionary->language;
 		}
 
 		return;

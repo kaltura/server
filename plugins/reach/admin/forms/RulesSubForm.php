@@ -35,7 +35,8 @@ class Form_RulesSubForm extends ConfigureSubForm
 	{
 		if ($data['VendorProfileRules'])
 			return true;
-		else return false;
+		else
+			return false;
 	}
 
 }

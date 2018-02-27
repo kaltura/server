@@ -1,0 +1,93 @@
+<dd id="test">
+	<fieldset id="dictionary-fieldSet" class="dictionary">
+		<a class="add-dictionary" href="javascript:;" style="display:block;" onclick="addDictionary(this);" >+ Add Dictionary</a>
+		<?php foreach($this->element->getSubForms() as $subForm): ?>
+			<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
+			<?php echo $subForm; ?>
+		<?php endforeach; ?>
+		<style type="text/css">
+			#frmVendorProfileConfigure .dictionary{ display:block; padding: 10px; min-width: 500px; }
+			#frmVendorProfileConfigure .dictionary span.rule { font-size: 14px; font-weight: bold; }
+			#frmVendorProfileConfigure .dictionary label { padding: 4px 0; }
+			#frmVendorProfileConfigure .dictionary fieldset { min-width: 0; height: auto; margin: 10px 0; padding: 5px; border: 1px solid #CCCCCC; }
+			#frmVendorProfileConfigure .dictionary .remove-dictionary { padding: 5px; float: right; }
+		</style>
+	</fieldset>
+</dd>
+
+
+<script type="text/javascript">
+
+	var dictionaryIndex = 0;
+	var maxDictionariesIndex = 0;
+	var maxChars = 1000;
+
+	function addDictionary(target)
+	{
+		if (jQuery('#dictionary-fieldSet').attr('disabled'))
+			return;
+
+		jQuery('#dictionary-fieldSet').attr('maxDictionariesIndex', maxDictionariesIndex++);
+		var dictionaryTag = 'Dictionary_' + dictionaryIndex++;
+		var newDictionary = createDictionary(dictionaryTag );
+
+		jQuery(target).after(newDictionary.show());
+	}
+
+	function removeDictionary(target) {
+		if (!jQuery('#dictionary-fieldSet').attr('disabled')) {
+			dictionaryIndex--;
+			$(target).parent().remove();
+		}
+	}
+
+	function createDictionary(dictionaryTag)
+	{
+		var dictionaryTemplate = jQuery('#DictionaryTemplate');
+		dictionaryTemplate.attr("name", "Template");
+
+		var newData = dictionaryTemplate.clone(true);
+		newData.attr("id", dictionaryTag).attr("name", dictionaryTag);
+
+		newData.find( "input,select").each(function(idx) {
+			var name = $( this ).attr("name");
+			var paramName =name.substring("Dictionary_".length);
+			var tag = dictionaryTag + "::" + paramName;
+			$( this ).attr("name", paramName).attr("id", tag);
+			$(this).attr("required","1");
+			$(this).attr("oninput",'validateDictionaryLength(this)');
+		});
+
+		return newData;
+	}
+
+	function validateDictionaryLength(item){
+		if(item.name == 'data') {
+			if (item.value.length > maxChars) {
+				alert("Max Characters allowed for dictionary is: " + maxChars);
+				item.value = item.value.substring(0, maxChars);
+			}
+		}
+	}
+
+	function addDictionaryFromObject(target, object)
+	{
+		jQuery('#dictionary-fieldSet').attr('maxDictionariesIndex', maxDictionariesIndex++);
+		var dictionaryTag = 'Dictionary_' + dictionaryIndex++;
+		var newDictionary = createDictionary(dictionaryTag);
+
+		newDictionary.find( "input,select").each(function(idx) {
+			if ($( this ).attr("type") == 'hidden')
+				return;
+			var name = $( this ).attr("name");
+			var val = object[name];
+			$(this).val(val).attr('checked', val);
+		});
+
+		jQuery(target).after(newDictionary.show());
+	}
+
+
+</script>
+
+

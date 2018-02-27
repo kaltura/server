@@ -131,6 +131,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 */
 	public $notes;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $dictionary;
 	
 	/**
 	 * Task context
@@ -175,6 +181,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'context',
 		'accuracy',
 		'outputObjectId'
+		'dictionary',
 	);
 	
 	/* (non-PHPdoc)
