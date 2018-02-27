@@ -1396,7 +1396,12 @@ class KalturaEntryService extends KalturaBaseService
 	protected function checkAdminOnlyUpdateProperties(KalturaBaseEntry $entry)
 	{
 		if ($entry->adminTags !== null)
-			$this->validateAdminSession("adminTags");
+		{
+			$canUpdateAdminTags = $this->hasPermissionToWriteProperty("admin_tags");
+			if (!$canUpdateAdminTags)
+				$this->validateAdminSession("adminTags");
+		}
+
 			
 		if ($entry->categories !== null)
 		{
@@ -1423,7 +1428,11 @@ class KalturaEntryService extends KalturaBaseService
 	protected function checkAdminOnlyInsertProperties(KalturaBaseEntry $entry)
 	{
 		if ($entry->adminTags !== null)
-			$this->validateAdminSession("adminTags");
+		{
+			$canInsertAdminTags = $this->hasPermissionToWriteProperty("admin_tags");
+			if (!$canInsertAdminTags)
+				$this->validateAdminSession("adminTags");
+		}
 			
 		if ($entry->categories !== null)
 		{
@@ -1803,7 +1812,21 @@ class KalturaEntryService extends KalturaBaseService
 		$kvote->setRank($rank);
 		$kvote->save();
 	}
-	
+
+	/**
+	 * @param string $propertyName	
+	 * @return array
+	 * @throws Exception
+	 * @throws kCoreException
+	 */
+	protected function hasPermissionToWriteProperty($propertyName)
+	{
+		$allowedPermissions = kConf::get("permissions_allowed_to_update_$propertyName", 'local', array());
+		$currentRolePermissions = explode(',', UserRolePeer::retrieveByPK($this->getKs()->getRole())->getPermissionNames());
+		$intersection = array_intersect($allowedPermissions, $currentRolePermissions);
+		return count($intersection);
+	}
+
 	/**
 	 * Set the default status to ready if other status filters are not specified
 	 * 
