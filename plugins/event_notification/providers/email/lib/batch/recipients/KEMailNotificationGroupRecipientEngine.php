@@ -12,13 +12,11 @@ class KEMailNotificationGroupRecipientEngine extends  KEmailNotificationRecipien
 	 */
 	function getRecipients(array $contentParameters) 
 	{
-		KalturaLog::debug("Testing:: GroupId = [" . $this->recipientJobData->groupId . "]");
 		if(is_array($contentParameters) && count($contentParameters))
 		{
 			$groupId = str_replace(array_keys($contentParameters), $contentParameters, $this->recipientJobData->groupId);
 		}
 		
-		KalturaLog::debug("Testing:: GroupId = [$groupId]");
 		//list users in group
 		$groupFilter = new KalturaGroupUserFilter();
 		$groupFilter->groupIdEqual = $groupId;
