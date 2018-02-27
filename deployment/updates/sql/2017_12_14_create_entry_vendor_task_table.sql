@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `entry_vendor_task`
 	`vendor_profile_id` INTEGER  NOT NULL,
 	`kuser_id` INTEGER  NOT NULL,
 	`version` INTEGER  NOT NULL,
+	`context` VARCHAR(31)  NOT NULL,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),
