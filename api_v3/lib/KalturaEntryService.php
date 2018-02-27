@@ -1396,8 +1396,12 @@ class KalturaEntryService extends KalturaBaseService
 	protected function checkAdminOnlyUpdateProperties(KalturaBaseEntry $entry)
 	{
 		if ($entry->adminTags !== null)
-			$this->validateAdminSession("adminTags");
-			
+		{
+			$ks = $this->getKs();
+			if (!ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
+				$this->validateAdminSession("adminTags");
+		}
+
 		if ($entry->categories !== null)
 		{
 			$cats = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->categories);
@@ -1423,8 +1427,12 @@ class KalturaEntryService extends KalturaBaseService
 	protected function checkAdminOnlyInsertProperties(KalturaBaseEntry $entry)
 	{
 		if ($entry->adminTags !== null)
-			$this->validateAdminSession("adminTags");
-			
+		{
+			$ks = $this->getKs();
+			if (!ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
+				$this->validateAdminSession("adminTags");
+		}
+
 		if ($entry->categories !== null)
 		{
 			$cats = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->categories);
