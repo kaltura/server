@@ -1,4 +1,16 @@
 # Mercury 13.15.0 #
+
+## Add new Drop Folder Type ##
+
+- Issue Type: New Feature
+- Issue ID: PSVAMB-2060
+
+### Configuration ###
+None. 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 ## Taking a break with explicit-live feature breaks player playback ##
 
 - Issue Type: Support
