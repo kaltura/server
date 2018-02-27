@@ -212,47 +212,37 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$rules = array();
 		foreach ($object->rules as $rule)
 		{
-			$newRule = array();
-
 			if ($rule->eventObjectType == Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY && $rule->eventType  == Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED)
-			{
-				$newRule['ruleType'] = self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified'];
-				foreach ($rule->eventConditions as $condition)
-				{
-					/* @var Kaltura_Client_EventNotification_Type_EventFieldCondition $condition*/
-					if ($condition->description)
-					{
-						$elements = json_decode($condition->description);
-						foreach ( $elements as $key => $value )
-						{
-							$newRule[$key] = $value;
-						}
-					}
-				}
-			}
+				$newRule = $this->createRule($rule,self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified'] );
 			elseif ($rule->eventObjectType == Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY && $rule->eventType == Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED)
-			{
-				$newRule['ruleType'] = self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive'];
-				foreach ($rule->eventConditions as $condition)
-				{
-					/* @var Kaltura_Client_EventNotification_Type_EventFieldCondition $condition*/
-					if ($condition->description)
-					{
-						$elements = json_decode($condition->description);
-						foreach ( $elements as $key => $value )
-						{
-							$newRule[$key] = $value;
-						}
-					}
-				}
-			}
+				$newRule = $this->createRule($rule,self::$rulesMap['Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive'] );
 			else
+			{
 				continue;
+			}
 			$rules[] = $newRule;
 		}
 		$this->setDefault('VendorProfileRules',  json_encode($rules));
 	}
 
+	private function createRule($rule, $ruleType)
+	{
+		$newRule = array();
+		$newRule['ruleType'] = $ruleType;
+		foreach ($rule->eventConditions as $condition)
+		{
+			/* @var Kaltura_Client_EventNotification_Type_EventFieldCondition $condition*/
+			if ($condition->description)
+			{
+				$elements = json_decode($condition->description);
+				foreach ( $elements as $key => $value )
+				{
+					$newRule[$key] = $value;
+				}
+			}
+		}
+		return $newRule;
+	}
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
@@ -261,18 +251,17 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$rulesArray = array();
 		foreach (json_decode($rules) as $rule)
 		{
+			$description = array();
+			$description['catalogItemsIds'] = $rule->catalogItemsIds;
 			switch(array_search ($rule->ruleType, self::$rulesMap))
 			{
 				case 'Kaltura_Client_Reach_Type_VendorProfileRuleEntryTagsModified':
-					$description = array();
-					$description['catalogItemsIds'] = $rule->catalogItemsIds;
+
 					$description['tags'] = $rule->tags;
 					$descriptionJson = json_encode($description);
 					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::ENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds, 'array_intersect($scope->getObject()->getTags(), array('. "'" . implode("','", explode(',',$rule->tags)) . "'".')' ,$descriptionJson );
 					break;
 				case 'Kaltura_Client_Reach_Type_VendorProfileRuleCategoryEntryActive':
-					$description = array();
-					$description['catalogItemsIds'] = $rule->catalogItemsIds;
 					$description['categoryIds'] = $rule->categoryIds;
 					$descriptionJson = json_encode($description);
 					$rulesArray[] = $this->getVendorProfileRule(Kaltura_Client_Reach_Enum_VendorProfileEventObjectType::CATEGORYENTRY, Kaltura_Client_Reach_Enum_VendorProfileEventType::OBJECT_UPDATED, $rule->catalogItemsIds,'$scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE && in_array($scope->getObject()->getCategoryId(), array('.$rule->categoryIds. ')' ,$descriptionJson  );

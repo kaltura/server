@@ -36,7 +36,7 @@
 
 		var newRule = createRule(ruleTag, showType);
 
-		jQuery(target).after(newRule.show());
+		jQuery(target).before(newRule.show());
 	}
 
 	function removeRule(target) {
@@ -80,7 +80,7 @@
 			$(this).val(val).attr('checked', val);
 		});
 
-		jQuery(target).after(newRule.show());
+		jQuery(target).before(newRule.show());
 	}
 
 </script>

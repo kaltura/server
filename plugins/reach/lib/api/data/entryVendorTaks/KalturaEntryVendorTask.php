@@ -158,6 +158,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'accessKey',
 		'notes',
 		'version',
+		'dictionary',
 	);
 	
 	/* (non-PHPdoc)
@@ -213,8 +214,5 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		if(!$srcObj)
 			return;
 
-		/* @var $srcObj EntryVendorTask */
-		parent::doFromObject($srcObj, $responseProfile);
-		$this->dictionary = $srcObj->getDictionary();
 	}
 }
