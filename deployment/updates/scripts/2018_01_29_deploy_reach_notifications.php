@@ -18,6 +18,12 @@ deployTemplate($script, $taskRejectedModeration);
 $taskDone = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2018_02_22_entry_vendor_task_done.template.xml");
 deployTemplate($script, $taskDone);
 
+$creditReached75Precent = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2018_02_22_reach_credit_usage_over_75_percent.template.xml");
+deployTemplate($script, $taskDone);
+
+$taskDone = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2018_02_22_reach_credit_usage_over_90_percent.template.xml");
+deployTemplate($script, $taskDone);
+
 function deployTemplate($script, $config)
 {
 	if(!file_exists($config))
