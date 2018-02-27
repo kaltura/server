@@ -34,6 +34,7 @@ class VendorProfile extends BaseVendorProfile
 	const CUSTOM_DATA_VENDOR_CREDIT = 						'vendor_credit';
 	
 	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
+	const CUSTOM_DATA_CONTENT_DELETION_POLICY = 			'content_deletion_policy';
 	
 	//setters
 	
@@ -182,6 +183,11 @@ class VendorProfile extends BaseVendorProfile
 		$this->putInCustomData(self::CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE, $v);
 	}
 	
+	public function setContentDeletionPolicy($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, $v);
+	}
+	
 	//getters
 	
 	public function getEnableMachineModeration()
@@ -306,6 +312,11 @@ class VendorProfile extends BaseVendorProfile
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE, null, 0);
 	}
+	
+	public function getContentDeletionPolicy($v)
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, null, VendorProfileContentDeletionPolicy::DO_NOTHING);
+	}
 
 	public function syncCredit()
 	{
@@ -328,27 +339,19 @@ class VendorProfile extends BaseVendorProfile
 		return false;
 	}
 	
-	
-	/* (non-PHPdoc)
-	 * @see BaseEntryVendorTask::preUpdate()
-	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function syncCreditPercentageUsage()
 	{
-		if ($this->isColumnModified(VendorProfilePeer::USED_CREDIT))
+		$currentCredit = $this->getCredit()->getCurrentCredit();
+		$creditUsagePercentage = ($currentCredit == VendorProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
+		
+		if($currentCredit != 0 && $currentCredit != VendorProfileCreditValues::UNLIMITED_CREDIT)
 		{
-			$creditUsagePercentage = 100;
-			$currentCredit = $this->getCredit()->getCurrentCredit();
-			
-			if($currentCredit != 0 && $currentCredit != VendorProfileCreditValues::UNLIMITED_CREDIT)
-			{
-				$usedCredit = $this->getUsedCredit();
-				$creditUsagePercentage = ceil($usedCredit/$currentCredit);
-			}
-			
-			$this->setCreditUsagePercentage($creditUsagePercentage);
+			$usedCredit = $this->getUsedCredit();
+			$creditUsagePercentage = ($usedCredit/$currentCredit)*100;
 		}
 		
-		return parent::preUpdate($con);
+		$this->setCreditUsagePercentage($creditUsagePercentage);
+		$this->save();
 	}
 	
 } // VendorProfile

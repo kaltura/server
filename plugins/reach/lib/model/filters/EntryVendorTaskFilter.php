@@ -28,6 +28,7 @@ class EntryVendorTaskFilter extends baseObjectFilter
 			"_eq_vendor_partner_id",
 			"_in_vendor_partner_id",
 			"_eq_version",
+			"_eq_context",
 			"_lte_finish_time",
 			"_eq_user_id",
 			"_gte_finish_time",

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+	<multirequest>
+		<!-- Entry Vendor Task Approved -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>Task Pending Moderation</name>
+				<systemName>Entry_Vendor_Task_Pending_Moderation</systemName>
+				<description>Email notification template to be sent when entry vendor task is pending moderation.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+				<eventObjectType>40</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_VENDOR_TASK -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::PENDING_MODERATION</code>
+						</field>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>[AppTitle] - New entry vendor task is awaiting approval</subject>
+				<body>New task is pendign approval for entry name {entry_name}, entry id {entry_id}. Task was requested on {request_date} by {creator_name}({creator_email}). In order to approve please go to the caption requests page in [AppEntryMediaUrl]/{entry_id}</body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<to objectType="KalturaEmailNotificationGroupRecipientProvider">
+					<groupId>{group_id_equal}</groupId>
+				</to>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Task entryId</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_email</key>
+						<description>Task creator email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getUserId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_name</key>
+						<description>Entry creator name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>request_date</key>
+						<description>Task creation time</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getCreatedAt()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>group_id_equal</key>
+						<description>The group id to send to</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>
+
