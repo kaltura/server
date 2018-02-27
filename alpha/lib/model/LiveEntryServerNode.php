@@ -65,8 +65,6 @@ class LiveEntryServerNode extends EntryServerNode
 				if(!count($playableServerNodes))
 				{
 					$liveEntry->unsetMediaServer();
-					$liveEntry->setViewMode(ViewMode::PREVIEW);
-					$liveEntry->setRecordingStatus(RecordingStatus::STOPPED);
 				}
 				
 				if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
