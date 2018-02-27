@@ -21,6 +21,17 @@ None.
 
 ### Deployment scripts ###
       php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_04_add_is_playable_user_configurations_KalturaLiveEntryServerNode.php
+      
+## Add ability to update/insert adminTags to non admins ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-8492
+
+### Configuration ###
+None. 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_28_add_allow_write_admin_tags_permission.php      
 
 # Mercury 13.14.0 #
 ## Add Parameters to Recorded Entry replaced EMAIL template ##
