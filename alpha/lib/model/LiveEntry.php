@@ -634,6 +634,12 @@ abstract class LiveEntry extends entry
 		{
 			$this->setCurrentBroadcastStartTime( 0 );
 		}
+
+		if ($this->getExplicitLive())
+		{
+			$this->setViewMode(ViewMode::PREVIEW);
+			$this->setRecordingStatus(RecordingStatus::STOPPED);
+		}
 	}
 
 
