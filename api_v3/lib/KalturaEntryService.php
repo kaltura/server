@@ -1398,7 +1398,7 @@ class KalturaEntryService extends KalturaBaseService
 		if ($entry->adminTags !== null)
 		{
 			$ks = $this->getKs();
-			if (!ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
+			if (!$ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
 				$this->validateAdminSession("adminTags");
 		}
 
@@ -1429,7 +1429,7 @@ class KalturaEntryService extends KalturaBaseService
 		if ($entry->adminTags !== null)
 		{
 			$ks = $this->getKs();
-			if (!ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
+			if (!$ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
 				$this->validateAdminSession("adminTags");
 		}
 
