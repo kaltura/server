@@ -279,7 +279,7 @@ class UserLoginData extends BaseUserLoginData{
 		if (function_exists('mcrypt_create_iv')) {
 		    $random = sha1( mcrypt_create_iv(32,MCRYPT_DEV_URANDOM) );
 		}else{
-		    $random = sha1(openssl_random_pseudo_bytes(32, true));
+		    $random = sha1(openssl_random_pseudo_bytes(32));
 		}
 		$hashKey = base64_encode(implode('|', array($loginDataId, $expiryTime, $random)));
 		return $hashKey;

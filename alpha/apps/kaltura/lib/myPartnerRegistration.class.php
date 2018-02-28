@@ -181,8 +181,8 @@ class myPartnerRegistration
 		    $secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
 		    $admin_secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
 		}else{
-		    $secret = md5(openssl_random_pseudo_bytes(16, true));
-		    $admin_secret = md5(openssl_random_pseudo_bytes(16, true));
+		    $secret = md5(openssl_random_pseudo_bytes(16));
+		    $admin_secret = md5(openssl_random_pseudo_bytes(16));
 		}
 
 		if (!$newPartner)
