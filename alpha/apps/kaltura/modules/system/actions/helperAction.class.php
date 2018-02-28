@@ -41,7 +41,7 @@ class helperAction extends kalturaSystemAction
 		elseif ( $algo == "base64_3des_encode" )
 		{
 			$key = $this->getP ( "des_key" );
-			$encrypted_data = openssl_encrypt($str,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+			$encrypted_data = openssl_encrypt($str,'DES-EDE3',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
 	    
 			$res = base64_encode($encrypted_data )		;
 			$this->des_key = $key;
@@ -50,7 +50,7 @@ class helperAction extends kalturaSystemAction
 		{
 			$key = $this->getP ( "des_key" );
 			$input = base64_decode ( $str );
-			$res = openssl_decrypt($input,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING); 
+			$res = openssl_decrypt($input,'DES-EDE3',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING); 
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "ks" )

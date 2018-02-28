@@ -74,7 +74,7 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 				mcrypt_module_close($td);
 	    
 			}else{
-			    $encrypted_data = openssl_encrypt($str,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+			    $encrypted_data = openssl_encrypt($str,'DES-EDE3',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
 			}
 			$res = base64_encode($encrypted_data )		;
 			$this->des_key = $key;
@@ -92,7 +92,7 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 			    mcrypt_generic_deinit($td);
 			    mcrypt_module_close($td);
 			}else{
-			    $encrypted_data = openssl_decrypt($input,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING); 
+			    $encrypted_data = openssl_decrypt($input,'DES-EDE3',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING); 
 			}
 	    
 			$res = ($encrypted_data )		;
