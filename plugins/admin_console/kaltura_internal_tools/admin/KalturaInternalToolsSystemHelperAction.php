@@ -63,18 +63,29 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		}
 		elseif ( $algo == "base64_3des_encode" )
 		{
+			$input = $str;
 			if (function_exists('mcrypt_generic_init')){
 				$td = mcrypt_module_open('tripledes', '', 'ecb', '');
 				$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
 		        	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
 	    	
 				mcrypt_generic_init($td, $key, $iv);
-				$encrypted_data = mcrypt_generic($td, $str);
+				$encrypted_data = mcrypt_generic($td, $input);
 				mcrypt_generic_deinit($td);
 				mcrypt_module_close($td);
 	    
 			}else{
-			    $encrypted_data = openssl_encrypt($str,'DES-EDE3',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+				$blockSize = 16;
+				$padLength = $blockSize - strlen($input) % $blockSize;
+				$input .= str_repeat(chr(0), $padLength);
+				$encrypted_data=openssl_encrypt(
+					$input,
+					'DES-EDE3',
+					$key,
+					OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
+					
+				);
+
 			}
 			$res = base64_encode($encrypted_data )		;
 			$this->des_key = $key;
@@ -88,14 +99,20 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 			    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
 		    
 			    mcrypt_generic_init($td, $key, $iv);
-			    $encrypted_data = mdecrypt_generic($td, $input);
+			    $decrypted_data = mdecrypt_generic($td, $input);
 			    mcrypt_generic_deinit($td);
 			    mcrypt_module_close($td);
 			}else{
-			    $encrypted_data = openssl_decrypt($input,'DES-EDE3',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING); 
+				$decrypted_data=openssl_decrypt(
+					$input,
+					'DES-EDE3',
+					$key,
+					OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
+					
+				);
 			}
 	    
-			$res = ($encrypted_data )		;
+			$res = ($decrypted_data )		;
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "ks" )
