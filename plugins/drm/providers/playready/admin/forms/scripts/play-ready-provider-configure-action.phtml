@@ -4,7 +4,7 @@ function generateKeySeed() {
 	<?php if(function_exists('mcrypt_create_iv')){ ?>
 		var keySeedGen = '<?php echo bin2hex(mcrypt_create_iv(30, MCRYPT_DEV_URANDOM)); ?>';
 	<?php }else{ ?>
-		var keySeedGen = '<?php echo bin2hex(openssl_random_pseudo_bytes(30, true)); ?>';
+		var keySeedGen = '<?php echo bin2hex(openssl_random_pseudo_bytes(30)); ?>';
 	<?php } ?>
 	jQuery('#extensionSubForm-keySeed').val(keySeedGen);
 }
