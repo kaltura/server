@@ -42,7 +42,7 @@ class helperAction extends kalturaSystemAction
 		{
 			$key = $this->getP ( "des_key" );
 			$input = $str;
-			if (function_exists('mcrypt_generic_init')){
+			if (extension_loaded('mcrypt')) {
 				$td = mcrypt_module_open('tripledes', '', 'ecb', '');
 				$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
 		        	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
@@ -72,7 +72,7 @@ class helperAction extends kalturaSystemAction
 		{
 			$key = $this->getP ( "des_key" );
 			$input = base64_decode ( $str );
-			if (function_exists('mcrypt_generic_init')){
+			if (extension_loaded('mcrypt')) {
 			    $td = mcrypt_module_open('tripledes', '', 'ecb', '');
 			    $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
 			    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
