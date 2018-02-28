@@ -757,7 +757,7 @@ class myPartnerUtils
 		if ( !$partner ) return null;
 		
 		$input = $partner_id;
-		if (function_exists('mcrypt_generic_init')) {
+		if (extension_loaded('mcrypt')) {
 		    $td = mcrypt_module_open('tripledes', '', 'ecb', '');
 		    $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
 		    mcrypt_generic_init($td, $key, $iv);
