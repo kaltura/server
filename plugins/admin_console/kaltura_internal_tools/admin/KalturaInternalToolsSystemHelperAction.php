@@ -63,31 +63,37 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		}
 		elseif ( $algo == "base64_3des_encode" )
 		{
-			$input = $str ;
-			$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-	    	$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
+			if (function_exists('mcrypt_generic_init')){
+				$td = mcrypt_module_open('tripledes', '', 'ecb', '');
+				$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+		        	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
 	    	
-	    	mcrypt_generic_init($td, $key, $iv);
-	    	$encrypted_data = mcrypt_generic($td, $input);
-	    	mcrypt_generic_deinit($td);
-	    	mcrypt_module_close($td);
+				mcrypt_generic_init($td, $key, $iv);
+				$encrypted_data = mcrypt_generic($td, $str);
+				mcrypt_generic_deinit($td);
+				mcrypt_module_close($td);
 	    
+			}else{
+			    $encrypted_data = openssl_encrypt($str,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+			}
 			$res = base64_encode($encrypted_data )		;
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "base64_3des_decode" )
 		{
-			//echo "[$key]";
 			$input = base64_decode ( $str );
-			$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-	    	$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
-	    	
-	    	mcrypt_generic_init($td, $key, $iv);
-	    	$encrypted_data = mdecrypt_generic($td, $input);
-	    	mcrypt_generic_deinit($td);
-	    	mcrypt_module_close($td);
+			if (function_exists('mcrypt_generic_init')){
+			    $td = mcrypt_module_open('tripledes', '', 'ecb', '');
+			    $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+			    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
+		    
+			    mcrypt_generic_init($td, $key, $iv);
+			    $encrypted_data = mdecrypt_generic($td, $input);
+			    mcrypt_generic_deinit($td);
+			    mcrypt_module_close($td);
+			}else{
+			    $encrypted_data = openssl_decrypt($input,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING); 
+			}
 	    
 			$res = ($encrypted_data )		;
 			$this->des_key = $key;

@@ -41,16 +41,7 @@ class helperAction extends kalturaSystemAction
 		elseif ( $algo == "base64_3des_encode" )
 		{
 			$key = $this->getP ( "des_key" );
-			echo "[$key]";
-			$input = $str ;
-			$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-	    	$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
-	    	
-	    	mcrypt_generic_init($td, $key, $iv);
-	    	$encrypted_data = mcrypt_generic($td, $input);
-	    	mcrypt_generic_deinit($td);
-	    	mcrypt_module_close($td);
+			$encrypted_data = openssl_encrypt($str,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
 	    
 			$res = base64_encode($encrypted_data )		;
 			$this->des_key = $key;
@@ -58,18 +49,8 @@ class helperAction extends kalturaSystemAction
 		elseif ( $algo == "base64_3des_decode" )
 		{
 			$key = $this->getP ( "des_key" );
-			echo "[$key]";
 			$input = base64_decode ( $str );
-			$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-	    	$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
-	    	
-	    	mcrypt_generic_init($td, $key, $iv);
-	    	$encrypted_data = mdecrypt_generic($td, $input);
-	    	mcrypt_generic_deinit($td);
-	    	mcrypt_module_close($td);
-	    
-			$res = ($encrypted_data )		;
+			$res = openssl_decrypt($input,'AES-128-ECB',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING); 
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "ks" )
