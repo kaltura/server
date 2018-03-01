@@ -7,6 +7,8 @@
  */ 
 class CaptionAsset extends asset
 {
+	const ASSET_STATUS_PENDING_REVIEW = 10;
+	
 	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
 	const CUSTOM_DATA_FIELD_DEFAULT = "default";
 	const CUSTOM_DATA_FIELD_LABEL = "label";
