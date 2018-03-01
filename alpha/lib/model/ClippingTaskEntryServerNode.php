@@ -3,7 +3,8 @@
  * @package Core
  * @subpackage model
  */
-class ClippingTaskEntryServerNode extends TaskEntryServerNode
+class
+ClippingTaskEntryServerNode extends TaskEntryServerNode
 {
 	const OM_CLASS = 'ClippingTaskEntryServerNode';
 	
@@ -34,5 +35,11 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
 	{
 		return;
 	}
+
+    public function preInsert(PropelPDO $con = null)
+    {
+        $this->setStatus(EntryServerNodeStatus::LIVE_CLIPPING_TASK_CREATED);
+        return parent::preInsert($con);
+    }
 
 }
