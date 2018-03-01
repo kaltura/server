@@ -221,23 +221,23 @@ class FacebookGraphSdkUtils
 	 * @param $appSecret
 	 * @param $accessToken
 	 * @param $videoId
-	 * @param $filePath
+	 * @param $fileName
+	 * @param $captionAssetContent
 	 * @param $locale
 	 * @param $tempDirectory
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale, $tempDirectory)
+	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $fileName, $captionAssetContent, $locale, $tempDirectory)
 	{
-		if (!file_exists($filePath))
-			throw new Exception("Captions file given does not exist: ".$filePath);
 		//create file name in format: filename.locale.srt
-		$newFilePath = $tempDirectory.'/'.basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
-		copy($filePath, $newFilePath);
+		$captionFilePath = $tempDirectory.'/'.basename($fileName, '.'.pathinfo($fileName, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
+		kFileBase::setFileContent($captionFilePath, $captionAssetContent);
 		$data = array (
-			'captions_file' => new FacebookCaptionsFile($newFilePath),
+			'captions_file' => new FacebookCaptionsFile($captionFilePath),
 		);
 		self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, false, "/captions" );
+		unlink($captionFilePath);
 	}
 
 	/**
