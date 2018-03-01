@@ -36,6 +36,8 @@ class KalturaReachErrors implements kReachErrors
 	const ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED = "VENDOR_TASK_SERVICE__GET_JOB_NOT_ALLOWED;ID;Vendor Task Service 'Get Job' action Not allowed. Vendor partner Type is not enabled on partner [@ID@]";
 
 	const ENTRY_VENDOR_TASK_NOT_FOUND = "ENTRY_VENDOR_TASK_NOT_FOUND;ID;entry vendor task item with id provided not found [@ID@]";
+
+	const ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED = "ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED;ID,USER_ID;user id [@USER_ID@] is not allowed to do acitons on entryVendorTask [@ID@]";
 	
 	const ENTRY_VENDOR_TASK_DUPLICATION = "ENTRY_VENDOR_TASK_DUPLICATION;ENTRY_ID,CATALOG_ITEM_ID,VERSION;entry vendor task already exists for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@] and version [@VERSION@]";
 	
