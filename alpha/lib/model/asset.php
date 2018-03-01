@@ -792,5 +792,10 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 
 		return false;
 	}
+
+	public function shouldEncrypt()
+	{
+		return true;
+	}
 		
 }

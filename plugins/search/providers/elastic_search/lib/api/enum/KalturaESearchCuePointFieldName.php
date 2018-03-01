@@ -16,4 +16,5 @@ class KalturaESearchCuePointFieldName extends KalturaStringEnum
 	const ANSWERS = 'answers';
 	const HINT = 'hint';
 	const EXPLANATION = 'explanation';
+	const TYPE = 'type';
 }

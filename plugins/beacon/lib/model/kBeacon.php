@@ -6,6 +6,19 @@
  */
 class kBeacon
 {
+	public static $indexNameByBeaconObjectType = array(
+			BeaconObjectTypes::ENTRY_BEACON => "beacon_entry_index",
+			BeaconObjectTypes::ENTRY_SERVER_NODE_BEACON => "beacon_entry_server_node_index",
+			BeaconObjectTypes::SCHEDULE_RESOURCE_BEACON => "beacon_scheduled_resource_index",
+			BeaconObjectTypes::SERVER_NODE_BEACON => "beacon_server_node_index",
+	);
+	
+	public static $indexTypeByBeaconObjectType = array(
+			BeaconObjectTypes::ENTRY_BEACON => "entry_beacon",
+			BeaconObjectTypes::ENTRY_SERVER_NODE_BEACON => "entry_server_node_beacon",
+			BeaconObjectTypes::SCHEDULE_RESOURCE_BEACON => "scheduled_resource_beacon",
+			BeaconObjectTypes::SERVER_NODE_BEACON => "server_node_beacon",
+	);
 	
 	const ELASTIC_BEACONS_INDEX_NAME = "beaconindex";
 	
@@ -27,6 +40,7 @@ class kBeacon
 	const FIELD_PRIVATE_DATA = 'private_data';
 	const FIELD_RAW_DATA = 'raw_data';
 	const FIELD_PARTNER_ID = 'partner_id';
+	const FIELD_IS_LOG = 'is_log';
 	
 	protected $id;
 	protected $relatedObjectType;
@@ -163,17 +177,16 @@ class kBeacon
 	private function getIndexObjectForState($indexObject)
 	{
 		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
-		
 		$indexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
-		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::STATE;
+		$indexObject[self::FIELD_IS_LOG] = false;
 		
 		return json_encode($indexObject);
 	}
 	
 	private function getIndexObjectForLog($indexObject)
 	{
-		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = BeaconIndexType::LOG;
-		
+		unset($indexObject[self::ELASTIC_DOCUMENT_ID_KEY]);
+		$indexObject[self::FIELD_IS_LOG] = true;
 		return json_encode($indexObject);
 	}
 	
@@ -183,7 +196,8 @@ class kBeacon
 		
 		//Set Action Name and Index Name and calculated document id
 		$indexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_INDEX_ACTION_VALUE;
-		$indexObject[self::ELASTIC_INDEX_KEY] = self::ELASTIC_BEACONS_INDEX_NAME;
+		$indexObject[self::ELASTIC_INDEX_KEY] = self::$indexNameByBeaconObjectType[$this->relatedObjectType];
+		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
 		
 		//Set values provided in input
 		$indexObject[self::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectType;

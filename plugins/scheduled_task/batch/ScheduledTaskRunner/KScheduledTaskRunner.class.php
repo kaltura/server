@@ -5,6 +5,8 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
+
+	private static $dontUpdateMetaDataTaskTypes = array (KalturaObjectTaskType::DELETE_ENTRY);
 	/**
 	 * @var array
 	 */
@@ -104,7 +106,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 				foreach ($result->objects as $object)
 				{
-					$error = $this->processObject($profile, $object);
+					list($error, $tasksCompleted)= $this->processObject($profile, $object);
 					if ($error)
 						$errorObjectsIds[] = $object->id;
 					else if ($object instanceof KalturaBaseEntry)
@@ -120,7 +122,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 					}
 
-					if ($isMediaRepurposingProfile)
+					if ($isMediaRepurposingProfile && $this->shouldUpdateMetadataStatusForMR($tasksCompleted))
 						$this->updateMetadataStatusForMediaRepurposing($profile, $object, $error);
 				}
 
@@ -140,6 +142,17 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$this->unimpersonate();
 	}
 
+	private function shouldUpdateMetadataStatusForMR($tasksCompleted)
+	{
+		foreach ($tasksCompleted as $task)
+		{
+			if(in_array($task, self::$dontUpdateMetaDataTaskTypes))
+				return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param string $userId
 	 * @return null|string
@@ -147,9 +160,19 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private function getMailFromUserId($userId)
 	{
 		$result = null;
+		$user = null;
 		$client = $this->getClient();
-		$user = $client->user->get($userId);
-		if($user->email)
+		try
+		{
+			$user = $client->user->get($userId);
+		}
+		catch ( Exception $e )
+		{
+			KalturaLog::err( $e );
+			return null;
+		}
+
+		if($user && $user->email)
 			$result = $user->email;
 		else if (filter_var($userId, FILTER_VALIDATE_EMAIL))
 			$result = $userId;
@@ -163,6 +186,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	 */
 	protected function processObject(KalturaScheduledTaskProfile $profile, $object)
 	{
+		$tasksCompleted = array();
 		$error = false;
 		foreach($profile->objectTasks as $objectTask)
 		{
@@ -174,13 +198,14 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			try
 			{
 				$objectTaskEngine->execute($object);
-
+				$tasksCompleted[] = $objectTask->type;
 			}
 			catch(Exception $ex)
 			{
 				$id = '';
 				if (property_exists($object, 'id'))
 					$id = $object->id;
+
 				KalturaLog::err(sprintf('An error occurred while executing %s on object %s (id %s)', get_class($objectTaskEngine), get_class($object), $id));
 				KalturaLog::err($ex);
 				$error = true;
@@ -193,7 +218,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			}
 		}
 
-		return $error;
+		return array($error, $tasksCompleted);
 	}
 
 	/**

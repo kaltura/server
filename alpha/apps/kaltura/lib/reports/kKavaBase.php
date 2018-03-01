@@ -7,8 +7,9 @@ class kKavaNoResultsException extends kException
 class kKavaBase extends kDruidBase
 {
 	// data sources
-	const REALTIME_DATASOURCE = 'player-events-realtime';
-	const HISTORICAL_DATASOURCE = 'player-events-historical';
+	const DATASOURCE_REALTIME = 'player-events-realtime';
+	const DATASOURCE_HISTORICAL = 'player-events-historical';
+	const DATASOURCE_ENTRY_LIFECYCLE = 'entry-lifecycle';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -19,6 +20,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_DOMAIN = 'urlParts.domain';
 	const DIMENSION_URL = 'urlParts.canonicalUrl';
 	const DIMENSION_USER_ID = 'userId';
+	const DIMENSION_USER_IS_ADMIN = 'userIsAdmin';
 	const DIMENSION_APPLICATION = 'application';
 	const DIMENSION_DEVICE = 'userAgent.device';
 	const DIMENSION_OS = 'userAgent.operatingSystem';
@@ -28,6 +30,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CATEGORIES = 'categories';
 	const DIMENSION_EVENT_TYPE = 'eventType';
 	const DIMENSION_HAS_BITRATE = 'hasBitrate';
+	const DIMENSION_MEDIA_TYPE = 'mediaType';
+	const DIMENSION_SOURCE_TYPE = 'sourceType';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -76,6 +80,12 @@ class kKavaBase extends kDruidBase
 	const VOD_ALLOWED_PARTNERS = "kava_vod_partners";
 	const LIVE_ALLOWED_PARTNERS = "kava_live_partners";
 	
+	// media types
+	const MEDIA_TYPE_VIDEO = 'Video';
+	const MEDIA_TYPE_AUDIO = 'Audio';
+	const MEDIA_TYPE_IMAGE = 'Image';
+	const MEDIA_TYPE_SHOW = 'Show';		// mix
+
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {
 	        if (!kConf::hasParam($serviceType)) 

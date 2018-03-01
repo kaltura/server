@@ -155,6 +155,24 @@ class kDruidBase
 		);
 	}
 	
+	protected static function getCardinalityAggregator($name, $fields)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_CARDINALITY,
+			self::DRUID_NAME => $name,
+			self::DRUID_FIELDS => $fields
+		);
+	}
+	
+	protected static function getHyperUniqueAggregator($name, $fieldName)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_HYPER_UNIQUE,
+			self::DRUID_NAME => $name,
+			self::DRUID_FIELD_NAME => $fieldName
+		);
+	}
+	
 	protected static function getFilteredAggregator($filter, $aggregator)
 	{
 		return array(
@@ -162,6 +180,14 @@ class kDruidBase
 			self::DRUID_FILTER => $filter,
 			self::DRUID_AGGREGATOR => $aggregator
 		);
+	}
+	
+	protected static function getConstantPostAggregator($name, $value)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_CONSTANT, 
+			self::DRUID_NAME => $name, 
+			self::DRUID_VALUE => $value);
 	}
 	
 	protected static function getFieldAccessPostAggregator($fieldName)

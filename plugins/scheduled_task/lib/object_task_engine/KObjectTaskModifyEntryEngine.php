@@ -16,7 +16,6 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		if (is_null($objectTask))
 			return;
 
-		KBatchBase::impersonate($object->partnerId);
 		$client = $this->getClient();
 		$metadataPlugin = KalturaMetadataClientPlugin::get($client);
 		$entryId = $object->id;
@@ -51,7 +50,6 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		$entryObj->entitledUsersPublish = is_null($entryObj->entitledUsersPublish) ? $objectTask->inputEntitledUsersPublish : null;
 
 		$client->baseEntry->update($entryId, $entryObj);
-		KBatchBase::unimpersonate();
 	}
 	
 	private function updateMetadataObj(KalturaBaseEntry $entryResultForMetadataUpdate, &$metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter)

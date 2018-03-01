@@ -3,7 +3,8 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchCaptionItem extends KalturaESearchAbstractEntryItem {
+class KalturaESearchCaptionItem extends KalturaESearchEntryAbstractNestedItem
+{
 
 	/**
 	 * @var KalturaESearchCaptionFieldName

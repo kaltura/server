@@ -1877,15 +1877,17 @@ class myPartnerUtils
 			$partner->setStatus(Partner::PARTNER_STATUS_DELETED);
 		}
 
-		$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
-		$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
-		KalturaLog::debug('closest day comparing today ['.$closestUpdatesDay.']');
-		if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
+		if(kConf::hasParam('free_trial_updates_days'))
 		{
-			KalturaLog::debug('Partner ['.$partner->getId().'] reached to one of the Marketo lead sync days.');
-			$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
+			$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
+			$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
+			KalturaLog::debug('closest day comparing today [' . $closestUpdatesDay . ']');
+			if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
+			{
+				KalturaLog::debug('Partner [' . $partner->getId() . '] reached to one of the Marketo lead sync days.');
+				$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
+			}
 		}
-
 		$partner->save();
 	}
 
@@ -2073,15 +2075,37 @@ class myPartnerUtils
 	 *  check if partner was created after we started the new free trial flow
 	 *
 	 * @param partner $partner
+	 * @param bool useCurrentTime
 	 * @return bool
 	 */
-	public static function isPartnerCreatedAsMonitoredFreeTrial($partner)
+	public static function isPartnerCreatedAsMonitoredFreeTrial($partner, $useCurrentTime = false)
 	{
 		$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
 		if(!$freeTrialStartDate)
 			return false;
-		if($partner->getCreatedAt() >= $freeTrialStartDate)
+		$createTime = $partner->getCreatedAt();
+		if($useCurrentTime)
+			$createTime = date('Y-m-d H:i:s');
+		if($createTime >= $freeTrialStartDate)
 			return true;
 		return false;
 	}
+
+	/**
+	 *  retrieve all the partners in status active with specific admin email and package type
+	 *
+	 * @param partner $partner
+	 * @param $package
+	 * @return array
+	 */
+	public static function retrieveNotDeletedPartnerByEmailAndPackage ($partner, $package)
+	{
+		$c = new Criteria();
+		$c->add(PartnerPeer::ADMIN_EMAIL, $partner->getAdminEmail());
+		$c->add(PartnerPeer::PARTNER_PACKAGE, $package);
+		$c->add(PartnerPeer::STATUS, KalturaPartnerStatus::DELETED, Criteria::NOT_EQUAL);
+		$result = PartnerPeer::doSelectOne($c);
+		return $result;
+	}
+
 }

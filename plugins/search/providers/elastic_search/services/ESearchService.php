@@ -57,6 +57,12 @@ class ESearchService extends KalturaBaseService
 		return $response;
 	}
 
+	/**
+	 * @param $searchParams
+	 * @param KalturaPager|null $pager
+	 * @return array
+	 * @throws KalturaAPIException
+	 */
 	private function initSearchActionParams($searchParams, KalturaPager $pager = null)
 	{
 		$searchOperator = $searchParams->searchOperator;
@@ -84,6 +90,12 @@ class ESearchService extends KalturaBaseService
 		return array($coreSearchOperator, $objectStatusesArr, $searchParams->objectId, $kPager, $coreOrder);
 	}
 
+	/**
+	 * @param kBaseSearch $coreSearchObject
+	 * @param $searchParams
+	 * @param $pager
+	 * @return array
+	 */
 	private function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
 		try
@@ -95,7 +107,9 @@ class ESearchService extends KalturaBaseService
 			$this->handleSearchException($e);
 		}
 
-		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject->getPeerName(), $coreSearchObject->getPeerRetrieveFunctionName());
+		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults,
+			$coreSearchObject->getPeerName(), $coreSearchObject->getPeerRetrieveFunctionName(),
+			$coreSearchObject->getQueryAttributes()->getQueryHighlightsAttributes());
 		return array($coreResults, $objectCount);
 	}
 
@@ -131,6 +145,8 @@ class ESearchService extends KalturaBaseService
 				throw new kESearchException(KalturaESearchErrors::INVALID_MIXED_SEARCH_TYPES, $data['fieldName'], $data['fieldValue']);
 			case kESearchException::MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM:
 				throw new KalturaAPIException(KalturaESearchErrors::MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM);
+			case kESearchException::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED:
+				throw new KalturaAPIException(KalturaESearchErrors::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED);
 
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);

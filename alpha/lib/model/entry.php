@@ -3585,17 +3585,73 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return $flavorAssetIds;
 	}
 	
-	public function getUserNames() {
+	public function getUserNames()
+	{
 		$kuser = $this->getkuser();
-		if(!$kuser)
-			return "";
-		
+		if($kuser)
+		{
+			$userNames = $this->getUserNamesAsArray($kuser);
+			if ($userNames)
+				return implode(" ", $userNames);
+		}
+
+		return "";
+	}
+
+	private function getAllUserNamesAsArray()
+	{
+
+		$result = array();
+		$users = $this->getAllUsers();
+
+		foreach ($users as $user)
+		{
+			$result2 = $this->getUserNamesAsArray($user, false);
+			$result = array_merge($result, $result2);
+		}
+
+		if($result)
+		{
+			$result = array_unique($result);
+			$result = array_values($result);
+			return $result;
+		}
+
+		return null;
+	}
+
+	private function getAllUsers()
+	{
+		$kUsersIds = array();
+
+		if($this->getKuserId())
+			$kUsersIds[] = $this->getKuserId();
+
+		if($this->getCreatorKuserId())
+			$kUsersIds[] = $this->getCreatorKuserId();
+
+		$entitledKusersIds = $this->getEntitledKusersEditArray();
+		$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		$entitledKusersIds = $this->getEntitledKusersPublishArray();
+		$kUsersIds = array_merge($kUsersIds, $entitledKusersIds);
+
+		return  kuserPeer::retrieveByPKs($kUsersIds);
+	}
+
+	private function getUserNamesAsArray($kuser, $includeNullValues = true)
+	{
 		$userNames = array();
-		$userNames[] = $kuser->getFirstName();
-		$userNames[] = $kuser->getLastName();
-		$userNames[] = $kuser->getScreenName();
-		
-		return implode(" ", $userNames);
+		if($includeNullValues || $kuser->getFirstName())
+			$userNames[] = $kuser->getFirstName();
+
+		if($includeNullValues || $kuser->getLastName())
+			$userNames[] = $kuser->getLastName();
+
+		if($includeNullValues || $kuser->getScreenName())
+			$userNames[] = $kuser->getScreenName();
+
+		return $userNames;
 	}
 
 	public function getCapabilities()
@@ -3711,8 +3767,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return $this->getFromCustomData("recorded_entry_length_in_msecs",null, 0);
 	}
-	
-	private function createPlayManifestUrlByFormat($format)
+
+	public function createPlayManifestUrlByFormat($format)
 	{
 		$entryId = $this->getId();
 		$protocolStr = infraRequestUtils::getProtocol();
@@ -3768,12 +3824,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'entitled_kusers_publish' => $this->getEntitledKusersPublishArray(),
 			'kuser_id' => $this->getKuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => elasticSearchUtils::formatSearchTerm($this->getName()),
+			'name' => $this->getName(),
 			'description' => $this->getDescription(),
 			'tags' => explode(',', $this->getTags()),
 			'partner_id' => $this->getPartnerId(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
-			'parent_id' => $this->getParentEntryId(),
 			'reference_id' => $this->getReferenceID(),
 			'conversion_profile_id' => $this->getConversionProfileId(),
 			'template_entry_id' => $this->getTemplateEntryId(),
@@ -3798,6 +3853,10 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'redirect_entry_id' => $this->getRedirectEntryId(),
 			'views' => $this->getViews(),
 			'votes' => $this->getVotes(),
+			'plays' => $this->getPlays(),
+			'last_played_at' => $this->getLastPlayedAt(null),
+			'user_names' => $this->getAllUserNamesAsArray(),
+			'root_id' => $this->getRootEntryId(),
 		);
 
 		$this->addCategoriesToObjectParams($body);
@@ -3816,6 +3875,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 	public function getElasticSaveMethod()
 	{
 		return ElasticMethodType::INDEX;
+	}
+
+	public function getElasticEntryId()
+	{
+		return $this->getId();
 	}
 
 	/**
@@ -3842,7 +3906,6 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 		$body['parent_entry'] = array(
 			'entry_id' => $parentEntry->getId(),
-			'partner_id' => $parentEntry->getPartnerId(),
 			'status' => $parentEntry->getStatus(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($parentEntry->getPartnerId(), $parentEntry->getStatus()),
 			'entitled_kusers_edit' => $parentEntry->getEntitledKusersEditArray(),

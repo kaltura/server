@@ -17,7 +17,7 @@ abstract class KalturaESearchItemImpl
 		}
 
 		$searchTerm = trim($eSearchItem->searchTerm);
-		if(self::shouldChangePartialToExact($searchTerm, $eSearchItem->itemType))
+		if(self::shouldChangeToExact($searchTerm, $eSearchItem->itemType))
 		{
 			$searchTerm = substr($searchTerm, 1, -1);
 			$object_to_fill->setSearchTerm($searchTerm);
@@ -53,9 +53,14 @@ abstract class KalturaESearchItemImpl
 		return array($object_to_fill, $props_to_skip);
 	}
 
-	private static function shouldChangePartialToExact($searchTerm, $itemType)
+
+	private static function shouldChangeToExact($searchTerm, $itemType)
 	{
-		if($itemType == KalturaESearchItemType::PARTIAL &&
+		/*
+		 * if itemType is PARTIAL and the searchTerm is wrapped with '"' - change search to EXACT_MATCH and trim '"'
+		 * if itemType is EXACT_MATCH and the searchTerm is wrapped with '"' - trim '"'
+		 */
+		if(in_array($itemType, array(KalturaESearchItemType::PARTIAL, KalturaESearchItemType::EXACT_MATCH)) &&
 			strlen($searchTerm) > 2 &&
 			substr($searchTerm, 0, 1) == '"' &&
 			substr($searchTerm,-1) == '"')

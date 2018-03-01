@@ -2,11 +2,10 @@
 <div class="error"><?php echo $this->errMessage ?></div><br/>
 <?php endif; ?>
 
-
-<?php
+<?php if($this->form):
 	$this->form->setAction($this->url(array('controller' => 'plugin', 'action' => 'MediaRepurposingConfigureAction')));
 	echo $this->form;
-?>
+endif; ?>
 
 <style type="text/css">
 	#frmMediaRepurposingConfigure textarea {  height: 5em;  width: 25em;  }

@@ -10,17 +10,18 @@ class kEncryptFileUtils
 {
     //iv length should be 16
     CONST ENCRYPT_METHOD = "AES-256-CBC";
-    const OPENSSL_RAW_DATA = 1;
+    const OPENSSL_RAW_DATA = 1; //can be removed once on PHP7
+    const ENCRYPT_INTERVAL = 3145728; // as 3MB = 1024 * 1024 * 3
+    const AES_BLOCK_SIZE = 16; //For IV extraction
+
     public static function encryptData($plainText, $key, $iv)
     {
         $iv = substr($iv,0, openssl_cipher_iv_length(self::ENCRYPT_METHOD));
-        $encryptedData =  openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key, self::OPENSSL_RAW_DATA , $iv);
-        return base64_encode($encryptedData);
+        return openssl_encrypt($plainText, self::ENCRYPT_METHOD, $key, self::OPENSSL_RAW_DATA , $iv);
     }
 
     public static function decryptData($cipherText, $key, $iv)
     {
-        $cipherText = base64_decode($cipherText);
         $iv = substr($iv,0, openssl_cipher_iv_length(self::ENCRYPT_METHOD));
         return openssl_decrypt($cipherText, self::ENCRYPT_METHOD, $key, self::OPENSSL_RAW_DATA, $iv);
     }
@@ -38,40 +39,108 @@ class kEncryptFileUtils
         return substr($plainData, $from_byte, $len);
     }
 
-    public static function setEncryptedFileContent($fileName, $key, $iv, $content)
+    private static function doEncryptFile($srcFd, $key, $iv, $destFd)
     {
-        $encryptedData = self::encryptData($content, $key, $iv);
-        kFileBase::setFileContent($fileName, $encryptedData);
+        $clear = fread($srcFd,self::ENCRYPT_INTERVAL);
+        $enc = self::encryptData($clear, $key, $iv);
+        $iv = substr($enc, -self::AES_BLOCK_SIZE);
+        fwrite($destFd, $enc);
+        return $iv;
     }
 
-    public static function encryptFile($fileName, $key, $iv)
+    public static function encryptFile($srcFilePath, $key, $iv, $dstFilePath = null)
     {
-        $data = kFileBase::getFileContent($fileName);
-        self::setEncryptedFileContent($fileName, $key, $iv, $data);
-        return true;
+        return self::wrapFileAccess('doEncryptFile', $srcFilePath, $key, $iv, $dstFilePath);
     }
 
-    public static function fileSize($filename, $key = null, $iv = null)
+    private static function doDecryptFile($srcFd, $key, $iv, $destFd)
     {
+        $content = fread($srcFd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
+        $clear = self::decryptData($content, $key, $iv);
+        fwrite($destFd, $clear);
+        return substr($content, -self::AES_BLOCK_SIZE);
+    }
+
+    public static function decryptFile($srcFilePath, $key, $iv, $dstFilePath = null)
+    {
+        return self::wrapFileAccess('doDecryptFile', $srcFilePath, $key, $iv, $dstFilePath);
+    }
+
+    private static function wrapFileAccess($functionName, $srcFilePath, $key, $iv, $dstFilePath = null)
+    {
+        $fd1 = $fd2 = null;
+        try
+        {
+            $tempPath =  self::getClearTempPath($srcFilePath);
+            $fd1 = fopen($srcFilePath, "rb");
+            $fd2 = fopen($tempPath, "w");
+            while (!feof($fd1))
+            {
+                $iv = call_user_func_array("self::$functionName", array($fd1, $key, $iv, $fd2));
+            }
+            fclose($fd1);
+            fclose($fd2);
+
+            if (!$dstFilePath)
+                $dstFilePath = $srcFilePath;
+            // adding @ to avoid valid case which in 2 process creating clear file at the same time
+            return @rename($tempPath, $dstFilePath);
+        }
+        catch(Exception $e)
+        {
+            if ($fd1)
+                fclose($fd1);
+            if ($fd2)
+                fclose($fd2);
+            throw new Exception("Failed to [$functionName] for src path [$srcFilePath] and dest [$dstFilePath] because " . $e->getMessage());
+        }
+    }
+
+    public static function dumpEncryptFilePart($filePath,  $key, $iv, $rangeFrom, $rangeLength)
+    {
+        $tempPath = self::getClearTempPath($filePath);
+        self::decryptFile($filePath, $key, $iv, $tempPath);
+        infraRequestUtils::dumpFilePart($tempPath, $rangeFrom, $rangeLength);
+        unlink($tempPath);
+        return;
+    }
+
+    public static function fileSize($filePath, $key = null, $iv = null)
+    {
+        $size = kFileBase::fileSize($filePath);
         if (!$key)
-            return kFileBase::fileSize($filename);
-        $data = self::getEncryptedFileContent($filename, $key, $iv, 0, -1);
-        return strlen($data);
+            return $size;
+        
+        if ($size < self::ENCRYPT_INTERVAL)
+            return strlen(self::getEncryptedFileContent($filePath, $key, $iv, 0, -1));
+
+        $tempPath = self::getClearTempPath($filePath);
+        self::decryptFile($filePath, $key, $iv, $tempPath);
+        $size = kFileBase::fileSize($tempPath);
+        unlink($tempPath);
+        return $size;
     }
     
     public static function encryptFolder($dirName, $key, $iv)
     {
         $filesPaths = kFile::dirList($dirName);
+        $done = true;
         foreach ($filesPaths as $filePath)
-            self::encryptFile($filePath, $key, $iv);
+            $done &= self::encryptFile($filePath, $key, $iv);
+        return $done;
     }
 
     public static function encrypt($path, $key, $iv)
     {
         if (is_file($path))
-            self::encryptFile($path, $key, $iv);
+            return self::encryptFile($path, $key, $iv);
         else if (is_dir($path))
-            self::encryptFolder($path, $key, $iv);
+            return self::encryptFolder($path, $key, $iv);
+    }
+    
+    public static function getClearTempPath($path)
+    {
+        return sys_get_temp_dir(). "/clear_" . pathinfo($path, PATHINFO_BASENAME);
     }
 
     

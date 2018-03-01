@@ -15,6 +15,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	const OUTPUT_ENTRY_ID = 'entryId';
 	const OUTPUT_TIMESTAMP = 'timestamp';
 	const OUTPUT_CITY_NAME = 'cityName';
+	const OUTPUT_REGION_NAME = 'regionName';
 	const OUTPUT_COUNTRY_NAME = 'countryName';
 	const OUTPUT_SEC_VIEWED = 'secondsViewed';
 	const OUTPUT_AUDIENCE = 'audience';
@@ -146,7 +147,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	{
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_TIMESERIES,
-			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
+			self::DRUID_DATASOURCE => self::DATASOURCE_REALTIME,
 			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 		);
@@ -156,7 +157,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	{
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_TOPN,
-			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
+			self::DRUID_DATASOURCE => self::DATASOURCE_REALTIME,
 			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 			self::DRUID_DIMENSION => $dimension,
@@ -169,7 +170,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	{
 		return array(
 			self::DRUID_QUERY_TYPE => self::DRUID_GROUP_BY,
-			self::DRUID_DATASOURCE => self::REALTIME_DATASOURCE,
+			self::DRUID_DATASOURCE => self::DATASOURCE_REALTIME,
 			self::DRUID_INTERVALS => self::getFilterIntervals($filter),
 			self::DRUID_FILTER => self::getBaseFilter($partnerId, $eventTypes, $filter),
 			self::DRUID_DIMENSIONS => $dimensions,
@@ -423,6 +424,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		$dimensions = array(
 			self::DIMENSION_ENTRY_ID => self::OUTPUT_ENTRY_ID,
 			self::DIMENSION_LOCATION_CITY => self::OUTPUT_CITY_NAME,
+			self::DIMENSION_LOCATION_REGION => self::OUTPUT_REGION_NAME,
 			self::DIMENSION_LOCATION_COUNTRY => self::OUTPUT_COUNTRY_NAME,
 		);
 

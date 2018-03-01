@@ -9,6 +9,7 @@
 
 require_once (dirname(__FILE__) . '/kBeacon.php');
 require_once (dirname(__FILE__) . '/../../../../plugins/beacon/lib/model/enums/BeaconIndexType.php');
+require_once (dirname(__FILE__) . '/../../../../plugins/beacon/lib/model/enums/BeaconObjectTypes.php');
 require_once (dirname(__FILE__) . '/../../../../plugins/beacon/lib/model/kBeaconSearchQueryManger.php');
 
 require_once (dirname(__FILE__) . '/../../../../plugins/queue/lib/QueueProvider.php');

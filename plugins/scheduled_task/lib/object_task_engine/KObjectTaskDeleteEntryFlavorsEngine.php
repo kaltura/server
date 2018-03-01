@@ -21,15 +21,12 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		$pager->pageSize = 500; // use max size, throw exception in case we got more than 500 flavors where pagination is not supported
 		$filter = new KalturaFlavorAssetFilter();
 		$filter->entryIdEqual = $object->id;
-		$this->impersonate($object->partnerId);
 		try
 		{
 			$flavorsResponse = $client->flavorAsset->listAction($filter);
-			$this->unimpersonate();
 		}
 		catch(Exception $ex)
 		{
-			$this->unimpersonate();
 			throw $ex;
 		}
 		if ($flavorsResponse->totalCount > $pager->pageSize)
@@ -61,16 +58,13 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 	protected function deleteFlavor($id, $partnerId)
 	{
 		$client = $this->getClient();
-		$this->impersonate($partnerId);
 		try
 		{
 			$client->flavorAsset->delete($id);
 			KalturaLog::info('Flavor id '.$id.' was deleted');
-			$this->unimpersonate();
 		}
 		catch(Exception $ex)
 		{
-			$this->unimpersonate();
 			KalturaLog::err($ex);
 			KalturaLog::err('Failed to delete flavor id '.$id);
 		}

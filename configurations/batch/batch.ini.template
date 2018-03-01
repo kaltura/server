@@ -786,3 +786,20 @@ friendlyName										= Copy Caption Assets
 type												= KAsyncCopyCaptions
 scriptPath											= ../plugins/content/caption/base/batch/CopyCaptions/KAsyncCopyCaptionsExe.php
 
+[KAsyncServerNodeMonitor : PeriodicWorker]
+id                                                  = 670
+sleepBetweenStopStart                               = 900
+friendlyName                                        = Server node monitor
+type                                                = KAsyncServerNodeMonitor
+scriptPath                                          = batches/ServerNodeMonitor/KAsyncServerNodeMonitorExe.php
+params.serverNodeTTL                                = 120
+params.typesToMonitor                               = 1
+
+[KAsyncUsersCsv : JobHandlerWorker]
+id													= 690
+friendlyName										= Users Csv
+type												= KAsyncUsersCsv
+params.localTempPath                                = @TMP_DIR@/userscsv
+params.sharedTempPath                                   = @WEB_DIR@/tmp/userscsv
+scriptPath											= batches/UsersCsv/kAsyncUsersCsvExe.php
+maximumExecutionTime			                    = 3600

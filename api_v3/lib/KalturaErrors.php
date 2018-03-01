@@ -85,6 +85,8 @@ class KalturaErrors extends APIErrors
 
 	const INVALID_USER_ID = "INVALID_USER_ID;;Invalid user id";
 
+	const INVALID_METADATA_PROFILE_ID = "INVALID_USER_ID;;Invalid user id";
+
 	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND;DCID;There is no data center with id [@DCID@]";
 
 	const PLUGIN_NOT_AVAILABLE_FOR_PARTNER = "PLUGIN_NOT_AVAILABLE_FOR_PARTNER;PLUGIN,PARTNER;Plugin [@PLUGIN@] is not available for partner [@PARTNER@]";
@@ -486,6 +488,12 @@ class KalturaErrors extends APIErrors
 	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING;PARAM;Parameter \"@PARAM@\" is missing";
 
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL;;Unable to create report. Query produced too many results";
+
+
+	/**
+	 * user service
+	 */
+	const INVALID_ID = "INVALID_ID;ID;Id \"@ID@\" contains invalid chars";
 
 	/**
 	 * categoryUser service

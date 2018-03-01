@@ -70,4 +70,9 @@ class WidevineFlavorAsset extends flavorAsset
 		parent::linkFromAsset($fromAsset);
 		$this->setWidevineAssetId($fromAsset->getWidevineAssetId());
 	}
+
+	public function shouldEncrypt()
+	{
+		return false;
+	}
 }

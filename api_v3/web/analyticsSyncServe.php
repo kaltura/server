@@ -5,12 +5,33 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 define('MAX_ITEMS', 2000);
 
+define('PARTNER_SECRET', 'secret');
+define('PARTNER_CRM_ID', 'crmId');
+define('PARTNER_VERTICAL', 'vertical');
+
+function getPartnerVertical($customData)
+{
+	if (isset($customData['internalUse']) && $customData['internalUse'])
+	{
+		return -1;
+	}
+	else if (isset($customData['verticalClasiffication']) && $customData['verticalClasiffication'] > 0)
+	{
+		return $customData['verticalClasiffication'];
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 function getPartnerUpdates($updatedAt)
 {
 	$c = new Criteria();
 	$c->addSelectColumn(PartnerPeer::ID);
 	$c->addSelectColumn(PartnerPeer::STATUS);
 	$c->addSelectColumn(PartnerPeer::ADMIN_SECRET);
+	$c->addSelectColumn(PartnerPeer::CUSTOM_DATA);
 	$c->addSelectColumn(PartnerPeer::UPDATED_AT);
 	$c->add(PartnerPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(PartnerPeer::UPDATED_AT);
@@ -26,8 +47,23 @@ function getPartnerUpdates($updatedAt)
 	{
 		$id = $row['ID'];
 		$status = $row['STATUS'];
-		$secret = $status == Partner::PARTNER_STATUS_ACTIVE ? $row['ADMIN_SECRET'] : '';
-		$result[$id] = $secret;
+		if ($status == Partner::PARTNER_STATUS_ACTIVE)
+		{
+			$customData = unserialize($row['CUSTOM_DATA']);
+			
+			$info = array(
+				PARTNER_SECRET => $row['ADMIN_SECRET'],
+				PARTNER_CRM_ID => isset($customData['crmId']) ? $customData['crmId'] : '',
+				PARTNER_VERTICAL => getPartnerVertical($customData),
+			);
+			$info = json_encode($info);
+		}
+		else
+		{
+			$info = '';
+		}
+		
+		$result[$id] = $info;
 		$updatedAt = new DateTime($row['UPDATED_AT']);
 		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
 	}

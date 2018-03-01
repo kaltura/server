@@ -58,6 +58,8 @@ if ($editFlavorParam)
 			<input type="text" id="max-frame-rate" name="max-frame-rate" value="<?php echo $editFlavorParam->getMaxFrameRate(); ?>" size="5" <?php echo $disabled; ?>/>fps
 			<br />
 			<label for="two-pass">Two Pass:</label><input type="checkbox" id="two-pass" name="two-pass" value="1" <?php echo ($editFlavorParam->getTwoPass()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="chunkedEncodeMode">ChunkedMode: </label>
+			<input type="text" id="chunkedEncodeMode" name="chunkedEncodeMode" value="<?php echo $editFlavorParam->getChunkedEncodeMode(); ?>" size="1" <?php echo $disabled; ?>/>
 			<label for="rotate">Rotate:</label><input type="checkbox" id="rotate" name="rotate" value="1" <?php echo ($editFlavorParam->getRotate()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<label for="aspectRatioProcessingMode">ARmode: </label>
 			<input type="text" id="aspectRatioProcessingMode" name="aspectRatioProcessingMode" value="<?php echo $editFlavorParam->getAspectRatioProcessingMode(); ?>" size="1" <?php echo $disabled; ?>/>

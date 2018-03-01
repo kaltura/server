@@ -27,19 +27,26 @@ abstract class kBaseSearch
 
 	public abstract function getPeerRetrieveFunctionName();
 
+	/**
+	 * @return ESearchQueryAttributes
+	 */
+	public function getQueryAttributes()
+	{
+		return $this->queryAttributes;
+	}
+
 	protected function handleDisplayInSearch()
 	{
 	}
 
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
-        $subQuery = $eSearchOperator->createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
+        $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->handleDisplayInSearch();
         $this->mainBoolQuery->addToMust($subQuery);
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
-        KalturaLog::debug("Elasticsearch query [".print_r($this->query, true)."]");
-        $result = $this->elasticClient->search($this->query);
+        $result = $this->elasticClient->search($this->query, true);
         return $result;
     }
 
@@ -113,9 +120,9 @@ abstract class kBaseSearch
 
     protected function addGlobalHighlights()
 	{
-        $this->queryAttributes->setScopeToGlobal();
+        $this->queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
         $numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey(self::GLOBAL_HIGHLIGHT_CONFIG);
-        $highlight = new kESearchHighlightQuery($this->queryAttributes->getFieldsToHighlight(), $numOfFragments);
+        $highlight = new kESearchHighlightQuery($this->queryAttributes->getQueryHighlightsAttributes()->getFieldsToHighlight(), $numOfFragments);
         $highlight = $highlight->getFinalQuery();
         if($highlight)
             $this->query['body']['highlight'] = $highlight;
@@ -130,7 +137,6 @@ abstract class kBaseSearch
     {
         $this->initPartnerLanguages($partnerId);
         $this->queryAttributes->setObjectId($objectId);
-        $this->queryAttributes->setShouldUseDisplayInSearch(true);
         $this->initOverrideInnerHits($objectId);
     }
 

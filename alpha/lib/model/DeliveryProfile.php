@@ -477,7 +477,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			KalturaLog::debug("No active delivery nodes found among the requested edge list: " . print_r($deliveryNodeIds, true));
 			return null;
 		}
-		
+	
+	        /* Shuffle the array to randomize the assigned KES, if more than one in the same rule */
+		shuffle($deliveryNodes);
+	
 		$deliveryNode = null;
 		foreach ($deliveryNodes as $node)
 		{

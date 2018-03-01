@@ -52,11 +52,11 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 		KalturaESearchEntryFieldName::CREDIT => ESearchEntryFieldName::CREDIT,
 		KalturaESearchEntryFieldName::SITE_URL => ESearchEntryFieldName::SITE_URL,
 		KalturaESearchEntryFieldName::ACCESS_CONTROL_ID => ESearchEntryFieldName::ACCESS_CONTROL_ID,
-		KalturaESearchEntryFieldName::VOTES => ESearchEntryFieldName::VOTES,
-		KalturaESearchEntryFieldName::VIEWS => ESearchEntryFieldName::VIEWS,
 		KalturaESearchEntryFieldName::EXTERNAL_SOURCE_TYPE => ESearchEntryFieldName::EXTERNAL_SOURCE_TYPE,
 		KalturaESearchEntryFieldName::IS_QUIZ => ESearchEntryFieldName::IS_QUIZ,
 		KalturaESearchEntryFieldName::IS_LIVE => ESearchEntryFieldName::IS_LIVE,
+		KalturaESearchEntryFieldName::USER_NAMES => ESearchEntryFieldName::USER_NAMES,
+		KalturaESearchEntryFieldName::ROOT_ID => ESearchEntryFieldName::ROOT_ID,
 	);
 
 	protected function getMapBetweenObjects()

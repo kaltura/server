@@ -40,4 +40,8 @@ abstract class UserEntry extends BaseUserEntry {
 		return UserEntryPeer::doSelectOne($userEntryCriteria);
 	}
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("userEntry:kuserId=".strtolower($this->getKuserId()));
+	}
 } // UserEntry

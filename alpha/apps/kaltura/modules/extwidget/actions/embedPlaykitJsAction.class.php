@@ -21,7 +21,9 @@ class embedPlaykitJsAction extends sfAction
 	private $sourceMapsCache = null;
 	private $eTagHash = null;
 	private $uiconfId = null;
+	private $uiConf = null;
 	private $partnerId = null;
+	private $partner = null;
 	private $bundle_name = null;
 	private $bundlerUrl = null;
 	private $sourcesPath = null;
@@ -108,7 +110,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = $this->appendConfig($bundleContentParts[1]);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
-		
+
 		//if auto embed selected add embed script to bundle content
 		if ($autoEmbed) 
 		{
@@ -129,22 +131,70 @@ class embedPlaykitJsAction extends sfAction
 
 	private function appendConfig($content)
 	{
-	    $uiConf = $this->playerConfig;
-	    $uiConf["env"] = $this->getEnvConfig();
-	    $uiConfJson = json_encode($uiConf);
-	    if ($uiConfJson === false)
-	    {
-	        KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
-	    }
-	    $confNS = "window.__kalturaplayerdata";
-	    $content .= "
-	    $confNS = ($confNS || {});
-	    $confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
-	    ";
-	    return $content;
+		$uiConf = $this->playerConfig;
+		$this->mergeEnvConfig($uiConf);
+		$uiConfJson = json_encode($uiConf);
+
+		if ($uiConfJson === false)
+		{
+			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
+		}
+		$confNS = "window.__kalturaplayerdata";
+		$content .= "
+		$confNS = ($confNS || {});
+		$confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
+		";
+		return $content;
+	}
+
+	private function mergeEnvConfig($uiConf)
+	{
+		if (!property_exists($uiConf, "provider"))
+		{
+			$uiConf->provider = new stdClass();
+			$uiConf->provider->env = new stdClass();
+		}
+
+		if (!property_exists($uiConf->provider, "env"))
+		{
+			$uiConf->provider->env = new stdClass();
+		}
+		foreach ($this->getEnvConfig() as $key => $value) {
+			if (!(property_exists($uiConf->provider->env, $key) && $uiConf->provider->env->$key))
+				$uiConf->provider->env->$key = $value;
+		}
 	}
 
 	private function getEnvConfig()
+	{
+		$tags = $this->uiConf->getTags();
+		$publisherEnvType = $this->partner->getPublisherEnvironmentType();
+		if (strpos($tags, "ott") || $publisherEnvType === PublisherEnvironmentType::OTT) {
+			return $this->getOttEnvConfig();
+		} else {
+			return $this->getOvpEnvConfig();
+		}
+	}
+
+	private function getOttEnvConfig()
+	{
+		$ottEnvConfig = json_decode($this->partner->getOttEnvironmentUrl(), true);
+		if (!is_array($ottEnvConfig)) {
+			$ottEnvConfig = array();
+		}
+		return $ottEnvConfig;
+	}
+
+	private function getOvpEnvConfig()
+	{
+		$ovpEnvConfig = json_decode($this->partner->getOvpEnvironmentUrl(), true);
+		if (!is_array($ovpEnvConfig)) {
+			$ovpEnvConfig = array();
+		}
+		return array_merge($this->getDefaultOvpEnvConfig(), $ovpEnvConfig);
+	}
+
+	private function getDefaultOvpEnvConfig()
 	{
 		$protocol = infraRequestUtils::getProtocol();
 
@@ -207,7 +257,7 @@ class embedPlaykitJsAction extends sfAction
 		) {
 			infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 			header("HTTP/1.1 304 Not Modified");
-			return;
+			KExternalErrors::dieGracefully();
 		}
 		
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
@@ -265,9 +315,14 @@ class embedPlaykitJsAction extends sfAction
 			$config[$key] = json_decode($val);
 		}
 
-		$config["partnerId"] = $this->partnerId;		
-		$config["uiConfId"] = $this->uiconfId;
-		
+		if (!isset($config["provider"])) {
+			$config["provider"] = new stdClass();
+		}
+		$config["provider"]->partnerId = $this->partnerId;
+		$config["provider"]->uiConfId = $this->uiconfId;
+
+		$config["targetId"] = $targetId;
+
 		$config = json_encode($config);		
 		if ($config === false)
 		{
@@ -276,13 +331,13 @@ class embedPlaykitJsAction extends sfAction
 
 		$autoEmbedCode = "
 		try {
-			var kalturaPlayer = KalturaPlayer.setup(\"$targetId\", $config);
-		    kalturaPlayer.loadMedia(\"" . $entry_id . "\");
-		  } catch (e) {
-		    console.error(e.message)
-		  }
+			var kalturaPlayer = KalturaPlayer.setup($config);
+			kalturaPlayer.loadMedia({entryId: \"" . $entry_id . "\"});
+		} catch (e) {
+			console.error(e.message);
+		}
 		";
-		
+
 		return $autoEmbedCode;
 	}
 	
@@ -388,21 +443,27 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, self::UI_CONF_ID_PARAM_NAME);
 		
 		// retrieve uiCong Obj
-		$uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
-		if (!$uiConf)
+		$this->uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
+		if (!$this->uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
-		$this->playerConfig = json_decode($uiConf->getConfig(), true);
-		$this->uiConfUpdatedAt = $uiConf->getUpdatedAt(null);
+		$this->playerConfig = json_decode($this->uiConf->getConfig());
+		if (!$this->playerConfig) {
+			$this->playerConfig = new stdClass();
+		}
+		$this->uiConfUpdatedAt = $this->uiConf->getUpdatedAt(null);
 		
 		//Get bundle configuration stored in conf_vars
-		$confVars = $uiConf->getConfVars();
+		$confVars = $this->uiConf->getConfVars();
 		if (!$confVars) {
 			KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
 		}
 		
 		//Get partner ID from QS or from UI conf
-		$this->partnerId = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $uiConf->getPartnerId());
-		
+		$this->partnerId = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $this->uiConf->getPartnerId());
+		$this->partner = PartnerPeer::retrieveByPK($this->partnerId);
+		if (!$this->partner)
+			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
+
 		//Get should force regenration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 		

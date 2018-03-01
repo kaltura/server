@@ -33,9 +33,9 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const CREDIT = 'credit';
 	const SITE_URL = 'site_url';
 	const ACCESS_CONTROL_ID = 'access_control_id';
-	const VOTES = 'votes';
-	const VIEWS = 'views';
 	const EXTERNAL_SOURCE_TYPE = 'external_source_type';
 	const IS_QUIZ = 'is_quiz';
 	const IS_LIVE = 'is_live';
+	const USER_NAMES = "user_names";
+	const ROOT_ID = 'root_id';
 }

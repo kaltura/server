@@ -144,7 +144,6 @@ abstract class LiveEntry extends entry
 			$this->setRedirectEntryId(null);
 			$this->setCustomDataObj();
 		}
-		
 		return parent::preUpdate($con);
 	}
 	
@@ -481,7 +480,11 @@ abstract class LiveEntry extends entry
 			/* @var WowzaMediaServerNode $serverNode*/
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+			{
+				if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$liveEntryServerNode->getIsPlayableUser())
+					return false;
 				return true;
+			}
 		}
 		
 		return !$currentDcOnly;
@@ -630,6 +633,12 @@ abstract class LiveEntry extends entry
 		if ( $this->getCurrentBroadcastStartTime() )
 		{
 			$this->setCurrentBroadcastStartTime( 0 );
+		}
+
+		if ($this->getExplicitLive())
+		{
+			$this->setViewMode(ViewMode::PREVIEW);
+			$this->setRecordingStatus(RecordingStatus::STOPPED);
 		}
 	}
 

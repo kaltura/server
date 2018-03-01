@@ -209,7 +209,7 @@ class CaptionAssetService extends KalturaAssetService
 
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
-		$captionAsset->setSize(kEncryptFileUtils::fileSize($finalPath, $fileSync->getEncryptionKey(), $fileSync->getIv()));
+		$captionAsset->setSize($fileSync->getFileSize());
 		
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
