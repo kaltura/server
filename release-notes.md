@@ -9,8 +9,14 @@
 ### configuration ###
 None
 
+#### Known Issues & Limitations ####
+
+None.
+
 ### Deployment scripts ###
 	php deployment/updates/scripts/add_permissions/2017_08_15_entry_server_enable_delete.php
+	php deployment/updates/scripts/add_permissions/2018_02_26_add_update_status_permission_to_entry_server_node.php
+	
 
 # Mercury 13.15.0 #
 
@@ -254,7 +260,6 @@ First replcae all tokens from the XML files below and remove ".template" from th
 None.
 
 # Mercury 13.10.0 # 
->>>>>>> Mercury-13.15.0
 
 ## Deploy new live audio flavor params ##
 
