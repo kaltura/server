@@ -185,15 +185,19 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		if (!$locale)
 			throw new Exception("Failed to find matching language for language ".$captionInfo->language." and there was no label available");
 
-		FacebookGraphSdkUtils::uploadCaptions(
-			$this->appId,
-			$this->appSecret,
-			$distributionProfile->pageAccessToken,
-			$remoteId,
-			$captionInfo->filePath,
-			$locale,
-			$this->tempDirectory
-			);
+		$contentUrl = $this->getRemoteCaptionContentUrl($captionInfo->assetId);
+		if($contentUrl)
+		{
+			$fileName = FacebookGraphSdkUtils::transformCaptionFilePathByFormat($captionInfo->assetId, $locale);
+			$tempPath = $this->putTempFile($fileName, $contentUrl, $this->getTempSubDirName());
+			FacebookGraphSdkUtils::uploadCaptions(
+				$this->appId,
+				$this->appSecret,
+				$distributionProfile->pageAccessToken,
+				$remoteId,
+				$tempPath
+				);
+		}
 
 		$mediaFile = new KalturaDistributionRemoteMediaFile();
 		$mediaFile->assetId = $captionInfo->assetId;
@@ -357,5 +361,10 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		}
 
 		return $value;
+	}
+
+	private function getTempSubDirName()
+	{
+		return "facebook";
 	}
 }
