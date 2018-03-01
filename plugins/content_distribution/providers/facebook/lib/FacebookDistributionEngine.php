@@ -191,7 +191,6 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			$this->appSecret,
 			$distributionProfile->pageAccessToken,
 			$remoteId,
-			$captionInfo->filePath,
 			$captionAssetContent,
 			$locale,
 			$this->tempDirectory
