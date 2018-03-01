@@ -14,8 +14,7 @@ None
 None.
 
 ### Deployment scripts ###
-	php deployment/updates/scripts/add_permissions/2017_08_15_entry_server_enable_delete.php
-	php deployment/updates/scripts/add_permissions/2018_02_26_add_update_status_permission_to_entry_server_node.php
+	php deployment/updates/scripts/add_permissions/2018_03_01_entry_server_enable_delete_and_update.php
 	
 
 # Mercury 13.15.0 #
