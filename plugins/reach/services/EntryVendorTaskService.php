@@ -259,6 +259,9 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 
 		/* @var EntryVendorTask $dbEntryVendorTask*/
+		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $dbEntryVendorTask->getUserId() )
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED,$id, $dbEntryVendorTask->getUserId());
+
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::ABORTED);
 		$dbEntryVendorTask->setErrDescription($abortReason);
 		$dbEntryVendorTask->save();
