@@ -235,8 +235,15 @@ class FacebookGraphSdkUtils
 		$data = array (
 			'captions_file' => new FacebookCaptionsFile($tempCaptionFilePath),
 		);
-		self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, false, "/captions" );
-		unlink($tempCaptionFilePath);
+		// finally support only from php 5.5
+		try {
+			self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, false, "/captions" );
+			unlink($tempCaptionFilePath);
+		}
+		catch (Exception $e) {
+			unlink($tempCaptionFilePath);
+			throw $e;
+		}
 	}
 
 	/**
