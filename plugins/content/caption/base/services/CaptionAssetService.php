@@ -121,7 +121,7 @@ class CaptionAssetService extends KalturaAssetService
 			CaptionAsset::ASSET_STATUS_READY,
 			CaptionAsset::ASSET_STATUS_VALIDATING,
 			CaptionAsset::ASSET_STATUS_TEMP,
-			CaptionAsset::PENDING_REVIEW
+			CaptionAsset::ASSET_STATUS_PENDING_REVIEW,
 		);
 
 		if ($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
@@ -740,7 +740,7 @@ class CaptionAssetService extends KalturaAssetService
 	private function setStatus($captionAsset)
 	{
 		if ($this - $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
-			$captionAsset->setStatus(CaptionAsset::PENDING_REVIEW);
+			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_PENDING_REVIEW);
 		else
 			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 	}

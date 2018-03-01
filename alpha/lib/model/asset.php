@@ -71,7 +71,6 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	const ASSET_STATUS_IMPORTING = 7;
 	const ASSET_STATUS_VALIDATING = 8;
 	const ASSET_STATUS_EXPORTING = 9;
-	const PENDING_REVIEW = 10;
 
 	/**
 	 * @deprecated use FILE_SYNC_ASSET_SUB_TYPE_ASSET instead
