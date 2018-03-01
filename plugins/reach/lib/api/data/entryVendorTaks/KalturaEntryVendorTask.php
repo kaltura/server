@@ -180,7 +180,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'version',
 		'context',
 		'accuracy',
-		'outputObjectId'
+		'outputObjectId',
 		'dictionary',
 	);
 	

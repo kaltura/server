@@ -524,6 +524,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				{
 					if (($entry->getType() == entryType::PLAYLIST) && (in_array($captionAsset->getLanguage(), $captionLanguages)))
 						continue;
+
+					if($captionAsset->getStatus() == CaptionAsset::PENDING_REVIEW)
+						continue;
+
 					$captionLanguages[] = $captionAsset->getLanguage();
 
 					/* @var $captionAsset CaptionAsset */
