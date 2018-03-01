@@ -36,6 +36,10 @@ class KalturaEntryResource extends KalturaContentResource
 			return;
 		
 		$srcFlavorAsset = null;
+
+		if ($srcEntry->getIsRecordedEntry() && myEntryUtils::shouldServeVodFromLive($srcEntry))
+			return;
+
 		if(is_null($this->flavorParamsId))
 		{
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
@@ -128,7 +132,12 @@ class KalturaEntryResource extends KalturaContentResource
 			
 			return $object_to_fill;
     	}
-    	
+		if ($srcEntry->getIsRecordedEntry() && myEntryUtils::shouldServeVodFromLive($srcEntry))
+		{
+			$object_to_fill->setOriginEntryId($this->entryId);
+			return $object_to_fill;
+		}
+
     	$srcFlavorAsset = null;
     	if(is_null($this->flavorParamsId))
     	{

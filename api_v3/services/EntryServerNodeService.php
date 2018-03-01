@@ -139,4 +139,34 @@ class EntryServerNodeService extends KalturaBaseService
 		/* @var EntryServerNode $dbEntryServerNode */
 		$dbEntryServerNode->validateEntryServerNode();
 	}
+
+	/**
+	 * Function returns EntryServerNode sub-type according to protocol
+	 *
+	 * @action updateStatus
+	 * @param string $id
+	 * @param KalturaEntryServerNodeStatus $status
+	 *
+	 * @return KalturaEntryServerNode
+	 *
+	 * @throws KalturaAPIException
+	 */
+	public static function updateStatusAction($id, $status)
+	{
+
+		$dbEntryServerNode = entryServerNode::retrieveByPK($id);
+
+		if (!$dbEntryServerNode)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $dbEntryServerNode);
+
+
+		$dbEntryServerNode->setStatus($status);
+		$dbEntryServerNode->save();
+
+		$entryServerNode = KalturaDropFolderFile::getInstanceByType($dbEntryServerNode->getType());
+		$entryServerNode->fromObject($dbEntryServerNode);
+
+		return $entryServerNode;
+
+	}
 }
