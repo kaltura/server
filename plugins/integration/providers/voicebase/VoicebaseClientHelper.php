@@ -178,6 +178,10 @@ class VoicebaseClientHelper
 		{
 			$params["format"] = $format;
 			$result = $this->sendAPICall($params);
+			if($format == "TXT")
+			{
+				$result = $this->trimRedundantString($result, "\n\n");
+			}
 			$results[$format] = $result->transcript;
 		}
 		
@@ -211,6 +215,27 @@ class VoicebaseClientHelper
 		$params = array("action" => self::VOICEBASE_ACTION_DELETEFILE, "externalID" => $entryId);
 	
 		$curlResult = $this->sendAPICall($params);
+	}
+
+	private function trimRedundantString($str, $substr)
+	{
+		$offset = 0;
+		$index = strpos($str, $substr, $offset);
+		$endOfSentenceChars = array(".","!","?");
+		while($index != false)
+		{
+			if($index > 1 && !in_array($str{$index-1}, $endOfSentenceChars) && !in_array($str{$index-2}, $endOfSentenceChars))
+			{
+				$str = substr($str, 0, $index) . substr($str, $index + 2);
+			}
+			$offset = $index + 2;
+			if($offset > strlen($str))
+			{
+				break;
+			}
+			$index = strpos($str, $substr, $offset);
+		}
+		return $str;
 	}
 
 	private function getFile($path)
