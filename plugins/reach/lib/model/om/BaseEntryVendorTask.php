@@ -1812,22 +1812,6 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 
 		$copyObj->setFinishTime($this->finish_time);
 
-		$copyObj->setPartnerId($this->partner_id);
-
-		$copyObj->setVendorPartnerId($this->vendor_partner_id);
-
-		$copyObj->setEntryId($this->entry_id);
-
-		$copyObj->setStatus($this->status);
-
-		$copyObj->setPrice($this->price);
-
-		$copyObj->setCatalogItemId($this->catalog_item_id);
-
-		$copyObj->setVendorProfileId($this->vendor_profile_id);
-
-		$copyObj->setKuserId($this->kuser_id);
-
 		$copyObj->setVersion($this->version);
 
 		$copyObj->setContext($this->context);
@@ -1838,6 +1822,22 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 		$copyObj->setNew(true);
 
 		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setPartnerId(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setVendorPartnerId(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setEntryId(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setStatus(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setPrice(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setCatalogItemId(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setVendorProfileId(NULL); // this is a auto-increment column, so set to default value
+
+		$copyObj->setKuserId(NULL); // this is a auto-increment column, so set to default value
 
 	}
 

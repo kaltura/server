@@ -39,17 +39,17 @@ class VendorCatalogItemTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 256, null);
-		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 256, null);
-		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', true, 256, null);
+		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('VENDOR_PARTNER_ID', 'VendorPartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('SERVICE_TYPE', 'ServiceType', 'TINYINT', true, null, null);
 		$this->addColumn('SERVICE_FEATURE', 'ServiceFeature', 'TINYINT', true, null, null);
 		$this->addColumn('TURN_AROUND_TIME', 'TurnAroundTime', 'INTEGER', true, null, null);
-		$this->addColumn('SOURCE_LANGUAGE', 'SourceLanguage', 'VARCHAR', true, 256, null);
-		$this->addColumn('TARGET_LANGUAGE', 'TargetLanguage', 'VARCHAR', true, 256, null);
-		$this->addColumn('OUTPUT_FORMAT', 'OutputFormat', 'VARCHAR', true, 256, null);
+		$this->addColumn('SOURCE_LANGUAGE', 'SourceLanguage', 'VARCHAR', false, 256, null);
+		$this->addColumn('TARGET_LANGUAGE', 'TargetLanguage', 'VARCHAR', false, 256, null);
+		$this->addColumn('OUTPUT_FORMAT', 'OutputFormat', 'VARCHAR', false, 256, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

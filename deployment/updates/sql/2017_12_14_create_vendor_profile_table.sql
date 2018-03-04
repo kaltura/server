@@ -1,13 +1,12 @@
 CREATE TABLE IF NOT EXISTS `vendor_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`created_at` DATETIME  NOT NULL,
-	`updated_at` DATETIME  NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
 	`partner_id` INTEGER  NOT NULL,
 	`type` TINYINT  NOT NULL,
 	`status` TINYINT  NOT NULL,
-	`used_credit` INTEGER  NOT NULL,
-	`used_credit_period` INTEGER  NOT NULL,
+	`used_credit` INTEGER,
 	`rules` TEXT,
 	`dictionary` TEXT,
 	`custom_data` TEXT,
