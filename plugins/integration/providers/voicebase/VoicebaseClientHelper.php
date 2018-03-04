@@ -180,7 +180,7 @@ class VoicebaseClientHelper
 			$result = $this->sendAPICall($params);
 			if($format == "TXT")
 			{
-				$result = $this->trimRedundantString($result, "\n\n");
+				$result->transcript = $this->trimRedundantString($result->transcript, "\n\n");
 			}
 			$results[$format] = $result->transcript;
 		}
