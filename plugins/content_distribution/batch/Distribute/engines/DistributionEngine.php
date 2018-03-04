@@ -200,4 +200,19 @@ abstract class DistributionEngine implements IDistributionEngine
 			KalturaLog::info("Can't serve caption asset id [$captionAssetId] " . $e->getMessage());
 		}
 	}
+
+	protected function getThumbAssetFile($thumbAssetId, $thumbFile)
+	{
+		KalturaLog::info("Retrieve thumb asset content for thumbAssetId: [$thumbAssetId]");
+		try
+		{
+			$thumbAssetContentUrl = self::getThumbAssetUrl($thumbAssetId);
+			$thumbContent = KCurlWrapper::getContent($thumbAssetContentUrl);
+			kFileBase::setFileContent($thumbFile, $thumbContent);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Can't serve thumb asset id [$thumbAssetId] " . $e->getMessage());
+		}
+	}
 }
