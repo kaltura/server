@@ -185,4 +185,19 @@ abstract class DistributionEngine implements IDistributionEngine
 
 		return $metadataListResponse->objects;
 	}
+
+	protected function getCaptionContent($captionAssetId)
+	{
+		KalturaLog::info("Retrieve caption assets content for captionAssetId: [$captionAssetId]");
+		try
+		{
+			$captionClientPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+			$captionAssetContentUrl= $captionClientPlugin->captionAsset->serve($captionAssetId);
+			return KCurlWrapper::getContent($captionAssetContentUrl);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Can't serve caption asset id [$captionAssetId] " . $e->getMessage());
+		}
+	}
 }

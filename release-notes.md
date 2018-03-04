@@ -10,6 +10,17 @@ None.
 ### Deployment scripts ###
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml
 
+## Update eSearch permissions ##
+
+- Issue Type: Task
+- Issue ID: PLAT-8618
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_28_update_esearch_permissions.php
+
 ## Add new Drop Folder Type ##
 
 - Issue Type: New Feature
