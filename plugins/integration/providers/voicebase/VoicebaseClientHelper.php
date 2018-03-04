@@ -178,6 +178,7 @@ class VoicebaseClientHelper
 		{
 			$params["format"] = $format;
 			$result = $this->sendAPICall($params);
+			//Due to service-provider API v1 bug, extra double newlines are being added in some cases
 			if($format == "TXT")
 			{
 				$result->transcript = $this->trimRedundantString($result->transcript, "\n\n");
