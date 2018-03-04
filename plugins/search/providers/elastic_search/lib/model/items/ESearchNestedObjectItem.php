@@ -78,6 +78,8 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 		$queryAttributes->setNestedOperatorInnerHitsSize($innerHitsSize);
 		$queryAttributes->setNestedOperatorNumOfFragments($numOfFragments);
 		$queryAttributes->setNestedOperatorPath(static::NESTED_QUERY_PATH);
+		$nestedSortOrder = static::getNestedSortOrder();
+		$queryAttributes->setNestedQuerySortOrder($nestedSortOrder);
 	}
 
 	public function createNestedQuery(&$boolQuery, &$queryAttributes)
@@ -126,5 +128,11 @@ abstract class ESearchNestedObjectItem extends ESearchItem
 	}
 
 	public abstract function getNestedQueryName(&$queryAttributes);
+
+	protected static function getNestedSortOrder()
+	{
+		//default - order by score
+		return null;
+	}
 
 }
