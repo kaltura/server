@@ -64,21 +64,26 @@ class FacebookDistributionEngine extends DistributionEngine implements
 
 		$facebookMetadata = $this->convertToFacebookData($data->providerData->fieldValues, true);
 
+		$tempThumbFile = $this->tempDirectory . '/thumb_'. $data->providerData->thumbAssetId;
 		try
 		{
+			$this->getThumbAssetFile($data->providerData->thumbAssetId, $tempThumbFile);
 			$data->remoteId = FacebookGraphSdkUtils::uploadVideo(
 				$this->appId,
 				$this->appSecret,
 				$data->distributionProfile->pageId,
 				$data->distributionProfile->pageAccessToken,
 				$videoPath,
-				$data->providerData->thumbAssetFilePath,
+				$tempThumbFile,
 				filesize($videoPath),
 				$this->tempDirectory,
 				$facebookMetadata);
+			unlink($tempThumbFile);
 		}
 		catch (Exception $e)
 		{
+			if (file_exists($tempThumbFile))
+				unlink($tempThumbFile);
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
 
