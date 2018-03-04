@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `partner_catalog_item`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`created_at` DATETIME  NOT NULL,
-	`updated_at` DATETIME  NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
 	`status` TINYINT  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
 	`catalog_item_id` INTEGER  NOT NULL,
