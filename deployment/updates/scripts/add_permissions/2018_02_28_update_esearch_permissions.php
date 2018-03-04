@@ -6,7 +6,7 @@
 
 $removePermissionsScript = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/removePermissionsAndItems.php';
 
-$removeConfig = realpath(dirname(__FILE__)) . '/../ini_files/esearch_update_permissions.ini';
+$removeConfig = realpath(dirname(__FILE__)) . '/../ini_files/2018_02_28_esearch_update_permissions.ini';
 passthru("php $removePermissionsScript $removeConfig");
 
 
