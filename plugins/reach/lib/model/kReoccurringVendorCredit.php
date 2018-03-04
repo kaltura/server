@@ -52,7 +52,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	}
 	
 	/**
-	 * @return the $frequency
+	 * @return string $frequency
 	 */
 	public function getFrequency()
 	{

@@ -122,7 +122,7 @@ class kVendorCredit
 
 
 	/**
-	 * @return the $lastSyncTime
+	 * @return string $lastSyncTime
 	 */
 	public function getLastSyncTime()
 	{
@@ -144,7 +144,7 @@ class kVendorCredit
 	public function syncCredit($vendorProfileId)
 	{
 		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::VENDOR_PROFILE_ID, $vendorProfileId->id , Criteria::EQUAL);
+		$c->add(EntryVendorTaskPeer::VENDOR_PROFILE_ID, $vendorProfileId , Criteria::EQUAL);
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
 		$date = $this->getLastSyncTime() ? $this->getLastSyncTime() : $this->getFromDate();
 		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $date, Criteria::GREATER_EQUAL);

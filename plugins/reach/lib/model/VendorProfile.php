@@ -326,6 +326,7 @@ class VendorProfile extends BaseVendorProfile
 			$syncedCredit = $vendorProfileCredit->syncCredit($this->getId());
 			$this->setUsedCredit($syncedCredit);
 		}
+		$this->setCredit($vendorProfileCredit);
 	}
 	
 	public function shouldModerate($type)

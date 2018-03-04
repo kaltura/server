@@ -160,23 +160,23 @@ class VendorProfileService extends KalturaBaseService
 	 *
 	 * @action syncCredit
 	 * @param int $vendorProfileId
-	 *
+	 * @return KalturaVendorProfile
 	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
 	 */
 	public function syncCredit($vendorProfileId)
 	{
-//		$dbVendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
-//		if (!$dbVendorProfile)
-//			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $vendorProfileId);
-//
-//		// set the object status to deleted
-//		$dbVendorProfile->syncCredit();
-//		$dbVendorProfile->save();
-//
-//		// return the saved object
-//		$vendorProfile = new KalturaVendorProfile();
-//		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-//		return $vendorProfile;
+		$dbVendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
+		if (!$dbVendorProfile)
+			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $vendorProfileId);
+
+		// set the object status to deleted
+		$dbVendorProfile->syncCredit();
+		$dbVendorProfile->save();
+
+		// return the saved object
+		$vendorProfile = new KalturaVendorProfile();
+		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
+		return $vendorProfile;
 	}
 
 }
