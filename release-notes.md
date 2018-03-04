@@ -1,5 +1,15 @@
 # Mercury 13.15.0 #
 
+## Entry added to category Firebase notification template ##
+- Issue Type: New Feature
+- Issue ID: PLAT-8645
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml
+
 ## Update eSearch permissions ##
 
 - Issue Type: Task
