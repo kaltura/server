@@ -49,8 +49,8 @@
                         <value>
                             {
                                 "content_available":true,
-                                "data": { "entry_id": "{entry_id}", "entry_title": "this is a new entry"},
-                                "to" : "/topics/{partner_id}/{category_id}"
+                                "data": { "entry_id": "{entry_id}", "category_id": "{category_id}"},
+                                "to" : "/topics/{partner_id}"
                             }
                         </value>
                     </content>
