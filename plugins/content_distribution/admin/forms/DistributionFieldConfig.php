@@ -49,15 +49,19 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 		$isRequired->setLabel('Required:');
 		$isRequired->setFilters(array('StringTrim'));
 		$this->addElements(array($isRequired));
-				
+
+		$type = new Kaltura_Form_Element_EnumSelect('type', array('enum' => 'Kaltura_Client_ContentDistribution_Enum_DistributionFieldType'));
+		$type->setLabel('Type:');
+		$type->setFilters(array('StringTrim'));
+		$this->addElements(array($type));
+
 		$this->addElement('checkbox', 'updateOnChange', array(
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper'),
 			'class' 		=> 'update-on-change',
 			'label' 		=> 'Trigger Update:', 
 		));
-		
-		
+
 		$this->addElement('text', 'updateParamsArrayString', array(
 			'filters'		=> array('StringTrim'),
 			'class'			=> 'update-param',
@@ -108,7 +112,9 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			// required by provider shouldn't be selectable by the user
 			$this->getElement('isRequired')->removeMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		}
-		
+
+		$fieldType = isset($props['type']) ? $props['type'] : null;
+		$this->setDefault('type', $this->getStringToType($fieldType));
 		$this->setDefault('fieldNameForView', $object->fieldName);
 		
 		if (!$object->isDefault)
@@ -148,7 +154,45 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			}
 		}
 		$object->updateParams = $updateParams;
-		
+
+		$type = $properties['type'];
+		$object->type = $this->getTypeAsString($type);
 		return $object;
 	}
+
+	private function getTypeAsString($type)
+	{
+		switch ($type)
+		{
+			case Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::INT:
+				return "int";
+			case Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::STRING:
+				return "string";
+			case Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::LONG:
+				return "long";
+			case Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::TIMESTAMP:
+				return "timestamp";
+			default:
+				return "string";
+		}
+	}
+
+	private function getStringToType($type)
+	{
+		switch ($type)
+		{
+			case "int":
+				return Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::INT;
+			case "string":
+				return Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::STRING;
+			case "long";
+				return Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::LONG;
+			case "timestamp":
+				return Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::TIMESTAMP;
+			default:
+				return Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::STRING;
+		}
+	}
+
+
 }
