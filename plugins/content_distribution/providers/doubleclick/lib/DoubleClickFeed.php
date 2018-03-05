@@ -333,7 +333,7 @@ class DoubleClickFeed
 				continue;
 
 			$keyvaluesElement = $this->doc->createElement('dfpvideo:keyvalues');
-			$type = $fieldConfig->getType() != null ? 'string' : $fieldConfig->getType();
+			$type = $fieldConfig->getType() != null ? $fieldConfig->getType() : 'string' ;
 			$keyvaluesElement->setAttribute('type', $type);
 			$keyvaluesElement->setAttribute('key', $key);
 			$keyvaluesElement->setAttribute('value', $value);
