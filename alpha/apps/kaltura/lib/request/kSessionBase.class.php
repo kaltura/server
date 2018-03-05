@@ -50,6 +50,7 @@ class kSessionBase
 	const PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT = "disablechangeaccount";
 	const PRIVILEGE_EDIT_USER = "edituser";
 	const PRIVILEGE_EDIT_ADMIN_TAGS = 'editadmintags';
+	const PRIVILEGE_CANNOT_VIEW_EXPLICIT = "cannotviewexplicit";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
