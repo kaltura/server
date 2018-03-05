@@ -489,50 +489,15 @@ class kSessionBase
 	{
 		
 		$key = substr(sha1($key, true), 0, 16);
-		if (function_exists('mcrypt_encrypt')) {
-			return mcrypt_encrypt(
-				MCRYPT_RIJNDAEL_128,
-				$key,
-				$message,
-				MCRYPT_MODE_CBC,
-				self::AES_IV // no need for a real IV since we add a random string to the message anyway
-			);
-		}else {
-			// Pad with null byte to be compatible with mcrypt PKCS#5 padding
-		        // See http://thefsb.tumblr.com/post/110749271235/using-opensslendecrypt-in-php-instead-of as reference
-			$blockSize = 16;
-			$padLength = $blockSize - strlen($message) % $blockSize;
-			$message .= str_repeat(chr(0), $padLength);
-			return openssl_encrypt(
-				$message,
-				'AES-128-CBC',
-				$key,
-				OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,
-				self::AES_IV
-			);
-		}
+		$myCryptor=KCryptoWrapper::getEncryptor();
+		return $myCryptor::encrypt_aes($message,$key, self::AES_IV);
 	}
 
 	protected static function aesDecrypt($key, $message)
 	{
-		if (function_exists('mcrypt_decrypt')) {
-		    return mcrypt_decrypt(
-			MCRYPT_RIJNDAEL_128,
-			substr(sha1($key, true), 0, 16),
-			$message,
-			MCRYPT_MODE_CBC, 
-			self::AES_IV
-		    );
-		}else{
-		    return openssl_decrypt(
-				$message,
-				'AES-128-CBC',
-				substr(sha1($key, true), 0, 16),
-				OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,
-				self::AES_IV
-			);
-
-		}
+		$key = substr(sha1($key, true), 0, 16);
+		$myCryptor=KCryptoWrapper::getEncryptor();
+		return $myCryptor::decrypt_aes($message,$key,self::AES_IV);
 	}
 
 

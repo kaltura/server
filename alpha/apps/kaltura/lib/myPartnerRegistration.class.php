@@ -177,13 +177,9 @@ class myPartnerRegistration
 	 */
 	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $newPartner = null, $templatePartnerId = null )
 	{
-		if (function_exists('mcrypt_create_iv')) {
-		    $secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
-		    $admin_secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
-		}else{
-		    $secret = md5(openssl_random_pseudo_bytes(16));
-		    $admin_secret = md5(openssl_random_pseudo_bytes(16));
-		}
+		$myCryptor=KCryptoWrapper::getEncryptor();
+		$secret = md5($myCryptor::random_pseudo_bytes(16));
+		$admin_secret = md5($myCryptor::random_pseudo_bytes(16));
 
 		if (!$newPartner)
 			$newPartner = new Partner();

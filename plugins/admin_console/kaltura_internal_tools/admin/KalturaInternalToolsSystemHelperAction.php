@@ -34,6 +34,7 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		
 		$SystemHelperForm = new Form_SystemHelper();
 		$SystemHelperFormResult = new Form_SystemHelperResult();
+		$myCryptor=KCryptoWrapper::getEncryptor();
 		
 		$algo ="";
 		$secret = "";
@@ -41,7 +42,6 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		$algo = $request->getParam('Algorithm', false);
 		$key = $request->getParam('des_key',false);
 		$secret = $request->getParam('secret',false);
-		
 		$res = "";
 		
 		
@@ -63,56 +63,15 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		}
 		elseif ( $algo == "base64_3des_encode" )
 		{
-			$input = $str;
-			if (extension_loaded('mcrypt')){
-				$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-				$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-		        	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
-	    	
-				mcrypt_generic_init($td, $key, $iv);
-				$encrypted_data = mcrypt_generic($td, $input);
-				mcrypt_generic_deinit($td);
-				mcrypt_module_close($td);
-	    
-			}else{
-				$blockSize = 16;
-				$padLength = $blockSize - strlen($input) % $blockSize;
-				$input .= str_repeat(chr(0), $padLength);
-				$encrypted_data=openssl_encrypt(
-					$input,
-					'DES-EDE3',
-					$key,
-					OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
-					
-				);
-
-			}
-			$res = base64_encode($encrypted_data )		;
+			$encrypted_data = $myCryptor::encrypt_3des($str,$key);
+			$res = base64_encode($encrypted_data)		;
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "base64_3des_decode" )
 		{
-			$input = base64_decode ( $str );
-			if (extension_loaded('mcrypt')){
-			    $td = mcrypt_module_open('tripledes', '', 'ecb', '');
-			    $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-			    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
-		    
-			    mcrypt_generic_init($td, $key, $iv);
-			    $decrypted_data = mdecrypt_generic($td, $input);
-			    mcrypt_generic_deinit($td);
-			    mcrypt_module_close($td);
-			}else{
-				$decrypted_data=openssl_decrypt(
-					$input,
-					'DES-EDE3',
-					$key,
-					OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
-					
-				);
-			}
-	    
-			$res = ($decrypted_data )		;
+			$input = base64_decode ($str);
+	   		$decrypted_data = $myCryptor::decrypt_3des($input,$key);
+			$res = ($decrypted_data);
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "ks" )

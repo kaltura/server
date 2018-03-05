@@ -756,27 +756,8 @@ class myPartnerUtils
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		if ( !$partner ) return null;
 		
-		$input = $partner_id;
-		if (extension_loaded('mcrypt')) {
-		    $td = mcrypt_module_open('tripledes', '', 'ecb', '');
-		    $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-		    mcrypt_generic_init($td, $key, $iv);
-		    $encrypted_data = mcrypt_generic($td, $input);
-		    mcrypt_generic_deinit($td);
-		    mcrypt_module_close($td);
-		}else{
-		    $blockSize = 16;
-		    $padLength = $blockSize - strlen($input) % $blockSize;
-		    $input .= str_repeat(chr(0), $padLength);
-		    $encrypted_data=openssl_encrypt(
-			    $input,
-			    'DES-EDE3',
-			    $key,
-			    OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
-			    
-		    );
-		}
-		
+		$myCryptor=KCryptoWrapper::getEncryptor();
+		$encrypted_data=$myCryptor::encrypt_3des($partner_id,$key);	
 		return $token_prefix . base64_encode( $encrypted_data );
 	}
 	

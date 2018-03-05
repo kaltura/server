@@ -21,6 +21,7 @@ class helperAction extends kalturaSystemAction
 		$algo = $this->getP ( "algo" , "wiki_decode_no_serialize" );
 		$res = "";
 		$key = null;
+		$myCryptor=KCryptoWrapper::getEncryptor();
 		
 		if ( $algo == "wiki_encode" )
 		{
@@ -41,30 +42,8 @@ class helperAction extends kalturaSystemAction
 		elseif ( $algo == "base64_3des_encode" )
 		{
 			$key = $this->getP ( "des_key" );
-			$input = $str;
-			if (extension_loaded('mcrypt')) {
-				$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-				$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-		        	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
-	    	
-				mcrypt_generic_init($td, $key, $iv);
-				$encrypted_data = mcrypt_generic($td, $input);
-				mcrypt_generic_deinit($td);
-				mcrypt_module_close($td);
+	    		$encrypted_data = $myCryptor::encrypt_3des($str, $key);
 	    
-			}else{
-				$blockSize = 16;
-				$padLength = $blockSize - strlen($input) % $blockSize;
-				$input .= str_repeat(chr(0), $padLength);
-				$encrypted_data=openssl_encrypt(
-					$input,
-					'DES-EDE3',
-					$key,
-					OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
-					
-				);
-
-			}
 			$res = base64_encode($encrypted_data )		;
 			$this->des_key = $key;
 		}
@@ -72,24 +51,7 @@ class helperAction extends kalturaSystemAction
 		{
 			$key = $this->getP ( "des_key" );
 			$input = base64_decode ( $str );
-			if (extension_loaded('mcrypt')) {
-			    $td = mcrypt_module_open('tripledes', '', 'ecb', '');
-			    $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-			    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
-		    
-			    mcrypt_generic_init($td, $key, $iv);
-			    $decrypted_data = mdecrypt_generic($td, $input);
-			    mcrypt_generic_deinit($td);
-			    mcrypt_module_close($td);
-			}else{
-				$decrypted_data=openssl_decrypt(
-					$input,
-					'DES-EDE3',
-					$key,
-					OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
-					
-				);
-			}
+	    		$decrypted_data = $myCryptor::decrypt_3des($input,$key);
 	    
 			$res = ($decrypted_data )		;
 			$this->des_key = $key;
