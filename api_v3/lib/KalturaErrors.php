@@ -679,6 +679,7 @@ class KalturaErrors extends APIErrors
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
 	const SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND = "SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND;NODE_IDS;The following parentIds where not found [@NODE_IDS@]";
 	const SERVER_NODE_PARENT_LOOP_DETECTED = "SERVER_NODE_PARENT_LOOP_DETECTED;ROUTE;ParentId loop detected on route [@ROUTE@], validate parentId tree definition";
+	const SERVER_NODE_WRONG_TYPE = "SERVER_NODE_WRONG_TYPE;;Wrong server node type received";
 
 	/*
 	 * EntryServerNode service

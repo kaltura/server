@@ -211,4 +211,21 @@ class kBroadcastUrlManager
 			return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $concatStreamName);
 		}
 	}
+
+	public function getRTCBroadcastingUrl(LiveStreamEntry $entry, $protocol, $hostname, $externalPort)
+	{
+		if (!$hostname)
+		{
+			return '';
+		}
+		$url = "$protocol://$hostname";
+		if ($externalPort)
+			$url .= ":$externalPort";
+		$url .= "/" . $entry->getId();
+		$paramsStr = http_build_query($queryParams = array('t' => $entry->getStreamPassword()));
+		$url .= "/$paramsStr";
+		return $url;
+
+//		return $this->getBroadcastUrl($entry, $protocol, $hostname, -1, true);
+	}
 }
