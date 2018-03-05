@@ -26,33 +26,29 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		$vendorProfiles = $this->getVendorProfiles();//TODO paginate
-		foreach($vendorProfiles as $vendorProfile)
-		{
-			try
-			{
-				$this->syncVendorProfileCredit($vendorProfile);
-			}
-			catch(Exception $ex)
-			{
-				KalturaLog::err($ex);
-			}
-		}
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function getVendorProfiles()
-	{
 		$reachClient = $this->SyncReachClient();
-
 		$filter = new KalturaVendorProfileFilter();
 		$filter->statusEqual = KalturaVendorProfileStatus::ACTIVE;
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = 500;
 
-		$result = $reachClient->vendorProfile->listAction($filter);
-
-		return $result->objects;
+		$result = $reachClient->vendorProfile->listAction($filter, $pager);
+		while ($result->totalCount > 0)
+		{
+			foreach ($result->objects as $vendorProfile)
+			{
+				try
+				{
+					$this->syncVendorProfileCredit($vendorProfile);
+				} catch (Exception $ex)
+				{
+					KalturaLog::err($ex);
+				}
+			}
+			$pager->pageIndex++;
+			$result = $reachClient->vendorProfile->listAction($filter, $pager);
+		}
 	}
 
 	/**
