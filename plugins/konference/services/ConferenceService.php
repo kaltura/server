@@ -15,7 +15,7 @@ class ConferenceService extends KalturaBaseService {
 	 * @action allocateConferenceRoom
 	 * @actionAlias liveStream.allocateConferenceRoom
 	 * @param string $entryId
-	 * @return KalturaConferenceEntryServerNode
+	 * @return KalturaRoomDetails
 	 * @throws KalturaAPIException
 	 */
 	public function allocateConferenceRoomAction($entryId)
@@ -60,8 +60,8 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode->setConfRoomStatus(ConferenceRoomStatus::READY);
 		$confEntryServerNode->save();
 
-		$outObj = new KalturaConferenceEntryServerNode();
-		$outObj->fromObject($confEntryServerNode);
+		$outObj = new KalturaRoomDetails();
+		$outObj->roomUrl = $confEntryServerNode->buildRoomUrl($this->getPartnerId());
 		return $outObj;
 	}
 
@@ -81,8 +81,8 @@ class ConferenceService extends KalturaBaseService {
 				$serverNode->save();
 				return null;
 			}
-			$outObj = new KalturaConferenceEntryServerNode();
-			$outObj->fromObject($existingConfRoom);
+			$outObj = new KalturaRoomDetails();
+			$outObj->roomUrl = $existingConfRoom->buildRoomUrl($this->getPartnerId());
 			return $outObj;
 		}
 		return null;
@@ -118,7 +118,7 @@ class ConferenceService extends KalturaBaseService {
 		//TODO: make sure that HTTP protocol is available for RTC servers.
 		$aliveUrl = "https://" . $serverNode->getHostName() . ":" . $serverNode->getExternalPort() . "/alive";
 		$content = KCurlWrapper::getContent($aliveUrl);
-		if ($content === self::CAN_REACH_EXPECTED_VALUE)
+		if (strtolower($content) === self::CAN_REACH_EXPECTED_VALUE)
 			return true;
 		return false;
 	}
@@ -126,14 +126,15 @@ class ConferenceService extends KalturaBaseService {
 	/**
 	 * Returns a url to broadcast to the specified room
 	 *
-	 * @action getRoomUrl
-	 * @actionAlias liveStream.getRoomUrl
+	 * @action getRoomDetails
+	 * @actionAlias liveStream.getRoomDetails
 	 * @param string $confRoomId
-	 * @return string
+	 * @return KalturaRoomDetails
 	 * @throws KalturaAPIException
 	 */
-	public function getRoomUrlAction($confRoomId)
+	public function getRoomDetailsAction($confRoomId)
 	{
+		$res = new KalturaRoomDetails();
 		$room = EntryServerNodePeer::retrieveByPK($confRoomId);
 		if (!$room)
 		{
@@ -142,13 +143,14 @@ class ConferenceService extends KalturaBaseService {
 		/** @var ConferenceEntryServerNode $room */
 		try
 		{
-			$url = $room->buildRoomUrl($this->getPartnerId());
+			$res->roomUrl = $room->buildRoomUrl($this->getPartnerId());
 		}
 		catch (kCoreException $e)
 		{
 			throw new KalturaAPIException($e->getMessage());
 		}
-		return $url;
+
+		return $res;
 	}
 
 	/**

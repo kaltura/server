@@ -33,7 +33,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	private static function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null)
+	private static function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null, $type = null)
 	{
 		$c = new Criteria();
 		
@@ -42,15 +42,18 @@ class ServerNodePeer extends BaseServerNodePeer {
 		
 		if($partnerId)
 			$c->add(ServerNodePeer::PARTNER_ID, $partnerId);
+
+		if($type)
+			$c->add(ServerNodePeer::TYPE, $type);
 		
 		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::DISABLED, Criteria::NOT_EQUAL);
 		
 		return $c;
 	}
 	
-	public static function retrieveActiveServerNode($hostName = null, $partnerId = null)
+	public static function retrieveActiveServerNode($hostName = null, $partnerId = null, $type = null)
 	{
-		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId, $type);
 		
 		return ServerNodePeer::doSelectOne($c);
 	}

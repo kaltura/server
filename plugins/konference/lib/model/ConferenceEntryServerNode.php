@@ -37,6 +37,9 @@ class ConferenceEntryServerNode extends EntryServerNode
 		{
 			throw new kCoreException(KalturaErrors::SERVER_NODE_NOT_FOUND, $this->getServerNodeId());
 		}
+		/**
+		 * @var ConferenceServerNode $conferenceServerNode
+		 */
 		if ($this->getConfRoomStatus() != ConferenceRoomStatus::READY)
 		{
 			throw new kCoreException(KalturaKonferenceErrors::ROOM_NOT_READY, $this->getId());
@@ -44,7 +47,7 @@ class ConferenceEntryServerNode extends EntryServerNode
 
 		$hostname = $conferenceServerNode->getHostName();
 		$manager = kBroadcastUrlManager::getInstance($partnerId);
-		$url = $manager->getRTCBroadcastingUrl($liveStreamEntry, kBroadcastUrlManager::PROTOCOL_RTC, $hostname);
+		$url = $manager->getRTCBroadcastingUrl($liveStreamEntry, 'https', $hostname, $conferenceServerNode->getExternalPort());
 		return $url;
 	}
 
