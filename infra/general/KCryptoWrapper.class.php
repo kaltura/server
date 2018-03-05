@@ -12,10 +12,8 @@ class KCryptoWrapper
 		    $crypto_ext='mcrypt';
 	    }
 	    if ($crypto_ext === 'openssl'){
-		    error_log("$crypto_ext\n",3,'/tmp/ext');
 		    return new OpenSSLWrapper();
 	    }elseif($crypto_ext === 'mcrypt'){
-		    error_log("$crypto_ext\n",3,'/tmp/ext');
 		    return new McryptWrapper();
 	    }
 
