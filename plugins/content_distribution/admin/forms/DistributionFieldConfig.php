@@ -155,7 +155,7 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 		}
 		$object->updateParams = $updateParams;
 
-		$type = $properties['type'];
+		$type = isset($properties['type']) ? $properties['type'] : null;
 		$object->type = $this->getTypeAsString($type);
 		return $object;
 	}
