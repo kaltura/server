@@ -7,6 +7,7 @@
  */
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/general/KCryptoWrapper.class.php');
 
 /** 
  * @package server-infra
