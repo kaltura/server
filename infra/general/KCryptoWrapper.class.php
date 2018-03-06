@@ -20,9 +20,9 @@ class OpenSSLWrapper
     const AES_METHOD = 'AES-128-CBC';
     const DES3_METHOD = 'DES-EDE3';
 
-    public static function random_pseudo_bytes($bytes)
+    public static function random_pseudo_bytes($length)
     {
-	    return openssl_random_pseudo_bytes($bytes);
+	    return openssl_random_pseudo_bytes($length);
     }
 
     public static function encrypt_3des($str, $key)
@@ -82,9 +82,9 @@ class OpenSSLWrapper
 
 class McryptWrapper
 {
-    public static function random_pseudo_bytes($bytes)
+    public static function random_pseudo_bytes($length)
     {
-	    return mcrypt_create_iv($bytes,MCRYPT_DEV_URANDOM);
+	    return mcrypt_create_iv($length,MCRYPT_DEV_URANDOM);
     }
 
     public static function encrypt_3des($str, $key)
