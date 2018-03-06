@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers,IKalturaEnumerator
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -23,22 +23,32 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 
 		if($baseClass == 'BaseVendorCatalogItem' && $enumValue == KalturaVendorCatalogItemType::TRANSLATION)
 			return 'KalturaVendorTranslationCatalogItem';
+		
+		if($baseClass == 'KalturaCondition' && $enumValue == ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY))
+			return 'KalturaCategoryEntryCondition';
+		
+		if($baseClass == 'kRuleAction' && $enumValue == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+			return 'kAddEntryVendorTaskAction';
+		
+		if($baseClass == 'KalturaRuleAction' && ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+			return 'KalturaAddEntryVendorTaskAction';
 
 		return null;
 	}
-
-	/**
-	 * Returns a list of enumeration class names that implement the baseEnumName interface.
-	 * @param string $baseEnumName the base implemented enum interface, set to null to retrieve all plugin enums
-	 * @return array<string> A string listing the enum class names that extend baseEnumName
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('SyncReachCreditTaskBatchType');
+			return array('SyncReachCreditTaskBatchType', 'ReachConditionType');
 
 		if($baseEnumName == 'BatchJobType')
 			return array('SyncReachCreditTaskBatchType');
+		
+		if($baseEnumName == 'ConditionType')
+			return array('ReachConditionType');
 
 		return array();
 	}
@@ -133,6 +143,40 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function getEventConsumers()
 	{
 		return array(self::REACH_MANAGER, self::REACH_FLOW_MANAGER);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getConditionTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ConditionType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if($baseClass == 'KalturaCondition' && $enumValue == ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY))
+			return new KalturaCategoryEntryCondition();
+		
+		if($baseClass == 'kRuleAction' && $enumValue == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+			return new kAddEntryVendroTaskAction();
+		
+		if($baseClass == 'KalturaRuleAction' && $enumValue == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+			return new KalturaAddEntryVendorTaskAction();
+		
+		return null;
 	}
 	
 	//TODO add reach plugin permission

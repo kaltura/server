@@ -2,8 +2,19 @@
 /**
  * @package plugins.reach
  */
-class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer
+class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kObjectAddedEventConsumer
 {
+	/**
+	 * @param BaseObject $object
+	 * @param BatchJob $raisedJob
+	 * @return bool true if the consumer should handle the event
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof categoryEntry)
+			return true;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
 	 */
@@ -38,7 +49,23 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return true;
 		
+		if($object instanceof categoryEntry)
+			return true;
+		
 		return false;
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @param BatchJob $raisedJob
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		if($object instanceof categoryEntry)
+			$this->checkCategoryEntryAutomaticRules($object);
+		
+		return true;
 	}
 	
 	/* (non-PHPdoc)
@@ -72,6 +99,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
 		)
 			return $this->handleEntryDurationChanged($object);
+		
+		if($object instanceof categoryEntry)
+			return $this->checkCategoryEntryAutomaticRules($object);
 		
 		return true;
 	}
@@ -163,6 +193,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		$entryVendorTask->setVersion($version);
+		$entryVendorTask->setQueueTime(null);
+		$entryVendorTask->setFinishTime(null);
 		
 		//Set calculated values
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId()));
@@ -180,5 +212,27 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->save();
 		
 		return $entryVendorTask;
+	}
+	
+	private function checkCategoryEntryAutomaticRules(categoryEntry $categoryEntry)
+	{
+		$scope = new kScope();
+		$entryId = $categoryEntry->getEntryId();
+		$scope->setEntryId($entryId);
+		$vendorProfiles = VendorProfilePeer::retrieveByPartnerId($categoryEntry->getPartnerId());
+		foreach ($vendorProfiles as $profile)
+		{
+			/* @var $profile VendorProfile */
+			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope);
+			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasks($entryId, $fullFieldCatalogItemIds);
+			$catalogItemIdsToAdd = array_unique(array_diff($fullFieldCatalogItemIds, $existingCatalogItemIds));
+			
+			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
+			{
+				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId());
+			}
+		}
+		
+		return true;
 	}
 }

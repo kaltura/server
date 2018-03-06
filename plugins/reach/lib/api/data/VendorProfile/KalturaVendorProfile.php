@@ -107,7 +107,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	public $contentDeletionPolicy;
 
 	/**
-	 * @var KalturaVendorProfileRulesArray
+	 * @var KalturaRuleArray
 	 */
 	public $rules;
 
