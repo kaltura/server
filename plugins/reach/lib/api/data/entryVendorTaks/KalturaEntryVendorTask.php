@@ -158,6 +158,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $outputObjectId;
 	
+	/**
+	 * Json object containing extra task data required by the requester 
+	 * @var string
+	 */
+	public $partnerData;
+	
 	private static $map_between_objects = array
 	(
 		'id',
@@ -182,6 +188,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'accuracy',
 		'outputObjectId',
 		'dictionary',
+		'partnerData',
 	);
 	
 	/* (non-PHPdoc)
@@ -209,7 +216,19 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$this->validatePropertyNotNull("catalogItemId");
 		$this->validatePropertyNotNull("entryId");
 		$this->validateEntryId();
+		
+		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
+			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
+		
 		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
+			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
 	private function validateEntryId()
@@ -227,5 +246,11 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	private function checkIsValidJson($string)
+	{
+		$json = json_decode($string);
+		return (is_object($json) && json_last_error() == JSON_ERROR_NONE) ? true : false;
 	}
 }

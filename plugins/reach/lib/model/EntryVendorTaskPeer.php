@@ -49,5 +49,17 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelectOne($c);
 	}
 	
+	public static function retrieveExistingTasks($entryId, $catalogItemIds)
+	{
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
+		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemIds, Criteria::IN);
+		$c->addGroupByColumn(EntryVendorTaskPeer::CATALOG_ITEM_ID);
+		$c->addSelectColumn(EntryVendorTaskPeer::CATALOG_ITEM_ID);
+		
+		$stmt = EntryVendorTaskPeer::doSelectStmt($c, null);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
+	
 	
 } // EntryVendorTaskPeer

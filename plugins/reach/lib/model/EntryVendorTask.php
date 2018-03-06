@@ -23,6 +23,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	const CUSTOM_DATA_ACCURACY 	= 			'accuracy';
 	const CUSTOM_DATA_OUTPUT_OBJECT_ID = 	'output_object_id';
 	const CUSTOM_DATA_DICTIONARY =          'dictionary';
+	const CUSTOM_DATA_PARTNER_DATA =          'partner_data';
 	
 	//setters
 	
@@ -64,6 +65,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	public function setOutputObjectId($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_OUTPUT_OBJECT_ID, $v);
+	}
+	
+	public function setPartnerData($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PARTNER_DATA, $v);
 	}
 	
 	//getters
@@ -121,6 +127,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	public function getOutputObjectId()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_OUTPUT_OBJECT_ID, null, null);
+	}
+	
+	public function getPartnerData($v)
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PARTNER_DATA, null, null);
 	}
 	
 	/* (non-PHPdoc)

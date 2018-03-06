@@ -355,4 +355,42 @@ class VendorProfile extends BaseVendorProfile
 		$this->save();
 	}
 	
+	/**
+	 * Validate if the entry should be exported to the remote storage according to the defined export rules
+	 *
+	 * @param kCategoryEntryScope $scope
+	 */
+	public function fulfillsRules(kScope $scope)
+	{
+		$fullFilledCatalogItemIds = array();
+		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
+			return true;
+		
+		$context = new kContextDataResult();
+		foreach ($this->getRulesArray() as $rule)
+		{
+			/* @var $rule kRule */
+			$rule->setScope($scope);
+			$fulfilled = $rule->applyContext($context);
+			
+			if($fulfilled)
+			{
+				foreach ($context->getActions() as $action)
+				{
+					/* @var $action kRuleAction */
+					if($action->getType() == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+					{
+						/* $var $action kAddEntryVendorTaskAction */
+						$fullFilledCatalogItemIds[] = $action->getCatalogItemId();
+					}
+				}
+			}
+			
+			if($fulfilled && $rule->getStopProcessing())
+				break;
+		}
+		
+		return $fullFilledCatalogItemIds;
+	}
+	
 } // VendorProfile
