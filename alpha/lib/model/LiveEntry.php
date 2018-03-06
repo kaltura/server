@@ -551,7 +551,7 @@ abstract class LiveEntry extends entry
 	public function setMediaServer($mediaServerIndex, $hostname, $liveEntryStatus, $applicationName = null)
 	{
 		/* @var $mediaServerNode MediaServerNode */
-		$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
+		$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname, null, null, $mediaServerIndex);
 		if (!$mediaServerNode)
 			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
 

@@ -222,10 +222,9 @@ class kBroadcastUrlManager
 		if ($externalPort)
 			$url .= ":$externalPort";
 		$url .= "/" . $entry->getId();
-		$paramsStr = http_build_query($queryParams = array('t' => $entry->getStreamPassword()));
+		$paramsStr = http_build_query(array('t' => $entry->getStreamPassword(), 'entryId' => $entry->getId()));
 		$url .= "/$paramsStr";
 		return $url;
 
-//		return $this->getBroadcastUrl($entry, $protocol, $hostname, -1, true);
 	}
 }

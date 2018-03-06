@@ -18,6 +18,7 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"serverTypeEqual" => "_eq_server_type",
+		"serverTypeIn" => "_in_server_type",
 	);
 
 	static private $order_by_map = array
@@ -87,4 +88,10 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 	 * @var KalturaEntryServerNodeType
 	 */
 	public $serverTypeEqual;
+
+	/**
+	 * @dynamicType KalturaEntryServerNodeType
+	 * @var string
+	 */
+	public $serverTypeIn;
 }
