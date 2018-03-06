@@ -1,7 +1,5 @@
 <?php
 
-require_once('/opt/kaltura/app/alpha/config/kConf.php');
-
 class KCryptoWrapper
 {
     public static function getEncryptor()
