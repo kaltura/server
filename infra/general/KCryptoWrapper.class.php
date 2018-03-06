@@ -15,7 +15,8 @@ class KCryptoWrapper
 
 class OpenSSLWrapper
 {
-    const BLOCK_SIZE = 16;
+    const AES_BLOCK_SIZE = 16;
+    const DES3_BLOCK_SIZE = 8;
     const AES_METHOD = 'AES-128-CBC';
     const DES3_METHOD = 'DES-EDE3';
 
@@ -26,8 +27,10 @@ class OpenSSLWrapper
 
     public static function encrypt_3des($str, $key)
     {
-	    $padLength = self::BLOCK_SIZE - strlen($str) % self::BLOCK_SIZE;
-	    $str .= str_repeat(chr("\0"), $padLength);
+	    if (strlen($str) % self::DES3_BLOCK_SIZE) {
+		$padLength = self::DES3_BLOCK_SIZE - strlen($str) % self::DES3_BLOCK_SIZE;
+		$str .= str_repeat(chr("\0"), $padLength);
+	    }
 	    return openssl_encrypt(
 		    $str,
 		    self::DES3_METHOD,
@@ -49,8 +52,10 @@ class OpenSSLWrapper
 
 	    // Pad with null byte to be compatible with mcrypt PKCS#5 padding
 	    // See http://thefsb.tumblr.com/post/110749271235/using-opensslendecrypt-in-php-instead-of as 
-	    $padLength = self::BLOCK_SIZE - strlen($str) % self::BLOCK_SIZE;
-	    $str .= str_repeat(chr("\0"), $padLength);
+	    if (strlen($str) % self::AES_BLOCK_SIZE) {
+		$padLength = self::AES_BLOCK_SIZE - strlen($str) % self::AES_BLOCK_SIZE;
+		$str .= str_repeat(chr("\0"), $padLength);
+	    }
 	    return openssl_encrypt(
 		    $str,
 		    self::AES_METHOD,
@@ -87,7 +92,7 @@ class McryptWrapper
 	    $td = mcrypt_module_open('tripledes', '', 'ecb', ''); 
 	    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
 
-	    mcrypt_generic_init($td, $key, null);
+	    mcrypt_generic_init($td, $key, str_repeat(chr("\0"), 8));
 	    $encrypted_data = mcrypt_generic($td, $str);
 	    mcrypt_generic_deinit($td);
 	    mcrypt_module_close($td);
@@ -99,7 +104,7 @@ class McryptWrapper
 	    $td = mcrypt_module_open('tripledes', '', 'ecb', '');
 	    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
 
-	    mcrypt_generic_init($td, $key, null);
+	    mcrypt_generic_init($td, $key, str_repeat(chr("\0"), 8));
 	    $decrypted_data = mdecrypt_generic($td, $str);
 	    mcrypt_generic_deinit($td);
 	    mcrypt_module_close($td);
