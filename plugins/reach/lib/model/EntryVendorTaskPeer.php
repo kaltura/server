@@ -49,7 +49,7 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelectOne($c);
 	}
 	
-	public static function retrieveExistingTasks($entryId, $catalogItemIds)
+	public static function retrieveExistingTasksCatalogItemIds($entryId, $catalogItemIds)
 	{
 		$c = new Criteria();
 		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);

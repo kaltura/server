@@ -154,7 +154,7 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $userIdEqual;
-	
+
 	/**
 	 * @var string
 	 */

@@ -224,7 +224,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			/* @var $profile VendorProfile */
 			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope);
-			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasks($entryId, $fullFieldCatalogItemIds);
+			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $fullFieldCatalogItemIds);
 			$catalogItemIdsToAdd = array_unique(array_diff($fullFieldCatalogItemIds, $existingCatalogItemIds));
 			
 			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
