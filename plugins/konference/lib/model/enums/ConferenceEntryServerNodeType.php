@@ -3,14 +3,14 @@
  * @package plugins.konference
  * @subpackage lib.enum
  */
-class ConferenceServerNodeType implements IKalturaPluginEnum, serverNodeType
+class ConferenceEntryServerNodeType implements IKalturaPluginEnum, EntryServerNodeType
 {
-	const CONFERENCE_SERVER = 'CONFERENCE_SERVER';
+	const CONFERENCE_ENTRY_SERVER = 'CONFERENCE_ENTRY_SERVER';
 	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'CONFERENCE_SERVER' => self::CONFERENCE_SERVER,
+			'CONFERENCE_ENTRY_SERVER' => self::CONFERENCE_ENTRY_SERVER,
 		);
 	}
 	

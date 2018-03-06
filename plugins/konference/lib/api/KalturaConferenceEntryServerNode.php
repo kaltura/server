@@ -12,9 +12,16 @@ class KalturaConferenceEntryServerNode extends KalturaEntryServerNode
 	 */
 	public $confRoomStatus;
 
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $registered;
+
 	private static $map_between_objects = array
 	(
 		"confRoomStatus",
+		"registered",
 	);
 
 	/* (non-PHPdoc)

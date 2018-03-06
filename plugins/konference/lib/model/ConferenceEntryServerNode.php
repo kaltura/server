@@ -8,6 +8,8 @@ class ConferenceEntryServerNode extends EntryServerNode
 	const OM_CLASS = 'ConferenceEntryServerNode';
 
 	const CUSTOM_DATA_CONFERENCE_STATUS = 'conf_status';
+	const CUSTOM_DATA_CONFERENCE_REGISTERED = 'registered';
+	const CUSTOM_DATA_LAST_ALLOCATE_TIME = 'last_allocate';
 
 	public function getConfRoomStatus()
 	{
@@ -51,5 +53,29 @@ class ConferenceEntryServerNode extends EntryServerNode
 		return $url;
 	}
 
+	public function getRegistered()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CONFERENCE_REGISTERED, null, 0);
+	}
+
+	public function setRegistered($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CONFERENCE_REGISTERED, $v);
+	}
+
+	public function incRegistered()
+	{
+		$this->setRegistered($this->getRegistered() + 1);
+	}
+
+	public function getLastAllocationTime()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_ALLOCATE_TIME);
+	}
+
+	public function setLastAllocationTime($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_LAST_ALLOCATE_TIME, $v);
+	}
 
 }

@@ -56,8 +56,9 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode = new ConferenceEntryServerNode();
 		$confEntryServerNode->setEntryId($entryId);
 		$confEntryServerNode->setServerNodeId($serverNode->getId());
-		$confEntryServerNode->setServerType($serverNode->getType());
+		$confEntryServerNode->setServerType(KonferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		$confEntryServerNode->setConfRoomStatus(ConferenceRoomStatus::READY);
+		$confEntryServerNode->setLastAllocationTime(time());
 		$confEntryServerNode->save();
 
 		$outObj = new KalturaRoomDetails();
@@ -81,6 +82,7 @@ class ConferenceService extends KalturaBaseService {
 				$serverNode->save();
 				return null;
 			}
+			$existingConfRoom->setLastAllocationTime(time());
 			$outObj = new KalturaRoomDetails();
 			$outObj->roomUrl = $existingConfRoom->buildRoomUrl($this->getPartnerId());
 			return $outObj;
@@ -128,26 +130,58 @@ class ConferenceService extends KalturaBaseService {
 	 *
 	 * @action finishConf
 	 * @actionAlias liveStream.finishConf
-	 * @param string $hostname
-	 * @return KalturaServerNode
+	 * @param strign $entryId
+	 * @return bool
 	 * @throws KalturaAPIException
 	 */
-	public function finishConfAction($hostname)
+	public function finishConfAction($entryId)
 	{
-//		$serverNodeDb = ServerNodePeer::retrieveByHostname($hostname);
-		$serverNodeDb = ServerNodePeer::retrieveActiveServerNode($hostname, null, KonferencePlugin::getCoreValue('ServerNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
-		if (!$serverNodeDb)
+		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getApiValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+		if (!$confEntryServerNode)
 		{
-			KalturaLog::info("Could not find server node with hostname [" . $hostname . "]");
-			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, KonferencePlugin::getApiValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
 		}
-		/**
-		 * @var ConferenceServerNode $serverNodeDb
-		 */
-		$serverNodeDb->removeAttachedEntryServerNodes();
-		$serverNode = new KalturaConferenceServerNode();
-		$serverNode->fromObject($serverNodeDb);
-		return $serverNode;
+		/** @var ConferenceEntryServerNode $confEntryServerNode */
+		if ($confEntryServerNode->getLastAllocationTime() < (time() - kConf::get('conf_not_finished_timeout')))
+		{
+			return false;
+		}
+		$serverNode = ServerNodePeer::retrieveByPK($confEntryServerNode->getServerNodeId());
+		if (!$serverNode)
+		{
+			KalturaLog::info("Could not find server node with id [" . $confEntryServerNode->getServerNodeId() . "]");
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
+		}
+		$confEntryServerNode->delete();
+		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), KonferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
+		if (!count($otherEntryServerNodes))
+		{
+			KalutraLog::debgu('No entry server nodes left, marking server node as not registered');
+			$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
+			$serverNode->save();
+		}
+		return true;
+	}
+
+	/**
+	 * Mark that the conference has actually started
+	 *
+	 * @action registerConf
+	 * @actionAlias liveStream.registerConf
+	 * @param string $entryId
+	 * @return bool
+	 * @throws KalturaAPIException
+	 */
+	public function registerConfAction($entryId)
+	{
+		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getApiValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+		if (!$confEntryServerNode)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, KonferencePlugin::getApiValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+		}
+		/** @var ConferenceEntryServerNode $confEntryServerNode */
+		$confEntryServerNode->incRegistered();
+		return true;
 	}
 
 }
