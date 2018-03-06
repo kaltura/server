@@ -31,7 +31,7 @@ class WebexXmlClient
 
 	protected function isRunningOnBackupSite()
 	{
-		$url = "{$this->url}/webex/gsbstatus.php";
+		$url = substr($this->url, 0, strpos($this->url, "com")+3)."/webex/gsbstatus.php";
 		return (trim(@file_get_contents($url)) == 'TRUE');
 	}
 

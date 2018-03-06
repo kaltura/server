@@ -1,7 +1,8 @@
 <?php
 
-require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlClient.php';
-
+require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlClient.class.php';
+require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlEpListControlType.class.php';
+require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlListRecordingRequest.class.php';
 
 /**
  *  This class is a helper class for the use of web xml client
@@ -74,6 +75,7 @@ class webexWrapper
 			{
 				$listControl = new WebexXmlEpListControlType();
 				$listControl->setStartFrom($startFrom);
+				$listControl->setMaximumNum(1000);
 				$listRecordingRequest = new WebexXmlListRecordingRequest();
 				$listRecordingRequest->setListControl($listControl);
 				if($stringServiceTypes)
