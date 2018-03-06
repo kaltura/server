@@ -56,7 +56,7 @@ abstract class KalturaVendorCatalogItemBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $idIn;
-	
+
 	/**
 	 * @var string
 	 */

@@ -11,8 +11,8 @@ class KalturaEntryVendorTaskOrderBy extends KalturaStringEnum
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";
 	const UPDATED_AT_DESC = "-updatedAt";
-	const QUEUED_AT_ASC = "+queuedAt";
-	const QUEUED_AT_DESC = "-queuedAt";
-	const FINISHED_AT_ASC = "+finishedAt";
-	const FINISHED_AT_DESC = "-finishedAt";
+	const QUEUE_TIME_ASC = "+queueTime";
+	const QUEUE_TIME_DESC = "-queueTime";
+	const FINISH_TIME_ASC = "+finishTime";
+	const FINISH_TIME_DESC = "-finishTime";
 }

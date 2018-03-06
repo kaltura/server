@@ -75,5 +75,23 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		
 		return VendorCatalogItemPeer::doSelectOne($criteria);
 	}
+	
+	public static function getVendorCatalogItemIdsByFilter(kCatalogItemAdvancedFilter $filter)
+	{
+		$filter = $filter->getBaseFilter();
+		
+		$vendorCatalogItemCriteria = new Criteria();
+		
+		$vendorCatalogItemCriteria->addSelectColumn(self::ID);
+		$filter->attachToCriteria($vendorCatalogItemCriteria);
+		
+		$vendorCatalogItemCriteria->add(PartnerCatalogItemPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
+		$vendorCatalogItemCriteria->add(PartnerCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE);
+		$vendorCatalogItemCriteria->addJoin(PartnerCatalogItemPeer::CATALOG_ITEM_ID, VendorCatalogItemPeer::ID, Criteria::INNER_JOIN);
+		
+		
+		$stmt = self::doSelectStmt($vendorCatalogItemCriteria);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
 
 } // VendorCatalogItemPeer

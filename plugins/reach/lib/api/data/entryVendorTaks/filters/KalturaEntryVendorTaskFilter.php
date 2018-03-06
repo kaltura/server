@@ -16,6 +16,12 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
  	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		if($this->advancedSearch && $this->advancedSearch instanceof KalturaCatalogItemAdvancedFilter)
+		{
+			$catalogItemIds = VendorCatalogItemPeer::getVendorCatalogItemIdsByFilter($this->advancedSearch->toObject());
+			$this->catalogItemIdIn = count($catalogItemIds) ? implode(",", $catalogItemIds) : -1;
+		}
+		
 		$c = new Criteria();
 		$filter = $this->toObject();
 		$filter->attachToCriteria($c);
