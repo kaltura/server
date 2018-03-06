@@ -49,7 +49,7 @@
                         <value>
                             {
                                 "content_available":true,
-                                "data": { "entry_id": "{entry_id}", "category_id": "{category_id}"},
+                                "data": { "entry_id": "{entry_id}", "category_id": "{category_id}, "partner_id" : {partner_id}},
                                 "to" : "/topics/{partner_id}"
                             }
                         </value>
