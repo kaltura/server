@@ -29,7 +29,7 @@ class OpenSSLWrapper
     public static function encrypt_3des($str, $key)
     {
 	    $padLength = self::BLOCK_SIZE - strlen($str) % self::BLOCK_SIZE;
-	    $str .= str_repeat(chr('\0'), $padLength);
+	    $str .= str_repeat(chr("\0"), $padLength);
 	    return openssl_encrypt(
 		    $str,
 		    self::DES3_METHOD,
@@ -52,7 +52,7 @@ class OpenSSLWrapper
 	    // Pad with null byte to be compatible with mcrypt PKCS#5 padding
 	    // See http://thefsb.tumblr.com/post/110749271235/using-opensslendecrypt-in-php-instead-of as 
 	    $padLength = self::BLOCK_SIZE - strlen($str) % self::BLOCK_SIZE;
-	    $str .= str_repeat(chr('\0'), $padLength);
+	    $str .= str_repeat(chr("\0"), $padLength);
 	    return openssl_encrypt(
 		    $str,
 		    self::AES_METHOD,
