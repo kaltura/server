@@ -1,8 +1,8 @@
 <script type="text/javascript">
 
 function generateKeySeed() {
-	<?php $myCryptor=KCryptoWrapper::getEncryptor();?>
-	var keySeedGen = '<?php echo bin2hex($myCryptor::random_pseudo_bytes(30)) ?>';
+	<?php $kCrypto = KCryptoWrapper::getEncryptor();?>
+	var keySeedGen = '<?php echo bin2hex($kCrypto::random_pseudo_bytes(30)) ?>';
 	jQuery('#extensionSubForm-keySeed').val(keySeedGen);
 }
 

@@ -6,17 +6,11 @@ class KCryptoWrapper
 {
     public static function getEncryptor()
     {
-	    if(kConf::hasParam('php_crypto_ext')){
-		    $crypto_ext=kConf::get('php_crypto_ext');
-	    }else{
-		    $crypto_ext='mcrypt';
-	    }
-	    if ($crypto_ext === 'openssl'){
-		    return new OpenSSLWrapper();
-	    }elseif($crypto_ext === 'mcrypt'){
-		    return new McryptWrapper();
-	    }
-
+	if (extension_loaded('mcrypt')){
+	    return new McryptWrapper();
+	}else{
+	    return new OpenSSLWrapper();
+	}
     }
 
 }
@@ -35,7 +29,7 @@ class OpenSSLWrapper
     public static function encrypt_3des($str, $key)
     {
 	    $padLength = self::BLOCK_SIZE - strlen($str) % self::BLOCK_SIZE;
-	    $str .= str_repeat(chr(0), $padLength);
+	    $str .= str_repeat(chr('\0'), $padLength);
 	    return openssl_encrypt(
 		    $str,
 		    self::DES3_METHOD,
@@ -52,13 +46,13 @@ class OpenSSLWrapper
 		    OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
 	    );
     }
-    public static function encrypt_aes($str, $key,$iv)
+    public static function encrypt_aes($str, $key, $iv)
     {
 
 	    // Pad with null byte to be compatible with mcrypt PKCS#5 padding
 	    // See http://thefsb.tumblr.com/post/110749271235/using-opensslendecrypt-in-php-instead-of as 
 	    $padLength = self::BLOCK_SIZE - strlen($str) % self::BLOCK_SIZE;
-	    $str .= str_repeat(chr(0), $padLength);
+	    $str .= str_repeat(chr('\0'), $padLength);
 	    return openssl_encrypt(
 		    $str,
 		    self::AES_METHOD,

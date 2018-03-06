@@ -37,11 +37,11 @@ class registerNotificationPostProcessor
 	
 	private function encode($data)
 	{
-		$myCryptor=KCryptoWrapper::getEncryptor();
+		$kCrypto = KCryptoWrapper::getEncryptor();
 		$secret = kConf::get("push_server_secret");
 		$iv = kConf::get("push_server_secret_iv");
 	
-		$cipherData = $myCryptor::encrypt_aes($data,$secret,$iv); 
+		$cipherData = $kCrypto::encrypt_aes($data, $secret, $iv); 
 	
 		return bin2hex($cipherData);
 	}

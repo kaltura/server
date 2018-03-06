@@ -21,7 +21,7 @@ class helperAction extends kalturaSystemAction
 		$algo = $this->getP ( "algo" , "wiki_decode_no_serialize" );
 		$res = "";
 		$key = null;
-		$myCryptor=KCryptoWrapper::getEncryptor();
+		$kCrypto = KCryptoWrapper::getEncryptor();
 		
 		if ( $algo == "wiki_encode" )
 		{
@@ -42,16 +42,16 @@ class helperAction extends kalturaSystemAction
 		elseif ( $algo == "base64_3des_encode" )
 		{
 			$key = $this->getP ( "des_key" );
-	    		$encrypted_data = $myCryptor::encrypt_3des($str, $key);
+	    		$encrypted_data = $kCrypto::encrypt_3des($str, $key);
 	    
-			$res = base64_encode($encrypted_data )		;
+			$res = base64_encode($encrypted_data)		;
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "base64_3des_decode" )
 		{
 			$key = $this->getP ( "des_key" );
 			$input = base64_decode ( $str );
-	    		$decrypted_data = $myCryptor::decrypt_3des($input,$key);
+	    		$decrypted_data = $kCrypto::decrypt_3des($input, $key);
 	    
 			$res = ($decrypted_data )		;
 			$this->des_key = $key;
