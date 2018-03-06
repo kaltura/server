@@ -108,8 +108,9 @@ class MediaRepurposingUtils
 	}
 
 	public static function executeDryRun($mr) {
+		$max = $mr->maxTotalCountAllowed ? $mr->maxTotalCountAllowed : 500;
 		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
-		return $scheduledtaskPlugin->scheduledTaskProfile->requestDryRun($mr->id);
+		return $scheduledtaskPlugin->scheduledTaskProfile->requestDryRun($mr->id, $max);
 	}
 
 	public static function getDryRunResult($dryRunId) {
