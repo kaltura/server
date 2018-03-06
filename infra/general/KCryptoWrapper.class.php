@@ -29,7 +29,7 @@ class OpenSSLWrapper
     {
 	    if (strlen($str) % self::DES3_BLOCK_SIZE) {
 		$padLength = self::DES3_BLOCK_SIZE - strlen($str) % self::DES3_BLOCK_SIZE;
-		$str .= str_repeat(chr("\0"), $padLength);
+		$str .= str_repeat("\0", $padLength);
 	    }
 	    return openssl_encrypt(
 		    $str,
@@ -54,7 +54,7 @@ class OpenSSLWrapper
 	    // See http://thefsb.tumblr.com/post/110749271235/using-opensslendecrypt-in-php-instead-of as 
 	    if (strlen($str) % self::AES_BLOCK_SIZE) {
 		$padLength = self::AES_BLOCK_SIZE - strlen($str) % self::AES_BLOCK_SIZE;
-		$str .= str_repeat(chr("\0"), $padLength);
+		$str .= str_repeat("\0", $padLength);
 	    }
 	    return openssl_encrypt(
 		    $str,
