@@ -12,6 +12,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 
 	private static $unsupported_file_formats = array('WARF');
 
+	private $dropFolderFilesMap = null;
 	/**
 	 * Webex wrapper
 	 * @var webexWrapper
@@ -39,15 +40,35 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$endTime = (date('m/j/Y H:i:s', time()+86400));
 		}
 
-		$physicalFiles = $this->listRecordings($startTime, $endTime)->getRecording();
-		
-		if (!count($physicalFiles))
+		$result = $this->listRecordings($startTime, $endTime);
+		if ($result->getMatchingRecords()->getTotal())
 		{
-			KalturaLog::info('No new files to handle at this time');			
-			return;
+			$physicalFiles = $result->getRecording();
+			$this->HandleNewFiles($physicalFiles);
 		}
-		
-		$dropFolderFilesMap = $this->loadDropFolderFiles();
+		else
+		{
+			KalturaLog::info('No new files to handle at this time');
+		}
+
+		if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
+		{
+			$this->purgeFiles();
+		}
+	}
+
+	private function getDropFolderFilesMap()
+	{
+		if(!$this->dropFolderFilesMap)
+		{
+			$this->dropFolderFilesMap = $this->loadDropFolderFiles();
+		}
+
+		return $this->dropFolderFilesMap;
+	}
+	private function HandleNewFiles($physicalFiles)
+	{
+		$dropFolderFilesMap = $this->getDropFolderFilesMap();
 		$maxTime = $this->dropFolder->lastFileTimestamp;
 		foreach ($physicalFiles as $physicalFile)
 		{
@@ -57,7 +78,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				KalturaLog::info('Recording with id [' . $physicalFile->getRecordingID() . '] format [' . $physicalFile->getFormat() . '] is incompatible with the Kaltura conversion processes. Ignoring.');
 				continue;
 			}
-			
+
 			$physicalFileName = $physicalFile->getName() . '_' . $physicalFile->getRecordingID();
 			if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 			{
@@ -73,21 +94,15 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 					$this->handleExistingDropFolderFile($dropFolderFile);
 			}
 		}
-		
+
 		if ($this->dropFolder->incremental && $maxTime > $this->dropFolder->lastFileTimestamp)
 		{
 			$updateDropFolder = new KalturaDropFolder();
 			$updateDropFolder->lastFileTimestamp = $maxTime;
 			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 		}
-		
-		if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
-		{
-			$this->purgeFiles($dropFolderFilesMap);
-		}
-		
 	}
-	
+
 	public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
 		KBatchBase::impersonate ($job->partnerId);
@@ -131,11 +146,9 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	}
 	
 	/**
-	 * 
-	 * @param array $dropFolderFilesMap
 	 * @throws Exception
 	 */
-	protected function purgeFiles ($dropFolderFilesMap)
+	protected function purgeFiles ()
 	{
 		$createTimeEnd = date('m/j/Y H:i:s');
 		$createTimeStart = date('m/j/Y H:i:s', time() - self::MAX_QUERY_DATE_RANGE_DAYS * 86400);
@@ -143,8 +156,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$createTimeStart = date('m/j/Y H:i:s', $this->dropFolder->deleteFromTimestamp);
 
 		$result = $this->listRecordings($createTimeStart, $createTimeEnd);
-		KalturaLog::info("Files to delete: " . $result->getMatchingRecords()->getTotal());
-		$faultCounter = 0;
+		if($result)
+		{
+			KalturaLog::info("Files to delete: " . $result->getMatchingRecords()->getTotal());
+			$faultCounter = 0;
+			$dropFolderFilesMap = $this->getDropFolderFilesMap();
+		}
+
 		while ($result)
 		{
 			$fileList = $result->getRecording();
