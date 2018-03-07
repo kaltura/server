@@ -201,14 +201,16 @@ abstract class DistributionEngine implements IDistributionEngine
 		}
 	}
 
-	protected function getThumbAssetFile($thumbAssetId, $thumbFile)
+	protected function getThumbAssetFile($thumbAssetId, $directory)
 	{
 		KalturaLog::info("Retrieve thumb asset content for thumbAssetId: [$thumbAssetId]");
 		try
 		{
+			$thumbFilePath = $directory . '/thumb_'. $thumbAssetId;
 			$thumbAssetContentUrl = self::getThumbAssetUrl($thumbAssetId);
 			$thumbContent = KCurlWrapper::getContent($thumbAssetContentUrl);
-			kFileBase::setFileContent($thumbFile, $thumbContent);
+			kFileBase::setFileContent($thumbFilePath, $thumbContent);
+			return $thumbFilePath;
 		}
 		catch(Exception $e)
 		{
