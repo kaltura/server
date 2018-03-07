@@ -216,5 +216,6 @@ abstract class DistributionEngine implements IDistributionEngine
 		{
 			KalturaLog::info("Can't serve thumb asset id [$thumbAssetId] " . $e->getMessage());
 		}
+		return null;
 	}
 }
