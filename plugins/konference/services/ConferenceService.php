@@ -130,7 +130,7 @@ class ConferenceService extends KalturaBaseService {
 	 *
 	 * @action finishConf
 	 * @actionAlias liveStream.finishConf
-	 * @param strign $entryId
+	 * @param string $entryId
 	 * @return bool
 	 * @throws KalturaAPIException
 	 */
