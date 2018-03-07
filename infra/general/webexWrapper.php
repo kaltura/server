@@ -262,7 +262,6 @@ class webexWrapper
 	 * @param string[] $stringServiceTypes
 	 * @param long $startTime
 	 * @param long $endTime
-	 * @return WebexXmlResponseBodyContent[]
 	 * @throws Exception
 	 */
 	public function deleteRecordingsByDates ($stringServiceTypes, $startTime = null, $endTime = null)
