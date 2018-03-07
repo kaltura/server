@@ -3,6 +3,7 @@
 require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlClient.class.php';
 require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlEpListControlType.class.php';
 require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlListRecordingRequest.class.php';
+require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlDelRecordingRequest.class.php';
 
 /**
  *  This class is a helper class for the use of web xml client
@@ -13,10 +14,34 @@ require_once KALTURA_ROOT_PATH.'/vendor/webex/xml/WebexXmlListRecordingRequest.c
 class webexWrapper
 {
 	/**
-	 * @var array
-	 * this array callable as function name who can print data to the log
+	 * @var string $url
+	 * @var WebexXmlSecurityContext $securityContext
+	 * @var callable $errorLogger
+	 * @var callable $debugLogger
 	 */
-	private $logger;
+	public function __construct($url, WebexXmlSecurityContext $securityContext, $errorLogger = null, $debugLogger = null)
+	{
+		$this->webexClient = new WebexXmlClient($url, $securityContext);
+		$this->errorLogger = $errorLogger;
+		$this->debugLogger = $debugLogger;
+	}
+
+	const MAX_DELETE_FAILURES = 10;
+	const START_INDEX_OFFSET = 1;
+	const NO_RECORDS_FOUND_ERROR_CODE = 15;
+	const NO_RECORDS_FOUND_ERROR_MSG = 'Status: FAILURE, Reason: Sorry, no record found';
+
+	// <editor-fold defaultstate="collapsed" desc="private members">
+
+	/**
+	 * @var callable
+	 */
+	private $errorLogger;
+
+	/**
+	 * @var callable
+	 */
+	private $debugLogger;
 
 	/**
 	 * Webex XML API client
@@ -24,21 +49,51 @@ class webexWrapper
 	 */
 	private $webexClient;
 
+	// </editor-fold>
+
+	// <editor-fold defaultstate="collapsed" desc="private methods">
+
 	/**
-	 * @var string $url
-	 * @var WebexXmlSecurityContext $securityContext
-	 * @var array $logger
+	 * @param $stringServiceTypes
+	 * @param $maximumNum
+	 * @param $startTime
+	 * @param $endTime
+	 * @param $startFrom
+	 * @return WebexXmlListRecordingRequest
 	 */
-	public function __construct($url, WebexXmlSecurityContext $securityContext, $logger = null)
+	private function initListRecordingRequest($stringServiceTypes, $maximumNum, $startTime, $endTime, $startFrom)
 	{
-		$this->webexClient = new WebexXmlClient($url, $securityContext);
-		$this->logger = $logger;
+		$listRecordingRequest = new WebexXmlListRecordingRequest();
+		$listControl = new WebexXmlEpListControlType();
+		$listControl->setStartFrom($startFrom);
+		$listControl->setMaximumNum($maximumNum);
+		$listRecordingRequest->setListControl($listControl);
+		$servicesTypes = $this->stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes);
+		$listRecordingRequest->setServiceTypes($servicesTypes);
+
+		if ($startTime && $endTime)
+		{
+			$createTimeScope = $this->getTimeScope($startTime, $endTime);
+			$listRecordingRequest->setCreateTimeScope($createTimeScope);
+		}
+
+		return $listRecordingRequest;
 	}
 
-	private function log($str)
+	private function log($logger, $str)
 	{
-		if ($this->logger)
-			call_user_func($this->logger, '[From webexWrapper] ' .$str);
+		if ($logger)
+			call_user_func($logger, '[From webexWrapper] ' .$str);
+	}
+
+	private function logError($str)
+	{
+		$this->log($this->errorLogger, $str);
+	}
+
+	private function logDebug($str)
+	{
+		$this->log($this->debugLogger, $str);
 	}
 
 	/**
@@ -56,54 +111,45 @@ class webexWrapper
 		return $servicesTypes;
 	}
 
+	private function getTimeScope($startTime, $endTime)
+	{
+		$createTimeScope = new WebexXmlEpCreateTimeScopeType();
+		$createTimeScope->setCreateTimeStart($startTime);
+		$createTimeScope->setCreateTimeEnd($endTime);
+		return $createTimeScope;
+	}
+
+	// </editor-fold>
+
 	/**
 	 * @param string[] $stringServiceTypes
 	 * @param long $startTime
 	 * @param long $endTime
-	 * @return WebexXmlEpRecordingType[]
+	 * @param int $startFrom
+	 * @param int $maximumNum
+	 * @return WebexXmlListRecording
 	 * @throws Exception
 	 */
-	public function listRecordings ($stringServiceTypes = null, $startTime = null, $endTime = null)
+	public function listRecordings ($stringServiceTypes, $startTime = null, $endTime = null, $startFrom = 1, $maximumNum = 500)
 	{
-		$fileList = array();
-		$startFrom = 1;
-		if($stringServiceTypes)
-			$servicesTypes = $this->stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes);
-
-		try{
-			do
-			{
-				$listControl = new WebexXmlEpListControlType();
-				$listControl->setStartFrom($startFrom);
-				$listControl->setMaximumNum(1000);
-				$listRecordingRequest = new WebexXmlListRecordingRequest();
-				$listRecordingRequest->setListControl($listControl);
-				if($stringServiceTypes)
-					$listRecordingRequest->setServiceTypes($servicesTypes);
-
-				if($startTime && $endTime)
-				{
-					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
-					$createTimeScope->setCreateTimeStart($startTime);
-					$createTimeScope->setCreateTimeEnd($endTime);
-					$listRecordingRequest->setCreateTimeScope($createTimeScope);
-				}
-
-				$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
-				$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
-				$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom() + $listRecordingResponse->getMatchingRecords()->getReturned();
-			} while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
+		$listRecordingRequest = $this->initListRecordingRequest($stringServiceTypes, $maximumNum, $startTime, $endTime, $startFrom);
+		try
+		{
+			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
 		}
 		catch (Exception $e)
 		{
-			if ($e->getCode() != 15 && $e->getMessage() != 'Status: FAILURE, Reason: Sorry, no record found')
+			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
 			{
-				$this->log("Error occurred while fetching records from webex: " . print_r($e, true));
+				$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
 				throw $e;
 			}
+
+			return null;
 		}
 
-		return $fileList;
+		$this->logDebug("Found {$listRecordingResponse->getMatchingRecords()->getTotal()} matching records");
+		return $listRecordingResponse;
 	}
 
 	/**
@@ -114,7 +160,7 @@ class webexWrapper
 	public function deleteRecordById($recordingId)
 	{
 		$deleteRecordingRequest = new WebexXmlDelRecordingRequest();
-		$deleteRecordingRequest->setRecordingID(getRecordingID());
+		$deleteRecordingRequest->setRecordingID($recordingId);
 		$deleteRecordingRequest->setIsServiceRecording(1);
 		try
 		{
@@ -122,7 +168,7 @@ class webexWrapper
 		}
 		catch (Exception $e)
 		{
-			$this->log("Error occurred while deleting record {$recordingId} from webex: " . print_r($e, true));
+			$this->logError("Error occurred while deleting record {$recordingId} from webex: " . print_r($e, true));
 			throw $e;
 		}
 
@@ -145,7 +191,7 @@ class webexWrapper
 		}
 		catch (Exception $e)
 		{
-			$this->log("Error occurred while trying to delete file with id: {$recordingId} from webex recyclebin: " . print_r($e, true));
+			$this->logError("Error occurred while trying to delete file with id: {$recordingId} from webex recyclebin: " . print_r($e, true));
 			throw $e;
 		}
 	}
@@ -160,9 +206,7 @@ class webexWrapper
 	{
 		$listControl = new WebexXmlEpListControlType();
 		$listControl->setStartFrom(1);
-		$createTimeScope = new WebexXmlEpCreateTimeScopeType();
-		$createTimeScope->setCreateTimeStart($createTime);
-		$createTimeScope->setCreateTimeEnd($createTime);
+		$createTimeScope = $this->getTimeScope($createTime, $createTime);
 		$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
 		$listRecordingRequest->setCreateTimeScope($createTimeScope);
 		$listRecordingRequest->setListControl($listControl);
@@ -172,7 +216,7 @@ class webexWrapper
 		}
 		catch (Exception $e)
 		{
-			$this->log("Error occurred while trying to get file with creation time: {$createTime} from webex recyclebin: " . print_r($e, true));
+			$this->logError("Error occurred while trying to get file with creation time: {$createTime} from webex recyclebin: " . print_r($e, true));
 			throw $e;
 		}
 
@@ -182,27 +226,36 @@ class webexWrapper
 	/**
 	 * @param string $recordName
 	 * @param string $stringServiceTypes
-	 * @return WebexXmlResponseBodyContent
 	 * @throws Exception
 	 */
-    public function deleteRecordByName($recordName, $stringServiceTypes = null)
+    public function deleteRecordByName($recordName, $stringServiceTypes)
 	{
 		$listRecordingRequest = new WebexXmlListRecordingRequest();
 		$listRecordingRequest->setRecordName($recordName);
-		if($stringServiceTypes)
+		$servicesTypes = $this->stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes);
+		$listRecordingRequest->setServiceTypes($servicesTypes);
+		try
 		{
-			$servicesTypes = $this->stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes);
-			$listRecordingRequest->setServiceTypes($servicesTypes);
+			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+		}
+		catch (Exception $e)
+		{
+			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
+			{
+				$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
+				throw $e;
+			}
+			else
+			{
+				$this->logDebug("No Record found for name {$recordName}.");
+				return;
+			}
 		}
 
-		$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
-		if(!$listRecordingResponse)
-		{
-			throw new Exception("Record {$recordName} not found on the webex.");
-		}
-
-		$id = $listRecordingResponse[0]->getRecordingID();
-		return $this->deleteRecordById($id);
+		$records = $listRecordingResponse->getRecording();
+		$id = $records[0]->getRecordingID();
+		$this->deleteRecordById($id);
+		$this->logDebug("Deleted record {$recordName} with id {$id}.");
 	}
 
 	/**
@@ -212,15 +265,30 @@ class webexWrapper
 	 * @return WebexXmlResponseBodyContent[]
 	 * @throws Exception
 	 */
-	public function deleteRecordingsByDates ($stringServiceTypes = null, $startTime = null, $endTime = null)
+	public function deleteRecordingsByDates ($stringServiceTypes, $startTime = null, $endTime = null)
 	{
-		$result = array();
-		$recordingsToDelete  = $this->listRecordings($stringServiceTypes, $startTime, $endTime);
-		foreach ($recordingsToDelete as $recordingToDelete)
+		$result = $this->listRecordings($stringServiceTypes, $startTime, $endTime);
+		$count = 0;
+		$faultCounter = 0;
+		while($result && $result->getMatchingRecords()->getTotal())
 		{
-			$result[] = $this->deleteRecordById($recordingToDelete);
-		}
+			$records = $result->getRecording();
+			foreach ($records as $record)
+			{
+				try
+				{
+					$this->deleteRecordById($record->getRecordingID());
+					$this->logDebug('deleted ' . ++$count . ' records so far');
+				}
+				catch (Exception $e)
+				{
+					$this->logError("Failed to delete record {$record->getRecordingID()} ".print_r($e, true));
+					if(++$faultCounter >= webexWrapper::MAX_DELETE_FAILURES)
+						throw new Exception("Failed to delete more then ".webexWrapper::MAX_FAILURES." times", 0, $e);
+				}
+			}
 
-		return $result;
+			$result = $this->listRecordings($stringServiceTypes, $startTime, $endTime, $faultCounter+webexWrapper::START_INDEX_OFFSET);
+		}
 	}
 }
