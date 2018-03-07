@@ -270,7 +270,7 @@ class webexWrapper
 		$result = $this->listRecordings($stringServiceTypes, $startTime, $endTime);
 		$count = 0;
 		$faultCounter = 0;
-		while($result && $result->getMatchingRecords()->getTotal())
+		while($result)
 		{
 			$records = $result->getRecording();
 			foreach ($records as $record)

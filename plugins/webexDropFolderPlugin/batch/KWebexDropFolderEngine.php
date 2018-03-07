@@ -23,7 +23,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		/* @var $dropFolder KalturaWebexDropFolder */
 		$this->dropFolder = $dropFolder;
 		$this->webexWrapper = new webexWrapper($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $this->initWebexClientSecurityContext(),
-			array('KalturaLog', 'debug'));
+			array('KalturaLog', 'err'), array('KalturaLog', 'debug'));
 
 		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
 		$startTime = null;
@@ -39,7 +39,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$endTime = (date('m/j/Y H:i:s', time()+86400));
 		}
 
-		$physicalFiles = $this->listRecordings($startTime, $endTime);
+		$physicalFiles = $this->listRecordings($startTime, $endTime)->getRecording();
 		
 		if (!count($physicalFiles))
 		{
@@ -83,7 +83,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		
 		if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
 		{
-			$this->purgeFiles ($dropFolderFilesMap);
+			$this->purgeFiles($dropFolderFilesMap);
 		}
 		
 	}
@@ -109,14 +109,15 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		KBatchBase::unimpersonate();
 	}
 
-	protected function listRecordings ($startTime = null, $endTime = null)
+	protected function listRecordings ($startTime = null, $endTime = null, $startFrom = 1)
 	{
 		$dropFolderServiceTypes = $this->dropFolder->webexServiceType ? explode(',', $this->dropFolder->webexServiceType) :
 			array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 		KalturaLog::info("Fetching list of recordings from Webex, startTime [$startTime], endTime [$endTime] of types ".print_r($dropFolderServiceTypes));
-		$physicalFiles = $this->webexWrapper->listRecordings($dropFolderServiceTypes, $startTime, $endTime);
-		KalturaLog::info('Recordings fetched: '.print_r($physicalFiles, true) );
-		return $physicalFiles;
+		$result = $this->webexWrapper->listRecordings($dropFolderServiceTypes, $startTime, $endTime, $startFrom);
+		$recording = $result->getRecording();
+		KalturaLog::info('Recordings fetched: '.print_r($recording, true) );
+		return $result;
 	}
 
 	protected function initWebexClientSecurityContext ()
@@ -137,24 +138,35 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	protected function purgeFiles ($dropFolderFilesMap)
 	{
 		$createTimeEnd = date('m/j/Y H:i:s');
-		$createTimeStart = date('m/j/Y H:i:s', time()-self::MAX_QUERY_DATE_RANGE_DAYS*86400);
-		if ($this->dropFolder->deleteFromTimestamp && $this->dropFolder->deleteFromTimestamp > (time()-self::MAX_QUERY_DATE_RANGE_DAYS*86400) )
-		{
-			$createTimeStart = date('m/j/Y H:i:s',$this->dropFolder->deleteFromTimestamp);
-		}
-		
-		$fileList = $this->listRecordings($createTimeStart, $createTimeEnd);
-		KalturaLog::info("Files to delete: " . count($fileList));
-		
-		foreach ($fileList as $file)
-		{
-			$physicalFileName = $file->getName() . '_' . $file->getRecordingID();
-			if(!$this->shouldPurgeFile($dropFolderFilesMap, $physicalFileName))
-				continue;
+		$createTimeStart = date('m/j/Y H:i:s', time() - self::MAX_QUERY_DATE_RANGE_DAYS * 86400);
+		if ($this->dropFolder->deleteFromTimestamp && $this->dropFolder->deleteFromTimestamp > (time() - self::MAX_QUERY_DATE_RANGE_DAYS * 86400))
+			$createTimeStart = date('m/j/Y H:i:s', $this->dropFolder->deleteFromTimestamp);
 
-			try
+		$result = $this->listRecordings($createTimeStart, $createTimeEnd);
+		KalturaLog::info("Files to delete: " . $result->getMatchingRecords()->getTotal());
+		$faultCounter = 0;
+		while ($result)
+		{
+			$fileList = $result->getRecording();
+			foreach ($fileList as $file)
 			{
-				$response = $this->webexWrapper->deleteRecordById($file->getRecordingID());
+				$physicalFileName = $file->getName() . '_' . $file->getRecordingID();
+				if (!$this->shouldPurgeFile($dropFolderFilesMap, $physicalFileName))
+					continue;
+
+				try
+				{
+					$this->webexWrapper->deleteRecordById($file->getRecordingID());
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err('Error occurred: ' . print_r($e, true));
+					if (++$faultCounter >= webexWrapper::MAX_DELETE_FAILURES)
+						throw new Exception("Failed to delete more then " . webexWrapper::MAX_FAILURES . " times", 0, $e);
+
+					continue;
+				}
+
 				if ($this->dropFolder->deleteFromRecycleBin)
 				{
 					$this->deleteFileFromRecycleBin($physicalFileName, $dropFolderFilesMap[$physicalFileName]->id, $file->getCreateTime());
@@ -165,10 +177,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 					$this->dropFolderFileService->updateStatus($dropFolderFilesMap[$physicalFileName]->id, KalturaDropFolderFileStatus::PURGED);
 				}
 			}
-			catch (Exception $e)
-			{
-				KalturaLog::err('Error occurred: ' . print_r($e, true));
-			}
+
+			$result = $this->listRecordings($createTimeStart, $createTimeEnd, $faultCounter + webexWrapper::START_INDEX_OFFSET);
 		}
 	}
 
@@ -191,7 +201,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 		else
 		{
-			throw new Exception("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
+			KalturaLog::err("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
 		}
 	}
 
@@ -260,7 +270,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		if (!$dropFolderFile->fileSize)
 		{
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
-				DropFolderPlugin::ERROR_READING_FILE_MESSAGE.'['.$dropFolderFile->contentUrl.']');
+				DropFolderPlugin::ERROR_READING_FILE_MESSAGE . '[' . $dropFolderFile->contentUrl . ']');
 		}
 		else if ($dropFolderFile->fileSize < $updatedFileSize)
 		{
@@ -281,19 +291,15 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		else // file sizes are equal
 		{
 			$time = time();
-			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt ;
+			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt;
 
 			KalturaLog::info("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
 
 			// check if fileSizeCheckInterval time has passed since the last file size update
-			if ($time > $fileSizeLastSetAt)
-			{
-				try
-				{
+			if ($time > $fileSizeLastSetAt) {
+				try {
 					return $this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
-				}
-				catch(KalturaException $e)
-				{
+				} catch (KalturaException $e) {
 					$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE,
 						DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
 					return null;
