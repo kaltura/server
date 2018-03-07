@@ -2,14 +2,26 @@
 
 class KCryptoWrapper
 {
-    public static function getEncryptor()
-    {
-	if (extension_loaded('mcrypt')){
-	    return new McryptWrapper();
-	}else{
-	    return new OpenSSLWrapper();
-	}
-    }
+        public static function getEncryptorClassName()
+        {
+                if (extension_loaded('mcrypt')){
+		    return 'McryptWrapper';
+                }else{
+		    return 'OpenSSLWrapper';
+                }
+        }
+
+        public static function __callStatic($func, $args)
+        {
+                $encryptorClass = self::getEncryptorClassName();
+                return call_user_func_array(array($encryptorClass, $func), $args);
+        }
+
+        public static function getEncryptor()
+        {
+                $encryptorClass = self::getEncryptorClassName();
+                return new $encryptorClass();
+        }
 
 }
 

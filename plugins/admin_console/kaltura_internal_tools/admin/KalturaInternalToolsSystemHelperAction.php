@@ -34,7 +34,6 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		
 		$SystemHelperForm = new Form_SystemHelper();
 		$SystemHelperFormResult = new Form_SystemHelperResult();
-		$kCrypto = KCryptoWrapper::getEncryptor();
 		
 		$algo ="";
 		$secret = "";
@@ -63,14 +62,14 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlu
 		}
 		elseif ( $algo == "base64_3des_encode" )
 		{
-			$encrypted_data = $kCrypto::encrypt_3des($str, $key);
+			$encrypted_data = KCryptoWrapper::encrypt_3des($str, $key);
 			$res = base64_encode($encrypted_data)		;
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "base64_3des_decode" )
 		{
 			$input = base64_decode ($str);
-	   		$decrypted_data = $kCrypto::decrypt_3des($input, $key);
+	   		$decrypted_data = KCryptoWrapper::decrypt_3des($input, $key);
 			$res = ($decrypted_data);
 			$this->des_key = $key;
 		}

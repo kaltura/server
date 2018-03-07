@@ -490,15 +490,13 @@ class kSessionBase
 	{
 		
 		$key = substr(sha1($key, true), 0, 16);
-		$kCrypto = KCryptoWrapper::getEncryptor();
-		return $kCrypto::encrypt_aes($message, $key, self::AES_IV);
+		return KCryptoWrapper::encrypt_aes($message, $key, self::AES_IV);
 	}
 
 	protected static function aesDecrypt($key, $message)
 	{
 		$key = substr(sha1($key, true), 0, 16);
-		$kCrypto = KCryptoWrapper::getEncryptor();
-		return $kCrypto::decrypt_aes($message, $key, self::AES_IV);
+		return KCryptoWrapper::decrypt_aes($message, $key, self::AES_IV);
 	}
 
 

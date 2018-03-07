@@ -756,8 +756,7 @@ class myPartnerUtils
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		if ( !$partner ) return null;
 		
-		$kCrypto = KCryptoWrapper::getEncryptor();
-		$encrypted_data = $kCrypto::encrypt_3des($partner_id, $key);	
+		$encrypted_data = KCryptoWrapper::encrypt_3des($partner_id, $key);	
 		return $token_prefix . base64_encode( $encrypted_data );
 	}
 	
