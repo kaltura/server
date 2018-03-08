@@ -7,6 +7,6 @@ class KalturaLiveEntryServerNodeFilter extends KalturaLiveEntryServerNodeBaseFil
 {
 	public function __construct()
 	{
-		$this->typeIn = array(KalturaEntryServerNodeType::LIVE_PRIMARY, KalturaEntryServerNodeType::LIVE_BACKUP);
+		$this->serverTypeIn = array(KalturaEntryServerNodeType::LIVE_PRIMARY, KalturaEntryServerNodeType::LIVE_BACKUP);
 	}
 }
