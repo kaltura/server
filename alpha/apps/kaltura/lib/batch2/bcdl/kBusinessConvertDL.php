@@ -556,6 +556,26 @@ class kBusinessConvertDL
 						$liveAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
 						$definedRecordingAnchor = true;
 					}
+
+
+					$multiStream = $liveParams->getMultiStream();
+					if (isset($multiStream))
+					{
+						$multiStreamObj = json_decode($multiStream);
+						if (isset($multiStreamObj))
+						{
+							if (isset($multiStreamObj->audio) && isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0 )
+							{
+								$flavorLang = $multiStreamObj->audio->languages[0];
+								$liveAsset->setLanguage($flavorLang);
+								$conversionProfile = $entry->getconversionProfile2();
+								if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
+								{
+									$liveAsset->setDefault(true);
+								}
+							}
+						}
+					}
 				}
 				
 				// set the status according to the entry status
