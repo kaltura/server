@@ -7,6 +7,6 @@ class KalturaConferenceEntryServerNodeFilter extends KalturaConferenceEntryServe
 {
 	public function __construct()
 	{
-		$this->typeIn = array(KonferencePlugin::getApiValue('ConferenceEntryServerNodeType'));
+		$this->serverTypeIn = array(KonferencePlugin::getCoreValue('ConferenceEntryServerNodeType'));
 	}
 }
