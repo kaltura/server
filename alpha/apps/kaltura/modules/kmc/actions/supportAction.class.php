@@ -85,7 +85,7 @@ class supportAction extends kalturaAction
                 $post_items[] = $key . '=' . urlencode($value);
             }
             $post_string = implode ('&', $post_items);
-            $ch = curl_init("https://www.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8");
+            $ch = curl_init("https://webto.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8");
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);
             $this->curlResult = curl_exec($ch);
