@@ -707,16 +707,24 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setSource($sourceType);
 			$dbEntry->save();
 		}
-		
+
 		$errDescription = '';
-		$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
+		$clipManager = new kClipManager();
+		if ($clipManager->isClipServiceRequired($operationAttributes))
+		{
+			$batchJob = $this->startClippingBatch($dbEntry, $dbAsset, $clipManager, $operationAttributes,$errDescription);
+		}
+		else
+		{
+			$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
+		}
 		$isImportNeeded = false;
 		if ($batchJob && $batchJob->getJobType() == BatchJobType::IMPORT)
 			$isImportNeeded = true;
 		if($isNewAsset && !$isImportNeeded)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
-			
+
 		if($isSource && $internalResource instanceof kFileSyncResource)
 		{
 			$srcEntryId = $internalResource->getEntryId();
@@ -728,7 +736,7 @@ class KalturaEntryService extends KalturaBaseService
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
 				}
 			}
-			
+
 			$dbEntry->setOperationAttributes($operationAttributes);
 			$dbEntry->save();
 		}
@@ -1811,7 +1819,35 @@ class KalturaEntryService extends KalturaBaseService
 		$kvote->setRank($rank);
 		$kvote->save();
 	}
-	
+
+	/**
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @param kClipManager $clipManager
+	 * @param $operationAttributes
+	 * @param $errDescription
+	 * @return mixed|null
+	 */
+	protected function startClippingBatch(entry $dbEntry, asset $dbAsset, $clipManager, $operationAttributes, &$errDescription)
+	{
+		$batchJob = null;
+		KalturaLog::info("clipping service detected start to create sub flavors;");
+		$batchArray = $clipManager->decideAddClipEntryFlavor($dbEntry->getId(), $errDescription, $dbEntry->getPartnerId(), $operationAttributes);
+		if (count($batchArray) == 1) {
+			$batchJob = reset($batchArray);
+		} else {
+			KalturaLog::info("Number of batches: " . count($batchArray));
+			foreach ($batchArray as $currentJob) {
+				if ($currentJob && $currentJob->getJobType() == BatchJobType::IMPORT) {
+					KalturaLog::info("Found Import Job: ");
+					$batchJob = $currentJob;
+					break;
+				}
+			}
+		}
+		return $batchJob;
+	}
+
 	/**
 	 * Set the default status to ready if other status filters are not specified
 	 * 
