@@ -8,13 +8,13 @@ class KalturaAddEntryVendorTaskAction extends KalturaRuleAction
 	/**
 	 * Catalog Item Id
 	 * 
-	 * @var int
+	 * @var string
 	 */
-	public $catalogItemId;
+	public $catalogItemIds;
 
 	private static $mapBetweenObjects = array
 	(
-		'catalogItemId',
+		'catalogItemIds',
 	);
 
 	/**

@@ -278,16 +278,17 @@
 	function setRuleData() {
 		var rules = [];
 		var currentIndex = 0;
-		while (jQuery('#Rule_' + currentIndex.toString()).length > 0) {
-			rules.push(buildOutputParams('Rule_', currentIndex));
-			currentIndex++;
-		}
+		$('[description^=AutomaticAdminConsoleRule]').each(function(idx){
+			var newRule= buildOutputParams($( this ).attr("id"), currentIndex);
+			rules.push(newRule);
+		});
+
 		jQuery('#VendorProfileRules').val(JSON.stringify(rules));
 	}
 
     function buildOutputParams(paramName, index) {
 	    var param = {};
-        jQuery('#' + paramName + index).find('input,select').each(function(idx) {
+        jQuery('#' + paramName).find('input,select').each(function(idx) {
             var type = $( this ).attr("type");
             var name = $( this ).attr("name");
             var val = $( this ).val();
