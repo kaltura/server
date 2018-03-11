@@ -41,7 +41,7 @@
 
 	function removeRule(target) {
 		if (!jQuery('#rule-fieldSet').attr('disabled')) {
-			ruleIndex--;
+			maxRuleIndex--;
 			$(target).parent().remove();
 		}
 	}
@@ -51,7 +51,7 @@
 		ruleTemplate.attr("name", "Template");
 
 		var newData = ruleTemplate.clone(true);
-		newData.attr("id", ruleTag).attr("name", ruleTag);
+		newData.attr("id", ruleTag).attr("name", ruleTag).attr("description","AutomaticAdminConsoleRule");
 		newData.find("input[id=Rule_ruleType]").val(type);
 		newData.find("input,select").each(function (idx) {
 			var name = $(this).attr("name");
@@ -79,6 +79,8 @@
 			var val = object[name];
 			$(this).val(val).attr('checked', val);
 		});
+	    if (object["description"])
+		    newRule.attr("description",object["description"]);
 
 		jQuery(target).before(newRule.show());
 	}

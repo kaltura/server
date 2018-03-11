@@ -6,9 +6,9 @@
 class kAddEntryVendorTaskAction extends kRuleAction
 {
 	/**
-	 * @var int
+	 * @var string
 	 */
-	protected $catalogItemId;
+	protected $catalogItemIds;
 	
 	public function __construct() 
 	{
@@ -16,18 +16,18 @@ class kAddEntryVendorTaskAction extends kRuleAction
 	}
 	
 	/**
-	 * @return the $catalogItemId
+	 * @return the $catalogItemIds
 	 */
-	public function getCatalogItemId() 
+	public function getCatalogItemIds()
 	{
-		return $this->catalogItemId;
+		return $this->catalogItemIds;
 	}
 
 	/**
-	 * @param int $catalogItemId
+	 * @param string $catalogItemIds
 	 */
-	public function setCatalogItemId($catalogItemId) 
+	public function setCatalogItemIds($catalogItemIds)
 	{
-		$this->catalogItemId = $catalogItemId;
+		$this->catalogItemIds = $catalogItemIds;
 	}
 }

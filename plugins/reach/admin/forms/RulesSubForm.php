@@ -29,6 +29,13 @@ class Form_RulesSubForm extends ConfigureSubForm
 		$this->addStringElement("ruleType", $this->prefix);
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
 
+		$options = array(
+			'filters' 		=> array('StringTrim'),
+			'placement'		=> 'prepend',
+		);
+			$options["hidden"] = true;
+
+		$this->addElement("text", $this->prefix."description", $options);
 	}
 
 	public function isValid($data)

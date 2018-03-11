@@ -63,7 +63,7 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		$request = $action->getRequest();
 		$formData = $request->getPost();
 		if ($request->isPost() && $form->isValid($formData))
-			$this->handlePost($action, $form, $formData, $vendorProfileId);
+			$this->handleExistingPost($action, $form, $formData, $vendorProfile);
 		else
 			$form->populateFromObject($vendorProfile, false);
 		return $form;
@@ -109,6 +109,75 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		$action->view->formValid = true;
 	}
 
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @param $form
+	 * @param $formData
+	 */
+	protected function handleExistingPost(Zend_Controller_Action $action, $form, $formData, $originalVendorProfile = null)
+	{
+		$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
+		$form->populate($formData);
+		$form->resetUnUpdatebleAttributes($vendorProfile);
+		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+		if ($originalVendorProfile)
+		{
+			$this->filterRules($originalVendorProfile, $vendorProfile);
+			$vendorProfile = $reachPluginClient->vendorProfile->update($originalVendorProfile->id, $vendorProfile);
+		}
+		else
+			$vendorProfile = $reachPluginClient->vendorProfile->add($vendorProfile);
+
+		$form->setAttrib('class', 'valid');
+		$action->view->formValid = true;
+	}
+
+	/***
+	 * filters out deleted admin console rules , update existing admin console rules, adds new admin console rules.
+	 * @param $originalVendorProfile
+	 * @param $vendorProfile
+	 */
+	private function filterRules($originalVendorProfile, $vendorProfile)
+	{
+		$originalRules = $originalVendorProfile->rules;
+
+		$originalDescriptionMap = array();
+		$actualDescriptionMap = array();
+		$filteredRules = array();
+
+		foreach ($originalRules as $originalRule)
+			if (!empty($originalRule->description))
+				$originalDescriptionMap[] = $originalRule->description;
+
+		//handle added or updated rules
+		foreach ($vendorProfile->rules as $rule)
+		{
+			if (!empty($rule->description))
+			{
+				$actualDescriptionMap[] = $rule->description;
+				// in case of new rule add to end of array otherwise replace the rule
+				if (!in_array($rule->description, $originalDescriptionMap))
+					$originalRules[] = $rule;
+				else
+				{
+					foreach ($originalRules as &$originalRule)
+						if ($rule->description == $originalRule->description)
+							$originalRule = $rule;
+				}
+			}
+		}
+
+		//handle deleted rules
+		foreach ($originalRules as $ruleToFilter)
+		{
+			if (!empty($ruleToFilter->description))
+				if (!in_array($ruleToFilter->description, $actualDescriptionMap))
+					continue;
+			$filteredRules[] = $ruleToFilter;
+		}
+
+		$vendorProfile->rules = $filteredRules;
+	}
 	/**
 	 * @param Zend_Controller_Action $action
 	 * @param $partnerId
