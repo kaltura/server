@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -11,6 +11,25 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	const PLUGIN_VERSION_BUILD = 0;
 	const REACH_MANAGER = 'kReachManager';
 	const REACH_FLOW_MANAGER = 'kReachFlowManager';
+	const SEARCH_FIELD_CATALOG_ITEM_DATA = 'cid';
+	const SEARCH_TEXT_SUFFIX = 'ciend';
+	const CATALOG_ITEM_INDEX_PREFIX = 'cis_';
+	const CATALOG_ITEM_INDEX_SUFFIX = 'cie_';
+	const CATALOG_ITEM_INDEX_SERVICE_TYPE = 'cist';
+	const CATALOG_ITEM_INDEX_TURN_AROUND_TIME = 'citat';
+	const CATALOG_ITEM_INDEX_SERVICE_FEATURE = 'cisf';
+	const CATALOG_ITEM_INDEX_LANGUAGE = 'cil';
+	
+	/**
+	 * return field name as appears in index schema
+	 * @param string $fieldName
+	 */
+	public static function getSearchFieldName($fieldName){
+		if ($fieldName == self::SEARCH_FIELD_CATALOG_ITEM_DATA)
+			return  'catalog_item_data';
+		
+		return CuePointPlugin::getPluginName() . '_' . $fieldName;
+	}
 
 	/*
 	 * (non-PHPdoc)
@@ -177,6 +196,45 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			return new KalturaAddEntryVendorTaskAction();
 		
 		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+		if($object instanceof EntryVendorTask && self::isAllowedPartner($object->getPartnerId()))
+			return self::getEntryVendorTaskSearchData($object);
+		
+		return null;
+	}
+	
+	public static function getEntryVendorTaskSearchData(EntryVendorTask $entryVendorTask)
+	{
+		$catalogItem = $entryVendorTask->getCatalogItem();
+		$catalogItemSearchField  = ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA);
+		
+		$contributedData = self::buildDataOnTask($catalogItem, $entryVendorTask->getPartnerId());
+		
+		$searchValues = array(
+			$catalogItemSearchField => ReachPlugin::PLUGIN_NAME . "_" . $entryVendorTask->getPartnerId() . ' ' . $contributedData . ' ' . ReachPlugin::SEARCH_TEXT_SUFFIX
+		);
+		
+		return $searchValues;
+	}
+	
+	public static function buildDataOnTask(VendorCatalogItem $catalogItem, $partnerId)
+	{
+		$data = self::CATALOG_ITEM_INDEX_PREFIX. $partnerId;
+		
+		$data .= " " . self::CATALOG_ITEM_INDEX_SERVICE_TYPE . $catalogItem->getServiceType();
+		$data .= " " . self::CATALOG_ITEM_INDEX_SERVICE_FEATURE . $catalogItem->getServiceFeature();
+		$data .= " " . self::CATALOG_ITEM_INDEX_TURN_AROUND_TIME . $catalogItem->getTurnAroundTime();
+		$data .= " " . self::CATALOG_ITEM_INDEX_LANGUAGE . $catalogItem->getSourceLanguage();
+		
+		$data .= " " . self::CATALOG_ITEM_INDEX_SUFFIX . $partnerId;
+		
+		return $data;
 	}
 	
 	//TODO add reach plugin permission

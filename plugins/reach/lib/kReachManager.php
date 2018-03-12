@@ -20,7 +20,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
+		if($object instanceof EntryVendorTask)
 			return true;
 		
 		return false;
@@ -73,7 +73,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectCreated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$this->updateVendorProfileCreditUsage($object);
+		/* @var $object EntryVendorTask */
+		$object->indexToSearchIndex();
+		
+		if($object->getStatus() == EntryVendorTaskStatus::PENDING)
+			$this->updateVendorProfileCreditUsage($object);
 		return true;
 	}
 	
@@ -118,7 +122,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function handleEntryDurationChanged(entry $entry)
 	{
-		$pendingEntryVendorTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId());
+		$pendingEntryVendorTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId());
 		$addedCostByProfileId = array();
 		foreach ($pendingEntryVendorTasks as $pendingEntryVendorTask)
 		{

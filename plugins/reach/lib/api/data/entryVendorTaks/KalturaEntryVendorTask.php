@@ -6,7 +6,7 @@
 class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 {
 	/**
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 * @filter eq,in,order
 	 */

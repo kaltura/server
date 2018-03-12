@@ -451,6 +451,26 @@ index kaltura_schedule_event:kaltura_base
 }
 
 
+index kaltura_entry_vendor_task:kaltura_base
+{
+	path     = @BASE_DIR@/sphinx/kaltura_entry_vendor_task_rt
+	rt_attr_bigint       = int_id
+	rt_attr_timestamp	 = created_at
+	rt_attr_timestamp	 = updated_at
+	rt_attr_timestamp	 = queue_time
+	rt_attr_timestamp	 = finish_time
+	rt_attr_bigint       = partner_id
+	rt_field             = vendor_partner_id
+	rt_field	         = entry_id
+	rt_attr_uint         = task_status
+	rt_attr_uint	     = price
+	rt_field	         = catalog_item_id
+	rt_field             = vendor_profile_id
+	rt_field             = kuser_id
+	rt_field	         = context
+	rt_field             = catalog_item_data
+}
+
 searchd
 {
 	log = @LOG_DIR@/sphinx/kaltura_sphinx_searchd.log

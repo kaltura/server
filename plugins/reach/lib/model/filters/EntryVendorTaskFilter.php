@@ -38,10 +38,10 @@ class EntryVendorTaskFilter extends baseObjectFilter
 
 		$this->allowed_order_fields = array (
 			"id",
-			"createdAt",
-			"updatedAt",
-			"queuedAt",
-			"finishedAt",
+			"created_at",
+			"updated_at",
+			"queued_at",
+			"finished_at",
 		);
 		
 		$this->aliases = array (

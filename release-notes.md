@@ -1,13 +1,12 @@
 # Mercury 13.14.0 #
 
-# Vendor Profile #
-
 ## Reach In-House Support ##
 - Issue Type: Feature
 - Issue ID: PLAT-7596
 
 ### Configuration ###
-	None.
+	- copy "index kaltura_entry_vendor_task:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template to /opt/kaltura/app/configurations/sphinx/kaltura.conf modifiy path to appropriate directory.
+	- restart sphinx service
 
 ### Deployment scripts ###
 	
