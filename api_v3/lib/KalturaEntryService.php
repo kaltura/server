@@ -1826,26 +1826,27 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param kClipManager $clipManager
 	 * @param $operationAttributes
 	 * @param $errDescription
-	 * @return mixed|null
+	 * @return BatchJob
 	 */
 	protected function startClippingBatch(entry $dbEntry, asset $dbAsset, $clipManager, $operationAttributes, &$errDescription)
 	{
 		$batchJob = null;
 		KalturaLog::info("clipping service detected start to create sub flavors;");
-		$batchArray = $clipManager->decideAddClipEntryFlavor($dbEntry->getId(), $errDescription, $dbEntry->getPartnerId(), $operationAttributes);
-		if (count($batchArray) == 1) {
-			$batchJob = reset($batchArray);
-		} else {
-			KalturaLog::info("Number of batches: " . count($batchArray));
-			foreach ($batchArray as $currentJob) {
-				if ($currentJob && $currentJob->getJobType() == BatchJobType::IMPORT) {
-					KalturaLog::info("Found Import Job: ");
-					$batchJob = $currentJob;
-					break;
-				}
-			}
-		}
-		return $batchJob;
+		return $clipManager->createParentBatchJob($dbEntry->getId(),$dbEntry->getPartnerId() , $operationAttributes);
+		//$batchArray = $clipManager->decideAddClipEntryFlavor($dbEntry->getId(), $errDescription, $dbEntry->getPartnerId(), $operationAttributes);
+//		if (count($batchArray) == 1) {
+//			$batchJob = reset($batchArray);
+//		} else {
+//			KalturaLog::info("Number of batches: " . count($batchArray));
+//			foreach ($batchArray as $currentJob) {
+//				if ($currentJob && $currentJob->getJobType() == BatchJobType::IMPORT) {
+//					KalturaLog::info("Found Import Job: ");
+//					$batchJob = $currentJob;
+//					break;
+//				}
+//			}
+//		}
+//		return $batchJob;
 	}
 
 	/**
