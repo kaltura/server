@@ -4,7 +4,7 @@
  * @subpackage api.enum
  * @see EventNotificationEventType
  */
-class KalturaVendorProfileEventType extends KalturaDynamicEnum implements EventNotificationEventType
+class KalturaReachProfileEventType extends KalturaDynamicEnum implements EventNotificationEventType
 {
 	public static function getEnumClass()
 	{

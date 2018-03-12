@@ -1,16 +1,16 @@
 <dd id="test">
-<fieldset id="vendorProfileRule-fieldSet" class="vendorProfileRule">
+<fieldset id="reachProfileRule-fieldSet" class="reachProfileRule">
 	<a class="add-rule" href="javascript:;" style="display:block;" onclick="addRule(this);" >+  Add Rule</a>
 	<?php foreach($this->element->getSubForms() as $subForm): ?>
 		<?php $subForm->setElementsBelongTo($subForm->getName()); ?>
 		<?php echo $subForm; ?>
 	<?php endforeach; ?>
 	<style type="text/css">
-		#frmVendorProfileConfigure .vendorProfileRule{ display:block; padding: 10px; min-width: 500px; }
-		#frmVendorProfileConfigure .vendorProfileRule span.rule { font-size: 14px; font-weight: bold; }
-		#frmVendorProfileConfigure .vendorProfileRule label { padding: 4px 0; }
-		#frmVendorProfileConfigure .vendorProfileRule fieldset { min-width: 0; height: auto; margin: 10px 0; padding: 5px; border: 1px solid #CCCCCC; }
-		#frmVendorProfileConfigure .vendorProfileRule .remove-vendorProfileRule { padding: 5px; float: right; }
+		#frmReachProfileConfigure .reachProfileRule{ display:block; padding: 10px; min-width: 500px; }
+		#frmReachProfileConfigure .reachProfileRule span.rule { font-size: 14px; font-weight: bold; }
+		#frmReachProfileConfigure .reachProfileRule label { padding: 4px 0; }
+		#frmReachProfileConfigure .reachProfileRule fieldset { min-width: 0; height: auto; margin: 10px 0; padding: 5px; border: 1px solid #CCCCCC; }
+		#frmReachProfileConfigure .reachProfileRule .remove-reachProfileRule { padding: 5px; float: right; }
 	</style>
 </fieldset>
 </dd>
@@ -26,7 +26,7 @@
 		var chooseElem = document.getElementById("ruleType");
 		var showType = chooseElem.options[chooseElem.selectedIndex].text;
 		if (showType == 'None')
-			return alert("Please choose vendor profile rule");
+			return alert("Please choose reach profile rule");
 
 		if (jQuery('#rule-fieldSet').attr('disabled'))
 			return;
@@ -47,7 +47,7 @@
 	}
 
 	function createRule(ruleTag, type) {
-		var ruleTemplate = jQuery('#vendorProfileRuleTemplate_' + type);
+		var ruleTemplate = jQuery('#reachProfileRuleTemplate_' + type);
 		ruleTemplate.attr("name", "Template");
 
 		var newData = ruleTemplate.clone(true);

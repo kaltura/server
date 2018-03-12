@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.filters
  */
-class KalturaVendorProfileFilter extends KalturaVendorProfileBaseFilter
+class KalturaReachProfileFilter extends KalturaReachProfileBaseFilter
 {
 	protected function getCoreFilter()
 	{
@@ -31,8 +31,8 @@ class KalturaVendorProfileFilter extends KalturaVendorProfileBaseFilter
 			$totalCount = VendorProfilePeer::doCount($c);
 		}
 		
-		$response = new KalturaVendorProfileListResponse();
-		$response->objects = KalturaVendorProfileArray::fromDbArray($list, $responseProfile);
+		$response = new KalturaReachProfileListResponse();
+		$response->objects = KalturaReachProfileArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
 		return $response;
 	}

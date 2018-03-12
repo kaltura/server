@@ -8,11 +8,11 @@
 <script type="text/javascript">
 
 	try{
-		$('fieldset[id^="vendorProfileRuleTemplate"]').hide();
+		$('fieldset[id^="reachProfileRuleTemplate"]').hide();
 		populateRules();
 		populateDates();
 		$('fieldset[id^="DictionaryTemplate"]').hide();
-		populate("VendorProfileDictionaries", "add-dictionary");
+		populate("ReachProfileDictionaries", "add-dictionary");
 	}
 	catch (e)
 	{
@@ -25,13 +25,13 @@
 		var arr = JSON.parse(data);
 		var ts = $("." + file);
 		for (var i = 0, len = arr.length; i < len; i++) {
-			if (name == 'VendorProfileDictionaries')
+			if (name == 'ReachProfileDictionaries')
 				addDictionaryFromObject(ts, arr[i]);
 		}
 	}
 
 	function populateRules() {
-		var data = jQuery('#VendorProfileRules').val();
+		var data = jQuery('#ReachProfileRules').val();
 		if (!data)
 			return;
 		var arr = JSON.parse(data);
@@ -44,7 +44,7 @@
 		jQuery(function() {
 		<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
-		jQuery('#frmVendorProfileConfigure').submit();
+		jQuery('#frmReachProfileConfigure').submit();
 		<?php endif; ?>
 	});
 	}
@@ -52,25 +52,25 @@
 	{
 
 	}
-	function replaceVendorProfileCreditForm() {
+	function replaceReachProfileCreditForm() {
 
-		var creditHandlerClass = jQuery('#vendorProfileCredit-objectType').val();
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'VendorProfileCreditConfigureAction', 'creditHandlerClass' => 'CREDIT_HANDLER')); ?>';
+		var creditHandlerClass = jQuery('#reachProfileCredit-objectType').val();
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ReachProfileCreditConfigureAction', 'creditHandlerClass' => 'CREDIT_HANDLER')); ?>';
 		url = url.replace('CREDIT_HANDLER', creditHandlerClass);
 
-		subform = jQuery('#vendorProfileCredit-element');
+		subform = jQuery('#reachProfileCredit-element');
 		subform.load(
 			url,
 			null,
 			function(html) {
-				jQuery('#vendorProfileCredit-element').replaceWith(jQuery.parseHTML(html)[1]);
-				jQuery('#vendorProfileCredit-objectType').change(replaceVendorProfileCreditForm);
+				jQuery('#reachProfileCredit-element').replaceWith(jQuery.parseHTML(html)[1]);
+				jQuery('#reachProfileCredit-objectType').change(replaceReachProfileCreditForm);
 			}
 		);
 	}
 
 	try {
-		jQuery('#vendorProfileCredit-objectType').change(replaceVendorProfileCreditForm);
+		jQuery('#reachProfileCredit-objectType').change(replaceReachProfileCreditForm);
 	}
 	catch (e)
 	{
@@ -78,7 +78,7 @@
 	}
 
 	function populateDates() {
-		var f = jQuery('#frmVendorProfileConfigure');
+		var f = jQuery('#frmReachProfileConfigure');
 		f.find( "input[innertype=DateElement]").each(function(idx) {
 			var val = parseInt($(this).val());
 			if (isNaN(val))

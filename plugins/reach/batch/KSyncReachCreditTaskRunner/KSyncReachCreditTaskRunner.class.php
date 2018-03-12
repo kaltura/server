@@ -27,8 +27,8 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 	public function run($jobs = null)
 	{
 		$reachClient = $this->SyncReachClient();
-		$filter = new KalturaVendorProfileFilter();
-		$filter->statusEqual = KalturaVendorProfileStatus::ACTIVE;
+		$filter = new KalturaReachProfileFilter();
+		$filter->statusEqual = KalturaReachProfileStatus::ACTIVE;
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
@@ -52,9 +52,9 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 	}
 
 	/**
-	 * @param KalturaVendorProfile $vendorProfile
+	 * @param KalturaReachProfile $vendorProfile
 	 */
-	protected function syncVendorProfileCredit(KalturaVendorProfile $vendorProfile)
+	protected function syncVendorProfileCredit(KalturaReachProfile $vendorProfile)
 	{
 		$reachClient = $this->SyncReachClient();
 		$this->impersonate($vendorProfile->partnerId);

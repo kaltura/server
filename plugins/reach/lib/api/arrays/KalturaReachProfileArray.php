@@ -3,17 +3,17 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaVendorProfileArray extends KalturaTypedArray
+class KalturaReachProfileArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$newArr = new KalturaVendorProfileArray();
+		$newArr = new KalturaReachProfileArray();
 		if ($arr == null)
 			return $newArr;
 		
 		foreach ($arr as $obj)
 		{
-			$object = new KalturaVendorProfile();
+			$object = new KalturaReachProfile();
 			$object->fromObject($obj, $responseProfile);
 			$newArr[] = $object;
 		}
@@ -23,6 +23,6 @@ class KalturaVendorProfileArray extends KalturaTypedArray
 	
 	public function __construct()
 	{
-		parent::__construct("KalturaVendorProfile");
+		parent::__construct("KalturaReachProfile");
 	}
 }

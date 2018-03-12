@@ -3,10 +3,10 @@
  * @package plugins.schedule
  * @subpackage api.objects
  */
-class KalturaVendorProfileListResponse extends KalturaListResponse
+class KalturaReachProfileListResponse extends KalturaListResponse
 {
 	/**
-	 * @var KalturaVendorProfileArray
+	 * @var KalturaReachProfileArray
 	 * @readonly
 	 */
 	public $objects;

@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class VendorProfileSetStatusAction extends KalturaApplicationPlugin
+class ReachProfileSetStatusAction extends KalturaApplicationPlugin
 {
 
 	/**
@@ -17,8 +17,8 @@ class VendorProfileSetStatusAction extends KalturaApplicationPlugin
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('layout')->disableLayout();
-		$vendorProfileId = $this->_getParam('vendorProfileId');
-		$newStatus = $this->_getParam('vendorProfileStatus');
+		$reachProfileId = $this->_getParam('reachProfileId');
+		$newStatus = $this->_getParam('reachProfileStatus');
 		$partnerId = $this->_getParam('partnerId');
 
 		$client = Infra_ClientHelper::getClient();
@@ -26,10 +26,10 @@ class VendorProfileSetStatusAction extends KalturaApplicationPlugin
 		Infra_ClientHelper::impersonate($partnerId);
 		try
 		{
-			if  ( $newStatus == Kaltura_Client_Reach_Enum_VendorProfileStatus::DELETED )
-				$res = $reachPluginClient->vendorProfile->delete($vendorProfileId);
+			if  ( $newStatus == Kaltura_Client_Reach_Enum_ReachProfileStatus::DELETED )
+				$res = $reachPluginClient->reachProfile->delete($reachProfileId);
 			else
-				$res = $reachPluginClient->vendorProfile->updateStatus($vendorProfileId, $newStatus);
+				$res = $reachPluginClient->reachProfile->updateStatus($reachProfileId, $newStatus);
 			echo $action->getHelper('json')->sendJson('ok', false);
 		} catch (Exception $e)
 		{

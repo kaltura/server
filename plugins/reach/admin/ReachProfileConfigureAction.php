@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class VendorProfileConfigureAction extends KalturaApplicationPlugin
+class ReachProfileConfigureAction extends KalturaApplicationPlugin
 {
 	/**
 	 * @return string - absolute file path of the phtml template
@@ -18,7 +18,7 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		$action->getHelper('layout')->disableLayout();
 		$this->client = Infra_ClientHelper::getClient();
 		$partnerId = $this->_getParam('new_partner_id');
-		$vendorProfileId = $this->_getParam('vendor_profile_id');
+		$reachProfileId = $this->_getParam('reach_profile_id');
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -26,10 +26,10 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 		try
 		{
 			Infra_ClientHelper::impersonate($partnerId);
-			if ($vendorProfileId)
-				$form = $this->handleExistingVendorProfile($action, $vendorProfileId, $partnerId);
+			if ($reachProfileId)
+				$form = $this->handleExistingReachProfile($action, $reachProfileId, $partnerId);
 			else
-				$form = $this->handleNewVendorProfile($action, $partnerId);
+				$form = $this->handleNewReachProfile($action, $partnerId);
 		} catch (Exception $e)
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -38,34 +38,34 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 			{
 				$formData = $action->getRequest()->getPost();
 				$form->populate($formData);
-				$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
+				$reachProfile = $form->getObject('Kaltura_Client_Reach_Type_ReachProfile', $formData, false, true);
 			}
 		}
 
 		Infra_ClientHelper::unimpersonate();
 		$action->view->form = $form;
-		$action->view->vendorProfileId = $vendorProfileId;
+		$action->view->reachProfileId = $reachProfileId;
 	}
 
 	/***
 	 * @param Zend_Controller_Action $action
-	 * @param $vendorProfileId
+	 * @param $reachProfileId
 	 * @param $partnerId
 	 * @throws Zend_Form_Exception
 	 */
-	protected function handleExistingVendorProfile(Zend_Controller_Action $action, $vendorProfileId, $partnerId)
+	protected function handleExistingReachProfile(Zend_Controller_Action $action, $reachProfileId, $partnerId)
 	{
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-		$vendorProfile = $reachPluginClient->vendorProfile->get($vendorProfileId);
-		$creditHandlerClass = get_class($vendorProfile->credit);
-		$form = $this->initForm($action, $partnerId, $vendorProfileId, $creditHandlerClass);
+		$reachProfile = $reachPluginClient->reachProfile->get($reachProfileId);
+		$creditHandlerClass = get_class($reachProfile->credit);
+		$form = $this->initForm($action, $partnerId, $reachProfileId, $creditHandlerClass);
 
 		$request = $action->getRequest();
 		$formData = $request->getPost();
 		if ($request->isPost() && $form->isValid($formData))
-			$this->handleExistingPost($action, $form, $formData, $vendorProfile);
+			$this->handleExistingPost($action, $form, $formData, $reachProfile);
 		else
-			$form->populateFromObject($vendorProfile, false);
+			$form->populateFromObject($reachProfile, false);
 		return $form;
 	}
 
@@ -74,11 +74,11 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 	 * @param $partnerId
 	 * @return mixed
 	 */
-	protected function handleNewVendorProfile(Zend_Controller_Action $action, $partnerId)
+	protected function handleNewReachProfile(Zend_Controller_Action $action, $partnerId)
 	{
 		$request = $action->getRequest();
 		$formData = $request->getPost();
-		$creditHandlerClass = $this->_getParam('creditHandlerClass') != 'Null' ? $this->_getParam('creditHandlerClass') : $formData['vendorProfileCredit']['objectType'];
+		$creditHandlerClass = $this->_getParam('creditHandlerClass') != 'Null' ? $this->_getParam('creditHandlerClass') : $formData['reachProfileCredit']['objectType'];
 		$form = $this->initForm($action, $partnerId, null, $creditHandlerClass);
 		$form->populate($formData);
 		if ($request->isPost() && $form->isValid($formData))
@@ -94,16 +94,16 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 	 * @param $form
 	 * @param $formData
 	 */
-	protected function handlePost(Zend_Controller_Action $action, $form, $formData, $vendorProfileId = null)
+	protected function handlePost(Zend_Controller_Action $action, $form, $formData, $reachProfileId = null)
 	{
-		$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
+		$reachProfile = $form->getObject('Kaltura_Client_Reach_Type_ReachProfile', $formData, false, true);
 		$form->populate($formData);
-		$form->resetUnUpdatebleAttributes($vendorProfile);
+		$form->resetUnUpdatebleAttributes($reachProfile);
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-		if ($vendorProfileId)
-			$vendorProfile = $reachPluginClient->vendorProfile->update($vendorProfileId, $vendorProfile);
+		if ($reachProfileId)
+			$reachProfile = $reachPluginClient->reachProfile->update($reachProfileId, $reachProfile);
 		else
-			$vendorProfile = $reachPluginClient->vendorProfile->add($vendorProfile);
+			$reachProfile = $reachPluginClient->reachProfile->add($reachProfile);
 
 		$form->setAttrib('class', 'valid');
 		$action->view->formValid = true;
@@ -114,19 +114,19 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 	 * @param $form
 	 * @param $formData
 	 */
-	protected function handleExistingPost(Zend_Controller_Action $action, $form, $formData, $originalVendorProfile = null)
+	protected function handleExistingPost(Zend_Controller_Action $action, $form, $formData, $originalReachProfile = null)
 	{
-		$vendorProfile = $form->getObject('Kaltura_Client_Reach_Type_VendorProfile', $formData, false, true);
+		$reachProfile = $form->getObject('Kaltura_Client_Reach_Type_ReachProfile', $formData, false, true);
 		$form->populate($formData);
-		$form->resetUnUpdatebleAttributes($vendorProfile);
+		$form->resetUnUpdatebleAttributes($reachProfile);
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-		if ($originalVendorProfile)
+		if ($originalReachProfile)
 		{
-			$this->filterRules($originalVendorProfile, $vendorProfile);
-			$vendorProfile = $reachPluginClient->vendorProfile->update($originalVendorProfile->id, $vendorProfile);
+			$this->filterRules($originalReachProfile, $reachProfile);
+			$reachProfile = $reachPluginClient->reachProfile->update($originalReachProfile->id, $reachProfile);
 		}
 		else
-			$vendorProfile = $reachPluginClient->vendorProfile->add($vendorProfile);
+			$reachProfile = $reachPluginClient->reachProfile->add($reachProfile);
 
 		$form->setAttrib('class', 'valid');
 		$action->view->formValid = true;
@@ -134,12 +134,12 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 
 	/***
 	 * filters out deleted admin console rules , update existing admin console rules, adds new admin console rules.
-	 * @param $originalVendorProfile
-	 * @param $vendorProfile
+	 * @param $originalReachProfile
+	 * @param $reachProfile
 	 */
-	private function filterRules($originalVendorProfile, $vendorProfile)
+	private function filterRules($originalReachProfile, $reachProfile)
 	{
-		$originalRules = $originalVendorProfile->rules;
+		$originalRules = $originalReachProfile->rules;
 
 		$originalDescriptionMap = array();
 		$actualDescriptionMap = array();
@@ -150,7 +150,7 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 				$originalDescriptionMap[] = $originalRule->description;
 
 		//handle added or updated rules
-		foreach ($vendorProfile->rules as $rule)
+		foreach ($reachProfile->rules as $rule)
 		{
 			if (!empty($rule->description))
 			{
@@ -176,70 +176,70 @@ class VendorProfileConfigureAction extends KalturaApplicationPlugin
 			$filteredRules[] = $ruleToFilter;
 		}
 
-		$vendorProfile->rules = $filteredRules;
+		$reachProfile->rules = $filteredRules;
 	}
 	/**
 	 * @param Zend_Controller_Action $action
 	 * @param $partnerId
-	 * @param $vendorProfileId
+	 * @param $reachProfileId
 	 * @param $creditHandlerClass
-	 * @return Form_VendorProfileConfigure
+	 * @return Form_ReachProfileConfigure
 	 */
-	protected function initForm(Zend_Controller_Action $action, $partnerId, $vendorProfileId = null, $creditHandlerClass = null)
+	protected function initForm(Zend_Controller_Action $action, $partnerId, $reachProfileId = null, $creditHandlerClass = null)
 	{
 		$urlParams = array(
 			'controller' => 'plugin',
-			'action' => 'VendorProfileConfigureAction',
+			'action' => 'ReachProfileConfigureAction',
 		);
 
-		if ($vendorProfileId)
+		if ($reachProfileId)
 		{
 			$blockFields = true;
-			$urlParams['vendor_profile_id'] = $vendorProfileId;
+			$urlParams['reach_profile_id'] = $reachProfileId;
 		}
-		$form = new Form_VendorProfileConfigure($partnerId, $blockFields);
+		$form = new Form_ReachProfileConfigure($partnerId, $blockFields);
 		$form->setAction($action->view->url($urlParams));
 
 		$creditHandlerForm = $this->getCreditHandlerForm($creditHandlerClass);
 
 		if(is_null($creditHandlerForm))
-			throw new Exception("Can't instantiate vendor profile credit form of type $creditHandlerClass");
-		$creditHandlerForm->updateCreditOptions($this->getVendorProfileCreditClasses($action));
-		$form->addSubForm($creditHandlerForm, "vendorProfileCredit");
+			throw new Exception("Can't instantiate reach profile credit form of type $creditHandlerClass");
+		$creditHandlerForm->updateCreditOptions($this->getReachProfileCreditClasses($action));
+		$form->addSubForm($creditHandlerForm, "reachProfileCredit");
 		return $form;
 	}
 
 	protected function getCreditHandlerForm($type) {
 		switch($type) {
 			case 'Null':
-				return new Form_VendorProfileNullCredit();
+				return new Form_ReachProfileNullCredit();
 			case 'Kaltura_Client_Reach_Type_VendorCredit':
-				return new Form_VendorProfileCredit();
+				return new Form_ReachProfileCredit();
 			case 'Kaltura_Client_Reach_Type_UnlimitedVendorCredit':
-				return new Form_VendorProfileUnlimitedCredit();
+				return new Form_ReachProfileUnlimitedCredit();
 			case 'Kaltura_Client_Reach_Type_ReoccurringVendorCredit':
-				return new Form_VendorProfileRecurringCredit();
+				return new Form_ReachProfileRecurringCredit();
 			case 'Kaltura_Client_Reach_Type_TimeRangeVendorCredit':
-				return new Form_VendorProfileTimeFramedCredit();
+				return new Form_ReachProfileTimeFramedCredit();
 			default:
-				return new Form_VendorProfileNullCredit();
+				return new Form_ReachProfileNullCredit();
 		}
 	}
 
-	public function getVendorProfileCreditFormAction(Zend_Controller_Action $action)
+	public function getReachProfileCreditFormAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('layout')->disableLayout();
 		$type = $action->getRequest()->getParam('creditHandlerClass');
 		$form = $this->getCreditHandlerForm($type);
 		if(is_null($form))
-			throw new Exception("Can't instantiate vendor profile credit form of type $form");
+			throw new Exception("Can't instantiate reach profile credit form of type $form");
 
 		$action->view->form = $form;
-		$action->view->form->updateCreditOptions($this->getVendorProfileCreditClasses($action));
+		$action->view->form->updateCreditOptions($this->getReachProfileCreditClasses($action));
 		$action->view->form->getElement("objectType")->setValue($type);
 	}
 
-	protected function getVendorProfileCreditClasses($action) {
+	protected function getReachProfileCreditClasses($action) {
 		$credits = array();
 		$credits['Null'] = $action->view->translate('Choose Credit Type');
 		$credits['Kaltura_Client_Reach_Type_VendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_VendorCredit');

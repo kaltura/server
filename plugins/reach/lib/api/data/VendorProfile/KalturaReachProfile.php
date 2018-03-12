@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
+class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 {
     const MAX_DICTIONARY_LENGTH = 1000;
 	/**
@@ -34,14 +34,14 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	public $updatedAt;
 
 	/**
-	 * @var KalturaVendorProfileStatus
+	 * @var KalturaReachProfileStatus
 	 * @readonly
 	 * @filter eq,in
 	 */
 	public $status;
 
 	/**
-	 * @var KalturaVendorProfileType
+	 * @var KalturaReachProfileType
 	 * @filter eq,in
 	 */
 	public $profileType;
@@ -102,7 +102,7 @@ class KalturaVendorProfile extends KalturaObject implements IRelatedFilterable
 	public $maxCharactersPerCaptionLine;
 	
 	/**
-	 * @var KalturaVendorProfileContentDeletionPolicy
+	 * @var KalturaReachProfileContentDeletionPolicy
 	 */
 	public $contentDeletionPolicy;
 

@@ -13,7 +13,7 @@ $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.reach.par
 echo "Running php $script $config";
 passthru("php $script $config");
 
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.reach.vendorProfile.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.reach.reachProfile.ini';
 echo "Running php $script $config";
 passthru("php $script $config");
 
@@ -23,7 +23,7 @@ echo "Running php $script $config";
 passthru("php $script $config");
 
 /// adding objects permissions
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaVendorProfile.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaReachProfile.ini';
 echo "Running php $script $config";
 passthru("php $script $config");
 

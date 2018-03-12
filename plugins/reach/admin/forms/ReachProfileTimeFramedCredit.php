@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Reach
  */
-class Form_VendorProfileTimeFramedCredit extends Form_VendorProfileCredit
+class Form_ReachProfileTimeFramedCredit extends Form_ReachProfileCredit
 {
 	
 	public function init()

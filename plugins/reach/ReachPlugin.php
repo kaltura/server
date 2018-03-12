@@ -102,7 +102,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	{
 		$map = array(
 			'vendorCatalogItem' => 'VendorCatalogItemService',
-			'vendorProfile' => 'VendorProfileService',
+			'reachProfile' => 'ReachProfileService',
 			'entryVendorTask' => 'EntryVendorTaskService',
 			'partnerCatalogItem' => 'PartnerCatalogItemService',
 		);
@@ -121,10 +121,10 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new CatalogItemListAction();
 		$pages[] = new CatalogItemConfigureAction();
 		$pages[] = new CatalogItemSetStatusAction();
-		$pages[] = new VendorProfileListAction();
-		$pages[] = new VendorProfileConfigureAction();
-		$pages[] = new VendorProfileSetStatusAction();
-		$pages[] = new VendorProfileCreditConfigureAction();
+		$pages[] = new ReachProfileListAction();
+		$pages[] = new ReachProfileConfigureAction();
+		$pages[] = new ReachProfileSetStatusAction();
+		$pages[] = new ReachProfileCreditConfigureAction();
 		return $pages;
 	}
 	

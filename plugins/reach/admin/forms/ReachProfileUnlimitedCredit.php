@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Reach
  */
-class Form_VendorProfileUnlimitedCredit extends Form_VendorProfileCredit
+class Form_ReachProfileUnlimitedCredit extends Form_ReachProfileCredit
 {
 	public function init()
 	{
