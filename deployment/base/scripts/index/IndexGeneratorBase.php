@@ -155,7 +155,6 @@ class IndexGeneratorBase
 		foreach($indexComplex->children() as $indexValue) {
 			$idxValueAttr = $indexValue->attributes();
 			$fieldName = $idxValueAttr["field"];
-			echo __FUNCTION__ . " fieldName = $fieldName\n";
 			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
 				"get" . ucwords(preg_replace_callback("/_(.?)/",
 					function($matches)
