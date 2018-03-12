@@ -447,6 +447,9 @@ class embedPlaykitJsAction extends sfAction
 		if (!$this->uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 		$this->playerConfig = json_decode($this->uiConf->getConfig());
+		if (!$this->playerConfig) {
+			$this->playerConfig = new stdClass();
+		}
 		$this->uiConfUpdatedAt = $this->uiConf->getUpdatedAt(null);
 		
 		//Get bundle configuration stored in conf_vars

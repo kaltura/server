@@ -164,6 +164,10 @@
 		  "type" : "keyword",
 		  "normalizer" : "kaltura_keyword_normalizer"
 		},
+		"partner_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
 		"partner_status":{
 		  "type" : "keyword"
 		},

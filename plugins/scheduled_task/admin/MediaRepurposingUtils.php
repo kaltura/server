@@ -15,6 +15,7 @@ class MediaRepurposingUtils
 
 	const MEDIA_REPURPOSING_SYSTEM_NAME = 'MRP';
 	const ADMIN_CONSOLE_PARTNER = "-2";
+	const DRY_RUN_MAX_RESULT_DEFAULT = 500;
 	/**
 	 * get all Media Repurposing of the partner
 	 * @param int $partnerId
@@ -108,8 +109,9 @@ class MediaRepurposingUtils
 	}
 
 	public static function executeDryRun($mr) {
+		$max = $mr->maxTotalCountAllowed ? $mr->maxTotalCountAllowed : self::DRY_RUN_MAX_RESULT_DEFAULT;
 		$scheduledtaskPlugin = self::getPluginByName('Kaltura_Client_ScheduledTask_Plugin');
-		return $scheduledtaskPlugin->scheduledTaskProfile->requestDryRun($mr->id);
+		return $scheduledtaskPlugin->scheduledTaskProfile->requestDryRun($mr->id, $max);
 	}
 
 	public static function getDryRunResult($dryRunId) {

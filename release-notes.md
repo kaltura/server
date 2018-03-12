@@ -1,3 +1,48 @@
+# Mercury 13.15.0 #
+
+## Entry added to category Firebase notification template ##
+- Issue Type: New Feature
+- Issue ID: PLAT-8645
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml
+
+## Update eSearch permissions ##
+
+- Issue Type: Task
+- Issue ID: PLAT-8618
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_28_update_esearch_permissions.php
+
+## Add new Drop Folder Type ##
+
+- Issue Type: New Feature
+- Issue ID: PSVAMB-2060
+
+### Configuration ###
+None. 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Taking a break with explicit-live feature breaks player playback ##
+
+- Issue Type: Support
+- Issue ID: PLAT-8554
+
+### Configuration ###
+None. 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_04_add_is_playable_user_configurations_KalturaLiveEntryServerNode.php
+
 # Mercury 13.14.0 #
 ## Add Parameters to Recorded Entry replaced EMAIL template ##
 

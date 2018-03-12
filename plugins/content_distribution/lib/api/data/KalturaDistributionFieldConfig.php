@@ -32,6 +32,11 @@ class KalturaDistributionFieldConfig extends KalturaObject
      * @var KalturaDistributionFieldRequiredStatus
      */
     public $isRequired;
+
+	/**
+	 * @var string
+	 */
+	public $type;
     
     /**
      * Trigger distribution update when this field changes or not ?
@@ -72,6 +77,7 @@ class KalturaDistributionFieldConfig extends KalturaObject
 		'updateOnChange',
 		'isDefault',
 		'triggerDeleteOnError',
+		'type',
 	);
 		 
 	public function getMapBetweenObjects()

@@ -19,10 +19,17 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	 */
 	public $recordingInfo;
 
+	/**
+	 * @var bool
+	 * @requiresPermission read,insert,update
+	 */
+	public $isPlayableUser;
+
 	private static $map_between_objects = array
 	(
 		"streams",
 		"recordingInfo",
+		"isPlayableUser",
 	);
 
 	/* (non-PHPdoc)
