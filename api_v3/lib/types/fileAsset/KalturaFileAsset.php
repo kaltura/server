@@ -165,7 +165,7 @@ class KalturaFileAsset extends KalturaObject implements IRelatedFilterable
 		if($peerType) {
 			$object = $peerType::retrieveByPK($this->objectId);
 			if (!$object)
-				throw new KalturaAPIException(APIErrors::INVALID_UI_CONF_ID, $this->objectId);
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->objectId);
 		}
 	}
 }
