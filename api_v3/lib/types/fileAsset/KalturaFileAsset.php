@@ -151,15 +151,21 @@ class KalturaFileAsset extends KalturaObject implements IRelatedFilterable
 	{
 		$this->validatePropertyNotNull('fileAssetObjectType');
 		$this->validatePropertyNotNull('objectId');
-		
+
+		$peerType=null;
+
 		switch($this->fileAssetObjectType)
 		{
 			case KalturaFileAssetObjectType::UI_CONF:
-				$uiConf = uiConfPeer::retrieveByPK($this->objectId);
-				if(!$uiConf)
-					throw new KalturaAPIException(APIErrors::INVALID_UI_CONF_ID, $this->objectId);
-					 
+				$peerType = uiConfPeer;
 				break;
+			case KalturaFileAssetObjectType::ENTRY:
+				$peerType = entryPeer;
+		}
+		if($peerType) {
+			$object = $peerType::retrieveByPK($this->objectId);
+			if (!$object)
+				throw new KalturaAPIException(APIErrors::INVALID_UI_CONF_ID, $this->objectId);
 		}
 	}
 }
