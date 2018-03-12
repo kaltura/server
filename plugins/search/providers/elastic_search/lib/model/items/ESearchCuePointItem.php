@@ -164,4 +164,10 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		return $cuePointRange;
 	}
 
+	protected static function getNestedSortOrder()
+	{
+		$nestedSortOrder = array(ESearchCuePointFieldName::START_TIME);
+		return $nestedSortOrder;
+	}
+
 }

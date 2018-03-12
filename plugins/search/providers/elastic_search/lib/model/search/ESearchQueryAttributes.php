@@ -66,6 +66,11 @@ class ESearchQueryAttributes
 	protected $nestedOperatorObjectTypes;
 
 	/**
+	 * @var array
+	 */
+	protected $nestedQuerySortOrder;
+
+	/**
 	 * @var ESearchQueryHighlightsAttributes
 	 */
 	private $queryHighlightsAttributes;
@@ -269,6 +274,22 @@ class ESearchQueryAttributes
 	public function setQueryFilterAttributes($queryFilterAttributes)
 	{
 		$this->queryFilterAttributes = $queryFilterAttributes;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getNestedQuerySortOrder()
+	{
+		return $this->nestedQuerySortOrder;
+	}
+
+	/**
+	 * @param array $nestedQuerySortOrder
+	 */
+	public function setNestedQuerySortOrder($nestedQuerySortOrder)
+	{
+		$this->nestedQuerySortOrder = $nestedQuerySortOrder;
 	}
 
 }

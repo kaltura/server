@@ -167,6 +167,7 @@ class KDLWrap
 					$gop 	= isset($trg->_video->_gop)? $trg->_video->_gop: null;
 					$duration = isset($trg->_container->_duration)? round($trg->_container->_duration/1000): null;;
 					$height = isset($trg->_video->_height)? $trg->_video->_height: null;
+					$msgStr = null;
 					$rv=KChunkedEncode::verifySupport($vcodec,$acodec,$format,$fps,$gop,$duration,$height,$msgStr);
 					if($rv===true){
 						$tmpTrans->_id=conversionEngineType::CHUNKED_FFMPEG;
