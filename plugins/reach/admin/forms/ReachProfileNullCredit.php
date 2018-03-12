@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_VendorProfileNullCredit extends Form_VendorProfileCredit
+class Form_ReachProfileNullCredit extends Form_ReachProfileCredit
 {
 	public function init()
 	{

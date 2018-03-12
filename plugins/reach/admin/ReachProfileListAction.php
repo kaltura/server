@@ -3,14 +3,14 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class VendorProfileListAction extends KalturaApplicationPlugin
+class ReachProfileListAction extends KalturaApplicationPlugin
 {
 	const ADMIN_CONSOLE_PARTNER = "-2";
 
 	public function __construct()
 	{
-		$this->action = 'VendorProfileListAction';
-		$this->label = "Vendor Profiles";
+		$this->action = 'ReachProfileListAction';
+		$this->label = "Reach Profiles";
 		$this->rootLabel = "Reach";
 	}
 
@@ -32,35 +32,35 @@ class VendorProfileListAction extends KalturaApplicationPlugin
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
 		// init filter
-		$vendorProfileFilter = new Kaltura_Client_Reach_Type_VendorProfileFilter();
-		$vendorProfileFilter->orderBy = "-createdAt";
+		$reachProfileFilter = new Kaltura_Client_Reach_Type_ReachProfileFilter();
+		$reachProfileFilter->orderBy = "-createdAt";
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->vendorProfile, "listAction", $partnerId, $vendorProfileFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->reachProfile, "listAction", $partnerId, $reachProfileFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 
 		// set view
-		$vendorProfileFilterForm = new Form_VendorProfileFilter();
-		$vendorProfileFilterForm->populate($request->getParams());
-		$vendorProfileFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
-		$vendorProfileFilterForm->setAction($vendorProfileFilterFormAction);
+		$reachProfileFilterForm = new Form_ReachProfileFilter();
+		$reachProfileFilterForm->populate($request->getParams());
+		$reachProfileFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
+		$reachProfileFilterForm->setAction($reachProfileFilterFormAction);
 
-		$action->view->filterForm = $vendorProfileFilterForm;
+		$action->view->filterForm = $reachProfileFilterForm;
 		$action->view->paginator = $paginator;
 
-		$createVendorProfileForm = new Form_CreateVendorProfile();
-		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'VendorProfileConfigure'), null, true);
-		$createVendorProfileForm->setAction($actionUrl);
+		$createReachProfileForm = new Form_CreateReachProfile();
+		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'ReachProfileConfigure'), null, true);
+		$createReachProfileForm->setAction($actionUrl);
 
 		if ($partnerId)
-			$createVendorProfileForm->getElement("newPartnerId")->setValue($partnerId);
+			$createReachProfileForm->getElement("newPartnerId")->setValue($partnerId);
 
-		$action->view->newVendorProfileFolderForm = $createVendorProfileForm;
+		$action->view->newReachProfileFolderForm = $createReachProfileForm;
 
 	}
 

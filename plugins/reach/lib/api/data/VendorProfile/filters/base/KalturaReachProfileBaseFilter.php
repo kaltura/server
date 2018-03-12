@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaVendorProfileBaseFilter extends KalturaRelatedFilter
+abstract class KalturaReachProfileBaseFilter extends KalturaRelatedFilter
 {
 	static private $map_between_objects = array
 	(
@@ -71,7 +71,7 @@ abstract class KalturaVendorProfileBaseFilter extends KalturaRelatedFilter
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * @var KalturaVendorProfileStatus
+	 * @var KalturaReachProfileStatus
 	 */
 	public $statusEqual;
 
@@ -81,7 +81,7 @@ abstract class KalturaVendorProfileBaseFilter extends KalturaRelatedFilter
 	public $statusIn;
 
 	/**
-	 * @var KalturaVendorProfileType
+	 * @var KalturaReachProfileType
 	 */
 	public $profileTypeEqual;
 

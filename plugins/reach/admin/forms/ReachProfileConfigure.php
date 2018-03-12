@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_VendorProfileConfigure extends ConfigureForm
+class Form_ReachProfileConfigure extends ConfigureForm
 {
 	protected $newPartnerId;
 	protected $disableAttributes;
@@ -19,7 +19,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 
 	public function init()
 	{
-		$this->setAttrib('id', 'frmVendorProfileConfigure');
+		$this->setAttrib('id', 'frmReachProfileConfigure');
 		$this->setMethod('post');
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
 		$titleElement->setLabel('General');
@@ -41,9 +41,9 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			'readonly'		=> 'true',
 		));
 
-		$profileType = new Kaltura_Form_Element_EnumSelect('profileType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorProfileType'));
+		$profileType = new Kaltura_Form_Element_EnumSelect('profileType', array('enum' => 'Kaltura_Client_Reach_Enum_ReachProfileType'));
 		$profileType->setLabel('Profile Type:');
-		$profileType->setValue(Kaltura_Client_Reach_Enum_VendorProfileType::FREE_TRIAL);
+		$profileType->setValue(Kaltura_Client_Reach_Enum_ReachProfileType::FREE_TRIAL);
 		$this->addElement($profileType);
 
 		$defaultSourceLanguageView = new Kaltura_Form_Element_EnumSelect('defaultSourceLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
@@ -124,19 +124,19 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		$element3 = new Infra_Form_Html ( 'place_holder3', array ('content' => '<span/>' ) );
 		$this->addElement ( $element3 );
 
-		$this->addDisplayGroup(array('place_holder3'), 'vendorProfileCredit', array(
+		$this->addDisplayGroup(array('place_holder3'), 'reachProfileCredit', array(
 			'legend' => 'Credit Configuration',
 		));
 
 		$this->addLine("Dictionaries Line");
-		$this->addTitle('Vendor Profile Dictionaries:');
+		$this->addTitle('Reach Profile Dictionaries:');
 		$this->addTitle('Max 1000 Characters per dictionary');
 
 		$dictionariesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$dictionariesSubForm ->addDecorator('ViewScript', array(
 			'viewScript' => 'dictionaries-sub-form.phtml',
 		));
-		$this->addSubForm($dictionariesSubForm , 'VendorProfileDictionaries_');
+		$this->addSubForm($dictionariesSubForm , 'ReachProfileDictionaries_');
 		$innerDictionariesSubForm = new Form_DictionariesSubForm ('Kaltura_Client_Reach_Type_Dictionary');
 		$this->addSubForm($innerDictionariesSubForm , "DictionaryTemplate");
 
@@ -147,7 +147,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 	private function addRulesSection()
 	{
 		$this->addLine("3");
-		$this->addTitle('Vendor Profile Rules:');
+		$this->addTitle('Reach Profile Rules:');
 
 		$options = self::$rulesMap;
 		$this->addSelectElement("ruleType", $options);
@@ -157,14 +157,14 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			'viewScript' => 'rules-sub-form.phtml',
 		));
 
-		$this->addSubForm($ruleSubForm, 'VendorProfileRules_');
+		$this->addSubForm($ruleSubForm, 'ReachProfileRules_');
 
 	}
 	private function addRulesTemplate()
 	{
 		foreach(self::$rulesMap as $name => $class) {
 			$ruleSubForm = new Form_RulesSubForm($name);
-			$this->addSubForm($ruleSubForm, "vendorProfileRuleTemplate_" . $class);
+			$this->addSubForm($ruleSubForm, "reachProfileRuleTemplate_" . $class);
 		}
 	}
 
@@ -190,7 +190,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 
 		$this->populateDictionaries($object);
 		$this->populateRules($object);
-		$this->getSubForm("vendorProfileCredit")->populateFromObject($object->credit);
+		$this->getSubForm("reachProfileCredit")->populateFromObject($object->credit);
 
 	}
 
@@ -205,7 +205,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 			$dictionaries[] = $newDictionary;
 		}
 		if (!empty($dictionaries))
-			$this->setDefault('VendorProfileDictionaries',  json_encode($dictionaries));
+			$this->setDefault('ReachProfileDictionaries',  json_encode($dictionaries));
 	}
 
 	private function populateRules($object)
@@ -220,7 +220,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 				$rules[] = $newRule;
 			}
 		}
-		$this->setDefault('VendorProfileRules',  json_encode($rules));
+		$this->setDefault('ReachProfileRules',  json_encode($rules));
 	}
 
 	private function createAutomaticRule($rule, $ruleType)
@@ -241,7 +241,7 @@ class Form_VendorProfileConfigure extends ConfigureForm
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
 
-		$rules = $properties['VendorProfileRules'];
+		$rules = $properties['ReachProfileRules'];
 		foreach (json_decode($rules) as $rule)
 		{
 			switch(array_search($rule->ruleType, self::$rulesMap))
@@ -251,13 +251,13 @@ class Form_VendorProfileConfigure extends ConfigureForm
 						$action = new Kaltura_Client_Reach_Type_AddEntryVendorTaskAction();
 						$action->catalogItemIds = $rule->catalogItemIds;
 						$description = ( empty($rule->description) || $rule->description == self::ADMIN_CONSOLE_RULE_PREFIX) ? (self::ADMIN_CONSOLE_RULE_PREFIX . mt_rand(100000, 999999)) : $rule->description ;
-						$rulesArray[] = $this->getVendorProfileRule(array($action), $description);
+						$rulesArray[] = $this->getReachProfileRule(array($action), $description);
 				}
 			}
 		}
 
 		$object->rules = $rulesArray;
-		$dictionaries = $properties['VendorProfileDictionaries'];
+		$dictionaries = $properties['ReachProfileDictionaries'];
 		$dictionariesArray = array();
 		foreach (json_decode($dictionaries) as $dictionary)
 		{
@@ -268,11 +268,11 @@ class Form_VendorProfileConfigure extends ConfigureForm
 		}
 		$object->dictionaries = $dictionariesArray;
 
-		$object->credit = $this->getSubForm("vendorProfileCredit")->getObject($properties["vendorProfileCredit"]);
+		$object->credit = $this->getSubForm("reachProfileCredit")->getObject($properties["reachProfileCredit"]);
 		return $object;
 	}
 
-	public function getVendorProfileRule($actions, $description = null)
+	public function getReachProfileRule($actions, $description = null)
 	{
 		$rule = new Kaltura_Client_Type_Rule();
 		$rule->actions = $actions;
@@ -283,16 +283,16 @@ class Form_VendorProfileConfigure extends ConfigureForm
 
 	/**
 	 * Set to null all the attributes that shouldn't be updated
-	 * @param Kaltura_Client_Reach_Type_VendorProfile $vendorProfile
+	 * @param Kaltura_Client_Reach_Type_ReachProfile $reachProfile
 	 */
-	public function resetUnUpdatebleAttributes(Kaltura_Client_Reach_Type_VendorProfile $vendorProfile)
+	public function resetUnUpdatebleAttributes(Kaltura_Client_Reach_Type_ReachProfile $reachProfile)
 	{
 		// reset readonly attributes
-		$vendorProfile->id = null;
-		$vendorProfile->partnerId = null;
-		$vendorProfile->createdAt = null;
-		$vendorProfile->updatedAt = null;
-		$vendorProfile->VendorProfileRules = null;
-		$vendorProfile->VendorProfileDictionaries = null;
+		$reachProfile->id = null;
+		$reachProfile->partnerId = null;
+		$reachProfile->createdAt = null;
+		$reachProfile->updatedAt = null;
+		$reachProfile->ReachProfileRules = null;
+		$reachProfile->ReachProfileDictionaries = null;
 	}
 }

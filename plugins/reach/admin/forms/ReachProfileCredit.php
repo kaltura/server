@@ -3,12 +3,12 @@
  * @package Admin
  * @subpackage Reach
  */
-class Form_VendorProfileCredit extends Zend_Form_SubForm
+class Form_ReachProfileCredit extends Zend_Form_SubForm
 {
 	public function init()
 	{
  		$this->setLegend("Credit Configuration");
- 		$this->setName("vendorProfileCredit");
+ 		$this->setName("reachProfileCredit");
  		$this->addElement('select', 'objectType', array(
 		'label'			=> 'Credit type: (Mandatory) ',
 		'filters'		=> array('StringTrim'),

@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class VendorProfileCreditConfigureAction extends VendorProfileConfigureAction
+class ReachProfileCreditConfigureAction extends ReachProfileConfigureAction
 {
 	/**
 	 * @return string - absolute file path of the phtml template
@@ -19,10 +19,10 @@ class VendorProfileCreditConfigureAction extends VendorProfileConfigureAction
 		$type = $action->getRequest()->getParam('creditHandlerClass');
 		$form = $this->getCreditHandlerForm($type);
 		if(is_null($form))
-			throw new Exception("Can't instantiate vendor profile credit form of type $form");
+			throw new Exception("Can't instantiate reach profile credit form of type $form");
 
 		$action->view->form = $form;
-		$action->view->form->updateCreditOptions($this->getVendorProfileCreditClasses($action));
+		$action->view->form->updateCreditOptions($this->getReachProfileCreditClasses($action));
 		$action->view->form->getElement("objectType")->setValue($type);
 	}
 }

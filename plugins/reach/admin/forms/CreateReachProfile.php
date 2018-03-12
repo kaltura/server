@@ -3,11 +3,11 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_CreateVendorProfile extends Infra_Form
+class Form_CreateReachProfile extends Infra_Form
 {
 	public function init()
 	{
-		$this->setAttrib('id', 'frmCreateVendorProfile');
+		$this->setAttrib('id', 'frmCreateReachProfile');
 		$this->setDecorators(array(
 			'FormElements',
 			array('HtmlTag', array('tag' => 'fieldset')),
@@ -20,10 +20,10 @@ class Form_CreateVendorProfile extends Infra_Form
 		));
 
 		// submit button
-		$this->addElement('button', 'newVendorProfile', array(
+		$this->addElement('button', 'newReachProfile', array(
 			'ignore' => true,
 			'label' => 'Create New',
-			'onclick' => "addVendorProfile($('#newPartnerId').val())",
+			'onclick' => "addReachProfile($('#newPartnerId').val())",
 			'decorators' => array('ViewHelper'),
 		));
 	}

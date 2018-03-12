@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class Form_VendorProfileFilter extends Form_PartnerIdFilter
+class Form_ReachProfileFilter extends Form_PartnerIdFilter
 {
 	public function init()
 	{

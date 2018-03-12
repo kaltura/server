@@ -1902,11 +1902,11 @@ form#frmCreateCatalogItem dd,form#frmCreateCatalogItem dt {
 	float: left;
 }
 
-form#frmCreateVendorProfile {
+form#frmCreateReachProfile {
 	margin-left: 20px;
 }
 
-form#frmCreateVendorProfile dd,form#frmCreateVendorProfile dt {
+form#frmCreateReachProfile dd,form#frmCreateReachProfile dt {
 	float: left;
 }
 
@@ -1992,23 +1992,23 @@ form#frmCreateVendorProfile dd,form#frmCreateVendorProfile dt {
 	padding: 1px;
 }
 
-#vendor-profile-configure-dialog {
+#reach-profile-configure-dialog {
 	padding-top: 10px;
 }
 
-#vendor-profile-configure-dialog label {
+#reach-profile-configure-dialog label {
 	padding: 0;
 }
 
-#vendor-profile-configure-dialog dl {
+#reach-profile-configure-dialog dl {
 	margin-top: 15px;
 }
 
-#vendor-profile-configure-dialog b {
+#reach-profile-configure-dialog b {
 	display: block;
 }
 
-#vendor-profile-configure-dialog dl p {
+#reach-profile-configure-dialog dl p {
 	width: 333px;
 	padding: 3px;
 	margin-top: 5px;
@@ -2016,20 +2016,20 @@ form#frmCreateVendorProfile dd,form#frmCreateVendorProfile dt {
 	background: #f0f0f0;
 }
 
-#vendor-profile-configure-dialog dt {
+#reach-profile-configure-dialog dt {
 	margin: 10px 0 5px;
 }
 
-#vendor-profile-configure-dialog dd input {
+#reach-profile-configure-dialog dd input {
 	width: 333px;
 	height: 22px;
 }
 
-#vendor-profile-configure-dialog dd input#max_bulk_size {
+#reach-profile-configure-dialog dd input#max_bulk_size {
 	width: 150px;
 }
 
-#vendor-profile-configure-dialog select {
+#reach-profile-configure-dialog select {
 	min-width: 338px;
 	height: 24px;
 	padding: 1px;
