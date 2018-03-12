@@ -155,8 +155,17 @@ class IndexGeneratorBase
 		foreach($indexComplex->children() as $indexValue) {
 			$idxValueAttr = $indexValue->attributes();
 			$fieldName = $idxValueAttr["field"];
+			echo __FUNCTION__ . " fieldName = $fieldName\n";
 			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
-				"get" . ucwords(preg_replace_callback("/_(.?)/", function($matches) { foreach($matches as $match){ return strtoupper($match); }}, $fieldName));
+				"get" . ucwords(preg_replace_callback("/_(.?)/",
+					function($matches)
+					{
+						foreach($matches as $match)
+						{
+							return strtoupper(ltrim($match, "_"));
+						}
+					},
+					$fieldName));
 			if(strpos($fieldName, ".") === FALSE)
 				$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
 			

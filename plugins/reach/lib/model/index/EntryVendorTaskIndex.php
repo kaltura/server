@@ -57,7 +57,9 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'catalog_item_id' => 'catalogItemId',
 				'vendor_profile_id' => 'vendorProfileId',
 				'kuser_id' => 'kuserId',
+				'user_id' => 'userId',
 				'context' => 'context',
+				'notes' => 'notes',
 			);
 		}
 		return self::$fieldsMap;
@@ -83,7 +85,9 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'catalog_item_id' => IIndexable::FIELD_TYPE_STRING,
 				'vendor_profile_id' => IIndexable::FIELD_TYPE_STRING,
 				'kuser_id' => IIndexable::FIELD_TYPE_STRING,
+				'user_id' => IIndexable::FIELD_TYPE_STRING,
 				'context' => IIndexable::FIELD_TYPE_STRING,
+				'notes' => IIndexable::FIELD_TYPE_STRING,
 				'catalog_item_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
@@ -122,7 +126,9 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'entry_vendor_task.CATALOG_ITEM_ID' => 'catalog_item_id',
 				'entry_vendor_task.VENDOR_PROFILE_ID' => 'vendor_profile_id',
 				'entry_vendor_task.KUSER_ID' => 'kuser_id',
+				'entry_vendor_task.USER_ID' => 'user_id',
 				'entry_vendor_task.CONTEXT' => 'context',
+				'entry_vendor_task.NOTES' => 'notes',
 				'entry_vendor_task.CATALOG_ITEM_DATA' => 'catalog_item_data',
 			);
 		}
@@ -164,7 +170,9 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				"catalog_item_id",
 				"vendor_profile_id",
 				"kuser_id",
+				"user_id",
 				"context",
+				"notes",
 			);
 		}
 		return self::$matchableFields;
