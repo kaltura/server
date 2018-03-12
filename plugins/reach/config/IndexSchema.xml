@@ -10,7 +10,7 @@
 		<field name="vendor_partner_id"  indexName="vendor_partner_id"  type="string"   matchable="yes"/>
 		<field name="entry_id"           indexName="entry_id"           type="string"   skipField="yes" />
 		<field name="status"             indexName="task_status"        type="int"      orderable="yes"	getter="status" />
-		<field name="price"              indexName="price"              type="int" />
+		<field name="price"              indexName="price"              type="int"      orderable="yes" />
 		<field name="catalog_item_id"    indexName="catalog_item_id"    type="string"   matchable="yes" />
 		<field name="vendor_profile_id"  indexName="vendor_profile_id"  type="string"   matchable="yes" />
 		<field name="kuser_id"           indexName="kuser_id"           type="string"   matchable="yes"/>

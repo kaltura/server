@@ -191,6 +191,7 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'entry_vendor_task.QUEUE_TIME' => 'queue_time',
 				'entry_vendor_task.FINISH_TIME' => 'finish_time',
 				'entry_vendor_task.STATUS' => 'task_status',
+				'entry_vendor_task.PRICE' => 'price',
 			);
 		}
 		return self::$orderFields;
