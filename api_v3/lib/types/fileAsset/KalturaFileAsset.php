@@ -161,6 +161,7 @@ class KalturaFileAsset extends KalturaObject implements IRelatedFilterable
 				break;
 			case KalturaFileAssetObjectType::ENTRY:
 				$peerType = entryPeer;
+				break;
 		}
 		if($peerType) {
 			$object = $peerType::retrieveByPK($this->objectId);
