@@ -72,7 +72,6 @@ class KDLFlavor extends KDLMediaDataSet {
 		parent::__construct();
 	}
 	public function __destruct() {
-		unset($this);
 	}
 	public function __clone() {
 		if(!is_null($this->_container)) $this->_container = clone $this->_container;
