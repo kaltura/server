@@ -467,7 +467,9 @@ index kaltura_entry_vendor_task:kaltura_base
 	rt_field	         = catalog_item_id
 	rt_field             = vendor_profile_id
 	rt_field             = kuser_id
+	rt_field             = user_id
 	rt_field	         = context
+	rt_field             = notes
 	rt_field             = catalog_item_data
 }
 

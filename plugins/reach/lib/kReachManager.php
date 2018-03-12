@@ -20,7 +20,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if($object instanceof EntryVendorTask)
+		if($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 		
 		return false;
@@ -73,11 +73,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectCreated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		/* @var $object EntryVendorTask */
-		$object->indexToSearchIndex();
-		
-		if($object->getStatus() == EntryVendorTaskStatus::PENDING)
-			$this->updateVendorProfileCreditUsage($object);
+		$this->updateVendorProfileCreditUsage($object);
 		return true;
 	}
 	

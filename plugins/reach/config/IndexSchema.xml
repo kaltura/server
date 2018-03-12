@@ -14,7 +14,9 @@
 		<field name="catalog_item_id"    indexName="catalog_item_id"    type="string"   matchable="yes" />
 		<field name="vendor_profile_id"  indexName="vendor_profile_id"  type="string"   matchable="yes" />
 		<field name="kuser_id"           indexName="kuser_id"           type="string"   matchable="yes"/>
+		<field name="user_id"            indexName="user_id"            type="string"   matchable="yes"/>
 		<field name="context"            indexName="context"            type="string"   matchable="yes" />
+		<field name="notes"              indexName="notes"              type="string"   matchable="yes" />
 		<field name="catalog_item_data"  indexName="catalog_item_data"  type="string"   searchableonly="yes" />
 	</object>
 </schema>

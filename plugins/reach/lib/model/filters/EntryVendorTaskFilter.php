@@ -5,6 +5,8 @@
  */
 class EntryVendorTaskFilter extends baseObjectFilter
 {
+	const FREE_TEXT_FIELDS = 'user_id,notes';
+	
 	public function init ()
 	{
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
@@ -34,6 +36,7 @@ class EntryVendorTaskFilter extends baseObjectFilter
 			"_gte_finish_time",
 			"_lte_queue_time",
 			"_gte_queue_time",
+			"_free_text",
 		) , NULL );
 
 		$this->allowed_order_fields = array (

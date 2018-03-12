@@ -5,9 +5,15 @@
  */
 class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 {
+	/**
+	 * @var string
+	 */
+	public $freeText;
+	
 	static private $map_between_objects = array
 	(
 		"userIdEqual" => "_eq_kuser_id",
+		"freeText" => "_free_text",
 	);
 	
 	public function getMapBetweenObjects()

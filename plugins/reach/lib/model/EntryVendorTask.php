@@ -205,4 +205,10 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 	
+	public function postSave(PropelPDO $con = null)
+	{
+		parent::postSave($con);
+		$this->indexToSearchIndex();
+	}
+	
 } // EntryVendorTask

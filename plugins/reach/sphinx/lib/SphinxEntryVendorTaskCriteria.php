@@ -26,14 +26,13 @@ class SphinxEntryVendorTaskCriteria extends SphinxCriteria
 	{
 		/* @var $filter EntryVendorTaskFilter */
 		
-		if($filter->get('_eq_user_id'))
+		if($filter->get('_free_text'))
 		{
 			$this->sphinxSkipped = false;
-			$kuserId = $filter->get('_eq_user_id');
-			
-			$this->addAnd(CuePointPeer::IS_PUBLIC, CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId()).$isPublic, Criteria::EQUAL);
+			$freeTexts = $filter->get('_free_text');
+			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, EntryVendorTaskFilter::FREE_TEXT_FIELDS);
 		}
-		$filter->unsetByName('_eq_is_public');
+		$filter->unsetByName('_free_text');
 		
 		return parent::applyFilterFields($filter);
 	}
@@ -41,10 +40,5 @@ class SphinxEntryVendorTaskCriteria extends SphinxCriteria
 	public function getTranslateIndexId($id)
 	{
 		return $id;
-	}
-
-	private function buildMd5String($str)
-	{
-		return mySearchUtils::getMd5EncodedString($str);
 	}
 }
