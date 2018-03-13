@@ -15,4 +15,6 @@ class KalturaScheduledTaskErrors extends KalturaErrors
 	const DRY_RUN_NOT_READY = "DRY_RUN_NOT_READY;;Dry run results are not ready yet";
 
 	const DRY_RUN_FAILED = "DRY_RUN_FAILED;;Dry run execution has failed";
+
+	const DRY_RUN_PAGGIN_ONLY_SUPPORTED_IN_NEW_VERSION = "Dry run pagging only supported in new version of dry runs";
 }

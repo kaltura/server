@@ -5,10 +5,16 @@
  */
 class kScheduledTaskJobData extends kJobData
 {
+
 	/**
 	 * @var int
 	 */
 	private $_maxResults;
+
+	/**
+	 * @var bool
+	 */
+	private $_isNewFormat;
 
 	/**
 	 * @var string
@@ -19,6 +25,15 @@ class kScheduledTaskJobData extends kJobData
 	 * @var int
 	 */
 	private $_referenceTime;
+
+	/**
+	 * kScheduledTaskJobData constructor.
+	 */
+	public function __construct()
+	{
+		$this->_isNewFormat = false;
+		$this->_maxResults = 0;
+	}
 
 	/**
 	 * @param int $maxResults
@@ -66,5 +81,13 @@ class kScheduledTaskJobData extends kJobData
 	public function getReferenceTime()
 	{
 		return $this->_referenceTime;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getIsNewFormat()
+	{
+		return $this->_isNewFormat;
 	}
 }

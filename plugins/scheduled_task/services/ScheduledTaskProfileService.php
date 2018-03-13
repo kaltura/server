@@ -177,15 +177,39 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	}
 
 	/**
-	 *
-	 *
 	 * @action getDryRunResults
 	 * @param int $requestId
 	 * @return KalturaObjectListResponse
-	 *
-	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
+	 * @throws KalturaAPIException
 	 */
-	public function getDryRunResultsAction($requestId)
+	public function getDryRunResultsAction($requestId, KalturaFilterPager $pager = null)
+	{
+		$batchJob = $this->getScheduledTaskBatchJob($requestId);
+		/* @var $jobData kScheduledTaskJobData */
+		$jobData = $batchJob->getData();
+		if($jobData->getIsNewFormat)
+		{
+			return getDryRunResultsNewFormat($jobData, $pager);
+		}
+
+		if($pager)
+		{
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_PAGGIN_ONLY_SUPPORTED_IN_NEW_VERSION);
+		}
+
+		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+		$data = kFileSyncUtils::file_get_contents($syncKey, true);
+		$results = unserialize($data);
+		return $results;
+	}
+
+	/**
+	 * @action getDryRunResults
+	 * @param int $requestId
+	 * @return BatchJob
+	 * @throws KalturaAPIException
+	 */
+	private function getScheduledTaskBatchJob($requestId)
 	{
 		$this->applyPartnerFilterForClass('BatchJob');
 		$batchJob = BatchJobPeer::retrieveByPK($requestId);
@@ -199,10 +223,12 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		if ($batchJob->getStatus() != KalturaBatchJobStatus::FINISHED)
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_NOT_READY);
 
-		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
-		$data = kFileSyncUtils::file_get_contents($syncKey, true);
-		$results = unserialize($data);
-		return $results;
+		return $batchJob;
+	}
+
+	private function getDryRunResultsNewFormat($jobData, KalturaFilterPager $pager)
+	{
+
 	}
 
 	/**
@@ -222,7 +248,6 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$batchJob->setObjectId($scheduledTaskProfileId);
 		$batchJob->setObjectType($objectType);
 		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
-
 		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType);
 
 		return $batchJob;

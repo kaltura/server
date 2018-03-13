@@ -46,27 +46,23 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
-
-		$response = new KalturaObjectListResponse();
-		$response->objects = array();
-		$response->totalCount = 0;
 		$resultsCount = 0;
+		$client = $this->getClient();
+		$ks = $this->createKs($client, $jobData);
+		$client->setKs($ks);
+		$this->impersonate($scheduledTaskProfile->partnerId);
 		while(true)
 		{
-			$client = $this->getClient();
-			$ks = $this->createKs($client, $jobData);
-			$client->setKs($ks);
-			$this->impersonate($scheduledTaskProfile->partnerId);
 			try
 			{
 				$results = ScheduledTaskBatchHelper::query($client, $scheduledTaskProfile, $pager);
-				$this->unimpersonate();
 			}
 			catch(Exception $ex)
 			{
 				$this->unimpersonate();
 				throw $ex;
 			}
+
 			if (!count($results->objects))
 				break;
 

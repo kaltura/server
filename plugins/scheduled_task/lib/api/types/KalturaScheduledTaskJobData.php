@@ -12,6 +12,11 @@ class KalturaScheduledTaskJobData extends KalturaJobData
 	public $maxResults;
 
 	/**
+	 * @var int
+	 */
+	public $totalCount;
+
+	/**
 	 * @var string
 	 */
 	public $resultsFilePath;
