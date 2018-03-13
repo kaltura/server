@@ -129,7 +129,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$dropFolderServiceTypes = $this->dropFolder->webexServiceType ? explode(',', $this->dropFolder->webexServiceType) :
 			array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 		KalturaLog::info("Fetching list of recordings from Webex, startTime [$startTime], endTime [$endTime] of types ".print_r($dropFolderServiceTypes));
-		$serviceTypes = $this->webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
+		$serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
 		$result = $this->webexWrapper->listRecordings($serviceTypes, $startTime, $endTime, $startFrom);
 		$recording = $result->getRecording();
 		KalturaLog::info('Recordings fetched: '.print_r($recording, true) );
