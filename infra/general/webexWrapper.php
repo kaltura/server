@@ -96,21 +96,6 @@ class webexWrapper
 		$this->log($this->debugLogger, $str);
 	}
 
-	/**
-	 * @param string[] $stringServiceTypes
-	 * @return WebexXmlArray
-	 */
-	private function stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes)
-	{
-		$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
-		foreach($stringServiceTypes as $serviceType)
-		{
-			$servicesTypes[] = new WebexXmlComServiceTypeType($serviceType);
-		}
-
-		return $servicesTypes;
-	}
-
 	private function getTimeScope($startTime, $endTime)
 	{
 		$createTimeScope = new WebexXmlEpCreateTimeScopeType();
@@ -123,6 +108,21 @@ class webexWrapper
 
 	/**
 	 * @param string[] $stringServiceTypes
+	 * @return WebexXmlArray
+	 */
+	public static function stringServicesTypesToWebexXmlArray($stringServiceTypes)
+	{
+		$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
+		foreach($stringServiceTypes as $serviceType)
+		{
+			$servicesTypes[] = new WebexXmlComServiceTypeType($serviceType);
+		}
+
+		return $servicesTypes;
+	}
+
+	/**
+	 * @param WebexXmlArray $serviceTypes
 	 * @param long $startTime
 	 * @param long $endTime
 	 * @param int $startFrom
@@ -130,9 +130,9 @@ class webexWrapper
 	 * @return WebexXmlListRecording
 	 * @throws Exception
 	 */
-	public function listRecordings ($stringServiceTypes, $startTime = null, $endTime = null, $startFrom = 1, $maximumNum = 500)
+	public function listRecordings ($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $maximumNum = 500)
 	{
-		$listRecordingRequest = $this->initListRecordingRequest($stringServiceTypes, $maximumNum, $startTime, $endTime, $startFrom);
+		$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, $maximumNum, $startTime, $endTime, $startFrom);
 		try
 		{
 			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
