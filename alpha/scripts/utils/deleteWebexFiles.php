@@ -31,5 +31,6 @@ $webexWrapper = new webexWrapper('https://roche.webex.com/WBXService/XMLService'
 $createTimeStart = date('m/j/Y H:i:s', $startTime);
 $createTimeEnd  = date('m/j/Y H:i:s', $endTime);
 scriptLogger::logScript('Starting to delete webex files.');
-$webexWrapper->deleteRecordingsByDates(array(WebexXmlComServiceTypeType::_MEETINGCENTER), $createTimeStart, $createTimeEnd);
+$serviceTypes = $webexWrapper::stringServicesTypesToWebexXmlArray(array(WebexXmlComServiceTypeType::_MEETINGCENTER));
+$webexWrapper->deleteRecordingsByDates($serviceTypes, $createTimeStart, $createTimeEnd);
 

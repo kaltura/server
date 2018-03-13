@@ -2,7 +2,7 @@
 /**
  * 
  */
-class KWebexDropFolderEngine extends KDropFolderEngine 
+class KWebexDropFolderEngine extends KDropFolderEngine
 {
 	const ZERO_DATE = '12/31/1971 00:00:01';
 	
@@ -129,7 +129,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$dropFolderServiceTypes = $this->dropFolder->webexServiceType ? explode(',', $this->dropFolder->webexServiceType) :
 			array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 		KalturaLog::info("Fetching list of recordings from Webex, startTime [$startTime], endTime [$endTime] of types ".print_r($dropFolderServiceTypes));
-		$result = $this->webexWrapper->listRecordings($dropFolderServiceTypes, $startTime, $endTime, $startFrom);
+		$serviceTypes = $this->webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
+		$result = $this->webexWrapper->listRecordings($serviceTypes, $startTime, $endTime, $startFrom);
 		$recording = $result->getRecording();
 		KalturaLog::info('Recordings fetched: '.print_r($recording, true) );
 		return $result;

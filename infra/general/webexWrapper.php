@@ -55,18 +55,18 @@ class webexWrapper
 
 	/**
 	 * @param $stringServiceTypes
-	 * @param $maximumNum
+	 * @param $pageSize
 	 * @param $startTime
 	 * @param $endTime
 	 * @param $startFrom
 	 * @return WebexXmlListRecordingRequest
 	 */
-	private function initListRecordingRequest($stringServiceTypes, $maximumNum, $startTime, $endTime, $startFrom)
+	private function initListRecordingRequest($stringServiceTypes, $pageSize, $startTime, $endTime, $startFrom)
 	{
 		$listRecordingRequest = new WebexXmlListRecordingRequest();
 		$listControl = new WebexXmlEpListControlType();
 		$listControl->setStartFrom($startFrom);
-		$listControl->setMaximumNum($maximumNum);
+		$listControl->setMaximumNum($pageSize);
 		$listRecordingRequest->setListControl($listControl);
 		$servicesTypes = $this->stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes);
 		$listRecordingRequest->setServiceTypes($servicesTypes);
@@ -126,13 +126,13 @@ class webexWrapper
 	 * @param long $startTime
 	 * @param long $endTime
 	 * @param int $startFrom
-	 * @param int $maximumNum
+	 * @param int $pageSize
 	 * @return WebexXmlListRecording
 	 * @throws Exception
 	 */
-	public function listRecordings ($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $maximumNum = 500)
+	public function listRecordings ($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $pageSize = 500)
 	{
-		$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, $maximumNum, $startTime, $endTime, $startFrom);
+		$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom);
 		try
 		{
 			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
@@ -225,15 +225,14 @@ class webexWrapper
 
 	/**
 	 * @param string $recordName
-	 * @param string $stringServiceTypes
+	 * @param WebexXmlArray $serviceTypes
 	 * @throws Exception
 	 */
-    public function deleteRecordByName($recordName, $stringServiceTypes)
+    public function deleteRecordByName($recordName, $serviceTypes)
 	{
 		$listRecordingRequest = new WebexXmlListRecordingRequest();
 		$listRecordingRequest->setRecordName($recordName);
-		$servicesTypes = $this->stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes);
-		$listRecordingRequest->setServiceTypes($servicesTypes);
+		$listRecordingRequest->setServiceTypes($serviceTypes);
 		try
 		{
 			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
@@ -259,14 +258,14 @@ class webexWrapper
 	}
 
 	/**
-	 * @param string[] $stringServiceTypes
+	 * @param WebexXmlArray $serviceTypes
 	 * @param long $startTime
 	 * @param long $endTime
 	 * @throws Exception
 	 */
-	public function deleteRecordingsByDates ($stringServiceTypes, $startTime = null, $endTime = null)
+	public function deleteRecordingsByDates($serviceTypes, $startTime = null, $endTime = null)
 	{
-		$result = $this->listRecordings($stringServiceTypes, $startTime, $endTime);
+		$result = $this->listRecordings($serviceTypes, $startTime, $endTime);
 		$count = 0;
 		$faultCounter = 0;
 		while($result)
@@ -287,7 +286,7 @@ class webexWrapper
 				}
 			}
 
-			$result = $this->listRecordings($stringServiceTypes, $startTime, $endTime, $faultCounter+webexWrapper::START_INDEX_OFFSET);
+			$result = $this->listRecordings($serviceTypes, $startTime, $endTime, $faultCounter+webexWrapper::START_INDEX_OFFSET);
 		}
 	}
 }
