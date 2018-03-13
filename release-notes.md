@@ -7,6 +7,7 @@
 ### Configuration ###
 	- copy "index kaltura_entry_vendor_task:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template to /opt/kaltura/app/configurations/sphinx/kaltura.conf modifiy path to appropriate directory.
 	- restart sphinx service
+	- Add the following to plugins.ini: Reach, EntryVendorTaskSphinx
 
 ### Deployment scripts ###
 	

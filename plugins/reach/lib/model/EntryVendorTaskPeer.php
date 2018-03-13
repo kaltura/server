@@ -66,7 +66,7 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		if($c instanceof KalturaCriteria)
 		{
 			$c->applyFilters();
-			$criteria->setRecordsCount($c->getRecordsCount());
+			$c->setRecordsCount($c->getRecordsCount());
 		}
 		
 		return parent::doSelect($c, $con);
