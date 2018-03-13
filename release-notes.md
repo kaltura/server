@@ -36,6 +36,7 @@
     		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_rejected_moderation.template.xml
     		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_75_percent.template.xml
     		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_90_percent.template.xml
+    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_100_percent.template.xml
 		
 		Run deployment script:
 			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_notifications.php

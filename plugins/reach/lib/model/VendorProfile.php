@@ -342,7 +342,7 @@ class VendorProfile extends BaseVendorProfile
 	
 	public function syncCreditPercentageUsage()
 	{
-		$currentCredit = $this->getCredit()->getCurrentCredit();
+		$currentCredit = $this->getCredit()->getCurrentCredit(false);
 		$creditUsagePercentage = ($currentCredit == VendorProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
 		
 		if($currentCredit != 0 && $currentCredit != VendorProfileCreditValues::UNLIMITED_CREDIT)
