@@ -913,7 +913,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$isQuiz = self::getQuizData($entry);
 		if (!is_null($isQuiz))
 		{
-			$quizData['is_quiz'] = 1;
+			$quizData['is_quiz'] = true;
 		}
 
 		return $quizData;
