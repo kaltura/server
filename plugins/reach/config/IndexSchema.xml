@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema>
+	<object name="EntryVendorTask"       indexId="int_id" id="ID" >
+		<field name="id"                 indexName="int_id"             type="bint"     orderable="yes" skipField="yes"  />
+		<field name="created_at"         indexName="created_at"         type="datetime" orderable="yes" />
+		<field name="updated_at"         indexName="updated_at"         type="datetime" orderable="yes" />
+		<field name="queue_time"         indexName="queue_time"         type="datetime" orderable="yes" />
+		<field name="finish_time"        indexName="finish_time"        type="datetime" orderable="yes" />
+		<field name="partner_id"         indexName="partner_id"         type="bint"     keepCondition="yes" />
+		<field name="vendor_partner_id"  indexName="vendor_partner_id"  type="string"   matchable="yes"/>
+		<field name="entry_id"           indexName="entry_id"           type="string"   skipField="yes" />
+		<field name="status"             indexName="task_status"        type="int"      orderable="yes"	getter="status" />
+		<field name="price"              indexName="price"              type="int"      orderable="yes" />
+		<field name="catalog_item_id"    indexName="catalog_item_id"    type="string"   matchable="yes" />
+		<field name="vendor_profile_id"  indexName="vendor_profile_id"  type="string"   matchable="yes" />
+		<field name="kuser_id"           indexName="kuser_id"           type="string"   matchable="yes"/>
+		<field name="user_id"            indexName="user_id"            type="string"   matchable="yes"/>
+		<field name="context"            indexName="context"            type="string"   matchable="yes" />
+		<field name="notes"              indexName="notes"              type="string"   matchable="yes" />
+		<field name="catalog_item_data"  indexName="catalog_item_data"  type="string"   searchableonly="yes" />
+	</object>
+</schema>

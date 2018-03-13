@@ -13,7 +13,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
+class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIndexable
 {
 	const CUSTOM_DATA_NOTES = 				'notes';
 	const CUSTOM_DATA_ACCESS_KEY = 			'access_key';
@@ -155,6 +155,60 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject
 	public function getKuser()
 	{
 		return kuserPeer::retrieveByPk($this->kuser_id);
+	}
+	
+	// IIndexable interface implantation 
+	
+	/**
+	 * Is the id as used and know by the indexing server
+	 * @return int
+	 */
+	public function getIntId()
+	{
+		return $this->getId();
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getEntryId()
+	{
+		return parent::getEntryId();
+	}
+	
+	/**
+	 * This function returns the index object name (the one responsible for the sphinx mapping)
+	 */
+	public function getIndexObjectName() 
+	{
+		return "EntryVendorTaskIndex";
+	}
+	
+	/**
+	 * @param int $time
+	 * @return IIndexable
+	 */
+	public function setUpdatedAt($time)
+	{
+		parent::setUpdatedAt($time);
+		if(!in_array(entryPeer::UPDATED_AT, $this->modifiedColumns, false))
+			$this->modifiedColumns[] = entryPeer::UPDATED_AT;
+		
+		return $this;
+	}
+	
+	/**
+	 * Index the object in the search engine
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	public function postSave(PropelPDO $con = null)
+	{
+		parent::postSave($con);
+		$this->indexToSearchIndex();
 	}
 	
 } // EntryVendorTask

@@ -289,6 +289,12 @@ index kaltura_schedule_event:kaltura_base
 	@FIELDS_PLACEHOLDER-kaltura_schedule_event@
 }
 
+index kaltura_entry_vendor_task:kaltura_base
+{
+	path	 = @BASE_DIR@/sphinx/kaltura_entry_vendor_task_rt
+	@FIELDS_PLACEHOLDER-kaltura_entry_vendor_task@
+}
+
 
 searchd
 {

@@ -5,6 +5,22 @@
  */
 class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 {
+	/**
+	 * @var string
+	 */
+	public $freeText;
+	
+	static private $map_between_objects = array
+	(
+		"userIdEqual" => "_eq_kuser_id",
+		"freeText" => "_free_text",
+	);
+	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
 	protected function getCoreFilter()
 	{
 		return new EntryVendorTaskFilter();
@@ -16,13 +32,7 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
  	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if($this->advancedSearch && $this->advancedSearch instanceof KalturaCatalogItemAdvancedFilter)
-		{
-			$catalogItemIds = VendorCatalogItemPeer::getVendorCatalogItemIdsByFilter($this->advancedSearch->toObject());
-			$this->catalogItemIdIn = count($catalogItemIds) ? implode(",", $catalogItemIds) : -1;
-		}
-		
-		$c = new Criteria();
+		$c = KalturaCriteria::create(EntryVendorTaskPeer::OM_CLASS);
 		$filter = $this->toObject();
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
@@ -30,15 +40,7 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		$this->fixFilterUserId($c);
 		
 		$list = EntryVendorTaskPeer::doSelect($c);
-		
-		$resultCount = count($list);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
-		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = EntryVendorTaskPeer::doCount($c);
-		}
+		$totalCount = $c->getRecordsCount();
 		
 		$response = new KalturaEntryVendorTaskListResponse();
 		$response->objects = KalturaEntryVendorTaskArray::fromDbArray($list, $responseProfile);

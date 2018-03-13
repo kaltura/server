@@ -34,11 +34,6 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 			$c->add(EntryVendorTaskPeer::PARTNER_ID,$partnerId );
 		return EntryVendorTaskPeer::doSelect($c);
 	}
-
-	public static function retrievePendingModerationByEntryIdAndPartnerId($entryId, $partnerId = null)
-	{
-		return self::retrievePendingByEntryId($entryId, $partnerId, array(EntryVendorTaskStatus::PENDING_MODERATION));
-	}
 	
 	public static function retrieveByPKAndVendorPartnerId($taskId, $partnerId)
 	{
@@ -61,5 +56,20 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
 	
+	/* (non-PHPdoc)
+ 	 * @see BaseEntryVendorTaskPeer::doSelect()
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+		
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$c->setRecordsCount($c->getRecordsCount());
+		}
+		
+		return parent::doSelect($c, $con);
+	}
 	
 } // EntryVendorTaskPeer

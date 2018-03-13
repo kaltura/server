@@ -118,7 +118,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function handleEntryDurationChanged(entry $entry)
 	{
-		$pendingEntryVendorTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId());
+		$pendingEntryVendorTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId());
 		$addedCostByProfileId = array();
 		foreach ($pendingEntryVendorTasks as $pendingEntryVendorTask)
 		{
