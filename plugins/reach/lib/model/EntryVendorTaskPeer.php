@@ -34,11 +34,6 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 			$c->add(EntryVendorTaskPeer::PARTNER_ID,$partnerId );
 		return EntryVendorTaskPeer::doSelect($c);
 	}
-
-	public static function retrievePendingModerationByEntryIdAndPartnerId($entryId, $partnerId = null)
-	{
-		return self::retrievePendingByEntryId($entryId, $partnerId, array(EntryVendorTaskStatus::PENDING_MODERATION));
-	}
 	
 	public static function retrieveByPKAndVendorPartnerId($taskId, $partnerId)
 	{
