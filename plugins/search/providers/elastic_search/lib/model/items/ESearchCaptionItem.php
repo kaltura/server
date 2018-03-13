@@ -119,4 +119,9 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		return ESearchItemDataType::CAPTION.self::QUERY_NAME_DELIMITER.self::DEFAULT_GROUP_NAME.self::QUERY_NAME_DELIMITER.$queryAttributes->getNestedQueryNameIndex();
 	}
 
+	protected static function getNestedSortOrder()
+	{
+		return array(ESearchCaptionFieldName::START_TIME);
+	}
+
 }
