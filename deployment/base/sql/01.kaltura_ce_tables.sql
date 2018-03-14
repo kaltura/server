@@ -2568,7 +2568,6 @@ CREATE TABLE `vendor_catalog_item`
 	`output_format` VARCHAR(256),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `status_service_type_index`(`status`, `service_type`),
 	KEY `status_service_type_service_feature_index`(`status`, `service_type`, `service_feature`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2594,7 +2593,7 @@ CREATE TABLE IF NOT EXISTS `reach_profile`
 	`partner_id` INTEGER  NOT NULL,
 	`type` TINYINT  NOT NULL,
 	`status` TINYINT  NOT NULL,
-	`used_credit` INTEGER,
+	`used_credit` INTEGER default 0 NOT NULL,
 	`rules` TEXT,
 	`dictionary` TEXT,
 	`custom_data` TEXT,

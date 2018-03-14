@@ -340,6 +340,17 @@ class ReachProfile extends BaseReachProfile
 		return false;
 	}
 	
+	public function shouldModerateOutputCaptions($type)
+	{
+		if($type == VendorServiceType::HUMAN)
+			return $this->getAutoDisplayHumanCaptionsOnPlayer();
+		
+		if($type == VendorServiceType::MACHINE)
+			return $this->getAutoDisplayMachineCaptionsOnPlayer();
+		
+		return false;
+	}
+	
 	public function syncCreditPercentageUsage()
 	{
 		$currentCredit = $this->getCredit()->getCurrentCredit(false);

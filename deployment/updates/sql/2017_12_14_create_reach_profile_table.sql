@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `reach_profile`
 	`partner_id` INTEGER  NOT NULL,
 	`type` TINYINT  NOT NULL,
 	`status` TINYINT  NOT NULL,
-	`used_credit` INTEGER,
+	`used_credit` INTEGER default 0 NOT NULL,
 	`rules` TEXT,
 	`dictionary` TEXT,
 	`custom_data` TEXT,

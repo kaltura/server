@@ -9,7 +9,7 @@ class kReachUtils
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function generateReachVendorKs($entryId)
+	public static function generateReachVendorKs($entryId, $shouldModerate = false)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
@@ -26,7 +26,8 @@ class kReachUtils
 		// Disable entitlement to avoid entitlement validation when accessing an entry
 		$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY. ':' . $entryId;
 
-		$privileges .= ',' . kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION;
+		if($shouldModerate)
+			$privileges .= ',' . kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION;
 
 		$limitedKs = '';
 		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), '', $limitedKs, dateUtils::DAY, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null);
