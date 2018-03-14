@@ -556,7 +556,6 @@ class kBusinessConvertDL
 						$liveAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
 						$definedRecordingAnchor = true;
 					}
-					self::setLanguageAndDefault($entry, $liveParams, $liveAsset);
 				}
 				
 				// set the status according to the entry status
@@ -724,30 +723,4 @@ class kBusinessConvertDL
 		return $cmdLine;
 	}
 
-	/**
-	 * @param LiveEntry $entry
-	 * @param $liveParams
-	 * @param $liveAsset
-	 */
-	protected static function setLanguageAndDefault(LiveEntry $entry, $liveParams, $liveAsset)
-	{
-		$multiStream = $liveParams->getMultiStream();
-		if (isset($multiStream))
-		{
-			$multiStreamObj = json_decode($multiStream);
-			if (isset($multiStreamObj))
-			{
-				if (isset($multiStreamObj->audio) && isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
-				{
-					$flavorLang = $multiStreamObj->audio->languages[0];
-					$liveAsset->setLanguage($flavorLang);
-					$conversionProfile = $entry->getconversionProfile2();
-					if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
-					{
-						$liveAsset->setDefault(true);
-					}
-				}
-			}
-		}
-	}
 }
