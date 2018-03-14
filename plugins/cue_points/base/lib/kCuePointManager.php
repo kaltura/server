@@ -280,6 +280,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 				return true;
 		}
+		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED
+		&& $dbBatchJob->getRootJob() && $dbBatchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT)
+		{
+			//TODO: change to true...
+			return false;
+		}
 		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$convertLiveSegmentJobData = $dbBatchJob->getParentJob()->getData();
