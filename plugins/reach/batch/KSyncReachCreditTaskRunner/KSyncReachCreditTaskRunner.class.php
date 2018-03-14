@@ -33,34 +33,34 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
 
-		$result = $reachClient->vendorProfile->listAction($filter, $pager);
+		$result = $reachClient->reachProfile->listAction($filter, $pager);
 		while ($result->totalCount > 0)
 		{
-			foreach ($result->objects as $vendorProfile)
+			foreach ($result->objects as $reachProfile)
 			{
 				try
 				{
-					$this->syncVendorProfileCredit($vendorProfile);
+					$this->syncReachProfileCredit($reachProfile);
 				} catch (Exception $ex)
 				{
 					KalturaLog::err($ex);
 				}
 			}
 			$pager->pageIndex++;
-			$result = $reachClient->vendorProfile->listAction($filter, $pager);
+			$result = $reachClient->reachProfile->listAction($filter, $pager);
 		}
 	}
 
 	/**
-	 * @param KalturaReachProfile $vendorProfile
+	 * @param KalturaReachProfile $reachProfile
 	 */
-	protected function syncVendorProfileCredit(KalturaReachProfile $vendorProfile)
+	protected function syncReachProfileCredit(KalturaReachProfile $reachProfile)
 	{
 		$reachClient = $this->SyncReachClient();
-		$this->impersonate($vendorProfile->partnerId);
+		$this->impersonate($reachProfile->partnerId);
 		try
 		{
-			$result = $reachClient->vendorProfile->syncCredit($vendorProfile->id);
+			$result = $reachClient->reachProfile->syncCredit($reachProfile->id);
 			$this->unimpersonate();
 		} catch (Exception $ex)
 		{
