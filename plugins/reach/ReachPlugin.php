@@ -52,6 +52,22 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		if($baseClass == 'KalturaRuleAction' && ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
 			return 'KalturaAddEntryVendorTaskAction';
 
+		if($baseClass == 'kJobData')
+		{
+			if($enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			{
+				return 'kEntryVendorTaskCsvJobData';
+			}
+		}
+
+		if($baseClass == 'KalturaJobData')
+		{
+			if($enumValue == self::getApiValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			{
+				return 'KalturaEntryVendorTaskCsvJobData';
+			}
+		}
+
 		return null;
 	}
 	
@@ -61,10 +77,10 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('SyncReachCreditTaskBatchType', 'ReachConditionType');
+			return array('SyncReachCreditTaskBatchType', 'ReachConditionType', 'ReachEntryVendorTasksCsvBatchType');
 
 		if($baseEnumName == 'BatchJobType')
-			return array('SyncReachCreditTaskBatchType');
+			return array('SyncReachCreditTaskBatchType', 'ReachEntryVendorTasksCsvBatchType');
 		
 		if($baseEnumName == 'ConditionType')
 			return array('ReachConditionType');
@@ -155,14 +171,17 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		return array();
 	}
 	
-	/* (non-PHPdoc)
- 	 * @see IKalturaEventConsumers::getEventConsumers()
- 	 */
+	/**
+	 * @return array
+	 */
 	public static function getEventConsumers()
 	{
-		return array(self::REACH_MANAGER, self::REACH_FLOW_MANAGER);
+		return array(
+			self::REACH_FLOW_MANAGER,
+			self::REACH_MANAGER
+		);
 	}
-	
+
 	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
@@ -193,8 +212,33 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		
 		if($baseClass == 'KalturaRuleAction' && $enumValue == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
 			return new KalturaAddEntryVendorTaskAction();
-		
+
+		if($baseClass == 'kJobData')
+		{
+			if($enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			{
+				return new kEntryVendorTaskCsvJobData();
+			}
+		}
+
+		if($baseClass == 'KalturaJobData')
+		{
+			if($enumValue == self::getApiValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV) ||
+				$enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			{
+				return new KalturaEntryVendorTaskCsvJobData();
+			}
+		}
 		return null;
+	}
+
+  /**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBatchJobTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
 	}
 	
 	/* (non-PHPdoc)
@@ -236,5 +280,4 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		return $data;
 	}
 	
-	//TODO add reach plugin permission
 }

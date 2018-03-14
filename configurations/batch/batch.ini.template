@@ -804,10 +804,18 @@ params.sharedTempPath                                   = @WEB_DIR@/tmp/userscsv
 scriptPath											= batches/UsersCsv/kAsyncUsersCsvExe.php
 maximumExecutionTime			                    = 3600
 
-[KReachTaskRunner : PeriodicWorker]
-id                                                                                                      = 700
-type                                                                                            = KReachTaskRunner
-maximumExecutionTime                                                            = 3600
-scriptPath                                                                                      = ../plugins/reach/batch/KReachTaskRunner/KReachTaskRunnerExe.php
-sleepBetweenStopStart                                                           = 86400
+[KSyncReachCreditTaskRunner : PeriodicWorker]
+id													= 690
+type												= KSyncReachCreditTaskRunner
+maximumExecutionTime								= 3600
+scriptPath											= ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
+sleepBetweenStopStart								= 60
 
+[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
+id													= 710
+friendlyName										= Entry Vendor Tasks Csv
+type												= KAsyncEntryVendorTasksCsv
+params.localTempPath                                = @TMP_DIR@/entryVendorTasksCsv
+params.sharedTempPath                               = @WEB_DIR@/tmp/entryVendorTasksCsv
+scriptPath											= ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
+maximumExecutionTime			                    = 3600

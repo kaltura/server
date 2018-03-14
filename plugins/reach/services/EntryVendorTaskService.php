@@ -274,4 +274,53 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
 	}
+
+	/**
+	 * add batch job that sends an email with a link to download an updated CSV that contains list of users
+	 *
+	 * @action exportToCsv
+	 * @param KalturaEntryVendorTaskFilter $filter A filter used to exclude specific tasks
+	 * @return string
+	 */
+	function exportToCsvAction(KalturaEntryVendorTaskFilter $filter)
+	{
+		if (!$filter)
+			$filter = new KalturaEntryVendorTaskFilter();
+		$dbFilter = new EntryVendorTaskFilter();
+		$filter->toObject($dbFilter);
+
+		$kuser = $this->getKuser();
+		if(!$kuser || !$kuser->getEmail())
+			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
+
+		kReachJobsManager::addEntryVendorTasksCsvJob($this->getPartnerId(), $dbFilter, $kuser);
+
+		return $kuser->getEmail();
+	}
+
+
+	/**
+	 *
+	 * Will serve a requested csv
+	 * @action serveCsv
+	 * @param string $id - the requested file id
+	 * @return string
+	 */
+	public function serveCsvAction($id)
+	{
+		if(!preg_match('/^\w+\.csv$/', $id))
+			throw new KalturaAPIException(KalturaErrors::INVALID_ID, $id);
+
+		// KS verification - we accept either admin session or download privilege of the file
+		$ks = $this->getKs();
+		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+
+		$partner_id = $this->getPartnerId();
+		$folderPath = "/content/entryVendorTasksCsv/$partner_id";
+		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
+		$file_path = "$fullPath/$id";
+
+		return $this->dumpFile($file_path, 'text/csv');
+	}
 }
