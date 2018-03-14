@@ -40,6 +40,47 @@
 		
 		Run deployment script:
 			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_notifications.php
+	Add in Admin.ini:
+		moduls.Reach.enabled = true
+		moduls.Reach.permissionType = 3
+		moduls.Reach.label = "Reach"
+		moduls.Reach.permissionName = REACH_PLUGIN_PERMISSION
+		moduls.Reach.group = GROUP_ENABLE_DISABLE_FEATURES
+
+		moduls.ReachVendorProfile.enabled = true
+		moduls.ReachVendorProfile.permissionType = 2
+		moduls.ReachVendorProfile.label = "Reach - Vendor Partner"
+		moduls.ReachVendorProfile.permissionName = REACH_VENDOR_PARTNER_PERMISSION
+		moduls.ReachVendorProfile.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+	Add in Batch.ini:
+		enabledWorkers.KSyncReachCreditTaskRunner           = 1
+		enabledWorkers.KAsyncEntryVendorTasksCsv            = 1
+		
+		KSyncReachCreditTaskRunner : PeriodicWorker]
+		id	= 690
+		type	= KSyncReachCreditTaskRunner
+		maximumExecutionTime	= 3600
+		scriptPath	= ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
+		sleepBetweenStopStart	= 21600
+
+		[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
+		id 	= 710
+		friendlyName	= Entry Vendor Tasks Csv
+		type	= KAsyncEntryVendorTasksCsv
+		params.localTempPath	= /opt/kaltura/temp/entryVendorTasksCsv
+		params.sharedTempPath	= /opt/kaltura/web/tmp/entryVendorTasksCsv
+		scriptPath	= ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
+		maximumExecutionTime	= 3600
+		
+	Add in emails_en.ini:
+		KALTURA_ENTRY_VENDOR_TASKS_CSV_MAIL = 134;
+		134 = "Your REACH requests Csv is ready for download"
+		134 = "Hello %s,<BR><BR>Following is the download link to your REACH requests csv: %s<BR>Please notice that the link will be available only for 24 hours. <BR><BR> Kaltura Customer Service"
+
+		
+		
+	
 			    
 	
 #### Known Issues & Limitations ####
