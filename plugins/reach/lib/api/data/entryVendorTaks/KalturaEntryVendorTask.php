@@ -6,7 +6,7 @@
 class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 {
 	/**
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 * @filter eq,in,order
 	 */
@@ -86,6 +86,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	/**
 	 * The charged price to execute this task
 	 * @var int
+	 * @filter order
 	 * @readonly
 	 */
 	public $price;

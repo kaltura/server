@@ -35,6 +35,8 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	(
 		"+id" => "+id",
 		"-id" => "-id",
+		"+price" => "+price",
+		"-price" => "-price",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",

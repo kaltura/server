@@ -165,10 +165,10 @@ class kVendorCredit
 	}
 
 	/***
-	 * @param $date
+	 * @param $includeOverages should return current credit including overageCredit info or not (Default is true)
 	 * @return int
 	 */
-	public function getCurrentCredit()
+	public function getCurrentCredit($includeOverages = true)
 	{
 		$now = time();
 		if ( $now < $this->fromDate)
@@ -178,7 +178,7 @@ class kVendorCredit
 		}
 		
 		$credit = $this->credit;
-		if($this->allowOverage)
+		if($includeOverages && $this->allowOverage)
 			$credit += $this->overageCredit;
 		
 		return $credit;
