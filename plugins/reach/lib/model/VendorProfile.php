@@ -360,7 +360,7 @@ class VendorProfile extends BaseVendorProfile
 	 *
 	 * @param kCategoryEntryScope $scope
 	 */
-	public function fulfillsRules(kScope $scope)
+	public function fulfillsRules(kScope $scope, $checkEmptyRulesOnly = false)
 	{
 		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
@@ -370,6 +370,12 @@ class VendorProfile extends BaseVendorProfile
 		foreach ($this->getRulesArray() as $rule)
 		{
 			/* @var $rule kRule */
+			if(count($rule->getConditions()) && $checkEmptyRulesOnly)
+				continue;
+			
+			if(!$checkEmptyRulesOnly && !count($rule->getConditions()))
+				continue;
+			
 			$rule->setScope($scope);
 			$fulfilled = $rule->applyContext($context);
 			
@@ -381,7 +387,7 @@ class VendorProfile extends BaseVendorProfile
 					if($action->getType() == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
 					{
 						/* $var $action kAddEntryVendorTaskAction */
-						$fullFilledCatalogItemIds[] = $action->getCatalogItemId();
+						$fullFilledCatalogItemIds = array_merge($fullFilledCatalogItemIds, explode(",", $action->getCatalogItemIds()));
 					}
 				}
 			}

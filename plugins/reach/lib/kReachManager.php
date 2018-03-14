@@ -49,7 +49,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return true;
 		
-		if($object instanceof categoryEntry)
+		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+			return true;
+		
+		if($object instanceof entry && in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 			return true;
 		
 		return false;
@@ -62,8 +65,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof categoryEntry)
-			$this->checkCategoryEntryAutomaticRules($object);
+		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+			$this->checkAutomaticRules($object);
 		
 		return true;
 	}
@@ -100,8 +103,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return $this->handleEntryDurationChanged($object);
 		
-		if($object instanceof categoryEntry)
-			return $this->checkCategoryEntryAutomaticRules($object);
+		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+			return $this->checkAutomaticRules($object);
+		
+		if($object instanceof entry && in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
+			return $this->checkAutomaticRules($object, true);
 		
 		return true;
 	}
@@ -214,16 +220,16 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 	
-	private function checkCategoryEntryAutomaticRules(categoryEntry $categoryEntry)
+	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
-		$entryId = $categoryEntry->getEntryId();
+		$entryId = $object->getEntryId();
 		$scope->setEntryId($entryId);
-		$vendorProfiles = VendorProfilePeer::retrieveByPartnerId($categoryEntry->getPartnerId());
+		$vendorProfiles = VendorProfilePeer::retrieveByPartnerId($object->getPartnerId());
 		foreach ($vendorProfiles as $profile)
 		{
 			/* @var $profile VendorProfile */
-			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope);
+			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
 			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $fullFieldCatalogItemIds);
 			$catalogItemIdsToAdd = array_unique(array_diff($fullFieldCatalogItemIds, $existingCatalogItemIds));
 			
