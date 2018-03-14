@@ -1,29 +1,29 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'vendor_profile' table.
+ * Base static class for performing query and update operations on the 'reach_profile' table.
  *
  * 
  *
  * @package plugins.reach
  * @subpackage model.om
  */
-abstract class BaseVendorProfilePeer {
+abstract class BaseReachProfilePeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'vendor_profile';
+	const TABLE_NAME = 'reach_profile';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'VendorProfile';
+	const OM_CLASS = 'ReachProfile';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'plugins.reach.VendorProfile';
+	const CLASS_DEFAULT = 'plugins.reach.ReachProfile';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'VendorProfileTableMap';
+	const TM_CLASS = 'ReachProfileTableMap';
 	
 	/** The total number of columns. */
 	const NUM_COLUMNS = 10;
@@ -32,40 +32,40 @@ abstract class BaseVendorProfilePeer {
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'vendor_profile.ID';
+	const ID = 'reach_profile.ID';
 
 	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'vendor_profile.CREATED_AT';
+	const CREATED_AT = 'reach_profile.CREATED_AT';
 
 	/** the column name for the UPDATED_AT field */
-	const UPDATED_AT = 'vendor_profile.UPDATED_AT';
+	const UPDATED_AT = 'reach_profile.UPDATED_AT';
 
 	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'vendor_profile.PARTNER_ID';
+	const PARTNER_ID = 'reach_profile.PARTNER_ID';
 
 	/** the column name for the TYPE field */
-	const TYPE = 'vendor_profile.TYPE';
+	const TYPE = 'reach_profile.TYPE';
 
 	/** the column name for the STATUS field */
-	const STATUS = 'vendor_profile.STATUS';
+	const STATUS = 'reach_profile.STATUS';
 
 	/** the column name for the USED_CREDIT field */
-	const USED_CREDIT = 'vendor_profile.USED_CREDIT';
+	const USED_CREDIT = 'reach_profile.USED_CREDIT';
 
 	/** the column name for the RULES field */
-	const RULES = 'vendor_profile.RULES';
+	const RULES = 'reach_profile.RULES';
 
 	/** the column name for the DICTIONARY field */
-	const DICTIONARY = 'vendor_profile.DICTIONARY';
+	const DICTIONARY = 'reach_profile.DICTIONARY';
 
 	/** the column name for the CUSTOM_DATA field */
-	const CUSTOM_DATA = 'vendor_profile.CUSTOM_DATA';
+	const CUSTOM_DATA = 'reach_profile.CUSTOM_DATA';
 
 	/**
-	 * An identiy map to hold any loaded instances of VendorProfile objects.
+	 * An identiy map to hold any loaded instances of ReachProfile objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array VendorProfile[]
+	 * @var        array ReachProfile[]
 	 */
 	public static $instances = array();
 
@@ -144,12 +144,12 @@ abstract class BaseVendorProfilePeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. VendorProfilePeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. ReachProfilePeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(VendorProfilePeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(ReachProfilePeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -165,16 +165,16 @@ abstract class BaseVendorProfilePeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(VendorProfilePeer::ID);
-		$criteria->addSelectColumn(VendorProfilePeer::CREATED_AT);
-		$criteria->addSelectColumn(VendorProfilePeer::UPDATED_AT);
-		$criteria->addSelectColumn(VendorProfilePeer::PARTNER_ID);
-		$criteria->addSelectColumn(VendorProfilePeer::TYPE);
-		$criteria->addSelectColumn(VendorProfilePeer::STATUS);
-		$criteria->addSelectColumn(VendorProfilePeer::USED_CREDIT);
-		$criteria->addSelectColumn(VendorProfilePeer::RULES);
-		$criteria->addSelectColumn(VendorProfilePeer::DICTIONARY);
-		$criteria->addSelectColumn(VendorProfilePeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(ReachProfilePeer::ID);
+		$criteria->addSelectColumn(ReachProfilePeer::CREATED_AT);
+		$criteria->addSelectColumn(ReachProfilePeer::UPDATED_AT);
+		$criteria->addSelectColumn(ReachProfilePeer::PARTNER_ID);
+		$criteria->addSelectColumn(ReachProfilePeer::TYPE);
+		$criteria->addSelectColumn(ReachProfilePeer::STATUS);
+		$criteria->addSelectColumn(ReachProfilePeer::USED_CREDIT);
+		$criteria->addSelectColumn(ReachProfilePeer::RULES);
+		$criteria->addSelectColumn(ReachProfilePeer::DICTIONARY);
+		$criteria->addSelectColumn(ReachProfilePeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -193,27 +193,27 @@ abstract class BaseVendorProfilePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(VendorProfilePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(ReachProfilePeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			VendorProfilePeer::addSelectColumns($criteria);
+			ReachProfilePeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		VendorProfilePeer::attachCriteriaFilter($criteria);
+		ReachProfilePeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'VendorProfilePeer', 
+			'ReachProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
@@ -222,7 +222,7 @@ abstract class BaseVendorProfilePeer {
 		}
 		
 		// select the connection for the query
-		$con = VendorProfilePeer::alternativeCon ($con, $queryDB);
+		$con = ReachProfilePeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -246,7 +246,7 @@ abstract class BaseVendorProfilePeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     VendorProfile
+	 * @return     ReachProfile
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -254,7 +254,7 @@ abstract class BaseVendorProfilePeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = VendorProfilePeer::doSelect($critcopy, $con);
+		$objects = ReachProfilePeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -296,10 +296,10 @@ abstract class BaseVendorProfilePeer {
 	{
 		foreach ($queryResult as $curIndex => $curObject)
 		{
-			$objFromPool = VendorProfilePeer::getInstanceFromPool($curObject->getPrimaryKey());
+			$objFromPool = ReachProfilePeer::getInstanceFromPool($curObject->getPrimaryKey());
 			if ($objFromPool === null)
 			{
-				VendorProfilePeer::addInstanceToPool($curObject);
+				ReachProfilePeer::addInstanceToPool($curObject);
 			}
 			else
 			{
@@ -321,7 +321,7 @@ abstract class BaseVendorProfilePeer {
 			{  
 				foreach ($queryResult as $curResult)
 				{
-					VendorProfilePeer::addInstanceToPool($curResult);
+					ReachProfilePeer::addInstanceToPool($curResult);
 				}
 			}
 		}
@@ -338,27 +338,27 @@ abstract class BaseVendorProfilePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = VendorProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = ReachProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'VendorProfilePeer', 
+			'ReachProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			$cacheKey = null;
-			VendorProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			VendorProfilePeer::updateInstancePool($cachedResult);
+			ReachProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			ReachProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
-		$con = VendorProfilePeer::alternativeCon($con, $queryDB);
+		$con = ReachProfilePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = VendorProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = ReachProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
@@ -369,9 +369,9 @@ abstract class BaseVendorProfilePeer {
 			$cacheKey = null;
 		}
 		
-		VendorProfilePeer::filterSelectResults($queryResult, $criteria);
+		ReachProfilePeer::filterSelectResults($queryResult, $criteria);
 		
-		VendorProfilePeer::addInstancesToPool($queryResult);
+		ReachProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
 
@@ -395,7 +395,7 @@ abstract class BaseVendorProfilePeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -407,7 +407,7 @@ abstract class BaseVendorProfilePeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = VendorProfilePeer::getCriteriaFilter();
+		$criteria_filter = ReachProfilePeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -421,12 +421,12 @@ abstract class BaseVendorProfilePeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			VendorProfilePeer::setDefaultCriteriaFilter();
+			ReachProfilePeer::setDefaultCriteriaFilter();
 		
-		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('VendorProfile');
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('ReachProfile');
 		if ($partnerCriteria)
 		{
-			call_user_func_array(array('VendorProfilePeer','addPartnerToCriteria'), $partnerCriteria);
+			call_user_func_array(array('ReachProfilePeer','addPartnerToCriteria'), $partnerCriteria);
 		}
 		
 		return self::$s_criteria_filter;
@@ -453,7 +453,7 @@ abstract class BaseVendorProfilePeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		VendorProfilePeer::getCriteriaFilter()->applyFilter($criteria);
+		ReachProfilePeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
@@ -535,10 +535,10 @@ abstract class BaseVendorProfilePeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		VendorProfilePeer::attachCriteriaFilter($criteria);
+		ReachProfilePeer::attachCriteriaFilter($criteria);
 		
 		// select the connection for the query
-		$con = VendorProfilePeer::alternativeCon ( $con );
+		$con = ReachProfilePeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -552,20 +552,20 @@ abstract class BaseVendorProfilePeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				VendorProfilePeer::addSelectColumns($criteria);
+				ReachProfilePeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			VendorProfilePeer::addSelectColumns($criteria);
+			ReachProfilePeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		VendorProfilePeer::attachCriteriaFilter($criteria);
+		ReachProfilePeer::attachCriteriaFilter($criteria);
 
 		return $criteria;
 	}
@@ -585,9 +585,9 @@ abstract class BaseVendorProfilePeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = VendorProfilePeer::alternativeCon($con);
+		$con = ReachProfilePeer::alternativeCon($con);
 		
-		$criteria = VendorProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteria = ReachProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -601,10 +601,10 @@ abstract class BaseVendorProfilePeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      VendorProfile $value A VendorProfile object.
+	 * @param      ReachProfile $value A ReachProfile object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(VendorProfile $obj, $key = null)
+	public static function addInstanceToPool(ReachProfile $obj, $key = null)
 	{
 		if ( Propel::isInstancePoolingEnabled() )
 		{
@@ -618,7 +618,7 @@ abstract class BaseVendorProfilePeer {
 				)
 			{
 				self::$instances[$key] = $obj;
-				kMemoryManager::registerPeer('VendorProfilePeer');
+				kMemoryManager::registerPeer('ReachProfilePeer');
 			}
 		}
 	}
@@ -631,18 +631,18 @@ abstract class BaseVendorProfilePeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A VendorProfile object or a primary key value.
+	 * @param      mixed $value A ReachProfile object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof VendorProfile) {
+			if (is_object($value) && $value instanceof ReachProfile) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or VendorProfile object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or ReachProfile object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -657,7 +657,7 @@ abstract class BaseVendorProfilePeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     VendorProfile Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     ReachProfile Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -685,7 +685,7 @@ abstract class BaseVendorProfilePeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to vendor_profile
+	 * Method to invalidate the instance pool of all tables related to reach_profile
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -723,11 +723,11 @@ abstract class BaseVendorProfilePeer {
 		$results = array();
 	
 		// set the class once to avoid overhead in the loop
-		$cls = VendorProfilePeer::getOMClass(false);
+		$cls = ReachProfilePeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = VendorProfilePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = VendorProfilePeer::getInstanceFromPool($key))) {
+			$key = ReachProfilePeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = ReachProfilePeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
@@ -758,10 +758,10 @@ abstract class BaseVendorProfilePeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseVendorProfilePeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseVendorProfilePeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BaseReachProfilePeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BaseReachProfilePeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new VendorProfileTableMap());
+	    $dbMap->addTableObject(new ReachProfileTableMap());
 	  }
 	}
 
@@ -778,13 +778,13 @@ abstract class BaseVendorProfilePeer {
 	 */
 	public static function getOMClass($withPrefix = true)
 	{
-		return $withPrefix ? VendorProfilePeer::CLASS_DEFAULT : VendorProfilePeer::OM_CLASS;
+		return $withPrefix ? ReachProfilePeer::CLASS_DEFAULT : ReachProfilePeer::OM_CLASS;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a VendorProfile or Criteria object.
+	 * Method perform an INSERT on the database, given a ReachProfile or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or VendorProfile object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or ReachProfile object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -793,17 +793,17 @@ abstract class BaseVendorProfilePeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from VendorProfile object
+			$criteria = $values->buildCriteria(); // build Criteria from ReachProfile object
 		}
 
-		if ($criteria->containsKey(VendorProfilePeer::ID) && $criteria->keyContainsValue(VendorProfilePeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.VendorProfilePeer::ID.')');
+		if ($criteria->containsKey(ReachProfilePeer::ID) && $criteria->keyContainsValue(ReachProfilePeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.ReachProfilePeer::ID.')');
 		}
 
 
@@ -825,9 +825,9 @@ abstract class BaseVendorProfilePeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a VendorProfile or Criteria object.
+	 * Method perform an UPDATE on the database, given a ReachProfile or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or VendorProfile object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or ReachProfile object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -836,7 +836,7 @@ abstract class BaseVendorProfilePeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -844,10 +844,10 @@ abstract class BaseVendorProfilePeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(VendorProfilePeer::ID);
-			$selectCriteria->add(VendorProfilePeer::ID, $criteria->remove(VendorProfilePeer::ID), $comparison);
+			$comparison = $criteria->getComparison(ReachProfilePeer::ID);
+			$selectCriteria->add(ReachProfilePeer::ID, $criteria->remove(ReachProfilePeer::ID), $comparison);
 
-		} else { // $values is VendorProfile object
+		} else { // $values is ReachProfile object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -877,26 +877,26 @@ abstract class BaseVendorProfilePeer {
 	}
 
 	/**
-	 * Method to DELETE all rows from the vendor_profile table.
+	 * Method to DELETE all rows from the reach_profile table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(VendorProfilePeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(ReachProfilePeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			VendorProfilePeer::clearInstancePool();
-			VendorProfilePeer::clearRelatedInstancePool();
+			ReachProfilePeer::clearInstancePool();
+			ReachProfilePeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -906,9 +906,9 @@ abstract class BaseVendorProfilePeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a VendorProfile or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a ReachProfile or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or VendorProfile object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or ReachProfile object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -919,27 +919,27 @@ abstract class BaseVendorProfilePeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			VendorProfilePeer::clearInstancePool();
+			ReachProfilePeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof VendorProfile) { // it's a model object
+		} elseif ($values instanceof ReachProfile) { // it's a model object
 			// invalidate the cache for this single object
-			VendorProfilePeer::removeInstanceFromPool($values);
+			ReachProfilePeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(VendorProfilePeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(ReachProfilePeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				VendorProfilePeer::removeInstanceFromPool($singleval);
+				ReachProfilePeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -954,7 +954,7 @@ abstract class BaseVendorProfilePeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			VendorProfilePeer::clearRelatedInstancePool();
+			ReachProfilePeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -964,24 +964,24 @@ abstract class BaseVendorProfilePeer {
 	}
 
 	/**
-	 * Validates all modified columns of given VendorProfile object.
+	 * Validates all modified columns of given ReachProfile object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      VendorProfile $obj The object to validate.
+	 * @param      ReachProfile $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(VendorProfile $obj, $cols = null)
+	public static function doValidate(ReachProfile $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(VendorProfilePeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(VendorProfilePeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(ReachProfilePeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(ReachProfilePeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -997,7 +997,7 @@ abstract class BaseVendorProfilePeer {
 
 		}
 
-		return BasePeer::doValidate(VendorProfilePeer::DATABASE_NAME, VendorProfilePeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(ReachProfilePeer::DATABASE_NAME, ReachProfilePeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -1005,19 +1005,19 @@ abstract class BaseVendorProfilePeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     VendorProfile
+	 * @return     ReachProfile
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = VendorProfilePeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = ReachProfilePeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(VendorProfilePeer::DATABASE_NAME);
-		$criteria->add(VendorProfilePeer::ID, $pk);
+		$criteria = new Criteria(ReachProfilePeer::DATABASE_NAME);
+		$criteria->add(ReachProfilePeer::ID, $pk);
 
-		$v = VendorProfilePeer::doSelect($criteria, $con);
+		$v = ReachProfilePeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -1036,16 +1036,16 @@ abstract class BaseVendorProfilePeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(VendorProfilePeer::DATABASE_NAME);
-			$criteria->add(VendorProfilePeer::ID, $pks, Criteria::IN);
-			$objs = VendorProfilePeer::doSelect($criteria, $con);
+			$criteria = new Criteria(ReachProfilePeer::DATABASE_NAME);
+			$criteria->add(ReachProfilePeer::ID, $pks, Criteria::IN);
+			$objs = ReachProfilePeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BaseVendorProfilePeer
+} // BaseReachProfilePeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseVendorProfilePeer::buildTableMap();
+BaseReachProfilePeer::buildTableMap();
 

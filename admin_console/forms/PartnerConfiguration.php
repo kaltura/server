@@ -951,8 +951,6 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overagePrice',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overageUnit',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::REACH_CREDIT.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::REACH_OVERCHARGE.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `entry_vendor_task`
 	`status` TINYINT  NOT NULL,
 	`price` INTEGER  NOT NULL,
 	`catalog_item_id` INTEGER  NOT NULL,
-	`vendor_profile_id` INTEGER  NOT NULL,
+	`reach_profile_id` INTEGER  NOT NULL,
 	`kuser_id` INTEGER  NOT NULL,
 	`version` INTEGER,
 	`context` VARCHAR(256),

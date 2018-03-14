@@ -23,8 +23,8 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 		"entryIdEqual" => "_eq_entry_id",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
-		"vendorProfileIdEqual" => "_eq_vendor_profile_id",
-		"vendorProfileIdIn" => "_in_vendor_profile_id",
+		"reachProfileIdEqual" => "_eq_reach_profile_id",
+		"reachProfileIdIn" => "_in_reach_profile_id",
 		"catalogItemIdEqual" => "_eq_catalog_item_id",
 		"catalogItemIdIn" => "_in_catalog_item_id",
 		"userIdEqual" => "_eq_user_id",
@@ -135,12 +135,12 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	/**
 	 * @var int
 	 */
-	public $vendorProfileIdEqual;
+	public $reachProfileIdEqual;
 
 	/**
 	 * @var string
 	 */
-	public $vendorProfileIdIn;
+	public $reachProfileIdIn;
 
 	/**
 	 * @var int

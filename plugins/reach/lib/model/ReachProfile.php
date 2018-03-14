@@ -2,7 +2,7 @@
 
 
 /**
- * Skeleton subclass for representing a row from the 'vendor_profile' table.
+ * Skeleton subclass for representing a row from the 'reach_profile' table.
  *
  * 
  *
@@ -13,7 +13,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class VendorProfile extends BaseVendorProfile 
+class ReachProfile extends BaseReachProfile 
 {
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 				'rules_array_compressed';
 	const CUSTOM_DATA_DICTIONARY_ARRAY_COMPRESSED = 		'dictionary_array_compressed';
@@ -117,37 +117,37 @@ class VendorProfile extends BaseVendorProfile
 		
 		$this->setRules($serializedRulesArray);
 	}
-
+	
 	public function setDictionariesArrayCompressed($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_DICTIONARY_ARRAY_COMPRESSED, $v);
 	}
-
+	
 	public function setDictionariesArray($dictionaries)
 	{
 		$serializedDictionariesArray = serialize($dictionaries);
-
+		
 		if(strlen($serializedDictionariesArray) > myCustomData::MAX_TEXT_FIELD_SIZE)
 		{
 			$this->setDictionariesArrayCompressed(true);
 			$serializedDictionariesArray = gzcompress($serializedDictionariesArray);
 			if(strlen(utf8_encode($serializedDictionariesArray)) > myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
 				throw new kCoreException('Exceeded max size allowed for access control', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
-
+			
 		}
 		else
 		{
 			$this->setDictionariesArrayCompressed(false);
 		}
-
+		
 		$this->setDictionary($serializedDictionariesArray);
 	}
-
+	
 	public function getDictionariesArrayCompressed()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DICTIONARY_ARRAY_COMPRESSED, null, false);
 	}
-
+	
 	/**
 	 * @return array<kDictionary>
 	 */
@@ -161,7 +161,7 @@ class VendorProfile extends BaseVendorProfile
 			{
 				if($this->getDictionariesArrayCompressed())
 					$dictionariesString   = gzuncompress($dictionariesString  );
-
+				
 				$dictionaries = unserialize($dictionariesString );
 			}
 			catch(Exception $e)
@@ -288,7 +288,7 @@ class VendorProfile extends BaseVendorProfile
 		
 		return $credit;
 	}
-
+	
 	/**
 	 * @param $language
 	 * @return string
@@ -305,8 +305,8 @@ class VendorProfile extends BaseVendorProfile
 		}
 		return null;
 	}
-
-
+	
+	
 	
 	public function getCreditUsagePercentage()
 	{
@@ -315,18 +315,18 @@ class VendorProfile extends BaseVendorProfile
 	
 	public function getContentDeletionPolicy($v)
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, null, VendorProfileContentDeletionPolicy::DO_NOTHING);
+		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, null, ReachProfileContentDeletionPolicy::DO_NOTHING);
 	}
-
+	
 	public function syncCredit()
 	{
-		$vendorProfileCredit = $this->getCredit();
-		if ($vendorProfileCredit)
+		$reachProfileCredit = $this->getCredit();
+		if ($reachProfileCredit)
 		{
-			$syncedCredit = $vendorProfileCredit->syncCredit($this->getId());
+			$syncedCredit = $reachProfileCredit->syncCredit($this->getId());
 			$this->setUsedCredit($syncedCredit);
 		}
-		$this->setCredit($vendorProfileCredit);
+		$this->setCredit($reachProfileCredit);
 	}
 	
 	public function shouldModerate($type)
@@ -340,12 +340,23 @@ class VendorProfile extends BaseVendorProfile
 		return false;
 	}
 	
+	public function shouldModerateOutputCaptions($type)
+	{
+		if($type == VendorServiceType::HUMAN)
+			return $this->getAutoDisplayHumanCaptionsOnPlayer();
+		
+		if($type == VendorServiceType::MACHINE)
+			return $this->getAutoDisplayMachineCaptionsOnPlayer();
+		
+		return false;
+	}
+	
 	public function syncCreditPercentageUsage()
 	{
 		$currentCredit = $this->getCredit()->getCurrentCredit(false);
-		$creditUsagePercentage = ($currentCredit == VendorProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
+		$creditUsagePercentage = ($currentCredit == ReachProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
 		
-		if($currentCredit != 0 && $currentCredit != VendorProfileCreditValues::UNLIMITED_CREDIT)
+		if($currentCredit != 0 && $currentCredit != ReachProfileCreditValues::UNLIMITED_CREDIT)
 		{
 			$usedCredit = $this->getUsedCredit();
 			$creditUsagePercentage = ($usedCredit/$currentCredit)*100;
@@ -399,4 +410,4 @@ class VendorProfile extends BaseVendorProfile
 		return $fullFilledCatalogItemIds;
 	}
 	
-} // VendorProfile
+} // ReachProfile

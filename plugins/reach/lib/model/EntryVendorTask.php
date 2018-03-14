@@ -104,9 +104,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_USER_ID, null, null);
 	}
 	
-	public function getVendorProfile()
+	public function getReachProfile()
 	{
-		return VendorProfilePeer::retrieveByPK($this->getVendorProfileId());
+		return ReachProfilePeer::retrieveByPK($this->getReachProfileId());
 	}
 	
 	public function getEntry()

@@ -465,7 +465,7 @@ index kaltura_entry_vendor_task:kaltura_base
 	rt_attr_uint         = task_status
 	rt_attr_uint	     = price
 	rt_field	         = catalog_item_id
-	rt_field             = vendor_profile_id
+	rt_field             = reach_profile_id
 	rt_field             = kuser_id
 	rt_field             = user_id
 	rt_field	         = context

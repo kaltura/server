@@ -16,10 +16,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="target_language"		type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="output_format"			type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" 			type="longvarchar" />
-		<index name="partner_id_status_index">
-			<index-column name="partner_id" />
-			<index-column name="status" />
-		</index>
 		<index name="status_service_type_index">
 			<index-column name="status" />
 			<index-column name="service_type" />
@@ -45,14 +41,14 @@
 		</index>
 	</table>
 	
-	<table skipSql="false" abstract="false" name="vendor_profile">
+	<table skipSql="false" abstract="false" name="reach_profile">
 		<column primaryKey="true"  required="true"  autoIncrement="true"  lazyLoad="false" name="id" 					type="integer" />
 		<column primaryKey="false" required="false"	autoIncrement="false" lazyLoad="false" name="created_at" 			type="timestamp" />
 		<column primaryKey="false" required="false"	autoIncrement="false" lazyLoad="false" name="updated_at" 			type="timestamp" />
 		<column primaryKey="false" required="true"	autoIncrement="false" lazyLoad="false" name="partner_id" 			type="integer" />
 		<column primaryKey="false" required="true"	autoIncrement="false" lazyLoad="false" name="type" 					type="tinyint" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="status" 				type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="used_credit"			type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="used_credit"			type="integer" default="0"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="rules" 				type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dictionary" 			type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" 			type="longvarchar" />
@@ -78,7 +74,7 @@
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="status" 				type="tinyint" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="price" 				type="integer" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="catalog_item_id"		type="integer" />
-		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="vendor_profile_id"		type="integer" />
+		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="reach_profile_id"		type="integer" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="kuser_id"				type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version"				type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="context"				type="varchar" size="256" /> />

@@ -7,7 +7,7 @@ class KalturaReachProfileFilter extends KalturaReachProfileBaseFilter
 {
 	protected function getCoreFilter()
 	{
-		return new VendorProfileFilter();
+		return new ReachProfileFilter();
 	}
 	
 	/* (non-PHPdoc)
@@ -20,7 +20,7 @@ class KalturaReachProfileFilter extends KalturaReachProfileBaseFilter
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		
-		$list = VendorProfilePeer::doSelect($c);
+		$list = ReachProfilePeer::doSelect($c);
 		
 		$resultCount = count($list);
 		if ($resultCount && $resultCount < $pager->pageSize)
@@ -28,7 +28,7 @@ class KalturaReachProfileFilter extends KalturaReachProfileBaseFilter
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = VendorProfilePeer::doCount($c);
+			$totalCount = ReachProfilePeer::doCount($c);
 		}
 		
 		$response = new KalturaReachProfileListResponse();

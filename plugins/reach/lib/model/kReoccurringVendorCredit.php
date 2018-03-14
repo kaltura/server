@@ -75,9 +75,9 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$this->frequency = $frequency;
 	}
 
-	public function syncCredit($vendorProfileId)
+	public function syncCredit($reachProfileId)
 	{
-		$syncedCredit = parent::syncCredit($vendorProfileId);
+		$syncedCredit = parent::syncCredit($reachProfileId);
 		if ( $this->getLastSyncTime() > $this->getToDate() )
 		{
 			$this->calculateNextPeriodEndDate();

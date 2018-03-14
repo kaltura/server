@@ -23,9 +23,9 @@ class KalturaReachErrors implements kReachErrors
 	
 	const VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER = "VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER;ID,PARTNER_ID;Vendor catalog item with id [@ID@] already enabled for partner [@PARTNER_ID@]";
 
-	/* Vendor Profile */
+	/* Reach Profile */
 
-	const VENDOR_PROFILE_NOT_FOUND = "VENDOR_PROFILE_NOT_FOUND;ID;Vendor profile with id provided not found [@ID@]";
+	const REACH_PROFILE_NOT_FOUND = "REACH_PROFILE_NOT_FOUND;ID;Reach profile with id provided not found [@ID@]";
 
 	const DICTIONARY_LANGUAGE_DUPLICATION = "DICTIONARY_LANGUAGE_DUPLICATION;LANGUAGE; Vendor profile configuration error - not allowed duplicate dictionaries for language [@LANGUAGE@] ";
 

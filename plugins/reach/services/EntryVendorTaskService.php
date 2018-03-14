@@ -29,7 +29,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @param KalturaEntryVendorTask $entryVendorTask
 	 * @return KalturaEntryVendorTask
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION
 	 * @throws KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED
@@ -42,9 +42,9 @@ class EntryVendorTaskService extends KalturaBaseService
 		if(!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryVendorTask->entryId);
 		
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($entryVendorTask->vendorProfileId);
-		if(!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $entryVendorTask->vendorProfileId);
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($entryVendorTask->reachProfileId);
+		if(!$dbReachProfile)
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $entryVendorTask->reachProfileId);
 		
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->catalogItemId);
 		if(!$dbVendorCatalogItem)
@@ -56,10 +56,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		if(EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemIdAndEntryVersion($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(),$sourceFlavorVersion))
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $sourceFlavorVersion, kCurrentContext::getCurrentPartnerId());
 		
-		if(!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbVendorProfile))
+		if(!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbReachProfile))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED,  $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		
-		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbVendorProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $sourceFlavorVersion);
+		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $sourceFlavorVersion);
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
 		$dbEntryVendorTask->save();
 
@@ -74,7 +74,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @action get
 	 * @param int $id
 	 * @return KalturaEntryVendorTask
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 */
 	function getAction($id)
 	{

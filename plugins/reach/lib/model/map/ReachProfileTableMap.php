@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'vendor_profile' table.
+ * This class defines the structure of the 'reach_profile' table.
  *
  *
  *
@@ -14,12 +14,12 @@
  * @package plugins.reach
  * @subpackage model.map
  */
-class VendorProfileTableMap extends TableMap {
+class ReachProfileTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'plugins.reach.VendorProfileTableMap';
+	const CLASS_NAME = 'plugins.reach.ReachProfileTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -31,9 +31,9 @@ class VendorProfileTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('vendor_profile');
-		$this->setPhpName('VendorProfile');
-		$this->setClassname('VendorProfile');
+		$this->setName('reach_profile');
+		$this->setPhpName('ReachProfile');
+		$this->setClassname('ReachProfile');
 		$this->setPackage('plugins.reach');
 		$this->setUseIdGenerator(true);
 		// columns
@@ -57,4 +57,4 @@ class VendorProfileTableMap extends TableMap {
 	{
 	} // buildRelations()
 
-} // VendorProfileTableMap
+} // ReachProfileTableMap

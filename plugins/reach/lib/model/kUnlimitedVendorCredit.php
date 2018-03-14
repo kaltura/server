@@ -14,7 +14,7 @@ class kUnlimitedVendorCredit extends kVendorCredit
 	 * @var int
 	 * @readonly
 	 */
-	protected $credit = VendorProfileCreditValues::UNLIMITED_CREDIT;
+	protected $credit = ReachProfileCreditValues::UNLIMITED_CREDIT;
 	
 	/***
 	 * @param $date

@@ -37,7 +37,7 @@ class EntryVendorTaskTableMap extends TableMap {
 		$this->setPackage('plugins.reach');
 		$this->setUseIdGenerator(true);
 		// columns
-		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addPrimaryKey('ID', 'Id', 'BIGINT', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('QUEUE_TIME', 'QueueTime', 'TIMESTAMP', false, null, null);
@@ -48,7 +48,7 @@ class EntryVendorTaskTableMap extends TableMap {
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('PRICE', 'Price', 'INTEGER', true, null, null);
 		$this->addColumn('CATALOG_ITEM_ID', 'CatalogItemId', 'INTEGER', true, null, null);
-		$this->addColumn('VENDOR_PROFILE_ID', 'VendorProfileId', 'INTEGER', true, null, null);
+		$this->addColumn('REACH_PROFILE_ID', 'ReachProfileId', 'INTEGER', true, null, null);
 		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', true, null, null);
 		$this->addColumn('VERSION', 'Version', 'INTEGER', false, null, null);
 		$this->addColumn('CONTEXT', 'Context', 'VARCHAR', false, 256, null);

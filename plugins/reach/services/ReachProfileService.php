@@ -18,47 +18,47 @@ class ReachProfileService extends KalturaBaseService
 		if (!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 
-		$this->applyPartnerFilterForClass('vendorProfile');
+		$this->applyPartnerFilterForClass('reachProfile');
 	}
 
 	/**
-	 * Allows you to add a partner specific vendor profile
+	 * Allows you to add a partner specific reach profile
 	 *
 	 * @action add
-	 * @param KalturaReachProfile $vendorProfile
+	 * @param KalturaReachProfile $reachProfile
 	 * @return KalturaReachProfile
 	 */
-	public function addAction(KalturaReachProfile $vendorProfile)
+	public function addAction(KalturaReachProfile $reachProfile)
 	{
-		$dbVendorProfile = $vendorProfile->toInsertableObject();
+		$dbReachProfile = $reachProfile->toInsertableObject();
 
-		/* @var $dbVendorProfile VendorProfile */
-		$dbVendorProfile->setPartnerId(kCurrentContext::getCurrentPartnerId());
-		$dbVendorProfile->setStatus(KalturaReachProfileStatus::ACTIVE);
-		$dbVendorProfile->save();
+		/* @var $dbReachProfile ReachProfile */
+		$dbReachProfile->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		$dbReachProfile->setStatus(KalturaReachProfileStatus::ACTIVE);
+		$dbReachProfile->save();
 
 		// return the saved object
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
+		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+		return $reachProfile;
 	}
 
 	/**
-	 * Retrieve specific vendor profile by id
+	 * Retrieve specific reach profile by id
 	 *
 	 * @action get
 	 * @param int $id
 	 * @return KalturaReachProfile
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 */
 	function getAction($id)
 	{
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if (!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $id);
-
-		$vendorProfile = new KalturaReachProfile();
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
+		if (!$dbReachProfile)
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
+		
+		$reachProfile = new KalturaReachProfile();
+		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+		return $reachProfile;
 	}
 
 	/**
@@ -81,58 +81,58 @@ class ReachProfileService extends KalturaBaseService
 	}
 
 	/**
-	 * Update an existing vendor profile object
+	 * Update an existing reach profile object
 	 *
 	 * @action update
 	 * @param int $id
-	 * @param KalturaReachProfile $vendorProfile
+	 * @param KalturaReachProfile $reachProfile
 	 * @return KalturaReachProfile
 	 *
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 */
-	public function updateAction($id, KalturaReachProfile $vendorProfile)
+	public function updateAction($id, KalturaReachProfile $reachProfile)
 	{
 		// get the object
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if (!$dbVendorProfile)
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
+		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 
 		// save the object
-		$dbVendorProfile = $vendorProfile->toUpdatableObject($dbVendorProfile);
-		$dbVendorProfile->save();
+		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
+		$dbReachProfile->save();
 
 		// return the saved object
-		$vendorProfile = new KalturaReachProfile();
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
+		$reachProfile = new KalturaReachProfile();
+		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+		return $reachProfile;
 	}
 
 	/**
-	 * Update vendor profile status by id
+	 * Update reach profile status by id
 	 *
 	 * @action updateStatus
 	 * @param int $id
 	 * @param KalturaReachProfileStatus $status
 	 * @return KalturaReachProfile
 	 *
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 */
 	function updateStatusAction($id, $status)
 	{
 		// get the object
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if (!$dbVendorProfile)
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
+		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 
 		// save the object
-		$dbVendorProfile->setStatus($status);
-		$dbVendorProfile->save();
+		$dbReachProfile->setStatus($status);
+		$dbReachProfile->save();
 
 		// return the saved object
 		// return the saved object
-		$vendorProfile = new KalturaReachProfile();
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
+		$reachProfile = new KalturaReachProfile();
+		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+		return $reachProfile;
 	}
 
 	/**
@@ -141,42 +141,42 @@ class ReachProfileService extends KalturaBaseService
 	 * @action delete
 	 * @param int $id
 	 *
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 */
 	public function deleteAction($id)
 	{
 		// get the object
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($id);
-		if (!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $id);
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
+		if (!$dbReachProfile)
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
 
 		// set the object status to deleted
-		$dbVendorProfile->setStatus(KalturaReachProfileStatus::DELETED);
-		$dbVendorProfile->save();
+		$dbReachProfile->setStatus(KalturaReachProfileStatus::DELETED);
+		$dbReachProfile->save();
 	}
 
 	/**
 	 * sync vednor profile credit
 	 *
 	 * @action syncCredit
-	 * @param int $vendorProfileId
+	 * @param int $reachProfileId
 	 * @return KalturaReachProfile
-	 * @throws KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 */
-	public function syncCredit($vendorProfileId)
+	public function syncCredit($reachProfileId)
 	{
-		$dbVendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
-		if (!$dbVendorProfile)
-			throw new KalturaAPIException(KalturaReachErrors::VENDOR_PROFILE_NOT_FOUND, $vendorProfileId);
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
+		if (!$dbReachProfile)
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
 
 		// set the object status to deleted
-		$dbVendorProfile->syncCredit();
-		$dbVendorProfile->save();
+		$dbReachProfile->syncCredit();
+		$dbReachProfile->save();
 
 		// return the saved object
-		$vendorProfile = new KalturaReachProfile();
-		$vendorProfile->fromObject($dbVendorProfile, $this->getResponseProfile());
-		return $vendorProfile;
+		$reachProfile = new KalturaReachProfile();
+		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+		return $reachProfile;
 	}
 
 }

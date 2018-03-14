@@ -238,7 +238,7 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 					return 'EntryVendorTask';
 				
 				case EventNotificationEventObjectType::REACH_PROFILE:
-					return 'VendorProfile';
+					return 'ReachProfile';
 
 			}
 		}
