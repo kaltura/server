@@ -53,13 +53,13 @@ CREATE TABLE `partner_catalog_item`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
-#-- vendor_profile
+#-- reach_profile
 #-----------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `vendor_profile`;
+DROP TABLE IF EXISTS `reach_profile`;
 
 
-CREATE TABLE `vendor_profile`
+CREATE TABLE `reach_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,
@@ -85,18 +85,18 @@ DROP TABLE IF EXISTS `entry_vendor_task`;
 
 CREATE TABLE `entry_vendor_task`
 (
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`id` BIGINT  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`queue_time` DATETIME DEFAULT NULL,
-	`finish_time` DATETIME DEFAULT NULL,
+	`queue_time` DATETIME,
+	`finish_time` DATETIME,
 	`partner_id` INTEGER  NOT NULL,
 	`vendor_partner_id` INTEGER  NOT NULL,
 	`entry_id` VARCHAR(31)  NOT NULL,
 	`status` TINYINT  NOT NULL,
 	`price` INTEGER  NOT NULL,
 	`catalog_item_id` INTEGER  NOT NULL,
-	`vendor_profile_id` INTEGER  NOT NULL,
+	`reach_profile_id` INTEGER  NOT NULL,
 	`kuser_id` INTEGER  NOT NULL,
 	`version` INTEGER,
 	`context` VARCHAR(256),

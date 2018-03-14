@@ -15,7 +15,7 @@
 		1. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_11_21_create_vendor_catalog_item_table.sql
 		2. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_11_21_create_partner_catalog_item_table.sql
 		3. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_entry_vendor_task_table.sql
-		4. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_vendor_profile_table.sql
+		4. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_reach_profile_table.sql
 		
 	Run Permissions scripts script:
 		1. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_vendor_role_and_permissions.php
@@ -58,14 +58,14 @@
 		enabledWorkers.KAsyncEntryVendorTasksCsv            = 1
 		
 		KSyncReachCreditTaskRunner : PeriodicWorker]
-		id	= 690
+		id	= 780
 		type	= KSyncReachCreditTaskRunner
 		maximumExecutionTime	= 3600
 		scriptPath	= ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
 		sleepBetweenStopStart	= 21600
 
 		[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
-		id 	= 710
+		id 	= 790
 		friendlyName	= Entry Vendor Tasks Csv
 		type	= KAsyncEntryVendorTasksCsv
 		params.localTempPath	= /opt/kaltura/temp/entryVendorTasksCsv

@@ -21,7 +21,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the id field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $id;
 
@@ -86,10 +86,10 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	protected $catalog_item_id;
 
 	/**
-	 * The value for the vendor_profile_id field.
+	 * The value for the reach_profile_id field.
 	 * @var        int
 	 */
-	protected $vendor_profile_id;
+	protected $reach_profile_id;
 
 	/**
 	 * The value for the kuser_id field.
@@ -163,7 +163,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	/**
 	 * Get the [id] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getId()
 	{
@@ -391,13 +391,13 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [vendor_profile_id] column value.
+	 * Get the [reach_profile_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getVendorProfileId()
+	public function getReachProfileId()
 	{
-		return $this->vendor_profile_id;
+		return $this->reach_profile_id;
 	}
 
 	/**
@@ -443,7 +443,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [id] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     EntryVendorTask The current object (for fluent API support)
 	 */
 	public function setId($v)
@@ -452,7 +452,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[EntryVendorTaskPeer::ID] = $this->id;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->id !== $v) {
@@ -804,27 +804,27 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	} // setCatalogItemId()
 
 	/**
-	 * Set the value of [vendor_profile_id] column.
+	 * Set the value of [reach_profile_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     EntryVendorTask The current object (for fluent API support)
 	 */
-	public function setVendorProfileId($v)
+	public function setReachProfileId($v)
 	{
-		if(!isset($this->oldColumnsValues[EntryVendorTaskPeer::VENDOR_PROFILE_ID]))
-			$this->oldColumnsValues[EntryVendorTaskPeer::VENDOR_PROFILE_ID] = $this->vendor_profile_id;
+		if(!isset($this->oldColumnsValues[EntryVendorTaskPeer::REACH_PROFILE_ID]))
+			$this->oldColumnsValues[EntryVendorTaskPeer::REACH_PROFILE_ID] = $this->reach_profile_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->vendor_profile_id !== $v) {
-			$this->vendor_profile_id = $v;
-			$this->modifiedColumns[] = EntryVendorTaskPeer::VENDOR_PROFILE_ID;
+		if ($this->reach_profile_id !== $v) {
+			$this->reach_profile_id = $v;
+			$this->modifiedColumns[] = EntryVendorTaskPeer::REACH_PROFILE_ID;
 		}
 
 		return $this;
-	} // setVendorProfileId()
+	} // setReachProfileId()
 
 	/**
 	 * Set the value of [kuser_id] column.
@@ -950,7 +950,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 		
 		try {
 
-			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
 			$this->created_at = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->queue_time = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
@@ -961,7 +961,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->price = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->catalog_item_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->vendor_profile_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->reach_profile_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->kuser_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
 			$this->version = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
 			$this->context = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
@@ -1529,7 +1529,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 				return $this->getCatalogItemId();
 				break;
 			case 11:
-				return $this->getVendorProfileId();
+				return $this->getReachProfileId();
 				break;
 			case 12:
 				return $this->getKuserId();
@@ -1575,7 +1575,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			$keys[8] => $this->getStatus(),
 			$keys[9] => $this->getPrice(),
 			$keys[10] => $this->getCatalogItemId(),
-			$keys[11] => $this->getVendorProfileId(),
+			$keys[11] => $this->getReachProfileId(),
 			$keys[12] => $this->getKuserId(),
 			$keys[13] => $this->getVersion(),
 			$keys[14] => $this->getContext(),
@@ -1645,7 +1645,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 				$this->setCatalogItemId($value);
 				break;
 			case 11:
-				$this->setVendorProfileId($value);
+				$this->setReachProfileId($value);
 				break;
 			case 12:
 				$this->setKuserId($value);
@@ -1694,7 +1694,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setPrice($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCatalogItemId($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setVendorProfileId($arr[$keys[11]]);
+		if (array_key_exists($keys[11], $arr)) $this->setReachProfileId($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setKuserId($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setVersion($arr[$keys[13]]);
 		if (array_key_exists($keys[14], $arr)) $this->setContext($arr[$keys[14]]);
@@ -1721,7 +1721,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS)) $criteria->add(EntryVendorTaskPeer::STATUS, $this->status);
 		if ($this->isColumnModified(EntryVendorTaskPeer::PRICE)) $criteria->add(EntryVendorTaskPeer::PRICE, $this->price);
 		if ($this->isColumnModified(EntryVendorTaskPeer::CATALOG_ITEM_ID)) $criteria->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $this->catalog_item_id);
-		if ($this->isColumnModified(EntryVendorTaskPeer::VENDOR_PROFILE_ID)) $criteria->add(EntryVendorTaskPeer::VENDOR_PROFILE_ID, $this->vendor_profile_id);
+		if ($this->isColumnModified(EntryVendorTaskPeer::REACH_PROFILE_ID)) $criteria->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $this->reach_profile_id);
 		if ($this->isColumnModified(EntryVendorTaskPeer::KUSER_ID)) $criteria->add(EntryVendorTaskPeer::KUSER_ID, $this->kuser_id);
 		if ($this->isColumnModified(EntryVendorTaskPeer::VERSION)) $criteria->add(EntryVendorTaskPeer::VERSION, $this->version);
 		if ($this->isColumnModified(EntryVendorTaskPeer::CONTEXT)) $criteria->add(EntryVendorTaskPeer::CONTEXT, $this->context);
@@ -1773,7 +1773,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 
 	/**
 	 * Returns the primary key for this object (row).
-	 * @return     int
+	 * @return     string
 	 */
 	public function getPrimaryKey()
 	{
@@ -1783,7 +1783,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	/**
 	 * Generic method to set the primary key (id column).
 	 *
-	 * @param      int $key Primary key.
+	 * @param      string $key Primary key.
 	 * @return     void
 	 */
 	public function setPrimaryKey($key)
@@ -1824,7 +1824,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 
 		$copyObj->setCatalogItemId($this->catalog_item_id);
 
-		$copyObj->setVendorProfileId($this->vendor_profile_id);
+		$copyObj->setReachProfileId($this->reach_profile_id);
 
 		$copyObj->setKuserId($this->kuser_id);
 

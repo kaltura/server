@@ -46,7 +46,7 @@ class EntryVendorTaskSphinxPlugin extends KalturaPlugin implements IKalturaCrite
 					'status' 			=> SphinxFieldType::RT_ATTR_UINT,
 					'price' 			=> SphinxFieldType::RT_ATTR_UINT,
 					'catalog_item_id' 	=> SphinxFieldType::RT_FIELD,
-					'vendor_profile_id' => SphinxFieldType::RT_FIELD,
+					'reach_profile_id'  => SphinxFieldType::RT_FIELD,
 					'kuser_id'			=> SphinxFieldType::RT_FIELD,
 					'user_id'			=> SphinxFieldType::RT_FIELD,
 					'context' 			=> SphinxFieldType::RT_FIELD,

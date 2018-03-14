@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage model.filters
  */
-class VendorProfileFilter extends baseObjectFilter
+class ReachProfileFilter extends baseObjectFilter
 {
 	public function init ()
 	{
@@ -34,19 +34,19 @@ class VendorProfileFilter extends baseObjectFilter
 	{
 		return
 			array (
-				"display_name" => "VendorProfile",
+				"display_name" => "ReachProfile",
 				"desc" => ""
 			);
 	}
 	
 	public function getFieldNameFromPeer($field_name)
 	{
-		return VendorProfilePeer::translateFieldName($field_name, $this->field_name_translation_type, BasePeer::TYPE_COLNAME);
+		return ReachProfilePeer::translateFieldName($field_name, $this->field_name_translation_type, BasePeer::TYPE_COLNAME);
 	}
 	
 	public function getIdFromPeer()
 	{
-		return VendorProfilePeer::ID;
+		return ReachProfilePeer::ID;
 	}
 }
 

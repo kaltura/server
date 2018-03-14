@@ -10,7 +10,7 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	 *  @var int
 	 *  @readonly
 	 */
-	public $credit = VendorProfileCreditValues::UNLIMITED_CREDIT;
+	public $credit = ReachProfileCreditValues::UNLIMITED_CREDIT;
 
 	/**
 	 *  @var time

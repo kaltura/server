@@ -143,7 +143,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	 */
 	private function addHeaderRowToCsv($csvFile)
 	{
-		$headerRow = 'Task id,vendorPartnerId,createdAt,updatedAt,queueTime,finishTime,entryId,status,vendorProfileId,catalogItemId,price,userId,moderatingUser,errDescription,notes,version,context,accuracy,outputObjectId,partnerData';
+		$headerRow = 'Task id,vendorPartnerId,createdAt,updatedAt,queueTime,finishTime,entryId,status,reachProfileId,catalogItemId,price,userId,moderatingUser,errDescription,notes,version,context,accuracy,outputObjectId,partnerData';
 		fputcsv($csvFile, explode(',', $headerRow));
 		return $csvFile;
 	}
@@ -184,7 +184,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 			'finishTime' => $entryVendorTask->finishTime,
 			'entryId' => $entryVendorTask->entryId,
 			'status' => $entryVendorTask->status,
-			'vendorProfileId' => $entryVendorTask->vendorProfileId,
+			'reachProfileId' => $entryVendorTask->reachProfileId,
 			'catalogItemId' => $entryVendorTask->catalogItemId,
 			'price' => $entryVendorTask->price,
 			'userId' => $entryVendorTask->userId,

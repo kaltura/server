@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Base class that represents a row from the 'vendor_profile' table.
+ * Base class that represents a row from the 'reach_profile' table.
  *
  * 
  *
  * @package plugins.reach
  * @subpackage model.om
  */
-abstract class BaseVendorProfile extends BaseObject  implements Persistent {
+abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        VendorProfilePeer
+	 * @var        ReachProfilePeer
 	 */
 	protected static $peer;
 
@@ -288,12 +288,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::ID]))
-			$this->oldColumnsValues[VendorProfilePeer::ID] = $this->id;
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::ID]))
+			$this->oldColumnsValues[ReachProfilePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -301,7 +301,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::ID;
+			$this->modifiedColumns[] = ReachProfilePeer::ID;
 		}
 
 		return $this;
@@ -312,7 +312,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -349,7 +349,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = VendorProfilePeer::CREATED_AT;
+				$this->modifiedColumns[] = ReachProfilePeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -361,7 +361,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
@@ -398,7 +398,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 					)
 			{
 				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = VendorProfilePeer::UPDATED_AT;
+				$this->modifiedColumns[] = ReachProfilePeer::UPDATED_AT;
 			}
 		} // if either are not null
 
@@ -409,12 +409,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [partner_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setPartnerId($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::PARTNER_ID]))
-			$this->oldColumnsValues[VendorProfilePeer::PARTNER_ID] = $this->partner_id;
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::PARTNER_ID]))
+			$this->oldColumnsValues[ReachProfilePeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -422,7 +422,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->partner_id !== $v) {
 			$this->partner_id = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::PARTNER_ID;
+			$this->modifiedColumns[] = ReachProfilePeer::PARTNER_ID;
 		}
 
 		return $this;
@@ -432,12 +432,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [type] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setType($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::TYPE]))
-			$this->oldColumnsValues[VendorProfilePeer::TYPE] = $this->type;
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::TYPE]))
+			$this->oldColumnsValues[ReachProfilePeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -445,7 +445,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->type !== $v) {
 			$this->type = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::TYPE;
+			$this->modifiedColumns[] = ReachProfilePeer::TYPE;
 		}
 
 		return $this;
@@ -455,12 +455,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [status] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::STATUS]))
-			$this->oldColumnsValues[VendorProfilePeer::STATUS] = $this->status;
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::STATUS]))
+			$this->oldColumnsValues[ReachProfilePeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -468,7 +468,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->status !== $v) {
 			$this->status = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::STATUS;
+			$this->modifiedColumns[] = ReachProfilePeer::STATUS;
 		}
 
 		return $this;
@@ -478,12 +478,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [used_credit] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setUsedCredit($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::USED_CREDIT]))
-			$this->oldColumnsValues[VendorProfilePeer::USED_CREDIT] = $this->used_credit;
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::USED_CREDIT]))
+			$this->oldColumnsValues[ReachProfilePeer::USED_CREDIT] = $this->used_credit;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -491,7 +491,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->used_credit !== $v) {
 			$this->used_credit = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::USED_CREDIT;
+			$this->modifiedColumns[] = ReachProfilePeer::USED_CREDIT;
 		}
 
 		return $this;
@@ -501,12 +501,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [rules] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setRules($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::RULES]))
-			$this->oldColumnsValues[VendorProfilePeer::RULES] = $this->rules;
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::RULES]))
+			$this->oldColumnsValues[ReachProfilePeer::RULES] = $this->rules;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -514,7 +514,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->rules !== $v) {
 			$this->rules = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::RULES;
+			$this->modifiedColumns[] = ReachProfilePeer::RULES;
 		}
 
 		return $this;
@@ -524,12 +524,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [dictionary] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setDictionary($v)
 	{
-		if(!isset($this->oldColumnsValues[VendorProfilePeer::DICTIONARY]))
-			$this->oldColumnsValues[VendorProfilePeer::DICTIONARY] = $this->dictionary;
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::DICTIONARY]))
+			$this->oldColumnsValues[ReachProfilePeer::DICTIONARY] = $this->dictionary;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -537,7 +537,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->dictionary !== $v) {
 			$this->dictionary = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::DICTIONARY;
+			$this->modifiedColumns[] = ReachProfilePeer::DICTIONARY;
 		}
 
 		return $this;
@@ -547,7 +547,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     VendorProfile The current object (for fluent API support)
+	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setCustomData($v)
 	{
@@ -557,7 +557,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 		if ($this->custom_data !== $v) {
 			$this->custom_data = $v;
-			$this->modifiedColumns[] = VendorProfilePeer::CUSTOM_DATA;
+			$this->modifiedColumns[] = ReachProfilePeer::CUSTOM_DATA;
 		}
 
 		return $this;
@@ -617,10 +617,10 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = VendorProfilePeer::NUM_COLUMNS - VendorProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 10; // 10 = ReachProfilePeer::NUM_COLUMNS - ReachProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating VendorProfile object", $e);
+			throw new PropelException("Error populating ReachProfile object", $e);
 		}
 	}
 
@@ -663,17 +663,17 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		VendorProfilePeer::setUseCriteriaFilter(false);
+		ReachProfilePeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		VendorProfilePeer::addSelectColumns($criteria);
+		ReachProfilePeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
-		VendorProfilePeer::setUseCriteriaFilter(true);
+		ReachProfilePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -702,14 +702,14 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			if ($ret) {
-				VendorProfilePeer::doDelete($this, $con);
+				ReachProfilePeer::doDelete($this, $con);
 				$this->postDelete($con);
 				$this->setDeleted(true);
 				$con->commit();
@@ -742,7 +742,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(VendorProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -763,12 +763,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
                $affectedRows = $this->doSave($con);
-                if ($affectedRows || !$this->isColumnModified(VendorProfilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                if ($affectedRows || !$this->isColumnModified(ReachProfilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
                 KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
-				$criteria->addSelectColumn(VendorProfilePeer::CUSTOM_DATA);
+				$criteria->addSelectColumn(ReachProfilePeer::CUSTOM_DATA);
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
@@ -780,7 +780,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 
 				//set custom data column values we wanted to change to
 				$validUpdate = true;
-				$atomicCustomDataFields = VendorProfilePeer::getAtomicCustomDataFields();
+				$atomicCustomDataFields = ReachProfilePeer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
@@ -830,7 +830,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 				$this->postUpdate($con);
 			}
 			$this->postSave($con);
-			VendorProfilePeer::addInstanceToPool($this);
+			ReachProfilePeer::addInstanceToPool($this);
 			
 			$con->commit();
 			return $affectedRows;
@@ -863,14 +863,14 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 			$this->alreadyInSave = true;
 
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = VendorProfilePeer::ID;
+				$this->modifiedColumns[] = ReachProfilePeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = VendorProfilePeer::doInsert($this, $con);
+					$pk = ReachProfilePeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -880,7 +880,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
-					$affectedObjects = VendorProfilePeer::doUpdate($this, $con);
+					$affectedObjects = ReachProfilePeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
 						
@@ -1099,7 +1099,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = VendorProfilePeer::doValidate($this, $columns)) !== true) {
+			if (($retval = ReachProfilePeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
@@ -1122,7 +1122,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = VendorProfilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = ReachProfilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -1186,7 +1186,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = VendorProfilePeer::getFieldNames($keyType);
+		$keys = ReachProfilePeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getCreatedAt(),
@@ -1214,7 +1214,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = VendorProfilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = ReachProfilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -1281,7 +1281,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = VendorProfilePeer::getFieldNames($keyType);
+		$keys = ReachProfilePeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
@@ -1302,18 +1302,18 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(VendorProfilePeer::DATABASE_NAME);
+		$criteria = new Criteria(ReachProfilePeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(VendorProfilePeer::ID)) $criteria->add(VendorProfilePeer::ID, $this->id);
-		if ($this->isColumnModified(VendorProfilePeer::CREATED_AT)) $criteria->add(VendorProfilePeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(VendorProfilePeer::UPDATED_AT)) $criteria->add(VendorProfilePeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(VendorProfilePeer::PARTNER_ID)) $criteria->add(VendorProfilePeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(VendorProfilePeer::TYPE)) $criteria->add(VendorProfilePeer::TYPE, $this->type);
-		if ($this->isColumnModified(VendorProfilePeer::STATUS)) $criteria->add(VendorProfilePeer::STATUS, $this->status);
-		if ($this->isColumnModified(VendorProfilePeer::USED_CREDIT)) $criteria->add(VendorProfilePeer::USED_CREDIT, $this->used_credit);
-		if ($this->isColumnModified(VendorProfilePeer::RULES)) $criteria->add(VendorProfilePeer::RULES, $this->rules);
-		if ($this->isColumnModified(VendorProfilePeer::DICTIONARY)) $criteria->add(VendorProfilePeer::DICTIONARY, $this->dictionary);
-		if ($this->isColumnModified(VendorProfilePeer::CUSTOM_DATA)) $criteria->add(VendorProfilePeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(ReachProfilePeer::ID)) $criteria->add(ReachProfilePeer::ID, $this->id);
+		if ($this->isColumnModified(ReachProfilePeer::CREATED_AT)) $criteria->add(ReachProfilePeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(ReachProfilePeer::UPDATED_AT)) $criteria->add(ReachProfilePeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(ReachProfilePeer::PARTNER_ID)) $criteria->add(ReachProfilePeer::PARTNER_ID, $this->partner_id);
+		if ($this->isColumnModified(ReachProfilePeer::TYPE)) $criteria->add(ReachProfilePeer::TYPE, $this->type);
+		if ($this->isColumnModified(ReachProfilePeer::STATUS)) $criteria->add(ReachProfilePeer::STATUS, $this->status);
+		if ($this->isColumnModified(ReachProfilePeer::USED_CREDIT)) $criteria->add(ReachProfilePeer::USED_CREDIT, $this->used_credit);
+		if ($this->isColumnModified(ReachProfilePeer::RULES)) $criteria->add(ReachProfilePeer::RULES, $this->rules);
+		if ($this->isColumnModified(ReachProfilePeer::DICTIONARY)) $criteria->add(ReachProfilePeer::DICTIONARY, $this->dictionary);
+		if ($this->isColumnModified(ReachProfilePeer::CUSTOM_DATA)) $criteria->add(ReachProfilePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1328,29 +1328,29 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(VendorProfilePeer::DATABASE_NAME);
+		$criteria = new Criteria(ReachProfilePeer::DATABASE_NAME);
 
-		$criteria->add(VendorProfilePeer::ID, $this->id);
+		$criteria->add(ReachProfilePeer::ID, $this->id);
 		
 		if($this->alreadyInSave)
 		{
-			if ($this->isColumnModified(VendorProfilePeer::CUSTOM_DATA))
+			if ($this->isColumnModified(ReachProfilePeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
-					$criteria->add(VendorProfilePeer::CUSTOM_DATA, "MD5(cast(" . VendorProfilePeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					$criteria->add(ReachProfilePeer::CUSTOM_DATA, "MD5(cast(" . ReachProfilePeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
-					$criteria->add(VendorProfilePeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+					$criteria->add(ReachProfilePeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
 			
-			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(VendorProfilePeer::UPDATED_AT))
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(ReachProfilePeer::UPDATED_AT))
 			{
 				$theModifiedColumn = null;
 				foreach($this->modifiedColumns as $modifiedColumn)
-					if($modifiedColumn != VendorProfilePeer::UPDATED_AT)
+					if($modifiedColumn != ReachProfilePeer::UPDATED_AT)
 						$theModifiedColumn = $modifiedColumn;
 						
-				$atomicColumns = VendorProfilePeer::getAtomicColumns();
+				$atomicColumns = ReachProfilePeer::getAtomicColumns();
 				if(in_array($theModifiedColumn, $atomicColumns))
 					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
@@ -1385,7 +1385,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of VendorProfile (or compatible) type.
+	 * @param      object $copyObj An object of ReachProfile (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
@@ -1426,7 +1426,7 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     VendorProfile Clone of current object.
+	 * @return     ReachProfile Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1442,16 +1442,16 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     VendorProfile Clone of current object.
+	 * @var     ReachProfile Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      VendorProfile $copiedFrom Clone of current object.
+	 * @param      ReachProfile $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(VendorProfile $copiedFrom)
+	public function setCopiedFrom(ReachProfile $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}
@@ -1463,12 +1463,12 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     VendorProfilePeer
+	 * @return     ReachProfilePeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new VendorProfilePeer();
+			self::$peer = new ReachProfilePeer();
 		}
 		return self::$peer;
 	}
@@ -1636,4 +1636,4 @@ abstract class BaseVendorProfile extends BaseObject  implements Persistent {
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	
-} // BaseVendorProfile
+} // BaseReachProfile

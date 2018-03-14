@@ -2586,7 +2586,7 @@ CREATE TABLE `partner_catalog_item`
 	KEY `partner_id_status_index`(`partner_id`, `status`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `vendor_profile`
+CREATE TABLE IF NOT EXISTS `reach_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,
@@ -2616,7 +2616,7 @@ CREATE TABLE IF NOT EXISTS `entry_vendor_task`
 	`status` TINYINT  NOT NULL,
 	`price` INTEGER  NOT NULL,
 	`catalog_item_id` INTEGER  NOT NULL,
-	`vendor_profile_id` INTEGER  NOT NULL,
+	`reach_profile_id` INTEGER  NOT NULL,
 	`kuser_id` INTEGER  NOT NULL,
 	`version` INTEGER,
 	`context` VARCHAR(256),

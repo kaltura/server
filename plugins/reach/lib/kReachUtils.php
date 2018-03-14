@@ -54,14 +54,14 @@ class kReachUtils
 	/**
 	 * @param $entry
 	 * @param $catalogItem
-	 * @param $vendorProfile
+	 * @param $reachProfile
 	 * @return bool
 	 */
-	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, VendorProfile $vendorProfile)
+	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, ReachProfile $reachProfile)
 	{
-		$creditUsed = $vendorProfile->getUsedCredit();
-		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
-		if ($allowedCredit == VendorProfileCreditValues::UNLIMITED_CREDIT )
+		$creditUsed = $reachProfile->getUsedCredit();
+		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
+		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
 			return true;
 
 		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
@@ -78,13 +78,13 @@ class kReachUtils
 	 */
 	public static function checkCreditForApproval(EntryVendorTask $entryVendorTask)
 	{
-		$vendorProfile = $entryVendorTask->getVendorProfile();
+		$reachProfile = $entryVendorTask->getReachProfile();
 
-		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
-		if ($allowedCredit == VendorProfileCreditValues::UNLIMITED_CREDIT )
+		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
+		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
 			return true;
 
-		$creditUsed = $vendorProfile->getUsedCredit();
+		$creditUsed = $reachProfile->getUsedCredit();
 		$entryTaskPrice = $entryVendorTask->getPrice();
 		
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
@@ -95,13 +95,13 @@ class kReachUtils
 	
 	public static function checkPriceAddon($entryVendorTask, $taskPriceDiff)
 	{
-		$vendorProfile = $entryVendorTask->getVendorProfile();
-		$allowedCredit = $vendorProfile->getCredit()->getCurrentCredit();
+		$reachProfile = $entryVendorTask->getReachProfile();
+		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
 
-		if ($allowedCredit == VendorProfileCreditValues::UNLIMITED_CREDIT )
+		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
 			return true;
 
-		$creditUsed = $vendorProfile->getUsedCredit();
+		$creditUsed = $reachProfile->getUsedCredit();
 
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] taskPriceDiff [$taskPriceDiff]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);

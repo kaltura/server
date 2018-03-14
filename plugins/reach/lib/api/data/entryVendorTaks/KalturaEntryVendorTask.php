@@ -68,12 +68,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	public $status;
 	
 	/**
-	 * The profile id from which this task base cnfig is taken from
+	 * The profile id from which this task base config is taken from
 	 * @var int
 	 * @filter eq,in
 	 * @insertonly
 	 */
-	public $vendorProfileId;
+	public $reachProfileId;
 	
 	/**
 	 * The catalog item Id containing the task description 
@@ -176,7 +176,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'finishTime',
 		'entryId',
 		'status',
-		'vendorProfileId',
+		'reachProfileId',
 		'catalogItemId',
 		'price',
 		'userId',
@@ -213,7 +213,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("vendorProfileId");
+		$this->validatePropertyNotNull("reachProfileId");
 		$this->validatePropertyNotNull("catalogItemId");
 		$this->validatePropertyNotNull("entryId");
 		$this->validateEntryId();

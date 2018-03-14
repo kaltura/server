@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `vendor_profile`
+CREATE TABLE IF NOT EXISTS `reach_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,

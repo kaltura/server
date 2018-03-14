@@ -168,7 +168,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
-			$object_to_fill = new VendorProfile();
+			$object_to_fill = new ReachProfile();
 
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -190,7 +190,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		return strlen($data) <= self::MAX_DICTIONARY_LENGTH ? true : false;
 	}
 
-	private function validate(VendorProfile $sourceObject = null)
+	private function validate(ReachProfile $sourceObject = null)
 	{
 		if (!$sourceObject) //Source object will be null on insert
 		{
@@ -231,7 +231,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	 */
 	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		/* @var $dbObject VendorProfile */
+		/* @var $dbObject ReachProfile */
 		parent::doFromObject($dbObject, $responseProfile);
 
 		if($this->shouldGet('credit', $responseProfile) && !is_null($dbObject->getCredit())) 

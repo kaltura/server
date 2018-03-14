@@ -64,8 +64,8 @@ abstract class BaseEntryVendorTaskPeer {
 	/** the column name for the CATALOG_ITEM_ID field */
 	const CATALOG_ITEM_ID = 'entry_vendor_task.CATALOG_ITEM_ID';
 
-	/** the column name for the VENDOR_PROFILE_ID field */
-	const VENDOR_PROFILE_ID = 'entry_vendor_task.VENDOR_PROFILE_ID';
+	/** the column name for the REACH_PROFILE_ID field */
+	const REACH_PROFILE_ID = 'entry_vendor_task.REACH_PROFILE_ID';
 
 	/** the column name for the KUSER_ID field */
 	const KUSER_ID = 'entry_vendor_task.KUSER_ID';
@@ -95,10 +95,10 @@ abstract class BaseEntryVendorTaskPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'QueueTime', 'FinishTime', 'PartnerId', 'VendorPartnerId', 'EntryId', 'Status', 'Price', 'CatalogItemId', 'VendorProfileId', 'KuserId', 'Version', 'Context', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'queueTime', 'finishTime', 'partnerId', 'vendorPartnerId', 'entryId', 'status', 'price', 'catalogItemId', 'vendorProfileId', 'kuserId', 'version', 'context', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::QUEUE_TIME, self::FINISH_TIME, self::PARTNER_ID, self::VENDOR_PARTNER_ID, self::ENTRY_ID, self::STATUS, self::PRICE, self::CATALOG_ITEM_ID, self::VENDOR_PROFILE_ID, self::KUSER_ID, self::VERSION, self::CONTEXT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'queue_time', 'finish_time', 'partner_id', 'vendor_partner_id', 'entry_id', 'status', 'price', 'catalog_item_id', 'vendor_profile_id', 'kuser_id', 'version', 'context', 'custom_data', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'QueueTime', 'FinishTime', 'PartnerId', 'VendorPartnerId', 'EntryId', 'Status', 'Price', 'CatalogItemId', 'ReachProfileId', 'KuserId', 'Version', 'Context', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'queueTime', 'finishTime', 'partnerId', 'vendorPartnerId', 'entryId', 'status', 'price', 'catalogItemId', 'reachProfileId', 'kuserId', 'version', 'context', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::QUEUE_TIME, self::FINISH_TIME, self::PARTNER_ID, self::VENDOR_PARTNER_ID, self::ENTRY_ID, self::STATUS, self::PRICE, self::CATALOG_ITEM_ID, self::REACH_PROFILE_ID, self::KUSER_ID, self::VERSION, self::CONTEXT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'queue_time', 'finish_time', 'partner_id', 'vendor_partner_id', 'entry_id', 'status', 'price', 'catalog_item_id', 'reach_profile_id', 'kuser_id', 'version', 'context', 'custom_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
 	);
 
@@ -109,10 +109,10 @@ abstract class BaseEntryVendorTaskPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'QueueTime' => 3, 'FinishTime' => 4, 'PartnerId' => 5, 'VendorPartnerId' => 6, 'EntryId' => 7, 'Status' => 8, 'Price' => 9, 'CatalogItemId' => 10, 'VendorProfileId' => 11, 'KuserId' => 12, 'Version' => 13, 'Context' => 14, 'CustomData' => 15, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'queueTime' => 3, 'finishTime' => 4, 'partnerId' => 5, 'vendorPartnerId' => 6, 'entryId' => 7, 'status' => 8, 'price' => 9, 'catalogItemId' => 10, 'vendorProfileId' => 11, 'kuserId' => 12, 'version' => 13, 'context' => 14, 'customData' => 15, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::QUEUE_TIME => 3, self::FINISH_TIME => 4, self::PARTNER_ID => 5, self::VENDOR_PARTNER_ID => 6, self::ENTRY_ID => 7, self::STATUS => 8, self::PRICE => 9, self::CATALOG_ITEM_ID => 10, self::VENDOR_PROFILE_ID => 11, self::KUSER_ID => 12, self::VERSION => 13, self::CONTEXT => 14, self::CUSTOM_DATA => 15, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'queue_time' => 3, 'finish_time' => 4, 'partner_id' => 5, 'vendor_partner_id' => 6, 'entry_id' => 7, 'status' => 8, 'price' => 9, 'catalog_item_id' => 10, 'vendor_profile_id' => 11, 'kuser_id' => 12, 'version' => 13, 'context' => 14, 'custom_data' => 15, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'QueueTime' => 3, 'FinishTime' => 4, 'PartnerId' => 5, 'VendorPartnerId' => 6, 'EntryId' => 7, 'Status' => 8, 'Price' => 9, 'CatalogItemId' => 10, 'ReachProfileId' => 11, 'KuserId' => 12, 'Version' => 13, 'Context' => 14, 'CustomData' => 15, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'queueTime' => 3, 'finishTime' => 4, 'partnerId' => 5, 'vendorPartnerId' => 6, 'entryId' => 7, 'status' => 8, 'price' => 9, 'catalogItemId' => 10, 'reachProfileId' => 11, 'kuserId' => 12, 'version' => 13, 'context' => 14, 'customData' => 15, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::QUEUE_TIME => 3, self::FINISH_TIME => 4, self::PARTNER_ID => 5, self::VENDOR_PARTNER_ID => 6, self::ENTRY_ID => 7, self::STATUS => 8, self::PRICE => 9, self::CATALOG_ITEM_ID => 10, self::REACH_PROFILE_ID => 11, self::KUSER_ID => 12, self::VERSION => 13, self::CONTEXT => 14, self::CUSTOM_DATA => 15, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'queue_time' => 3, 'finish_time' => 4, 'partner_id' => 5, 'vendor_partner_id' => 6, 'entry_id' => 7, 'status' => 8, 'price' => 9, 'catalog_item_id' => 10, 'reach_profile_id' => 11, 'kuser_id' => 12, 'version' => 13, 'context' => 14, 'custom_data' => 15, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
 	);
 
@@ -194,7 +194,7 @@ abstract class BaseEntryVendorTaskPeer {
 		$criteria->addSelectColumn(EntryVendorTaskPeer::STATUS);
 		$criteria->addSelectColumn(EntryVendorTaskPeer::PRICE);
 		$criteria->addSelectColumn(EntryVendorTaskPeer::CATALOG_ITEM_ID);
-		$criteria->addSelectColumn(EntryVendorTaskPeer::VENDOR_PROFILE_ID);
+		$criteria->addSelectColumn(EntryVendorTaskPeer::REACH_PROFILE_ID);
 		$criteria->addSelectColumn(EntryVendorTaskPeer::KUSER_ID);
 		$criteria->addSelectColumn(EntryVendorTaskPeer::VERSION);
 		$criteria->addSelectColumn(EntryVendorTaskPeer::CONTEXT);
@@ -1027,7 +1027,7 @@ abstract class BaseEntryVendorTaskPeer {
 	/**
 	 * Retrieve a single object by pkey.
 	 *
-	 * @param      int $pk the primary key.
+	 * @param      string $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
 	 * @return     EntryVendorTask
 	 */

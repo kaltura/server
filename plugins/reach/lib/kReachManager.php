@@ -76,7 +76,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectCreated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$this->updateVendorProfileCreditUsage($object);
+		$this->updateReachProfileCreditUsage($object);
 		return true;
 	}
 	
@@ -89,7 +89,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& $object->getStatus() == EntryVendorTaskStatus::PENDING
 			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) != EntryVendorTaskStatus::PENDING_MODERATION
 		)
-			return $this->updateVendorProfileCreditUsage($object);
+			return $this->updateReachProfileCreditUsage($object);
 		
 		if($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
@@ -112,14 +112,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 	
-	private function updateVendorProfileCreditUsage(EntryVendorTask $entryVendorTask)
+	private function updateReachProfileCreditUsage(EntryVendorTask $entryVendorTask)
 	{
-		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), $entryVendorTask->getPrice());
+		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), $entryVendorTask->getPrice());
 	}
 	
 	private function handleErrorTask(EntryVendorTask $entryVendorTask)
 	{
-		VendorProfilePeer::updateUsedCredit($entryVendorTask->getVendorProfileId(), -$entryVendorTask->getPrice());
+		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 	}
 
 	private function handleEntryDurationChanged(entry $entry)
@@ -134,13 +134,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$priceDiff = $newPrice - $oldPrice;
 			$pendingEntryVendorTask->setPrice($newPrice);
 			
-			if(!isset($addedCostByProfileId[$pendingEntryVendorTask->getVendorProfileId()]))
-				$addedCostByProfileId[$pendingEntryVendorTask->getVendorProfileId()] = 0;
+			if(!isset($addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()]))
+				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] = 0;
 			
 			if(kReachUtils::checkPriceAddon($pendingEntryVendorTask, $priceDiff))
 			{
 				$pendingEntryVendorTask->save();
-				$addedCostByProfileId[$pendingEntryVendorTask->getVendorProfileId()] += $priceDiff;
+				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] += $priceDiff;
 			}
 			else
 			{
@@ -148,22 +148,22 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				$pendingEntryVendorTask->setPrice($newPrice);
 				$pendingEntryVendorTask->setErrDescription("Current task price exceeded credit allowed, task was aborted");
 				$pendingEntryVendorTask->save();
-				$addedCostByProfileId[$pendingEntryVendorTask->getVendorProfileId()] -= $oldPrice;
+				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] -= $oldPrice;
 			}
 		}
 		
-		foreach($addedCostByProfileId as $vendorProfileId => $addedCost)
+		foreach($addedCostByProfileId as $reachProfileId => $addedCost)
 		{
-			VendorProfilePeer::updateUsedCredit($vendorProfileId, $addedCost);
+			ReachProfilePeer::updateUsedCredit($reachProfileId, $addedCost);
 		}
 		
 		return true;
 	}
 	
-	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $vendorProfileId)
+	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
-		$vendorProfile = VendorProfilePeer::retrieveByPK($vendorProfileId);
+		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
 
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
@@ -175,17 +175,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		if(!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $vendorProfile))
+		if(!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $reachProfile))
 		{
 			KalturaLog::err("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
 		
-		$entryVendorTask = self::addEntryVendorTask($entry, $vendorProfile, $vendorCatalogItem, false, $sourceFlavorVersion);
+		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion);
 		return $entryVendorTask;
 	}
 	
-	public static function addEntryVendorTask(entry $entry, VendorProfile $vendorProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0)
+	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0)
 	{
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
@@ -193,7 +193,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		//Assign default parameters
 		$entryVendorTask->setEntryId($entry->getId());
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
-		$entryVendorTask->setVendorProfileId($vendorProfile->getId());
+		$entryVendorTask->setReachProfileId($reachProfile->getId());
 		$entryVendorTask->setPartnerId($entry->getPartnerId());
 		$entryVendorTask->setKuserId(kCurrentContext::getCurrentKsKuserId());
 		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
@@ -207,10 +207,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
 		
 		$status = EntryVendorTaskStatus::PENDING;
-		if($validateModeration && $vendorProfile->shouldModerate($vendorCatalogItem->getServiceType()))
+		if($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 
-		$dictionary = $vendorProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
+		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
 		if ($dictionary)
 			$entryVendorTask->setDictionary($dictionary->getData());
 
@@ -225,10 +225,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$scope = new kScope();
 		$entryId = $object->getEntryId();
 		$scope->setEntryId($entryId);
-		$vendorProfiles = VendorProfilePeer::retrieveByPartnerId($object->getPartnerId());
-		foreach ($vendorProfiles as $profile)
+		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($object->getPartnerId());
+		foreach ($reachProfiles as $profile)
 		{
-			/* @var $profile VendorProfile */
+			/* @var $profile ReachProfile */
 			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
 			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $fullFieldCatalogItemIds);
 			$catalogItemIdsToAdd = array_unique(array_diff($fullFieldCatalogItemIds, $existingCatalogItemIds));

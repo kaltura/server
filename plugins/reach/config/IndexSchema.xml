@@ -12,7 +12,7 @@
 		<field name="status"             indexName="task_status"        type="int"      orderable="yes"	getter="status" />
 		<field name="price"              indexName="price"              type="int"      orderable="yes" />
 		<field name="catalog_item_id"    indexName="catalog_item_id"    type="string"   matchable="yes" />
-		<field name="vendor_profile_id"  indexName="vendor_profile_id"  type="string"   matchable="yes" />
+		<field name="reach_profile_id"   indexName="reach_profile_id"   type="string"   matchable="yes" />
 		<field name="kuser_id"           indexName="kuser_id"           type="string"   matchable="yes"/>
 		<field name="user_id"            indexName="user_id"            type="string"   matchable="yes"/>
 		<field name="context"            indexName="context"            type="string"   matchable="yes" />
