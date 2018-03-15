@@ -9,7 +9,7 @@
 require_once (__DIR__ . '/../../bootstrap.php');
 $script = realpath(dirname(__FILE__) . '/../../../') . '/tests/standAloneClient/exec.php';
 
-$config = realpath(dirname(__FILE__)) . '/xml/responseProfiles/reach_vendor_response_profiles.xml';
+$config = realpath(dirname(__FILE__)) . '/../../updates/scripts/xml/responseProfiles/reach_vendor_response_profiles.xml';
 if(!file_exists($config))
 	KalturaLog::err("Missing file [$config] will not deploy");
 
