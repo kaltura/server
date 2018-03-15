@@ -218,11 +218,6 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		return $result;
 	}
 
-	private function getUrl()
-	{
-
-	}
-
 	/**
 	 * Serves dry run results by its request id
 	 * @action serveDryRunResults
