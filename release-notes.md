@@ -20,7 +20,7 @@
 	Run Permissions scripts script:
 		1. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_vendor_role_and_permissions.php
 		2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_permissions.php
-		3. php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php -2 "Server Administrator" REACH_ADMIN_PERMISSION realrun/dryrun
+		3. php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php -2 "@DESIRED_ROLE@" REACH_ADMIN_PERMISSION realrun/dryrun
 
 		
 	Response profiles:
