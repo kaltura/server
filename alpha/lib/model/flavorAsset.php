@@ -325,37 +325,42 @@ class flavorAsset extends exportableAsset
 		return ($entry->getType() == entryType::DOCUMENT);
 	}
 
-	public function setLanguageAndDefault()
+	protected function setLanguageFromFlavorParams()
 	{
-		$entry = $this->getentry();
-		if (!$entry)
-			throw new kCoreException("Invalid entry id [".$this->getEntryId()."]", APIErrors::INVALID_ENTRY_ID);
 		$flavorParams = $this->getFlavorParams();
 		$multiStream = $flavorParams->getMultiStream();
 		if (isset($multiStream))
 		{
 			$multiStreamObj = json_decode($multiStream);
-			if (isset($multiStreamObj))
+			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
 			{
-				if (isset($multiStreamObj->audio) && isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
-				{
-					$flavorLang = $multiStreamObj->audio->languages[0];
-					$this->setLanguage($flavorLang);
-					$conversionProfile = $entry->getconversionProfile2();
-					if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
-					{
-						$this->setDefault(true);
-					}
-				}
+				$flavorLang = $multiStreamObj->audio->languages[0];
+				$this->setLanguage($flavorLang);
+				return $flavorLang;
 			}
 		}
+		return null;
 	}
 
 	public function preSave(PropelPDO $con = null)
 	{
 		if ($this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID))
 		{
-			$this->setLanguageAndDefault();
+//			$this->setLanguageAndDefault();
+			$flavorLang = $this->setLanguageFromFlavorParams();
+			if ($flavorLang)
+			{
+				$entry = $this->getentry();
+				if (!$entry)
+					throw new kCoreException("Invalid entry id [" . $this->getEntryId() . "]", APIErrors::INVALID_ENTRY_ID);
+				$conversionProfile = $entry->getconversionProfile2();
+				if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
+				{
+					$this->setDefault(true);
+				}
+
+			}
+
 		}
 		return parent::preSave($con);
 	}
