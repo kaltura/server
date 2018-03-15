@@ -16,5 +16,5 @@ class KalturaScheduledTaskErrors extends KalturaErrors
 
 	const DRY_RUN_FAILED = "DRY_RUN_FAILED;;Dry run execution has failed";
 
-	const DRY_RUN_IN_NEW_VERSION = "DRY_RUN_IN_NEW_VERSION;;Dry run is in new version use serveDryRunResults api instead";
+	const DRY_RUN_RESULT_IS_TOO_BIG = "DRY_RUN_RESULT_IS_TOO_BIG;;Dry run result is too big, use serveDryRunResults api instead";
 }

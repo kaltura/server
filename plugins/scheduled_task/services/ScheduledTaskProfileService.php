@@ -194,7 +194,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 				return $this->getDryRunResultsNewFormat($syncKey);
 			}
 
-			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_IN_NEW_VERSION);
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_RESULT_IS_TOO_BIG);
 		}
 
 		$data = kFileSyncUtils::file_get_contents($syncKey, true);
