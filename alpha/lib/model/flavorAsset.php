@@ -327,6 +327,9 @@ class flavorAsset extends exportableAsset
 
 	public function setLanguageAndDefault()
 	{
+		$entry = $this->getentry();
+		if (!$entry)
+			throw new kCoreException("Invalid entry id [".$this->getEntryId()."]", APIErrors::INVALID_ENTRY_ID);
 		$flavorParams = $this->getFlavorParams();
 		$multiStream = $flavorParams->getMultiStream();
 		if (isset($multiStream))
@@ -338,9 +341,6 @@ class flavorAsset extends exportableAsset
 				{
 					$flavorLang = $multiStreamObj->audio->languages[0];
 					$this->setLanguage($flavorLang);
-					$entry = $this->getentry();
-					if (!$entry)
-						throw new kCoreException("Invalid entry id [".$this->getEntryId()."]", APIErrors::INVALID_ENTRY_ID);
 					$conversionProfile = $entry->getconversionProfile2();
 					if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
 					{
