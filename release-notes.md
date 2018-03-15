@@ -1,3 +1,15 @@
+# Mercury 13.16.0 #
+
+## Media repurposing dry run improvements ##
+- Issue Type: Bug
+- Issue ID: PLAT-8691
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission
+
 # Mercury 13.15.0 #
 
 ## Entry added to category Firebase notification template ##
