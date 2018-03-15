@@ -22,7 +22,7 @@
 		2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_permissions.php
 		
 	Response profiles:
-		First replace all tokens from the XML file below and remove ".template" from the fle name:
+		First replace all tokens in the XML file below and remove ".template" from the fle name:
 			/opt/kaltur/app/deployment/updates/scripts/xml/responseProfiles/reach_vendor_response_profiles.template.xml
 		
 		Run deployment script:
