@@ -474,6 +474,20 @@
 				$adjustedFilterStr = str_replace($lastLabelOut, "", $adjustedFilterStr);
 			}
 			
+				/*
+				 * For the last chunk, make sure that the loop/t period does not overflow the end of the file, 
+				 * causing failure on duration validation
+				 */
+			if($this->params->duration-$start<$chunkWithOverlap){
+				$keys=array_keys($cmdLineArr,'-loop');
+				if(count($keys)>0){
+					foreach($keys as $key) {
+						if($cmdLineArr[$key+2]=='-t')
+							$cmdLineArr[$key+3] = 1;
+					}
+				}
+			}
+			
 			if(isset($adjustedFilterStr) || ($adjustedFilterStr=$filterGraphBase->CompoundString($lastLabelOut))!==null) {
 				KalturaLog::log("adjustedFilterStr:".$adjustedFilterStr);
 				$cmdLineArr[$filterIdx+1] = '\''.$adjustedFilterStr.'\'';

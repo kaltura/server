@@ -10,6 +10,16 @@ None.
 ### Deployment scripts ###
 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission
 
+## Add ability to set default audio language in live streams ##
+- Issue Type: New Feature
+- Issue ID: SUP-13373
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_12_allow_media_server_to_get_conversionprofile.php
+
 # Mercury 13.15.0 #
 
 ## Entry added to category Firebase notification template ##

@@ -406,22 +406,27 @@ class LiveStreamService extends KalturaLiveEntryService
 			case KalturaPlaybackProtocol::HLS:
 			case KalturaPlaybackProtocol::APPLE_HTTP:
 				$url = $liveStreamEntry->getHlsStreamUrl('http');
-				
-				foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol){
+				if($protocol == KalturaPlaybackProtocol::HLS)
+					$hlsProtocols = array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP);
+				else
+					$hlsProtocols = array(KalturaPlaybackProtocol::APPLE_HTTP, KalturaPlaybackProtocol::HLS);
+
+				foreach ($hlsProtocols as $hlsProtocol){
 					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::getProtocol());
 					if ($config){
 						$url = $config->getUrl();
 						$protocol = $hlsProtocol;
+						$dpda->setFormat($protocol);
 						break;
 					}
 				}
+
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
-				
 				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 				if($urlManager)
 					return $this->responseHandlingIsLive($urlManager->isLive($url));
+
 				break;
-				
 			case KalturaPlaybackProtocol::HDS:
 			case KalturaPlaybackProtocol::AKAMAI_HDS:
 				$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());

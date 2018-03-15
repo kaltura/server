@@ -41,6 +41,11 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	 */
 	public $presentationOrder;
 
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $excludeFromScore;
+
 	public function __construct()
 	{
 		$this->cuePointType = QuizPlugin::getApiValue(QuizCuePointType::QUIZ_QUESTION);
@@ -54,6 +59,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		"explanation",
 		"questionType",
 		"presentationOrder",
+		"excludeFromScore"
 	);
 
 	/* (non-PHPdoc)
