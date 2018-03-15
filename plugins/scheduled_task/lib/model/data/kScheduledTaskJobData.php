@@ -5,6 +5,10 @@
  */
 class kScheduledTaskJobData extends kJobData
 {
+	/**
+	 * @var int
+	 */
+	private $_totalCount;
 
 	/**
 	 * @var int
@@ -89,5 +93,29 @@ class kScheduledTaskJobData extends kJobData
 	public function getIsNewFormat()
 	{
 		return $this->_isNewFormat;
+	}
+
+	/**
+	 * @param bool $bool
+	 */
+	public function setIsNewFormat($bool)
+	{
+		$this->_isNewFormat = $bool;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getTotalCount()
+	{
+		return $this->_totalCount;
+	}
+
+	/**
+	 * @param int $count
+	 */
+	public function setTotalCount($count)
+	{
+		$this->_totalCount = $count;
 	}
 }

@@ -130,6 +130,10 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $this->getFileRoot() . $this->getFilePath();
 	}
 
+	/**
+	 * Its the caller responsibility to remove the file after usage
+	 * @return string path to a temporary decrypted file
+	 */
 	public function createTempClear()
 	{
 		$realPath = realpath($this->getFullPath());

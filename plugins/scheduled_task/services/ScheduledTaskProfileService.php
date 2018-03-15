@@ -9,6 +9,8 @@
  */
 class ScheduledTaskProfileService extends KalturaBaseService
 {
+	const MAX_RESULTS_THRESHOLD = 1000;
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -147,14 +149,11 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	}
 
 	/**
-	 *
-	 *
 	 * @action requestDryRun
 	 * @param int $scheduledTaskProfileId
 	 * @param int $maxResults
 	 * @return int
-	 *
-	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
+	 * @throws KalturaAPIException
 	 */
 	public function requestDryRunAction($scheduledTaskProfileId, $maxResults = 500)
 	{
@@ -182,25 +181,59 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 * @return KalturaObjectListResponse
 	 * @throws KalturaAPIException
 	 */
-	public function getDryRunResultsAction($requestId, KalturaFilterPager $pager = null)
+	public function getDryRunResultsAction($requestId)
 	{
 		$batchJob = $this->getScheduledTaskBatchJob($requestId);
 		/* @var $jobData kScheduledTaskJobData */
 		$jobData = $batchJob->getData();
-		if($jobData->getIsNewFormat)
-		{
-			return getDryRunResultsNewFormat($jobData, $pager);
-		}
-
-		if($pager)
-		{
-			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_PAGGIN_ONLY_SUPPORTED_IN_NEW_VERSION);
-		}
-
 		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+		if($jobData->getIsNewFormat())
+		{
+			if($jobData->getMaxResults() < self::MAX_RESULTS_THRESHOLD)
+			{
+				return $this->getDryRunResultsNewFormat($syncKey);
+			}
+
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_IN_NEW_VERSION);
+		}
+
 		$data = kFileSyncUtils::file_get_contents($syncKey, true);
-		$results = unserialize($data);
-		return $results;
+		return unserialize($data);
+	}
+
+	private function getDryRunResultsNewFormat($syncKey)
+	{
+		$data = kFileSyncUtils::file_get_contents($syncKey, true);
+		$objects = explode(ScheduledTaskBatchHelper::getDryRunObjectSeprator(), $data);
+		$numResults = count($objects)-1; //last line is total count and not entry object
+		$kalturaBaseEntryArray = new KalturaBaseEntryArray();
+		for ($i = 0; $i < $numResults; $i++ )
+		{
+			$kalturaBaseEntryArray[] = unserialize($objects[$i]);
+		}
+
+		$result = new KalturaObjectListResponse();
+		$result->objects = $kalturaBaseEntryArray;
+		$result->totalCount = $numResults;
+		return $result;
+	}
+
+	private function getUrl()
+	{
+
+	}
+
+	/**
+	 * Serves dry run results by its request id
+	 * @action serveDryRunResults
+	 * @param int $requestId
+	 * @return file
+	 * @throws KalturaAPIException
+	 */
+	public function serveDryRunResultsAction($requestId)
+	{
+		$batchJob = $this->getScheduledTaskBatchJob($requestId);
+		return $this->serveFile($batchJob, BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 	}
 
 	/**
@@ -224,11 +257,6 @@ class ScheduledTaskProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_NOT_READY);
 
 		return $batchJob;
-	}
-
-	private function getDryRunResultsNewFormat($jobData, KalturaFilterPager $pager)
-	{
-
 	}
 
 	/**
