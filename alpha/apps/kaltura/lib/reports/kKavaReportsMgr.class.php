@@ -132,7 +132,7 @@ class kKavaReportsMgr extends kKavaBase
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
 	
-	static $reports_def = array(
+	protected static $reports_def = array(
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
 			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
 			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name'),
@@ -630,7 +630,7 @@ class kKavaReportsMgr extends kKavaBase
 		),
 	);
 	
-	private static $event_type_count_aggrs = array(
+	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
 		self::EVENT_TYPE_PLAYER_IMPRESSION,
 		self::EVENT_TYPE_PLAY_END,
@@ -644,21 +644,21 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_REPORT_CLICKED
 	);
 
-	private static $media_type_count_aggrs = array(
+	protected static $media_type_count_aggrs = array(
 		self::MEDIA_TYPE_VIDEO,
 		self::MEDIA_TYPE_AUDIO,
 		self::MEDIA_TYPE_IMAGE,
 		self::MEDIA_TYPE_SHOW,
 	);
 	
-	private static $playthrough_event_types = array(
+	protected static $playthrough_event_types = array(
 		self::EVENT_TYPE_PLAYTHROUGH_25,
 		self::EVENT_TYPE_PLAYTHROUGH_50,
 		self::EVENT_TYPE_PLAYTHROUGH_75,
 		self::EVENT_TYPE_PLAYTHROUGH_100
 	);
 	
-	static $metrics_to_headers = array(
+	protected static $metrics_to_headers = array(
 		self::DIMENSION_DEVICE => 'device',
 		self::DIMENSION_OS => 'os',
 		self::DIMENSION_BROWSER => 'browser',
@@ -707,7 +707,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_DURATION_TOTAL_MSEC => self::METRIC_DURATION_TOTAL_MSEC,
 	);
 	
-	static $transform_metrics = array(
+	protected static $transform_metrics = array(
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
 		self::DIMENSION_DEVICE => array('kKavaReportsMgr', 'toSafeId'),
@@ -718,19 +718,19 @@ class kKavaReportsMgr extends kKavaBase
 		self::DIMENSION_SOURCE_TYPE => array('kKavaReportsMgr', 'toSafeId'),
 	);
 
-	static $transform_time_dimensions = array(
+	protected static $transform_time_dimensions = array(
 		self::DRUID_GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
 		self::DRUID_GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
 		self::DRUID_GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId')
 	);
 
-	static $granularity_mapping = array(
+	protected static $granularity_mapping = array(
 		self::DRUID_GRANULARITY_DAY => 'P1D',
 		self::DRUID_GRANULARITY_MONTH => 'P1M',
 		self::DRUID_GRANULARITY_HOUR => 'PT1H',
 	);
 
-	static $non_linear_metrics = array(
+	protected static $non_linear_metrics = array(
 		self::METRIC_AVG_PLAY_TIME => true,
 		self::METRIC_PLAYER_IMPRESSION_RATIO => true,
 		self::METRIC_PLAYTHROUGH_RATIO => true,
@@ -739,11 +739,11 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_USERS => true,
 	);
 
-	static $multi_value_dimensions = array(
+	protected static $multi_value_dimensions = array(
 		self::DIMENSION_CATEGORIES
 	);
 
-	static $php_timezone_names = array(
+	protected static $php_timezone_names = array(
 		-840 => 'Pacific/Kiritimati',
 		-780 => 'Pacific/Enderbury',
 		-765 => 'Pacific/Chatham',
@@ -790,7 +790,7 @@ class kKavaReportsMgr extends kKavaBase
 	//		it seems to be better to use Etc/GMT... with Druid when possible -
 	//		https://github.com/druid-io/druid/issues/5200
 	
-	static $druid_timezone_names = array(
+	protected static $druid_timezone_names = array(
 		-840 => 'Etc/GMT-14',
 		-780 => 'Etc/GMT-13',
 		-765 => 'Pacific/Chatham',
@@ -833,20 +833,20 @@ class kKavaReportsMgr extends kKavaBase
 		 720 => 'Etc/GMT+12',
 	);
 	
-	static $aggregations_def = array();
-	static $metrics_def = array();
-	static $headers_to_metrics = array();
-	static $custom_reports = null;
+	protected static $aggregations_def = array();
+	protected static $metrics_def = array();
+	protected static $headers_to_metrics = array();
+	protected static $custom_reports = null;
 	
 	/// init functions
-	private static function getFieldRatioPostAggr($agg_name, $field1, $field2)
+	protected static function getFieldRatioPostAggr($agg_name, $field1, $field2)
 	{
 		return self::getArithmeticPostAggregator($agg_name, '/', array(
 			self::getFieldAccessPostAggregator($field1),
 			self::getFieldAccessPostAggregator($field2)));
 	}
 
-	private static function getConstantRatioPostAggr($agg_name, $field, $const)
+	protected static function getConstantRatioPostAggr($agg_name, $field, $const)
 	{
 		return self::getArithmeticPostAggregator(
 			$agg_name, '/', array(
@@ -854,7 +854,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::getConstantPostAggregator('c', $const)));
 	}
 	
-	private static function getConstantFactorPostAggr($agg_name, $field, $const)
+	protected static function getConstantFactorPostAggr($agg_name, $field, $const)
 	{
 		return self::getArithmeticPostAggregator(
 			$agg_name, '*', array(
@@ -862,7 +862,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::getConstantPostAggregator('c', $const)));
 	}
 	
-	private static function init()
+	protected static function init()
 	{
 		if (self::$metrics_def)
 		{
@@ -1062,7 +1062,7 @@ class kKavaReportsMgr extends kKavaBase
 	}
 	
 	/// time functions
-	private static function fixTimeZoneOffset($timezone_offset)
+	protected static function fixTimeZoneOffset($timezone_offset)
 	{
 		if (isset(self::$php_timezone_names[$timezone_offset]))
 		{
@@ -1073,19 +1073,19 @@ class kKavaReportsMgr extends kKavaBase
 		return round($timezone_offset / 60) * 60;
 	}
 
-	private static function getPhpTimezoneName($timezone_offset)
+	protected static function getPhpTimezoneName($timezone_offset)
 	{
 		// Note: value must be set, since the offset already went through fixTimeZoneOffset
 		return self::$php_timezone_names[$timezone_offset];
 	}
 
-	private static function getPhpTimezone($timezone_offset)
+	protected static function getPhpTimezone($timezone_offset)
 	{
 		$tz_name = self::getPhpTimezoneName($timezone_offset);
 		return new DateTimeZone($tz_name);
 	}
 	
-	private static function getDruidTimezoneName($timezone_offset)
+	protected static function getDruidTimezoneName($timezone_offset)
 	{
 		// Note: value must be set, since the offset already went through fixTimeZoneOffset
 		return self::$druid_timezone_names[$timezone_offset];
@@ -1106,12 +1106,12 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	private static function isDateIdValid($date_id)
+	protected static function isDateIdValid($date_id)
 	{
 		return strlen($date_id) >= 8 && preg_match('/^\d+$/', substr($date_id, 0, 8));
 	}
 
-	private static function dateIdToDate($date_id)
+	protected static function dateIdToDate($date_id)
 	{
 		if (!self::isDateIdValid($date_id))
 		{
@@ -1133,7 +1133,7 @@ class kKavaReportsMgr extends kKavaBase
 		return new DateTime("$year-$month-$day");
 	}
 		
-	private static function dateIdToUnixtime($date_id)
+	protected static function dateIdToUnixtime($date_id)
 	{
 		if (!self::isDateIdValid($date_id))
 		{
@@ -1146,14 +1146,14 @@ class kKavaReportsMgr extends kKavaBase
 		return gmmktime(0, 0, 0, $month, $day, $year);
 	}
 
-	private static function timestampToHourId($timestamp, $tz)
+	protected static function timestampToHourId($timestamp, $tz)
 	{
 		// hours are returned from druid query with the right offset so no need to change it
 		$date = new DateTime($timestamp);
 		return $date->format('YmdH');
 	}
 
-	private static function timestampToDateId($timestamp, $tz)
+	protected static function timestampToDateId($timestamp, $tz)
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
@@ -1161,7 +1161,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $date->format('Ymd');
 	}
 
-	private static function timestampToMonthId($timestamp, $tz)
+	protected static function timestampToMonthId($timestamp, $tz)
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
@@ -1225,7 +1225,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $name;
 	}
 
-	private static function getReportDef($report_type)
+	protected static function getReportDef($report_type)
 	{
 		if ($report_type >= 0)
 		{
@@ -1237,7 +1237,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 	
-	private static function getDimension($report_def, $object_ids)
+	protected static function getDimension($report_def, $object_ids)
 	{
 		if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
 		{
@@ -1247,12 +1247,12 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def[self::REPORT_DIMENSION];
 	}
 
-	private static function getMetrics($report_def)
+	protected static function getMetrics($report_def)
 	{
 		return $report_def[self::REPORT_METRICS];
 	}
 
-	private static function getFilterValues($filter, $dimension)
+	protected static function getFilterValues($filter, $dimension)
 	{
 		foreach ($filter as $cur_filter)
 		{
@@ -1265,7 +1265,7 @@ class kKavaReportsMgr extends kKavaBase
 		return null;
 	}
 
-	private static function getFilterIntervals($report_def, $input_filter)
+	protected static function getFilterIntervals($report_def, $input_filter)
 	{
 		$offset = self::fixTimeZoneOffset($input_filter->timeZoneOffset);
 		$input_filter->timeZoneOffset = $offset;
@@ -1319,7 +1319,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $intervals;
 	}
 
-	private static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
+	protected static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
 	{
 		$category_filter = new categoryFilter();
 
@@ -1349,7 +1349,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	private static function addEndUserReportsDruidFilters($partner_id, $input_filter, &$druid_filter)
+	protected static function addEndUserReportsDruidFilters($partner_id, $input_filter, &$druid_filter)
 	{
 		if (!($input_filter instanceof endUserReportsInputFilter))
 		{
@@ -1390,7 +1390,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	private static function getCategoriesIds($categories, $partner_id)
+	protected static function getCategoriesIds($categories, $partner_id)
 	{
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 
@@ -1423,7 +1423,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	}
 
-	private static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids)
+	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids)
 	{
 		$druid_filter = array();
 		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
@@ -1536,7 +1536,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $druid_filter;
 	}
 
-	private static function getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics = null)
+	protected static function getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics = null)
 	{
 		$report_def = array(
 			self::DRUID_DATASOURCE => $data_source ? $data_source : self::DATASOURCE_HISTORICAL,
@@ -1657,7 +1657,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	private static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null)
+	protected static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null)
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
 
@@ -1690,7 +1690,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	private static function getSearchReport($data_source, $partner_id, $intervals, $dimensions, $filter)
+	protected static function getSearchReport($data_source, $partner_id, $intervals, $dimensions, $filter)
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_SEARCH;
@@ -1704,7 +1704,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	private static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter)
+	protected static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter)
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
@@ -1716,7 +1716,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	private static function getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $filter, $filter_metrics)
+	protected static function getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $filter, $filter_metrics)
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
@@ -1727,7 +1727,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	private static function getGroupByReport($data_source, $partner_id, $intervals, $granularity, $dimensions, $metrics, $filter, $pageSize = 0)
+	protected static function getGroupByReport($data_source, $partner_id, $intervals, $granularity, $dimensions, $metrics, $filter, $pageSize = 0)
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_GROUP_BY;
@@ -1736,7 +1736,7 @@ class kKavaReportsMgr extends kKavaBase
 	}
 
 	/// graph functions
-	private static function getGranularityDef($granularity, $timezone_offset)
+	protected static function getGranularityDef($granularity, $timezone_offset)
 	{
 		if (!isset(self::$granularity_mapping[$granularity]))
 		{
@@ -2349,7 +2349,7 @@ class kKavaReportsMgr extends kKavaBase
 	}
 
 	/// table enrich functions
-	private static function getEntriesNames($ids, $partner_id)
+	protected static function getEntriesNames($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 
@@ -2377,7 +2377,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $entries_names;
 	}
 
-	private static function getQuotedEntriesNames($ids, $partner_id)
+	protected static function getQuotedEntriesNames($ids, $partner_id)
 	{
 		$result = self::getEntriesNames($ids, $partner_id);
 		foreach ($result as &$name)
@@ -2387,7 +2387,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	private static function getEntriesUserIdsAndNames($ids, $partner_id)
+	protected static function getEntriesUserIdsAndNames($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 
@@ -2417,7 +2417,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	private static function getCategoriesNames($ids, $partner_id)
+	protected static function getCategoriesNames($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 
@@ -2445,7 +2445,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $categories_names;
 	}
 
-	private static function genericQueryEnrich($ids, $partner_id, $context)
+	protected static function genericQueryEnrich($ids, $partner_id, $context)
 	{
 		$peer = $context['peer'];
 		$columns = $context['columns'];
@@ -2658,7 +2658,7 @@ class kKavaReportsMgr extends kKavaBase
 		return null;
 	}
 	
-	private static function getTableFromGraphs($graphs, $has_aligned_dates, $date_column_name = 'date_id')
+	protected static function getTableFromGraphs($graphs, $has_aligned_dates, $date_column_name = 'date_id')
 	{
 		if (!$has_aligned_dates)
 		{
@@ -2726,7 +2726,7 @@ class kKavaReportsMgr extends kKavaBase
 		return array($headers, $data, count($data));
 	}
 
-	private static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
+	protected static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
 	{
 		$cache_key = 'reportCount-' . md5("$partner_id|".serialize($report_def)."|$object_ids|".serialize($input_filter));
 
@@ -3632,7 +3632,7 @@ class kKavaReportsMgr extends kKavaBase
 		return array($header, $data);
 	}
 
-	private static function getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $timezone_offset)
+	protected static function getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $timezone_offset)
 	{
 		$granularity = $report_def[self::REPORT_GRANULARITY];
 		$granularity_def = self::getGranularityDef($granularity, $timezone_offset);
@@ -3661,7 +3661,7 @@ class kKavaReportsMgr extends kKavaBase
 	}
 	
 	/// csv functions
-	static function getCsvData(
+	protected static function getCsvData(
 		$partner_id,
 		$report_title, $report_text, $headers,
 		$report_type,
