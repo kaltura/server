@@ -501,7 +501,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		$currentTime = time();
 		$dbLastLoginTime = $kuser->getLastLoginTime();
-		if($dbLastLoginTime && $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL)
+		if(!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL)
 			$kuser->setLastLoginTime($currentTime);
 		
 		$kuser->save();
