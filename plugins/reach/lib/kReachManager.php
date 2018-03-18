@@ -52,7 +52,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			return true;
 		
-		if($object instanceof entry && in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
+		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
+			in_array(entryPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), array(entryStatus::READY, entryStatus::DELETED))
+		)
 			return true;
 		
 		return false;
@@ -106,8 +108,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			return $this->checkAutomaticRules($object);
 		
-		if($object instanceof entry && in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
-			return $this->checkAutomaticRules($object, true);
+		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns))
+		{
+			if($object->getStatus() == entryStatus::READY)
+				return $this->checkAutomaticRules($object, true);
+			
+			if($object->getStatus() == entryStatus::DELETED)
+				return $this->handleEntryDeleted($object);
+		}
 		
 		return true;
 	}
@@ -160,7 +168,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 	
-	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId)
+	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $objectId = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
@@ -181,11 +189,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion);
+		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $objectId);
 		return $entryVendorTask;
 	}
 	
-	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0)
+	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null)
 	{
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
@@ -206,6 +214,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$shouldModerateOutput = !$reachProfile->shouldModerateOutputCaptions($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput));
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
+		
+		if($context)
+			$entryVendorTask->setContext($context);
 		
 		$status = EntryVendorTaskStatus::PENDING;
 		if($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
@@ -236,10 +247,24 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			
 			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 			{
-				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId());
+				//Pass the object Id as the context of the task
+				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId(), $object->getId());
 			}
 		}
 		
 		return true;
+	}
+	
+	private function handleEntryDeleted(entry $entry)
+	{
+		//Delete all pending moderation tasks
+		$pendingModerationTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId(), array(EntryVendorTaskStatus::PENDING_MODERATION));
+		foreach ($pendingModerationTasks as $pendingModerationTask)
+		{
+			/* @var $pendingModerationTask EntryVendorTask */
+			$pendingModerationTask->setStatus(EntryVendorTaskStatus::ABORTED);
+			$pendingModerationTask->setErrDescription("Task was aborted by server, associated entry [{$entry->getId()}] was deleted");
+			$pendingModerationTask->save();
+		}
 	}
 }

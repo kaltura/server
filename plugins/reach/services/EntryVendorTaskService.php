@@ -147,6 +147,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$dbEntryVendorTask )
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		
+		$dbEntry = entryPeer::retrieveByPK($dbEntryVendorTask->getEntryId());
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
+		
 		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PENDING_MODERATION)
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_APPROVE_NOT_MODERATED_TASK);
 		
@@ -178,6 +182,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
 		if (!$dbEntryVendorTask )
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		
+		$dbEntry = entryPeer::retrieveByPK($dbEntryVendorTask->getEntryId());
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
 		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PENDING_MODERATION)
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_REJECT_NOT_MODERATED_TASK);
@@ -257,6 +265,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
 		if (!$dbEntryVendorTask)
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		
+		$dbEntry = entryPeer::retrieveByPK($dbEntryVendorTask->getEntryId());
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
 		/* @var EntryVendorTask $dbEntryVendorTask*/
 		if($dbEntryVendorTask->getStatus() !== EntryVendorTaskStatus::PENDING_MODERATION)
