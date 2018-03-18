@@ -179,4 +179,37 @@ class ReachProfileService extends KalturaBaseService
 		return $reachProfile;
 	}
 
+	/**
+	 * reset vednor profile credit
+	 *
+	 * @action resetCredit
+	 * @param int $reachProfileId
+	 * @return KalturaReachProfile
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
+	 */
+	public function resetCredit($reachProfileId)
+	{
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
+		if (!$dbReachProfile)
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
+
+		$currentCreditHistory = array();
+		$currentCreditHistory ['usedCreditBeforeReset'] = $dbReachProfile->getUsedCredit();
+		$currentCreditHistory ['userId'] = kCurrentContext::$ks_uid;
+		$currentCreditHistory ['resetTime'] = time();
+
+		// reset the credit.
+		$dbReachProfile->setUsedCredit(0);
+
+		//add the reset history
+		$creditHistory = $dbReachProfile->getCreditResetHistory();
+		$dbReachProfile->setCreditResetHistory($currentCreditHistory);
+		$dbReachProfile->save();
+
+		// return the saved object
+		$reachProfile = new KalturaReachProfile();
+		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+		return $reachProfile;
+	}
+
 }
