@@ -838,40 +838,7 @@ class kKavaReportsMgr extends kKavaBase
 	static $headers_to_metrics = array();
 	static $custom_reports = null;
 	
-	protected static function toSafeId($name)
-	{
-		$name = strtoupper($name);
-		$name = preg_replace('/[^\w]/', '_', $name);
-		return $name;
-	}
-
-	protected static function fromSafeId($name)
-	{
-		$name = str_replace('_', ' ', $name);
-		$name = ucfirst(strtolower($name));
-		return $name;
-	}
-
-	protected static function transformBrowserName($name)
-	{
-		$name = str_replace(array('Internet Explorer', 'Microsoft Edge'), array('IE', 'Edge'), $name);
-		$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
-		$name = strtoupper($name);
-		$name = str_replace(array('(',')'), '', $name);
-		$name = preg_replace('/[^\w]/', '_', $name);
-		return $name;
-	}
-
-	protected static function transformOperatingSystemName($name)
-	{
-		$name = str_replace(array('Windows ', '.x'), array('Windows_', ''), $name);
-		$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
-		$name = strtoupper($name);
-		$name = str_replace(array('(',')'), '', $name);
-		$name = preg_replace('/[^\w]/', '_', $name);
-		return $name;
-	}
-
+	/// init functions
 	private static function getFieldRatioPostAggr($agg_name, $field1, $field2)
 	{
 		return self::getArithmeticPostAggregator($agg_name, '/', array(
@@ -1093,58 +1060,846 @@ class kKavaReportsMgr extends kKavaBase
 			self::$headers_to_metrics[$header] = $metric;
 		}
 	}
-
-	public static function getGraph($partner_id, $report_type, reportsInputFilter $input_filter, $dimension = null, $object_ids = null)
+	
+	/// time functions
+	private static function fixTimeZoneOffset($timezone_offset)
 	{
-		self::init();
-		
-		$report_def = self::getReportDef($report_type);
-		
-		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
+		if (isset(self::$php_timezone_names[$timezone_offset]))
 		{
-			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
+			return $timezone_offset;
 		}
-		
-		// get the graphs
-		$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-		
-		// reorder
-		if (isset($report_def[self::REPORT_GRAPH_MAP]))
+
+		$timezone_offset = min(max($timezone_offset, -14 * 60), 12 * 60);
+		return round($timezone_offset / 60) * 60;
+	}
+
+	private static function getPhpTimezoneName($timezone_offset)
+	{
+		// Note: value must be set, since the offset already went through fixTimeZoneOffset
+		return self::$php_timezone_names[$timezone_offset];
+	}
+
+	private static function getPhpTimezone($timezone_offset)
+	{
+		$tz_name = self::getPhpTimezoneName($timezone_offset);
+		return new DateTimeZone($tz_name);
+	}
+	
+	private static function getDruidTimezoneName($timezone_offset)
+	{
+		// Note: value must be set, since the offset already went through fixTimeZoneOffset
+		return self::$druid_timezone_names[$timezone_offset];
+	}
+	
+	protected static function getRelativeDateTime($days)
+	{
+		$result = new DateTime();
+		if ($days < 0)
 		{
-			$result = self::reorderGraphs($report_def[self::REPORT_GRAPH_MAP], $result);
+			$days = -$days;
+			$result->sub(new DateInterval("P{$days}D"));
 		}
-		
+		else if ($days > 0)
+		{ 
+			$result->add(new DateInterval("P{$days}D"));
+		}
 		return $result;
 	}
 
-	protected static function reorderGraphs($map, $input)
+	private static function isDateIdValid($date_id)
 	{
-		$result = array();
-		foreach ($map as $column => $metric)
+		return strlen($date_id) >= 8 && preg_match('/^\d+$/', substr($date_id, 0, 8));
+	}
+
+	private static function dateIdToDate($date_id)
+	{
+		if (!self::isDateIdValid($date_id))
 		{
-			if (isset($input[$metric]))
+			return null;
+		}
+
+		$year = substr($date_id, 0, 4);
+		$month = substr($date_id, 4, 2);
+		$day = substr($date_id, 6, 2);
+
+		return "$year-$month-$day";
+	}
+
+	protected static function dateIdToDateTime($date_id)
+	{
+		$year = substr($date_id, 0, 4);
+		$month = substr($date_id, 4, 2);
+		$day = substr($date_id, 6, 2);
+		return new DateTime("$year-$month-$day");
+	}
+		
+	private static function dateIdToUnixtime($date_id)
+	{
+		if (!self::isDateIdValid($date_id))
+		{
+			return null;
+		}
+
+		$year = substr($date_id, 0, 4);
+		$month = substr($date_id, 4, 2);
+		$day = substr($date_id, 6, 2);
+		return gmmktime(0, 0, 0, $month, $day, $year);
+	}
+
+	private static function timestampToHourId($timestamp, $tz)
+	{
+		// hours are returned from druid query with the right offset so no need to change it
+		$date = new DateTime($timestamp);
+		return $date->format('YmdH');
+	}
+
+	private static function timestampToDateId($timestamp, $tz)
+	{
+		$date = new DateTime($timestamp);
+		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
+		$date->setTimezone($tz);
+		return $date->format('Ymd');
+	}
+
+	private static function timestampToMonthId($timestamp, $tz)
+	{
+		$date = new DateTime($timestamp);
+		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
+		$date->setTimezone($tz);
+		return $date->format('Ym');
+	}
+
+	protected static function getDateIdRange($from_day, $to_day)
+	{
+		$date = self::dateIdToDateTime($from_day);
+		$interval = new DateInterval('P1D');
+	
+		$result = array();
+		for (;;)
+		{
+			$cur = $date->format('Ymd');
+			if (strcmp($cur, $to_day) > 0 || count($result) >= 1000)
 			{
-				$result[$column] = $input[$metric];
+				break;
 			}
+	
+			$result[] = $cur;
+			$date->add($interval);
 		}
 	
 		return $result;
 	}
-		
-	protected static function getGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
+	
+	/// common query functions
+	protected static function toSafeId($name)
 	{
-		if (isset($report_def[self::REPORT_JOIN_REPORTS]))
+		$name = strtoupper($name);
+		$name = preg_replace('/[^\w]/', '_', $name);
+		return $name;
+	}
+
+	protected static function fromSafeId($name)
+	{
+		$name = str_replace('_', ' ', $name);
+		$name = ucfirst(strtolower($name));
+		return $name;
+	}
+
+	protected static function transformBrowserName($name)
+	{
+		$name = str_replace(array('Internet Explorer', 'Microsoft Edge'), array('IE', 'Edge'), $name);
+		$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
+		$name = strtoupper($name);
+		$name = str_replace(array('(',')'), '', $name);
+		$name = preg_replace('/[^\w]/', '_', $name);
+		return $name;
+	}
+
+	protected static function transformOperatingSystemName($name)
+	{
+		$name = str_replace(array('Windows ', '.x'), array('Windows_', ''), $name);
+		$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
+		$name = strtoupper($name);
+		$name = str_replace(array('(',')'), '', $name);
+		$name = preg_replace('/[^\w]/', '_', $name);
+		return $name;
+	}
+
+	private static function getReportDef($report_type)
+	{
+		if ($report_type >= 0)
 		{
-			$result = self::getJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
+			return self::$reports_def[$report_type];
 		}
 		else
 		{
-			$result = self::getSimpleGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
+			return self::$custom_reports[-$report_type];
 		}
-		
-		return $result;
 	}
 	
+	private static function getDimension($report_def, $object_ids)
+	{
+		if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
+		{
+			return $report_def[self::REPORT_DRILLDOWN_DIMENSION];
+		}
+
+		return $report_def[self::REPORT_DIMENSION];
+	}
+
+	private static function getMetrics($report_def)
+	{
+		return $report_def[self::REPORT_METRICS];
+	}
+
+	private static function getFilterValues($filter, $dimension)
+	{
+		foreach ($filter as $cur_filter)
+		{
+			if ($cur_filter[self::DRUID_DIMENSION] == $dimension)
+			{
+				return $cur_filter[self::DRUID_VALUES];
+			}
+		}
+
+		return null;
+	}
+
+	private static function getFilterIntervals($report_def, $input_filter)
+	{
+		$offset = self::fixTimeZoneOffset($input_filter->timeZoneOffset);
+		$input_filter->timeZoneOffset = $offset;
+		$timezone_offset = sprintf('%s%02d:%02d', 
+			$offset <= 0 ? '+' : '-', 
+			intval(abs($offset) / 60), abs($offset) % 60);
+		
+		$report_interval = isset($report_def[self::REPORT_INTERVAL]) ? 
+			$report_def[self::REPORT_INTERVAL] : 
+			self::INTERVAL_START_TO_END;
+		switch ($report_interval)
+		{
+		case self::INTERVAL_START_TO_END:
+			$from_date = self::dateIdToDate($input_filter->from_day);
+			$to_date = self::dateIdToDate($input_filter->to_day);
+			break;
+			
+		case self::INTERVAL_BASE_TO_START:
+			$to_date_id = $report_interval == self::INTERVAL_BASE_TO_START ? 
+				$input_filter->from_day : 
+				$input_filter->to_day;
+			$to_date = self::dateIdToDateTime($to_date_id);
+			$to_date->sub(new DateInterval('P1D'));
+			$to_date = $to_date->format('Y-m-d');
+			$from_date = self::BASE_DATE_ID;
+			break;
+
+		case self::INTERVAL_BASE_TO_END:
+			$from_date = self::BASE_DATE_ID;
+			$to_date = self::dateIdToDate($input_filter->to_day);
+			break;
+					
+		default:
+			list($from_day, $to_day) = explode('/', $report_interval);
+			$from_date = self::getRelativeDateTime($from_day)->format('Y-m-d');
+			$to_date = self::getRelativeDateTime($to_day)->format('Y-m-d');
+			break;
+		}
+
+		if (!$from_date || !$to_date || strcmp($to_date, $from_date) < 0)
+		{
+			$from_date = $to_date = '2010-01-01T00:00:00+00:00';
+		}
+		else
+		{
+			$from_date .= self::DAY_START_TIME . $timezone_offset;
+			$to_date .= self::DAY_END_TIME . $timezone_offset;
+		}
+	
+		$intervals = array($from_date . '/' . $to_date);
+		return $intervals;
+	}
+
+	private static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
+	{
+		$category_filter = new categoryFilter();
+
+		if ($is_ancestor)
+		{
+			$category_filter->set('_matchor_likex_full_name', $playback_context);
+		}
+		else
+		{
+			$category_filter->set('_in_full_name', $playback_context);
+		}
+
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$category_filter->attachToCriteria($c);
+		$category_filter->setPartnerSearchScope($partner_id);
+		$c->applyFilters();
+
+		$category_ids_from_db = $c->getFetchedIds();
+
+		if (count($category_ids_from_db))
+		{
+			return $category_ids_from_db;
+		}
+		else
+		{
+			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
+	}
+
+	private static function addEndUserReportsDruidFilters($partner_id, $input_filter, &$druid_filter)
+	{
+		if (!($input_filter instanceof endUserReportsInputFilter))
+		{
+			return;
+		}
+
+		if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
+		{
+			if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
+			{
+				$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+			}
+			else
+			{
+				$category_ids = self::getPlaybackContextCategoriesIds($partner_id, $input_filter->playbackContext ?
+					$input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
+			}
+
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
+				self::DRUID_VALUES => $category_ids);
+		}
+
+		if ($input_filter->application)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
+				self::DRUID_VALUES => explode(',', $input_filter->application)
+			);
+		}
+
+		if ($input_filter->userIds != null)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_USER_ID,
+				self::DRUID_VALUES => explode(',', $input_filter->userIds)
+			);
+		}
+	}
+
+	private static function getCategoriesIds($categories, $partner_id)
+	{
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+		$c->addSelectColumn(categoryPeer::ID);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add(categoryPeer::PARTNER_ID, $partner_id);
+		}
+		$c->add(categoryPeer::FULL_NAME, explode(',', $categories), Criteria::IN);
+
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$stmt = categoryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+
+		if (count($rows))
+		{
+			$category_ids = array();
+			foreach ($rows as $row)
+			{
+				$category_ids[] = $row['ID'];
+			}
+		}
+		else
+		{
+			$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
+		return $category_ids;
+
+	}
+
+	private static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids)
+	{
+		$druid_filter = array();
+		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
+		{
+			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+				self::DRUID_VALUES => $playback_types
+			);
+		}
+		
+		if (isset($report_def[self::REPORT_FILTER]))
+		{
+			$druid_filter[] = $report_def[self::REPORT_FILTER];
+		}
+		
+		self::addEndUserReportsDruidFilters($partner_id, $input_filter, $druid_filter);
+
+		if ($input_filter->categories)
+		{
+			$category_ids = self::getCategoriesIds($input_filter->categories, $partner_id);
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
+				self::DRUID_VALUES => $category_ids
+			);
+		}
+
+		if ($input_filter->categoriesIds)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
+				self::DRUID_VALUES => explode(',', $input_filter->categoriesIds)
+			);
+		}
+
+		if ($input_filter->countries)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
+				self::DRUID_VALUES => explode(',', $input_filter->countries)
+			);
+		}
+
+		$entry_ids_from_db = array();
+		if ($input_filter->keywords)
+		{
+			$entry_filter = new entryFilter();
+			$entry_filter->setPartnerSearchScope($partner_id);
+
+			if($input_filter->search_in_tags)
+				$entry_filter->set('_free_text', $input_filter->keywords);
+			else
+				$entry_filter->set('_like_admin_tags', $input_filter->keywords);
+
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$entry_filter->attachToCriteria($c);
+			$c->applyFilters();
+
+			$entry_ids_from_db = $c->getFetchedIds();
+
+			if ($c->getRecordsCount() > count($entry_ids_from_db))
+			{
+				throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
+			}
+
+			if (!count($entry_ids_from_db))
+			{
+				$entry_ids_from_db[] = entry::ENTRY_ID_THAT_DOES_NOT_EXIST;
+			}
+		}
+
+		if($object_ids)
+		{
+			$object_ids_arr = explode(',', $object_ids);
+
+			if (isset($report_def[self::REPORT_OBJECT_IDS_TRANSFORM]))
+			{
+				$object_ids_arr = array_map($report_def[self::REPORT_OBJECT_IDS_TRANSFORM], $object_ids_arr);
+			}
+			
+			if (isset($report_def[self::REPORT_FILTER_DIMENSION]))
+			{
+				$druid_filter[] = array(
+					self::DRUID_DIMENSION => $report_def[self::REPORT_FILTER_DIMENSION],
+					self::DRUID_VALUES => $object_ids_arr
+				);
+			}
+			else
+			{
+				$entry_ids_from_db = array_merge($object_ids_arr, $entry_ids_from_db);
+			}
+		}
+
+		if (count($entry_ids_from_db))
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
+				self::DRUID_VALUES => $entry_ids_from_db
+			);
+		}
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
+				self::DRUID_VALUES => array($partner_id)
+			);
+		}
+
+		return $druid_filter;
+	}
+
+	private static function getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics = null)
+	{
+		$report_def = array(
+			self::DRUID_DATASOURCE => $data_source ? $data_source : self::DATASOURCE_HISTORICAL,
+			self::DRUID_INTERVALS => $intervals,
+			self::DRUID_GRANULARITY => $granularity,
+			self::DRUID_AGGR => array(),
+			self::DRUID_POST_AGGR => array(),
+		);
+
+		if (kConf::hasParam('kava_top_priority_client_tags'))
+		{
+			$priority_tags = kConf::get('kava_top_priority_client_tags');
+			$client_tag = kCurrentContext::$client_lang;
+			
+			foreach ($priority_tags as $tag)
+			{
+				if (strpos($client_tag, $tag) === 0)
+				{
+					$report_def[self::DRUID_CONTEXT] = array(self::DRUID_PRIORITY => self::CLIENT_TAG_PRIORITY);
+					break;
+				}
+			}
+		}
+		
+		// aggregations / post aggregations
+		foreach ($metrics as $metric)
+		{
+			if (array_key_exists($metric, self::$metrics_def))
+			{
+				$metric_aggr = self::$metrics_def[$metric];
+			}
+			else
+			{
+				$metric_aggr = array(self::DRUID_AGGR => array($metric));
+			}
+			
+			foreach ($metric_aggr[self::DRUID_AGGR] as $aggr)
+			{
+				if (in_array(self::$aggregations_def[$aggr], $report_def[self::DRUID_AGGR]))
+				{
+					continue;
+				}
+
+				$report_def[self::DRUID_AGGR][] = self::$aggregations_def[$aggr];
+			}
+			
+			if (array_key_exists(self::DRUID_POST_AGGR, $metric_aggr))
+			{
+				$metric_post_aggr = $metric_aggr[self::DRUID_POST_AGGR];
+				if (!in_array($metric_post_aggr, $report_def[self::DRUID_POST_AGGR]))
+				{
+					$report_def[self::DRUID_POST_AGGR][] = $metric_post_aggr;
+				}
+			}
+		}
+
+		// event types
+		$event_types = array();
+		if (!$filter_metrics)
+		{
+			$filter_metrics = $metrics;
+		}
+		foreach ($filter_metrics as $metric)
+		{
+			if (array_key_exists($metric, self::$metrics_def))
+			{
+		 		$aggrs = self::$metrics_def[$metric][self::DRUID_AGGR];
+			}
+			else
+			{
+				$aggrs = array($metric);
+			}
+			
+		 	foreach ($aggrs as $aggr)
+		 	{
+		 		if (!isset(self::$aggregations_def[$aggr][self::DRUID_FILTER]))
+		 		{
+		 			continue;
+		 		}
+		 		
+		 		$aggr_filter = self::$aggregations_def[$aggr][self::DRUID_FILTER];
+		 		if (!isset($aggr_filter[self::DRUID_DIMENSION]) ||
+		 			$aggr_filter[self::DRUID_DIMENSION] != self::DIMENSION_EVENT_TYPE)
+		 		{
+		 			continue;
+		 		}
+		 		
+				if (isset($aggr_filter[self::DRUID_VALUE]))
+				{
+					$event_types[] = $aggr_filter[self::DRUID_VALUE];
+				}
+				else if (isset($aggr_filter[self::DRUID_VALUES]))
+				{
+					$event_types = array_merge($event_types, $aggr_filter[self::DRUID_VALUES]);
+				}
+		 	}
+		}
+
+		if (count($event_types))
+		{
+			$filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+				self::DRUID_VALUES => array_values(array_unique($event_types)));
+		}
+
+		$filter_def = array();
+		foreach ($filter as $cur_filter)
+		{
+			$filter_def[] = self::getInFilter(
+				$cur_filter[self::DRUID_DIMENSION], 
+				$cur_filter[self::DRUID_VALUES]);
+		}
+		
+		$report_def[self::DRUID_FILTER] = array(
+			self::DRUID_TYPE => 'and',
+			self::DRUID_FIELDS => $filter_def);
+
+		return $report_def;
+	}
+
+	private static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null)
+	{
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
+
+		if (in_array($dimensions, self::$multi_value_dimensions))
+		{
+			$values = self::getFilterValues($filter, $dimensions);
+			if ($values)
+			{
+				// use a list filtered dimension, otherwise we may get values that don't match the filter
+				$dimensions = array(
+					self::DRUID_TYPE => self::DRUID_LIST_FILTERED,
+					self::DRUID_DELEGATE => array(
+						self::DRUID_TYPE => self::DRUID_DEFAULT,
+						self::DRUID_DIMENSION => $dimensions,
+						self::DRUID_OUTPUT_NAME => $dimensions,
+					),
+					self::DRUID_VALUES => $values,
+				);
+			}
+		}
+
+		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TOPN;
+		$report_def[self::DRUID_DIMENSION] = $dimensions;
+		$order_type = $order_dir === '+' ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
+		$report_def[self::DRUID_METRIC] = array(
+			self::DRUID_TYPE => $order_type,
+			self::DRUID_METRIC => $order_by);
+		$report_def[self::DRUID_THRESHOLD] = $threshold;
+
+		return $report_def;
+	}
+
+	private static function getSearchReport($data_source, $partner_id, $intervals, $dimensions, $filter)
+	{
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
+		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_SEARCH;
+		$report_def[self::DRUID_SEARCH_DIMENSIONS] = $dimensions;
+		$report_def[self::DRUID_QUERY] = array(
+			self::DRUID_TYPE => self::DRUID_CONTAINS,
+			self::DRUID_CASE_SENSITIVE => true,
+			self::DRUID_VALUE => ''
+		);
+
+		return $report_def;
+	}
+
+	private static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter)
+	{
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
+		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
+		if (!isset($report_def[self::DRUID_CONTEXT]))
+		{
+			$report_def[self::DRUID_CONTEXT] = array();
+		}
+		$report_def[self::DRUID_CONTEXT][self::DRUID_SKIP_EMPTY_BUCKETS] = 'true';
+		return $report_def;
+	}
+
+	private static function getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $filter, $filter_metrics)
+	{
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
+		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
+		$report_def[self::DRUID_AGGR][] = array(
+			self::DRUID_TYPE => self::DRUID_CARDINALITY,
+			self::DRUID_NAME => self::METRIC_CARDINALITY,
+			self::DRUID_FIELDS => is_array($dimension) ? $dimension : array($dimension));
+		return $report_def;
+	}
+
+	private static function getGroupByReport($data_source, $partner_id, $intervals, $granularity, $dimensions, $metrics, $filter, $pageSize = 0)
+	{
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
+		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_GROUP_BY;
+		$report_def[self::DRUID_DIMENSIONS] = $dimensions;
+		return $report_def;
+	}
+
+	/// graph functions
+	private static function getGranularityDef($granularity, $timezone_offset)
+	{
+		if (!isset(self::$granularity_mapping[$granularity]))
+		{
+			return self::DRUID_GRANULARITY_ALL;
+		}
+
+		$granularity_def = array(
+			self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
+			self::DRUID_GRANULARITY_PERIOD => self::$granularity_mapping[$granularity],
+			self::DRUID_TIMEZONE => self::getDruidTimezoneName($timezone_offset)
+		);
+		return $granularity_def;
+	}
+	
+	protected static function getGraphsByDateId($result, $graph_metrics_to_headers, $tz_offset, $transform)
+	{
+		$tz = self::getPhpTimezone($tz_offset);
+
+		$graphs = array();
+
+		foreach ($graph_metrics_to_headers as $column => $header)
+		{
+			$graphs[$header] = array();
+		}
+
+		foreach ($result as $row)
+		{
+			$row_data = $row[self::DRUID_RESULT];
+
+			$date = call_user_func($transform, $row[self::DRUID_TIMESTAMP], $tz);
+
+			foreach ($graph_metrics_to_headers as $column => $header)
+			{
+				$graphs[$header][$date] = $row_data[$column];
+			}
+		}
+		return $graphs;
+	}
+
+	protected static function getAssociativeMultiGraphsByDateId($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
+	{
+		$tz = self::getPhpTimezone($tz_offset);
+
+		$graphs = array();
+
+		unset($graph_metrics_to_headers[$multiline_column]);
+
+		foreach ($result as $row)
+		{
+			$row_data = $row[self::DRUID_EVENT];
+
+			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz);
+			$multiline_val = $row_data[$multiline_column];
+			if ($transform)
+			{
+				$multiline_val = call_user_func($transform, $multiline_val);
+			}
+			
+			if (!isset($graphs[$multiline_val]))
+			{
+				$graphs[$multiline_val] = array();
+				foreach ($graph_metrics_to_headers as $column => $header)
+				{
+					$graphs[$multiline_val][$header] = array();
+				}
+			}
+			
+			foreach ($graph_metrics_to_headers as $column => $header)
+			{
+				$graphs[$multiline_val][$header][$date] = $row_data[$column];
+			}
+		}
+		return $graphs;
+	}
+	
+	protected static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
+	{
+		$tz = self::getPhpTimezone($tz_offset);
+
+		$graphs = array();
+
+		unset($graph_metrics_to_headers[$multiline_column]);
+		foreach ($graph_metrics_to_headers as $column => $header)
+		{
+			$graphs[$header] = array();
+		}
+
+		foreach ($result as $row)
+		{
+			$row_data = $row[self::DRUID_EVENT];
+
+			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz);
+			$multiline_val = $row_data[$multiline_column];
+			if ($transform)
+			{
+				$multiline_val = call_user_func($transform, $multiline_val);
+			}
+			
+			foreach ($graph_metrics_to_headers as $column => $header)
+			{
+				if (isset($graphs[$header][$date]))
+				{
+					$graphs[$header][$date] .=	',';
+				}
+				else
+				{
+					$graphs[$header][$date] = '';
+				}
+
+				$graphs[$header][$date] .= $multiline_val . ':' . $row_data[$column];
+			}
+		}
+		return $graphs;
+	}
+
+	protected static function getMultiGraphsByColumnName ($result, $graph_metrics_to_headers, $dimension, $transform)
+	{
+		$graphs = array();
+
+		foreach ($graph_metrics_to_headers as $column => $header)
+		{
+			$graphs[$header] = array();
+		}
+
+		foreach ($result as $row)
+		{
+			$row_data = $row[self::DRUID_EVENT];
+
+			$dim_value = $row_data[$dimension];
+			if ($transform)
+			{
+				$dim_value = call_user_func($transform, $dim_value);
+			}
+
+			foreach ($graph_metrics_to_headers as $column => $header)
+			{
+				$graphs[$header][$dim_value] = $row_data[$column];
+			}
+		}
+		return $graphs;
+	}
+
+	protected static function getGraphsByColumnName($result, $graph_metrics_to_headers, $type_str)
+	{
+		$graph = array();
+		if (isset($result[0][self::DRUID_RESULT]))
+		{
+			$row_data = $result[0][self::DRUID_RESULT];
+			foreach ($graph_metrics_to_headers as $column => $header)
+			{
+				$graph[$header] = $row_data[$column];
+			}
+		}
+		else
+		{
+			$graph = array_combine(
+				array_values($graph_metrics_to_headers),
+				array_fill(0, count($graph_metrics_to_headers), 0));
+		}
+
+		return array($type_str => $graph);
+	}
+
 	protected static function getSimpleGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
 		if (!isset($report_def[self::REPORT_GRAPH_METRICS]))
@@ -1240,6 +1995,21 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function zeroFill(&$graphs, $dates)
+	{
+		foreach ($graphs as $name => $values)
+		{
+			$new_values = array();
+			foreach ($dates as $date)
+			{
+				// Note: the != 0 is here to avoid returning '-0' that may come from druid 
+				$new_values[$date] = isset($values[$date]) && $values[$date] != 0 ? $values[$date] : 0; 
+			}
+			
+			$graphs[$name] = $new_values;
+		}
+	}
+	
 	protected static function getJoinGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
 	{
 		self::init();
@@ -1311,7 +2081,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return $result;
 	}
-	
+
 	protected static function getKeyedJoinGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
 	{
 		self::init();
@@ -1421,42 +2191,38 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	protected static function getTableFromGraphs($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
+	protected static function getGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
-		// calculate the graphs
-		$input_filter->interval = self::INTERVAL_ALL;
-		$result = self::getKeyedJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-		if (!$result)
+		if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{
-			return array(array(), array(), 0);
+			$result = self::getJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
+		}
+		else
+		{
+			$result = self::getSimpleGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 		}
 		
-		// convert the result to a table
-		$metric_headers = array_keys(reset($result));
-		$headers = array_merge(
-			$report_def[self::REPORT_DIMENSION_HEADERS], 
-			$metric_headers);
-		 
-		$dim_header_count = count($report_def[self::REPORT_DIMENSION_HEADERS]);
-		
-		$data = array();
-		foreach ($result as $dim => $graphs)
-		{
-			$row = array_fill(0, $dim_header_count, $dim);
-			foreach ($metric_headers as $header)
-			{
-				$row[] = isset($graphs[$header]) ? $graphs[$header] : 0;
-			}
-			$data[] = $row;
-		}
-		
-		return array($headers, $data, count($data));
+		return $result;
 	}
+
+	protected static function reorderGraphs($map, $input)
+	{
+		$result = array();
+		foreach ($map as $column => $metric)
+		{
+			if (isset($input[$metric]))
+			{
+				$result[$column] = $input[$metric];
+			}
+		}
 	
-	public static function getTotal($partner_id, $report_type, reportsInputFilter $input_filter, $object_ids = null)
+		return $result;
+	}
+		
+	public static function getGraph($partner_id, $report_type, reportsInputFilter $input_filter, $dimension = null, $object_ids = null)
 	{
 		self::init();
-
+		
 		$report_def = self::getReportDef($report_type);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
@@ -1464,233 +2230,312 @@ class kKavaReportsMgr extends kKavaBase
 			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
 		}
 		
-		// run the query
-		$result = self::getTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
+		// get the graphs
+		$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 		
 		// reorder
-		if (isset($report_def[self::REPORT_TOTAL_MAP]))
+		if (isset($report_def[self::REPORT_GRAPH_MAP]))
 		{
-			self::reorderTableColumns(0, $report_def[self::REPORT_TOTAL_MAP], false, $result);
+			$result = self::reorderGraphs($report_def[self::REPORT_GRAPH_MAP], $result);
 		}
 		
 		return $result;
 	}
-
-	protected static function getTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
+		
+	/// usage graph functions
+	protected static function addAggregatedStorageGraphs(&$storage, $base_storage, $dates)
 	{
-		if (!isset($report_def[self::REPORT_DIMENSION]))
+		$cur_storage = $base_storage;
+		foreach ($dates as $date)
 		{
-			$input_filter->interval = self::INTERVAL_ALL;
-			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = array(array_keys($result), array_values($result));
+			$cur_storage += $storage[self::METRIC_STORAGE_ADDED_MB][$date];
+			$storage[self::METRIC_AVERAGE_STORAGE_MB][$date] = $cur_storage;
+			$storage[self::METRIC_PEAK_STORAGE_MB][$date] = $cur_storage;
+			$cur_storage -= $storage[self::METRIC_STORAGE_DELETED_MB][$date];
 		}
-		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
+	}
+		
+	protected static function aggregateUsageDataAll($graphs)
+	{
+		$result = array();
+		foreach ($graphs as $name => $values)
 		{
-			$result = self::getJoinTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
+			switch ($name)
+			{
+				case self::METRIC_AVERAGE_STORAGE_MB:
+					$value = $values ? array_sum($values) / count($values) : 0;
+					break;
+		
+				case self::METRIC_PEAK_STORAGE_MB:
+					$value = $values ? max($values) : 0;
+					break;
+		
+				case self::METRIC_BANDWIDTH_STORAGE_MB:
+					$value = $result[self::METRIC_BANDWIDTH_SIZE_MB] + $result[self::METRIC_AVERAGE_STORAGE_MB];
+					break;
+		
+				default:
+					$value = array_sum($values);
+					break;
+			}
+		
+			$result[$name] = $value;
 		}
-		else 
-		{
-			$result = self::getSimpleTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
-		}
-
+		
 		return $result;
 	}
 	
-	protected static function getSimpleTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
+	protected static function aggregateUsageDataByMonth($graphs, &$dates)
 	{
-		$start = microtime(true);
-		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
-		$intervals = self::getFilterIntervals($report_def, $input_filter);
-		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
+		// group by months
+		$grouped = array();
+		foreach ($dates as $date)
+		{
+			$month = substr($date, 0, 6);
+			foreach ($graphs as $name => $values)
+			{
+				$grouped[$month][$name][$date] = $values[$date];
+			}
+		}
 		
-		if (array_key_exists(self::REPORT_TOTAL_METRICS, $report_def))
+		// aggregate the months
+		$result = array();
+		foreach ($grouped as $month => $graphs)
 		{
-			$metrics = $report_def[self::REPORT_TOTAL_METRICS];
-		}
-		else 
-		{
-			$metrics = self::getMetrics($report_def);
-			if (!$metrics)
+			foreach (self::aggregateUsageDataAll($graphs) as $header => $value)
 			{
-				throw new Exception('unsupported query - report has no metrics');
+				$result[$header][$month] = $value;
 			}
 		}
-
-		$granularity = self::DRUID_GRANULARITY_ALL;
-		$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $druid_filter);
-		$result = self::runQuery($query);
 		
-		$headers = array();
-		$data = array();
-		if (count($result) > 0)
-		{
-			$row = $result[0];
-			$row_data = $row[self::DRUID_RESULT];
-
-			foreach ($metrics as $column)
-			{
-				$headers[] = self::$metrics_to_headers[$column];
-				$data[] = $row_data[$column];
-			}
-
-			foreach (self::$transform_metrics as $metric => $func)
-			{
-				$field_index = array_search(self::$metrics_to_headers[$metric], $headers);
-				if (false !== $field_index)
-				{
-					$data[$field_index] = call_user_func($func, $data[$field_index]);
-				}
-			}
-		}
-		else
-		{
-			foreach ($metrics as $column)
-			{
-				$headers[] = self::$metrics_to_headers[$column];
-				$data[] = '';
-			}
-		}
-
-		$end = microtime(true);
-		KalturaLog::log('getTotal took ['  . ($end - $start) . ']');
-
-		return array($headers, $data);
+		$dates = array_keys($grouped);
+		
+		return $result;
 	}
 
-	protected static function getJoinTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null) 
+	protected static function aggregateUsageData($interval, $graphs, &$dates)
 	{
-		$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
-			
-		$headers = array();
-		$data = array();
-		foreach ($report_defs as $cur_report_def)
+		switch ($interval)
 		{
-			list($cur_headers, $cur_data) = self::getSimpleTotalImpl($partner_id, $cur_report_def, $input_filter, $object_ids);
-			$headers = array_merge($headers, $cur_headers);
-			$data = array_merge($data, $cur_data);
+			case self::INTERVAL_MONTHS:
+				return self::aggregateUsageDataByMonth($graphs, $dates);
+					
+			case self::INTERVAL_ALL:
+				$dates = null;
+				return self::aggregateUsageDataAll($graphs);
+				
+			// Note: no need to do anything for 'days', input data is already per day
 		}
-			
-		return array($headers, $data);
+		
+		return $graphs;
 	}
 	
-	private static function graphToTable($graphs, $has_aligned_dates, $date_column_name = 'date_id')
+	protected static function addCombinedUsageGraph(&$result, $dates)
 	{
-		if (!$has_aligned_dates)
+		if (!$dates)
 		{
-			// get the union of all dates
-			$dates = array();
-			foreach ($graphs as $graph)
-			{
-				foreach ($graph as $date => $value)
-				{
-					$dates[$date] = true;
-				}
-			}
-			ksort($dates);
-		}
-		else 
-		{
-			$dates = reset($graphs);
-		}
-
-		// build the table
-		$header = array_keys($graphs);
-		$data = array();
-		foreach ($dates as $date => $ignore)
-		{
-			$row = array($date);
-			foreach ($header as $column)
-			{
-				$row[] = isset($graphs[$column][$date]) ? $graphs[$column][$date] : 0;
-			}
-			$data[] = $row;
-		}
-
-		return array(array_merge(array($date_column_name), $header), $data, count($data));
-	}
-
-	public static function customReport($id, $params)
-	{
-		self::$custom_reports = kConf::getMap('custom_reports');
-		$report_def = self::$custom_reports[$id];
-
-		// build the filter
-		$input_filter = new reportsInputFilter();
-		foreach ($report_def['filter'] as $field => $value)
-		{
-			if (is_string($value) && $value[0] == ':')
-			{
-				$paramName = substr($value, 1);
-				if (!isset($params[$paramName]))
-				{
-					throw new Exception("missing parameter $paramName");
-				}
-				$value = $params[$paramName];
-			}
-			$input_filter->$field = $value;
+			$result[self::METRIC_BANDWIDTH_STORAGE_MB] =
+				$result[self::METRIC_BANDWIDTH_SIZE_MB] +
+				$result[self::METRIC_AVERAGE_STORAGE_MB];
+			return;
 		}
 		
-		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
-
-		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
+		foreach ($dates as $date)
 		{
-			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
+			$result[self::METRIC_BANDWIDTH_STORAGE_MB][$date] =
+				$result[self::METRIC_BANDWIDTH_SIZE_MB][$date] +
+				$result[self::METRIC_AVERAGE_STORAGE_MB][$date];
 		}
-		else
-		{
-			$partner_id = $params['partner_id'];
-		}
-		$report_type = -$id;		// negative report types are used to identify custom reports
-
-		if (isset($report_def[self::REPORT_GRAPH_METRICS]))
-		{
-			// graph report
-			$graphs = self::getGraph($partner_id, $report_type, $input_filter, null, $object_ids);
-			list($header, $data) = self::graphToTable($graphs, false);
-		}
-		else if (isset($report_def[self::REPORT_DIMENSION]))
-		{
-			// table report
-			list($header, $data, $totalCount) = self::getTable(
-				$partner_id,
-				$report_type,
-				$input_filter,
-				self::MAX_CUSTOM_REPORT_RESULT_SIZE,
-				1,
-				$report_def['order_by'],
-				$object_ids,
-				true);
-		}
-		else
-		{
-			// total report
-			list($header, $data) = self::getTotal(
-				$partner_id,
-				$report_type,
-				$input_filter,
-				$object_ids);
-		}
-
-		if (isset($report_def['header']))
-		{
-			$header = explode(',', $report_def['header']);
-		}
-
-		return array($header, $data);
 	}
 
-	private static function getReportDef($report_type)
+	/// table enrich functions
+	private static function getEntriesNames($ids, $partner_id)
 	{
-		if ($report_type >= 0)
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+
+		$c->addSelectColumn(entryPeer::ID);
+		$c->addSelectColumn(entryPeer::NAME);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
 		{
-			return self::$reports_def[$report_type];
+			$c->add(entryPeer::PARTNER_ID, $partner_id);
 		}
-		else
+		$c->add(entryPeer::ID, $ids, Criteria::IN);
+
+		entryPeer::setUseCriteriaFilter(false);
+		$stmt = entryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		entryPeer::setUseCriteriaFilter(true);
+
+		$entries_names = array();
+		foreach ($rows as $row)
 		{
-			return self::$custom_reports[-$report_type];
+			$id = $row['ID'];
+			$name = $row['NAME'];
+			$entries_names[$id] = $name;
 		}
+		return $entries_names;
 	}
-	
+
+	private static function getQuotedEntriesNames($ids, $partner_id)
+	{
+		$result = self::getEntriesNames($ids, $partner_id);
+		foreach ($result as &$name)
+		{
+			$name = '"' . str_replace('"', '""', $name) . '"';
+		}
+		return $result;
+	}
+
+	private static function getEntriesUserIdsAndNames($ids, $partner_id)
+	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+
+		$c->addSelectColumn(entryPeer::ID);
+		$c->addSelectColumn(entryPeer::NAME);
+		$c->addSelectColumn(entryPeer::PUSER_ID);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add(entryPeer::PARTNER_ID, $partner_id);
+		}
+		$c->add(entryPeer::ID, $ids, Criteria::IN);
+
+		entryPeer::setUseCriteriaFilter(false);
+		$stmt = entryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		entryPeer::setUseCriteriaFilter(true);
+
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$id = $row['ID'];
+			$puserId = $row['PUSER_ID'];
+			$name = $row['NAME'];
+			$result[$id] = array($puserId, '"' . $name . '"');
+		}
+		return $result;
+	}
+
+	private static function getCategoriesNames($ids, $partner_id)
+	{
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+		$c->addSelectColumn(categoryPeer::ID);
+		$c->addSelectColumn(categoryPeer::NAME);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add(categoryPeer::PARTNER_ID, $partner_id);
+		}
+		$c->add(categoryPeer::ID, $ids, Criteria::IN);
+
+		categoryPeer::setUseCriteriaFilter(false);
+		$stmt = categoryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		categoryPeer::setUseCriteriaFilter(true);
+
+		$categories_names = array();
+		foreach ($rows as $row)
+		{
+			$id = $row['ID'];
+			$name = $row['NAME'];
+			$categories_names[$id] = $name;
+		}
+		return $categories_names;
+	}
+
+	private static function genericQueryEnrich($ids, $partner_id, $context)
+	{
+		$peer = $context['peer'];
+		$columns = $context['columns'];
+		$dim_column = isset($context['dim_column']) ? $context['dim_column'] : 'ID';
+		$partner_id_column = isset($context['partner_id_column']) ? $context['partner_id_column'] : 'PARTNER_ID';
+		$custom_crit = isset($context['custom_criterion']) ? $context['custom_criterion'] : null;
+
+		$c = KalturaCriteria::create($peer::OM_CLASS);
+
+		$table_name = $peer::TABLE_NAME;
+		$c->addSelectColumn($table_name . '.' . $dim_column);
+
+		$column_formats = array();
+		foreach ($columns as $index => $column)
+		{
+			switch ($column[0])
+			{
+			case '"':
+				$column = trim($column, '"');
+				$columns[$index] = $column;
+				$column_formats[$column] = self::COLUMN_FORMAT_QUOTE;
+				break;
+				
+			case '@':
+				$column = substr($column, 1);
+				$columns[$index] = $column;
+				$column_formats[$column] = self::COLUMN_FORMAT_UNIXTIME;
+				break;
+			}
+			$exploded_column = explode('.', $column);
+			$c->addSelectColumn($table_name . '.' . $exploded_column[0]);
+		}
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add($table_name . '.' . $partner_id_column, $partner_id);
+		}
+		$c->add($table_name . '.' . $dim_column, $ids, Criteria::IN);
+
+		if ($custom_crit)
+		{
+			$c->addAnd($c->getNewCriterion($custom_crit['column'], $custom_crit['value'], Criteria::CUSTOM));
+		}
+
+		$peer::setUseCriteriaFilter(false);
+		$stmt = $peer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$peer::setUseCriteriaFilter(true);
+
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$output_row = array();
+			foreach ($columns as $column)
+			{
+				$format = isset($column_formats[$column]) ? $column_formats[$column] : null;
+
+				$exploded_column = explode('.', $column);
+				if (count($exploded_column) > 1)
+				{
+					list($column, $field) = $exploded_column;
+					$value = @unserialize($row[$column]);
+					$value = isset($value[$field]) ? $value[$field] : '';
+				}
+				else
+				{
+					$value = $row[$column];
+				}
+
+				switch ($format)
+				{
+				case self::COLUMN_FORMAT_QUOTE:
+					$value = '"' . str_replace('"', '""', $value) . '"';
+					break;
+					
+				case self::COLUMN_FORMAT_UNIXTIME:
+					$dt = new DateTime($value);
+					$value = (int) $dt->format('U');
+					break;
+				}
+
+				$output_row[] = $value;
+			}
+
+			$id = $row[$dim_column];
+			$result[$id] = $output_row;
+		}
+		return $result;
+	}
+
 	protected static function getEnrichDefs($report_def)
 	{
 		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
@@ -1785,81 +2630,141 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	public static function getTable($partner_id, $report_type, reportsInputFilter $input_filter,
-		$page_size, $page_index, $order_by, $object_ids = null, $isCsv = false)
+	/// table functions
+	protected static function getMetricFromOrderBy($report_def, $order_by)
 	{
-		self::init();		
+		if (!$order_by)
+		{
+			return null;
+		}
+		
+		if ($order_by[0] === '-' || $order_by[0] === '+')
+		{
+			$order_by = substr($order_by, 1);
+		}
 
-		// pager
-		if (!$page_size || $page_size < 0)
-			$page_size = 10;
-		
-		if (!$page_index || $page_index < 0)
-			$page_index = 1;
-		
-		// run the query
-		$report_def = self::getReportDef($report_type);
-		
-		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
-		{
-			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
-		}
-		
-		$flags = $isCsv ? self::GET_TABLE_FLAG_IS_CSV : 0;
-		
-		$result = self::getTableImpl($partner_id, $report_type, $report_def, $input_filter,
-			$page_size, $page_index, $order_by, $object_ids, $flags);
-	
-		// finalize / enrich
-		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
-		{
-			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result));
-		}
-		
-		if (isset($report_def[self::REPORT_ENRICH_DEF]))
-		{
-			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
-		}
-		
-		// reorder
 		if (isset($report_def[self::REPORT_TABLE_MAP]))
 		{
-			self::reorderTableColumns(
-				count($report_def[self::REPORT_DIMENSION_HEADERS]), 
-				$report_def[self::REPORT_TABLE_MAP], 
-				true,
-				$result);
+			if (isset($report_def[self::REPORT_TABLE_MAP][$order_by]))
+			{
+				return $report_def[self::REPORT_TABLE_MAP][$order_by];
+			}
+		}
+		else if (isset(self::$headers_to_metrics[$order_by]))
+		{
+			return self::$headers_to_metrics[$order_by];
 		}
 		
-		return $result;
+		return null;
 	}
 	
-	protected static function getTableImpl($partner_id, $report_type, $report_def, 
-		reportsInputFilter $input_filter,
-		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
+	private static function getTableFromGraphs($graphs, $has_aligned_dates, $date_column_name = 'date_id')
 	{
-		if (!isset($report_def[self::REPORT_DIMENSION]))
+		if (!$has_aligned_dates)
 		{
-			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = self::graphToTable($result, true, $input_filter->interval == self::INTERVAL_MONTHS ? 'month_id' : 'date_id');
-		}
-		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]))
-		{
-			$result = self::getTableFromGraphs($partner_id, $report_def, $input_filter, $object_ids);
-		}
-		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
-		{
-			$result = self::getJoinTableImpl($partner_id, $report_type, $report_def, $input_filter, $page_size, $page_index, $order_by, $object_ids, $flags);
+			// get the union of all dates
+			$dates = array();
+			foreach ($graphs as $graph)
+			{
+				foreach ($graph as $date => $value)
+				{
+					$dates[$date] = true;
+				}
+			}
+			ksort($dates);
 		}
 		else 
 		{
-			$result = self::getSimpleTableImpl($partner_id, $report_type, $report_def, $input_filter,
-				$page_size, $page_index, $order_by, $object_ids, $flags);
+			$dates = reset($graphs);
+		}
+
+		// build the table
+		$header = array_keys($graphs);
+		$data = array();
+		foreach ($dates as $date => $ignore)
+		{
+			$row = array($date);
+			foreach ($header as $column)
+			{
+				$row[] = isset($graphs[$column][$date]) ? $graphs[$column][$date] : 0;
+			}
+			$data[] = $row;
+		}
+
+		return array(array_merge(array($date_column_name), $header), $data, count($data));
+	}
+
+	protected static function getTableFromKeyedGraphs($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
+	{
+		// calculate the graphs
+		$input_filter->interval = self::INTERVAL_ALL;
+		$result = self::getKeyedJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
+		if (!$result)
+		{
+			return array(array(), array(), 0);
 		}
 		
-		return $result;
-	}
+		// convert the result to a table
+		$metric_headers = array_keys(reset($result));
+		$headers = array_merge(
+			$report_def[self::REPORT_DIMENSION_HEADERS], 
+			$metric_headers);
+		 
+		$dim_header_count = count($report_def[self::REPORT_DIMENSION_HEADERS]);
 		
+		$data = array();
+		foreach ($result as $dim => $graphs)
+		{
+			$row = array_fill(0, $dim_header_count, $dim);
+			foreach ($metric_headers as $header)
+			{
+				$row[] = isset($graphs[$header]) ? $graphs[$header] : 0;
+			}
+			$data[] = $row;
+		}
+		
+		return array($headers, $data, count($data));
+	}
+
+	private static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
+	{
+		$cache_key = 'reportCount-' . md5("$partner_id|".serialize($report_def)."|$object_ids|".serialize($input_filter));
+
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_REPORTS_COUNT);
+		if ($cache)
+		{
+			$total_count = $cache->get($cache_key);
+			if ($total_count)
+			{
+				KalturaLog::log("count from cache: [$total_count]");
+				return $total_count;
+			}
+		}
+
+		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
+
+		$query = self::getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $druid_filter, self::getMetrics($report_def));
+
+		$total_count_arr = self::runQuery($query);
+		if (isset($total_count_arr[0][self::DRUID_RESULT][self::METRIC_CARDINALITY]))
+		{
+			$total_count = floor($total_count_arr[0][self::DRUID_RESULT][self::METRIC_CARDINALITY]);
+		}
+		else
+		{
+			$total_count = 0;
+		}
+
+		KalturaLog::log("count: [$total_count]");
+
+		if ($cache)
+		{
+			$cache->set($cache_key, $total_count, myReportsMgr::REPORTS_COUNT_CACHE);
+		}
+
+		return $total_count;
+	}
+
 	// TODO: remove the report_type param once legacy reports are removed
 	protected static function getSimpleTableImpl($partner_id, $report_type, $report_def, 
 		reportsInputFilter $input_filter,
@@ -2232,88 +3137,6 @@ class kKavaReportsMgr extends kKavaBase
 		return array($headers, $data, $total_count);
 	}
 
-	protected static function getMetricFromOrderBy($report_def, $order_by)
-	{
-		if (!$order_by)
-		{
-			return null;
-		}
-		
-		if ($order_by[0] === '-' || $order_by[0] === '+')
-		{
-			$order_by = substr($order_by, 1);
-		}
-
-		if (isset($report_def[self::REPORT_TABLE_MAP]))
-		{
-			if (isset($report_def[self::REPORT_TABLE_MAP][$order_by]))
-			{
-				return $report_def[self::REPORT_TABLE_MAP][$order_by];
-			}
-		}
-		else if (isset(self::$headers_to_metrics[$order_by]))
-		{
-			return self::$headers_to_metrics[$order_by];
-		}
-		
-		return null;
-	}
-	
-	protected static function reorderTableColumns($dim_header_count, $column_map, $isTable, &$result) 
-	{
-		if ($dim_header_count > 0)
-		{
-			$indexes = range(0, $dim_header_count - 1);
-			$header = array_slice($result[0], 0, $dim_header_count);
-		}
-		else
-		{
-			$indexes = array();
-			$header = array();
-		}
-		
-		foreach ($column_map as $column => $metric)
-		{
-			$index = array_search($metric, $result[0]);
-			if ($index === false)
-			{
-				continue;
-			}
-				
-			$indexes[] = $index;
-			$header[] = $column;
-		}
-		
-		$orig_header_count = count($result[0]);
-		$result[0] = $header;		
-		if ($indexes == range(0, count($orig_header_count) - 1))
-		{
-			return;
-		}
-		
-		if ($isTable)
-		{
-			foreach ($result[1] as &$row)
-			{
-				$new_row = array();
-				foreach ($indexes as $index)
-				{
-					$new_row[] = $row[$index];
-				}
-				$row = $new_row;
-			}
-		}
-		else
-		{
-			$new_row = array();
-			foreach ($indexes as $index)
-			{
-				$new_row[] = $result[1][$index];
-			}
-			$result[1] = $new_row;
-		}
-	}
-	
 	protected static function getJoinTableImpl($partner_id, $report_type, $report_def,
 			reportsInputFilter $input_filter,
 			$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
@@ -2468,1038 +3291,376 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		return array($headers, $data, $total_count);
+	}		
+
+	protected static function getTableImpl($partner_id, $report_type, $report_def, 
+		reportsInputFilter $input_filter,
+		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
+	{
+		if (!isset($report_def[self::REPORT_DIMENSION]))
+		{
+			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
+			$result = self::getTableFromGraphs($result, true, $input_filter->interval == self::INTERVAL_MONTHS ? 'month_id' : 'date_id');
+		}
+		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]))
+		{
+			$result = self::getTableFromKeyedGraphs($partner_id, $report_def, $input_filter, $object_ids);
+		}
+		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
+		{
+			$result = self::getJoinTableImpl($partner_id, $report_type, $report_def, $input_filter, $page_size, $page_index, $order_by, $object_ids, $flags);
+		}
+		else 
+		{
+			$result = self::getSimpleTableImpl($partner_id, $report_type, $report_def, $input_filter,
+				$page_size, $page_index, $order_by, $object_ids, $flags);
+		}
+		
+		return $result;
 	}
 		
-	private static function fixTimeZoneOffset($timezone_offset)
+	protected static function reorderTableColumns($dim_header_count, $column_map, $isTable, &$result) 
 	{
-		if (isset(self::$php_timezone_names[$timezone_offset]))
+		if ($dim_header_count > 0)
 		{
-			return $timezone_offset;
-		}
-
-		$timezone_offset = min(max($timezone_offset, -14 * 60), 12 * 60);
-		return round($timezone_offset / 60) * 60;
-	}
-
-	private static function getPhpTimezoneName($timezone_offset)
-	{
-		// Note: value must be set, since the offset already went through fixTimeZoneOffset
-		return self::$php_timezone_names[$timezone_offset];
-	}
-
-	private static function getPhpTimezone($timezone_offset)
-	{
-		$tz_name = self::getPhpTimezoneName($timezone_offset);
-		return new DateTimeZone($tz_name);
-	}
-	
-	private static function getDruidTimezoneName($timezone_offset)
-	{
-		// Note: value must be set, since the offset already went through fixTimeZoneOffset
-		return self::$druid_timezone_names[$timezone_offset];
-	}
-	
-	private static function getGranularityDef($granularity, $timezone_offset)
-	{
-		if (!isset(self::$granularity_mapping[$granularity]))
-		{
-			return self::DRUID_GRANULARITY_ALL;
-		}
-
-		$granularity_def = array(
-			self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
-			self::DRUID_GRANULARITY_PERIOD => self::$granularity_mapping[$granularity],
-			self::DRUID_TIMEZONE => self::getDruidTimezoneName($timezone_offset)
-		);
-		return $granularity_def;
-	}
-
-	private static function getFilterIntervals($report_def, $input_filter)
-	{
-		$offset = self::fixTimeZoneOffset($input_filter->timeZoneOffset);
-		$input_filter->timeZoneOffset = $offset;
-		$timezone_offset = sprintf('%s%02d:%02d', 
-			$offset <= 0 ? '+' : '-', 
-			intval(abs($offset) / 60), abs($offset) % 60);
-		
-		$report_interval = isset($report_def[self::REPORT_INTERVAL]) ? 
-			$report_def[self::REPORT_INTERVAL] : 
-			self::INTERVAL_START_TO_END;
-		switch ($report_interval)
-		{
-		case self::INTERVAL_START_TO_END:
-			$from_date = self::dateIdToDate($input_filter->from_day);
-			$to_date = self::dateIdToDate($input_filter->to_day);
-			break;
-			
-		case self::INTERVAL_BASE_TO_START:
-			$to_date_id = $report_interval == self::INTERVAL_BASE_TO_START ? 
-				$input_filter->from_day : 
-				$input_filter->to_day;
-			$to_date = self::dateIdToDateTime($to_date_id);
-			$to_date->sub(new DateInterval('P1D'));
-			$to_date = $to_date->format('Y-m-d');
-			$from_date = self::BASE_DATE_ID;
-			break;
-
-		case self::INTERVAL_BASE_TO_END:
-			$from_date = self::BASE_DATE_ID;
-			$to_date = self::dateIdToDate($input_filter->to_day);
-			break;
-					
-		default:
-			list($from_day, $to_day) = explode('/', $report_interval);
-			$from_date = self::getRelativeDateTime($from_day)->format('Y-m-d');
-			$to_date = self::getRelativeDateTime($to_day)->format('Y-m-d');
-			break;
-		}
-
-		if (!$from_date || !$to_date || strcmp($to_date, $from_date) < 0)
-		{
-			$from_date = $to_date = '2010-01-01T00:00:00+00:00';
+			$indexes = range(0, $dim_header_count - 1);
+			$header = array_slice($result[0], 0, $dim_header_count);
 		}
 		else
 		{
-			$from_date .= self::DAY_START_TIME . $timezone_offset;
-			$to_date .= self::DAY_END_TIME . $timezone_offset;
+			$indexes = array();
+			$header = array();
 		}
-	
-		$intervals = array($from_date . '/' . $to_date);
-		return $intervals;
-	}
-
-	private static function getDimension($report_def, $object_ids)
-	{
-		if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
+		
+		foreach ($column_map as $column => $metric)
 		{
-			return $report_def[self::REPORT_DRILLDOWN_DIMENSION];
-		}
-
-		return $report_def[self::REPORT_DIMENSION];
-	}
-
-	private static function getMetrics($report_def)
-	{
-		return $report_def[self::REPORT_METRICS];
-	}
-
-	private static function isDateIdValid($date_id)
-	{
-		return strlen($date_id) >= 8 && preg_match('/^\d+$/', substr($date_id, 0, 8));
-	}
-
-	private static function dateIdToDate($date_id)
-	{
-		if (!self::isDateIdValid($date_id))
-		{
-			return null;
-		}
-
-		$year = substr($date_id, 0, 4);
-		$month = substr($date_id, 4, 2);
-		$day = substr($date_id, 6, 2);
-
-		return "$year-$month-$day";
-	}
-
-	private static function dateIdToUnixtime($date_id)
-	{
-		if (!self::isDateIdValid($date_id))
-		{
-			return null;
-		}
-
-		$year = substr($date_id, 0, 4);
-		$month = substr($date_id, 4, 2);
-		$day = substr($date_id, 6, 2);
-		return gmmktime(0, 0, 0, $month, $day, $year);
-	}
-
-	protected static function dateIdToDateTime($date_id)
-	{
-		$year = substr($date_id, 0, 4);
-		$month = substr($date_id, 4, 2);
-		$day = substr($date_id, 6, 2);
-		return new DateTime("$year-$month-$day");
-	}
-	
-	protected static function getRelativeDateTime($days)
-	{
-		$result = new DateTime();
-		if ($days < 0)
-		{
-			$days = -$days;
-			$result->sub(new DateInterval("P{$days}D"));
-		}
-		else if ($days > 0)
-		{ 
-			$result->add(new DateInterval("P{$days}D"));
-		}
-		return $result;
-	}
-	
-	private static function timestampToDateId($timestamp, $tz)
-	{
-		$date = new DateTime($timestamp);
-		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
-		$date->setTimezone($tz);
-		return $date->format('Ymd');
-	}
-
-	private static function timestampToMonthId($timestamp, $tz)
-	{
-		$date = new DateTime($timestamp);
-		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
-		$date->setTimezone($tz);
-		return $date->format('Ym');
-	}
-
-	// hours are returned from druid query with the right offset so no need to change it
-	private static function timestampToHourId($timestamp, $tz)
-	{
-		$date = new DateTime($timestamp);
-		return $date->format('YmdH');
-	}
-
-	protected static function getDateIdRange($from_day, $to_day)
-	{
-		$date = self::dateIdToDateTime($from_day);
-		$interval = new DateInterval('P1D');
-	
-		$result = array();
-		for (;;)
-		{
-			$cur = $date->format('Ymd');
-			if (strcmp($cur, $to_day) > 0 || count($result) >= 1000)
+			$index = array_search($metric, $result[0]);
+			if ($index === false)
 			{
-				break;
+				continue;
 			}
-	
-			$result[] = $cur;
-			$date->add($interval);
+				
+			$indexes[] = $index;
+			$header[] = $column;
 		}
-	
-		return $result;
-	}
-	
-	private static function addEndUserReportsDruidFilters($partner_id, $input_filter, &$druid_filter)
-	{
-		if (!($input_filter instanceof endUserReportsInputFilter))
+		
+		$orig_header_count = count($result[0]);
+		$result[0] = $header;		
+		if ($indexes == range(0, count($orig_header_count) - 1))
 		{
 			return;
 		}
-
-		if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
-		{
-			if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
-			{
-				$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-			}
-			else
-			{
-				$category_ids = self::getPlaybackContextCategoriesIds($partner_id, $input_filter->playbackContext ?
-					$input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
-			}
-
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
-				self::DRUID_VALUES => $category_ids);
-		}
-
-		if ($input_filter->application)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
-				self::DRUID_VALUES => explode(',', $input_filter->application)
-			);
-		}
-
-		if ($input_filter->userIds != null)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_USER_ID,
-				self::DRUID_VALUES => explode(',', $input_filter->userIds)
-			);
-		}
-	}
-
-	private static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids)
-	{
-		$druid_filter = array();
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
-		{
-			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
-				self::DRUID_VALUES => $playback_types
-			);
-		}
 		
-		if (isset($report_def[self::REPORT_FILTER]))
+		if ($isTable)
 		{
-			$druid_filter[] = $report_def[self::REPORT_FILTER];
-		}
-		
-		self::addEndUserReportsDruidFilters($partner_id, $input_filter, $druid_filter);
-
-		if ($input_filter->categories)
-		{
-			$category_ids = self::getCategoriesIds($input_filter->categories, $partner_id);
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
-				self::DRUID_VALUES => $category_ids
-			);
-		}
-
-		if ($input_filter->categoriesIds)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
-				self::DRUID_VALUES => explode(',', $input_filter->categoriesIds)
-			);
-		}
-
-		if ($input_filter->countries)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
-				self::DRUID_VALUES => explode(',', $input_filter->countries)
-			);
-		}
-
-		$entry_ids_from_db = array();
-		if ($input_filter->keywords)
-		{
-			$entry_filter = new entryFilter();
-			$entry_filter->setPartnerSearchScope($partner_id);
-
-			if($input_filter->search_in_tags)
-				$entry_filter->set('_free_text', $input_filter->keywords);
-			else
-				$entry_filter->set('_like_admin_tags', $input_filter->keywords);
-
-			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-			$entry_filter->attachToCriteria($c);
-			$c->applyFilters();
-
-			$entry_ids_from_db = $c->getFetchedIds();
-
-			if ($c->getRecordsCount() > count($entry_ids_from_db))
+			foreach ($result[1] as &$row)
 			{
-				throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
-			}
-
-			if (!count($entry_ids_from_db))
-			{
-				$entry_ids_from_db[] = entry::ENTRY_ID_THAT_DOES_NOT_EXIST;
-			}
-		}
-
-		if($object_ids)
-		{
-			$object_ids_arr = explode(',', $object_ids);
-
-			if (isset($report_def[self::REPORT_OBJECT_IDS_TRANSFORM]))
-			{
-				$object_ids_arr = array_map($report_def[self::REPORT_OBJECT_IDS_TRANSFORM], $object_ids_arr);
-			}
-			
-			if (isset($report_def[self::REPORT_FILTER_DIMENSION]))
-			{
-				$druid_filter[] = array(
-					self::DRUID_DIMENSION => $report_def[self::REPORT_FILTER_DIMENSION],
-					self::DRUID_VALUES => $object_ids_arr
-				);
-			}
-			else
-			{
-				$entry_ids_from_db = array_merge($object_ids_arr, $entry_ids_from_db);
-			}
-		}
-
-		if (count($entry_ids_from_db))
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
-				self::DRUID_VALUES => $entry_ids_from_db
-			);
-		}
-
-		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
-				self::DRUID_VALUES => array($partner_id)
-			);
-		}
-
-		return $druid_filter;
-	}
-
-	private static function getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics = null)
-	{
-		$report_def = array(
-			self::DRUID_DATASOURCE => $data_source ? $data_source : self::DATASOURCE_HISTORICAL,
-			self::DRUID_INTERVALS => $intervals,
-			self::DRUID_GRANULARITY => $granularity,
-			self::DRUID_AGGR => array(),
-			self::DRUID_POST_AGGR => array(),
-		);
-
-		if (kConf::hasParam('kava_top_priority_client_tags'))
-		{
-			$priority_tags = kConf::get('kava_top_priority_client_tags');
-			$client_tag = kCurrentContext::$client_lang;
-			
-			foreach ($priority_tags as $tag)
-			{
-				if (strpos($client_tag, $tag) === 0)
+				$new_row = array();
+				foreach ($indexes as $index)
 				{
-					$report_def[self::DRUID_CONTEXT] = array(self::DRUID_PRIORITY => self::CLIENT_TAG_PRIORITY);
-					break;
+					$new_row[] = $row[$index];
 				}
+				$row = $new_row;
 			}
 		}
-		
-		// aggregations / post aggregations
-		foreach ($metrics as $metric)
+		else
 		{
-			if (array_key_exists($metric, self::$metrics_def))
+			$new_row = array();
+			foreach ($indexes as $index)
 			{
-				$metric_aggr = self::$metrics_def[$metric];
+				$new_row[] = $result[1][$index];
 			}
-			else
-			{
-				$metric_aggr = array(self::DRUID_AGGR => array($metric));
-			}
-			
-			foreach ($metric_aggr[self::DRUID_AGGR] as $aggr)
-			{
-				if (in_array(self::$aggregations_def[$aggr], $report_def[self::DRUID_AGGR]))
-				{
-					continue;
-				}
-
-				$report_def[self::DRUID_AGGR][] = self::$aggregations_def[$aggr];
-			}
-			
-			if (array_key_exists(self::DRUID_POST_AGGR, $metric_aggr))
-			{
-				$metric_post_aggr = $metric_aggr[self::DRUID_POST_AGGR];
-				if (!in_array($metric_post_aggr, $report_def[self::DRUID_POST_AGGR]))
-				{
-					$report_def[self::DRUID_POST_AGGR][] = $metric_post_aggr;
-				}
-			}
+			$result[1] = $new_row;
 		}
-
-		// event types
-		$event_types = array();
-		if (!$filter_metrics)
-		{
-			$filter_metrics = $metrics;
-		}
-		foreach ($filter_metrics as $metric)
-		{
-			if (array_key_exists($metric, self::$metrics_def))
-			{
-		 		$aggrs = self::$metrics_def[$metric][self::DRUID_AGGR];
-			}
-			else
-			{
-				$aggrs = array($metric);
-			}
-			
-		 	foreach ($aggrs as $aggr)
-		 	{
-		 		if (!isset(self::$aggregations_def[$aggr][self::DRUID_FILTER]))
-		 		{
-		 			continue;
-		 		}
-		 		
-		 		$aggr_filter = self::$aggregations_def[$aggr][self::DRUID_FILTER];
-		 		if (!isset($aggr_filter[self::DRUID_DIMENSION]) ||
-		 			$aggr_filter[self::DRUID_DIMENSION] != self::DIMENSION_EVENT_TYPE)
-		 		{
-		 			continue;
-		 		}
-		 		
-				if (isset($aggr_filter[self::DRUID_VALUE]))
-				{
-					$event_types[] = $aggr_filter[self::DRUID_VALUE];
-				}
-				else if (isset($aggr_filter[self::DRUID_VALUES]))
-				{
-					$event_types = array_merge($event_types, $aggr_filter[self::DRUID_VALUES]);
-				}
-		 	}
-		}
-
-		if (count($event_types))
-		{
-			$filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array_values(array_unique($event_types)));
-		}
-
-		$filter_def = array();
-		foreach ($filter as $cur_filter)
-		{
-			$filter_def[] = self::getInFilter(
-				$cur_filter[self::DRUID_DIMENSION], 
-				$cur_filter[self::DRUID_VALUES]);
-		}
-		
-		$report_def[self::DRUID_FILTER] = array(
-			self::DRUID_TYPE => 'and',
-			self::DRUID_FIELDS => $filter_def);
-
-		return $report_def;
-	}
-
-	private static function getFilterValues($filter, $dimension)
-	{
-		foreach ($filter as $cur_filter)
-		{
-			if ($cur_filter[self::DRUID_DIMENSION] == $dimension)
-			{
-				return $cur_filter[self::DRUID_VALUES];
-			}
-		}
-
-		return null;
-	}
-
-	private static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null)
-	{
-		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
-
-		if (in_array($dimensions, self::$multi_value_dimensions))
-		{
-			$values = self::getFilterValues($filter, $dimensions);
-			if ($values)
-			{
-				// use a list filtered dimension, otherwise we may get values that don't match the filter
-				$dimensions = array(
-					self::DRUID_TYPE => self::DRUID_LIST_FILTERED,
-					self::DRUID_DELEGATE => array(
-							self::DRUID_TYPE => self::DRUID_DEFAULT,
-							self::DRUID_DIMENSION => $dimensions,
-							self::DRUID_OUTPUT_NAME => $dimensions,
-					),
-					self::DRUID_VALUES => $values,
-				);
-			}
-		}
-
-		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TOPN;
-		$report_def[self::DRUID_DIMENSION] = $dimensions;
-		$order_type = $order_dir === '+' ? self::DRUID_INVERTED : self::DRUID_NUMERIC;
-		$report_def[self::DRUID_METRIC] = array(
-			self::DRUID_TYPE => $order_type,
-			self::DRUID_METRIC => $order_by);
-		$report_def[self::DRUID_THRESHOLD] = $threshold;
-
-		return $report_def;
-	}
-
-	private static function getSearchReport($data_source, $partner_id, $intervals, $dimensions, $filter)
-	{
-		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL);
-		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_SEARCH;
-		$report_def[self::DRUID_SEARCH_DIMENSIONS] = $dimensions;
-		$report_def[self::DRUID_QUERY] = array(
-			self::DRUID_TYPE => self::DRUID_CONTAINS,
-			self::DRUID_CASE_SENSITIVE => true,
-			self::DRUID_VALUE => ''
-		);
-
-		return $report_def;
-	}
-
-	private static function buildFilter($filters)
-	{
-		$filters_def = array();
-		foreach ($filters as $filter)
-		{
-			$filters_def[] = self::getInFilter(
-				$filter[self::DRUID_DIMENSION], 
-				$filter[self::DRUID_VALUES]);
-		}
-		return $filters_def;
-	}
-
-	private static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter)
-	{
-		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
-		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
-		if (!isset($report_def[self::DRUID_CONTEXT]))
-		{
-			$report_def[self::DRUID_CONTEXT] = array();
-		}
-		$report_def[self::DRUID_CONTEXT][self::DRUID_SKIP_EMPTY_BUCKETS] = 'true';
-		return $report_def;
-	}
-
-	private static function getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $filter, $filter_metrics)
-	{
-		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
-		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
-		$report_def[self::DRUID_AGGR][] = array(
-			self::DRUID_TYPE => self::DRUID_CARDINALITY,
-			self::DRUID_NAME => self::METRIC_CARDINALITY,
-			self::DRUID_FIELDS => is_array($dimension) ? $dimension : array($dimension));
-		return $report_def;
-	}
-
-	private static function getGroupByReport($data_source, $partner_id, $intervals, $granularity, $dimensions, $metrics, $filter, $pageSize = 0)
-	{
-		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
-		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_GROUP_BY;
-		$report_def[self::DRUID_DIMENSIONS] = $dimensions;
-		return $report_def;
-	}
-
-	protected static function getGraphsByDateId($result, $graph_metrics_to_headers, $tz_offset, $transform)
-	{
-		$tz = self::getPhpTimezone($tz_offset);
-
-		$graphs = array();
-
-		foreach ($graph_metrics_to_headers as $column => $header)
-		{
-			$graphs[$header] = array();
-		}
-
-		foreach ($result as $row)
-		{
-			$row_data = $row[self::DRUID_RESULT];
-
-			$date = call_user_func($transform, $row[self::DRUID_TIMESTAMP], $tz);
-
-			foreach ($graph_metrics_to_headers as $column => $header)
-			{
-				$graphs[$header][$date] = $row_data[$column];
-			}
-		}
-		return $graphs;
-	}
-
-	protected static function getAssociativeMultiGraphsByDateId($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
-	{
-		$tz = self::getPhpTimezone($tz_offset);
-
-		$graphs = array();
-
-		unset($graph_metrics_to_headers[$multiline_column]);
-
-		foreach ($result as $row)
-		{
-			$row_data = $row[self::DRUID_EVENT];
-
-			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz);
-			$multiline_val = $row_data[$multiline_column];
-			if ($transform)
-			{
-				$multiline_val = call_user_func($transform, $multiline_val);
-			}
-			
-			if (!isset($graphs[$multiline_val]))
-			{
-				$graphs[$multiline_val] = array();
-				foreach ($graph_metrics_to_headers as $column => $header)
-				{
-					$graphs[$multiline_val][$header] = array();
-				}
-			}
-			
-			foreach ($graph_metrics_to_headers as $column => $header)
-			{
-				$graphs[$multiline_val][$header][$date] = $row_data[$column];
-			}
-		}
-		return $graphs;
 	}
 	
-	protected static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
+	public static function getTable($partner_id, $report_type, reportsInputFilter $input_filter,
+		$page_size, $page_index, $order_by, $object_ids = null, $isCsv = false)
 	{
-		$tz = self::getPhpTimezone($tz_offset);
+		self::init();		
 
-		$graphs = array();
-
-		unset($graph_metrics_to_headers[$multiline_column]);
-		foreach ($graph_metrics_to_headers as $column => $header)
+		// pager
+		if (!$page_size || $page_size < 0)
+			$page_size = 10;
+		
+		if (!$page_index || $page_index < 0)
+			$page_index = 1;
+		
+		// run the query
+		$report_def = self::getReportDef($report_type);
+		
+		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
-			$graphs[$header] = array();
+			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
 		}
-
-		foreach ($result as $row)
+		
+		$flags = $isCsv ? self::GET_TABLE_FLAG_IS_CSV : 0;
+		
+		$result = self::getTableImpl($partner_id, $report_type, $report_def, $input_filter,
+			$page_size, $page_index, $order_by, $object_ids, $flags);
+	
+		// finalize / enrich
+		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
 		{
-			$row_data = $row[self::DRUID_EVENT];
-
-			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz);
-			$multiline_val = $row_data[$multiline_column];
-			if ($transform)
-			{
-				$multiline_val = call_user_func($transform, $multiline_val);
-			}
-			
-			foreach ($graph_metrics_to_headers as $column => $header)
-			{
-				if (isset($graphs[$header][$date]))
-				{
-					$graphs[$header][$date] .=	',';
-				}
-				else
-				{
-					$graphs[$header][$date] = '';
-				}
-
-				$graphs[$header][$date] .= $multiline_val . ':' . $row_data[$column];
-			}
+			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result));
 		}
-		return $graphs;
-	}
-
-	protected static function getMultiGraphsByColumnName ($result, $graph_metrics_to_headers, $dimension, $transform)
-	{
-		$graphs = array();
-
-		foreach ($graph_metrics_to_headers as $column => $header)
+		
+		if (isset($report_def[self::REPORT_ENRICH_DEF]))
 		{
-			$graphs[$header] = array();
+			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
 		}
-
-		foreach ($result as $row)
+		
+		// reorder
+		if (isset($report_def[self::REPORT_TABLE_MAP]))
 		{
-			$row_data = $row[self::DRUID_EVENT];
-
-			$dim_value = $row_data[$dimension];
-			if ($transform)
-			{
-				$dim_value = call_user_func($transform, $dim_value);
-			}
-
-			foreach ($graph_metrics_to_headers as $column => $header)
-			{
-				$graphs[$header][$dim_value] = $row_data[$column];
-			}
+			self::reorderTableColumns(
+				count($report_def[self::REPORT_DIMENSION_HEADERS]), 
+				$report_def[self::REPORT_TABLE_MAP], 
+				true,
+				$result);
 		}
-		return $graphs;
-	}
-
-	protected static function getGraphsByColumnName($result, $graph_metrics_to_headers, $type_str)
-	{
-		$graph = array();
-		if (isset($result[0][self::DRUID_RESULT]))
-		{
-			$row_data = $result[0][self::DRUID_RESULT];
-			foreach ($graph_metrics_to_headers as $column => $header)
-			{
-				$graph[$header] = $row_data[$column];
-			}
-		}
-		else
-		{
-			$graph = array_combine(
-				array_values($graph_metrics_to_headers),
-				array_fill(0, count($graph_metrics_to_headers), 0));
-		}
-
-		return array($type_str => $graph);
-	}
-
-
-	private static function getEntriesNames($ids, $partner_id)
-	{
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-
-		$c->addSelectColumn(entryPeer::ID);
-		$c->addSelectColumn(entryPeer::NAME);
-
-		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
-		{
-			$c->add(entryPeer::PARTNER_ID, $partner_id);
-		}
-		$c->add(entryPeer::ID, $ids, Criteria::IN);
-
-		entryPeer::setUseCriteriaFilter(false);
-		$stmt = entryPeer::doSelectStmt($c);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		entryPeer::setUseCriteriaFilter(true);
-
-		$entries_names = array();
-		foreach ($rows as $row)
-		{
-			$id = $row['ID'];
-			$name = $row['NAME'];
-			$entries_names[$id] = $name;
-		}
-		return $entries_names;
-	}
-
-	private static function getQuotedEntriesNames($ids, $partner_id)
-	{
-		$result = self::getEntriesNames($ids, $partner_id);
-		foreach ($result as &$name)
-		{
-			$name = '"' . str_replace('"', '""', $name) . '"';
-		}
+		
 		return $result;
 	}
-
-	private static function getEntriesUserIdsAndNames($ids, $partner_id)
+	
+	protected static function addCombinedUsageColumn(&$result)
 	{
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-
-		$c->addSelectColumn(entryPeer::ID);
-		$c->addSelectColumn(entryPeer::NAME);
-		$c->addSelectColumn(entryPeer::PUSER_ID);
-
-		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		$headers = $result[0];
+		$bandwidth = array_search(self::METRIC_BANDWIDTH_SIZE_MB, $headers);
+		$storage = array_search(self::METRIC_AVERAGE_STORAGE_MB, $headers);
+		if ($bandwidth === false || $storage === false)
 		{
-			$c->add(entryPeer::PARTNER_ID, $partner_id);
+			return;
 		}
-		$c->add(entryPeer::ID, $ids, Criteria::IN);
-
-		entryPeer::setUseCriteriaFilter(false);
-		$stmt = entryPeer::doSelectStmt($c);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		entryPeer::setUseCriteriaFilter(true);
-
-		$result = array();
-		foreach ($rows as $row)
+		
+		$result[0][] = self::METRIC_BANDWIDTH_STORAGE_MB;
+		foreach ($result[1] as &$row)
 		{
-			$id = $row['ID'];
-			$puserId = $row['PUSER_ID'];
-			$name = $row['NAME'];
-			$result[$id] = array($puserId, '"' . $name . '"');
-		}
-		return $result;
-	}
-
-	private static function getCategoriesNames($ids, $partner_id)
-	{
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-
-		$c->addSelectColumn(categoryPeer::ID);
-		$c->addSelectColumn(categoryPeer::NAME);
-
-		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
-		{
-			$c->add(categoryPeer::PARTNER_ID, $partner_id);
-		}
-		$c->add(categoryPeer::ID, $ids, Criteria::IN);
-
-		categoryPeer::setUseCriteriaFilter(false);
-		$stmt = categoryPeer::doSelectStmt($c);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		categoryPeer::setUseCriteriaFilter(true);
-
-		$categories_names = array();
-		foreach ($rows as $row)
-		{
-			$id = $row['ID'];
-			$name = $row['NAME'];
-			$categories_names[$id] = $name;
-		}
-		return $categories_names;
-	}
-
-	private static function genericQueryEnrich($ids, $partner_id, $context)
-	{
-		$peer = $context['peer'];
-		$columns = $context['columns'];
-		$dim_column = isset($context['dim_column']) ? $context['dim_column'] : 'ID';
-		$partner_id_column = isset($context['partner_id_column']) ? $context['partner_id_column'] : 'PARTNER_ID';
-		$custom_crit = isset($context['custom_criterion']) ? $context['custom_criterion'] : null;
-
-		$c = KalturaCriteria::create($peer::OM_CLASS);
-
-		$table_name = $peer::TABLE_NAME;
-		$c->addSelectColumn($table_name . '.' . $dim_column);
-
-		$column_formats = array();
-		foreach ($columns as $index => $column)
-		{
-			switch ($column[0])
-			{
-			case '"':
-				$column = trim($column, '"');
-				$columns[$index] = $column;
-				$column_formats[$column] = self::COLUMN_FORMAT_QUOTE;
-				break;
-				
-			case '@':
-				$column = substr($column, 1);
-				$columns[$index] = $column;
-				$column_formats[$column] = self::COLUMN_FORMAT_UNIXTIME;
-				break;
-			}
-			$exploded_column = explode('.', $column);
-			$c->addSelectColumn($table_name . '.' . $exploded_column[0]);
-		}
-
-		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
-		{
-			$c->add($table_name . '.' . $partner_id_column, $partner_id);
-		}
-		$c->add($table_name . '.' . $dim_column, $ids, Criteria::IN);
-
-		if ($custom_crit)
-		{
-			$c->addAnd($c->getNewCriterion($custom_crit['column'], $custom_crit['value'], Criteria::CUSTOM));
-		}
-
-		$peer::setUseCriteriaFilter(false);
-		$stmt = $peer::doSelectStmt($c);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$peer::setUseCriteriaFilter(true);
-
-		$result = array();
-		foreach ($rows as $row)
-		{
-			$output_row = array();
-			foreach ($columns as $column)
-			{
-				$format = isset($column_formats[$column]) ? $column_formats[$column] : null;
-
-				$exploded_column = explode('.', $column);
-				if (count($exploded_column) > 1)
-				{
-					list($column, $field) = $exploded_column;
-					$value = @unserialize($row[$column]);
-					$value = isset($value[$field]) ? $value[$field] : '';
-				}
-				else
-				{
-					$value = $row[$column];
-				}
-
-				switch ($format)
-				{
-				case self::COLUMN_FORMAT_QUOTE:
-					$value = '"' . str_replace('"', '""', $value) . '"';
-					break;
-					
-				case self::COLUMN_FORMAT_UNIXTIME:
-					$dt = new DateTime($value);
-					$value = (int) $dt->format('U');
-					break;
-				}
-
-				$output_row[] = $value;
-			}
-
-			$id = $row[$dim_column];
-			$result[$id] = $output_row;
-		}
-		return $result;
-	}
-
-	private static function getCategoriesIds($categories, $partner_id)
-	{
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-
-		$c->addSelectColumn(categoryPeer::ID);
-
-		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
-		{
-			$c->add(categoryPeer::PARTNER_ID, $partner_id);
-		}
-		$c->add(categoryPeer::FULL_NAME, explode(',', $categories), Criteria::IN);
-
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$stmt = categoryPeer::doSelectStmt($c);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-
-		if (count($rows))
-		{
-			$category_ids = array();
-			foreach ($rows as $row)
-			{
-				$category_ids[] = $row['ID'];
-			}
-		}
-		else
-		{
-			$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-		}
-		return $category_ids;
-
-	}
-
-	private static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
-	{
-		$category_filter = new categoryFilter();
-
-		if ($is_ancestor)
-		{
-			$category_filter->set('_matchor_likex_full_name', $playback_context);
-		}
-		else
-		{
-			$category_filter->set('_in_full_name', $playback_context);
-		}
-
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$category_filter->attachToCriteria($c);
-		$category_filter->setPartnerSearchScope($partner_id);
-		$c->applyFilters();
-
-		$category_ids_from_db = $c->getFetchedIds();
-
-		if (count($category_ids_from_db))
-		{
-			return $category_ids_from_db;
-		}
-		else
-		{
-			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+			$row[] = $row[$bandwidth] + $row[$storage]; 
 		}
 	}
-
-
-	private static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
+		
+	/// total functions
+	protected static function getSimpleTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
-		$cache_key = 'reportCount-' . md5("$partner_id|".serialize($report_def)."|$object_ids|".serialize($input_filter));
-
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_REPORTS_COUNT);
-		if ($cache)
-		{
-			$total_count = $cache->get($cache_key);
-			if ($total_count)
-			{
-				KalturaLog::log("count from cache: [$total_count]");
-				return $total_count;
-			}
-		}
-
+		$start = microtime(true);
 		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
-
-		$query = self::getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $druid_filter, self::getMetrics($report_def));
-
-		$total_count_arr = self::runQuery($query);
-		if (isset($total_count_arr[0][self::DRUID_RESULT][self::METRIC_CARDINALITY]))
+		$intervals = self::getFilterIntervals($report_def, $input_filter);
+		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
+		
+		if (array_key_exists(self::REPORT_TOTAL_METRICS, $report_def))
 		{
-			$total_count = floor($total_count_arr[0][self::DRUID_RESULT][self::METRIC_CARDINALITY]);
+			$metrics = $report_def[self::REPORT_TOTAL_METRICS];
+		}
+		else 
+		{
+			$metrics = self::getMetrics($report_def);
+			if (!$metrics)
+			{
+				throw new Exception('unsupported query - report has no metrics');
+			}
+		}
+
+		$granularity = self::DRUID_GRANULARITY_ALL;
+		$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $druid_filter);
+		$result = self::runQuery($query);
+		
+		$headers = array();
+		$data = array();
+		if (count($result) > 0)
+		{
+			$row = $result[0];
+			$row_data = $row[self::DRUID_RESULT];
+
+			foreach ($metrics as $column)
+			{
+				$headers[] = self::$metrics_to_headers[$column];
+				$data[] = $row_data[$column];
+			}
+
+			foreach (self::$transform_metrics as $metric => $func)
+			{
+				$field_index = array_search(self::$metrics_to_headers[$metric], $headers);
+				if (false !== $field_index)
+				{
+					$data[$field_index] = call_user_func($func, $data[$field_index]);
+				}
+			}
 		}
 		else
 		{
-			$total_count = 0;
+			foreach ($metrics as $column)
+			{
+				$headers[] = self::$metrics_to_headers[$column];
+				$data[] = '';
+			}
 		}
 
-		KalturaLog::log("count: [$total_count]");
+		$end = microtime(true);
+		KalturaLog::log('getTotal took ['  . ($end - $start) . ']');
 
-		if ($cache)
+		return array($headers, $data);
+	}
+	
+	protected static function getJoinTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null) 
+	{
+		$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
+			
+		$headers = array();
+		$data = array();
+		foreach ($report_defs as $cur_report_def)
 		{
-			$cache->set($cache_key, $total_count, myReportsMgr::REPORTS_COUNT_CACHE);
+			list($cur_headers, $cur_data) = self::getSimpleTotalImpl($partner_id, $cur_report_def, $input_filter, $object_ids);
+			$headers = array_merge($headers, $cur_headers);
+			$data = array_merge($data, $cur_data);
 		}
-
-		return $total_count;
+			
+		return array($headers, $data);
 	}
 
+	protected static function getTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
+	{
+		if (!isset($report_def[self::REPORT_DIMENSION]))
+		{
+			$input_filter->interval = self::INTERVAL_ALL;
+			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
+			$result = array(array_keys($result), array_values($result));
+		}
+		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
+		{
+			$result = self::getJoinTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
+		}
+		else 
+		{
+			$result = self::getSimpleTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
+		}
+
+		return $result;
+	}
+	
+	public static function getTotal($partner_id, $report_type, reportsInputFilter $input_filter, $object_ids = null)
+	{
+		self::init();
+
+		$report_def = self::getReportDef($report_type);
+		
+		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
+		{
+			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
+		}
+		
+		// run the query
+		$result = self::getTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
+		
+		// reorder
+		if (isset($report_def[self::REPORT_TOTAL_MAP]))
+		{
+			self::reorderTableColumns(0, $report_def[self::REPORT_TOTAL_MAP], false, $result);
+		}
+		
+		return $result;
+	}
+
+	/// custom report functions
+	public static function customReport($id, $params)
+	{
+		self::$custom_reports = kConf::getMap('custom_reports');
+		$report_def = self::$custom_reports[$id];
+
+		// build the filter
+		$input_filter = new reportsInputFilter();
+		foreach ($report_def['filter'] as $field => $value)
+		{
+			if (is_string($value) && $value[0] == ':')
+			{
+				$paramName = substr($value, 1);
+				if (!isset($params[$paramName]))
+				{
+					throw new Exception("missing parameter $paramName");
+				}
+				$value = $params[$paramName];
+			}
+			$input_filter->$field = $value;
+		}
+		
+		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
+
+		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
+		{
+			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
+		}
+		else
+		{
+			$partner_id = $params['partner_id'];
+		}
+		$report_type = -$id;		// negative report types are used to identify custom reports
+
+		if (isset($report_def[self::REPORT_GRAPH_METRICS]))
+		{
+			// graph report
+			$graphs = self::getGraph($partner_id, $report_type, $input_filter, null, $object_ids);
+			list($header, $data) = self::getTableFromGraphs($graphs, false);
+		}
+		else if (isset($report_def[self::REPORT_DIMENSION]))
+		{
+			// table report
+			list($header, $data, $totalCount) = self::getTable(
+				$partner_id,
+				$report_type,
+				$input_filter,
+				self::MAX_CUSTOM_REPORT_RESULT_SIZE,
+				1,
+				$report_def['order_by'],
+				$object_ids,
+				true);
+		}
+		else
+		{
+			// total report
+			list($header, $data) = self::getTotal(
+				$partner_id,
+				$report_type,
+				$input_filter,
+				$object_ids);
+		}
+
+		if (isset($report_def['header']))
+		{
+			$header = explode(',', $report_def['header']);
+		}
+
+		return array($header, $data);
+	}
+
+	private static function getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $timezone_offset)
+	{
+		$granularity = $report_def[self::REPORT_GRANULARITY];
+		$granularity_def = self::getGranularityDef($granularity, $timezone_offset);
+		$query = self::getTimeSeriesReport(null, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
+		$result = self::runQuery($query);
+		$report_metrics_to_headers = array();
+		foreach ($metrics as $column)
+		{
+			$report_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
+		}
+		$druid_result = self::getGraphsByDateId($result, $report_metrics_to_headers, $timezone_offset, self::$transform_time_dimensions[$granularity]);
+		$mapping = $report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_MAPPING];
+		$druid_field = reset($mapping);
+		$legacy_field = key($mapping);
+		$legacy_field_index = array_search($legacy_field, $headers);
+
+		$key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $headers);
+		if (false !== $legacy_field_index)
+		{
+			foreach ($data as &$row)
+			{
+				$row[$legacy_field_index] = isset($druid_result[$druid_field][$row[$key_index]]) ? $druid_result[$druid_field][$row[$key_index]] : 0;
+			}
+		}
+		return $data;
+	}
+	
+	/// csv functions
 	static function getCsvData(
 		$partner_id,
 		$report_title, $report_text, $headers,
@@ -3598,170 +3759,5 @@ class kKavaReportsMgr extends kKavaBase
 
 		$url = myReportsMgr::createUrl($partner_id, $file_name);
 		return $url;
-	}
-
-	private static function getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $timezone_offset)
-	{
-		$granularity = $report_def[self::REPORT_GRANULARITY];
-		$granularity_def = self::getGranularityDef($granularity, $timezone_offset);
-		$query = self::getTimeSeriesReport(null, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
-		$result = self::runQuery($query);
-		$report_metrics_to_headers = array();
-		foreach ($metrics as $column)
-		{
-			$report_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
-		}
-		$druid_result = self::getGraphsByDateId($result, $report_metrics_to_headers, $timezone_offset, self::$transform_time_dimensions[$granularity]);
-		$mapping = $report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_MAPPING];
-		$druid_field = reset($mapping);
-		$legacy_field = key($mapping);
-		$legacy_field_index = array_search($legacy_field, $headers);
-
-		$key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $headers);
-		if (false !== $legacy_field_index)
-		{
-			foreach ($data as &$row)
-			{
-				$row[$legacy_field_index] = isset($druid_result[$druid_field][$row[$key_index]]) ? $druid_result[$druid_field][$row[$key_index]] : 0;
-			}
-		}
-		return $data;
-	}
-	
-	protected static function aggregateUsageDataAll($graphs)
-	{
-		$result = array();
-		foreach ($graphs as $name => $values)
-		{
-			switch ($name)
-			{
-				case self::METRIC_AVERAGE_STORAGE_MB:
-					$value = $values ? array_sum($values) / count($values) : 0;
-					break;
-		
-				case self::METRIC_PEAK_STORAGE_MB:
-					$value = $values ? max($values) : 0;
-					break;
-		
-				case self::METRIC_BANDWIDTH_STORAGE_MB:
-					$value = $result[self::METRIC_BANDWIDTH_SIZE_MB] + $result[self::METRIC_AVERAGE_STORAGE_MB];
-					break;
-		
-				default:
-					$value = array_sum($values);
-					break;
-			}
-		
-			$result[$name] = $value;
-		}
-		
-		return $result;
-	}
-	
-	protected static function aggregateUsageDataByMonth($graphs, &$dates)
-	{
-		// group by months
-		$grouped = array();
-		foreach ($dates as $date)
-		{
-			$month = substr($date, 0, 6);
-			foreach ($graphs as $name => $values)
-			{
-				$grouped[$month][$name][$date] = $values[$date];
-			}
-		}
-		
-		// aggregate the months
-		$result = array();
-		foreach ($grouped as $month => $graphs)
-		{
-			foreach (self::aggregateUsageDataAll($graphs) as $header => $value)
-			{
-				$result[$header][$month] = $value;
-			}
-		}
-		
-		$dates = array_keys($grouped);
-		
-		return $result;
-	}
-
-	protected static function aggregateUsageData($interval, $graphs, &$dates)
-	{
-		switch ($interval)
-		{
-			case self::INTERVAL_MONTHS:
-				return self::aggregateUsageDataByMonth($graphs, $dates);
-					
-			case self::INTERVAL_ALL:
-				$dates = null;
-				return self::aggregateUsageDataAll($graphs);
-				
-			// Note: no need to do anything for 'days', input data is already per day
-		}
-		
-		return $graphs;
-	}
-	
-	protected static function zeroFill(&$graphs, $dates)
-	{
-		foreach ($graphs as $name => $values)
-		{
-			$new_values = array();
-			foreach ($dates as $date)
-			{
-				// Note: the != 0 is here to avoid returning '-0' that may come from druid 
-				$new_values[$date] = isset($values[$date]) && $values[$date] != 0 ? $values[$date] : 0; 
-			}
-			
-			$graphs[$name] = $new_values;
-		}
-	}
-	
-	protected static function addAggregatedStorageGraphs(&$storage, $base_storage, $dates)
-	{
-		$cur_storage = $base_storage;
-		foreach ($dates as $date)
-		{
-			$cur_storage += $storage[self::METRIC_STORAGE_ADDED_MB][$date];
-			$storage[self::METRIC_AVERAGE_STORAGE_MB][$date] = $cur_storage;
-			$storage[self::METRIC_PEAK_STORAGE_MB][$date] = $cur_storage;
-			$cur_storage -= $storage[self::METRIC_STORAGE_DELETED_MB][$date];
-		}
-	}
-		
-	protected static function addCombinedUsageGraph(&$result, $dates)
-	{
-		if (!$dates)
-		{
-			$result[self::METRIC_BANDWIDTH_STORAGE_MB] =
-				$result[self::METRIC_BANDWIDTH_SIZE_MB] +
-				$result[self::METRIC_AVERAGE_STORAGE_MB];
-			return;
-		}
-		
-		foreach ($dates as $date)
-		{
-			$result[self::METRIC_BANDWIDTH_STORAGE_MB][$date] =
-				$result[self::METRIC_BANDWIDTH_SIZE_MB][$date] +
-				$result[self::METRIC_AVERAGE_STORAGE_MB][$date];
-		}
-	}
-
-	protected static function addCombinedUsageColumn(&$result)
-	{
-		$headers = $result[0];
-		$bandwidth = array_search(self::METRIC_BANDWIDTH_SIZE_MB, $headers);
-		$storage = array_search(self::METRIC_AVERAGE_STORAGE_MB, $headers);
-		if ($bandwidth === false || $storage === false)
-		{
-			return;
-		}
-		
-		$result[0][] = self::METRIC_BANDWIDTH_STORAGE_MB;
-		foreach ($result[1] as &$row)
-		{
-			$row[] = $row[$bandwidth] + $row[$storage]; 
-		}
 	}
 }
