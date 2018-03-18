@@ -3,7 +3,7 @@
  * Enable indexing and searching schedule event objects in sphinx
  * @package plugins.reach
  */
-class EntryVendorTaskSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration
+class EntryVendorTaskSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaPending
 {
 	const PLUGIN_NAME = 'entryVendorTaskSphinx';
 	
@@ -55,5 +55,14 @@ class EntryVendorTaskSphinxPlugin extends KalturaPlugin implements IKalturaCrite
 				)
 			)
 		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$rechPluginDependency = new KalturaDependency(ReachPlugin::getPluginName());
+		return array($rechPluginDependency);
 	}
 }
