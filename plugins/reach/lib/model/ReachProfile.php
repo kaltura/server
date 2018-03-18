@@ -35,7 +35,9 @@ class ReachProfile extends BaseReachProfile
 	
 	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
 	const CUSTOM_DATA_CONTENT_DELETION_POLICY = 			'content_deletion_policy';
-	
+
+	const CUSTOM_DATA_CREDIT_RESET_HISTORY =                'credit_reset_history';
+	const MAX_CREDIT_HISTORY_TO_KEEP =                      10;
 	//setters
 	
 	public function setEnableMachineModeration($v)
@@ -327,6 +329,24 @@ class ReachProfile extends BaseReachProfile
 			$this->setUsedCredit($syncedCredit);
 		}
 		$this->setCredit($reachProfileCredit);
+	}
+
+	public function setCreditResetHistory($v)
+	{
+		$currentCreditHistory = $this->getCreditResetHistory();
+		$currentCreditHistory[] = $v;
+		$offset = count($currentCreditHistory) >  self::MAX_CREDIT_HISTORY_TO_KEEP ?  self::MAX_CREDIT_HISTORY_TO_KEEP : 0;
+
+		$currentCreditHistory = array_splice($currentCreditHistory, $offset, self::MAX_CREDIT_HISTORY_TO_KEEP);
+		$this->putInCustomData(self::CUSTOM_DATA_CREDIT_RESET_HISTORY, serialize($currentCreditHistory));
+	}
+
+	public function getCreditResetHistory()
+	{
+		$creditResetHistory = $this->getFromCustomData(self::CUSTOM_DATA_CREDIT_RESET_HISTORY, null, array());
+		if(count($creditResetHistory))
+			$creditResetHistory = unserialize($creditResetHistory);
+		return $creditResetHistory;
 	}
 	
 	public function shouldModerate($type)
