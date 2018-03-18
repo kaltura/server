@@ -16,7 +16,7 @@
 class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectPeer
 {
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
-	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 60;
+	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 600; // 10 Minutes
 	
 	public static function generateNewPassword()
 	{
