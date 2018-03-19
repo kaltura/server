@@ -346,4 +346,31 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	{
 		return false;
 	}
+	
+	public static function validateMetadataObjectAccess($objectId, $objectType)
+	{
+		$objectPeer = kMetadataManager::getObjectPeer($objectType);
+		if (!$objectPeer)
+		{
+			KalturaLog::debug("objectPeer not found for object object type [$objectType]");
+			return false;
+		}
+	
+		$cuePointDb = $objectPeer::retrieveByPK($objectId);
+		if(!$cuePointDb)
+		{
+			KalturaLog::debug("Metadata object id with id [$objectId] not found");
+			return false;
+		}
+		
+		/* @var $cuePointDb CuePoint */
+		//check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
+		$limitEntry = kCurrentContext::$ks_object->getLimitEntry();
+		if ($limitEntry && $limitEntry != $cuePointDb->getEntryId())
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $cuePointDb->getEntryId());
+		}
+	
+		return true;
+	}
 }

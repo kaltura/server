@@ -43,6 +43,21 @@ class MetadataEntryPeer extends entryPeer implements IMetadataPeer
     		KalturaLog::debug("Metadata object id with id [$objectId] not found");
     		return false;
     	}
+    	
+    	// check if all ids are privileged
+    	if (kCurrentContext::$ks_object->hasPrivilege(ks::PRIVILEGE_WILDCARD) ||
+    			kkCurrentContext::$ks_object->verifyPrivileges(kSessionBase::PRIVILEGE_EDIT, $objectId))
+    	{
+    		return true;
+    	}
+    	
+    	/* @var $entryDb entry */
+    	if(strtolower($entryDb->getPuserId()) != strtolower(kCurrentContext::$ks_uid) &&
+    			!$entryDb->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId())
+    	)
+    	{
+    		return false;
+    	}
     	 
     	return true;
     }
