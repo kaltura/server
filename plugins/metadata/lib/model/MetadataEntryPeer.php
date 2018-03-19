@@ -27,4 +27,23 @@ class MetadataEntryPeer extends entryPeer implements IMetadataPeer
     {
         return self::retrieveByPK($objectId);
     }
+    
+    public static function validateMetadataObjectAccess($objectId, $objectType)
+    {
+    	$objectPeer = kMetadataManager::getObjectPeer($objectType);
+    	if (!$objectPeer)
+    	{
+    		KalturaLog::debug("objectPeer not found for object object type [$objectType]");
+    		return false;
+    	}
+    	 
+    	$entryDb = $objectPeer::retrieveByPK($objectId);
+    	if(!$entryDb)
+    	{
+    		KalturaLog::debug("Metadata object id with id [$objectId] not found");
+    		return false;
+    	}
+    	 
+    	return true;
+    }
 }
