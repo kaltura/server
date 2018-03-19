@@ -198,11 +198,11 @@ class ReachProfileService extends KalturaBaseService
 		$currentCreditHistory ['userId'] = kCurrentContext::$ks_uid;
 		$currentCreditHistory ['resetTime'] = time();
 
-		// reset the credit.
+		// reset the used_credit and the usage percentage.
 		$dbReachProfile->setUsedCredit(0);
+		$dbReachProfile->setCreditUsagePercentage(0);
 
 		//add the reset history
-		$creditHistory = $dbReachProfile->getCreditResetHistory();
 		$dbReachProfile->setCreditResetHistory($currentCreditHistory);
 		$dbReachProfile->save();
 

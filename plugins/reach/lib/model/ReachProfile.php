@@ -335,7 +335,7 @@ class ReachProfile extends BaseReachProfile
 	{
 		$currentCreditHistory = $this->getCreditResetHistory();
 		$currentCreditHistory[] = $v;
-		$offset = count($currentCreditHistory) >  self::MAX_CREDIT_HISTORY_TO_KEEP ?  self::MAX_CREDIT_HISTORY_TO_KEEP : 0;
+		$offset = count($currentCreditHistory) >  self::MAX_CREDIT_HISTORY_TO_KEEP ? 1 : 0;
 
 		$currentCreditHistory = array_splice($currentCreditHistory, $offset, self::MAX_CREDIT_HISTORY_TO_KEEP);
 		$this->putInCustomData(self::CUSTOM_DATA_CREDIT_RESET_HISTORY, serialize($currentCreditHistory));
