@@ -146,7 +146,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 				break;
 
 			$this->updateFitler($results->objects);
-			$results = ScheduledTaskHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+			$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
 		}
 
 		$jobData->totalCount = $resultsCount;
@@ -159,7 +159,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	private function getCsvData($entry)
 	{
 		$date = gmdate("M d Y H:i:s", $entry->lastPlayedAt);
-		$mediaType = ScheduledTaskHelper::getMediaTypeString($entry->mediaType);
+		$mediaType = ScheduledTaskBatchHelper::getMediaTypeString($entry->mediaType);
 		return array($entry->id, $entry->name, $date, $mediaType);
 	}
 
@@ -181,7 +181,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 
 			$response->objects = array_merge($response->objects, $results->objects);
 			$this->updateFitler($results->objects);
-			$results = ScheduledTaskHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+			$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
 		}
 
 		$response->totalCount = $resultsCount;
@@ -225,7 +225,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	{
 		$lastResult = end($entries);
 		$this->filter->createdAtGreaterThanOrEqual = $lastResult->createdAt;
-		$idsToIgnore = ScheduledTaskHelper::getEntriesIdWithSameCreateAtTime($entries, $lastResult->createdAt);
+		$idsToIgnore = ScheduledTaskBatchHelper::getEntriesIdWithSameCreateAtTime($entries, $lastResult->createdAt);
 		$this->filter->idNotIn = implode (", ", $idsToIgnore);
 	}
 

@@ -2,6 +2,8 @@
 
 class ScheduledTaskBatchHelper
 {
+	const MAX_RESULTS_THRESHOLD = 1000;
+
 	/**
 	 * @param KalturaClient $client
 	 * @param KalturaScheduledTaskProfile $scheduledTaskProfile
@@ -21,11 +23,10 @@ class ScheduledTaskBatchHelper
 		return $objectFilterEngine->query($filter);
 	}
 
-
 	/**
-	 * @param $entries
+	 * @param KalturaBaseEntryArray $entries
 	 * @param $createAtTime
-	 * @return string
+	 * @return array
 	 */
 	public static function getEntriesIdWithSameCreateAtTime($entries, $createAtTime)
 	{
@@ -36,11 +37,37 @@ class ScheduledTaskBatchHelper
 				$result[] = $entry->id;
 		}
 
-		return implode (", ", $result);
+		$result = array_column($result, 'id');
+		return $result;
 	}
 
-	public static function getDryRunObjectSeprator()
+	public static function getMediaTypeString($mediaType)
 	{
-		return chr(07) . chr(03);
+		switch ($mediaType)
+		{
+			case 1:
+				return "video";
+				break;
+			case 2:
+				return "image";
+				break;
+			case 5:
+				return "audio";
+				break;
+			case 201:
+				return "live steam flash";
+				break;
+			case 202:
+				return "live steam windows media";
+				break;
+			case 203:
+				return "live steam real media";
+				break;
+			case 204:
+				return "live steam quicktime";
+				break;
+			default:
+				return "unkown";
+		}
 	}
 }
