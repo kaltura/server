@@ -173,7 +173,10 @@
 				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
 				$subsArr = array();
 			}
-			while($finish>$start) {
+				/*
+				 * '$finish-$start' condition was added to avoid 'zero' chunks
+				 */
+			while($finish-$start>$params->frameDuration) {
 				$chunkData = new KChunkData($idx, $start, $duration);
 				if($idx>0) {
 					$this->chunkDataArr[$idx-1]->calcGapToNext($chunkData, $params->frameDuration);
@@ -474,6 +477,20 @@
 				$adjustedFilterStr = str_replace($lastLabelOut, "", $adjustedFilterStr);
 			}
 			
+				/*
+				 * For the last chunk, make sure that the loop/t period does not overflow the end of the file, 
+				 * causing failure on duration validation
+				 */
+			if($this->params->duration-$start<$chunkWithOverlap){
+				$keys=array_keys($cmdLineArr,'-loop');
+				if(count($keys)>0){
+					foreach($keys as $key) {
+						if($cmdLineArr[$key+2]=='-t')
+							$cmdLineArr[$key+3] = 1;
+					}
+				}
+			}
+			
 			if(isset($adjustedFilterStr) || ($adjustedFilterStr=$filterGraphBase->CompoundString($lastLabelOut))!==null) {
 				KalturaLog::log("adjustedFilterStr:".$adjustedFilterStr);
 				$cmdLineArr[$filterIdx+1] = '\''.$adjustedFilterStr.'\'';
@@ -722,7 +739,7 @@
 			$frameDuration = $this->params->frameDuration;
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				$chunkName = $this->getChunkName($idx);
-/* Discontinuity check by analysing chunk generation log file */
+/* Discontinuity check by analyzing chunk generation log file */
 				$stat = $chunkData->stat;
 				if(isset($prevObjIdx)) {
 					$prevObj = $this->chunkDataArr[$prevObjIdx]->stat;
@@ -770,9 +787,9 @@
 			$aDelta = ($fileDtSrc->audioDuration>0)? round(($fileDt->audioDuration - $fileDtSrc->audioDuration)/1000,4): null;
 			$cDelta = ($fileDtSrc->containerDuration>0)? round(($fileDt->containerDuration - $fileDtSrc->containerDuration)/1000,4): null;
 			$maxMergeDelta = 2;
-			if((isset($vDelta) && $vDelta>$maxMergeDelta) 
-			|| (isset($aDelta) && $aDelta>$maxMergeDelta) 
-//			|| (isset($cDelta) && $cDelta>$maxMergeDelta)
+			if((isset($vDelta) && abs($vDelta)>$maxMergeDelta) 
+			|| (isset($aDelta) && abs($aDelta)>$maxMergeDelta) 
+//			|| (isset($cDelta) && abs($cDelta>$maxMergeDelta))
 			){
 				KalturaLog::log($msgStr="FAILED to merge, delta to source is too large - (v:$vDelta,a:$aDelta,c:$cDelta), max allowed $maxMergeDelta sec!");
 				return false;

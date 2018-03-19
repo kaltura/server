@@ -37,19 +37,10 @@ class registerNotificationPostProcessor
 	
 	private function encode($data)
 	{
-		// use a 128 Rijndael encyrption algorithm with Cipher-block chaining (CBC) as mode of AES encryption
-		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
 		$secret = kConf::get("push_server_secret");
 		$iv = kConf::get("push_server_secret_iv");
 	
-		// pad the rest of the block to suit Node crypto functions padding scheme (PKCS5)
-		$blocksize = 16;
-		$pad = $blocksize - (strlen($data) % $blocksize);
-		$data = $data . str_repeat(chr($pad), $pad);
-	
-		mcrypt_generic_init($cipher, $secret, $iv);
-		$cipherData = mcrypt_generic($cipher, $data);
-		mcrypt_generic_deinit($cipher);
+		$cipherData = KCryptoWrapper::encrypt_aes($data, $secret, $iv); 
 	
 		return bin2hex($cipherData);
 	}

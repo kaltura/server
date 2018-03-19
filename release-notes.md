@@ -1,3 +1,31 @@
+# Mercury 13.16.0 #
+
+## Add ability to set default audio language in live streams ##
+- Issue Type: New Feature
+- Issue ID: SUP-13373
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_12_allow_media_server_to_get_conversionprofile.php
+
+## Workers allocation for full-scale Chunked Encoding deployment ##
+- Issue Type: Configuration update 
+- Issue ID: NONE
+
+### Configuration ###
+- server-saas-config/configurations/batch/workers.ini
+- server-saas-config/configurations/batch/encoder.ini
+- https://github.com/kaltura/server-saas-config/compare/Mercury-13.16.0-CE-resources-allocation
+
+## Handle chunks split edge conditions ##
+- Issue Type: Support
+- Issue ID: SUP-13904
+
+### Configuration ###
+None.
+
 # Mercury 13.15.0 #
 
 ## Entry added to category Firebase notification template ##
