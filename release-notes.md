@@ -19,6 +19,13 @@ None.
 - server-saas-config/configurations/batch/encoder.ini
 - https://github.com/kaltura/server-saas-config/compare/Mercury-13.16.0-CE-resources-allocation
 
+## Handle chunks split edge conditions ##
+- Issue Type: Support
+- Issue ID: SUP-13904
+
+### Configuration ###
+None.
+
 # Mercury 13.15.0 #
 
 ## Entry added to category Firebase notification template ##
