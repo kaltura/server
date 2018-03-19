@@ -77,6 +77,8 @@ class ConferenceService extends KalturaBaseService {
 			 * @var ConferenceEntryServerNode $existingConfRoom
 			 */
 			$serverNode = ServerNodePeer::retrieveByPK($existingConfRoom->getServerNodeId());
+			if (!$serverNode)
+				return null;
 			if (!$this->canReach($serverNode))
 			{
 				$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
@@ -93,7 +95,7 @@ class ConferenceService extends KalturaBaseService {
 
 	protected function findFreeServerNode()
 	{
-		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
+		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(KonferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		if (!$serverNodes)
 		{
 			KalturaLog::debug("Could not find avaialable conference server node in pool");
