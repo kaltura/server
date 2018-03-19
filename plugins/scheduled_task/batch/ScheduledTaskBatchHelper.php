@@ -41,33 +41,14 @@ class ScheduledTaskBatchHelper
 		return $result;
 	}
 
+	/**
+	 * @param  KalturaMediaType $mediaType
+	 * @return string
+	 */
 	public static function getMediaTypeString($mediaType)
 	{
-		switch ($mediaType)
-		{
-			case 1:
-				return "video";
-				break;
-			case 2:
-				return "image";
-				break;
-			case 5:
-				return "audio";
-				break;
-			case 201:
-				return "live steam flash";
-				break;
-			case 202:
-				return "live steam windows media";
-				break;
-			case 203:
-				return "live steam real media";
-				break;
-			case 204:
-				return "live steam quicktime";
-				break;
-			default:
-				return "unkown";
-		}
+		$relectionClass =  new ReflectionClass ('KalturaMediaType');
+		$mapping = $relectionClass->getConstants();
+		return array_search($mediaType, $mapping);
 	}
 }

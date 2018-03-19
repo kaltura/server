@@ -37,6 +37,16 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	 */
 	private $filter;
 
+	/**
+	 * @var kalturaClient
+	 */
+	private $client;
+
+	/**
+	 * @var scheduledTaskProfile
+	 */
+	private $scheduledTaskProfile;
+
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -59,7 +69,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$ks = $this->createKs($client, $jobData);
 		$client->setKs($ks);
 		$this->impersonate($partnerId);
-		return $client;
+		$this->client = $client;
 	}
 
 	private function initRunFiles()
@@ -109,20 +119,22 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$this->initRunFiles();
 		$profileId = $job->jobObjectId;
 		$this->maxResults = ($jobData->maxResults) ? $jobData->maxResults : 500;
-		$scheduledTaskProfile = $this->getScheduledTaskProfile($profileId);
-		$this->initClient($jobData,$scheduledTaskProfile->partnerId);
+		$this->scheduledTaskProfile = $this->getScheduledTaskProfile($profileId);
+		$this->initClient($jobData, $this->scheduledTaskProfile->partnerId);
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 500;
 		$this->pager->pageIndex = 1;
-		$this->filter = $scheduledTaskProfile->objectFilter;
+		$this->filter = $this->scheduledTaskProfile->objectFilter;
 	}
 
 	private function execDryRunInCSVMode($results, KalturaScheduledTaskJobData $jobData)
 	{
+		$jobData->fileFormat = KalturaDryRunFileType::CSV;
 		$resultsCount = 0;
-		while(true)
+		try
 		{
-			try
+			fputcsv($this->handle, $this->getCsvHeaders());
+			while (true)
 			{
 				$objects = $results->objects;
 				$count = count($objects);
@@ -135,25 +147,25 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 					$csvEntryData = $this->getCsvData($entry);
 					fputcsv($this->handle, $csvEntryData, ",");
 				}
-			}
-			catch(Exception $ex)
-			{
-				$this->unimpersonate();
-				throw $ex;
-			}
 
-			if ($resultsCount >= $this->maxResults || $resultsCount < 500)
-				break;
+				if ($resultsCount >= $this->maxResults || $resultsCount < 500)
+					break;
 
-			$this->updateFitler($results->objects);
-			$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+				$this->updateFitler($results->objects);
+				$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+			}
+		}
+		catch(Exception $ex)
+		{
+			$this->unimpersonate();
+			throw $ex;
 		}
 
 		$jobData->totalCount = $resultsCount;
 	}
 
 	/**
-	 * @param KalturaBaseEntry $entry
+	 * @param KalturaMediaEntry $entry
 	 * @return array
 	 */
 	private function getCsvData($entry)
@@ -163,8 +175,17 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		return array($entry->id, $entry->name, $date, $mediaType);
 	}
 
+	/**
+	 * @return array
+	 */
+	private function getCsvHeaders()
+	{
+		return array("id", "name", "last played at", "media type");
+	}
+
 	private function execDryRunInListResponseMode($results, KalturaScheduledTaskJobData $jobData)
 	{
+		$jobData->fileFormat = KalturaDryRunFileType::LIST_RESPONSE;
 		$resultsCount =0;
 		$response = new KalturaObjectListResponse();
 		$response->objects = array();
@@ -175,11 +196,11 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 			if (!$count)
 				break;
 
+			$response->objects = array_merge($response->objects, $results->objects);
 			$resultsCount += $count;
 			if ($resultsCount >= $this->maxResults || $resultsCount < 500)
 				break;
 
-			$response->objects = array_merge($response->objects, $results->objects);
 			$this->updateFitler($results->objects);
 			$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
 		}
@@ -200,10 +221,10 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	private function execDryRun(KalturaBatchJob $job, KalturaScheduledTaskJobData $jobData)
 	{
 		$this->initRunData($job, $jobData);
-		$results = ScheduledTaskHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
-		if($results->totalCount > ScheduledTaskHelper::MAX_RESULTS_THRESHOLD)
+		$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+		if($results->totalCount > ScheduledTaskBatchHelper::MAX_RESULTS_THRESHOLD)
 		{
-			$this->execDryRunInCSVMode($results);
+			$this->execDryRunInCSVMode($results, $jobData);
 		}
 		else
 		{

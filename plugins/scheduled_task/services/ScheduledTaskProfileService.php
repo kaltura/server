@@ -214,13 +214,11 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 */
 	private function getDryRunResultUrl($requestId)
 	{
-		$finalPath ='/api_v3/service/scheduledTaskProfileService/action/serveDryRunResults/requestId';
-
+		$finalPath ='/api_v3/service/scheduledtask_scheduledtaskprofile/action/serveDryRunResults/requestId/';
 		$finalPath .="$requestId";
 		$ksObj = $this->getKs();
 		$ksStr = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$finalPath .= "/ks/".$ksStr;
-
 		$partnerId = $this->getPartnerId();
 		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
 
