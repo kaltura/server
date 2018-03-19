@@ -173,7 +173,10 @@
 				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
 				$subsArr = array();
 			}
-			while($finish>$start) {
+				/*
+				 * '$finish-$start' condition was added to avoid 'zero' chunks
+				 */
+			while($finish-$start>$params->frameDuration) {
 				$chunkData = new KChunkData($idx, $start, $duration);
 				if($idx>0) {
 					$this->chunkDataArr[$idx-1]->calcGapToNext($chunkData, $params->frameDuration);
@@ -736,7 +739,7 @@
 			$frameDuration = $this->params->frameDuration;
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				$chunkName = $this->getChunkName($idx);
-/* Discontinuity check by analysing chunk generation log file */
+/* Discontinuity check by analyzing chunk generation log file */
 				$stat = $chunkData->stat;
 				if(isset($prevObjIdx)) {
 					$prevObj = $this->chunkDataArr[$prevObjIdx]->stat;
@@ -784,9 +787,9 @@
 			$aDelta = ($fileDtSrc->audioDuration>0)? round(($fileDt->audioDuration - $fileDtSrc->audioDuration)/1000,4): null;
 			$cDelta = ($fileDtSrc->containerDuration>0)? round(($fileDt->containerDuration - $fileDtSrc->containerDuration)/1000,4): null;
 			$maxMergeDelta = 2;
-			if((isset($vDelta) && $vDelta>$maxMergeDelta) 
-			|| (isset($aDelta) && $aDelta>$maxMergeDelta) 
-//			|| (isset($cDelta) && $cDelta>$maxMergeDelta)
+			if((isset($vDelta) && abs($vDelta)>$maxMergeDelta) 
+			|| (isset($aDelta) && abs($aDelta)>$maxMergeDelta) 
+//			|| (isset($cDelta) && abs($cDelta>$maxMergeDelta))
 			){
 				KalturaLog::log($msgStr="FAILED to merge, delta to source is too large - (v:$vDelta,a:$aDelta,c:$cDelta), max allowed $maxMergeDelta sec!");
 				return false;
