@@ -5,10 +5,37 @@
  */
 class KScheduledTaskDryRunner extends KJobHandlerWorker
 {
-	const TEMP_SHARD_PATH = "sharedTempPath";
+	const SHARED_TEMP_PATH = "sharedTempPath";
 
+	/**
+	 * @var string
+	 */
 	private $sharedFilePath;
+
+	/**
+	 * @var string
+	 */
 	private $tempFilePath;
+
+	/**
+	 * @var resource
+	 */
+	private $handle;
+
+	/**
+	 * @var int
+	 */
+	private $maxResults;
+
+	/**
+	 * @var kalturaPager
+	 */
+	private $pager;
+
+	/**
+	 * @var kalturaFilter
+	 */
+	private $filter;
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -35,9 +62,9 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		return $client;
 	}
 
-	private function getFileHandler()
+	private function initRunFiles()
 	{
-		$sharedPath = $this->getAdditionalParams(self::TEMP_SHARD_PATH);
+		$sharedPath = $this->getAdditionalParams(self::SHARED_TEMP_PATH);
 		KalturaLog::info('Temp shared path: '.$sharedPath);
 		if (!is_dir($sharedPath))
 		{
@@ -45,15 +72,16 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 			if (!is_dir($sharedPath))
 				throw new Exception('Shared path ['.$sharedPath.'] does not exist and could not be created');
 		}
+
 		$fileName = uniqid('sheduledtask_');
 		$this->sharedFilePath = $sharedPath.DIRECTORY_SEPARATOR.$fileName;
 		$this->tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.$fileName;
-		$handle = fopen($this->tempFilePath, "w");
+		$this->handle = fopen($this->tempFilePath, "w");
 		KalturaLog::info('Temp file: '.$this->tempFilePath);
-		return $handle;
 	}
 
 	/**
+	 * @param string $profileId
 	 * @return KalturaScheduledTaskProfile
 	 */
 	private function getScheduledTaskProfile($profileId)
@@ -76,32 +104,37 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		return $client->generateSession($adminSecret, $puserId, $sessionType, $partnerId, 86400, implode(',', $privileges));
 	}
 
-	private function execDryRun(KalturaBatchJob $job, KalturaScheduledTaskJobData $jobData)
+	private function initRunData(KalturaBatchJob $job, KalturaScheduledTaskJobData $jobData)
 	{
-		$handle = $this->getFileHandler();
+		$this->initRunFiles();
 		$profileId = $job->jobObjectId;
-		$maxResults = ($jobData->maxResults) ? $jobData->maxResults : 500;
+		$this->maxResults = ($jobData->maxResults) ? $jobData->maxResults : 500;
 		$scheduledTaskProfile = $this->getScheduledTaskProfile($profileId);
-		$client = $this->initClient($jobData,$scheduledTaskProfile->partnerId);
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
-		$pager->pageIndex = 1;
-		$resultsCount = 0;
-		$filter = $scheduledTaskProfile->objectFilter;
+		$this->initClient($jobData,$scheduledTaskProfile->partnerId);
+		$this->pager = new KalturaFilterPager();
+		$this->pager->pageSize = 500;
+		$this->pager->pageIndex = 1;
+		$this->filter = $scheduledTaskProfile->objectFilter;
+	}
 
+	private function execDryRunInCSVMode($results, KalturaScheduledTaskJobData $jobData)
+	{
+		$resultsCount = 0;
 		while(true)
 		{
 			try
 			{
-				$results = ScheduledTaskBatchHelper::query($client, $scheduledTaskProfile, $pager, $filter);
 				$objects = $results->objects;
 				$count = count($objects);
 				if (!$count)
 					break;
 
 				$resultsCount += $count;
-				foreach ($objects as $object)
-					fwrite($handle, serialize($object).ScheduledTaskBatchHelper::getDryRunObjectSeprator());
+				foreach ($objects as $entry)
+				{
+					$csvEntryData = $this->getCsvData($entry);
+					fputcsv($this->handle, $csvEntryData, ",");
+				}
 			}
 			catch(Exception $ex)
 			{
@@ -109,24 +142,93 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 				throw $ex;
 			}
 
-			if ($resultsCount >= $maxResults || $resultsCount < 500)
+			if ($resultsCount >= $this->maxResults || $resultsCount < 500)
 				break;
 
-			$lastResult = end($objects);
-			$filter->createdAtGreaterThanOrEqual = $lastResult->createdAt;
-			$filter->idNotIn = ScheduledTaskBatchHelper::getEntriesIdWithSameCreateAtTime($objects, $lastResult->createdAt);
+			$this->updateFitler($results->objects);
+			$results = ScheduledTaskHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+		}
+
+		$jobData->totalCount = $resultsCount;
+	}
+
+	/**
+	 * @param KalturaBaseEntry $entry
+	 * @return array
+	 */
+	private function getCsvData($entry)
+	{
+		$date = gmdate("M d Y H:i:s", $entry->lastPlayedAt);
+		$mediaType = ScheduledTaskHelper::getMediaTypeString($entry->mediaType);
+		return array($entry->id, $entry->name, $date, $mediaType);
+	}
+
+	private function execDryRunInListResponseMode($results, KalturaScheduledTaskJobData $jobData)
+	{
+		$resultsCount =0;
+		$response = new KalturaObjectListResponse();
+		$response->objects = array();
+		while(true)
+		{
+			$objects = $results->objects;
+			$count = count($objects);
+			if (!$count)
+				break;
+
+			$resultsCount += $count;
+			if ($resultsCount >= $this->maxResults || $resultsCount < 500)
+				break;
+
+			$response->objects = array_merge($response->objects, $results->objects);
+			$this->updateFitler($results->objects);
+			$results = ScheduledTaskHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+		}
+
+		$response->totalCount = $resultsCount;
+		$jobData->totalCount = $resultsCount;
+		try
+		{
+			fwrite($this->handle, serialize($response));
+		}
+		catch(Exception $ex)
+		{
+				$this->unimpersonate();
+				throw $ex;
+		}
+	}
+
+	private function execDryRun(KalturaBatchJob $job, KalturaScheduledTaskJobData $jobData)
+	{
+		$this->initRunData($job, $jobData);
+		$results = ScheduledTaskHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+		if($results->totalCount > ScheduledTaskHelper::MAX_RESULTS_THRESHOLD)
+		{
+			$this->execDryRunInCSVMode($results);
+		}
+		else
+		{
+			$this->execDryRunInListResponseMode($results, $jobData);
 		}
 
 		$this->unimpersonate();
-		fwrite ($handle, "Total results: {$resultsCount}".PHP_EOL);
-		fclose($handle);
-		$jobData->totalCount = $resultsCount;
-		$jobData->isNewFormat = true;
+		fclose($this->handle);
 		kFile::moveFile($this->tempFilePath, $this->sharedFilePath);
 		KalturaLog::info('Temp shared path: '.$this->tempPath);
 		$jobData->resultsFilePath = $this->sharedFilePath;
 		return $this->closeJob($job, null, null, 'Dry run finished', KalturaBatchJobStatus::FINISHED, $jobData);
 	}
+
+	/**
+	 * @param KalturaBaseEntryArray $entries
+	 */
+	private function updateFitler($entries)
+	{
+		$lastResult = end($entries);
+		$this->filter->createdAtGreaterThanOrEqual = $lastResult->createdAt;
+		$idsToIgnore = ScheduledTaskHelper::getEntriesIdWithSameCreateAtTime($entries, $lastResult->createdAt);
+		$this->filter->idNotIn = implode (", ", $idsToIgnore);
+	}
+
 	/* (non-PHPdoc)
 	 * @see KBatchBase::run()
 	*/

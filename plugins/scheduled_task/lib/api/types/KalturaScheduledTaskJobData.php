@@ -17,9 +17,9 @@ class KalturaScheduledTaskJobData extends KalturaJobData
 	public $totalCount;
 
 	/**
-	 * @var bool
+	 * @var KalturaDryRunFileType
 	 */
-	public $isNewFormat;
+	public $fileFormat;
 
 	/**
 	 * @var string
@@ -37,7 +37,7 @@ class KalturaScheduledTaskJobData extends KalturaJobData
 		'resultsFilePath',
 		'referenceTime',
 		'totalCount',
-		'isNewFormat'
+		'fileFormat'
 	);
 
 	public function getMapBetweenObjects ( )

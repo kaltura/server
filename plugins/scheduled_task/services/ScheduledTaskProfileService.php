@@ -9,8 +9,6 @@
  */
 class ScheduledTaskProfileService extends KalturaBaseService
 {
-	const MAX_RESULTS_THRESHOLD = 1000;
-
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -187,37 +185,15 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		/* @var $jobData kScheduledTaskJobData */
 		$jobData = $batchJob->getData();
 		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
-		if($jobData->getIsNewFormat())
+		if($jobData->getFileFormat() == DryRunFileType::CSV)
 		{
-			if($jobData->getMaxResults() < self::MAX_RESULTS_THRESHOLD)
-			{
-				return $this->getDryRunResultsNewFormat($syncKey);
-			}
-
-			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_RESULT_IS_TOO_BIG);
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_RESULT_IS_TOO_BIG.$this->getDryRunResultUrl($requestId));
 		}
 
 		$data = kFileSyncUtils::file_get_contents($syncKey, true);
 		return unserialize($data);
 	}
-
-	private function getDryRunResultsNewFormat($syncKey)
-	{
-		$data = kFileSyncUtils::file_get_contents($syncKey, true);
-		$objects = explode(ScheduledTaskBatchHelper::getDryRunObjectSeprator(), $data);
-		$numResults = count($objects)-1; //last line is total count and not entry object
-		$kalturaBaseEntryArray = new KalturaBaseEntryArray();
-		for ($i = 0; $i < $numResults; $i++ )
-		{
-			$kalturaBaseEntryArray[] = unserialize($objects[$i]);
-		}
-
-		$result = new KalturaObjectListResponse();
-		$result->objects = $kalturaBaseEntryArray;
-		$result->totalCount = $numResults;
-		return $result;
-	}
-
+	
 	/**
 	 * Serves dry run results by its request id
 	 * @action serveDryRunResults
@@ -231,6 +207,26 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		return $this->serveFile($batchJob, BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 	}
 
+	/**
+	 * Get a url to serve dry run result action
+	 * @param int $requestId
+	 * @return string
+	 */
+	private function getDryRunResultUrl($requestId)
+	{
+		$finalPath ='/api_v3/service/scheduledTaskProfileService/action/serveDryRunResults/requestId';
+
+		$finalPath .="$requestId";
+		$ksObj = $this->getKs();
+		$ksStr = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$finalPath .= "/ks/".$ksStr;
+
+		$partnerId = $this->getPartnerId();
+		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+
+		return $downloadUrl;
+	}
+	
 	/**
 	 * @action getDryRunResults
 	 * @param int $requestId

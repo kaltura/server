@@ -16,9 +16,9 @@ class kScheduledTaskJobData extends kJobData
 	private $_maxResults;
 
 	/**
-	 * @var bool
+	 * @var DryRunType
 	 */
-	private $_isNewFormat;
+	private $_fileFormat;
 
 	/**
 	 * @var string
@@ -35,7 +35,7 @@ class kScheduledTaskJobData extends kJobData
 	 */
 	public function __construct()
 	{
-		$this->_isNewFormat = false;
+		$this->_fileFormat = DryRunFileType::LIST_RESPONSE;
 		$this->_maxResults = 0;
 	}
 
@@ -90,17 +90,17 @@ class kScheduledTaskJobData extends kJobData
 	/**
 	 * @return bool
 	 */
-	public function getIsNewFormat()
+	public function getFileFormat()
 	{
-		return $this->_isNewFormat;
+		return $this->_fileFormat;
 	}
 
 	/**
-	 * @param bool $bool
+	 * @param DryRunFileType $fileFormat
 	 */
-	public function setIsNewFormat($bool)
+	public function setFileFormat($fileFormat)
 	{
-		$this->_isNewFormat = $bool;
+		$this->_fileFormat = $fileFormat;
 	}
 
 	/**
