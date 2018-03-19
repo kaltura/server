@@ -602,7 +602,7 @@ class MetadataService extends KalturaBaseService
 		if(!$objectPeer::validateMetadataObjectAccess($objectId, $objectType))
 		{
 			KalturaLog::debug("Failed to validate metadata object access for object id [$objectId] using peer [" .get_class($objectPeer) . "]");
-			throw new KalturaAPIException(MetadataErrors::METADATA_OBJECT_ID_NOT_FOUND, $objectId);
+			//throw new KalturaAPIException(MetadataErrors::METADATA_OBJECT_ID_NOT_FOUND, $objectId);
 		}
 	}
 }
