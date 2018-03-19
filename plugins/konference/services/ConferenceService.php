@@ -69,7 +69,7 @@ class ConferenceService extends KalturaBaseService {
 
 	protected function findExistingConferenceRoom($entryId)
 	{
-		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
+		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		if ($existingConfRoom)
 		{
 			/**
@@ -153,7 +153,7 @@ class ConferenceService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
 		}
 		$confEntryServerNode->delete();
-		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), KonferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
+		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), KonferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		if (!count($otherEntryServerNodes))
 		{
 			KalutraLog::debgu('No entry server nodes left, marking server node as not registered');
