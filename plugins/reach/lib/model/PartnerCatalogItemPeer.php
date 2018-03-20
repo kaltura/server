@@ -26,19 +26,6 @@ class PartnerCatalogItemPeer extends BasePartnerCatalogItemPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function getIds(Criteria $criteria, $con = null)
-	{
-		$result = array();
-		$partnerCatalogItems = PartnerCatalogItemPeer::doSelect($criteria, $con);
-		foreach ($partnerCatalogItems as $item)
-		{
-			/* @var $item PartnerCatalogItem */
-			$result[] = $item->getCatalogItemId();
-		}
-		
-		return $result;
-	}
-	
 	public static function retrieveByCatalogItemId($catalogItemId, $partnerId)
 	{
 		$criteria = new Criteria ( PartnerCatalogItemPeer::DATABASE_NAME );
