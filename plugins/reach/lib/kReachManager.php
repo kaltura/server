@@ -168,7 +168,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 	
-	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $objectId = null)
+	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $context = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
@@ -189,7 +189,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $objectId);
+		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context);
 		return $entryVendorTask;
 	}
 	
@@ -248,7 +248,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 			{
 				//Pass the object Id as the context of the task
-				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId(), $object->getId());
+				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId(), $this->getContextByObjectType($object));
 			}
 		}
 		
@@ -266,5 +266,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$pendingModerationTask->setErrDescription("Task was aborted by server, associated entry [{$entry->getId()}] was deleted");
 			$pendingModerationTask->save();
 		}
+	}
+	
+	private function getContextByObjectType($object)
+	{
+		if($object instanceof categoryEntry)
+			return $object->getCategoryId();
+		
+		return null;
 	}
 }

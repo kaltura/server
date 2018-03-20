@@ -50,6 +50,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		if(!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $entryVendorTask->catalogItemId);
 
+		$partnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId());
+		if(!$partnerCatalogItem)
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_ENABLED_FOR_ACCOUNT, $entryVendorTask->catalogItemId);
+		
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($dbEntry->getId());
 		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
