@@ -168,8 +168,8 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$referenceTime = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_REFERENCE_TIME);
 		if ($referenceTime)
 			$jobData->setReferenceTime($referenceTime);
-		$batchJob = $this->createScheduledTaskJob($dbScheduledTaskProfile, $jobData);
 
+		$batchJob = $this->createScheduledTaskJob($dbScheduledTaskProfile, $jobData);
 		return $batchJob->getId();
 	}
 
@@ -258,7 +258,6 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$scheduledTaskProfileId = $scheduledTaskProfile->getId();
 		$jobType = ScheduledTaskPlugin::getBatchJobTypeCoreValue(ScheduledTaskBatchType::SCHEDULED_TASK);
 		$objectType = ScheduledTaskPlugin::getBatchJobObjectTypeCoreValue(ScheduledTaskBatchJobObjectType::SCHEDULED_TASK_PROFILE);
-
 		KalturaLog::log("Creating scheduled task dry run job for profile [".$scheduledTaskProfileId."]");
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($scheduledTaskProfile->getPartnerId());

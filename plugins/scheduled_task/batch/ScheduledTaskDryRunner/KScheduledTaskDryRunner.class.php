@@ -127,32 +127,39 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$this->filter = $this->scheduledTaskProfile->objectFilter;
 	}
 
-	private function execDryRunInCSVMode($results, KalturaScheduledTaskJobData $jobData)
+	private function writeEntriesToCsv($entries)
+	{
+		$count =0;
+		foreach ($entries as $entry)
+		{
+			$csvEntryData = $this->getCsvData($entry);
+			fputcsv($this->handle, $csvEntryData, ",");
+			$count++;
+		}
+
+		return $count;
+	}
+
+	private function execDryRunInCSVMode($firstPage, KalturaScheduledTaskJobData $jobData)
 	{
 		$jobData->fileFormat = KalturaDryRunFileType::CSV;
 		$resultsCount = 0;
 		try
 		{
 			fputcsv($this->handle, $this->getCsvHeaders());
-			while (true)
+			$resultsCount += $this->writeEntriesToCsv($firstPage->objects);
+			$count = $resultsCount;
+			$this->updateFitler($firstPage->objects);
+			while($resultsCount < $this->maxResults && $count == 500)
 			{
+				$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
 				$objects = $results->objects;
 				$count = count($objects);
-				if (!$count)
-					break;
-
-				$resultsCount += $count;
-				foreach ($objects as $entry)
+				if ($count)
 				{
-					$csvEntryData = $this->getCsvData($entry);
-					fputcsv($this->handle, $csvEntryData, ",");
+					$resultsCount += $this->writeEntriesToCsv($objects);
+					$this->updateFitler($results->objects);
 				}
-
-				if ($resultsCount >= $this->maxResults || $resultsCount < 500)
-					break;
-
-				$this->updateFitler($results->objects);
-				$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
 			}
 		}
 		catch(Exception $ex)
@@ -183,60 +190,74 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		return array("id", "name", "last played at", "media type");
 	}
 
-	private function execDryRunInListResponseMode($results, KalturaScheduledTaskJobData $jobData)
+
+	/**
+	 * @param KalturaBaseEntryListResponse $firstPage
+	 * @param KalturaScheduledTaskJobData $jobData
+	 * @throws Exception
+	 */
+	private function execDryRunInListResponseMode($firstPage, KalturaScheduledTaskJobData $jobData)
 	{
 		$jobData->fileFormat = KalturaDryRunFileType::LIST_RESPONSE;
-		$resultsCount =0;
-		$response = new KalturaObjectListResponse();
-		$response->objects = array();
-		while(true)
+		$resultsCount = count($firstPage->objects);
+		$resultObjects = $firstPage->objects;
+		if($resultsCount)
 		{
-			$objects = $results->objects;
-			$count = count($objects);
-			if (!$count)
-				break;
-
-			$response->objects = array_merge($response->objects, $results->objects);
-			$resultsCount += $count;
-			if ($resultsCount >= $this->maxResults || $resultsCount < 500)
-				break;
-
-			$this->updateFitler($results->objects);
-			$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+			$count = $resultsCount;
+			$this->updateFitler($firstPage->objects);
+			while($resultsCount < $this->maxResult && $count == 500)
+			{
+				$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+				$count = count($results->objects);
+				$resultObjects = array_merge($resultObjects, $results->objects);
+				$resultsCount += $count;
+			}
 		}
 
-		$response->totalCount = $resultsCount;
+		$this->saveResponseListResult($resultObjects, $resultsCount);
 		$jobData->totalCount = $resultsCount;
+	}
+
+	private function saveResponseListResult($objects, $totalCount)
+	{
+		$response = new KalturaObjectListResponse();
+		$response->totalCount = $totalCount;
+		$response->objects = $objects;
 		try
 		{
 			fwrite($this->handle, serialize($response));
 		}
 		catch(Exception $ex)
 		{
-				$this->unimpersonate();
-				throw $ex;
+			$this->unimpersonate();
+			throw $ex;
 		}
 	}
 
 	private function execDryRun(KalturaBatchJob $job, KalturaScheduledTaskJobData $jobData)
 	{
 		$this->initRunData($job, $jobData);
-		$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
-		if($results->totalCount > ScheduledTaskBatchHelper::MAX_RESULTS_THRESHOLD)
+		$firstPage = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
+		if($firstPage->totalCount > ScheduledTaskBatchHelper::MAX_RESULTS_THRESHOLD)
 		{
-			$this->execDryRunInCSVMode($results, $jobData);
+			$this->execDryRunInCSVMode($firstPage, $jobData);
 		}
 		else
 		{
-			$this->execDryRunInListResponseMode($results, $jobData);
+			$this->execDryRunInListResponseMode($firstPage, $jobData);
 		}
 
+		$this->closeDryRun($jobData);
+		return $this->closeJob($job, null, null, 'Dry run finished', KalturaBatchJobStatus::FINISHED, $jobData);
+	}
+
+	private function closeDryRun($jobData)
+	{
 		$this->unimpersonate();
 		fclose($this->handle);
 		kFile::moveFile($this->tempFilePath, $this->sharedFilePath);
 		KalturaLog::info('Temp shared path: '.$this->tempPath);
 		$jobData->resultsFilePath = $this->sharedFilePath;
-		return $this->closeJob($job, null, null, 'Dry run finished', KalturaBatchJobStatus::FINISHED, $jobData);
 	}
 
 	/**
