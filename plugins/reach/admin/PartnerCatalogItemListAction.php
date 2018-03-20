@@ -108,6 +108,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 			$result = $client->permission->listAction($filter, null);
 		} catch (Exception $e)
 		{
+			$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
 			return false;
 		}
 		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
