@@ -928,27 +928,6 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData('max_login_attempts', $maxAttempts, null);
 	}
-
-	public function getReachCredit()
-	{
-		return $this->getFromCustomData('reach_credit', null, 0);
-	}
-
-	public function setReachCredit($reachCredit)
-	{
-		$this->putInCustomData('reach_credit', $reachCredit, null);
-	}
-
-	public function getReachAllowedOvercharged()
-	{
-		return $this->getFromCustomData('reach_allowed_overcharge', null, 0);
-	}
-
-	public function setReachAllowedOvercharged($reachCredit)
-	{
-		$this->putInCustomData('reach_allowed_overcharge', $reachCredit, null);
-	}
-	
 	
 	public function getLoginBlockPeriod()
 	{

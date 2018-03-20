@@ -313,18 +313,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $timeAlignedRenditions;
-
-	/**
-	 * @var int
-	 * @requiresPermission insert,update
-	 */
-	public $reachCredit;
-
-	/**
-	 * @var int
-	 * @requiresPermission insert,update
-	 */
-	public $reachAllowedOvercharge;
 	 
 	/**
 	* @readonly

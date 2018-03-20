@@ -2600,7 +2600,7 @@ CREATE TABLE IF NOT EXISTS `reach_profile`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `partner_id_type_index`(`partner_id`, `type`)
-)Type=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `entry_vendor_task`
 (
@@ -2624,4 +2624,4 @@ CREATE TABLE IF NOT EXISTS `entry_vendor_task`
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `vendor_partner_id_status_index`(`vendor_partner_id`, `status`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`)
-)Type=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
