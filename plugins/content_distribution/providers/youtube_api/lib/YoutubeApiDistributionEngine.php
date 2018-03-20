@@ -66,7 +66,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				$this->processedTimeout = KBatchBase::$taskConfig->params->youtubeApi->processedTimeout;
 		}
 		
-		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');
+		KalturaLog::info('Request timeout set to '.$this->timeout.' seconds, processed timeout set to '.$this->processedTimeout.' seconds');
 	}
 
 	/**
