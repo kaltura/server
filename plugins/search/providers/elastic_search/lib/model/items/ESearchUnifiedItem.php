@@ -63,6 +63,7 @@ class ESearchUnifiedItem extends ESearchItem
 				$entryItem->setFieldName($fieldName);
 				$entryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$entryItem->setItemType($eSearchUnifiedItem->getItemType());
+				$entryItem->setAddHighlight($eSearchUnifiedItem->getAddHighlight());
 				if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
 					$entryItem->setRange($eSearchUnifiedItem->getRange());
 				$entryItems[] = $entryItem;
@@ -94,7 +95,7 @@ class ESearchUnifiedItem extends ESearchItem
 				$categoryEntryItem->setFieldName($fieldName);
 				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
-
+				$categoryEntryItem->setAddHighlight($eSearchUnifiedItem->getAddHighlight());
 				$categoryEntryItems[] = $categoryEntryItem;
 			}
 		}
@@ -108,6 +109,7 @@ class ESearchUnifiedItem extends ESearchItem
 				$categoryEntryItem->setFieldName($fieldName);
 				$categoryEntryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$categoryEntryItem->setItemType($eSearchUnifiedItem->getItemType());
+				$categoryEntryItem->setAddHighlight($eSearchUnifiedItem->getAddHighlight());
 
 				$categoryEntryItems[] = $categoryEntryItem;
 			}
@@ -137,6 +139,7 @@ class ESearchUnifiedItem extends ESearchItem
 				$cuePointItem->setFieldName($fieldName);
 				$cuePointItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$cuePointItem->setItemType($eSearchUnifiedItem->getItemType());
+				$cuePointItem->setAddHighlight($eSearchUnifiedItem->getAddHighlight());
 				if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
 					$cuePointItem->setRange($eSearchUnifiedItem->getRange());
 				$cuePointItems[] = $cuePointItem;
@@ -165,6 +168,7 @@ class ESearchUnifiedItem extends ESearchItem
 				$captionItem->setFieldName($fieldName);
 				$captionItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$captionItem->setItemType($eSearchUnifiedItem->getItemType());
+				$captionItem->setAddHighlight($eSearchUnifiedItem->getAddHighlight());
 				if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
 					$captionItem->setRange($eSearchUnifiedItem->getRange());
 				$captionItems[] = $captionItem;
@@ -189,6 +193,7 @@ class ESearchUnifiedItem extends ESearchItem
 		$metadataItem = new ESearchMetadataItem();
 		$metadataItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 		$metadataItem->setItemType($eSearchUnifiedItem->getItemType());
+		$metadataItem->setAddHighlight($eSearchUnifiedItem->getAddHighlight());
 		if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
 			$metadataItem->setRange($eSearchUnifiedItem->getRange());
 		$metadataItems[] = $metadataItem;
