@@ -32,13 +32,13 @@
 			
 	Email notifications:
 		First replace all tokens from the XML files below and remove ".template" from the fle 
-			/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_approved_moderation.template.xml
-    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_done.template.xml
-    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_pending_moderation.template.xml
-    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_entry_vendor_task_rejected_moderation.template.xml
-    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_75_percent.template.xml
-    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_90_percent.template.xml
-    		/opt/kaltura/app/deployment/updates/scripts/xml/2018_02_22_reach_credit_usage_over_100_percent.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_approved_moderation.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_done.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_pending_moderation.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_rejected_moderation.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_reach_credit_usage_over_75_percent.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_reach_credit_usage_over_90_percent.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_reach_credit_usage_over_100_percent.template.xml
 		
 		Run deployment script:
 			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_notifications.php
