@@ -129,25 +129,21 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 
 	private function writeEntriesToCsv($entries)
 	{
-		$count =0;
 		foreach ($entries as $entry)
 		{
 			$csvEntryData = $this->getCsvData($entry);
 			fputcsv($this->handle, $csvEntryData, ",");
-			$count++;
 		}
-
-		return $count;
 	}
 
 	private function execDryRunInCSVMode($firstPage, KalturaScheduledTaskJobData $jobData)
 	{
 		$jobData->fileFormat = KalturaDryRunFileType::CSV;
-		$resultsCount = 0;
+		$resultsCount = count($firstPage->objects);
 		try
 		{
 			fputcsv($this->handle, $this->getCsvHeaders());
-			$resultsCount += $this->writeEntriesToCsv($firstPage->objects);
+			$this->writeEntriesToCsv($firstPage->objects);
 			$count = $resultsCount;
 			$this->updateFitler($firstPage->objects);
 			while($resultsCount < $this->maxResults && $count == 500)
@@ -157,7 +153,8 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 				$count = count($objects);
 				if ($count)
 				{
-					$resultsCount += $this->writeEntriesToCsv($objects);
+					$resultsCount += $count;
+					$this->writeEntriesToCsv($objects);
 					$this->updateFitler($results->objects);
 				}
 			}
