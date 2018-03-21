@@ -6,10 +6,15 @@
 
 class kClipConcatJobData extends kJobData
 {
-	/**$entryId
+	/**$destEntryId
 	 * @var string
 	 */
-	private $entryId;
+	private $destEntryId;
+
+	/**$tempEntryId
+	 * @var string
+	 */
+	private $tempEntryId;
 
 	/** $partnerId
 	 * @var int
@@ -30,17 +35,33 @@ class kClipConcatJobData extends kJobData
 	/**
 	 * @return string $entryId
 	 */
-	public function getEntryId()
+	public function getDestEntryId()
 	{
-		return $this->entryId;
+		return $this->destEntryId;
 	}
 
 	/**
 	 * @param string $entryId
 	 */
-	public function setEntryId($entryId)
+	public function setDestEntryId($entryId)
 	{
-		$this->entryId = $entryId;
+		$this->destEntryId = $entryId;
+	}
+
+	/**
+	 * @return string $entryId
+	 */
+	public function getTempEntryId()
+	{
+		return $this->tempEntryId;
+	}
+
+	/**
+	 * @param string $entryId
+	 */
+	public function setTempEntryId($entryId)
+	{
+		$this->tempEntryId = $entryId;
 	}
 
 	/**

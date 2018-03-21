@@ -9,10 +9,15 @@
 class KalturaClipConcatJobData extends KalturaJobData
 {
 
-	/**$entryId
+	/**$destEntryId
 	 * @var string
 	 */
-	private $entryId;
+	private $destEntryId;
+
+	/**$tempEntryId
+	 * @var string
+	 */
+	private $tempEntryId;
 
 	/** $partnerId
 	 * @var int
@@ -33,7 +38,8 @@ class KalturaClipConcatJobData extends KalturaJobData
 
 	private static $map_between_objects = array
 	(
-		'entryId',
+		'destEntryId',
+		'tempEntryId',
 		'partnerId',
 		'priority',
 		'operationAttributes'
