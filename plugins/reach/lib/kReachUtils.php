@@ -108,4 +108,13 @@ class kReachUtils
 		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);
 		return $remainingCredit >= 0 ? true : false;
 	}
+	
+	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version)
+	{
+		$existingTask = EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemIdAndEntryVersion($entryId, $catalogItemId, $partnerId, $version);
+		if(!$existingTask || in_array($existingTask->getStatus(), array(EntryVendorTaskStatus::ABORTED, EntryVendorTaskStatus::ERROR, EntryVendorTaskStatus::REJECTED)))
+			return false;
+		
+		return true;
+	}
 }
