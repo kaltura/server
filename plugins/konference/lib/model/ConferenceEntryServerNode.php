@@ -28,12 +28,6 @@ class ConferenceEntryServerNode extends EntryServerNode
 
 	public function buildRoomURL($partnerId = null)
 	{
-		$liveStreamEntry = entryPeer::retrieveByPK($this->getEntryId());
-		/** @var LiveStreamEntry $liveStreamEntry */
-		if (!$liveStreamEntry)
-		{
-			throw new kCoreException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->getEntryId());
-		}
 		$conferenceServerNode = ServerNodePeer::retrieveByPK($this->getServerNodeId());
 		if (!$conferenceServerNode)
 		{
@@ -49,7 +43,7 @@ class ConferenceEntryServerNode extends EntryServerNode
 
 		$hostname = $conferenceServerNode->getHostName();
 		$manager = kBroadcastUrlManager::getInstance($partnerId);
-		$url = $manager->getRTCBroadcastingUrl($liveStreamEntry, 'https', $hostname, $conferenceServerNode->getExternalPort());
+		$url = $manager->getRTCBroadcastingUrl('https', $hostname, $conferenceServerNode->getExternalPort());
 		return $url;
 	}
 

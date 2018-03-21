@@ -991,6 +991,4 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
 	}
 
-	public function setStreamPassword ( $v )	{	$this->putInCustomData ( "streamPassword" , $v );	}
-	public function getStreamPassword (  )		{	return $this->getFromCustomData( "streamPassword" );	}
 }

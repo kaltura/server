@@ -212,7 +212,7 @@ class kBroadcastUrlManager
 		}
 	}
 
-	public function getRTCBroadcastingUrl(LiveStreamEntry $entry, $protocol, $hostname, $externalPort)
+	public function getRTCBroadcastingUrl($protocol, $hostname, $externalPort)
 	{
 		if (!$hostname)
 		{
@@ -221,9 +221,6 @@ class kBroadcastUrlManager
 		$url = "$protocol://$hostname";
 		if ($externalPort)
 			$url .= ":$externalPort";
-		$url .= "/" . $entry->getId();
-		$paramsStr = http_build_query(array('t' => $entry->getStreamPassword(), 'entryId' => $entry->getId()));
-		$url .= "/$paramsStr";
 		return $url;
 
 	}

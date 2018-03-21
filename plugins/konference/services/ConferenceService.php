@@ -52,6 +52,13 @@ class ConferenceService extends KalturaBaseService {
 		if ($existingConfRoom)
 			return $existingConfRoom;
 
+		$liveStreamEntry = entryPeer::retrieveByPK($entryId);
+		/** @var LiveStreamEntry $liveStreamEntry */
+		if (!$liveStreamEntry)
+		{
+			throw new kCoreException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->getEntryId());
+		}
+
 		$serverNode = $this->findFreeServerNode();
 		$confEntryServerNode = new ConferenceEntryServerNode();
 		$confEntryServerNode->setEntryId($entryId);
@@ -61,15 +68,14 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode->setLastAllocationTime(time());
 		$confEntryServerNode->save();
 
-		$outObj = new KalturaRoomDetails();
-		$outObj->roomUrl = $confEntryServerNode->buildRoomUrl($this->getPartnerId());
+		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode);
 		return $outObj;
 	}
 
 
 	protected function findExistingConferenceRoom($entryId)
 	{
-		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
+		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		if ($existingConfRoom)
 		{
 			/**
@@ -84,9 +90,10 @@ class ConferenceService extends KalturaBaseService {
 				$serverNode->save();
 				return null;
 			}
+
 			$existingConfRoom->setLastAllocationTime(time());
-			$outObj = new KalturaRoomDetails();
-			$outObj->roomUrl = $existingConfRoom->buildRoomUrl($this->getPartnerId());
+
+			$outObj = $this->getRoomDetails($entryId, $existingConfRoom);
 			return $outObj;
 		}
 		return null;
@@ -184,6 +191,27 @@ class ConferenceService extends KalturaBaseService {
 		/** @var ConferenceEntryServerNode $confEntryServerNode */
 		$confEntryServerNode->incRegistered();
 		return true;
+	}
+
+	/**
+	 * @param $entryId
+	 * @param $confRoom
+	 * @return KalturaRoomDetails
+	 * @throws kCoreException
+	 */
+	protected function getRoomDetails($entryId, ConferenceEntryServerNode $confRoom)
+	{
+		$liveStreamEntry = entryPeer::retrieveByPK($entryId);
+		/** @var LiveStreamEntry $liveStreamEntry */
+		if (!$liveStreamEntry)
+		{
+			throw new kCoreException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->getEntryId());
+		}
+		$outObj = new KalturaRoomDetails();
+		$outObj->serverUrl = $confRoom->buildRoomUrl($this->getPartnerId());
+		$outObj->entryId = $entryId;
+		$outObj->token = $liveStreamEntry->getStreamPassword();
+		return $outObj;
 	}
 
 }
