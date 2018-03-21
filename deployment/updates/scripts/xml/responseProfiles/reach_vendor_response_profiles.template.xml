@@ -20,7 +20,7 @@
 				<type>1</type>
 				<name>reach_vendor</name>
 				<systemName>reach_vendor</systemName>
-				<fields>id,partnerId,vendorPartnerId,createdAt,updatedAt,queuedAt,finishedAt,entryId,status,reachProfileId,catalogItemId,price,userId,moderatingUser,errDescription,accessKey,notes</fields>
+				<fields>id,partnerId,vendorPartnerId,createdAt,entryId,status,reachProfileId,catalogItemId,accessKey,notes,dictionary</fields>
 				<relatedProfiles objectType="array">
 					<item objectType="KalturaDetachedResponseProfile">
 						<name>reach_vendor_catalog_item</name>
@@ -38,7 +38,7 @@
 					<item objectType="KalturaDetachedResponseProfile">
 						<name>reach_vendor_profile</name>
 						<type>2</type>
-						<fields>autoDisplayMachineCaptionsOnPlayer,autoDisplayHumanCaptionsOnPlayer,enableMetadataExtraction,enableSpeakerChangeIndication,enableAudioTags,enableProfanityRemoval,maxCharactersPerCaptionLine</fields>
+						<fields>id,partnerId,createdAt,updatedAt,status,profileType,rules,credit,usedCredit,dictionaries</fields>
 						<filter objectType="KalturaReachProfileFilter">
 						</filter>
 						<mappings objectType="array">
