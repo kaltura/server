@@ -127,6 +127,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$this->pager->pageSize = self::PAGE_SIZE;
 		$this->pager->pageIndex = 1;
 		$this->filter = $this->scheduledTaskProfile->objectFilter;
+		$this->filter->orderBy = '+createdAt';
 	}
 
 	private function writeEntriesToCsv($entries)
@@ -267,7 +268,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$lastResult = end($entries);
 		$this->filter->createdAtGreaterThanOrEqual = $lastResult->createdAt;
 		$idsToIgnore = ScheduledTaskBatchHelper::getEntriesIdWithSameCreateAtTime($entries, $lastResult->createdAt);
-		$this->filter->idNotIn = implode (", ", $idsToIgnore);
+		$this->filter->idNotIn = implode (',', $idsToIgnore);
 	}
 
 	/* (non-PHPdoc)
