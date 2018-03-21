@@ -165,9 +165,6 @@ class DataService extends KalturaEntryService
 		
 		header("Content-Disposition: attachment; filename=\"$fileName\"");
 
-
-
-		
 		if($local)
 		{
 			$filePath = $fileSync->getFullPath();
