@@ -6,6 +6,8 @@
 class KScheduledTaskDryRunner extends KJobHandlerWorker
 {
 	const SHARED_TEMP_PATH = "sharedTempPath";
+	const PAGE_SIZE = 500;
+	const MAX_RESULTS_THRESHOLD = 1000;
 
 	/**
 	 * @var string
@@ -33,7 +35,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	private $pager;
 
 	/**
-	 * @var kalturaFilter
+	 * @var KalturaBaseEntryFilter
 	 */
 	private $filter;
 
@@ -118,11 +120,11 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	{
 		$this->initRunFiles();
 		$profileId = $job->jobObjectId;
-		$this->maxResults = ($jobData->maxResults) ? $jobData->maxResults : 500;
+		$this->maxResults = ($jobData->maxResults) ? $jobData->maxResults : self::PAGE_SIZE;
 		$this->scheduledTaskProfile = $this->getScheduledTaskProfile($profileId);
 		$this->initClient($jobData, $this->scheduledTaskProfile->partnerId);
 		$this->pager = new KalturaFilterPager();
-		$this->pager->pageSize = 500;
+		$this->pager->pageSize = self::PAGE_SIZE;
 		$this->pager->pageIndex = 1;
 		$this->filter = $this->scheduledTaskProfile->objectFilter;
 	}
@@ -146,7 +148,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 			$this->writeEntriesToCsv($firstPage->objects);
 			$count = $resultsCount;
 			$this->updateFitler($firstPage->objects);
-			while($resultsCount < $this->maxResults && $count == 500)
+			while($resultsCount < $this->maxResults && $count == self::PAGE_SIZE)
 			{
 				$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
 				$objects = $results->objects;
@@ -155,7 +157,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 				{
 					$resultsCount += $count;
 					$this->writeEntriesToCsv($objects);
-					$this->updateFitler($results->objects);
+					$this->updateFitler($objects);
 				}
 			}
 		}
@@ -202,7 +204,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		{
 			$count = $resultsCount;
 			$this->updateFitler($firstPage->objects);
-			while($resultsCount < $this->maxResult && $count == 500)
+			while($resultsCount < $this->maxResults && $count == self::PAGE_SIZE)
 			{
 				$results = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
 				$count = count($results->objects);
@@ -235,7 +237,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	{
 		$this->initRunData($job, $jobData);
 		$firstPage = ScheduledTaskBatchHelper::query($this->client, $this->scheduledTaskProfile, $this->pager, $this->filter);
-		if($firstPage->totalCount > ScheduledTaskBatchHelper::MAX_RESULTS_THRESHOLD)
+		if($firstPage->totalCount > self::MAX_RESULTS_THRESHOLD && $this->maxResults > self::MAX_RESULTS_THRESHOLD)
 		{
 			$this->execDryRunInCSVMode($firstPage, $jobData);
 		}
@@ -253,7 +255,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$this->unimpersonate();
 		fclose($this->handle);
 		kFile::moveFile($this->tempFilePath, $this->sharedFilePath);
-		KalturaLog::info('Temp shared path: '.$this->tempPath);
+		KalturaLog::info('Temp shared path: '.$this->sharedFilePath);
 		$jobData->resultsFilePath = $this->sharedFilePath;
 	}
 

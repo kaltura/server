@@ -2,8 +2,6 @@
 
 class ScheduledTaskBatchHelper
 {
-	const MAX_RESULTS_THRESHOLD = 1000;
-
 	/**
 	 * @param KalturaClient $client
 	 * @param KalturaScheduledTaskProfile $scheduledTaskProfile
@@ -37,7 +35,6 @@ class ScheduledTaskBatchHelper
 				$result[] = $entry->id;
 		}
 
-		$result = array_column($result, 'id');
 		return $result;
 	}
 
