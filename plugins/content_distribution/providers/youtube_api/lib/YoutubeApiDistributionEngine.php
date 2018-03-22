@@ -65,7 +65,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			if (isset(KBatchBase::$taskConfig->params->youtubeApi->processedTimeout))
 				$this->processedTimeout = KBatchBase::$taskConfig->params->youtubeApi->processedTimeout;
 		}
-		
+
 		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');
 	}
 
@@ -290,7 +290,11 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
 				if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION)
 				{
-					$data->mediaFiles[] = $this->submitCaption($youtube, $captionInfo, $data->remoteId);
+					$ingestRemoteFile = $this->submitCaption($youtube, $captionInfo, $data->remoteId);
+					if($ingestRemoteFile)
+					{
+						$data->mediaFiles[] = $ingestRemoteFile;
+					}
 				}
 			}
 		}
@@ -348,13 +352,23 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
 			switch ($captionInfo->action){
 				case KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION:
-					$data->mediaFiles[] = $this->submitCaption($youtube, $captionInfo, $data->entryDistribution->remoteId);
+					$ingestRemoteFile = $this->submitCaption($youtube, $captionInfo, $data->entryDistribution->remoteId);
+					if($ingestRemoteFile)
+					{
+						$data->mediaFiles[] = $ingestRemoteFile;
+					}
 					break;
 				case KalturaYouTubeApiDistributionCaptionAction::UPDATE_ACTION:
-					$this->updateCaption($youtube, $captionInfo, $data->mediaFiles);
+					if(self::setCaptionRemoteId($captionInfo, $youtube, $data->entryDistribution->remoteId))
+					{
+						$this->updateCaption($youtube, $captionInfo, $data->mediaFiles);
+					}
 					break;
 				case KalturaYouTubeApiDistributionCaptionAction::DELETE_ACTION:
-					$this->deleteCaption($youtube, $captionInfo);
+					if(self::setCaptionRemoteId($captionInfo, $youtube, $data->entryDistribution->remoteId))
+					{
+						$this->deleteCaption($youtube, $captionInfo);
+					}
 					break;
 			}
 		}
@@ -466,21 +480,28 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$youtube->captions->delete($captionInfo->remoteId);
 	}
 	
-	protected function updateCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo, KalturaDistributionRemoteMediaFileArray &$mediaFiles)
+	protected function updateCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo, array &$mediaFiles)
 	{
 		$captionSnippet = new Google_Service_YouTube_CaptionSnippet();
 		$captionSnippet->setName($captionInfo->label);
 	
 		$caption = new Google_Service_YouTube_Caption();
-		$caption->setId($captionInfo->remoteId);
 		$caption->setSnippet($captionSnippet);
+		$caption->setId($captionInfo->remoteId);
 
 		$youtube->getClient()->setDefer(true);
 		$captionUpdateRequest = $youtube->captions->update('snippet', $caption);
 
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $captionUpdateRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
-		$media->setFileSize(filesize($captionInfo->filePath));
-		self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
+		$captionContentUrl = $this->getRemoteCaptionContentUrl($captionInfo->assetId);
+		if($captionContentUrl)
+		{
+			$this->uploadCaptionContent($media, $captionInfo, $captionContentUrl);
+		}
+		else
+		{
+			return;
+		}
 
 		$youtube->getClient()->setDefer(false);
 		
@@ -512,19 +533,15 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
 
-		if ($captionInfo->encryptionKey)
+		$captionContentUrl = $this->getRemoteCaptionContentUrl($captionInfo->assetId);
+		if($captionContentUrl)
 		{
-			$tempPath = KBatchBase::createTempClearFile($captionInfo->filePath, $captionInfo->encryptionKey);
-			$media->setFileSize(filesize($tempPath));
-			$ingestedCaption = self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
-			unlink($tempPath);
+			$ingestedCaption = $this->uploadCaptionContent($media, $captionInfo, $captionContentUrl);
 		}
-			else
+		else
 		{
-			$media->setFileSize(filesize($captionInfo->filePath));
-			$ingestedCaption = self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
+			return null;
 		}
-
 
 		$youtube->getClient()->setDefer(false);
 		
@@ -661,7 +678,47 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			}
 		}
 		return $ingestedVideo;
+	}
 
+	protected static function setCaptionRemoteId(KalturaYouTubeApiCaptionDistributionInfo &$captionInfo, Google_Service_YouTube $youtubeClient, $remoteVideoId)
+	{
+		$captionLanguage = $captionInfo->language;
+		try
+		{
+			/* @var $response Google_Service_YouTube_CaptionListResponse */
+			$remoteCaptions = $youtubeClient->captions->listCaptions('snippet', $remoteVideoId);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("remote captions unavailable - video id $remoteVideoId");
+			return null;
+		}
+		foreach($remoteCaptions as $remoteCaption)
+		{
+			if($captionLanguage == $remoteCaption['snippet']['language'])
+			{
+				$captionInfo->remoteId = $remoteCaption['id'];
+				return true;
+			}
+		}
+		KalturaLog::err("remote caption not found - language " . $captionInfo->language);
+		return false;
+	}
+
+	protected function uploadCaptionContent(&$media, $captionInfo, $captionContentUrl)
+	{
+		$ext = pathinfo($captionInfo->filePath, PATHINFO_EXTENSION);
+		$fileName = $captionInfo->assetId .".". $ext;
+		$tempPath = $this->putTempFile($fileName, $captionContentUrl, $this->getTempSubDirName());
+		$media->setFileSize(filesize($tempPath));
+		$ingestedCaption = self::uploadInChunks($media, $tempPath);
+		unlink($tempPath);
+		return $ingestedCaption;
+	}
+
+	private function getTempSubDirName()
+	{
+		return "youtube_api";
 	}
 
 
