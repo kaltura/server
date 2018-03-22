@@ -68,7 +68,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		try
 		{
 			if ($data->providerData->thumbAssetId)
-				$tempThumbFile = $this->getThumbAssetFile($data->providerData->thumbAssetId, $this->tempDirectory);
+				$tempThumbFile = $this->getAssetFile($data->providerData->thumbAssetId, $this->tempDirectory);
 			$data->remoteId = FacebookGraphSdkUtils::uploadVideo(
 				$this->appId,
 				$this->appSecret,
