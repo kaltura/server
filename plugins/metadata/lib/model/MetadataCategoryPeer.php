@@ -36,7 +36,7 @@ class MetadataCategoryPeer extends categoryPeer implements IMetadataPeer
     		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId(), array(PermissionName::CATEGORY_EDIT));
     		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
     		{
-    			KalturaLog::debug("Current user is not permitted to access categoru with id [$objectId]");
+    			KalturaLog::debug("Current user is not permitted to access category with id [$objectId]");
     			return false;
     		}
     	}
