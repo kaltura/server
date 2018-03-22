@@ -1,5 +1,14 @@
 # Mercury 13.16.0 #
 
+## Youtube api distribution timeout ##
+- Issue Type: Bug
+- Issue ID: supp-13294
+
+### Configuration ###
+Update batch.ini/workers.ini:
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeSubmit : KAsyncDistribute]
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeUpdate : KAsyncDistribute]
+
 ## Media repurposing dry run improvements ##
 - Issue Type: Bug
 - Issue ID: PLAT-8691
