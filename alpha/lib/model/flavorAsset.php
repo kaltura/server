@@ -328,15 +328,16 @@ class flavorAsset extends exportableAsset
 	protected function setLanguageFromFlavorParams()
 	{
 		$flavorParams = $this->getFlavorParams();
-		$multiStream = $flavorParams->getMultiStream();
-		if (isset($multiStream))
+		if ($flavorParams)
 		{
-			$multiStreamObj = json_decode($multiStream);
-			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
-			{
-				$flavorLang = $multiStreamObj->audio->languages[0];
-				$this->setLanguage($flavorLang);
-				return $flavorLang;
+			$multiStream = $flavorParams->getMultiStream();
+			if (isset($multiStream)) {
+				$multiStreamObj = json_decode($multiStream);
+				if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0) {
+					$flavorLang = $multiStreamObj->audio->languages[0];
+					$this->setLanguage($flavorLang);
+					return $flavorLang;
+				}
 			}
 		}
 		return null;
