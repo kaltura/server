@@ -12,6 +12,7 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_DC = "dc";
 	const CUSTOM_DATA_RECORDING_INFO = "recording_info";
 	const MAX_DURATIONS_TO_KEEP = 20;
+	const CUSTOM_DATA_IS_PLAYABLE_USER = "is_playable_user";
 
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
@@ -252,4 +253,14 @@ class LiveEntryServerNode extends EntryServerNode
 			array_unshift($existingRecordingInfoArr, $recordingInfo);
 	}
 
+
+	public function getIsPlayableUser()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_PLAYABLE_USER, null, true);
+	}
+
+	public function setIsPlayableUser($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_PLAYABLE_USER, $v);
+	}
 }

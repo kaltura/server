@@ -449,7 +449,7 @@
 			}
 		  }
 		},
-		"users_name" : {
+		"user_names" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_text",
 		  "fields": {

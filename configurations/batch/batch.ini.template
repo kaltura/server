@@ -206,6 +206,7 @@ type												= KAsyncExtractMedia
 scriptPath											= batches/ExtractMedia/KAsyncExtractMediaExe.php
 params.mediaInfoCmd									= @BIN_DIR@/mediainfo
 params.ffprobeCmd									= @BIN_DIR@/ffprobe
+params.ffmpegCmd                                                                        = @BIN_DIR@/ffmpeg
 ;The path for local temporary generated product
 params.localTempPath 								= @TMP_DIR@/convert
 ;The path for finished products, acessable from the apache
@@ -805,7 +806,7 @@ scriptPath											= batches/UsersCsv/kAsyncUsersCsvExe.php
 maximumExecutionTime			                    = 3600
 
 [KSyncReachCreditTaskRunner : PeriodicWorker]
-id													= 690
+id													= 700
 type												= KSyncReachCreditTaskRunner
 maximumExecutionTime								= 3600
 scriptPath											= ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
@@ -819,3 +820,4 @@ params.localTempPath                                = @TMP_DIR@/entryVendorTasks
 params.sharedTempPath                               = @WEB_DIR@/tmp/entryVendorTasksCsv
 scriptPath											= ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
 maximumExecutionTime			                    = 3600
+

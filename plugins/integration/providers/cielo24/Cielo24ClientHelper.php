@@ -27,6 +27,11 @@ class Cielo24ClientHelper
 															"replace_slang",
 															"remove_sound_references",
 															);
+
+	private static $performTranscriptionWhitelistedParams = array (
+															"priority",
+															"turnaround_time_hours",
+														);
 	 
 	
 	public function __construct($username, $password, $baseUrl = null, $additionalParams = array())
@@ -103,6 +108,19 @@ class Cielo24ClientHelper
 								"priority" => $priority,
 								"callback_url" => $callBackUrl
 								);
+
+		if (isset($this->additionalParams['perform_transcription']))
+		{
+			$additionalParameters = array ();
+			foreach ($this->additionalParams['perform_transcription'] as $key => $value)
+			{
+				if (in_array ($key, self::$performTranscriptionWhitelistedParams))
+					$additionalParameters[$key] = $value;
+			}
+
+			$requestParams = array_merge($requestParams, $additionalParameters);
+		}
+
 		$requestTransctiptAPIUrl = $this->createAPIUrl("job/perform_transcription", $requestParams);
 		$requestTranscriptionResult = $this->sendAPICall($requestTransctiptAPIUrl);
 		if(!$requestTranscriptionResult || !isset($requestTranscriptionResult->TaskId))

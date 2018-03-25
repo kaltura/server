@@ -21,6 +21,8 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	const FILE_SYNC_MEDIAINFO_XSL = 2;
 	
 	const DEFAULT_REPLACEMENT_OPTIONS = "defaultReplacementOptions";
+
+	const CUSTOM_DATA_DEFAULT_AUDIO_LANG = "default_audio_lang";
 	
 	private $xsl;
 	private $mediaInfoXsl;
@@ -376,5 +378,16 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	 */
 	public function getDefaultReplacementOptions() {return $this->getFromCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, null, 0);}
 	public function setDefaultReplacementOptions($v) {$this->putInCustomData(self::DEFAULT_REPLACEMENT_OPTIONS, $v);}
+
+	public function getDefaultAudioLang() {
+		$languageCode = $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_AUDIO_LANG);
+		$obj = languageCodeManager::getObjectFromTwoCode($languageCode);
+		return !is_null($obj) ? $obj[languageCodeManager::ISO639_B] : $languageCode;
+	}
+	public function setDefaultAudioLang($v) {
+		$key = languageCodeManager::getLanguageKey($v,$v);
+		$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_AUDIO_LANG, $key);
+	}
+
 
 }

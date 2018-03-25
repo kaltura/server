@@ -36,6 +36,15 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	 */
 	public $questionType;
 
+	/**
+	 * @var int
+	 */
+	public $presentationOrder;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $excludeFromScore;
 
 	public function __construct()
 	{
@@ -49,6 +58,8 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		"question" => "name",
 		"explanation",
 		"questionType",
+		"presentationOrder",
+		"excludeFromScore"
 	);
 
 	/* (non-PHPdoc)

@@ -13,7 +13,7 @@ class DistributionFieldConfig
     private $fieldName;
     
     /**
-     * A string that will be shown to the user as the field’s name in error messages related to the current field
+     * A string that will be shown to the user as the field's name in error messages related to the current field
      * @var string
      */
     private $userFriendlyFieldName;
@@ -31,6 +31,11 @@ class DistributionFieldConfig
      * @var DistributionFieldRequiredStatus
      */
     private $isRequired;
+
+	/**
+	 * @var string
+	 */
+	private $type;
     
     /**
      * Trigger distribution update when this field changes or not ?
@@ -114,10 +119,25 @@ class DistributionFieldConfig
 	}
 
 	/**
+	 * @return string $type
+	 */
+	public function getType() {
+		return $this->type;
+	}
+
+
+	/**
 	 * @param DistributionFieldRequiredStatus $isRequired
 	 */
 	public function setIsRequired($isRequired) {
 		$this->isRequired = $isRequired;
+	}
+
+	/**
+	 * @param string $type
+	 */
+	public function setType($type) {
+		$this->type = $type;
 	}
 
 	/**

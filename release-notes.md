@@ -1,6 +1,5 @@
-# Mercury 13.14.0 #
-
-## Reach In-House Support ##
+	
+# Reach In-House Support #
 - Issue Type: Feature
 - Issue ID: PLAT-7596
 
@@ -88,9 +87,126 @@
 #### Known Issues & Limitations ####
 
 	None.
+	
+# Mercury 13.16.0 #
 
+## Youtube api distribution timeout ##
+- Issue Type: Bug
+- Issue ID: supp-13294
+
+### Configuration ###
+Update batch.ini/workers.ini:
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeSubmit : KAsyncDistribute]
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeUpdate : KAsyncDistribute]
+
+## Media repurposing dry run improvements ##
+- Issue Type: Bug
+- Issue ID: PLAT-8691
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission
+
+## Add ability to set default audio language in live streams ##
+- Issue Type: New Feature
+- Issue ID: SUP-13373
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_12_allow_media_server_to_get_conversionprofile.php
+
+## Workers allocation for full-scale Chunked Encoding deployment ##
+- Issue Type: Configuration update 
+- Issue ID: NONE
+
+### Configuration ###
+- server-saas-config/configurations/batch/workers.ini
+- server-saas-config/configurations/batch/encoder.ini
+- https://github.com/kaltura/server-saas-config/compare/Mercury-13.16.0-CE-resources-allocation
+
+## Handle chunks split edge conditions ##
+- Issue Type: Support
+- Issue ID: SUP-13904
+
+### Configuration ###
+None.
+
+# Mercury 13.15.0 #
+
+## Entry added to category Firebase notification template ##
+- Issue Type: New Feature
+- Issue ID: PLAT-8645
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml
+
+## Update eSearch permissions ##
+
+- Issue Type: Task
+- Issue ID: PLAT-8618
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_28_update_esearch_permissions.php
+
+## Add new Drop Folder Type ##
+
+- Issue Type: New Feature
+- Issue ID: PSVAMB-2060
+
+### Configuration ###
+None. 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Taking a break with explicit-live feature breaks player playback ##
+
+- Issue Type: Support
+- Issue ID: PLAT-8554
+
+### Configuration ###
+None. 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_04_add_is_playable_user_configurations_KalturaLiveEntryServerNode.php
+
+# Mercury 13.14.0 #
+## Add Parameters to Recorded Entry replaced EMAIL template ##
+
+- Issue Type: Support
+- Issue ID: SUP-13536
+
+### Configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_RecordedEntryReplaced_emailNotification.template.xml
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
+
+## fix Add-Media-Entry ready email template ##
+
+- Issue Type: Support
+- Issue ID: SUP-13536
+
+### Configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2017_06_20_AddMediaEntryReadyTemplate.template.xml
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
+      	
 # Mercury 13.13.0 #
-
 ## Update File-Sync version field type ##
 
 - Issue Type: Task
@@ -173,7 +289,7 @@ None.
 ### Deployment scripts ###
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_23_getCsv_user_permissions.php
- 
+	
 # Mercury 13.12.0 #
 
 ## Split beacon index to index per object type ##

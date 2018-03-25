@@ -164,12 +164,14 @@ class DataService extends KalturaEntryService
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		
 		header("Content-Disposition: attachment; filename=\"$fileName\"");
-		
+
 		if($local)
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			return $this->dumpFile($filePath, $mimeType);
+			$key = $fileSync->isEncrypted() ? $fileSync->getEncryptionKey() : null;
+			$iv = $key ? $fileSync->getIv() : null;
+			return $this->dumpFile($filePath, $mimeType, $key, $iv);
 		}
 		else
 		{

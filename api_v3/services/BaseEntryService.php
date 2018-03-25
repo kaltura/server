@@ -901,9 +901,11 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	public function cloneAction( $entryId, $cloneOptions=null )
 	{
-		// Reset criteria filters such that it will be
-		entryPeer::setUseCriteriaFilter(false);
-		categoryEntryPeer::setUseCriteriaFilter(false);
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			entryPeer::setUseCriteriaFilter(false);
+			categoryEntryPeer::setUseCriteriaFilter(false);
+		}
 
 		// Get the entry
 		$coreEntry = entryPeer::retrieveByPK( $entryId );

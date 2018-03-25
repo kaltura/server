@@ -239,4 +239,16 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->additionalParameters = $additionalParameters;
 	}
+
+	/**
+	 * kVoicebaseJobProviderData constructor.
+	 * The VoiceBase job provider data must include the partner's additional params.
+	 */
+	public function __construct()
+	{
+		$partnerOptions = Cielo24Plugin::getPartnerCielo24Options(kCurrentContext::getCurrentPartnerId());
+
+		if($partnerOptions->defaultParams)
+			$this->setAdditionalParameters($partnerOptions->defaultParams);
+	}
 }

@@ -13,6 +13,7 @@ class kESearchNestedQuery extends kESearchCompoundQuery
 	const NAME_KEY = 'name';
 	const HIGHLIGHT_KEY = 'highlight';
 	const QUERY_KEY = 'query';
+	const SORT_KEY = 'sort';
 
 	/**
 	 * @var string
@@ -41,6 +42,11 @@ class kESearchNestedQuery extends kESearchCompoundQuery
 	
 
 	protected $query;
+
+	/**
+	 * @var array
+	 */
+	protected $sort;
 
 	/**
 	 * @return string
@@ -138,6 +144,22 @@ class kESearchNestedQuery extends kESearchCompoundQuery
 		$this->query = $query;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getSort()
+	{
+		return $this->sort;
+	}
+
+	/**
+	 * @param array $sort
+	 */
+	public function setSort($sort)
+	{
+		$this->sort = $sort;
+	}
+
 	public function getFinalQuery()
 	{
 		if(!$this->getQuery())
@@ -153,6 +175,9 @@ class kESearchNestedQuery extends kESearchCompoundQuery
 
 		if($this->getHighlight())
 			$query[self::NESTED_KEY][self::INNER_HITS_KEY][self::HIGHLIGHT_KEY] = $this->getHighlight();
+
+		if($this->getSort())
+			$query[self::NESTED_KEY][self::INNER_HITS_KEY][self::SORT_KEY] = $this->getSort();
 
 		return $query;
 	}

@@ -11,6 +11,8 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	const CUSTOM_DATA_CORRECT_ANSWER_KEYS = 'correctAnswerKeys';
 	const CUSTOM_DATA_EXPLANATION = 'explanation';
 	const CUSTOM_DATA_QUESTION_TYPE = 'questionType';
+	const CUSTOM_DATA_PRESENTATION_ORDER = 'presentationOrder';
+	const CUSTOM_DATA_EXCLUDE_FROM_SCORE = 'excludefromscore';
 
 	public function __construct()
 	{
@@ -40,12 +42,20 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 
 	public function getExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_EXPLANATION);}
 
+	public function getExcludeFromScore() {return $this->getFromCustomData(self::CUSTOM_DATA_EXCLUDE_FROM_SCORE, null, false);}
+
+	public function setExcludeFromScore($v) {return $this->putInCustomData(self::CUSTOM_DATA_EXCLUDE_FROM_SCORE, $v);}
+
 	/**
 	 * @param QuestionType $v
 	 */
 	public function setQuestionType($v) {$this->putInCustomData(self::CUSTOM_DATA_QUESTION_TYPE, $v);}
 
 	public function getQuestionType() {return $this->getFromCustomData(self::CUSTOM_DATA_QUESTION_TYPE);}
+
+	public function setPresentationOrder($v) {$this->putInCustomData(self::CUSTOM_DATA_PRESENTATION_ORDER, $v);}
+
+	public function getPresentationOrder() {return $this->getFromCustomData(self::CUSTOM_DATA_PRESENTATION_ORDER);}
 
 	public function getIsPublic()	{return true;}
 

@@ -64,21 +64,27 @@ class FacebookDistributionEngine extends DistributionEngine implements
 
 		$facebookMetadata = $this->convertToFacebookData($data->providerData->fieldValues, true);
 
+		$tempThumbFile = null;
 		try
 		{
+			if ($data->providerData->thumbAssetId)
+				$tempThumbFile = $this->getThumbAssetFile($data->providerData->thumbAssetId, $this->tempDirectory);
 			$data->remoteId = FacebookGraphSdkUtils::uploadVideo(
 				$this->appId,
 				$this->appSecret,
 				$data->distributionProfile->pageId,
 				$data->distributionProfile->pageAccessToken,
 				$videoPath,
-				$data->providerData->thumbAssetFilePath,
+				$tempThumbFile,
 				filesize($videoPath),
 				$this->tempDirectory,
 				$facebookMetadata);
+			unlink($tempThumbFile);
 		}
 		catch (Exception $e)
 		{
+			if (file_exists($tempThumbFile))
+				unlink($tempThumbFile);
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
 
@@ -185,12 +191,13 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		if (!$locale)
 			throw new Exception("Failed to find matching language for language ".$captionInfo->language." and there was no label available");
 
+		$captionAssetContent = $this->getCaptionContent($captionInfo->assetId);
 		FacebookGraphSdkUtils::uploadCaptions(
 			$this->appId,
 			$this->appSecret,
 			$distributionProfile->pageAccessToken,
 			$remoteId,
-			$captionInfo->filePath,
+			$captionAssetContent,
 			$locale,
 			$this->tempDirectory
 			);

@@ -223,7 +223,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return parent::save( $con );
 	}
 	
-	public function save(PropelPDO $con = null)
+	public function save(PropelPDO $con = null, $skipReload = false)
 	{
 		$is_new = false;
 		if ( $this->isNew() )
