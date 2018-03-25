@@ -39,9 +39,13 @@ class registerNotificationPostProcessor
 	{
 		$secret = kConf::get("push_server_secret");
 		$iv = kConf::get("push_server_secret_iv");
-	
-		$cipherData = KCryptoWrapper::encrypt_aes($data, $secret, $iv); 
-	
+		
+		// pad the rest of the block to suit Node crypto functions padding scheme (PKCS5)
+		$blocksize = 16;
+		$pad = $blocksize - (strlen($data) % $blocksize);
+		$data = $data . str_repeat(chr($pad), $pad);
+		
+		$cipherData = KCryptoWrapper::encrypt_aes($data, $secret, $iv);
 		return bin2hex($cipherData);
 	}
 	
