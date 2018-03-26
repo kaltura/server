@@ -147,14 +147,11 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	}
 
 	/**
-	 *
-	 *
 	 * @action requestDryRun
 	 * @param int $scheduledTaskProfileId
 	 * @param int $maxResults
 	 * @return int
-	 *
-	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
+	 * @throws KalturaAPIException
 	 */
 	public function requestDryRunAction($scheduledTaskProfileId, $maxResults = 500)
 	{
@@ -171,21 +168,70 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$referenceTime = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_REFERENCE_TIME);
 		if ($referenceTime)
 			$jobData->setReferenceTime($referenceTime);
-		$batchJob = $this->createScheduledTaskJob($dbScheduledTaskProfile, $jobData);
 
+		$batchJob = $this->createScheduledTaskJob($dbScheduledTaskProfile, $jobData);
 		return $batchJob->getId();
 	}
 
 	/**
-	 *
-	 *
 	 * @action getDryRunResults
 	 * @param int $requestId
 	 * @return KalturaObjectListResponse
-	 *
-	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
+	 * @throws KalturaAPIException
 	 */
 	public function getDryRunResultsAction($requestId)
+	{
+		$batchJob = $this->getScheduledTaskBatchJob($requestId);
+		/* @var $jobData kScheduledTaskJobData */
+		$jobData = $batchJob->getData();
+		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+		if($jobData->getFileFormat() == DryRunFileType::CSV)
+		{
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_RESULT_IS_TOO_BIG.$this->getDryRunResultUrl($requestId));
+		}
+
+		$data = kFileSyncUtils::file_get_contents($syncKey, true);
+		return unserialize($data);
+	}
+	
+	/**
+	 * Serves dry run results by its request id
+	 * @action serveDryRunResults
+	 * @param int $requestId
+	 * @return file
+	 * @throws KalturaAPIException
+	 */
+	public function serveDryRunResultsAction($requestId)
+	{
+		$batchJob = $this->getScheduledTaskBatchJob($requestId);
+		return $this->serveFile($batchJob, BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+	}
+
+	/**
+	 * Get a url to serve dry run result action
+	 * @param int $requestId
+	 * @return string
+	 */
+	private function getDryRunResultUrl($requestId)
+	{
+		$finalPath ='/api_v3/service/scheduledtask_scheduledtaskprofile/action/serveDryRunResults/requestId/';
+		$finalPath .="$requestId";
+		$ksObj = $this->getKs();
+		$ksStr = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$finalPath .= "/ks/".$ksStr;
+		$partnerId = $this->getPartnerId();
+		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+
+		return $downloadUrl;
+	}
+	
+	/**
+	 * @action getDryRunResults
+	 * @param int $requestId
+	 * @return BatchJob
+	 * @throws KalturaAPIException
+	 */
+	private function getScheduledTaskBatchJob($requestId)
 	{
 		$this->applyPartnerFilterForClass('BatchJob');
 		$batchJob = BatchJobPeer::retrieveByPK($requestId);
@@ -199,10 +245,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		if ($batchJob->getStatus() != KalturaBatchJobStatus::FINISHED)
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_NOT_READY);
 
-		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
-		$data = kFileSyncUtils::file_get_contents($syncKey, true);
-		$results = unserialize($data);
-		return $results;
+		return $batchJob;
 	}
 
 	/**
@@ -215,14 +258,12 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$scheduledTaskProfileId = $scheduledTaskProfile->getId();
 		$jobType = ScheduledTaskPlugin::getBatchJobTypeCoreValue(ScheduledTaskBatchType::SCHEDULED_TASK);
 		$objectType = ScheduledTaskPlugin::getBatchJobObjectTypeCoreValue(ScheduledTaskBatchJobObjectType::SCHEDULED_TASK_PROFILE);
-
 		KalturaLog::log("Creating scheduled task dry run job for profile [".$scheduledTaskProfileId."]");
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($scheduledTaskProfile->getPartnerId());
 		$batchJob->setObjectId($scheduledTaskProfileId);
 		$batchJob->setObjectType($objectType);
 		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
-
 		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType);
 
 		return $batchJob;

@@ -327,13 +327,14 @@ class DoubleClickFeed
 			$key = $fieldConfig->getUserFriendlyFieldName();
 			if (!$key)
 				continue;
-				
+
 			$value = isset($values[$fieldConfig->getFieldName()]) ? $values[$fieldConfig->getFieldName()] : '';
 			if (!$value)
 				continue;
-			
+
 			$keyvaluesElement = $this->doc->createElement('dfpvideo:keyvalues');
-			$keyvaluesElement->setAttribute('type', 'string');
+			$type = $fieldConfig->getType() != null ? $fieldConfig->getType() : 'string' ;
+			$keyvaluesElement->setAttribute('type', $type);
 			$keyvaluesElement->setAttribute('key', $key);
 			$keyvaluesElement->setAttribute('value', $value);
 			

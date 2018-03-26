@@ -17,7 +17,6 @@
 			$this->_srcDataSet = new KDLMediaDataSet();
 		}
 		public function __destruct() {
-			unset($this);
 		}
 
 		/* ----------------------

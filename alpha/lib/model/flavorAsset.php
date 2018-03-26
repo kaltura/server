@@ -324,4 +324,47 @@ class flavorAsset extends exportableAsset
 		$entry = $this->getentry();
 		return ($entry->getType() == entryType::DOCUMENT);
 	}
+
+	protected function setLanguageFromFlavorParams()
+	{
+		$flavorParams = $this->getFlavorParams();
+		if (!$flavorParams)
+			return null;
+		$multiStream = $flavorParams->getMultiStream();
+		if (isset($multiStream))
+		{
+			$multiStreamObj = json_decode($multiStream);
+			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
+			{
+				$flavorLang = $multiStreamObj->audio->languages[0];
+				$this->setLanguage($flavorLang);
+				return $flavorLang;
+			}
+		}
+		return null;
+	}
+
+	public function preSave(PropelPDO $con = null)
+	{
+		if ($this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID))
+		{
+			$flavorLang = $this->setLanguageFromFlavorParams();
+			if ($flavorLang)
+			{
+				$entry = $this->getentry();
+				if (!$entry)
+					throw new kCoreException("Invalid entry id [" . $this->getEntryId() . "]", APIErrors::INVALID_ENTRY_ID);
+				$conversionProfile = $entry->getconversionProfile2();
+				if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
+				{
+					$this->setDefault(true);
+				}
+
+			}
+
+		}
+		return parent::preSave($con);
+	}
+
+
 }
