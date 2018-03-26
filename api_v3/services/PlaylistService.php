@@ -393,6 +393,7 @@ class PlaylistService extends KalturaEntryService
 	
 	/**
 	 * Retrieve playlist statistics
+	 * @deprecated
 	 * @action getStatsFromContent
 	 * @param KalturaPlaylistType $playlistType
 	 * @param string $playlistContent
@@ -400,6 +401,8 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function getStatsFromContentAction( $playlistType , $playlistContent )
 	{
+		die;
+
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 	    
 		$dbPlaylist = new entry();
