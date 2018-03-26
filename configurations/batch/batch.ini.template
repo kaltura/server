@@ -206,6 +206,7 @@ type												= KAsyncExtractMedia
 scriptPath											= batches/ExtractMedia/KAsyncExtractMediaExe.php
 params.mediaInfoCmd									= @BIN_DIR@/mediainfo
 params.ffprobeCmd									= @BIN_DIR@/ffprobe
+params.ffmpegCmd                                                                        = @BIN_DIR@/ffmpeg
 ;The path for local temporary generated product
 params.localTempPath 								= @TMP_DIR@/convert
 ;The path for finished products, acessable from the apache

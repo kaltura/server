@@ -268,10 +268,12 @@ class kKavaLiveReportsMgr extends kKavaBase
 		
 		foreach ($fieldNames as $fieldName)
 		{
-			$dest[$fieldName] = $src[$fieldName];
+			$dest[$fieldName] = isset($src[$fieldName]) ? $src[$fieldName] : 0;
 		}
-		$dest[self::OUTPUT_BUFFER_TIME] = $src[self::OUTPUT_BUFFER_TIME] * 6;	// return in minutes
-		$dest[self::OUTPUT_SEC_VIEWED] = $src[self::METRIC_VIEW_COUNT] * self::VIEW_EVENT_INTERVAL;
+		$dest[self::OUTPUT_BUFFER_TIME] = isset($src[self::OUTPUT_BUFFER_TIME]) ? 
+			$src[self::OUTPUT_BUFFER_TIME] * 6 : 0;	// return in minutes
+		$dest[self::OUTPUT_SEC_VIEWED] = isset($src[self::METRIC_VIEW_COUNT]) ? 
+			$src[self::METRIC_VIEW_COUNT] * self::VIEW_EVENT_INTERVAL : 0;
 	}
 	
 	// reports
@@ -391,7 +393,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	public static function entryTimeline($partnerId, $filter, $limit)
+	public static function entryTimeline($partnerId, $filter)
 	{
 		$query = self::getBaseTimeseriesQuery(
 			$partnerId, 

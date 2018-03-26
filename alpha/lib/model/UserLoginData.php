@@ -276,7 +276,7 @@ class UserLoginData extends BaseUserLoginData{
 	{
 		$loginDataId = $this->getId();
 		$expiryTime = time() + (kConf::get('user_login_set_password_hash_key_validity')); // now + 24 hours
-		$random = sha1( mcrypt_create_iv(32,MCRYPT_DEV_URANDOM) );
+		$random = sha1(KCryptoWrapper::random_pseudo_bytes(32));
 		$hashKey = base64_encode(implode('|', array($loginDataId, $expiryTime, $random)));
 		return $hashKey;
 	}

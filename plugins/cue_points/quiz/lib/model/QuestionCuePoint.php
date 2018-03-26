@@ -12,6 +12,7 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	const CUSTOM_DATA_EXPLANATION = 'explanation';
 	const CUSTOM_DATA_QUESTION_TYPE = 'questionType';
 	const CUSTOM_DATA_PRESENTATION_ORDER = 'presentationOrder';
+	const CUSTOM_DATA_EXCLUDE_FROM_SCORE = 'excludefromscore';
 
 	public function __construct()
 	{
@@ -40,6 +41,10 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 	public function setExplanation($v) {return $this->putInCustomData(self::CUSTOM_DATA_EXPLANATION, $v);}
 
 	public function getExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_EXPLANATION);}
+
+	public function getExcludeFromScore() {return $this->getFromCustomData(self::CUSTOM_DATA_EXCLUDE_FROM_SCORE, null, false);}
+
+	public function setExcludeFromScore($v) {return $this->putInCustomData(self::CUSTOM_DATA_EXCLUDE_FROM_SCORE, $v);}
 
 	/**
 	 * @param QuestionType $v

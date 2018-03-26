@@ -50,7 +50,7 @@ class KalturaFrontController
 			'pid' => getmypid(),
 			'agent' => '"' . (isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : null) . '"',
 			'host' => (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname()),
-			'clientTag' => '"' . (isset($_REQUEST['clientTag']) ? $_REQUEST['clientTag'] : null) . '"',
+			'clientTag' => '"' . (isset($params['clientTag']) ? $params['clientTag'] : null) . '"',
 			'time' => $this->requestStart,
 			'service' => $service,
 			'action' => $action,

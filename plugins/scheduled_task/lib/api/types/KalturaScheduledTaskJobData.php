@@ -12,10 +12,19 @@ class KalturaScheduledTaskJobData extends KalturaJobData
 	public $maxResults;
 
 	/**
+	 * @var int
+	 */
+	public $totalCount;
+
+	/**
+	 * @var KalturaDryRunFileType
+	 */
+	public $fileFormat;
+
+	/**
 	 * @var string
 	 */
 	public $resultsFilePath;
-
 
 	/**
 	 * @var time
@@ -27,6 +36,8 @@ class KalturaScheduledTaskJobData extends KalturaJobData
 		'maxResults' ,
 		'resultsFilePath',
 		'referenceTime',
+		'totalCount',
+		'fileFormat'
 	);
 
 	public function getMapBetweenObjects ( )
