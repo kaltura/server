@@ -628,6 +628,65 @@ class kKavaReportsMgr extends kKavaBase
 				'transcoding mb' => self::METRIC_TRANSCODING_SIZE_MB,
 			),
 		),
+
+		myReportsMgr::REPORT_TYPE_VAR_USAGE => array(
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_DIMENSION_HEADERS => array('status', 'partner_name', 'partner_id', 'created_at'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => array('status', 'partner_name', 'created_at'),
+				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'peer' => 'PartnerPeer',
+					'columns' => array('STATUS', 'PARTNER_NAME', '@CREATED_AT'),
+				)),
+			self::REPORT_JOIN_GRAPHS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedUsageColumn',
+			self::REPORT_TABLE_MAP => array(
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
+				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
+				'added_storage' => self::METRIC_STORAGE_ADDED_MB,
+				'deleted_storage' => self::METRIC_STORAGE_DELETED_MB,
+				'combined_bandwidth_storage' => self::METRIC_BANDWIDTH_STORAGE_MB,
+				'transcoding_usage' => self::METRIC_TRANSCODING_SIZE_MB,
+			),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -2596,6 +2655,9 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function enrichData($report_def, $headers, $partner_id, &$data)
 	{
 		// get the enrichment specification
+		$dim_header = reset($report_def[self::REPORT_DIMENSION_HEADERS]);
+		$dim_index = array_search($dim_header, $headers);
+
 		$enrich_specs = array();
 		$enrich_defs = self::getEnrichDefs($report_def);
 		foreach ($enrich_defs as $enrich_def)
@@ -2623,23 +2685,25 @@ class kKavaReportsMgr extends kKavaBase
 		$start = 0;
 		while ($start < $rows_count)
 		{
+			// get the dimension values for the current chunk
 			$limit = min($start + self::ENRICH_CHUNK_SIZE, $rows_count);
-			$dimension_ids = array_map('reset', array_slice($data, $start, $limit - $start));
-		
+			$dimension_ids = array();
+			for ($current_row = $start; $current_row < $limit; $current_row++) 
+			{
+				$key = $data[$current_row][$dim_index];
+				$dimension_ids[$key] = true;
+			}
+			
+			// run the enrichment functions
 			foreach ($enrich_specs as $enrich_spec)
 			{
 				list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
-					
-				if (is_array($report_def[self::REPORT_DIMENSION]))
-				{
-					$dimension_ids = array_unique($dimension_ids);
-				}
 
-				$entities = call_user_func($enrich_func, $dimension_ids, $partner_id, $enrich_context);
+				$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
 		
 				for ($current_row = $start; $current_row < $limit; $current_row++) 
 				{
-					$key = reset($data[$current_row]);
+					$key = $data[$current_row][$dim_index];
 					$entity = isset($entities[$key]) ? $entities[$key] : null;
 					foreach ($enriched_indexes as $index => $enrich_field) 
 					{
@@ -2653,6 +2717,21 @@ class kKavaReportsMgr extends kKavaBase
 	}
 
 	/// table functions
+	protected static function getDateColumnName($interval)
+	{
+		switch ($interval)
+		{
+			case self::INTERVAL_DAYS:
+				return 'date_id';
+
+			case self::INTERVAL_MONTHS:
+				return 'month_id';
+
+			default:
+				return 'all';
+		}
+	}
+	
 	protected static function getMetricFromOrderBy($report_def, $order_by)
 	{
 		if (!$order_by)
@@ -2716,10 +2795,10 @@ class kKavaReportsMgr extends kKavaBase
 		return array(array_merge(array($date_column_name), $header), $data, count($data));
 	}
 
-	protected static function getTableFromKeyedGraphs($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
+	protected static function getTableFromKeyedGraphs($partner_id, $report_def, reportsInputFilter $input_filter, 
+		$page_size, $page_index, $object_ids)
 	{
 		// calculate the graphs
-		$input_filter->interval = self::INTERVAL_ALL;
 		$result = self::getKeyedJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 		if (!$result)
 		{
@@ -2728,24 +2807,52 @@ class kKavaReportsMgr extends kKavaBase
 		
 		// convert the result to a table
 		$metric_headers = array_keys(reset($result));
+		$date_headers = $input_filter->interval != self::INTERVAL_ALL ? 
+			array(self::getDateColumnName($input_filter->interval)) : 
+			array();
 		$headers = array_merge(
+			$date_headers,
 			$report_def[self::REPORT_DIMENSION_HEADERS], 
 			$metric_headers);
 		 
 		$dim_header_count = count($report_def[self::REPORT_DIMENSION_HEADERS]);
-		
+				
 		$data = array();
-		foreach ($result as $dim => $graphs)
+		if ($input_filter->interval != self::INTERVAL_ALL)
 		{
-			$row = array_fill(0, $dim_header_count, $dim);
-			foreach ($metric_headers as $header)
+			$first_graph = reset($result);
+			$dates = array_keys(reset($first_graph));
+
+			foreach ($dates as $date)
 			{
-				$row[] = isset($graphs[$header]) ? $graphs[$header] : 0;
+				foreach ($result as $dim => $graphs)
+				{
+					$row = array_merge(array($date), array_fill(0, $dim_header_count, $dim));
+					foreach ($metric_headers as $header)
+					{
+						$row[] = isset($graphs[$header][$date]) ? $graphs[$header][$date] : 0;
+					}
+					$data[] = $row;
+				}
 			}
-			$data[] = $row;
+		}
+		else
+		{
+			foreach ($result as $dim => $graphs)
+			{
+				$row = array_fill(0, $dim_header_count, $dim);
+				foreach ($metric_headers as $header)
+				{
+					$row[] = isset($graphs[$header]) ? $graphs[$header] : 0;
+				}
+				$data[] = $row;
+			}
 		}
 		
-		return array($headers, $data, count($data));
+		return array(
+			$headers, 
+			array_slice($data, ($page_index - 1) * $page_size, $page_size), 
+			count($data));
 	}
 
 	protected static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
@@ -3163,6 +3270,9 @@ class kKavaReportsMgr extends kKavaBase
 			reportsInputFilter $input_filter,
 			$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
+		// use interval=all, only relevant if the join includes graphs
+		$input_filter->interval = self::INTERVAL_ALL;
+		
 		$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
 	
 		// decide which report to run first, according to the order by
@@ -3322,20 +3432,33 @@ class kKavaReportsMgr extends kKavaBase
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = self::getTableFromGraphs($result, true, $input_filter->interval == self::INTERVAL_MONTHS ? 'month_id' : 'date_id');
+			$result = self::getTableFromGraphs($result, true, self::getDateColumnName($input_filter->interval));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
-			$result = self::getTableFromKeyedGraphs($partner_id, $report_def, $input_filter, $object_ids);
+			$result = self::getTableFromKeyedGraphs($partner_id, $report_def, $input_filter, 
+				$page_size, $page_index, $object_ids);
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{
-			$result = self::getJoinTableImpl($partner_id, $report_type, $report_def, $input_filter, $page_size, $page_index, $order_by, $object_ids, $flags);
+			$result = self::getJoinTableImpl($partner_id, $report_type, $report_def, $input_filter, 
+				$page_size, $page_index, $order_by, $object_ids, $flags);
 		}
 		else 
 		{
 			$result = self::getSimpleTableImpl($partner_id, $report_type, $report_def, $input_filter,
 				$page_size, $page_index, $order_by, $object_ids, $flags);
+		}
+		
+		// finalize / enrich
+		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
+		{
+			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result));
+		}
+		
+		if (isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
 		}
 		
 		return $result;
@@ -3421,22 +3544,14 @@ class kKavaReportsMgr extends kKavaBase
 		$result = self::getTableImpl($partner_id, $report_type, $report_def, $input_filter,
 			$page_size, $page_index, $order_by, $object_ids, $flags);
 	
-		// finalize / enrich
-		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
-		{
-			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result));
-		}
-		
-		if (isset($report_def[self::REPORT_ENRICH_DEF]))
-		{
-			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
-		}
-		
 		// reorder
 		if (isset($report_def[self::REPORT_TABLE_MAP]))
 		{
+			// Note: not using count($report_def[self::REPORT_DIMENSION_HEADERS]) since the table may also have a date id header
+			$last_dim_header = end($report_def[self::REPORT_DIMENSION_HEADERS]);
+			$dim_header_count = array_search($last_dim_header, $result[0]) + 1;
 			self::reorderTableColumns(
-				count($report_def[self::REPORT_DIMENSION_HEADERS]), 
+				$dim_header_count, 
 				$report_def[self::REPORT_TABLE_MAP], 
 				true,
 				$result);
