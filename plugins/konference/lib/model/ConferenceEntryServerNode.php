@@ -23,7 +23,7 @@ class ConferenceEntryServerNode extends EntryServerNode
 
 	public function validateEntryServerNode()
 	{
-		// TODO: Implement validateEntryServerNode() method.
+		return;
 	}
 
 	public function buildRoomURL($partnerId = null)

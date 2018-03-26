@@ -17,6 +17,7 @@ class ConferenceService extends KalturaBaseService {
 	 * @param string $entryId
 	 * @return KalturaRoomDetails
 	 * @throws KalturaAPIException
+	 * @beta
 	 */
 	public function allocateConferenceRoomAction($entryId)
 	{
@@ -142,6 +143,7 @@ class ConferenceService extends KalturaBaseService {
 	 * @param string $entryId
 	 * @return bool
 	 * @throws KalturaAPIException
+	 * @beta
 	 */
 	public function finishConfAction($entryId)
 	{
@@ -180,6 +182,8 @@ class ConferenceService extends KalturaBaseService {
 	 * @param string $entryId
 	 * @return bool
 	 * @throws KalturaAPIException
+	 * @beta
+	 *
 	 */
 	public function registerConfAction($entryId)
 	{

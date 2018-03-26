@@ -147,14 +147,4 @@ class ServerNodePeer extends BaseServerNodePeer {
 		return $objs;
 	}
 
-	public static function retrieveByHostname($hostname)
-	{
-		$criteria = new Criteria();
-		$criteria->add(ServerNodePeer::HOST_NAME, $hostname);
-
-		$v = ServerNodePeer::doSelect($criteria);
-		return !empty($v) > 0 ? $v[0] : null;
-
-	}
-
 } // ServerNodePeer
