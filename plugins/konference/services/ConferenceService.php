@@ -151,7 +151,7 @@ class ConferenceService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, KonferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
 		}
 		/** @var ConferenceEntryServerNode $confEntryServerNode */
-		if ($confEntryServerNode->getLastAllocationTime() < (time() - kConf::get('conf_not_finished_timeout')))
+		if ($confEntryServerNode->getLastAllocationTime() < (time() - kConf::get('conf_not_finished_timeout', 'local', 0)))
 		{
 			return false;
 		}
