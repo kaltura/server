@@ -313,7 +313,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array('entryCreated')),
+				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 		),
 			
 		myReportsMgr::REPORT_TYPE_CONTENT_CONTRIBUTIONS => array(
@@ -324,7 +324,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT_TOTAL, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array('entryCreated')),
+				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_SOURCE_TYPE,
 		),
 			
@@ -345,7 +345,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array('entryCreated')),
+				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 		),
 		
 		myReportsMgr::REPORT_TYPE_USER_USAGE => array(
@@ -878,8 +878,12 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::$aggregations_def[self::METRIC_ENTRIES_TOTAL] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_ENTRY_CREATED, 
-				self::EVENT_TYPE_ENTRY_DELETED)),
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_DELETE,
+			)),
 			self::getLongSumAggregator(self::METRIC_ENTRIES_TOTAL, self::METRIC_DELTA));
 		
 		self::$aggregations_def[self::METRIC_PLAYTHROUGH] = self::getFilteredAggregator(
@@ -941,8 +945,12 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::$aggregations_def[self::METRIC_DURATION_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_ENTRY_CREATED, 
-				self::EVENT_TYPE_ENTRY_DELETED)),
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_DELETE,
+			)),
 			self::getLongSumAggregator(self::METRIC_DURATION_SEC, self::METRIC_DURATION_SEC));
 		
 		self::$aggregations_def[self::METRIC_SIZE_ADDED_BYTES] = self::getFilteredAggregator(
@@ -961,19 +969,33 @@ class kKavaReportsMgr extends kKavaBase
 			self::getLongSumAggregator(self::METRIC_SIZE_DELETED_BYTES, self::METRIC_SIZE_BYTES));
 		
 		self::$aggregations_def[self::METRIC_DURATION_ADDED_SEC] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_CREATED),
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_ADD
+			)),
 			self::getLongSumAggregator(self::METRIC_DURATION_ADDED_SEC, self::METRIC_DURATION_SEC));
 		
 		self::$aggregations_def[self::METRIC_DURATION_DELETED_SEC] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_DELETED),
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_DELETE
+			)),
 			self::getLongSumAggregator(self::METRIC_DURATION_DELETED_SEC, self::METRIC_DURATION_SEC));
 		
 		self::$aggregations_def[self::METRIC_ENTRIES_ADDED] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_CREATED),
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_ADD
+			)),
 			self::getLongSumAggregator(self::METRIC_ENTRIES_ADDED, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_ENTRIES_DELETED] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_DELETED),
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_DELETE
+			)),
 			self::getLongSumAggregator(self::METRIC_ENTRIES_DELETED, self::METRIC_COUNT));
 				
 		// Note: metrics that have post aggregations are defined below, any metric that
@@ -3561,6 +3583,44 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	public static function getBaseTotal($partner_id, $report_type, reportsInputFilter $input_filter, $object_ids = null )
+	{
+		switch ($report_type)
+		{
+			case myReportsMgr::REPORT_TYPE_USER_USAGE:
+			case myReportsMgr::REPORT_TYPE_SPECIFIC_USER_USAGE:
+				break;		// handled outside the switch
+			
+			default:
+				throw new Exception("request for invalid report $report_type");
+		}
+		
+		self::init();
+		
+		$report_def = array(
+			self::REPORT_DIMENSION => self::DIMENSION_USER_ID, 
+			self::REPORT_JOIN_REPORTS => array(
+				// storage total
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+				),
+				
+				// entries total
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_METRICS => array(self::METRIC_ENTRIES_TOTAL, self::METRIC_DURATION_TOTAL_MSEC),
+				),
+			),
+		);
+		
+		list($headers, $data) = self::getTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
+		
+		return array_combine($headers, $data);
+	}
+	
 	/// custom report functions
 	public static function customReport($id, $params)
 	{
