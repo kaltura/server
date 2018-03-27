@@ -58,7 +58,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_KS_IGNORED = "/\\@ksIgnored/i";
 
-    const DOCCOMMENT_BETA = "/\\@beta/";
+    const DOCCOMMENT_BETA = "/\\@beta/i";
 
     const MIN_LENGTH_CONSTRAINT = "minLength";
     const MAX_LENGTH_CONSTRAINT = "maxLength";
@@ -228,7 +228,12 @@ class KalturaDocCommentParser
      * @var bool
      */
     public $ksNeeded = true;
-    
+
+    /**
+     * @var bool
+     */
+    public $beta = false;
+
     /**
      * Parse a docComment
      *
