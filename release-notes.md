@@ -1,4 +1,35 @@
+# Mercury 13.17.0 #
+
+## Remove use of partner 0 in sphinx queries ##
+- Issue Type: Task
+- Issue ID: PLAT-8311
+
+### Configuration ###
+-Added the following to local.ini in server-saas-config:
+[partner_0_static_playlists]
+0 = @PARTNER_0_STATIC_PLAYLIST1@
+1 = @PARTNER_0_STATIC_PLAYLIST2@
+
 # Mercury 13.16.0 #
+
+## Youtube api distribution timeout ##
+- Issue Type: Bug
+- Issue ID: supp-13294
+
+### Configuration ###
+Update batch.ini/workers.ini:
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeSubmit : KAsyncDistribute]
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeUpdate : KAsyncDistribute]
+
+## Media repurposing dry run improvements ##
+- Issue Type: Bug
+- Issue ID: PLAT-8691
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission
 
 ## Add ability to set default audio language in live streams ##
 - Issue Type: New Feature

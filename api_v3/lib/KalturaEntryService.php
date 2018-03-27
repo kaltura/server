@@ -12,17 +12,6 @@ class KalturaEntryService extends KalturaBaseService
 	  //amount of time for holding kLock
 	  const KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT = 7;
 	
-	/* (non-PHPdoc)
-	 * @see KalturaBaseService::globalPartnerAllowed()
-	 */
-	protected function globalPartnerAllowed($actionName)
-	{
-		if($actionName == 'get')
-			return true;
-		
-		return parent::globalPartnerAllowed($actionName);
-	}
-	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		$ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
