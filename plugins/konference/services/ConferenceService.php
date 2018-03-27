@@ -9,6 +9,17 @@
 class ConferenceService extends KalturaBaseService {
 	const CAN_REACH_EXPECTED_VALUE = 'kaltura';
 
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+		$partner = $this->getPartner();
+		if (!$partner->getEnableSelfServe())
+		{
+			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
+		}
+	}
+
+
 	/**
 	 * Allocates a conference room or returns ones that has already been allocated
 	 *

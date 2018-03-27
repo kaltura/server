@@ -375,6 +375,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $ottEnvironmentUrl;
 
+	/**
+	 * @var bool
+	 */
+	public $enableSelfServe;
 	
 	private static $map_between_objects = array
 	(
@@ -448,6 +452,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"publisherEnvironmentType",
 		"ovpEnvironmentUrl",
 		"ottEnvironmentUrl",
+		"enableSelfServe",
 	);
 
 	public function getMapBetweenObjects()

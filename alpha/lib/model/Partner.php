@@ -1903,4 +1903,14 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData( self::OTT_ENVIRONMENT_URL, $v );
 	}
+
+	public function getEnableSelfServe()
+	{
+		return $this->getFromCustomData("enable_self_serve", null, false);
+	}
+
+	public function setEnableSelfServe($v)
+	{
+		$this->putInCustomData( "enable_self_serve", $v );
+	}
 }
