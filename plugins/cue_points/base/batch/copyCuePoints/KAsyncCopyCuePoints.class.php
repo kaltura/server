@@ -57,7 +57,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	 */
 	private function copyCuePoint(KalturaBatchJob $job, KalturaCopyCuePointsJobData $data)
 	{
-
+		self::impersonate($job->partnerId);
 		$currentDuration = 0;
 		$totalCuePointNumber = 0;
 		/** @var KalturaCopyCuePointsJobData $data */
@@ -81,6 +81,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			$this->copyToDestEntry($data->destinationEntryId, $clipStartTime, $currentDuration, $cuePointList);
 			$currentDuration = $currentDuration + $clipDescription->duration;
 		}
+		self::unimpersonate();
 		return $this->closeJob($job, null, null,
 			"All Cue Point Copied ,total number of cue point $totalCuePointNumber",
 			KalturaBatchJobStatus::FINISHED);
