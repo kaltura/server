@@ -7,19 +7,11 @@ class ESearchUnifiedItem extends ESearchItem
 {
 
 	const UNIFIED = 'unified';
-	const KUSER_ID_THAT_DOESNT_EXIST = -1;
 
 	/**
 	 * @var string
 	 */
 	protected $searchTerm;
-
-	private static $entryItemUserFields = array(
-		ESearchEntryFieldName::CREATOR_ID,
-		ESearchEntryFieldName::ENTITLED_USER_EDIT,
-		ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
-		ESearchEntryFieldName::USER_ID,
-	);
 
 	/**
 	 * @return string
@@ -63,29 +55,13 @@ class ESearchUnifiedItem extends ESearchItem
 		$entryItems = array();
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
 		//Start handling entry fields
-		$fetchKuser = true;
-		$kuserId = self::KUSER_ID_THAT_DOESNT_EXIST;
 		foreach($entryAllowedFields as $fieldName => $fieldAllowedTypes)
 		{
 			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
 			{
 				$entryItem = new ESearchEntryItem();
 				$entryItem->setFieldName($fieldName);
-				$searchTerm = $eSearchUnifiedItem->getSearchTerm();
-
-				if(in_array($fieldName, self::$entryItemUserFields))
-				{
-					if($fetchKuser)
-					{
-						$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $eSearchUnifiedItem->getSearchTerm(), true);
-						if($kuser)
-							$kuserId = $kuser->getId();
-						$fetchKuser = false;
-					}
-					$searchTerm = $kuserId;
-				}
-
-				$entryItem->setSearchTerm($searchTerm);
+				$entryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$entryItem->setItemType($eSearchUnifiedItem->getItemType());
 				$entryItem->setAddHighlight($eSearchUnifiedItem->getAddHighlight());
 				if($eSearchUnifiedItem->getItemType() == ESearchItemType::RANGE)
