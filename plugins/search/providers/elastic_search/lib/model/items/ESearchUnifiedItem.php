@@ -64,7 +64,7 @@ class ESearchUnifiedItem extends ESearchItem
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
 		//Start handling entry fields
 		$fetchKuser = true;
-		$kuserId = null;
+		$kuserId = self::KUSER_ID_THAT_DOESNT_EXIST;
 		foreach($entryAllowedFields as $fieldName => $fieldAllowedTypes)
 		{
 			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
@@ -77,7 +77,6 @@ class ESearchUnifiedItem extends ESearchItem
 				{
 					if($fetchKuser)
 					{
-						$kuserId = self::KUSER_ID_THAT_DOESNT_EXIST;
 						$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $eSearchUnifiedItem->getSearchTerm(), true);
 						if($kuser)
 							$kuserId = $kuser->getId();
