@@ -49,4 +49,5 @@ interface BatchJobType extends BaseEnum
 	const SERVER_NODE_MONITOR  = 45;
 	const USERS_CSV  = 46;
 	const CLIP_CONCAT = 47;
+	const COPY_CUE_POINTS = 48;
 }

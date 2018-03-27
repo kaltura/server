@@ -19,7 +19,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		if ($dbBatchJob->getJobType() == BatchJobType::CONCAT)
+		if ($dbBatchJob->getJobType() == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED
+		&& $dbBatchJob->getRootJob() && $dbBatchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT)
+		{
+			self::handleConcatAfterClipJobFinished($dbBatchJob->getRootJob() , $dbBatchJob->getRootJob()->getData());
+		}
+		else if ($dbBatchJob->getJobType() == BatchJobType::CONCAT)
 		{
 			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
 		}
@@ -92,6 +97,39 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 
 		self::copyCuePointsFromLiveToVodEntry( $entry->getRecordedEntryId(), $data->getConcatenatedDuration(), $segmentDuration, $amfArray);
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kClipConcatJobData $data
+	 */
+	private static function handleConcatAfterClipJobFinished($dbBatchJob, $data)
+	{
+
+		/** @var kClipDescription[] $kClipDescriptionArray */
+		$kClipDescriptionArray = array();
+		KalturaLog::debug("Cue Point Destination Entry ID: " . $data->getDestEntryId());
+
+		foreach ($data->getOperationAttributes() as $operationAttribute)
+		{
+			$kClipDescription = new kClipDescription();
+			if (!$data->getSourceEntryId())
+			{
+				//if no source entry we will not copy the entry ID.
+				continue;
+			}
+			$kClipDescription->setSourceEntryId($data->getSourceEntryId());
+			$kClipDescription->setStartTime($operationAttribute->getOffset());
+			$kClipDescription->setDuration($operationAttribute->getDuration());
+			$kClipDescriptionArray[] = $kClipDescription;
+		}
+		$jobData = new kCopyCuePointsJobData();
+		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
+		$jobData->setDestinationEntryId($data->getDestEntryId());
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($data->getDestEntryId());
+		$batchJob->setPartnerId($data->getPartnerId());
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS);
 	}
 
 	private function handleExtractMediaFinished(BatchJob $dbBatchJob, kExtractMediaJobData $data)
@@ -283,8 +321,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED
 		&& $dbBatchJob->getRootJob() && $dbBatchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT)
 		{
-			//TODO: change to true...
-			return false;
+			return true;
 		}
 		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{

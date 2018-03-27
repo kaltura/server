@@ -16,6 +16,11 @@ class kClipConcatJobData extends kJobData
 	 */
 	private $tempEntryId;
 
+	/**sourceEntryId
+	 * @var string
+	 */
+	private $sourceEntryId;
+
 	/** $partnerId
 	 * @var int
 	 */
@@ -54,6 +59,22 @@ class kClipConcatJobData extends kJobData
 	public function getTempEntryId()
 	{
 		return $this->tempEntryId;
+	}
+
+	/**
+	 * @param string $sourceEntryId
+	 */
+	public function setSourceEntryId($sourceEntryId)
+	{
+		$this->sourceEntryId = $sourceEntryId;
+	}
+
+	/**
+	 * @return string $sourceEntryId
+	 */
+	public function getSourceEntryId()
+	{
+		return $this->sourceEntryId;
 	}
 
 	/**
@@ -113,6 +134,7 @@ class kClipConcatJobData extends kJobData
 	{
 		$this->operationAttributes = $operationAttributes;
 	}
+
 
 
 }

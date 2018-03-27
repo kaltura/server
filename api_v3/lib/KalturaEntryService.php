@@ -676,7 +676,8 @@ class KalturaEntryService extends KalturaBaseService
 		$operationAttributes = $resource->getOperationAttributes();
 		if ($clipManager->isClipServiceRequired($operationAttributes))
 		{
-			return $this->startClippingBatch( $resource,$dbEntry, $clipManager, $operationAttributes);
+			$this->startClippingBatch($resource,$dbEntry, $clipManager, $operationAttributes);
+			return $dbAsset;
 
 		}
 		else
@@ -1839,7 +1840,15 @@ class KalturaEntryService extends KalturaBaseService
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
 		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
-		$clipManager->createParentBatchJob($clipEntry,$dbEntry,$dbEntry->getPartnerId() , $operationAttributes);
+		$internalResource = $resource->getResource();
+		if ($internalResource instanceof  kFileSyncResource && $internalResource->getOriginEntryId())
+		{
+			$clipManager->createParentBatchJob($internalResource->getOriginEntryId(),$clipEntry, $dbEntry,$dbEntry->getPartnerId() , $operationAttributes);
+		}
+		else
+		{
+			$clipManager->createParentBatchJob(null,$clipEntry, $dbEntry,$dbEntry->getPartnerId() , $operationAttributes);
+		}
 		return $dbAsset;
 	}
 

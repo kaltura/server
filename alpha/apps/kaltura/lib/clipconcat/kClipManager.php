@@ -12,19 +12,21 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const CLIP_NUMBER = 'clipNumber';
 
 	/**
+	 * @param string $sourceEntryId
 	 * @param entry $clipEntry
 	 * @param entry $destEntry
 	 * @param $partnerId
 	 * @param array $operationAttributes
 	 * @param int $priority
 	 */
-	public function createParentBatchJob($clipEntry, $destEntry, $partnerId, array $operationAttributes, $priority = 0)
+	public function createParentBatchJob($sourceEntryId,$clipEntry, $destEntry, $partnerId, array $operationAttributes, $priority = 0)
 	{
 		$parentJob = new BatchJob();
 		$this->setDummyOriginalFlavorAssetReady($clipEntry->getId());
 		$jobData = new kClipConcatJobData();
 		$jobData->setDestEntryId($destEntry->getEntryId());
 		$jobData->setTempEntryId($clipEntry->getEntryId());
+		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority($priority);
 		$jobData->setOperationAttributes($operationAttributes);
@@ -382,6 +384,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$tempEntry->setName('TEMP_'.time());
 		$tempEntry->setPartnerId($partnerId);
 		$tempEntry->setStatus(entryStatus::NO_CONTENT);
+		$tempEntry->setDisplayInSearch(EntryDisplayInSearchType::SYSTEM);
 		$tempEntry->setSourceType(EntrySourceType::CLIP);
 		$tempEntry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($partnerId)->getId());
 		$tempEntry->save();
@@ -445,7 +448,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	private function concatDone(BatchJob $batchJob): void
+	private function concatDone(BatchJob $batchJob)
 	{
 		/** @var kConcatJobData $concatJobData */
 		$concatJobData = $batchJob->getParentJob()->getData();
