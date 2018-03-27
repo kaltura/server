@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 	
 # Reach In-House Support #
 - Issue Type: Feature
@@ -88,6 +89,20 @@
 
 	None.
 	
+=======
+# Mercury 13.17.0 #
+
+## Remove use of partner 0 in sphinx queries ##
+- Issue Type: Task
+- Issue ID: PLAT-8311
+
+### Configuration ###
+-Added the following to local.ini in server-saas-config:
+[partner_0_static_playlists]
+0 = @PARTNER_0_STATIC_PLAYLIST1@
+1 = @PARTNER_0_STATIC_PLAYLIST2@
+
+>>>>>>> Mercury-13.17.0
 # Mercury 13.16.0 #
 
 ## Youtube api distribution timeout ##
