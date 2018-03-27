@@ -2734,14 +2734,14 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		switch ($interval)
 		{
-			case self::INTERVAL_DAYS:
-				return 'date_id';
-
 			case self::INTERVAL_MONTHS:
 				return 'month_id';
 
-			default:
+			case self::INTERVAL_ALL:
 				return 'all';
+
+			default:
+				return 'date_id';
 		}
 	}
 	
@@ -3445,7 +3445,7 @@ class kKavaReportsMgr extends kKavaBase
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = self::getTableFromGraphs($result, true, $input_filter->interval == self::INTERVAL_MONTHS ? 'month_id' : 'date_id');
+			$result = self::getTableFromGraphs($result, true, self::getDateColumnName($input_filter->interval));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
