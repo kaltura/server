@@ -659,13 +659,12 @@ class KalturaEntryService extends KalturaBaseService
 	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
 
-
 		$errDescription = '';
-		$clipManager = new kClipManager();
 		$operationAttributes = $resource->getOperationAttributes();
-		if ($clipManager->isClipServiceRequired($operationAttributes))
+		if (kClipManager::isClipServiceRequired($operationAttributes))
 		{
-			$this->startClippingBatch($resource,$dbEntry, $clipManager, $operationAttributes);
+			$clipManager = new kClipManager();
+			$this->init($resource,$dbEntry, $clipManager, $operationAttributes);
 			return $dbAsset;
 
 		}
@@ -1822,9 +1821,8 @@ class KalturaEntryService extends KalturaBaseService
 	 * @throws Exception
 	 * @throws KalturaErrors
 	 */
-	protected function startClippingBatch($resource,entry $dbEntry, $clipManager, $operationAttributes)
+	protected function init($resource, entry $dbEntry, $clipManager, $operationAttributes)
 	{
-		$batchJob = null;
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
 		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());

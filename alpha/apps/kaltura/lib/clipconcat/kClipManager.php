@@ -91,7 +91,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param array $dynamicAttributes
 	 * @return bool is clip attribute exist in dynamic attribute
 	 */
-	public function isClipServiceRequired(array $dynamicAttributes)
+	public static function isClipServiceRequired(array $dynamicAttributes)
 	{
 		if (count($dynamicAttributes) <= 1)
 		{
@@ -207,7 +207,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$flavorAsset = $this->getNewAssetFromEntry($tempEntry);
 
-		kJobsManager::addConcatJob($batchJob, $flavorAsset, $files,true);
+		kJobsManager::addConcatJob($batchJob, $flavorAsset, $files,false);
 
 	}
 

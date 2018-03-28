@@ -45,7 +45,7 @@ class KalturaConcatJobData extends KalturaJobData
 	 * Should Sort the clip parts
 	 * @var bool
 	 */
-	public $sortNotNeeded;
+	public $shouldSort;
 
 	private static $map_between_objects = array
 	(

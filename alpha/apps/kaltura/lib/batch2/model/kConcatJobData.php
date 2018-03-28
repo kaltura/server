@@ -33,7 +33,7 @@ class kConcatJobData extends kJobData
 	/**
 	 * @var bool
 	 */
-	private $sortNotNeeded;
+	private $shouldSort;
 
 	/**
 	 * duration of the concated video
@@ -140,16 +140,16 @@ class kConcatJobData extends kJobData
 	/**
 	 * @return bool $sortNeeded
 	 */
-	public function getSortNotNeeded()
+	public function getShouldSort()
 	{
-		return $this->sortNotNeeded;
+		return $this->shouldSort;
 	}
 
 	/**
-	 * @param bool $sortNotNeeded
+	 * @param bool $shouldSort
 	 */
-	public function setSortNotNeeded($sortNotNeeded)
+	public function setShouldSort($shouldSort)
 	{
-		$this->sortNotNeeded = $sortNotNeeded;
+		$this->shouldSort = $shouldSort;
 	}
 }

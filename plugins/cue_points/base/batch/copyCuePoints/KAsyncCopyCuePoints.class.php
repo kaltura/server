@@ -67,17 +67,18 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			$sourceEntryId = $clipDescription->sourceEntryId;
 			$clipStartTime = $clipDescription->startTime;
 			$clipEndTime = $clipStartTime + $clipDescription->duration;
-			$cuePointCount = $this->getCuePointCount($sourceEntryId,$clipStartTime,$clipEndTime);
-			$totalCuePointNumber += $cuePointCount;
-			if ($cuePointCount == 0)
+			$cuePointList = $this->getCuePointListForEntry($sourceEntryId,$clipStartTime,$clipEndTime);
+			$count = count($cuePointList);
+			$totalCuePointNumber += $count;
+			if ($count == 0)
 			{
 				KalturaLog::info("clip ID: "."$clipDescription->sourceEntryId " . "has no cue point between 
 								 $clipStartTime and $clipEndTime");
 				$currentDuration = $currentDuration + $clipDescription->duration;
 				continue;
 			}
-			KalturaLog::info("Total count of cue-point to copy: " .$cuePointCount);
-			$cuePointList = $this->getCuePointListForEntry($sourceEntryId,$clipStartTime,$clipEndTime);
+			KalturaLog::info("Total count of cue-point to copy: " .$count);
+
 			$this->copyToDestEntry($data->destinationEntryId, $clipStartTime, $currentDuration, $cuePointList);
 			$currentDuration = $currentDuration + $clipDescription->duration;
 		}
@@ -86,20 +87,6 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			"All Cue Point Copied ,total number of cue point $totalCuePointNumber",
 			KalturaBatchJobStatus::FINISHED);
 
-	}
-
-
-	/**
-	 * @param $entryId
-	 * @param $currentSegmentEndTime
-	 * @param $endTime
-	 * @return int count
-	 */
-	private function getCuePointCount($entryId, $currentSegmentEndTime, $endTime)
-	{
-		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime, $endTime);
-		/** @noinspection PhpUndefinedFieldInspection */
-		return KBatchBase::$kClient->cuePoint->count($filter);
 	}
 
 	/**

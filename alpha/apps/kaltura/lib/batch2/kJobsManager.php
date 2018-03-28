@@ -1042,19 +1042,19 @@ class kJobsManager
 	 * @param BatchJob $parentJob
 	 * @param flavorAsset $asset
 	 * @param array $files
-	 * @param bool $sortNotNeeded
+	 * @param bool $shouldSort
 	 * @param null $offset
 	 * @param null $duration
 	 * @return BatchJob
 	 */
-	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $sortNotNeeded = false , $offset = null, $duration = null)
+	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true , $offset = null, $duration = null)
 	{
 		$jobData = new kConcatJobData();
  		$jobData->setSrcFiles($files);
 		$jobData->setFlavorAssetId($asset->getId());
 		$jobData->setOffset($offset);
 		$jobData->setDuration($duration);
-		$jobData->setSortNotNeeded($sortNotNeeded);
+		$jobData->setShouldSort($shouldSort);
 
  		$entry = $asset->getentry();
  		if($entry && $entry->getStatus() != entryStatus::READY)
