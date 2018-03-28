@@ -39,14 +39,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'disabled'		=> 'disabled',
 		));
 
-		$this->addElement('text', 'partnerId', array(
-			'label' 		=> 'Related Publisher ID:',
-			'required'		=> true,
-			'filters' 		=> array('StringTrim'),
-			'placement' => 'prepend',
-			'readonly'		=> 'true',
-		));
-
 		$this->addElement('text', 'vendorPartnerId', array(
 			'label' 		=> 'Vendor Partner ID:',
 			'required'		=> true,
