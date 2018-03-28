@@ -4,12 +4,6 @@
  * @subpackage copyCuePoints
  */
 
-/**
- * Clear cue points from live entries that were not marked as handled (cases were recording is off)
- *
- * @package Scheduler
- * @subpackage copyCuePointsConcat
- */
 class KAsyncCopyCuePoints extends KJobHandlerWorker
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
