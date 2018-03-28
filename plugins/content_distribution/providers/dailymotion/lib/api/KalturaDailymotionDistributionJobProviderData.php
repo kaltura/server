@@ -160,35 +160,33 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 			$assetType = $asset->getType ();
 			switch ($assetType) {
 				case CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ):
-					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
-						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
-						if ($captionInfo){
-							$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
-							$captionInfo->format = $this->getCaptionFormat($asset);
-							if ($captionInfo->language)
-								$this->captionsInfo [] = $captionInfo;
-							else
-								KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().']'); 
-						}
+					$captionInfo = $this->getCaptionInfo($asset, $distributionJobData);
+					if ($captionInfo)
+					{
+						$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
+						$captionInfo->format = $this->getCaptionFormat($asset);
+						if ($captionInfo->language)
+							$this->captionsInfo [] = $captionInfo;
+						else
+							KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().']');
 					}
+
 					break;
 				case AttachmentPlugin::getAssetTypeCoreValue ( AttachmentAssetType::ATTACHMENT ) :
-					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
-						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
-						if ($captionInfo){
-							//language code should be set in the attachments title
-							$captionInfo->language = $asset->getTitle();
-							$captionInfo->format = $this->getCaptionFormat($asset);
-							$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
-							//check if the language code exists 
-						    if($languageCodeReflector && $languageCodeReflector->getConstantName($captionInfo->language))
-								$this->captionsInfo [] = $captionInfo;
-							else
-								KalturaLog::err('The attachment ['.$asset->getId().'] has unrecognized language ['.$asset->getTitle().']'); 		    
-						}
+					$captionInfo = $this->getCaptionInfo($asset, $distributionJobData);
+					if ($captionInfo)
+					{
+						//language code should be set in the attachments title
+						$captionInfo->language = $asset->getTitle();
+						$captionInfo->format = $this->getCaptionFormat($asset);
+						$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
+						//check if the language code exists
+						if ($languageCodeReflector && $languageCodeReflector->getConstantName($captionInfo->language))
+							$this->captionsInfo [] = $captionInfo;
+						else
+							KalturaLog::err('The attachment [' . $asset->getId() . '] has unrecognized language [' . $asset->getTitle() . ']');
 					}
+
 					break;
 			}
 		}
@@ -206,9 +204,8 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 		return null;
 	}
 	
-	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData) {
+	private function getCaptionInfo($asset, KalturaDistributionJobData $distributionJobData) {
 		$captionInfo = new KalturaDailymotionDistributionCaptionInfo ();
-		$captionInfo->filePath = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
 		$captionInfo->assetId = $asset->getId();
 		$captionInfo->version = $asset->getVersion();
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */

@@ -81,8 +81,9 @@ class DailyMotionImpl
 		return self::$categoriesMap;
 	}
 	
-	public function uploadSubtitle($remoteVideoId, KalturaDailymotionDistributionCaptionInfo $captionInfo) {
-		$url = $this->api->uploadFile ( $captionInfo->filePath );
+	public function uploadSubtitle($remoteVideoId, KalturaDailymotionDistributionCaptionInfo $captionInfo, $filePath)
+	{
+		$url = $this->api->uploadFile ( $filePath );
 		$args = array ();
 		$args ['url'] = $url;
 		$args ['language'] = $captionInfo->language;
@@ -94,8 +95,9 @@ class DailyMotionImpl
 		return $response['id'];
 	}
 	
-	public function updateSubtitle($remoteSubtitleId, KalturaDailymotionDistributionCaptionInfo $captionInfo) {
-		$url = $this->api->uploadFile ( $captionInfo->filePath );
+	public function updateSubtitle($remoteSubtitleId, KalturaDailymotionDistributionCaptionInfo $captionInfo, $filePath)
+	{
+		$url = $this->api->uploadFile ( $filePath );
 		$args = array ();
 		$args ['url'] = $url;
 		$args ['language'] = $captionInfo->language;

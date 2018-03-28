@@ -10,12 +10,7 @@ class KalturaDailymotionDistributionCaptionInfo extends KalturaObject{
 	 * @var string
 	 */
 	public $language; 
-	
-	/**
-	 * @var string
-	 */
-	public $filePath;
-	
+
 	/**
 	 * @var string
 	 */

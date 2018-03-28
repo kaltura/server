@@ -251,10 +251,21 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 					$data->mediaFiles[] = $this->submitCaption($dailyMotionImpl,$captionInfo, $data->remoteId);
 					break;
 				case KalturaDailymotionDistributionCaptionAction::UPDATE_ACTION:
-					if (!file_exists($captionInfo->filePath ))
-						throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
-					$dailyMotionImpl->updateSubtitle($captionInfo->remoteId, $captionInfo);
-					$this->updateRemoteMediaFileVersion($data,$captionInfo);
+					$tempFile = $this->getAssetFile($captionInfo->assetId, $this->tempDirectory);
+					if (!file_exists($tempFile))
+						throw new KalturaDistributionException('The caption file was not found (probably not synced yet), the job will retry');
+					try
+					{
+						$dailyMotionImpl->updateSubtitle($captionInfo->remoteId, $captionInfo, $tempFile);
+						$this->updateRemoteMediaFileVersion($data, $captionInfo);
+					}
+					catch (Exception $e)
+					{
+						unlink($tempFile);
+						throw $e;
+					}
+
+					unlink($tempFile);
 					break;
 				case KalturaDailymotionDistributionCaptionAction::DELETE_ACTION:
 					$dailyMotionImpl->deleteSubtitle($captionInfo->remoteId);
@@ -336,11 +347,24 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		return $geoBlocking;
 	}
 	
-	private function submitCaption(DailymotionImpl $dailymotionImpl, $captionInfo, $remoteId) {
-		if (!file_exists($captionInfo->filePath ))
-			throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
+	private function submitCaption(DailymotionImpl $dailymotionImpl, $captionInfo, $remoteId)
+	{
+		$tempFile = $this->getAssetFile($captionInfo->assetId, $this->tempDirectory);
+		if (!$tempFile)
+			throw new KalturaDistributionException('The caption file was not found (probably not synced yet), the job will retry');
+
 		KalturaLog::info ( 'Submitting caption [' . $captionInfo->assetId . ']' );
-		$captionRemoteId = $dailymotionImpl->uploadSubtitle($remoteId, $captionInfo);
+		try
+		{
+			$captionRemoteId = $dailymotionImpl->uploadSubtitle($remoteId, $captionInfo, $tempFile);
+		}
+		catch (Exception $e)
+		{
+			unlink($tempFile);
+			throw $e;
+		}
+
+		unlink($tempFile);
 		return $this->getNewRemoteMediaFile ( $captionRemoteId, $captionInfo );
 	}
 	
