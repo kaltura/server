@@ -51,7 +51,7 @@
                 <td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
                 <td>
                     <select class="options"
-                            onchange="doAction(this.value, <?php echo $catalogItem->id; ?>, <?php echo $catalogItem->partnerId; ?>)">
+                            onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
                         <option value=""><?php echo $this->translate('Select Action'); ?></option>
                         <option value="configureCatalogItem"><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED): ?>

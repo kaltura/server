@@ -118,7 +118,6 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 			$this->handlePost($action, $form);
 		else
 		{
-			$form->getElement('partnerId')->setValue($partnerId);
 			$form->getElement('serviceFeature')->setValue($catalogItemType);
 		}
 		return $form;
