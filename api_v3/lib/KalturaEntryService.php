@@ -664,7 +664,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (kClipManager::isClipServiceRequired($operationAttributes))
 		{
 			$clipManager = new kClipManager();
-			$this->init($resource,$dbEntry, $clipManager, $operationAttributes);
+			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
 			return $dbAsset;
 
 		}
@@ -1821,23 +1821,16 @@ class KalturaEntryService extends KalturaBaseService
 	 * @throws Exception
 	 * @throws KalturaErrors
 	 */
-	protected function init($resource, entry $dbEntry, $clipManager, $operationAttributes)
+	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
 		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
-		$internalResource = $resource->getResource();
-		if ($internalResource instanceof  kFileSyncResource && $internalResource->getOriginEntryId())
-		{
-			$clipManager->createParentBatchJob($internalResource->getOriginEntryId(),$clipEntry, $dbEntry,$dbEntry->getPartnerId() , $operationAttributes);
-		}
-		else
-		{
-			$clipManager->createParentBatchJob(null,$clipEntry, $dbEntry,$dbEntry->getPartnerId() , $operationAttributes);
-		}
+		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
 		return $dbAsset;
 	}
+
 
 	/**
 	 * Set the default status to ready if other status filters are not specified

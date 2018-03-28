@@ -11,6 +11,27 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	const CLIP_NUMBER = 'clipNumber';
 
+	/***
+	 * @param array $dynamicAttributes
+	 * @return bool is clip attribute exist in dynamic attribute
+	 */
+	public static function isClipServiceRequired(array $dynamicAttributes)
+	{
+		if (count($dynamicAttributes) <= 1)
+		{
+			return false;
+		}
+
+		foreach ($dynamicAttributes as $value)
+		{
+			if ($value instanceof kClipAttributes)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @param string $sourceEntryId
 	 * @param entry $clipEntry
@@ -87,25 +108,21 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return false;
 	}
 
-	/***
-	 * @param array $dynamicAttributes
-	 * @return bool is clip attribute exist in dynamic attribute
+	/**
+	 * @param kOperationResource $resource
+	 * @param entry $dbEntry
+	 * @param $operationAttributes
+	 * @param $clipEntry
 	 */
-	public static function isClipServiceRequired(array $dynamicAttributes)
+	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry): void
 	{
-		if (count($dynamicAttributes) <= 1)
-		{
-			return false;
+		$internalResource = $resource->getResource();
+		if ($internalResource instanceof kFileSyncResource && $internalResource->getOriginEntryId()) {
+			$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry,
+													$dbEntry->getPartnerId(), $operationAttributes);
+		} else {
+			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
 		}
-
-		foreach ($dynamicAttributes as $value)
-		{
-			if ($value instanceof kClipAttributes)
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/***

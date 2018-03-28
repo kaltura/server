@@ -64,7 +64,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			$cuePointList = $this->getCuePointListForEntry($sourceEntryId,$clipStartTime,$clipEndTime);
 			$count = count($cuePointList);
 			$totalCuePointNumber += $count;
-			if ($count == 0)
+			if (!$count)
 			{
 				KalturaLog::info("clip ID: "."$clipDescription->sourceEntryId " . "has no cue point between 
 								 $clipStartTime and $clipEndTime");
