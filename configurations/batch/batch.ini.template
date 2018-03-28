@@ -82,6 +82,7 @@ enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncCopyPartner					= 1
+enabledWorkers.KAsyncCopyCuePoints                   = 1
 
 
 [Worker]
@@ -804,3 +805,9 @@ params.localTempPath                                = @TMP_DIR@/userscsv
 params.sharedTempPath                                   = @WEB_DIR@/tmp/userscsv
 scriptPath											= batches/UsersCsv/kAsyncUsersCsvExe.php
 maximumExecutionTime			                    = 3600
+
+[KAsyncCopyCuePoints : JobHandlerWorker]
+id                                                  = 700
+friendlyName                                        = Copy Cue Point
+type                                                = KAsyncCopyCuePoints
+scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
