@@ -115,7 +115,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 	const DAY_START_TIME = 'T00:00:00';
 	const DAY_END_TIME = 'T23:59:59';
-	const BASE_DATE_ID = '2017-01-01';	// the date from which to start aggragating usage data
+	const BASE_DATE_ID = '2013-12-01';	// the date from which to start aggragating usage data
 	
 	// limits
 	const MAX_RESULT_SIZE = 12000;
