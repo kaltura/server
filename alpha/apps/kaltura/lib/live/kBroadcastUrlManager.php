@@ -211,4 +211,17 @@ class kBroadcastUrlManager
 			return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $concatStreamName);
 		}
 	}
+
+	public function getRTCBroadcastingUrl($protocol, $hostname, $externalPort)
+	{
+		if (!$hostname)
+		{
+			return '';
+		}
+		$url = "$protocol://$hostname";
+		if ($externalPort)
+			$url .= ":$externalPort";
+		return $url;
+
+	}
 }
