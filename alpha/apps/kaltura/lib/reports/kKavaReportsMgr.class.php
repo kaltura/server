@@ -3629,7 +3629,12 @@ class kKavaReportsMgr extends kKavaBase
 			foreach ($metrics as $column)
 			{
 				$headers[] = self::$metrics_to_headers[$column];
-				$data[] = $row_data[$column];
+				$value = $row_data[$column];
+				if ($value == '-0')
+				{
+					$value = 0;
+				}
+				$data[] = $value;
 			}
 
 			foreach (self::$transform_metrics as $metric => $func)
