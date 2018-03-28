@@ -576,7 +576,12 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$actionElement->setAttribute('actionAlias', $actionInfo->actionAlias);
 			$actionElement->setAttribute('plugin', $pluginName);
 		}
-		
+
+		if ($actionInfo->beta)
+		{
+			$actionElement->setAttribute('beta', true);
+		}
+
 		foreach($actionInfo->errors as $error)
 		{
 			list($errorCode, $content, $errorClass) = $error;
