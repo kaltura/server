@@ -114,7 +114,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $operationAttributes
 	 * @param $clipEntry
 	 */
-	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry): void
+	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry)
 	{
 		$internalResource = $resource->getResource();
 		if ($internalResource instanceof kFileSyncResource && $internalResource->getOriginEntryId()) {
