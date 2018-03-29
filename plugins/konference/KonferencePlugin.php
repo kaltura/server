@@ -39,6 +39,8 @@ class KonferencePlugin extends KalturaPlugin implements IKalturaObjectLoader, IK
 	{
 		if($baseClass == 'KalturaServerNode' && $enumValue == self::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER))
 			return new KalturaConferenceServerNode();
+		if($baseClass == 'KalturaEntryServerNode' && $enumValue == self::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER))
+			return new KalturaConferenceEntryServerNode();
 
 	}
 	
