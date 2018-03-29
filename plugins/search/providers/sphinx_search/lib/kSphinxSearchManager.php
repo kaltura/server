@@ -442,7 +442,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		if (isset($map[$key]))
 		{
 			KalturaLog::log("Specific partner action to skip sphinx detected ($key). skipping sphinx.");
-			return false;
+			return true;
 		}
 
 		if(!kConf::get('exec_sphinx', 'local', 0))
