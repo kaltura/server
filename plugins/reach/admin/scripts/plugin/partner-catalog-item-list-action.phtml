@@ -165,7 +165,7 @@
 
 	function configureCatalogItems(partnerId, serviceFeature, serviceType, turnAroundTime, sourceLanguage, targetLanguage, vendorPartnerId)
 	{
-		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime + '/sourceLanguage/' + sourceLanguage + '/targetLanguage/'+targetLanguage+'/vendorPartnerId/'+vendorPartnerId +'/pageSize/10/page/1';
+		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime + '/sourceLanguage/' + sourceLanguage + '/targetLanguage/'+targetLanguage+'/vendorPartnerId/'+vendorPartnerId +'/page/1/pageSize/10';
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>' + paramsStr;
 
 		jQuery('#partner-catalog-item-configure-dialog').remove();
