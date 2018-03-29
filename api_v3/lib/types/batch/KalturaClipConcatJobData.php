@@ -14,11 +14,6 @@ class KalturaClipConcatJobData extends KalturaJobData
 	 */
 	public $destEntryId;
 
-	/**$destEntryId
-	 * @var string
-	 */
-	public $cuePointDestEntryId;
-
 	/**$tempEntryId
 	 * @var string
 	 */
@@ -53,8 +48,7 @@ class KalturaClipConcatJobData extends KalturaJobData
 		'partnerId',
 		'priority',
 		'operationAttributes',
-		'sourceEntryId',
-		'cuePointDestEntryId'
+		'sourceEntryId'
 	);
 
 	/* (non-PHPdoc)

@@ -46,8 +46,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$this->setDummyOriginalFlavorAssetReady($clipEntry->getId());
 		$jobData = new kClipConcatJobData();
 		$jobData->setDestEntryId($destEntry->getEntryId());
-		$cuePointsDestId = $destEntry->getFromCustomData('replacedEntryId') ? $destEntry->getFromCustomData('replacedEntryId') : $destEntry->getEntryId();
-		$jobData->setCuePointDestEntryId($cuePointsDestId);
 		$jobData->setTempEntryId($clipEntry->getEntryId());
 		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
