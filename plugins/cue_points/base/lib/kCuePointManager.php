@@ -108,7 +108,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 		/** @var kClipDescription[] $kClipDescriptionArray */
 		$kClipDescriptionArray = array();
-		KalturaLog::debug("Cue Point Destination Entry ID: " . $data->getDestEntryId());
+		KalturaLog::debug("Cue Point Destination Entry ID: " . $data->getCuePointDestEntryId());
 
 		foreach ($data->getOperationAttributes() as $operationAttribute)
 		{
@@ -125,9 +125,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 		$jobData = new kCopyCuePointsJobData();
 		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
-		$jobData->setDestinationEntryId($data->getDestEntryId());
+		$jobData->setDestinationEntryId($data->getCuePointDestEntryId());
 		$batchJob = new BatchJob();
-		$batchJob->setEntryId($data->getDestEntryId());
+		$batchJob->setEntryId($data->getCuePointDestEntryId());
 		$batchJob->setPartnerId($data->getPartnerId());
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS);
 	}

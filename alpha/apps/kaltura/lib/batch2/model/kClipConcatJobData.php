@@ -11,6 +11,11 @@ class kClipConcatJobData extends kJobData
 	 */
 	private $destEntryId;
 
+	/**$destEntryId
+	 * @var string
+	 */
+	private $cuePointDestEntryId;
+
 	/**$tempEntryId
 	 * @var string
 	 */
@@ -52,6 +57,23 @@ class kClipConcatJobData extends kJobData
 	{
 		$this->destEntryId = $entryId;
 	}
+
+	/**
+	 * @return string $cuePointDestEntryId
+	 */
+	public function getCuePointDestEntryId()
+	{
+		return $this->cuePointDestEntryId;
+	}
+
+	/**
+	 * @param string $cuePointDestEntryId
+	 */
+	public function setCuePointDestEntryId($cuePointDestEntryId)
+	{
+		$this->cuePointDestEntryId = $cuePointDestEntryId;
+	}
+
 
 	/**
 	 * @return string $entryId
@@ -134,7 +156,6 @@ class kClipConcatJobData extends kJobData
 	{
 		$this->operationAttributes = $operationAttributes;
 	}
-
 
 
 }

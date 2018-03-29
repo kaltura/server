@@ -132,7 +132,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			if ($clonedCuePoint) {
 				/** @noinspection PhpUndefinedFieldInspection */
 				$res = $this->updateStartTime($clonedCuePoint, $cuePointDestStartTime);
-				if (!KBatchBase::$kClient->isError($res))
+				if (KBatchBase::$kClient->isError($res))
 				{
 					KalturaLog::alert("Error during copy , of cuePoint $clonedCuePoint->id");
 				}
