@@ -47,6 +47,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData = new kClipConcatJobData();
 		$jobData->setDestEntryId($destEntry->getEntryId());
 		$jobData->setTempEntryId($clipEntry->getEntryId());
+		//if it is replace(Trim flow) active the copy to destenation consumers
+		if ($destEntry->getIsTemporary())
+		{
+			$destEntry->putInCustomData('clipConcatFlow','true');
+			$destEntry->save();
+		}
 		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority($priority);

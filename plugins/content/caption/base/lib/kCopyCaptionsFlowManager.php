@@ -42,8 +42,9 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	*/
 	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null) {
 		$clipAttributes = self::getClipAttributesFromEntry($replacingObject);
+		$clipConcatFlow = self::getClipConcatFlow($replacingObject);
 		//replacement as a result of trimming
-		if (!is_null($clipAttributes))
+		if (!is_null($clipAttributes) || $clipConcatFlow)
 		{
 			kEventsManager::setForceDeferredEvents(true);
 			$c = new Criteria();
@@ -194,4 +195,19 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 		}
 		return null;
 	}
+
+	/**
+	 * @param BaseObject $object
+	 * @return bool
+	 */
+	protected static function getClipConcatFlow( BaseObject $object ) {
+		if ( $object instanceof entry ) {
+			if ($object->getFromCustomData('clipConcatFlow')){
+				return true;
+			}
+		}
+		return false;
+	}
 }
+
+

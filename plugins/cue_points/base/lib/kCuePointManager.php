@@ -449,8 +449,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return true;
 		}
 		$clipAttributes = self::getClipAttributesFromEntry( $replacingObject );
+		$isClipConcatFlow = self::getClipConcatFlow( $replacingObject );
 		//replacement as a result of trimming
-		if ( !is_null($clipAttributes) ) {
+		if ( !is_null($clipAttributes) || $isClipConcatFlow ) {
 			kEventsManager::setForceDeferredEvents( true );
 			$this->deleteCuePoints($c);
 			//copy cuepoints from replacement entry
@@ -519,6 +520,19 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @param BaseObject $object
+	 * @return bool
+	 */
+	protected static function getClipConcatFlow( BaseObject $object ) {
+		if ( $object instanceof entry ) {
+			if ($object->getFromCustomData('clipConcatFlow')){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
