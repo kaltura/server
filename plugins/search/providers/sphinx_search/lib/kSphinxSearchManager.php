@@ -435,7 +435,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 
 		kSphinxQueryCache::invalidateQueryCache($object);
 
-		//Skip sphinx if partner action configured as skipped.
+		// Skip sphinx if partner action configured as skipped.
 		// key = pid_service_action eg - 2341115_thumbAsset_add
 		$key = kCurrentContext::$ks_partner_id . "_" . kCurrentContext::$service . "_" . kCurrentContext::$action;
 		if (in_array($key , kConf::get('partner_actions_to_skip_sphinx', 'local', array())))
