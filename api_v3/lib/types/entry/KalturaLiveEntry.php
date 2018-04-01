@@ -125,6 +125,13 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $recordingStatus;
 
+	/**
+	 * The time the last broadcast finished.
+	 * @var int
+	 * @readonly
+	 */
+	public $lastBroadcastEndTime;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -145,6 +152,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"explicitLive",
 		"viewMode",
 		"recordingStatus",
+		"lastBroadcastEndTime",
 	);
 	
 	/* (non-PHPdoc)

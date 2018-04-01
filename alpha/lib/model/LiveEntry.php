@@ -329,7 +329,7 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds, $format);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -340,7 +340,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
 	{
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
@@ -552,7 +552,7 @@ abstract class LiveEntry extends entry
 	public function setMediaServer($mediaServerIndex, $hostname, $liveEntryStatus, $applicationName = null)
 	{
 		/* @var $mediaServerNode MediaServerNode */
-		$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
+		$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname, null, null, $mediaServerIndex);
 		if (!$mediaServerNode)
 			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
 

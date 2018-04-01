@@ -5,16 +5,26 @@
  */
 class KalturaESearchUserResult extends KalturaESearchResult
 {
-    private static $map_between_objects = array();
+	/**
+	 * @var KalturaUser
+	 */
+	public $object;
 
-    protected function getMapBetweenObjects()
-    {
-        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-    }
+	private static $map_between_objects = array(
+		'object',
+	);
 
-	public function getAPIObject($srcObj)
+	protected function getMapBetweenObjects()
 	{
-		return new KalturaUser();
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$object = new KalturaUser();
+		$object->fromObject($srcObj->getObject());
+		$this->object = $object;
+		return parent::doFromObject($srcObj, $responseProfile);
 	}
 
 }

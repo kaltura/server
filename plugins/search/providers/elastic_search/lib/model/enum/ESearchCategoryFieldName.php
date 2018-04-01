@@ -5,6 +5,7 @@
  */ 
 interface ESearchCategoryFieldName extends BaseEnum
 {
+	const ID = '_id';
 	const PRIVACY = 'privacy';
 	const PRIVACY_CONTEXT = 'privacy_context';
 	const PRIVACY_CONTEXTS = 'privacy_contexts';
