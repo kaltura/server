@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage model.items
  */
-abstract class ESearchItem extends BaseObject
+abstract class ESearchItem extends BaseObject implements IESearchItem
 {
 	/**
 	 * @var array
@@ -114,8 +114,6 @@ abstract class ESearchItem extends BaseObject
 	{
 		return array();
 	}
-
-	abstract public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null);
 
 	abstract public function shouldAddLanguageSearch();
 
